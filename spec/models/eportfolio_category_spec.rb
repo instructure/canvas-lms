@@ -24,6 +24,41 @@ describe EportfolioCategory do
   let(:spam_status) { eportfolio.reload.spam_status }
   let(:category) { eportfolio.eportfolio_categories.create!(name: "my category") }
 
+  describe "validation" do
+    it "generates a URL-friendly slug" do
+      expect(category.slug).to eq "my-category"
+    end
+
+    it "recalculates the slug only if the name changes" do
+      cat = eportfolio.eportfolio_categories.create!(name: "Frog and Toad")
+      EportfolioCategory.where(id: cat).update_all(slug: "something-else")
+      cat.reload
+
+      cat.update! position: 10
+      expect(cat.reload.slug).to eq "something-else"
+
+      cat.update! name: "Toad and Frog"
+      expect(cat.reload.slug).to eq "toad-and-frog"
+    end
+
+    it "uniquifies the slug" do
+      category
+      dup = eportfolio.eportfolio_categories.create!(name: "my category")
+      expect(dup.slug).to eq "my-category_2"
+    end
+
+    it "generates a non-empty slug when given non-ASCII alphanumeric characters" do
+      cat = eportfolio.eportfolio_categories.create!(name: "ページ名")
+      expect(cat.slug).to eq "peziming"
+    end
+
+    it "generates a non-empty slug when given non-alphanumeric characters" do
+      expect(CanvasSlug).to receive(:generate).and_return("41fe")
+      cat = eportfolio.eportfolio_categories.create!(name: "☃")
+      expect(cat.slug).to eq "41fe"
+    end
+  end
+
   describe "callbacks" do
     describe "#check_for_spam" do
       context "when the setting has a value" do

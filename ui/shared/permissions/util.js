@@ -129,7 +129,7 @@ export function groupGranularPermissionsInRole(role) {
   const groups = {}
   const accountPermissionsByName = ENV.ACCOUNT_PERMISSIONS
     ? ENV.ACCOUNT_PERMISSIONS.find(
-        el => el.context_type && el.context_type === 'Account'
+        el => el.context_type && el.context_type === 'Account',
       ).group_permissions.map(perm => perm.permission_name)
     : null
   const courseRoleTypes = ENV.COURSE_ROLES

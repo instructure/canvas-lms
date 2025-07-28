@@ -46,6 +46,24 @@ module CanvasTextHelper
       truncated = truncated.split(word_separator)[0, options[:max_words]].join(word_separator)
     end
 
+    if options[:max_byte]
+      ellipsis = options[:ellipsis] || I18n.t("lib.text_helper.ellipsis")
+      ellipsis_size = ellipsis.bytesize
+      max_byte = options[:max_byte]
+
+      if truncated.bytesize > max_byte
+        max_byte -= ellipsis_size if ellipsis_size > 0
+        truncated = truncated.byteslice(0, max_byte).force_encoding("UTF-8")
+        unless truncated.valid_encoding?
+          # We might cut a character in half, so we need to find the last valid character
+          truncated = truncated.encode("UTF-8", invalid: :replace, undef: :replace, replace: "")
+        end
+        truncated += ellipsis
+      end
+
+      return truncated
+    end
+
     max_length = options[:max_length] || 30
     return truncated if truncated.length <= max_length
 
@@ -60,9 +78,7 @@ module CanvasTextHelper
   end
 
   def self.indent(text, spaces = 2)
-    text = text.to_s rescue ""
-    indentation = " " * spaces
-    text.gsub("\n", "\n#{indentation}")
+    text.to_s.gsub("\n", "\n#{" " * spaces}")
   end
 
   # CGI escape a string, truncating it without breaking apart UTF-8 characters or other escape sequences

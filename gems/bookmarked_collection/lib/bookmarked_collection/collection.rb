@@ -35,9 +35,7 @@ class BookmarkedCollection::Collection < Array
     [shift, bookmark]
   end
 
-  def bookmark_for(item)
-    @bookmarker.bookmark_for(item)
-  end
+  delegate :bookmark_for, to: :@bookmarker
 
   def leaf_bookmark_for(item)
     bookmark_for(item)
@@ -46,9 +44,7 @@ class BookmarkedCollection::Collection < Array
   attr_reader :current_bookmark
   attr_reader :next_bookmark
 
-  def validate(bookmark)
-    @bookmarker.validate(bookmark)
-  end
+  delegate :validate, to: :@bookmarker
 
   def current_bookmark=(bookmark)
     @current_bookmark = if bookmark.nil? || validate(bookmark)

@@ -21,7 +21,7 @@ import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   updateDiscussionTopicEntryCounts,
   updateDiscussionEntryRootEntryCounts,
@@ -31,10 +31,10 @@ import React, {useContext, useEffect, useState} from 'react'
 import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -86,8 +86,12 @@ export const DiscussionTopicRepliesContainer = props => {
     if (discussionEntriesToUpdate.size > 0 && !searchTerm) {
       const interval = setInterval(() => {
         const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
-          entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
+        const entries = JSON.parse(
+          JSON.stringify(
+            props.discussionTopic.discussionEntriesConnection.nodes.filter(
+              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false,
+            ),
+          ),
         )
         entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
@@ -128,7 +132,11 @@ export const DiscussionTopicRepliesContainer = props => {
   }
 
   return (
-    <View as="div" data-testid="discussion-root-entry-container">
+    <View
+      as="div"
+      padding="mediumSmall mediumSmall large mediumSmall"
+      data-testid="discussion-root-entry-container"
+    >
       {searchTerm && <SearchResultsCount resultsFound={props.discussionTopic.searchEntryCount} />}
       {props.discussionTopic.discussionEntriesConnection.nodes.map(thread => {
         return (
@@ -142,6 +150,7 @@ export const DiscussionTopicRepliesContainer = props => {
             highlightEntryId={props.highlightEntryId}
             setHighlightEntryId={props.setHighlightEntryId}
             userSplitScreenPreference={props.userSplitScreenPreference}
+            refetchDiscussionEntries={props.refetchDiscussionEntries}
           />
         )
       })}
@@ -150,7 +159,7 @@ export const DiscussionTopicRepliesContainer = props => {
           setPage={setPage}
           selectedPage={Math.ceil(
             atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) /
-              ENV.per_page
+              ENV.per_page,
           )}
           totalPages={props.discussionTopic.entriesTotalPages}
         />
@@ -167,6 +176,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   isSearchResults: PropTypes.bool,
   setHighlightEntryId: PropTypes.func,
   userSplitScreenPreference: PropTypes.bool,
+  refetchDiscussionEntries: PropTypes.func,
 }
 
 export default DiscussionTopicRepliesContainer

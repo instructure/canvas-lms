@@ -35,7 +35,7 @@ describe('OutcomesPopover', () => {
           canUnlink: false,
         },
       }),
-      {}
+      {},
     )
 
   const defaultProps = (numberToGenerate = 2) => ({
@@ -65,7 +65,7 @@ describe('OutcomesPopover', () => {
     expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
     expect(getByText('0 Outcomes Selected').closest('button')).toHaveAttribute(
       'aria-disabled',
-      'true'
+      'true',
     )
   })
 
@@ -97,7 +97,7 @@ describe('OutcomesPopover', () => {
       outcomeCount: 4,
     }
     const {findAllByText, getByRole} = render(
-      <OutcomesPopover {...props} onClearHandler={onClearHandlerMock} />
+      <OutcomesPopover {...props} onClearHandler={onClearHandlerMock} />,
     )
     const button = getByRole('button')
     fireEvent.click(button)

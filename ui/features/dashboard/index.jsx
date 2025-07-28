@@ -19,12 +19,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 import ready from '@instructure/ready'
 
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
-// eslint-disable-next-line import/no-named-as-default
+import DashboardWrapper from './react/DashboardWrapper'
+
 import DashboardHeader from './react/DashboardHeader'
 
 ready(() => {
@@ -32,20 +35,30 @@ ready(() => {
   if (dashboardHeaderContainer) {
     const dashboard_view = ENV.PREFERENCES.dashboard_view
 
-    ReactDOM.render(
-      <DashboardHeader
-        dashboard_view={dashboard_view}
-        allowElementaryDashboard={!!ENV.ALLOW_ELEMENTARY_DASHBOARD}
-        isElementaryUser={!!ENV.K5_USER}
-        planner_enabled={ENV.STUDENT_PLANNER_ENABLED}
-        flashError={$.flashError}
-        flashMessage={$.flashMessage}
-        screenReaderFlashMessage={$.screenReaderFlashMessage}
-        env={window.ENV}
-        {...$(dashboardHeaderContainer).data('props')}
-      />,
-      dashboardHeaderContainer
-    )
+    const dashcard_query_enabled = !!ENV?.FEATURES?.dashboard_graphql_integration
+
+    const dashboardProps = {
+      dashboard_view,
+      allowElementaryDashboard: !!ENV.ALLOW_ELEMENTARY_DASHBOARD,
+      isElementaryUser: !!ENV.K5_USER,
+      planner_enabled: ENV.STUDENT_PLANNER_ENABLED,
+      flashError: $.flashError,
+      flashMessage: $.flashMessage,
+      screenReaderFlashMessage: $.screenReaderFlashMessage,
+      env: window.ENV,
+      ...$(dashboardHeaderContainer).data('props'),
+    }
+
+    if (dashcard_query_enabled) {
+      ReactDOM.render(
+        <QueryClientProvider client={queryClient}>
+          <DashboardWrapper {...dashboardProps} />
+        </QueryClientProvider>,
+        dashboardHeaderContainer,
+      )
+    } else {
+      ReactDOM.render(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
+    }
   } else {
     // if we are on the root dashboard page, then we conditinally load the
     // stream items and initialize the backbone view in DashboardHeader

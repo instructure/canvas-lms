@@ -21,14 +21,13 @@ import addLinkRow from '../../jst/addLinkRow.handlebars'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.instructure_forms'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
-import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('user_profile')
+const I18n = createI18nScope('user_profile')
 
 export default class ProfileShow extends Backbone.View {
   static initClass() {
@@ -47,7 +46,7 @@ export default class ProfileShow extends Backbone.View {
   initialize() {
     super.initialize(...arguments)
     this.displayAlertOnSave()
-    return new AvatarWidget('.profile-link')
+    return new AvatarWidget('.profile-edit-link')
   }
 
   renderAlert(message, container, variant) {
@@ -61,7 +60,7 @@ export default class ProfileShow extends Backbone.View {
       >
         {message}
       </Alert>,
-      this.$el.find(container)[0]
+      this.$el.find(container)[0],
     )
   }
 
@@ -75,7 +74,7 @@ export default class ProfileShow extends Backbone.View {
       this.renderAlert(
         I18n.t('Profile has been saved successfully'),
         saveSuccessContainer,
-        'success'
+        'success',
       )
     } else if (saveFailedDiv.length > 0) {
       this.renderAlert(I18n.t('Profile save was unsuccessful'), saveFailedContainer, 'error')
@@ -101,7 +100,7 @@ export default class ProfileShow extends Backbone.View {
         $('.avatar').css('background-image', 'url()')
         link.remove()
       },
-      _data => $.flashError(I18n.t('Failed to remove the image, please try again.'))
+      _data => $.flashError(I18n.t('Failed to remove the image, please try again.')),
     )
   }
 
@@ -111,7 +110,7 @@ export default class ProfileShow extends Backbone.View {
     const result = await showConfirmationDialog({
       label: I18n.t('Report Profile Picture'),
       body: I18n.t(
-        'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.'
+        'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.',
       ),
     })
     if (!result) {
@@ -125,7 +124,7 @@ export default class ProfileShow extends Backbone.View {
         $.flashMessage(I18n.t('The profile picture has been reported.'))
         link.remove()
       },
-      _data => $.flashError(I18n.t('Failed to report the image, please try again.'))
+      _data => $.flashError(I18n.t('Failed to report the image, please try again.')),
     )
   }
 
@@ -214,12 +213,25 @@ export default class ProfileShow extends Backbone.View {
             return I18n.t('profile_bio_too_long', 'Bio is too long')
           }
         },
-        'link_urls[]': function (value) {
-          if (value && /\s/.test(value)) {
+        'link_urls[]': function (input) {
+          if (Array.isArray(input)) {
+            for (const url of input) {
+              if (url && /\s/.test(url)) {
+                return I18n.t('invalid_url', 'Invalid URL')
+              }
+            }
+          } else if (input && /\s/.test(input)) {
             return I18n.t('invalid_url', 'Invalid URL')
           }
         },
       },
+    }
+    if ($('input[name="user[short_name]"]').length > 0) {
+      validations['property_validations']['user[short_name]'] = function (value) {
+        if (!value || value.trim() === '') {
+          return I18n.t('user_short_name_required', 'Please add your full name')
+        }
+      }
     }
     if (!$(event.target).validateForm(validations)) {
       return event.preventDefault()

@@ -45,7 +45,7 @@ describe('DeveloperKeyScope', () => {
     expect(
       screen.getByRole('checkbox', {
         name: /disable scope/i,
-      })
+      }),
     ).toBeChecked()
   })
 
@@ -55,7 +55,7 @@ describe('DeveloperKeyScope', () => {
     expect(
       screen.getByRole('checkbox', {
         name: /enable scope/i,
-      })
+      }),
     ).not.toBeChecked()
   })
 

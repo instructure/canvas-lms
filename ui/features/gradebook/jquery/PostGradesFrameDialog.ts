@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -18,8 +17,6 @@
  */
 
 import $ from 'jquery'
-import type JQuery from 'jquery'
-// @ts-expect-error
 import postGradesFrameDialog from '../jst/PostGradesFrameDialog.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import 'jqueryui/dialog'
@@ -31,12 +28,8 @@ type PostGradesFrameDialogOptions = {
 
 export default class PostGradesFrameDialog {
   returnFocusTo?: HTMLElement
-
   baseUrl?: string
-
   $dialog: JQuery
-
-  $iframe
 
   constructor(options: PostGradesFrameDialogOptions) {
     this.open = this.open.bind(this)
@@ -56,10 +49,9 @@ export default class PostGradesFrameDialog {
     this.$dialog = $(
       postGradesFrameDialog({
         allowances: iframeAllowances(),
-      })
+      }),
     )
 
-    this.$iframe = this.$dialog.find('.post-grades-frame')
     this.$dialog.on('dialogopen', this.onDialogOpen)
     this.$dialog.on('dialogclose', this.onDialogClose)
     this.$dialog.dialog({
@@ -78,29 +70,6 @@ export default class PostGradesFrameDialog {
       zIndex: 1000,
     })
 
-    // list for focus/blur events
-    $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', e => {
-        const iframeWidth = this.$iframe.outerWidth(true)
-        const iframeHeight = this.$iframe.outerHeight(true)
-        this.$iframe.addClass('info_alert_outline')
-        this.$iframe.data('height-with-alert', iframeHeight)
-        $(e.target).children('div').first().removeClass('screenreader-only')
-        const alertHeight = $(e.target).outerHeight(true) || 0
-        this.$iframe
-          .css('height', iframeHeight - alertHeight - 4 + 'px')
-          .css('width', iframeWidth - 4 + 'px')
-        return this.$dialog.scrollLeft(0).scrollTop(0)
-      })
-      .on('blur', e => {
-        const iframeWidth = this.$iframe.outerWidth(true)
-        const iframeHeight = this.$iframe.data('height-with-alert')
-        this.$iframe.removeClass('info_alert_outline')
-        $(e.target).children('div').first().addClass('screenreader-only')
-        this.$iframe.css('height', iframeHeight + 'px').css('width', iframeWidth + 'px')
-        return this.$dialog.scrollLeft(0).scrollTop(0)
-      })
-
     // other init
     if (this.baseUrl) {
       this.$dialog.find('.post-grades-frame').attr('src', this.baseUrl)
@@ -115,8 +84,10 @@ export default class PostGradesFrameDialog {
     this.$dialog.dialog('close')
   }
 
+  // @ts-expect-error
   onDialogOpen(_event) {}
 
+  // @ts-expect-error
   onDialogClose(_event) {
     this.$dialog.dialog('destroy').remove()
     if (this.returnFocusTo) {

@@ -49,17 +49,17 @@ describe('ReplyInfo', () => {
   describe('desktop', () => {
     it('renders the expanded reply info text', () => {
       const container = setup({replyCount: 24, unreadCount: 5})
-      expect(container.getAllByText('24 Replies, 5 Unread').length).toBe(2)
+      expect(container.getAllByText('24 Replies, 5 Unread')).toHaveLength(2)
     })
 
     it('omits the unread count if there are no unread replies', () => {
       const container = setup({replyCount: 24, unreadCount: 0})
-      expect(container.getAllByText('24 Replies').length).toBe(2)
+      expect(container.getAllByText('24 Replies')).toHaveLength(2)
     })
 
     it('uses the singular tense of reply if there is only one reply', () => {
       const container = setup({replyCount: 1})
-      expect(container.getAllByText('1 Reply').length).toBe(2)
+      expect(container.getAllByText('1 Reply')).toHaveLength(2)
     })
   })
 
@@ -79,12 +79,12 @@ describe('ReplyInfo', () => {
 
     it('omits the unread count if there are no unread replies', () => {
       const container = setup({replyCount: 24, unreadCount: 0})
-      expect(container.getAllByText('24 Replies').length).toBe(2)
+      expect(container.getAllByText('24 Replies')).toHaveLength(2)
     })
 
     it('uses the singular tense of reply if there is only one reply', () => {
       const container = setup({replyCount: 1})
-      expect(container.getAllByText('1 Reply').length).toBe(2)
+      expect(container.getAllByText('1 Reply')).toHaveLength(2)
     })
   })
 })

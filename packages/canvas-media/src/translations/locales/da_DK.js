@@ -20,5 +20,4 @@ import formatMessage from '../../format-message'
 
 const locale = {}
 
-
 formatMessage.addLocale({'da-DK': locale})

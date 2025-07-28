@@ -22,15 +22,19 @@ RSpec.describe Lti::Registration do
   let(:account) { Account.create! }
 
   describe "validations" do
-    it { is_expected.to validate_length_of(:name).is_at_most(255) }
-    it { is_expected.to validate_length_of(:admin_nickname).is_at_most(255) }
-    it { is_expected.to validate_length_of(:vendor).is_at_most(255) }
-    it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to have_one(:ims_registration).class_name("Lti::IMS::Registration").with_foreign_key(:lti_registration_id) }
-    it { is_expected.to have_one(:developer_key).class_name("DeveloperKey").inverse_of(:lti_registration).with_foreign_key(:lti_registration_id) }
-    it { is_expected.to belong_to(:created_by).class_name("User").optional(true) }
-    it { is_expected.to belong_to(:updated_by).class_name("User").optional(true) }
-    it { is_expected.to have_many(:lti_registration_account_bindings).class_name("Lti::RegistrationAccountBinding") }
+    subject { registration.valid? }
+
+    let(:registration) { described_class.new(account: Account.new, name: "Test Registration") }
+
+    it "doesn't let the description be too long" do
+      registration.description = "a" * 2049
+      expect(subject).to be false
+    end
+
+    it "doesn't require a description" do
+      registration.description = nil
+      expect(subject).to be true
+    end
   end
 
   describe "#lti_version" do
@@ -63,10 +67,10 @@ RSpec.describe Lti::Registration do
     end
   end
 
-  describe "#configuration" do
-    subject { registration.configuration }
+  describe "#internal_lti_configuration" do
+    subject { registration.internal_lti_configuration(context: account) }
 
-    let(:registration) { lti_registration_model }
+    let(:registration) { lti_registration_model(account:) }
 
     context "when ims_registration is present" do
       let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
@@ -75,15 +79,233 @@ RSpec.describe Lti::Registration do
         ims_registration # instantiate before test runs
       end
 
-      it "returns the registration_configuration" do
-        expect(subject).to eq(ims_registration.registration_configuration)
+      it "returns the internal_lti_configuration" do
+        expect(subject).to eq(ims_registration.internal_lti_configuration)
+      end
+
+      context "when the ims_registration has an overlay on itself" do
+        let(:icon_url) { "https://example.com/icon.png" }
+
+        before do
+          ims_registration.lti_tool_configuration["messages"][0]["placements"] << "course_navigation"
+          ims_registration.registration_overlay = {
+            "privacy_level" => "email_only",
+            "disabledScopes" => [TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE],
+            "disabledPlacements" => ["course_navigation"],
+            "placements" => [
+              {
+                "type" => "course_navigation",
+                "default" => "disabled",
+              },
+              {
+                "type" => "global_navigation",
+                "iconUrl" => icon_url,
+              }
+            ]
+          }
+          ims_registration.save!
+        end
+
+        it "returns the configuration with the overlay applied" do
+          config = subject
+          expect(config["privacy_level"]).to eq("email_only")
+          expect(config["scopes"]).not_to include(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
+          expect(config["placements"].find { |p| p["placement"] == "course_navigation" }).to include("default" => "disabled", "enabled" => false)
+        end
+
+        it "only overlays allowed properties for Dyn Reg" do
+          overlay = ims_registration.registration_overlay
+          overlay["custom_fields"] = { "foo" => "bar" }
+          # Avoid validation callbacks to simulate invalid data, like might
+          # be in production.
+          ims_registration.update_column(:registration_overlay, overlay)
+
+          expect(subject["custom_fields"]).not_to eq({ "foo" => "bar" })
+        end
+      end
+
+      context "when an Lti::Overlay is present" do
+        let(:data) do
+          {
+            scopes: [TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],
+            title: "A Better Title",
+            privacy_level: "anonymous",
+            disabled_scopes: [TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE],
+            placements: {
+              global_navigation: {
+                icon_url: "https://example.com/icon.png",
+                text: "A Better Title",
+                message_type: "LtiDeepLinkingRequest"
+              }
+            }
+
+          }
+        end
+        let(:overlay) do
+          Lti::Overlay.create!(account:,
+                               registration: ims_registration.lti_registration,
+                               updated_by: user,
+                               data:)
+        end
+
+        it "returns the configuration with the overlay applied" do
+          overlay
+          config = subject
+
+          expect(config["privacy_level"]).to eq("anonymous")
+          expect(config["title"]).to eq("A Better Title")
+          expect(config["scopes"]).not_to include(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
+          global_nav_config = config["placements"].find { |p| p["placement"] == "global_navigation" }
+
+          expect(global_nav_config["icon_url"]).to eq("https://example.com/icon.png")
+          expect(global_nav_config["text"]).to eq("A Better Title")
+        end
       end
     end
 
-    context "when ims_registration is not present" do
-      # this will change when manual 1.3 and 1.1 registrations are supported
+    context "when tool_configuration is present" do
+      let(:developer_key) { lti_developer_key_model(account:) }
+      let(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+
+      before { tool_configuration }
+
+      it "returns the manual_configuration" do
+        expect(subject).to eq(tool_configuration.internal_lti_configuration.with_indifferent_access)
+      end
+
+      context "when an Lti::Overlay is present" do
+        let(:data) do
+          {
+            title: "A Better Title",
+            privacy_level: "anonymous",
+            placements: {
+              global_navigation: {
+                target_link_uri: "https://example.com/launch?placement=global_navigation",
+                icon_url: "https://example.com/icon.png",
+                title: "A Better Title",
+                message_type: "LtiDeepLinkingRequest"
+              },
+              module_index_menu_modal: {
+                target_link_uri: "https://example.com/launch?placement=module_index_menu_modal",
+                icon_url: "https://example.com/icon.png",
+                title: "A Better Title",
+                message_type: "LtiDeepLinkingRequest"
+              }
+            }
+          }
+        end
+        let(:overlay) do
+          Lti::Overlay.create!(account:,
+                               registration:,
+                               updated_by: user,
+                               data:)
+        end
+
+        it "overlays all fields on top of the configuration" do
+          overlay
+
+          expect(subject["privacy_level"]).to eq("anonymous")
+          expect(subject["title"]).to eq("A Better Title")
+          global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
+          module_config = subject["placements"].find { |p| p["placement"] == "module_index_menu_modal" }
+
+          expect(global_nav_config).to include("target_link_uri" => "https://example.com/launch?placement=global_navigation",
+                                               "icon_url" => "https://example.com/icon.png",
+                                               "title" => "A Better Title",
+                                               "message_type" => "LtiDeepLinkingRequest")
+          expect(module_config).to include("target_link_uri" => "https://example.com/launch?placement=module_index_menu_modal",
+                                           "icon_url" => "https://example.com/icon.png",
+                                           "title" => "A Better Title",
+                                           "message_type" => "LtiDeepLinkingRequest")
+        end
+
+        context "with include_overlay: false" do
+          subject { registration.internal_lti_configuration(context: account, include_overlay: false) }
+
+          it "does not overlay fields on top of configuration" do
+            overlay
+
+            expect(subject["privacy_level"]).not_to eq("anonymous")
+            expect(subject["title"]).not_to eq("A Better Title")
+          end
+        end
+      end
+    end
+
+    context "when neither ims_registration nor manual_configuration is present" do
+      # this will change when and 1.1 registrations are supported
       it "is empty" do
         expect(subject).to eq({})
+      end
+    end
+  end
+
+  describe "#deployment_configuration" do
+    subject { registration.deployment_configuration(context: account) }
+
+    shared_examples_for "doesn't remove disabled placements" do
+      it "doesn't remove disabled placements from the configuration" do
+        expect(subject.dig("settings", "global_navigation")).to be_present
+        expect(subject.dig("settings", "global_navigation", "enabled")).to be(false)
+      end
+    end
+
+    let_once(:registration) { lti_registration_model(account:) }
+
+    context "the registration is associated with a manual registration" do
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration) }
+
+      before do
+        tool_configuration.update!(lti_registration: registration, placements: [{ placement: "global_navigation", target_link_uri: "https://example.com/launch" }])
+      end
+
+      context "the tool_configuration has it's own disabled_placements value" do
+        before do
+          tool_configuration.update!(disabled_placements: ["global_navigation"])
+        end
+
+        it_behaves_like "doesn't remove disabled placements"
+      end
+
+      context "an Lti::Overlay exists" do
+        let(:overlay) do
+          Lti::Overlay.create!(account:, updated_by: user, registration:, data: { "disabled_placements" => ["global_navigation"] })
+        end
+
+        before do
+          overlay
+        end
+
+        it_behaves_like "doesn't remove disabled placements"
+      end
+    end
+
+    context "the registration is associated with a Dynamic Registration" do
+      let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+
+      before(:once) do
+        ims_registration.update!(lti_registration: registration)
+      end
+
+      context "the Dynamic Registration has it's own list of disabledPlacements" do
+        before do
+          ims_registration.update!(registration_overlay: { "disabledPlacements" => ["global_navigation"] })
+        end
+
+        it_behaves_like "doesn't remove disabled placements"
+      end
+
+      context "an Lti::Overlay exists" do
+        let(:overlay) do
+          Lti::Overlay.create!(registration:, updated_by: user, account:, data: { "disabled_placements" => ["global_navigation"] })
+        end
+
+        before do
+          overlay
+        end
+
+        it_behaves_like "doesn't remove disabled placements"
       end
     end
   end
@@ -94,18 +316,25 @@ RSpec.describe Lti::Registration do
     let(:registration) { lti_registration_model }
 
     context "when ims_registration is present" do
-      let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
-
-      before do
-        ims_registration # instantiate before test runs
-      end
+      let!(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
 
       it "returns the logo_uri" do
         expect(subject).to eq(ims_registration.logo_uri)
       end
     end
 
-    context "when ims_registration is not present" do
+    context "when a tool configuration is present" do
+      let!(:tool_configuration) do
+        dk = lti_developer_key_model
+        lti_tool_configuration_model(developer_key: dk, lti_registration: registration)
+      end
+
+      it "returns the logo_uri" do
+        expect(subject).to eq(tool_configuration.launch_settings["icon_url"])
+      end
+    end
+
+    context "when neither ims_registration nor manual_configuration is present" do
       it "is nil" do
         expect(subject).to be_nil
       end
@@ -115,7 +344,7 @@ RSpec.describe Lti::Registration do
   describe "#account_binding_for" do
     subject { registration.account_binding_for(account) }
 
-    let(:registration) { lti_registration_model }
+    let(:registration) { lti_registration_model(account:) }
     let(:account) { account_model }
     let(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
 
@@ -125,6 +354,16 @@ RSpec.describe Lti::Registration do
 
     context "when account is nil" do
       it "returns the account_binding for the registration's account" do
+        expect(subject).to eq(account_binding)
+      end
+    end
+
+    context "when account is not root account" do
+      subject { registration.account_binding_for(subaccount) }
+
+      let(:subaccount) { account_model(parent_account: account) }
+
+      it "returns the binding for the nearest root account" do
         expect(subject).to eq(account_binding)
       end
     end
@@ -140,6 +379,128 @@ RSpec.describe Lti::Registration do
 
       it "returns nil" do
         expect(subject).to be_nil
+      end
+    end
+
+    context "with site admin registration" do
+      specs_require_sharding
+
+      let(:registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin) } }
+      let(:site_admin_binding) { Shard.default.activate { lti_registration_account_binding_model(registration:, workflow_state: "on", account: Account.site_admin) } }
+      let(:account) { @shard2.activate { account_model } }
+
+      before do
+        site_admin_binding # instantiate before test runs
+      end
+
+      it "prefers site admin binding" do
+        expect(@shard2.activate { subject }).to eq(site_admin_binding)
+      end
+
+      context "when site admin binding is allow" do
+        before do
+          site_admin_binding.update!(workflow_state: "allow")
+        end
+
+        it "ignores site admin binding" do
+          expect(@shard2.activate { subject }).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "#overlay_for" do
+    subject { registration.overlay_for(context) }
+
+    let(:registration) { lti_registration_model(account:) }
+    let(:user) { user_model }
+    let(:account) { account_model }
+    let(:other_account) { account_model }
+    let(:context) { account }
+    let(:unused_overlay) do
+      Lti::Overlay.create!(account: other_account,
+                           registration: lti_registration_model(account: other_account),
+                           updated_by: user,
+                           data: {
+                             "privacy_level" => "public",
+                             "title" => "This should never be seen",
+                           })
+    end
+    let(:overlay) do
+      Lti::Overlay.create!(account:,
+                           registration:,
+                           updated_by: user,
+                           data: {
+                             "privacy_level" => "public",
+                             "title" => "A Better Title",
+                           })
+    end
+
+    before do
+      # Ensure there's some data in the database
+      unused_overlay
+    end
+
+    it "returns the correct overlay" do
+      overlay
+      expect(subject).to eq(overlay)
+    end
+
+    context "when context is nil" do
+      let(:context) { nil }
+
+      it "returns the overlay associated with the registration's account" do
+        overlay
+        expect(subject).to eq(overlay)
+      end
+    end
+
+    context "when context is a course" do
+      let(:context) { course_model(account:) }
+
+      it "returns the overlay associated with the course's account" do
+        overlay
+        expect(subject).to eq(overlay)
+      end
+    end
+
+    context "when context is a sub-account" do
+      let(:context) { account_model(parent_account: account) }
+
+      it "returns the overlay associated with the parent account" do
+        overlay
+        expect(subject).to eq(overlay)
+      end
+    end
+
+    context "with site admin registration" do
+      specs_require_sharding
+
+      let(:registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin) } }
+      let(:site_admin_overlay) do
+        Shard.default.activate do
+          Lti::Overlay.create!(account: Account.site_admin, registration:, updated_by: user, data: { "title" => "Site Admin overlay" })
+        end
+      end
+      let(:account) { @shard2.activate { account_model } }
+      let(:overlay) do
+        @shard2.activate do
+          Lti::Overlay.create!(account:, registration:, updated_by: user, data: { "title" => "Account overlay" })
+        end
+      end
+      let(:context) { account }
+
+      it "uses the site admin overlay" do
+        site_admin_overlay
+        expect(subject).to eq(site_admin_overlay)
+      end
+
+      context "when the account has it's own overlay" do
+        it "uses the account's overlay" do
+          site_admin_overlay
+          overlay
+          expect(@shard2.activate { subject }).to eq(overlay)
+        end
       end
     end
   end
@@ -215,7 +576,7 @@ RSpec.describe Lti::Registration do
     end
 
     context "with a developer key" do
-      let(:developer_key) { developer_key_model(lti_registration: registration) }
+      let(:developer_key) { developer_key_model(lti_registration: registration, account: registration.account) }
 
       before do
         developer_key # instantiate before test runs
@@ -285,7 +646,7 @@ RSpec.describe Lti::Registration do
     end
 
     context "with a developer key" do
-      let(:developer_key) { developer_key_model(lti_registration: registration) }
+      let(:developer_key) { developer_key_model(lti_registration: registration, account: registration.account) }
 
       before do
         developer_key.destroy
@@ -303,35 +664,90 @@ RSpec.describe Lti::Registration do
     end
   end
 
-  describe "after_update" do
-    let(:developer_key) do
-      DeveloperKey.create!(
-        name: "test devkey",
-        email: "test@test.com",
-        redirect_uri: "http://test.com",
-        account_id: account.id,
-        skip_lti_sync: false
-      )
-    end
-    let(:lti_registration) do
-      Lti::Registration.create!(
-        developer_key:,
-        name: "test registration",
-        admin_nickname: "test reg",
-        vendor: "test vendor",
-        account_id: account.id,
-        created_by: user,
-        updated_by: user
-      )
+  describe "#new_external_tool" do
+    subject { registration.new_external_tool(account) }
+
+    let(:registration) { lti_registration_model(account:) }
+
+    context "with a manual registration" do
+      let_once(:developer_key) { lti_developer_key_model(account:) }
+      let_once(:tool_configuration) { lti_tool_configuration_model(developer_key:, lti_registration: registration) }
+      let_once(:registration) { lti_registration_model(account:, developer_key:) }
+
+      it "returns a new deployment" do
+        expect(subject).to be_a(ContextExternalTool)
+        expect(subject.lti_registration).to eq(registration)
+        expect(subject.account).to eq(account)
+      end
+
+      it "creates a context control" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(1)
+        expect(subject.context_controls).to include(Lti::ContextControl.last)
+        expect(subject.context_controls.first.deployment).to eq(subject)
+      end
+
+      it "sets context control to available" do
+        expect(subject.context_controls.first.available).to be true
+      end
+
+      context "with available: false" do
+        subject { registration.new_external_tool(account, available: false) }
+
+        it "sets context control to unavailable" do
+          expect(subject.context_controls.first.available).to be false
+        end
+
+        context "with an existing tool" do
+          subject { registration.new_external_tool(account, existing_tool:, available: true) }
+
+          let(:existing_tool) { registration.new_external_tool(account, available: false) }
+
+          before do
+            existing_tool # instantiate before test runs
+          end
+
+          it "does not create a new deployment" do
+            expect { subject }.not_to change { ContextExternalTool.count }
+            expect(subject).to eq(existing_tool)
+          end
+
+          it "does not change availability" do
+            subject
+            expect(existing_tool.context_controls.first.available).to be false
+          end
+        end
+      end
     end
 
-    it "updates the developer key after updating lti_registration" do
-      lti_registration.update!(admin_nickname: "new test name")
-      expect(lti_registration.developer_key.name).to eq("new test name")
-    end
+    context "with an ims_registration" do
+      let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
 
-    it "does not update the developer key if skip_lti_sync is true" do
-      expect(Lti::Registration.where(developer_key:).first).to be_nil
+      before do
+        ims_registration # instantiate before test runs
+      end
+
+      it "returns a new deployment" do
+        expect(subject).to be_a(ContextExternalTool)
+        expect(subject.lti_registration).to eq(registration)
+      end
+
+      it "creates a context control" do
+        expect { subject }.to change { Lti::ContextControl.count }.by(1)
+        expect(subject.context_controls).to include(Lti::ContextControl.last)
+        expect(subject.context_controls.first.deployment).to eq(subject)
+      end
+
+      it "sets context control to available" do
+        expect(subject.context_controls.first.available).to be true
+      end
+
+      context "with available: false" do
+        subject { registration.new_external_tool(account, available: false) }
+
+        it "sets context control to unavailable" do
+          expect(subject.context_controls.first.available).to be false
+        end
+      end
     end
   end
 end

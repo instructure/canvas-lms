@@ -24,7 +24,7 @@ import type {Submission, DueDate, UserDueDateMap, AssignmentUserDueDateMap} from
 
 export function scopeToUser(
   dueDateDataByAssignmentId: AssignmentUserDueDateMap,
-  userId: string
+  userId: string,
 ): UserDueDateMap {
   const scopedData: {
     [assignmentId: string]: DueDate
@@ -35,7 +35,7 @@ export function scopeToUser(
       if (dueDateDataByUserId[userId]) {
         scopedData[assignmentId] = dueDateDataByUserId[userId]
       }
-    }
+    },
   )
   return scopedData
 }
@@ -43,12 +43,12 @@ export function scopeToUser(
 export function updateWithSubmissions(
   effectiveDueDates: AssignmentUserDueDateMap,
   submissions: Pick<Submission, 'cached_due_date' | 'assignment_id' | 'user_id'>[],
-  gradingPeriods: CamelizedGradingPeriod[] = []
+  gradingPeriods: CamelizedGradingPeriod[] = [],
 ): AssignmentUserDueDateMap {
   const helper = new GradingPeriodsHelper(gradingPeriods)
   const sortedPeriods: CamelizedGradingPeriod[] = _.sortBy<CamelizedGradingPeriod>(
     gradingPeriods,
-    'startDate'
+    'startDate',
   )
 
   submissions.forEach(submission => {

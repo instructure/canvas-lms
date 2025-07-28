@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -58,7 +59,7 @@ const dateTests = (testType: string) => {
 
   it('renders a date field', () => {
     const {getByTestId} = render(
-      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
     )
     const dateComponent: Partial<HTMLInputElement> = getByTestId(`${filter.type}-input`)
     expect(dateComponent).toBeInTheDocument()
@@ -68,7 +69,7 @@ const dateTests = (testType: string) => {
     filter.value = '2021-12-03T02:00:00-0500'
     props.filter = filter
     const {getByTestId} = render(
-      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
     )
     const dateComponent: Partial<HTMLInputElement> = getByTestId(`${filter.type}-input`)
     expect(dateComponent.value).toContain('Dec 3, 2021')
@@ -76,7 +77,7 @@ const dateTests = (testType: string) => {
 
   it('changing the date input value triggers onChange', async () => {
     const {getByTestId} = render(
-      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
     )
     const dateComponent = getByTestId(`${filter.type}-input`)
     fireEvent.change(dateComponent, {
@@ -114,7 +115,7 @@ describe('FilterNavFilter', () => {
 
     it('renders filters for submissions', () => {
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       const button = getByRole('combobox', {name: 'Submissions'})
       expect(button).toBeInTheDocument()
@@ -123,7 +124,7 @@ describe('FilterNavFilter', () => {
     it('sets the submissions field if value is present', () => {
       filter.value = 'has-ungraded-submissions'
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       const button: Partial<HTMLButtonElement> = getByRole('combobox', {name: 'Submissions'})
       expect(button?.value).toContain('Has ungraded submissions')
@@ -131,7 +132,7 @@ describe('FilterNavFilter', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       await userEvent.click(getByRole('combobox', {name: 'Submissions'}))
       await userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
@@ -139,7 +140,7 @@ describe('FilterNavFilter', () => {
         expect.objectContaining({
           type: 'submissions',
           value: 'has-ungraded-submissions',
-        })
+        }),
       )
     })
   })
@@ -168,7 +169,7 @@ describe('FilterNavFilter', () => {
     it('sets the sections field if value is present', () => {
       filter.value = '1'
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       const button: Partial<HTMLButtonElement> = getByRole('combobox', {name: 'Sections'})
       expect(button.value).toContain('Section 1')
@@ -176,7 +177,7 @@ describe('FilterNavFilter', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       await userEvent.click(getByRole('combobox', {name: 'Sections'}))
       await userEvent.click(getByRole('option', {name: 'Section 1'}))
@@ -185,7 +186,7 @@ describe('FilterNavFilter', () => {
           id: '456',
           type: 'section',
           value: '1',
-        })
+        }),
       )
     })
   })
@@ -215,7 +216,7 @@ describe('FilterNavFilter', () => {
     it('sets the grading periods field if value is present', () => {
       filter.value = '1'
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       const button: Partial<HTMLButtonElement> = getByRole('combobox', {name: 'Grading Periods'})
       expect(button.value).toContain('Grading Period 1')
@@ -223,7 +224,7 @@ describe('FilterNavFilter', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       await userEvent.click(getByRole('combobox', {name: 'Grading Periods'}))
       await userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
@@ -232,7 +233,7 @@ describe('FilterNavFilter', () => {
           id: '456',
           type: 'grading-period',
           value: '1',
-        })
+        }),
       )
     })
   })
@@ -275,7 +276,7 @@ describe('FilterNavFilter', () => {
     it('sets the student group field if value is present', () => {
       filter.value = '1'
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       const button: Partial<HTMLButtonElement> = getByRole('combobox', {name: 'Student Groups'})
       expect(button.value).toContain('Student Group 1')
@@ -283,7 +284,7 @@ describe('FilterNavFilter', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />,
       )
       await userEvent.click(getByRole('combobox', {name: 'Student Groups'}))
       await userEvent.click(getByRole('option', {name: 'Student Group 1'}))
@@ -292,7 +293,7 @@ describe('FilterNavFilter', () => {
           id: '456',
           type: 'student-group',
           value: '1',
-        })
+        }),
       )
     })
   })

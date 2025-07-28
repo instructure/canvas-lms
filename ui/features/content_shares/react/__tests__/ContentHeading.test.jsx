@@ -27,7 +27,7 @@ describe('reusable share page header', () => {
 
   it('renders title and description', () => {
     const {getByText} = render(
-      <ContentHeading svgUrl={svgUrl} heading={heading} description={description} />
+      <ContentHeading svgUrl={svgUrl} heading={heading} description={description} />,
     )
     expect(getByText(heading)).toBeInTheDocument()
     expect(getByText(description)).toBeInTheDocument()

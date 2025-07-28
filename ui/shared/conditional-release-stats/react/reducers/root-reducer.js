@@ -31,7 +31,7 @@ const studentCache = handleActions(
       return state
     },
   },
-  {}
+  {},
 )
 
 const isInitialDataLoading = handleActions(
@@ -39,7 +39,7 @@ const isInitialDataLoading = handleActions(
     [actionTypes.LOAD_INITIAL_DATA_START]: () => true,
     [actionTypes.LOAD_INITIAL_DATA_END]: () => false,
   },
-  false
+  false,
 )
 
 const isStudentDetailsLoading = handleActions(
@@ -47,7 +47,7 @@ const isStudentDetailsLoading = handleActions(
     [actionTypes.LOAD_STUDENT_DETAILS_START]: () => true,
     [actionTypes.LOAD_STUDENT_DETAILS_END]: () => false,
   },
-  false
+  false,
 )
 
 const errors = handleActions(
@@ -57,7 +57,7 @@ const errors = handleActions(
       ...Array.from(state),
     ],
   },
-  []
+  [],
 )
 
 const ranges = handleActions(
@@ -65,14 +65,14 @@ const ranges = handleActions(
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.ranges,
     [actionTypes.SET_SCORING_RANGES]: getPayload,
   },
-  []
+  [],
 )
 
 const assignment = handleActions(
   {
     [actionTypes.SET_ASSIGNMENT]: getPayload,
   },
-  {}
+  {},
 )
 
 const rule = handleActions(
@@ -80,7 +80,7 @@ const rule = handleActions(
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.rule,
     [actionTypes.SET_RULE]: getPayload,
   },
-  {course_id: '', trigger_assignment: ''}
+  {course_id: '', trigger_assignment: ''},
 )
 
 const enrolled = handleActions(
@@ -88,7 +88,7 @@ const enrolled = handleActions(
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.enrolled,
     [actionTypes.SET_ENROLLED]: getPayload,
   },
-  0
+  0,
 )
 
 const sidebarTrigger = handleActions(
@@ -96,7 +96,7 @@ const sidebarTrigger = handleActions(
     [actionTypes.OPEN_SIDEBAR]: (state, action) => action.payload,
     [actionTypes.CLOSE_SIDEBAR]: () => null,
   },
-  null
+  null,
 )
 
 const showDetails = handleActions(
@@ -105,7 +105,7 @@ const showDetails = handleActions(
     [actionTypes.CLOSE_SIDEBAR]: () => false,
     [actionTypes.SELECT_RANGE]: (state, action) => action.payload !== null,
   },
-  false
+  false,
 )
 
 const selectedPath = handleActions(
@@ -123,7 +123,7 @@ const selectedPath = handleActions(
       return state
     },
   },
-  {range: 0, student: null}
+  {range: 0, student: null},
 )
 
 export default combineReducers({

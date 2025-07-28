@@ -22,8 +22,8 @@ module Factories
     params ||= {}
     params[:created_by] ||= user_model
     params[:updated_by] ||= params[:created_by]
-    params[:account] ||= account_model
-    params[:registration] ||= lti_registration_model
+    params[:account] ||= params[:registration]&.account || account_model
+    params[:registration] ||= lti_registration_model(account: params[:account])
     @lti_registration_account_binding = Lti::RegistrationAccountBinding.create!(params)
   end
 end

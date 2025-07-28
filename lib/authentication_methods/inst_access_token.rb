@@ -50,7 +50,7 @@ module AuthenticationMethods
     end
 
     # functionally encapsulates mapping an InstAccess token and a domain root account
-    # to a user/pseudonym.  This is out on it's own because there are some db-state
+    # to a user/pseudonym.  This is out on its own because there are some db-state
     # edge cases (like multiple users with the same UUID due to user merges, etc)
     # that are convenient to test close to the implementation.
     #
@@ -107,7 +107,6 @@ module AuthenticationMethods
     def self.find_user_by_uuid_prefer_local(uuid)
       User.active.where(uuid:).order(:id).first
     end
-    private_class_method :find_user_by_uuid_prefer_local
 
     class Authentication
       def initialize(request)
@@ -116,14 +115,12 @@ module AuthenticationMethods
       end
 
       def blocked?
-        return false unless Account.site_admin.feature_enabled?(:site_admin_service_auth)
         return false unless verified_token.try(:jti).present?
 
         RequestThrottle.blocklist.include? verified_token.jti
       end
 
       def tag_identifier
-        return unless Account.site_admin.feature_enabled?(:site_admin_service_auth)
         return unless request.present?
 
         return unless RequestThrottle::SERVICE_HEADER_EXPRESSION.match?(request.user_agent)

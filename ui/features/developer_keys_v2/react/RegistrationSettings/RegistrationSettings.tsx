@@ -18,7 +18,7 @@
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -32,7 +32,7 @@ import {updateRegistrationOverlay} from '../dynamic_registration/registrationApi
 import {RegistrationOverlayForm} from './RegistrationOverlayForm'
 import {createRegistrationOverlayStore} from './RegistrationOverlayState'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export type RegistrationSettingsProps = {
   ctx: {
@@ -151,7 +151,7 @@ type RegistrationOverlayFormWrapperProps = {
 
 const RegistrationOverlayFormWrapper = (props: RegistrationOverlayFormWrapperProps) => {
   const store = React.useRef(
-    createRegistrationOverlayStore(props.developerKeyName, props.ltiRegistration)
+    createRegistrationOverlayStore(props.developerKeyName, props.ltiRegistration),
   ).current
   const [saving, setSaving] = React.useState(false)
   return (
@@ -176,7 +176,7 @@ const RegistrationOverlayFormWrapper = (props: RegistrationOverlayFormWrapperPro
               updateRegistrationOverlay(
                 props.contextId,
                 props.ltiRegistration.id,
-                store.getState().state.registration
+                store.getState().state.registration,
               )
                 .then(() => {
                   page(`/accounts/${props.contextId}/developer_keys`)

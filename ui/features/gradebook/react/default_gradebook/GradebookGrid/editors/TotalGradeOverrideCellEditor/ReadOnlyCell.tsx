@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -38,6 +37,7 @@ export default class ReadOnlyCell extends CellEditorComponent {
   }
 
   render() {
+    // @ts-expect-error
     const {gradeEntry, gradeInfo, pendingGradeInfo} = this.props
     const displayValue = gradeEntry.formatGradeInfoForDisplay(pendingGradeInfo || gradeInfo)
 

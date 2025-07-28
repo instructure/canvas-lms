@@ -19,7 +19,7 @@
 
 module Lti
   # @API Plagiarism Detection Platform Users
-  # **Plagiarism Detection Platform API for Users (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  # **Plagiarism Detection Platform API for Users (Must use <a href="file.jwt_access_tokens.html">JWT access tokens</a> with this API).**
   class UsersApiController < ApplicationController
     include Lti::IMS::AccessTokenHelper
     include Api::V1::User
@@ -78,7 +78,7 @@ module Lti
     private
 
     def user
-      @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: { user_lti_context_id: params[:id] }).take ||
+      @_user ||= User.joins(:past_lti_ids).find_by(user_past_lti_ids: { user_lti_context_id: params[:id] }) ||
                  User.active.find_by(lti_context_id: params[:id]) ||
                  User.active.find(params[:id])
     end

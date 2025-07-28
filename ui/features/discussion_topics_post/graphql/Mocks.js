@@ -48,7 +48,7 @@ export const getDiscussionQueryMock = ({
   perPage = 20,
   rootEntries = true,
   searchTerm = '',
-  sort = 'desc',
+  sort = null,
   shouldError = false,
   isGroup = true,
   unreadBefore = '',
@@ -63,7 +63,6 @@ export const getDiscussionQueryMock = ({
         perPage,
         rootEntries,
         searchTerm,
-        sort,
         unreadBefore,
       },
     },
@@ -87,6 +86,9 @@ export const getDiscussionQueryMock = ({
           }
           if (sort === 'asc') {
             return Discussion.mock({
+              participant: {
+                sortOrder: 'asc',
+              },
               discussionEntriesConnection: {
                 nodes: [
                   DiscussionEntry.mock({
@@ -139,7 +141,6 @@ export const getAnonymousDiscussionQueryMock = ({
   perPage = 20,
   rootEntries = true,
   searchTerm = '',
-  sort = 'desc',
   shouldError = false,
   unreadBefore = '',
 } = {}) => [
@@ -153,7 +154,6 @@ export const getAnonymousDiscussionQueryMock = ({
         perPage,
         rootEntries,
         searchTerm,
-        sort,
         unreadBefore,
       },
     },
@@ -382,6 +382,7 @@ export const updateDiscussionEntryMock = ({
   message = '<p>This is the parent reply</p>',
   fileId = '7',
   removeAttachment = !fileId,
+  quotedEntryId = null,
 } = {}) => [
   {
     request: {
@@ -391,6 +392,7 @@ export const updateDiscussionEntryMock = ({
         message,
         ...(fileId !== null && {fileId}),
         removeAttachment,
+        quotedEntryId,
       },
     },
     result: {

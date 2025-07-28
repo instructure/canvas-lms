@@ -50,7 +50,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
       return render json: { errors: ["user_id is invalid"] }, status: :bad_request
     end
 
-    threshold = ObserverAlertThreshold.where(observer: @current_user, student: user, alert_type: attrs[:alert_type]).take
+    threshold = ObserverAlertThreshold.find_by(observer: @current_user, student: user, alert_type: attrs[:alert_type])
     if threshold
       # update if duplicate
       threshold.update(threshold: attrs[:threshold], workflow_state: "active")

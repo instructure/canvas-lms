@@ -18,7 +18,7 @@
 
 import formatMessage from '../../../format-message'
 import {scaleForHeight, scaleForWidth} from '../shared/DimensionUtils'
-import RCEGlobals from '../../RCEGlobals'
+import RCEGlobals from '../../../rce/RCEGlobals'
 
 export const MIN_HEIGHT = 10
 export const MIN_WIDTH = 10
@@ -33,6 +33,7 @@ export const CUSTOM = 'custom'
 
 export const imageSizes = [SMALL, MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
 export const videoSizes = [MEDIUM, LARGE, EXTRA_LARGE, CUSTOM]
+export const studioPlayerSizes = [SMALL, MEDIUM, LARGE, CUSTOM]
 
 const sizeByMaximumDimension = {
   200: SMALL,
@@ -40,6 +41,15 @@ const sizeByMaximumDimension = {
   400: LARGE,
   640: EXTRA_LARGE,
 }
+
+const studioPlayerDimensions = {
+  [SMALL]: {width: 320, height: 254},
+  [MEDIUM]: {width: 480, height: 300},
+  [LARGE]: {width: 700, height: 441},
+}
+
+export const MIN_WIDTH_STUDIO_PLAYER = studioPlayerDimensions[SMALL].width
+export const MIN_HEIGHT_STUDIO_PLAYER = studioPlayerDimensions[SMALL].height
 
 function parsedOrNull($element, attribute) {
   // when the image is first inserted into the rce, it's size
@@ -57,6 +67,10 @@ function imageSizeFromKnownOptions(imageOptions) {
   const intendedHeight = imageOptions.appliedHeight || imageOptions.naturalHeight
   const largestDimension = Math.max(intendedWidth, intendedHeight)
   return sizeByMaximumDimension[largestDimension] || CUSTOM
+}
+
+function hasHeightAndWidth($element) {
+  return $element.hasAttribute('width') && $element.hasAttribute('height')
 }
 
 function getPercentageUnitsFromAttributes($element) {
@@ -78,7 +92,8 @@ export function fromImageEmbed($element) {
     naturalWidth: $element.naturalWidth,
     naturalHeight: $element.naturalHeight,
     appliedPercentage: percentageUnits || 100,
-    usePercentageUnits: !!percentageUnits,
+    // by default use percentage units
+    usePercentageUnits: hasHeightAndWidth($element) ? !!percentageUnits : true,
     altText: altText || '',
     isDecorativeImage: altText !== null && altText.replace(/\s/g, '') === '',
     url: $element.src,
@@ -140,14 +155,18 @@ export function fromVideoEmbed($element) {
     // bad json?
   }
 
-  videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
+  if (RCEGlobals.getFeatures()?.consolidated_media_player) {
+    const width = videoOptions.appliedWidth || videoOptions.naturalWidth
+    videoOptions.videoSize =
+      [SMALL, MEDIUM, LARGE].find(size => width === studioPlayerDimensions[size].width) || CUSTOM
+  } else {
+    videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
+  }
 
-  if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
-    const source = $videoIframe.getAttribute('src')
-    const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
-    if (matches) {
-      videoOptions.attachmentId = matches[1]
-    }
+  const source = $videoIframe.getAttribute('src')
+  const matches = source?.match(/\/media_attachments_iframe\/(\d+)/)
+  if (matches) {
+    videoOptions.attachmentId = matches[1]
   }
 
   return videoOptions
@@ -174,6 +193,14 @@ export function scaleToSize(imageSize, naturalWidth, naturalHeight) {
     height: Math.round(naturalHeight * scaleFactor),
     width: Math.round(naturalWidth * scaleFactor),
   }
+}
+
+export function scaleVideoSize(videoSize, naturalWidth, naturalHeight) {
+  if (videoSize === CUSTOM) {
+    return {width: naturalWidth, height: naturalHeight}
+  }
+  const {width, height} = studioPlayerDimensions[videoSize]
+  return {width, height}
 }
 
 export function labelForImageSize(imageSize) {

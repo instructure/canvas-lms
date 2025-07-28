@@ -23,7 +23,7 @@ module Canvas
     def lock_explanation(hash, type, context = nil, options = {})
       include_js = options.fetch(:include_js, true)
       url_options = options.key?(:only_path) ? { only_path: options[:only_path] } : {}
-      # Any additions to this function should also be made in javascripts/content_locks.js
+      # Any additions to this function should also be made in javascripts/lock_reason.js
       if hash[:lock_at]
         case type
         when "quiz"
@@ -71,7 +71,7 @@ module Canvas
                  else
                    I18n.t("messages.content_unpublished_module", "This content is part of an unpublished module and is not available yet.")
                  end
-               elsif hash[:context_module]["unlock_at"] && hash[:context_module]["unlock_at"] > Time.now
+               elsif hash[:context_module]["unlock_at"] && hash[:context_module]["unlock_at"] > Time.zone.now
                  unlock_time = datetime_string(hash[:context_module]["unlock_at"])
                  case type
                  when "quiz"
@@ -154,7 +154,7 @@ module Canvas
           html << "<div class='spinner'></div>".html_safe
           html << I18n.t("messages.visit_modules_page",
                          "*Visit the course modules page for information on how to unlock this content.*",
-                         wrapper: "<a #{"style='display: none;'" if include_js} class='module_prerequisites_fallback' href='#{course_context_modules_url((context || obj.context), anchor: "module_#{obj.id}", **url_options)}'>\\1</a>")
+                         wrapper: "<a #{"style='display: none;'" if include_js} class='module_prerequisites_fallback' href='#{course_context_modules_url(context || obj.context, anchor: "module_#{obj.id}", **url_options)}'>\\1</a>")
           html << "<a x-canvaslms-trusted-url='#{course_context_module_prerequisites_needing_finishing_path((context || obj.context).id, obj.id, hash[:asset_string])}' style='display: none;' id='module_prerequisites_lookup_link'>&nbsp;</a>".html_safe
           js_bundle :prerequisites_lookup if include_js
         end

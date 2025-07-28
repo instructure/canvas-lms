@@ -73,11 +73,13 @@ export const masteryScalesGraphqlMocks = [
       query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
       variables: {
         contextId: '11',
+        proficiencyRatingsCursor: null,
       },
     },
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Account',
           outcomeProficiency,
         },
@@ -89,11 +91,13 @@ export const masteryScalesGraphqlMocks = [
       query: COURSE_OUTCOME_PROFICIENCY_QUERY,
       variables: {
         contextId: '12',
+        proficiencyRatingsCursor: null,
       },
     },
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Course',
           outcomeProficiency,
         },
@@ -113,6 +117,7 @@ export const masteryCalculationGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Account',
           outcomeCalculationMethod,
         },
@@ -129,6 +134,7 @@ export const masteryCalculationGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Course',
           outcomeCalculationMethod,
         },
@@ -157,6 +163,7 @@ export const findModalMocks = ({
           type: 'Account',
           rootGroupId: includeGlobalRootGroup ? '1' : '0',
           includeGlobalRootGroup,
+          parentAccountsCursor: null,
         },
       },
       result: {
@@ -178,6 +185,7 @@ export const findModalMocks = ({
           type: 'Course',
           rootGroupId: '0',
           includeGlobalRootGroup: false,
+          parentAccountsCursor: null,
         },
       },
       result: {
@@ -204,6 +212,11 @@ export const findModalMocks = ({
 
 const parentAccountMock = count => ({
   __typename: 'ParentAccountsConnection',
+  pageInfo: {
+    __typename: 'PageInfo',
+    endCursor: null,
+    hasNextPage: false,
+  },
   nodes: new Array(count).fill(0).map((_v, i) => ({
     __typename: 'Account',
     rootOutcomeGroup: {

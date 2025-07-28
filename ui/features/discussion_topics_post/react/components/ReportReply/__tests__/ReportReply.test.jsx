@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {ReportReply} from '../ReportReply'
 
 const mockProps = ({
@@ -29,7 +30,10 @@ const mockProps = ({
 } = {}) => ({onCloseReportModal, onSubmit, showReportModal, isLoading, errorSubmitting})
 
 const setup = props => {
-  return render(<ReportReply {...props} />)
+  return {
+    user: userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never}),
+    ...render(<ReportReply {...props} />),
+  }
 }
 
 describe('Report Reply', () => {
@@ -43,12 +47,12 @@ describe('Report Reply', () => {
       const container = setup(mockProps({errorSubmitting: true}))
 
       expect(
-        container.findByText('We experienced an issue. This reply was not reported.')
+        container.findByText('We experienced an issue. This reply was not reported.'),
       ).toBeTruthy()
 
       setTimeout(() => {
         expect(
-          container.findByText('We experienced an issue. This reply was not reported.')
+          container.findByText('We experienced an issue. This reply was not reported.'),
         ).toBeFalsy()
       }, 5000)
     })
@@ -59,8 +63,8 @@ describe('Report Reply', () => {
     const container = setup(mockProps({onCloseReportModal: onCloseReportModalMock}))
     const cancelButton = await container.findByTestId('report-reply-cancel-modal-button')
     expect(cancelButton).toBeTruthy()
-    fireEvent.click(cancelButton)
-    expect(onCloseReportModalMock.mock.calls.length).toBe(1)
+    await container.user.click(cancelButton)
+    expect(onCloseReportModalMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onCloseReportModal from the close button', async () => {
@@ -68,8 +72,8 @@ describe('Report Reply', () => {
     const container = setup(mockProps({onCloseReportModal: onCloseReportModalMock}))
     const cancelButton = await container.findByText('Close')
     expect(cancelButton).toBeTruthy()
-    fireEvent.click(cancelButton)
-    expect(onCloseReportModalMock.mock.calls.length).toBe(1)
+    await container.user.click(cancelButton)
+    expect(onCloseReportModalMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onSubmit', async () => {
@@ -77,11 +81,11 @@ describe('Report Reply', () => {
     const container = setup(mockProps({onSubmit: onSubmitMock}))
     const option = await container.findByText('Other')
     expect(option).toBeTruthy()
-    fireEvent.click(option)
+    await userEvent.click(option)
     const submitButton = await container.findByTestId('report-reply-submit-button')
     expect(submitButton).toBeTruthy()
-    fireEvent.click(submitButton)
-    expect(onSubmitMock.mock.calls.length).toBe(1)
+    await userEvent.click(submitButton)
+    expect(onSubmitMock.mock.calls).toHaveLength(1)
     expect(onSubmitMock).toHaveBeenCalledWith('other')
   })
 
@@ -90,7 +94,7 @@ describe('Report Reply', () => {
     expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     const option = await container.findByText('Other')
     expect(option).toBeTruthy()
-    fireEvent.click(option)
+    await userEvent.click(option)
     expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
   })
 
@@ -109,10 +113,10 @@ describe('Report Reply', () => {
     const container = setup(mockProps({onCloseReportModal: jest.fn()}))
 
     const option = await container.findByText('Other')
-    fireEvent.click(option)
+    await userEvent.click(option)
 
     const cancelButton = await container.findByTestId('report-reply-cancel-modal-button')
-    fireEvent.click(cancelButton)
+    await userEvent.click(cancelButton)
 
     expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
   })

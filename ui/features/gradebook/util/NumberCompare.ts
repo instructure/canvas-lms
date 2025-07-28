@@ -22,15 +22,15 @@ function isNumber(value: number | null): value is number {
 export default function numberCompare(
   a: number | null,
   b: number | null,
-  options: {descending?: boolean} = {}
+  options: {descending?: boolean} = {},
 ) {
   return !isNumber(a)
     ? !isNumber(b)
       ? 0
       : 1
     : !isNumber(b)
-    ? -1
-    : options.descending
-    ? b - a
-    : a - b
+      ? -1
+      : options.descending
+        ? b - a
+        : a - b
 }

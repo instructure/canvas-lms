@@ -16,13 +16,13 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import template from '../../jst/resendInvitations.handlebars'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('ResendInvitationsView')
+const I18n = createI18nScope('ResendInvitationsView')
 
 export default class ResendInvitationsView extends View {
   static initClass() {
@@ -53,8 +53,8 @@ export default class ResendInvitationsView extends View {
       () => $.flashMessage(I18n.t('invitations_re_sent', 'Invitations sent successfully')),
       () =>
         $.flashError(
-          I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.')
-        )
+          I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.'),
+        ),
     )
     return $.when(xhr).always(() => (this.sending = false), this.render.bind(this))
   }

@@ -16,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useRef, useMemo} from 'react'
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useGetAssigneeOptions} from './useGetAssigneeOptions'
+import {getCourseSettings, CourseSettings} from './queryFn'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {uniqBy} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {AssigneeOption} from '../../react/Item/types'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {type AssigneeOption} from '../../react/Item/types'
+import {useQuery} from '@tanstack/react-query'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 interface Props {
   courseId: string
@@ -39,187 +41,68 @@ interface Props {
   onError?: () => void
 }
 
-const processResult = (
-  result: PromiseSettledResult<{json: Record<string, string>[]}> | null,
-  key: string,
-  groupKey: string,
-  allOptions: AssigneeOption[],
-  setErrorCallback: (state: boolean) => void
-) => {
-  let resultParsedResult: AssigneeOption[] = []
-  if (result && result.status === 'fulfilled') {
-    const resultJSON = result.value.json
-    resultParsedResult =
-      resultJSON?.map(({id, name, group_category_id: groupCategoryId}) => {
-        const parsedId = `${key.toLowerCase()}-${id}`
-        // if an existing override exists for this asignee, use it so we have its overrideId
-        const existing = allOptions.find(option => option.id === parsedId)
-        if (existing !== undefined) {
-          return existing
-        }
-        return {
-          id: parsedId,
-          value: name,
-          groupCategoryId,
-          group: I18n.t('%{groupKey}', {groupKey}),
-        }
-      }) ?? []
-  } else if (result) {
-    showFlashError(I18n.t('Failed to load %{groupKey} data', {groupKey}))(result.reason)
-    setErrorCallback(true)
-  }
-  return resultParsedResult
-}
-
 const useFetchAssignees = ({
   courseId,
   defaultValues,
-  groupCategoryId,
-  disableFetch = false,
+  groupCategoryId = null,
   everyoneOption,
   checkMasteryPaths = false,
   customAllOptions,
-  customIsLoading,
   customSetSearchTerm,
   onError = () => {},
 }: Props) => {
+  // FIXME: This search term should be needs to be used
   const [searchTerm, setSearchTerm] = useState('')
   const [allOptions, setAllOptions] = useState<AssigneeOption[]>(defaultValues)
-  const [isLoading, setIsLoading] = useState(false)
-  const [loaded, setLoaded] = useState(false)
   const [hasErrors, setHasErrors] = useState(false)
+  const groupCategoryRef = useRef<string | null>(null)
+
+  const shouldFetch = !ENV?.IN_PACED_COURSE
+
+  const params: Record<string, string | number> = useMemo(() => {
+    return {per_page: 100}
+  }, [])
+
+  const {data: fetchedCourseSettings, isSuccess: courseSettingsIsSuccess} =
+    useQuery<CourseSettings>({
+      queryKey: ['courseSettings', courseId],
+      queryFn: getCourseSettings,
+      enabled: shouldFetch && checkMasteryPaths,
+    })
+
+  const {baseFetchedOptions, isLoading} = useGetAssigneeOptions({
+    allOptions,
+    courseId,
+    defaultOptions: defaultValues,
+    groupCategoryId,
+    shouldFetch,
+    params,
+    setHasErrors,
+  })
+
+  const baseDefaultOptions = useMemo(() => {
+    const defaultOptions = everyoneOption ? [everyoneOption] : []
+    if (courseSettingsIsSuccess) {
+      const courseSettings = fetchedCourseSettings
+      if (courseSettings?.conditional_release) {
+        defaultOptions.push({id: 'mastery_paths', value: I18n.t('Mastery Paths')})
+      }
+    } else if (fetchedCourseSettings) {
+      // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
+      showFlashError(I18n.t('Failed to load course settings'))(fetchedCourseSettings?.reason)
+      setHasErrors(true)
+    }
+
+    return defaultOptions
+  }, [courseSettingsIsSuccess, everyoneOption, fetchedCourseSettings])
 
   useEffect(() => {
-    const params: Record<string, string> = {}
-    const shouldSearchTerm = searchTerm.length > 2
-    if (
-      (shouldSearchTerm || searchTerm === '') &&
-      !disableFetch &&
-      !isLoading &&
-      !customAllOptions
-    ) {
-      setIsLoading(true)
-      if (shouldSearchTerm) {
-        params.search_term = searchTerm
-      }
-      const fetchSections =
-        (!loaded || searchTerm !== '') &&
-        doFetchApi({
-          path: `/api/v1/courses/${courseId}/sections`,
-          params,
-        })
-      const fetchStudents =
-        (!loaded || searchTerm !== '') &&
-        doFetchApi({
-          path: `/api/v1/courses/${courseId}/users`,
-          params: {...params, enrollment_type: 'student'},
-        })
+    const newOptions = uniqBy([...baseDefaultOptions, ...baseFetchedOptions], 'id')
 
-      const fetchCourseSettings =
-        !loaded &&
-        checkMasteryPaths &&
-        doFetchApi({
-          path: `/api/v1/courses/${courseId}/settings`,
-        })
-
-      const fetchGroups =
-        groupCategoryId &&
-        doFetchApi({
-          path: `/api/v1/group_categories/${groupCategoryId}/groups`,
-          params,
-        })
-
-      Promise.allSettled(
-        [fetchSections, fetchStudents, fetchCourseSettings, fetchGroups].filter(Boolean)
-      )
-        .then(results => {
-          const sectionsResult = fetchSections ? results[0] : null
-          const studentsResult = fetchStudents ? results[1] : null
-          const courseSettingsResult = fetchCourseSettings ? results[2] : null
-          const groupsResult = fetchGroups ? (loaded ? results[0] : results[3]) : null
-          const sectionsParsedResult: AssigneeOption[] = processResult(
-            sectionsResult,
-            'section',
-            'Sections',
-            allOptions,
-            setHasErrors
-          )
-          let studentsParsedResult: AssigneeOption[] = []
-          const groupsParsedResult: AssigneeOption[] = processResult(
-            groupsResult,
-            'group',
-            'Groups',
-            allOptions,
-            setHasErrors
-          )
-          let masteryPathsOption
-
-          if (studentsResult && studentsResult.status === 'fulfilled') {
-            const studentsJSON = studentsResult.value.json as Record<string, string>[]
-            studentsParsedResult =
-              studentsJSON?.map(({id, name, sis_user_id}: any) => {
-                const parsedId = `student-${id}`
-                // if an existing override exists for this student, use it so we have its overrideId
-                const existing = allOptions.find(option => option.id === parsedId)
-                if (existing !== undefined) {
-                  return {
-                    ...existing,
-                    sisID: sis_user_id,
-                  }
-                }
-                return {
-                  id: parsedId,
-                  value: name,
-                  sisID: sis_user_id,
-                  group: I18n.t('Students'),
-                }
-              }) ?? []
-          } else if (studentsResult) {
-            showFlashError(I18n.t('Failed to load students data'))(studentsResult.reason)
-            setHasErrors(true)
-          }
-
-          if (courseSettingsResult && courseSettingsResult.status === 'fulfilled') {
-            if (courseSettingsResult.value.json.conditional_release) {
-              masteryPathsOption = {id: 'mastery_paths', value: I18n.t('Mastery Paths')}
-            }
-          } else if (courseSettingsResult) {
-            showFlashError(I18n.t('Failed to load course settings'))(courseSettingsResult.reason)
-            setHasErrors(true)
-          }
-          const filteredOptions = allOptions.filter(
-            option =>
-              option.groupCategoryId === undefined || option.groupCategoryId === groupCategoryId
-          )
-          const defaultOptions = [everyoneOption, masteryPathsOption, ...filteredOptions].filter(
-            Boolean
-          )
-          const newOptions = uniqBy(
-            [
-              ...defaultOptions.map(option => {
-                const sisID = studentsParsedResult.find(student => student.id === option.id)?.sisID
-                if (sisID !== undefined) {
-                  return {...option, sisID}
-                }
-                return option
-              }),
-              ...sectionsParsedResult,
-              ...studentsParsedResult,
-              ...groupsParsedResult,
-            ],
-            'id'
-          )
-          setAllOptions(newOptions)
-          setIsLoading(false)
-          setLoaded(true)
-        })
-        .catch(e => {
-          showFlashError(I18n.t('Something went wrong while fetching data'))(e)
-          setHasErrors(true)
-        })
-    }
+    groupCategoryRef.current = groupCategoryId
+    setAllOptions(newOptions)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, searchTerm, disableFetch, customAllOptions, groupCategoryId])
+  }, [baseDefaultOptions, baseFetchedOptions])
 
   useEffect(() => {
     // call onError until all the requests have finished to avoid
@@ -230,24 +113,10 @@ const useFetchAssignees = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasErrors, isLoading])
 
-  useEffect(() => {
-    if (everyoneOption !== undefined && !isLoading) {
-      const newOptions = [...allOptions]
-      const everyoneOptionIndex = allOptions?.findIndex(option => option.id === everyoneOption.id)
-      if (everyoneOptionIndex > -1) {
-        newOptions[everyoneOptionIndex] = everyoneOption
-      } else {
-        newOptions.push(everyoneOption)
-      }
-      setAllOptions(newOptions)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(allOptions), everyoneOption, isLoading])
-
   return {
     allOptions: customAllOptions ?? allOptions,
-    isLoading: customIsLoading ?? isLoading,
-    loadedAssignees: loaded,
+    isLoading,
+    loadedAssignees: true,
     setSearchTerm: customSetSearchTerm ?? setSearchTerm,
   }
 }

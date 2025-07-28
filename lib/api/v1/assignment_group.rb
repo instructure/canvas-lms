@@ -32,7 +32,7 @@ module Api::V1::AssignmentGroup
     integration_data
   ].freeze
 
-  def assignment_group_json(group, user, session, includes = [], opts = {})
+  def assignment_group_json(group, user, session, includes = [], opts = {}, preloaded_enrollments_by_user_id: nil)
     includes ||= []
     opts.reverse_merge!(override_assignment_dates: true, exclude_response_fields: [])
 
@@ -72,6 +72,10 @@ module Api::V1::AssignmentGroup
         ActiveRecord::Associations.preload(assignments, :score_statistic)
       end
 
+      if includes.include?("checkpoints")
+        ActiveRecord::Associations.preload(assignments, :sub_assignments)
+      end
+
       hash["assignments"] = assignments.map do |assignment|
         overrides = if opts[:overrides].present?
                       opts[:overrides].select { |override| override.assignment_id == assignment.id }
@@ -99,7 +103,9 @@ module Api::V1::AssignmentGroup
                                submission: includes.include?("submission") ? opts[:submissions][assignment.id] : nil,
                                master_course_status: opts[:master_course_status],
                                include_assessment_requests: includes.include?("assessment_requests"),
-                               include_checkpoints: includes.include?("checkpoints"))
+                               include_checkpoints: includes.include?("checkpoints"),
+                               include_has_rubric: includes.include?("has_rubric"),
+                               preloaded_enrollments_by_user_id:)
 
         unless opts[:exclude_response_fields].include?("in_closed_grading_period")
           assignment_closed_grading_period_hash = closed_grading_period_hash[json[:id]] || {}

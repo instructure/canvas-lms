@@ -24,11 +24,37 @@ class Loaders::AssessmentRequestLoader < GraphQL::Batch::Loader
     @current_user = current_user
   end
 
-  def perform(assignments)
-    assignments.each do |assignment|
-      reviews = @current_user.assigned_submission_assessments.shard(assignment.shard).for_assignment(assignment.id)
-      valid_student_ids = assignment.course.participating_students.where(id: reviews.select("user_id"))
-      fulfill(assignment, reviews.where(user_id: valid_student_ids))
+  # This is somewhat complicated to remove a plethora of N+1s
+  def perform(input_assignments)
+    valid_students_by_course_id = {}
+
+    assignments_by_shard = input_assignments.group_by(&:shard)
+
+    assignments_by_shard.each do |shard, assignments|
+      assignments.each_slice(1000) do |assignment_slice|
+        all_reviews = @current_user.assigned_submission_assessments.shard(shard).for_assignment(assignment_slice)
+        reviews_by_assignment = all_reviews.group_by { |r| r.submission.assignment_id }
+
+        unless reviews_by_assignment.empty?
+          ActiveRecord::Associations.preload(assignment_slice, :context)
+          assignment_slice.map(&:course).uniq.each do |course|
+            next if valid_students_by_course_id[course.global_id]
+
+            user_ids = all_reviews.map(&:user_id).uniq
+            valid_students_by_course_id[course.global_id] = course.participating_students.where(id: user_ids).pluck(:id)
+          end
+        end
+
+        assignment_slice.each do |assignment|
+          reviews = reviews_by_assignment[assignment.id]
+          if reviews
+            valid_student_ids = valid_students_by_course_id[assignment.course.global_id]
+            fulfill(assignment, reviews.select { |r| valid_student_ids.include?(r.user_id) })
+          else
+            fulfill(assignment, [])
+          end
+        end
+      end
     end
   end
 end

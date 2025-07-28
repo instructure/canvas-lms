@@ -4,7 +4,7 @@
     <textarea name="description">{{description}}</textarea>
   </p>
   <p>
-   <label>
+   <label id="max_participants_container">
     {{checkbox "max_participants_option" id=null}}
     {{#ifEqual calendarEvent.participant_type "Group"}}
       {{#t}}Limit this slot to <input type="number" name="max_participants" class="max-participants" min="1" disabled> groups.{{/t}}

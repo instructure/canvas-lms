@@ -50,7 +50,7 @@ describe('ImportantInfo', () => {
 
   it('does not show title or button if neither showTitle nor canEdit', () => {
     const {queryByText, queryByRole} = render(
-      <ImportantInfo {...getProps({showTitle: false}, {canEdit: false})} />
+      <ImportantInfo {...getProps({showTitle: false}, {canEdit: false})} />,
     )
     expect(queryByText('Homeroom')).not.toBeInTheDocument()
     expect(queryByRole('link', {name: 'Edit important info for Homeroom'})).not.toBeInTheDocument()

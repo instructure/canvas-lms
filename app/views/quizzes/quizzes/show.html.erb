@@ -128,11 +128,11 @@
     <div class="header-bar-right">
       <div class="header-group-left">
         <button id="quiz-publish-link"
-          class='btn quiz-publish-button <%= "disabled" unless @quiz.can_unpublish? %>'
+          class='btn quiz-publish-button <%= "disabled" if @context.horizon_course? || !@quiz.can_unpublish? %>'
           <%= 'data-tooltip' unless @quiz.can_unpublish? %>>
         </button>
         <%= link_to_preview_quiz('class' => "btn", 'id' => "preview_quiz_button", 'preview' => 1) %>
-      <% if @quiz.grants_right?(@current_user, session, :manage_assign_to) && Account.site_admin.feature_enabled?(:differentiated_modules) %>
+      <% if @quiz.grants_right?(@current_user, session, :manage_assign_to) %>
           <button
             class='btn assign-to-link'
             data-quiz-name="<%= @quiz.title %>"
@@ -159,7 +159,7 @@
             <span class="screenreader-only"><%= admin_manage_title %></span>
           </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
-            <% if can_do(@quiz, @current_user, :update) && @assignment %>
+            <% if can_do(@quiz, @current_user, :update) && @assignment && !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
               <li role="presentation">
                 <a href="#" rel="<%= context_url(@context, :context_assignment_rubric_url, @assignment.id) %>" class="show_rubric_link" tabindex="-1" role="menuitem">
                   <i class="icon-rubric"><span class="screenreader-only"><%= admin_show_rubric_title %></span></i>
@@ -343,7 +343,7 @@
     <% if @submission && params[:preview] %>
       <p>
         <div class="alert">
-          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <i class="icon-warning" aria-hidden="true"></i>
           <%= t 'This is a preview of the draft version of the quiz' %>
         </div>
       </p>
@@ -428,4 +428,11 @@
 
   <div id="module_sequence_footer"></div>
 
+  <% if can_do(@quiz, @current_user, :update) && @assignment && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+  <% end %>
+
+  <% if can_do(@quiz, @current_user, :update) && @assignment && !Rubric.rubric_self_assessment_enabled?(@context) && Rubric.rubric_self_assessment_enabled?(@context) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
 </div>

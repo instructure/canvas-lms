@@ -35,9 +35,7 @@ module Canvas
           !@manifest.empty?
         end
 
-        def include?(realpath)
-          @files.include?(realpath)
-        end
+        delegate :include?, to: :@files
 
         def scripts_for(bundle)
           if @manifest.key?(bundle)

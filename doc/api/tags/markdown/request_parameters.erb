@@ -1,0 +1,6 @@
+#### Request Parameters:
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+<% @request_parameters.each do |param| %>| ```<%= param.name(json: false) %>``` | <% if param.required? %>Required<% end %> ```<%= param.swagger_type %>``` | <% if param.deprecated? %> **[DEPRECATED]** Effective <%= param.effective_date %> (notice given <%= param.notice_date %>) <% end %> <%= trim_and_br(htmlify(param.desc)) %> <% if param.enums.present? %> Allowed values: <%= param.enums.map { |v| "`#{v}`" }.join(", ") %> <% end %> |
+<% end %>

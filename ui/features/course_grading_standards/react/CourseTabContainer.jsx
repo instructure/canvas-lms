@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import GradingStandardCollection from '@canvas/grading-standard-collection'
 import GradingPeriodCollection from './gradingPeriodCollection'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('gradingCourseTabContainer')
+const I18n = createI18nScope('gradingCourseTabContainer')
 
 class CourseTabContainer extends React.Component {
   static propTypes = {
@@ -46,15 +46,23 @@ class CourseTabContainer extends React.Component {
       >
         <h1>{I18n.t('Grading')}</h1>
         <div className="ui-tabs-minimal">
-          <ul>
+          <ul data-testid="grading-tabs">
             <li>
-              <a href="#grading-periods-tab" className="grading_periods_tab">
+              <a
+                href="#grading-periods-tab"
+                className="grading_periods_tab"
+                data-testid="grading-periods-tab-link"
+              >
                 {' '}
                 {I18n.t('Grading Periods')}
               </a>
             </li>
             <li>
-              <a href="#grading-standards-tab" className="grading_standards_tab">
+              <a
+                href="#grading-standards-tab"
+                className="grading_standards_tab"
+                data-testid="grading-standards-tab-link"
+              >
                 {' '}
                 {I18n.t('Grading Schemes')}
               </a>

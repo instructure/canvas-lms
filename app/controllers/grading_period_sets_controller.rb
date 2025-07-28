@@ -78,13 +78,13 @@ class GradingPeriodSetsController < ApplicationController
   # @argument enrollment_term_ids[] [Array]
   #   A list of associated term ids for the grading period set
   #
-  # @argument grading_period_set[][title] [Required, String]
+  # @argument grading_period_set[title] [Required, String]
   #   The title of the grading period set
   #
-  # @argument grading_period_set[][weighted] [Boolean]
+  # @argument grading_period_set[weighted] [Boolean]
   #   A boolean to determine whether the grading periods in the set are weighted
   #
-  # @argument grading_period_set[][display_totals_for_all_grading_periods] [Boolean]
+  # @argument grading_period_set[display_totals_for_all_grading_periods] [Boolean]
   #   A boolean to determine whether the totals for all grading periods in the set are displayed
   #
   # @example_response

@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {each, isEmpty, extend as lodashExtend} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'
 import Backbone from '@canvas/backbone'
@@ -37,7 +37,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/avatar/jst/_avatar.handlebars'
 import '../../jst/_reply_form.handlebars'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 extend(EntryView, Backbone.View)
 
@@ -121,7 +121,7 @@ EntryView.prototype.initialize = function () {
         _this.render()
         return entry.trigger('edited')
       }
-    })(this)
+    })(this),
   )
   this.model.on(
     'change:replies',
@@ -134,7 +134,7 @@ EntryView.prototype.initialize = function () {
           return _this.renderTree()
         }
       }
-    })(this)
+    })(this),
   )
   this.model.on('change:rating', this.renderRating)
   return this.model.on('change:rating_sum', this.renderRatingSum)
@@ -226,7 +226,7 @@ EntryView.prototype.addCountsToHeader = function () {
   this.$headerBadges.append(
     entryStatsTemplate({
       stats,
-    })
+    }),
   )
   return (this.addedCountsToHeader = true)
 }
@@ -294,7 +294,7 @@ EntryView.prototype.renderTree = function (opts) {
     perPage: children,
   })
   const page = collection.getPageAsCollection(0)
-  // eslint-disable-next-line new-cap
+
   this.treeView = new this.options.treeView({
     el: this.$replies[0],
     descendants,
@@ -316,7 +316,7 @@ EntryView.prototype.renderDescendantsLink = function () {
     entryStatsTemplate({
       stats,
       showMore: true,
-    })
+    }),
   )
   this.$descendantsLink.addClass('showMore loadDescendants')
   return this.$replies.append(this.$descendantsLink)
@@ -356,7 +356,6 @@ EntryView.prototype.remove = function () {
     return
   }
   if (
-    // eslint-disable-next-line no-alert
     window.confirm(I18n.t('are_your_sure_delete', 'Are you sure you want to delete this entry?'))
   ) {
     this.model.set('deleted', true)
@@ -382,7 +381,7 @@ EntryView.prototype.edit = function () {
       return function () {
         return setTimeout(_this.focus, 0)
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -409,7 +408,7 @@ EntryView.prototype.addReply = function (_event, _$el) {
         _this.trigger('addReply')
         return EntryView.trigger('addReply', entry)
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -422,7 +421,7 @@ EntryView.prototype.renderRating = function () {
   this.$rateLink.toggleClass('discussion-rate-action--checked', !!this.model.get('rating'))
   return this.$rateLink.attr(
     'aria-label',
-    this.model.get('rating') ? I18n.t('Unlike this Entry') : I18n.t('Like this Entry')
+    this.model.get('rating') ? I18n.t('Unlike this Entry') : I18n.t('Like this Entry'),
   )
 }
 

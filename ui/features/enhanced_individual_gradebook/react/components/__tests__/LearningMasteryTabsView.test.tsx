@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import userSettings from '@canvas/user-settings'
 import {fireEvent, render, within} from '@testing-library/react'
 import axios from 'axios'
@@ -27,7 +27,7 @@ import * as ReactRouterDom from 'react-router-dom'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import {GradebookSortOrder} from '../../../types/gradebook.d'
 import LearningMasteryTabsView from '../LearningMasteryTabsView'
-import {OUTCOME_ROLLUP_QUERY_RESPONSE, setGradebookOptions, setupGraphqlMocks} from './fixtures'
+import {OUTCOME_ROLLUP_QUERY_RESPONSE, setGradebookOptions, setupCanvasQueries} from './fixtures'
 
 jest.mock('axios') // mock axios for final grade override helper API call
 jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
@@ -70,6 +70,8 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       data: [],
     })
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
   })
   afterEach(() => {
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
@@ -78,20 +80,18 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
   const renderLearningMasteryGradebookWrapper = (mockOverrides = []) => {
     return render(
-      <QueryProvider>
-        <BrowserRouter basename="">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <MockedProvider mocks={setupGraphqlMocks(mockOverrides)} addTypename={false}>
-                  <LearningMasteryTabsView />
-                </MockedProvider>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </QueryProvider>
+      <BrowserRouter basename="">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MockedQueryProvider>
+                <LearningMasteryTabsView />
+              </MockedQueryProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>,
     )
   }
 
@@ -110,7 +110,8 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       window.ENV.FEATURES = {instui_nav: true}
       mockSearchParams({student: '5', outcome: '1'})
 
-      const {getByTestId, getByText, queryByTestId} = renderLearningMasteryGradebookWrapper()
+      const {getByTestId, getByText, queryByTestId, findByTestId} =
+        renderLearningMasteryGradebookWrapper()
 
       const learningMasteryTab = getByText('Learning Mastery')
       expect(learningMasteryTab).toBeInTheDocument()
@@ -125,14 +126,16 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       expect(gradebookExportLink).toBeInTheDocument()
       expect(gradebookExportLink).toHaveAttribute(
         'href',
-        'https://www.testattachment.com/attachment'
+        'https://www.testattachment.com/attachment',
       )
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
       // content selection query params
       await new Promise(resolve => setTimeout(resolve, 0))
 
-      const contentSelectionStudent = getByTestId('learning-mastery-content-selection-student')
+      const contentSelectionStudent = await findByTestId(
+        'learning-mastery-content-selection-student',
+      )
       expect(contentSelectionStudent).toBeInTheDocument()
       expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
 
@@ -170,7 +173,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       })
       window.ENV.FEATURES = {instui_nav: true}
       mockSearchParams({student: '5', outcome: '1'})
-      const {getByTestId, getByText} = renderLearningMasteryGradebookWrapper()
+      const {getByTestId, getByText, findByTestId} = renderLearningMasteryGradebookWrapper()
 
       const learningMasteryTab = getByText('Learning Mastery')
       expect(learningMasteryTab).toBeInTheDocument()
@@ -185,14 +188,16 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       expect(gradebookExportLink).toBeInTheDocument()
       expect(gradebookExportLink).toHaveAttribute(
         'href',
-        'https://www.testattachment.com/attachment'
+        'https://www.testattachment.com/attachment',
       )
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
       // content selection query params
       await new Promise(resolve => setTimeout(resolve, 0))
 
-      const contentSelectionStudent = getByTestId('learning-mastery-content-selection-student')
+      const contentSelectionStudent = await findByTestId(
+        'learning-mastery-content-selection-student',
+      )
       expect(contentSelectionStudent).toBeInTheDocument()
       expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
 
@@ -220,15 +225,15 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       const outcomeInformationTitle = getByTestId('outcome-information-calculation-method')
       expect(outcomeInformationTitle).toBeInTheDocument()
       expect(
-        within(outcomeInformationTitle).getByText('Calculation Method: Decaying Average - 65%/35%')
+        within(outcomeInformationTitle).getByText('Calculation Method: Decaying Average - 65%/35%'),
       ).toBeInTheDocument()
 
       const outcomeInformationExample = getByTestId('outcome-information-example')
       expect(outcomeInformationExample).toBeInTheDocument()
       expect(
         within(outcomeInformationExample).getByText(
-          'Example: Most recent result counts as 65% of mastery weight, average of all other results count as 35% of weight. If there is only one result, the single score will be returned.'
-        )
+          'Example: Most recent result counts as 65% of mastery weight, average of all other results count as 35% of weight. If there is only one result, the single score will be returned.',
+        ),
       ).toBeInTheDocument()
       // outcome-information-total-result
     })
@@ -236,7 +241,8 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
   describe('with no presets on learning mastery', () => {
     it('renders on user changes the tab', async () => {
-      const {getByText, queryByTestId, getByTestId} = renderLearningMasteryGradebookWrapper()
+      const {getByText, queryByTestId, getByTestId, findByTestId} =
+        renderLearningMasteryGradebookWrapper()
 
       const assignmentTabData = queryByTestId('assignment-data')
       expect(assignmentTabData).toBeInTheDocument()
@@ -258,7 +264,9 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
 
       // Content selection
-      const contentSelectionStudent = getByTestId('learning-mastery-content-selection-student')
+      const contentSelectionStudent = await findByTestId(
+        'learning-mastery-content-selection-student',
+      )
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
 
       const contentSelectionOutcome = getByTestId('learning-mastery-content-selection-outcome')
@@ -267,28 +275,28 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       // Outcome Result
       const outcomeResult = getByTestId('student-outcome-results-empty')
       expect(
-        within(outcomeResult).getByText('Select a student and an outcome to view results.')
+        within(outcomeResult).getByText('Select a student and an outcome to view results.'),
       ).toBeInTheDocument()
 
       // Student Information
       const studentInformation = getByTestId('student-information-empty')
       expect(
         within(studentInformation).getByText(
-          'Select a student to view additional information here.'
-        )
+          'Select a student to view additional information here.',
+        ),
       ).toBeInTheDocument()
 
       // Outcome Information
       const outcomeInformation = getByTestId('outcome-information-empty')
       expect(
-        within(outcomeInformation).getByText('Select a outcome to view additional information')
+        within(outcomeInformation).getByText('Select a outcome to view additional information'),
       ).toBeInTheDocument()
     })
   })
 
-  describe('without presets on induvidual gradebook', () => {
+  describe('without presets on individual gradebook', () => {
     it('renders without error', async () => {
-      const {queryByTestId, getByTestId} = renderLearningMasteryGradebookWrapper()
+      const {queryByTestId, getByTestId, findByTestId} = renderLearningMasteryGradebookWrapper()
 
       const assignmentTabData = queryByTestId('assignment-data')
       expect(assignmentTabData).toBeInTheDocument()
@@ -329,33 +337,97 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0))
 
-      const contentSelectionStudent = getByTestId('content-selection-student')
+      const contentSelectionStudent = await findByTestId('content-selection-student')
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
       const contentSelectionAssignment = getByTestId('content-selection-assignment')
       expect(
-        within(contentSelectionAssignment).getByText('No Assignment Selected')
+        within(contentSelectionAssignment).getByText('No Assignment Selected'),
       ).toBeInTheDocument()
 
       const gradingResults = getByTestId('grading-results-empty')
       expect(
         within(gradingResults).getByText(
-          'Select a student and an assignment to view and edit grades.'
-        )
+          'Select a student and an assignment to view and edit grades.',
+        ),
       ).toBeInTheDocument()
 
       const studentInformation = getByTestId('student-information-empty')
       expect(
         within(studentInformation).getByText(
-          'Select a student to view additional information here.'
-        )
+          'Select a student to view additional information here.',
+        ),
       ).toBeInTheDocument()
 
       const assignmentInformation = getByTestId('assignment-information-empty')
       expect(
         within(assignmentInformation).getByText(
-          'Select an assignment to view additional information here.'
-        )
+          'Select an assignment to view additional information here.',
+        ),
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('learning mastery tab', () => {
+    describe('with account_level_mastery_scales turned OFF', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {instui_nav: true, account_level_mastery_scales: false}
+        mockSearchParams({student: '5', outcome: '1'})
+      })
+
+      it('renders student outcome rollup results with outcome mastery points', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const studentOutcomeRollupResult = getByText('Current Mastery Score: 5 out of 3')
+        expect(studentOutcomeRollupResult).toBeInTheDocument()
+      })
+
+      it('renders outcome information with outcome calculation method and calculation int', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const outcomeInformation = getByText('Calculation Method: Decaying Average - 65%/35%')
+        expect(outcomeInformation).toBeInTheDocument()
+      })
+    })
+
+    describe('with account_level_mastery_scales turned ON', () => {
+      beforeEach(() => {
+        window.ENV.FEATURES = {instui_nav: true, account_level_mastery_scales: true}
+        mockSearchParams({student: '5', outcome: '1'})
+      })
+
+      it('renders student outcome rollup results with course outcome proficiency mastery points', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const studentOutcomeRollupResult = getByText('Current Mastery Score: 5 out of 5')
+        expect(studentOutcomeRollupResult).toBeInTheDocument()
+      })
+
+      it('renders outcome information with course outcome calculation method', async () => {
+        const {getByText} = renderLearningMasteryGradebookWrapper()
+
+        const learningMasteryTab = getByText('Learning Mastery')
+        expect(learningMasteryTab).toBeInTheDocument()
+
+        fireEvent.click(learningMasteryTab)
+
+        const outcomeInformation = getByText('Calculation Method: Achieve mastery 5 times')
+        expect(outcomeInformation).toBeInTheDocument()
+      })
     })
   })
 })

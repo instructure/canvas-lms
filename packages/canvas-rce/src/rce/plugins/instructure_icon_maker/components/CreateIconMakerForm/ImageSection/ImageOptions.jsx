@@ -42,7 +42,7 @@ const getCompressionMessage = () =>
     'Your image has been compressed for Icon Maker. Images less than {size} KB will not be compressed.',
     {
       size: MAX_IMAGE_SIZE_BYTES / 1024,
-    }
+    },
   )
 
 function renderImagePreview({loading}, embedImage) {
@@ -107,7 +107,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
     el => {
       if (el && isImageActionFocused) el.focus()
     },
-    [isImageActionFocused]
+    [isImageActionFocused],
   )
 
   // After submitting cropper modal a new embedded image should be generated
@@ -122,7 +122,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
       }
       createCroppedImageSvg(state.cropperSettings, settings.imageSettings.image)
         .then(generatedSvg =>
-          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+          convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'})),
         )
         .then(base64Image => {
           trayDispatch({
@@ -130,7 +130,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
             payload: base64Image,
           })
         })
-        // eslint-disable-next-line no-console
+         
         .catch(error => console.error(error))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,7 +149,7 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
             dispatch,
             trayDispatch,
             setIsImageActionFocused,
-            imageActionRef
+            imageActionRef,
           )
         ) : (
           <ModeSelect

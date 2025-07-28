@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {Component, createRef} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -37,7 +37,7 @@ import EmptyDesert from '@canvas/images/react/EmptyDesert'
 
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
 
-const I18n = useI18nScope('security_panel')
+const I18n = createI18nScope('security_panel')
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 
@@ -62,6 +62,8 @@ export class Whitelist extends Component {
   static defaultProps = {
     inherited: false,
   }
+
+  domainNameInputRef = createRef()
 
   state = {
     addDomainInputValue: '',
@@ -100,10 +102,11 @@ export class Whitelist extends Component {
         errors: [
           {
             text: I18n.t('Invalid domain'),
-            type: 'error',
+            type: 'newError',
           },
         ],
       })
+      this.domainNameInputRef.current.focus()
     }
   }
 
@@ -158,6 +161,7 @@ export class Whitelist extends Component {
         </View>
 
         <form
+          noValidate={true}
           onSubmit={e => {
             e.preventDefault()
             this.handleSubmit()
@@ -166,7 +170,7 @@ export class Whitelist extends Component {
           {domainLimitReached && (
             <Alert variant="error" margin="small 0">
               {I18n.t(
-                `You have reached the domain limit. You can add more domains by deleting existing domains in your allowed list.`
+                `You have reached the domain limit. You can add more domains by deleting existing domains in your allowed list.`,
               )}
             </Alert>
           )}
@@ -174,7 +178,7 @@ export class Whitelist extends Component {
           {this.props.inherited && this.props.isSubAccount && (
             <Alert variant="info" margin="small 0">
               {I18n.t(
-                `Domain editing is disabled when security settings are inherited from a parent account.`
+                `Domain editing is disabled when security settings are inherited from a parent account.`,
               )}
             </Alert>
           )}
@@ -182,11 +186,13 @@ export class Whitelist extends Component {
           <Flex>
             <Flex.Item shouldGrow={true} shouldShrink={true} padding="0 medium 0 0">
               <TextInput
+                ref={this.domainNameInputRef}
                 renderLabel={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
                 disabled={(this.props.inherited && this.props.isSubAccount) || domainLimitReached}
+                isRequired={true}
                 onChange={e => {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}
@@ -249,13 +255,13 @@ export class Whitelist extends Component {
             <p>
               {I18n.t(
                 `The following domains have automatically been allowed from tools that already exist in your account.
-                 To remove these domains, remove the associated tools.`
+                 To remove these domains, remove the associated tools.`,
               )}
             </p>
             <p>
               {I18n.t(
                 `NOTE: Associated tools are only listed once, even if they have
-                been installed in multiple subaccounts.`
+                been installed in multiple subaccounts.`,
               )}
             </p>
             <Table

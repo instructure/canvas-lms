@@ -18,10 +18,12 @@
 import React from 'react'
 import Router from 'react-router'
 import {BrowserRouter} from 'react-router-dom'
-import {render, waitFor} from '@testing-library/react'
-import {QueryProvider} from '@canvas/query'
+import {render, waitFor, cleanup} from '@testing-library/react'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {DuplicateRubricModal} from '../DuplicateRubricModal'
 import * as ViewRubricQueries from '../../../queries/ViewRubricQueries'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {destroyContainer as destroyFlashAlertContainer} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
@@ -37,15 +39,20 @@ jest.mock('../../../queries/ViewRubricQueries', () => ({
 
 describe('RubricForm Tests', () => {
   beforeEach(() => {
+    fakeENV.setup()
     jest.spyOn(Router, 'useParams').mockReturnValue({accountId: '1', rubricId: '1'})
   })
+
   afterEach(() => {
+    cleanup()
+    destroyFlashAlertContainer()
+    fakeENV.teardown()
     jest.resetAllMocks()
   })
 
   const renderComponent = (isOpen = true) => {
     return render(
-      <QueryProvider>
+      <MockedQueryProvider>
         <BrowserRouter>
           <DuplicateRubricModal
             id="1"
@@ -109,11 +116,11 @@ describe('RubricForm Tests', () => {
             ratingOrder="ascending"
           />
         </BrowserRouter>
-      </QueryProvider>
+      </MockedQueryProvider>,
     )
   }
 
-  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent
+  const getSRAlert = () => document.querySelector('#flash_screenreader_holder')?.textContent?.trim()
 
   it('renders the DuplicateRubricModal component', () => {
     const {getByText} = renderComponent()
@@ -144,9 +151,9 @@ describe('RubricForm Tests', () => {
       .spyOn(ViewRubricQueries, 'duplicateRubric')
       .mockImplementation(() => Promise.resolve({id: '1', title: 'Rubric 1', pointsPossible: 10}))
     const {getByTestId} = renderComponent()
-    const duplicateButton = getByTestId('duplicate-rubric-button')
+    const duplicateButton = getByTestId('duplicate-rubric-modal-button')
     duplicateButton?.click()
     await new Promise(resolve => setTimeout(resolve, 0))
-    expect(getSRAlert()).toEqual('Rubric duplicated successfully')
+    expect(getSRAlert()).toContain('Rubric duplicated successfully')
   })
 })

@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/QuestionRoute', () => {
     render(
       <MemoryRouter>
         <QuestionRoute questions={[]} query={{}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

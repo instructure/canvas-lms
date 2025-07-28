@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {func, bool} from 'prop-types'
 
@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import propTypes from '../propTypes'
 
-const I18n = useI18nScope('discussion_settings')
+const I18n = createI18nScope('discussion_settings')
 
 const STUDENT_SETTINGS = [
   'allow_student_forum_attachments',
@@ -41,7 +41,7 @@ const STUDENT_SETTINGS = [
 
 export default class DiscussionSettings extends Component {
   static propTypes = {
-    courseSettings: propTypes.courseSettings, // eslint-disable-line react/no-unused-prop-types
+    courseSettings: propTypes.courseSettings,
     isSavingSettings: bool.isRequired,
     isSettingsModalOpen: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
@@ -68,7 +68,7 @@ export default class DiscussionSettings extends Component {
 
   defaultStudentSettingsValues = props => {
     const defaultChecked = Object.keys(props.courseSettings).filter(
-      key => props.courseSettings[key] === true && STUDENT_SETTINGS.includes(key)
+      key => props.courseSettings[key] === true && STUDENT_SETTINGS.includes(key),
     )
     return defaultChecked
   }
@@ -76,7 +76,7 @@ export default class DiscussionSettings extends Component {
   handleSavedClick = () => {
     if (this.props.permissions.change_settings) {
       const falseSettings = STUDENT_SETTINGS.filter(
-        item => !this.state.studentSettings.includes(item)
+        item => !this.state.studentSettings.includes(item),
       )
       const falseUpdateSettings = falseSettings.reduce((accumulator, key) => {
         const accumulatorCopy = accumulator
@@ -90,7 +90,7 @@ export default class DiscussionSettings extends Component {
       }, {})
       this.props.saveSettings(
         {markAsRead: this.state.markAsRead},
-        Object.assign(trueUpdateSettings, falseUpdateSettings)
+        Object.assign(trueUpdateSettings, falseUpdateSettings),
       )
     } else {
       this.props.saveSettings({markAsRead: this.state.markAsRead})
@@ -183,8 +183,13 @@ export default class DiscussionSettings extends Component {
             this._settingsButton = button
           }}
           onClick={this.props.toggleModalOpen}
+          as="span"
+          display="block"
+          textAlign="center"
+          renderIcon={IconSettingsLine}
+          data-testid="discussion-setting-button"
         >
-          <IconSettingsLine />
+          {I18n.t('Settings')}
           <ScreenReaderContent>{I18n.t('Discussion Settings')}</ScreenReaderContent>
         </Button>
         <Modal

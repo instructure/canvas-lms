@@ -17,7 +17,7 @@
  */
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import CourseNotificationSettingsQuery from './CourseNotificationSettingsQuery'
 import React from 'react'
 

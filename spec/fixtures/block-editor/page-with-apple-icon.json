@@ -1,0 +1,115 @@
+{
+  "ROOT": {
+    "type": {
+      "resolvedName": "PageBlock"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Page",
+    "custom": {},
+    "hidden": false,
+    "nodes": [
+      "erBCjb4f1F"
+    ],
+    "linkedNodes": {}
+  },
+  "erBCjb4f1F": {
+    "type": {
+      "resolvedName": "ColumnsSection"
+    },
+    "isCanvas": false,
+    "props": {
+      "columns": 1
+    },
+    "displayName": "Columns",
+    "custom": {
+      "isSection": true
+    },
+    "parent": "ROOT",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "columns__inner": "0PR_eDXcC5"
+    }
+  },
+  "0PR_eDXcC5": {
+    "type": {
+      "resolvedName": "ColumnsSectionInner"
+    },
+    "isCanvas": true,
+    "props": {},
+    "displayName": "Columns Inner",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "erBCjb4f1F",
+    "hidden": false,
+    "nodes": [
+      "q0-rtsEu6T"
+    ],
+    "linkedNodes": {}
+  },
+  "q0-rtsEu6T": {
+    "type": {
+      "resolvedName": "GroupBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "alignment": "start",
+      "verticalAlignment": "start",
+      "layout": "column",
+      "resizable": false,
+      "isColumn": true
+    },
+    "displayName": "Group",
+    "custom": {
+      "isResizable": false,
+      "isBlock": true,
+      "displayName": "Column"
+    },
+    "parent": "0PR_eDXcC5",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {
+      "group__inner": "Arka26rHUm"
+    }
+  },
+  "Arka26rHUm": {
+    "type": {
+      "resolvedName": "NoSections"
+    },
+    "isCanvas": true,
+    "props": {
+      "className": "group-block__inner",
+      "placeholderText": "Drop a block to add it here"
+    },
+    "displayName": "NoSections",
+    "custom": {
+      "noToolbar": true
+    },
+    "parent": "q0-rtsEu6T",
+    "hidden": false,
+    "nodes": [
+      "rLP27io1vi"
+    ],
+    "linkedNodes": {}
+  },
+  "rLP27io1vi": {
+    "type": {
+      "resolvedName": "IconBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "iconName": "apple",
+      "size": "small"
+    },
+    "displayName": "Icon",
+    "custom": {
+      "isBlock": true
+    },
+    "parent": "Arka26rHUm",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  }
+}

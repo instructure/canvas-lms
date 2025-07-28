@@ -35,15 +35,27 @@ describe Lti::Messages::DeepLinkingRequest do
     )
   end
 
-  let(:jws) { jwt_message.generate_post_payload }
+  let(:jws) { jwt_message.to_cached_hash }
 
   it_behaves_like "lti 1.3 message initialization"
 
   describe "#generate_post_payload_message" do
-    subject { jws["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"] }
+    subject { jws[:post_payload]["https://purl.imsglobal.org/spec/lti-dl/claim/deep_linking_settings"] }
 
     it 'sets the "deep_link_return_url"' do
       expect(subject["deep_link_return_url"]).to eq deep_linking_return_url
+    end
+
+    context "when there is a secure_params with an assignment id" do
+      let(:expander_opts) { super().merge(secure_params: assignment.secure_params) }
+
+      it 'sets the assignment "deep_link_return_url"' do
+        expect(expander.controller).to receive(:polymorphic_url) do |_fragments, params|
+          expect(CanvasSecurity.decode_jwt(params[:data])["assignment_id"]).to eq(assignment.id)
+          deep_linking_return_url
+        end
+        expect(subject["deep_link_return_url"]).to eq deep_linking_return_url
+      end
     end
 
     context "when assignment with nil lti_context_id exists" do
@@ -199,6 +211,25 @@ describe Lti::Messages::DeepLinkingRequest do
         let(:accept_media_types) { "application/vnd.ims.lti.v1.ltilink" }
         let(:auto_create) { true }
         let(:accept_multiple) { true }
+      end
+    end
+
+    context 'when resource type is "ActivityAssetProcessor"' do
+      let(:opts) { { resource_type: "ActivityAssetProcessor" } }
+      let(:expander_opts) { super().merge(secure_params: assignment.secure_params) }
+
+      it_behaves_like "sets deep linking attributes" do
+        let(:accept_types) { %w[ltiAssetProcessor] }
+        let(:accept_presentation_document_targets) { %w[iframe window] }
+        let(:accept_media_types) { "application/vnd.ims.lti.v1.ltilink" }
+        let(:auto_create) { true }
+        let(:accept_multiple) { true }
+      end
+
+      it "sets the activity id" do
+        activity_claim = jws[:post_payload]["https://purl.imsglobal.org/spec/lti/claim/activity"]
+
+        expect(activity_claim["id"]).to eq(assignment.lti_context_id)
       end
     end
   end

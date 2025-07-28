@@ -126,4 +126,9 @@
   color: #21f8f8 !important;
 }
 
+.mejs-button.mejs-speed-button .mejs-speed-selector{
+  height: 150px;
+}
+.mejs-button.mejs-speed-button .mejs-speed-selector li, label { margin-bottom: 0px; }
+
 /* stylelint-enable property-disallowed-list, declaration-property-value-disallowed-list */

@@ -1,4 +1,3 @@
-/* eslint-disable promise/no-callback-in-promise */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,86 +16,111 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CardDashboardLoader, resetCardCache} from '../loadCardDashboard'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
+const server = setupServer()
+
 describe('loadCardDashboard', () => {
   let cardDashboardLoader
+
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
-    moxios.install()
     cardDashboardLoader = new CardDashboardLoader()
+    // Clear any cached data from previous tests
+    resetCardCache()
+    // Clear session storage to prevent cached data from affecting tests
+    sessionStorage.clear()
+    // Mock sessionStorage.getItem to return null to prevent cached data
+    jest.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
   })
 
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
     resetCardCache()
+    jest.restoreAllMocks()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('with observer', () => {
-    it('loads student cards asynchronously and calls back renderFn', done => {
-      const callback = jest.fn()
-      cardDashboardLoader.loadCardDashboard(callback, 2)
-      moxios.wait(() => {
-        expect(callback).not.toHaveBeenCalled()
-        moxios.requests
-          .mostRecent()
-          .respondWith({
+    it('loads student cards asynchronously and calls back renderFn', async () => {
+      server.use(
+        http.get('*/api/v1/dashboard/dashboard_cards', ({request}) => {
+          const url = new URL(request.url)
+          expect(url.searchParams.get('observed_user_id')).toBe('2')
+          return new HttpResponse(JSON.stringify(['card']), {
             status: 200,
-            response: ['card'],
+            headers: {'Content-Type': 'application/json'},
           })
-          .then(() => {
-            expect(callback).toHaveBeenCalledWith(['card'], true)
-            done()
-          })
-          .catch(e => {
-            throw e
-          })
-      })
+        }),
+      )
+
+      const callback = jest.fn()
+
+      // The CardDashboardLoader uses a timeout to debounce calls
+      cardDashboardLoader.loadCardDashboard(callback, 2)
+
+      // Wait for the async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(callback).toHaveBeenCalledWith(['card'], true)
     })
 
-    it('saves student cards and calls back renderFn immediately if requested again', done => {
+    it('saves student cards and calls back renderFn immediately if requested again', async () => {
+      let requestCount = 0
+      server.use(
+        http.get('*/api/v1/dashboard/dashboard_cards', () => {
+          requestCount++
+          return new HttpResponse(JSON.stringify(['card']), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
       const callback = jest.fn()
       cardDashboardLoader.loadCardDashboard(callback, 5)
-      moxios.wait(() => {
-        moxios.requests
-          .mostRecent()
-          .respondWith({
-            status: 200,
-            response: ['card'],
-          })
-          .then(() => {
-            resetCardCache()
-            cardDashboardLoader.loadCardDashboard(callback, 5)
-            moxios.wait(() => {
-              expect(callback).toHaveBeenCalledWith(['card'], true)
-              expect(moxios.requests.count()).toBe(1)
-              done()
-            })
-          })
-          .catch(e => {
-            throw e
-          })
-      })
+
+      // Wait for first load
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      // Reset and load again
+      resetCardCache()
+      cardDashboardLoader.loadCardDashboard(callback, 5)
+
+      // Wait for second load
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(callback).toHaveBeenCalledWith(['card'], true)
+      expect(requestCount).toBe(1) // Should only make one request due to caching
     })
 
-    it('fails gracefully', done => {
-      const callback = jest.fn()
-      cardDashboardLoader.loadCardDashboard(callback, 2)
-      moxios.wait(() => {
-        // eslint-disable-next-line promise/catch-or-return
-        moxios.requests
-          .mostRecent()
-          .respondWith({
+    it('fails gracefully', async () => {
+      server.use(
+        http.get('*/api/v1/dashboard/dashboard_cards', () => {
+          return new HttpResponse(null, {
             status: 500,
           })
-          .then(() => {
-            expect(showFlashAlert).toHaveBeenCalledTimes(1)
-            done()
-          })
-      })
+        }),
+      )
+
+      const callback = jest.fn()
+      cardDashboardLoader.loadCardDashboard(callback, 2)
+
+      // Wait for the async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -18,17 +18,20 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {createRoot} from 'react-dom/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import * as apiClient from './apiClient'
 
-const I18n = useI18nScope('OutcomesImporter')
+const I18n = createI18nScope('OutcomesImporter')
 
-const unmount = mount => () => ReactDOM.unmountComponentAtNode(mount)
+const unmount = root => () => {
+  root.unmount()
+}
+
 export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
   return apiClient
     .queryImportStatus(props.contextUrlRoot, 'latest')
@@ -36,14 +39,14 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
       if (response.status === 200 && response.data.workflow_state === 'importing') {
         const importId = response.data.id
         const invokedImport = userId === response.data.user.id
-        ReactDOM.render(
+        const root = createRoot(mount)
+        root.render(
           <OutcomesImporter
             {...props}
-            hide={unmount(mount)}
+            hide={unmount(root)}
             importId={importId}
             invokedImport={invokedImport}
           />,
-          mount
         )
       }
     })
@@ -51,7 +54,8 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
 }
 
 export function showOutcomesImporter({mount, ...props}) {
-  ReactDOM.render(<OutcomesImporter {...props} hide={unmount(mount)} invokedImport={true} />, mount)
+  const root = createRoot(mount)
+  root.render(<OutcomesImporter {...props} hide={unmount(root)} invokedImport={true} />)
 }
 
 export default class OutcomesImporter extends Component {
@@ -85,14 +89,13 @@ export default class OutcomesImporter extends Component {
 
   pollImportStatus(importId) {
     this.pollStatus = setInterval(() => {
-      // eslint-disable-next-line promise/catch-or-return
       apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
         const workflowState = response.data.workflow_state
         if (workflowState === 'succeeded' || workflowState === 'failed') {
           this.completeUpload(
             importId,
             response.data.processing_errors.length,
-            workflowState === 'succeeded'
+            workflowState === 'succeeded',
           )
           clearInterval(this.pollStatus)
         }
@@ -137,7 +140,7 @@ export default class OutcomesImporter extends Component {
       showFlashAlert({
         type: 'error',
         message: I18n.t(
-          'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.'
+          'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.',
         ),
       })
     } else {
@@ -172,7 +175,7 @@ export default class OutcomesImporter extends Component {
     showFlashAlert({
       type: 'warning',
       message: I18n.t(
-        'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+        'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.',
       ),
     })
   }

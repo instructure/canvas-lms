@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::AddForeignKey do
   subject(:cop) { described_class.new }
 
   it "complains if `delay_validation` is missing" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -30,13 +30,13 @@ describe RuboCop::Cop::Migration::AddForeignKey do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to include "delay_validation: true"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to include "delay_validation: true"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "complains if `disable_ddl_transaction!` is missing" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -45,13 +45,13 @@ describe RuboCop::Cop::Migration::AddForeignKey do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to include "delay_validation: true"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to include "delay_validation: true"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "is happy if both `disable_ddl_transaction!` and `delay_validation` are present" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
         disable_ddl_transaction!
@@ -61,11 +61,11 @@ describe RuboCop::Cop::Migration::AddForeignKey do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "does not complain if we're operating on a newly-created table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -77,11 +77,11 @@ describe RuboCop::Cop::Migration::AddForeignKey do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "does not complain in `down`" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class MyMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -90,6 +90,6 @@ describe RuboCop::Cop::Migration::AddForeignKey do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 end

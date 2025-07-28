@@ -20,7 +20,7 @@ import {AnonymousUser} from './AnonymousUser'
 import {DiscussionEntry} from './DiscussionEntry'
 import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {User} from './User'
 import {Submission} from './Submission'
 
@@ -152,6 +152,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
     $message: String
     $fileId: ID
     $removeAttachment: Boolean
+    $quotedEntryId: ID
   ) {
     updateDiscussionEntry(
       input: {
@@ -159,6 +160,7 @@ export const UPDATE_DISCUSSION_ENTRY = gql`
         message: $message
         fileId: $fileId
         removeAttachment: $removeAttachment
+        quotedEntryId: $quotedEntryId
       }
     ) {
       discussionEntry {
@@ -255,6 +257,29 @@ export const UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE = gql`
     ) {
       user {
         discussionsSplitscreenView
+      }
+    }
+  }
+`
+
+export const UPDATE_DISCUSSION_TOPIC_PARTICIPANT = gql`
+  mutation UpdateDiscussionTopicParticipant(
+    $discussionTopicId: ID!
+    $sortOrder: DiscussionSortOrderType
+    $expanded: Boolean
+    $summaryEnabled: Boolean
+  ) {
+    updateDiscussionTopicParticipant(
+      input: {discussionTopicId: $discussionTopicId, sortOrder: $sortOrder, expanded: $expanded, summaryEnabled: $summaryEnabled}
+    ) {
+      discussionTopic {
+        id
+        participant {
+          id
+          sortOrder
+          expanded
+          summaryEnabled
+        }
       }
     }
   }

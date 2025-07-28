@@ -30,7 +30,7 @@ function renderComponent(props) {
       {...props}
     >
       the children
-    </AccordionSection>
+    </AccordionSection>,
   )
 }
 

@@ -17,27 +17,29 @@
  */
 
 import React from 'react'
-import {render, act, fireEvent} from '@testing-library/react'
+import {render, act, fireEvent, waitFor} from '@testing-library/react'
 import JobStats from '../JobStats'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import mockJobsApi from './MockJobsAPI'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.useFakeTimers()
 
 describe('JobStats', () => {
-  let oldEnv
   beforeAll(() => {
-    oldEnv = {...window.ENV}
     doFetchApi.mockImplementation(mockJobsApi)
   })
 
   beforeEach(() => {
+    fakeENV.setup({
+      manage_jobs: false,
+    })
     doFetchApi.mockClear()
   })
 
-  afterAll(() => {
-    window.ENV = oldEnv
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   it('loads cluster info', async () => {
@@ -55,8 +57,10 @@ describe('JobStats', () => {
     expect(getByText('530', {selector: 'td'})).toBeInTheDocument()
     expect(getByText('9', {selector: 'td button'})).toBeInTheDocument()
 
-    // since ENV.manage_jobs isn't set
-    expect(queryByText('Unblock', {selector: 'button span'})).not.toBeInTheDocument()
+    // since ENV.manage_jobs is explicitly set to false
+    await waitFor(() => {
+      expect(queryByText('Unblock', {selector: 'button span'})).not.toBeInTheDocument()
+    })
   })
 
   it('refreshes cluster', async () => {
@@ -67,7 +71,7 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shards: ['101']}})
+      expect.objectContaining({params: {job_shards: ['101']}}),
     )
 
     expect(queryByText('jobs held')).not.toBeInTheDocument()
@@ -84,7 +88,10 @@ describe('JobStats', () => {
   })
 
   it('unstucks a cluster', async () => {
-    ENV.manage_jobs = true
+    // Set manage_jobs to true for this test
+    fakeENV.setup({
+      manage_jobs: true,
+    })
 
     const {getByText, queryByText} = render(<JobStats />)
     await act(async () => jest.runAllTimers())
@@ -93,10 +100,10 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(
-      getByText('Are you sure you want to unblock all stuck jobs in this job cluster?')
+      getByText('Are you sure you want to unblock all stuck jobs in this job cluster?'),
     ).toBeInTheDocument()
     expect(
-      getByText('NOTE: Jobs blocked by shard migrations will not be unblocked.')
+      getByText('NOTE: Jobs blocked by shard migrations will not be unblocked.'),
     ).toBeInTheDocument()
 
     fireEvent.click(getByText('Confirm'))
@@ -108,7 +115,7 @@ describe('JobStats', () => {
         method: 'PUT',
         params: {job_shards: ['101']},
         path: '/api/v1/jobs2/unstuck',
-      })
+      }),
     )
 
     await act(async () => jest.advanceTimersByTime(2000))
@@ -126,14 +133,14 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/strands'})
+      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/strands'}),
     )
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/singletons'})
+      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/singletons'}),
     )
 
     const ss_links = getAllByText('baz', {selector: 'td a'})
-    expect(ss_links.length).toEqual(2)
+    expect(ss_links).toHaveLength(2)
     expect(ss_links.map(link => link.getAttribute('href'))).toEqual([
       '//jobs101.example.com/jobs_v2?group_type=strand&group_text=baz&bucket=queued',
       '//jobs101.example.com/jobs_v2?group_type=singleton&group_text=baz&bucket=queued',

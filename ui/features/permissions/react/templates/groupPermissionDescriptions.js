@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('permissions_templates_8')
+const I18n = createI18nScope('permissions_templates_8')
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_courses: contextType => {
@@ -39,4 +39,6 @@ export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_course_observer_enrollments: () => I18n.t('add / remove in courses'),
   manage_course_designer_enrollments: () => I18n.t('add / remove in courses'),
   manage_course_templates: () => I18n.t('create / delete / edit'),
+  users_manage_access_tokens: () => I18n.t('create / update / delete'),
+  manage_differentiation_tags: () => I18n.t('add / delete / manage'),
 }

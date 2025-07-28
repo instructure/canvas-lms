@@ -66,6 +66,25 @@ describe "context modules" do
         expect(mod).to be_unpublished
       end
 
+      it "keeps module workflow state after editing module", priority: "1" do
+        edit_text = "New Module Name"
+        mod = @course.context_modules.first
+        mod.workflow_state = "unpublished"
+        mod.save!
+        go_to_modules
+        expect(unpublished_module_icon(mod.id)).to be_present
+        publish_module_and_items(mod.id)
+        expect(published_module_icon(mod.id)).to be_present
+        manage_module_button(mod).click
+        module_index_menu_tool_link("Edit").click
+        expect(settings_tray_exists?).to be_truthy
+        update_module_name(edit_text)
+        click_settings_tray_update_module_button
+        expect(settings_tray_exists?).to be_falsey
+        expect(ff(".context_module > .header")[0]).to include_text(edit_text)
+        expect(published_module_icon(mod.id)).to be_present
+      end
+
       it "deletes a module", priority: "1" do
         skip_if_safari(:alert)
         f(".ig-header-admin .al-trigger").click
@@ -82,6 +101,17 @@ describe "context modules" do
         expect(fln("New Assignment Title")).to be_displayed
       end
 
+      it "validate only one assignment is created when multiple clicks are done", priority: "2" do
+        first_module = @course.context_modules.reload.first
+        add_module_item_button(first_module).click
+        f("#add_module_item_select").click
+        select_module_item("#assignments_select" + " .module_item_select", "[ Create Assignment ]")
+        replace_content(f("#assignments_select input.item_title"), "New Assignment Title")
+        driver.action.double_click(f(".add_item_button.ui-button")).perform
+        wait_for_ajax_requests
+        expect(@course.assignments.where(title: "New Assignment Title").count).to eq 1
+      end
+
       it "adds a assignment item to a module, publish new assignment refresh page and verify", priority: "2" do
         # this test basically verifies that the published icon is accurate after a page refresh
         mod = @course.context_modules.first
@@ -95,7 +125,8 @@ describe "context modules" do
         wait_for_ajax_requests
         expect(tag.reload).to be_published
         refresh_page
-        driver.action.move_to(f("i.icon-unpublish")).perform
+        f("#course_publish_button button").click
+        f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
         expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
         expect(tag).to be_published
       end
@@ -130,53 +161,8 @@ describe "context modules" do
       end
     end
 
-    context "when adding new module without differentiated modules" do
-      before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
-      end
-
-      before do
-        user_session(@teacher)
-      end
-
-      it "adds a new module", priority: "1" do
-        go_to_modules
-        add_module("New Module")
-        mod = @course.context_modules.first
-        expect(mod.name).to eq "New Module"
-      end
-
-      it "publishes an unpublished module", priority: "1" do
-        go_to_modules
-        add_module("New Module")
-        expect(f(".context_module")).to have_class("unpublished_module")
-        expect(@course.context_modules.count).to eq 1
-        mod = @course.context_modules.first
-        expect(mod.name).to eq "New Module"
-        publish_module_and_items(mod.id)
-        mod.reload
-        expect(mod).to be_published
-        expect(published_module_icon(mod.id)).to be_displayed
-      end
-
-      it "edits a module", priority: "1" do
-        @new_module = @course.context_modules.create! name: "New Module"
-        go_to_modules
-        edit_text = "Module Edited"
-        f(".ig-header-admin .al-trigger").click
-        f(".edit_module_link").click
-        expect(f("#add_context_module_form")).to be_displayed
-        edit_form = f("#add_context_module_form")
-        edit_form.find_element(:id, "context_module_name").send_keys(edit_text)
-        submit_form(edit_form)
-        expect(edit_form).not_to be_displayed
-        expect(f(".context_module > .header")).to include_text(edit_text)
-      end
-    end
-
     context "when adding new module with differentiated modules" do
       before :once do
-        differentiated_modules_on
         @new_module = @course.context_modules.create! name: "New Module"
       end
 
@@ -186,14 +172,12 @@ describe "context modules" do
       end
 
       it "adds a new module with differentiated modules", priority: "1" do
-        differentiated_modules_on
         add_module_with_tray("New Module2")
         mod = @course.context_modules.last
         expect(mod.name).to eq "New Module2"
       end
 
       it "publishes an unpublished module with differentiated modules", priority: "1" do
-        differentiated_modules_on
         add_module_with_tray("New Module2")
         expect(ff(".context_module")[1]).to have_class("unpublished_module")
         expect(@course.context_modules.count).to eq 2

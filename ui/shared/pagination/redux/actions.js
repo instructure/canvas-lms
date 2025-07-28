@@ -31,7 +31,7 @@ export const LoadStates = (function initLoadStates() {
       Object.assign(map, {
         [state]: state,
       }),
-    {}
+    {},
   )
 
   return {
@@ -69,14 +69,14 @@ function createReducePage(actions) {
         [actions.fail]: () => LoadStates.ERRORED,
         [actions.clear]: () => LoadStates.NOT_LOADED,
       },
-      LoadStates.NOT_LOADED
+      LoadStates.NOT_LOADED,
     ),
     items: handleActions(
       {
         [actions.success]: (state, action) => action.payload.data,
         [actions.clear]: () => [],
       },
-      []
+      [],
     ),
   })
 }
@@ -101,7 +101,7 @@ function createPagesReducer(actions) {
             [curPage]: createReducePage(actions)(pageState, action),
           })
         },
-        {...state}
+        {...state},
       )
     } else {
       return state // page or pages is a required prop on payload
@@ -136,13 +136,13 @@ export function createPaginatedReducer(name) {
       {
         [actions.select]: (state, action) => action.payload.page,
       },
-      DEFAULT_PAGE
+      DEFAULT_PAGE,
     ),
     lastPage: handleActions(
       {
         [actions.success]: (state, action) => action.payload.lastPage || state,
       },
-      DEFAULT_PAGE
+      DEFAULT_PAGE,
     ),
     pages: createPagesReducer(actions),
   })

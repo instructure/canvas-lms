@@ -20,9 +20,10 @@ import React, {useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconWarningSolid} from '@instructure/ui-icons'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {View} from '@instructure/ui-view'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 import formatMessage from '../../../../format-message'
 import {Tray} from '@instructure/ui-tray'
 import {TextInput, TextInputProps} from '@instructure/ui-text-input'
@@ -97,8 +98,8 @@ export default function FindReplaceTray({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function usePrevious(value: any) {
-    const ref = useRef()
+  function usePrevious(value: string) {
+    const ref = useRef<string>()
     useEffect(() => {
       ref.current = value
     }, [value])
@@ -154,14 +155,14 @@ export default function FindReplaceTray({
     showReplaceAlert === ''
       ? ''
       : showReplaceAlert === 'replace'
-      ? formatMessage('Replaced {alertFindText} with {alertReplaceText}', {
-          alertFindText,
-          alertReplaceText,
-        })
-      : formatMessage('Replaced all {alertFindText} with {alertReplaceText}', {
-          alertFindText,
-          alertReplaceText,
-        })
+        ? formatMessage('Replaced {alertFindText} with {alertReplaceText}', {
+            alertFindText,
+            alertReplaceText,
+          })
+        : formatMessage('Replaced all {alertFindText} with {alertReplaceText}', {
+            alertFindText,
+            alertReplaceText,
+          })
 
   const renderReplaceAlert = () => {
     if (!showReplaceAlert) {
@@ -186,7 +187,14 @@ export default function FindReplaceTray({
     return <ScreenReaderContent>{alertText}</ScreenReaderContent>
   }
 
-  const errMsg = formatMessage('No results found')
+  const errMsg = (
+    <Flex gap="xx-small" alignItems="center">
+      <IconWarningSolid color="error" data-testid="error-icon" />
+      <Text color="danger" size="small">
+        {formatMessage('No results found')}
+      </Text>
+    </Flex>
+  )
   const messages = findText && max === 0 ? ([{text: errMsg, type: 'error'}] as FormMessage[]) : []
 
   const resultText = () => {
@@ -237,7 +245,7 @@ export default function FindReplaceTray({
     <Tray
       data-mce-component={true}
       label={formatMessage('Find and Replace')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn()}
       onDismiss={onRequestClose}
       open={true}
       placement="end"

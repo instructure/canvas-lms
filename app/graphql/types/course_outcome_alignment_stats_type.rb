@@ -22,11 +22,11 @@ module Types
   class CourseOutcomeAlignmentStatsType < ApplicationObjectType
     graphql_name "CourseOutcomeAlignmentStats"
 
-    field :total_outcomes, Int, null: true
+    field :aligned_artifacts, Int, null: true
     field :aligned_outcomes, Int, null: true
+    field :artifact_alignments, Int, null: true
     field :total_alignments, Int, null: true
     field :total_artifacts, Int, null: true
-    field :aligned_artifacts, Int, null: true
-    field :artifact_alignments, Int, null: true
+    field :total_outcomes, Int, null: true
   end
 end

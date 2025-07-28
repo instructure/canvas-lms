@@ -36,7 +36,7 @@ describe CalendarEvent do
   describe "default_values" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
 
       # Create the initial event
@@ -74,7 +74,7 @@ describe CalendarEvent do
     end
 
     it "populates all day flag" do
-      midnight = Time.at(1_361_862_000) # 2013-02-26 00:00:00
+      midnight = Time.zone.at(1_361_862_000) # 2013-02-26 00:00:00
 
       event_1 = calendar_event_model(time_zone_edited: "Mountain Time (US & Canada)")
       event_1.start_at = event_1.end_at = midnight
@@ -125,9 +125,9 @@ describe CalendarEvent do
   describe "default_values during update" do
     before(:once) do
       course_model
-      @original_start_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @original_start_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       @original_end_at = @original_start_at + 2.hours
-      @midnight = Time.at(1_220_421_600)
+      @midnight = Time.zone.at(1_220_421_600)
       @event = calendar_event_model(
         start_at: @original_start_at,
         end_at: @original_end_at,
@@ -166,7 +166,7 @@ describe CalendarEvent do
         Time.zone = "UTC"
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?("DTSTART:20080903T115500Z")).not_to be_nil
@@ -178,7 +178,7 @@ describe CalendarEvent do
         Time.zone = "Alaska" # -0800
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.include?("DTSTART:20080903T195500Z")).not_to be_nil
@@ -190,30 +190,30 @@ describe CalendarEvent do
         Time.zone = "UTC"
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+        @event.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
-        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtstamp.tz_utc).to be true
-        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
       end
 
       it "returns data for events with times in correct tz" do
         Time.zone = "Alaska" # -0800
         calendar_event_model(start_at: "Sep 3 2008 11:55am", end_at: "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
-        @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+        @event.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
         expect(res.dtstart.tz_utc).to be true
-        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").utc.strftime("%Y-%m-%dT%H:%M:00")
         expect(res.dtend.tz_utc).to be true
-        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
+        expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").utc.strftime("%Y-%m-%dT%H:%M:00")
       end
 
       it "does not fail with no date for all_day event" do
@@ -243,29 +243,36 @@ describe CalendarEvent do
         expect(ev.x_alt_desc.first).to eq @event.description
       end
 
-      it "does not add verifiers to files unless course or attachment is public" do
-        attachment_model(context: course_factory)
-        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
-        calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to_not include("verifier")
+      context "with double testing with disable adding uuid verifier in api ff" do
+        before do
+          attachment_model(context: course_factory)
+        end
 
-        @attachment.file_state = "public"
-        @attachment.save!
+        double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+          it "does not add verifiers to files unless course or attachment is public" do
+            html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
+            calendar_event_model(start_at: "Sep 3 2008 12:00am", description: html)
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to_not include("verifier")
 
-        AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to include("verifier")
+            @attachment.file_state = "public"
+            @attachment.save!
 
-        @attachment.file_state = "hidden"
-        @attachment.save!
-        @course.offer
-        @course.is_public = true
-        @course.save!
+            AdheresToPolicy::Cache.clear
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to include("verifier") unless disable_adding_uuid_verifier_in_api
 
-        AdheresToPolicy::Cache.clear
-        ev = @event.to_ics(in_own_calendar: false)
-        expect(ev.description).to include("verifier")
+            @attachment.file_state = "hidden"
+            @attachment.save!
+            @course.offer
+            @course.is_public = true
+            @course.save!
+
+            AdheresToPolicy::Cache.clear
+            ev = @event.to_ics(in_own_calendar: false)
+            expect(ev.description).to include("verifier") unless disable_adding_uuid_verifier_in_api
+          end
+        end
       end
 
       it "works with media comments in course section events" do
@@ -298,6 +305,35 @@ describe CalendarEvent do
         @event.effective_context_code = @group.asset_string
         ics = @event.to_ics
         expect(ics).to include("SUMMARY:#{@event.title} [#{@course.course_code}]")
+      end
+
+      context "discussion with checkpoints" do
+        before :once do
+          course_model
+          @course.account.enable_feature!(:discussion_checkpoints)
+          @required_replies = 2
+          @reply_to_topic, @reply_to_entry, @topic = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            reply_to_entry_required_count: @required_replies
+          )
+        end
+
+        def url_for_checkpoint(checkpoint)
+          asset_string = checkpoint.context.asset_string
+          start_at = checkpoint.due_at
+          tag_name_id = "assignment_#{checkpoint.parent_assignment_id}"
+          "https://localhost/calendar?include_contexts=#{asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_id}"
+        end
+
+        it "generates correct titles for discussion checkpoints" do
+          expect(@reply_to_topic.to_ics).to include("SUMMARY:#{@topic.title} Reply to Topic")
+          expect(@reply_to_entry.to_ics).to include("SUMMARY:#{@topic.title} Required Replies (#{@required_replies})")
+        end
+
+        it "generates correct urls for discussion checkpoints" do
+          expect(@reply_to_topic.to_ics.match(/URI([\s\S]*?)END/)).not_to be_nil
+          expect(@reply_to_entry.to_ics.match(/URI([\s\S]*?)END/)).not_to be_nil
+        end
       end
     end
   end
@@ -466,7 +502,7 @@ describe CalendarEvent do
 
       context "with event date edited" do
         before :once do
-          @event1.update(start_at: Time.now, end_at: Time.now)
+          @event1.update(start_at: Time.zone.now, end_at: Time.zone.now)
         end
 
         context "edit notification" do
@@ -696,7 +732,6 @@ describe CalendarEvent do
 
       appointment.participants_per_appointment = 2
       appointment.save!
-      expect(appointment.read_attribute(:participants_per_limit)).to be_nil
       expect(appointment.override_participants_per_appointment?).to be_falsey
       expect(appointment.participants_per_appointment).to be 2
     end
@@ -1102,16 +1137,17 @@ describe CalendarEvent do
 
     context "cascading" do
       it "copies cascaded attributes when creating a child event" do
-        calendar_event_model(start_at: "Sep 3 2008", title: "some event")
+        calendar_event_model(start_at: "Sep 3 2008", title: "some event", important_dates: true)
         child = @event.child_events.build
         child.context = user_factory
         child.save!
         expect(child.start_at).to be_nil
         expect(child.title).to eql @event.title
+        expect(child.important_dates).to eql @event.important_dates
       end
 
       it "updates cascaded attributes on the child events whenever the parent is updated" do
-        calendar_event_model(start_at: "Sep 3 2008", title: "some event")
+        calendar_event_model(start_at: "Sep 3 2008", title: "some event", important_dates: false)
         child = @event.child_events.build
         child.context = user_factory
         child.save!
@@ -1119,9 +1155,11 @@ describe CalendarEvent do
         orig_start_at = child.start_at
 
         @event.title = "asdf"
+        @event.important_dates = true
         @event.start_at = Time.now.utc
         @event.save!
         expect(child.reload.title).to eql "asdf"
+        expect(child.important_dates).to be true
         expect(child.start_at).to eql orig_start_at
       end
 

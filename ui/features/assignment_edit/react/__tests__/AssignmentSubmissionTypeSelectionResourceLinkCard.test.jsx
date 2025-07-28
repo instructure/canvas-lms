@@ -37,7 +37,7 @@ const renderComponent = () => {
       tool={tool}
       resourceTitle={resource.title}
       onCloseButton={onCloseFn}
-    />
+    />,
   )
 }
 

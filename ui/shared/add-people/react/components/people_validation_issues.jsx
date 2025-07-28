@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {duplicatesShape, missingsShape} from './shapes'
@@ -24,7 +24,7 @@ import DuplicateSection from './duplicate_section'
 import MissingPeopleSection from './missing_people_section'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('PeopleValidationIssues')
+const I18n = createI18nScope('PeopleValidationIssues')
 
 class PeopleValidationIssues extends React.Component {
   static propTypes = {
@@ -34,13 +34,11 @@ class PeopleValidationIssues extends React.Component {
     missing: PropTypes.shape(missingsShape),
     onChangeDuplicate: PropTypes.func.isRequired,
     onChangeMissing: PropTypes.func.isRequired,
+    fieldsRefAndError: PropTypes.object,
   }
 
   static defaultProps = {
     inviteUsersURL: undefined,
-  }
-
-  static defaultProps = {
     duplicates: {},
     missing: {},
   }
@@ -99,13 +97,14 @@ class PeopleValidationIssues extends React.Component {
       <div className="peopleValidationissues__duplicates">
         <Alert variant="warning">
           {I18n.t(
-            'There were several possible matches with the import. Please resolve them below.'
+            'There were several possible matches with the import. Please resolve them below.',
           )}
         </Alert>
         {duplicateAddresses.map(address => {
           const dupeSet = this.props.duplicates[address]
           return (
             <DuplicateSection
+              fieldsRefAndError={this.props.fieldsRefAndError}
               key={`dupe_${address}`}
               inviteUsersURL={this.props.inviteUsersURL}
               duplicates={dupeSet}
@@ -127,7 +126,7 @@ class PeopleValidationIssues extends React.Component {
     }
     const alertText = this.props.inviteUsersURL
       ? I18n.t(
-          'We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time.'
+          'We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time.',
         )
       : I18n.t('We were unable to find matches below.')
 
@@ -135,6 +134,7 @@ class PeopleValidationIssues extends React.Component {
       <div className="peoplevalidationissues__missing">
         <Alert variant="warning">{alertText}</Alert>
         <MissingPeopleSection
+          fieldsRefAndError={this.props.fieldsRefAndError}
           inviteUsersURL={this.props.inviteUsersURL}
           missing={this.props.missing}
           searchType={this.props.searchType}

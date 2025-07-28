@@ -59,7 +59,7 @@ it('removes the loading dialog and replaces it with a checkbox when loaded', asy
   expect.assertions(2)
   const fakeAxios = getFakeApi({enabled: false}, {}, 100)
   const {getByText, getByLabelText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} />,
   )
   expect(getByText('Loading')).toBeInTheDocument()
   await waitFor(() => {
@@ -71,7 +71,7 @@ it('shows an enabled checkbox when canManage prop is true', async () => {
   expect.assertions(1)
   const fakeAxios = getFakeApi({enabled: false}, {})
   const {getByLabelText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />,
   )
   await waitFor(() => {
     const checkbox = getByLabelText('Disable Content Security Policy')
@@ -92,7 +92,7 @@ it('shows the checkbox as disabled when canManage is false', async () => {
 it('sets the csp status to disabled when checked', async () => {
   const fakeAxios = getFakeApi({enabled: true}, {enabled: false})
   const {getByLabelText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />,
   )
   await waitFor(() => {
     const checkbox = getByLabelText('Disable Content Security Policy')
@@ -104,7 +104,7 @@ it('sets the csp status to disabled when checked', async () => {
 it('sets the csp status to enabled when unchecked', async () => {
   const fakeAxios = getFakeApi({enabled: false}, {enabled: true})
   const {getByLabelText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />,
   )
   await waitFor(() => {
     const checkbox = getByLabelText('Disable Content Security Policy')
@@ -116,7 +116,7 @@ it('sets the csp status to enabled when unchecked', async () => {
 it('reverts to the previous state if the request fails', async () => {
   const fakeAxios = getFakeApi({enabled: true}, {enabled: false}, null, 'put')
   const {getByLabelText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />,
   )
   await waitFor(async () => {
     const checkbox = getByLabelText('Disable Content Security Policy')
@@ -130,11 +130,11 @@ it('reverts to the previous state if the request fails', async () => {
 it('shows a failure message if tthe initial get request fails', async () => {
   const fakeAxios = getFakeApi({enabled: true}, {enabled: false}, null, 'get')
   const {getByText} = render(
-    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />
+    <CSPSelectionBox courseId="1" apiLibrary={fakeAxios} canManage={true} />,
   )
   await waitFor(() => {
     expect(
-      getByText('Failed to load CSP information, try refreshing the page.')
+      getByText('Failed to load CSP information, try refreshing the page.'),
     ).toBeInTheDocument()
   })
 })

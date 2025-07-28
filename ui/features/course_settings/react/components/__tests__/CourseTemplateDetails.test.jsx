@@ -16,8 +16,9 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
 import {render, fireEvent, waitFor, getByText as getByTextFromElement} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import CourseTemplateDetails from '../CourseTemplateDetails'
 
 function accountFactory(n) {
@@ -39,6 +40,7 @@ const response4 = {template: true, templated_accounts: accountFactory(25)}
 
 describe('CourseTemplateDetails::', () => {
   const oldEnv = window.ENV
+  const server = setupServer()
 
   function setRoute(route) {
     window.ENV = {CONTEXT_BASE_URL: route}
@@ -47,15 +49,38 @@ describe('CourseTemplateDetails::', () => {
   const endpoint = base => `/api/v1${base}?include[]=templated_accounts`
 
   beforeAll(() => {
-    fetchMock.get(endpoint(route1), response1)
-    fetchMock.get(endpoint(route2), response2)
-    fetchMock.get(endpoint(route3), response3)
-    fetchMock.get(endpoint(route4), response4)
+    server.listen()
+    server.use(
+      http.get(/\/api\/v1\/courses\/\d+/, ({request}) => {
+        const url = new URL(request.url)
+        const courseId = url.pathname.split('/').pop()
+
+        if (url.searchParams.get('include[]') === 'templated_accounts') {
+          switch (courseId) {
+            case '1':
+              return HttpResponse.json(response1)
+            case '2':
+              return HttpResponse.json(response2)
+            case '3':
+              return HttpResponse.json(response3)
+            case '4':
+              return HttpResponse.json(response4)
+            default:
+              return new HttpResponse(null, {status: 404})
+          }
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
+  })
+
+  afterEach(() => {
+    // Don't reset handlers - our handlers should handle all routes correctly
   })
 
   afterAll(() => {
     window.ENV = oldEnv
-    fetchMock.restore()
+    server.close()
   })
 
   describe('before the API call responds', () => {
@@ -91,7 +116,7 @@ describe('CourseTemplateDetails::', () => {
     it('renders a checked box if a template, with the right message for zero associations', async () => {
       setRoute(route2)
       const {getByTestId, getByText, container} = render(
-        <CourseTemplateDetails isEditable={true} />
+        <CourseTemplateDetails isEditable={true} />,
       )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
@@ -105,7 +130,7 @@ describe('CourseTemplateDetails::', () => {
     it('renders the right message for multiple associations', async () => {
       setRoute(route3)
       const {getByTestId, getByText, container} = render(
-        <CourseTemplateDetails isEditable={true} />
+        <CourseTemplateDetails isEditable={true} />,
       )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
@@ -144,7 +169,7 @@ describe('CourseTemplateDetails::', () => {
       await waitFor(() => expect(getByTestId('result-modal')).toBeInTheDocument())
       const modal = getByTestId('result-modal')
       const listElements = modal.querySelectorAll('ul li')
-      expect(listElements.length).toBe(5)
+      expect(listElements).toHaveLength(5)
     })
 
     it('shows the right overflow text if more than ten associated accounts', async () => {
@@ -156,7 +181,7 @@ describe('CourseTemplateDetails::', () => {
       await waitFor(() => expect(getByTestId('result-modal')).toBeInTheDocument())
       const modal = getByTestId('result-modal')
       const listElements = modal.querySelectorAll('ul li')
-      expect(listElements.length).toBe(10)
+      expect(listElements).toHaveLength(10)
       getByTextFromElement(modal, '(more not shown)') // should not throw
     })
   })

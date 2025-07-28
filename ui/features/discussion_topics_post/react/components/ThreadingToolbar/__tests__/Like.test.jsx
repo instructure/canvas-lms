@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {Like} from '../Like'
 import {responsiveQuerySizes} from '../../../utils'
@@ -50,7 +50,7 @@ const setup = props => {
       likeCount={0}
       authorName="Xerxes"
       {...props}
-    />
+    />,
   )
 }
 
@@ -58,19 +58,21 @@ describe('Like', () => {
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getByTestId} = setup({onClick: onClickMock})
-    expect(onClickMock.mock.calls.length).toBe(0)
+    expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByTestId('like-button'))
-    expect(onClickMock.mock.calls.length).toBe(1)
+    expect(onClickMock.mock.calls).toHaveLength(1)
   })
 
   it('displays like count', () => {
-    const {getByText} = setup({likeCount: 2})
+    const {getByText, getByTestId} = setup({likeCount: 2})
     expect(getByText('Like count: 2')).toBeTruthy()
+    expect(getByTestId('like-count').textContent).toContain('2 Likes')
   })
 
-  it('does not display a like count below 1', () => {
-    const {queryByTestId} = setup({likeCount: 0})
-    expect(queryByTestId('like-count')).toBeFalsy()
+  it('displays 1 like', () => {
+    const {getByText, getByTestId} = setup({likeCount: 1})
+    expect(getByText('Like count: 1')).toBeTruthy()
+    expect(getByTestId('like-count').textContent).toContain('1 Like')
   })
 
   it('indicates like status', () => {
@@ -81,6 +83,7 @@ describe('Like', () => {
     expect(queryByTestId('liked-icon')).toBeFalsy()
     expect(queryByText('Like post from Xerxes')).toBeTruthy()
     expect(queryByText('Unlike post from Xerxes')).toBeFalsy()
+    expect(queryByTestId('like-button')).toHaveAttribute('data-action-state', 'likeButton')
 
     rerender(
       <Like
@@ -89,27 +92,13 @@ describe('Like', () => {
         authorName="Xerxes"
         delimiterKey="like"
         likeCount={0}
-      />
+      />,
     )
 
     expect(queryByTestId('not-liked-icon')).toBeFalsy()
     expect(queryByTestId('liked-icon')).toBeTruthy()
     expect(queryByText('Like post from Xerxes')).toBeFalsy()
     expect(queryByText('Unlike post from Xerxes')).toBeTruthy()
-  })
-
-  describe('Mobile', () => {
-    beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'},
-      }))
-    })
-
-    it('uses mobile prop values', () => {
-      const container = setup()
-      expect(container.getByTestId('like-button').parentNode).toHaveStyle(
-        'margin: 0px 0.75rem 0px 0px'
-      )
-    })
+    expect(queryByTestId('like-button')).toHaveAttribute('data-action-state', 'unlikeButton')
   })
 })

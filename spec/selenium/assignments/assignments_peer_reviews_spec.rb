@@ -82,6 +82,27 @@ describe "assignments" do
       expect(list_items.count).to eq(1)
     end
 
+    describe "validations" do
+      it "renders validation seleect a student" do
+        course_with_teacher_logged_in
+        create_users_in_course(@course, 11)
+        @assignment = assignment_model({
+                                         course: @course,
+                                         peer_reviews: true,
+                                         automatic_peer_reviews: false,
+                                       })
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews?page=2"
+
+        f(".assign_peer_review_link").click
+        find_button("Add").click
+        expect(f("#reviewee_errors")).to be_displayed
+        expect(f("#reviewee_id").attribute("class")).to include("error-outline")
+        input = driver.find_element(:css, "select[name='reviewee_id']")
+        expect(input.attribute("aria-label")).to eq("Please select a student")
+      end
+    end
+
     it "displays the intra-group review toggle for group assignments" do
       course_with_teacher_logged_in
       student = student_in_course.user
@@ -195,6 +216,61 @@ describe "assignments" do
     end
   end
 
+  describe "auto assign" do
+    before do
+      course_with_teacher_logged_in
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
+    end
+
+    it "displays auto assign section if the assignment is assigned to at least one user" do
+      student_in_course(active_all: true)
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#automatically_assign_reviews")).to be_displayed
+    end
+
+    it "displays auto assign input if there are submissions" do
+      student1 = student_in_course(active_all: true).user
+      student_in_course(active_all: true).user
+      submission = @assignment.submit_homework(student1)
+      submission.submission_type = "online_text_entry"
+      submission.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#reviews_per_user_container")).to be_displayed
+    end
+
+    it "displays redirect to edit assignment button if there are no submissions" do
+      student_in_course(active_all: true).user
+      student_in_course(active_all: true).user
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f("#redirect_to_edit_button")).to be_displayed
+    end
+
+    it "automatically assigns peer reviews if both students have submissions" do
+      student1 = student_in_course(active_all: true).user
+      student2 = student_in_course(active_all: true).user
+      submission1 = @assignment.submit_homework(student1)
+      submission2 = @assignment.submit_homework(student2)
+      [submission1, submission2].each do |s|
+        s.submission_type = "online_text_entry"
+        s.save!
+      end
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      f("#reviews_per_user_input").send_keys("1")
+      f("#submit_assign_peer_reviews").click
+
+      wait_for_ajaximations
+      expect(submission1.assigned_assessments.size).to eq(1)
+      expect(submission2.assigned_assessments.size).to eq(1)
+    end
+  end
+
   describe "with anonymous peer reviews" do
     let!(:review_course) { course_factory(active_all: true) }
     let!(:teacher) { review_course.teachers.first }
@@ -257,6 +333,7 @@ describe "assignments" do
                            }
                          })
     end
+    let!(:anonymous_submission_page) { "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}" }
 
     before { assignment.assign_peer_review(reviewer, reviewed) }
 
@@ -288,6 +365,12 @@ describe "assignments" do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
+
+      it "allows reviewer to access the anonymous submission page" do
+        get anonymous_submission_page
+        expect(driver.current_url).to include(anonymous_submission_page)
+        expect(f("h1.submission_header")).to include_text("Peer Review")
+      end
     end
 
     context "when teacher is logged in" do
@@ -303,6 +386,12 @@ describe "assignments" do
         f(".assess_submission_link").click
         wait_for_animations
         expect(f("#rubric_assessment_option_#{assessment.id}")).to include_text(assessment.assessor_name)
+      end
+
+      it "allows teacher to access the anonymous submission page" do
+        get anonymous_submission_page
+        expect(driver.current_url).to include(anonymous_submission_page)
+        expect(f("h1.submission_header")).to include_text("Submission Details")
       end
     end
 

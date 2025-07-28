@@ -18,12 +18,12 @@
 
 import axios from '@canvas/axios'
 import {camelizeProperties} from '@canvas/convert-case'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {createClient, gql} from '@canvas/apollo'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {createClient, gql} from '@canvas/apollo-v3'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {FinalGradeOverrideMap} from './grading.d'
 
-const I18n = useI18nScope('finalGradeOverrideApi')
+const I18n = createI18nScope('finalGradeOverrideApi')
 type FinalGradeOverrideResult = {
   finalGradeOverrides: FinalGradeOverrideMap
 }
@@ -54,7 +54,7 @@ export function getFinalGradeOverrides(courseId: string): Promise<void | FinalGr
 
           for (const gradingPeriodId in responseOverrides.grading_period_grades) {
             studentOverrides.gradingPeriodGrades[gradingPeriodId] = camelizeProperties(
-              responseOverrides.grading_period_grades[gradingPeriodId]
+              responseOverrides.grading_period_grades[gradingPeriodId],
             )
           }
         }
@@ -74,7 +74,7 @@ export function getFinalGradeOverrides(courseId: string): Promise<void | FinalGr
 export function updateFinalGradeOverride(
   enrollmentId: string,
   gradingPeriodId?: string,
-  grade?: {percentage: number}
+  grade?: {percentage: number},
 ): any {
   const gradingPeriodQuery = gradingPeriodId ? `gradingPeriodId: ${gradingPeriodId}` : ''
 

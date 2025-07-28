@@ -48,7 +48,7 @@ module Lti
         Digest::SHA256.hexdigest(code)[0...16]
       rescue => e
         Canvas::Errors.capture(e)
-        Date.today.to_s
+        Time.zone.today.to_s
       end
 
     before_action :ensure_decoded_jwt
@@ -63,7 +63,7 @@ module Lti
     def self.js_rev
       js_url = Canvas::Cdn.registry.url_for("javascripts/lti_post_message_forwarding.js")
       # Seems to be nil at least sometimes in specs
-      return Date.today.to_s unless js_url
+      return Time.zone.today.to_s unless js_url
 
       File.basename(js_url).split("-").last.split(".").first
     end

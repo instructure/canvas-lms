@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LazyLoad from 'react-lazy-load'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -27,7 +27,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import ScopesGroup from './ScopesGroup'
 import ScopesMethod from './ScopesMethod'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export default class ScopesList extends React.Component {
   constructor(props) {
@@ -164,7 +164,7 @@ export default class ScopesList extends React.Component {
                           selectedScopes={this.state.selectedScopes}
                           setSelectedScopes={this.setSelectedScopes}
                         />
-                      </LazyLoad>
+                      </LazyLoad>,
                     )
                   }
                   return result
@@ -186,8 +186,8 @@ ScopesList.propTypes = {
       PropTypes.shape({
         resource: PropTypes.string,
         scope: PropTypes.string,
-      })
-    )
+      }),
+    ),
   ).isRequired,
   filter: PropTypes.string.isRequired,
   selectedScopes: PropTypes.arrayOf(PropTypes.string),

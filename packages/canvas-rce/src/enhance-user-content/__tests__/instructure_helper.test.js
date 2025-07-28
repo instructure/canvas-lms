@@ -78,19 +78,26 @@ describe('enhanced_user_content/instructure_helpers', () => {
       link.href = '/at/some/path'
       expect(isExternalLink(link)).toBeFalsy()
     })
+
+    it('handles vanity domains correctly', () => {
+      const customDomain = 'https://www.example.co.uk'
+      const link = document.createElement('a')
+      link.href = 'https://other-site.co.uk/example-page'
+      expect(isExternalLink(link, customDomain)).toBeTruthy()
+    })
   })
 
   describe('getTld', () => {
     it('copes with ports', () => {
-      expect(getTld('company.com:3000')).toEqual('company.com')
+      expect(getTld('example.com:3000')).toEqual('example.com')
     })
 
     it('copes with subdomains', () => {
-      expect(getTld('sub.company.com')).toEqual('company.com')
+      expect(getTld('sub.example.com')).toEqual('example.com')
     })
 
     it('copes with subdomains and ports', () => {
-      expect(getTld('sub.company.com:3000')).toEqual('company.com')
+      expect(getTld('sub.example.com:3000')).toEqual('example.com')
     })
 
     it('copes with localhost', () => {
@@ -99,6 +106,42 @@ describe('enhanced_user_content/instructure_helpers', () => {
 
     it('copes with gibberish', () => {
       expect(getTld('this is not a hostname at all')).toEqual('this is not a hostname at all')
+    })
+
+    it('handles two-part TLDs correctly', () => {
+      expect(getTld('example.co.uk')).toEqual('example.co.uk')
+    })
+
+    it('handles subdomains with two-part TLDs correctly', () => {
+      expect(getTld('sub.example.co.uk')).toEqual('example.co.uk')
+    })
+
+    it('handles www with two-part TLDs correctly', () => {
+      expect(getTld('www.example.com.au')).toEqual('example.com.au')
+    })
+
+    it('handles root multi-part TLDs correctly', () => {
+      expect(getTld('school.pvt.k12.ma.us')).toEqual('school.pvt.k12.ma.us')
+    })
+
+    it('handles localhost development domains correctly', () => {
+      expect(getTld('localhost')).toEqual('localhost')
+    })
+
+    it('handles docker development domains correctly', () => {
+      expect(getTld('canvas-web.docker')).toEqual('canvas-web.docker')
+    })
+
+    it('handles subdomains of docker development domains correctly', () => {
+      expect(getTld('sub.canvas-web.docker')).toEqual('canvas-web.docker')
+    })
+
+    it('handles inst development domains correctly', () => {
+      expect(getTld('canvas-web.inseng.test')).toEqual('canvas-web.inseng.test')
+    })
+
+    it('handles subdomains of inst development domains correctly', () => {
+      expect(getTld('sub.canvas-web.inseng.test')).toEqual('canvas-web.inseng.test')
     })
   })
 
@@ -119,9 +162,8 @@ describe('enhanced_user_content/instructure_helpers', () => {
         {
           subject: 'preview_file',
           file_id: '2',
-          verifier: null,
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
 
@@ -136,7 +178,38 @@ describe('enhanced_user_content/instructure_helpers', () => {
           file_id: '2',
           verifier: 'xyzzy',
         },
-        canvasOrigin
+        canvasOrigin,
+      )
+    })
+
+    it('posts a message with the canvas file location', () => {
+      const link = document.createElement('a')
+      link.href = 'http://localhost/courses/1/files/2?location=xyzzy'
+      const event = makeEvent({target: link})
+      showFilePreviewInOverlay(event, canvasOrigin)
+      expect(window.postMessage).toHaveBeenCalledWith(
+        {
+          subject: 'preview_file',
+          file_id: '2',
+          location: 'xyzzy',
+        },
+        canvasOrigin,
+      )
+    })
+
+    it('posts a message with the access token and instfs_id', () => {
+      const link = document.createElement('a')
+      link.href = 'http://localhost/courses/1/files/2?instfs_id=stuff&access_token=xyzzy'
+      const event = makeEvent({target: link})
+      showFilePreviewInOverlay(event, canvasOrigin)
+      expect(window.postMessage).toHaveBeenCalledWith(
+        {
+          subject: 'preview_file',
+          file_id: '2',
+          access_token: 'xyzzy',
+          instfs_id: 'stuff',
+        },
+        canvasOrigin,
       )
     })
 
@@ -165,9 +238,8 @@ describe('enhanced_user_content/instructure_helpers', () => {
         {
           subject: 'preview_file',
           file_id: '17~76640',
-          verifier: null,
         },
-        canvasOrigin
+        canvasOrigin,
       )
     })
   })

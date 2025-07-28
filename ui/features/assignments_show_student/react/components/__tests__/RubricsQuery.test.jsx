@@ -17,11 +17,17 @@
  */
 
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 import {render} from '@testing-library/react'
 import RubricsQuery from '../RubricsQuery'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {useAllPages} from '@canvas/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+jest.mock('@canvas/query', () => ({
+  useAllPages: jest.fn(),
+}))
 
 async function makeMocks() {
   const variables = {
@@ -35,8 +41,8 @@ async function makeMocks() {
     Node: {__typename: 'Assignment'},
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
-    Submission: {rubricAssessmentsConnection: null},
-    Account: {outcomeProficiency: {proficiencyRatingsConnection: null}},
+    Submission: {rubricAssessmentsConnection: []},
+    HtmlEncodedString: () => 'Mocked HTML encoded string',
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
@@ -61,36 +67,61 @@ async function makeProps() {
 }
 
 describe('RubricsQuery', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user: {id: '1', display_name: 'Test User'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('renders the rubric tab', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages: []},
+      isError: false,
+      isLoading: false,
+    })
     const mocks = await makeMocks()
     const props = await makeProps()
     const {findByTestId} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByTestId('rubric-tab')).toBeInTheDocument()
   })
 
   it('renders an error when the query fails', async () => {
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: true,
+      isLoading: false,
+    })
     const props = await makeProps()
     const mocks = await makeMocks()
     mocks[0].error = new Error('aw shucks')
     const {findByText} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   it('renders the loading indicator when making a query', async () => {
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: false,
+      isLoading: true,
+    })
     const mocks = await makeMocks()
     const props = await makeProps()
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
         <RubricsQuery {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByText('Loading')).toBeInTheDocument()
   })

@@ -37,9 +37,9 @@ export function removeUnloadMessage() {
 // disabling b/c eslint fails, saying 'MessageEventSource' is not defined, but it's
 // defined in lib.dom.d.ts
 export function findDomForWindow(
-  // eslint-disable-next-line no-undef
+   
   sourceWindow?: MessageEventSource | null,
-  startDocument?: Document | null
+  startDocument?: Document | null,
 ) {
   startDocument = startDocument || document
   const iframes = Array.from(startDocument.getElementsByTagName('iframe'))
@@ -52,7 +52,7 @@ export function findDomForWindow(
  * Those are same-origin, so we can look through those RCE iframes' documents
  * too for the window we're looking for.
  */
-// eslint-disable-next-line no-undef
+ 
 export function findDomForWindowInRCEIframe(sourceWindow?: MessageEventSource | null) {
   const iframes = document.querySelectorAll('.tox-tinymce iframe')
   for (let i = 0; i < iframes.length; i++) {
@@ -72,7 +72,7 @@ export function findDomForWindowInRCEIframe(sourceWindow?: MessageEventSource | 
 //   when we upgrade to TS 4.9+
 export function hasKey<K extends string, T extends object>(
   k: K,
-  o: T
+  o: T,
 ): o is T & Record<K, unknown> {
   return k in o
 }

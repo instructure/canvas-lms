@@ -19,8 +19,8 @@
 import React from 'react'
 import {render as realRender, act} from '@testing-library/react'
 import AlignmentSummary from '../index'
-import {createCache} from '@canvas/apollo'
-import {MockedProvider} from '@apollo/react-testing'
+import {createCache} from '@canvas/apollo-v3'
+import {MockedProvider} from '@apollo/client/testing'
 import {courseAlignmentStatsMocks} from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import useCourseAlignments from '@canvas/outcomes/react/hooks/useCourseAlignments'
@@ -47,14 +47,14 @@ describe('AlignmentSummary', () => {
       contextId = '1',
       rootOutcomeGroup = {id: '1'},
       mocks = courseAlignmentStatsMocks(),
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 

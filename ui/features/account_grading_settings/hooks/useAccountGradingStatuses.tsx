@@ -17,9 +17,9 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/client'
 import type {GradeStatus, StandardStatusAllowedName} from '@canvas/grading/accountGradingStatus'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   DELETE_CUSTOM_GRADING_STATUS_MUTATION,
   UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
@@ -38,7 +38,7 @@ import {
   statusesTitleMap,
 } from '../utils/accountStatusUtils'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEnabled?: boolean) => {
   const [standardStatuses, setStandardStatuses] = useState<GradeStatus[]>([])
@@ -50,13 +50,13 @@ export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEna
   const [successMessage, setSuccessMessage] = useState<string>('')
 
   const [upsertStandardStatusMutation] = useMutation<StandardGradingStatusUpsertResponse>(
-    UPSERT_STANDARD_GRADING_STATUS_MUTATION
+    UPSERT_STANDARD_GRADING_STATUS_MUTATION,
   )
   const [upsertCustomStatusMutation] = useMutation<CustomGradingStatusUpsertResponse>(
-    UPSERT_CUSTOM_GRADING_STATUS_MUTATION
+    UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
   )
   const [deleteCustomStatusMutation] = useMutation<CustomGradingStatusDeleteResponse>(
-    DELETE_CUSTOM_GRADING_STATUS_MUTATION
+    DELETE_CUSTOM_GRADING_STATUS_MUTATION,
   )
 
   const {
@@ -75,15 +75,14 @@ export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEna
       return
     }
 
-    if (!fetchStatusesData?.account) {
-      return
-    }
-
-    const {account} = fetchStatusesData
-    const {customGradeStatusesConnection, standardGradeStatusesConnection} = account
-    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection.nodes))
+    const {account} = fetchStatusesData ?? {}
+    const {customGradeStatusesConnection, standardGradeStatusesConnection} = account ?? {}
+    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection?.nodes ?? []))
     setStandardStatuses(
-      mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes, isExtendedStatusEnabled)
+      mapStandardStatusQueryResults(
+        standardGradeStatusesConnection?.nodes ?? [],
+        isExtendedStatusEnabled,
+      ),
     )
   }, [fetchStatusesData, fetchStatusesError, isExtendedStatusEnabled])
 
@@ -113,7 +112,7 @@ export const useAccountGradingStatuses = (accountId: string, isExtendedStatusEna
 
     setStandardStatuses(statuses => {
       const statusIndexToChange = statuses.findIndex(status =>
-        isNew ? status.name === savedStatus.name : status.id === savedStatus.id
+        isNew ? status.name === savedStatus.name : status.id === savedStatus.id,
       )
 
       if (statusIndexToChange >= 0) {

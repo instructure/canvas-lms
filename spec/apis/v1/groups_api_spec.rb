@@ -36,6 +36,7 @@ describe "Groups API", type: :request do
       "members_count" => group.members_count,
       "max_membership" => group.max_membership,
       "avatar_url" => group.avatar_attachment && "http://www.example.com/images/thumbnails/#{group.avatar_attachment.id}/#{group.avatar_attachment.uuid}",
+      "context_name" => group.context.name,
       "context_type" => group.context_type,
       "#{group.context_type.downcase}_id" => group.context_id,
       "role" => group.group_category.role,
@@ -44,7 +45,8 @@ describe "Groups API", type: :request do
       "leader" => group.leader,
       "has_submission" => group.submission?,
       "concluded" => group.context.concluded? || group.context.deleted?,
-      "created_at" => group.created_at.iso8601
+      "created_at" => group.created_at.iso8601,
+      "non_collaborative" => false
     }
     if opts[:include_users]
       json["users"] = users_json(group.users, **opts)
@@ -74,6 +76,7 @@ describe "Groups API", type: :request do
       "name" => group_category.name,
       "role" => group_category.role,
       "self_signup" => group_category.self_signup,
+      "self_signup_end_at" => group_category.self_signup_end_at,
       "context_type" => group_category.context_type,
       "#{group_category.context_type.underscore}_id" => group_category.context_id,
       "protected" => group_category.protected?,
@@ -86,8 +89,8 @@ describe "Groups API", type: :request do
     json
   end
 
-  def users_json(users, **opts)
-    users.map { |user| user_json(user, **opts) }
+  def users_json(users, **)
+    users.map { |user| user_json(user, **) }
   end
 
   def user_json(user, **)
@@ -281,7 +284,7 @@ describe "Groups API", type: :request do
                  "/api/v1/accounts/#{@account.to_param}/groups.json",
                  @category_path_options.merge(action: "context_index",
                                               account_id: @account.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "shows students all groups" do
@@ -462,7 +465,7 @@ describe "Groups API", type: :request do
     project_groups.name = "Course Project Groups"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "allows an admin to create a group in a account" do
@@ -519,7 +522,7 @@ describe "Groups API", type: :request do
     project_groups.name = "test group category"
     project_groups.save
     raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   it "allows a moderator to edit a group" do
@@ -566,7 +569,7 @@ describe "Groups API", type: :request do
       "is_public" => true,
       "join_level" => "parent_context_auto_join",
     }
-    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 401)
+    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 403)
   end
 
   it "allows a moderator to delete a group" do
@@ -577,13 +580,13 @@ describe "Groups API", type: :request do
 
   it "does not allow a member to delete a group" do
     @user = @member
-    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"), {}, {}, expected_status: 401)
+    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"), {}, {}, expected_status: 403)
   end
 
   describe "quota" do
     before :once do
       @account = Account.default
-      Setting.set("group_default_quota", 11.megabytes)
+      Setting.set("group_default_quota", 11.decimal_megabytes)
     end
 
     context "with manage_storage_quotas permission" do
@@ -678,7 +681,7 @@ describe "Groups API", type: :request do
 
       it "does not allow an unrelated user to read a membership by membership id" do
         @user = user_model
-        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
+        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show), {}, {}, expected_status: 403)
       end
 
       it "allows a member to read their membership by user id" do
@@ -695,7 +698,7 @@ describe "Groups API", type: :request do
 
       it "does not allow an unrelated user to read a membership by user id" do
         @user = user_model
-        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
+        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show), {}, {}, expected_status: 403)
       end
     end
 
@@ -735,7 +738,7 @@ describe "Groups API", type: :request do
                  user_id: @new_user.id
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "allows accepting a join request by a moderator" do
@@ -816,7 +819,7 @@ describe "Groups API", type: :request do
                  workflow_state: "accepted"
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload).to be_requested
     end
 
@@ -833,7 +836,7 @@ describe "Groups API", type: :request do
                  workflow_state: "accepted"
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload).to be_requested
     end
 
@@ -875,7 +878,7 @@ describe "Groups API", type: :request do
                  moderator: false
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload.moderator).to be_truthy
     end
 
@@ -889,7 +892,7 @@ describe "Groups API", type: :request do
                  moderator: false
                },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@membership.reload.moderator).to be_truthy
     end
 
@@ -945,7 +948,7 @@ describe "Groups API", type: :request do
     it "does not allow a member to invite people to a group" do
       @user = @member
       invitees = { invitees: ["leonard@example.com", "sheldon@example.com"] }
-      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees, {}, expected_status: 401)
+      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees, {}, expected_status: 403)
       @memberships = expect(@community.reload.group_memberships.where(workflow_state: "invited").order(:id).count).to eq 0
     end
 
@@ -1005,6 +1008,212 @@ describe "Groups API", type: :request do
       expect(json.first["sis_import_id"]).to eq sis_batch.id
       expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: "invited").first, true)
     end
+
+    it "allows a user to join a group whose self sign-up is still open" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:self_signup_deadline)
+      @category = @course.group_categories.create!(name: "foo", self_signup: "enabled", self_signup_end_at: 1.day.from_now)
+      @group = group_model(group_category: @category, context: @course)
+      user_session(@student)
+
+      json = api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/memberships",
+        @memberships_path_options.merge(group_id: @group.to_param, action: "create"),
+        { user_id: @student.id }
+      )
+
+      @membership = GroupMembership.where(user_id: @student, group_id: @group).first
+      expect(@membership.workflow_state).to eq "accepted"
+      expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
+    end
+
+    it "does not allow a user to join a group whose self sign-up is closed" do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:self_signup_deadline)
+      @category = @course.group_categories.create!(name: "foo", self_signup: "enabled", self_signup_end_at: 1.day.ago)
+      @group = group_model(group_category: @category, context: @course)
+      user_session(@student)
+
+      api_call(
+        :post,
+        "/api/v1/groups/#{@group.id}/memberships",
+        @memberships_path_options.merge(group_id: @group.to_param, action: "create"),
+        { user_id: @student.id },
+        {},
+        expected_status: 403
+      )
+    end
+
+    it "bulks add users to non collaborative groups" do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+      category = @course.group_categories.create(name: "category", non_collaborative: true)
+      @group = @course.groups.create!(name: "G1", group_category: category, non_collaborative: true)
+      user = student_in_course(active_all: true).user
+      user2 = student_in_course(active_all: true).user
+      user_session(@teacher)
+      post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [user.id, user2.id] }
+
+      expect(response).to be_successful
+      expect(user.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
+      expect(user2.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
+    end
+
+    it "calls SLM when assignmnets are assigned to the non-collaborative group" do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+      category = @course.group_categories.create(name: "category", non_collaborative: true)
+      @group = @course.groups.create!(name: "G1", group_category: category, non_collaborative: true)
+      da = assignment_model(course: @course)
+      diff_tag_override = assignment_override_model(assignment: da)
+      diff_tag_override.set_type = "Group"
+      diff_tag_override.set_id = @group.id
+      diff_tag_override.save!
+      da.update!(only_visible_to_overrides: true)
+      user = student_in_course(active_all: true).user
+      user2 = student_in_course(active_all: true).user
+      user_session(@teacher)
+
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+        [user.id, user2.id],
+        @course.id,
+        match_array([da.id])
+      )
+      post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [user.id, user2.id] }
+      expect(response).to be_successful
+    end
+
+    describe "POST /api/v1/groups/:group_id/memberships (Differentiation Tag Membership)" do
+      before do
+        course_with_teacher(active_all: true)
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
+        category = @course.group_categories.create!(name: "Differentiation", non_collaborative: true)
+        @group = @course.groups.create!(name: "Diff Group", group_category: category, non_collaborative: true)
+        user_session(@teacher)
+      end
+
+      context "when the members param is blank" do
+        it "returns ok without processing any memberships" do
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [] }
+          expect(response).to have_http_status :ok
+        end
+      end
+
+      context "when the group context is an Account" do
+        it "returns ok and does not attempt to add memberships" do
+          @account_group = group_model(name: "Algebra Teachers", context: Account.default)
+          student = student_in_course(active_all: true).user
+          post "/api/v1/groups/#{@account_group.id}/memberships", params: { group_id: @account_group.id, members: [student.id] }
+          expect(response).to have_http_status :bad_request
+          # Ensure that no differentiation tag memberships were created
+          expect(student.differentiation_tag_memberships.pluck(:group_id)).not_to include(@account_group.id)
+        end
+      end
+
+      context "when the current user is not authorized" do
+        it "returns forbidden" do
+          # Stub the authorization check to simulate lack of permission.
+          student = student_in_course(active_all: true).user
+          user_session(student)
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [student.id] }
+          expect(response).not_to be_successful
+        end
+      end
+
+      context "when valid users are provided and processing succeeds" do
+        it "adds the memberships and returns ok" do
+          student = student_in_course(active_all: true).user
+          student2 = student_in_course(active_all: true).user
+          # add student2 to another section (it should also succeed when added to a tag)
+          sec2 = @course.course_sections.create!(name: "section2")
+          @course.enroll_student(student2, section: sec2, allow_multiple_enrollments: true)
+
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [student.id, student2.id] }
+          expect(response).to have_http_status :ok
+          expect(student.differentiation_tag_memberships.pluck(:group_id)).to include(@group.id)
+          expect(student2.differentiation_tag_memberships.pluck(:group_id)).to include(@group.id)
+        end
+
+        it "processes all enrollments excluding specified users when using params[:all_in_group_course] and params[:exclude]" do
+          # Create three enrolled students.
+          student1 = student_in_course(active_all: true).user
+          student2 = student_in_course(active_all: true).user
+          student3 = student_in_course(active_all: true).user
+
+          user_session(@teacher)
+
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, all_in_group_course: true, exclude_user_ids: [student2.id] }
+
+          expect(response).to have_http_status :ok
+
+          @group.reload
+          expect(@group.group_memberships.active.count).to eq @course.student_enrollments.active.count - 1
+          expect(@group.group_memberships.active.pluck(:user_id)).to include(student1.id, student3.id)
+          expect(@group.group_memberships.active.pluck(:user_id)).not_to include(student2.id)
+        end
+
+        it "does not include all enrollments excluding when using params[:all_in_group_course] with a string" do
+          student_in_course(active_all: true).user
+          student_in_course(active_all: true).user
+
+          user_session(@teacher)
+
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, all_in_group_course: "false", members: [@student.id] }
+
+          expect(response).to have_http_status :ok
+
+          @group.reload
+          expect(@group.group_memberships.active.count).to eq 1
+        end
+      end
+
+      context "when some users are not actively enrolled" do
+        it "returns partial failure with invalid_user_ids" do
+          enrolled_student = student_in_course(active_all: true).user
+          not_enrolled_student = course_with_student(active_all: true).user
+
+          post "/api/v1/groups/#{@group.id}/memberships",
+               params: { group_id: @group.id, members: [enrolled_student.id, not_enrolled_student.id] }
+
+          expect(response).to have_http_status :ok
+          json = JSON.parse(response.body)
+          expect(json["message"]).to eq "Partial failure encountered"
+          expect(json["invalid_user_ids"]).to include(not_enrolled_student.id)
+          expect(enrolled_student.differentiation_tag_memberships.pluck(:group_id)).to include(@group.id)
+        end
+      end
+
+      context "when membership errors occur during bulk addition" do
+        it "returns partial failure with membership_errors" do
+          student = student_in_course(active_all: true).user
+
+          # Create a real GroupMembership instance and add an error to it.
+          error_membership = GroupMembership.new(group: @group, user: student)
+          error_membership.errors.add(:base, "Error adding membership")
+
+          # Stub bulk_add_users_to_differentiation_tag to return the real membership with errors.
+          allow_any_instance_of(Group).to receive(:bulk_add_users_to_differentiation_tag).and_return([error_membership])
+
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [student.id] }
+
+          expect(response).to have_http_status :ok
+          json = JSON.parse(response.body)
+          expect(json["message"]).to eq "Partial failure encountered"
+          expect(json["membership_errors"]).not_to be_empty
+        end
+      end
+    end
   end
 
   context "users" do
@@ -1030,12 +1239,12 @@ describe "Groups API", type: :request do
       end
     end
 
-    it "returns 401 for users outside the group" do
+    it "returns 403 for users outside the group" do
       user_factory
       raw_api_call(:get,
                    "/api/v1/groups/#{@community.id}/users",
                    { controller: "groups", action: "users", group_id: @community.to_param, format: "json" })
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "returns an error when search_term is fewer than 2 characters" do
@@ -1159,18 +1368,25 @@ describe "Groups API", type: :request do
       user_session @teacher
     end
 
-    it "sanitizes html and process links" do
-      @user = @teacher
-      attachment_model(context: @group)
-      html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
-      json = api_call(:post,
-                      "/api/v1/groups/#{@group.id}/preview_html",
-                      { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
-                      { html: })
+    context "with double testing verifiers with disable_adding_uuid_verifier_in_api ff" do
+      before do
+        attachment_model(context: @group)
+      end
 
-      returned_html = json["html"]
-      expect(returned_html).not_to include("<script>")
-      expect(returned_html).to include("/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}")
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "sanitizes html and process links" do
+          @user = @teacher
+          html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
+          json = api_call(:post,
+                          "/api/v1/groups/#{@group.id}/preview_html",
+                          { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
+                          { html: })
+
+          returned_html = json["html"]
+          expect(returned_html).not_to include("<script>")
+          expect(returned_html).to include("/groups/#{@group.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}")
+        end
+      end
     end
 
     it "requires permission to preview" do
@@ -1180,7 +1396,7 @@ describe "Groups API", type: :request do
                { controller: "groups", action: "preview_html", group_id: @group.to_param, format: "json" },
                { html: "" },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -1212,7 +1428,7 @@ describe "Groups API", type: :request do
                  permissions: %w[send_messages] },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 end

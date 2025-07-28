@@ -30,7 +30,7 @@ class SisBatch < ActiveRecord::Base
   belongs_to :errors_attachment, class_name: "Attachment"
   has_many :parallel_importers, inverse_of: :sis_batch
   has_many :sis_batch_errors, inverse_of: :sis_batch, autosave: false
-  has_many :roll_back_data, inverse_of: :sis_batch, class_name: "SisBatchRollBackData", autosave: false
+  has_many :roll_back_data, inverse_of: :sis_batch, class_name: "SisBatchRollBackData", autosave: false, dependent: :destroy
   has_many :progresses, inverse_of: :sis_batch
   belongs_to :generated_diff, class_name: "Attachment"
   belongs_to :batch_mode_term, class_name: "EnrollmentTerm"
@@ -128,6 +128,7 @@ class SisBatch < ActiveRecord::Base
     state :restoring
     state :partially_restored
     state :restored
+    state :restore_failed
   end
 
   def process
@@ -209,12 +210,7 @@ class SisBatch < ActiveRecord::Base
 
     import_scheme[:callback].call(self)
   rescue => e
-    reload # might have failed trying to save
-    self.data ||= {}
-    self.data[:error_message] = e.to_s
-    self.data[:stack_trace] = "#{e}\n#{e.backtrace.join("\n")}"
-    self.workflow_state = "failed"
-    save
+    fail_with_error!(e)
   end
 
   def abort_batch
@@ -229,7 +225,7 @@ class SisBatch < ActiveRecord::Base
 
   def self.abort_all_pending_for_account(account)
     transaction do
-      account.sis_batches.not_started.lock(:no_key_update).order(:id).find_in_batches do |batch|
+      account.sis_batches.not_started.lock("FOR NO KEY UPDATE").order(:id).find_in_batches do |batch|
         SisBatch.where(id: batch).update_all(workflow_state: "aborted", progress: 100)
       end
     end
@@ -292,8 +288,13 @@ class SisBatch < ActiveRecord::Base
     require "sis"
     download_zip
     diff_result = generate_diff
-    if diff_result == :empty_diff_file
+    case diff_result
+    when :empty_diff_file
       finish(true)
+      return
+    when :too_many_over_threshold_batches
+      SisBatch.add_error(nil, "Too many consecutive batches exceeded the change threshold. A remaster is required.", sis_batch: self, failure: true)
+      finish(false)
       return
     end
 
@@ -325,6 +326,13 @@ class SisBatch < ActiveRecord::Base
     previous_batch ||= account.sis_batches
                               .succeeded.where(diffing_data_set_identifier:).order(:created_at).first
 
+    # require a remaster if too many consecutive batches exceeded the threshold
+    return :too_many_over_threshold_batches if previous_batch && account.sis_batches
+                                                                        .succeeded
+                                                                        .where(diffing_data_set_identifier:, diffing_threshold_exceeded: true)
+                                                                        .where("id > ? AND id < ?", previous_batch.id, id)
+                                                                        .count > Setting.get("sis_diffing_max_skip", "5").to_i
+
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
@@ -350,7 +358,7 @@ class SisBatch < ActiveRecord::Base
 
     self.diffing_threshold_exceeded = false
 
-    self.data[:diffed_against_sis_batch_id] = previous_batch.id
+    data[:diffed_against_sis_batch_id] = previous_batch.id
 
     self.generated_diff = Attachment.create_data_attachment(
       self,
@@ -376,8 +384,8 @@ class SisBatch < ActiveRecord::Base
   end
 
   def download_zip
-    @data_file = if self.data[:file_path]
-                   File.open(self.data[:file_path], "rb")
+    @data_file = if data[:file_path]
+                   File.open(data[:file_path], "rb")
                  else
                    attachment.open(integrity_check: true)
                  end
@@ -389,7 +397,7 @@ class SisBatch < ActiveRecord::Base
     @data_file = nil
     return self if workflow_state == "aborted"
 
-    if batch_mode? && import_finished && !self.data[:running_immediately]
+    if batch_mode? && import_finished && !data[:running_immediately]
       # in batch mode, there's still a lot of work left to do, and it needs to be done in a separate job
       # from the last ParallelImporter or a failed job will retry that bit of the import (and not the batch cleanup!)
       save!
@@ -414,9 +422,9 @@ class SisBatch < ActiveRecord::Base
     self.progress = 100 if import_finished
     self.ended_at = Time.now.utc
     save!
-    InstStatsd::Statsd.increment("sis_batch_completed", tags: { failed: @has_errors })
+    InstStatsd::Statsd.distributed_increment("sis_batch_completed", tags: { failed: @has_errors })
 
-    if !self.data[:running_immediately] && account.sis_batches.needs_processing.exists?
+    if !data[:running_immediately] && account.sis_batches.needs_processing.exists?
       self.class.queue_job_for_account(account) # check if there's anything that needs to be run
     end
   end
@@ -431,6 +439,19 @@ class SisBatch < ActiveRecord::Base
       self.workflow_state = :failed
       self.workflow_state = :failed_with_messages if @has_errors
     end
+  end
+
+  def fail_with_error!(error)
+    reload # might have failed trying to save; also ensure workflow_state is up to date
+    self.data ||= {}
+    self.data[:error_message] = error&.to_s
+    self.data[:stack_trace] = "#{error}\n#{error&.backtrace&.join("\n")}"
+    self.workflow_state = if %w[restoring restored partially_restored restore_failed].include?(workflow_state)
+                            "restore_failed"
+                          else
+                            "failed"
+                          end
+    save!
   end
 
   def statistics
@@ -639,7 +660,7 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we should not try to cleanup if the batch didn't work out, we could delete
     # stuff we still need
-    current_workflow_state = self.class.where(id:).pluck(:workflow_state).first.to_s
+    current_workflow_state = self.class.where(id:).pick(:workflow_state).to_s
     # ^reloading the whole batch can be a problem because we might be tracking data
     # we haven't persisted yet on model attributes...
     if %w[failed failed_with_messages aborted].include?(current_workflow_state)
@@ -845,6 +866,9 @@ class SisBatch < ActiveRecord::Base
     count
   end
 
+  # Stub in case any extensions need to do post processing
+  def capture_ids_for_post_processing(type, ids) end
+
   def restore_workflow_states(scope, type, restore_progress, count, total)
     GuardRail.activate(:secondary) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
@@ -853,7 +877,9 @@ class SisBatch < ActiveRecord::Base
             if retry_count == 0
               # restore the items and return the ids of the items that changed
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
+              capture_ids_for_post_processing(type, ids)
               finalize_enrollments(ids) if type == "Enrollment"
+              restore_assignment_overrides(ids) if type == "AssignmentOverrideStudent"
               count += update_restore_progress(restore_progress, data, count, total)
             else
               # try to restore each row one at a time
@@ -869,7 +895,10 @@ class SisBatch < ActiveRecord::Base
                   end
                 end
               end
+
+              capture_ids_for_post_processing(type, successful_ids)
               finalize_enrollments(successful_ids) if type == "Enrollment"
+              restore_assignment_overrides(ids) if type == "AssignmentOverrideStudent"
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: "failed", updated_at: Time.zone.now)
             end
@@ -893,12 +922,18 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
+  def restore_assignment_overrides(assignment_override_student_ids)
+    # restore assignment overrides that were deleted when the last AssignmentOverrideStudent was deleted but is now being restored
+    ao_ids = AssignmentOverrideStudent.where(id: assignment_override_student_ids).distinct.pluck(:assignment_override_id)
+    AssignmentOverride.where(workflow_state: "deleted", id: ao_ids).update_all(workflow_state: "active", updated_at: Time.now.utc)
+  end
+
   def restore_states_later(batch_mode: nil, undelete_only: false, unconclude_only: false)
     shard.activate do
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
       restore_progress.process_job(self,
                                    :restore_states_for_batch,
-                                   { n_strand: ["restore_states_for_batch", account.global_id] },
+                                   { n_strand: ["restore_states_for_batch", account.global_id], max_attempts: 3 },
                                    batch_mode:,
                                    undelete_only:,
                                    unconclude_only:)
@@ -907,6 +942,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_states_for_batch(restore_progress = nil, batch_mode: false, undelete_only: false, unconclude_only: false)
+    capture_job_id
     restore_progress&.start
     update_attribute(:workflow_state, "restoring")
     roll_back = roll_back_data
@@ -926,19 +962,19 @@ class SisBatch < ActiveRecord::Base
     restore_progress&.complete
     self.workflow_state = (undelete_only || unconclude_only || batch_mode) ? "partially_restored" : "restored"
     tags = { undelete_only:, unconclude_only:, batch_mode: }
-    InstStatsd::Statsd.increment("sis_batch_restored", tags:)
+    InstStatsd::Statsd.distributed_increment("sis_batch_restored", tags:)
     save!
   end
 
   def add_restore_statistics
-    statistics unless self&.data&.key? :statistics
-    stats = self.data[:statistics]
+    statistics unless data&.key? :statistics
+    stats = data[:statistics]
     stats ||= {}
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       stats[type.to_sym] ||= {}
       stats[type.to_sym][:restored] = roll_back_data.restored.where(context_type: type).count
     end
-    self.data[:statistics] = stats
+    data[:statistics] = stats
   end
 
   # returns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"

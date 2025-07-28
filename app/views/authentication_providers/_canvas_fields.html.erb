@@ -16,19 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<div class="ic-Form-control ic-Form-control--radio" %>
-  <span class="ic-Label"><%= t('Self Registration') %></span>
-  <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'none', id: "self_registration_none_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'none' %>
-    <%= f.label :self_registration, t('Disabled'), for: "self_registration_none_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
-  </div>
-  <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'all', id: "self_registration_all_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'all' %>
-    <%= f.label :self_registration, t('All Account Types'), for: "self_registration_all_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
-  </div>
-  <div class="ic-Radio">
-    <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'observer' %>
-    <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+<div class="ic-Form-control ic-Form-control--radio">
+  <span id="self-registration-label" class="ic-Label"><%= t('Self Registration') %></span>
+  <div role="radiogroup" aria-labelledby="self-registration-label">
+    <div class="ic-Radio">
+      <%= f.radio_button :self_registration, 'none', id: "self_registration_none_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'none' %>
+      <%= f.label :self_registration, t('Disabled'), for: "self_registration_none_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :self_registration, 'all', id: "self_registration_all_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'all' %>
+      <%= f.label :self_registration, t('All Account Types'), for: "self_registration_all_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
+    <div class="ic-Radio">
+      <%= f.radio_button :self_registration, 'observer', id: "self_registration_observers_#{presenter.id_suffix(aac)}", checked: aac.self_registration == 'observer' %>
+      <%= f.label :self_registration, t('Observer Accounts Only'), for: "self_registration_observers_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+    </div>
   </div>
   <div class="ic-Checkbox-group">
     <% if DynamicSettings.find(tree: :private)['recaptcha_server_key'] %>
@@ -44,4 +46,8 @@
     </div>
     <% end %>
   </div>
+  <% if @domain_root_account.feature_enabled?(:password_complexity) && !@domain_root_account.site_admin? %>
+    <% js_bundle :password_complexity_configuration %>
+    <div id="password_complexity_configuration"></div>
+  <% end %>
 </div>

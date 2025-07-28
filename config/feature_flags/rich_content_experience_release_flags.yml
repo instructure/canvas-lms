@@ -1,0 +1,292 @@
+---
+ai_text_tools:
+  applies_to: Account
+  state: hidden
+  display_name: AI Text Tools
+  description: |-
+    Enable AI text tools in the Rich Content Editor
+  beta: true
+
+authenticated_iframe_content:
+  state: hidden
+  display_name: 'Authenticated IFrame Content'
+  description: This flag changes the way RCE content is loaded in iframes to proxy the request through canvas.
+  applies_to: SiteAdmin
+
+auto_show_cc:
+  type: setting
+  state: allowed
+  display_name: Auto Show Closed Captions
+  description: |-
+    Automatically show closed captions in the user's current
+    language (if available) when playing canvas media.
+  applies_to: User
+
+block_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Editor
+  description: |-
+    Enable the new block editor for the rich content editor.
+  beta: true
+
+block_template_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Template Editor
+  description: |-
+    Surfaces the "Block Editor Templates - edit" permission in the permissions UI.
+    Users with this permission can create and edit block templates.
+  beta: true
+
+buttons_and_icons_root_account:
+  state: allowed
+  applies_to: RootAccount
+  display_name: RCE Icon Maker
+  description: |-
+    Manage a library of custom icons from the RCE.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+    production:
+      state: hidden
+
+block_content_editor:
+  applies_to: Account
+  state: hidden
+  display_name: Block Content Editor
+  description: |-
+    Enable the new Block Content Editor for creating pages.
+  shadow: true
+
+consolidated_media_player:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Consolidated Media Player
+  description: |-
+    Enable the new consolidated media player in the Rich Content Editor.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+default_copyright_on_attachments:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Default Copyright on Attachments
+  description: |-
+    Sets the default copyright for new attachments if the course requires copyright on files.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+deprecate_uuid_in_files_api:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Remove UUID from the response of the files API
+  description: This will remove the UUID from the response of the files API. This is an internal only field, and not sending it over the wire will be a network optimization.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+disable_iframe_sandbox_file_show:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: Disable Iframe Sandbox at File Show
+  description: |-
+    Disable iframe sandboxing at file show.
+
+docviewer_enable_iwork_files:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Docviewer Apple iWork file support"
+  description: "Allows Canvas to send iWork files to docviewer."
+  visible_on: docviewer_enable_iwork_visible_on_hook
+
+enhanced_docviewer_url_security:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enhanced DocViewer URL Security
+  description: |-
+    DocViewer will be launched more securely (using a JWT with a JTI claim to prevent token reuse)
+
+explicit_latex_typesetting:
+  state: hidden
+  display_name: Explicit LaTeX Typesetting
+  description: |-
+    Instead of typesetting LaTeX anywhere, only typeset LaTeX where
+    it is explicitly enabled.
+  applies_to: SiteAdmin
+
+file_verifiers_for_quiz_links:
+  state: allowed_on
+  shadow: true
+  display_name: Use file verifier authentication for New Quiz file links
+  description: |-
+    Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed
+    ci:
+      state: allowed
+
+files_a11y_rewrite:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Files a11y Rewrite
+  description: |-
+    Enables the new Files a11y Rewrite page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+files_a11y_rewrite_toggle:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Files a11y Rewrite Toggle
+  description: |-
+    Allows users to switch to the old files ui when the Files A11y Rewrite flag is enabled.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+hidden_attachments_replacement_chain:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Hidden Attachments Replacement Chain
+  description: |-
+    Enables that hidden attachments will be included into the replacement chain.
+
+media_links_use_attachment_id:
+  state: hidden
+  display_name: Use Attachment IDs in Media Links
+  description: |-
+    Use attachment ids in media links so that users are always pointed to the correct instance of media
+    instead of the original
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+permanent_page_links:
+  state: hidden
+  display_name: 'Permanent Page Links'
+  description: |-
+    When the title to a page is changed, old links to that page will link to the correct page.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+precise_link_replacements:
+  state: hidden
+  display_name: Precise link replacement on content migrations
+  description: |-
+    Apply link replacement logic to a select list of
+    elements only, as opposed to all texts
+  applies_to: SiteAdmin
+
+rce_a11y_resize:
+  state: hidden
+  applies_to: SiteAdmin
+  shadow: true
+  display_name: RCE Accessible Resize
+  description: |-
+    Enable the Rich Content Editor to resize editor's size in a way that is accessible.
+    This will allow users to resize editor without losing accessibility features.
+
+rce_find_replace:
+  state: hidden
+  display_name: Find and Replace RCE Plugin
+  description: |-
+    Enable a plugin which can find and replace content when editing in an RCE
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+rce_transform_loaded_content:
+  state: hidden
+  display_name: Transform RCE Content on Load
+  description: |-
+    Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
+    Needed for the RCE to function fully in New Quizzes.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+reset_uuid_on_course_reset:
+  state: allowed_on
+  display_name: Reset UUID on Course Reset
+  description: |-
+    Reset the UUID of a course when it is reset.  This allows course restore to work better for New Quizzes.
+  applies_to: RootAccount
+
+safe_files_token:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Safe Files Token
+  description: |-
+    Adds a one time use token when redirecting to the safe files domain.
+    This allows access to files within iframes in rich content that would be blocked by cross-site cookie protections.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+visibility_performance_improvements:
+  state: hidden
+  display_name: Selective Release Visibility Performance Improvements
+  description: |-
+    Improves performance of selective release visibility queries.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+standardize_assignment_date_formatting:
+  state: hidden
+  display_name: Standardize Assignment Dates Formatting
+  description: |-
+    Standardizes the formatting of assignment and quiz dates to include selective release logic and be consistent across canvas.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+youtube_migration:
+  applies_to: RootAccount
+  state: hidden
+  display_name: YouTube content migration
+  description: |-
+    Turn on YouTube Content Migration feature. Adding the scanning ability and the convert option on YouTube embeddings.

@@ -56,7 +56,7 @@ describe('CalendarConferenceWidget', () => {
 
   it('does not show a selector if conference is present and single types is available', () => {
     const {queryByText} = render(
-      <CalendarConferenceWidget {...makeParams({conferenceTypes: conferenceTypes.slice(0, 1)})} />
+      <CalendarConferenceWidget {...makeParams({conferenceTypes: conferenceTypes.slice(0, 1)})} />,
     )
     expect(queryByText('Select Conference Provider')).toBeNull()
   })
@@ -68,7 +68,7 @@ describe('CalendarConferenceWidget', () => {
 
   it('does not show a selector if setConference is not defined', () => {
     const {queryByText} = render(
-      <CalendarConferenceWidget {...makeParams({setConference: null})} />
+      <CalendarConferenceWidget {...makeParams({setConference: null})} />,
     )
     expect(queryByText('Select Conference Provider')).toBeNull()
   })

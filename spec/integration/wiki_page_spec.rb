@@ -120,3 +120,21 @@ describe WikiPagesController do
     end
   end
 end
+
+describe "Admin without Course Content - view permission" do
+  before do
+    course_with_teacher_logged_in(active_all: true)
+  end
+
+  it "cannot view unpublished wiki pages" do
+    account = @course.root_account
+    role = custom_account_role("CustomAccountUser", account:)
+    RoleOverride.manage_role_override(account, role, :read_course_content, enabled: false)
+    admin = account_admin_user(account:, role:, active_all: true)
+    user_session(admin)
+
+    wiki_page = @course.wiki_pages.create!(title: "Unpublished Page", body: "This page should not be viewable", workflow_state: "unpublished")
+    get course_wiki_page_url(@course, wiki_page)
+    expect(response).to have_http_status(:unauthorized)
+  end
+end

@@ -17,12 +17,12 @@
  */
 
 import {useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {DELETE_OUTCOME_LINKS} from '../../graphql/Management'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 export const REMOVE_NOT_STARTED = 'REMOVE_NOT_STARTED'
 export const REMOVE_PENDING = 'REMOVE_PENDING'
@@ -50,7 +50,7 @@ const useOutcomesRemove = () => {
           },
           {
             count: outcomeCount,
-          }
+          },
         ),
         type: 'success',
       })
@@ -63,7 +63,7 @@ const useOutcomesRemove = () => {
           },
           {
             count: outcomeCount,
-          }
+          },
         ),
         type: 'error',
       })
@@ -74,7 +74,7 @@ const useOutcomesRemove = () => {
     async outcomes => {
       const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
       const nonRemovableLinkIds = Object.keys(outcomes).filter(
-        linkId => !outcomes[linkId].canUnlink
+        linkId => !outcomes[linkId].canUnlink,
       )
       const removableCount = removableLinkIds.length
       const nonRemovableCount = nonRemovableLinkIds.length
@@ -110,7 +110,7 @@ const useOutcomesRemove = () => {
         showFlashMessage(totalCount)
       }
     },
-    [deleteOutcomeLinks]
+    [deleteOutcomeLinks],
   )
 
   return {

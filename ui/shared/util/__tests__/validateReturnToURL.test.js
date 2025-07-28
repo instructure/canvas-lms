@@ -27,22 +27,22 @@ describe('returnToHelper', () => {
     })
 
     test('returns false for javascript protocol', () => {
-      // eslint-disable-next-line no-script-url
+       
       expect(isValid('javascript:alert("shame!")')).toEqual(false)
       expect(isValid('  javascript:alert("this would still run")')).toEqual(false)
-      // eslint-disable-next-line no-script-url
+       
       expect(isValid('JaVaScRiPt:alert("nice try")')).toEqual(false)
     })
 
     test('returns false for data: protocol', () => {
       expect(isValid('data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
-        false
+        false,
       )
       expect(isValid('  data:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
-        false
+        false,
       )
       expect(isValid('DaTa:text/html;base64,PHNjcmlwdD5hbGVydCgiaGkiKTwvc2NyaXB0Pg==')).toEqual(
-        false
+        false,
       )
     })
 

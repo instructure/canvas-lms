@@ -23,11 +23,11 @@ import {
   ADDRESS_BOOK_RECIPIENTS,
   ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
 } from '../../../graphql/Queries'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const AddressBookContainer = props => {
   const {setOnSuccess} = useContext(AlertManagerContext)
@@ -95,7 +95,7 @@ export const AddressBookContainer = props => {
         courseContextCode: props.courseContextCode,
       },
       notifyOnNetworkStatusChange: true,
-    }
+    },
   )
   const {loading, data} = addressBookRecipientsQuery
 
@@ -119,26 +119,12 @@ export const AddressBookContainer = props => {
           one: '1 Address book result loaded',
           other: '%{count} Address book results loaded',
         },
-        {count: searchResults.length}
+        {count: searchResults.length},
       )
       setOnSuccess(loadedMessage)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, data, searchTerm])
-
-  useEffect(() => {
-    if (
-      props.activeCourseFilter?.contextID === null &&
-      props.activeCourseFilter?.contextName === null
-    ) {
-      setInputValue('')
-      setFilterHistory([
-        {
-          context: null,
-        },
-      ])
-    }
-  }, [props.activeCourseFilter])
 
   useEffect(() => {
     props.onInputValueChange(searchTerm)
@@ -201,19 +187,30 @@ export const AddressBookContainer = props => {
 
   const getCommonCoursesInformation = commonCourses => {
     const activeEnrollments = commonCourses?.nodes.filter(
-      courseEnrollment => courseEnrollment.state === 'active'
+      courseEnrollment => courseEnrollment.state === 'active',
     )
     return activeEnrollments.map(
       courseEnrollment =>
         (courseEnrollment = {
           courseID: courseEnrollment.course._id,
           courseRole: courseEnrollment.type,
-        })
+        }),
     )
   }
 
   useEffect(() => {
-    if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1]?.context) {
+    if (
+      props.activeCourseFilter?.contextID === null &&
+      props.activeCourseFilter?.contextName === null
+    ) {
+      setInputValue('')
+      setFilterHistory([
+        {
+          context: null,
+        },
+      ])
+    }
+    if (props.activeCourseFilter?.contextID && props.activeCourseFilter?.contextName) {
       addFilterHistory({
         context: {
           contextID: props.activeCourseFilter.contextID,
@@ -225,11 +222,6 @@ export const AddressBookContainer = props => {
   }, [props.activeCourseFilter])
 
   const menuData = useMemo(() => {
-    // If loading is true and there is no data, return an empty array.
-    if (loading && !data) {
-      return []
-    }
-
     // Extract contextData: { id, name, and context_type}
     let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {
@@ -246,6 +238,7 @@ export const AddressBookContainer = props => {
         _id: u._id,
         id: u.id,
         name: u.shortName,
+        pronouns: u.pronouns,
         commonCoursesInfo: props.includeCommonCourses
           ? getCommonCoursesInformation(u.commonCoursesConnection)
           : [],
@@ -297,6 +290,7 @@ export const AddressBookContainer = props => {
       addFilterHistory({
         context: {contextID: item.id, contextName: item.name, totalRecipientCount: item.userCount},
       })
+      setInputValue('')
     } else if (isSubmenu) {
       addFilterHistory({
         context: null,
@@ -339,6 +333,7 @@ export const AddressBookContainer = props => {
       isOnObserverSubmenu={isOnObserverSubmenu()}
       placeholder={props.placeholder}
       addressBookLabel={props.addressBookLabel}
+      renderingContext={props.renderingContext}
     />
   )
 }
@@ -385,6 +380,7 @@ AddressBookContainer.propTypes = {
    */
   placeholder: PropTypes.string,
   addressBookLabel: PropTypes.string,
+  renderingContext: PropTypes.string,
 }
 
 AddressBookContainer.defaultProps = {

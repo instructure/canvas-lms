@@ -533,3 +533,18 @@ table.response-fields td.param-desc ul {
 .field-effective {
   width: 10em;
 }
+
+.lti-pns-image,
+.lti-placement-image {
+  width: 100%;
+}
+
+.alert {
+  border-width: 0.125rem;
+  border-style: solid;
+  border-radius: 0.25rem;
+  border-color: rgb(43, 122, 188);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 0.1875rem 0.375rem, rgba(0, 0, 0, 0.16) 0px 0.1875rem 0.375rem;
+  padding: 1.33em;
+  line-height: 21px;
+}

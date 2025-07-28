@@ -17,7 +17,7 @@
  */
 
 import {datetimeString} from '@canvas/datetime/date-functions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 
 import {List} from '@instructure/ui-list'
@@ -26,7 +26,7 @@ import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const usersList = userIds => {
   if (userIds && userIds.length > 0) {

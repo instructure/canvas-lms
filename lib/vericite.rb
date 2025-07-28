@@ -164,7 +164,7 @@ module VeriCite
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
+      object_id = submission.vericite_data_hash.dig(asset_string, :object_id)
       res = nil
       res = sendRequest(:get_scores, oid: object_id, utp: "2", user:, course:, assignment:) if object_id
       data = {}
@@ -178,7 +178,7 @@ module VeriCite
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
+      object_id = submission.vericite_data_hash.dig(asset_string, :object_id)
       response = sendRequest(:generate_report, oid: object_id, utp: "2", current_user:, user:, course:, assignment:)
       if response.nil?
         nil
@@ -191,7 +191,7 @@ module VeriCite
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
+      object_id = submission.vericite_data_hash.dig(asset_string, :object_id)
       response = sendRequest(:generate_report, oid: object_id, utp: "1", current_user:, user:, course:, assignment:, tem: email(course))
       if response.nil?
         nil
@@ -373,7 +373,9 @@ module VeriCite
 
     private
 
-    SUCCESSFUL_RETURN_CODES = (200..299)
+    SUCCESSFUL_RETURN_CODES = 200..299
+    private_constant :SUCCESSFUL_RETURN_CODES
+
     def is_response_success?(response)
       response&.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
     rescue

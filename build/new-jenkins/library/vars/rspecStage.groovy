@@ -38,7 +38,6 @@ def createDistribution(nestedStages) {
     "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
     "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
     "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",
-    "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
   if(env.CRYSTALBALL_MAP == '1') {
@@ -103,7 +102,7 @@ def tearDownNode() {
   }
 
   def destDir = "tmp/${env.CI_NODE_INDEX}"
-  def srcDir = "${env.COMPOSE_PROJECT_NAME}_canvas_1:/usr/src/app"
+  def srcDir = "${env.COMPOSE_PROJECT_NAME}-canvas-1:/usr/src/app"
   def uploadDockerLogs = commitMessageFlag('upload-docker-logs') as Boolean
 
   sh """#!/bin/bash
@@ -164,7 +163,7 @@ def runRspecqSuite() {
       cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
       return
     }
-    sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
+    sh(script: 'docker compose exec -T -e ENABLE_AXE_SELENIUM \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
@@ -178,7 +177,7 @@ def runRspecqSuite() {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */
       sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas_") )
+        ids=( $(docker ps -aq --filter "name=canvas-") )
         for i in "${ids[@]}"
         do
           docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
@@ -201,7 +200,7 @@ def runRspecqSuite() {
 
 def runReporter() {
   try {
-    sh(script: "docker-compose exec -e SENTRY_DSN -T canvas bundle exec rspecq \
+    sh(script: "docker compose exec -e SENTRY_DSN -T canvas bundle exec rspecq \
                                             --build=${JOB_NAME}_build${BUILD_NUMBER} \
                                             --queue-wait-timeout 120 \
                                             --redis-url $RSPECQ_REDIS_URL \
@@ -210,7 +209,7 @@ def runReporter() {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */
       sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas_") )
+        ids=( $(docker ps -aq --filter "name=canvas-") )
         for i in "${ids[@]}"
         do
           docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"

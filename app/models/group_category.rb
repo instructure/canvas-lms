@@ -24,6 +24,11 @@ class GroupCategory < ActiveRecord::Base
   attr_accessor :group_by_section
   attr_writer :assign_unassigned_members
 
+  cattr_accessor :MAX_DIFFERENTIATION_TAG_PER_COURSE
+  self.MAX_DIFFERENTIATION_TAG_PER_COURSE = 40
+
+  attr_readonly :non_collaborative
+
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch
   belongs_to :root_account, class_name: "Account", inverse_of: :all_group_categories
@@ -35,9 +40,11 @@ class GroupCategory < ActiveRecord::Base
 
   before_validation :set_root_account_id
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
+  validate :validate_non_collaborative_constraints, if: :non_collaborative?
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
+  after_update :clear_permissions_cache_for_selfsignup
 
   delegate :time_zone, to: :context
 
@@ -47,14 +54,20 @@ class GroupCategory < ActiveRecord::Base
     max_len = maximum_string_length
     max_len -= record.create_group_count.to_s.length + 1 if record.create_group_count
 
-    if value.blank?
-      record.errors.add attr, t(:name_required, "Name is required")
+    if record.non_collaborative?
+      if value.blank?
+        record.errors.add(attr, t(:name_required, "Name is required"))
+      elsif value.length > max_len
+        record.errors.add(attr, t(:name_too_long, "Enter a shorter category name"))
+      end
+    elsif value.blank?
+      record.errors.add(attr, t(:name_required, "Name is required"))
     elsif GroupCategory.protected_name_for_context?(value, record.context)
-      record.errors.add attr, t(:name_reserved, "%{name} is a reserved name.", name: value)
+      record.errors.add(attr, t(:name_reserved, "%{name} is a reserved name.", name: value))
     elsif record.context && record.context.group_categories.other_than(record).where(name: value).exists?
-      record.errors.add attr, t(:name_unavailable, "%{name} is already in use.", name: value)
+      record.errors.add(attr, t(:name_unavailable, "%{name} is already in use.", name: value))
     elsif value.length > max_len
-      record.errors.add attr, t(:name_too_long, "Enter a shorter category name")
+      record.errors.add(attr, t(:name_too_long, "Enter a shorter category name"))
     end
   end
 
@@ -98,6 +111,8 @@ class GroupCategory < ActiveRecord::Base
 
   scope :by_name, -> { order(Bookmarker.order_by) }
   scope :active, -> { where(deleted_at: nil) }
+  scope :collaborative, -> { where(non_collaborative: false) }
+  scope :non_collaborative, -> { where(non_collaborative: true) }
   scope :other_than, ->(cat) { where("group_categories.id<>?", cat.id || 0) }
 
   class << self
@@ -203,6 +218,12 @@ class GroupCategory < ActiveRecord::Base
     self_signup.present? && self_signup == "restricted"
   end
 
+  def past_self_signup_end_at?
+    return false unless context.is_a?(Course) && context.account.feature_enabled?(:self_signup_deadline)
+
+    self_signup? && self_signup_end_at.present? && self_signup_end_at < Time.now.utc
+  end
+
   def has_heterogenous_group?
     # if it's not a course, we want the answer to be false. but that same
     # condition would may any group in the category say has_common_section?
@@ -215,7 +236,7 @@ class GroupCategory < ActiveRecord::Base
 
   def group_for(user)
     shard.activate do
-      groups.active.where(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists).take
+      groups.active.find_by(GroupMembership.active.where("group_id=groups.id").where(user_id: user).arel.exists)
     end
   end
 
@@ -237,7 +258,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def restore
-    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
+    groups.where(deleted_at: [(deleted_at - 10.minutes)..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
     self.deleted_at = nil
     save!
   end
@@ -537,7 +558,14 @@ class GroupCategory < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| context.grants_right?(user, session, :read) }
+    given do |user, session|
+      # For non_collaborative group_sets, we only give read access to users who can manage groups
+      if non_collaborative? && !context.grants_any_right?(user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        false
+      else
+        context.grants_right?(user, session, :read)
+      end
+    end
     can :read
   end
 
@@ -560,7 +588,34 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
+  def max_diff_tag_validation_count
+    sql = <<-SQL.squish
+      SELECT
+        SUM(
+          (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')
+        ) AS diff_tag_count
+      FROM #{GroupCategory.quoted_table_name} parent
+      WHERE#{" "}
+        non_collaborative = true
+        AND context_type = 'Course'
+        AND context_id = #{context_id}
+        AND deleted_at IS null
+    SQL
+
+    ActiveRecord::Base.connection.execute(sql).first["diff_tag_count"].to_i
+  end
+
+  def single_tag?
+    groups.count == 1 && groups.first.name == name
+  end
+
   protected
+
+  def validate_non_collaborative_constraints
+    errors.add(:base, "Non-collaborative group categories can only be created for courses") unless context_type == "Course"
+    errors.add(:base, "Non-collaborative group categories cannot be student organized or communities") if ["student_organized", "communities"].include?(role)
+    errors.add(:base, "You have reached the tag limit for this course") if new_record? && max_diff_tag_validation_count >= self.MAX_DIFFERENTIATION_TAG_PER_COURSE
+  end
 
   def start_progress
     self.current_progress ||= progresses.build(tag: "assign_unassigned_members", completion: 0)
@@ -679,5 +734,11 @@ class GroupCategory < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def clear_permissions_cache_for_selfsignup
+    return unless %i[self_signup self_signup_end_at].any? { |k| saved_changes.key?(k) } # Skip if neither setting was changed
+
+    context.students.each { |student| clear_permissions_cache(student) } if context.is_a?(Course)
   end
 end

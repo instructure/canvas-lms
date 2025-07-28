@@ -47,7 +47,7 @@ export function uploadFile(file, folderId, onSuccess, onFailure) {
         parent_folder_id: folderId,
         on_duplicate: 'rename',
       },
-      stringIds
+      stringIds,
     )
     .then(response => onFileUploadInfoReceived(file, response.data, onSuccess, onFailure))
     .catch(response => onFailure(response))

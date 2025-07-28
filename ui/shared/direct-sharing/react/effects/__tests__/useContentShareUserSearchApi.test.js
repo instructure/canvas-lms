@@ -31,7 +31,7 @@ describe('useContentShareUserSearchApi', () => {
   it('reports null as its result if the search term is too short', () => {
     const success = jest.fn()
     renderHook(() =>
-      useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '12'}})
+      useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '12'}}),
     )
     expect(success).toHaveBeenCalledWith(null)
   })
@@ -40,7 +40,7 @@ describe('useContentShareUserSearchApi', () => {
     fetchMock.mock(`path:${path}`, ['list of users'])
     const success = jest.fn()
     renderHook(() =>
-      useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '123'}})
+      useContentShareUserSearchApi({success, courseId: '42', params: {search_term: '123'}}),
     )
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)

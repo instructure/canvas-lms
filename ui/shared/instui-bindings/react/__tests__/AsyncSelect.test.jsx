@@ -83,7 +83,7 @@ describe('CanvasAsyncSelect', () => {
           {id: 'foo', label: 'bar'},
           {id: 'baz', label: 'bing'},
         ],
-      })
+      }),
     )
     expect(domGetByText(ariaLive, /2 options loaded/i)).toBeInTheDocument()
   })
@@ -101,7 +101,7 @@ describe('CanvasAsyncSelect', () => {
           {id: 'foo', label: 'bar'},
           {id: 'baz', label: 'bing'},
         ],
-      })
+      }),
     )
     expect(domQueryByText(ariaLive, /options loaded/i)).toBe(null)
   })

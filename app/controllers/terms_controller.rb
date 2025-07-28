@@ -144,7 +144,7 @@ class TermsController < ApplicationController
       if validate_dates(@term, term_params, overrides) && @term.update(term_params)
         @term.set_overrides(@context, overrides)
         # Republish any courses with course paces that may be affected
-        if @term.root_account.feature_enabled?(:course_paces) && @term.saved_changes.keys.intersect?(%w[start_at end_at])
+        if @term.saved_changes.keys.intersect?(%w[start_at end_at])
           @term.courses.where("restrict_enrollments_to_course_dates IS NOT TRUE AND settings LIKE ?", "%enable_course_paces: true%").find_each do |course|
             course.course_paces.find_each(&:create_publish_progress)
           end
@@ -160,9 +160,11 @@ class TermsController < ApplicationController
     hashes = [term_params]
     hashes += overrides.values if overrides
     invalid_dates = hashes.any? do |hash|
-      start_at = DateTime.parse(hash[:start_at]) rescue nil
-      end_at = DateTime.parse(hash[:end_at]) rescue nil
+      start_at = Time.zone.parse(hash[:start_at]) if hash[:start_at]
+      end_at = Time.zone.parse(hash[:end_at]) if hash[:end_at]
       start_at && end_at && end_at < start_at
+    rescue ArgumentError
+      false
     end
     term.errors.add(:base, t("End dates cannot be before start dates")) if invalid_dates
     !invalid_dates
@@ -185,7 +187,7 @@ class TermsController < ApplicationController
     if api_request?
       enrollment_term_json(@term, @current_user, session, nil, ["overrides"])
     else
-      @term.as_json(include: :enrollment_dates_overrides)
+      @term.as_json(include: :enrollment_dates_overrides, methods: :filter_courses_by_term)
     end
   end
 end

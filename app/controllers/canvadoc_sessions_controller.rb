@@ -23,6 +23,10 @@ class CanvadocSessionsController < ApplicationController
   include CoursesHelper
   include HmacHelper
 
+  def token_auth_allowed?
+    params[:action] == "show"
+  end
+
   def create
     submission_attempt, submission_id = params.require([:submission_attempt, :submission_id])
 
@@ -63,8 +67,8 @@ class CanvadocSessionsController < ApplicationController
         @current_user,
         annotation_context,
         submission,
-        true,
-        enable_annotations
+        disable_annotation_notifications: true,
+        enable_annotations:
       )
     }
   end
@@ -73,6 +77,10 @@ class CanvadocSessionsController < ApplicationController
   # This API can only be accessed when another endpoint provides a signed URL.
   # It will simply redirect you to the 3rd party document preview.
   def show
+    unless params[:hmac] && params[:blob]
+      return render plain: "Missing HMAC and blob", status: :bad_request
+    end
+
     blob = extract_blob(params[:hmac],
                         params[:blob],
                         "user_id" => @current_user.try(:global_id),
@@ -141,7 +149,7 @@ class CanvadocSessionsController < ApplicationController
       if blob["annotation_context"]
         annotation_context_id = if ApplicationController.test_cluster?
                                   # since Canvas test environments are often configured to point at production
-                                  # DocViewer environments, this prevents making an annotation on Canavs beta and
+                                  # DocViewer environments, this prevents making an annotation on Canvas beta and
                                   # having it show up on Canvas prod.  See CAS-1551
                                   # TODO: a proper Canvas/DocViewer environment pairing and beta refresh from prod on DocViewer
                                   blob["annotation_context"] + "-#{ApplicationController.test_cluster_name}"
@@ -151,6 +159,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:annotation_context] = annotation_context_id
       end
       attachment.submit_to_canvadocs(1, **opts) unless attachment.canvadoc_available?
+      attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id) if submission
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
       # For the purposes of reporting student viewership, we only

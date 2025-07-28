@@ -17,20 +17,23 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import {NewActivityIndicator} from '../NewActivityIndicator'
 
-it('passes props to Indicator', () => {
-  const wrapper = shallow(<NewActivityIndicator title="some title" itemIds={['1', '2']} />)
-  expect(wrapper).toMatchSnapshot()
+it('renders indicator with correct props', () => {
+  const {getByText, container} = render(
+    <NewActivityIndicator title="some title" itemIds={['1', '2']} />,
+  )
+
+  expect(getByText('New activity for some title')).toBeInTheDocument()
+  expect(container.querySelector('span[class*="badge"]')).toBeInTheDocument()
 })
 
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
   const ref = React.createRef()
-  const wrapper = render(
+  const {rerender} = render(
     <NewActivityIndicator
       title="some title"
       itemIds={['first', 'second']}
@@ -38,14 +41,14 @@ it('registers itself as animatable', () => {
       deregisterAnimatable={fakeDeregister}
       animatableIndex={42}
       ref={ref}
-    />
+    />,
   )
   expect(fakeRegister).toHaveBeenCalledWith('new-activity-indicator', ref.current, 42, [
     'first',
     'second',
   ])
 
-  wrapper.rerender(
+  rerender(
     <NewActivityIndicator
       title="some title"
       itemIds={['third', 'fourth']}
@@ -53,7 +56,7 @@ it('registers itself as animatable', () => {
       deregisterAnimatable={fakeDeregister}
       animatableIndex={84}
       ref={ref}
-    />
+    />,
   )
   expect(fakeDeregister).toHaveBeenCalledWith('new-activity-indicator', ref.current, [
     'first',

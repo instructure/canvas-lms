@@ -31,6 +31,9 @@
   @else if $breakpoint == desktop {
     $dimension: 992px;
   }
+  @else if $breakpoint == ICEDesktop {
+    $dimension: 1025px;
+  }
   @else if $breakpoint == desktop--nav-open {
     $dimension: 1140px;
   }

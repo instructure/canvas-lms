@@ -16,23 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import WithBreakpoints from '@canvas/with-breakpoints'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import type {Breakpoints} from '@canvas/with-breakpoints'
+import {Text} from '@instructure/ui-text'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import WithBreakpoints, {Breakpoints} from '@canvas/with-breakpoints'
 import type {FormMessage} from '@instructure/ui-form-field'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 function useElementResize(
-  onResize: (element: Element) => void
+  onResize: (element: Element) => void,
 ): [(element: Element | null) => void] {
   const observer = useRef(
-    new ResizeObserver(entries => entries.forEach(entry => onResize(entry.target)))
+    new ResizeObserver(entries => entries.forEach(entry => onResize(entry.target))),
   )
 
   const listenElement = (element: Element | null) => {
@@ -65,6 +66,7 @@ export interface ClearableDateTimeInputProps {
   dateInputRef?: (el: HTMLInputElement | null) => void
   timeInputRef?: (el: HTMLInputElement | null) => void
   clearButtonAltLabel: string
+  setStatusMessage?: (message: string) => void
 }
 
 function ClearableDateTimeInput({
@@ -85,6 +87,19 @@ function ClearableDateTimeInput({
   timeInputRef,
   clearButtonAltLabel,
 }: ClearableDateTimeInputProps) {
+  const elementRef = useRef<Element | null>(null)
+  const elementRefCallback = (element: Element | null) => {
+    elementRef.current = element
+    if (elementRef?.current) {
+      // @ts-expect-error
+      setHeight(elementRef.current.offsetHeight)
+    }
+  }
+
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
+  const [height, setHeight] = useState(0)
+
   const [hasErrorBorder, setHasErrorBorder] = useState(false)
   const clearButtonContainer = useRef<HTMLElement | null>()
 
@@ -101,9 +116,28 @@ function ClearableDateTimeInput({
 
   useEffect(() => {
     if (!clearButtonContainer.current) return
-    // labels + labels margins + 0.5rem (padding when the date time input has errors)
-    clearButtonContainer.current.style.paddingTop = hasErrorBorder ? '2.75rem' : '2.25rem'
-  }, [hasErrorBorder])
+    if (height > 0) {
+      // labels + labels margins + 0.5rem (padding when the date time input has errors)
+      clearButtonContainer.current.style.paddingTop = hasErrorBorder
+        ? `${1.5 + height / 16}rem`
+        : `${1 + height / 16}rem`
+    }
+  }, [hasErrorBorder, height])
+  const renderDateLabel = <Text elementRef={elementRefCallback}>{dateRenderLabel}</Text>
+
+  const renderTimeLabel = (
+    <Flex as="div" height={height - 2} direction="column" justifyItems="end">
+      {I18n.t('Time')}
+    </Flex>
+  )
+
+  const handleClear = () => {
+    onClear()
+    setTimeout(() => {
+      setOnSuccess(I18n.t('Cleared successfully'))
+    }, 500)
+  }
+
   return (
     <Flex
       data-testid="clearable-date-time-input"
@@ -124,8 +158,8 @@ function ClearableDateTimeInput({
           colSpacing="small"
           dateFormat="ll"
           description={<ScreenReaderContent>{description}</ScreenReaderContent>}
-          dateRenderLabel={dateRenderLabel}
-          timeRenderLabel={I18n.t('Time')}
+          dateRenderLabel={renderDateLabel}
+          timeRenderLabel={renderTimeLabel}
           invalidDateTimeMessage={I18n.t('Invalid date')}
           prevMonthLabel={I18n.t('Previous month')}
           nextMonthLabel={I18n.t('Next month')}
@@ -147,12 +181,11 @@ function ClearableDateTimeInput({
         margin="0 0 0 small"
         elementRef={e => (clearButtonContainer.current = e as HTMLElement)}
       >
-        <CondensedButton interaction={disabled ? 'disabled' : 'enabled'} onClick={onClear}>
+        <CondensedButton interaction={disabled ? 'disabled' : 'enabled'} onClick={handleClear}>
           <AccessibleContent alt={clearButtonAltLabel}>{I18n.t('Clear')}</AccessibleContent>
         </CondensedButton>
       </Flex.Item>
     </Flex>
   )
 }
-
 export default WithBreakpoints(ClearableDateTimeInput)

@@ -72,9 +72,9 @@ describe TurnitinApi::OutcomesResponseTransformer do
       end
 
       it "increments a statsd counter which includes the status code" do
-        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment)
         expect { subject.response }.to raise_error(described_class::InvalidResponse)
-        expect(InstStatsd::Statsd).to have_received(:increment).with(
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
           "lti.tii.outcomes_response_bad",
           tags: { status: 403, message: :unknown }
         )
@@ -92,9 +92,9 @@ describe TurnitinApi::OutcomesResponseTransformer do
         end
 
         it "identifies known responses in the statsd counter" do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
           expect { subject.response }.to raise_error(described_class::InvalidResponse)
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "lti.tii.outcomes_response_bad",
             tags: { status: 401, message: :api_product_inactive }
           )

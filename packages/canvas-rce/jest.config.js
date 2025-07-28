@@ -18,7 +18,7 @@
 
 // Used to enable babel transformations for node_modules that use ecmascript module syntax directly
 // From https://github.com/nrwl/nx/issues/812
-const esModules = ['text-field-edit', '@instructure\\/ui-icons'].join('|')
+const esModules = ['text-field-edit', '@instructure\\/ui-icons', 'msw'].join('|')
 
 module.exports = {
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
@@ -34,6 +34,7 @@ module.exports = {
     ],
   ],
   setupFilesAfterEnv: [
+    '@testing-library/jest-dom',
     '<rootDir>/jest/jest-setup-framework.js',
     '<rootDir>/../../jest/stubInstUi.js',
   ],
@@ -41,13 +42,19 @@ module.exports = {
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/canvas'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
-  testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
+  testEnvironment: 'jsdom',
+  testEnvironmentOptions: {
+    // https://github.com/mswjs/examples/blob/main/examples/with-jest/jest.config.ts#L20
+    customExportConditions: [''],
+  },
   moduleNameMapper: {
     // jest can't import css
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',
     // mock the tinymce-react Editor component
     '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.jsx',
     'crypto-es': '<rootDir>/src/rce/__mocks__/_mockCryptoEs.ts',
+    '@instructure/studio-player':
+      '<rootDir>/__mocks__/@instructure/studio-player/_mockStudioPlayer.js',
   },
 
   transform: {
@@ -60,9 +67,7 @@ module.exports = {
           ['@babel/preset-react', {}],
           ['@babel/preset-typescript', {}],
         ],
-        plugins: [
-          ['@babel/plugin-proposal-decorators', {legacy: true}],
-        ],
+        plugins: [['@babel/plugin-proposal-decorators', {legacy: true}]],
       },
     ],
   },

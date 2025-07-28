@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 
@@ -40,20 +40,29 @@ import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
 import {scoreDistributionRow} from './AssignmentTableRows/ScoreDistributionRow'
 import {rubricRow} from './AssignmentTableRows/RubricRow'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
-const headers = [
-  {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
-  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
-  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '15%'},
-  {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
-]
+function createHeaders(showDocumentProcessors) {
+  return [
+    {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
+    {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
+    {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '15%'},
+    {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
+    {
+      key: 'assetReports',
+      value: showDocumentProcessors ? I18n.t('Document Processors') : '',
+      id: nanoid(),
+      alignment: 'start',
+      width: showDocumentProcessors ? null : '0',
+    },
+  ]
+}
 
 const getCurrentOrFinalGrade = (
   allGradingPeriods,
   calculateOnlyGradedAssignments,
   current,
-  final
+  final,
 ) => {
   if (allGradingPeriods) {
     return calculateOnlyGradedAssignments ? current : final
@@ -62,8 +71,34 @@ const getCurrentOrFinalGrade = (
   }
 }
 
+const hasAssetReports = submission => {
+  const nodes = submission?.ltiAssetReportsConnection?.nodes
+  return nodes !== undefined && nodes !== null
+}
+
+const shouldShowDocumentProcessorsColumn = assignmentsData => {
+  if (!assignmentsData?.assignments) {
+    return false
+  }
+
+  if (
+    !assignmentsData.assignments.some(
+      assignment =>
+        assignment?.ltiAssetProcessorsConnection &&
+        assignment.ltiAssetProcessorsConnection.nodes.length > 0,
+    )
+  ) {
+    return false
+  }
+
+  return assignmentsData.assignments.some(assignment =>
+    assignment?.submissionsConnection?.nodes?.some(hasAssetReports),
+  )
+}
+
 const AssignmentTable = ({
   queryData,
+  assignmentsData,
   layout,
   handleReadStateChange,
   handleRubricReadStateChange,
@@ -80,34 +115,42 @@ const AssignmentTable = ({
     calculateCourseGrade(
       queryData?.relevantGradingPeriodGroup,
       queryData?.assignmentGroupsConnection?.nodes,
-      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      filteredAssignments(assignmentsData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
-      activeWhatIfScores
-    )
+      activeWhatIfScores,
+    ),
   )
+
+  const overrideGrade =
+    queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades?.overrideGrade || null
+
+  const showDocumentProcessors = shouldShowDocumentProcessorsColumn(assignmentsData)
+  const headers = createHeaders(showDocumentProcessors)
 
   useEffect(() => {
     const grades = calculateCourseGrade(
       queryData?.relevantGradingPeriodGroup,
       queryData?.assignmentGroupsConnection?.nodes,
-      filteredAssignments(queryData, calculateOnlyGradedAssignments, activeWhatIfScores),
+      filteredAssignments(assignmentsData, calculateOnlyGradedAssignments, activeWhatIfScores),
       calculateOnlyGradedAssignments,
       queryData?.applyGroupWeights,
-      activeWhatIfScores
+      activeWhatIfScores,
     )
     setCourseGrades(grades)
-  }, [activeWhatIfScores, calculateOnlyGradedAssignments, queryData])
+  }, [activeWhatIfScores, assignmentsData, calculateOnlyGradedAssignments, queryData])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
-    listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
+    listDroppedAssignments(queryData, assignmentsData, getGradingPeriodID() === '0', true),
   )
 
   const handleCalculateOnlyGradedAssignmentsChange = useCallback(() => {
     const checked = document.querySelector('#only_consider_graded_assignments').checked
     setCalculateOnlyGradedAssignments(checked)
-    setDroppedAssignments(listDroppedAssignments(queryData, getGradingPeriodID() === '0', checked))
-  }, [queryData])
+    setDroppedAssignments(
+      listDroppedAssignments(queryData, assignmentsData, getGradingPeriodID() === '0', checked),
+    )
+  }, [assignmentsData, queryData])
 
   useEffect(() => {
     const checkbox = document.querySelector('#only_consider_graded_assignments')
@@ -138,18 +181,21 @@ const AssignmentTable = ({
         <Table.Row>
           {(headers || []).map(header => (
             <Table.ColHeader
-              key={header?.key}
-              id={header?.id}
-              textAlign={header?.alignment}
-              width={header?.width}
+              key={header.key}
+              id={header.id}
+              textAlign={header.alignment}
+              width={header.width}
             >
-              {header?.value}
+              {header.value}
             </Table.ColHeader>
           ))}
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)
+        {sortAssignments(assignmentSortBy, assignmentsData?.assignments)
+          ?.filter(
+            assignment => !ENV.SETTINGS.suppress_assignments || !assignment.suppressAssignment,
+          )
           ?.map(assignment => {
             const modifiedAssignment = {
               ...assignment,
@@ -170,14 +216,15 @@ const AssignmentTable = ({
                 setOpenRubricDetailIds,
                 openRubricDetailIds,
                 setActiveWhatIfScores,
-                activeWhatIfScores
+                activeWhatIfScores,
+                showDocumentProcessors,
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic
                 ? scoreDistributionRow(
                     modifiedAssignment,
                     setOpenAssignmentDetailIds,
-                    openAssignmentDetailIds
+                    openAssignmentDetailIds,
                   )
                 : null,
               openRubricDetailIds.includes(modifiedAssignment._id) && modifiedAssignment.rubric
@@ -191,10 +238,11 @@ const AssignmentTable = ({
               return assignmentGroupRow(
                 assignmentGroup,
                 queryData,
+                assignmentsData,
                 calculateOnlyGradedAssignments,
                 calculateOnlyGradedAssignments
                   ? courseGrades?.assignmentGroups[assignmentGroup._id]?.current
-                  : courseGrades?.assignmentGroups[assignmentGroup._id]?.current
+                  : courseGrades?.assignmentGroups[assignmentGroup._id]?.current,
               )
             })
           : queryData?.gradingPeriodsConnection?.nodes?.map(gradingPeriod => {
@@ -202,24 +250,27 @@ const AssignmentTable = ({
                 ? gradingPeriodRow(
                     gradingPeriod,
                     queryData,
+                    assignmentsData,
                     calculateOnlyGradedAssignments,
                     calculateOnlyGradedAssignments
                       ? courseGrades?.gradingPeriods[gradingPeriod._id].current
-                      : courseGrades?.gradingPeriods[gradingPeriod._id].current
+                      : courseGrades?.gradingPeriods[gradingPeriod._id].current,
                   )
                 : null
             })}
         {!hideTotalRow &&
           totalRow(
             queryData,
+            assignmentsData,
             calculateOnlyGradedAssignments,
             getCurrentOrFinalGrade(
               getGradingPeriodID() === '0',
               calculateOnlyGradedAssignments,
               courseGrades?.current,
               courseGrades?.final,
-              activeWhatIfScores
-            )
+              activeWhatIfScores,
+            ),
+            overrideGrade,
           )}
       </Table.Body>
     </Table>
@@ -228,10 +279,13 @@ const AssignmentTable = ({
 
 AssignmentTable.propTypes = {
   queryData: PropTypes.object,
+  assignmentsData: PropTypes.object,
   layout: PropTypes.string,
   handleReadStateChange: PropTypes.func,
+  handleRubricReadStateChange: PropTypes.func,
   setSubmissionAssignmentId: PropTypes.func,
   submissionAssignmentId: PropTypes.string,
+  hideTotalRow: PropTypes.bool,
 }
 
 export default AssignmentTable

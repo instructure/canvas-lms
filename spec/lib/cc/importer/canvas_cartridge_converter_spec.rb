@@ -24,9 +24,9 @@ require "nokogiri"
 describe "Canvas Cartridge importing" do
   before do
     @converter = get_cc_converter
-    @copy_from = course_model
+    @copy_from = course_model(name: "copy from course")
     @from_teacher = @user
-    @copy_to = course_model
+    @copy_to = course_model(name: "copy to course")
     @copy_to.conclude_at = nil
     @copy_to.start_at = nil
     @copy_to.name = "alt name"
@@ -37,6 +37,7 @@ describe "Canvas Cartridge importing" do
     @resource = CC::Resource.new(manifest, nil)
     @migration = ContentMigration.new
     @migration.context = @copy_to
+    @migration.user = @user
     @migration.save
   end
 
@@ -495,9 +496,12 @@ describe "Canvas Cartridge importing" do
       mod2.save!
 
       asmnt1 = @copy_from.assignments.create!(title: "some assignment")
+      asmnt1_2 = @copy_from.assignments.create!(title: "some assignment by percentage")
       tag = mod1.add_item({ id: asmnt1.id, type: "assignment", indent: 1 })
+      tag_percentage = mod1.add_item({ id: asmnt1_2.id, type: "assignment", indent: 1 })
       c_reqs = []
       c_reqs << { type: "min_score", min_score: 5, id: tag.id }
+      c_reqs << { type: "min_percentage", min_percentage: 50, id: tag_percentage.id }
       page = @copy_from.wiki_pages.create!(title: "some page")
       tag = mod1.add_item({ id: page.id, type: "wiki_page" })
       c_reqs << { type: "must_view", id: tag.id }
@@ -508,6 +512,9 @@ describe "Canvas Cartridge importing" do
       asmnt2 = @copy_to.assignments.create(title: "some assignment")
       asmnt2.migration_id = CC::CCHelper.create_key(asmnt1)
       asmnt2.save!
+      asmnt3 = @copy_to.assignments.create(title: "some assignment by percentage")
+      asmnt3.migration_id = CC::CCHelper.create_key(asmnt1_2)
+      asmnt3.save!
       page2 = @copy_to.wiki_pages.create(title: "some page")
       page2.migration_id = CC::CCHelper.create_key(page)
       page2.save!
@@ -563,6 +570,10 @@ describe "Canvas Cartridge importing" do
       cr1 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
       expect(cr1[:type]).to eq "min_score"
       expect(cr1[:min_score]).to eq 5
+      tag = mod1_2.content_tags[1]
+      cr2 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
+      expect(cr2[:type]).to eq "min_percentage"
+      expect(cr2[:min_percentage]).to eq 50
       tag = mod1_2.content_tags.last
       expect(tag.content_id).to eq page2.id
       expect(tag.content_type).to eq "WikiPage"
@@ -656,8 +667,15 @@ describe "Canvas Cartridge importing" do
   end
 
   it "translates attachment links on import" do
-    attachment = Attachment.create!(filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
-    attachment_import = factory_with_protected_attributes(Attachment, filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_to), context: @copy_to, migration_id: "ohai")
+    attachment = Attachment.create!(filename: "ohai there.txt",
+                                    uploaded_data: StringIO.new("ohai"),
+                                    folder: Folder.unfiled_folder(@copy_from),
+                                    context: @copy_from)
+    attachment_import = Attachment.create!(filename: "ohai there.txt",
+                                           uploaded_data: StringIO.new("ohai"),
+                                           folder: Folder.unfiled_folder(@copy_to),
+                                           context: @copy_to,
+                                           migration_id: "ohai")
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/files/%s/preview">Preview File</a>
       <a href="/courses/%s/files/%s/download">Download File</a>
@@ -683,6 +701,37 @@ describe "Canvas Cartridge importing" do
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
     expect(page_2.body).to eq body_with_link % ([@copy_to.id, attachment_import.id] * 4)
+  end
+
+  it "creates attachment_associations for syllabus attachment links on import" do
+    @copy_from.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+
+    image = attachment_model(context: @copy_from, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"))
+    media = attachment_model(context: @copy_from, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"))
+    image_to = attachment_model(context: @copy_to, display_name: "cn_image.jpg", uploaded_data: fixture_file_upload("cn_image.jpg"), migration_id: "image")
+    media_to = attachment_model(context: @copy_to, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), migration_id: "media")
+    body = <<~HTML
+      <p><img src="/courses/#{@copy_from.id}/files/#{image.id}/preview"></p>
+      <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
+    HTML
+    @copy_from.saving_user = @from_teacher
+    @copy_from.update!(syllabus_body: body)
+
+    # export to html file
+    exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(@copy_from.syllabus_body, "Syllabus")
+    # convert to json
+    doc = Nokogiri::XML(exported_html)
+    syllabus_body = @converter.convert_syllabus(doc)
+    # import into new course
+    @migration.attachment_path_id_lookup = {
+      "cn_image.jpg" => image_to.migration_id,
+      "292.mp3" => media_to.migration_id
+    }
+    Importers::CourseContentImporter.import_syllabus_from_migration(@copy_to, syllabus_body, @migration)
+    @migration.resolve_content_links!
+
+    syllabus_attachment_associations = @copy_to.attachment_associations.where(context_concern: "syllabus_body")
+    expect(syllabus_attachment_associations.pluck(:attachment_id)).to match_array([image_to.id, media_to.id])
   end
 
   it "translates media file links on import" do
@@ -874,6 +923,46 @@ describe "Canvas Cartridge importing" do
       expect(page_2.notify_of_update).to eq @page.notify_of_update
       expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
       expect(page_2.unpublished?).to be true
+    end
+
+    it "imports mastery path hidden assignment with assignment override" do
+      @copy_from.conditional_release = true
+      @copy_from.save!
+
+      wiki_page_assignment = @copy_from.assignments.create!(title: "Hidden Assignment", only_visible_to_overrides: true, migration_id: @migration.id, submission_types: "wiki_pages", grading_type: "points")
+      @page.assignment = wiki_page_assignment
+      @page.save!
+
+      assignment_override = wiki_page_assignment.assignment_overrides.create!(set_type: "Noop")
+
+      @meta_fields[:assignment_identifier] = wiki_page_assignment.migration_id
+      @meta_fields[:only_visible_to_overrides] = true
+      @meta_fields[:assignment_overrides] = [
+        assignment_override.slice(:set_type, :set_id, :title)
+      ].to_json
+
+      @migration.context.conditional_release = true
+      @migration.context.save!
+
+      exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(
+        @page.body, @page.title, @meta_fields
+      )
+      # convert to json
+      doc = Nokogiri::HTML5(exported_html)
+      hash = @converter.convert_wiki(doc, "some-page")
+      hash = hash.with_indifferent_access
+
+      # import into new course
+      Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
+      @migration.resolve_content_links!
+
+      page_2 = @copy_to.wiki_pages.where(migration_id: @migration_id).first
+
+      expect(page_2.assignment).to be_present
+      expect(page_2.assignment.title).to eq wiki_page_assignment.title
+      expect(page_2.assignment.only_visible_to_overrides).to be true
+      expect(page_2.assignment.assignment_overrides.count).to eq 1
+      expect(page_2.assignment.assignment_overrides.first.set_type).to eq "Noop"
     end
   end
 
@@ -1431,7 +1520,8 @@ describe "Canvas Cartridge importing" do
           "start_at" => 1_371_189_600_000,
           "end_at" => 1_371_189_600_000,
           "all_day" => false,
-          "description" => "<a href='discussion_topic_migration_id=stillnotreal'>hooray for bad links</a>"
+          "description" => "<a href='discussion_topic_migration_id=stillnotreal'>hooray for bad links</a>",
+          "blackout_date" => false
         },
                               {
                                 "migration_id" => "blahblahblah",
@@ -1439,7 +1529,8 @@ describe "Canvas Cartridge importing" do
                                 "start_at" => 1_371_189_600_000,
                                 "end_at" => 1_371_189_600_000,
                                 "all_day" => false,
-                                "description" => "<a href='http://thislinkshouldbeokaythough.com'>hooray for good links</a>"
+                                "description" => "<a href='http://thislinkshouldbeokaythough.com'>hooray for good links</a>",
+                                "blackout_date" => false
                               }]
       }.with_indifferent_access
 

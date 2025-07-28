@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`data returns empty caption object 1`] = `
-Object {
+{
   "caption": "",
 }
 `;
 
 exports[`form returns the appropriate object 1`] = `
-Array [
-  Object {
+[
+  {
     "dataKey": "caption",
     "label": "Add a caption",
   },

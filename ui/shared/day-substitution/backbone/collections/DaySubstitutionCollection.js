@@ -46,7 +46,7 @@ DaySubstitutionCollection.prototype.toJSON = function () {
         return {...memo, ...daySub.attributes}
       }
     })(this),
-    {}
+    {},
   )
 }
 

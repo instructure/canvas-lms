@@ -30,6 +30,8 @@ export function animatable(WrappedComponent) {
   return class Animatable extends React.Component {
     static displayName = getDisplayName(WrappedComponent)
 
+    static componentId = WrappedComponent.componentId || WrappedComponent.displayName
+
     static contextTypes = {
       dynamicUiManager: shape({
         registerAnimatable: func,
@@ -54,6 +56,7 @@ export function animatable(WrappedComponent) {
     render() {
       return (
         <WrappedComponent
+          ref={this.props.innerRef}
           {...this.props}
           registerAnimatable={this.registerAnimatable}
           deregisterAnimatable={this.deregisterAnimatable}

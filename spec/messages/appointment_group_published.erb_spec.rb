@@ -33,7 +33,7 @@ describe "appointment_group_published" do
   let(:asset) { @appointment_group }
   let(:message_data) { { user: @user } }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -50,7 +50,7 @@ describe "appointment_group_published" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -59,21 +59,12 @@ describe "appointment_group_published" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to include("some title")
-      expect(msg.body).to include("some title")
-    end
-  end
-
-  context ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
       expect(msg.body).to include("some title")
     end
   end

@@ -25,7 +25,7 @@ const activePermissionTrayReducer = handleActions(
     }),
     [actionTypes.HIDE_ALL_TRAYS]: () => null,
   },
-  null
+  null,
 )
 
 export default activePermissionTrayReducer

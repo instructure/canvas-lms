@@ -18,105 +18,137 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import moxios from 'moxios'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GeneratePairingCode from '../index'
 
 const defaultProps = {
   userId: '1',
 }
 
-beforeAll(() => {
-  moxios.install()
-})
+const server = setupServer()
 
-afterAll(() => {
-  moxios.uninstall()
-})
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('renders the button and modal', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
+  render(<GeneratePairingCode {...defaultProps} />)
 
-  const button = tree.find('div > Button')
-  expect(button.exists()).toEqual(true)
-
-  const modal = tree.find('Modal')
-  expect(modal.exists()).toEqual(true)
-  expect(modal.props().open).toEqual(false)
-
-  const closeButton = tree.find('CloseButton')
-  expect(closeButton.exists()).toEqual(true)
-
-  const okButton = tree.find('ModalFooter > Button')
-  expect(okButton.exists()).toEqual(true)
+  expect(screen.getByRole('button', {name: 'Pair with Observer'})).toBeInTheDocument()
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 
-it('Shows the pairing code in the modal after clicking the button', () => {
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 200,
-    data: {
-      code: '1234',
-    },
+it('Shows the pairing code in the modal after clicking the button', async () => {
+  const user = userEvent.setup()
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
+
+  render(<GeneratePairingCode {...defaultProps} />)
+
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
+
+  await waitFor(() => {
+    expect(screen.getByRole('dialog', {name: 'Pair with Observer'})).toBeInTheDocument()
   })
 
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-
-  const button = tree.find('div > Button')
-  button.simulate('click')
-
-  moxios.wait(() => {
-    const modal = tree.find('Modal')
-    expect(modal.props().open).toEqual(true)
-
-    const pairingCode = tree.find('.pairing-code Text')
-    expect(pairingCode.props().children).toEqual('1234')
+  await waitFor(() => {
+    expect(screen.getByText('1234')).toBeInTheDocument()
   })
 })
 
-it('Show an error in the modal if the pairing code fails to generate', () => {
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 401,
+it('Show an error in the modal if the pairing code fails to generate', async () => {
+  const user = userEvent.setup()
+
+  server.use(
+    http.post(
+      '/api/v1/users/1/observer_pairing_codes',
+      () => new HttpResponse(null, {status: 401}),
+    ),
+  )
+
+  render(<GeneratePairingCode {...defaultProps} />)
+
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
+
+  await waitFor(() => {
+    expect(screen.getByText('There was an error generating the pairing code')).toBeInTheDocument()
+  })
+})
+
+it('Shows the loading spinner while the pairing code is being generated', async () => {
+  const user = userEvent.setup()
+  render(<GeneratePairingCode {...defaultProps} />)
+
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
+
+  expect(screen.getByText('Generating pairing code...')).toBeInTheDocument()
+})
+
+it('clicking the close button will close the modal', async () => {
+  const user = userEvent.setup()
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
+
+  render(<GeneratePairingCode {...defaultProps} />)
+
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
+
+  await waitFor(() => {
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
 
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-  tree.setState({showModal: true})
+  const closeButton = screen.getByRole('button', {name: /Close/})
+  await user.click(closeButton)
 
-  moxios.wait(() => {
-    const errorMessage = tree.find('Text[color="error"]')
-    expect(errorMessage.toExists()).toEqual(true)
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+})
+
+it('clicking the ok button will close the modal', async () => {
+  const user = userEvent.setup()
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
+
+  render(<GeneratePairingCode {...defaultProps} />)
+
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
+
+  await waitFor(() => {
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
   })
+
+  const okButton = screen.getByRole('button', {name: 'OK'})
+  await user.click(okButton)
+
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 
-it('Shows the loading spinner while the pairing code is being generated', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-  tree.setState({gettingPairingCode: true})
+it('should use the name in the text when it is provided', async () => {
+  const user = userEvent.setup()
 
-  const spinner = tree.find('Spinner')
-  expect(spinner.exists()).toEqual(true)
-})
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
 
-it('clicking the close button will close the modal', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-  tree.setState({showModal: true})
+  render(<GeneratePairingCode {...defaultProps} name="George" />)
 
-  const closeButton = tree.find('CloseButton')
-  closeButton.simulate('click')
-  expect(tree.find('Modal').props().open).toEqual(false)
-})
+  const button = screen.getByRole('button', {name: 'Pair with Observer'})
+  await user.click(button)
 
-it('clicking the ok button will close the modal', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
-  tree.setState({showModal: true})
-
-  const okButton = tree.find('ModalFooter Button')
-  okButton.simulate('click')
-  expect(tree.find('Modal').props().open).toEqual(false)
-})
-
-it('should use the name in the text when it is provided', () => {
-  const tree = shallow(<GeneratePairingCode {...defaultProps} name="George" />)
-  tree.setState({showModal: true})
-
-  const text = tree.find('ModalBody > Text').props().children
-  expect(text.includes('George')).toEqual(true)
+  await waitFor(() => {
+    expect(screen.getByText(/George/)).toBeInTheDocument()
+  })
 })

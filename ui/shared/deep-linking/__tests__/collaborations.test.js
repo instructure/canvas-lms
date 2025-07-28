@@ -62,7 +62,7 @@ describe('handleDeepLinking', () => {
   function mockNewCollaborationElement() {
     jest
       .spyOn(document, 'querySelector')
-      .mockReturnValue({getAttribute: key => ({action: '/collaborations'}[key])})
+      .mockReturnValue({getAttribute: key => ({action: '/collaborations'})[key]})
   }
 
   function expectAJAXWithContentItems(url, method) {
@@ -118,27 +118,23 @@ describe('collaborationUrl', () => {
 })
 
 describe('onExternalContentReady', () => {
-  let querySelector, ajaxJSON
+  let ajaxJSON
+  let querySelectorSpy
 
-  beforeAll(() => {
-    querySelector = global.document.querySelector
+  beforeEach(() => {
     ajaxJSON = $.ajaxJSON
+    $.ajaxJSON = jest.fn().mockImplementation(() => ({}))
 
-    global.document.querySelector = jest.fn().mockImplementation(() => ({
+    // Create a fresh spy for each test to avoid issues with mockClear
+    querySelectorSpy = jest.spyOn(document, 'querySelector').mockImplementation(() => ({
       href: 'http://www.test.com/update',
       getAttribute: () => 'http://www.test.com/create',
     }))
-    $.ajaxJSON = jest.fn().mockImplementation(() => ({}))
   })
 
-  afterAll(() => {
-    global.document.querySelector = querySelector
+  afterEach(() => {
     $.ajaxJSON = ajaxJSON
-  })
-
-  beforeEach(() => {
-    global.document.querySelector.mockClear()
-    $.ajaxJSON.mockClear()
+    querySelectorSpy.mockRestore()
   })
 
   it('creates a new collaboration', () => {
@@ -148,7 +144,7 @@ describe('onExternalContentReady', () => {
       'POST',
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -160,7 +156,7 @@ describe('onExternalContentReady', () => {
         'PUT',
         expect.anything(),
         expect.anything(),
-        expect.anything()
+        expect.anything(),
       )
     })
   })

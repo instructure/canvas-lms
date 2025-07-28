@@ -34,25 +34,29 @@ module Auditors::ActiveRecord
     def self.process(prune: false)
       Shard.current.database_server.unguard do
         GuardRail.activate(:deploy) do
-          AUDITOR_CLASSES.each do |auditor_cls|
-            log "*" * 80
-            log "-" * 80
+          ActiveRecord::Migrator.with_advisory_lock do
+            AUDITOR_CLASSES.each do |auditor_cls|
+              log "*" * 80
+              log "-" * 80
 
-            partman = CanvasPartman::PartitionManager.create(auditor_cls)
+              partman = CanvasPartman::PartitionManager.create(auditor_cls)
 
-            partman.ensure_partitions(PRECREATE_TABLES)
+              partman.ensure_partitions(PRECREATE_TABLES)
 
-            if prune
-              Shard.current.database_server.unguard do
-                partman.prune_partitions(retention_months)
+              if prune
+                Shard.current.database_server.unguard do
+                  partman.prune_partitions(retention_months)
+                end
               end
-            end
 
-            log "*" * 80
+              log "*" * 80
+            end
           end
           unless Rails.env.test?
             ActiveRecord::Base.connection_pool.disconnect!
           end
+        rescue ActiveRecord::ConcurrentMigrationError
+          # ignore
         end
       end
     end
@@ -65,8 +69,8 @@ module Auditors::ActiveRecord
       Setting.get("auditor_partitions_keep_months", 14).to_i
     end
 
-    def self.log(*args)
-      logger&.info(*args)
+    def self.log(*)
+      logger&.info(*)
     end
 
     def self.processed?

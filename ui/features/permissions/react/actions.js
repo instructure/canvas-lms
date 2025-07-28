@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 import $ from 'jquery'
 import {ALL_ROLES_VALUE} from '@canvas/permissions/react/propTypes'
@@ -24,7 +24,7 @@ import * as apiClient from './apiClient'
 
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('permissions')
+const I18n = createI18nScope('permissions')
 
 const types = [
   'ADD_NEW_ROLE',
@@ -64,7 +64,7 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
         one: 'One permission found',
         other: '%{count} permissions found',
       },
-      {count: numDisplayedPermissions}
+      {count: numDisplayedPermissions},
     )
     $.screenReaderFlashMessageExclusive(message)
   }
@@ -85,7 +85,7 @@ actions.createNewRole = function (label, baseRole, context) {
         dispatch(actions.displayRoleTray({role: createdRole}))
         const newSelectedRoles = [...selectedRoles, createdRole]
         dispatch(
-          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext})
+          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext}),
         )
         dispatch(actions.filterNewRole(createdRole))
       })
@@ -193,7 +193,7 @@ actions.deleteRole = function (role, successCallback, failCallback) {
         failCallback()
         setTimeout(
           () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
-          500
+          500,
         )
       })
   }

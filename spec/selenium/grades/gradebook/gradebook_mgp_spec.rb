@@ -23,9 +23,21 @@ require_relative "../pages/gradebook_page"
 require_relative "../pages/gradebook_cells_page"
 require_relative "../setup/gradebook_setup"
 
-describe "Gradebook with grading periods" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook with grading periods" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookSetup
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   context "with close and end dates" do
     now = Time.zone.now
@@ -88,4 +100,9 @@ describe "Gradebook with grading periods" do
       expect(Gradebook::Cells.grading_cell(@student, assign)).to contain_css(Gradebook::Cells.ungradable_selector)
     end
   end
+end
+
+describe "Gradebook with grading periods" do
+  it_behaves_like "Gradebook with grading periods", true
+  it_behaves_like "Gradebook with grading periods", false
 end

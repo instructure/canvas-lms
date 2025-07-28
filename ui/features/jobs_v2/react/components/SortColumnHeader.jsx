@@ -54,7 +54,7 @@ export default function SortColumnHeader({bucket, attr, content, sortColumn, onC
         isWithinText={false}
         as="button"
         onClick={() => onClickHeader(attr)}
-        themeOverride={{color: colors.textDarkest}}
+        themeOverride={{color: colors.contrasts.grey125125}}
       >
         <Text weight="bold">{content}</Text>
       </Link>

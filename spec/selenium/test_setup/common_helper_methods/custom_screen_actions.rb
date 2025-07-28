@@ -19,7 +19,7 @@
 
 module CustomScreenActions
   def scroll_page_to_top
-    driver.execute_script("window.scrollTo(0, 0)")
+    driver.execute_script("document.getElementById('application').scrollIntoView()")
   end
 
   def scroll_page_to_bottom

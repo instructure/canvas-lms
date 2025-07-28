@@ -19,6 +19,7 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "../helpers/announcements_common"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
 
@@ -27,6 +28,7 @@ describe "context modules" do
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
+  include AnnouncementsCommon
 
   context "adds existing items to modules" do
     before(:once) do
@@ -214,6 +216,16 @@ describe "context modules" do
       expect(f(".due_date_display").text).to eq date_string(todo_date, :no_words)
     end
 
+    it "does not show the todo date on an graded discussion in a module", priority: "2" do
+      due_at = 3.days.from_now
+      todo_date = 3.days.from_now
+      @assignment = @course.assignments.create!(name: "assignemnt", due_at:)
+      @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment, todo_date:)
+      @mod.add_item(type: "discussion_topic", id: @discussion.id)
+      go_to_modules
+      expect(f(".due_date_display").text).to eq date_string(due_at, :no_words)
+    end
+
     it "edits available/until dates on a ungraded discussion in a module", priority: "2" do
       available_from = 2.days.from_now
       available_until = 4.days.from_now
@@ -221,7 +233,7 @@ describe "context modules" do
       @mod.add_item(type: "discussion_topic", id: @discussion.id)
       go_to_modules
       fln("Non-graded Published Discussion").click
-      f(".edit-btn").click
+      click_edit_btn
       replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(available_from), tab_out: true)
       replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(available_until), tab_out: true)
       expect_new_page_load { f(".form-actions button[type=submit]").click }
@@ -243,6 +255,22 @@ describe "context modules" do
       publish_module_and_items(@mod.id)
       expect(published_module_icon(@mod.id)).to be_present
       expect(f("span.publish-icon.unpublished.publish-icon-published > i.icon-publish")).to be_present
+    end
+
+    it "toggles visibility of the move contents link when items are added or removed" do
+      go_to_modules
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
+
+      @assignment = Assignment.create!(context: @course, title: "some assignment in a module")
+      @assignment.save!
+      @mod.add_item(type: "assignment", id: @assignment.id)
+      @mod.save!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).not_to include("display: none;")
+
+      @assignment.destroy!
+      refresh_page
+      expect(f(".move-contents-container")[:style]).to include("display: none;")
     end
   end
 
@@ -568,24 +596,7 @@ describe "context modules" do
         expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
-      it "creating a new module should display a drag and drop area without differentiated modules" do
-        Account.site_admin.disable_feature! :differentiated_modules
-
-        get "/courses/#{@course.id}/modules"
-        wait_for_ajaximations
-
-        f("button.add_module_link").click
-        wait_for_ajaximations
-
-        replace_content(f("#context_module_name"), "New Module")
-        f("#add_context_module_form button.submit_button").click
-        wait_for_ajaximations
-
-        expect(ff('.module_dnd input[type="file"]')).to have_size(2)
-      end
-
       it "creating a new module should display a drag and drop area with differentiated modules" do
-        differentiated_modules_on
         get "/courses/#{@course.id}/modules"
 
         click_new_module_link
@@ -596,16 +607,7 @@ describe "context modules" do
       end
     end
 
-    it "adds a file item to a module when differentiated modules is disabled", priority: "1" do
-      Account.site_admin.disable_feature! :differentiated_modules
-      get "/courses/#{@course.id}/modules"
-      manually_add_module_item("#attachments_select", "File", file_name)
-      expect(f(".context_module_item")).to include_text(file_name)
-    end
-
     it "adds a file item to a module when differentiated modules is enabled", priority: "1" do
-      differentiated_modules_on
-
       get "/courses/#{@course.id}/modules"
       manually_add_module_item("#attachments_select", "File", file_name)
       expect(f(".context_module_item")).to include_text(file_name)
@@ -625,20 +627,48 @@ describe "context modules" do
       expect(f(".context_module_item")).to include_text(file_name)
     end
 
-    it "sets usage rights on a file in a module", priority: "1" do
-      course_module
-      @module.add_item({ id: @file.id, type: "attachment" })
-      get "/courses/#{@course.id}/modules"
+    context("files rewrite tooggle") do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
+      end
 
-      f(".icon-publish").click
-      wait_for_ajaximations
-      set_value f(".UsageRightsSelectBox__select"), "own_copyright"
-      set_value f("#copyrightHolder"), "Test User"
-      f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
-      wait_for_ajaximations
-      get "/courses/#{@course.id}/files/folder/unfiled"
-      icon_class = "icon-files-copyright"
-      expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+      before do
+        user_session @teacher
+      end
+
+      it "sets usage rights on a file in a module", priority: "1" do
+        @teacher.set_preference(:files_ui_version, "v1")
+        course_module
+        @module.add_item({ id: @file.id, type: "attachment" })
+        get "/courses/#{@course.id}/modules"
+
+        f(".icon-publish").click
+        wait_for_ajaximations
+        set_value f(".UsageRightsSelectBox__select"), "own_copyright"
+        set_value f("#copyrightHolder"), "Test User"
+        f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+        wait_for_ajaximations
+        get "/courses/#{@course.id}/files/folder/unfiled"
+        icon_class = "icon-files-copyright"
+        expect(f(".UsageRightsIndicator__openModal i.#{icon_class}")).to be_displayed
+      end
+
+      it "sets usage rights on a file in a module with new files UI", priority: "1" do
+        @teacher.set_preference(:files_ui_version, "v2")
+        course_module
+        @module.add_item({ id: @file.id, type: "attachment" })
+        get "/courses/#{@course.id}/modules"
+
+        f(".icon-publish").click
+        wait_for_ajaximations
+        set_value f(".UsageRightsSelectBox__select"), "used_by_permission"
+        set_value f("#copyrightHolder"), "Test User"
+        f(".form-horizontal.form-dialog.permissions-dialog-form > div.form-controls > button.btn.btn-primary").click
+        wait_for_ajaximations
+        get "/courses/#{@course.id}/files/folder/unfiled"
+        expect(fxpath("//button[.//span[text()='Used by Permission']]")).to be_displayed
+      end
     end
 
     it "edit file module item inline", priority: "2" do
@@ -680,34 +710,28 @@ describe "context modules" do
       validate_selector_displayed(".item-group-container")
     end
 
-    context "when :react_discussions_post ff is ON" do
+    context "when visiting a graded discussion in a module" do
       before do
-        Account.default.enable_feature!(:react_discussions_post)
+        @module = public_course.context_modules.create!(name: "module 1")
+        @assignment = @course.assignments.create!(name: "assignemnt")
+        @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
+        @module.add_item(type: "discussion_topic", id: @discussion.id)
       end
 
-      context "when visiting a graded discussion in a module" do
-        before do
-          @module = public_course.context_modules.create!(name: "module 1")
-          @assignment = @course.assignments.create!(name: "assignemnt")
-          @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
-          @module.add_item(type: "discussion_topic", id: @discussion.id)
-        end
+      it "redirects unauthenticated users to login page" do
+        get "/courses/#{public_course.id}/modules"
+        f("a[title='Graded Discussion']").click
+        expect(f("#pseudonym_session_unique_id")).to be_present
+      end
 
-        it "redirects unauthenticated users to login page" do
-          get "/courses/#{public_course.id}/modules"
-          f("a[title='Graded Discussion']").click
-          expect(f("#pseudonym_session_unique_id")).to be_present
-        end
-
-        it "lets users with access see the discussion" do
-          student = user_factory(active_all: true, active_state: "active")
-          public_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
-          user_session student
-          get "/courses/#{public_course.id}/modules"
-          f("a[title='Graded Discussion']").click
-          wait_for_ajaximations
-          expect(fj("[data-testid='discussion-topic-container']:contains('Graded Discussion')")).to be_present
-        end
+      it "lets users with access see the discussion" do
+        student = user_factory(active_all: true, active_state: "active")
+        public_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+        user_session student
+        get "/courses/#{public_course.id}/modules"
+        f("a[title='Graded Discussion']").click
+        wait_for_ajaximations
+        expect(fj("[data-testid='discussion-topic-container']:contains('Graded Discussion')")).to be_present
       end
     end
   end

@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {render, fireEvent, waitFor, within} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
-import CanvasInbox from '../CanvasInbox'
-import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
+import {ApolloProvider} from '@apollo/client'
+
 import {mswClient} from '../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../shared/msw/mswServer'
-import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
+import React from 'react'
+import CanvasInbox from '../CanvasInbox'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -33,7 +35,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('CanvasInbox App Container', () => {
-  const server = mswServer(handlers.concat(inboxSettingsHandlers()))
+  const server = setupServer(...handlers.concat(inboxSettingsHandlers()))
 
   beforeAll(() => {
     server.listen()
@@ -80,9 +82,9 @@ describe('CanvasInbox App Container', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <CanvasInbox />
+          <CanvasInbox breakpoints={{desktopOnly: true}} />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </ApolloProvider>,
     )
   }
 
@@ -133,11 +135,12 @@ describe('CanvasInbox App Container', () => {
         expect(window.location.hash).toBe('#filter=type=inbox')
 
         const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        fireEvent.click(mailboxDropdown)
+        await userEvent.click(mailboxDropdown)
         await waitForApolloLoading()
 
-        const option = await container.findByText('Sent')
-        fireEvent.click(option)
+        const listbox = await container.findByRole('listbox')
+        const option = within(listbox).getByRole('option', {name: 'Sent'})
+        await userEvent.click(option)
         await waitForApolloLoading()
 
         expect(window.location.hash).toBe('#filter=type=sent')
@@ -187,12 +190,15 @@ describe('CanvasInbox App Container', () => {
 
         expect(window.location.hash).toBe('#filter=type=inbox')
 
-        const courseDropdown = await container.findByTestId('course-select')
-        fireEvent.click(courseDropdown)
+        const courseDropdown = container.getByTestId('course-select')
+        await userEvent.click(courseDropdown)
         await waitForApolloLoading()
 
-        const option = await container.findByText('Ipsum')
-        fireEvent.click(option)
+        const listbox = await container.findByRole('listbox')
+        await waitFor(() => within(listbox).getAllByRole('option', {name: /Ipsum/}))
+        const options = within(listbox).getAllByRole('option', {name: /Ipsum/})
+        expect(options).toHaveLength(4)
+        await userEvent.click(options[0])
         await waitForApolloLoading()
 
         expect(window.location.hash).toBe('#filter=type=inbox&course=course_195')
@@ -209,20 +215,16 @@ describe('CanvasInbox App Container', () => {
         expect(mailboxDropdown.getAttribute('value')).toBe('')
       })
       it('should set course select in compose modal to course name when the context id param is in the url', async () => {
-        const originalLocation = window.location
-        delete window.location
-        window.location = {
-          search: '',
-          hash: '',
-        }
-        window.location.hash = '#filter=type=inbox'
-        window.location.search = '?context_id=course_195&user_id=9&user_name=Ally'
+        const url = new URL(window.location.href)
+        url.hash = '#filter=type=inbox'
+        url.search = '?context_id=course_195&user_id=9&user_name=Ally'
+        window.history.pushState({}, '', url.toString())
+
         const container = setup()
         await waitForApolloLoading()
 
         const courseSelectModal = await container.findByTestId('course-select-modal')
         expect(courseSelectModal.getAttribute('value')).toBe('XavierSchool')
-        window.location = originalLocation
       })
     })
   })
@@ -243,6 +245,6 @@ describe('CanvasInbox App Container', () => {
       fireEvent.click(composeButton)
       await waitForApolloLoading()
       expect(window.location.hash).toBe('#filter=type=inbox')
-    })
+    }, 15000)
   })
 })

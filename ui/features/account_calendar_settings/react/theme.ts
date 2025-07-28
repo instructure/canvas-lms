@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import canvas from '@instructure/canvas-theme'
-import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
+import {canvasHighContrast} from '@instructure/ui-themes'
 
 const {variables} = ENV.use_high_contrast ? canvasHighContrast : canvas
 const {colors} = variables
@@ -27,15 +26,15 @@ const {colors} = variables
 
 export const treeBrowserTheme = {
   'TreeBrowser.Node': {
-    hoverBackgroundColor: colors.backgroundLight,
-    nameTextColor: colors.textDarkest,
-    hoverTextColor: colors.textDarkest,
+    hoverBackgroundColor: colors.contrasts.grey1111,
+    nameTextColor: colors.contrasts.grey125125,
+    hoverTextColor: colors.contrasts.grey125125,
     baseSpacingMedium: '2rem',
   },
   'TreeBrowser.Button': {
-    hoverBackgroundColor: colors.backgroundLight,
-    nameTextColor: colors.textDarkest,
-    hoverTextColor: colors.textDarkest,
+    hoverBackgroundColor: colors.contrasts.grey1111,
+    nameTextColor: colors.contrasts.grey125125,
+    hoverTextColor: colors.contrasts.grey125125,
     baseSpacingMedium: '2rem',
     nameFontSizeMedium: '1rem',
     focusOutlineStyle: 'none',
@@ -43,6 +42,6 @@ export const treeBrowserTheme = {
 }
 export const accountListTheme = {
   View: {
-    borderColorPrimary: colors.porcelain,
+    borderColorPrimary: colors.contrasts.grey1111,
   },
 }

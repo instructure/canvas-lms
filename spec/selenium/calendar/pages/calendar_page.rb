@@ -109,6 +109,18 @@ module CalendarPage
     "#use_section_dates"
   end
 
+  def duplicate_event_checkbox_selector
+    "#duplicate_event"
+  end
+
+  def duplicate_interval_input_selector
+    "#duplicate_interval"
+  end
+
+  def duplicate_count_input_selector
+    "#duplicate_count"
+  end
+
   def this_event_radio_button_selector
     "//*[@aria-label='Confirm Changes']//label[../input[@value = 'one']]"
   end
@@ -219,6 +231,18 @@ module CalendarPage
     f(use_section_dates_checkbox_selector)
   end
 
+  def duplicate_event_checkbox
+    f(duplicate_event_checkbox_selector)
+  end
+
+  def duplicate_interval_input
+    f(duplicate_interval_input_selector)
+  end
+
+  def duplicate_count_input
+    f(duplicate_count_input_selector)
+  end
+
   def event_calendar_selector_input
     f(event_calendar_selector_input_selector)
   end
@@ -276,7 +300,11 @@ module CalendarPage
 
   def enter_new_event_date(date_text)
     replace_content(edit_event_date_input, date_text)
-    edit_event_date_input.send_keys(:enter)
+    edit_event_date_input.send_keys(:tab)
+  end
+
+  def handle_event_date_input_arrow_down
+    edit_event_date_input.send_keys(:arrow_down)
   end
 
   def enter_event_title(title_text)

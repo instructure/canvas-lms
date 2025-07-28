@@ -31,7 +31,9 @@
         <span class="screenreader-only">{{#t "group_settings"}}Settings{{/t}}</span>
       </a>
       <ul class="al-options">
-        <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
+        {{#unless isNonCollaborative}}
+          <li><a href="/groups/{{id}}" class="icon-group visit-group">{{#t "visit_group_homepage"}}Visit Group Homepage{{/t}}</a></li>
+        {{/unless}}
         {{#if canManage}}
           <li><a role="button" href="#" data-focus-returns-to='group-{{id}}-actions' class="icon-edit edit-group">{{#t "group_edit"}}Edit{{/t}}</a></li>
         {{/if}}

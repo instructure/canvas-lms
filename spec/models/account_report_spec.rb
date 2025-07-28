@@ -73,4 +73,25 @@ describe AccountReport do
       expect(@runners.map { |r| r.reload.workflow_state }).to eq %w[completed running created]
     end
   end
+
+  describe ".mark_as_errored" do
+    let(:account) { account_model }
+    let(:admin) { user_model }
+    let(:error_message) { "something went wrong" }
+
+    it "marks the report as errored" do
+      allow(Rails.logger).to receive(:error)
+      report = AccountReport.create!(account_id: account.id, user_id: admin.id)
+      report.mark_as_errored
+      expect(report.reload.workflow_state).to eq "error"
+      expect(Rails.logger).not_to have_received(:error)
+    end
+
+    it "logs the specified error message" do
+      allow(Rails.logger).to receive(:error)
+      report = AccountReport.create!(account_id: account.id, user_id: admin.id)
+      report.mark_as_errored(error_message)
+      expect(Rails.logger).to have_received(:error).with(/#{error_message}/)
+    end
+  end
 end

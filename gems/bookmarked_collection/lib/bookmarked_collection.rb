@@ -74,6 +74,7 @@ module BookmarkedCollection
   require "bookmarked_collection/concat_collection"
   require "bookmarked_collection/concat_proxy"
   require "bookmarked_collection/filter_proxy"
+  require "bookmarked_collection/sync_filter_proxy"
   require "bookmarked_collection/merge_proxy"
   require "bookmarked_collection/simple_bookmarker"
   require "bookmarked_collection/wrap_proxy"
@@ -265,9 +266,16 @@ module BookmarkedCollection
   end
 
   # Filters the results of a collection to only include rows that the
-  # filter_proc returns true for.
-  def self.filter(collection, &)
-    BookmarkedCollection::FilterProxy.new(collection, &)
+  # filter_proc returns true for. if `sync` is true, the subpager will
+  # be kept in sync with the pager to allow for filtering collections
+  # that must be retrieved sequentially, at the expense of returning
+  # fewer items than the requested per_page.
+  def self.filter(collection, sync: false, &)
+    if sync
+      BookmarkedCollection::SyncFilterProxy.new(collection, &)
+    else
+      BookmarkedCollection::FilterProxy.new(collection, &)
+    end
   end
 
   # Transform the results of a collection using the transform_proc

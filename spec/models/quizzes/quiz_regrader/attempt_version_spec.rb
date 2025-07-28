@@ -49,7 +49,7 @@ describe Quizzes::QuizRegrader::AttemptVersion do
            :score= => nil,
            :score_before_regrade= => nil,
            :submission_data => submission_data,
-           :write_attribute => {})
+           :[]= => {})
   end
 
   let(:version) do

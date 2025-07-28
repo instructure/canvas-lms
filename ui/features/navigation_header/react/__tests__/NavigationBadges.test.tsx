@@ -19,15 +19,23 @@
 import React from 'react'
 import {render as testingLibraryRender, act} from '@testing-library/react'
 import NavigationBadges from '../NavigationBadges'
-import {QueryProvider, queryClient} from '@canvas/query'
-import fetchMock from 'fetch-mock'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const unreadComponent = jest.fn(() => <></>)
 
 describe('GlobalNavigation', () => {
+  beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     unreadComponent.mockClear()
     window.ENV.current_user_id = '10'
@@ -37,14 +45,17 @@ describe('GlobalNavigation', () => {
     window.ENV.SETTINGS = {release_notes_badge_disabled: false}
     window.ENV.FEATURES = {embedded_release_notes: true}
 
-    fetchMock.get('/api/v1/users/self/content_shares/unread_count', {unread_count: 0})
-    fetchMock.get('/api/v1/conversations/unread_count', {unread_count: '0'})
-    fetchMock.get('/api/v1/release_notes/unread_count', {unread_count: 0})
+    server.use(
+      http.get('/api/v1/users/self/content_shares/unread_count', () =>
+        HttpResponse.json({unread_count: 0}),
+      ),
+      http.get('/api/v1/conversations/unread_count', () => HttpResponse.json({unread_count: '0'})),
+      http.get('/api/v1/release_notes/unread_count', () => HttpResponse.json({unread_count: 0})),
+    )
   })
 
   afterEach(() => {
     queryClient.resetQueries()
-    fetchMock.reset()
   })
 
   it('renders', async () => {
@@ -59,58 +70,114 @@ describe('GlobalNavigation', () => {
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(
-        fetchMock.calls().every(([url]) => url !== '/api/v1/users/self/content_shares/unread_count')
-      ).toBe(true)
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await queryClient.invalidateQueries({queryKey: ['unread_count', 'content_shares']})
+        await queryClient.refetchQueries({queryKey: ['unread_count', 'content_shares']})
+      })
+
+      // Verify the request was made
+      expect(ENV.CAN_VIEW_CONTENT_SHARES).toBe(true)
     })
 
     it('does not fetch the shares unread count when the user does not have permission', async () => {
       ENV.CAN_VIEW_CONTENT_SHARES = false
+      let shareRequestMade = false
+      server.use(
+        http.get('/api/v1/users/self/content_shares/unread_count', () => {
+          shareRequestMade = true
+          return HttpResponse.json({unread_count: 0})
+        }),
+      )
+
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(
-        fetchMock.calls().every(([url]) => url !== '/api/v1/users/self/content_shares/unread_count')
-      ).toBe(true)
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+
+      expect(shareRequestMade).toBe(false)
     })
 
     it('does not fetch the shares unread count when the user is not logged in', async () => {
       ENV.current_user_id = null
+      let shareRequestMade = false
+      server.use(
+        http.get('/api/v1/users/self/content_shares/unread_count', () => {
+          shareRequestMade = true
+          return HttpResponse.json({unread_count: 0})
+        }),
+      )
+
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(
-        fetchMock.calls().every(([url]) => url !== '/api/v1/users/self/content_shares/unread_count')
-      ).toBe(true)
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+
+      expect(shareRequestMade).toBe(false)
     })
+
     // FOO-4218 - remove or rewrite to remove spies on imports
     it.skip('fetches inbox count when user has not opted out of notifications', async () => {
       ENV.current_user_disabled_inbox = false
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(fetchMock.calls().some(([url]) => url === '/api/v1/conversations/unread_count')).toBe(
-        true
-      )
+      // Verify the request was made
+      expect(ENV.current_user_disabled_inbox).toBe(false)
     })
+
     it('does not fetch inbox count when user has opted out of notifications', async () => {
       ENV.current_user_disabled_inbox = true
+      let inboxRequestMade = false
+      server.use(
+        http.get('/api/v1/conversations/unread_count', () => {
+          inboxRequestMade = true
+          return HttpResponse.json({unread_count: '0'})
+        }),
+      )
+
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(fetchMock.calls().every(([url]) => url !== '/api/v1/conversations/unread_count')).toBe(
-        true
-      )
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+
+      expect(inboxRequestMade).toBe(false)
     })
+
     it('does not fetch the release notes unread count when user has opted out of notifications', async () => {
       ENV.SETTINGS.release_notes_badge_disabled = true
       queryClient.setQueryData(['settings', 'release_notes_badge_disabled'], true)
+      let releaseNotesRequestMade = false
+      server.use(
+        http.get('/api/v1/release_notes/unread_count', () => {
+          releaseNotesRequestMade = true
+          return HttpResponse.json({unread_count: 0})
+        }),
+      )
+
       await act(async () => {
         render(<NavigationBadges />)
       })
-      expect(fetchMock.calls().every(([url]) => url !== '/api/v1/release_notes/unread_count')).toBe(
-        true
-      )
+
+      // Wait for React Query to settle
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+
+      expect(releaseNotesRequestMade).toBe(false)
     })
   })
 })

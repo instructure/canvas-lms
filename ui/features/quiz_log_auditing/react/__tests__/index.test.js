@@ -17,9 +17,10 @@
  */
 
 import $ from 'jquery'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {configure, mount, unmount} from '../index'
-import {fireEvent, findByTestId} from '@testing-library/dom'
+import {fireEvent, findByTestId, waitFor} from '@testing-library/dom'
 
 const fixture = {
   '/api/v1/quizzes/1/submissions/2': {
@@ -864,21 +865,24 @@ const fixture = {
   },
 }
 
+// Setup MSW server
+const server = setupServer(
+  ...Object.entries(fixture).map(([url, response]) =>
+    http.get(url, () => HttpResponse.json(response)),
+  ),
+)
+
 describe('canvas_quizzes/events', () => {
-  let fakeServer
+  let container
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    fakeServer = sinon.createFakeServer()
-    fakeServer.autoRespond = true
-    fakeServer.respondImmediately = true
-
-    for (const url of Object.keys(fixture)) {
-      fakeServer.respondWith('GET', url, [
-        200,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(fixture[url]),
-      ])
-    }
+    // Reset container for each test
+    container = document.createElement('div')
+    document.body.appendChild(container)
 
     configure({
       ajax: $.ajax,
@@ -892,48 +896,64 @@ describe('canvas_quizzes/events', () => {
     })
   })
 
-  afterEach(() => {
-    fakeServer.restore()
-    fakeServer = null
-
-    return unmount()
+  afterEach(async () => {
+    // Clean up in reverse order of setup
+    await unmount()
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container)
+    }
+    container = null
   })
 
-  it('renders event stream', () => {
-    const node = document.createElement('div')
+  it('renders event stream', async () => {
+    await mount(container)
 
-    return mount(node)
-      .then(() => findByTestId(node, 'event-stream'))
-      .then(eventStream => {
-        const eventStreamInText = [
-          '00:01Session started',
-          '00:03Answered the following questions:#1#2#5#6#7',
-          '00:15Answered question:#3',
-          '00:16Viewed (and possibly read) question#1',
-          '00:16Viewed (and possibly read) question#2',
-          '00:16Viewed (and possibly read) the following questions:#3#4#5',
-          '00:19Answered question:#4',
-          '00:31Viewed (and possibly read) question#6',
-          '00:53Answered question:#8',
-          '01:01Viewed (and possibly read) the following questions:#7#8',
-        ]
+    // If we're in table view, switch to stream view
+    const answerMatrix = container.querySelector('#ic-AnswerMatrix')
+    if (answerMatrix) {
+      const viewStreamButton = container.querySelector('a.btn.btn-default')
+      await fireEvent.click(viewStreamButton)
+    }
 
-        for (const entry of eventStreamInText) {
+    // Now wait for the event stream to appear
+    const eventStream = await findByTestId(container, 'event-stream')
+
+    const expectedEvents = [
+      '00:01Session started',
+      '00:03Answered the following questions:#1#2#5#6#7',
+      '00:15Answered question:#3',
+      '00:16Viewed (and possibly read) question#1',
+      '00:16Viewed (and possibly read) question#2',
+      '00:16Viewed (and possibly read) the following questions:#3#4#5',
+      '00:19Answered question:#4',
+      '00:31Viewed (and possibly read) question#6',
+      '00:53Answered question:#8',
+      '01:01Viewed (and possibly read) the following questions:#7#8',
+    ]
+
+    await Promise.all(
+      expectedEvents.map(async entry => {
+        await waitFor(() => {
           expect(eventStream.textContent).toContain(entry)
-        }
-      })
+        })
+      }),
+    )
   })
 
-  it('renders table', () => {
-    const node = document.createElement('div')
+  it('renders table', async () => {
+    await mount(container)
 
-    return mount(node)
-      .then(() => findByTestId(node, 'view-table-button').then(fireEvent.click))
-      .then(() => findByTestId(node, 'answer-matrix'))
-      .then(answerMatrix => {
-        expect(answerMatrix).toBeTruthy()
-        expect(answerMatrix.querySelectorAll('thead th').length).toBe(9) // 1 for Timestamp and 8 for questions
-        expect(answerMatrix.querySelectorAll('tbody tr').length).toBe(4)
-      })
+    const viewTableButton = await findByTestId(container, 'view-table-button')
+    await fireEvent.click(viewTableButton)
+
+    const answerMatrix = await findByTestId(container, 'answer-matrix')
+
+    await waitFor(() => {
+      expect(answerMatrix).toBeTruthy()
+      const headers = answerMatrix.querySelectorAll('thead th')
+      const rows = answerMatrix.querySelectorAll('tbody tr')
+      expect(headers).toHaveLength(9) // 1 for Timestamp and 8 for questions
+      expect(rows).toHaveLength(4)
+    })
   })
 })

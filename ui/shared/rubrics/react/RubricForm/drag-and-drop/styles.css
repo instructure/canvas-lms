@@ -1,0 +1,31 @@
+.draggable.dragging {
+  background: white;
+  box-shadow: 2px 2px 4px grey;
+  padding: 1rem;
+}
+
+.draggable.dragging.generated-criterion-row {
+  background: linear-gradient(#f9f7fb, #f9f7fb) padding-box,
+    linear-gradient(to bottom, #7f61b3, #32759c) border-box;
+  border-radius: 0.25rem;
+  border: 2px solid transparent;
+  box-shadow: 2px 2px 4px grey;
+  padding: 1rem;
+}
+
+/* IgniteAI branding for generated rows */
+.generated-criterion-row {
+  background: linear-gradient(#f9f7fb, #f9f7fb) padding-box,
+    linear-gradient(to bottom, #7f61b3, #32759c) border-box;
+  border-radius: 0.25rem;
+  border: 2px solid transparent;
+}
+
+.criterion-row {
+  padding: 1rem 0.75rem;
+  margin-bottom: 0.125rem;
+}
+
+.divided-criterion-row {
+  border-bottom: 1px solid #e0e0e0;
+}

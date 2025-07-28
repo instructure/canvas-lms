@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {map, find, filter, includes, some} from 'lodash'
@@ -28,7 +26,7 @@ import VeriCiteSettings from '../../VeriCiteSettings'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection'
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import * as tz from '@instructure/moment-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -36,7 +34,7 @@ import PandaPubPoller from '@canvas/panda-pub-poller'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
 
 const default_interval = 3000
-const I18n = useI18nScope('models_Assignment')
+const I18n = createI18nScope('models_Assignment')
 
 const hasProp = {}.hasOwnProperty
 
@@ -123,9 +121,11 @@ function Assignment() {
   this.groupCategoryId = this.groupCategoryId.bind(this)
   this.hasDueDate = this.hasDueDate.bind(this)
   this.hasPointsPossible = this.hasPointsPossible.bind(this)
+  this.hasSubAssignments = this.hasSubAssignments.bind(this)
   this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
   this.hideInGradebook = this.hideInGradebook.bind(this)
   this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
+  this.suppressAssignmentAllowed = this.suppressAssignmentAllowed.bind(this)
   this.htmlBuildUrl = this.htmlBuildUrl.bind(this)
   this.htmlEditUrl = this.htmlEditUrl.bind(this)
   this.htmlUrl = this.htmlUrl.bind(this)
@@ -203,6 +203,7 @@ function Assignment() {
   this.submissionTypes = this.submissionTypes.bind(this)
   this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
   this.submissionTypesFrozen = this.submissionTypesFrozen.bind(this)
+  this.suppressAssignment = this.suppressAssignment.bind(this)
   this.toView = this.toView.bind(this)
   this.turnitinAvailable = this.turnitinAvailable.bind(this)
   this.turnitinEnabled = this.turnitinEnabled.bind(this)
@@ -250,7 +251,7 @@ Assignment.prototype.initialize = function () {
     if (!this.get('id') && this.get('post_to_sis') !== false) {
       return this.set(
         'post_to_sis',
-        !!(typeof ENV !== 'undefined' && ENV !== null ? ENV.POST_TO_SIS_DEFAULT : void 0)
+        !!(typeof ENV !== 'undefined' && ENV !== null ? ENV.POST_TO_SIS_DEFAULT : void 0),
       )
     }
   }
@@ -616,7 +617,7 @@ Assignment.prototype.moderatedGrading = function (enabled) {
 }
 
 Assignment.prototype.anonymousInstructorAnnotations = function (
-  anonymousInstructorAnnotationsBoolean
+  anonymousInstructorAnnotationsBoolean,
 ) {
   if (!(arguments.length > 0)) {
     return this.get('anonymous_instructor_annotations')
@@ -994,7 +995,15 @@ Assignment.prototype.htmlEditUrl = function () {
 }
 
 Assignment.prototype.htmlBuildUrl = function () {
-  return this.get('html_url')
+  if (this.isQuizLTIAssignment() && canManage()) {
+    let displayType = 'full_width'
+    if (ENV.FEATURES.new_quizzes_navigation_updates) {
+      displayType = 'full_width_with_nav'
+    }
+    return this.get('html_url') + `?display=${displayType}`
+  } else {
+    return this.get('html_url')
+  }
 }
 
 Assignment.prototype.labelId = function () {
@@ -1003,6 +1012,10 @@ Assignment.prototype.labelId = function () {
 
 Assignment.prototype.postToSISEnabled = function () {
   return ENV.POST_TO_SIS
+}
+
+Assignment.prototype.suppressAssignmentAllowed = function () {
+  return ENV.SETTINGS.suppress_assignments
 }
 
 Assignment.prototype.postToSISName = function () {
@@ -1069,6 +1082,10 @@ Assignment.prototype.hasDueDate = function () {
 
 Assignment.prototype.hasPointsPossible = function () {
   return !this.isQuiz() && !this.isPage()
+}
+
+Assignment.prototype.hasSubAssignments = function () {
+  return this.get('has_sub_assignments')
 }
 
 Assignment.prototype.nonBaseDates = function () {
@@ -1179,11 +1196,17 @@ Assignment.prototype.isImporting = function () {
 }
 
 Assignment.prototype.failedToImport = function () {
-  return this.get('workflow_state') === 'failed_to_import'
+  return this.get('workflow_state') === 'fail_to_import'
 }
 
 Assignment.prototype.submissionTypesFrozen = function () {
   return includes(this.frozenAttributes(), 'submission_types')
+}
+
+Assignment.prototype.suppressAssignment = function (suppressAssignment) {
+  return suppressAssignment !== undefined
+    ? this.set('suppress_assignment', suppressAssignment)
+    : this.get('suppress_assignment')
 }
 
 Assignment.prototype.toView = function () {
@@ -1234,8 +1257,10 @@ Assignment.prototype.toView = function () {
     'groupCategoryId',
     'hasDueDate',
     'hasPointsPossible',
+    'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
+    'suppressAssignmentAllowed',
     'htmlBuildUrl',
     'htmlEditUrl',
     'htmlUrl',
@@ -1289,11 +1314,13 @@ Assignment.prototype.toView = function () {
     'submissionType',
     'submissionTypeSelectionTools',
     'submissionTypesFrozen',
+    'suppressAssignment',
     'turnitinAvailable',
     'turnitinEnabled',
     'unlockAt',
     'vericiteAvailable',
     'vericiteEnabled',
+    'isHorizonCourse',
   ]
   const hash = {
     id: this.get('id'),
@@ -1337,7 +1364,7 @@ Assignment.prototype.inGradingPeriod = function (gradingPeriod) {
   const gradingPeriodsHelper = new GradingPeriodsHelper(gradingPeriod)
   if (dateGroups) {
     return some(dateGroups.models, dateGroup =>
-      gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id)
+      gradingPeriodsHelper.isDateInGradingPeriod(dateGroup.dueAt(), gradingPeriod.id),
     )
   } else {
     return gradingPeriodsHelper.isDateInGradingPeriod(tz.parse(this.dueAt()), gradingPeriod.id)
@@ -1363,7 +1390,7 @@ Assignment.prototype.endSearch = function () {
 }
 
 Assignment.prototype.parse = function (data) {
-  let overrides, turnitin_settings, vericite_settings
+  let overrides, turnitin_settings, vericite_settings, checkpoints
   data = Assignment.__super__.parse.call(this, data)
   if ((overrides = data.assignment_overrides) != null) {
     data.assignment_overrides = new AssignmentOverrideCollection(overrides)
@@ -1373,6 +1400,9 @@ Assignment.prototype.parse = function (data) {
   }
   if ((vericite_settings = data.vericite_settings) != null) {
     data.vericite_settings = new VeriCiteSettings(vericite_settings)
+  }
+  if ((checkpoints = data.checkpoints) != null) {
+    data.checkpoints = checkpoints
   }
   return data
 }
@@ -1470,7 +1500,7 @@ Assignment.prototype.duplicate = function (callback) {
     '/api/v1/courses/' + course_id + '/assignments/' + assignment_id + '/duplicate',
     'POST',
     {},
-    callback
+    callback,
   )
 }
 
@@ -1494,7 +1524,7 @@ Assignment.prototype.duplicate_failed = function (callback) {
       query_string,
     'POST',
     {},
-    callback
+    callback,
   )
 }
 
@@ -1517,7 +1547,7 @@ Assignment.prototype.alignment_clone_failed = function (callback) {
       query_string,
     'POST',
     {},
-    callback
+    callback,
   )
 }
 
@@ -1536,7 +1566,7 @@ Assignment.prototype.retry_migration = function (callback) {
       '&include[]=migrated_assignment',
     'POST',
     {},
-    callback
+    callback,
   )
 }
 
@@ -1597,14 +1627,14 @@ Assignment.prototype.pollUntilFinished = function (interval, isFinished) {
           }
         })
       }
-    })(this)
+    })(this),
   )
   return poller.start()
 }
 
 Assignment.prototype.isOnlyVisibleToOverrides = function (override_flag) {
   if (!(arguments.length > 0)) {
-    if (ENV.FEATURES?.differentiated_modules && this.get('visible_to_everyone') != null) {
+    if (this.get('visible_to_everyone') != null) {
       return !this.get('visible_to_everyone')
     }
     return this.get('only_visible_to_overrides') || false
@@ -1622,6 +1652,111 @@ Assignment.prototype.showGradersAnonymousToGradersCheckbox = function () {
 
 Assignment.prototype.quizzesRespondusEnabled = function () {
   return this.get('require_lockdown_browser') && this.isQuizLTIAssignment() && isStudent()
+}
+
+Assignment.prototype.getCheckpoints = function () {
+  return this.get('checkpoints') || []
+}
+
+Assignment.prototype.getDateSortGroup = function () {
+  if (!this.dueAt()) {
+    return 'undated'
+  }
+
+  const now = new Date()
+  const dueDate = Date.parse(this.dueAt())
+
+  if (now < dueDate) {
+    return 'upcoming'
+  }
+
+  const isOverdue = this.allowedToSubmit() && this.withoutGradedSubmission()
+  // only handles observer observing one student, this needs to change to handle multiple users in the future
+  const canHaveOverdueAssignment =
+    !ENV?.current_user_has_been_observer_in_this_course ||
+    (ENV?.observed_student_ids && ENV?.observed_student_ids.length === 1)
+
+  if (isOverdue && canHaveOverdueAssignment) {
+    return 'overdue'
+  }
+
+  return 'past'
+}
+
+Assignment.prototype.getCheckpointDateGroup = function () {
+  if (!this.getCheckpoints()) {
+    return null
+  }
+
+  const checkpoints = this.getCheckpoints()
+  if (checkpoints.length !== 2) {
+    return null
+  }
+
+  const [checkpoint1, checkpoint2] = checkpoints
+  const group1 = this.getCheckpointGroup(checkpoint1)
+  const group2 = this.getCheckpointGroup(checkpoint2)
+
+  // Helper functions
+  const allMatch = (groups, target) => groups.every(group => group === target)
+  const anyMatch = (groups, target) => groups.some(group => group === target)
+  const matchAll = (groups, targets) =>
+    groups.length === targets.length && targets.every(target => groups.includes(target))
+
+  const groups = [group1, group2]
+
+  if (allMatch(groups, 'undated')) {
+    return 'undated'
+  }
+
+  if (anyMatch(groups, 'overdue')) {
+    return 'overdue'
+  }
+
+  if (matchAll(groups, ['upcoming', 'upcoming']) || matchAll(groups, ['upcoming', 'undated'])) {
+    return 'upcoming'
+  }
+
+  return 'past'
+}
+
+Assignment.prototype.subAssignmentWithoutGradedSubmission = function (checkpointTag) {
+  const sub =
+    this.get('submission')?.attributes?.sub_assignment_submissions?.find(
+      submission => submission.sub_assignment_tag === checkpointTag,
+    ) ?? null
+  return sub == null || sub.grade == null
+}
+
+Assignment.prototype.getCheckpointGroup = function (checkpoint) {
+  if (!checkpoint.due_at) {
+    return 'undated'
+  }
+
+  const now = new Date()
+  const dueDate = new Date(checkpoint.due_at)
+
+  if (now < dueDate) {
+    return 'upcoming'
+  }
+
+  const checkpointIsWithoutGradedSubmission = this.subAssignmentWithoutGradedSubmission(
+    checkpoint.tag,
+  )
+  const isOverdue = this.allowedToSubmit() && checkpointIsWithoutGradedSubmission
+  const canHaveOverdueAssignment =
+    !ENV?.current_user_has_been_observer_in_this_course ||
+    (ENV?.observed_student_ids && ENV?.observed_student_ids.length === 1)
+
+  if (isOverdue && canHaveOverdueAssignment) {
+    return 'overdue'
+  }
+
+  return 'past'
+}
+
+Assignment.prototype.isHorizonCourse = function () {
+  return ENV.horizon_course
 }
 
 export default Assignment

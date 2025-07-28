@@ -76,8 +76,8 @@ describe "root account basic settings" do
       button = fj("button:contains('About restrict quantitative data')")
       button.location_once_scrolled_into_view
       button.click
-      expect(fj("div.ui-dialog-titlebar:contains('Restrict Quantitative Data')")).to be_present
-      force_click(".ui-dialog-titlebar-close")
+      expect("[data-testid='rqd-modal-test']").to be_present
+      f("[data-testid='close-button']").click
 
       f("#account_settings_restrict_quantitative_data_value").click
       submit_form("#account_settings")
@@ -197,7 +197,7 @@ describe "root account basic settings" do
 
         it "lets a user update what settings they want to use" do
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
 
           tenant_input_area = fxpath('//input[@placeholder="microsoft_tenant_name.onmicrosoft.com"]')
           set_value(tenant_input_area, tenant)
@@ -231,7 +231,7 @@ describe "root account basic settings" do
           account.save!
 
           get account_settings_url
-          f("#tab-integrations-link").click
+          f("#tab-integrations").click
           f("#microsoft_teams_sync_toggle_button").click
           wait_for_ajaximations
 
@@ -244,57 +244,103 @@ describe "root account basic settings" do
     end
   end
 
-  it "downloads reports" do
-    course_with_admin_logged_in
-    account.account_reports.create!(
-      user: @user,
-      report_type: "course_storage_csv"
-    ).run_report(synchronous: true)
-    get reports_url
+  context "reports" do
+    before do
+      course_with_admin_logged_in
+    end
 
-    expect(f("#course_storage_csv .last-run a").attribute("href")).to match(/download_frd=1/)
-  end
+    def modal_body
+      f("#configure_modal_body")
+    end
 
-  it "has date pickers for reports tab" do
-    course_with_admin_logged_in
-    get account_settings_url
-    f("#tab-reports-link").click
-    wait_for_ajax_requests
-    f("#configure_zero_activity_csv").click
-    expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
-  end
+    it "downloads reports" do
+      course_with_admin_logged_in
+      account.account_reports.create!(
+        user: @user,
+        report_type: "course_storage_csv"
+      ).run_report(synchronous: true)
+      get reports_url
 
-  it "handles linking directly to reports tab" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
-    f("#configure_zero_activity_csv").click
-    expect(f("#zero_activity_csv_form")).to contain_css(".ui-datepicker-trigger")
-  end
+      expect(f("#course_storage_csv .last-run a").attribute("href")).to match(/download_frd=1/)
+    end
 
-  it "disables report options for provisioning report form when a report hasn't been selected" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
+    it "has date pickers for reports tab" do
+      course_with_admin_logged_in
+      get account_settings_url
+      f("#tab-reports").click
+      wait_for_ajax_requests
+      f("#configure_zero_activity_csv").click
+      expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
+    end
 
-    f("#configure_provisioning_csv").click
-    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to be_disabled
-    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to be_disabled
+    it "handles linking directly to reports tab" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
+      f("#configure_zero_activity_csv").click
+      expect(modal_body.find('[data-testid="parameters[start_at]"]')).to be_present
+    end
 
-    f("#provisioning_csv_form").find("#parameters_courses").click
-    expect(f("#provisioning_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
-    expect(f("#provisioning_csv_form").find("#parameters_include_deleted")).to_not be_disabled
-  end
+    it "disables report options for provisioning report form when a report hasn't been selected" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
 
-  it "disables report options for SIS export report form when a report hasn't been selected" do
-    course_with_admin_logged_in
-    get account_settings_url + "#tab-reports"
+      f("#configure_provisioning_csv").click
+      expect(modal_body.find("#parameters_created_by_sis")).to be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to be_disabled
 
-    f("#configure_sis_export_csv").click
-    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to be_disabled
-    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to be_disabled
+      modal_body.find("#parameters_courses").click
+      expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+    end
 
-    f("#sis_export_csv_form").find("#parameters_users").click
-    expect(f("#sis_export_csv_form").find("#parameters_created_by_sis")).to_not be_disabled
-    expect(f("#sis_export_csv_form").find("#parameters_include_deleted")).to_not be_disabled
+    it "disables report options for SIS export report form when a report hasn't been selected" do
+      course_with_admin_logged_in
+      get account_settings_url + "#tab-reports"
+
+      f("#configure_sis_export_csv").click
+      expect(modal_body.find("#parameters_created_by_sis")).to be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to be_disabled
+
+      modal_body.find("#parameters_users").click
+      expect(modal_body.find("#parameters_created_by_sis")).to_not be_disabled
+      expect(modal_body.find("#parameters_include_deleted")).to_not be_disabled
+    end
+
+    it "creates a report with correct parameters" do
+      course_with_admin_logged_in
+
+      get account_settings_url + "#tab-reports"
+
+      f("#configure_students_with_no_submissions_csv").click
+      # change start_at date
+      start_at = modal_body.find('[data-testid="parameters[start_at]"]')
+      start_at.click
+      start_at.clear
+      start_at.send_keys("2023-01-01")
+
+      # change end_at date
+      end_at = modal_body.find('[data-testid="parameters[end_at]"]')
+      end_at.click
+      end_at.clear
+      end_at.send_keys("2023-01-15")
+
+      # change the enrollment state (select)
+      enrollment_state = modal_body.find("select[name='parameters[enrollment_state][]']")
+      enrollment_state.click
+      enrollment_state.find('[value="active"').click
+
+      f("[data-testid='run-report']").click
+
+      report = Account.default.account_reports.last
+      expect(report).to be_present
+      params = report.parameters
+      # unchecked params are excluded from the report
+      expect(params["enrollment_term_id"]).to eq("")
+      expect(params).to have_key("start_at")
+      expect(params).to have_key("end_at")
+      expect(params).not_to have_key("include_enrollment_state")
+      expect(params["enrollment_state"]).to eq(["active"])
+    end
   end
 
   it "changes the default user quota", priority: "1" do
@@ -302,7 +348,7 @@ describe "root account basic settings" do
     group_model(context: @course)
     get account_settings_url
 
-    f("#tab-quotas-link").click
+    f("#tab-quotas").click
 
     # update the quotas
     user_quota = account.default_user_storage_quota_mb
@@ -312,12 +358,12 @@ describe "root account basic settings" do
     user_quota += 15
     replace_content(user_quota_input, user_quota.to_s)
 
-    submit_form("#default-quotas")
+    submit_form("[aria-label='Default Account Quotas form']")
     wait_for_ajax_requests
 
     # ensure the account was updated properly
     account.reload
-    expect(account.default_user_storage_quota).to eq user_quota * 1_048_576
+    expect(account.default_user_storage_quota).to eq user_quota * 1_000_000
 
     # ensure the new value is reflected after a refresh
     get account_settings_url
@@ -336,8 +382,8 @@ describe "root account basic settings" do
     account.reload
     expect(account.settings[:ip_filters]).to be_present # should not have cleared them if we didn't do anything
 
-    filter = ff(".ip_filter").detect(&:displayed?)
-    el = filter.find_element(:css, ".delete_filter_link")
+    filter = ff(%(span[data-testid="ip-filter"])).detect(&:displayed?)
+    el = filter.find_element(:css, %([data-testid="delete-ip-filter"]))
     el.location_once_scrolled_into_view
     el.click
 
@@ -411,6 +457,44 @@ describe "root account basic settings" do
         expect(account.no_enrollments_can_create_courses?).to be_falsey
         expect(account.teachers_can_create_courses_anywhere?).to be_truthy
         expect(account.students_can_create_courses_anywhere?).to be_falsey
+      end
+    end
+  end
+
+  context "Differentiation Tags" do
+    before :once do
+      account_admin_user(active_all: true)
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    describe "allow_assign_to_differentiation_tags originally enabled" do
+      before do
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.settings[:allow_assign_to_differentiation_tags] = true
+        account.save!
+        get account_settings_url
+      end
+
+      it "shows warning message when differentiation tags settings is unchecked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        scroll_into_view(differentiation_checkbox)
+        differentiation_checkbox.click
+
+        warning_message = f("#differentiation_tags_account_settings_warning_message")
+        description = f("#differentiation_tags_account_settings_description_message")
+        expect(warning_message).to be_displayed
+        expect(description).not_to be_displayed
+      end
+
+      it "shows description message when differentiation tags settings is checked" do
+        differentiation_checkbox = f("#account_settings_allow_assign_to_differentiation_tags_value")
+        expect(differentiation_checkbox.selected?).to be true
+        expect(f("#differentiation_tags_account_settings_warning_message")).not_to be_displayed
+        expect(f("#differentiation_tags_account_settings_description_message")).to be_displayed
       end
     end
   end

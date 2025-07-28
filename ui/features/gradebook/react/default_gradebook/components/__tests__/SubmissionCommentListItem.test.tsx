@@ -33,7 +33,7 @@ describe('SubmissionCommentListItem', () => {
       createdAt: new Date(),
       editedAt: null,
       currentUserIsAuthor: true,
-      comment: 'a comment',
+      comment: '<p>a comment</p>',
       editing: false,
       editSubmissionComment() {},
       last: false,
@@ -77,9 +77,14 @@ describe('SubmissionCommentListItem', () => {
     expect(screen.getByText('An Author')).toBeInTheDocument()
   })
 
-  test('include the comment', function () {
+  test('includes the comment without html tags', function () {
     mountComponent()
-    expect(screen.getByText('a comment')).toBeInTheDocument()
+    expect(screen.getByTestId('comment').textContent).toBe('a comment')
+  })
+
+  test('preserves \n formatting in a comment', function () {
+    mountComponent({comment: 'formatted\ncomment'})
+    expect(screen.getByTestId('comment').innerHTML).toBe('formatted<br>\ncomment')
   })
 
   test('clicking the edit icon calls editSubmissionComment with the comment id', function () {

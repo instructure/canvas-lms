@@ -13,6 +13,7 @@ $black:                 #000 !default;
 $grayDarker:            #222 !default;
 $grayDark:              #333 !default;
 $gray:                  #555 !default;
+$gray30:                #8D959F !default;
 $grayLight:             #999 !default;
 $grayLighter:           #eee !default;
 $white:                 #fff !default;
@@ -35,7 +36,7 @@ $textColor:             $grayDark !default;
 // Bootstrap Pagination
 $paginationBackground:                #fff !default;
 $paginationBorder:                    #ddd !default;
-$paginationActiveBackground:          #f5f5f5 !default;
+$paginationActiveBackground:          #F2F4F4 !default;
 
 // Links
 // -------------------------
@@ -80,7 +81,7 @@ $borderRadiusSmall:     1px;
 // -------------------------
 $tableBackground:                   transparent !default; // overall background-color
 $tableBackgroundAccent:             #f9f9f9 !default; // for striping
-$tableBackgroundHover:              #f5f5f5 !default; // for hover
+$tableBackgroundHover:              #F2F4F4 !default; // for hover
 $tableBorder:                       #ddd !default; // table and cell border
 
 // Buttons
@@ -114,10 +115,10 @@ $btnInverseBackgroundHighlight:     $grayDarker !default;
 // Forms
 // -------------------------
 $inputBackground:               $white !default;
-$inputBorder:                   #ccc !default;
+$inputBorder:                   $gray30 !default;
 $inputBorderRadius:             $baseBorderRadius !default;
 $inputDisabledBackground:       $grayLighter !default;
-$formActionsBackground:         #f5f5f5 !default;
+$formActionsBackground:         #F2F4F4 !default;
 $inputHeight:                   $baseLineHeight + 10px; // base line-height + 8px vertical padding + 2px top/bottom border
 $inputHeightRem:                $baseLineHeightRem + 0.625rem;
 
@@ -172,7 +173,7 @@ $horizontalComponentOffset:       180px;
 
 // Wells
 // -------------------------
-$wellBackground:                  #f5f5f5 !default;
+$wellBackground:                  #F2F4F4 !default;
 
 
 // Drag & Drop

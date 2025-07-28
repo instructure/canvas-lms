@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import mBus from './message_bus'
-import UploadResult from './upload_result'
-import KalturaRequestBuilder from './kaltura_request_builder'
+import mBus from './message_bus.js'
+import UploadResult from './upload_result.js'
+import KalturaRequestBuilder from './kaltura_request_builder.js'
 
 function Uploader() {
   this.xhr = new XMLHttpRequest()

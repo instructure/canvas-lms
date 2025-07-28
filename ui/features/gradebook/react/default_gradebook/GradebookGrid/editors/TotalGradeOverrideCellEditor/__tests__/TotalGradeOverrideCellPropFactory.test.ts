@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -16,8 +17,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import sinon from 'sinon'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
@@ -92,10 +91,10 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
         },
 
         gradebookGrid: {
-          updateRowCell: sinon.stub(),
+          updateRowCell: jest.fn(),
         },
 
-        isFilteringColumnsByGradingPeriod: sinon.stub().returns(false),
+        isFilteringColumnsByGradingPeriod: jest.fn().mockReturnValue(false),
 
         studentCanReceiveGradeOverride(id) {
           return {1101: true, 1102: false}[id]
@@ -184,27 +183,33 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
       let props
 
       beforeEach(() => {
-        sinon.stub(gradebook.finalGradeOverrides, 'updateGrade')
+        jest.spyOn(gradebook.finalGradeOverrides, 'updateGrade').mockImplementation(() => {})
         props = getProps()
       })
 
       it('updates a final grade override when called', () => {
         const gradeInfo = props.gradeEntry.parseValue('A')
         props.onGradeUpdate(gradeInfo)
-        expect(gradebook.finalGradeOverrides.updateGrade.callCount).toEqual(1)
+        expect(gradebook.finalGradeOverrides.updateGrade).toHaveBeenCalledTimes(1)
       })
 
       it('includes the user id for the row when updating the final grade override', () => {
         const gradeInfo = props.gradeEntry.parseValue('A')
         props.onGradeUpdate(gradeInfo)
-        const [userId] = gradebook.finalGradeOverrides.updateGrade.lastCall.args
+        const [userId] =
+          gradebook.finalGradeOverrides.updateGrade.mock.calls[
+            gradebook.finalGradeOverrides.updateGrade.mock.calls.length - 1
+          ]
         expect(userId).toEqual('1101')
       })
 
       it('includes the given grade override info when updating the final grade override', () => {
         const gradeInfo = props.gradeEntry.parseValue('A')
         props.onGradeUpdate(gradeInfo)
-        const [, gradeOverrideInfo] = gradebook.finalGradeOverrides.updateGrade.lastCall.args
+        const [, gradeOverrideInfo] =
+          gradebook.finalGradeOverrides.updateGrade.mock.calls[
+            gradebook.finalGradeOverrides.updateGrade.mock.calls.length - 1
+          ]
         expect(gradeOverrideInfo).toBe(gradeInfo)
       })
     })

@@ -26,7 +26,12 @@ module Submissions
             flash[:error] = t("The specified user is not a student in this course")
             redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
           else
-            flash[:error] = t("The specified assignment could not be found")
+            deleted_discussion = Assignment.find_by(id: params.fetch(:assignment_id))&.then { |a| a.deleted? && a.discussion_topic? }
+            if deleted_discussion
+              flash[:notice] = t("This Discussion has been deleted")
+            else
+              flash[:error] = t("The specified assignment could not be found")
+            end
             redirect_to course_url(@context)
           end
         end

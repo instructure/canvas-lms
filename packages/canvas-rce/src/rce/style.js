@@ -56,7 +56,7 @@ export default function buildStyle() {
       themeCanvasPrimaryButtonColor = variables['ic-brand-button--primary-text']
       themeCanvasPrimaryButtonHoverBackground = darken(
         variables['ic-brand-button--primary-bgd'],
-        10
+        10,
       )
       themeActiveMenuItemBackground = variables['ic-brand-button--primary-bgd']
       themeActiveMenuItemLabelColor = variables['ic-brand-button--primary-text']
@@ -64,29 +64,29 @@ export default function buildStyle() {
       break
     case 'canvas-a11y':
     case 'canvas-high-contrast':
-      themeCanvasButtonBackground = variables.colors.backgroundLight
-      themeCanvasSecondaryButtonBorderColor = variables.colors.borderMedium
+      themeCanvasButtonBackground = variables.colors.contrasts.grey1111
+      themeCanvasSecondaryButtonBorderColor = variables.colors.contrasts.grey1214
       themeCanvasLinkDecoration = 'underline'
-      themeCanvasFocusBorderColor = variables.colors.borderBrand
+      themeCanvasFocusBorderColor = variables.colors.contrasts.blue4570
       themeCanvasFocusBoxShadow = `0 0 0 2px ${variables.colors.brand}`
       themeCanvasBrandColor = variables.colors.brand
       break
     default:
       themeCanvasLinkColor = variables.colors.link
       themeCanvasLinkDecoration = 'none'
-      themeCanvasTextColor = variables.colors.textDarkest
+      themeCanvasTextColor = variables.colors.contrasts.grey125125
       themeCanvasBrandColor = variables.colors.brand
       themeCanvasFocusBorderColor = variables.borders.brand
       themeCanvasFocusBoxShadow = `0 0 0 2px ${variables.colors.brand}`
       themeCanvasEnabledColor = variables.borders.brand
-      themeCanvasPrimaryButtonBackground = variables.colors.backgroundBrand
-      themeCanvasPrimaryButtonColor = variables.colors.textLightest
-      themeCanvasPrimaryButtonHoverBackground = darken(variables.colors.backgroundBrand, 10)
-      themeActiveMenuItemBackground = variables.colors.backgroundBrand
-      themeActiveMenuItemLabelColor = variables.colors.textLightest
+      themeCanvasPrimaryButtonBackground = variables.colors.contrasts.blue4570
+      themeCanvasPrimaryButtonColor = variables.colors.contrasts.white1010
+      themeCanvasPrimaryButtonHoverBackground = darken(variables.colors.contrasts.blue4570, 10)
+      themeActiveMenuItemBackground = variables.colors.contrasts.blue4570
+      themeActiveMenuItemLabelColor = variables.colors.contrasts.white1010
       themeTableSelectorHighlightColor = alpha(lighten(variables.colors.brand, 10), 50)
-      themeCanvasButtonBackground = variables.colors.backgroundLightest
-      themeCanvasSecondaryButtonBorderColor = darken(variables.colors.backgroundLight, 10)
+      themeCanvasButtonBackground = variables.colors.contrasts.white1010
+      themeCanvasSecondaryButtonBorderColor = darken(variables.colors.contrasts.grey1111, 10)
       break
   }
 
@@ -94,17 +94,17 @@ export default function buildStyle() {
     root: 'canvas-rce__skins--root',
   }
 
-  const toolbarButtonHoverBackgroundConst = darken(variables.colors.backgroundLightest, 5)
+  const toolbarButtonHoverBackgroundConst = darken(variables.colors.contrasts.white1010, 5)
   const tinySplitButtonChevronHoverBackgroundConst = darken(toolbarButtonHoverBackgroundConst, 10)
 
   const theme = {
-    canvasBackgroundColor: variables.colors.white,
+    canvasBackgroundColor: variables.colors.primitives.white,
     canvasTextColor: themeCanvasTextColor,
-    canvasErrorColor: variables.colors.textDanger,
-    canvasWarningColor: variables.colors.textWarning,
-    canvasInfoColor: variables.colors.textInfo,
-    canvasSuccessColor: variables.colors.textSuccess,
-    canvasBorderColor: variables.colors.borderMedium,
+    canvasErrorColor: variables.colors.contrasts.red4570,
+    canvasWarningColor: variables.colors.contrasts.orange4570,
+    canvasInfoColor: variables.colors.contrasts.blue4570,
+    canvasSuccessColor: variables.colors.contrasts.green4570,
+    canvasBorderColor: variables.colors.contrasts.grey3045,
     toolbarButtonHoverBackground: toolbarButtonHoverBackgroundConst, // copied from INSTUI "light" Button
     tinySplitButtonChevronHoverBackground: tinySplitButtonChevronHoverBackgroundConst,
     canvasBrandColor: themeCanvasBrandColor,
@@ -119,10 +119,10 @@ export default function buildStyle() {
     // the instui default button
     canvasButtonBackground: themeCanvasButtonBackground,
     canvasButtonBorderColor: 'transparent',
-    canvasButtonColor: variables.colors.textDarkest,
-    canvasButtonHoverBackground: variables.colors.backgroundLightest,
+    canvasButtonColor: variables.colors.contrasts.grey125125,
+    canvasButtonHoverBackground: variables.colors.contrasts.white1010,
     canvasButtonHoverColor: variables.colors.brand,
-    canvasButtonActiveBackground: variables.colors.backgroundLightest,
+    canvasButtonActiveBackground: variables.colors.contrasts.white1010,
     canvasButtonFontWeight: variables.typography.fontWeightNormal,
     canvasButtonFontSize: variables.typography.fontSizeMedium,
     canvasButtonLineHeight: variables.forms.inputHeightMedium,
@@ -133,22 +133,22 @@ export default function buildStyle() {
     canvasPrimaryButtonColor: themeCanvasPrimaryButtonColor,
     canvasPrimaryButtonBorderColor: 'transparent',
     canvasPrimaryButtonHoverBackground: themeCanvasPrimaryButtonHoverBackground,
-    canvasPrimaryButtonHoverColor: variables.colors.textLightest,
+    canvasPrimaryButtonHoverColor: variables.colors.contrasts.white1010,
 
     // the instui secondary button
-    canvasSecondaryButtonBackground: variables.colors.backgroundLight,
-    canvasSecondaryButtonColor: variables.colors.textDarkest,
+    canvasSecondaryButtonBackground: variables.colors.contrasts.grey1111,
+    canvasSecondaryButtonColor: variables.colors.contrasts.grey125125,
     canvasSecondaryButtonBorderColor: themeCanvasSecondaryButtonBorderColor,
-    canvasSecondaryButtonHoverBackground: darken(variables.colors.backgroundLight, 10),
-    canvasSecondaryButtonHoverColor: variables.colors.textDarkest,
+    canvasSecondaryButtonHoverBackground: darken(variables.colors.contrasts.grey1111, 10),
+    canvasSecondaryButtonHoverColor: variables.colors.contrasts.grey125125,
 
     canvasFocusBorderColor: themeCanvasFocusBorderColor,
     canvasFocusBorderWidth: variables.borders.widthSmall, // canvas really uses widthMedium
     canvasFocusBoxShadow: themeCanvasFocusBoxShadow,
     canvasEnabledColor: themeCanvasEnabledColor,
     canvasEnabledBoxShadow: `inset 0 0 0.1875rem 0.0625rem ${darken(
-      variables.colors.borderLightest,
-      25
+      variables.colors.contrasts.white1010,
+      25,
     )}`,
 
     canvasFontFamily: variables.typography.fontFamily,
@@ -162,15 +162,15 @@ export default function buildStyle() {
     canvasModalHeadingFontWeight: variables.typography.fontWeightNormal,
     canvasModalBodyPadding: variables.spacing.medium,
     canvasModalFooterPadding: variables.spacing.small,
-    canvasModalFooterBackground: variables.colors.backgroundLight,
+    canvasModalFooterBackground: variables.colors.contrasts.grey1111,
     canvasFormElementMargin: `0 0 ${variables.spacing.medium} 0`,
-    canvasFormElementLabelColor: variables.colors.textDarkest,
+    canvasFormElementLabelColor: variables.colors.contrasts.grey125125,
     canvasFormElementLabelMargin: `0 0 ${variables.spacing.small} 0`,
     canvasFormElementLabelFontSize: variables.typography.fontSizeMedium,
     canvasFormElementLabelFontWeight: variables.typography.fontWeightBold,
 
     // a11y button badge
-    canvasBadgeBackgroundColor: variables.colors.textInfo,
+    canvasBadgeBackgroundColor: variables.colors.contrasts.blue4570,
   }
 
   const css = `
@@ -298,7 +298,7 @@ export default function buildStyle() {
     color: ${theme.canvasButtonHoverColor};
   }
   .tox .tox-checkbox__icons .tox-checkbox-icon__unchecked svg {
-    fill: rgba(45, 59, 69, 0.3);
+    fill: rgba(39, 53, 64, 0.3);
   }
   .tox .tox-checkbox__icons .tox-checkbox-icon__indeterminate svg {
     fill: ${theme.canvasTextColor};
@@ -314,7 +314,7 @@ export default function buildStyle() {
   }
   .tox .tox-collection__group-heading {
     background-color: #e3e6e8;
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-collection__item {
     color: ${theme.canvasTextColor};
@@ -355,7 +355,7 @@ export default function buildStyle() {
     margin-right: 8px;
   }
   .tox .tox-collection__item-accessory {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-sv-palette {
     border: 1px solid black;
@@ -381,19 +381,19 @@ export default function buildStyle() {
   .tox .tox-comment {
     background: ${theme.canvasBackgroundColor};
     border-color: ${theme.canvasBorderColor};
-    box-shadow: 0 4px 8px 0 rgba(45, 59, 69, 0.1);
+    box-shadow: 0 4px 8px 0 rgba(39, 53, 64, 0.1);
   }
   .tox .tox-comment__header {
     color: ${theme.canvasTextColor};
   }
   .tox .tox-comment__date {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-comment__body {
     color: ${theme.canvasTextColor};
   }
   .tox .tox-comment__expander p {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-comment-thread__overlay::after {
     background: ${theme.canvasBackgroundColor};
@@ -412,10 +412,10 @@ export default function buildStyle() {
     background-color: ${theme.canvasBackgroundColor};
   }
   .tox .tox-user__avatar svg {
-    fill: rgba(45, 59, 69, 0.6);
+    fill: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-user__name {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-dialog-wrap__backdrop {
     background-color: rgba(255, 255, 255, 0.75);
@@ -442,7 +442,7 @@ export default function buildStyle() {
     padding: ${theme.canvasModalBodyPadding};
   }
   .tox .tox-dialog__body-nav-item {
-    color: rgba(45, 59, 69, 0.75);
+    color: rgba(39, 53, 64, 0.75);
   }
   .tox .tox-dialog__body-nav-item:focus {
     box-shadow: ${theme.canvasFocusBoxShadow};
@@ -465,10 +465,10 @@ export default function buildStyle() {
     border: 2px dashed ${theme.canvasBorderColor};
   }
   .tox .tox-dropzone p {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-edit-area {
-    border: 1px solid ${theme.canvasBorderColor};
+    border: 1px solid rgba(122, 122, 122);
     border-radius: 3px;
   }
   .tox .tox-edit-area__iframe {
@@ -494,14 +494,14 @@ export default function buildStyle() {
     fill: ${theme.canvasSuccessColor};
   }
   .tox .tox-color-input span {
-    border-color: rgba(45, 59, 69, 0.2);
+    border-color: rgba(39, 53, 64, 0.2);
   }
   .tox .tox-color-input span:focus {
     border-color: ${theme.canvasBrandColor};
   }
   .tox .tox-label,
   .tox .tox-toolbar-label {
-    color: rgba(45, 59, 69, 0.6);
+    color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-form__group {
     margin: ${theme.canvasFormElementMargin};
@@ -559,6 +559,7 @@ export default function buildStyle() {
   }
   .tox .tox-menubar {
     background-color: ${theme.canvasBackgroundColor};
+    font-family: ${theme.canvasFontFamily};
   }
   .tox .tox-mbtn {
     color: ${theme.canvasButtonColor};
@@ -629,7 +630,7 @@ export default function buildStyle() {
     background-color: ${theme.canvasBrandColor};
   }
   .tox .tox-spinner > div {
-    background-color: rgba(45, 59, 69, 0.6);
+    background-color: rgba(39, 53, 64, 0.6);
   }
   .tox .tox-tbtn {
     border-style: none;
@@ -713,7 +714,7 @@ export default function buildStyle() {
   }
   .tox .tox-tooltip__body {
     background-color: ${theme.canvasTextColor};
-    box-shadow: 0 2px 4px rgba(45, 59, 69, 0.3);
+    box-shadow: 0 2px 4px rgba(39, 53, 64, 0.3);
     color: rgba(255, 255, 255, 0.75);
   }
   .tox .tox-tooltip--down .tox-tooltip__arrow {
@@ -744,6 +745,7 @@ export default function buildStyle() {
   .tox-editor-container .tox-toolbar-overlord {
     background-image: none;
     margin-bottom: 5px;
+    font-family: ${theme.canvasFontFamily};
   }
   .tox-editor-container .tox-toolbar__primary {
     background-image: none;

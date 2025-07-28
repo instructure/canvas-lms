@@ -35,8 +35,14 @@ export type ApiRequest = {
   headers?: Record<string, string>
 }
 
+/**
+ * @deprecated USE `doFetchApi` INSTEAD
+ *
+ * @description
+ * This function only rearranges the response format from `doFetchApi`. It does not provide any
+ * additional functionality or benefits. Please use `doFetchApi` directly.
+ */
 export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-  // @ts-expect-error
   const {json, response, link} = await doFetchApi(request)
 
   return {

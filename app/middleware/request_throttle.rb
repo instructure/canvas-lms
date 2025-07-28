@@ -120,12 +120,12 @@ class RequestThrottle
     elsif blocked?(request)
       # blocking is useful even if throttling is disabled, this is left in intentionally
       Rails.logger.info("blocking request due to blocklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
-      InstStatsd::Statsd.increment("request_throttling.blocked")
+      InstStatsd::Statsd.distributed_increment("request_throttling.blocked")
       false
     else
       if bucket.full?
         if RequestThrottle.enabled?
-          InstStatsd::Statsd.increment("request_throttling.throttled")
+          InstStatsd::Statsd.distributed_increment("request_throttling.throttled")
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
@@ -392,7 +392,7 @@ class RequestThrottle
     # old values, and then pushing the new values. That would take at least 2
     # round trips, and possibly more when we get a transaction conflict.
     # amount and reserve_cost are passed separately for logging purposes.
-    def increment(amount, reserve_cost = 0, current_time = Time.now)
+    def increment(amount, reserve_cost = 0, current_time = Time.zone.now)
       if client_identifier.blank? || !Canvas.redis_enabled?
         return
       end

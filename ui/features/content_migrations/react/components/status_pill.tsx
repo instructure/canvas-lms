@@ -18,18 +18,18 @@
 
 import React from 'react'
 import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import type {StatusPillState} from './types'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 export type Color = 'primary' | 'success' | 'danger' | 'info' | 'warning' | 'alert'
 
-export const StatusPill = ({
-  hasIssues,
-  workflowState,
-}: {
+export type StatusPillProps = {
   hasIssues: boolean
-  workflowState: string
-}) => {
+  workflowState: StatusPillState
+}
+
+export const getColor = ({workflowState, hasIssues}: StatusPillProps): Color => {
   let color: Color = 'primary'
   if (workflowState === 'completed') {
     if (hasIssues) {
@@ -39,21 +39,30 @@ export const StatusPill = ({
     }
   } else if (workflowState === 'failed') {
     color = 'danger'
-  } else if (workflowState === 'running' || workflowState === 'pre_processed') {
+  } else if (workflowState === 'running') {
     color = 'info'
   }
+
+  return color
+}
+
+export const StatusPill: React.FC<StatusPillProps> = props => {
+  const color = getColor(props)
+
+  const {workflowState, hasIssues} = props
+
   let text = ''
   if (workflowState === 'queued') {
     text = I18n.t('Queued')
-  } else if (workflowState === 'pre_processing') {
-    text = I18n.t('Created')
   } else if (workflowState === 'waiting_for_select') {
     text = I18n.t('Waiting for selection')
-  } else if (workflowState === 'running' || workflowState === 'pre_processed') {
+  } else if (workflowState === 'running') {
     text = I18n.t('Running')
   } else if (workflowState === 'failed') {
     text = I18n.t('Failed')
-  } else if (workflowState === 'completed') {
+  } else if (workflowState === 'completed' && hasIssues) {
+    text = I18n.t('Partially Completed')
+  } else if (workflowState === 'completed' && !hasIssues) {
     text = I18n.t('Completed')
   }
 

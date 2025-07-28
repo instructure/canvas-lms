@@ -22,6 +22,7 @@ require_relative "../graphql_spec_helper"
 
 describe Types::MediaObjectType do
   before(:once) do
+    student_in_course(active_all: true)
     teacher_in_course(active_all: true)
 
     @media_object = media_object(
@@ -33,10 +34,7 @@ describe Types::MediaObjectType do
 
   context "with a valid media object" do
     def resolve_media_object_field(field, current_user: @teacher)
-      media_object_type.resolve(
-        field,
-        current_user:
-      )
+      media_object_type.resolve(field, current_user:)
     end
 
     [
@@ -104,7 +102,7 @@ describe Types::MediaObjectType do
     end
 
     it "checks permissions on canAddCaptions" do
-      expect(resolve_media_object_field("canAddCaptions", current_user: User.new)).to be(false)
+      expect(resolve_media_object_field("canAddCaptions", current_user: @student)).to be(false)
     end
 
     it "returns media download url" do

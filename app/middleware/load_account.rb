@@ -24,18 +24,11 @@ class LoadAccount
 
       @schema_cache_loaded = true
       MultiCache.fetch("schema_cache", expires_in: 1.week) do
-        conn = ActiveRecord::Base.connection
-        if $canvas_rails == "7.1"
-          reflection = ActiveRecord::Base.connection_pool.schema_reflection
-          cache = reflection.send(:empty_cache)
-          cache.add_all(conn)
-          reflection.set_schema_cache(cache)
-          cache
-        else
-          conn.schema_cache.clear!
-          conn.data_sources.each { |table| conn.schema_cache.add(table) }
-          conn.schema_cache
-        end
+        reflection = ActiveRecord::Base.connection_pool.schema_reflection
+        cache = reflection.send(:empty_cache)
+        cache.add_all(ActiveRecord::Base.connection_pool)
+        reflection.instance_variable_set(:@cache, cache)
+        cache
       end
     end
 
@@ -64,7 +57,7 @@ class LoadAccount
   end
 
   def clear_caches
-    Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
+    Canvas::Reloader.reload
     ::Account.clear_special_account_cache!(::LoadAccount.force_special_account_reload)
     ::LoadAccount.clear_shard_cache
     Account.current_domain_root_account = nil

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import undatedEventsTemplate from '../jst/undatedEvents.handlebars'
 import ShowEventDetailsDialog from './ShowEventDetailsDialog'
@@ -25,7 +25,7 @@ import 'jqueryui/droppable'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jquery-tinypubsub'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class UndatedEventsList {
   constructor(selector, dataSource, calendar) {
@@ -70,7 +70,7 @@ export default class UndatedEventsList {
 
     const loadingTimer = setTimeout(
       () => $.screenReaderFlashMessage(I18n.t('loading_undated_events', 'Loading undated events')),
-      0
+      0,
     )
 
     return this.dataSource.getEvents(null, null, this.visibleContextList, events => {

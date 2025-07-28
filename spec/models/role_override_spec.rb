@@ -282,7 +282,7 @@ describe RoleOverride do
 
     def check_permission(role, enabled)
       hash = RoleOverride.permission_for(@account, @permission, role)
-      expect((!!hash[:enabled])).to eq enabled
+      expect(!!hash[:enabled]).to eq enabled
     end
 
     def create_role(base_role, role_name)
@@ -408,7 +408,7 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@course, @permission, @role)
-            expect((!!hash[:enabled])).to eq !@default_perm
+            expect(!!hash[:enabled]).to eq !@default_perm
           end
 
           it "uses permission for role in parent account if the course is the role_context and has the same id as an account" do
@@ -421,15 +421,14 @@ describe RoleOverride do
 
             # check based on sub account
             hash = RoleOverride.permission_for(@course, @permission, @role, @course)
-            expect((!!hash[:enabled])).to eq !@default_perm
+            expect(!!hash[:enabled]).to eq !@default_perm
           end
         end
       end
     end
 
-    context "account_only with granular_permissions_manage_users FF off" do
+    context "account_only" do
       before :once do
-        Account.default.disable_feature! :granular_permissions_manage_users
         @site_admin = User.create!
         Account.site_admin.account_users.create!(user: @site_admin)
         @root_admin = User.create!
@@ -467,30 +466,51 @@ describe RoleOverride do
       end
 
       it "does not allow a sub-account to revoke a permission granted to a parent account" do
-        @sub_account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_admin_users)
-        expect(@sub_account.grants_right?(@site_admin, :manage_admin_users)).to be_truthy
-        expect(@sub_account.grants_right?(@root_admin, :manage_admin_users)).to be_truthy
-        expect(@sub_account.grants_right?(@sub_admin, :manage_admin_users)).to be_falsey
-      end
-    end
-
-    context "account_only with granular_permissions_manage_users FF on" do
-      before :once do
-        Account.default.enable_feature! :granular_permissions_manage_users
-        @site_admin = User.create!
-        Account.site_admin.account_users.create!(user: @site_admin)
-        @root_admin = User.create!
-        Account.default.account_users.create!(user: @root_admin)
-        @sub_admin = User.create!
-        @sub_account = Account.default.sub_accounts.create!
-        @sub_account.account_users.create!(user: @sub_admin)
-      end
-
-      it "does not allow a sub-account to revoke a permission granted to a parent account" do
         @sub_account.role_overrides.create!(role: admin_role, enabled: false, permission: :allow_course_admin_actions)
         expect(@sub_account.grants_right?(@site_admin, :allow_course_admin_actions)).to be_truthy
         expect(@sub_account.grants_right?(@root_admin, :allow_course_admin_actions)).to be_truthy
         expect(@sub_account.grants_right?(@sub_admin, :allow_course_admin_actions)).to be_falsey
+      end
+    end
+
+    context "allowed custom site admin role" do
+      let_once(:site_admin_account) { Account.site_admin }
+      let_once(:root_account) { Account.default }
+      let(:role) { custom_account_role("OnTheList", account: site_admin_account) }
+      let(:admin_user) { site_admin_user(role:) }
+
+      before(:once) do
+        Setting.set("allowed_custom_site_admin_roles", "OnTheList,Also on The - List")
+      end
+
+      it "permissions are default enabled for descendant non site admin root accounts" do
+        expect(root_account.grants_right?(admin_user, :become_user)).to be_truthy
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to eq [:self, :descendants]
+      end
+
+      it "works for role names with spaces and special characters" do
+        role = custom_account_role("Also on The - List", account: site_admin_account)
+        user = site_admin_user(role:)
+        expect(root_account.grants_right?(user, :become_user)).to be_truthy
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to eq [:self, :descendants]
+      end
+
+      it "is ignored when the permission's account is site admin" do
+        expect(site_admin_account.grants_right?(admin_user, :manage_account_memberships)).to be_falsey
+        expect(RoleOverride.permission_for(site_admin_account, :manage_account_memberships, role)[:enabled]).to be_falsey
+      end
+
+      it "is ignored when the associated account is site admin but the role is not on the allow list" do
+        role = custom_account_role("NotOnTheList", account: site_admin_account)
+        user = site_admin_user(role:)
+        expect(root_account.grants_right?(user, :manage_account_memberships)).to be_falsey
+        expect(RoleOverride.permission_for(root_account, :manage_account_memberships, role)[:enabled]).to be_falsey
+      end
+
+      it "can be disabled / overriden from the default enabled" do
+        Account.site_admin.role_overrides.create!(role:, enabled: false, permission: :become_user)
+        expect(root_account.grants_right?(admin_user, :become_user)).to be_falsey
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to be_falsey
       end
     end
 
@@ -551,44 +571,6 @@ describe RoleOverride do
       expect(RoleOverride.enabled_for?(Account.site_admin, :manage_role_overrides, role)).to eq [:self]
       # applying to Default Account, should be disabled
       expect(RoleOverride.enabled_for?(Account.default, :manage_role_overrides, role)).to eq []
-    end
-
-    context "with account allows" do
-      before :once do
-        @role = Account.default.roles.build(name: "role")
-        @role.base_role_type = "AccountMembership"
-        @role.save!
-        RoleOverride.create!(context: Account.default, permission: "manage_user_notes", role: @role, enabled: true)
-      end
-
-      it "ignores permissions with account_allows off" do
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to eq []
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
-      end
-
-      context "when the deprecate_faculty_journal flag is disabled" do
-        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-        it "allows with account_allows on" do
-          Account.default.tap do |a|
-            a.enable_user_notes = true
-            a.save!
-          end
-          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
-          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
-        end
-      end
-
-      context "when the deprecated_faculty_journal flag is enabled" do
-        it "does not allow with account_allows on" do
-          Account.default.tap do |a|
-            a.enable_user_notes = true
-            a.save!
-          end
-          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to eq []
-          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
-        end
-      end
     end
   end
 

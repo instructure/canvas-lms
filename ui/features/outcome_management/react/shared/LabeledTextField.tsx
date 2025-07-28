@@ -19,6 +19,7 @@
 import React from 'react'
 import {useField} from 'react-final-form'
 import {TextInput} from '@instructure/ui-text-input'
+import {FormMessage} from '@instructure/ui-form-field'
 
 type Props = {
   label: string
@@ -48,12 +49,9 @@ const LabeledTextField = ({name, validate, ...props}: Props) => {
     }
   }
 
-  const errorMessages_: Array<{
-    text: string
-    type: 'error' | 'hint' | 'success' | 'screenreader-only'
-  }> = errorMessages.map(text => ({
+  const errorMessages_: Array<FormMessage> = errorMessages.map(text => ({
     text,
-    type: 'error',
+    type: 'newError',
   }))
 
   return <TextInput {...input} {...props} messages={errorMessages_} />

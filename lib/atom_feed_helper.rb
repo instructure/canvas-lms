@@ -20,12 +20,12 @@
 module AtomFeedHelper
   ALLOWED_ENTRY_KEYS = %i[title author updated published id link content attachment_links].freeze
 
-  def self.render_xml(title:, link:, entries:, updated: nil, id: nil, **kwargs)
+  def self.render_xml(title:, link:, entries:, updated: nil, id: nil, **)
     require "rss/maker"
 
     content = RSS::Maker.make("atom") do |maker|
       maker.channel.author = "canvas-lms"
-      maker.channel.updated = updated ? updated.to_s : Time.now.to_s
+      maker.channel.updated = updated ? updated.to_s : Time.zone.now.to_s
       maker.channel.about = id || link
       maker.channel.title = title
       maker.channel.links.new_link do |rss_link|
@@ -37,7 +37,7 @@ module AtomFeedHelper
         hash = if block_given?
                  e.to_atom(**yield(e))
                else
-                 e.to_atom(**kwargs)
+                 e.to_atom(**)
                end
 
         raise "unknown key(s) found" unless (hash.keys - ALLOWED_ENTRY_KEYS).empty?

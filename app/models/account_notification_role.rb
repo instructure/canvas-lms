@@ -19,8 +19,9 @@
 #
 
 class AccountNotificationRole < ActiveRecord::Base
-  belongs_to :account_notification
+  include Canvas::SoftDeletable
 
+  belongs_to :account_notification
   belongs_to :role
   before_save :resolve_cross_account_role
 

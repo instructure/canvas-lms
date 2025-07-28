@@ -47,7 +47,6 @@ module SpeedGrader
         score
         points_deducted
         assignment_id
-        submission_comments
         grading_period_id
         excused
         updated_at
@@ -56,6 +55,7 @@ module SpeedGrader
         resource_link_lookup_uuid
         redo_request
         cached_due_date
+        sticker
       ]
 
       submission_json_fields <<
@@ -124,8 +124,12 @@ module SpeedGrader
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
 
       unless assignment.anonymize_students?
-        # Ensure that any test students are sorted last
-        students = students.sort_by { |r| (r.preferences[:fake_student] == true) ? 1 : 0 }
+        num_students = students.length
+        students = students.sort_by.with_index do |student, idx|
+          # Ensure that any test students are sorted last. sort_by is not stable,
+          # so return idx for real students to preserve their original order.
+          (student.preferences[:fake_student] == true) ? num_students + idx : idx
+        end
       end
 
       enrollments =
@@ -141,6 +145,8 @@ module SpeedGrader
           current_user,
           provisional_grader: provisional_grader_or_moderator?
         ) || []
+
+      rubric_assessments_by_user_id = current_user_rubric_assessments.group_by(&:user_id)
 
       # include all the rubric assessments if a moderator
       all_provisional_rubric_assessments =
@@ -160,17 +166,9 @@ module SpeedGrader
         :user,
         :attachment_associations,
         :assignment,
-        :originality_reports
+        { originality_reports: :lti_link }
       ]
-      includes << {
-        all_submission_comments: {
-          submission: {
-            assignment: {
-              context: :root_account
-            }
-          }
-        }
-      }
+      includes << (assignment.grade_as_group? ? :all_submission_comments_for_groups : :all_submission_comments)
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
       student_json_fields =
@@ -179,6 +177,11 @@ module SpeedGrader
         else
           %i[name id sortable_name]
         end
+
+      # yes, this will arbitrarily pick the first enrollment in the course for the user,
+      # but it mirrors what CoursesHelper#user_type does, which we're now passing this value to
+      # in order to avoid an N+1 query problem
+      current_user_enrollments = { current_user.id => course.enrollments.find_by(user: current_user) }
 
       res[:context][:students] =
         students.map do |student|
@@ -207,10 +210,7 @@ module SpeedGrader
           end
           json[:rubric_assessments] =
             rubric_assessments_to_json(
-              rubric_assessments:
-                current_user_rubric_assessments.select do |assessment|
-                  assessment.user_id == student.id
-                end,
+              rubric_assessments: rubric_assessments_by_user_id.fetch(student.id, []),
               submissions:
             )
           json[:fake_student] = !!student.preferences[:fake_student]
@@ -278,8 +278,14 @@ module SpeedGrader
         end
       end
 
+      discussion_checkpoints_enabled = assignment.context.discussion_checkpoints_enabled?
+      if assignment.submission_types.include?("discussion_topic")
+        res[:student_entries] = assignment.discussion_topic.discussion_entries.pluck(:user_id, :id).group_by(&:first).transform_values { |entries| entries.map(&:last) }
+      end
+
       res[:submissions] =
         submissions.map do |sub|
+          sub.workflow_state = "pending_review" if sub.checkpoints_needs_grading? && discussion_checkpoints_enabled
           submission_methods = %i[
             submission_history
             late
@@ -290,6 +296,7 @@ module SpeedGrader
             missing
             late_policy_status
             word_count
+            partially_submitted?
           ]
           json =
             sub
@@ -306,19 +313,17 @@ module SpeedGrader
             json.merge! provisional_grade_to_json(provisional_grade)
           end
 
-          json[:has_postable_comments] =
-            sub.all_submission_comments.any?(&:allows_posting_submission?)
-
+          submission_comments = sub.visible_submission_comments_for(current_user)
           json[:submission_comments] =
             anonymous_moderated_submission_comments_json(
               assignment:,
               course:,
               current_user:,
               avatars: display_avatars?,
-              submission_comments: sub.visible_submission_comments_for(current_user),
+              submission_comments:,
               submissions:
             )
-
+          json[:has_postable_comments] = sub.postable_comments?
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
           json[:proxy_submitter_id] = sub.proxy_submitter_id
 
@@ -346,11 +351,11 @@ module SpeedGrader
 
           if url_opts[:enable_annotations]
             url_opts[:disable_annotation_notifications] = assignment.post_manually? && !sub.posted?
-            url_opts[:enrollment_type] = canvadocs_user_role(course, current_user)
+            url_opts[:enrollment_type] = canvadocs_user_role(course, current_user, current_user_enrollments)
           end
 
           if quizzes_next_submission?
-            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user)
+            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user, submission: sub)
             json["submission_history"] =
               quiz_lti_submission.grade_history.map { |submission| { submission: } }
           elsif json["submission_history"] && (assignment.quiz.nil? || too_many)
@@ -487,6 +492,9 @@ module SpeedGrader
 
       res[:GROUP_GRADING_MODE] = assignment.grade_as_group?
       res[:quiz_lti] = assignment.quiz_lti?
+
+      merge_lti_asset_processor_data!(assignment:, response_hash: res)
+
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
@@ -604,18 +612,38 @@ module SpeedGrader
       return nil unless course.filter_speed_grader_by_student_group?
 
       group_id =
-        current_user
-        .get_preference(:gradebook_settings, course.global_id)
-        &.dig("filter_rows_by", "student_group_id")
+        current_user.get_latest_preference_setting_by_key(:gradebook_settings, course.global_id, "filter_rows_by", "student_group_ids")
 
       # If we selected a group that is now deleted, don't use it
       Group.active.where(id: group_id).exists? ? group_id : nil
     end
 
     def section_id_filter
-      current_user
-        .get_preference(:gradebook_settings, course.global_id)
-        &.dig("filter_rows_by", "section_id")
+      if Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+        current_user
+          .get_preference(:gradebook_settings, course.global_id)
+          &.dig("filter_rows_by", "section_ids")
+      else
+        current_user
+          .get_preference(:gradebook_settings, course.global_id)
+          &.dig("filter_rows_by", "section_id")
+      end
+    end
+
+    def merge_lti_asset_processor_data!(assignment:, response_hash:)
+      return unless assignment.root_account.feature_enabled?(:lti_asset_processor)
+
+      submission_ids = response_hash["submissions"].pluck("id")
+      reports_by_submission = Lti::AssetReport.info_for_display_by_submission(submission_ids:)
+
+      return unless reports_by_submission.present?
+
+      response_hash[:lti_asset_processors] =
+        Lti::AssetProcessor.where(assignment:).info_for_display
+      response_hash["submissions"].each do |sub|
+        reports = reports_by_submission[sub["id"]]
+        sub[:lti_asset_reports] = reports if reports
+      end
     end
   end
 end

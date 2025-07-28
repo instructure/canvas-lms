@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -128,7 +129,7 @@ describe('FilterNavFilter', () => {
   it('clicking save after change triggers onSave', async () => {
     const onUpdate = jest.fn(() => Promise.resolve())
     const {getByRole, getByLabelText, getByText} = render(
-      <FilterNavFilter {...defaultProps} onUpdate={onUpdate} />
+      <FilterNavFilter {...defaultProps} onUpdate={onUpdate} />,
     )
     await userEvent.click(getByLabelText('Sections'))
     await userEvent.click(getByText('Section 7'))

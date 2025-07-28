@@ -19,7 +19,7 @@
 import React from 'react'
 import {shape, arrayOf, string, func} from 'prop-types'
 import {debounce} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CoursesStore from '../store/CoursesStore'
 import TermsStore from '../store/TermsStore'
@@ -30,7 +30,7 @@ import SearchMessage from './SearchMessage'
 import SRSearchMessage from './SRSearchMessage'
 import {SEARCH_DEBOUNCE_TIME} from './UsersPane'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const MIN_SEARCH_LENGTH = 2
 const stores = [CoursesStore, TermsStore, AccountsTreeStore]
@@ -78,7 +78,8 @@ class CoursesPane extends React.Component {
 
   componentDidMount() {
     this.fetchCourses()
-    TermsStore.loadAll()
+    const accountId = TermsStore.getAccountId()
+    TermsStore.loadAll({subaccount_id: accountId, per_page: 100})
   }
 
   componentWillUnmount() {
@@ -101,7 +102,7 @@ class CoursesPane extends React.Component {
         filters: {...oldState.filters, page},
         previousCourses: CoursesStore.get(oldState.filters),
       }),
-      this.fetchCourses
+      this.fetchCourses,
     )
   }
 
@@ -111,7 +112,7 @@ class CoursesPane extends React.Component {
         errors: {},
         draftFilters: {...oldState.draftFilters, ...newFilters, page: null},
       }),
-      this.debouncedApplyFilters
+      this.debouncedApplyFilters,
     )
   }
 
@@ -168,7 +169,12 @@ class CoursesPane extends React.Component {
     if (!courses || !courses.data) {
       courses = this.state.previousCourses
     }
-    const terms = TermsStore.get()
+    const accountId = TermsStore.getAccountId()
+    const terms = TermsStore.get({subaccount_id: accountId, per_page: 100})
+    let filteredTerms = []
+    if (terms.data) {
+      filteredTerms = terms.data.filter(term => term.used_in_subaccount)
+    }
     const isLoading = !(courses && !courses.loading)
 
     return (
@@ -181,6 +187,7 @@ class CoursesPane extends React.Component {
           onUpdateFilters={this.onUpdateFilters}
           onApplyFilters={this.onApplyFilters}
           terms={terms}
+          filteredTerms={filteredTerms}
           isLoading={isLoading}
           errors={errors}
           draftFilters={draftFilters}

@@ -138,7 +138,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     await store.getState().saveStagedFilter(newFilter)
     expect(fetchMock.called(url, 'POST')).toBe(true)
-    expect(store.getState().stagedFilters.length).toStrictEqual(0)
+    expect(store.getState().stagedFilters).toHaveLength(0)
     expect(store.getState().filterPresets).toMatchObject([
       {
         id: '321',
@@ -261,10 +261,10 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
-    expect(store.getState().stagedFilters.length).toStrictEqual(0)
+    expect(store.getState().stagedFilters).toHaveLength(0)
   })
 
   it('derive staged section filter from gradebook settings', async () => {
@@ -288,7 +288,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -322,7 +322,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -356,7 +356,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -390,7 +390,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -424,7 +424,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -458,10 +458,10 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
-    expect(store.getState().stagedFilters.length).toStrictEqual(0)
+    expect(store.getState().stagedFilters).toHaveLength(0)
   })
 
   it('derive staged grading period filter from gradebook settings', async () => {
@@ -485,7 +485,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -519,7 +519,7 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).toMatchObject([
@@ -552,10 +552,78 @@ describe('filtersState', () => {
         initialRowFilterSettings,
         initialColumnFilterSettings,
         customStatuses,
-        false
+        false,
       )
     store.getState().initializeStagedFilters()
-    expect(store.getState().stagedFilters.length).toStrictEqual(0)
+    expect(store.getState().stagedFilters).toHaveLength(0)
+  })
+
+  it('derive staged start date filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings: InitialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null,
+    }
+    const initialColumnFilterSettings: InitialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null,
+      submissions: null,
+      start_date: '2023-05-28',
+      end_date: null,
+    }
+    store
+      .getState()
+      .initializeAppliedFilters(
+        initialRowFilterSettings,
+        initialColumnFilterSettings,
+        customStatuses,
+        false,
+      )
+    store.getState().initializeStagedFilters()
+    expect(store.getState().stagedFilters).not.toBeNull()
+    expect(store.getState().stagedFilters).toMatchObject([
+      {
+        id: expect.any(String),
+        type: 'start-date',
+        value: '2023-05-28',
+      },
+    ])
+  })
+
+  it('derive staged end date filter from gradebook settings', async () => {
+    const url = `/api/v1/courses/${courseId}/gradebook_filters`
+    fetchMock.post(url, mockResponse[0])
+    const initialRowFilterSettings: InitialRowFilterSettings = {
+      section_id: null,
+      student_group_id: null,
+    }
+    const initialColumnFilterSettings: InitialColumnFilterSettings = {
+      assignment_group_id: null,
+      context_module_id: null,
+      grading_period_id: null,
+      submissions: null,
+      start_date: null,
+      end_date: '2023-05-28',
+    }
+    store
+      .getState()
+      .initializeAppliedFilters(
+        initialRowFilterSettings,
+        initialColumnFilterSettings,
+        customStatuses,
+        false,
+      )
+    store.getState().initializeStagedFilters()
+    expect(store.getState().stagedFilters).not.toBeNull()
+    expect(store.getState().stagedFilters).toMatchObject([
+      {
+        id: expect.any(String),
+        type: 'end-date',
+        value: '2023-05-28',
+      },
+    ])
   })
 
   it('disallows multiple filters from being applied', async () => {
@@ -629,7 +697,7 @@ describe('filtersState', () => {
           initialRowFilterSettings,
           initialColumnFilterSettings,
           customStatuses,
-          true
+          true,
         )
       store.getState().initializeStagedFilters()
       expect(store.getState().stagedFilters).not.toBeNull()
@@ -669,7 +737,7 @@ describe('filtersState', () => {
           initialRowFilterSettings,
           initialColumnFilterSettings,
           customStatuses,
-          true
+          true,
         )
       store.getState().initializeStagedFilters()
       expect(store.getState().stagedFilters).not.toBeNull()
@@ -709,7 +777,7 @@ describe('filtersState', () => {
           initialRowFilterSettings,
           initialColumnFilterSettings,
           customStatuses,
-          true
+          true,
         )
       store.getState().initializeStagedFilters()
       expect(store.getState().stagedFilters).not.toBeNull()
@@ -749,7 +817,7 @@ describe('filtersState', () => {
           initialRowFilterSettings,
           initialColumnFilterSettings,
           customStatuses,
-          true
+          true,
         )
       store.getState().initializeStagedFilters()
       expect(store.getState().stagedFilters).not.toBeNull()
@@ -794,7 +862,7 @@ describe('filtersState', () => {
           initialRowFilterSettings,
           initialColumnFilterSettings,
           customStatuses,
-          true
+          true,
         )
       store.getState().initializeStagedFilters()
       expect(store.getState().stagedFilters).not.toBeNull()
@@ -808,6 +876,108 @@ describe('filtersState', () => {
           id: expect.any(String),
           type: 'module',
           value: '2',
+        },
+      ])
+    })
+
+    it('derive staged grading period filter from gradebook settings', async () => {
+      const url = `/api/v1/courses/${courseId}/gradebook_filters`
+      fetchMock.post(url, mockResponse[0])
+      const initialRowFilterSettings: InitialRowFilterSettings = {
+        section_id: null,
+        student_group_id: null,
+      }
+      const initialColumnFilterSettings: InitialColumnFilterSettings = {
+        assignment_group_id: null,
+        context_module_id: null,
+        grading_period_id: '1',
+        submissions: null,
+        start_date: null,
+        end_date: null,
+      }
+      store
+        .getState()
+        .initializeAppliedFilters(
+          initialRowFilterSettings,
+          initialColumnFilterSettings,
+          customStatuses,
+          true,
+        )
+      store.getState().initializeStagedFilters()
+      expect(store.getState().stagedFilters).not.toBeNull()
+      expect(store.getState().stagedFilters).toMatchObject([
+        {
+          id: expect.any(String),
+          type: 'grading-period',
+          value: '1',
+        },
+      ])
+    })
+
+    it('derive staged start date filter from gradebook settings', async () => {
+      const url = `/api/v1/courses/${courseId}/gradebook_filters`
+      fetchMock.post(url, mockResponse[0])
+      const initialRowFilterSettings: InitialRowFilterSettings = {
+        section_id: null,
+        student_group_id: null,
+      }
+      const initialColumnFilterSettings: InitialColumnFilterSettings = {
+        assignment_group_id: null,
+        context_module_id: null,
+        grading_period_id: null,
+        submissions: null,
+        start_date: '2023-05-28',
+        end_date: null,
+      }
+      store
+        .getState()
+        .initializeAppliedFilters(
+          initialRowFilterSettings,
+          initialColumnFilterSettings,
+          customStatuses,
+          true,
+        )
+      store.getState().initializeStagedFilters()
+      expect(store.getState().stagedFilters).not.toBeNull()
+      expect(store.getState().stagedFilters).toMatchObject([
+        {
+          id: expect.any(String),
+          type: 'start-date',
+          value: '2023-05-28',
+        },
+      ])
+    })
+
+    it('derive staged end date filter from gradebook settings', async () => {
+      const url = `/api/v1/courses/${courseId}/gradebook_filters`
+      fetchMock.post(url, mockResponse[0])
+      const initialRowFilterSettings: InitialRowFilterSettings = {
+        section_id: null,
+        student_group_id: null,
+      }
+      const initialColumnFilterSettings: InitialColumnFilterSettings = {
+        assignment_group_id: null,
+        context_module_id: null,
+        grading_period_id: null,
+        submissions: null,
+        start_date: null,
+        end_date: '2023-05-28',
+      }
+      store
+        .getState()
+        .initializeAppliedFilters(
+          initialRowFilterSettings,
+          initialColumnFilterSettings,
+          customStatuses,
+          true,
+        )
+      store.getState().initializeStagedFilters()
+      expect(store.getState().stagedFilters).not.toBeNull()
+      expect(store.getState().stagedFilters).toMatchObject([
+        {
+          id: expect.any(String),
+          type: 'end-date',
+          value: '2023-05-28',
         },
       ])
     })

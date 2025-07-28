@@ -17,26 +17,34 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'react-redux'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
+import AlertManager from '@canvas/alerts/react/AlertManager'
 
 import {subscribeFlashNotifications} from '@canvas/notifications/redux/actions'
 import {ConnectedDiscussionsIndex} from './components/DiscussionsIndex'
 import createStore from './store'
 
-export default function createDiscussionsIndex(root, data = {}) {
+const client = createClient()
+
+export default function createDiscussionsIndex(rootElement, data = {}) {
   const store = createStore(data)
+  const root = createRoot(rootElement)
 
   function unmount() {
-    ReactDOM.unmountComponentAtNode(root)
+    root.unmount()
   }
 
   function render() {
-    ReactDOM.render(
-      <Provider store={store}>
-        <ConnectedDiscussionsIndex />
-      </Provider>,
-      root
+    root.render(
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <AlertManager>
+            <ConnectedDiscussionsIndex />
+          </AlertManager>
+        </Provider>
+      </ApolloProvider>,
     )
   }
 

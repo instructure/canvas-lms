@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
 import {IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/EditHeaderView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('assignmentsEditHeaderView')
+const I18n = createI18nScope('assignmentsEditHeaderView')
 
 extend(EditHeaderView, Backbone.View)
 
@@ -74,7 +73,7 @@ EditHeaderView.prototype.afterRender = function () {
     return this.toggleConditionalReleaseTab(this.model.gradingType())
   }
   // EVAL-3711 Remove ICE feature flag
-  if (ENV.FEATURES.instui_nav) {
+  if (ENV.FEATURES?.instui_nav) {
     ReactDOM.render(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}
@@ -82,7 +81,7 @@ EditHeaderView.prototype.afterRender = function () {
       >
         {this.model.published() ? 'Published' : 'Not Published'}
       </Pill>,
-      this.$el.find('.published-assignment-container')[0]
+      this.$el.find('.published-assignment-container')[0],
     )
   }
 }
@@ -101,7 +100,6 @@ EditHeaderView.prototype.canDelete = function () {
 EditHeaderView.prototype.onDelete = function (e) {
   e.preventDefault()
   if (this.canDelete()) {
-    // eslint-disable-next-line no-alert
     if (window.confirm(this.messages.confirm)) {
       return this.delete()
     } else {
@@ -114,7 +112,6 @@ EditHeaderView.prototype.delete = function () {
   let destroyDfd
   const disablingDfd = new $.Deferred()
   if ((destroyDfd = this.model.destroy())) {
-    // eslint-disable-next-line promise/catch-or-return
     destroyDfd.then(this.onDeleteSuccess.bind(this))
     destroyDfd.fail(function () {
       return disablingDfd.reject()
@@ -126,7 +123,7 @@ EditHeaderView.prototype.delete = function () {
 }
 
 EditHeaderView.prototype.onDeleteSuccess = function () {
-  return (window.location.href = ENV.ASSIGNMENT_INDEX_URL)
+  return assignLocation(ENV.ASSIGNMENT_INDEX_URL)
 }
 
 EditHeaderView.prototype.onGradingTypeUpdate = function (e) {
@@ -166,11 +163,11 @@ EditHeaderView.prototype.onShowErrors = function (errors) {
 EditHeaderView.prototype.renderHeaderTitle = function () {
   return this.model.name()
     ? this.model.isQuizLTIAssignment()
-      ? 'Edit Quiz'
-      : 'Edit Assignment'
+      ? I18n.t('Edit Quiz')
+      : I18n.t('Edit Assignment')
     : this.model.isQuizLTIAssignment()
-    ? 'Create Quiz'
-    : 'Create New Assignment'
+      ? I18n.t('Create Quiz')
+      : I18n.t('Create New Assignment')
 }
 
 EditHeaderView.prototype.toJSON = function () {

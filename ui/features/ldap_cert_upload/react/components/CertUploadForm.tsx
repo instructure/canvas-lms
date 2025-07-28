@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -17,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEventHandler, useEffect, useState} from 'react'
+import React, {type MouseEventHandler, useEffect, useState} from 'react'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconUploadSolid, IconCertifiedLine, IconTrashLine} from '@instructure/ui-icons'
 import {isCa, parseCertificate, withinValidityPeriod} from '../../utils/certUtils'
 import {X509Certificate} from '@peculiar/x509'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('ldapInternalCaUpload')
+const I18n = createI18nScope('ldapInternalCaUpload')
 
 const dateFormatter = new Intl.DateTimeFormat(ENV?.LOCALE || navigator.language, {
   dateStyle: 'full',
@@ -50,7 +49,7 @@ export type CertUploadFormProps = {
 
 export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
   const [cert, setCert] = useState(() =>
-    inputField.value ? new X509Certificate(inputField.value) : null
+    inputField.value ? new X509Certificate(inputField.value) : null,
   )
   const [errors, setErrors] = useState<string[]>([])
 
@@ -96,6 +95,7 @@ export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
     <div>
       <FileDrop
         accept={ACCEPTED_TYPES.join(',')}
+        // @ts-expect-error
         onDropAccepted={([file]) => {
           parseCertificate(file)
             .then(setCert)
@@ -136,6 +136,7 @@ export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
                   }}
                 />
                 <br />
+                {/* @ts-expect-error */}
                 <Button renderIcon={IconTrashLine} onClick={handleCertCleared} size="small">
                   {I18n.t('Remove certificate')}
                 </Button>

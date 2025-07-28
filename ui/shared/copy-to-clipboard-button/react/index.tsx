@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,17 +18,17 @@
 
 import React, {useCallback, useState} from 'react'
 import {IconCheckDarkSolid, IconCopyLine, IconXSolid} from '@instructure/ui-icons'
-import {IconButton, IconButtonProps} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {IconButton} from '@instructure/ui-buttons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('copy-to-clipboard-button')
+const I18n = createI18nScope('copy-to-clipboard-button')
 
 export type CopyToClipboardButtonProps = {
   value: string
   screenReaderLabel: string
   tooltipText?: string
-  buttonProps?: Partial<IconButtonProps>
+  buttonProps?: Partial<unknown>
   tooltip?: boolean
 }
 
@@ -43,17 +42,18 @@ export default function CopyToClipboardButton({
   const [feedback, setFeedback] = useState<boolean | null>(null)
 
   const temporarilySetFeedback = useCallback(
+    // @ts-expect-error
     success => {
       setFeedback(success)
       setTimeout(() => setFeedback(null), 1000)
     },
-    [setFeedback]
+    [setFeedback],
   )
 
   const copyToClipboardAction = useCallback(() => {
     return navigator.clipboard.writeText(value).then(
       () => temporarilySetFeedback(true),
-      () => temporarilySetFeedback(false)
+      () => temporarilySetFeedback(false),
     )
   }, [temporarilySetFeedback, value])
 

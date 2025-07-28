@@ -7,3 +7,7 @@ gemspec
 gem "config_file", path: "../config_file"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "debug"
+gem "rspec"
+gem "timecop"

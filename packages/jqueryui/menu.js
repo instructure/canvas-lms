@@ -1,5 +1,3 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
 /*!
  * jQuery UI Menu 1.9.2
  * http://jqueryui.com
@@ -537,7 +535,7 @@ import './widget'
             .eq( -1 );
         } else {
           next = this.active
-            [ direction + "All" ]( ".ui-menu-item" )
+            [ direction + "All" ]( ".ui-menu-item:visible" )
             .eq( 0 );
         }
       }

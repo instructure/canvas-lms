@@ -30,6 +30,6 @@ export function deletePages(contextName, contextId, pageUrls) {
     },
     {
       poolSize: MAX_CONCURRENT_REQS,
-    }
+    },
   )
 }

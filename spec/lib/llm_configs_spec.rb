@@ -27,6 +27,7 @@ describe LLMConfigs do
       allow(YAML).to receive(:load_file).with("config/llm_configs/test.yml").and_return({
                                                                                           "name" => "test",
                                                                                           "model_id" => "model123",
+                                                                                          "rate_limit" => { "limit" => 10, "period" => "day" },
                                                                                           "template" => "template123",
                                                                                           "options" => { "option1" => "value1" }
                                                                                         })
@@ -35,17 +36,18 @@ describe LLMConfigs do
     it "loads configuration from YAML files" do
       expect(LLMConfigs.configs["test"].name).to eq("test")
       expect(LLMConfigs.configs["test"].model_id).to eq("model123")
+      expect(LLMConfigs.configs["test"].rate_limit).to eq({ limit: 10, period: "day" })
       expect(LLMConfigs.configs["test"].template).to eq("template123")
       expect(LLMConfigs.configs["test"].options).to eq({ "option1" => "value1" })
     end
 
     context "when there is an ArgumentError" do
       before do
-        allow(YAML).to receive(:load_file).with("config/llm_configs/test.yml").and_return({
-                                                                                            "model_id" => "model123",
-                                                                                            "template" => "template123",
-                                                                                            "options" => { "option1" => "value1" }
-                                                                                          })
+        expect(YAML).to receive(:load_file).with("config/llm_configs/test.yml").and_return({
+                                                                                             "model_id" => "model123",
+                                                                                             "template" => "template123",
+                                                                                             "options" => { "option1" => "value1" }
+                                                                                           })
       end
 
       it "raises an error with a descriptive message" do
@@ -60,6 +62,7 @@ describe LLMConfigs do
                                                            "test" => LLMConfig.new(
                                                              name: "test",
                                                              model_id: "model123",
+                                                             rate_limit: { limit: 10, period: "day" },
                                                              template: "template123",
                                                              options: { "option1" => "value1" }
                                                            )
@@ -70,6 +73,7 @@ describe LLMConfigs do
       config = LLMConfigs.config_for(:test)
       expect(config.name).to eq("test")
       expect(config.model_id).to eq("model123")
+      expect(config.rate_limit).to eq({ limit: 10, period: "day" })
       expect(config.template).to eq("template123")
       expect(config.options).to eq({ "option1" => "value1" })
     end

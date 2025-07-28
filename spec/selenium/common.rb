@@ -117,6 +117,17 @@ shared_context "in-process server selenium tests" do
     ActiveRecord::Base.connection.class.prepend(SynchronizeConnection)
   end
 
+  # this is a common error, there have been many bugs reported to selenium
+  # one example bug https://github.com/SeleniumHQ/selenium/issues/14438
+  after do |example|
+    if example.exception&.message&.include?("disconnected: not connected to DevTools")
+      # exit this process to avoid further exceptions
+      puts "Exiting due to browser crash!"
+      puts example.exception.full_message
+      exit!
+    end
+  end
+
   after do
     begin
       clear_timers!
@@ -140,7 +151,7 @@ shared_context "in-process server selenium tests" do
     # we don't want to combine this into the above block to avoid x-test pollution
     # if a previous step fails
     begin
-      driver.session_storage.clear
+      clear_session_storage
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
@@ -148,13 +159,19 @@ shared_context "in-process server selenium tests" do
 
   # logs everything that showed up in the browser console during selenium tests
   after do |example|
-    if example.exception
+    # this is a common error, there have been many bugs reported to selenium
+    # one example bug https://github.com/SeleniumHQ/selenium/issues/14438
+    if example.exception && !example.exception.message.include?("disconnected: not connected to DevTools")
       html = f("body").attribute("outerHTML")
       document = Nokogiri::HTML5(html)
       example.metadata[:page_html] = document.to_html
     end
 
-    browser_logs = driver.logs.get(:browser) rescue nil
+    begin
+      browser_logs = driver.logs.get(:browser)
+    rescue
+      # ignore
+    end
 
     # log INSTUI deprecation warnings
     if browser_logs.present?
@@ -172,6 +189,7 @@ shared_context "in-process server selenium tests" do
 
       # if you run into something that doesn't make sense t
       browser_errors_we_dont_care_about = [
+        "because the document's frame is sandboxed and the 'allow-scripts' permission is not set",
         "Warning: Can't perform a React state update on an unmounted component",
         "Replacing React-rendered children with a new root component.",
         "A theme registry has already been initialized.",
@@ -188,6 +206,9 @@ shared_context "in-process server selenium tests" do
         "Warning: Failed propType",
         "Warning: React.render is deprecated",
         "Warning: ReactDOMComponent: Do not access .getDOMNode()",
+        "Invalid prop `margin` `space8` supplied",
+        "unmountComponentAtNode is deprecated and will be removed",
+        "You are calling ReactDOMClient.createRoot() on a container that has already been passed",
         "Please either add a 'report-uri' directive, or deliver the policy via the 'Content-Security-Policy' header.",
         "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
         "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
@@ -210,12 +231,17 @@ shared_context "in-process server selenium tests" do
         "Uncaught Error: Loading chunk", # probably happens when the test ends when the browser is still loading some JS
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
         "Access to XMLHttpRequest at 'http://www.example.com/' from origin",
+        "Access to fetch at 'http://canvas.instructure.com/images/messages/avatar-50.png' from origin", # The avatar image fails to load occasionally at the beginning of tests.
+        # It is potentially a request timeout issue but indicated as CORS error by the browser.
         "The user aborted a request", # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.
         # Is fixed in Chrome 109, remove this once upgraded to or above Chrome 109 https://bugs.chromium.org/p/chromium/issues/detail?id=1307772
         "Found a 'popup' attribute. If you are testing the popup API, you must enable Experimental Web Platform Features.",
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
         "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
-        "This file should be served over HTTPS." # tests are not run over https, this error is expected
+        "This file should be served over HTTPS.", # tests are not run over https, this error is expected
+        "Uncaught DOMException: signal is aborted without reason", # Investigate as part of LX-2075
+        "Support for string refs",
+        "DEV_HOST is not defined" # Federated Modules aren't configured to work in Selenium
       ].freeze
 
       javascript_errors = browser_logs.select do |e|
@@ -226,7 +252,7 @@ shared_context "in-process server selenium tests" do
 
       # Crystalball is going to get a few JS errors when using istanbul-instrumenter
       if javascript_errors.present? && ENV["CRYSTALBALL_MAP"] != "1"
-        raise javascript_errors.map(&:message).join("\n\n")
+        raise javascript_errors.map(&:message).join("\n\n").gsub('\\n', "\n")
       end
     end
   end

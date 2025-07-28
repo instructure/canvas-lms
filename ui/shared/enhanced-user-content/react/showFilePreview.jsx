@@ -17,35 +17,52 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {instanceOf} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import File from '@canvas/files/backbone/models/File'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 
-const I18n = useI18nScope('standalone_file_preview')
+const I18n = createI18nScope('standalone_file_preview')
+
+let root = null
 
 // showFilePreview repurposes the file preview overlay from the Files
 // pages to show a single file in an arbitrary context. First use
 // is for canvas files users linked to using the RCE.
-export function showFilePreview(file_id, verifier = '') {
+export function showFilePreview(
+  file_id,
+  verifier = '',
+  access_token = '',
+  instfs_id = '',
+  location = '',
+) {
   let container = document.getElementById('file_preview_container')
   if (!container) {
     container = document.createElement('div')
     container.id = 'file_preview_container'
     document.body.appendChild(container)
   }
+
+  if (!root) {
+    root = createRoot(container)
+  }
+
   let url = `/api/v1/files/${file_id}?include[]=enhanced_preview_url`
   if (verifier) {
     url += `&verifier=${verifier}`
+  } else if (access_token && instfs_id) {
+    url += `&access_token=${access_token}&instfs_id=${instfs_id}`
+  } else if (location) {
+    url += `&location=${encodeURIComponent(location)}`
   }
 
   asJson(fetch(url, defaultFetchOptions()))
     .then(file => {
       const backboneFile = new File(file)
-      ReactDOM.render(<StandaloneFilePreview preview_file={backboneFile} />, container)
+      root.render(<StandaloneFilePreview preview_file={backboneFile} />)
     })
     .catch(err => {
       showFlashAlert({

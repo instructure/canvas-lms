@@ -22,25 +22,27 @@ class Checkpoints::AdhocOverrideCreatorService < Checkpoints::AdhocOverrideCommo
     desired_student_ids = @override.fetch(:student_ids) { raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" }
     raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
 
-    student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id)
-    override = build_override(assignment: @checkpoint, student_ids:)
-    build_override_students(override:, student_ids:)
-    override.save!
-
-    parent_override = existing_parent_override || build_override(assignment: @checkpoint.parent_assignment, student_ids:, shell_override: true)
+    student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id).uniq
+    parent_override = existing_parent_override(student_ids:) || build_override(assignment: @checkpoint.parent_assignment, student_ids:, shell_override: true)
     build_override_students(override: parent_override, student_ids:)
     parent_override.save! if parent_override.changed? || parent_override.changed_student_ids.any?
 
+    override = build_override(assignment: @checkpoint, student_ids:, parent_override:)
+    build_override_students(override:, student_ids:)
+    override.save!
     override
   end
 
   private
 
-  def build_override(assignment:, student_ids:, shell_override: false)
+  def build_override(assignment:, student_ids:, shell_override: false, parent_override: nil)
     override = assignment.assignment_overrides.build(
       set_id: nil,
       set_type: AssignmentOverride::SET_TYPE_ADHOC,
-      dont_touch_assignment: true
+      dont_touch_assignment: true,
+      title: get_title(student_ids:),
+      parent_override:,
+      unassign_item: @override.fetch(:unassign_item, false)
     )
     apply_overridden_dates(override, @override, shell_override:)
     override

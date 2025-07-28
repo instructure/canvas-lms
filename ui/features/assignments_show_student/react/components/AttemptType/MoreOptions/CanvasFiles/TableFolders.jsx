@@ -18,7 +18,7 @@
 
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {func, object, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import * as tz from '@instructure/moment-utils'
 
@@ -34,7 +34,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const FolderButton = props => {
   return (
@@ -84,7 +84,7 @@ const renderSRContents = folder => {
   description.push(I18n.t('name: %{name}', {name: folder.name}))
   if (folder.hasOwnProperty('created_at')) {
     description.push(
-      I18n.t('date created: %{createdAt}', {createdAt: formattedDateTime(folder.created_at)})
+      I18n.t('date created: %{createdAt}', {createdAt: formattedDateTime(folder.created_at)}),
     )
   }
   if (folder.hasOwnProperty('locked')) {
@@ -138,7 +138,7 @@ const TableFolders = props => {
       {renderParentFolder(
         props.folders[props.selectedFolderID],
         props.handleFolderSelect,
-        props.columnWidths
+        props.columnWidths,
       )}
       {props.folders[props.selectedFolderID].subFolderIDs.map(id => {
         const folder = props.folders[id]

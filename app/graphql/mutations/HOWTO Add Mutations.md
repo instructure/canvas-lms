@@ -8,7 +8,7 @@ Create a new mutation by inheriting from the `Mutations::BaseMutation` class.
 
 - creates a new mutation-specific input object.  Any arguments defined for the
   mutation will be fields on this input object.
-- adds an `errors` resonse field (more on that below).
+- adds an `errors` response field (more on that below).
 - passes the input object to `resolve` on execution.
 
 After creating a new mutation class, add a field for the new mutation to

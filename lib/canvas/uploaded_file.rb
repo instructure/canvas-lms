@@ -20,6 +20,7 @@
 # copy the file being uploaded. Since all our use cases involve synchronous upload
 # and we don't make use of #append, we don't need to waste the time or space.
 # This also doesn't implement the StringIO interface that we don't use.
+require "mimemagic"
 
 module Canvas
   class UploadedFile
@@ -27,6 +28,9 @@ module Canvas
 
     def initialize(path, content_type)
       @content_type = content_type
+      if @content_type == "unknown/unknown" && (content_type = MimeMagic.by_magic(File.open(path))&.type)
+        @content_type = content_type
+      end
       @original_filename = File.basename(path)
       @tempfile = File.open(path, "rb")
     end

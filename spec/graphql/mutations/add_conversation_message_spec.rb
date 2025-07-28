@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 RSpec.describe Mutations::AddConversationMessage do
   before do
     allow(InstStatsd::Statsd).to receive(:count)
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
   end
 
   before(:once) do
@@ -49,8 +49,7 @@ RSpec.describe Mutations::AddConversationMessage do
     included_messages: nil,
     attachment_ids: nil,
     media_comment_id: nil,
-    media_comment_type: nil,
-    user_note: nil
+    media_comment_type: nil
   )
     <<~GQL
       mutation {
@@ -62,7 +61,6 @@ RSpec.describe Mutations::AddConversationMessage do
           #{"attachmentIds: #{attachment_ids}" if attachment_ids}
           #{"mediaCommentId: \"#{media_comment_id}\"" if media_comment_id}
           #{"mediaCommentType: \"#{media_comment_type}\"" if media_comment_type}
-          #{"userNote: #{user_note}" unless user_note.nil?}
         }) {
           conversationMessage {
             _id
@@ -115,11 +113,11 @@ RSpec.describe Mutations::AddConversationMessage do
       attachment_ids: [attachment.id]
     )
 
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.isReply.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
-    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.media.react")
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.sent.attachment.react")
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "addConversationMessage", "errors")).to be_nil
     expect(
@@ -177,51 +175,13 @@ RSpec.describe Mutations::AddConversationMessage do
     result = run_mutation(conversation_id: @conversation.conversation_id, body: "This should be delayed", recipients: [@teacher.id.to_s])
 
     expect(result["errors"]).to be_nil
-    # a nil result with no errors implies that the message was delayed and will be processed later
-    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be_nil
+    # although the process being delayed, a preview of the conversation message should be send
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be_present
+    # the preview should not have a true id because the message is not processed yet
+    expect(result.dig("data", "addConversationMessage", "conversationMessage", "_id")).to eq "0"
     expect(@conversation.reload.messages.count(:all)).to eq 1
     run_jobs
     expect(@conversation.reload.messages.count(:all)).to eq 2
-  end
-
-  context "when the deprecate_faculty_journal feature flag is disabled" do
-    before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-    it "generates a user note when requested" do
-      Account.default.update_attribute(:enable_user_notes, true)
-      conversation(users: [@teacher])
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 1
-    end
-  end
-
-  context "when the deprecated_faculty_journal feature flag is enabled" do
-    it "does not generate a user note when requested" do
-      Account.default.update_attribute(:enable_user_notes, true)
-      conversation(users: [@teacher])
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-
-      result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
-      expect(result["errors"]).to be_nil
-      cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
-      student = cm.recipients.first
-      expect(student.user_notes.size).to eq 0
-    end
   end
 
   it "does not allow new messages in concluded courses for students" do

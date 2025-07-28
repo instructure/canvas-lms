@@ -31,7 +31,7 @@ const defaultProps: ComponentProps = {
 describe('SubscriptionDropDown', () => {
   it('renders the proper option', () => {
     const {getByTestId, rerender} = render(
-      <SubscriptionDropDown {...defaultProps} autoSubscription={true} />
+      <SubscriptionDropDown {...defaultProps} autoSubscription={true} />,
     )
     expect(getByTestId('subscription-dropdown')?.getAttribute('value')).toBe('Auto subscribe')
     rerender(<SubscriptionDropDown {...defaultProps} autoSubscription={false} />)
@@ -46,7 +46,7 @@ describe('SubscriptionDropDown', () => {
   it('calls onChange with the accountId and the new value', () => {
     const onChange = jest.fn()
     const {getByTestId, getByText} = render(
-      <SubscriptionDropDown {...defaultProps} onChange={onChange} />
+      <SubscriptionDropDown {...defaultProps} onChange={onChange} />,
     )
     // display options
     getByTestId('subscription-dropdown').click()

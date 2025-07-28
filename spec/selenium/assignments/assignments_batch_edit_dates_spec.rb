@@ -180,13 +180,5 @@ describe "assignment batch edit" do
       expect(f("body")).not_to contain_jqcss(bulk_edit_dates_menu_jqselector)
       expect(assignment_groups_weight).to be_displayed
     end
-
-    it "does include Edit Assignment Dates in page menu when feature off" do
-      @course.account.disable_feature!(:course_paces)
-      visit_assignments_index_page(@course.id)
-      course_assignments_settings_button.click
-      expect(f("body")).to contain_jqcss(bulk_edit_dates_menu_jqselector)
-      expect(assignment_groups_weight).to be_displayed
-    end
   end
 end

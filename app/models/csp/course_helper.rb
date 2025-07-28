@@ -55,7 +55,7 @@ module Csp::CourseHelper
   def cached_tool_domains
     # invalidate when the course is touched
     Rails.cache.fetch(tool_domain_cache_key) do
-      context_external_tools.active.map do |tool|
+      Lti::ContextToolFinder.only_for(self).active.map do |tool|
         Csp::Domain.domains_for_tool(tool)
       end.flatten.compact.uniq
     end

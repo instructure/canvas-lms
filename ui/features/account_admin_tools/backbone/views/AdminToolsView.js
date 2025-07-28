@@ -32,7 +32,6 @@ export default class AdminToolsView extends Backbone.View {
     // Define children that use this backbone template.
     // @api custom backbone
     this.child('restoreContentPaneView', '#restoreContentPane')
-    this.child('messageContentPaneView', '#commMessagesPane')
     this.child('loggingContentPaneView', '#loggingPane')
     this.optionProperty('tabs')
 

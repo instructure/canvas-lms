@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -47,6 +46,7 @@ export default class FinalGradeOverrideDatastore {
     return gradeOverrides.courseGrade || null
   }
 
+  // @ts-expect-error
   updateGrade(userId: string, gradingPeriodId: string | null, grade) {
     this._gradesByUserId[userId] = this._gradesByUserId[userId] || {}
     const gradeOverrides = this._gradesByUserId[userId]
@@ -60,6 +60,7 @@ export default class FinalGradeOverrideDatastore {
 
     const {finalGradeOverrides: existingFinalGradeOverrides} = useStore.getState()
     useStore.setState({
+      // @ts-expect-error
       finalGradeOverrides: {
         ...existingFinalGradeOverrides,
         [userId]: {...gradeOverrides},
@@ -67,10 +68,12 @@ export default class FinalGradeOverrideDatastore {
     })
   }
 
+  // @ts-expect-error
   setGrades(gradeOverrides) {
     this._gradesByUserId = gradeOverrides
   }
 
+  // @ts-expect-error
   addPendingGradeInfo(userId: string, gradingPeriodId: string | null, gradeInfo) {
     const pendingGradeInfo = {gradeInfo, userId, gradingPeriodId}
     this.removePendingGradeInfo(userId, gradingPeriodId)
@@ -80,13 +83,13 @@ export default class FinalGradeOverrideDatastore {
   removePendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     this._pendingGrades =
       this._pendingGrades.filter(
-        gradeInfo => gradeInfo.userId !== userId || gradeInfo.gradingPeriodId !== gradingPeriodId
+        gradeInfo => gradeInfo.userId !== userId || gradeInfo.gradingPeriodId !== gradingPeriodId,
       ) || null
   }
 
   getPendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     const datum = this._pendingGrades.find(
-      gradeInfo => gradeInfo.userId === userId && gradeInfo.gradingPeriodId === gradingPeriodId
+      gradeInfo => gradeInfo.userId === userId && gradeInfo.gradingPeriodId === gradingPeriodId,
     )
     return datum ? datum.gradeInfo : null
   }

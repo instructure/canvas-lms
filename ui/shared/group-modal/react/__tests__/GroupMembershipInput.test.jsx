@@ -64,7 +64,7 @@ describe('GroupMembershipInput', () => {
     it('returns an error if input is greater than set maximum', () => {
       const onChange = jest.fn()
       const {getByText, getByLabelText} = render(
-        <GroupMembershipInput onChange={onChange} value="" />
+        <GroupMembershipInput onChange={onChange} value="" />,
       )
       const input = getByLabelText(/Group Membership/i)
       fireEvent.input(input, {target: {value: '999999'}})
@@ -74,7 +74,7 @@ describe('GroupMembershipInput', () => {
     it('returns an error if input is less than set minimum', () => {
       const onChange = jest.fn()
       const {getByText, getByLabelText} = render(
-        <GroupMembershipInput onChange={onChange} value="" />
+        <GroupMembershipInput onChange={onChange} value="" />,
       )
       const input = getByLabelText(/Group Membership/i)
       fireEvent.input(input, {target: {value: '0'}})
@@ -84,7 +84,7 @@ describe('GroupMembershipInput', () => {
     it('returns an error if input is not a number', () => {
       const onChange = jest.fn()
       const {getByText, getByLabelText} = render(
-        <GroupMembershipInput onChange={onChange} value="" />
+        <GroupMembershipInput onChange={onChange} value="" />,
       )
       const input = getByLabelText(/Group Membership/i)
       fireEvent.input(input, {target: {value: 'F'}})

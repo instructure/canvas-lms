@@ -108,15 +108,35 @@ describe ContentMigration do
       expect(new_topic2.sort_by_rating).to be true
     end
 
-    it "copies group setting" do
-      group_category = @copy_from.group_categories.create!(name: "blah")
-      topic = @copy_from.discussion_topics.create!(group_category:)
+    describe "migrate_assignment_group_categories" do
+      before :once do
+        @group_category = @copy_from.group_categories.create!(name: "blah")
+        @topic = @copy_from.discussion_topics.create!(group_category: @group_category)
+      end
 
-      run_course_copy
+      context "with feature off" do
+        it "copies group discussions to Project Groups" do
+          run_course_copy
 
-      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
-      expect(new_topic).to be_has_group_category
-      expect(new_topic.group_category.name).to eq "Project Groups"
+          new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
+          expect(new_topic).to be_has_group_category
+          expect(new_topic.group_category.name).to eq "Project Groups"
+        end
+      end
+
+      context "with feature on" do
+        before :once do
+          Account.default.enable_feature!(:migrate_assignment_group_categories)
+        end
+
+        it "copies group discussions to a group with the same name as the original" do
+          run_course_copy
+
+          new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
+          expect(new_topic).to be_has_group_category
+          expect(new_topic.group_category.name).to eq "blah"
+        end
+      end
     end
 
     it "assigns group discussions to a group with a matching name in the destination course" do
@@ -170,12 +190,6 @@ describe ContentMigration do
         to_ann.reload
         expect(to_ann.workflow_state).to eq "active"
       end
-
-      Timecop.freeze(26.hours.from_now) do
-        run_jobs
-        to_ann.reload
-        expect(to_ann.locked).to be_truthy
-      end
     end
 
     it "properly copies selected delayed announcements even if they've already posted and locked" do
@@ -185,14 +199,13 @@ describe ContentMigration do
       from_ann.reload
 
       expect(from_ann.workflow_state).to eq "active"
-      expect(from_ann.locked).to be_truthy
 
       @cm.copy_options = {
         everything: true,
         shift_dates: true,
         old_start_date: 7.days.ago.to_s,
-        old_end_date: Time.now.to_s,
-        new_start_date: Time.now.to_s,
+        old_end_date: Time.zone.now.to_s,
+        new_start_date: Time.zone.now.to_s,
         new_end_date: 7.days.from_now.to_s
       }
       @cm.save!
@@ -207,12 +220,6 @@ describe ContentMigration do
         run_jobs
         to_ann.reload
         expect(to_ann.workflow_state).to eq "active"
-      end
-
-      Timecop.freeze(6.days.from_now) do
-        run_jobs
-        to_ann.reload
-        expect(to_ann.locked).to be_truthy
       end
     end
 
@@ -317,13 +324,13 @@ describe ContentMigration do
       expect(decoy_ag.reload.name).not_to eql group.name
     end
 
-    it "copies references to locked discussions even if manage_content is not true" do
+    it "copies references to locked discussions even if manage_course_content_edit is not true" do
       @role = Account.default.roles.build name: "SuperTeacher"
       @role.base_role_type = "TeacherEnrollment"
       @role.save!
       @copy_to.enroll_user(@user, "TeacherEnrollment", role: @role)
 
-      Account.default.role_overrides.create!(permission: "manage_content", role: teacher_role, enabled: false)
+      Account.default.role_overrides.create!(permission: "manage_course_content_edit", role: teacher_role, enabled: false)
 
       topic = @copy_from.discussion_topics.build(title: "topic")
       topic.locked = true

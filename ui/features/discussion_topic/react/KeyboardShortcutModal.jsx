@@ -19,9 +19,9 @@
 import React from 'react'
 import {shape, string, arrayOf} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('keyboardShortcutModal')
+const I18n = createI18nScope('keyboardShortcutModal')
 
 export default class KeyboardShortcutModal extends React.Component {
   static propTypes = {
@@ -29,7 +29,7 @@ export default class KeyboardShortcutModal extends React.Component {
       shape({
         keycode: string.isRequired,
         description: string.isRequired,
-      })
+      }),
     ),
   }
 
@@ -73,7 +73,7 @@ export default class KeyboardShortcutModal extends React.Component {
           <div className="keyboard_navigation">
             <span className="screenreader-only">
               {I18n.t(
-                'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts'
+                'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts',
               )}
             </span>
             <ul className="navigation_list">

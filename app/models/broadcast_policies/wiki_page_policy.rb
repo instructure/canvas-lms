@@ -42,7 +42,7 @@ module BroadcastPolicies
     def changed_while_published?
       wiki_page.published? &&
         wiki_page.wiki_page_changed &&
-        !wiki_page.just_created
+        !wiki_page.previously_new_record?
     end
   end
 end

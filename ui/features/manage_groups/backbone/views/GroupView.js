@@ -163,7 +163,7 @@ export default class GroupView extends View {
   moveUser(e, user) {
     const newGroupId = $(e.currentTarget).data('id')
     return setTimeout(() =>
-      this.model.collection.category.reassignUser(user, this.model.collection.get(newGroupId))
+      this.model.collection.category.reassignUser(user, this.model.collection.get(newGroupId)),
     )
   }
 }

@@ -24,71 +24,93 @@ import AllowedAttempts from '../AllowedAttempts'
 function renderAllowedAttempts(opts) {
   const defaults = {
     limited: false,
+    attempts: 42,
     onLimitedChange: jest.fn(),
     onAttemptsChange: jest.fn(),
+    onHideErrors: jest.fn(),
   }
 
   return {...render(<AllowedAttempts {...defaults} {...opts} />), ...defaults, ...opts}
 }
 
 it('renders limited attempts with proper field values', () => {
-  const {getByLabelText} = renderAllowedAttempts({limited: true, attempts: 42})
+  const {getByLabelText} = renderAllowedAttempts({limited: true})
   expect(getByLabelText(/allowed attempts/i).value).toBe('limited')
   expect(getByLabelText(/number of attempts/i).value).toBe('42')
 })
 
 it('renders number of attempts as hidden with a value of -1 when limited is false', () => {
-  const {getByLabelText} = renderAllowedAttempts({limited: false, attempts: 42})
+  const {getByLabelText} = renderAllowedAttempts()
   expect(getByLabelText(/allowed attempts/i).value).toBe('unlimited')
   const numberInput = getByLabelText(/number of attempts/i)
   expect(numberInput).not.toBeVisible()
   expect(numberInput.value).toBe('-1')
 })
 
-it('renders an error when attempts is blank', () => {
-  const {getByLabelText, getByText} = renderAllowedAttempts({limited: true, attempts: null})
-  expect(getByText(/must be a number/i)).toBeInTheDocument()
-  expect(getByLabelText(/number of attempts/i).value).toBe('')
-})
-
 it('calls onLimitedChange when the option is changed', () => {
-  const {getByLabelText, onLimitedChange} = renderAllowedAttempts({limited: false, attempts: 42})
+  const {getByLabelText, onLimitedChange} = renderAllowedAttempts()
   const input = getByLabelText(/allowed attempts/i)
   fireEvent.change(input, {target: {value: 'limited'}})
   expect(onLimitedChange).toHaveBeenCalledWith(true)
 })
 
-it('calls onAttemptsChange with a numberic value when the input value changes', () => {
-  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true, attempts: 42})
+it('calls onHideErrors when the option is changed', () => {
+  const {getByLabelText, onHideErrors} = renderAllowedAttempts()
+  const input = getByLabelText(/allowed attempts/i)
+  fireEvent.change(input, {target: {value: 'limited'}})
+  expect(onHideErrors).toHaveBeenCalled()
+})
+
+it('calls onAttemptsChange with a numeric value when the input value changes', () => {
+  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true})
   const input = getByLabelText(/number of attempts/i)
   fireEvent.change(input, {target: {value: '3'}})
   expect(onAttemptsChange).toHaveBeenCalledWith(3)
 })
 
+it('calls onHideErrors when the input value changes', () => {
+  const {getByLabelText, onHideErrors} = renderAllowedAttempts()
+  const input = getByLabelText(/number of attempts/i)
+  fireEvent.change(input, {target: {value: '3'}})
+  expect(onHideErrors).toHaveBeenCalled()
+})
+
 it('calls onAttemptsChange with null when the input value becomes blank', () => {
-  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true, attempts: 42})
+  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true})
   const input = getByLabelText(/number of attempts/i)
   fireEvent.change(input, {target: {value: ''}})
   expect(onAttemptsChange).toHaveBeenCalledWith(null)
 })
 
 it('does not call onAttemptsChange when value is NaN', () => {
-  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true, attempts: 42})
+  const {getByLabelText, onAttemptsChange} = renderAllowedAttempts({limited: true})
   const input = getByLabelText(/number of attempts/i)
   fireEvent.change(input, {target: {value: 'abc'}})
   expect(onAttemptsChange).not.toHaveBeenCalled()
 })
 
 it('calls onAttemptsChange when incremented', () => {
-  const {onAttemptsChange} = renderAllowedAttempts({limited: true, attempts: 42})
+  const {onAttemptsChange} = renderAllowedAttempts({limited: true})
   fireEvent.mouseDown(document.querySelectorAll('button')[0])
   expect(onAttemptsChange).toHaveBeenCalledWith(43)
 })
 
+it('calls onHideErrors when incremented', () => {
+  const {onHideErrors} = renderAllowedAttempts({limited: true})
+  fireEvent.mouseDown(document.querySelectorAll('button')[0])
+  expect(onHideErrors).toHaveBeenCalled()
+})
+
 it('calls onAttemptsChange when decremented', () => {
-  const {onAttemptsChange} = renderAllowedAttempts({limited: true, attempts: 42})
+  const {onAttemptsChange} = renderAllowedAttempts({limited: true})
   fireEvent.mouseDown(document.querySelectorAll('button')[1])
   expect(onAttemptsChange).toHaveBeenCalledWith(41)
+})
+
+it('calls onHideErrors when incremented', () => {
+  const {onHideErrors} = renderAllowedAttempts({limited: true})
+  fireEvent.mouseDown(document.querySelectorAll('button')[1])
+  expect(onHideErrors).toHaveBeenCalled()
 })
 
 it('does not allow decrement below one', () => {

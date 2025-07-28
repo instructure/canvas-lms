@@ -121,6 +121,46 @@ describe ContentSharesController do
       end
     end
 
+    context "when sharing a module item in a horizon course" do
+      subject do
+        post(
+          :create,
+          params: {
+            user_id: sender.id,
+            content_type: "module_item",
+            content_id: module_item.id,
+            receiver_ids: [receiver.id],
+            include_module: true
+          }
+        )
+      end
+
+      before do
+        @course_1.account.enable_feature!(:horizon_course_setting)
+        @course_1.update!(horizon_course: true)
+      end
+
+      let_once(:course) { @course_1 }
+      let_once(:context_module) { course.context_modules.create! name: "Module 1" }
+      let_once(:module_item) do
+        context_module.content_tags.create!(
+          content_id: 0,
+          tag_type: "context_module",
+          content_type: "ExternalUrl",
+          context_id: course.id,
+          context_type: "Course",
+          title: "Test Title",
+          url: "https://google.com"
+        )
+      end
+
+      it "includes the module in the export" do
+        export = ContentExport.find JSON.parse(subject.body)["content_export"]["id"]
+        expect(export.settings["selected_content"]["content_tags"]).not_to be_nil
+        expect(export.settings["selected_content"]["context_modules"]).not_to be_nil
+      end
+    end
+
     it "returns 400 if required parameters aren't included" do
       post :create, params: { user_id: @teacher_1.id, content_type: "assignment", content_id: @assignment.id }
       expect(response).to have_http_status(:bad_request)

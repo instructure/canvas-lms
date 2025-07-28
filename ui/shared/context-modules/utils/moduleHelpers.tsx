@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
 import React from 'react'
+import {createRoot, Root} from 'react-dom/client'
 import {Mathml} from '@instructure/canvas-rce/es/enhance-user-content/mathml'
 import ModuleFileDrop from '@canvas/context-module-file-drop/react'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
@@ -31,13 +31,18 @@ import {
   setExpandAllButtonVisible,
 } from '../jquery/utils'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
+import {itemCount} from './showAllOrLess'
+
+export interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
+}
 
 export function addModuleElement(
   data: Record<string, any>,
   $module: JQuery,
   updatePublishMenuDisabledState: (disabled: boolean) => void,
   relockModulesDialog: RelockModulesDialog,
-  moduleItems: any
+  moduleItems: any,
 ) {
   $module.loadingImage('remove')
   $module.attr('id', 'context_module_' + data.context_module.id)
@@ -51,7 +56,7 @@ export function addModuleElement(
       data.context_module.context_id +
       '/modules/' +
       data.context_module.id +
-      'items?include[]=content_details'
+      'items?include[]=content_details',
   )
   $module.data('workflow-state', data.context_module.workflow_state)
   if (data.context_module.workflow_state === 'unpublished') {
@@ -61,6 +66,7 @@ export function addModuleElement(
       .addClass('publish-module-link')
       .removeClass('unpublish-module-link')
     $module.addClass('unpublished_module')
+    $module.find('h2').text(data.context_module.name)
   }
 
   $('#no_context_modules_message').slideUp()
@@ -93,36 +99,26 @@ export function addModuleElement(
   }
   const isPublishing =
     document.querySelector<Element & {dataset: Record<string, string>}>(
-      '#context-modules-publish-menu'
+      '#context-modules-publish-menu',
     )?.dataset['data-progress-id'] !== undefined
   updatePublishMenuDisabledState(isPublishing)
   renderContextModulesPublishIcon(
     data.context_module.context_id,
     data.context_module.id,
     published,
-    isPublishing
+    isPublishing,
   )
   relockModulesDialog.renderIfNeeded(data.context_module)
   $module.triggerHandler('update', data)
-  const module_dnd = $module.find('.module_dnd')[0]
-  if (module_dnd) {
-    const contextModules = document.getElementById('context_modules')
-    ReactDOM.render(
-      <ModuleFileDrop
-        courseId={ENV.course_id}
-        moduleId={data.context_module.id}
-        contextModules={contextModules}
-      />,
-      module_dnd
-    )
-  }
+
+  addEmptyModuleUI($module[0])
 
   const mathml = new Mathml(
     {
       new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
       explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
     },
-    {locale: ENV?.LOCALE || 'en'}
+    {locale: ENV?.LOCALE || 'en'},
   )
   if (mathml.isMathMLOnPage()) {
     if (mathml.isMathJaxLoaded()) {
@@ -132,3 +128,69 @@ export function addModuleElement(
     }
   }
 }
+
+export function showMoveContentsLink(module: HTMLElement, isVisible: boolean): void {
+  const linkContainer = module.querySelector('.move-contents-container') as HTMLElement | null
+  if (linkContainer) {
+    linkContainer.style.display = isVisible ? '' : 'none'
+  }
+}
+
+export function addEmptyModuleUI(module: HTMLElement) {
+  if (!module) return
+
+  showMoveContentsLink(module, false)
+  const moduleId = module.dataset.moduleId
+  const moduleName = getModuleAriaLabel(module)
+  if (!moduleId || !moduleName) return
+
+  let module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
+  if (!module_dnd) {
+    module_dnd = document.createElement('div')
+    module_dnd.className = 'module_dnd'
+    module_dnd.setAttribute('data-context-module-id', moduleId)
+    module.querySelector('.footer')?.insertAdjacentElement('beforebegin', module_dnd)
+  }
+
+  const contextModules = document.getElementById('context_modules')
+
+  if (!module_dnd.reactRoot) {
+    module_dnd.reactRoot = createRoot(module_dnd)
+  }
+
+  module_dnd.reactRoot.render(
+    <ModuleFileDrop
+      courseId={ENV.course_id}
+      moduleId={moduleId}
+      contextModules={contextModules}
+      moduleName={moduleName}
+    />,
+  )
+}
+
+export function removeEmptyModuleUI(module: HTMLElement) {
+  showMoveContentsLink(module, true)
+  const module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
+  if (!module_dnd) return
+
+  module_dnd.reactRoot?.unmount()
+  module_dnd.reactRoot = undefined
+}
+
+export function updateModuleFileDrop(module: HTMLElement) {
+  if (!module) return
+  if (ENV.IS_STUDENT) return
+
+  if (itemCount(module) === 0) {
+    addEmptyModuleUI(module)
+    return
+  }
+  removeEmptyModuleUI(module)
+}
+
+export function getModuleAriaLabel(module: HTMLElement) {
+  return module.getAttribute('aria-label')
+}
+
+export const MODULE_ITEM_LIST =
+  '<ul class="ig-list items context_module_items manageable ui-sortable" data-total-items="0"></ul>'

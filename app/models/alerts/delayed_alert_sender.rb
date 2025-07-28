@@ -56,7 +56,7 @@ module Alerts
       teacher_student_mapper = Courses::TeacherStudentMapper.new(student_enrollments, teacher_enrollments)
 
       # Evaluate all the criteria for each user for each alert
-      today = Time.now.beginning_of_day
+      today = Time.zone.now.beginning_of_day
 
       alert_checkers = {}
 

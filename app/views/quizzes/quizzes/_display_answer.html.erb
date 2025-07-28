@@ -81,21 +81,21 @@
       <span class='hidden id'><%= answer_id %></span>
 
     <% if !user_answer || question_type.display_answers != "xsingle" %>
-    <div class="select_answer answer_type" <%= hidden(true) unless answer_type == "select_answer" %>>
+    <div class="select_answer answer_type" <%= hidden(include_style: true) unless answer_type == "select_answer" %>>
       <% if %w{radio checkbox}.include?(question_type.entry_type) %>
         <input id="answer-<%= answer_id %>" name="question-<%= question_id %>" type="<%= question_type.entry_type %>" <%= 'checked' if selected_answer %> class="question_input" aria-disabled="true" disabled />&nbsp;
       <% end %>
       <label for="answer-<%= answer_id %>">
-        <div class="answer_text" <%= hidden(true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
+        <div class="answer_text" <%= hidden(include_style: true) if hash_get(answer, :html).present? %>><%= hash_get(answer, :text) %></div>
         <div class="answer_html"><%= user_content(hash_get(answer, :html).to_s) %></div>
       </label>
     </div>
-    <div class="answer_type short_answer" <%= hidden(true) unless answer_type == "short_answer" %>>
+    <div class="answer_type short_answer" <%= hidden(include_style: true) unless answer_type == "short_answer" %>>
       <input name="answer_text" type="text" style="width: 200px; margin-bottom: 5px; color: #000;" disabled="true" value="<%= hash_get(answer, :text) %>"/>
     </div>
-    <div class="answer_match matching_answer answer_type" <%= hidden(true) unless answer_type == "matching_answer" %>>
-      <div class="answer_match_left" <%= hidden(true) if (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= (hash_get(answer, :left) || hash_get(answer, :text)) %></div>
-      <div class="answer_match_left_html" <%= hidden(true) unless (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= user_content((hash_get(answer, :left_html) || hash_get(answer, :html)).to_s) %></div>
+    <div class="answer_match matching_answer answer_type" <%= hidden(include_style: true) unless answer_type == "matching_answer" %>>
+      <div class="answer_match_left" <%= hidden(include_style: true) if (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= (hash_get(answer, :left) || hash_get(answer, :text)) %></div>
+      <div class="answer_match_left_html" <%= hidden(include_style: true) unless (hash_get(answer, :left_html) || hash_get(answer, :html)).present? %>><%= user_content((hash_get(answer, :left_html) || hash_get(answer, :html)).to_s) %></div>
       <div class="answer_match_middle">&nbsp;</div>
       <div class="answer_match_right">
         <% if user_answer %>
@@ -141,21 +141,21 @@
       <% number_type = "exact" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "exact_answer" %>
       <% number_type = "precision" if answer_type == "numerical_answer" && hash_get(answer, :numerical_answer_type) == "precision_answer" %>
       <% number_type = "equation" if answer_type == "numerical_answer" && hash_get(answer, :variables) %>
-      <div class="numerical_exact_answer answer_type" <%= hidden(true) unless number_type == 'exact' %>>
+      <div class="numerical_exact_answer answer_type" <%= hidden(include_style: true) unless number_type == 'exact' %>>
         <span class="answer_exact"><%= render_number(hash_get(answer, :exact, 0)) %></span> (<%= before_label :answer_with_margin, 'with margin' %> <span class="answer_error_margin"><%= render_number(hash_get(answer, :margin, 0)) %></span>)
       </div>
-      <div class="numerical_precision_answer answer_type" <%= hidden(true) unless number_type == 'precision' %>>
+      <div class="numerical_precision_answer answer_type" <%= hidden(include_style: true) unless number_type == 'precision' %>>
         <span class="answer_approximate">
           <%= render_score(hash_get(answer, :approximate, 0), hash_get(answer, :precision, 10)) %>
         </span> (<%= before_label :answer_with_precision, 'with precision' %> <span class="answer_precision"><%= render_number(hash_get(answer, :precision, 10)) %></span>)
       </div>
-      <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'range' %>>
+      <div class="numerical_range_answer answer_type" <%= hidden(include_style: true) unless number_type == 'range' %>>
         <%= t(:range_answer, "Between %{lower_bound} and %{upper_bound}",
               :lower_bound => raw("<span class=\"answer_range_start\">#{render_number(hash_get(answer, :start, 0))}</span>"),
               :upper_bound => raw("<span class=\"answer_range_end\">#{render_number(hash_get(answer, :end, 0))}</span>")) %>
       </div>
     <% end %>
-    <div class="numerical_range_answer answer_type" <%= hidden(true) unless number_type == 'equation' %>>
+    <div class="numerical_range_answer answer_type" <%= hidden(include_style: true) unless number_type == 'equation' %>>
       <span class="answer_equation"><%= render_number(hash_get(answer, :answer) || hash_get(answer, :exact)) %></span>
       <span class="margin" style="<%= hidden unless hash_get(question, :answer_tolerance, 0).to_f > 0 %>">
         <%= t(:margin_of_error, "margin of error") %>
@@ -170,7 +170,7 @@
     <% end %>
     <% if show_comment %>
       <div class="quiz_comment <%= "empty" unless has_answer_comment %>">
-        <div class="answer_comment" <%= hidden(true) if hash_get(answer, :comments_html).present? %>><%= comment_get(answer, :comments) %></div>
+        <div class="answer_comment" <%= hidden(include_style: true) if hash_get(answer, :comments_html).present? %>><%= comment_get(answer, :comments) %></div>
         <div class="answer_comment_html"><%= user_content(Sanitize.clean(hash_get(answer, :comments_html) || "", CanvasSanitize::SANITIZE).to_s) %></div>
       </div>
     <% end %>

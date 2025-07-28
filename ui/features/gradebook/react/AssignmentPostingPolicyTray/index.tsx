@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -24,14 +23,14 @@ import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
-const I18n = useI18nScope('post_grades_tray')
+const I18n = createI18nScope('post_grades_tray')
 
 type Props = {}
 
@@ -46,6 +45,8 @@ type State = {
 
   onExited?: () => void
 
+  onDismiss?: () => void
+
   onAssignmentPostPolicyUpdated?: ({
     assignmentId,
     postManually,
@@ -56,6 +57,7 @@ type State = {
 }
 
 export default class AssignmentPostingPolicyTray extends PureComponent<Props, State> {
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -74,6 +76,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
     this.setState({open: false})
   }
 
+  // @ts-expect-error
   show(context) {
     this.setState({
       ...context,
@@ -83,6 +86,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
     })
   }
 
+  // @ts-expect-error
   handlePostPolicyChanged({postManually}) {
     this.setState({selectedPostManually: postManually})
   }
@@ -98,6 +102,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
 
     this.setState({requestInProgress: true})
     setAssignmentPostPolicy({assignmentId, postManually: selectedPostManually})
+      // @ts-expect-error
       .then(response => {
         const message = I18n.t('Success! The post policy for %{name} has been updated.', {name})
         const {postManually} = response
@@ -106,6 +111,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
         this.state.onAssignmentPostPolicyUpdated?.({assignmentId, postManually})
         this.handleDismiss()
       })
+      // @ts-expect-error
       .catch(_error => {
         const message = I18n.t('An error occurred while saving the assignment post policy')
         showFlashAlert({message, type: 'error', err: null})

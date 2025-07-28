@@ -19,25 +19,28 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import AccountsTray from '../AccountsTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('AccountsTray', () => {
-  const accounts = [
-    {
-      id: '1',
-      name: 'Account1',
-    },
-    {
-      id: '2',
-      name: 'Account2',
-    },
-  ]
+  const data = {
+    json: [
+      {
+        id: '1',
+        name: 'Account1',
+      },
+      {
+        id: '2',
+        name: 'Account2',
+      },
+    ],
+  }
 
   beforeEach(() => {
-    queryClient.setQueryData(['accounts'], accounts)
+    queryClient.setQueryData(['accounts', {pageIndex: 1}], data)
   })
 
   afterEach(() => {

@@ -26,6 +26,7 @@ describe "CSP Settings API", type: :request do
 
   before do
     allow(HostUrl).to receive(:context_host).with(Account.default, anything).and_return("example1.com")
+    allow(HostUrl).to receive(:context_host).with(->(arg) { arg != Account.default }, anything).and_call_original
   end
 
   before :once do
@@ -54,7 +55,7 @@ describe "CSP Settings API", type: :request do
 
     it "is unauthorized" do
       course_with_student(active_all: true, course: @course)
-      get_csp_settings(@course, 401)
+      get_csp_settings(@course, 403)
     end
 
     describe "course-level settings" do
@@ -329,44 +330,6 @@ describe "CSP Settings API", type: :request do
       json = remove_domain(@sub, domain1)
       expect(@sub.reload.csp_domains.active.pluck(:domain)).to eq [domain2]
       expect(json["current_account_whitelist"]).to eq [domain2]
-    end
-  end
-
-  describe "GET csp_log" do
-    def get_csp_log(account, expected_status)
-      api_call(:get,
-               "/api/v1/accounts/#{account.id}/csp_log",
-               { controller: "csp_settings",
-                 action: "csp_log",
-                 format: "json",
-                 account_id: account.id.to_param },
-               {},
-               {},
-               { expected_status: })
-    end
-
-    it "400s for a subaccount" do
-      get_csp_log(@sub, 400)
-    end
-
-    it "requires authorization" do
-      course_with_teacher(active_all: true, course: @course)
-      get_csp_log(Account.default, 401)
-    end
-
-    it "requires csp logging to be configured" do
-      allow_any_instantiation_of(Account.default).to receive(:csp_logging_config).and_return({})
-      get_csp_log(Account.default, 503)
-    end
-
-    it "just passes through the result from the external service" do
-      allow_any_instantiation_of(Account.default).to receive(:csp_logging_config).and_return(
-        { "host" => "http://csp_logging.docker/", "shared_secret" => "bob" }
-      )
-      expect(CanvasHttp).to receive(:get).with("http://csp_logging.docker/report/#{Account.default.global_id}",
-                                               { "Authorization" => "Bearer bob" }).and_return(double(body: "{}"))
-      res = get_csp_log(Account.default, 200)
-      expect(res).to eq({})
     end
   end
 end

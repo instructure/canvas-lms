@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {clone} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -25,10 +25,8 @@ import ConferenceCollection from './backbone/collections/ConferenceCollection'
 import Conference from './backbone/models/Conference'
 import ConferenceView from './backbone/views/ConferenceView'
 import ConcludedConferenceView from './backbone/views/ConcludedConferenceView'
-import EditConferenceView from './backbone/views/EditConferenceView'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms'
-import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
@@ -40,80 +38,87 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {VideoConferenceModal} from './react/components/VideoConferenceModal/VideoConferenceModal'
 import getCookie from '@instructure/get-cookie'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('conferences')
+const I18n = createI18nScope('conferences')
 
-if (ENV.can_create_conferences) {
-  if (ENV.render_alternatives) {
-    const node = document.getElementById('conference-alternatives-container')
-    if (!node) {
-      throw new Error('Could not find #conference-alternatives-container')
-    }
-    renderConferenceAlternatives(node)
-  }
-}
-
-const ConferencesRouter = Backbone.Router.extend({
-  routes: {
-    '': 'index',
-    'conference_:id': 'edit',
-  },
-
-  editView: null,
-  currentConferences: null,
-  concludedConferences: null,
-
-  initialize() {
-    this.close = this.close.bind(this)
-    // populate the conference list with inital set of data
-    this.editView = new EditConferenceView()
-
-    this.currentConferences = new ConferenceCollection(ENV.current_conferences)
-    this.currentConferences.on('change', () => {
-      // focus if edit finalized (element is redrawn so we find by id)
-      if (this.editConferenceId) {
-        $(`#new-conference-list div[data-id=${this.editConferenceId}] .al-trigger`).focus()
+ready(() => {
+  if (ENV.can_create_conferences) {
+    if (ENV.render_alternatives) {
+      const node = document.getElementById('conference-alternatives-container')
+      if (!node) {
+        throw new Error('Could not find #conference-alternatives-container')
       }
-    })
-    let view = (this.currentView = new CollectionView({
-      el: $('#new-conference-list'),
-      itemView: ConferenceView,
-      collection: this.currentConferences,
-      emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
-      listClassName: 'ig-list',
-    }))
-    view.render()
+      renderConferenceAlternatives(node)
+    }
+  }
 
-    this.concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
-    view = this.concludedView = new CollectionView({
-      el: $('#concluded-conference-list'),
-      itemView: ConcludedConferenceView,
-      collection: this.concludedConferences,
-      emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences'),
-      listClassName: 'ig-list',
-    })
-    view.render()
+  const ConferencesRouter = Backbone.Router.extend({
+    routes: {
+      '': 'index',
+      'conference_:id': 'edit',
+    },
 
-    $.screenReaderFlashMessage(
-      I18n.t(
-        'notifications.inaccessible',
-        'Warning: This page contains third-party content which is not accessible to screen readers.'
-      ),
-      20000
-    )
+    editView: null,
+    currentConferences: null,
+    concludedConferences: null,
 
-    $('.new-conference-btn').on('click', () => this.create())
-  },
+    initialize() {
+      this.close = this.close.bind(this)
+      // populate the conference list with inital set of data
 
-  index() {
-    this.editView.close()
-  },
+      this.currentConferences = new ConferenceCollection(ENV.current_conferences)
+      this.currentConferences.on('change', () => {
+        // focus if edit finalized (element is redrawn so we find by id)
+        if (this.editConferenceId) {
+          $(`#new-conference-list div[data-id=${this.editConferenceId}] .al-trigger`).focus()
+        }
+      })
+      let view = (this.currentView = new CollectionView({
+        el: $('#new-conference-list'),
+        itemView: ConferenceView,
+        collection: this.currentConferences,
+        emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
+        listClassName: 'ig-list',
+      }))
+      view.render()
 
-  create() {
-    const conference = new Conference(clone(ENV.default_conference))
-    conference.once('startSync', () => this.currentConferences.unshift(conference))
-    if (conference.get('permissions').create) {
-      if (ENV.bbb_modal_update) {
+      this.concludedConferences = new ConferenceCollection(ENV.concluded_conferences)
+      view = this.concludedView = new CollectionView({
+        el: $('#concluded-conference-list'),
+        itemView: ConcludedConferenceView,
+        collection: this.concludedConferences,
+        emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences'),
+        listClassName: 'ig-list',
+      })
+      view.render()
+
+      $.screenReaderFlashMessage(
+        I18n.t(
+          'notifications.inaccessible',
+          'Warning: This page contains third-party content which is not accessible to screen readers.',
+        ),
+        20000,
+      )
+
+      const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+        const currentCrumbs = getCrumbs()
+        currentCrumbs.at(-1).url = ''
+        setCrumbs(currentCrumbs)
+      }
+
+      initializeTopNavPortalWithDefaults({
+        getBreadCrumbSetter: handleBreadCrumbSetter,
+        useStudentView: true,
+      })
+
+      $('.new-conference-btn').on('click', () => this.create())
+    },
+
+    create() {
+      const conference = new Conference(clone(ENV.default_conference))
+      conference.once('startSync', () => this.currentConferences.unshift(conference))
+      if (conference.get('permissions').create) {
         const {attributes} = conference
 
         const availableAttendeesList = ENV.users.map(({id, name}) => {
@@ -146,6 +151,7 @@ const ConferencesRouter = Backbone.Router.extend({
           }) || []
 
         const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
+
         ReactDOM.render(
           <VideoConferenceModal
             open={true}
@@ -153,6 +159,7 @@ const ConferencesRouter = Backbone.Router.extend({
             availableAttendeesList={menuData}
             onDismiss={() => {
               window.location.hash = ''
+
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
             onSubmit={async (e, data) => {
@@ -160,8 +167,8 @@ const ConferencesRouter = Backbone.Router.extend({
                 attributes.context_type === 'Course'
                   ? 'courses'
                   : attributes.context_type === 'Group'
-                  ? 'groups'
-                  : null
+                    ? 'groups'
+                    : null
               const contextId = attributes.context_id
               const inviteAll = data.invitationOptions.includes('invite_all') ? 1 : 0
               const noTimeLimit = data.options.includes('no_time_limit') ? 1 : 0
@@ -210,7 +217,6 @@ const ConferencesRouter = Backbone.Router.extend({
                   }
                 })
               }
-
               ;[
                 'share_webcam',
                 'share_microphone',
@@ -248,25 +254,21 @@ const ConferencesRouter = Backbone.Router.extend({
               }
             }}
           />,
-          document.getElementById('react-conference-modal-container')
+          document.getElementById('react-conference-modal-container'),
         )
-      } else {
-        this.editView.show(conference)
       }
-    }
-  },
+    },
 
-  edit(conference) {
-    conference =
-      this.currentConferences.get(conference) || this.concludedConferences.get(conference)
-    if (!conference) return
-    if (!conference.get('permissions').update) {
-      // reached when a user without edit permissions navigates
-      // to a specific conference's url directly
-      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
-      return
-    }
-    if (ENV.bbb_modal_update) {
+    edit(conference) {
+      conference =
+        this.currentConferences.get(conference) || this.concludedConferences.get(conference)
+      if (!conference) return
+      if (!conference.get('permissions').update) {
+        // reached when a user without edit permissions navigates
+        // to a specific conference's url directly
+        $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+        return
+      }
       const {attributes} = conference
       const options = []
       const invitationOptions = []
@@ -316,7 +318,6 @@ const ConferencesRouter = Backbone.Router.extend({
       if (attributes.has_calendar_event && attributes.start_at && attributes.end_at) {
         options.push('add_to_calendar')
       }
-
       ;[
         'share_webcam',
         'share_other_webcams',
@@ -349,6 +350,7 @@ const ConferencesRouter = Backbone.Router.extend({
           endCalendarDate={attributes.end_at}
           onDismiss={() => {
             window.location.hash = ''
+
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
           onSubmit={async (e, data) => {
@@ -356,8 +358,8 @@ const ConferencesRouter = Backbone.Router.extend({
               attributes.context_type === 'Course'
                 ? 'courses'
                 : attributes.context_type === 'Group'
-                ? 'groups'
-                : null
+                  ? 'groups'
+                  : null
             const contextId = attributes.context_id
             const conferenceId = conference.id
             const inviteAll = data.invitationOptions.includes('invite_all') ? 1 : 0
@@ -407,7 +409,6 @@ const ConferencesRouter = Backbone.Router.extend({
                 }
               })
             }
-
             ;[
               'share_webcam',
               'share_other_webcams',
@@ -416,7 +417,7 @@ const ConferencesRouter = Backbone.Router.extend({
               'send_private_chat',
             ].forEach(option => {
               payload[`web_conference[user_settings][${option}]`] = data.attendeesOptions.includes(
-                option
+                option,
               )
                 ? 1
                 : 0
@@ -438,7 +439,7 @@ const ConferencesRouter = Backbone.Router.extend({
 
             const response = await fetch(
               `/${context}/${contextId}/conferences/${conferenceId}`,
-              requestOptions
+              requestOptions,
             )
 
             if (response.status === 200) {
@@ -451,21 +452,16 @@ const ConferencesRouter = Backbone.Router.extend({
             }
           }}
         />,
-        document.getElementById('react-conference-modal-container')
+        document.getElementById('react-conference-modal-container'),
       )
-    } else {
-      this.editConferenceId = conference.get('id')
-      this.editView.show(conference, {isEditing: true})
-    }
-  },
+    },
 
-  close(conference) {
-    this.currentConferences.remove(conference)
-    this.concludedConferences.unshift(conference)
-  },
-})
+    close(conference) {
+      this.currentConferences.remove(conference)
+      this.concludedConferences.unshift(conference)
+    },
+  })
 
-ready(() => {
   window.router = new ConferencesRouter()
   Backbone.history.start()
 })

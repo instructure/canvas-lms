@@ -39,10 +39,12 @@ describe "courses" do
         @course.save
       end
 
-      def validate_action_button(postion, validation_text)
-        action_button = ff("#course_status_actions button").send(postion)
-        expect(action_button).to have_class("disabled")
+      def validate_action_button(validation_text)
+        f("#course_publish_button button").click
+        action_button = f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])")
         expect(action_button.text).to eq validation_text
+        # Close menu
+        f("#course_publish_button button").click
       end
 
       it "allows publishing of the course through the course status actions" do
@@ -50,13 +52,14 @@ describe "courses" do
         @course.lock_all_announcements = true
         @course.save!
         get "/courses/#{@course.id}"
-        course_status_buttons = ff("#course_status_actions button")
-        expect(course_status_buttons.first).to have_class("disabled")
-        expect(course_status_buttons.first.text).to eq "Unpublished"
-        expect(course_status_buttons.last).not_to have_class("disabled")
-        expect(course_status_buttons.last.text).to eq "Publish"
-        expect_new_page_load { course_status_buttons.last.click }
-        validate_action_button(:last, "Published")
+        course_status_button = f("#course_publish_button button")
+        expect(course_status_button.text).to include("Unpublished")
+        validate_action_button("Publish")
+        expect_new_page_load do
+          f("#course_publish_button button").click
+          f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        end
+        validate_action_button("Unpublish")
 
         @course.reload
         expect(@course.lock_all_announcements).to be_truthy
@@ -71,14 +74,17 @@ describe "courses" do
       end
 
       it "allows unpublishing of a course through the course status actions" do
+        @course.workflow_state = "available"
+        @course.save!
         get "/courses/#{@course.id}"
-        course_status_buttons = ff("#course_status_actions button")
-        expect(course_status_buttons.first).not_to have_class("disabled")
-        expect(course_status_buttons.first.text).to eq " Unpublish"
-        expect(course_status_buttons.last).to have_class("disabled")
-        expect(course_status_buttons.last.text).to eq "Published"
-        expect_new_page_load { course_status_buttons.first.click }
-        validate_action_button(:first, "Unpublished")
+        course_status_button = f("#course_publish_button button")
+        expect(course_status_button.text).to include("Published")
+        validate_action_button("Unpublish")
+        expect_new_page_load do
+          f("#course_publish_button button").click
+          f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        end
+        validate_action_button("Publish")
       end
 
       it "allows publishing even if graded submissions exist" do
@@ -86,12 +92,11 @@ describe "courses" do
         @course.default_view = "feed"
         @course.save
         get "/courses/#{@course.id}"
-        course_status_buttons = ff("#course_status_actions button")
-        expect(course_status_buttons.first).to have_class("disabled")
-        expect(course_status_buttons.first.text).to eq "Unpublished"
-        expect(course_status_buttons.last).not_to have_class("disabled")
-        expect(course_status_buttons.last.text).to eq "Publish"
-        expect_new_page_load { course_status_buttons.last.click }
+        validate_action_button("Publish")
+        expect_new_page_load do
+          f("#course_publish_button button").click
+          f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        end
         @course.reload
         expect(@course).to be_available
       end
@@ -101,23 +106,10 @@ describe "courses" do
         @course.default_view = "feed"
         @course.save
         get "/courses/#{@course.id}"
-        expect(f("#content")).not_to contain_css("#course_status")
+        expect(f("#content")).not_to contain_css("#course_publish_button")
       end
 
-      it "allows publishing/unpublishing with only change_course_state permission" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(permission: :manage_course_content, role: teacher_role, enabled: false)
-        @course.account.role_overrides.create!(permission: :manage_courses, role: teacher_role, enabled: false)
-
-        get "/courses/#{@course.id}"
-        expect_new_page_load { ff("#course_status_actions button").first.click }
-        validate_action_button(:first, "Unpublished")
-        expect_new_page_load { ff("#course_status_actions button").last.click }
-        validate_action_button(:last, "Published")
-      end
-
-      it "allows publishing/unpublishing with only manage_courses_publish permission (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      it "allows publishing/unpublishing with only manage_courses_publish permission" do
         @course.account.role_overrides.create!(
           permission: :manage_course_content,
           role: teacher_role,
@@ -130,22 +122,19 @@ describe "courses" do
         )
 
         get "/courses/#{@course.id}"
-        expect_new_page_load { ff("#course_status_actions button").first.click }
-        validate_action_button(:first, "Unpublished")
-        expect_new_page_load { ff("#course_status_actions button").last.click }
-        validate_action_button(:last, "Published")
+        expect_new_page_load do
+          f("#course_publish_button button").click
+          f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        end
+        validate_action_button("Publish")
+        expect_new_page_load do
+          f("#course_publish_button button").click
+          f("div[role='menu'][aria-label='course_publish_menu'] button:not([aria-disabled])").click
+        end
+        validate_action_button("Unpublish")
       end
 
-      it "does not allow publishing/unpublishing without change_course_state permission" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(permission: :change_course_state, role: teacher_role, enabled: false)
-
-        get "/courses/#{@course.id}"
-        expect(f("#content")).not_to contain_css("#course_status_actions")
-      end
-
-      it "does not allow publishing/unpublishing without manage_courses_publish permission (granular permissions)" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
+      it "does not allow publishing/unpublishing without manage_courses_publish permission" do
         @course.account.role_overrides.create!(
           permission: :manage_courses_publish,
           role: teacher_role,
@@ -153,7 +142,7 @@ describe "courses" do
         )
 
         get "/courses/#{@course.id}"
-        expect(f("#content")).not_to contain_css("#course_status_actions")
+        expect(f("#content")).not_to contain_css("#course_publish_button")
       end
     end
 
@@ -162,7 +151,6 @@ describe "courses" do
 
       # first try setting the quota explicitly
       get "/courses/#{@course.id}/settings"
-      f("#ui-id-1").click
       form = f("#course_form")
       expect(form).to be_displayed
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")
@@ -175,12 +163,12 @@ describe "courses" do
     it "saves quota when not changed" do
       # then try just saving it (without resetting it)
       course_with_admin_logged_in
-      @course.update!(storage_quota: 10.megabytes)
+      @course.update!(storage_quota: 10.decimal_megabytes)
       get "/courses/#{@course.id}/settings"
       form = f("#course_form")
       submit_form(form)
       value = @course.storage_quota
-      expect(value).to eq 10.megabytes
+      expect(value).to eq 10.decimal_megabytes
     end
 
     it "redirects to the gradebook when switching courses when viewing a students grades" do
@@ -222,7 +210,9 @@ describe "courses" do
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
-      expect(ff(".roster .rosterUser").length).to eq 2
+      wait_for(method: nil, timeout: 5) do
+        expect(ff(".roster .rosterUser").length).to eq 2
+      end
     end
 
     it "displays users section name" do

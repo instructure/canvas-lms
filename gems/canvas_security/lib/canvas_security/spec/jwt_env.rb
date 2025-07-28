@@ -48,7 +48,7 @@ RSpec.shared_context "JWT setup" do
   end
 
   before do
-    allow(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials: {})) unless Rails.application.present?
+    allow(Rails).to receive(:application).and_return(instance_double(Rails::Application, credentials: {})) unless Rails.application.present?
 
     allow(Rails.application.credentials).to receive(:dig).and_call_original
     allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return(fake_encryption_secret)
@@ -74,7 +74,7 @@ RSpec.shared_context "JWT setup with deprecated secret" do
   let(:fake_signing_secret_deprecated) { "nowiknowmyabcsnexttimewontyou..." }
 
   before do
-    allow(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials: {})) unless Rails.application.present?
+    allow(Rails).to receive(:application).and_return(instance_double(Rails::Application, credentials: {})) unless Rails.application.present?
 
     allow(Rails.application.credentials).to receive(:dig).and_call_original
     allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return(fake_encryption_secret)

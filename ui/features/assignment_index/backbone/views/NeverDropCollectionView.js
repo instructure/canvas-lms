@@ -52,7 +52,7 @@ NeverDropCollectionView.prototype.createItemView = function (model) {
   const options = {
     canChangeDropRules: this.canChangeDropRules,
   }
-  // eslint-disable-next-line new-cap
+
   return new this.itemView(
     $.extend(
       {},
@@ -60,8 +60,8 @@ NeverDropCollectionView.prototype.createItemView = function (model) {
       {
         model,
       },
-      options
-    )
+      options,
+    ),
   )
 }
 

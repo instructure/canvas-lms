@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
   GradebookSortOrder,
@@ -28,7 +28,7 @@ import {
 } from '../../types'
 import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook_content_selection')
+const I18n = createI18nScope('enhanced_individual_gradebook_content_selection')
 
 type DropDownOption<T> = {
   id: string
@@ -91,7 +91,7 @@ export const useUserDropdownOptions = ({
     const filteredStudents = students.filter(
       student =>
         filteredStates.includes(student.state) &&
-        (selectedSection ? student.sections.includes(selectedSection) : true)
+        (selectedSection ? student.sections.includes(selectedSection) : true),
     )
     const studentOptions: StudentDropdownOption = [
       defaultStudentDropdownOptions,
@@ -143,7 +143,7 @@ export const useAssignmentDropdownOptions = ({
 
     if (selectedGradingPeriodId) {
       filteredAssignments = filteredAssignments.filter(
-        assignment => assignment.gradingPeriodId === selectedGradingPeriodId
+        assignment => assignment.gradingPeriodId === selectedGradingPeriodId,
       )
     }
 

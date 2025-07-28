@@ -20,6 +20,35 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CustomEmojiDenyList from '../CustomEmojiDenyList'
 
+jest.mock('@canvas/emoji', () => ({
+  EmojiPicker: () => 'emoji-picker',
+}))
+
+jest.mock('emoji-mart', () => ({
+  Emoji: () => 'emoji',
+}))
+
+jest.mock('emoji-mart/data/all.json', () => ({
+  emojis: {
+    middle_finger: {
+      name: 'Reversed Hand with Middle Finger Extended',
+      id: 'middle_finger',
+    },
+    eggplant: {
+      name: 'Aubergine',
+      id: 'eggplant',
+    },
+    kissing_heart: {
+      name: 'Face Throwing a Kiss',
+      id: 'kissing_heart',
+    },
+    stuck_out_tongue_closed_eyes: {
+      name: 'Face With Stuck-Out Tongue and Tightly-Closed Eyes',
+      id: 'stuck_out_tongue_closed_eyes',
+    },
+  },
+}))
+
 describe('CustomEmojiDenyList', () => {
   let originalENV
 
@@ -37,7 +66,7 @@ describe('CustomEmojiDenyList', () => {
     window.ENV.EMOJI_DENY_LIST = 'middle_finger,eggplant'
     const {getByRole} = render(<CustomEmojiDenyList />)
     expect(
-      getByRole('button', {name: /Remove emoji "Reversed Hand with Middle Finger Extended"/})
+      getByRole('button', {name: /Remove emoji "Reversed Hand with Middle Finger Extended"/}),
     ).toBeInTheDocument()
     expect(getByRole('button', {name: /Remove emoji "Aubergine"/})).toBeInTheDocument()
   })

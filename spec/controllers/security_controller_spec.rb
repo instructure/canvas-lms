@@ -84,58 +84,148 @@ RSpec.describe SecurityController, type: :request do
   end
 
   describe "openid_configuration" do
+    let(:messages) do
+      [{ "type" => "LtiResourceLinkRequest",
+         "placements" =>
+       ["https://canvas.instructure.com/lti/account_navigation",
+        "https://canvas.instructure.com/lti/analytics_hub",
+        "https://canvas.instructure.com/lti/assignment_edit",
+        "https://canvas.instructure.com/lti/assignment_group_menu",
+        "https://canvas.instructure.com/lti/assignment_index_menu",
+        "https://canvas.instructure.com/lti/assignment_menu",
+        "https://canvas.instructure.com/lti/assignment_selection",
+        "https://canvas.instructure.com/lti/assignment_view",
+        "https://canvas.instructure.com/lti/collaboration",
+        "https://canvas.instructure.com/lti/conference_selection",
+        "https://canvas.instructure.com/lti/course_assignments_menu",
+        "https://canvas.instructure.com/lti/course_home_sub_navigation",
+        "https://canvas.instructure.com/lti/course_navigation",
+        "https://canvas.instructure.com/lti/course_settings_sub_navigation",
+        "https://canvas.instructure.com/lti/discussion_topic_index_menu",
+        "https://canvas.instructure.com/lti/discussion_topic_menu",
+        "https://canvas.instructure.com/lti/file_index_menu",
+        "https://canvas.instructure.com/lti/file_menu",
+        "https://canvas.instructure.com/lti/global_navigation",
+        "https://canvas.instructure.com/lti/homework_submission",
+        "https://canvas.instructure.com/lti/link_selection",
+        "https://canvas.instructure.com/lti/migration_selection",
+        "https://canvas.instructure.com/lti/module_group_menu",
+        "https://canvas.instructure.com/lti/module_index_menu",
+        "https://canvas.instructure.com/lti/module_index_menu_modal",
+        "https://canvas.instructure.com/lti/module_menu_modal",
+        "https://canvas.instructure.com/lti/module_menu",
+        "https://canvas.instructure.com/lti/post_grades",
+        "https://canvas.instructure.com/lti/quiz_index_menu",
+        "https://canvas.instructure.com/lti/quiz_menu",
+        "https://canvas.instructure.com/lti/similarity_detection",
+        "https://canvas.instructure.com/lti/student_context_card",
+        "https://canvas.instructure.com/lti/submission_type_selection",
+        "https://canvas.instructure.com/lti/tool_configuration",
+        "https://canvas.instructure.com/lti/top_navigation",
+        "https://canvas.instructure.com/lti/user_navigation",
+        "https://canvas.instructure.com/lti/wiki_index_menu",
+        "https://canvas.instructure.com/lti/wiki_page_menu",
+        "ContentArea"] },
+       { "type" => "LtiDeepLinkingRequest",
+         "placements" =>
+         ["https://canvas.instructure.com/lti/assignment_selection",
+          "ActivityAssetProcessor",
+          "https://canvas.instructure.com/lti/collaboration",
+          "https://canvas.instructure.com/lti/conference_selection",
+          "https://canvas.instructure.com/lti/course_assignments_menu",
+          "https://canvas.instructure.com/lti/editor_button",
+          "https://canvas.instructure.com/lti/homework_submission",
+          "https://canvas.instructure.com/lti/link_selection",
+          "https://canvas.instructure.com/lti/migration_selection",
+          "https://canvas.instructure.com/lti/module_index_menu_modal",
+          "https://canvas.instructure.com/lti/module_menu_modal",
+          "https://canvas.instructure.com/lti/submission_type_selection",
+          "ContentArea",
+          "RichTextEditor"] },
+       { "type" => "LtiEulaRequest" }]
+    end
+
     before do
       allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
     end
 
+    def make_jwt(time = nil)
+      time ||= 5.minutes.from_now
+      body = {
+        user_id: 1,
+        root_account_global_id: Account.default.global_id
+      }
+      Canvas::Security.create_jwt(body, time)
+    end
+
     it "rejects timed-out tokens" do
-      jwt = Canvas::Security.create_jwt({
-                                          user_id: 1,
-                                          root_account_uuid: Account.default.uuid
-                                        },
-                                        5.minutes.ago)
+      jwt = make_jwt(5.minutes.ago)
 
       get "/api/lti/security/openid-configuration", headers: { "Authorization" => "Bearer #{jwt}" }
       expect(response).to have_http_status :unauthorized
     end
 
     it "contains the correct information" do
-      jwt = Canvas::Security.create_jwt({
-                                          user_id: 1,
-                                          root_account_global_id: Account.default.global_id
-                                        },
-                                        5.minutes.from_now)
+      notice_types = SecurityController.notice_types_supported
 
-      messages = Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys.map(&:to_s).map do |message_type|
-        {
-          "type" => message_type,
-          "placements" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE[message_type].reject { |p| p == :resource_selection }.map(&:to_s)
-        }
-      end
+      get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
 
-      get "/api/lti/security/openid-configuration?registration_token=#{jwt}"
       expect(response).to have_http_status :ok
       parsed_body = response.parsed_body
       expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
       expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
       expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+      expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
       expect(parsed_body["jwks_uri"]).to eq "http://canvas.instructure.com/api/lti/security/jwks"
       expect(parsed_body["token_endpoint"]).to eq "http://canvas.instructure.com/login/oauth2/token"
       lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
       expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
       expect(lti_platform_configuration["messages_supported"]).to eq messages
-    end
-  end
-
-  context "sharding" do
-    specs_require_sharding
-
-    before do
-      allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+      expect(lti_platform_configuration["notice_types_supported"]).to eq notice_types
     end
 
-    describe "openid_configuration" do
+    it "contains the scopes based on available public scopes for that account (possibly feature-flag-gated)" do
+      sample_scope_urls_for_root_account =
+        TokenScopes::LTI_SCOPES.keys - [TokenScopes::LTI_ASSET_REPORT_SCOPE]
+
+      expect(TokenScopes).to receive(:public_lti_scopes_urls_for_account) do |acct|
+        expect(acct.id).to eq(Account.default.id)
+        sample_scope_urls_for_root_account
+      end
+
+      get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+      expected_scopes = ["openid"] | sample_scope_urls_for_root_account
+      expect(response.parsed_body["scopes_supported"]).to match_array(expected_scopes)
+    end
+
+    context "when the lti_asset_processor feature flag is off" do
+      before do
+        Account.default.disable_feature!(:lti_asset_processor)
+      end
+
+      it "contains the correct information" do
+        messages.each do |message|
+          message["placements"] -= ["ActivityAssetProcessor"] if message["placements"]
+        end
+
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["messages_supported"]).to eq messages
+      end
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before do
+        allow(Lti::Oidc).to receive(:auth_domain).and_return("canvas.instructure.com")
+      end
+
       it "works cross-shard" do
         account_name = "Shard 2 Account"
 
@@ -157,6 +247,7 @@ RSpec.describe SecurityController, type: :request do
         expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
         expect(parsed_body["authorization_endpoint"]).to eq "http://canvas.instructure.com/api/lti/authorize_redirect"
         expect(parsed_body["registration_endpoint"]).to eq "http://localhost/api/lti/registrations"
+        expect(parsed_body["scopes_supported"]).to match_array(["openid", *TokenScopes::LTI_SCOPES.keys])
         lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
         expect(lti_platform_configuration["product_family_code"]).to eq "canvas"
         expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Shard 2 Account"

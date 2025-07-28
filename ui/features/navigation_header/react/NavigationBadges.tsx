@@ -17,35 +17,37 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Portal} from '@instructure/ui-portal'
-import {useQuery} from '@canvas/query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting} from '@canvas/settings-query/react/settingsQuery'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
+import {useBroadcastQuery} from '@canvas/query/broadcast'
 
-const I18n = useI18nScope('Navigation')
+const I18n = createI18nScope('Navigation')
 
 const unreadReleaseNotesCountElement = document.querySelector(
-  '#global_nav_help_link .menu-item__badge'
+  '#global_nav_help_link .menu-item__badge',
 )
 const unreadInboxCountElement = document.querySelector(
-  '#global_nav_conversations_link .menu-item__badge'
+  '#global_nav_conversations_link .menu-item__badge',
 )
 const unreadSharesCountElement = document.querySelector(
-  '#global_nav_profile_link .menu-item__badge'
+  '#global_nav_profile_link .menu-item__badge',
 )
 
 export default function NavigationBadges() {
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: releaseNotesBadgeDisabled} = useQuery({
     queryKey: ['settings', 'release_notes_badge_disabled'],
     queryFn: getSetting,
     enabled: countsEnabled && ENV.FEATURES.embedded_release_notes,
-    fetchAtLeastOnce: true,
+    persister: sessionStoragePersister,
   })
 
   const {data: unreadContentSharesCount, isSuccess: hasUnreadContentSharesCount} = useQuery({
@@ -53,7 +55,12 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
+    persister: sessionStoragePersister,
     refetchOnWindowFocus: true,
+  })
+
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'content_shares'],
   })
 
   const {data: unreadConversationsCount, isSuccess: hasUnreadConversationsCount} = useQuery({
@@ -61,8 +68,12 @@ export default function NavigationBadges() {
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
-    broadcast: true,
+    persister: sessionStoragePersister,
     refetchOnWindowFocus: true,
+  })
+
+  useBroadcastQuery({
+    queryKey: ['unread_count', 'conversations'],
   })
 
   const {data: unreadReleaseNotesCount, isSuccess: hasUnreadReleaseNotesCount} = useQuery({
@@ -85,7 +96,7 @@ export default function NavigationBadges() {
                 one: 'One unread share.',
                 other: '%{count} unread shares.',
               },
-              {count: unreadContentSharesCount}
+              {count: unreadContentSharesCount},
             )}
           </>
         </ScreenReaderContent>
@@ -103,7 +114,7 @@ export default function NavigationBadges() {
                 one: 'One unread message.',
                 other: '%{count} unread messages.',
               },
-              {count: unreadConversationsCount}
+              {count: unreadConversationsCount},
             )}
           </>
         </ScreenReaderContent>
@@ -121,7 +132,7 @@ export default function NavigationBadges() {
                 one: 'One unread release note.',
                 other: '%{count} unread release notes.',
               },
-              {count: unreadReleaseNotesCount}
+              {count: unreadReleaseNotesCount},
             )}
           </>
         </ScreenReaderContent>

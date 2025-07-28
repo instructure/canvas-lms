@@ -17,6 +17,7 @@
  */
 
 import * as browser from '../common/browser'
+// eslint-disable-next-line no-redeclare
 import tinymce from 'tinymce'
 
 // load theme
@@ -41,6 +42,7 @@ import 'tinymce/plugins/hr/plugin'
 import 'tinymce/plugins/searchreplace/plugin'
 
 // add custom plugins
+import './plugins/instructure_color/plugin'
 import './plugins/instructure-ui-icons/plugin'
 import './plugins/instructure_condensed_buttons/plugin'
 import './plugins/instructure_equation/plugin'

@@ -23,15 +23,6 @@ describe GraphQLController do
     student_in_course(user: user_with_pseudonym)
   end
 
-  let(:federation_query_params) do
-    {
-      query: "query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }",
-      variables: {
-        representations: [{ __typename: "Course", id: "Q291cnNlLTE=" }]
-      }
-    }
-  end
-
   context "graphiql" do
     it "requires a user" do
       get :graphiql
@@ -76,39 +67,67 @@ describe GraphQLController do
       expect(response.parsed_body["data"]).not_to be_blank
     end
 
-    it "does not handle Apollo Federation queries" do
-      post :execute, params: federation_query_params, format: :json
-      expect(response.parsed_body["errors"]).not_to be_blank
-      expect(response.parsed_body["data"]).to be_blank
-    end
+    context "CreateSubmission" do
+      before do
+        Setting.set("enable_page_views", "db")
+        @course = course_factory(name: "course", active_course: true)
+        student_in_course(active_all: true, course: @course)
+        user_session(@student)
 
-    it "logs a page view for CreateSubmission" do
-      Setting.set("enable_page_views", "db")
-      @course = course_factory(name: "course", active_course: true)
+        @assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: "online_text_entry"
+        )
 
-      @assignment = @course.assignments.create!(
-        name: "assignment",
-        due_at: 5.days.ago,
-        points_possible: 10,
-        submission_types: "online_text_entry"
-      )
+        @test_query = <<~GQL
+          mutation CreateSubmission($assignmentLid: ID!, $type: OnlineSubmissionType!, $body: String!) {
+            createSubmission(input: {
+              assignmentId: $assignmentLid
+              submissionType: $type
+              body: $body
+            }) {
+              submission {
+                _id
+                attempt
+              }
+              errors {
+                attribute
+                message
+              }
+            }
+          }
+        GQL
 
-      test_query = <<~GQL
-        mutation {
-          CreateSubmission(input: {assignmentId: $assignmentLid, submissionType: $type, body: $body})
-      GQL
+        @test_variables = {
+          assignmentLid: @assignment.id,
+          body: "<p>test</p>",
+          type: "online_text_entry"
+        }
 
-      test_variables = {
-        assignmentLid: @assignment.id,
-        body: "<p>test</p>",
-        type: "online_text_entry"
-      }
-      # need this for the page view to be assigned a proper request_id
-      RequestContext::Generator.new(->(_env) { [200, {}, []] }).call({})
+        # need this for the page view to be assigned a proper request_id
+        RequestContext::Generator.new(->(_env) { [200, {}, []] }).call({})
+      end
 
-      expect { post :execute, params: { query: test_query, operationName: "CreateSubmission", variables: test_variables }, format: :json }.to change { PageView.count }.by(1)
+      it "logs a page view for CreateSubmission" do
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.to change { PageView.count }.by(1)
 
-      expect(PageView.last.participated).to be(true)
+        expect(PageView.last.participated).to be(true)
+      end
+
+      it "does not log a page view for CreateSubmission when graphql error (user has no permission)" do
+        usr = user_model
+        user_session(usr)
+
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.not_to change { PageView.count }
+      end
+
+      it "does not log a page view for CreateSubmission if generic graphql error" do
+        allow(GraphQLTuning).to receive(:max_complexity).and_return(1)
+
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.not_to change { PageView.count }
+      end
     end
 
     context "discussions" do
@@ -155,7 +174,7 @@ describe GraphQLController do
       it "increments participate_score on participate for DiscussionTopic" do
         course_with_teacher(active_all: true)
         student_in_course(active_all: true)
-        discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
+        dt = discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
 
         user_session(@student)
 
@@ -163,6 +182,11 @@ describe GraphQLController do
         expect(AssetUserAccess.last.participate_score).to eq 1.0
 
         create_discussion_entry("Post 2")
+        expect(AssetUserAccess.last.participate_score).to eq 2.0
+
+        dt.locked = true
+        dt.save!
+        create_discussion_entry("failure")
         expect(AssetUserAccess.last.participate_score).to eq 2.0
       end
 
@@ -271,55 +295,129 @@ describe GraphQLController do
         end
       end
     end
-  end
 
-  describe "subgraph_execute" do
-    context "with authentication" do
-      around do |example|
-        InstAccess.with_config(signing_key: signing_priv_key, &example)
+    context "get_context" do
+      context "on creating submissions" do
+        before do
+          @course = Course.create!
+          @assignment = @course.assignments.create!
+        end
+
+        it "sets context based on the course" do
+          params = { operationName: "CreateSubmission", variables: { assignmentLid: @assignment.id } }
+          expect { post :execute, params:, format: :json }.to change { subject.context }.from(nil).to(@course)
+        end
       end
 
-      let(:token_signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
-      let(:signing_priv_key) { token_signing_keypair.to_s }
-      let(:token) { InstAccess::Token.for_user(user_uuid: @student.uuid, account_uuid: @student.account.uuid) }
+      context "on creating discussion entries" do
+        before do
+          @course = Course.create!
+          @group = Group.create!(context: @course)
 
-      it "handles standard queries" do
-        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
-        post :subgraph_execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
+          @course_discussion_topic = DiscussionTopic.create!(context: @course)
+          @group_discussion_topic = DiscussionTopic.create!(context: @group)
+        end
+
+        context "when the discussion is under a course" do
+          it "sets context based on the course" do
+            params = { operationName: "CreateDiscussionEntry", variables: { discussionTopicId: @course_discussion_topic.id } }
+            expect { post :execute, params:, format: :json }.to change { subject.context }.from(nil).to(@course)
+          end
+        end
+
+        context "when the discussion is under a group" do
+          it "sets context based on the group" do
+            params = { operationName: "CreateDiscussionEntry", variables: { discussionTopicId: @group_discussion_topic.id } }
+            expect { post :execute, params:, format: :json }.to change { subject.context }.from(nil).to(@group)
+          end
+        end
       end
 
-      it "handles Apollo Federation queries" do
-        request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
-        post :subgraph_execute, params: federation_query_params, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
+      context "on other operations" do
+        it "does not change the context" do
+          params = { operationName: "CreateDiscussionTopic" }
+          expect { post :execute, params:, format: :json }.not_to change { subject.context }
+        end
+      end
+
+      context "on invalid context objects" do
+        before do
+          allow(subject).to receive(:subject) { double("dummy subject", pick: ["User", 1]) }
+        end
+
+        it "raises an exception" do
+          post :execute, format: :json
+          expect(response).to have_http_status(:internal_server_error)
+          expect(ErrorReport.last.message).to eq("Can not handle User in GraphQL context")
+        end
       end
     end
 
-    describe "without authentication" do
-      it "services subgraph introspection queries" do
-        post :subgraph_execute, params: { query: "query FederationSubgraphIntrospection { _service { sdl } }" }, format: :json
-        expect(response.parsed_body["errors"]).to be_blank
-        expect(response.parsed_body["data"]).not_to be_blank
-      end
+    it "logs statsd metrics with correct complexity and operation name" do
+      allow(GraphQLTuning).to receive(:max_complexity).and_return(1)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:gauge)
+      allow(controller).to receive(:operation_name).and_return("MyQuery")
 
-      it "rejects other queries" do
-        post :subgraph_execute, params: federation_query_params, format: :json
-        expect(response).to be_unauthorized
-      end
+      post :execute, params: { query: '{ course(id: "1") { id, name } }' }, format: :json
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "graphql.errors.exceeds_max_complexity.count",
+        tags: { operation_name: "MyQuery" }
+      )
+      expect(InstStatsd::Statsd).to have_received(:gauge).with(
+        "graphql.errors.exceeds_max_complexity.compexity",
+        3,
+        tags: { operation_name: "MyQuery" }
+      )
     end
   end
 
   context "with feature flag disable_graphql_authentication enabled" do
     context "graphql, without a session" do
       it "works" do
-        expect(Account.site_admin).to(
-          receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
-        )
+        Account.site_admin.enable_feature!(:disable_graphql_authentication)
         post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
         expect(response.parsed_body["errors"]).to be_blank
         expect(response.parsed_body["data"]).not_to be_blank
+      end
+    end
+  end
+
+  describe "#execute error handling" do
+    before do
+      # Mock the schema execution to return custom error results
+      allow_any_instance_of(GraphQLController).to receive(:execute_on) { mocked_result }
+      user_session(@student)
+    end
+
+    context "when root errors are present" do
+      let(:mocked_result) { { "errors" => [{ "message" => "Root error" }] } }
+
+      it "returns root errors in the response" do
+        post :execute, params: { query: "{ dummy }" }, format: :json
+        expect(response.parsed_body["errors"]).to eq([{ "message" => "Root error" }])
+      end
+    end
+
+    context "when nested data errors are present and no root errors" do
+      let(:mocked_result) do
+        {
+          "data" => {
+            "foo" => { "errors" => [{ "message" => "Nested error" }] },
+            "bar" => { "errors" => [] },
+            "baz" => { "value" => 1 },
+            "qux" => "",
+            "quux" => nil,
+            "corge" => { "errors" => nil }
+          }
+        }
+      end
+
+      it "returns nested data errors in the response" do
+        post :execute, params: { query: "{ dummy }" }, format: :json
+        # The controller currently just renders the result, so errors will be in the data structure
+        expect(response.parsed_body["data"]["foo"]["errors"]).to eq([{ "message" => "Nested error" }])
       end
     end
   end

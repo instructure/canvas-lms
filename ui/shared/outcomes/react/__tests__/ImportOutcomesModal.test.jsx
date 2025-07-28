@@ -17,26 +17,62 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import sinon from 'sinon'
+import {render} from '@testing-library/react'
 import ImportOutcomesModal from '../ImportOutcomesModal'
 
-const element = () => sinon.createStubInstance(Element)
+const element = () => {
+  const el = document.createElement('div')
+  el.trigger = jest.fn()
+  return el
+}
 
-it('renders the ConfirmOutcomeEditModal component', () => {
-  const modal = shallow(<ImportOutcomesModal toolbar={element()} />)
-  expect(modal.exists()).toBe(true)
+it('renders the ImportOutcomesModal component', () => {
+  let modalRef
+  render(
+    <ImportOutcomesModal
+      toolbar={element()}
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  modalRef.show()
+  expect(modalRef).toBeTruthy()
 })
 
-it('renders the ConfirmOutcomeEditModal component wihout toolbar', () => {
-  const modal = shallow(<ImportOutcomesModal />)
-  expect(modal.exists()).toBe(true)
+it('renders the ImportOutcomesModal component without toolbar', () => {
+  let modalRef
+  render(
+    <ImportOutcomesModal
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  modalRef.show()
+  expect(modalRef).toBeTruthy()
 })
 
 it('renders the invalid file error message if a file is rejected', () => {
-  const modal = shallow(<ImportOutcomesModal toolbar={element()} />)
-  modal.instance().onSelection([], [{file: 'foo'}], {})
-  expect(modal.instance().state.messages).toEqual([{text: 'Invalid file type', type: 'error'}])
+  let modalRef
+  const {rerender} = render(
+    <ImportOutcomesModal
+      toolbar={element()}
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  modalRef.onSelection([], [{file: 'foo'}], {})
+  rerender(
+    <ImportOutcomesModal
+      toolbar={element()}
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  expect(modalRef.state.messages).toEqual([{text: 'Invalid file type', type: 'error'}])
 })
 
 it('triggers sync and hides if a file is accepted', () => {
@@ -44,17 +80,33 @@ it('triggers sync and hides if a file is accepted', () => {
   const toolbar = element()
   const dummyFile = {file: 'foo'}
   toolbar.trigger = trigger
-  const modal = shallow(<ImportOutcomesModal toolbar={toolbar} />)
-  modal.instance().onSelection([dummyFile], [], {})
+  let modalRef
+  render(
+    <ImportOutcomesModal
+      toolbar={toolbar}
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  modalRef.onSelection([dummyFile], [], {})
   expect(trigger).toHaveBeenCalledWith('start_sync', dummyFile)
-  expect(modal.instance().state.show).toEqual(false)
+  expect(modalRef.state.show).toEqual(false)
 })
 
 it('calls onFileDrop and hides if a file is accepted', () => {
   const onFileDrop = jest.fn()
   const dummyFile = {file: 'foo'}
-  const modal = shallow(<ImportOutcomesModal onFileDrop={onFileDrop} />)
-  modal.instance().onSelection([dummyFile], [], {})
+  let modalRef
+  render(
+    <ImportOutcomesModal
+      onFileDrop={onFileDrop}
+      ref={ref => {
+        modalRef = ref
+      }}
+    />,
+  )
+  modalRef.onSelection([dummyFile], [], {})
   expect(onFileDrop).toHaveBeenCalledWith(dummyFile, undefined, undefined)
-  expect(modal.instance().state.show).toEqual(false)
+  expect(modalRef.state.show).toEqual(false)
 })

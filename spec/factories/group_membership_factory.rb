@@ -20,8 +20,7 @@
 
 module Factories
   def group_membership_model(opts = {})
-    do_save = opts.key?(:save) ? opts.delete(:save) : true
-    @group_membership = factory_with_protected_attributes(GroupMembership, valid_group_membership_attributes.merge(opts), do_save)
+    @group_membership = GroupMembership.create!(valid_group_membership_attributes.merge(opts))
   end
 
   def valid_group_membership_attributes

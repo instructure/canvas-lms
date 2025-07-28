@@ -42,6 +42,7 @@ describe('GraderCountNumberInput', () => {
       currentGraderCount: null,
       locale: 'en',
       availableGradersCount: 10,
+      hideErrors: jest.fn()
     }
   })
 
@@ -102,13 +103,6 @@ describe('GraderCountNumberInput', () => {
     expect(numberInput().value).toBe('2')
   })
 
-  test('shows an error message if the grader count is 0', async () => {
-    const user = userEvent.setup()
-    mountComponent()
-    await user.type(numberInput(), '{backspace}0')
-    expect(numberInputContainer().textContent).toContain('Must have at least 1 grader')
-  })
-
   test('shows a message if the grader count is > the max', async () => {
     const user = userEvent.setup()
     mountComponent()
@@ -124,18 +118,17 @@ describe('GraderCountNumberInput', () => {
     expect(numberInputContainer().textContent).toContain('There is currently 1 available grader')
   })
 
-  test('shows an error message on blur if the grader count is the empty string', async () => {
-    const user = userEvent.setup()
-    mountComponent()
-    await user.type(numberInput(), '{backspace}')
-    numberInput().blur()
-    expect(numberInputContainer().textContent).toContain('Must have at least 1 grader')
-  })
-
   test('does not pass any validation error messages to the NumberInput if the input is valid', async () => {
     const user = userEvent.setup()
     mountComponent()
     await user.type(numberInput(), '{backspace}4')
     expect(numberInputContainer().textContent).toBe('Number of graders')
+  })
+
+  test('calls hideErrors when the input value changes', async () => {
+    const user = userEvent.setup()
+    mountComponent()
+    await user.type(numberInput(), '{backspace}4')
+    expect(props.hideErrors).toHaveBeenCalled()
   })
 })

@@ -77,12 +77,12 @@ def computeTestCount() {
 
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 
-  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
+  sh(script: "docker compose exec -T canvas bundle exec rspec --dry-run \
                                       --require './spec/formatters/node_count_formatter.rb' \
                                       --format NodeCountRecorder \
                                       --out formatter_out.txt --pattern ${specUnique.join(',')}", label: 'Get Node Count')
 
-  def formatterResult = sh(script: 'docker-compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim().split(" ")
+  def formatterResult = sh(script: 'docker compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim().split(" ")
 
   def nodeTotal = formatterResult[0].toInteger()
   def specTotal = formatterResult[1].toInteger()
@@ -125,6 +125,12 @@ def computeTestCount() {
   } else {
     echo "=== No Spec Timings Found! ==="
   }
+}
+
+def sendRspecqSlack(status) {
+  def jobInfo = ":alert: <$env.BUILD_URL|RspecQ Timings Build> ${status}! :alert:"
+  def message = "$jobInfo\nResolve this issue to prevent further build failures!"
+  slackSend channel: '#devx-alerts', color: 'danger', message: message
 }
 
 def sendCrystalballSlack(summary, color, status) {
@@ -171,7 +177,7 @@ pipeline {
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
-    RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
+    RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()
@@ -189,6 +195,9 @@ pipeline {
               node('master') {
                 if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
                   sendCrystalballSlack(summaryMessage, crystalballColor, stageConfig.status())
+                }
+                if (stageConfig.status() != 'SUCCESS' && env.RSPECQ_UPDATE_TIMINGS == '1') {
+                  sendRspecqSlack(stageConfig.status())
                 }
                 buildSummaryReport.saveRunManifest()
               }
@@ -240,7 +249,7 @@ pipeline {
                         "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
                     .hooks(initialNodeHooks)
-                    .timeout(10)
+                    .timeout(env.NODE_TIMEOUT.toInteger())
                     .queue(rspecqStages) {
                       def initialNodeStages = [:]
 
@@ -255,7 +264,7 @@ pipeline {
                           if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                             /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
                             sh '''#!/bin/bash
-                              ids=($(docker ps -aq --filter "name=canvas_"))
+                              ids=($(docker ps -aq --filter "name=canvas-"))
                               for i in "${ids[@]}"
                                 do
                                   docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
@@ -281,7 +290,7 @@ pipeline {
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
                     .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                     .nodeRequirements(rspecNodeRequirements)
-                    .timeout(10)
+                    .timeout(env.NODE_TIMEOUT.toInteger())
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
                 }
 

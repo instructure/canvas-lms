@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 import MarkAsDoneButton from '../MarkAsDoneButton'
 import {SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
@@ -70,7 +70,7 @@ describe('"Mark as Done" button', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <MarkAsDoneButton {...propsToRender} />
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 

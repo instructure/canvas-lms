@@ -100,8 +100,8 @@ class ReleaseNotesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @context.site_admin?
 
     @page_title = t("Canvas Release Notes")
-    js_bundle :release_notes_edit
     set_active_tab "release_notes"
+    add_crumb t("Release Notes")
     js_env({
              release_notes_langs: allowed_langs,
              release_notes_envs: allowed_envs,
@@ -134,7 +134,7 @@ class ReleaseNotesController < ApplicationController
 
   def last_seen_release_note
     # for an anonymous user, they have always seen everything
-    @last_seen_release_note ||= @current_user&.last_seen_release_note || Time.now
+    @last_seen_release_note ||= @current_user&.last_seen_release_note || Time.zone.now
   end
 
   def release_note_lang
@@ -150,7 +150,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def allowed_langs
-    Setting.get("release_notes_langs", "en,es,pt,nn,nl,zh").split(",")
+    Setting.get("release_notes_langs", "en,es,pt,fr-CA,no,nl,sv,zh").split(",")
   end
 
   def allowed_envs

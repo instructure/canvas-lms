@@ -19,7 +19,7 @@
 #
 
 class Thumbnail < ActiveRecord::Base
-  belongs_to :attachment, foreign_key: "parent_id"
+  belongs_to :attachment, foreign_key: "parent_id", inverse_of: :thumbnails
 
   # the ":keep_profile => true" part is in here so that we tell mini_magic to not try to pass the command line option -strip.
   # this is because on the servers we are actually using graphics_magic not image_magic's mogrify and graphics_magick doesn't
@@ -35,12 +35,32 @@ class Thumbnail < ActiveRecord::Base
   )
 
   before_save :set_namespace
+
+  set_policy do
+    given { |user, session| attachment.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| attachment.grants_right?(user, session, :download) }
+    can :download
+
+    given { |user| attachment.grants_right?(user, :read) }
+    can :read
+
+    given { |user| attachment.grants_right?(user, :download) }
+    can :download
+
+    given { |user, session| attachment.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
+  end
+
   def set_namespace
     self.namespace = attachment.namespace
   end
 
-  def local_storage_path
-    "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
+  def local_storage_path(user: nil, ttl: nil)
+    path = "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}"
+    path = "#{path}/#{uuid}" unless attachment.root_account.feature_enabled?(:file_association_access)
+    path
   end
 
   delegate :bucket, to: :attachment

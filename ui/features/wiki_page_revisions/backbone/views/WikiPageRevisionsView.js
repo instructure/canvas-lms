@@ -120,7 +120,7 @@ export default class WikiPageRevisionsView extends CollectionView {
     return this.trigger(
       'selectionChanged',
       {model, view},
-      {model: oldSelectedModel, view: oldSelectedView}
+      {model: oldSelectedModel, view: oldSelectedView},
     )
   }
 

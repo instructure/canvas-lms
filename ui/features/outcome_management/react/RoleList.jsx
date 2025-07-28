@@ -51,7 +51,7 @@ RoleList.propTypes = {
       role: string.isRequired,
       label: string.isRequired,
       base_role_type: string.isRequired,
-    })
+    }),
   ).isRequired,
 }
 

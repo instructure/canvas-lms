@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Lti2ReregistrationUpdateModal from './Lti2ReregistrationUpdateModal'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class ManageUpdateExternalToolButton extends React.Component {
   static propTypes = {
@@ -29,8 +29,14 @@ export default class ManageUpdateExternalToolButton extends React.Component {
     returnFocus: PropTypes.func.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.reregModalRef = React.createRef()
+    this.updateButtonRef = React.createRef()
+  }
+
   openReregModal = e => {
-    this.refs.reregModal.openModal(e)
+    this.reregModalRef.current.openModal(e)
   }
 
   render() {
@@ -45,7 +51,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
-          ref="updateButton"
+          ref={this.updateButtonRef}
           tabIndex="-1"
           role="menuitem"
           aria-label={updateAriaLabel}
@@ -55,7 +61,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
           {I18n.t('Manage Update')}
         </a>
         <Lti2ReregistrationUpdateModal
-          ref="reregModal"
+          ref={this.reregModalRef}
           tool={this.props.tool}
           returnFocus={this.props.returnFocus}
         />

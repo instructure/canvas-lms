@@ -25,7 +25,7 @@
 import $ from 'jquery'
 import {pick, has, omit, throttle} from 'lodash'
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import '@canvas/rails-flash-notifications'
@@ -33,11 +33,11 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 
 let WikiPageRevision
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 const pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 
-export default WikiPageRevision = (function () {
+export default (WikiPageRevision = (function () {
   WikiPageRevision = class WikiPageRevision extends Backbone.Model {
     constructor(...args) {
       super(...args)
@@ -151,7 +151,7 @@ export default WikiPageRevision = (function () {
 
     restore() {
       const d = $.ajaxJSON(this.url(), 'POST').fail(() =>
-        $.flashError(I18n.t('restore_failed', 'Failed to restore page revision'))
+        $.flashError(I18n.t('restore_failed', 'Failed to restore page revision')),
       )
       $('#wiki_page_revisions').disableWhileLoading($.Deferred())
       return d
@@ -159,4 +159,4 @@ export default WikiPageRevision = (function () {
   }
   WikiPageRevision.initClass()
   return WikiPageRevision
-})()
+})())

@@ -20,6 +20,32 @@
 
 class BlockEditor < ActiveRecord::Base
   belongs_to :context, polymorphic: [:wiki_page]
+  before_create :set_root_account_id
 
   alias_attribute :version, :editor_version
+
+  LATEST_VERSION = "0.2"
+
+  def set_root_account_id
+    self.root_account_id = context&.root_account_id unless root_account_id
+  end
+
+  def viewer_iframe_html
+    html = <<-HTML
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      iframe.block_editor_view {
+        height: 100%;
+      }
+    </style>
+    <iframe class='block_editor_view' src='#{Rails.application.routes.url_helpers.block_editor_path(id)}' />
+    HTML
+    html.html_safe # rubocop:disable Rails/OutputSafety
+  end
 end

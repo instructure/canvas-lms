@@ -20,17 +20,19 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, each, intersection, find} from 'lodash'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('external_toolsgradingStandardCollection')
+const I18n = createI18nScope('external_toolsgradingStandardCollection')
 
 class GradingStandardCollection extends React.Component {
   state = {standards: null}
 
-  UNSAFE_componentWillMount() {
-    $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
+  componentDidMount() {
+    if (ENV.GRADING_STANDARDS_URL) {
+      $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
+    }
   }
 
   gotStandards = standards => {
@@ -42,8 +44,12 @@ class GradingStandardCollection extends React.Component {
     this.setState({standards: formattedStandards})
   }
 
-  formatStandardData = standardData =>
-    map(standardData, dataRow => [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)])
+  formatStandardData = standardData => {
+    const formatted = map(standardData, dataRow => {
+      return [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)]
+    })
+    return formatted
+  }
 
   addGradingStandard = () => {
     const newStandard = {
@@ -84,6 +90,10 @@ class GradingStandardCollection extends React.Component {
   anyStandardBeingEdited = () => !!find(this.state.standards, standard => standard.editing)
 
   saveGradingStandard = standard => {
+    if (!ENV.GRADING_STANDARDS_URL) {
+      throw new Error('ENV.GRADING_STANDARDS_URL is not defined')
+    }
+
     const newStandards = $.extend(true, [], this.state.standards)
     const indexToUpdate = this.state.standards.indexOf(this.getStandardById(standard.id))
     let type, url, data
@@ -108,7 +118,7 @@ class GradingStandardCollection extends React.Component {
     })
       .success(function (updatedStandard) {
         updatedStandard.grading_standard.data = this.formatStandardData(
-          updatedStandard.grading_standard.data
+          updatedStandard.grading_standard.data,
         )
         newStandards[indexToUpdate] = updatedStandard
         this.setState({standards: newStandards}, () => {
@@ -154,6 +164,11 @@ class GradingStandardCollection extends React.Component {
   deleteGradingStandard = (event, uniqueId) => {
     const self = this,
       $standard = $(event.target).parents('.grading_standard')
+
+    if (!ENV.GRADING_STANDARDS_URL) {
+      throw new Error('ENV.GRADING_STANDARDS_URL is not defined')
+    }
+
     $standard.confirmDelete({
       url: `${ENV.GRADING_STANDARDS_URL}/${uniqueId}`,
       message: I18n.t('Are you sure you want to delete this grading scheme?'),

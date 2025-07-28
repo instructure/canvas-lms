@@ -39,7 +39,7 @@ describe('ExternalToolOptions', () => {
         activeSubmissionType="basic_lti_launch"
         externalTools={[studio]}
         updateActiveSubmissionType={updateActiveSubmissionType}
-      />
+      />,
     )
 
     expect(getByRole('button', {name: /Studio/})).toBeInTheDocument()
@@ -52,7 +52,7 @@ describe('ExternalToolOptions', () => {
         activeSubmissionType="basic_lti_launch"
         externalTools={[office]}
         updateActiveSubmissionType={updateActiveSubmissionType}
-      />
+      />,
     )
 
     expect(getByRole('button', {name: /Office 365/})).toBeInTheDocument()
@@ -65,7 +65,7 @@ describe('ExternalToolOptions', () => {
         activeSubmissionType="basic_lti_launch"
         externalTools={[google]}
         updateActiveSubmissionType={updateActiveSubmissionType}
-      />
+      />,
     )
 
     expect(getByRole('button', {name: /Google Drive/})).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('ExternalToolOptions', () => {
         activeSubmissionType="basic_lti_launch"
         externalTools={[dropbox, rollcall]}
         updateActiveSubmissionType={updateActiveSubmissionType}
-      />
+      />,
     )
 
     fireEvent.click(getAllByRole('button', {name: /More/})[0])
@@ -97,7 +97,7 @@ describe('ExternalToolOptions', () => {
         activeSubmissionType="basic_lti_launch"
         externalTools={[google, dropbox]}
         updateActiveSubmissionType={updateActiveSubmissionType}
-      />
+      />,
     )
 
     fireEvent.click(getByRole('button', {name: /Google Drive/}))

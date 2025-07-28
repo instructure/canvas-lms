@@ -16,16 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 export const COMMENTS_QUERY = gql`
-  query CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int) {
+  query CommentBankItemQuery($userId: ID!, $query: String, $maxResults: Int, $after: String) {
     legacyNode(_id: $userId, type: User) {
       ... on User {
-        commentBankItemsConnection(query: $query, limit: $maxResults) {
+        commentBankItemsConnection(query: $query, limit: $maxResults, after: $after) {
           nodes {
             comment
             _id
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
           }
         }
       }

@@ -17,22 +17,25 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {ActiveText} from './utils'
-import accountsQuery from '../queries/accountsQuery'
+import getAccounts from '@canvas/api/accounts/getAccounts'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
-const I18n = useI18nScope('CoursesTray')
+const I18n = createI18nScope('CoursesTray')
 
-export default function CoursesList() {
+export default function AccountsList() {
   const {data, isLoading, isSuccess} = useQuery({
-    queryKey: ['accounts'],
-    queryFn: accountsQuery,
-    fetchAtLeastOnce: true,
+    queryKey: ['accounts', {pageIndex: 1}],
+    queryFn: getAccounts,
+    persister: sessionStoragePersister,
   })
+
+  const accounts = data?.json || []
 
   return (
     <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
@@ -49,13 +52,13 @@ export default function CoursesList() {
             </Link>
           </List.Item>,
         ].concat(
-          data.map(account => (
+          accounts.map(account => (
             <List.Item key={account.id}>
               <Link href={`/accounts/${account.id}`} isWithinText={false} display="block">
                 <ActiveText url={`/accounts/${account.id}`}>{account.name}</ActiveText>
               </Link>
             </List.Item>
-          ))
+          )),
         )}
     </List>
   )

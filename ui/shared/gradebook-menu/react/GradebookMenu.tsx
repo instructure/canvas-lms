@@ -27,9 +27,9 @@ import {Menu} from '@instructure/ui-menu'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type GradiantVariantName =
   | 'DefaultGradebook'
@@ -49,7 +49,6 @@ const activeLabels = {
 type Props = {
   courseUrl: string
   learningMasteryEnabled?: boolean
-  enhancedIndividualGradebookEnabled?: boolean
   variant: GradiantVariantName
   customTrigger?: any
 }
@@ -57,7 +56,6 @@ type Props = {
 export default function GradebookMenu({
   courseUrl,
   learningMasteryEnabled,
-  enhancedIndividualGradebookEnabled,
   variant,
   customTrigger,
 }: Props) {
@@ -69,7 +67,7 @@ export default function GradebookMenu({
 
   const getMenuTrigger = () => {
     // EVAL-3711 Remove Evaluate ICE feature flag
-    const trigger = window.ENV.FEATURES.instui_nav ? (
+    const trigger = window.ENV.FEATURES?.instui_nav ? (
       <IconButton
         size="small"
         margin="0 0 0 x-small"
@@ -94,7 +92,7 @@ export default function GradebookMenu({
     <>
       <Flex>
         {/* EVAL-3711 Remove Evaluate ICE feature flag */}
-        {window.ENV.FEATURES.instui_nav && (
+        {window.ENV.FEATURES?.instui_nav && (
           <Heading
             level="h1"
             data-testid="gradebook-title"
@@ -107,7 +105,7 @@ export default function GradebookMenu({
         {/* EVAL-3711 Remove Evaluate ICE feature flag */}
         <Menu
           trigger={menuTrigger}
-          onToggle={window.ENV.FEATURES.instui_nav ? handleRenderArrowIcon : undefined}
+          onToggle={window.ENV.FEATURES?.instui_nav ? handleRenderArrowIcon : undefined}
         >
           <Menu.Group
             selected={[variant]}
@@ -137,25 +135,12 @@ export default function GradebookMenu({
               </Menu.Item>
             )}
 
-            {enhancedIndividualGradebookEnabled ? (
-              <Menu.Item
-                href={`${courseUrl}/gradebook/change_gradebook_version?version=individual_enhanced`}
-                value="EnhancedIndividualGradebook"
-              >
-                <span data-menu-item-id="individual-gradebook">
-                  {I18n.t('Individual Gradebook')}
-                </span>
-              </Menu.Item>
-            ) : (
-              <Menu.Item
-                href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
-                value="IndividualGradebook"
-              >
-                <span data-menu-item-id="individual-gradebook">
-                  {I18n.t('Individual Gradebook')}
-                </span>
-              </Menu.Item>
-            )}
+            <Menu.Item
+              href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
+              value="EnhancedIndividualGradebook"
+            >
+              <span data-menu-item-id="individual-gradebook">{I18n.t('Individual Gradebook')}</span>
+            </Menu.Item>
 
             <Menu.Separator key="separator" />
 

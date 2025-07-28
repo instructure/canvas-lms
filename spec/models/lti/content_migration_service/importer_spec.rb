@@ -97,7 +97,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
 
       it "must post the context_id to the tool" do
         assert_requested(:post, import_url, {
-                           body: hash_including(context_id: Lti::Asset.opaque_identifier_for(course))
+                           body: hash_including(context_id: Lti::V1p1::Asset.opaque_identifier_for(course))
                          })
       end
 
@@ -128,7 +128,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
       it "must format request body as nested query" do
         assert_requested(:post, import_url, {
                            body: Rack::Utils.build_nested_query({
-                                                                  context_id: Lti::Asset.opaque_identifier_for(@course),
+                                                                  context_id: Lti::V1p1::Asset.opaque_identifier_for(@course),
                                                                   data: content,
                                                                   tool_consumer_instance_guid: root_account.lti_guid,
                                                                   custom_course_id: @course.id.to_s
@@ -169,7 +169,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         assert_requested(:post, import_url, {
                            body: {
                              tool_consumer_instance_guid: root_account.lti_guid,
-                             context_id: Lti::Asset.opaque_identifier_for(course),
+                             context_id: Lti::V1p1::Asset.opaque_identifier_for(course),
                              data: content
                            }
                          })
@@ -216,7 +216,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         .to_return(status: 200, body: response_body, headers: {})
       importer.send_imported_content(course, content_migration, content)
       assert_requested(:post, "https://lti.example.com/begin_import_again", {
-                         body: hash_including(context_id: Lti::Asset.opaque_identifier_for(course))
+                         body: hash_including(context_id: Lti::V1p1::Asset.opaque_identifier_for(course))
                        })
     end
   end

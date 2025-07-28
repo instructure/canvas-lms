@@ -19,7 +19,8 @@
 import React, {Component} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {PendingGradeInfo} from '../gradebook.d'
 import type {
   CamelizedAssignment,
@@ -33,11 +34,12 @@ import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
 import type {TextInputProps} from '@instructure/ui-text-input'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Message = {
-  text: string
+  text: string | JSX.Element
   type: 'error' | 'hint'
 }
 
@@ -48,6 +50,7 @@ function normalizeSubmissionGrade(props: Props) {
     enterGradesAs: formatType,
     gradingScheme,
     pointsBasedGradingScheme,
+    scalingFactor,
   } = props
   const gradeToNormalize = submission.enteredGrade
 
@@ -67,6 +70,7 @@ function normalizeSubmissionGrade(props: Props) {
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'entered',
   }
 
@@ -142,10 +146,12 @@ type Props = {
   pointsBasedGradingScheme: boolean
   onSubmissionUpdate: (submission: SubmissionData, gradeInfo: GradeResult) => void
   pendingGradeInfo: PendingGradeInfo
+  scalingFactor: number
   submission: SubmissionData
   submissionUpdating: boolean
   subAssignmentTag?: string
   header?: string
+  inputDisplay?: 'inline-block' | 'block'
 }
 
 type State = {
@@ -160,7 +166,9 @@ export default class GradeInput extends Component<Props, State> {
     pointsBasedGradingScheme: false,
     onSubmissionUpdate() {},
     pendingGradeInfo: null,
+    scalingFactor: 1.0,
     submissionUpdating: false,
+    inputDisplay: 'inline-block',
   }
 
   constructor(props: Props) {
@@ -200,7 +208,7 @@ export default class GradeInput extends Component<Props, State> {
         if (hasGradeChanged(this.props, this.state)) {
           this.handleGradeChange()
         }
-      }
+      },
     )
   }
 
@@ -221,6 +229,7 @@ export default class GradeInput extends Component<Props, State> {
       gradingScheme: this.props.gradingScheme,
       pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       pointsPossible: this.props.assignment.pointsPossible,
+      scalingFactor: this.props.scalingFactor,
       subAssignmentTag: this.props.subAssignmentTag,
     })
 
@@ -259,6 +268,7 @@ export default class GradeInput extends Component<Props, State> {
         gradingScheme: this.props.gradingScheme,
         pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
         pointsPossible: this.props.assignment.pointsPossible,
+        scalingFactor: this.props.scalingFactor,
         subAssignmentTag: this.props.subAssignmentTag,
       })
     }
@@ -299,7 +309,17 @@ export default class GradeInput extends Component<Props, State> {
       !this.props.pendingGradeInfo.valid &&
       this.props.pendingGradeInfo.subAssignmentTag === this.props.subAssignmentTag
     ) {
-      messages.push({type: 'error', text: I18n.t('This is not a valid grade')})
+      messages.push({
+        type: 'error',
+        text: (
+          <View textAlign="center">
+            <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+              <IconWarningSolid />
+            </View>
+            {I18n.t('This is not a valid grade')}
+          </View>
+        ),
+      })
     } else if (typeof score === 'number' && score < 0) {
       messages.push({type: 'hint', text: I18n.t('This grade has negative points')})
     } else if (isUnusuallyHigh(score, this.props.assignment.pointsPossible)) {
@@ -316,7 +336,8 @@ export default class GradeInput extends Component<Props, State> {
           </Text>
         )}
         <TextInput
-          display="inline-block"
+          autoComplete="off"
+          display={this.props.inputDisplay}
           id="grade-detail-tray--grade-input"
           interaction={interaction}
           messages={messages}

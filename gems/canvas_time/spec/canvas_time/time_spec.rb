@@ -50,17 +50,17 @@ describe CanvasTime do
 
   describe "#is_fancy_midnight" do
     it "returns true if hour is 23 and min is 59" do
-      time = Time.now.end_of_day
+      time = Time.zone.now.end_of_day
       expect(CanvasTime.is_fancy_midnight?(time)).to be(true)
     end
 
     it "returns false if hour is 23 but min isn't 59" do
-      time = Time.now.end_of_day - 1.minute
+      time = Time.zone.now.end_of_day - 1.minute
       expect(CanvasTime.is_fancy_midnight?(time)).to be(false)
     end
 
     it "returns false if hour isn't 23" do
-      expect(CanvasTime.is_fancy_midnight?(Time.now)).to be(false)
+      expect(CanvasTime.is_fancy_midnight?(Time.zone.now)).to be(false)
     end
 
     it "returns false for nil" do

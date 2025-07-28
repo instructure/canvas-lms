@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const UserGroups = {
   fragment: gql`
@@ -34,7 +34,7 @@ export const UserGroups = {
       shape({
         _id: string,
         name: string,
-      })
+      }),
     ),
   }),
 }

@@ -24,6 +24,7 @@
 class RubricAssessment < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
+  include Trackable
 
   belongs_to :rubric
   belongs_to :rubric_association
@@ -50,8 +51,9 @@ class RubricAssessment < ActiveRecord::Base
   def track_outcomes
     outcome_ids = aligned_outcome_ids
     peer_review = assessment_type == "peer_review"
+    self_assessment = assessment_type == "self_assessment"
     provisional_grade = artifact_type == "ModeratedGrading::ProvisionalGrade"
-    update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
+    update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade && !self_assessment
     delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
 
@@ -200,7 +202,9 @@ class RubricAssessment < ActiveRecord::Base
     case artifact_type
     when "Submission"
       assignment = rubric_association.association_object
-      return unless assignment.grants_right?(assessor, :grade)
+      # as part of the initial checkpoints release, we will not respect use for grading for checkpoints
+      # use for grading will be respected, when support for rubrics on checkpoints has been fleshed-out
+      return if !assignment.grants_right?(assessor, :grade) || assignment.checkpoints_parent?
 
       assignment.grade_student(
         artifact.student,
@@ -240,7 +244,7 @@ class RubricAssessment < ActiveRecord::Base
 
     given do |user, session|
       rubric_association&.grants_right?(user, session, :manage) &&
-        (rubric_association.association_object.context.grants_right?(assessor, :manage_rubrics) rescue false)
+        rubric_association.association_object.try(:context)&.grants_right?(assessor, :manage_rubrics)
     end
     can :update
 
@@ -272,11 +276,11 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def assessor_name
-    assessor.short_name rescue t("unknown_user", "Unknown User")
+    assessor&.short_name || t("unknown_user", "Unknown User")
   end
 
   def assessment_url
-    artifact.url rescue nil
+    artifact.try(:url)
   end
 
   def can_read_assessor_name?(user, session)

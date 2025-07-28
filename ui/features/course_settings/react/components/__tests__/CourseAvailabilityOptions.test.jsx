@@ -40,7 +40,7 @@ function setupWindowEnv() {
     start_at: '2021-02-10T00:00:00-07:00',
     end_at: '2021-07-10T00:00:00-07:00',
   }
-  window.ENV.TIMEZONE = 'America/Halifax'
+  window.ENV.TIMEZONE = 'Etc/UTC'
   window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 }
 
@@ -62,17 +62,17 @@ function renderComponent(wrapper, overrides = {}) {
   createFormField(
     wrapper,
     'course_restrict_student_past_view',
-    options.course_restrict_student_past_view
+    options.course_restrict_student_past_view,
   )
   createFormField(
     wrapper,
     'course_restrict_student_future_view',
-    options.course_restrict_student_future_view
+    options.course_restrict_student_future_view,
   )
   createFormField(
     wrapper,
     'course_restrict_enrollments_to_course_dates',
-    options.course_restrict_enrollments_to_course_dates
+    options.course_restrict_enrollments_to_course_dates,
   )
 
   return render(<CourseAvailabilityOptions {...options} />, wrapper)
@@ -93,14 +93,14 @@ describe('CourseAvailabilityOptions', () => {
   it('renders all applicable inputs with default options', () => {
     const {getByLabelText, getByText} = renderComponent(wrapper)
     expect(
-      getByLabelText('Limit course participation to term or custom course dates?')
+      getByLabelText('Limit course participation to term or custom course dates?'),
     ).toBeInTheDocument()
     expect(getByText('Course participation is limited to', {exact: false})).toBeInTheDocument()
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeInTheDocument()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeInTheDocument()
   })
 
@@ -118,7 +118,7 @@ describe('CourseAvailabilityOptions', () => {
     expect(
       getByText('Any section dates created in the course may override course dates.', {
         exact: false,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -151,10 +151,10 @@ describe('CourseAvailabilityOptions', () => {
       viewFutureLocked: true,
     })
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeEnabled()
   })
 
@@ -163,10 +163,10 @@ describe('CourseAvailabilityOptions', () => {
       viewPastLocked: true,
     })
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeEnabled()
   })
 
@@ -176,15 +176,15 @@ describe('CourseAvailabilityOptions', () => {
       course_restrict_enrollments_to_course_dates: 'true',
     })
     expect(
-      getByLabelText('Limit course participation to term or custom course dates?')
+      getByLabelText('Limit course participation to term or custom course dates?'),
     ).toBeDisabled()
     expect(getByLabelText('Start')).toBeDisabled()
     expect(getByLabelText('End')).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course before course start date')
+      getByLabelText('Restrict students from viewing course before course start date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course after course end date')
+      getByLabelText('Restrict students from viewing course after course end date'),
     ).toBeDisabled()
   })
 
@@ -218,10 +218,10 @@ describe('CourseAvailabilityOptions', () => {
       course_restrict_student_past_view: 'true',
     })
     expect(
-      getByLabelText('Restrict students from viewing course before term start date').checked
+      getByLabelText('Restrict students from viewing course before term start date').checked,
     ).toBeFalsy()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date').checked
+      getByLabelText('Restrict students from viewing course after term end date').checked,
     ).toBeTruthy()
   })
 
@@ -271,7 +271,7 @@ describe('CourseAvailabilityOptions', () => {
     fireEvent.click(endDate)
     fireEvent.blur(endDate)
     expect(document.getElementById('course_conclude_at').value).toBe(
-      `${futureYear}-01-01T00:00:00.000Z`
+      `${futureYear}-01-01T00:00:00.000Z`,
     )
   })
 
@@ -303,6 +303,50 @@ describe('CourseAvailabilityOptions', () => {
     })
   })
 
+  describe('end date warning', () => {
+    const warningText = 'The end date can not occur before the start date.'
+
+    it('is not shown if end date is greater than the start date', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: moment('2020-10-17T12:00:00Z').toISOString(),
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is shown if end date is less than the start date', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: moment('2020-10-15T12:00:00Z').toISOString(),
+      })
+      expect(queryByText(warningText)).toBeInTheDocument()
+    })
+
+    it('is not shown if conclude_at is blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: moment('2020-10-16T12:00:00Z').toISOString(),
+        course_conclude_at: '',
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if start_at is blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: '',
+        course_conclude_at: moment('2020-10-15T12:00:00Z').toISOString(),
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+
+    it('is not shown if start_at and conclude_at are blank', () => {
+      const {queryByText} = renderComponent(wrapper, {
+        course_start_at: '',
+        course_conclude_at: '',
+      })
+      expect(queryByText(warningText)).not.toBeInTheDocument()
+    })
+  })
+
   describe('shows local and course time', () => {
     it('shows local and course time for the start date', () => {
       const {getByLabelText, getByText} = renderComponent(wrapper, {
@@ -310,11 +354,11 @@ describe('CourseAvailabilityOptions', () => {
       })
       const startDate = getByLabelText('Start')
       const year = moment().year()
-      fireEvent.change(startDate, {target: {value: `Mar 1, ${year} 10:00am`}})
+      fireEvent.change(startDate, {target: {value: `Jun 1, ${year} 10:00am`}})
       pressKey(startDate, {key: 'Enter'})
-      expect(document.getElementById('course_start_at').value).toBe(`${year}-03-01T10:00:00.000Z`)
-      expect(getByText(`Local: Mar 1, ${year} 10:00am`)).toBeInTheDocument()
-      expect(getByText(`Course: Mar 1, ${year} 7:00am`)).toBeInTheDocument()
+      expect(document.getElementById('course_start_at').value).toBe(`${year}-06-01T10:00:00.000Z`)
+      expect(getByText(`Local: Jun 1, ${year}, 10:00 AM`)).toBeInTheDocument()
+      expect(getByText(`Course: Jun 1, ${year}, 4:00 AM`)).toBeInTheDocument()
     })
 
     it('shows local and course time for the end date', () => {
@@ -323,13 +367,13 @@ describe('CourseAvailabilityOptions', () => {
       })
       const endDate = getByLabelText('End')
       const year = moment().year()
-      fireEvent.change(endDate, {target: {value: `Apr 5, ${year} 10:00am`}})
+      fireEvent.change(endDate, {target: {value: `Jul 5, ${year} 10:00am`}})
       pressKey(endDate, {key: 'Enter'})
       expect(document.getElementById('course_conclude_at').value).toBe(
-        `${year}-04-05T10:00:00.000Z`
+        `${year}-07-05T10:00:00.000Z`,
       )
-      expect(getByText(`Local: Apr 5, ${year} 10:00am`)).toBeInTheDocument()
-      expect(getByText(`Course: Apr 5, ${year} 7:00am`)).toBeInTheDocument()
+      expect(getByText(`Local: Jul 5, ${year}, 10:00 AM`)).toBeInTheDocument()
+      expect(getByText(`Course: Jul 5, ${year}, 4:00 AM`)).toBeInTheDocument()
     })
   })
 })

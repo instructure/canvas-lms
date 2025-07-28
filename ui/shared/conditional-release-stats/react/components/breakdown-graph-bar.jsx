@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_graph_bar')
+const I18n = createI18nScope('cyoe_assignment_sidebar_breakdown_graph_bar')
 
 const {string, number, func} = PropTypes
 
@@ -53,13 +53,13 @@ class BreakdownGraph extends React.Component {
   render() {
     const {rangeStudents, totalStudents} = this.props
     return (
-      <div className="crs-bar__container">
+      <div className="crs-bar__container" data-testid="breakdown-bar">
         <div className="crs-bar__horizontal-outside">
           <div className="crs-bar__horizontal-inside" />
           {this.renderInnerBar()}
         </div>
         <div className="crs-bar__bottom">
-          <span className="crs-bar__info">
+          <span className="crs-bar__info" data-testid="range-bounds">
             {I18n.t('%{lowerBound}+ to %{upperBound}', {
               upperBound: this.props.upperBound,
               lowerBound: this.props.lowerBound,
@@ -71,6 +71,7 @@ class BreakdownGraph extends React.Component {
             className="crs-link-button"
             onClick={this.selectRange}
             title={I18n.t('View range student details')}
+            data-testid="student-counts"
           >
             {I18n.t('%{rangeStudents} out of %{totalStudents} students', {
               rangeStudents,

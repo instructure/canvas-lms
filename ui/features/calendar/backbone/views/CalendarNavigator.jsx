@@ -254,7 +254,7 @@ CalendarNavigator.prototype.afterRender = function () {
         },
       }}
     />,
-    this.$el.find('#calendar_navigator_component')[0]
+    this.$el.find('#calendar_navigator_component')[0],
   )
 }
 

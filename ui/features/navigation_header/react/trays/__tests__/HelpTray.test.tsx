@@ -17,12 +17,28 @@
  */
 
 import React from 'react'
-import {render as testingLibraryRender} from '@testing-library/react'
+import {render as testingLibraryRender, screen} from '@testing-library/react'
 import HelpTray from '../HelpTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+// Mock the API call
+jest.mock('@canvas/do-fetch-api-effect')
+
+const props = {
+  closeTray: jest.fn(),
+  badgeDisabled: false,
+  setBadgeDisabled: jest.fn(),
+  forceUnreadPoll: jest.fn(),
+}
+const render = () => {
+  return testingLibraryRender(
+    <MockedQueryProvider>
+      <HelpTray {...props} />
+    </MockedQueryProvider>,
+  )
+}
 
 describe('HelpTray', () => {
   const links = [
@@ -42,34 +58,28 @@ describe('HelpTray', () => {
     },
   ]
 
-  const props = {
-    closeTray: jest.fn(),
-    badgeDisabled: false,
-    setBadgeDisabled: jest.fn(),
-    forceUnreadPoll: jest.fn(),
-  }
-
   beforeEach(() => {
-    // @ts-expect-error
-    window.ENV = {FEATURES: {featured_help_links: true}}
+    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({response: {status: 200, ok: true}})
   })
 
   afterEach(() => {
-    // @ts-expect-error
-    window.ENV = {}
     queryClient.removeQueries()
   })
 
   it('renders title header', () => {
     window.ENV.help_link_name = 'Halp'
-    const {getByText} = render(<HelpTray {...props} />)
-    expect(getByText('Halp')).toBeVisible()
+
+    render()
+
+    expect(screen.getByText('Halp')).toBeVisible()
   })
 
   it('renders help dialog links', () => {
     queryClient.setQueryData(['helpLinks'], links)
-    const {getByText} = render(<HelpTray {...props} />)
-    getByText('Search the Canvas Guides')
-    getByText('Report a Problem')
+
+    render()
+
+    expect(screen.getByText('Search the Canvas Guides')).toBeVisible()
+    expect(screen.getByText('Report a Problem')).toBeVisible()
   })
 })

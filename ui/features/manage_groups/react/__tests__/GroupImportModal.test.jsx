@@ -23,7 +23,7 @@ describe('GroupImportModal', () => {
   it('adds an error message when an unsupported filetype is selected', async () => {
     const badFile = new File(['(⌐□_□)'], 'file.png', {type: 'image/png'})
     const {findByText, findByLabelText} = render(
-      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />
+      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />,
     )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
@@ -69,7 +69,7 @@ describe('GroupImportModal', () => {
 
     const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
     const {findByLabelText, findAllByText} = render(
-      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />
+      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />,
     )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 

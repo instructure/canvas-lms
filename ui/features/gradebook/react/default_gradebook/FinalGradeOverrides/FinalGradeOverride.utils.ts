@@ -21,7 +21,7 @@ import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'
 export const gradeOverrideCustomStatus = (
   finalGradeOverrides: FinalGradeOverrideMap,
   studentId: string,
-  gradingPeriodId?: string
+  gradingPeriodId?: string,
 ): string | null | undefined => {
   const overridesForStudent = finalGradeOverrides[studentId]
   if (!overridesForStudent) return null

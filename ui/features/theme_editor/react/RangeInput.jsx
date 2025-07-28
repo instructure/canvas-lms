@@ -32,7 +32,7 @@ export default class RangeInput extends Component {
     onChange: PropTypes.func,
     themeState: PropTypes.object,
     handleThemeStateChange: PropTypes.func,
-    variableKey: PropTypes.string.isRequired,
+    variableKey: PropTypes.string,
   }
 
   static defaultProps = {
@@ -69,7 +69,6 @@ export default class RangeInput extends Component {
     const {labelText, formatValue, onChange, value, ...props} = this.props
 
     return (
-      // eslint-disable-next-line jsx-a11y/label-has-associated-control
       <label className="RangeInput">
         <div className="RangeInput__label">{labelText}</div>
         <div className="RangeInput__control">
@@ -82,7 +81,13 @@ export default class RangeInput extends Component {
             aria-valuemax={this.props.max}
             aria-valuetext={formatValue(this.state.value)}
             onChange={() => {}}
-            {...props}
+            min={props.min}
+            max={props.max}
+            step={props.step}
+            defaultValue={props.defaultValue}
+            name={props.name}
+            size={props.size}
+            value={props.value}
           />
           <output
             ref={c => (this.outputElement = c)}

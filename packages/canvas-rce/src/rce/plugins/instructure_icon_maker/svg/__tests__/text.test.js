@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
-
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from '../text'
 import {BASE_SIZE, DEFAULT_SETTINGS} from '../constants'
 
@@ -292,7 +290,7 @@ describe('buildText()', () => {
 
       it('and it is a multi line text', () => {
         expect(
-          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'middle'})
+          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'middle'}),
         ).toMatchInlineSnapshot(`
           <text
             fill="#000000"
@@ -346,7 +344,7 @@ describe('buildText()', () => {
             ...settings,
             text: 'Hello World! Hello World! Bye!',
             textPosition: 'bottom-third',
-          })
+          }),
         ).toMatchInlineSnapshot(`
           <text
             fill="#000000"
@@ -396,7 +394,7 @@ describe('buildText()', () => {
 
       it('and it is a multi line text', () => {
         expect(
-          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'below'})
+          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'below'}),
         ).toMatchInlineSnapshot(`
           <text
             fill="#000000"
@@ -451,7 +449,7 @@ describe('buildTextBackground()', () => {
     describe('is middle', () => {
       it('and it is a single line text', () => {
         expect(buildTextBackground({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(
-          `null`
+          `null`,
         )
       })
 
@@ -461,7 +459,7 @@ describe('buildTextBackground()', () => {
             ...settings,
             text: 'Hello World! Hello World! Bye!',
             textPosition: 'middle',
-          })
+          }),
         ).toMatchInlineSnapshot(`
           <path
             d="M48,43 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
@@ -474,7 +472,7 @@ describe('buildTextBackground()', () => {
     describe('is bottom-third', () => {
       it('and it is a single line text', () => {
         expect(
-          buildTextBackground({...settings, textPosition: 'bottom-third'})
+          buildTextBackground({...settings, textPosition: 'bottom-third'}),
         ).toMatchInlineSnapshot(`null`)
       })
 
@@ -484,7 +482,7 @@ describe('buildTextBackground()', () => {
             ...settings,
             text: 'Hello World! Hello World! Bye!',
             textPosition: 'bottom-third',
-          })
+          }),
         ).toMatchInlineSnapshot(`
           <path
             d="M48,97 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
@@ -497,7 +495,7 @@ describe('buildTextBackground()', () => {
     describe('is below', () => {
       it('and it is a single line text', () => {
         expect(buildTextBackground({...settings, textPosition: 'below'})).toMatchInlineSnapshot(
-          `null`
+          `null`,
         )
       })
 
@@ -507,7 +505,7 @@ describe('buildTextBackground()', () => {
             ...settings,
             text: 'Hello World! Hello World! Bye!',
             textPosition: 'below',
-          })
+          }),
         ).toMatchInlineSnapshot(`
           <path
             d="M48,127 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
@@ -529,15 +527,16 @@ describe('getContainerWidth()', () => {
   })
 
   it('returns text width if is greater', () => {
-    sinon.stub(document, 'createElement').returns({
-      getContext: () => ({
-        measureText: text => ({
+    const mockCanvas = {
+      getContext: jest.fn(() => ({
+        measureText: jest.fn(text => ({
           width: text.length * 5,
-        }),
-      }),
-    })
+        })),
+      })),
+    }
+    jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas)
     expect(getContainerWidth({...settings, text: 'This is a long text for testing'})).toBe(125)
-    document.createElement.reset()
+    document.createElement.mockRestore()
   })
 })
 

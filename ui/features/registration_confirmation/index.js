@@ -29,7 +29,7 @@ $(() => {
 
   function showPane(paneToShow) {
     $.each([$disambiguation_box, $registration_form, $where_to_log_in], (i, $pane) =>
-      $pane.showIf($pane.is(paneToShow))
+      $pane.showIf($pane.is(paneToShow)),
     )
   }
 
@@ -45,7 +45,7 @@ $(() => {
   })
 
   $('input:radio[name="pseudonym_select"]').change(() =>
-    $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').prop('value'))
+    $merge_link.attr('href', $('input:radio[name="pseudonym_select"]:checked').prop('value')),
   )
 
   const $where_to_log_in = $('#where_to_log_in')

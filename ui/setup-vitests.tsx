@@ -17,11 +17,7 @@
  */
 
 import '@testing-library/jest-dom'
-import Adapter from 'enzyme-adapter-react-16'
-import Enzyme from 'enzyme'
 import {vi} from 'vitest'
-
-Enzyme.configure({adapter: new Adapter()})
 
 vi.stubGlobal('ENV', {
   FEATURES: {},
@@ -33,7 +29,9 @@ vi.stubGlobal(
     observe() {}
 
     unobserve() {}
-  }
+
+    disconnect() {}
+  },
 )
 
 vi.stubGlobal(
@@ -44,8 +42,10 @@ vi.stubGlobal(
     unobserve() {}
 
     disconnect() {}
-  }
+  },
 )
+
+vi.stubGlobal('DataTransferItem', class DataTransferItem {})
 
 vi.stubGlobal('matchMedia', () => ({
   matches: false,

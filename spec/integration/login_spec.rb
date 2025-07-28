@@ -56,11 +56,13 @@ describe "login" do
 
     it "logs in and log out a user CAS has validated" do
       user = user_with_pseudonym({ active_all: true })
+      Account.default.enable_feature!(:force_login_after_logout)
 
       stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
 
       get login_url
       redirect_until(cas_redirect_url)
+      expect(response.location).not_to include("renew=true")
 
       get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
@@ -70,6 +72,33 @@ describe "login" do
       expect(response).to be_redirect
       # we send both url (CAS v2) and service (CAS v3) params
       expect(response.location).to match(%r{/cas/logout\?url=.*service=})
+
+      get login_url
+      redirect_until(cas_redirect_url)
+      expect(response.location).to include("renew=true")
+    end
+
+    it "does not use renew if force_login_after_logout feature is off" do
+      user = user_with_pseudonym({ active_all: true })
+
+      stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
+
+      get login_url
+      redirect_until(cas_redirect_url)
+      expect(response.location).not_to include("renew=true")
+
+      get "/login/cas", params: { ticket: "ST-abcd" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+      expect(session[:cas_session]).to eq "ST-abcd"
+
+      delete logout_url
+      expect(response).to be_redirect
+      # we send both url (CAS v2) and service (CAS v3) params
+      expect(response.location).to match(%r{/cas/logout\?url=.*service=})
+
+      get login_url
+      redirect_until(cas_redirect_url)
+      expect(response.location).not_to include("renew=true")
     end
 
     it "informs the user CAS validation denied" do
@@ -120,7 +149,7 @@ describe "login" do
       redirect_until(cas_redirect_url)
 
       get "/login/cas", params: { ticket: "ST-abcd" }
-      expect(response).to redirect_to(redirect_url)
+      expect(response).to redirect_to(%r{^http://google.com/\?message=})
     end
 
     it "logins case insensitively" do
@@ -156,7 +185,7 @@ describe "login" do
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
         post cas_logout_url, params: { logoutRequest: <<~XML }
-          <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
+          <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="a1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="2013-06-14T12:56:07-06:00">
           <saml:NameID></saml:NameID>
           <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
           </samlp:LogoutRequest>

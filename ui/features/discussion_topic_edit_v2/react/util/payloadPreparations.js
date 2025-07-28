@@ -17,6 +17,7 @@
  */
 
 import {REPLY_TO_TOPIC, REPLY_TO_ENTRY} from './constants'
+import {attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor} from './assetProcessorGraphqlTypes'
 
 const prepareOverride = (
   overrideDueDate,
@@ -30,7 +31,7 @@ const prepareOverride = (
     studentIds: null,
     noopId: null,
   },
-  overrideTitle = null
+  overrideTitle = null,
 ) => {
   return {
     dueAt: overrideDueDate || null,
@@ -49,11 +50,12 @@ const prepareOverride = (
 const prepareAssignmentOverridesPayload = (
   assignedInfoList,
   defaultEveryoneOption,
-  masteryPathsOption
+  masteryPathsOption,
+  noDueDates = false,
 ) => {
   const onlyVisibleToEveryone = assignedInfoList.every(
     info =>
-      info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode
+      info.assignedList.length === 1 && info.assignedList[0] === defaultEveryoneOption.assetCode,
   )
 
   if (onlyVisibleToEveryone) return null
@@ -64,12 +66,15 @@ const prepareAssignmentOverridesPayload = (
     const studentIds = assignedList.filter(assetCode => assetCode.includes('user'))
     const sectionIds = assignedList.filter(assetCode => assetCode.includes('section'))
     const courseIds = assignedList.filter(
-      assetCode => assetCode.includes('course') && !assetCode.includes('section')
+      assetCode => assetCode.includes('course') && !assetCode.includes('section'),
     )
     const groupIds = assignedList.filter(assetCode => assetCode.includes('group'))
 
     // If the override is a module override, don't update it
     if (contextModuleId) return null
+
+    // remove due date if unsuported
+    if (noDueDates) info.dueDate = null
 
     // override for student ids
     if (studentIds.length > 0) {
@@ -82,8 +87,8 @@ const prepareAssignmentOverridesPayload = (
           {
             studentIds:
               studentIds.length > 0 ? studentIds.map(id => id.split('_').reverse()[0]) : null,
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -98,8 +103,8 @@ const prepareAssignmentOverridesPayload = (
             info.unassignItem || false,
             {
               courseSectionId: sectionId.split('_').reverse()[0] || null,
-            }
-          )
+            },
+          ),
         )
       })
     }
@@ -114,8 +119,8 @@ const prepareAssignmentOverridesPayload = (
           info.unassignItem || false,
           {
             courseId: 'everyone',
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -130,15 +135,15 @@ const prepareAssignmentOverridesPayload = (
             info.unassignItem || false,
             {
               groupIds: groupId.split('_').reverse()[0] || null,
-            }
-          )
+            },
+          ),
         )
       })
     }
   })
 
   const masteryPathOverride = assignedInfoList.find(info =>
-    info.assignedList.includes(masteryPathsOption.assetCode)
+    info.assignedList.includes(masteryPathsOption.assetCode),
   )
 
   if (masteryPathOverride) {
@@ -151,8 +156,8 @@ const prepareAssignmentOverridesPayload = (
         {
           noopId: '1',
         },
-        masteryPathsOption.label
-      )
+        masteryPathsOption.label,
+      ),
     )
   }
 
@@ -164,7 +169,7 @@ const preparePeerReviewPayload = (
   peerReviewAssignment,
   peerReviewsPerStudent,
   peerReviewDueDate,
-  intraGroupPeerReviews
+  intraGroupPeerReviews,
 ) => {
   return peerReviewAssignment === 'off'
     ? null
@@ -179,32 +184,150 @@ const preparePeerReviewPayload = (
 
 const setOnlyVisibleToOverrides = (assignedInfoList, everyoneOverride) => {
   const hasDefaultEveryone = !!Object.keys(everyoneOverride).length
-  if (ENV.FEATURES?.differentiated_modules) {
-    const contextModuleOverrides = assignedInfoList.filter(info => info.context_module_id != null)
-    return !(hasDefaultEveryone || contextModuleOverrides.length === assignedInfoList.length)
-  } else {
-    return !hasDefaultEveryone
+
+  const contextModuleOverrides = assignedInfoList.filter(info => info.context_module_id != null)
+  return !(hasDefaultEveryone || contextModuleOverrides.length === assignedInfoList.length)
+}
+
+export function convertToCheckpointsData(assignedInfoList) {
+  const checkpoints_data = []
+
+  const checkpoint_reply_to_topic = {
+    checkpoint_label: REPLY_TO_TOPIC,
+    dates: [],
   }
+
+  const checkpoint_reply_to_entry = {
+    checkpoint_label: REPLY_TO_ENTRY,
+    dates: [],
+  }
+
+  assignedInfoList.forEach(item => {
+    item.assignedList.forEach(assignee => {
+      const {type, id} = extractTypeAndId(assignee)
+
+      const return_hash = createCheckPointsDatesHash(
+        type,
+        id,
+        item.replyToTopicDueDate,
+        item.availableFrom,
+        item.availableUntil,
+        item.replyToTopicOverrideId,
+      )
+
+      if (return_hash) {
+        checkpoint_reply_to_topic.dates.push(return_hash)
+      }
+    })
+
+    item.assignedList.forEach(assignee => {
+      const {type, id} = extractTypeAndId(assignee)
+      const return_hash = createCheckPointsDatesHash(
+        type,
+        id,
+        item.requiredRepliesDueDate,
+        item.availableFrom,
+        item.availableUntil,
+        item.replyToEntryOverrideId,
+      )
+
+      if (return_hash) {
+        checkpoint_reply_to_entry.dates.push(return_hash)
+      }
+    })
+
+    if (item.assignedList.some(assignee => assignee.startsWith('user_'))) {
+      const topicStudentIds = item.assignedList
+        .filter(assignee => assignee.startsWith('user_'))
+        .map(assignee => parseInt(assignee.substring(assignee.lastIndexOf('_') + 1), 10))
+
+      const topic_return_hash = {
+        type: 'override',
+        dueAt: item.replyToTopicDueDate || null,
+        setType: 'ADHOC',
+        studentIds: topicStudentIds,
+        unlockAt: item.availableFrom || null,
+        lockAt: item.availableUntil || null,
+      }
+
+      checkpoint_reply_to_topic.dates.push(topic_return_hash)
+    }
+
+    if (item.assignedList.some(assignee => assignee.startsWith('user_'))) {
+      const replyStudentIds = item.assignedList
+        .filter(assignee => assignee.startsWith('user_'))
+        .map(assignee => parseInt(assignee.substring(assignee.lastIndexOf('_') + 1), 10))
+
+      const reply_return_hash = {
+        type: 'override',
+        dueAt: item.requiredRepliesDueDate || null,
+        setType: 'ADHOC',
+        studentIds: replyStudentIds,
+        unlockAt: item.availableFrom || null,
+        lockAt: item.availableUntil || null,
+      }
+
+      checkpoint_reply_to_entry.dates.push(reply_return_hash)
+    }
+  })
+  checkpoints_data.push(checkpoint_reply_to_topic, checkpoint_reply_to_entry)
+  return checkpoints_data
+}
+
+function extractTypeAndId(assignee) {
+  if (assignee === 'everyone') {
+    return {type: assignee, id: null}
+  }
+  const lastUnderscoreIndex = assignee.lastIndexOf('_')
+  const type = assignee.substring(0, lastUnderscoreIndex)
+  const id = parseInt(assignee.substring(lastUnderscoreIndex + 1), 10)
+
+  return {type, id}
+}
+
+function createCheckPointsDatesHash(type, id, dueAt, unlockAt, lockAt, overrideId = null) {
+  const return_hash = {}
+
+  if (type === 'everyone') {
+    return_hash.type = 'everyone'
+  } else if (type === 'course_section' || type === 'group' || type === 'course') {
+    return_hash.type = 'override'
+    return_hash.setType =
+      type === 'course_section' ? 'CourseSection' : type === 'group' ? 'Group' : 'Course'
+    return_hash.setId = id
+    if (overrideId) {
+      return_hash.id = parseInt(overrideId, 10)
+    }
+  }
+  return_hash.dueAt = dueAt || null
+  return_hash.unlockAt = unlockAt || null
+  return_hash.lockAt = lockAt || null
+
+  return Object.keys(return_hash).length > 0 && type !== 'user' ? return_hash : null
 }
 
 export const prepareCheckpointsPayload = (
+  assignedInfoList,
   pointsPossibleReplyToTopic,
   pointsPossibleReplyToEntry,
   replyToEntryRequiredCount,
-  isCheckpoints
+  isCheckpoints,
 ) => {
+  // convert assignedInfoList to Api format
+  const convertedAssignedInfoList = convertToCheckpointsData(assignedInfoList)
+
   return isCheckpoints
     ? [
         {
           checkpointLabel: REPLY_TO_TOPIC,
           pointsPossible: pointsPossibleReplyToTopic,
-          dates: [],
+          dates: convertedAssignedInfoList[0].dates,
           repliesRequired: replyToEntryRequiredCount,
         },
         {
           checkpointLabel: REPLY_TO_ENTRY,
           pointsPossible: pointsPossibleReplyToEntry,
-          dates: [],
+          dates: convertedAssignedInfoList[1].dates,
           repliesRequired: replyToEntryRequiredCount,
         },
       ]
@@ -214,12 +337,12 @@ export const prepareCheckpointsPayload = (
 const prepareEveryoneOrEveryoneElseOverride = (
   assignedInfoList,
   defaultEveryoneOption,
-  defaultEveryoneElseOption
+  defaultEveryoneElseOption,
 ) =>
   assignedInfoList.find(
     info =>
       info.assignedList.includes(defaultEveryoneOption.assetCode) ||
-      info.assignedList.includes(defaultEveryoneElseOption.assetCode)
+      info.assignedList.includes(defaultEveryoneElseOption.assetCode),
   ) || {}
 
 export const prepareAssignmentPayload = (
@@ -242,7 +365,9 @@ export const prepareAssignmentPayload = (
   masteryPathsOption,
   importantDates,
   isCheckpoints,
-  existingAssignment
+  existingAssignment,
+  suppressedAssignment,
+  assetProcessors,
 ) => {
   /*
   Return null if the assignment is not graded and there is no existing assignment.
@@ -254,7 +379,7 @@ export const prepareAssignmentPayload = (
   const everyoneOverride = prepareEveryoneOrEveryoneElseOverride(
     assignedInfoList,
     defaultEveryoneOption,
-    defaultEveryoneElseOption
+    defaultEveryoneElseOption,
   )
   // Common payload properties for graded assignments
   let payload = {
@@ -267,16 +392,15 @@ export const prepareAssignmentPayload = (
       peerReviewAssignment,
       peerReviewsPerStudent,
       peerReviewDueDate,
-      intraGroupPeerReviews
-    ),
-    assignmentOverrides: prepareAssignmentOverridesPayload(
-      assignedInfoList,
-      defaultEveryoneOption,
-      masteryPathsOption
+      intraGroupPeerReviews,
     ),
     onlyVisibleToOverrides: setOnlyVisibleToOverrides(assignedInfoList, everyoneOverride),
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
+    suppressAssignment: suppressedAssignment,
+    assetProcessors: assetProcessors.map(
+      attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor,
+    ),
   }
   if (abGuid) {
     payload = {
@@ -284,6 +408,7 @@ export const prepareAssignmentPayload = (
       abGuid,
     }
   }
+
   // Additional properties if graded assignment is not checkpointed
   if (!isCheckpoints) {
     payload = {
@@ -292,6 +417,11 @@ export const prepareAssignmentPayload = (
       dueAt: everyoneOverride.dueDate || null,
       lockAt: everyoneOverride.availableUntil || null,
       unlockAt: everyoneOverride.availableFrom || null,
+      assignmentOverrides: prepareAssignmentOverridesPayload(
+        assignedInfoList,
+        defaultEveryoneOption,
+        masteryPathsOption,
+      ),
     }
   }
   // Additional properties for editing of a graded assignment
@@ -316,12 +446,12 @@ export const prepareUngradedDiscussionOverridesPayload = (
   assignedInfoList,
   defaultEveryoneOption,
   defaultEveryoneElseOption,
-  masteryPathsOption
+  masteryPathsOption,
 ) => {
   const everyoneOverride = prepareEveryoneOrEveryoneElseOverride(
     assignedInfoList,
     defaultEveryoneOption,
-    defaultEveryoneElseOption
+    defaultEveryoneElseOption,
   )
 
   return {
@@ -332,7 +462,8 @@ export const prepareUngradedDiscussionOverridesPayload = (
     ungradedDiscussionOverrides: prepareAssignmentOverridesPayload(
       assignedInfoList,
       defaultEveryoneOption,
-      masteryPathsOption
+      masteryPathsOption,
+      true,
     ),
   }
 }

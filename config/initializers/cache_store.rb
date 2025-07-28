@@ -98,6 +98,10 @@ load_cache_config = lambda do
     raise
   end
 end
+Autoextend.hook("ActiveSupport::Cache::RedisCacheStore",
+                "ActiveSupport::Cache::SafeRedisRaceCondition",
+                method: :prepend)
+
 load_cache_config.call
 Canvas::Reloader.on_reload(&load_cache_config)
 

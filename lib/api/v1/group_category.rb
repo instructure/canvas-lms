@@ -25,7 +25,7 @@ module Api::V1::GroupCategory
   include Api::V1::Group
 
   API_GROUP_CATEGORY_JSON_OPTS = {
-    only: %w[id name role self_signup group_limit auto_leader created_at]
+    only: %w[id name role self_signup self_signup_end_at group_limit auto_leader created_at]
   }.freeze
 
   def group_category_json(group_category, user, session, options = {})
@@ -60,7 +60,7 @@ module Api::V1::GroupCategory
   def included_data(group_category, user, session, includes)
     hash = {}
     if includes
-      if includes.include?("progress_url") && group_category.current_progress && group_category.current_progress.pending?
+      if includes.include?("progress_url") && group_category.current_progress&.pending?
         hash["progress"] = progress_json(group_category.current_progress, user, session)
       end
       if includes.include?("groups_count")

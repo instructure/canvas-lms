@@ -127,4 +127,5 @@ describe "CanvasUnzip" do
   it_behaves_like "it extracts archives with extension", "zip"
   it_behaves_like "it extracts archives with extension", "tar"
   it_behaves_like "it extracts archives with extension", "tar.gz"
+  it_behaves_like "it extracts archives with extension", "imscc"
 end

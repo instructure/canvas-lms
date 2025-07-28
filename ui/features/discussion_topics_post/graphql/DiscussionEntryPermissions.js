@@ -17,7 +17,7 @@
  */
 
 import {bool, shape} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const DiscussionEntryPermissions = {
   fragment: gql`

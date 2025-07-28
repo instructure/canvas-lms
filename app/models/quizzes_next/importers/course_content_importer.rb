@@ -65,7 +65,7 @@ module QuizzesNext::Importers
         # Quizzes will be created in Quizzes.Next app
         # assignment.quiz_lti! breaks relation to quiz. Destroying Quizzes:Quiz wouldn't
         # mark assignment to be deleted.
-        quiz.destroy
+        Quizzes::Quiz.find(quiz.id)&.destroy
       end
       setup_assets_imported(lti_assignment_quiz_set)
     end

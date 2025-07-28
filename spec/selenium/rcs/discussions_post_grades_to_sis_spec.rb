@@ -20,8 +20,20 @@
 require_relative "../grades/pages/gradebook_page"
 require_relative "../helpers/discussions_common"
 
-describe "sync grades to sis" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "sync grades to sis" do |ff_enabled|
   include_context "in-process server selenium tests"
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   before(:once) { export_plugin_setting.update(disabled: false) }
 
@@ -43,7 +55,7 @@ describe "sync grades to sis" do
   it "does not display Sync to SIS option when feature not configured", priority: "1" do
     Account.default.set_feature_flag!("post_grades", "off")
     get "/courses/#{@course.id}/discussion_topics/new"
-    f("#use_for_grading").click
+    f("label[for='use_for_grading']").click
     expect(f("#content")).not_to contain_css("#assignment_post_to_sis")
   end
 
@@ -51,7 +63,7 @@ describe "sync grades to sis" do
     before do
       get "/courses/#{@course.id}/discussion_topics/new"
       f("#discussion-title").send_keys("New Discussion Title")
-      f("#use_for_grading").click
+      f("label[for='use_for_grading']").click
       f("#assignment_post_to_sis").click
       wait_for_ajaximations
       click_option("#assignment_group_id", "Assignment Group")
@@ -130,4 +142,9 @@ describe "sync grades to sis" do
 
     it_behaves_like "gradebook_sync_grades"
   end
+end
+
+describe "sync grades to sis" do
+  it_behaves_like "sync grades to sis", true
+  it_behaves_like "sync grades to sis", false
 end

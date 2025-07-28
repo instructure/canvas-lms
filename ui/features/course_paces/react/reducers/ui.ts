@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,14 +18,16 @@
 
 import {createSelector} from 'reselect'
 
-import {StoreState, UIState} from '../types'
-import {Constants as UIConstants, UIAction} from '../actions/ui'
+import type {StoreState, UIState} from '../types'
+import {Constants as UIConstants, type UIAction} from '../actions/ui'
 import {getCoursePaceType, getPacePublishing} from './course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 
+// @ts-expect-error
 export const initialState: UIState = {
   autoSaving: false,
   syncing: 0,
+  savingDraft: false,
   errors: {},
   divideIntoWeeks: true,
   selectedContextType: 'Course',
@@ -38,11 +39,15 @@ export const initialState: UIState = {
   responsiveSize: 'large',
   showProjections: true,
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
+  showWeightedAssignmentsTray: false,
+  bulkEditModalOpen: false,
+  selectedBulkStudents: [],
 }
 
 /* Selectors */
 
 export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
+export const getSavingDraft = (state: StoreState) => state.ui.savingDraft
 // there is a window between when blackout dates finish updating and the pace
 // begins publishing. use getSyncing to keep the ui consistent in the transition
 export const getSyncing = (state: StoreState): boolean =>
@@ -71,11 +76,15 @@ export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getIsSyncing = (state: StoreState) => state.ui.syncing
 export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocked
+export const getShowWeightedAssignmentsTray = (state: StoreState) => state.ui.showWeightedAssignmentsTray
+export const getBulkEditModalOpen = (state: StoreState) => state.ui.bulkEditModalOpen
+export const getSelectedBulkStudents = (state: StoreState) => state.ui.selectedBulkStudents
+
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
   getCoursePaceType,
-  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment'
+  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment',
 )
 
 /* Reducers */
@@ -97,8 +106,10 @@ export default (state = initialState, action: UIAction): UIState => {
       delete new_errors[action.payload]
       return {...state, errors: new_errors}
     }
+    // @ts-expect-error
     case UIConstants.TOGGLE_DIVIDE_INTO_WEEKS:
       return {...state, divideIntoWeeks: !state.divideIntoWeeks}
+    // @ts-expect-error
     case UIConstants.TOGGLE_SHOW_PROJECTIONS:
       return {...state, showProjections: !state.showProjections}
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
@@ -123,6 +134,18 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, selectedContextType: action.payload}
     case UIConstants.SET_BLUEPRINT_LOCK:
       return {...state, blueprintLocked: action.payload}
+    case UIConstants.SAVING_DRAFT:
+      return {...state, savingDraft: !state.savingDraft}
+    case UIConstants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: true}
+    case UIConstants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL:
+      return {...state, showWeightedAssignmentsTray: false}
+    case UIConstants.OPEN_BULK_EDIT_MODAL:
+      return {...state, bulkEditModalOpen: true, selectedBulkStudents: action.payload}
+    case UIConstants.CLOSE_BULK_EDIT_MODAL:
+      return {...state, bulkEditModalOpen: false, selectedBulkStudents: [] }
+    case UIConstants.SET_SELECTED_BULK_STUDENTS:
+      return {...state, selectedBulkStudents: action.payload}
     default:
       return state
   }

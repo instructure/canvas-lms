@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import React from 'react'
@@ -39,7 +39,7 @@ import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import FocusManager from '../focusManager'
 
-const I18n = useI18nScope('BlueprintAssociations')
+const I18n = createI18nScope('BlueprintAssociations')
 
 const {func, bool} = PropTypes
 
@@ -105,7 +105,7 @@ export default class BlueprintAssociations extends React.Component {
             <Text weight="bold">{I18n.t('Warning:')}</Text>&nbsp;
             <Text>
               {I18n.t(
-                'You have unsynced changes that will sync to all associated courses when a new association is saved.'
+                'You have unsynced changes that will sync to all associated courses when a new association is saved.',
               )}
             </Text>
           </p>
@@ -190,10 +190,10 @@ const connectState = state =>
     ]),
     {
       hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
-    }
+    },
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedBlueprintAssociations = connect(
   connectState,
-  connectActions
+  connectActions,
 )(BlueprintAssociations)

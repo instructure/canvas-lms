@@ -21,7 +21,7 @@ require "sanitize"
 
 module Quizzes::QuizQuestion::AnswerSerializers
   module Util
-    MaxTextualAnswerLength = 16.kilobyte
+    MaxTextualAnswerLength = 16.kilobytes
 
     class << self
       def blank_id(blank)
@@ -33,9 +33,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       # @return [Integer|NilClass]
       #   nil if the parameter isn't really an integer.
       def to_integer(number)
-        Integer(number)
-      rescue
-        nil
+        Integer(number, exception: false)
       end
 
       # Cast a localized string number to a BigDecimal

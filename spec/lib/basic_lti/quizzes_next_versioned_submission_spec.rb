@@ -26,7 +26,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     @root_account = @course.root_account
     @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
+    @user = User.create!(name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -155,6 +155,27 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         ).to eq(
           url_grades.map do |x|
             [x[:url], assignment.points_possible * x[:grade], (assignment.points_possible * x[:grade]).to_s]
+          end
+        )
+      end
+    end
+
+    context "with a version for each url on manual posting" do
+      let(:url_grades) do
+        [
+          { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: 0.11 },
+          { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: 0.22 }
+        ]
+      end
+
+      it "outputs all versions with hidden scores" do
+        expect(
+          subject.grade_history(hide_history_scores_on_manual_posting: true).map do |submission|
+            [submission[:url], submission[:score], submission[:grade]]
+          end
+        ).to eq(
+          url_grades.map do |x|
+            [x[:url], nil, nil]
           end
         )
       end
@@ -321,7 +342,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
               next if x[:grade].blank? && x[:workflow_state] != "graded"
 
               score = x[:grade] ? assignment.points_possible * x[:grade] : nil
-              grade = score ? score.to_s : nil
+              grade = score&.to_s
 
               [x[:url], score, grade]
             end
@@ -336,6 +357,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     before do
       allow(Submission).to receive(:find_or_initialize_by).and_return(submission)
+      allow(submission).to receive_messages(grader_can_grade?: true, autograded?: false)
     end
 
     let(:submission) do

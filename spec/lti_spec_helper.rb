@@ -99,4 +99,9 @@ module LtiSpecHelper
       </cartridge_basiclti_link>
     XML
   end
+
+  def allow_beta_overrides(tool)
+    allow(tool).to receive(:use_environment_overrides?).and_return(true)
+    allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+  end
 end

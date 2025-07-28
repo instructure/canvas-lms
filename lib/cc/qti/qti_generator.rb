@@ -33,8 +33,8 @@ module CC
         @html_exporter = html_exporter
       end
 
-      def self.generate_qti(*args)
-        qti = Qti::QtiGenerator.new(*args)
+      def self.generate_qti(*)
+        qti = Qti::QtiGenerator.new(*)
         qti.generate
       end
 
@@ -147,8 +147,7 @@ module CC
           begin
             generate_quiz(quiz, false)
           rescue
-            title = quiz.title rescue I18n.t("unknown_quiz", "Unknown quiz")
-            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title:), $!)
+            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: quiz.title), $!)
           end
         end
 
@@ -162,7 +161,7 @@ module CC
         banks = AssessmentQuestionBank.where(id: bank_ids)
 
         banks.each do |bank|
-          next unless export_object?(bank)
+          next unless export_object?(bank) && (@user.nil? || bank.grants_right?(@user, :read))
 
           begin
             generate_question_bank(bank)

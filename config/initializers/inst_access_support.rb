@@ -22,9 +22,16 @@ class InstAccessSupport
   def self.configure_inst_access!
     conf = Rails.application.credentials.inst_access_signature
     if conf
+      service_jwks = JSON::JWK::Set.new
+      conf[:service_keys]&.each do |kid, key|
+        service_jwks << JSON::JWK.new(kid: kid.to_s, k: key[:secret], kty: key[:key_type]) if key[:secret] && key[:key_type]
+      end
+
       InstAccess.configure(
         signing_key: Base64.decode64(conf[:private_key]),
-        encryption_key: Base64.decode64(conf[:encryption_public_key])
+        encryption_key: Base64.decode64(conf[:encryption_public_key]),
+        issuers: conf[:service_keys]&.values&.pluck(:issuer),
+        service_jwks:
       )
     end
   end

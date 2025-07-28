@@ -134,6 +134,9 @@
     "collaborations_5c56c15f": {
         "message": "همکاری ها"
     },
+    "color_a363e1b0": {
+        "message": "رنگ"
+    },
     "computer_1d7dfa6f": {
         "message": "کامپیوتر"
     },
@@ -142,6 +145,9 @@
     },
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
+    },
+    "copy_9748f9f": {
+        "message": "کپی کردن"
     },
     "copyright_holder_66ee111": {
         "message": "دارنده حق نشر:"
@@ -187,6 +193,9 @@
     },
     "deep_purple_bb3e2907": {
         "message": "ارغوانی پر رنگ"
+    },
+    "default_9db103d": {
+        "message": "پیش فرض"
     },
     "delimiters_4db4840d": {
         "message": "جداکننده ها"
@@ -602,6 +611,9 @@
     "reset_95a81614": {
         "message": "بازنشانی"
     },
+    "retry_ebd5f8ba": {
+        "message": "تلاش دوباره"
+    },
     "rich_content_editor_2708ef21": {
         "message": "ویرایشگر محتوای غنی"
     },
@@ -659,6 +671,9 @@
     "submit_a3cc6859": {
         "message": "ارسال"
     },
+    "submitting_b90fac62": {
+        "message": "در حال ارسال..."
+    },
     "swahili_5caeb4ba": {
         "message": "سواحیلی"
     },
@@ -682,9 +697,6 @@
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "پیش نمایش سند در حال پردازش است. لطفا بعدا دوباره تلاش کنید."
-    },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "محتوای زیر توسط شریک فراهم شده است"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "مطلب در دامنه عمومی است"

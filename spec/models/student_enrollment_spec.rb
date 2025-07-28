@@ -153,6 +153,27 @@ describe StudentEnrollment do
     end
   end
 
+  describe "update_override_status" do
+    let(:enrollment) { @se }
+    let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
+    let(:custom_grade_status) { CustomGradeStatus.create!(name: "custom", color: "#000000", root_account_id: @course.root_account_id, created_by: teacher) }
+
+    it "emits a final_grade_custom_status live event" do
+      updated_score = enrollment.find_score
+
+      expect(Canvas::LiveEvents).to receive(:final_grade_custom_status).with(updated_score, nil, enrollment, @course).once
+      enrollment.update_override_status(custom_grade_status:)
+    end
+
+    it "emits a final_grade_custom_status live event with the old status" do
+      updated_score = enrollment.find_score
+      updated_score.update!(custom_grade_status:)
+
+      expect(Canvas::LiveEvents).to receive(:final_grade_custom_status).with(updated_score, custom_grade_status, enrollment, @course).once
+      enrollment.update_override_status(custom_grade_status: nil)
+    end
+  end
+
   describe "course pace republishing" do
     before :once do
       @enrollment = course_with_student active_all: true
@@ -247,11 +268,11 @@ describe StudentEnrollment do
 
         it "logs a stat if a student is added to multiple sections that have published paces" do
           @unpublished_section_pace.publish
-          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
           student = student_in_section(@section1)
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces")
+          expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("course_pacing.student_with_multiple_sections_with_paces")
           student_in_section(@section2, user: student, allow_multiple_enrollments: true)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces").at_least(:once)
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.student_with_multiple_sections_with_paces").at_least(:once)
         end
       end
     end

@@ -44,7 +44,7 @@ module Lti
           raw_api_call(:delete,
                        "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "destroy", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id })
-          assert_status(401)
+          assert_forbidden
           expect(tp.reload.workflow_state).to eq "active"
         end
       end
@@ -65,7 +65,7 @@ module Lti
           raw_api_call(:delete,
                        "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "destroy", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id })
-          assert_status(401)
+          assert_forbidden
           expect(tp.reload.workflow_state).to eq "active"
         end
       end
@@ -88,7 +88,7 @@ module Lti
           raw_api_call(:put,
                        "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "update", format: "json", course_id: @course.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
-          assert_status(401)
+          assert_forbidden
           expect(tp.reload.workflow_state).to eq "active"
         end
       end
@@ -109,7 +109,7 @@ module Lti
           raw_api_call(:put,
                        "/api/v1/accounts/#{account.id}/tool_proxies/#{tp.id}",
                        { controller: "lti/tool_proxy", action: "update", format: "json", account_id: account.id.to_s, tool_proxy_id: tp.id, workflow_state: "disabled" })
-          assert_status(401)
+          assert_forbidden
           expect(tp.reload.workflow_state).to eq "active"
         end
       end

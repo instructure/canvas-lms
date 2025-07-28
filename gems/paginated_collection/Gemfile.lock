@@ -8,30 +8,30 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.1)
     folio-pagination (0.0.12)
-    mini_portile2 (2.8.6)
+    mini_portile2 (2.8.9)
     rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.0)
+    rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.0)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.1)
+    rspec-mocks (3.13.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.1)
-    sqlite3 (1.7.3)
+    rspec-support (3.13.2)
+    sqlite3 (2.6.0)
       mini_portile2 (~> 2.8.0)
-    sqlite3 (1.7.3-aarch64-linux)
-    sqlite3 (1.7.3-arm64-darwin)
-    sqlite3 (1.7.3-x86_64-darwin)
-    sqlite3 (1.7.3-x86_64-linux)
-    will_paginate (4.0.0)
+    sqlite3 (2.6.0-aarch64-linux-gnu)
+    sqlite3 (2.6.0-arm64-darwin)
+    sqlite3 (2.6.0-x86_64-darwin)
+    sqlite3 (2.6.0-x86_64-linux-gnu)
+    will_paginate (4.0.1)
 
 PLATFORMS
   aarch64-linux
@@ -41,14 +41,13 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   paginated_collection!
   rake
   rspec (~> 3.12)
   sqlite3
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.4.1p0
 
 BUNDLED WITH
-   2.5.10
+   2.6.7

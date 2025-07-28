@@ -358,8 +358,10 @@ describe Rubric do
   end
 
   it "changes workflow state properly when archiving when enhanced_rubrics FF enabled" do
+    allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+    expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.archived").at_least(:once)
     course_with_teacher
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.enable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "archived"
@@ -367,7 +369,7 @@ describe Rubric do
 
   it "changes workflow state propertly when unarchiving when enhanced_rubrics FF enabled" do
     course_with_teacher
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.enable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "archived"
@@ -378,11 +380,11 @@ describe Rubric do
   it "does not change workflow state when archiving when enhanced_rubrics FF disabled" do
     # remove this test when FF is removed
     course_with_teacher
-    @course.root_account.disable_feature!(:enhanced_rubrics)
+    @course.account.disable_feature!(:enhanced_rubrics)
     rubric = rubric_model({ context: @course })
     rubric.archive
     expect(rubric.workflow_state).to eq "active"
-    @course.root_account.enable_feature!(:enhanced_rubrics)
+    @course.enable_feature!(:enhanced_rubrics)
   end
 
   it "is cool about duplicate titles" do
@@ -587,6 +589,86 @@ describe Rubric do
           rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           expect(last_created_event.assignment_id).to eq assignment.id
         end
+      end
+    end
+
+    describe "criteria_via_llm" do
+      before do
+        @inst_llm = double("InstLLM::Client")
+        allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+      end
+
+      it "creates criteria via LLM if requested" do
+        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = { title: "Test LLM Rubric", criteria_via_llm: "true" }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
+
+        llm_response = {
+          criteria: [
+            { name: "n1", description: "d1", ratings: [{ title: "rt1.1", description: "rd1.1" }, { title: "rt1.2", description: "rd1.2" }, { title: "rt1.3", description: "rd1.3" }] },
+            { name: "n2", description: "d2", ratings: [{ title: "rt2.1", description: "rd2.1" }, { title: "rt2.2", description: "rd2.2" }, { title: "rt2.3", description: "rd2.3" }] },
+            { name: "n3", description: "d3", ratings: [{ title: "rt3.1", description: "rd3.1" }, { title: "rt3.2", description: "rd3.2" }, { title: "rt3.3", description: "rd3.3" }] },
+          ]
+        }
+        expect(@inst_llm).to receive(:chat).and_return(
+          InstLLM::Response::ChatResponse.new(
+            model: "model",
+            message: { role: :assistant, content: llm_response.to_json },
+            stop_reason: "stop_reason",
+            usage: {
+              input_tokens: 10,
+              output_tokens: 20,
+            }
+          )
+        )
+        expect(Rubric).to receive(:ai_rubrics_enabled?).and_return(true)
+
+        association = nil
+        expect do
+          association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+        end.to change { LLMResponse.count }.by(1)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "n1"
+        expect(llm_rubric.data[0][:ratings][0][:long_description]).to eq "rd1.1"
+        expect(llm_rubric.data[0][:ratings][1][:points]).to eq 10 # halfway between 20 (per-criteria default) and 0
+      end
+
+      it "still creates the normal way if requested" do
+        assignment.update!(description: "Write a well argued essay about whether milk is better than cheese")
+        llm_rubric = course.rubrics.build
+        llm_rubric.user = teacher
+        rubric_params = {
+          title: "Test LLM Rubric",
+          criteria_via_llm: "false",
+          criteria: {
+            "0" => {
+              "id" => "1742228963899",
+              "description" => "Test 1",
+              "long_description" => "Test first criteria",
+              "points" => "4",
+              "ignore_for_scoring" => "false",
+              "criterion_use_range" => "false",
+              "ratings" => {
+                "0" => { "description" => "Exceeds", "long_description" => "", "points" => "4", "id" => "1" },
+                "1" => { "description" => "Mastery", "long_description" => "", "points" => "3", "id" => "2" },
+                "2" => { "description" => "Near", "long_description" => "", "points" => "2", "id" => "3" },
+                "3" => { "description" => "Below", "long_description" => "", "points" => "1", "id" => "4" },
+                "4" => { "description" => "No Evidence", "long_description" => "", "points" => "0", "id" => "5" }
+              }
+            }
+          }.with_indifferent_access
+        }
+        association_params = { association_object: assignment, purpose: "grading", use_for_grading: "1" }
+
+        expect(Rubric).not_to receive(:ai_rubrics_enabled?)
+
+        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+
+        expect(association).to be_present
+        expect(llm_rubric.data[0][:description]).to eq "Test 1"
       end
     end
   end

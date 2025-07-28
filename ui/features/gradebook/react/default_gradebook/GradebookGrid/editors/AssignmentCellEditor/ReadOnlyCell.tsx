@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -24,10 +23,10 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconCheckMarkSolid, IconExpandStartLine, IconEndSolid} from '@instructure/ui-icons'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const componentOverrides = {
   IconButton: {
@@ -37,11 +36,18 @@ const componentOverrides = {
 }
 
 function formatGrade(
+  // @ts-expect-error
   submission,
+  // @ts-expect-error
   assignment,
+  // @ts-expect-error
   gradingScheme,
+  // @ts-expect-error
   pointsBasedGradingScheme,
-  enterGradesAs
+  // @ts-expect-error
+  enterGradesAs,
+  // @ts-expect-error
+  scalingFactor,
 ) {
   const formatOptions = {
     defaultValue: '–',
@@ -49,16 +55,19 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'final',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
+// @ts-expect-error
 function renderTextGrade(grade) {
   return <Text size="small">{grade}</Text>
 }
 
+// @ts-expect-error
 function renderCompleteIncompleteGrade(grade) {
   if (grade !== 'complete' && grade !== 'incomplete') {
     return renderTextGrade('–')
@@ -92,6 +101,7 @@ export default class ReadOnlyCell extends Component {
     gradingScheme: instanceOf(Array).isRequired,
     pointsBasedGradingScheme: bool,
     onToggleSubmissionTrayOpen: func.isRequired,
+    scalingFactor: number,
     student: shape({
       id: string.isRequired,
     }).isRequired,
@@ -105,10 +115,13 @@ export default class ReadOnlyCell extends Component {
     }).isRequired,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
+    // @ts-expect-error
     this.bindToggleTrayButtonRef = ref => {
+      // @ts-expect-error
       this.trayButton = ref
     }
 
@@ -117,12 +130,15 @@ export default class ReadOnlyCell extends Component {
   }
 
   componentDidMount() {
+    // @ts-expect-error
     this.trayButton.focus()
   }
 
   /* Required for AssignmentCellEditor */
+  // @ts-expect-error
   handleKeyDown(event) {
     // Enter
+    // @ts-expect-error
     if (event.which === 13 && this.trayButton === document.activeElement) {
       // browser will activate the tray button
       return false // prevent Grid behavior
@@ -132,11 +148,14 @@ export default class ReadOnlyCell extends Component {
   }
 
   handleToggleTrayButtonClick() {
+    // @ts-expect-error
     const {assignment, student} = this.props
+    // @ts-expect-error
     this.props.onToggleSubmissionTrayOpen(student.id, assignment.id)
   }
 
   focus() {
+    // @ts-expect-error
     this.trayButton.focus()
   }
 
@@ -150,27 +169,38 @@ export default class ReadOnlyCell extends Component {
 
   render() {
     const {
+      // @ts-expect-error
       assignment,
+      // @ts-expect-error
       enterGradesAs,
+      // @ts-expect-error
       gradeIsVisible,
+      // @ts-expect-error
       gradingScheme,
+      // @ts-expect-error
       pointsBasedGradingScheme,
+      // @ts-expect-error
+      scalingFactor,
+      // @ts-expect-error
       submission,
     } = this.props
 
     let content = ''
     if (gradeIsVisible) {
       if (enterGradesAs === 'passFail' && !submission.excused) {
+        // @ts-expect-error
         content = renderCompleteIncompleteGrade(submission.rawGrade)
       } else {
+        // @ts-expect-error
         content = renderTextGrade(
           formatGrade(
             submission,
             assignment,
             gradingScheme,
             pointsBasedGradingScheme,
-            enterGradesAs
-          )
+            enterGradesAs,
+            scalingFactor,
+          ),
         )
       }
     }
@@ -185,6 +215,7 @@ export default class ReadOnlyCell extends Component {
           <div className="Grid__GradeCell__EndContainer">
             <div className="Grid__GradeCell__Options">
               <IconButton
+                // @ts-expect-error
                 elementRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}
                 size="small"

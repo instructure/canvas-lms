@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {render, screen, within} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import React from 'react'
 import {COURSE_NOTIFICATIONS_QUERY} from '@canvas/notification-preferences-course/graphql/Queries'
@@ -35,7 +35,7 @@ async function mockUserEnrollmentsQuery(queryOverrides) {
     queryOverrides,
     {
       userId: 1,
-    }
+    },
   )
 
   return [
@@ -70,6 +70,7 @@ async function mockAccountNotificationsQuery(queryOverrides) {
         },
       },
       result: queryResult,
+      maxUsageCount: 2,
     },
   ]
 }
@@ -104,12 +105,12 @@ describe('Notification Settings page', () => {
     const {findByTestId, findByText} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(await findByTestId('settings-for-label')).toHaveValue('Account')
     expect(
-      await findByText('Account-level notifications apply to all courses', {exact: false})
+      await findByText('Account-level notifications apply to all courses', {exact: false}),
     ).toBeInTheDocument()
   })
 
@@ -125,17 +126,17 @@ describe('Notification Settings page', () => {
     const {findByTestId} = render(
       <MockedProvider mocks={accountMocks.concat(enrollmentMocks)} cache={createCache()}>
         <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const dropdown = await findByTestId('settings-for-label')
     await userEvent.click(dropdown)
 
     const terms = await screen.findAllByText('Term Name')
-    expect(terms.length).toEqual(1)
+    expect(terms).toHaveLength(1)
 
     const termNameGroupQueries = within(terms[0].parentElement)
-    expect((await termNameGroupQueries.findAllByText('Course Name')).length).toEqual(2)
+    expect(await termNameGroupQueries.findAllByText('Course Name')).toHaveLength(2)
   })
 
   it('only shows a course with multiple enrollments once', async () => {
@@ -151,13 +152,13 @@ describe('Notification Settings page', () => {
     const {findByTestId} = render(
       <MockedProvider mocks={accountMocks.concat(enrollmentMocks)} cache={createCache()}>
         <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const dropdown = await findByTestId('settings-for-label')
     await userEvent.click(dropdown)
 
-    expect((await screen.findAllByText('Duplicate enrollment course')).length).toEqual(1)
+    expect(await screen.findAllByText('Duplicate enrollment course')).toHaveLength(1)
   })
 
   it('displays course settings when a course is selected', async () => {
@@ -175,7 +176,7 @@ describe('Notification Settings page', () => {
         cache={createCache()}
       >
         <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     // Switch to a course
@@ -188,8 +189,8 @@ describe('Notification Settings page', () => {
     expect(
       await screen.findByText(
         'Course-level notifications are inherited from your account-level notification settings',
-        {exact: false}
-      )
+        {exact: false},
+      ),
     ).toBeInTheDocument()
   })
 
@@ -204,7 +205,7 @@ describe('Notification Settings page', () => {
         cache={createCache()}
       >
         <AccountNotificationSettingsView accountId="1" userId="1" />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(await queryByTestId('settings-for-label')).not.toBeInTheDocument()

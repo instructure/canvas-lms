@@ -22,6 +22,7 @@ import {
   calculatePanelHeight,
   convertFriendlyDatetimeToUTC,
   convertModuleSettingsForApi,
+  requirementTypesForResource,
 } from '../miscHelpers'
 import type {Requirement} from '../../react/types'
 
@@ -83,25 +84,33 @@ describe('convertModuleSettingsForApi', () => {
         minimumScore: '50',
         pointsPossible: '100',
       },
-      {type: 'contribute', id: '5', name: 'Mod 5', resource: 'discussion'},
+      {
+        type: 'percentage',
+        id: '5',
+        name: 'Mod 5',
+        resource: 'quiz',
+        minimumScore: '50',
+        pointsPossible: '120',
+      },
+      {type: 'contribute', id: '6', name: 'Mod 6', resource: 'discussion'},
     ] as Requirement[],
     requirementCount: 'all' as const,
     requireSequentialProgress: false,
     publishFinalGrade: true,
   }
 
-  it('converts the module settings to the format expected by the API', () => {
+  it('produces correct API parm when name was not modified', () => {
     expect(convertModuleSettingsForApi(moduleSettings)).toEqual({
       context_module: {
-        name: 'Module 1',
         unlock_at: '2023-08-02T06:00:00.000Z',
         prerequisites: 'module_1,module_2',
         completion_requirements: {
-          1: {min_score: '', type: 'must_view'},
-          2: {min_score: '', type: 'must_mark_done'},
-          3: {min_score: '', type: 'must_submit'},
-          4: {min_score: '50', type: 'min_score'},
-          5: {min_score: '', type: 'must_contribute'},
+          1: {min_percentage: '', min_score: '', type: 'must_view'},
+          2: {min_percentage: '', min_score: '', type: 'must_mark_done'},
+          3: {min_percentage: '', min_score: '', type: 'must_submit'},
+          4: {min_percentage: '', min_score: '50', type: 'min_score'},
+          5: {min_percentage: '50', min_score: '', type: 'min_percentage'},
+          6: {min_percentage: '', min_score: '', type: 'must_contribute'},
         },
         requirement_count: '',
         require_sequential_progress: false,
@@ -109,6 +118,29 @@ describe('convertModuleSettingsForApi', () => {
       },
     })
   })
+
+  it('includes the module name when it was modified', () => {
+    const settings = {...moduleSettings, moduleNameDirty: true}
+    expect(convertModuleSettingsForApi(settings)).toEqual({
+      context_module: {
+        name: 'Module 1',
+        unlock_at: '2023-08-02T06:00:00.000Z',
+        prerequisites: 'module_1,module_2',
+        completion_requirements: {
+          1: {min_percentage: '', min_score: '', type: 'must_view'},
+          2: {min_percentage: '', min_score: '', type: 'must_mark_done'},
+          3: {min_percentage: '', min_score: '', type: 'must_submit'},
+          4: {min_percentage: '', min_score: '50', type: 'min_score'},
+          5: {min_percentage: '50', min_score: '', type: 'min_percentage'},
+          6: {min_percentage: '', min_score: '', type: 'must_contribute'},
+        },
+        requirement_count: '',
+        require_sequential_progress: false,
+        publish_final_grade: true,
+      },
+    })
+  })
+
 
   it('excludes unlockAt if lockUntilChecked is false', () => {
     const formattedSettings = convertModuleSettingsForApi({
@@ -142,5 +174,60 @@ describe('convertModuleSettingsForApi', () => {
       requireSequentialProgress: true,
     })
     expect(formattedSettings.context_module.require_sequential_progress).toBe(false)
+  })
+})
+
+describe('requirementTypesForResource', () => {
+  it('returns types for assignment', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'assignment'})).toEqual([
+      'view',
+      'mark',
+      'submit',
+      'score',
+    ])
+  })
+
+  it('returns types for quiz', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'quiz'})).toEqual(['view', 'submit', 'score'])
+  })
+
+  it('returns types for file', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'file'})).toEqual(['view'])
+  })
+
+  it('returns types for page', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'page'})).toEqual(['view', 'mark', 'contribute'])
+  })
+
+  it('returns types for graded discussion', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'discussion', graded: true})).toEqual([
+      'view',
+      'contribute',
+      'submit',
+      'score',
+    ])
+  })
+
+  it('returns types for ungraded discussion', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'discussion', graded: false})).toEqual([
+      'view',
+      'contribute',
+    ])
+  })
+
+  it('returns types for externalUrl', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'externalUrl'})).toEqual(['view'])
+  })
+
+  it('returns types for externalTool', () => {
+    // @ts-expect-error
+    expect(requirementTypesForResource({resource: 'externalTool'})).toEqual(['view'])
   })
 })

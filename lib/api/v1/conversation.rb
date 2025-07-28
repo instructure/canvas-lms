@@ -79,8 +79,15 @@ module Api::V1::Conversation
   def conversation_message_json(message, current_user, session)
     result = message.as_json
     result["participating_user_ids"] = message.conversation_message_participants.pluck(:user_id)
-    result["media_comment"] = media_comment_json(result["media_comment"]) if result["media_comment"]
-    result["attachments"] = result["attachments"].map { |attachment| attachment_json(attachment, current_user) }
+    @file_association_access_enabled ||= message.root_account_feature_enabled?(:file_association_access)
+    url_opts = {}
+    url_opts[:location] = message.asset_string if @file_association_access_enabled
+    if result["media_comment"]
+      result["media_comment"] = media_comment_json(result["media_comment"], **url_opts)
+    end
+    result["attachments"] = result["attachments"].map do |attachment|
+      attachment_json(attachment, current_user, url_opts)
+    end
     result["forwarded_messages"] = result["forwarded_messages"].map { |m| conversation_message_json(m, current_user, session) }
     result
   end

@@ -39,7 +39,7 @@ it('sets focus to the prior focused item', () => {
   // check maintainViewportPosition to work around the chrome bug.
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'fixed-element-memo'
+    'fixed-element-memo',
   )
   expect(animator.focusElement).toHaveBeenCalledWith('prior-focus')
   expect(animator.scrollTo).toHaveBeenLastCalledWith('prior-focus', 34)
@@ -53,7 +53,7 @@ it('does not try to scroll to an item in the header', () => {
   animation.invokeUiDidUpdate()
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'fixed-element-memo'
+    'fixed-element-memo',
   )
   expect(animator.focusElement).toHaveBeenCalledWith('prior-focus')
   expect(contains).toHaveBeenCalledWith('prior-focus')
@@ -66,7 +66,7 @@ it('does not try to scroll to the document body', () => {
   animation.invokeUiDidUpdate()
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'fixed-element-memo'
+    'fixed-element-memo',
   )
   expect(animator.focusElement).not.toHaveBeenCalled()
   expect(animator.scrollTo).not.toHaveBeenCalled()

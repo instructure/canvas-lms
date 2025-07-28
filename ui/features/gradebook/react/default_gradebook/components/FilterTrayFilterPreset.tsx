@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useRef} from 'react'
 import uuid from 'uuid'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {chunk} from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
@@ -33,7 +33,7 @@ import type {Filter, FilterPreset, FilterType, PartialFilterPreset} from '../gra
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 import {isFilterNotEmpty} from '../Gradebook.utils'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type FilterTrayPresetProps = {
   applyFilters: (filters: PartialFilterPreset['filters']) => void
@@ -156,9 +156,9 @@ export default function FilterTrayPreset({
   // make the order of filters consistent
   const filtersWithItemsChunks = chunk(
     [sectionFilter, moduleFilter, assignmentGroupFilter, studentGroupFilter].filter(
-      x => x
+      x => x,
     ) as Filter[],
-    2
+    2,
   )
 
   const gradingPeriodFilter = ensureFilter(stagedFilters, 'grading-period')
@@ -205,7 +205,7 @@ export default function FilterTrayPreset({
                     },
                     {
                       count: stagedFilters.filter(isFilterNotEmpty).length,
-                    }
+                    },
                   )}
                 </Text>
               </View>
@@ -236,7 +236,6 @@ export default function FilterTrayPreset({
           </Flex>
 
           {filtersWithItemsChunks.map((filters, index) => (
-            // eslint-disable-next-line react/no-array-index-key
             <Flex key={`chunk-${index}`} margin="small 0">
               {filters.map(filter => (
                 <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">
@@ -255,7 +254,6 @@ export default function FilterTrayPreset({
           ))}
 
           {filtersAlwaysShownChunks.map((filters, index) => (
-            // eslint-disable-next-line react/no-array-index-key
             <Flex key={`always-shown-${index}`} margin="small 0">
               {filters.map(filter => (
                 <Flex.Item key={filter.id} size="50%" padding="0 xx-small 0 0">
@@ -277,6 +275,7 @@ export default function FilterTrayPreset({
             <Flex.Item margin="0 0 0 small">
               <Button
                 color="secondary"
+                id="delete-preset-button" // EVAL-4234
                 data-testid="delete-filter-preset-button"
                 margin="small 0 0 0"
                 onClick={() => {
@@ -293,6 +292,7 @@ export default function FilterTrayPreset({
 
             <Flex.Item margin="0 0 0 small">
               <Button
+                id="save-filter-button" // EVAL-4233
                 color="primary"
                 data-testid="save-filter-button"
                 margin="small 0 0 0"

@@ -19,10 +19,16 @@
 .Sticker__Container {
   background: none;
   border: none;
-  filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
   overflow: hidden;
   position: relative;
   padding: 0;
+
+  &.small {
+    height: 60px;
+    width: 60px;
+  }
+
   &.medium {
     height: 80px;
     width: 80px;
@@ -34,12 +40,112 @@
   }
 }
 
-.StickerOverlay__Container {
+.Sticker__ShinyContainer {
   border-radius: 50%;
+  backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   -moz-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  overflow: hidden;
+
+  &:before {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: skewX(-30deg);
+    transition: 0.3s;
+  }
+
+  &:hover:before,&:focus-within:before {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &.small {
+    &:before {
+      #{direction(left)}: -86px;
+    }
+
+    &:hover:before,&:focus-within:before {
+      #{direction(left)}: 86px;
+    }
+  }
+
+  &.medium {
+    &:before {
+      #{direction(left)}: -115px;
+    }
+
+    &:hover:before,&:focus-within:before {
+      #{direction(left)}: 115px;
+    }
+  }
+
+  &.large {
+    &:before {
+      #{direction(left)}: -140px;
+    }
+
+    &:hover:before,&:focus-within:before {
+      #{direction(left)}: 140px;
+    }
+  }
+}
+
+.StickerOverlay__Container {
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
   -webkit-transform: translate3d(0, 0, 0);
   -moz-transform: translate3d(0, 0, 0);
   overflow: hidden;
   position: relative;
+}
+
+.Sticker__Overlay {
+  transition: opacity .2s ease-in-out;
+  background-color: rgba(32,33,36,0.75);
+  bottom: 0;
+  height: 40%;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
+  opacity: 0;
+  position: absolute;
+
+  &.showing {
+    opacity: 1
+  }
+}
+
+.StickerSearch__images {
+  margin: $ic-sp;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  flex-flow: row wrap;
+}
+
+.ModalSticker__Container {
+  margin: $ic-sp;
+}
+
+.ModalSticker {
+  height: 100px;
+  width: 100px;
+  border: none;
+  filter: drop-shadow(3px 3px 5px rgba(0, 0, 0, 0.3));
+  position: relative;
+}
+
+.ModalSticker__Checkmark {
+  position: absolute;
+  top: 0;
+  #{direction(left)}: 0;
 }

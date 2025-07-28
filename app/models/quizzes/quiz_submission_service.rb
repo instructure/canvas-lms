@@ -347,12 +347,12 @@ class Quizzes::QuizSubmissionService
   # @throw RequestError(400) if attempt isn't a valid integer
   # @throw RequestError(400) if attempt is invalid (ie, isn't the latest one)
   def ensure_latest_attempt!(quiz_submission, attempt)
-    attempt = Integer(attempt) rescue nil
+    attempt = Integer(attempt)
 
-    if !attempt
-      reject! "invalid attempt", 400
-    elsif !quiz_submission.preview? && quiz_submission.attempt != attempt
+    if !quiz_submission.preview? && quiz_submission.attempt != attempt
       reject! "attempt #{attempt} can not be modified", 400
     end
+  rescue ArgumentError, TypeError
+    reject! "invalid attempt", 400
   end
 end

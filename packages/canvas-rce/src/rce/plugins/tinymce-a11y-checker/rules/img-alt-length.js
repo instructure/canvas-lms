@@ -53,7 +53,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image. Alternative text should be simple and concise.'
+      'Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image. Alternative text should be simple and concise.',
     ),
 
   link: '',

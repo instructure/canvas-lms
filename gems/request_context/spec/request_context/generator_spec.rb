@@ -84,7 +84,7 @@ describe "RequestContext::Generator" do
         @attrs[:created_at]
       end
     end
-    pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false })
+    pv = fake_pv_class.new({ seconds: 5.0, created_at: Time.now.utc, participated: false })
     _, headers, _ = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_page_view_meta(pv)
@@ -147,7 +147,7 @@ describe "RequestContext::Generator" do
     before do
       Thread.current[:context] = nil
 
-      rails_app = instance_double("Rails::Application", credentials: {
+      rails_app = instance_double(Rails::Application, credentials: {
                                     canvas_security: {
                                       signing_secret: shared_secret
                                     }
@@ -190,22 +190,6 @@ describe "RequestContext::Generator" do
       headers = run_middleware
       expect(Thread.current[:context][:request_id]).not_to eq(remote_request_context_id)
       expect(headers["X-Request-Context-Id"]).to eq(Thread.current[:context][:request_id])
-    end
-
-    describe "when the request path allows setting a context ID without a signature" do
-      before { RequestContext::Generator.allow_unsigned_request_context_for(test_path) }
-
-      after { RequestContext::Generator.reset_unsigned_request_context_paths }
-
-      let(:test_path) { "/super/trustworthy/path" }
-
-      it "does not require a signature for override" do
-        env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"] = nil
-        env["PATH_INFO"] = test_path
-        headers = run_middleware
-        expect(Thread.current[:context][:request_id]).to eq(remote_request_context_id)
-        expect(headers["X-Request-Context-Id"]).to eq(remote_request_context_id)
-      end
     end
   end
 end

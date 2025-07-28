@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
@@ -31,7 +29,6 @@ function ExternalContentReturnView() {
   this._contentCancel = this._contentCancel.bind(this)
   this._contentReady = this._contentReady.bind(this)
   this.removeDialog = this.removeDialog.bind(this)
-  this.handleAlertBlur = this.handleAlertBlur.bind(this)
   return ExternalContentReturnView.__super__.constructor.apply(this, arguments)
 }
 
@@ -45,9 +42,7 @@ function focusOnOpen() {
 ExternalContentReturnView.prototype.template = template
 
 ExternalContentReturnView.optionProperty('launchType')
-
 ExternalContentReturnView.optionProperty('launchParams')
-
 ExternalContentReturnView.optionProperty('displayAsModal')
 
 ExternalContentReturnView.prototype.defaults = {
@@ -58,23 +53,6 @@ ExternalContentReturnView.prototype.els = {
   'iframe.tool_launch': '$iframe',
 }
 
-ExternalContentReturnView.prototype.events = {
-  'focus .before_external_content_info_alert': 'handleAlertFocus',
-  'focus .after_external_content_info_alert': 'handleAlertFocus',
-  'blur .before_external_content_info_alert': 'handleAlertBlur',
-  'blur .after_external_content_info_alert': 'handleAlertBlur',
-}
-
-ExternalContentReturnView.prototype.handleAlertFocus = function (e) {
-  $(e.target).removeClass('screenreader-only')
-  return this.$el.find('iframe').addClass('info_alert_outline')
-}
-
-ExternalContentReturnView.prototype.handleAlertBlur = function (e) {
-  $(e.target).addClass('screenreader-only')
-  return this.$el.find('iframe').removeClass('info_alert_outline')
-}
-
 ExternalContentReturnView.prototype.attach = function () {
   return this.model.on(
     'change',
@@ -82,7 +60,7 @@ ExternalContentReturnView.prototype.attach = function () {
       return function () {
         return _this.render()
       }
-    })(this)
+    })(this),
   )
 }
 

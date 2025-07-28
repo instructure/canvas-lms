@@ -23,7 +23,7 @@ module Api::V1::AssignmentOverride
 
   OVERRIDABLE_ID_FIELDS = %i[assignment_id quiz_id context_module_id discussion_topic_id wiki_page_id attachment_id].freeze
 
-  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil)
+  def assignment_override_json(override, visible_users = nil, student_names: nil, module_names: nil, include_child_override_due_dates: nil)
     fields = %i[id title unassign_item]
     OVERRIDABLE_ID_FIELDS.each { |f| fields << f if override.send(f).present? }
     fields.push(:due_at, :all_day, :all_day_date) if override.due_at_overridden
@@ -44,13 +44,24 @@ module Api::V1::AssignmentOverride
         json[:students] = student_ids.map { |id| { id:, name: student_names[id] } } if student_names
       when "Group"
         json[:group_id] = override.set_id
-        json[:group_category_id] = override.assignment.group_category_id
+        json[:non_collaborative] = override.set.non_collaborative?
+        json[:group_category_id] = override.set[:group_category_id]
+        json[:title] = override.set.name
+
+        # Remove the title from the override if the group is non_collaborative AND the user does not have read permission
+        if override.set.non_collaborative? && !override.set.grants_right?(@current_user, session, :read)
+          json.delete(:title)
+        end
       when "CourseSection"
         json[:course_section_id] = override.set_id
+        json[:title] = override.set.name
       when "Course"
         json[:course_id] = override.set_id
       when "Noop"
         json[:noop_id] = override.set_id
+      end
+      if include_child_override_due_dates
+        json[:sub_assignment_due_dates] = override.sub_assignment_due_dates
       end
     end
   end
@@ -70,7 +81,7 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def assignment_overrides_json(overrides, user = nil, include_names: false)
+  def assignment_overrides_json(overrides, user = nil, include_names: false, include_child_override_due_dates: false)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
     if overrides.any? { |ov| ov.present? && ov.set_type == "ADHOC" && !ov.preloaded_student_ids }
@@ -82,7 +93,7 @@ module Api::V1::AssignmentOverride
       module_ids = overrides.select { |ov| ov.present? && ov.context_module_id.present? }.map(&:context_module_id).uniq
       module_names = ContextModule.where(id: module_ids).pluck(:id, :name).to_h
     end
-    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:) if override }
+    overrides.map { |override| assignment_override_json(override, visible_users_ids, student_names:, module_names:, include_child_override_due_dates:) if override }
   end
 
   def assignment_override_collection(learning_object, include_students: false)
@@ -176,8 +187,8 @@ module Api::V1::AssignmentOverride
             s.global_id.to_s,
             ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
             ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack("H*")}" if s.pseudonym),
-            ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
-            ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack("H*")}" if s.pseudonym && s.pseudonym.sis_user_id)
+            ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym&.sis_user_id),
+            ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack("H*")}" if s.pseudonym&.sis_user_id)
           ]
         end.flatten.compact
         bad_ids = student_ids.map(&:to_s) - found_ids
@@ -188,18 +199,23 @@ module Api::V1::AssignmentOverride
 
     if !set_type && data.key?(:group_id) && data[:group_id].present?
       group_category_id = learning_object.effective_group_category_id
-      if group_category_id
-        set_type = "Group"
-        # look up the group
-        begin
-          group = find_group(learning_object, data[:group_id], group_category_id)
-        rescue ActiveRecord::RecordNotFound
-          errors << "unknown group id #{data[:group_id].inspect}"
+
+      begin
+        group = Group.find_by!(id: data[:group_id], context: learning_object.context)
+
+        # For now, differentiation tags are allowed to be assigned to Group Assignments. If the group is non_collaborative
+        # and the feature flag is enabled, the learning object can be assigned to the group.
+        # For collaborative groups, if the group category id is the same as the learning_object's group category id
+        # the learning object can be assigned to the group.
+        if (group.non_collaborative? && learning_object.context.account.allow_assign_to_differentiation_tags?) ||
+           (!group.non_collaborative? && group_category_id == group.group_category_id)
+          set_type = "Group"
+          override_data[:group] = group
+        else
+          errors << "group_id is not valid"
         end
-        override_data[:group] = group
-      else
-        # don't recognize group_id for non-group assignments
-        errors << "group_id is not valid for non-group assignments"
+      rescue
+        errors << "unknown group id #{data[:group_id].inspect}"
       end
     end
 

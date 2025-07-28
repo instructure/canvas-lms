@@ -138,7 +138,7 @@ describe "CrocodocDocument" do
       end
     end
 
-    context "#upload" do
+    describe "#upload" do
       it "raises exception on timeout cutoff" do
         allow(Canvas).to receive(:timeout_protection).and_raise Canvas::TimeoutCutoff.new(5)
         @crocodoc.update_attribute(:uuid, nil)

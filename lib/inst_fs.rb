@@ -176,7 +176,7 @@ module InstFS
       # >   file_object: File.open("public/images/a.png")
       # > )
 
-      token = direct_upload_jwt
+      token = direct_upload_jwt(file_object)
       url = "#{app_host}/files?token=#{token}"
 
       data = {}
@@ -265,8 +265,8 @@ module InstFS
       json_response["success"][0]["id"]
     end
 
-    def duplicate_file(instfs_uuid)
-      token = duplicate_file_jwt(instfs_uuid)
+    def duplicate_file(instfs_uuid, new_tenant_auth: nil, tenant_auth: nil)
+      token = duplicate_file_jwt(instfs_uuid, new_tenant_auth:, tenant_auth:)
       url = "#{app_host}/files/#{instfs_uuid}/duplicate?token=#{token}"
 
       response = CanvasHttp.post(url)
@@ -289,6 +289,16 @@ module InstFS
       end
 
       true
+    end
+
+    def get_file_metadata(attachment)
+      token = metadata_file_jwt(attachment)
+      url = metadata_url(attachment, {})
+
+      response = CanvasHttp.get(url, { "Authorization" => "Bearer #{token}" })
+      return JSON.parse(response.body) if response.code.to_i == 200
+
+      raise InstFS::MetadataError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
     end
 
     private
@@ -398,6 +408,7 @@ module InstFS
         jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
+      claims[:tenant_auth] = @token.tenant_auth if @token&.tenant_auth.present?
       original_url = parse_original_url(options[:original_url])
       claims[:original_url] = original_url if original_url.present?
       if options[:acting_as] && options[:acting_as] != options[:user]
@@ -425,14 +436,17 @@ module InstFS
       service_jwt(claims, LONG_JWT_EXPIRATION)
     end
 
-    def direct_upload_jwt
-      service_jwt({
-                    iat: Time.now.utc.to_i,
-                    user_id: nil,
-                    host: "canvas",
-                    resource: "/files",
-                  },
-                  LONG_JWT_EXPIRATION)
+    def direct_upload_jwt(file_object)
+      claims = {
+        iat: Time.now.utc.to_i,
+        user_id: nil,
+        host: "canvas",
+        resource: "/files",
+      }
+
+      claims[:filesize] = file_object.size if file_object.respond_to?(:size)
+
+      service_jwt(claims, LONG_JWT_EXPIRATION)
     end
 
     def session_jwt(user, host)
@@ -462,12 +476,14 @@ module InstFS
                   SHORT_JWT_EXPIRATION)
     end
 
-    def duplicate_file_jwt(instfs_uuid)
-      service_jwt({
-                    iat: Time.now.utc.to_i,
-                    resource: "/files/#{instfs_uuid}/duplicate"
-                  },
-                  SHORT_JWT_EXPIRATION)
+    def duplicate_file_jwt(instfs_uuid, new_tenant_auth: nil, tenant_auth: nil)
+      jwt_contents = {
+        iat: Time.now.utc.to_i,
+        resource: "/files/#{instfs_uuid}/duplicate"
+      }
+      jwt_contents[:new_tenant_auth] = new_tenant_auth if new_tenant_auth.present?
+      jwt_contents[:tenant_auth] = tenant_auth if tenant_auth.present?
+      service_jwt(jwt_contents, SHORT_JWT_EXPIRATION)
     end
 
     def delete_file_jwt(instfs_uuid)
@@ -476,6 +492,15 @@ module InstFS
                     resource: "/files/#{instfs_uuid}"
                   },
                   SHORT_JWT_EXPIRATION)
+    end
+
+    def metadata_file_jwt(attachment)
+      jwt_contents = {
+        iat: Time.now.utc.to_i,
+        resource: metadata_path(attachment)
+      }
+      jwt_contents[:tenant_auth] = attachment.instfs_tenant_auth if attachment.instfs_tenant_auth.present?
+      service_jwt(jwt_contents, SHORT_JWT_EXPIRATION)
     end
 
     def parse_original_url(url)
@@ -539,4 +564,6 @@ module InstFS
   class DuplicationError < StandardError; end
 
   class DeletionError < StandardError; end
+
+  class MetadataError < StandardError; end
 end

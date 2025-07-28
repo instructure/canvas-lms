@@ -72,7 +72,7 @@ MediaElementKeyActionHandler.prototype._targetControl = function (selector) {
 MediaElementKeyActionHandler.prototype.handlerKey = function () {
   // Check whether one of the controls was the event target
   const target = Object.keys(controlSelectors).find(
-    key => this._targetControl(controlSelectors[key]).length
+    key => this._targetControl(controlSelectors[key]).length,
   )
 
   // If none of the controls were the target, then let the player handle it
@@ -93,7 +93,7 @@ MediaElementKeyActionHandler.prototype.captionsHandler = function () {
     srcOptions,
     (i, el) =>
       (el.value === 'none' && player.selectedTrack == null) ||
-      (player.selectedTrack && el.value === player.selectedTrack.srclang)
+      (player.selectedTrack && el.value === player.selectedTrack.srclang),
   )
 
   switch (this.keyCode) {
@@ -161,7 +161,7 @@ MediaElementKeyActionHandler.prototype.playpauseHandler = function () {
     case KeyCodes.G_FORWARD:
       newTime = Math.min(
         media.currentTime + player.options.defaultSeekForwardInterval(media),
-        media.duration
+        media.duration,
       )
       media.setCurrentTime(newTime)
       break
@@ -174,7 +174,7 @@ MediaElementKeyActionHandler.prototype.playpauseHandler = function () {
     case KeyCodes.PAGE_UP:
       newTime = Math.min(
         media.currentTime + player.options.defaultJumpForwardInterval(media),
-        media.duration
+        media.duration,
       )
       media.setCurrentTime(newTime)
       break
@@ -203,7 +203,7 @@ MediaElementKeyActionHandler.prototype.sourceHandler = function () {
   let newFocusPosition
   const {player} = this
   const srcOptions = $(player.sourcechooserButton).find(
-    '.mejs-sourcechooser-selector input[type=radio]'
+    '.mejs-sourcechooser-selector input[type=radio]',
   )
   const currentlyFocused = focusPosition(srcOptions, (i, el) => el.value === player.media.src)
 
@@ -228,7 +228,7 @@ MediaElementKeyActionHandler.prototype.speedHandler = function () {
   const srcOptions = $(player.speedButton).find('.mejs-speed-selector input[type=radio]')
   const currentlyFocused = focusPosition(
     srcOptions,
-    (i, el) => parseFloat(el.value) === player.media.playbackRate
+    (i, el) => parseFloat(el.value) === player.media.playbackRate,
   )
 
   switch (this.keyCode) {
@@ -301,7 +301,7 @@ MediaElementKeyActionHandler.prototype.playerHandler = function () {
     case KeyCodes.G_FORWARD:
       newTime = Math.min(
         media.currentTime + player.options.defaultSeekForwardInterval(media),
-        media.duration
+        media.duration,
       )
       media.setCurrentTime(newTime)
       break
@@ -314,7 +314,7 @@ MediaElementKeyActionHandler.prototype.playerHandler = function () {
     case KeyCodes.PAGE_UP:
       newTime = Math.min(
         media.currentTime + player.options.defaultJumpForwardInterval(media),
-        media.duration
+        media.duration,
       )
       media.setCurrentTime(newTime)
       break

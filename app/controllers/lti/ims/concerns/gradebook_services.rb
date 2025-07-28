@@ -35,11 +35,7 @@ module Lti::IMS::Concerns
     end
 
     def context
-      @_context ||= if Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
-                      Course.find(params[:course_id])
-                    else
-                      Course.not_completed.find(params[:course_id])
-                    end
+      @_context ||= Course.find(params[:course_id])
     end
 
     def user
@@ -65,8 +61,6 @@ module Lti::IMS::Concerns
     end
 
     def verify_course_not_concluded
-      return unless Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
-
       # If context is nil, the verify_context will handle rendering a 404.
       if context&.concluded?
         render_error("This course has concluded. AGS requests will no longer be accepted for this course.",
@@ -85,7 +79,7 @@ module Lti::IMS::Concerns
     end
 
     def verify_line_item_in_context
-      line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
+      line_item_context_id = Assignment.where(id: line_item.assignment_id).pick(:context_id)
       raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?
       return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_uuid == params[:resourceLinkId]
 
@@ -103,7 +97,7 @@ module Lti::IMS::Concerns
       assignment = Assignment.find_by(lti_context_id: params[:resourceLinkId])
       raise ActiveRecord::RecordNotFound unless assignment
 
-      if tool == ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment)
+      if tool == Lti::ToolFinder.from_content_tag(assignment.external_tool_tag, assignment)
         assignment.migrate_to_1_3_if_needed!(tool)
         return
       end

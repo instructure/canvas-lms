@@ -42,8 +42,15 @@ const attachment: ContentMigrationItemAttachment = {
   url: 'https://localhost/files/1/download',
 }
 
-const renderComponent = (overrideProps?: any) =>
-  render(<SourceLink item={{...item, ...overrideProps}} />)
+const ellipsisStyle = {
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: 'inline-block',
+  maxWidth: '40vw',
+}
+
+const renderComponent = (overrideItems?: any, ellipsis = false) =>
+  render(<SourceLink item={{...item, ...overrideItems}} ellipsis={ellipsis} />)
 
 describe('SourceLink', () => {
   describe('for Copy Canvas Course', () => {
@@ -51,7 +58,7 @@ describe('SourceLink', () => {
       const component = renderComponent()
       expect(component.getByRole('link', {name: 'My Course'})).toHaveAttribute(
         'href',
-        'https://localhost/courses/1'
+        'https://localhost/courses/1',
       )
     })
   })
@@ -61,7 +68,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'canvas_cartridge_importer'})
       expect(component.getByRole('link', {name: 'My Course'})).toHaveAttribute(
         'href',
-        'https://localhost/courses/1'
+        'https://localhost/courses/1',
       )
     })
 
@@ -73,7 +80,7 @@ describe('SourceLink', () => {
       })
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -85,7 +92,7 @@ describe('SourceLink', () => {
       })
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -103,7 +110,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'zip_file_importer', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -118,7 +125,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'common_cartridge_importer', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -133,7 +140,7 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'moodle_converter', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
@@ -148,13 +155,37 @@ describe('SourceLink', () => {
       const component = renderComponent({migration_type: 'qti_converter', attachment})
       expect(component.getByRole('link', {name: 'file.zip'})).toHaveAttribute(
         'href',
-        'https://localhost/files/1/download'
+        'https://localhost/files/1/download',
       )
     })
 
     it('renders the text when attachment is not available', () => {
       const component = renderComponent({migration_type: 'qti_converter'})
       expect(component.getByText('File not available')).toBeInTheDocument()
+    })
+  })
+
+  describe('ellipsis prop', () => {
+    it('renders with ellipsis style when ellipsis prop is true', () => {
+      const component = renderComponent({}, true)
+      const linkElement = component.getByText('My Course')
+
+      expect(linkElement).toHaveStyle(ellipsisStyle)
+    })
+
+    it('renders without ellipsis style when ellipsis prop is false', () => {
+      const component = renderComponent({}, false)
+      const linkElement = component.getByText('My Course')
+
+      expect(linkElement).not.toHaveStyle(ellipsisStyle)
+    })
+
+    it('renders text with ellipsis style when link is not available', () => {
+      const component = renderComponent({ settings: undefined, attachment: undefined }, true)
+      const textElement = component.getByText('File not available')
+
+      expect(textElement).toBeInTheDocument()
+      expect(textElement).toHaveStyle(ellipsisStyle)
     })
   })
 })

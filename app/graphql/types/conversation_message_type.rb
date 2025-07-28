@@ -24,8 +24,8 @@ module Types
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
-    field :conversation_id, ID, null: false
     field :body, String, null: false
+    field :conversation_id, ID, null: false
     field :created_at, Types::DateTimeType, null: true
 
     field :author, UserType, null: true
@@ -40,9 +40,9 @@ module Types
         unless cmps.size == 1
           # preload user to avoid N+1 queries at cmp.user.nil? below
           ConversationMessageParticipant::Preloader.new(records: cmps, associations: :user).call
-          cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? || cmp.user.nil? }
+          cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || cmp.user.nil? }
         end
-        Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
+        Loaders::AssociationLoader.for(ConversationMessageParticipant.unscoped, :user).load_many(cmps)
       end
     end
 
@@ -53,6 +53,15 @@ module Types
 
     field :attachments_connection, Types::FileType.connection_type, null: true
     def attachments_connection
+      load_association(:attachment_associations).then do |attachment_associations|
+        Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
+      end
+    end
+
+    # Temporary fix for grahpql pagination
+    field :attachments, [Types::FileType], null: true
+    def attachments
+      context.scoped_set!(:asset_location, object.asset_string)
       load_association(:attachment_associations).then do |attachment_associations|
         Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
       end

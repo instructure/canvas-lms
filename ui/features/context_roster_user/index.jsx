@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import initLastAttended from './react/index'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -26,19 +26,19 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
-import '@canvas/link-enrollment'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import ready from '@instructure/ready'
 
-const I18n = useI18nScope('context.roster_user')
+const I18n = createI18nScope('context.roster_user')
 
-$(document).ready(() => {
+ready(() => {
   $('.show_user_services_checkbox').change(function () {
     $.ajaxJSON(
       $('.profile_url').attr('href'),
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
       _data => {},
-      _data => {}
+      _data => {},
     )
   })
 
@@ -85,10 +85,13 @@ $(document).ready(() => {
       },
       _data => {
         $.flashError(
-          I18n.t('enrollment_change_failed', 'Enrollment privilege change failed, please try again')
+          I18n.t(
+            'enrollment_change_failed',
+            'Enrollment privilege change failed, please try again',
+          ),
         )
         $user.loadingImage('remove')
-      }
+      },
     )
     event.preventDefault()
   })
@@ -100,7 +103,7 @@ $(document).ready(() => {
       .confirmDelete({
         message: I18n.t(
           'confirm.delete_enrollment',
-          'Are you sure you want to delete this enrollment?'
+          'Are you sure you want to delete this enrollment?',
         ),
         url: $(this).attr('href'),
         success(_data) {
@@ -124,7 +127,7 @@ $(document).ready(() => {
   if (container != null) {
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
-      container
+      container,
     )
   }
 })

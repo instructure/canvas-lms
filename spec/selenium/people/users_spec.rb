@@ -33,12 +33,13 @@ describe "users" do
       course_factory.enroll_student(@user)
 
       get "/users/#{@user.id}"
-      pseudonym_form = f("#edit_pseudonym_form")
       f(".add_pseudonym_link").click
       wait_for_ajaximations
-      pseudonym_form.find_element(:css, "#pseudonym_unique_id").send_keys("new_user")
-      pseudonym_form.find_element(:css, "#pseudonym_password").send_keys("qwertyuiop")
-      pseudonym_form.find_element(:css, "#pseudonym_password_confirmation").send_keys("qwertyuiop")
+      pseudonym_form = f("[aria-label='Add Login']")
+      password = "qwertyuiop"
+      pseudonym_form.find_element(:css, "[name='unique_id']").send_keys("new_user")
+      pseudonym_form.find_element(:css, "[name='password']").send_keys(password)
+      pseudonym_form.find_element(:css, "[name='password_confirmation']").send_keys(password)
       submit_form(pseudonym_form)
       wait_for_ajaximations
 
@@ -46,7 +47,7 @@ describe "users" do
       expect(new_login).not_to be_nil
       expect(new_login.find_element(:css, ".account_name").text).not_to be_blank
       pseudonym = Pseudonym.by_unique_id("new_user").first
-      expect(pseudonym.valid_password?("qwertyuiop")).to be_truthy
+      expect(pseudonym.valid_password?(password)).to be_truthy
     end
   end
 
@@ -60,18 +61,18 @@ describe "users" do
     it "validates a basic page view" do
       page_view(user: @student, course: @course, url: "assignments")
       get "/users/#{@student.id}"
-      rows = ff("#page_view_results tr")
+      rows = ff(%([data-testid="page-views-table-body"] tr))
       expect(rows.count).to eq 1
       page_view = rows.first
       expect(page_view).to include_text("Firefox")
       expect(page_view).to include_text("assignments")
-      expect(f("#page_view_results")).not_to contain_css("tr img") # should not have a participation
+      expect(f(%([data-testid="page-views-table-body"] tr))).not_to contain_css("svg") # should not have a participation
     end
 
     it "validates page view with a participation" do
       page_view(user: @student, course: @course, participated: true)
       get "/users/#{@student.id}"
-      expect(f("#page_view_results .icon-check")).to be_displayed
+      expect(f(%([data-testid="page-views-table-body"] tr svg))).to be_displayed
     end
 
     it "validates a page view url" do
@@ -79,25 +80,28 @@ describe "users" do
       get "/users/#{@student.id}"
       page_view(user: @student, course: @course, participated: true, url: student_in_course(name: second_student_name).user.id.to_s)
       refresh_page # in order to get the generated page view
-      page_view_url = f("#page_view_results a")
+      page_view_url = f(%([data-testid="page-views-table-body"] a))
       second_student = User.where(name: second_student_name).first
       expect(page_view_url.text).to eq second_student.id.to_s
       expect_new_page_load { page_view_url.click }
       expect(f(".user_details .name").text).to eq second_student.name
-      expect(f("#page_view_results")).not_to contain_css("tr") # validate the second student has no page views
+      expect(f(%([data-testid="page-views-table-body"]))).not_to contain_css("tr") # validate the second student has no page views
     end
 
-    it "validates all page views were loaded" do
+    # Validating behavior of infinite scrolling from Tanstack query probably does
+    # not belong in an integration test like this. Instead, it should be in a unit
+    # test for the component that handles the infinite scrolling.
+    skip "validates all page views were loaded FOO-4949" do
       page_views_count = 100
       page_views_count.times { |i| page_view(user: @student, course: @course, url: ("%03d" % i).to_s) }
       get "/users/#{@student.id}"
       wait_for_ajaximations
       scroll_page_to_bottom
-      driver.execute_script("$('#pageviews').scrollTop($('#pageviews')[0].scrollHeight);")
+      driver.execute_script("$('#page_views_table').scrollTop($('#page_views_table')[0].scrollHeight);")
       # wait for loading spinner to finish
       wait_for(method: nil, timeout: 0.5) { f(".paginatedView-loading").displayed? }
       wait_for_no_such_element { f(".paginatedView-loading") }
-      expect(ff("#page_view_results tr").length).to eq page_views_count
+      expect(ff(%([data-testid="page-views-table-body"] tr)).length).to eq page_views_count
     end
 
     it "filters by date" do
@@ -106,123 +110,94 @@ describe "users" do
       page_view(user: @student, course: @course, url: "older", created_at: old_date + 1.minute)
       get "/users/#{@student.id}"
       wait_for_ajaximations
-      expect(ff("#page_view_results tr").first.text).to include "recent"
-      replace_content(f("#page_view_date"), old_date.strftime("%Y-%m-%d"))
+      expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "recent"
+      replace_content(f(%([data-testid="page-views-date-filter"])), format_date_for_view(old_date, "%Y-%m-%d"))
       driver.action.send_keys(:tab).perform
       wait_for_ajaximations
-      expect(ff("#page_view_results tr").first.text).to include "older"
-      match = f("#page_views_csv_link")["href"].match(/start_time=([^&]+)/)
-      expect(DateTime.parse(match[1]).to_i).to eq old_date.to_i
+      expect(ff(%([data-testid="page-views-table-body"] tr)).first.text).to include "older"
+      match = f(%([data-testid="page-views-csv-link"]))["href"].match(/start_time=([^&]+)/)
+      expect(Time.zone.parse(match[1]).to_i).to eq old_date.to_i
     end
   end
 
   context "admin merge" do
-    def setup_user_merge(from_user, into_user)
-      get "/users/#{from_user.id}/admin_merge"
-      f("#manual_user_id").send_keys(into_user.id)
-      expect_new_page_load { f('button[type="submit"]').click }
+    def select_user_for_merge_by_user_id(user)
+      user_id_input = f("input[name=destinationUserId]")
+      select_button = f("button[type=submit]")
+      user_id_input.send_keys(user.id)
+      select_button.click
     end
 
-    def reload_users(users)
-      users.each(&:reload)
-    end
-
-    def submit_merge
-      expect_new_page_load { f("#prepare_to_merge").click }
-      expect_new_page_load { f('button[type="submit"]').click }
-    end
-
-    def validate_login_info(user_id)
-      expect(f("#login_information")).to include_text(user_id)
+    def select_user_for_merge_by_user_name(user)
+      select_button = f("button[type=submit]")
+      click_option("input[data-testid=find-by-select]", "Name")
+      destination_user_input = f("input[name=destinationUserId]")
+      destination_user_input.send_keys(user.name)
+      option = fj("[role=option]:contains(#{user.name})")
+      option.click
+      select_button.click
     end
 
     before do
-      @student_1_id = "student1@example.com"
-      @student_2_id = "student2@example.com"
-
       course_with_admin_logged_in
       @student_1 = User.create!(name: "Student One")
       @student_1.register!
-      @student_1.pseudonyms.create!(unique_id: @student_1_id, password: "asdfasdf", password_confirmation: "asdfasdf")
-      @course.enroll_user(@student_1).accept!
+      @student_1.pseudonyms.create!(unique_id: "studentr1_pseudonym1@example.com", password: "asdfasdf", password_confirmation: "asdfasdf")
+      @student_1.communication_channels.create(path: "student1_cc@instructure.com").confirm!
+      @common_course = @course
+      @common_course.enroll_user(@student_1).accept!
+      course_with_student({ user: @student_1, active_course: true, active_enrollment: true })
 
       @student_2 = User.create!(name: "Student Two")
       @student_2.register!
-      @student_2.pseudonyms.create!(unique_id: @student_2_id, password: "asdfasdf", password_confirmation: "asdfasdf")
-      @course.enroll_user(@student_2).accept!
-      @users = [@student_1, @student_2]
+      @student_2.pseudonyms.create!(unique_id: "student2_pseudonym@example.com", password: "asdfasdf", password_confirmation: "asdfasdf")
+      @student_2.communication_channels.create(path: "student2_cc@instructure.com").confirm!
+      @common_course.enroll_user(@student_2).accept!
+      course_with_student({ user: @student_2, active_course: true, active_enrollment: true })
     end
 
-    it "merges user a with user b" do
-      setup_user_merge(@student_2, @student_1)
-      submit_merge
-      reload_users(@users)
+    it "merges user A with user B by user id" do
+      get "/users/#{@student_1.id}/admin_merge"
+      expected_enrollment_ids = [*@student_1.enrollments.filter { |e| e.course_id != @common_course.id }, *@student_2.enrollments].map(&:id)
+      expected_pseudonym_ids = [*@student_1.pseudonyms, *@student_2.pseudonyms].map(&:id)
+      expected_login_ids = [*@student_1.communication_channels, *@student_2.communication_channels].map(&:id)
+
+      select_user_for_merge_by_user_id(@student_2)
+      merge_account_button = f("[aria-label='Merge Accounts']")
+      merge_account_button.click
+      confirm_merge_account_button = f("[aria-label='Merge User Accounts']")
+      confirm_merge_account_button.click
+
+      @student_1.reload
+      @student_2.reload
+      expect(@student_2.workflow_state).to eq "registered"
+      expect(@student_1.workflow_state).to eq "deleted"
+      expect(@student_1.merged_into_user_id).to be(@student_2.id)
+      expect(@student_2.enrollments.map(&:id)).to match_array(expected_enrollment_ids)
+      expect(@student_2.pseudonyms.map(&:id)).to match_array(expected_pseudonym_ids)
+      expect(@student_2.communication_channels.map(&:id)).to match_array(expected_login_ids)
+    end
+
+    it "merges user B with user A by user name" do
+      get "/users/#{@student_2.id}/admin_merge"
+      expected_enrollment_ids = [*@student_2.enrollments.filter { |e| e.course_id != @common_course.id }, *@student_1.enrollments].map(&:id)
+      expected_pseudonym_ids = [*@student_2.pseudonyms, *@student_1.pseudonyms].map(&:id)
+      expected_login_ids = [*@student_2.communication_channels, *@student_1.communication_channels].map(&:id)
+
+      select_user_for_merge_by_user_name(@student_1)
+      merge_account_button = f("[aria-label='Merge Accounts']")
+      merge_account_button.click
+      confirm_merge_account_button = f("[aria-label='Merge User Accounts']")
+      confirm_merge_account_button.click
+
+      @student_1.reload
+      @student_2.reload
       expect(@student_1.workflow_state).to eq "registered"
       expect(@student_2.workflow_state).to eq "deleted"
-      validate_login_info(@student_1_id)
-    end
-
-    it "merges user b with user a" do
-      setup_user_merge(@student_1, @student_2)
-      submit_merge
-      reload_users(@users)
-      expect(@student_1.workflow_state).to eq "deleted"
-      expect(@student_2.workflow_state).to eq "registered"
-      validate_login_info(@student_2_id)
-    end
-
-    it "validates switching the users to merge" do
-      setup_user_merge(@student_2, @student_1)
-      user_names = ff(".result td")
-      expect(user_names[0]).to include_text(@student_2.name)
-      expect(user_names[1]).to include_text(@student_1.name)
-      f("#switch_user_positions").click
-      wait_for_ajaximations
-      user_names = ff(".result td")
-      expect(user_names[0]).to include_text(@student_1.name)
-      expect(user_names[1]).to include_text(@student_2.name)
-      submit_merge
-      reload_users(@users)
-      expect(@student_1.workflow_state).to eq "deleted"
-      expect(@student_2.workflow_state).to eq "registered"
-      validate_login_info(@student_1_id)
-    end
-
-    it "cancels a merge and validate both users still exist" do
-      setup_user_merge(@student_2, @student_1)
-      expect_new_page_load { f("#prepare_to_merge").click }
-      wait_for_ajaximations
-      expect_new_page_load { f(".button-secondary").click }
-      wait_for_ajaximations
-      expect(f("#global_nav_courses_link")).to be_displayed
-      expect(@student_1.workflow_state).to eq "registered"
-      expect(@student_2.workflow_state).to eq "registered"
-    end
-
-    it "shows an error if the user id entered is the current users" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys(@student_1.id)
-      expect_new_page_load { f('button[type="submit"]').click }
-      wait_for_ajaximations
-      expect_flash_message :error, "You can't merge an account with itself."
-    end
-
-    it "shows an error if invalid text is entered in the id box" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys("azxcvbytre34567uijmm23456yhj")
-      expect_new_page_load { f('button[type="submit"]').click }
-      wait_for_ajaximations
-      expect_flash_message :error, "No active user with that ID was found."
-    end
-
-    it "shows an error if the user id doesnt exist" do
-      get "/users/#{@student_1.id}/admin_merge"
-      expect_no_flash_message :error
-      f("#manual_user_id").send_keys(1_234_567_809)
-      expect_new_page_load { f('button[type="submit"]').click }
-      expect_flash_message :error, "No active user with that ID was found."
+      expect(@student_2.merged_into_user_id).to be(@student_1.id)
+      expect(@student_1.enrollments.map(&:id)).to match_array(expected_enrollment_ids)
+      expect(@student_1.pseudonyms.map(&:id)).to match_array(expected_pseudonym_ids)
+      expect(@student_1.communication_channels.map(&:id)).to match_array(expected_login_ids)
     end
   end
 
@@ -371,6 +346,45 @@ describe "users" do
       expect(bar).to include_text "You are currently acting as"
       bar.find_element(:css, ".stop_masquerading").click
       expect(displayed_username).to eq("The Admin")
+    end
+  end
+
+  context "user details" do
+    def clear_input_and_send_keys(input, text)
+      driver.action.key_down(:control).send_keys(input, "a").send_keys(input, :backspace).key_up(:control).perform
+      input.send_keys(text)
+    end
+
+    context "when details changed successfully via form" do
+      it "should update the 'Name and Email' section" do
+        course_with_admin_logged_in
+        @student = student_in_course.user
+        input_values = {
+          name: "New Name",
+          short_name: "New Short Name",
+          sortable_name: "New Sortable Name",
+          time_zone: "Arizona",
+          email: "new@email.com"
+        }
+        get "/accounts/#{@student.account.id}/users/#{@student.id}"
+
+        f(".edit_user_link").click
+        dialog = f('[role="dialog"][aria-label="Edit User Details"]')
+        clear_input_and_send_keys(dialog.find_element(:name, "name"), input_values[:name])
+        clear_input_and_send_keys(dialog.find_element(:name, "short_name"), input_values[:short_name])
+        clear_input_and_send_keys(dialog.find_element(:name, "sortable_name"), input_values[:sortable_name])
+        dialog.find_element(:name, "time_zone").click
+        f("[role='option'][value='#{input_values[:time_zone]}']").click
+        clear_input_and_send_keys(dialog.find_element(:name, "email"), input_values[:email])
+        dialog.find_element(:css, "button[type='submit']").click
+
+        name_and_email = f("#name_and_email")
+        expect(name_and_email.find_element(:css, ".name").text).to eq input_values[:name]
+        expect(name_and_email.find_element(:css, ".short_name").text).to eq input_values[:short_name]
+        expect(name_and_email.find_element(:css, ".sortable_name").text).to eq input_values[:sortable_name]
+        expect(name_and_email.find_element(:css, ".time_zone").text).to eq input_values[:time_zone]
+        expect(name_and_email.find_element(:css, ".email").text).to eq input_values[:email]
+      end
     end
   end
 end

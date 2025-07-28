@@ -21,11 +21,12 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
-import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
+import MutexManager from '@canvas/mutex-manager/MutexManager'
 
 ready(() => {
-  const formSubmissionDelay = window.ENV.INTEROP_8200_DELAY_FORM_SUBMIT
+  const formSubmissionDelay = window.ENV.LTI_FORM_SUBMIT_DELAY
+  const formSubmissionMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
 
   let toolFormId = '#tool_form'
   let toolIframeId = '#tool_content'
@@ -35,6 +36,28 @@ ready(() => {
   }
   const $toolForm = $(toolFormId)
 
+  const submitForm = function (submitFn) {
+    if (formSubmissionDelay) {
+      setTimeout(() => {
+        MutexManager.awaitMutex(formSubmissionMutex, () => {
+          if (submitFn) {
+            $toolForm.submit(submitFn)
+          } else {
+            $toolForm.submit()
+          }
+        })
+      }, formSubmissionDelay)
+    } else {
+      MutexManager.awaitMutex(formSubmissionMutex, () => {
+        if (submitFn) {
+          $toolForm.submit(submitFn)
+        } else {
+          $toolForm.submit()
+        }
+      })
+    }
+  }
+
   const launchToolManually = function () {
     const $button = $toolForm.find('button')
 
@@ -42,25 +65,18 @@ ready(() => {
 
     // Firefox remembers disabled state after page reloads
     $button.prop('disabled', false)
-    setTimeout(() => {
-      // LTI links have a time component in the signature and will
-      // expire after a few minutes.
-      $button.prop('disabled', true).text($button.data('expired_message'))
-    }, 60 * 2.5 * 1000)
+    setTimeout(
+      () => {
+        // LTI links have a time component in the signature and will
+        // expire after a few minutes.
+        $button.prop('disabled', true).text($button.data('expired_message'))
+      },
+      60 * 2.5 * 1000,
+    )
 
-    if (formSubmissionDelay) {
-      setTimeout(
-        () =>
-          $toolForm.submit(function () {
-            $(this).find('.load_tab,.tab_loaded').toggle()
-          }),
-        formSubmissionDelay
-      )
-    } else {
-      $toolForm.submit(function () {
-        $(this).find('.load_tab,.tab_loaded').toggle()
-      })
-    }
+    submitForm(function () {
+      $(this).find('.load_tab,.tab_loaded').toggle()
+    })
   }
 
   const launchToolInNewTab = function () {
@@ -75,19 +91,11 @@ ready(() => {
       break
     case 'self':
       $toolForm.removeAttr('target')
-      if (formSubmissionDelay) {
-        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
-      } else {
-        $toolForm.submit()
-      }
+      submitForm()
       break
     default:
       // Firefox throws an error when submitting insecure content
-      if (formSubmissionDelay) {
-        setTimeout(() => $toolForm.submit(), formSubmissionDelay)
-      } else {
-        $toolForm.submit()
-      }
+      submitForm()
 
       $(toolIframeId).bind('load', () => {
         if (document.location.protocol !== 'https:' || $toolForm[0].action.indexOf('https:') > -1) {
@@ -111,20 +119,6 @@ ready(() => {
   const $window = $(window)
   const toolResizer = new ToolLaunchResizer(tool_height)
 
-  const $external_content_info_alerts = $tool_content_wrapper.find(
-    '.before_external_content_info_alert, .after_external_content_info_alert'
-  )
-
-  $external_content_info_alerts.on('focus', function () {
-    $tool_content_wrapper.find('iframe').css('border', '2px solid #0374B5')
-    $(this).removeClass('screenreader-only-tool')
-  })
-
-  $external_content_info_alerts.on('blur', function () {
-    $tool_content_wrapper.find('iframe').css('border', 'none')
-    $(this).addClass('screenreader-only-tool')
-  })
-
   const is_full_screen = $('body').hasClass('ic-full-screen-lti-tool')
 
   if (!is_full_screen) {
@@ -140,12 +134,6 @@ ready(() => {
 
         if (!$tool_content_wrapper.data('height_overridden')) {
           if (is_full_screen) {
-            // divs from app/views/lti/_lti_message.html.erb that usually have 1px
-            const div_before_iframe =
-              document.querySelector('div.before_external_content_info_alert')?.offsetHeight || 0
-            const div_after_iframe =
-              document.querySelector('div.after_external_content_info_alert')?.offsetHeight || 0
-
             // header#mobile-header
             //   hidden when screen width > 768px
             //   see app/stylesheets/base/_ic_app_header.scss
@@ -153,15 +141,14 @@ ready(() => {
             const mobile_header_height =
               document.querySelector('header#mobile-header')?.offsetHeight || 0
 
-            tool_height =
-              window.innerHeight - mobile_header_height - div_before_iframe - div_after_iframe
+            tool_height = window.innerHeight - mobile_header_height
 
             toolResizer.resize_tool_content_wrapper(tool_height, $tool_content_wrapper, true)
           } else {
             // module item navigation from PLAT-1687
             const sequenceFooterHeight = $('#sequence_footer').outerHeight(true) || 0
             toolResizer.resize_tool_content_wrapper(
-              $window.height() - canvas_chrome_height - sequenceFooterHeight
+              $window.height() - canvas_chrome_height - sequenceFooterHeight,
             )
           }
         }
@@ -181,5 +168,3 @@ ready(() => {
     MarkAsDone.toggle(this)
   })
 })
-
-monitorLtiMessages()

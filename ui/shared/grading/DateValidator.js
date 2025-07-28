@@ -18,11 +18,11 @@
 
 import {find, forEach} from 'lodash'
 import * as tz from '@instructure/moment-utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import DateHelper from '@canvas/datetime/dateHelper'
 
-const I18n = useI18nScope('DateValidator')
+const I18n = createI18nScope('DateValidator')
 
 const DATE_RANGE_ERRORS = {
   due_at: {
@@ -65,6 +65,12 @@ const DATE_RANGE_ERRORS = {
       get due() {
         return I18n.t('Unlock date cannot be after due date')
       },
+      get replyToTopicDue() {
+        return I18n.t('Unlock date cannot be after reply to topic due date')
+      },
+      get replyToEntryDue() {
+        return I18n.t('Unlock date cannot be after required replies due date')
+      },
       get lock() {
         return I18n.t('Unlock date cannot be after lock date')
       },
@@ -74,6 +80,12 @@ const DATE_RANGE_ERRORS = {
     start_range: {
       get due() {
         return I18n.t('Lock date cannot be before due date')
+      },
+      get replyToTopicDue() {
+        return I18n.t('Lock date cannot be before reply to topic due date')
+      },
+      get replyToEntryDue() {
+        return I18n.t('Lock date cannot be before required replies due date')
       },
     },
     end_range: {
@@ -103,6 +115,8 @@ export default class DateValidator {
     const lockAt = data.lock_at
     const unlockAt = data.unlock_at
     const dueAt = data.due_at
+    const requiredrepliesDueAt = data.required_replies_due_at
+    const replyToTopicDueAt = data.reply_to_topic_due_at
     const section_id = data.set_type === 'CourseSection' ? data.set_id : data.course_section_id
     const section = find(ENV.SECTION_LIST, {id: section_id})
     const currentDateRange = section ? this.getSectionRange(section) : this.dateRange
@@ -150,6 +164,44 @@ export default class DateValidator {
       })
     }
 
+    if (requiredrepliesDueAt) {
+      datetimesToValidate.push({
+        date: requiredrepliesDueAt,
+        validationDates: {
+          lock_at: lockAt,
+        },
+        range: 'start_range',
+        type: 'replyToEntryDue',
+      })
+      datetimesToValidate.push({
+        date: requiredrepliesDueAt,
+        validationDates: {
+          unlock_at: unlockAt,
+        },
+        range: 'end_range',
+        type: 'replyToEntryDue',
+      })
+    }
+
+    if (replyToTopicDueAt) {
+      datetimesToValidate.push({
+        date: replyToTopicDueAt,
+        validationDates: {
+          lock_at: lockAt,
+        },
+        range: 'start_range',
+        type: 'replyToTopicDue',
+      })
+      datetimesToValidate.push({
+        date: replyToTopicDueAt,
+        validationDates: {
+          unlock_at: unlockAt,
+        },
+        range: 'end_range',
+        type: 'replyToTopicDue',
+      })
+    }
+
     if (this.dueDateRequired) {
       datetimesToValidate.push({
         date: dueAt,
@@ -184,16 +236,25 @@ export default class DateValidator {
   }
 
   getSectionRange(section) {
-    if (!section.override_course_and_term_dates) return this.dateRange
-
     const dateRange = {...this.dateRange}
-    if (section.start_at) {
+    const override_course_dates = section.override_course_and_term_dates
+    // if !override_course_dates, then use the earlier start date and the later end date
+    // if override_course_dates, then use the section start and end dates
+    if (
+      section.start_at &&
+      (override_course_dates ||
+        this._formatDatetime(section.start_at) < this._formatDatetime(dateRange.start_at.date))
+    ) {
       dateRange.start_at = {
         date: section.start_at,
         date_context: 'section',
       }
     }
-    if (section.end_at) {
+    if (
+      section.end_at &&
+      (override_course_dates ||
+        this._formatDatetime(section.end_at) > this._formatDatetime(dateRange.end_at.date))
+    ) {
       dateRange.end_at = {
         date: section.end_at,
         date_context: 'section',

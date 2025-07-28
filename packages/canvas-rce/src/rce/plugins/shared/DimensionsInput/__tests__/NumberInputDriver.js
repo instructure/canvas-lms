@@ -49,7 +49,7 @@ export default class NumberInputDriver {
     }
 
     return [...$label.querySelectorAll(`#${messagesId} > *`)].map($message =>
-      $message.textContent.trim()
+      $message.textContent.trim(),
     )
   }
 

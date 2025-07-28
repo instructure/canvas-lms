@@ -24,7 +24,7 @@ const scrollToTop: LtiMessageHandler = () => {
     {
       scrollTop: $('.tool_content_wrapper').offset()?.top,
     },
-    'fast'
+    'fast',
   )
   return false
 }

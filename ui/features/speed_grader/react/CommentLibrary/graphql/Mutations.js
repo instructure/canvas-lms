@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 import {COMMENTS_QUERY} from './Queries'
 
 export const CREATE_COMMENT_MUTATION = gql`
@@ -67,8 +67,8 @@ const getCache = (cache, userId) => {
       cache.readQuery({
         query: COMMENTS_QUERY,
         variables: {userId},
-      })
-    )
+      }),
+    ),
   )
 }
 
@@ -84,10 +84,10 @@ export const removeDeletedCommentFromCache = (cache, result, userId) => {
   const comments = getCache(cache, userId)
   const resultId = result.data.deleteCommentBankItem.commentBankItemId
   const removedIndex = comments.legacyNode.commentBankItemsConnection.nodes.findIndex(
-    comment => comment._id === resultId
+    comment => comment._id === resultId,
   )
   const updatedComments = comments.legacyNode.commentBankItemsConnection.nodes.filter(
-    (_comment, index) => index !== removedIndex
+    (_comment, index) => index !== removedIndex,
   )
 
   comments.legacyNode.commentBankItemsConnection.nodes = updatedComments

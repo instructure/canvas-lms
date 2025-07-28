@@ -18,7 +18,7 @@
 
 import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import useStore from '../../stores'
 
@@ -39,8 +39,9 @@ import {View} from '@instructure/ui-view'
 
 import WhatIfGrade from '../WhatIfGrade'
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
+import AssetProcessorCell from '../../AssetProcessorCell'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const getSubmissionCommentsTrayProps = assignmentId => {
   const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)
@@ -91,7 +92,8 @@ export const assignmentRow = (
   setOpenRubricDetailIds,
   openRubricDetailIds,
   setActiveWhatIfScores,
-  activeWhatIfScores
+  activeWhatIfScores,
+  showDocumentProcessors = false,
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {
@@ -154,6 +156,8 @@ export const assignmentRow = (
       </IconButton>
     )
   }
+
+  const reports = assignment?.submissionsConnection?.nodes[0]?.ltiAssetReportsConnection?.nodes
 
   return (
     <Table.Row
@@ -260,11 +264,18 @@ export const assignmentRow = (
           </Flex>
         )}
       </Table.Cell>
+      <Table.Cell textAlign="start">
+        {showDocumentProcessors && reports !== undefined && reports !== null && (
+          <AssetProcessorCell
+            assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes || []}
+            assetReports={reports}
+          />
+        )}
+      </Table.Cell>
       <Table.Cell textAlign="end">
         <Flex justifyItems="end">
           <Flex.Item>
-            {!ENV.restrict_quantitative_data &&
-            assignment?.rubric &&
+            {assignment?.rubric &&
             assignment?.submissionsConnection?.nodes[0]?.rubricAssessmentsConnection?.nodes.length >
               0 ? (
               renderRubricButton()

@@ -1,0 +1,34 @@
+---
+pre_date_shift_for_assignment_importing:
+  state: hidden
+  display_name: Pre-Date Shift for Assignment importing
+  description: |-
+    This feature flag enables the assignment and classic quiz creation with shifted dates during content migration.
+    The original flow perform date shifting after the assignment creation as an update operation.
+  applies_to: SiteAdmin
+
+instui_for_course_copy_page:
+  state: hidden
+  display_name: Use InstUI for the course copy page
+  description: |-
+    If enabled, the course copy page will use InstUI components
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+fill_missing_dates_from_source_course:
+  state: hidden
+  display_name: Fill missing dates for date shifting from source course
+  description: |-
+    If enabled, the date shifting process will fill in missing dates from the source course.
+  applies_to: SiteAdmin
+
+validate_call_to_action:
+  state: hidden
+  display_name: Validate call to action buttons instead of disabling them
+  description: |-
+    If this feature flag is enabled, the call to action button won't be disabled and the validation will be done for the required fields, showing an error if necessary.
+  applies_to: SiteAdmin

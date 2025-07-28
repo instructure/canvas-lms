@@ -42,9 +42,16 @@ export enum Constants {
   SHOW_PACE_MODAL = 'UI/SHOW_PACE_MODAL',
   HIDE_PACE_MODAL = 'UI/HIDE_PACE_MODAL',
   START_SYNCING = 'UI/START_SYNCING',
+  SAVING_DRAFT = 'UI/START_SAVE_DRAFT',
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
   SET_BLUEPRINT_LOCK = 'COURSE_PACE/SET_BLUEPRINT_LOCK',
+  SHOW_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/SHOW_WEIGHTING_ASSIGNMENTS_MODAL',
+  HIDE_WEIGHTING_ASSIGNMENTS_MODAL = 'UI/HIDE_WEIGHTING_ASSIGNMENTS_MODAL',
+  OPEN_BULK_EDIT_MODAL = 'UI/OPEN_BULK_EDIT_MODAL',
+  CLOSE_BULK_EDIT_MODAL = 'UI/CLOSE_BULK_EDIT_MODAL',
+  SET_SELECTED_BULK_STUDENTS = 'UI/SET_SELECTED_STUDENTS',
+  GET_SELECTED_BULK_STUDENTS = 'UI/GET_SELECTED_STUDENTS'
 }
 
 /* Action creators */
@@ -62,23 +69,29 @@ export const regularActions = {
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
     contextId: string,
-    newSelectedPace: CoursePace
+    newSelectedPace: CoursePace,
   ) => createAction(Constants.SET_SELECTED_PACE_CONTEXT, {contextType, contextId, newSelectedPace}),
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
     createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
   setOuterResponsiveSize: (outerResponsiveSize: ResponsiveSizes) =>
     createAction(Constants.SET_OUTER_RESPONSIVE_SIZE, outerResponsiveSize),
   startSyncing: () => createAction(Constants.START_SYNCING),
+  toggleSavingDraft: () => createAction(Constants.SAVING_DRAFT),
   syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED),
   setSelectedContextType: (selectedContextType: PaceContextTypes) =>
     createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),
   setBlueprintLocked: (locked?: boolean) => createAction(Constants.SET_BLUEPRINT_LOCK, locked),
+  showWeightedAssignmentsTray: () => createAction(Constants.SHOW_WEIGHTING_ASSIGNMENTS_MODAL),
+  hideWeightedAssignmentsTray: () => createAction(Constants.HIDE_WEIGHTING_ASSIGNMENTS_MODAL),
+  openBulkEditModal: (students: string[]) => createAction(Constants.OPEN_BULK_EDIT_MODAL, students),
+  closeBulkEditModal: () => createAction(Constants.CLOSE_BULK_EDIT_MODAL),
+  setSelectedBulkStudents: (students: string[]) => createAction(Constants.SET_SELECTED_BULK_STUDENTS, students),
 }
 
 export const thunkActions = {
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
-    contextId: string
+    contextId: string,
   ): ThunkAction<void, StoreState, void, Action> => {
     // Switch to the other pace type, and load the exact pace we should switch to
     return dispatch => {
@@ -88,9 +101,16 @@ export const thunkActions = {
           payload: {contextType, contextId, newSelectedPace},
         }
       }
-      dispatch(
-        coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator)
-      )
+
+      if (contextType == 'BulkEnrollment') {
+        dispatch(
+          coursePaceActions.loadLatestPaceByContext('Enrollment', contextId.split(',')[0], afterLoadActionCreator, true, true),
+        )
+      } else {
+        dispatch(
+          coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator),
+        )
+      }
     }
   },
 }

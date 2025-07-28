@@ -46,16 +46,6 @@ describe Score do
 
   subject_once(:score) { student.scores.create!(params) }
 
-  it { is_expected.to belong_to(:enrollment).required }
-  # shoulda-matchers will have an `optional` method in version 4. As a workaround,
-  # I've used the validates_presence_of matcher on the line following the belong_to matcher
-  it { is_expected.to belong_to(:grading_period) }
-  it { is_expected.not_to validate_presence_of(:grading_period) }
-  it { is_expected.to belong_to(:assignment_group) }
-  it { is_expected.not_to validate_presence_of(:assignment_group) }
-  it { is_expected.to have_one(:score_metadata) }
-  it { is_expected.to have_one(:course).through(:enrollment) }
-
   it_behaves_like "soft deletion" do
     subject { student.scores }
 
@@ -69,17 +59,11 @@ describe Score do
 
   describe "validations" do
     it { is_expected.to be_valid }
-    it { is_expected.to validate_numericality_of(:current_score).allow_nil }
-    it { is_expected.to validate_numericality_of(:unposted_current_score).allow_nil }
-    it { is_expected.to validate_numericality_of(:final_score).allow_nil }
-    it { is_expected.to validate_numericality_of(:unposted_final_score).allow_nil }
 
     it "is invalid without an enrollment" do
       score.enrollment = nil
       expect(score).not_to be_valid
     end
-
-    it { is_expected.to validate_presence_of(:enrollment) }
 
     it "is invalid without unique enrollment for course" do
       student.scores.create!(params)

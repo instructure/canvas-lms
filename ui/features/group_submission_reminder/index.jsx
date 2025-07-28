@@ -17,14 +17,14 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {string} from 'prop-types'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('GroupSubmissionAlert')
+const I18n = createI18nScope('GroupSubmissionAlert')
 
 export default function GroupSubmissionAlert({groupType}) {
   return (
@@ -44,7 +44,7 @@ ready(() => {
   $('.group_submission_alert').each((idx, alertContainer) => {
     ReactDOM.render(
       <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
-      alertContainer
+      alertContainer,
     )
   })
 })

@@ -1,0 +1,19 @@
+.base-block-layout {
+  border: solid 1px #d7dade;
+  position: relative;
+}
+
+.base-block-layout [data-header] {
+  height: 38px;
+}
+
+.base-block-layout [data-title] {
+  color: #9ea6ad;
+}
+
+.base-block-layout [data-addbutton] {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}

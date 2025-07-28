@@ -20,7 +20,7 @@
 describe MissingPolicyApplicator do
   describe ".apply_missing_deductions" do
     it "invokes #apply_missing_deductions" do
-      dbl = instance_double("MissingPolicyApplicator")
+      dbl = instance_double(MissingPolicyApplicator)
       allow(described_class).to receive(:new).and_return(dbl)
       expect(dbl).to receive(:apply_missing_deductions)
 
@@ -262,6 +262,52 @@ describe MissingPolicyApplicator do
       expect(submission.grade).to be_nil
     end
 
+    it "does not apply deductions to submissions for parents in checkpointed assignments" do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      late_policy_missing_enabled
+      create_recent_assignment
+      assignment = Assignment.last
+      assignment.has_sub_assignments = true
+      assignment.submission_types = "discussion_topic"
+      d = @course.discussion_topics.create!(title: "Test Topic", assignment:)
+      d.publish!
+      assignment.save!
+
+      submission = @course.submissions.find { |s| s.assignment&.has_sub_assignments? }
+      submission.update_columns(score: nil, grade: nil, workflow_state: "unsubmitted")
+
+      checkpoint1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: d,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 1.hour.ago(now) }],
+        points_possible: 5
+      )
+      checkpoint1_submission = checkpoint1.submissions.find_by(user_id: submission.user_id)
+
+      checkpoint2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: d,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 1.hour.ago(now) }],
+        points_possible: 5,
+        replies_required: 2
+      )
+      checkpoint2_submission = checkpoint2.submissions.find_by(user_id: submission.user_id)
+      applicator.apply_missing_deductions
+
+      checkpoint1_submission.reload
+      expect(checkpoint1_submission.score).to eq 1.25
+      expect(checkpoint1_submission.grade).to eq "F"
+
+      checkpoint2_submission.reload
+      expect(checkpoint2_submission.score).to eq 1.25
+      expect(checkpoint2_submission.grade).to eq "F"
+
+      submission.reload
+      # submission score is the sum of the already missing policy applied checkpoint scores
+      expect(submission.score).to eq 2.5
+      expect(submission.grade).to eq "F"
+    end
+
     it "does not apply deductions to assignments expecting on paper submissions if the due date is past" do
       late_policy_missing_enabled
       create_recent_paper_assignment
@@ -463,6 +509,71 @@ describe MissingPolicyApplicator do
         applicator.send(:apply_missing_deduction, assignment, [submission])
 
         expect(submission.reload.score).to be_nil
+      end
+    end
+
+    describe "mastery paths and missing policy applicator" do
+      let(:mastery_path_course) do
+        course_with_teacher(active_all: true)
+        @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+
+        @course.conditional_release = true
+        @course.save!
+
+        @trigger_assignment = @course.assignments.create!(
+          title: "Trigger Assignment",
+          grading_type: "points",
+          points_possible: 100,
+          # due_at: 1.hour.ago(now),
+          submission_types: "online_text_entry"
+        )
+
+        @set1_assignment = @course.assignments.create!(
+          title: "Set 1 Assignment",
+          points_possible: 10,
+          only_visible_to_overrides: true
+        )
+        @set1_assignment.assignment_overrides.create!(
+          set_type: "Noop",
+          set_id: 1,
+          all_day: false,
+          title: "Mastery Paths",
+          unlock_at_overridden: true,
+          lock_at_overridden: true,
+          due_at_overridden: true
+        )
+
+        course_module = @course.context_modules.create!(name: "Mastery Path Module")
+        course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+        course_module.add_item(id: @set1_assignment.id, type: "assignment")
+
+        ranges = [
+          ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
+                                                 ConditionalRelease::AssignmentSet.new(
+                                                   assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                                     assignment_id: @set1_assignment.id
+                                                   )]
+                                                 )
+                                               ])
+        ]
+        @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+      end
+
+      it "triggers unlocking of mastery path assignment when missing grade is applied" do
+        mastery_path_course
+        late_policy_missing_enabled
+
+        @trigger_assignment.update!(due_at: 1.hour.from_now(now))
+        # this is a hack to force the submissions in a missing state before the Missing Policy Applicator runs.
+        # Timecop isn't sufficient here because the missing check in the DB uses CURRENT_TIMESTAMP
+        # which isn't impacted by Timecop time travel.
+        @trigger_assignment.submissions.update_all(late_policy_status: "missing")
+        Timecop.travel(2.hours.from_now(now)) do
+          applicator.apply_missing_deductions
+          run_jobs
+          cr_action = ConditionalRelease::AssignmentSetAction.where(student_id: @student.id).first
+          expect(cr_action).not_to be_nil
+        end
       end
     end
   end

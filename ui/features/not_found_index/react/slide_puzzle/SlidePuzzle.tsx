@@ -18,10 +18,10 @@
 
 import React, {useEffect, useState} from 'react'
 import {Img} from '@instructure/ui-img'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import imageSource from './StudiousPandaSource'
 
-const I18n = useI18nScope('not_found_page_slide_puzzle')
+const I18n = createI18nScope('not_found_page_slide_puzzle')
 
 const GRID_SIZE = 4
 const DIMENSION = 556
@@ -34,7 +34,7 @@ interface Delta {
 
 interface TileData {
   value: number
-  position: number // eslint-disable-line react/no-unused-prop-types
+  position: number
   x: number
   y: number
   translation: string
@@ -89,7 +89,7 @@ function tryMove(tiles: TileData[], move: string): boolean {
   const emptyTile = tiles.find(tile => tile.value === GRID_SIZE * GRID_SIZE)!
   const {xOffset, yOffset} = DeltaMap[move]
   const tileToMove = tiles.find(
-    tile => tile.x === emptyTile.x + xOffset && tile.y === emptyTile.y + yOffset
+    tile => tile.x === emptyTile.x + xOffset && tile.y === emptyTile.y + yOffset,
   )
   if (tileToMove) {
     swapTiles(emptyTile, tileToMove)

@@ -63,7 +63,7 @@ module Exporters
       time_zone = @export.settings[:user_time_zone]
       export_time =
         if time_zone.blank?
-          Time.now.strftime("%Y-%m-%dT%H:%M:%S")
+          Time.zone.now.strftime("%Y-%m-%dT%H:%M:%S")
         else
           TZInfo::Timezone.get(time_zone).now.strftime("%Y-%m-%dT%H:%M:%S")
         end
@@ -172,7 +172,8 @@ module Exporters
 
     def attach_zip(zip_filename)
       attachment = @export.attachments.build
-      attachment.uploaded_data = Canvas::UploadedFile.new(zip_filename, "application/zip")
+      uploaded_data = Canvas::UploadedFile.new(zip_filename, "application/zip")
+      Attachments::Storage.store_for_attachment(attachment, uploaded_data)
       attachment.workflow_state = "zipped"
       attachment.file_state = "available"
       attachment.save!
@@ -190,7 +191,7 @@ module Exporters
       # clamp at 100% to prevent weirdness if Attachment#size lies
       # make database updates at most once per second
       percent_complete = [(@total_copied * 100) / @total_size, 100].min
-      now = Time.now
+      now = Time.zone.now
       if (percent_complete - @last_percent >= 1) && (now - @last_update >= 1) # 1 second
         @export.fast_update_progress(percent_complete)
         @last_percent = percent_complete

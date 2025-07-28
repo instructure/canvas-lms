@@ -36,12 +36,12 @@ describe LegacyMultipart::SequencedStream do
         @reader = reader
       end
 
-      def size
+      def size # rubocop:disable Rails/Delegate
         @source.size
       end
 
-      def read(*args)
-        @reader.call(@source, *args)
+      def read(*)
+        @reader.call(@source, *)
       end
     end
   end

@@ -5,3 +5,8 @@ source "https://rubygems.org"
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "debug"
+gem "nokogiri"
+gem "rake"
+gem "rspec", "~> 3.12"

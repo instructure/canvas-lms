@@ -23,7 +23,7 @@ require_relative "../views_helper"
 describe "context_modules/index" do
   before do
     assign(:body_classes, [])
-    assign(:menu_tools, Hash.new([]))
+    assign(:menu_tools, Hash.new([].freeze))
     assign(:collapsed_modules, [])
   end
 
@@ -122,6 +122,19 @@ describe "context_modules/index" do
     expect(page.css(".offline_web_export").length).to eq 1
   end
 
+  it "shows H3 for text header" do
+    course_factory
+    context_module = @course.context_modules.create!
+    module_item = context_module.add_item type: "context_module_sub_header"
+    module_item.publish! if module_item.unpublished?
+    view_context(@course, @user)
+    assign(:modules, @course.context_modules.active)
+    render "context_modules/index"
+    expect(response).not_to be_nil
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("h3").length).to eq 1
+  end
+
   context "direct_share" do
     before :once do
       course_with_teacher
@@ -209,6 +222,44 @@ describe "context_modules/index" do
       expect(response).not_to be_nil
       page = Nokogiri("<document>" + response.body + "</document>")
       expect(page.css("#module_student_view_peer_reviews_#{@module_item.content_id}_#{@module_item.context_module_id}").length).to eq 0
+    end
+
+    describe "turning off the module item rendering" do
+      subject do
+        render "context_modules/index"
+        Nokogiri("<document>" + response.body + "</document>")
+      end
+
+      before do
+        course_factory
+        @course.context_modules.create!
+        view_context(@course, @user)
+        assign(:modules, @course.context_modules.active)
+      end
+
+      context "when modules_perf FF is on" do
+        before do
+          allow_any_instance_of(ContextModulesHelper)
+            .to receive(:module_performance_improvement_is_enabled?)
+            .and_return(true)
+        end
+
+        it "should NOT render the module items" do
+          expect(subject.css(".context_module_items").length).to eq 0
+        end
+      end
+
+      context "when modules_perf FF is off" do
+        before do
+          allow_any_instance_of(ContextModulesHelper)
+            .to receive(:module_performance_improvement_is_enabled?)
+            .and_return(false)
+        end
+
+        it "should render the module items" do
+          expect(subject.css(".context_module_items").length).to eq 1
+        end
+      end
     end
   end
 end

@@ -33,12 +33,17 @@ pipeline {
     PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:master"
     GERRIT_BRANCH = 'master'
     GERGICH_REVIEW_LABEL = 'Lint-Review'
+    MASTER_BOUNCER_KEY = credentials('master-bouncer-key')
   }
 
   stages {
     stage('Setup') {
       steps {
         cleanAndSetup()
+        sh 'docker pull instructure/gergich'
+        sh 'git config --add remote.origin.fetch +refs/heads/master:refs/remotes/origin/master'
+        sh 'docker build --file Dockerfile.master-bouncer --tag instructure/master_bouncer .'
+        sh 'docker run --rm --volume ./.git:/app/.git --volume gitconfig:/root -e RUBY_LOG_LEVEL=DEBUG --entrypoint git instructure/master_bouncer config --global --add safe.directory /app'
       }
     }
 
@@ -47,10 +52,43 @@ pipeline {
         // should only take about 5-10 min, but just in case
         timeout(time: 30) {
           script {
-            credentials.withMasterBouncerCredentials {
-              withGerritCredentials {
-                sh 'build/new-jenkins/linters/run-master-bouncer-all.py'
-              }
+            withCredentials([sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USER_NAME')]) {
+              sh ''' #!/usr/bin/env bash
+                set -exuE
+
+                cleanup() {
+                  kill "$SSH_AGENT_PID"
+                }
+                trap cleanup EXIT
+
+                if [[ -v SSH_AUTH_SOCK ]]; then
+                  echo "ssh is set and running!"
+                else
+                  if [[ -z "$SSH_KEY_PATH" ]]; then
+                    echo "No SSH agent present and no key file path supplied, aborting!"
+                    exit 1
+                  fi
+                  echo "No SSH agent present, starting one"
+                  SSH_AGENT_STARTED=1
+                  eval `ssh-agent`
+                  ssh-add "$SSH_KEY_PATH"
+                fi
+
+                docker run \
+                --volume gitconfig:/root \
+                --volume "$SSH_KEY_PATH:$SSH_KEY_PATH" \
+                --volume ./.git:/app/.git \
+                --env RUBY_LOG_LEVEL=DEBUG  \
+                --env SSH_KEY_PATH \
+                --env SSH_USER_NAME \
+                --env MASTER_BOUNCER_KEY \
+                --env GERGICH_REVIEW_LABEL=Lint-Review \
+                --env GERRIT_HOST \
+                --env GERRIT_PROJECT=canvas-lms \
+                --env GERRIT_BRANCH=master \
+                --entrypoint master_bouncer \
+                instructure/master_bouncer check_all
+              '''
             }
           }
         }

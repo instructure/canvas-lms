@@ -32,10 +32,6 @@ describe DatadogRumHelper do
   end
 
   describe "#include_datadog_rum_js?" do
-    before :once do
-      Account.site_admin.enable_feature!(:datadog_rum_js)
-    end
-
     before do
       allow(DynamicSettings).to receive(:find).and_call_original
       allow(DynamicSettings).to(
@@ -90,15 +86,10 @@ describe DatadogRumHelper do
         allow(self).to receive(:random).and_return(0.6)
         expect(include_datadog_rum_js?).to be(true)
       end
-
-      it "returns false when the feature is not enabled" do
-        Account.site_admin.disable_feature!(:datadog_rum_js)
-        expect(include_datadog_rum_js?).to be(false)
-      end
     end
 
     context "when explicitly requesting the feature" do
-      it "returns true when the feature is enabled" do
+      it "returns true" do
         request_datadog_rum_js
         expect(include_datadog_rum_js?).to be(true)
       end
@@ -106,12 +97,6 @@ describe DatadogRumHelper do
       it "returns false when the sample rate percentage is 0.0" do
         request_datadog_rum_js
         datadog_rum_config.data[:sample_rate_percentage] = 0.0
-        expect(include_datadog_rum_js?).to be(false)
-      end
-
-      it "returns false when the feature is not enabled" do
-        request_datadog_rum_js
-        Account.site_admin.disable_feature!(:datadog_rum_js)
         expect(include_datadog_rum_js?).to be(false)
       end
     end

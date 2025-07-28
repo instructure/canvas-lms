@@ -48,6 +48,10 @@ module Messages
       it "uses the user name for messages belonging to users" do
         expect(asset_for("New Discussion Entry").reply_to_name).to eq "User Name via Canvas Notifications"
       end
+
+      it "uses the user name for mention belonging to users" do
+        expect(asset_for("Discussion Mention").reply_to_name).to eq "User Name via Canvas Notifications"
+      end
     end
 
     describe "#from_name" do

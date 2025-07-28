@@ -36,7 +36,7 @@ function renderGradingSchemeViewModal(props: Partial<GradingSchemeViewModalProps
       editGradingScheme={editGradingScheme}
       canManageScheme={canManageScheme}
       {...props}
-    />
+    />,
   )
 
   return {
@@ -64,7 +64,7 @@ describe('GradingSchemeViewModal', () => {
   it('should render the title of the grading scheme in the modal', () => {
     const {getByTestId} = renderGradingSchemeViewModal()
     expect(getByTestId('grading-scheme-view-modal-title')).toHaveTextContent(
-      `${DefaultGradingScheme.title}`
+      `${DefaultGradingScheme.title}`,
     )
   })
 })

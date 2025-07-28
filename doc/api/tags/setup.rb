@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+include YARD::Templates::Helpers::HtmlHelper
+
 def init
   super
   sections :argument, :request_field, :response_field, :example_request, :example_response, :returns, :see

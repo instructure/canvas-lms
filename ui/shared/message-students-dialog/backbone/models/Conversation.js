@@ -17,11 +17,11 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Model} from '@canvas/backbone'
 import $ from 'jquery'
 
-const I18n = useI18nScope('models_conversations')
+const I18n = createI18nScope('models_conversations')
 
 extend(Conversation, Model)
 
@@ -42,10 +42,10 @@ const BLANK_BODY_ERR = I18n.t('cannot_be_empty', 'Message cannot be blank')
 
 const NO_RECIPIENTS_ERR = I18n.t(
   'no_recipients_choose_another_group',
-  'No recipients are in this group. Please choose another group.'
+  'No recipients are in this group. Please choose another group.',
 )
 
-Conversation.prototype.validate = function (attrs, _options) {
+Conversation.prototype.validate = function (attrs, options) {
   const errors = {}
   if (!attrs.body || !$.trim(attrs.body.toString())) {
     errors.body = [
@@ -64,7 +64,6 @@ Conversation.prototype.validate = function (attrs, _options) {
   if (Object.keys(errors).length) {
     return errors
   } else {
-    // eslint-disable-next-line no-void
     return void 0
   }
 }

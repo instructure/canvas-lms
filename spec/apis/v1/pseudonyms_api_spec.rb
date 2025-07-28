@@ -119,16 +119,16 @@ describe PseudonymsController, type: :request do
         @user = user_with_pseudonym
       end
 
-      it "returns 401 unauthorized when listing account pseudonyms" do
+      it "returns 403 forbidden when listing account pseudonyms" do
         raw_api_call(:get, @account_path, @account_path_options, {
                        user: { id: @student.id }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
-      it "returns 401 unauthorized when listing user pseudonyms" do
+      it "returns 403 forbidden when listing user pseudonyms" do
         raw_api_call(:get, @user_path, @user_path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -197,7 +197,7 @@ describe PseudonymsController, type: :request do
         expect(response).to have_http_status :bad_request
       end
 
-      it "returns 401 when trying to set a password on a non-Canvas login" do
+      it "returns 400 when trying to set a password on a non-Canvas login" do
         @account.authentication_providers.create!(auth_type: "cas")
         raw_api_call(:post, @path, @path_options, {
                        user: { id: @student.id },
@@ -212,7 +212,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @user = @student
         raw_api_call(:post, @path, @path_options, {
                        user: { id: @admin.id },
@@ -222,7 +222,7 @@ describe PseudonymsController, type: :request do
                          unique_id: "test@example.com"
                        }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -236,7 +236,7 @@ describe PseudonymsController, type: :request do
                      format: "json" },
                    user: { id: @user.id },
                    login: { unique_id: "user" })
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 
@@ -388,6 +388,18 @@ describe PseudonymsController, type: :request do
         expect(response).to have_http_status :not_found
       end
 
+      it "allows clearing the auth provider" do
+        auth_provider = @account.authentication_providers.active.where(auth_type: "canvas").first
+        @student.pseudonym.authentication_provider_id = auth_provider.id
+        @student.pseudonym.save!
+
+        json = api_call(:put, @path, @path_options, { login: { authentication_provider_id: "" } })
+
+        expect(response).to be_successful
+        expect(json["authentication_provider_id"]).to be_nil
+        expect(@student.pseudonym.reload.authentication_provider_id).to be_nil
+      end
+
       it "does not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(unique_id: "other@example.com")
@@ -400,16 +412,59 @@ describe PseudonymsController, type: :request do
                      })
         expect(response).to have_http_status :not_found
       end
+
+      context "updating own password" do
+        before(:once) do
+          @student.pseudonym.password = "password"
+          @student.pseudonym.password_confirmation = "password"
+          @student.pseudonym.save!
+          @user = @student
+        end
+
+        it "fails without old_password" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                         }
+                       })
+          assert_status(400)
+          expect(response.body).to match(/parameter is required to change your password/)
+          expect(@student.pseudonym.reload).not_to be_valid_password("new_password")
+        end
+
+        it "fails with an incorrect old_password" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                           old_password: "bad_old_password"
+                         }
+                       })
+          assert_status(400)
+          expect(response.body).to match(/parameter is incorrect/)
+          expect(@student.pseudonym.reload).not_to be_valid_password("new_password")
+        end
+
+        it "succeeds with all required params" do
+          raw_api_call(:put, @path, @path_options, {
+                         login: {
+                           password: "new_password",
+                           old_password: "password"
+                         }
+                       })
+          expect(response).to be_successful
+          expect(@student.pseudonym.reload).to be_valid_password("new_password")
+        end
+      end
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @path = "/api/v1/accounts/#{@account.id}/logins/#{@teacher.pseudonym.id}"
         @user = @student
         raw_api_call(:put, @path, @path_options.merge({ id: @teacher.pseudonym.id.to_param }), {
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is not able to update an authentication provider" do
@@ -422,7 +477,17 @@ describe PseudonymsController, type: :request do
         raw_api_call(:put, @path, @path_options.merge({ id: @student.pseudonym.id.to_param }), {
                        login: { authentication_provider_id: auth_provider.id.to_s }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
+      end
+
+      it "does not allow clearing the auth provider without proper admin privileges" do
+        auth_provider = @account.authentication_providers.active.where(auth_type: "canvas").first
+        @student.pseudonym.authentication_provider_id = auth_provider.id
+        @student.pseudonym.save!
+
+        @user = @student
+        raw_api_call(:put, @path, @path_options, { login: { authentication_provider_id: nil } })
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -475,7 +540,7 @@ describe PseudonymsController, type: :request do
         expect(JSON.parse(response.body)).to eq({
                                                   "errors" => {
                                                     "base" => [
-                                                      { "type" => "Users must have at least one login", "attribute" => "base", "message" => "Users must have at least one login" }
+                                                      { "type" => "Users must have at least one login", "attribute" => nil, "message" => "Users must have at least one login" }
                                                     ]
                                                   }
                                                 })
@@ -492,10 +557,10 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         user_with_pseudonym
         raw_api_call(:delete, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -527,13 +592,13 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         @user = @teacher
         raw_api_call(:post, @path, @path_options, {
                        email: "student@example.com",
                        login: { unique_id: "teacher+new@example.com" }
                      })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end

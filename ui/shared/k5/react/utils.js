@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
 
@@ -27,7 +27,7 @@ import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGrade
 import {scoreToGrade} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('k5_utils')
+const I18n = createI18nScope('k5_utils')
 
 export const countByCourseId = arr =>
   arr.reduce((acc, {course_id}) => {
@@ -54,6 +54,7 @@ export const transformGrades = courses =>
       gradingScheme: course.grading_scheme,
       pointsBasedGradingScheme: course.points_based_grading_scheme,
       restrictQuantitativeData: course.restrict_quantitative_data,
+      scalingFactor: course.scaling_factor,
     }
     return getCourseGrades(basicCourseInfo)
   })
@@ -95,22 +96,22 @@ export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
   asJson(
     window.fetch(
       `/api/v1/users/${userId}/enrollments?state[]=active&&type[]=StudentEnrollment&grading_period_id=${gradingPeriodId}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   ).then(enrollments =>
     enrollments.map(({course_id, grades}) => ({
       courseId: course_id,
       score: grades && grades.current_score,
       grade: grades && grades.current_grade,
-    }))
+    })),
   )
 
 export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
       `/api/v1/announcements?context_codes=course_${courseId}&active_only=true&per_page=1`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   ).then(data => {
     if (data?.length > 0) {
       return data[0]
@@ -124,8 +125,8 @@ export const fetchCourseInstructors = courseId =>
   asJson(
     window.fetch(
       `/api/v1/courses/${courseId}/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 export const fetchCourseApps = courseIds =>
@@ -134,8 +135,8 @@ export const fetchCourseApps = courseIds =>
       `/api/v1/external_tools/visible_course_nav_tools?${courseIds
         .map(id => `context_codes[]=course_${id}`)
         .join('&')}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 export const fetchCourseTabs = courseId =>
@@ -175,18 +176,19 @@ export const getAssignmentGroupTotals = (
   observedUserId,
   restrictQuantitativeData = false,
   gradingScheme = [],
-  pointsBasedGradingScheme = false
+  pointsBasedGradingScheme = false,
+  scalingFactor = null,
 ) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
       group.assignments?.some(a => {
         const submission = getSubmission(a, observedUserId)
         return submission?.grading_period_id === gradingPeriodId
-      })
+      }),
     )
   }
   return data.map(group => {
-    const assignments = group.assignments.map(a => ({
+    const assignments = (group.assignments || []).map(a => ({
       ...a,
       submission: getSubmission(a, observedUserId),
     }))
@@ -200,7 +202,7 @@ export const getAssignmentGroupTotals = (
         }
       }),
       {...group, assignments},
-      false
+      false,
     )
 
     let score
@@ -209,7 +211,7 @@ export const getAssignmentGroupTotals = (
     } else {
       const tempScore = (groupScores.current.score / groupScores.current.possible) * 100
       score = restrictQuantitativeData
-        ? scoreToGrade(tempScore, gradingScheme, pointsBasedGradingScheme)
+        ? scoreToGrade(tempScore, gradingScheme, pointsBasedGradingScheme, scalingFactor)
         : I18n.n(tempScore, {percentage: true, precision: 2})
     }
 
@@ -235,6 +237,7 @@ const formatGradeToRQD = (assignment, submission) => {
       restrict_quantitative_data: ENV.RESTRICT_QUANTITATIVE_DATA,
       grading_scheme: ENV.GRADING_SCHEME,
       points_based_grading_scheme: ENV.POINTS_BASED,
+      scaling_factor: ENV.SCALING_FACTOR,
     })
   }
 
@@ -246,32 +249,37 @@ const formatGradeToRQD = (assignment, submission) => {
 export const getAssignmentGrades = (data, observedUserId) => {
   return data
     .map(group =>
-      group.assignments.map(a => {
+      (group.assignments || []).reduce((assignments, a) => {
+        if (a.hide_in_gradebook) return assignments
+
         const submission = getSubmission(a, observedUserId)
         const rqd_grading_type = !['not_graded', 'pass_fail', 'gpa_scale'].includes(a.grading_type)
           ? 'letter_grade'
           : a.grading_type
         const rqdFormattedGrade = formatGradeToRQD(a, submission)
-        return {
-          id: a.id,
-          assignmentName: a.name,
-          url: a.html_url,
-          dueDate: a.due_at,
-          assignmentGroupName: group.name,
-          assignmentGroupId: group.id,
-          pointsPossible: a.points_possible,
-          gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
-          restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
-          score: submission?.score,
-          grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
-          submissionDate: submission?.submitted_at,
-          unread: submission?.read_state === 'unread',
-          late: submission?.late,
-          excused: submission?.excused,
-          missing: submission?.missing,
-          hasComments: !!submission?.submission_comments?.length,
+        if (a.grading_type != "not_graded") {
+          assignments.push({
+            id: a.id,
+            assignmentName: a.name,
+            url: a.html_url,
+            dueDate: a.due_at,
+            assignmentGroupName: group.name,
+            assignmentGroupId: group.id,
+            pointsPossible: a.points_possible,
+            gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
+            restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
+            score: submission?.score,
+            grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
+            submissionDate: submission?.submitted_at,
+            unread: submission?.read_state === 'unread',
+            late: submission?.late,
+            excused: submission?.excused,
+            missing: submission?.missing,
+            hasComments: !!submission?.submission_comments?.length,
+          })
         }
-      })
+        return assignments
+      }, []),
     )
     .flat(1)
     .sort((a, b) => {
@@ -289,12 +297,13 @@ export const getTotalGradeStringFromEnrollments = (
   observedUserId,
   restrictQuantitativeData = false,
   gradingScheme = [],
-  pointsBasedGradingScheme
+  pointsBasedGradingScheme,
+  scalingFactor,
 ) => {
   let grades
   if (observedUserId) {
     const enrollment = enrollments.find(
-      ({associated_user_id}) => associated_user_id === observedUserId
+      ({associated_user_id}) => associated_user_id === observedUserId,
     )
     grades = enrollment?.observed_user?.enrollments[0]?.grades
   } else {
@@ -304,7 +313,12 @@ export const getTotalGradeStringFromEnrollments = (
     return I18n.t('n/a')
   }
   if (restrictQuantitativeData) {
-    return scoreToGrade(grades.current_score, gradingScheme, pointsBasedGradingScheme)
+    return scoreToGrade(
+      grades.current_score,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      scalingFactor,
+    )
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
   return grades.current_grade == null
@@ -326,8 +340,8 @@ export const fetchImportantInfos = courses =>
         courseName: c.shortName,
         canEdit: c.canManage,
         content: data.json.syllabus_body,
-      }))
-    )
+      })),
+    ),
   ).then(infos => infos.filter(info => info.content))
 
 /* Turns raw announcement data from API into usable object */
@@ -382,7 +396,7 @@ export const groupAnnouncementsByHomeroom = (announcements = [], courses = []) =
       if (parsedAnnouncement) acc[course.isHomeroom] = [...group, parsedAnnouncement]
       return acc
     },
-    {true: [], false: []}
+    {true: [], false: []},
   )
 
 export const saveElementaryDashboardPreference = disabled =>
@@ -454,7 +468,7 @@ export const FOCUS_TARGETS = {
   MISSING_ITEMS: 'missing-items',
 }
 
-export const DEFAULT_COURSE_COLOR = '#394B58'
+export const DEFAULT_COURSE_COLOR = '#334451'
 
 export const GradingPeriodShape = {
   id: PropTypes.string.isRequired,

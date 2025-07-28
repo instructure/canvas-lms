@@ -17,21 +17,26 @@
  */
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo'
+import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import DiscussionTopicManager from './DiscussionTopicManager'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
+import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
+import {useKeyboardShortcuts} from './KeyboardShortcuts/useKeyboardShortcut'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const DiscussionTopicsPost = props => {
   const [client, setClient] = useState(null)
   const [loading, setLoading] = useState(true)
+
+  useKeyboardShortcuts()
 
   useEffect(() => {
     const setupApolloClient = async () => {
@@ -47,24 +52,26 @@ export const DiscussionTopicsPost = props => {
   }, [])
 
   if (loading) {
-    return <LoadingIndicator />
+    return <LoadingSpinner />
   }
 
   return (
-    <ApolloProvider client={client}>
-      <ErrorBoundary
-        errorComponent={
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorCategory={I18n.t('Discussion Topic Post Error Page')}
-          />
-        }
-      >
-        <AlertManager>
-          <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
-        </AlertManager>
-      </ErrorBoundary>
-    </ApolloProvider>
+    <QueryClientProvider client={queryClient}>
+      <ApolloProvider client={client}>
+        <ErrorBoundary
+          errorComponent={
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorCategory={I18n.t('Discussion Topic Post Error Page')}
+            />
+          }
+        >
+          <AlertManager>
+            <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
+          </AlertManager>
+        </ErrorBoundary>
+      </ApolloProvider>
+    </QueryClientProvider>
   )
 }
 

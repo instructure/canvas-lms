@@ -28,7 +28,7 @@ export const useGradingScheme = (): {
     contextType: 'Account' | 'Course',
     contextId: string,
     gradingSchemeId: string,
-    assignmentId?: string | null
+    assignmentId?: string | null,
   ) => Promise<GradingScheme>
   loadGradingSchemeStatus: string
 } => {
@@ -36,10 +36,13 @@ export const useGradingScheme = (): {
 
   const loadGradingScheme = useCallback(
     async (
+      // @ts-expect-error
       contextType,
+      // @ts-expect-error
       contextId,
+      // @ts-expect-error
       gradingSchemeId,
-      assignmentId = null
+      assignmentId = null,
     ): Promise<GradingScheme> => {
       setLoadGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
 
@@ -47,7 +50,6 @@ export const useGradingScheme = (): {
       try {
         setLoadGradingSchemeStatus(ApiCallStatus.PENDING)
 
-        // @ts-expect-error
         const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/${gradingSchemeId}${
             assignmentId !== null ? '?assignment_id=' + assignmentId : ''
@@ -58,16 +60,18 @@ export const useGradingScheme = (): {
           throw new Error(result.response.statusText)
         }
         setLoadGradingSchemeStatus(ApiCallStatus.COMPLETED)
+        // @ts-expect-error
         return result.json
       } catch (err) {
         setLoadGradingSchemeStatus(ApiCallStatus.FAILED)
         throw err
       }
     },
-    []
+    [],
   )
 
   return {
+    // @ts-expect-error
     loadGradingScheme,
     loadGradingSchemeStatus,
   }

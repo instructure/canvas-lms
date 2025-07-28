@@ -66,7 +66,7 @@ HomeroomAnnouncementsLayout.propTypes = {
       published: bool,
       canEdit: bool,
       announcement: K5AnnouncementType,
-    })
+    }),
   ),
   loading: bool.isRequired,
 }

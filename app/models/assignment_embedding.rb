@@ -18,7 +18,6 @@
 
 class AssignmentEmbedding < ApplicationRecord
   belongs_to :assignment, inverse_of: :embeddings
-  has_neighbors :embedding
 
   extend RootAccountResolver
   resolves_root_account through: :assignment

@@ -39,8 +39,8 @@ describe('transformRceContentForEditing', () => {
     expect(
       transformRceContentForEditing(
         `<iframe src="${defaultOptions.origin + url}"></iframe>`,
-        defaultOptions
-      )
+        defaultOptions,
+      ),
     ).toEqual(`<iframe src="${url}"></iframe>`)
   })
 
@@ -49,7 +49,7 @@ describe('transformRceContentForEditing', () => {
       '/courses/961/external_tools/retrieve?display=borderless&amp;url=https%3A%2F%2Faware.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dembed%26custom_arc_media_id%3D41c61c58-4182-458c-84b4-d0cdc98d331e-21'
 
     expect(transformRceContentForEditing(`<iframe src="${url}"></iframe>`, defaultOptions)).toEqual(
-      `<iframe src="${url.replace('borderless', 'in_rce')}"></iframe>`
+      `<iframe src="${url.replace('borderless', 'in_rce')}"></iframe>`,
     )
   })
 
@@ -57,10 +57,10 @@ describe('transformRceContentForEditing', () => {
     expect(
       transformRceContentForEditing(
         `<title>this is great</title><body>first body!</body><html><body> and now, lol, second body</body></html><html><html>More stuff </body><a href="http://canvas.com/lol-what?">canvas.com</a>`,
-        defaultOptions
-      )
+        defaultOptions,
+      ),
     ).toEqual(
-      `<title>this is great</title>first body! and now, lol, second bodyMore stuff <a href="/lol-what?">canvas.com</a>`
+      `<title>this is great</title>first body! and now, lol, second bodyMore stuff <a href="/lol-what?">canvas.com</a>`,
     )
   })
 
@@ -74,8 +74,8 @@ describe('transformRceContentForEditing', () => {
           '<img src="https://canvas.com/image.jpg">' +
           '<img src="https://othercanvas.com/image.jpg">' +
           '</div>',
-        defaultOptions
-      )
+        defaultOptions,
+      ),
     ).toEqual(
       '<img src="/image.jpg?something=x">' +
         '<img random="https://canvas.com/image.jpg">' +
@@ -83,21 +83,20 @@ describe('transformRceContentForEditing', () => {
         '<div>' +
         '<img src="/image.jpg">' +
         '<img src="https://othercanvas.com/image.jpg">' +
-        '</div>'
+        '</div>',
     )
   })
 
   it('should remove unnecessary attributes', () => {
     const options = {origin: 'http://canvas.com'}
-
     ;['data-api-endpoint', 'data-api-returntype'].forEach(attr => {
       // Non-self-closing tags
       ;['iframe', 'div', 'other'].forEach(tag => {
         expect(
           transformRceContentForEditing(
             `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`,
-            options
-          )
+            options,
+          ),
         ).toEqual(`<${tag}></${tag}><div><${tag}></${tag}></div>`)
       })
 
@@ -106,8 +105,8 @@ describe('transformRceContentForEditing', () => {
         expect(
           transformRceContentForEditing(
             `<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`,
-            options
-          )
+            options,
+          ),
         ).toEqual(`<${tag}><div><${tag}></div>`)
       })
     })
@@ -115,17 +114,16 @@ describe('transformRceContentForEditing', () => {
 
   it('should NOT remove other attributes', () => {
     const options = {origin: 'http://canvas.com'}
-
     ;['alt', 'style', 'title', 'class'].forEach(attr => {
       // Non-self-closing tags
       ;['iframe', 'div', 'other'].forEach(tag => {
         expect(
           transformRceContentForEditing(
             `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`,
-            options
-          )
+            options,
+          ),
         ).toEqual(
-          `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`
+          `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`,
         )
       })
 
@@ -134,8 +132,8 @@ describe('transformRceContentForEditing', () => {
         expect(
           transformRceContentForEditing(
             `<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`,
-            options
-          )
+            options,
+          ),
         ).toEqual(`<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`)
       })
     })

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {User} from '../graphql/User'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
@@ -29,7 +29,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
     querySizes.tablet = {minWidth: mobile ? '768px' : '0px'}
   }
   if (desktop) {
-    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '769px'}
   }
   return querySizes
 }
@@ -38,6 +38,19 @@ const DEFAULT_USER_PROPERTIES = {
   _id: null,
   name: I18n.t('DELETED USER'),
   shortName: I18n.t('DELETED USER'),
+}
+
+export const decodeHTMLAuthor = author => {
+  if (!author || !author.name) return author
+  return {
+    ...author,
+    name: decodeHTMLShortName(author.name),
+    shortName: decodeHTMLShortName(author.shortName),
+  }
+}
+
+const decodeHTMLShortName = name => {
+  return new DOMParser().parseFromString(name, 'text/html').body.innerHTML
 }
 
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
@@ -60,7 +73,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         inboxConversation.lastMessageContent = newestSubmissionComment?.comment
         inboxConversation.participantString = getParticipantsString(
           conversation?.commentsConnection.nodes,
-          isSubmissionComments
+          isSubmissionComments,
         )
         inboxConversation.messages = conversation?.commentsConnection.nodes
         inboxConversation.count = conversation?.commentsConnection.nodes.length || 0
@@ -83,7 +96,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
           inboxConversation?.participants,
           isSubmissionComments,
           inboxConversation?.messages[inboxConversation.messages.length - 1]?.author?.shortName ||
-            DEFAULT_USER_PROPERTIES.name
+            DEFAULT_USER_PROPERTIES.name,
         )
         inboxConversation.isPrivate = conversation?.conversation?.isPrivate
       }
@@ -111,21 +124,28 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage._id = message?._id
         inboxMessage.contextName = message?.contextName
         inboxMessage.createdAt = message?.createdAt
-        inboxMessage.author = message?.author || User.mock(DEFAULT_USER_PROPERTIES)
+        inboxMessage.author =
+          decodeHTMLAuthor(message?.author) || User.mock(DEFAULT_USER_PROPERTIES)
         inboxMessage.recipients = []
         inboxMessage.body = message?.comment
+        inboxMessage.htmlBody = message?.htmlComment
         inboxMessage.attachmentsConnection = null
+        inboxMessage.attachments = null
         inboxMessage.mediaComment = null
         contextName = message?.course?.contextName
+        canReply = canReply && message?.canReply
       } else {
         inboxMessage.id = message?.id
         inboxMessage._id = message?._id
         inboxMessage.contextName = message?.contextName
         inboxMessage.createdAt = message?.createdAt
-        inboxMessage.author = message?.author || User.mock(DEFAULT_USER_PROPERTIES)
+        inboxMessage.author =
+          decodeHTMLAuthor(message?.author) || User.mock(DEFAULT_USER_PROPERTIES)
         inboxMessage.recipients = message?.recipients
         inboxMessage.body = message?.body
+        inboxMessage.htmlBody = message?.htmlComment
         inboxMessage.attachmentsConnection = message?.attachmentsConnection
+        inboxMessage.attachments = message?.attachments
         inboxMessage.mediaComment = message?.mediaComment
         contextName = data?.contextName
         canReply = data?.canReply
@@ -144,7 +164,9 @@ const getSubmissionCommentsParticipantString = messages => {
       uniqueParticipants.push({_id: messageAuthor._id, authorName: messageAuthor.name})
     }
   })
-  const uniqueParticipantNames = uniqueParticipants.map(participant => participant.authorName)
+  const uniqueParticipantNames = uniqueParticipants.map(participant =>
+    decodeHTMLShortName(participant.authorName),
+  )
   return uniqueParticipantNames.join(', ')
 }
 const getConversationParticipantString = (participants, conversationOwnerName) => {
@@ -153,15 +175,15 @@ const getConversationParticipantString = (participants, conversationOwnerName) =
     .reduce((prev, curr) => {
       if (!curr?.user?.shortName && DEFAULT_USER_PROPERTIES.name === conversationOwnerName)
         return prev
-      return prev + ', ' + (curr?.user?.shortName || DEFAULT_USER_PROPERTIES.name)
+      return `${prev}, ${decodeHTMLShortName(curr?.user?.shortName) || DEFAULT_USER_PROPERTIES.name}`
     }, '')
-  return conversationOwnerName + participantString
+  return decodeHTMLShortName(conversationOwnerName) + participantString
 }
 
 const getParticipantsString = (
   participants,
   isSubmissionComments,
-  conversationOwnerName = null
+  conversationOwnerName = null,
 ) => {
   return isSubmissionComments
     ? getSubmissionCommentsParticipantString(participants)

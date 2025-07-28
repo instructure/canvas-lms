@@ -38,7 +38,7 @@ module CanvasKaltura
 
     def initialize
       config = CanvasKaltura::ClientV3.config
-      @host = config["domain"]
+      @host, @port = config["domain"].split(":") if config["domain"] && !config["domain"].empty? # rubocop:disable Rails/Present
       @resource_domain = config["resource_domain"]
       @endpoint = config["endpoint"]
       @partnerId = config["partner_id"]
@@ -390,7 +390,8 @@ module CanvasKaltura
     def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
-        http = Net::HTTP.new(@host, @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port)
+        @port ||= @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port
+        http = Net::HTTP.new(@host, @port)
         http.use_ssl = @use_ssl
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ENV["RAILS_ENV"] == "development"
 

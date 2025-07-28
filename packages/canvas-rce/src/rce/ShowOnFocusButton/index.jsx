@@ -28,8 +28,10 @@ import {func, node, oneOfType, string} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 
 const hideStyle = {
-  position: 'absolute',
-  left: '-9999px',
+  opacity: 0,
+  width: 0,
+  height: 0,
+  overflow: 'hidden',
 }
 
 export default class ShowOnFocusButton extends Component {

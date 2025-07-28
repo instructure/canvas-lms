@@ -46,7 +46,7 @@ function renderComponent(props, renderer = render) {
       onLinkClick={() => {}}
       contextType="course"
       {...props}
-    />
+    />,
   )
 }
 
@@ -90,7 +90,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
 
   it('renders load more button if there is more', () => {
     const {getByText} = renderComponent(
-      getDocumentProps('course', makeDocuments({hasMore: true, bookmark: 'next.docs'}))
+      getDocumentProps('course', makeDocuments({hasMore: true, bookmark: 'next.docs'})),
     )
 
     expect(getByText('Load More')).toBeInTheDocument()
@@ -140,7 +140,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
 
   it('shows spinner while loading more', () => {
     const {getByText} = renderComponent(
-      getDocumentProps('course', makeDocuments({isLoading: true, hasMore: true}))
+      getDocumentProps('course', makeDocuments({isLoading: true, hasMore: true})),
     )
 
     expect(getByText('Loading')).toBeInTheDocument()

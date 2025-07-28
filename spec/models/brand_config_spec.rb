@@ -158,7 +158,7 @@ describe BrandConfig do
     end
 
     it "includes default variables not found in brand config" do
-      expect(@brand_variables["ic-link-color"]).to eq "#0374B5"
+      expect(@brand_variables["ic-link-color"]).to eq "#0E68B3"
     end
   end
 
@@ -187,8 +187,8 @@ describe BrandConfig do
 --ic-brand-primary-lightened-15: #514334;
 --ic-brand-button--primary-bgd-darkened-5: #312111;
 --ic-brand-button--primary-bgd-darkened-15: #2C1D0F;
---ic-brand-button--secondary-bgd-darkened-5: #2B3942;
---ic-brand-button--secondary-bgd-darkened-15: #27333B;
+--ic-brand-button--secondary-bgd-darkened-5: #26333D;
+--ic-brand-button--secondary-bgd-darkened-15: #222E37;
 [\s|\S]*--ic-brand-primary: #321;
 [\s|\S]*--ic-brand-global-nav-bgd: #123;
 /)
@@ -284,7 +284,7 @@ describe BrandConfig do
 
   it "expects md5 to be correct" do
     what_it_should_be_if_you_have_not_ran_gulp_rev = 249_250_173_663_295_064_325
-    what_it_should_be_if_you_have = 748_091_800_218_022_945_873
+    what_it_should_be_if_you_have = 66_137_131_007_895_491
     expect(BrandableCSS.migration_version).to eq(what_it_should_be_if_you_have_not_ran_gulp_rev).or eq(what_it_should_be_if_you_have)
     # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
     # you will need to update the migration that runs brand_configs and update these md5s that are

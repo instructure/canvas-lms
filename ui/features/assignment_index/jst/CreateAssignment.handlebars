@@ -44,6 +44,7 @@
     </div>
 
     {{#if hasDueDate}}
+    {{#unless hasSubAssignments}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_due_at">
         {{#t "assignment_due_at"}}Due:{{/t}}
@@ -107,9 +108,11 @@
       {{/ifAny}}
       </div>
     </div>
+    {{/unless}}
     {{/if}}
 
     {{#if hasPointsPossible}}
+    {{#unless hasSubAssignments}}
     <div class="control-group">
       <label class="control-label" for="{{uniqLabel}}_assignment_points">
         {{#t "assignment_points"}}Points:{{/t}}
@@ -126,6 +129,7 @@
         />
       </div>
     </div>
+    {{/unless}}
     {{/if}}
 
     {{#if postToSISEnabled}}

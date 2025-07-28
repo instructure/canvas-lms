@@ -38,14 +38,14 @@ describe('EmptyK5Announcement', () => {
   it('shows some helpful text', () => {
     const {getByText} = render(<EmptyK5Announcement {...getProps()} />)
     expect(
-      getByText('New announcements show up in this area. Create a new announcement now.')
+      getByText('New announcements show up in this area. Create a new announcement now.'),
     ).toBeInTheDocument()
   })
 
   it('shows permission related text when applicable', () => {
     const {getByText} = render(<EmptyK5Announcement {...getProps({canReadAnnouncements: false})} />)
     expect(
-      getByText('You do not have permission to view announcements in this course.')
+      getByText('You do not have permission to view announcements in this course.'),
     ).toBeInTheDocument()
   })
 
@@ -54,7 +54,7 @@ describe('EmptyK5Announcement', () => {
     const button = getByRole('link', {name: "Create a new announcement for Mr. Smith's Homeroom 2"})
     expect(button).toBeInTheDocument()
     expect(button.href).toBe(
-      'http://google.com/courseurl2/discussion_topics/new?is_announcement=true'
+      'http://google.com/courseurl2/discussion_topics/new?is_announcement=true',
     )
   })
 })

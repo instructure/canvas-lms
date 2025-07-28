@@ -8,3 +8,8 @@ gem "canvas_text_helper", path: "../canvas_text_helper"
 gem "html_text_helper", path: "../html_text_helper"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "debug"
+gem "rake"
+gem "rspec", "~> 3.12"
+gem "simplecov", "~> 0.22"

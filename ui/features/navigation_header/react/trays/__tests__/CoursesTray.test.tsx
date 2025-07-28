@@ -19,10 +19,14 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import CoursesTray from '../CoursesTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+
+declare const window: Window & {ENV: GlobalEnv}
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('CoursesTray', () => {
   const courses = [
@@ -30,6 +34,18 @@ describe('CoursesTray', () => {
       id: '1',
       name: 'Course1',
       wokrflow_state: 'published',
+      enrollment_term_id: '1',
+      sis_course_id: 'sis1',
+      term: {
+        id: '1',
+        name: 'Term1',
+      },
+      sections: [
+        {
+          id: '1',
+          name: 'Section1',
+        },
+      ],
     },
     {
       id: '2',
@@ -40,23 +56,54 @@ describe('CoursesTray', () => {
         id: '2',
         name: 'Term2',
       },
+      sections: [
+        {
+          id: '2',
+          name: 'Section2',
+        },
+      ],
     },
     {
       id: '3',
       name: 'Course3',
       workflow_state: 'unpublished',
-      sis_course_id: 'sis1',
+      enrollment_term_id: '3',
+      sis_course_id: 'sis3',
+      term: {
+        id: '3',
+        name: 'Term3',
+      },
+      sections: [
+        {
+          id: '5',
+          name: 'Section5',
+        },
+        {
+          id: '3',
+          name: 'Section3',
+        },
+        {
+          id: '4',
+          name: 'Section4',
+        },
+      ],
     },
     {
       id: '4',
       name: 'Course4',
       workflow_state: 'published',
-      enrollment_term_id: '2',
+      enrollment_term_id: '4',
+      sis_course_id: 'sis4',
       term: {
-        id: '2',
-        name: 'Term2',
+        id: '4',
+        name: 'Term4',
       },
-      sis_course_id: 'sis1',
+      sections: [
+        {
+          id: '6',
+          name: 'Section6',
+        },
+      ],
     },
   ]
 
@@ -64,7 +111,9 @@ describe('CoursesTray', () => {
     queryClient.setQueryData(['courses'], courses)
     window.ENV.K5_USER = false
     window.ENV.FEATURES.courses_popout_sisid = true
-    ENV.current_user_roles = []
+    window.ENV.current_user_roles = []
+    // @ts-expect-error
+    window.ENV.SETTINGS = {show_sections_in_course_tray: true}
   })
 
   afterEach(() => {
@@ -108,18 +157,55 @@ describe('CoursesTray', () => {
     expect(queryByText('Courses')).not.toBeInTheDocument()
   })
 
-  it('renders the term name if present', () => {
+  it('renders term name', () => {
     const {getByText} = render(<CoursesTray />)
-    expect(getByText('Term2')).toBeInTheDocument()
+    expect(getByText('Term: Term2')).toBeInTheDocument()
   })
 
-  it('renders the sis id if present', () => {
+  it('renders sis id if present', () => {
     const {getByText} = render(<CoursesTray />)
-    expect(getByText('sis1')).toBeInTheDocument()
+    expect(getByText('SIS ID: sis1')).toBeInTheDocument()
   })
 
-  it('rendrs both the term name and the sis id if both are present', () => {
+  it('renders term name and sis id if both are present', () => {
     const {getByText} = render(<CoursesTray />)
-    expect(getByText('Term2 - sis1')).toBeInTheDocument()
+    expect(getByText('SIS ID: sis3 | Term: Term3')).toBeInTheDocument()
+  })
+
+  it('does not render term name if term id is 1 (default term for account)', () => {
+    const {queryByText} = render(<CoursesTray />)
+    expect(queryByText('Term1')).not.toBeInTheDocument()
+  })
+
+  it('renders section name if present', () => {
+    const {getByText} = render(<CoursesTray />)
+    expect(getByText('Section2')).toBeInTheDocument()
+  })
+
+  it('sorts section names in alphabetical and ascending order', () => {
+    const {getByText} = render(<CoursesTray />)
+    expect(getByText('Section3, Section4, Section5')).toBeInTheDocument()
+  })
+
+  it('does not render sections if setting show_sections_in_course_tray is disabled', () => {
+    // @ts-expect-error
+    window.ENV.SETTINGS.show_sections_in_course_tray = false
+    const {queryByText} = render(<CoursesTray />)
+    expect(queryByText('Section3, Section4, Section5')).not.toBeInTheDocument()
+  })
+
+  it('renders the correct URL for each course', () => {
+    const {getByText} = render(<CoursesTray />)
+    const courses = [
+      {name: 'Course1', url: '/courses/1'},
+      {name: 'Course2', url: '/courses/2'},
+      {name: 'Course3', url: '/courses/3'},
+      {name: 'Course4', url: '/courses/4'},
+    ]
+    courses.forEach(({name, url}) => {
+      const courseLink = getByText(name).closest('a')
+      expect(courseLink).toBeInTheDocument()
+      expect(courseLink).toHaveAttribute('href', url)
+    })
   })
 })

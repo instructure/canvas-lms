@@ -24,7 +24,7 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 const render = (children, {isMobileView = false} = {}) => {
   return realRender(
-    <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>
+    <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>,
   )
 }
 
@@ -78,7 +78,7 @@ describe('Ratings', () => {
       fireEvent.click(getByText('Confirm'))
       expect(onChangeRatingsMock).toHaveBeenCalled()
       const newRatings = onChangeRatingsMock.mock.calls[0][0](defaultProps().ratings)
-      expect(newRatings.length).toEqual(1)
+      expect(newRatings).toHaveLength(1)
       expect(newRatings[0].description).toEqual('Mastery')
     })
 
@@ -100,11 +100,11 @@ describe('Ratings', () => {
               error: 'Invalid points',
             },
           })}
-        />
+        />,
       )
       const masteryPointsInput = getByDisplayValue('11')
       expect(
-        within(masteryPointsInput.closest('.points')).getByText('Invalid points')
+        within(masteryPointsInput.closest('.points')).getByText('Invalid points'),
       ).toBeInTheDocument()
     })
   })

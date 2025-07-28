@@ -44,6 +44,44 @@ describe EportfolioEntry do
       @eportfolio_entry.name = @long_string
       expect { @eportfolio_entry.save! }.to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
+
+    it "generates a URL-friendly slug" do
+      @eportfolio_entry.name = "that's a wrap"
+      @eportfolio_entry.save!
+      expect(@eportfolio_entry.slug).to eq "thats-a-wrap"
+    end
+
+    it "recalculates the slug only if the name changes" do
+      ent = @eportfolio_category.eportfolio_entries.create!(eportfolio: @eportfolio, name: "Frog and Toad")
+      EportfolioEntry.where(id: ent).update_all(slug: "something-else")
+      ent.reload
+
+      ent.update! content: "hello"
+      expect(ent.reload.slug).to eq "something-else"
+
+      ent.update! name: "Toad and Frog"
+      expect(ent.reload.slug).to eq "toad-and-frog"
+    end
+
+    it "uniquifies the slug" do
+      @eportfolio_entry.name = "cats"
+      @eportfolio_entry.save!
+      dup = @eportfolio_category.eportfolio_entries.create!(eportfolio: @eportfolio, name: "cats")
+      expect(dup.slug).to eq "cats_2"
+    end
+
+    it "generates a non-empty slug when given non-ASCII alphanumeric characters" do
+      @eportfolio_entry.name = "ページ名"
+      @eportfolio_entry.save!
+      expect(@eportfolio_entry.slug).to eq "peziming"
+    end
+
+    it "generates a non-empty slug when given non-alphanumeric characters" do
+      @eportfolio_entry.name = "☃"
+      expect(CanvasSlug).to receive(:generate).and_return("41fe")
+      @eportfolio_entry.save!
+      expect(@eportfolio_entry.slug).to eq "41fe"
+    end
   end
 
   context "parse_content" do

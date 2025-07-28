@@ -20,7 +20,6 @@
 
 require_relative "../api_spec_helper"
 require_relative "../../lti_spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 module Lti
   describe LtiAppsController, type: :request do
@@ -51,14 +50,33 @@ module Lti
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).to be_nil
       end
 
-      it "works for a teacher even without lti_add_edit permissions" do
+      it "works for a teacher even without manage_lti_add permissions" do
         course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
-        account.role_overrides.create!(permission: "lti_add_edit", enabled: false, role: teacher_role)
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s })
         expect(json.count).to eq 1
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).not_to be_nil
+      end
+
+      it "includes icon information for asset processor placements" do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
+
+        tool1 = new_valid_external_tool(account)
+        tool1.settings["ActivityAssetProcessor"] = { icon_url: "http://example.com/foo.png" }
+        tool1.save!
+
+        url = "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions"
+        params = {
+          controller: "lti/lti_apps", action: "launch_definitions", course_id: @course.to_param, format: "json"
+        }
+        placements = ["ActivityAssetProcessor"]
+        json = api_call(:get, url, params, placements:)
+        icon_url = json.first["placements"]["ActivityAssetProcessor"]["icon_url"]
+        expect(icon_url).to eq "http://example.com/foo.png"
+        tool_name = json.first["placements"]["ActivityAssetProcessor"]["tool_name_for_default_icon"]
+        expect(tool_name).to eq tool1.name
       end
 
       it "returns authorized for a student but with no results when no placement is specified" do
@@ -179,27 +197,87 @@ module Lti
         # expect(json.detect {|j| j.key?('name') && j.key?('domain')}).not_to be_nil
       end
 
-      # Some tools like arc, gauge have visibility settings on global_navigation placements.
-      # For global_navigation we want to return all the launches, even if we are unsure what
-      # visibility the user should have access to.
-      it "returns global_navigation launches for a student even when visibility should not allow it" do
+      describe "student visiblity of global_navigation launches" do
+        before do
+          course_with_student(active_all: true, user: user_with_pseudonym, account:)
+
+          @tool = new_valid_external_tool(@course.root_account)
+          @tool.global_navigation = {
+            text: "Global Nav",
+            visibility: "admins"
+          }
+          @tool.save!
+        end
+
+        # Some tools like arc, gauge have visibility settings on global_navigation placements.
+        # For global_navigation we want to return all the launches, even if we are unsure what
+        # visibility the user should have access to.
+        it "returns global_navigation launches for a student even when visibility should not allow it" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+                          { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
+                          placements: ["global_navigation"])
+
+          expect(response).to have_http_status :ok
+          expect(json.count).to eq 1
+          expect(json.first["definition_id"]).to eq @tool.id
+        end
+
+        it "does not ignore visibility on global_navigation launches if only_visible is given" do
+          json = api_call(:get,
+                          "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions?only_visible=true",
+                          { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json", only_visible: "true" },
+                          placements: ["global_navigation"])
+
+          expect(response).to have_http_status :ok
+          expect(json).to be_empty
+        end
+      end
+
+      it "includes additional information for global navigation placements" do
         course_with_student(active_all: true, user: user_with_pseudonym, account:)
 
-        tool = new_valid_external_tool(@course.root_account)
-        tool.global_navigation = {
-          text: "Global Nav",
-          visibility: "admins"
+        tool1 = new_valid_external_tool(account)
+        tool1.description = "foo foo"
+        tool1.domain = "foo.org"
+        tool1.global_navigation = {
+          text: "Foo",
+          visibility: "members",
+          icon_url: "http://example.com/foo.png"
         }
-        tool.save!
+        tool1.save!
+
+        tool2 = new_valid_external_tool(account)
+        tool2.description = "baz baz"
+        tool2.domain = "baz.egg"
+        tool2.global_navigation = {
+          text: "Baz",
+          visibility: "members",
+          icon_svg_path_64: "baz svg...",
+          windowTarget: "_blank"
+        }
+        tool2.save!
 
         json = api_call(:get,
                         "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
-                        { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.id.to_param, format: "json" },
+                        { controller: "lti/lti_apps", action: "launch_definitions", account_id: account.to_param, format: "json" },
                         placements: ["global_navigation"])
 
-        expect(response).to have_http_status :ok
-        expect(json.count).to eq 1
-        expect(json.first["definition_id"]).to eq tool.id
+        tool1_index = json.find_index { |j| j["definition_id"] == tool1.id }
+        tool1_info = json[tool1_index]["placements"]["global_navigation"]
+        expect(tool1_info["title"]).to eq "Foo"
+        expect(tool1_info["icon_url"]).to eq "http://example.com/foo.png"
+        expect(tool1_info["icon_svg_path_64"]).to be_nil
+        expect(tool1_info["html_url"]).to eq "/accounts/#{account.id}/external_tools/#{tool1.id}?launch_type=global_navigation"
+
+        tool2_index = json.find_index { |j| j["definition_id"] == tool2.id }
+        tool2_info = json[tool2_index]["placements"]["global_navigation"]
+        expect(tool2_info["title"]).to eq "Baz"
+        expect(tool2_info["icon_url"]).to be_nil
+        expect(tool2_info["icon_svg_path_64"]).to eq "baz svg..."
+        uri = URI.parse(tool2_info["html_url"])
+        expect(uri.path).to eq "/accounts/#{account.id}/external_tools/#{tool2.id}"
+        expect(Rack::Utils.parse_nested_query(uri.query)).to eq({ "display" => "borderless", "launch_type" => "global_navigation" })
       end
 
       it "paginates the launch definitions" do
@@ -229,7 +307,7 @@ module Lti
     describe "#index" do
       subject { api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps", params) }
 
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:params) do
         {
@@ -246,7 +324,7 @@ module Lti
 
       context "lti 1.1 and 2.0, and 1.3 tools" do
         let(:dev_key) { DeveloperKey.create! account: }
-        let(:tool_config) { dev_key.create_tool_configuration! settings: }
+        let(:tool_config) { lti_tool_configuration_model(developer_key: dev_key) }
         let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: "on" }
         let(:advantage_tool) do
           t = new_valid_external_tool(account)

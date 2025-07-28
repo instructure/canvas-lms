@@ -28,7 +28,7 @@ const courseSettingsReducer = handleActions(
       return state
     },
   },
-  {}
+  {},
 )
 
 export default courseSettingsReducer

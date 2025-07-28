@@ -1,6 +1,4 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-/*!
+/*
  * jQuery UI Tabs 1.9.2
  * http://jqueryui.com
  *
@@ -915,7 +913,9 @@ import './widget'
               ajaxOptions.error(
                 xhr, status, ui.tab.closest( "li" ).index(), ui.tab[ 0 ] );
             }
-            catch ( error ) {}
+            catch ( error ) {
+              // empty block
+            }
           }
         }, this._superApply( arguments ) );
       },

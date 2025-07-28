@@ -23,16 +23,20 @@ import {
 } from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from '@canvas/rails-flash-notifications'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {loadErrorMessages, loadDevMessages} from '@apollo/client/dev'
+const I18n = createI18nScope('discussion_topics_post')
 
-const I18n = useI18nScope('discussion_topics_post')
-
-export const getSpeedGraderUrl = (authorId = null) => {
+export const getSpeedGraderUrl = (authorId = null, entryId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE
   if (authorId !== null) {
     speedGraderUrl = speedGraderUrl.replace(/%3Astudent_id/, authorId)
+  }
+
+  if (entryId !== null) {
+    speedGraderUrl = speedGraderUrl.concat(`&entry_id=${entryId}`)
   }
 
   return speedGraderUrl
@@ -49,7 +53,7 @@ export const getReviewLinkUrl = (courseId, assignmentId, revieweeId) => {
 export const updateDiscussionTopicEntryCounts = (
   cache,
   discussionTopicGraphQLId,
-  entryCountChange
+  entryCountChange,
 ) => {
   const options = {
     id: discussionTopicGraphQLId,
@@ -133,7 +137,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
       }
 
       const currentSubentriesQueryData = JSON.parse(
-        JSON.stringify(cache.readQuery(subEntriesOptions))
+        JSON.stringify(cache.readQuery(subEntriesOptions)),
       )
       if (currentSubentriesQueryData) {
         const subentriesLegacyNode = currentSubentriesQueryData.legacyNode
@@ -180,28 +184,60 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 }
 
 export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
-  try {
-    const options = {
-      query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
-      variables: {
-        discussionEntryID: newDiscussionEntry.rootEntryId,
-      },
+  if (newDiscussionEntry.id === 'DISCUSSION_ENTRY_PLACEHOLDER') return
+  const options = {
+    query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+    variables: {
+      discussionEntryID: newDiscussionEntry.rootEntryId,
+    },
+  }
+  const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
+  if (rootEntry) {
+    if (rootEntry.legacyNode.allRootEntries && Array.isArray(rootEntry.legacyNode.allRootEntries)) {
+      rootEntry.legacyNode.allRootEntries.push(newDiscussionEntry)
+    } else {
+      rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
     }
-    const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
-    if (rootEntry) {
-      if (
-        rootEntry.legacyNode.allRootEntries &&
-        Array.isArray(rootEntry.legacyNode.allRootEntries)
-      ) {
-        rootEntry.legacyNode.allRootEntries.push(newDiscussionEntry)
-      } else {
-        rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
-      }
+    rootEntry.legacyNode.subentriesCount = (rootEntry.legacyNode.subentriesCount || 0) + 1
+    rootEntry.legacyNode.rootEntryParticipantCounts = {
+      ...rootEntry.legacyNode.rootEntryParticipantCounts,
+      repliesCount: (rootEntry.legacyNode.rootEntryParticipantCounts?.repliesCount || 0) + 1,
+    }
+    cache.writeQuery({...options, data: rootEntry})
+  } else {
+    addFirstReplyToAllRootEntries(cache, newDiscussionEntry)
+  }
+}
+
+const addFirstReplyToAllRootEntries = (cache, newDiscussionEntry) => {
+  //either we're adding what would be the first reply to a thread either the thread is not expanded, first reply means un-expanded anyway
+  const discussionEntryOptions = {
+    id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
+    fragment: DiscussionEntry.fragment,
+    fragmentName: 'DiscussionEntry',
+  }
+  const rootEntry = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+  if (rootEntry) {
+    if (rootEntry.allRootEntries && Array.isArray(rootEntry.allRootEntries)) {
+      rootEntry.allRootEntries.push(newDiscussionEntry)
+    } else {
+      rootEntry.allRootEntries = [newDiscussionEntry]
+    }
+    rootEntry.subentriesCount = (rootEntry.subentriesCount || 0) + 1
+    rootEntry.rootEntryParticipantCounts = {
+      __typename: 'DiscussionEntryCounts',
+      unreadCount: rootEntry.rootEntryParticipantCounts?.unreadCount || 0,
+      repliesCount: (rootEntry.repliesCount || 0) + 1,
+    }
+    rootEntry.lastReply = {
+      createdAt: newDiscussionEntry.createdAt,
+      __typename: 'DiscussionEntry',
     }
 
-    cache.writeQuery({...options, data: rootEntry})
-  } catch (e) {
-    // do nothing for errors updating the cache on all root entries. This will happen when the thread hasn't been expanded.
+    cache.writeFragment({
+      ...discussionEntryOptions,
+      data: rootEntry,
+    })
   }
 }
 
@@ -220,6 +256,11 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
         data.lastReply = {
           createdAt: newDiscussionEntry.createdAt,
           __typename: 'DiscussionEntry',
+        }
+        data.rootEntryParticipantCounts = {
+          ...data.rootEntryParticipantCounts,
+          unreadCount: data.rootEntryParticipantCounts?.unreadCount || 0,
+          repliesCount: (data.rootEntryParticipantCounts?.repliesCount || 0) + 1,
         }
       }
 
@@ -336,6 +377,7 @@ export const getOptimisticResponse = ({
               __typename: 'AnonymousUser',
             }
           : null,
+        editedAt: null,
         editor: null,
         lastReply: null,
         permissions: {
@@ -355,10 +397,7 @@ export const getOptimisticResponse = ({
         attachment: attachment
           ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}
           : null,
-        discussionEntryVersionsConnection: {
-          nodes: [],
-          __typename: 'DiscussionEntryVersionConnection',
-        },
+        discussionEntryVersions: [],
         reportTypeCounts: {
           inappropriateCount: 0,
           offensiveCount: 0,
@@ -380,7 +419,7 @@ export const getOptimisticResponse = ({
 export const getCheckpointSubmission = (data, subAssignmentTag) => {
   return (
     data.createDiscussionEntry.mySubAssignmentSubmissions?.find(
-      sub => sub.subAssignmentTag === subAssignmentTag
+      sub => sub.subAssignmentTag === subAssignmentTag,
     ) || {}
   )
 }
@@ -391,7 +430,7 @@ export const buildQuotedReply = (nodes, previewId) => {
   nodes.every(reply => {
     if (reply._id === previewId) {
       preview = {
-        id: previewId,
+        _id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
         message: reply.message,
@@ -408,6 +447,17 @@ export const isAnonymous = discussionEntry =>
   discussionEntry.anonymousAuthor !== null &&
   discussionEntry.author === null
 
+const urlParams = new URLSearchParams(window.location.search)
+const hiddenUserId = urlParams.get('hidden_user_id')
+export const hideStudentNames = !!hiddenUserId
+
+export const userNameToShow = (originalName, authorId, course_roles) => {
+  if (hideStudentNames && course_roles?.includes('StudentEnrollment')) {
+    return hiddenUserId === authorId ? I18n.t('This Student') : I18n.t('Discussion Participant')
+  }
+  return originalName
+}
+
 export const getDisplayName = discussionEntry => {
   if (isAnonymous(discussionEntry)) {
     if (discussionEntry.anonymousAuthor.shortName === CURRENT_USER) {
@@ -418,7 +468,10 @@ export const getDisplayName = discussionEntry => {
     }
     return I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
-  return discussionEntry.author?.displayName || discussionEntry.author?.shortName
+
+  const author = discussionEntry.author
+  const name = author?.displayName || author?.shortName
+  return userNameToShow(name, author?._id, author?.courseRoles)
 }
 
 export const showErrorWhenMessageTooLong = message => {
@@ -440,42 +493,29 @@ export const showErrorWhenMessageTooLong = message => {
   return false
 }
 
-export const getTranslation = async (
-  text,
-  translateTargetLanguage,
-  setter,
-  setIsTranslating = () => {}
-) => {
-  if (text === undefined || text == null) {
-    return // Do nothing, there is no text to translate
-  }
+export const getTranslation = async (text, translateTargetLanguage) => {
+  if (!text) return // Don't translate, if no content
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
-  // Remove any tags from the string to be translated
-  const parsedDocument = new DOMParser().parseFromString(text, 'text/html')
-  const toTranslate = parsedDocument.documentElement.textContent
-
   try {
-    setIsTranslating(true)
     const {json} = await doFetchApi({
       method: 'POST',
       path: apiPath,
       body: {
         inputs: {
-          src_lang: 'en', // TODO: detect source language.
           tgt_lang: translateTargetLanguage,
-          text: toTranslate,
+          text,
+          feature_slug: 'discussion',
         },
       },
     })
-    // Join together all the text with a separator, so that the original text remains separate
-    setter([text, translationSeparator, json.translated_text].join(''))
+
+    return json.translated_text
   } catch (e) {
-    // TODO: Do something with the error message.
+    const response = await e.response.json()
+    const error = new Error()
+    Object.assign(error, {...response})
+    throw error
   }
-
-  setIsTranslating(false)
 }
-
-export const translationSeparator = "\n\n----------\n\n\n"

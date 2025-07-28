@@ -18,21 +18,22 @@
 
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
 } from '@canvas/assignments/graphql/student/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/client'
 import React from 'react'
 import {string} from 'prop-types'
 import StudentContent from './StudentContent'
+import {SubmissionProvider} from '../context/SubmissionContext'
 import SubmissionHistoriesQuery from './SubmissionHistoriesQuery'
 import {transformRubricData} from '../helpers/RubricHelpers'
 
-const I18n = useI18nScope('assignments_2_initial_query')
+const I18n = createI18nScope('assignments_2_initial_query')
 
 function getAssignmentEnvVariables() {
   const baseUrl = `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
@@ -101,7 +102,11 @@ const LoggedInStudentViewQuery = props => {
   const dataWithEnv = JSON.parse(JSON.stringify(data))
   dataWithEnv.assignment.env = getAssignmentEnvVariables()
   dataWithEnv.assignment.rubric = transformRubricData(dataWithEnv.assignment.rubric)
-  return <SubmissionHistoriesQuery initialQueryData={dataWithEnv} />
+  return (
+    <SubmissionProvider assignmentId={props.assignmentLid} submissionId={props.submissionID}>
+      <SubmissionHistoriesQuery initialQueryData={dataWithEnv} />
+    </SubmissionProvider>
+  )
 }
 
 const LoggedOutStudentViewQuery = props => {

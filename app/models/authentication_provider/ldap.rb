@@ -63,7 +63,9 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
          verify_tls_cert_opt_in].freeze
   end
 
-  SENSITIVE_PARAMS = [:auth_password].freeze
+  def self.sensitive_params
+    [*super, :auth_password].freeze
+  end
 
   def clear_last_timeout_failure
     unless last_timeout_failure_changed?
@@ -86,7 +88,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def auth_over_tls
-    self.class.auth_over_tls_setting(read_attribute(:auth_over_tls), tls_required: account.feature_enabled?(:verify_ldap_certs))
+    self.class.auth_over_tls_setting(super, tls_required: account.feature_enabled?(:verify_ldap_certs))
   end
 
   def ldap_connection(verify_tls_certs: nil)
@@ -279,9 +281,9 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
 
     if should_send_to_statsd?
-      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? "success" : "failure"}",
-                                   short_stat: "ldap_#{result ? "success" : "failure"}",
-                                   tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
+      InstStatsd::Statsd.distributed_increment("#{statsd_prefix}.ldap_#{result ? "success" : "failure"}",
+                                               short_stat: "ldap_#{result ? "success" : "failure"}",
+                                               tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
     end
 
     result
@@ -289,17 +291,21 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ::Canvas::Errors.capture(e, { type: :ldap, account: }, :warn)
     if e.is_a?(Timeout::Error)
       if should_send_to_statsd?
-        InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout",
-                                     short_stat: "ldap_timeout",
-                                     tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
+        InstStatsd::Statsd.distributed_increment("#{statsd_prefix}.ldap_timeout",
+                                                 short_stat: "ldap_timeout",
+                                                 tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
       end
       update_attribute(:last_timeout_failure, Time.zone.now)
     elsif should_send_to_statsd?
-      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_error",
-                                   short_stat: "ldap_error",
-                                   tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
+      InstStatsd::Statsd.distributed_increment("#{statsd_prefix}.ldap_error",
+                                               short_stat: "ldap_error",
+                                               tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
     end
     nil
+  end
+
+  def slo?
+    false
   end
 
   def user_logout_redirect(controller, _current_user)
@@ -316,10 +322,10 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     begin
       return errors unless (cert = internal_ca_cert)
 
-      time = Time.now
+      time = Time.zone.now
 
       errors << "certificate is not a CA" unless cert.extensions.map(&:to_h)&.any? { |e| e["critical"] && e["oid"] == "basicConstraints" && e["value"].include?("CA:TRUE") }
-      errors << "certificate is expired or not yet valid" unless cert.not_before <= time && cert.not_after >= time
+      errors << "certificate is expired or not yet valid" unless time.between?(cert.not_before, cert.not_after)
     rescue => e
       errors << "unable to parse certificate: #{e.message}"
     end

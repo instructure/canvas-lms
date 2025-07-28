@@ -23,7 +23,7 @@ class StandardGradeStatus < ApplicationRecord
   belongs_to :root_account, class_name: "Account", inverse_of: :standard_grade_statuses
 
   validates :color, presence: true, length: { maximum: 7 }, format: { with: /\A#([0-9a-fA-F]{3}){1,2}\z/ }
-  validates :status_name, presence: true, uniqueness: { scope: :root_account }, inclusion: { in: STANDARD_GRADE_STATUSES, message: -> { t("%{value} is not a valid standard grade status") } }
+  validates :status_name, presence: true, uniqueness: { scope: :root_account }, inclusion: { in: STANDARD_GRADE_STATUSES, message: ->(_object, _data) { t("%{value} is not a valid standard grade status") } }
   validates :hidden, inclusion: [true, false]
   validates :root_account, presence: true
 

@@ -18,82 +18,130 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import ready from '@instructure/ready'
-import speedGrader from './jquery/speed_grader'
-import {getCurrentTheme} from '@instructure/theme-registry'
+
 import {captureException} from '@sentry/browser'
-import {getAssignment} from './queries/assignmentQuery'
-import {getCourse} from './queries/courseQuery'
-import {getSectionsByAssignment} from './queries/sectionsByAssignmentQuery'
-import {getSubmission} from './queries/submissionQuery'
-import {getSubmissionsByAssignment} from './queries/submissionsByAssignmentQuery'
+import {Spinner} from '@instructure/ui-spinner'
+import ready from '@instructure/ready'
+
+import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
 import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
 import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
 import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
-import {
-  postAssignmentGradesForSections,
-  resolvePostAssignmentGradesStatus,
-} from './mutations/postAssignmentGradesForSectionsMutation'
+import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
+import {updateSubmissionGradeStatus} from './mutations/updateSubmissionGradeStatusMutation'
+import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
+import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
+import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
+import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
+import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
+import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
+import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
+import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
+import {reassignAssignment} from './mutations/reassignAssignmentMutation'
+import {deleteAttachment} from './mutations/deleteAttachmentMutation'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {executeQuery} from '@canvas/graphql'
+import {initializePendo} from '@canvas/pendo'
+import speedGrader from './jquery/speed_grader'
+import SGUploader from './sg_uploader'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 ready(() => {
-  // The feature must be enabled AND we must be handed the speedgrader platform URL
-  if (window.ENV.FEATURES.platform_service_speedgrader && window.REMOTES?.speedgrader) {
-    const theme = getCurrentTheme()
-    const mountPoint = document.querySelector('#react-router-portals')
-    const params = new URLSearchParams(window.location.search)
+  async function speedGraderProps() {
+    const pendo = await initializePendo().catch(error => {
+      console.error('Failed to initialize Pendo for platform SpeedGrader', error)
+      // let's be explicit. if we run into an error, the pendo prop should be undefined.
+      return undefined
+    })
 
-    import('speedgrader/appInjector')
-      .then(module => {
-        module.render(mountPoint, {
-          theme,
-          queries: {
-            getCourse,
-            getAssignment,
-            getSubmission,
-            getSubmissionsByAssignment,
-            getSectionsByAssignment,
-            resolvePostAssignmentGradesStatus,
-          },
-          mutations: {
-            updateSubmissionGrade,
-            createSubmissionComment,
-            hideAssignmentGradesForSections,
-            postAssignmentGradesForSections,
-          },
-          context: {
-            courseId: window.ENV.course_id,
-            assignmentId: params.get('assignment_id'),
-            studentId: params.get('student_id'),
-            hrefs: {
-              heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
-            },
-            features: {
-              extendedSubmissionState: window.ENV.FEATURES.extended_submission_state,
-            },
-          },
-        })
-      })
-      .catch(error => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to load SpeedGrader', error)
-        captureException(error)
-        ReactDOM.render(
-          <GenericErrorPage
-            imageUrl={errorShipUrl}
-            errorSubject={I18n.t('SpeedGrader loading error')}
-            errorCategory={I18n.t('SpeedGrader Error Page')}
-          />,
-          mountPoint
-        )
-      })
-  } else {
+    const params = new URLSearchParams(window.location.search)
+    const postMessageAliases = {
+      'quizzesNext.register': 'tool.register',
+      'quizzesNext.nextStudent': 'tool.nextStudent',
+      'quizzesNext.previousStudent': 'tool.previousStudent',
+      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+    }
+
+    const sgUploader = window.INST.kalturaSettings
+      ? new SGUploader('any', {defaultTitle: 'Upload Media'})
+      : null
+
+    return {
+      executeQuery,
+      mutationFns: {
+        updateSubmissionGrade,
+        createSubmissionComment,
+        deleteSubmissionComment,
+        deleteAttachment,
+        hideAssignmentGradesForSections,
+        postAssignmentGradesForSections,
+        postDraftSubmissionComment,
+        updateSubmissionGradeStatus,
+        updateSubmissionSecondsLate,
+        createCommentBankItem,
+        deleteCommentBankItem,
+        updateCommentBankItem,
+        updateCommentSuggestionsEnabled,
+        updateSpeedGraderSettings,
+        postSubmissionCommentMedia: sgUploader?.doUploadByFile,
+        saveRubricAssessment,
+        reassignAssignment,
+      },
+      platform: 'canvas',
+      postMessageAliases,
+      context: {
+        userId: window.ENV.current_user_id,
+        assignmentId: params.get('assignment_id'),
+        studentId: params.get('student_id'),
+        hrefs: {
+          heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+        },
+        emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
+        mediaSettings: window.INST.kalturaSettings,
+        lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
+        currentUserIsAdmin: ENV.current_user_is_admin ?? false,
+        themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
+        useHighContrast: window.ENV.use_high_contrast ?? false,
+        commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
+        lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
+        ltiIframeAllowances: iframeAllowances(),
+        pendo,
+        permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
+        gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
+        gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
+      },
+      features: {
+        a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
+        extendedSubmissionState: window.ENV.FEATURES.extended_submission_state ?? false,
+        emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+        enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
+        commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
+        consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
+        restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
+        gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
+        discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
+        stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
+        filterSpeedGraderByStudentGroupEnabled:
+          window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
+        projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
+        gradingAssistanceFileUploadEnabled:
+          window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
+        discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
+        multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
+      },
+    }
+  }
+
+  const classicContainer = document.querySelector('#classic_speedgrader_container')
+
+  if (classicContainer instanceof HTMLElement) {
     // touch punch simulates mouse events for touch devices
+
     require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')
@@ -113,8 +161,53 @@ ready(() => {
       >
         <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
       </div>,
-      mountPoint
+      mountPoint,
     )
     speedGrader.setup()
+    return
   }
+
+  speedGrader.setupForSG2()
+
+  const mountPoint = document.querySelector('#react-router-portals')
+
+  // The feature must be enabled AND we must be handed the speedgrader platform URL
+  if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
+    ReactDOM.render(
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorMessage={
+          <>
+            {window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED ||
+              I18n.t('SpeedGrader Platform is not enabled')}
+            {window.REMOTES?.speedgrader || 'window.REMOTES?.speedgrader is missing'}
+          </>
+        }
+        errorSubject={I18n.t('SpeedGrader loading error')}
+        errorCategory={I18n.t('SpeedGrader Error Page')}
+      />,
+      mountPoint,
+    )
+    return
+  }
+
+  import('speedgrader/appInjector')
+    .then(async module => {
+      const props = await speedGraderProps()
+      module.render(mountPoint, props)
+    })
+    .catch(error => {
+      console.error('Failed to load SpeedGrader', error)
+      captureException(error)
+
+      ReactDOM.render(
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorMessage={error.message}
+          errorSubject={I18n.t('SpeedGrader loading error')}
+          errorCategory={I18n.t('SpeedGrader Error Page')}
+        />,
+        mountPoint,
+      )
+    })
 })

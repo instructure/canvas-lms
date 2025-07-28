@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import {Avatar} from '@instructure/ui-avatar'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Flex} from '@instructure/ui-flex'
@@ -31,47 +32,34 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
-import {formatMessage} from '@canvas/util/TextHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import { Spinner } from '@instructure/ui-spinner'
-import { translationSeparator } from '../../utils/constants'
-import { translateInboxMessage } from '../../utils/inbox_translator'
+import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
+import MediaPlayer from './MediaPlayer'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
-export const MessageDetailItem = ({...props}) => {
-  const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
+export const MessageDetailItem = ({
+  conversationMessage = {},
+  contextName,
+  onReply,
+  onReplyAll,
+  onDelete,
+  onForward,
+}) => {
+  const createdAt = DateHelper.formatDatetimeForDisplay(conversationMessage.createdAt)
+  const pronouns = conversationMessage?.author?.pronouns
   const {isSubmissionCommentsType} = useContext(ConversationContext)
-  const {conversationMessage: {mediaComment} = {}} = props
-  const [translatedMessage, setTranslatedMessage] = useState('')
-  const [isTranslating, setIsTranslating] = useState(false)
-  const translateInboundMessage = ENV?.inbox_translation_enabled
+  const {mediaComment} = conversationMessage
+  const isMessageHtml = containsHtmlTags(conversationMessage?.htmlBody)
 
-  useEffect(() => {
-    if (translateInboundMessage == null || !translateInboundMessage) {
-      return
-    }
+  const messageBody = isMessageHtml
+    ? sanitizeHtml(conversationMessage?.htmlBody)
+    : formatMessage(conversationMessage?.body)
 
-    // We've already translated
-    if (translatedMessage !== '') {
-      return
-    }
-
-    // Should translate here, check the body for the separator.
-    // If we have the separator in the message, don't translate.
-    if (props.conversationMessage?.body.includes(translationSeparator)) {
-      return
-    }
-    
-    setIsTranslating(true)
-    // Send the translation call to the backend.
-    translateInboxMessage(props.conversationMessage?.body, (result) => {
-      if (result.translated_text) {
-        setTranslatedMessage(translationSeparator.concat(result.translated_text))
-      }
-      setIsTranslating(false)
-    })
-  }, [translatedMessage])
+  const elementId = mediaComment?._id
+    ? `media-player-${conversationMessage?._id}-${mediaComment._id}`
+    : ''
 
   return (
     <Responsive
@@ -107,8 +95,8 @@ export const MessageDetailItem = ({...props}) => {
               <Avatar
                 size={responsiveProps.avatar}
                 margin="small small small none"
-                name={props.conversationMessage?.author?.shortName}
-                src={props.conversationMessage?.author?.avatarUrl}
+                name={conversationMessage?.author?.shortName}
+                src={conversationMessage?.author?.avatarUrl}
               />
             </Flex.Item>
             <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -116,14 +104,21 @@ export const MessageDetailItem = ({...props}) => {
                 <Flex.Item>
                   <MessageDetailParticipants
                     participantsSize={responsiveProps.usernames}
-                    conversationMessage={props.conversationMessage}
+                    conversationMessage={conversationMessage}
                   />
                 </Flex.Item>
                 <Flex.Item>
                   <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
-                    {props.contextName}
+                    {contextName}
                   </Text>
                 </Flex.Item>
+                {ENV?.SETTINGS?.can_add_pronouns && pronouns && (
+                  <Flex.Item>
+                    <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
+                      {pronouns}
+                    </Text>
+                  </Flex.Item>
+                )}
                 <Flex.Item>
                   <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {createdAt}
@@ -134,37 +129,27 @@ export const MessageDetailItem = ({...props}) => {
             {!isSubmissionCommentsType && (
               <Flex.Item textAlign="end">
                 <MessageDetailActions
-                  onReply={props.onReply}
-                  onReplyAll={props.onReplyAll}
-                  onDelete={props.onDelete}
-                  onForward={props.onForward}
+                  onReply={onReply}
+                  onReplyAll={onReplyAll}
+                  onDelete={onDelete}
+                  onForward={onForward}
                   authorName={
-                    props.conversationMessage?.author?.name?.length > 0
-                      ? props.conversationMessage?.author?.name
+                    conversationMessage?.author?.name?.length > 0
+                      ? conversationMessage?.author?.name
                       : I18n.t('Unknown User')
                   }
                 />
               </Flex.Item>
             )}
           </Flex>
-          {isTranslating && (
-            <Flex justifyItems="start">
-              <Flex.Item>
-                <Spinner renderTitle={I18n.t('Translating')} size="x-small" />
-              </Flex.Item>
-              <Flex.Item margin="0 0 0 x-small">
-                <Text>{I18n.t('Checking for Translation')}</Text>
-              </Flex.Item>
-            </Flex>
-          )}
           <Text
             wrap="break-word"
             size={responsiveProps.messageBody}
-            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body.concat(translatedMessage))}}
+            dangerouslySetInnerHTML={{__html: messageBody}}
           />
-          {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
+          {conversationMessage.attachments?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">
-              {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
+              {conversationMessage.attachments.map(attachment => {
                 return (
                   <List.Item as="div" key={attachment.id}>
                     <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
@@ -175,16 +160,22 @@ export const MessageDetailItem = ({...props}) => {
               })}
             </List>
           )}
-          {mediaComment && (
-            <MediaAttachment
-              file={{
-                mediaID: mediaComment._id,
-                title: mediaComment.title,
-                mediaTracks: mediaComment.media_tracks,
-                mediaSources: mediaComment.mediaSources,
-              }}
-            />
-          )}
+          {mediaComment &&
+            (ENV.FEATURES?.consolidated_media_player ? (
+              <>
+                <div id={elementId} />
+                <MediaPlayer elementId={elementId} mediaId={mediaComment._id} />
+              </>
+            ) : (
+              <MediaAttachment
+                file={{
+                  mediaID: mediaComment._id,
+                  title: mediaComment.title,
+                  mediaTracks: mediaComment.media_tracks,
+                  mediaSources: mediaComment.mediaSources,
+                }}
+              />
+            ))}
         </>
       )}
     />
@@ -199,8 +190,4 @@ MessageDetailItem.propTypes = {
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
   onForward: PropTypes.func,
-}
-
-MessageDetailItem.defaultProps = {
-  conversationMessage: {},
 }

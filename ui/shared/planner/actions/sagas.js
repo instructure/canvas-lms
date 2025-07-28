@@ -27,7 +27,7 @@ import {
   getResponseHeader,
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
   gotItemsError,
@@ -47,7 +47,7 @@ import {
   consumePeekIntoPast,
 } from './saga-actions'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 const MAX_PAGE_SIZE = 100
 
@@ -100,7 +100,7 @@ function* loadingLoop(fromMomentFunction, actionCreator, opts = {}) {
       // make sure we got a boolean like we expect.
       if (typeof stopLoading !== 'boolean') {
         throw new Error(
-          `saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`
+          `saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`,
         )
       }
       continueLoading = !stopLoading

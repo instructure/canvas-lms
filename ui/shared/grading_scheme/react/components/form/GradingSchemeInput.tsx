@@ -19,7 +19,7 @@
 import React, {Fragment, type ChangeEvent, useState, useImperativeHandle} from 'react'
 import shortid from '@canvas/shortid'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -32,8 +32,25 @@ import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
 import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
 import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 import {Flex} from '@instructure/ui-flex'
+import {FormMessage} from '@instructure/ui-form-field'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
+
+const emptyErrorMsg = (): FormMessage => ({
+  text: (
+    <Flex justifyItems="start" alignItems="center" direction="row" gap="x-small">
+      <Flex.Item align="start">
+        <IconWarningSolid color="error" />
+      </Flex.Item>
+      <Flex.Item>
+        <Text color="danger">{I18n.t('Please enter a grading scheme name')}</Text>
+      </Flex.Item>
+    </Flex>
+  ),
+  type: 'error',
+})
 
 export interface ComponentProps {
   initialFormDataByInputType: {
@@ -92,7 +109,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
     }
 
     const [formState, setFormState] = useState<GradingSchemeInputState>(
-      schemeInputType === 'points' ? formStateByType.points : formStateByType.percentage
+      schemeInputType === 'points' ? formStateByType.points : formStateByType.percentage,
     )
 
     function decimalRangeToDisplayString(percentageValue: number, displayScalingFactor: number) {
@@ -117,7 +134,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             minRangeDisplay: decimalRangeToDisplayString(dataRow.value, scalingFactorDisplay),
             maxRangeDisplay: decimalRangeToDisplayString(
               idx === 0 ? 1 : arr[idx - 1].value,
-              scalingFactorDisplay
+              scalingFactorDisplay,
             ),
             pointsBased: formInput.pointsBased,
           }
@@ -156,11 +173,11 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
     const handlePointsBasedChanged = (newValue: string) => {
       if (formState.pointsBased && newValue === 'percentage') {
         setFormState(
-          initializeFormState({...initialFormDataByInputType.percentage, title: formState.title})
+          initializeFormState({...initialFormDataByInputType.percentage, title: formState.title}),
         )
       } else if (!formState.pointsBased && newValue === 'points') {
         setFormState(
-          initializeFormState({...initialFormDataByInputType.points, title: formState.title})
+          initializeFormState({...initialFormDataByInputType.points, title: formState.title}),
         )
       }
     }
@@ -273,7 +290,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
 
       const rowBeforeLowRangeAsPercentage = rangeDisplayStringToDecimal(
         rowBefore.minRangeDisplay,
-        formState.scalingFactor
+        formState.scalingFactor,
       )
       const rowAfterLowRangeAsPercentage = rowAfter
         ? rangeDisplayStringToDecimal(rowAfter.minRangeDisplay, formState.scalingFactor)
@@ -284,7 +301,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         rowAfterLowRangeAsPercentage
       const lowRangeForNewRowScaledForDisplay = rangeScaledForDisplay(
         lowRangeForNewRowAsPercentage,
-        formState.scalingFactor
+        formState.scalingFactor,
       )
 
       const updatedScheme = {
@@ -347,11 +364,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                   onChange={changeTitle}
                   defaultValue={formState.title}
                   placeholder={I18n.t('New Grading Scheme')}
-                  messages={
-                    !valid && formState.title === ''
-                      ? [{text: I18n.t('Enter a grading scheme name'), type: 'error'}]
-                      : []
-                  }
+                  messages={!valid && formState.title === '' ? [emptyErrorMsg()] : []}
                   data-testid="grading-scheme-name-input"
                 />
               </Flex.Item>
@@ -374,7 +387,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             <caption>
               <ScreenReaderContent>
                 {I18n.t(
-                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.',
                 )}
               </ScreenReaderContent>
             </caption>
@@ -418,5 +431,5 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         </View>
       </View>
     )
-  }
+  },
 )

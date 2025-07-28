@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import createStore from '@canvas/backbone/createStore'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 
-const I18n = useI18nScope('dashcards')
+const I18n = createI18nScope('dashcards')
 
 type Props = {
   defaultView: string
@@ -76,7 +76,7 @@ export default class PublishButton extends React.Component<Props> {
           }
         })
         .catch(() =>
-          $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.'))
+          $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.')),
         )
     } else {
       apiClient.publishCourse({courseId, onSuccess})

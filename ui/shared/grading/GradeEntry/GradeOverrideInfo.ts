@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -55,6 +54,7 @@ export default class GradeOverrideInfo {
     return this._attr.valid
   }
 
+  // @ts-expect-error
   equals(gradeOverrideInfo) {
     return this.grade?.equals(gradeOverrideInfo.grade)
   }

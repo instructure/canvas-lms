@@ -25,6 +25,7 @@
   max-width: 300px;
   padding: 2px 5px;
   margin-bottom: 5px;
+  position: relative;
 }
 
 .admins_list li:hover {
@@ -52,7 +53,11 @@
 }
 
 .admins_list .remove_account_user_link {
-  float: direction(right);
+  #{direction(right)}: 0;
+  position: absolute;
+  top: 0;
+  border: none;
+  background: none;
 }
 
 #account_notification_icon {
@@ -137,9 +142,6 @@
     white-space: nowrap;
   }
   .formtable {
-    input, select, td {
-      vertical-align: baseline;
-    }
     p {
       line-height: 100%;
     }
@@ -175,6 +177,25 @@
     }
     & .account_settings__k5-help-text-container {
       display: flex;
+      flex-direction: column;
+      margin-bottom: 0.5rem;
+      & p {
+        margin: 0;
+      }
+    }
+  }
+  .account_settings__diff-tags-help-text {
+    display: flex;
+    font-size: 90%;
+    align-items: start;
+    gap: 0.5rem;
+    margin: 0.25rem 0 0;
+    & i {
+      color: $ic-color-danger;
+    }
+    & .account_settings__diff-tags-help-text-container {
+      display: flex;
+      align-items: start;
       flex-direction: column;
       margin-bottom: 0.5rem;
       & p {
@@ -270,4 +291,19 @@ textarea#account_notification_message, .edit_notification_form textarea {
   .announcement-details-post-info__datetime {
     padding-#{direction(right)}: 0px;
   }
+}
+
+#personal_pronouns_options {
+  margin-left: 1.5rem;
+  margin-bottom: 1.0rem;
+}
+
+#name_pronunciation_options {
+  margin-left: 1.5rem;
+  margin-bottom: 1.0rem;
+}
+
+#change_personal_pronouns {
+  margin-top: 0.45rem;
+  margin-bottom: 0.35rem;
 }

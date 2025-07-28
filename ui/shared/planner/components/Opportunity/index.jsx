@@ -24,11 +24,11 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {IconXLine} from '@instructure/ui-icons'
 import {string, bool, number, func, object} from 'prop-types'
 import {getFullDateAndTime} from '../../utilities/dateUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class Opportunity extends Component {
   static propTypes = {

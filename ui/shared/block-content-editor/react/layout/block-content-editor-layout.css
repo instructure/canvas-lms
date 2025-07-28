@@ -1,0 +1,18 @@
+.block-content-editor-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 36px;
+}
+
+.block-content-editor-container .toolbar-area {
+  position: sticky;
+  align-self: start;
+  top: 36px;
+}
+
+.block-content-editor-container .editor-area {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}

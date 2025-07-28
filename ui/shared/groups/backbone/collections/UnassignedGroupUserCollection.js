@@ -49,15 +49,20 @@ UnassignedGroupUserCollection.prototype.increment = function (amount) {
 UnassignedGroupUserCollection.prototype.search = function (filter, options) {
   options = options || {}
   options.reset = true
+  this.lastRequests.forEach(request => request.abort())
+  this.lastRequests = []
   if (filter && filter.length >= 3) {
-    options.url = this.url + '&search_term=' + filter
+    options.url = `${this.url}&search_term=${filter}`
     this.filtered = true
-    return this.fetch(options)
   } else if (this.filtered) {
     this.filtered = false
     options.url = this.url
-    return this.fetch(options)
+  } else {
+    return
   }
+  const fetchPromise = this.fetch(options)
+  this.lastRequests.push(fetchPromise)
+  return fetchPromise
 }
 
 export default UnassignedGroupUserCollection

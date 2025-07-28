@@ -21,7 +21,7 @@ import CalculatedRenderer from './questions/calculated'
 import EssayRenderer from './questions/essay'
 import FileUploadRenderer from './questions/file_upload'
 import FillInMultipleBlanksRenderer from './questions/fill_in_multiple_blanks'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MultipleChoiceRenderer from './questions/multiple_choice'
 import QuestionRenderer from './question'
 import React from 'react'
@@ -30,7 +30,7 @@ import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/component
 import ShortAnswerRenderer from './questions/short_answer'
 import Summary from './summary/index'
 
-const I18n = useI18nScope('quiz_statistics')
+const I18n = createI18nScope('quiz_statistics')
 
 const Renderers = {
   multiple_choice_question: MultipleChoiceRenderer,
@@ -68,7 +68,7 @@ class Statistics extends React.Component {
             <p>
               {I18n.t(
                 'quiz-stats-noshow-warning',
-                "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports."
+                "Even awesomeness has limits. We can't render statistics for this quiz, but you can download the reports.",
               )}
             </p>
             <div className="links">{this.renderQuizReports(this.props.quizReports)}</div>
@@ -120,7 +120,7 @@ class Statistics extends React.Component {
         <p>
           {I18n.t(
             'loading_questions',
-            'Question statistics are being loaded. Please wait a while.'
+            'Question statistics are being loaded. Please wait a while.',
           )}
         </p>
       )

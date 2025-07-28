@@ -25,7 +25,13 @@ class SentryTraceScrubber
   end
 
   def call(env)
-    referrer = URI.parse(env["HTTP_REFERRER"]) rescue nil
+    if (ref = env["HTTP_REFERRER"])
+      begin
+        referrer = URI.parse(ref)
+      rescue URI::InvalidURIError
+        # ignore
+      end
+    end
     request = Rack::Request.new(env)
 
     # Remove the sentry-trace header unless it's a same-origin request

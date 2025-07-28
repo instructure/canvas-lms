@@ -19,18 +19,23 @@
 #
 
 class Progress < ActiveRecord::Base
-  belongs_to :context, polymorphic:
-      [:content_migration,
-       :course,
-       :account,
-       :group_category,
-       :content_export,
-       :assignment,
-       :attachment,
-       :epub_export,
-       :sis_batch,
-       :course_pace,
-       { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
+  belongs_to :context, polymorphic: [
+    :content_migration,
+    :course,
+    :account,
+    :group_category,
+    :content_export,
+    :assignment,
+    :submission,
+    :attachment,
+    :epub_export,
+    :sis_batch,
+    :course_pace,
+    :context_external_tool,
+    :course_report,
+    { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" },
+  ] + (defined?(DsrRequest) ? [:dsr_request] : [])
+
   belongs_to :user
   belongs_to :delayed_job, class_name: "::Delayed::Job", optional: true
 
@@ -135,9 +140,9 @@ class Progress < ActiveRecord::Base
 
   # (private)
   class Work < Delayed::PerformableMethod
-    def initialize(progress, *args, **kwargs)
+    def initialize(progress, *, **)
       @progress = progress
-      super(*args, **kwargs)
+      super(*, **)
     end
 
     def perform
@@ -155,7 +160,7 @@ class Progress < ActiveRecord::Base
       @progress.message = "Unexpected error, ID: #{er_id || "unknown"}"
       @progress.save
       @progress.fail
-      @context.fail_with_error!(error) if @context.respond_to?(:fail_with_error!)
+      object.fail_with_error!(error) if object.respond_to?(:fail_with_error!)
     end
   end
 end

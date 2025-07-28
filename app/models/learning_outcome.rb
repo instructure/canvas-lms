@@ -23,10 +23,28 @@ class LearningOutcome < ActiveRecord::Base
   include Workflow
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[description]
+  end
+
+  def attachment_associations_enabled?
+    return context.root_account.feature_enabled?(:file_association_access) if context&.root_account
+
+    Account.site_admin.feature_enabled?(:file_association_access)
+  end
+
+  def actual_root_account_id
+    return context.root_account.id if context&.root_account
+
+    Account.site_admin.id
+  end
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results
   has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: "ContentTag"
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   belongs_to :copied_from,
              class_name: "LearningOutcome",
@@ -50,7 +68,7 @@ class LearningOutcome < ActiveRecord::Base
   validates :display_name, length: { maximum: maximum_string_length, allow_blank: true }
   validates :calculation_method, inclusion: {
     in: OutcomeCalculationMethod::CALCULATION_METHODS,
-    message: lambda do
+    message: lambda do |_object, _data|
       t(
         "calculation_method must be one of the following: %{calc_methods}",
         calc_methods: OutcomeCalculationMethod::CALCULATION_METHODS.to_s
@@ -83,7 +101,7 @@ class LearningOutcome < ActiveRecord::Base
     if data && data[:rubric_criterion]
       data[:rubric_criterion][:description] = short_description
     end
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
 
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
@@ -287,7 +305,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
-      context.short_name rescue ""
+      context&.short_name.to_s
     end
   end
 
@@ -340,12 +358,12 @@ class LearningOutcome < ActiveRecord::Base
       ratings.each do |rating|
         criterion[:ratings] << {
           description: rating[:description] || t(:no_comment, "No Comment"),
-          points: rating[:points].to_f || 0.00
+          points: rating[:points].to_f
         }
       end
       criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
       criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
-      criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
+      criterion[:points_possible] = criterion.dig(:ratings, 0, :points)
     else
       criterion = self.class.default_rubric_criterion
     end
@@ -473,7 +491,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def propagate_changes_to_rubrics
     # exclude new outcomes
-    return if saved_change_to_id?
+    return if previously_new_record?
     return if !saved_change_to_data? &&
               !saved_change_to_short_description? &&
               !saved_change_to_description?
@@ -513,13 +531,13 @@ class LearningOutcome < ActiveRecord::Base
       WITH RECURSIVE parents AS (
         SELECT id, copied_from_outcome_id
         FROM #{LearningOutcome.quoted_table_name} WHERE id = #{id}
-        UNION ALL
+        UNION
         SELECT lo.id, lo.copied_from_outcome_id FROM #{LearningOutcome.quoted_table_name} lo
         JOIN parents p ON lo.id = p.copied_from_outcome_id
       ), children AS (
         SELECT id, copied_from_outcome_id
         FROM parents
-        UNION ALL
+        UNION
         SELECT lo.id, lo.copied_from_outcome_id
         FROM #{LearningOutcome.quoted_table_name} lo
         JOIN children c ON lo.copied_from_outcome_id = c.id
@@ -547,7 +565,7 @@ class LearningOutcome < ActiveRecord::Base
       tag_type: "learning_outcome",
       context:
     ) do |_a|
-      InstStatsd::Statsd.increment("learning_outcome.align", tags: { type: asset.class.name })
+      InstStatsd::Statsd.distributed_increment("learning_outcome.align", tags: { type: asset.class.name })
     end
   end
 
@@ -630,36 +648,36 @@ class LearningOutcome < ActiveRecord::Base
     # apply appropriate defaults for each length if
     case length
     when 1
-      ratings[0][:color] ||= "0B874B"
+      ratings[0][:color] ||= "03893D"
 
     when 2
-      ratings[0][:color] ||= "0B874B"
+      ratings[0][:color] ||= "03893D"
       ratings[1][:color] ||= "555555"
 
     when 3
-      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "0B874B"
-      ratings[1][:color] ||= (mastery_index == 1) ? "0B874B" : "FAB901"
+      ratings[0][:color] ||= (mastery_index == 1) ? "2B7ABC" : "03893D"
+      ratings[1][:color] ||= (mastery_index == 1) ? "03893D" : "FAB901"
       ratings[2][:color] ||= "555555"
 
     when 4
-      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "0B874B"
-      ratings[1][:color] ||= (mastery_index == 1) ? "0B874B" : "FAB901"
-      ratings[2][:color] ||= (mastery_index == 1) ? "FAB901" : "E0061F"
+      ratings[0][:color] ||= (mastery_index == 1) ? "2B7ABC" : "03893D"
+      ratings[1][:color] ||= (mastery_index == 1) ? "03893D" : "FAB901"
+      ratings[2][:color] ||= (mastery_index == 1) ? "FAB901" : "E62429"
       ratings[3][:color] ||= "555555"
 
     when 5
-      ratings[0][:color] ||= "0374B5"
-      ratings[1][:color] ||= "0B874B"
+      ratings[0][:color] ||= "2B7ABC"
+      ratings[1][:color] ||= "03893D"
       ratings[2][:color] ||= "FAB901"
-      ratings[3][:color] ||= "E0061F"
+      ratings[3][:color] ||= "E62429"
       ratings[4][:color] ||= "555555"
 
     when 6
-      ratings[0][:color] ||= "0374B5"
-      ratings[1][:color] ||= "0B874B"
+      ratings[0][:color] ||= "2B7ABC"
+      ratings[1][:color] ||= "03893D"
       ratings[2][:color] ||= "FAB901"
       ratings[3][:color] ||= "D97900"
-      ratings[4][:color] ||= "E0061F"
+      ratings[4][:color] ||= "E62429"
       ratings[5][:color] ||= "555555"
     end
   end

@@ -38,47 +38,11 @@ describe "eportfolios/show" do
     expect(response).not_to be_nil
   end
 
-  it "does not link the user name if @owner_url is not set" do
-    render "eportfolios/show"
-    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).to be_nil
-    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
-  end
-
-  it "links the user name if @owner_url is set" do
-    owner_url = assign(:owner_url, user_url(@portfolio.user, host: "test.host"))
-    render "eportfolios/show"
-    expect(view.content_for(:left_side)[owner_url]).not_to be_nil
-    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
-    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
-  end
-
   it "shows the share link explicitly" do
     assign(:owner_view, true)
     render "eportfolios/show"
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#eportfolio_share_link").text).to match %r{https?://.*/eportfolios/#{@portfolio.id}\?verifier=.*}
-  end
-
-  it "shows submitted submissions and the right submission preview link" do
-    course_with_student(user: @user, active_all: true)
-    submission_model(course: @course, user: @user)
-    assign(:owner_view, true)
-    @submission.update_column("workflow_state", "submitted")
-    render "eportfolios/show"
-    doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url").attributes["href"].value).to match(
-      %r{/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}}
-    )
-  end
-
-  it "shows graded submissions" do
-    course_with_student(user: @user, active_all: true)
-    submission_model(course: @course, user: @user)
-    assign(:owner_view, true)
-    @submission.update_columns({ workflow_state: "graded", score: 0 })
-    render "eportfolios/show"
-    doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_present
   end
 
   it "does not show submissions unless submission is submitted" do

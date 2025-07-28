@@ -32,7 +32,11 @@ module Canvas::Migration
 
     def zip_file
       unless defined?(@zip_file)
-        @zip_file = Zip::File.open(file) rescue nil
+        @zip_file = begin
+          Zip::File.open(file)
+        rescue
+          nil
+        end
       end
       @zip_file
     end

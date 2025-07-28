@@ -762,6 +762,7 @@ describe NotificationMessageCreator do
   describe "#cancel_pending_duplicate_messages" do
     context "partitions" do
       let(:subject) { NotificationMessageCreator.new(double("notification", name: nil), nil) }
+      let(:count_of_updated_record) { 10 }
 
       def set_up_stubs(start_time, *conditions)
         scope = double("Message Scope")
@@ -775,10 +776,11 @@ describe NotificationMessageCreator do
           expect(scope).to receive(:where).with(*conditions).ordered.and_return(scope)
         end
         allow(Message.connection).to receive(:table_exists?).and_return(true)
-        expect(scope).to receive(:update_all).ordered
+        expect(scope).to receive(:update_all).ordered.and_return(count_of_updated_record)
+        expect(InstStatsd::Statsd).to receive(:count).with("cancelled_duplicated_messages", count_of_updated_record)
 
         user = User.create!
-        to_user_channels = Hash.new([])
+        to_user_channels = Hash.new([].freeze)
         to_user_channels[user] = user.communication_channels
         subject.instance_variable_set(:@to_user_channels, to_user_channels)
       end

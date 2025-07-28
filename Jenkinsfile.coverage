@@ -66,7 +66,7 @@ def generateSkippedSpecsReport() {
         def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
         sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/skipped_specs_ruby.json skipped_specs.json"
         sh """
-          docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
+          docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
           -v \$(pwd)/\$LOCAL_WORKDIR/skipped_specs.json/:/usr/src/app/skipped_specs.json \
           --name skipped-spec-collator canvas bash -c \
           "mkdir -p /usr/src/app/out; bundle install; ruby build/new-jenkins/skipped_specs_manager.rb ruby"
@@ -112,20 +112,17 @@ pipeline {
     SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium|contracts)'
-    RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()
     PATCHSET_TAG = getPatchsetTag()
 
-    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
     RSPEC_PROCESSES = 6
 
-    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
 
@@ -151,7 +148,7 @@ pipeline {
 
               withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
                 sh """
-                  docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
+                  docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
                   --name coverage-collator canvas bash -c \
                   "bundle install; bundle exec rake coverage:report['/tmp/*/coverage/**']"
                 """
@@ -207,7 +204,7 @@ pipeline {
                       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                         /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
                         sh '''#!/bin/bash
-                          ids=( $(docker ps -aq --filter "name=canvas_") )
+                          ids=( $(docker ps -aq --filter "name=canvas-") )
                           for i in "${ids[@]}"
                             do
                               docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
@@ -231,7 +228,7 @@ pipeline {
                       if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                         /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
                         sh '''#!/bin/bash
-                          ids=($(docker ps -aq --filter "name=canvas_"))
+                          ids=($(docker ps -aq --filter "name=canvas-"))
                           for i in "${ids[@]}"
                             do
                               docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"

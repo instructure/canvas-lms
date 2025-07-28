@@ -22,13 +22,13 @@ import {render, waitFor} from '@testing-library/react'
 import usePlanner from '../usePlanner'
 
 jest.mock('@canvas/planner')
-// eslint-disable-next-line import/no-commonjs
+ 
 const plannerExports = require('@canvas/planner')
 
 plannerExports.initializePlanner = jest.fn(options => Promise.resolve(options))
 
 jest.mock('@canvas/alerts/react/FlashAlert')
-// eslint-disable-next-line import/no-commonjs
+ 
 const flashAlerts = require('@canvas/alerts/react/FlashAlert')
 
 flashAlerts.showFlashError = jest.fn(() => () => {})
@@ -94,7 +94,7 @@ describe('usePlanner hook', () => {
   it('shows a flash error message and returns false if initialization fails', async () => {
     plannerExports.initializePlanner.mockClear()
     plannerExports.initializePlanner.mockImplementationOnce(() =>
-      Promise.reject(new Error('something went wrong'))
+      Promise.reject(new Error('something went wrong')),
     )
     renderHook(defaults, result => {
       expect(flashAlerts.showFlashError).toHaveBeenCalledWith('Failed to load the schedule tab')

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,24 +17,34 @@
  */
 
 import {func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SubmissionCommentForm from './SubmissionCommentForm'
+import {Editor} from 'tinymce'
+import {ViewProps} from '@instructure/ui-view'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {
+    // @ts-expect-error
     ...SubmissionCommentForm.propTypes,
     createSubmissionComment: func.isRequired,
   }
 
-  handleCancel(event) {
-    super.handleCancel(event, this.focusTextarea)
+  initRCE(tinyeditor: Editor) {
+    this.tinyeditor = tinyeditor
+    if (this.state.rceKey > 0) {
+      this.rceRef.current?.focus()
+    }
   }
 
-  handlePublishComment(event) {
-    super.handlePublishComment(event)
-    this.setState({comment: ''}, this.focusTextarea)
+  handleCancel(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
+    super.handleCancel(e, this.focusTextarea)
+  }
+
+  handlePublishComment(e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) {
+    super.handlePublishComment(e)
+    this.handleCommentChange('', {rerenderRCE: true, callback: this.focusTextarea})
   }
 
   buttonLabels() {
@@ -46,6 +55,7 @@ export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   }
 
   publishComment() {
+    // @ts-expect-error
     return this.props.createSubmissionComment(this.state.comment)
   }
 

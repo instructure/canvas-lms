@@ -55,7 +55,7 @@ describe('SubmissionAttempts', () => {
       3: [
         {
           id: '5',
-          comment: 'this is comment 3',
+          comment: '<p>this is comment 3</p>',
           is_read: false,
           author_name: 'user 123',
           display_updated_at: 'Friday December 2nd',
@@ -63,7 +63,7 @@ describe('SubmissionAttempts', () => {
         },
         {
           id: '6',
-          comment: 'this is comment 5',
+          comment: 'this\nis comment 5',
           is_read: false,
           author_name: 'user 222',
           display_updated_at: 'Thursday December 11th',
@@ -129,5 +129,17 @@ describe('SubmissionAttempts', () => {
     expect(attachmentSection[0]).toHaveTextContent('test.pdf')
     const mediaObjectSection = queryAllByTestId('submission-comment-media')
     expect(mediaObjectSection).toHaveLength(2)
+  })
+
+  it('renders the comment without html tags', () => {
+    const {queryAllByTestId} = render(<SubmissionAttempts {...props} />)
+    const submissionComments = queryAllByTestId('submission-comment-content')
+    expect(submissionComments[0].textContent).toEqual('this is comment 3')
+  })
+
+  it('preserves the \n formatting in the comment', () => {
+    const {queryAllByTestId} = render(<SubmissionAttempts {...props} />)
+    const submissionComments = queryAllByTestId('submission-comment-content')
+    expect(submissionComments[1].innerHTML).toEqual('this<br>\nis comment 5')
   })
 })

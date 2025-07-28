@@ -16,16 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 const parentAccountsFragment = gql`
   fragment ParentAccountsFragment on Account {
-    parentAccountsConnection {
+    parentAccountsConnection(after: $parentAccountsCursor) {
       nodes {
         rootOutcomeGroup {
           _id
           title
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
     }
   }
@@ -37,6 +41,7 @@ export const FIND_GROUPS_QUERY = gql`
     $type: NodeType!
     $rootGroupId: ID!
     $includeGlobalRootGroup: Boolean!
+    $parentAccountsCursor: String
   ) {
     context: legacyNode(type: $type, _id: $id) {
       ... on Account {

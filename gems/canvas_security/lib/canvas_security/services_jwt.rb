@@ -23,6 +23,7 @@ class CanvasSecurity::ServicesJwt
   class InvalidRefresh < RuntimeError; end
 
   REFRESH_WINDOW = 6.hours
+  DEFAULT_AUDIENCE = "Instructure"
 
   attr_reader :token_string, :is_wrapped
 
@@ -99,13 +100,14 @@ class CanvasSecurity::ServicesJwt
     CanvasSecurity.base64_encode(crypted_token)
   end
 
-  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true)
+  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true, audience: nil, root_account_uuid: nil)
     if domain.blank? || user.nil?
       raise ArgumentError, "Must have a domain and a user to build a JWT"
     end
 
     payload = {
       sub: user.global_id,
+      user_uuid: user.uuid,
       domain:
     }
     payload[:masq_sub] = real_user.global_id if real_user
@@ -117,6 +119,12 @@ class CanvasSecurity::ServicesJwt
     if context
       payload[:context_type] = context.class.name
       payload[:context_id] = context.id.to_s
+    end
+    if audience
+      payload[:aud] = audience
+    end
+    if root_account_uuid
+      payload[:root_account_uuid] = root_account_uuid
     end
     generate(payload, symmetric:, encrypt:)
   end
@@ -154,14 +162,14 @@ class CanvasSecurity::ServicesJwt
     end
 
     timestamp = Time.zone.now.to_i
-    payload_data.merge({
-                         iss: "Canvas",
-                         aud: ["Instructure"],
-                         exp: timestamp + 3600,  # token is good for 1 hour
-                         nbf: timestamp - 30,    # don't accept the token in the past
-                         iat: timestamp,         # tell when the token was issued
-                         jti: SecureRandom.uuid, # unique identifier
-                       })
+    payload_data.reverse_merge(
+      iss: CanvasSecurity.services_issuer,
+      aud: [DEFAULT_AUDIENCE],
+      exp: timestamp + 3600,  # token is good for 1 hour
+      nbf: timestamp - 30,    # don't accept the token in the past
+      iat: timestamp,         # tell when the token was issued
+      jti: SecureRandom.uuid # unique identifier
+    )
   end
 
   def self.decrypt(token, ignore_expiration: false)

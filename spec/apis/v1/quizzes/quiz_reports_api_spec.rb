@@ -44,7 +44,7 @@ describe Quizzes::QuizReportsController, type: :request do
       student_in_course(active_all: true)
       @quiz = @course.quizzes.create({ title: "Test Quiz" })
       api_index({}, { raw: true })
-      assert_status(401)
+      assert_forbidden
     end
 
     context "with privileged access" do
@@ -142,6 +142,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     it "reuses an existing report" do
+      Attachment.current_root_account = @course.root_account
       @quiz.statistics_csv("item_analysis")
       expect(Quizzes::QuizStatistics.count).to eq 1
       json = api_create({ quiz_report: { report_type: "item_analysis" } })
@@ -254,7 +255,7 @@ describe Quizzes::QuizReportsController, type: :request do
     it "denies unprivileged access" do
       student_in_course(active_all: true)
       api_abort
-      assert_status(401)
+      assert_forbidden
     end
 
     it "works when the report is already generated" do
@@ -316,7 +317,7 @@ describe Quizzes::QuizReportsController, type: :request do
       @quiz = @course.quizzes.create({ title: "Test Quiz" })
       @report = @quiz.current_statistics_for("student_analysis")
       api_show({}, raw: true)
-      assert_status(401)
+      assert_forbidden
     end
 
     context "with privileged access" do
@@ -333,6 +334,7 @@ describe Quizzes::QuizReportsController, type: :request do
       end
 
       it "embeds its attachment automatically in JSON format" do
+        Attachment.current_root_account = @course.root_account
         @report.generate_csv
         @report.reload
 
@@ -350,6 +352,7 @@ describe Quizzes::QuizReportsController, type: :request do
         end
 
         it "embeds its attachment with ?include=file" do
+          Attachment.current_root_account = @course.root_account
           @report.generate_csv
           @report.reload
 

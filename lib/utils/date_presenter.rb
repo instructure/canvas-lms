@@ -59,7 +59,7 @@ module Utils
 
     def i18n_date(format)
       # Use send to prevent i18nliner trying to parse this
-      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{with_weekday ? "_with_weekday" : ""}"))
+      I18n.l(raw_date, format: I18n.send(:t, "date.formats.#{format}#{"_with_weekday" if with_weekday}"))
     end
 
     def special_value_type

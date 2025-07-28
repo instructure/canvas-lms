@@ -22,7 +22,7 @@ import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionTopicRepliesContainer} from '../DiscussionTopicRepliesContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {getDiscussionEntryAllRootEntriesQueryMock} from '../../../../graphql/Mocks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
@@ -77,7 +77,7 @@ describe('DiscussionTopicRepliesContainer', () => {
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <DiscussionTopicRepliesContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 

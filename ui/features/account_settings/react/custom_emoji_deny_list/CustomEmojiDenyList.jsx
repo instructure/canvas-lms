@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -24,13 +24,13 @@ import {EmojiPicker} from '@canvas/emoji'
 import {Emoji} from 'emoji-mart'
 import data from 'emoji-mart/data/all.json'
 
-const I18n = useI18nScope('i18n!custom_emoji_deny_list')
+const I18n = createI18nScope('i18n!custom_emoji_deny_list')
 
 export default function CustomEmojiDenyList() {
   const [blockedEmojis, setBlockedEmojis] = useState(
     ENV.EMOJI_DENY_LIST
       ? ENV.EMOJI_DENY_LIST.split(',').map(id => ({name: data.emojis[id].name, id}))
-      : []
+      : [],
   )
 
   const removeEmoji = id => setBlockedEmojis(blockedEmojis.filter(emoji => emoji.id !== id))
@@ -40,7 +40,7 @@ export default function CustomEmojiDenyList() {
       <legend id="blocked-emojis">{I18n.t('Blocked Emojis')}</legend>
       <p>
         {I18n.t(
-          'Selected emojis will not be available in the "Emoji Picker" for students or instructors.'
+          'Selected emojis will not be available in the "Emoji Picker" for students or instructors.',
         )}
       </p>
       <View

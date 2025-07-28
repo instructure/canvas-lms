@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Provider} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradebookMenu from '@canvas/gradebook-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchForm from './SearchForm'
@@ -26,19 +26,14 @@ import SearchResults from './SearchResults'
 
 import GradebookHistoryStore from './store/GradebookHistoryStore'
 
-const I18n = useI18nScope('gradebook_history')
+const I18n = createI18nScope('gradebook_history')
 
 type Props = {
   courseUrl: string
   learningMasteryEnabled?: boolean
-  enhancedIndividualGradebookEnabled?: boolean
 }
 
-const GradebookHistoryApp = ({
-  courseUrl,
-  learningMasteryEnabled,
-  enhancedIndividualGradebookEnabled,
-}: Props) => (
+const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}: Props) => (
   <Provider store={GradebookHistoryStore}>
     <div>
       <h1 className="screenreader-only">{I18n.t('Gradebook History')}</h1>
@@ -47,11 +42,10 @@ const GradebookHistoryApp = ({
       padding and get the menu to line up with the search form */}
       {/* EVAL-3711 Remove ICE Feature Flag */}
       <div
-        style={window.ENV.FEATURES.instui_nav ? {margin: '0 0 2.25em 0'} : {margin: '0 0 1.5em 0'}}
+        style={window.ENV.FEATURES?.instui_nav ? {margin: '0 0 2.25em 0'} : {margin: '0 0 1.5em 0'}}
       >
         <GradebookMenu
           courseUrl={courseUrl}
-          enhancedIndividualGradebookEnabled={enhancedIndividualGradebookEnabled}
           learningMasteryEnabled={learningMasteryEnabled}
           variant="GradebookHistory"
         />

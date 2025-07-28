@@ -23,7 +23,7 @@
   </button>
   <ul class="al-options" role="menu" tabindex="0" aria-hidden="true">
     <% if @context.is_a?(Course) %>
-      <% if can_do(@context, @current_user, :read_roster) %>
+      <% if can_do(@context, @current_user, :read_roster) && !@context.horizon_course? %>
         <li role="presentation">
         <%= sidebar_button context_url(@context, :context_groups_url),
                            t('View User Groups'),
@@ -31,16 +31,9 @@
         </li>
       <% end %>
 
-      <% if can_do(@context, @current_user, :manage_students && @context.enable_user_notes) %>
-        <li role="presentation">
-        <%= sidebar_button course_user_notes_path(@context),
-                           t('View Faculty Journals') %>
-        </li>
-      <% end %>
-
       <% if can_do(@context,
                    @current_user,
-                   @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users,
+                   :allow_course_admin_actions,
                    :manage_students,
                    :read_prior_roster
                   ) %>

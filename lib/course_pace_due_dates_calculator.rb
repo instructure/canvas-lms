@@ -24,27 +24,38 @@ class CoursePaceDueDatesCalculator
     @course_pace = course_pace
   end
 
-  def get_due_dates(items, enrollment = nil, start_date: nil)
+  def get_due_dates(items, enrollment = nil, start_date: nil, by_assignment: false)
     due_dates = {}
-    # Ensure UTC for calculations against the database values
+
+    if by_assignment
+      items.preload!(:module_item)
+    end
+
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
-    start_date = start_date || enrollment_start_date&.utc&.to_date || course_pace.start_date.to_date
+    start_date = start_date || enrollment_start_date&.to_date || course_pace.start_date.to_date
     # We have to make sure we start counting on a day that is enabled
-    unless CoursePacesDateHelpers.day_is_enabled?(start_date, course_pace.exclude_weekends, blackout_dates)
-      start_date = CoursePacesDateHelpers.first_enabled_day(start_date, course_pace.exclude_weekends, blackout_dates)
+    unless CoursePacesDateHelpers.day_is_enabled?(start_date, course_pace, blackout_dates)
+      start_date = CoursePacesDateHelpers.first_enabled_day(start_date, course_pace, blackout_dates)
     end
 
     items.each do |item|
       due_date = CoursePacesDateHelpers.add_days(
         start_date,
         item.duration,
-        course_pace.exclude_weekends,
+        course_pace,
         blackout_dates
       )
 
       # If the course pace hasn't been committed yet we need to group the items from their module_item_id or we will
       # end up grouping them by nil and losing the data for each item as it gets overwritten by the next item.
-      key = course_pace.persisted? ? item.id : item.module_item_id
+      key = if by_assignment && item.module_item.content_type == "Assignment"
+              item.module_item.content_id
+            elsif course_pace.persisted?
+              item.id
+            else
+              item.module_item_id
+            end
+
       due_dates[key] = due_date.to_date
       start_date = due_date # The next item's start date is this item's due date
     end

@@ -25,8 +25,7 @@ describe SmartSearchable do
     before do
       skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
 
-      allow(SmartSearch).to receive(:generate_embedding).and_return([1] * 1024)
-      expect(SmartSearch).to receive(:bedrock_client).at_least(:once).and_return(double)
+      allow(SmartSearch).to receive_messages(generate_embedding: [1] * 1024, bedrock_client: double)
     end
 
     before :once do
@@ -38,6 +37,13 @@ describe SmartSearchable do
       wiki_page_model(title: "test", body: "foo")
       run_jobs
       expect(@page.reload.embeddings.count).to eq 1
+    end
+
+    it "does not generate an embedding for objects in group context" do
+      group = @course.groups.create! name: "gorp"
+      dt = group.discussion_topics.create! title: "test", message: "foo"
+      run_jobs
+      expect(dt.reload.embeddings.count).to eq 0
     end
 
     it "replaces an embedding if it already exists" do

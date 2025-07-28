@@ -1,0 +1,8 @@
+<% if object.has_tag?(:see) %>
+
+**See Also:**
+
+<% for tag in object.tags(:see) %>
+- <%= linkify(tag.name, tag.text) %>
+<% end %>
+<% end %>

@@ -31,10 +31,10 @@ module I18nTasks
       require "active_record"
       require "will_paginate"
       I18n.load_path.unshift(*WillPaginate::I18n.load_path)
-      I18n.load_path += Dir[Rails.root.join("gems/plugins/*/config/locales/*.{rb,yml}")]
-      I18n.load_path += Dir[Rails.root.join("config/locales/*.{rb,yml}")]
-      I18n.load_path += Dir[Rails.root.join("config/locales/locales.yml")]
-      I18n.load_path += Dir[Rails.root.join("config/locales/community.csv")]
+      I18n.load_path += Rails.root.glob("gems/plugins/*/config/locales/*.{rb,yml}").map(&:to_s)
+      I18n.load_path += Rails.root.glob("config/locales/*.{rb,yml}").map(&:to_s)
+      I18n.load_path += Rails.root.glob("config/locales/locales.yml").map(&:to_s)
+      I18n.load_path += Rails.root.glob("config/locales/community.csv").map(&:to_s)
 
       I18n::Backend::Simple.include I18nTasks::CsvBackend
       I18n::Backend::Simple.include I18n::Backend::Fallbacks

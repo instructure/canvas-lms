@@ -1,0 +1,11 @@
+accessibility_tab_enable:
+  state: hidden
+  applies_to: Course
+  beta: true
+  display_name: Course Level Accessibility Tab
+  description: |-
+    If enabled, a course level accessibility tab will be added to the course,
+    provided the feature "Accessibility Dashboard" is also enabled. Clicking 
+    on the tab will open a new page with accessibility issues found
+    among available course resources. 
+

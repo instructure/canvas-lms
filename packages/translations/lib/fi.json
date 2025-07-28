@@ -32,11 +32,23 @@
     "additional_considerations_f3801683": {
         "message": "Muuta huomioon otettavaa"
     },
+    "address_applied_64269b0b": {
+        "message": "Osoite käytetty"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Osoite poistettu"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Sellaisten peräkkäisten linkkien, joilla on sama URL, pitäisi olla yksi linkki."
     },
     "afrikaans_da0fe6ee": {
         "message": "afrikaans"
+    },
+    "ai_response_9624e8e8": {
+        "message": "Tekoälyvastaus"
+    },
+    "ai_tools_fda01177": {
+        "message": "Tekoälytyökalut"
     },
     "albanian_21ed929e": {
         "message": "albania"
@@ -76,6 +88,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ilmeni virhe tehtäessä verkkopyyntöä"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Ilmeni virhe pyynnön käsittelyn yhteydessä"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Ilmeni virhe mediaasi ladatessa."
@@ -158,6 +173,9 @@
     "available_folders_694d0436": {
         "message": "Saatavissa olevat kansiot"
     },
+    "background_1bc88842": {
+        "message": "Tausta"
+    },
     "backslash_b2d5442d": {
         "message": "Takakenoviiva"
     },
@@ -190,6 +208,15 @@
     },
     "blue_daf8fea9": {
         "message": "Sininen"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Lihavoitu käytetty"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Lihavoitu poistettu"
+    },
+    "border_5b08b06d": {
+        "message": "Reunus"
     },
     "bottom_15a2a9be": {
         "message": "Ala"
@@ -332,11 +359,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Piilota kutistamalla { types }"
     },
+    "color_a363e1b0": {
+        "message": "Väri"
+    },
+    "color_contrast_4c418add": {
+        "message": "Värin kontrasti"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Värikontrastin suhde"
+    },
     "color_picker_6b359edf": {
         "message": "Värivalitsin"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Värivalitsin ({ colorName } valittu)"
+    },
+    "color_popup_af39810f": {
+        "message": "Värin ponnahdusvalikko"
     },
     "column_e1ae5c64": {
         "message": "Sarake"
@@ -346,6 +385,9 @@
     },
     "complex_numbers_a543d004": {
         "message": "Monimutkaiset numerot"
+    },
+    "compose_44c904f4": {
+        "message": "Luo"
     },
     "computer_1d7dfa6f": {
         "message": "Tietokone"
@@ -373,6 +415,9 @@
     },
     "coproduct_e7838082": {
         "message": "Sivutuote"
+    },
+    "copy_9748f9f": {
+        "message": "Kopioi"
     },
     "copyright_holder_66ee111": {
         "message": "Tekijänoikeuden haltija:"
@@ -476,8 +521,14 @@
     "decrease_indent_d9cf469d": {
         "message": "Pienennä sisennystä"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Pienennä rikkaan sisällön aluetta"
+    },
     "deep_purple_bb3e2907": {
         "message": "Tumman violetti"
+    },
+    "default_9db103d": {
+        "message": "Oletus"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "luetelmakohdista koostuva järjestämätön oletuslista"
@@ -551,11 +602,20 @@
     "disjoint_union_e74351a8": {
         "message": "Erillinen liitto"
     },
+    "dislike_14befc48": {
+        "message": "Ei tykkää"
+    },
     "display_options_315aba85": {
         "message": "Näytä vaihtoehdot"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Näytä tekstilinkki (avautuu uudessa välilehdessä)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div sovellettu"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div poistettu"
     },
     "division_sign_72190870": {
         "message": "Jakomerkki"
@@ -629,7 +689,7 @@
     "edit_link_7f53bebb": {
         "message": "Muokkaa linkkiä"
     },
-    "editor_statusbar_26ac81fc": {
+    "editor_status_bar_653f44ee": {
         "message": "Editorin tilapalkki"
     },
     "element_starting_with_start_91bf4c3b": {
@@ -695,6 +755,9 @@
     "enter_search_text_26cb4459": {
         "message": "syötä hakuteksti."
     },
+    "enter_text_8b35c65b": {
+        "message": "Kirjoita teksti"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -758,8 +821,14 @@
     "f_function_fe422d65": {
         "message": "F (funktio)"
     },
+    "fail_544e5dde": {
+        "message": "VIKA"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Tiedoston sisällön haku epäonnistui"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Ei voi kopioida vastausta"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Sisällön haku ulkoisesta työkalusta ei onnistunut"
@@ -872,6 +941,9 @@
     "grades_a61eba0a": {
         "message": "Arvosanat"
     },
+    "graphics_text_bc9568bc": {
+        "message": "Graafinen teksti"
+    },
     "greater_than_e98af662": {
         "message": "Suurempi kuin"
     },
@@ -941,6 +1013,12 @@
     "heading_4_b2e74be7": {
         "message": "Otsikko 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Otsikko { h } sovelletaan"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Otsikko { h } poistettu"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Otsikon tasoja ei saa ohittaa."
     },
@@ -961,6 +1039,12 @@
     },
     "height_69b03e15": {
         "message": "Korkeus"
+    },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Hei. Kuvaile muutokset, joita haluat tehdä koostumukseesi."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Hei. Kuvaile muutokset, joita haluat tehdä valintaasi."
     },
     "hexagon_d8468e0d": {
         "message": "Kuusikulmio"
@@ -994,6 +1078,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Minulla on tekijäoikeus"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Pahoittelut, mutta tekoäly ei löydä vastausta."
     },
     "icelandic_9d6d35de": {
         "message": "islanti"
@@ -1070,6 +1157,9 @@
     "increase_indent_6af90f7c": {
         "message": "Suurenna sisennystä"
     },
+    "increase_rich_content_area_340b775": {
+        "message": "Suurenna rikkaan sisällön aluetta"
+    },
     "indefinite_integral_6623307e": {
         "message": "Epämääräinen integraali"
     },
@@ -1088,6 +1178,18 @@
     "infinity_7a10f206": {
         "message": "ÄÄRETÖN"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Datan syöttökenttä"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Alphan syöttökenttä"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Vihreän syöttökenttä"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Punaisen syöttökenttä"
+    },
     "insert_593145ef": {
         "message": "Aseta"
     },
@@ -1102,6 +1204,9 @@
     },
     "intersection_cd4590e4": {
         "message": "Leikkauskohta"
+    },
+    "invalid_description_991e23bb": {
+        "message": "Virheellinen kuvaus"
     },
     "invalid_entry_f7d2a0f5": {
         "message": "Väärä syöte."
@@ -1126,6 +1231,12 @@
     },
     "italian_bd3c792d": {
         "message": "italia"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Kursiivia sovellettiin"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Kursiivi poistettu"
     },
     "japanese_b5721ca7": {
         "message": "japani"
@@ -1156,6 +1267,9 @@
     },
     "large_9c5e80e7": {
         "message": "Suuri"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Suuri teksti"
     },
     "latvian_2bbb6aab": {
         "message": "latvia"
@@ -1261,6 +1375,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Linkittyy ulkoiselle sivustolle."
+    },
+    "lists_cd1336fc": {
+        "message": "Listat"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Luettelot pitäisi muotoilla luetteloina."
@@ -1382,6 +1499,9 @@
     "miscellaneous_e9818229": {
         "message": "Muut asiat"
     },
+    "modify_6b0b13e3": {
+        "message": "Muokkaa"
+    },
     "module_90d9fd32": {
         "message": "Moduuli"
     },
@@ -1402,12 +1522,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Musiikki-kuvake"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Täytyy olla vähintään { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Täytyy olla vähintään { width } x { height }px."
     },
     "my_files_2f621040": {
         "message": "Omat tiedostot"
@@ -1523,6 +1637,9 @@
     "none_selected_b93d56d2": {
         "message": "Ei valintoja"
     },
+    "normal_text_7b03da48": {
+        "message": "Normaali teksti"
+    },
     "norwegian_53f391ec": {
         "message": "norja"
     },
@@ -1601,8 +1718,8 @@
     "outline_size_a6059a21": {
         "message": "Ääriviivan koko"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } ei ole voimassa oleva protokolla. Sen täytyy olla ftp, http, https, mailto, skype, tel tai se saatetaan poistaa"
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } ei ole voimassa oleva protokolla."
     },
     "page_50c4823d": {
         "message": "Sivu"
@@ -1613,6 +1730,12 @@
     "paragraph_5e5ad8eb": {
         "message": "Kappale"
     },
+    "paragraph_applied_959b3fe5": {
+        "message": "Kappaletta sovellettiin"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Kappale poistettiin"
+    },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Kappale, joka alkaa { start }"
     },
@@ -1621,6 +1744,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Osittainen (johdannainen)"
+    },
+    "pass_1c19a2b3": {
+        "message": "LÄPÄISTY"
     },
     "paste_5963d1c1": {
         "message": "Liitä"
@@ -1639,6 +1765,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prosenttiosuuden täytyy olla numero"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Prosenttiosuuden täytyy olla vähintään { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Esittävien taiteiden kuvake"
@@ -1664,11 +1793,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Muuttuja)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Valitse väri"
+    },
     "pink_68ad45cb": {
         "message": "Vaaleanpunainen"
     },
     "pixels_52ece7d1": {
         "message": "Pikselit"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pikseleiden täytyy olla vähintään { width } x { height }px."
     },
     "play_1a47eaa7": {
         "message": "Toista"
@@ -1681,6 +1816,18 @@
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Anna Canvasin käyttää mikrofoniasi ja nettikameraasi."
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "Ole hyvä ja valitse tiedosto"
+    },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Kuvaile, mitä haluat säveltää."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Ole hyvä ja syötä tiedosto nimi"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Valitse tuettavan tyypin tiedosto"
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1732,6 +1879,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Edellinen { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Aikaisemmin valitut värit"
     },
     "prime_917ea60e": {
         "message": "Alku"
@@ -1832,11 +1982,17 @@
     "resize_ec83d538": {
         "message": "Muuta kokoa"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Vastaus kopioitu leikepöydälle"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Palautetetaanko automaattinen tallennus?"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Tulos { index } / { max }."
+    },
+    "retry_ebd5f8ba": {
+        "message": "Yritä uudelleen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Kääntöportti (ei anna periksi)"
@@ -1997,6 +2153,9 @@
     "shortcut_911d6255": {
         "message": "Oikotie"
     },
+    "show_all_967a90f0": {
+        "message": "Näytä kaikki"
+    },
     "show_audio_options_b489926b": {
         "message": "Näytä ääniasetukset"
     },
@@ -2129,6 +2288,9 @@
     "submit_a3cc6859": {
         "message": "Lähetä"
     },
+    "submitting_b90fac62": {
+        "message": "Lähetetään..."
+    },
     "subscript_59744f96": {
         "message": "Alaindeksi"
     },
@@ -2252,8 +2414,11 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Ensimmäisen otsikon sivulla pitäisi olla H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Seuraava sisältö on kumppanin toimittamaa"
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Rikkaan sisällön alueen korkeutta pienennetään."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Rikkaan sisällön alueen korkeutta suurennetaan."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materiaali on vapaasti käytössä (public domain)."
@@ -2263,9 +2428,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materiaali on poikkeuksen (esim. Fair Use, oikeus lainata tai muiden sovellettavien tekijänoikeuslakien) alainen"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Edeltävä sisältö on kumppanin toimittamaa"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Kun painat Shift-O, tekstieditori avautuu."
@@ -2362,6 +2524,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Resurssin valinnan url-linkin määrittäminen ei onnistu"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Allekirjoitusta sovellettiin"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Allekirjoitus poistettu"
     },
     "union_e6b57a53": {
         "message": "Liitto"
@@ -2552,6 +2720,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Tarkastele sanamäärää ja merkkien määrää"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Odottaa vastausta"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Emme havainneet toimivaa mikrofonia, joka olisi kytkettynä puhelimeen."
     },
@@ -2572,6 +2743,9 @@
     },
     "welsh_42ab94b1": {
         "message": "kymri"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Mitä haluaisit tehdä?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Kun käytetään merkintää, joka visuaalisesti muotoilee kohteet luettelona, mutta ei ilmaise suhdetta, käyttäjillä saattaa olla vaikeuksia tietojen navigoinnissa."
@@ -2603,6 +2777,9 @@
     "wreath_product_200b38ef": {
         "message": "Seppeletuote"
     },
+    "writing_assistant_a30ac16a": {
+        "message": "Kirjoitusavustaja"
+    },
     "xi_149681d0": {
         "message": "Xi"
     },
@@ -2611,6 +2788,15 @@
     },
     "yiddish_f96986df": {
         "message": "jiddish"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Olet väripaletissa. Jos haluat navigoida palettia ylös, vasermmalle, alas tai oikealle, käytä painikkeita ”W”, ”A”, ”S” ja ”D” vastaavassa järjestyksessä."
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Olet väriliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Olet alphaliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Voit korvata lataamalla uuden tekstitystiedoston."

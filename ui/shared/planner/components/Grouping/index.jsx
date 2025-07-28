@@ -22,10 +22,10 @@ import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import PlannerItem from '../PlannerItem'
-// eslint-disable-next-line import/no-named-as-default
+
 import CompletedItemsFacade from '../CompletedItemsFacade'
 import {MissingIndicator, NewActivityIndicator, NotificationBadge} from '../NotificationBadge'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   getBadgesForItem,
   getBadgesForItems,
@@ -34,9 +34,11 @@ import {
 import {animatable} from '../../dynamic-ui'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class Grouping extends Component {
+  static componentId = 'Grouping'
+
   static propTypes = {
     items: arrayOf(shape(itemShape)).isRequired,
     animatableIndex: number,
@@ -84,7 +86,7 @@ export class Grouping extends Component {
       'group',
       this,
       newProps.animatableIndex,
-      this.itemUniqueIds(newProps)
+      this.itemUniqueIds(newProps),
     )
   }
 
@@ -127,7 +129,7 @@ export class Grouping extends Component {
       }),
       () => {
         if (this.groupingLink) this.groupingLink.focus()
-      }
+      },
     )
   }
 
@@ -147,9 +149,13 @@ export class Grouping extends Component {
     }
 
     const componentsToRender = this.renderItems(itemsToRender)
-    componentsToRender.push(
-      this.renderFacade(completedItems, this.props.animatableIndex * 100 + itemsToRender.length + 1)
+    const facade = this.renderFacade(
+      completedItems,
+      this.props.animatableIndex * 100 + itemsToRender.length + 1,
     )
+    if (facade) {
+      componentsToRender.push(facade)
+    }
     return componentsToRender
   }
 
@@ -191,6 +197,8 @@ export class Grouping extends Component {
           responsiveSize={this.props.responsiveSize}
           onlineMeetingURL={item.onlineMeetingURL}
           isObserving={this.props.isObserving}
+          newActivityTestId="item-new-activity-indicator"
+          missingIndicatorTestId="item-missing-indicator"
         />
       </li>
     ))
@@ -256,6 +264,7 @@ export class Grouping extends Component {
     if (newItem || missing) {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
       const badgeMessage = this.props.title ? this.props.title : this.renderToDoText()
+      const testId = newItem ? 'new-activity-indicator' : 'missing-indicator'
       return (
         <NotificationBadge>
           <IndicatorComponent
@@ -263,6 +272,7 @@ export class Grouping extends Component {
             itemIds={this.itemUniqueIds()}
             animatableIndex={this.props.animatableIndex}
             getFocusable={this.getFocusable}
+            testId={testId}
           />
         </NotificationBadge>
       )
@@ -321,7 +331,7 @@ export class Grouping extends Component {
         className={classnames(
           this.style.classNames.root,
           this.style.classNames[this.getLayout()],
-          'planner-grouping'
+          'planner-grouping',
         )}
       >
         {this.renderNotificationBadge()}

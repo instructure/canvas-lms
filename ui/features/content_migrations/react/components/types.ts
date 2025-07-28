@@ -16,6 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {
+  type AdjustDates,
+  type DaySub,
+  type DateShifts,
+  type DateShiftsCommon,
+  type DateAdjustmentConfig,
+  type MigrationCreateRequestBody,
+  type onSubmitMigrationFormCallback,
+  type ItemType,
+} from '@canvas/content-migrations'
+
 export type ContentMigrationItemSettings = {
   source_course_id: string
   source_course_name: string
@@ -34,8 +45,14 @@ export type ContentMigrationItemAttachment = {
   url: string
 }
 
+export type ProgressWorkflowState = 'queued' | 'running' | 'completed' | 'failed'
+
+export type StatusPillState = ProgressWorkflowState | 'waiting_for_select'
+
 export type ContentMigrationWorkflowState =
   | 'pre_processing'
+  | 'pre_processed'
+  | 'queued'
   | 'failed'
   | 'waiting_for_select'
   | 'running'
@@ -55,65 +72,51 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type AdjustDates = {
-  enabled: boolean
-  operation: 'shift_dates' | 'remove_dates'
-}
-
-export type DaySub = {
-  to: number
-  from: number
-  id: number
-}
-
-export type DateShifts = {
-  substitutions: {}
-  old_start_date: string | false
-  new_start_date: string | false
-  old_end_date: string | false
-  new_end_date: string | false
-  day_substitutions: DaySub[]
-}
-
-export type DateAdjustmentConfig = {
-  adjust_dates: AdjustDates
-  date_shift_options: DateShifts
-}
-
-export type submitMigrationFormData = {
-  errored?: boolean
-  adjust_dates: AdjustDates
-  selective_import: boolean
-  date_shift_options: DateShifts
-  settings: {[key: string]: any}
-  daySubCollection?: object
-  pre_attachment?: {
-    name: string
-    size: number
-    no_redirect: boolean
-  }
-}
-
-export type onSubmitMigrationFormCallback = (
-  formData: submitMigrationFormData,
-  preAttachmentFile?: File
-) => void
-
-export type ContentMigrationResponse = ContentMigrationItem & {
-  pre_attachment?: {
-    file_param: string
-    progress: number | null
-    upload_url: string
-    upload_params: {
-      filename: string
-      content_type: string
-    }
-  }
-}
-
 export type AttachmentProgressResponse = ContentMigrationItem & {
   type: string
   total: number
   timeStamp: number
   loaded: number
+}
+
+export type UpdateMigrationItemType = (
+  contentMigrationItemId: string,
+  data?: object,
+  noXHR?: boolean,
+) => Promise<ContentMigrationItem | undefined>
+
+export type QuestionBankSettings = {
+  question_bank_id?: string | number
+  question_bank_name?: string
+}
+
+export type GenericItemResponse = {
+  property: string
+  title: string
+  type: ItemType
+  sub_items?: GenericItemResponse[]
+  sub_items_url?: string
+  submodule_count?: number // this only exist for modules
+  linked_resource?: {
+    migration_id: string
+    type: ItemType
+  }
+  migration_id?: string
+}
+
+export type SelectiveDataRequest = {
+  id: string
+  user_id: string
+  copy: {[key: string]: string | {[key: string]: string}}
+  workflow_state: ContentMigrationWorkflowState
+}
+
+export type {
+  AdjustDates,
+  DaySub,
+  DateShifts,
+  DateShiftsCommon,
+  DateAdjustmentConfig,
+  MigrationCreateRequestBody,
+  onSubmitMigrationFormCallback,
 }

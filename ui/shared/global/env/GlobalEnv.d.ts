@@ -16,20 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {EnvCommon} from './EnvCommon'
-import {EnvDeepLinking} from './EnvDeepLinking'
+import {EnvContentMigrations} from './ContentMigrations'
+import {EnvAccounts} from './EnvAccounts'
+import {EnvAlerts} from './EnvAlerts'
+import {EnvAms} from './EnvAms'
 import {EnvAssignments} from './EnvAssignments'
-import {EnvRce} from './EnvRce'
+import {EnvChangePassword} from './EnvChangePassword'
+import {EnvCommon} from './EnvCommon'
+import {EnvContextModules} from './EnvContextModules'
 import {EnvCourse} from './EnvCourse'
 import {EnvCoursePaces} from './EnvCoursePaces'
+import {EnvDeepLinking} from './EnvDeepLinking'
+import {EnvDeveloperKeys} from './EnvDeveloperKeys'
+import {EnvDiscussions} from './EnvDiscussions'
 import {EnvGradebook} from './EnvGradebook'
 import {EnvGradingStandards} from './EnvGradingStandards'
-import {EnvDeveloperKeys} from './EnvDeveloperKeys'
+import {EnvHorizon} from './EnvHorizon'
+import {EnvLtiRegistrations} from './EnvLtiRegistrations'
 import {EnvPlatformStorage} from './EnvPlatformStorage'
-import {EnvAccounts} from './EnvAccounts'
-import {EnvContextModules} from './EnvContextModules'
+import {EnvPortfolio} from './EnvPortfolio'
+import {EnvProfiles} from './EnvProfiles'
+import {EnvRce} from './EnvRce'
+import {EnvReleaseNotes} from './EnvReleaseNotes'
+import {EnvSmartSearch} from './EnvSmartSearch'
+import {EnvUserMerge} from './EnvUserMerge'
 import {EnvWikiPages} from './EnvWikiPages'
-import {EnvContentMigrations} from './ContentMigrations'
+import {EnvAuthentication} from './EnvAuthentication'
 
 /**
  * Top level ENV variable.
@@ -47,6 +59,7 @@ export type GlobalEnv =
     // Individual typescript files can narrow the type of ENV to include them
     Partial<
       EnvAccounts &
+        EnvAms &
         EnvAssignments &
         EnvCourse &
         EnvCoursePaces &
@@ -58,5 +71,16 @@ export type GlobalEnv =
         EnvDeveloperKeys &
         EnvContextModules &
         EnvWikiPages &
-        EnvContentMigrations
+        EnvContentMigrations &
+        EnvDiscussions &
+        EnvProfiles &
+        EnvChangePassword &
+        EnvAlerts &
+        EnvReleaseNotes &
+        EnvPortfolio &
+        EnvUserMerge &
+        EnvLtiRegistrations &
+        EnvSmartSearch &
+        EnvHorizon &
+        EnvAuthentication
     >

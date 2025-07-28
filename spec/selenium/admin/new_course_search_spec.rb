@@ -38,7 +38,6 @@ describe "new account course search" do
 
   before do
     user_session(@user)
-    @account.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
   it "does not show the courses tab without permission" do
@@ -155,20 +154,6 @@ describe "new account course search" do
     expect(course_teacher_link(teacher)).to include_text(teacher.name)
   end
 
-  it "shows manageable roles in new enrollment dialog" do
-    custom_name = "Custom Student role"
-    custom_student_role(custom_name, account: @account)
-
-    @account.role_overrides.create!(permission: "manage_admin_users", enabled: false, role: admin_role)
-    course_factory(account: @account)
-
-    visit_courses(@account)
-    click_add_users_to_course(@course)
-
-    expect(add_people_modal).to be_displayed
-    expect(role_options).to match_array(["Student", "Observer", custom_name])
-  end
-
   it "loads sections in new enrollment dialog" do
     course = course_factory(account: @account)
     visit_courses(@account)
@@ -208,6 +193,28 @@ describe "new account course search" do
     expect(rows.first).to include_text("Test Course Name")
   end
 
+  it "creates a new course from the 'Add a New Course' dialog with only required fields" do
+    visit_courses(@account)
+
+    # fill out the form
+    click_add_course_button
+    expect(add_course_modal).to be_displayed
+    enter_course_name("Test Course Name")
+    enter_reference_code("TCN 101")
+    submit_new_course
+
+    # make sure it got saved to db correctly
+    new_course = Course.last
+
+    expect(new_course.name).to eq("Test Course Name")
+    expect(new_course.course_code).to eq("TCN 101")
+    expect(new_course.account.name).to eq(@account.name)
+    expect(new_course.enrollment_term.name).to eq("Default Term")
+
+    # make sure it shows up on the page
+    expect(rows.first).to include_text("Test Course Name")
+  end
+
   it "lists course name at top of add user modal", priority: "1" do
     named_course = course_factory(account: @account, course_name: "course factory with name")
 
@@ -216,39 +223,33 @@ describe "new account course search" do
     expect(add_people_header).to include_text(named_course.name)
   end
 
-  context "with granular permissions enabled" do
-    before do
-      @account.root_account.enable_feature!(:granular_permissions_manage_users)
-    end
+  it "only shows non-admin manageable roles in new enrollment dialog" do
+    custom_name = "Custom Student role"
+    custom_student_role(custom_name, account: @account)
 
-    it "only shows non-admin manageable roles in new enrollment dialog" do
-      custom_name = "Custom Student role"
-      custom_student_role(custom_name, account: @account)
+    @account.role_overrides.create!(permission: "add_ta_to_course", enabled: false, role: admin_role)
+    @account.role_overrides.create!(permission: "add_designer_to_course", enabled: false, role: admin_role)
+    @account.role_overrides.create!(permission: "add_teacher_to_course", enabled: false, role: admin_role)
 
-      @account.role_overrides.create!(permission: "add_ta_to_course", enabled: false, role: admin_role)
-      @account.role_overrides.create!(permission: "add_designer_to_course", enabled: false, role: admin_role)
-      @account.role_overrides.create!(permission: "add_teacher_to_course", enabled: false, role: admin_role)
+    course_factory(account: @account)
 
-      course_factory(account: @account)
+    visit_courses(@account)
+    click_add_users_to_course(@course)
 
-      visit_courses(@account)
-      click_add_users_to_course(@course)
+    expect(add_people_modal).to be_displayed
+    expect(role_options).to match_array(["Student", "Observer", custom_name])
+  end
 
-      expect(add_people_modal).to be_displayed
-      expect(role_options).to match_array(["Student", "Observer", custom_name])
-    end
+  it "shows all admin manageable roles in new enrollment dialog" do
+    custom_name = "Custom Student role"
+    custom_student_role(custom_name, account: @account)
 
-    it "shows all admin manageable roles in new enrollment dialog" do
-      custom_name = "Custom Student role"
-      custom_student_role(custom_name, account: @account)
+    course_factory(account: @account)
 
-      course_factory(account: @account)
+    visit_courses(@account)
+    click_add_users_to_course(@course)
 
-      visit_courses(@account)
-      click_add_users_to_course(@course)
-
-      expect(add_people_modal).to be_displayed
-      expect(role_options).to match_array([custom_name, "Designer", "Observer", "Student", "TA", "Teacher"])
-    end
+    expect(add_people_modal).to be_displayed
+    expect(role_options).to match_array([custom_name, "Designer", "Observer", "Student", "TA", "Teacher"])
   end
 end

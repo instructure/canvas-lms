@@ -18,7 +18,7 @@
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -33,7 +33,7 @@ import downloadStuffAsAZip from '../legacy/util/downloadStuffAsAZip'
 import deleteStuff from '../legacy/util/deleteStuff'
 import $ from 'jquery'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 class ItemCog extends React.Component {
   static displayName = 'ItemCog'
@@ -171,7 +171,7 @@ class ItemCog extends React.Component {
           >
             {I18n.t('Download')}
           </a>
-        </li>
+        </li>,
       )
     } else {
       menuItems.push(
@@ -185,7 +185,7 @@ class ItemCog extends React.Component {
           >
             {I18n.t('Download')}
           </a>
-        </li>
+        </li>,
       )
 
       if (this.props.userCanEditFilesForContext) {
@@ -215,7 +215,7 @@ class ItemCog extends React.Component {
               >
                 {I18n.t('Copy To...')}
               </a>
-            </li>
+            </li>,
           )
         }
       }
@@ -235,7 +235,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Rename')}
             </a>
-          </li>
+          </li>,
         )
         // Move Link
         menuItems.push(
@@ -252,7 +252,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Move To...')}
             </a>
-          </li>
+          </li>,
         )
         // Manage Usage Rights Link
         if (this.props.usageRightsRequiredForContext) {
@@ -267,7 +267,7 @@ class ItemCog extends React.Component {
               >
                 {I18n.t('Manage Usage Rights')}
               </a>
-            </li>
+            </li>,
           )
         }
       }
@@ -285,7 +285,7 @@ class ItemCog extends React.Component {
             >
               {I18n.t('Delete')}
             </a>
-          </li>
+          </li>,
         )
       }
     }

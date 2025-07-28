@@ -21,7 +21,7 @@ describe Checkpoints::DateOverrideCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
       @checkpoint = topic.reply_to_topic_checkpoint
@@ -63,6 +63,41 @@ describe Checkpoints::DateOverrideCreatorService do
       overrides = [{ type: "override", set_type: "ADHOC", due_at: 2.days.from_now, student_ids: [student.id] }]
       expect(Checkpoints::AdhocOverrideCreatorService).to receive(:call).once
       service.call(checkpoint: @checkpoint, overrides:)
+    end
+
+    context "with shell overrides" do
+      let(:section) { @checkpoint.course.default_section }
+      let(:override_params) do
+        {
+          type: "override",
+          set_type: "CourseSection",
+          set_id: section.id,
+          due_at: 2.days.from_now,
+          unlock_at: 1.day.from_now,
+          lock_at: 3.days.from_now
+        }
+      end
+
+      it "creates a shell override for the parent assignment with nil due_at" do
+        Checkpoints::SectionOverrideCreatorService.call(checkpoint: @checkpoint, override: override_params)
+
+        # Fetch the last created override for the parent assignment
+        parent_override = @checkpoint.parent_assignment.assignment_overrides.last
+
+        # Assert that the parent override's due_at is nil and other dates are set correctly
+        expect(parent_override.due_at).to be_nil
+        expect(parent_override.unlock_at.to_s).to eq(override_params[:unlock_at].to_s)
+        expect(parent_override.lock_at.to_s).to eq(override_params[:lock_at].to_s)
+      end
+
+      it "creates a non-shell override for the checkpoint with all dates set" do
+        service.call(checkpoint: @checkpoint, overrides: [override_params])
+
+        checkpoint_override = @checkpoint.assignment_overrides.last
+        expect(checkpoint_override.due_at.to_s).to eq(override_params[:due_at].to_s)
+        expect(checkpoint_override.unlock_at.to_s).to eq(override_params[:unlock_at].to_s)
+        expect(checkpoint_override.lock_at.to_s).to eq(override_params[:lock_at].to_s)
+      end
     end
   end
 end

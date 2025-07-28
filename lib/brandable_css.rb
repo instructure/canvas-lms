@@ -207,13 +207,13 @@ module BrandableCSS
     end
 
     def default_brand_file(type, high_contrast = false)
-      default_brand_folder.join("variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}")
+      default_brand_folder.join("variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}")
     end
 
     def high_contrast_overrides
       Class.new do
         def get_value(variable_name)
-          { "ic-brand-primary" => "#0770A3", "ic-link-color" => "#0073A7" }[variable_name]
+          { "ic-brand-primary" => "#0A5A9E", "ic-link-color" => "#09508C" }[variable_name]
         end
       end.new
     end
@@ -251,7 +251,7 @@ module BrandableCSS
     end
 
     def public_default_path(type, high_contrast = false)
-      "dist/brandable_css/default/variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}"
+      "dist/brandable_css/default/variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}"
     end
 
     def variants

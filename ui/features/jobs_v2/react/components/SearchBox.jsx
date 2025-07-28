@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {View} from '@instructure/ui-view'
 
 import SearchItemSelector from '@canvas/search-item-selector/react/SearchItemSelector'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 function convertResult(json) {
   return Object.entries(json).map(item => ({id: item[0], name: item[0], count: item[1]}))

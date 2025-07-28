@@ -17,10 +17,10 @@
  */
 
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 
-const I18n = useI18nScope('models_DateGroup')
+const I18n = createI18nScope('models_DateGroup')
 
 export default class DateGroup extends Backbone.Model {
   dueAt() {
@@ -96,6 +96,7 @@ export default class DateGroup extends Backbone.Model {
       pending: this.pending(),
       open: this.open(),
       closed: this.closed(),
+      setType: this.get('set_type'),
     }
   }
 }

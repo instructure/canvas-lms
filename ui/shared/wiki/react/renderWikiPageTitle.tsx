@@ -17,29 +17,25 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {TextInput} from '@instructure/ui-text-input'
 import type {TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
 import {checkForTitleConflictDebounced} from '../utils/titleConflicts'
 
-const I18n = useI18nScope('pages_edit_title')
+const I18n = createI18nScope('pages_edit_title')
 
 interface ComponentProps {
   canEdit: boolean
   isContentLocked: boolean
   viewElement: JQuery<HTMLFormElement> & WikiPageEditView
   validationCallback: (data: Record<string, unknown>) => ValidationResult
-}
-
-export interface Message {
-  text: React.ReactNode
-  type: 'error' | 'hint' | 'success' | 'screenreader-only'
 }
 
 interface FormDataError {
@@ -54,22 +50,34 @@ interface ValidationResult {
 export type Props = TextInputProps & ComponentProps
 
 const EditableContent = (props: Props) => {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<FormMessage[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    const handleSubmit = (evt?: JQuery.Event) => {
+    const handleSubmit = (evt?: JQuery.SubmitEvent) => {
       evt?.stopPropagation()
+
       const data = props.viewElement.getFormData<Record<string, unknown>>()
       const dataErrors = props.validationCallback(data)
       const titleErrors = dataErrors?.title || []
       if (titleErrors.length > 0) {
-        const parsedErrors: Message[] = titleErrors.map((error: FormDataError) => ({
+        const parsedErrors: FormMessage[] = titleErrors.map((error: FormDataError) => ({
           text: error.message,
-          type: 'error',
+          type: 'newError',
         }))
         setMessages(parsedErrors)
         return false
+      }
+      else {
+        // we show errors from the server if any
+        evt?.result.catch((error: any) => {
+          const titleError = error.responseJSON.errors.title[0]
+          if (titleError) {
+            setMessages([{text: titleError.message, type: 'newError'}])
+            setTimeout(() => inputRef.current?.focus(), 200)
+            return false
+          }
+        })
       }
     }
 
@@ -83,7 +91,7 @@ const EditableContent = (props: Props) => {
     return () => {
       props.viewElement.off('submit', handleSubmit)
     }
-  }, [props])
+  }, [props, inputRef])
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = e.target
@@ -102,7 +110,7 @@ const EditableContent = (props: Props) => {
       <input name="title" type="hidden" value={props.defaultValue} />
     </>
   ) : (
-    <View as="div" maxWidth="356px">
+    <View as="div" maxWidth="600px">
       <TextInput
         id="wikipage-title-input"
         data-testid="wikipage-title-input"
@@ -132,7 +140,8 @@ const renderWikiPageTitle = (props: Props) => {
   const titleComponent = props.canEdit ? <EditableContent {...props} /> : readOnlyContent()
   const wikiPageTitleContainer = document.getElementById('edit_wikipage_title_container')
   if (wikiPageTitleContainer) {
-    ReactDOM.render(titleComponent, wikiPageTitleContainer)
+    const root = createRoot(wikiPageTitleContainer)
+    root.render(titleComponent)
   }
 
   return titleComponent

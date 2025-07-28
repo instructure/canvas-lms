@@ -21,9 +21,9 @@
 class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
   graphql_name "CreateLearningOutcomeGroup"
 
+  argument :description, String, required: false
   argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
   argument :title, String, required: true
-  argument :description, String, required: false
   argument :vendor_guid, String, required: false
 
   field :learning_outcome_group, Types::LearningOutcomeGroupType, null: true
@@ -34,6 +34,7 @@ class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
     check_user_permissions
 
     @child_outcome_group = @outcome_group.child_outcome_groups.build(attributes(input))
+    @child_outcome_group.saving_user = current_user
     if @child_outcome_group.save
       { learning_outcome_group: @child_outcome_group }
     else

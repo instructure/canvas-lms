@@ -226,6 +226,7 @@ iges: model/iges
 igs: model/iges
 igx: application/vnd.micrografx.igx
 ilbm: image/x-ilbm
+imscc: application/zip
 ins: text/x-tex
 irm: application/vnd.ibm.rights-management
 irp: application/vnd.irepository.package+xml

@@ -17,13 +17,22 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 import FinalGraderSelectMenu from '../FinalGraderSelectMenu'
 import userEvent from '@testing-library/user-event'
 
 describe('FinalGraderSelectMenu', () => {
   let props
   let wrapper
+  let user
+
+  beforeEach(() => {
+    user = userEvent.setup()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
 
   function selectMenu() {
     return wrapper.container.querySelector('select[name="final_grader_id"]')
@@ -51,6 +60,7 @@ describe('FinalGraderSelectMenu', () => {
         {name: 'Jane Doe', id: '492'},
       ],
       finalGraderID: undefined,
+      hideErrors: jest.fn(),
     }
   })
 
@@ -81,7 +91,6 @@ describe('FinalGraderSelectMenu', () => {
   })
 
   test('removes the "Select Grader" menuitem if a final grader is selected', async () => {
-    const user = userEvent.setup()
     mountComponent()
     await user.selectOptions(selectMenu(), props.availableModerators[0].name)
     const menuitem = selectMenuOptions().find(option => option.text === 'Select Grader')
@@ -103,11 +112,16 @@ describe('FinalGraderSelectMenu', () => {
   })
 
   test('selects an option when clicked', async () => {
-    const user = userEvent.setup()
     const [finalGrader] = props.availableModerators
     mountComponent()
     await user.selectOptions(selectMenu(), finalGrader.name)
     const menuitem = selectMenuOptions().find(option => option.text === finalGrader.name)
     expect(menuitem.selected).toBe(true)
+  })
+
+  test('calls hideErrors when the option changes', async () => {
+    mountComponent()
+    await user.selectOptions(selectMenu(), props.availableModerators[0].name)
+    expect(props.hideErrors).toHaveBeenCalled()
   })
 })

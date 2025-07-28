@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {srAlert} from '../utilities/alertUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export function specialFallbackFocusId(type) {
   return `~~~${type}-fallback-focus~~~`

@@ -39,7 +39,7 @@ describe('ContextModuleApi', () => {
         expect.objectContaining({
           assetID: '3456',
           courseID: '1234',
-        })
+        }),
       )
     })
 
@@ -57,7 +57,7 @@ describe('ContextModuleApi', () => {
         return Promise.resolve(footerInstance)
       })
       await expect(api.getContextModuleData('1', '2')).resolves.toEqual(
-        expect.objectContaining({previous: {url: '/previous'}, next: {url: '/next'}})
+        expect.objectContaining({previous: {url: '/previous'}, next: {url: '/next'}}),
       )
     })
 

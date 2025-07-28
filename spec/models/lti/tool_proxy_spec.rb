@@ -45,15 +45,13 @@ module Lti
       it "requires a shared_secret" do
         subject.shared_secret = nil
         subject.save
-        error = subject.errors.find { |e| e == [:shared_secret, "can't be blank"] }
-        expect(error).not_to be_nil
+        expect(subject.errors[:shared_secret]).to include("can't be blank")
       end
 
       it "requires a guid" do
         subject.guid = nil
         subject.save
-        error = subject.errors.find { |e| e == [:guid, "can't be blank"] }
-        expect(error).not_to be_nil
+        expect(subject.errors[:guid]).to include("can't be blank")
       end
 
       it "must have a unique guid" do
@@ -603,15 +601,15 @@ module Lti
       end
 
       it "does not match when vendor code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(vendor_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, vendor_code: "")).to be(false)
       end
 
       it "does not match when product_code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(product_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, product_code: "")).to be(false)
       end
 
       it "does not match when resource_type_code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(resource_type_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, resource_type_code: "")).to be(false)
       end
     end
 

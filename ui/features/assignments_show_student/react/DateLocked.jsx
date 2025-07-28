@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string, oneOf} from 'prop-types'
-import '@canvas/content-locks/jquery/lock_reason'
+import lockExplanation from '@canvas/content-locks/jquery/lock_reason'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 
 import locked1SVG from '../images/Locked1.svg'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function DateLocked(props) {
   return (
@@ -36,7 +36,7 @@ export default function DateLocked(props) {
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
           <Flex.Item>
             <Heading size="large" data-testid="assignments-2-date-locked" margin="small">
-              {INST.lockExplanation({unlock_at: props.date}, props.type)}
+              {lockExplanation({unlock_at: props.date}, props.type)}
             </Heading>
           </Flex.Item>
         </Flex>

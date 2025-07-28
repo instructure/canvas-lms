@@ -22,7 +22,7 @@ module ConditionalRelease
     class << self
       # handle the parts of the service that was making API calls back to canvas to create/remove assignment overrides
 
-      def handle_grade_change(submission)
+      def handle_grade_change(progress, submission)
         return unless submission.graded? && submission.posted? # sanity check
 
         sets_to_assign, sets_to_unassign = find_assignment_sets(submission)
@@ -33,6 +33,8 @@ module ConditionalRelease
                                                                  student_id: submission.user_id,
                                                                  actor_id: submission.grader_id,
                                                                  source: "grade_change")
+
+        progress.update_completion!(100)
       end
 
       def handle_assignment_set_selection(student, trigger_assignment, assignment_set_id)
@@ -81,10 +83,34 @@ module ConditionalRelease
         ActiveRecord::Associations.preload(existing_overrides,
                                            :assignment_override_students,
                                            AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
+        existing_overrides_map_with_dates = existing_overrides.group_by { |override| [override.assignment_id, override.due_at] }
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
+        due_dates = {}
+        course_pace = nil
+
+        course = [assignments_to_assign.first, assignments_to_unassign.first].compact.first&.course
+
+        if course
+          enrollment = StudentEnrollment.current.find_by(user_id: student_id, course:)
+          course_pace = CoursePace.pace_for_context(course, enrollment)
+          due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(course_pace.course_pace_module_items, enrollment, by_assignment: true) if course_pace
+        end
+
+        assignments_to_unassign.each do |to_unassign|
+          overrides = existing_overrides_map[to_unassign.id] || []
+          overrides.each do |o|
+            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
+          end
+        end
 
         assignments_to_assign.each do |to_assign|
-          overrides = existing_overrides_map[to_assign.id]
+          due_at = if course_pace
+                     due_dates[to_assign.id]
+                   else
+                     nil
+                   end
+
+          overrides = existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]]
           if overrides
             unless overrides.any? { |o| o.assignment_override_students.map(&:user_id).include?(student_id) }
               override = overrides.min_by(&:id) # kind of arbitrary but may as well be consistent and always pick the earliest
@@ -97,16 +123,28 @@ module ConditionalRelease
               set_type: "ADHOC",
               assignment_override_students: [
                 AssignmentOverrideStudent.new(assignment: to_assign, user_id: student_id, no_enrollment: false)
-              ]
+              ],
+              due_at_overridden: due_at&.present?,
+              due_at:
             )
-            existing_overrides_map[to_assign.id] = [new_override]
+
+            existing_overrides_map_with_dates[[to_assign.id, due_dates[to_assign.id]]] = [new_override]
           end
         end
+        if course
+          affected_assignments = assignments_to_assign.concat(assignments_to_unassign)
+          SubmissionLifecycleManager.recompute_users_for_course([student_id], course, affected_assignments)
+          affected_context_modules = ContextModule.active.joins(:content_tags).where(content_tags: { content_type: "Assignment", content_id: affected_assignments }).distinct
 
-        assignments_to_unassign.each do |to_unassign|
-          overrides = existing_overrides_map[to_unassign.id] || []
-          overrides.each do |o|
-            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
+          student = User.find(student_id)
+          affected_context_modules.each do |context_module|
+            progression = context_module.find_or_create_progression(student)
+            progression.mark_as_outdated
+            progression.reload.evaluate
+          end
+
+          if course.root_account.feature_enabled? :mastery_path_invalidate_assignment_visibility_cache
+            AssignmentVisibility::AssignmentVisibilityService.invalidate_cache(course_ids: [course.id], user_ids: [student_id])
           end
         end
       end

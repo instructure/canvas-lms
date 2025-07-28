@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -22,7 +21,7 @@ import {gradeToScoreLowerBound, gradeToScoreUpperBound, indexOfGrade} from './Gr
 import {scoreToGrade} from '@instructure/grading-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import type {GradeInput, GradeResult} from './grading.d'
-import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
+import type {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 // Allow unchecked access to ENV variables that should exist in this context
@@ -48,6 +47,7 @@ function percentageFromPoints(points: number, pointsPossible: number): number {
   return toNumber(new Big(points).div(pointsPossible).times(100))
 }
 
+// @ts-expect-error
 function invalid(value, options) {
   return {
     enteredAs: null,
@@ -60,6 +60,7 @@ function invalid(value, options) {
   }
 }
 
+// @ts-expect-error
 function parseAsGradingScheme(value: number, options): null | GradeInput {
   if (!options.gradingScheme) {
     return null
@@ -75,10 +76,16 @@ function parseAsGradingScheme(value: number, options): null | GradeInput {
     enteredAs: 'gradingScheme',
     percent: options.pointsPossible ? percentage : 0,
     points: options.pointsPossible ? pointsFromPercentage(percentage, options.pointsPossible) : 0,
-    schemeKey: scoreToGrade(percentage, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percentage,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor,
+    ),
   }
 }
 
+// @ts-expect-error
 function parseAsPercent(value: string, options): null | GradeInput {
   const percentage = numberHelper.parse(value.replace(PERCENTAGES, ''))
   if (Number.isNaN(Number(percentage))) {
@@ -100,10 +107,16 @@ function parseAsPercent(value: string, options): null | GradeInput {
     enteredAs: 'percent',
     percent,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percent,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor,
+    ),
   }
 }
 
+// @ts-expect-error
 function parseAsPoints(value: string, options): null | GradeInput {
   const points = numberHelper.parse(value)
   if (Number.isNaN(Number(points))) {
@@ -116,10 +129,16 @@ function parseAsPoints(value: string, options): null | GradeInput {
     enteredAs: 'points',
     percent: null,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme, options.pointsBasedGradingScheme),
+    schemeKey: scoreToGrade(
+      percent,
+      options.gradingScheme,
+      options.pointsBasedGradingScheme,
+      options.scalingFactor,
+    ),
   }
 }
 
+// @ts-expect-error
 function parseForGradingScheme(value, options): GradeResult {
   const result: null | GradeInput =
     parseAsGradingScheme(value, options) ||
@@ -141,6 +160,7 @@ function parseForGradingScheme(value, options): GradeResult {
   return invalid(value, options)
 }
 
+// @ts-expect-error
 function parseForPercent(value, options): GradeResult {
   const result: null | GradeInput =
     parseAsPercent(value, options) || parseAsGradingScheme(value, options)
@@ -160,6 +180,7 @@ function parseForPercent(value, options): GradeResult {
   return invalid(value, options)
 }
 
+// @ts-expect-error
 function parseForPoints(value, options) {
   const result =
     parseAsPoints(value, options) ||
@@ -191,6 +212,7 @@ function parseForPassFail(value: string, options: {pointsPossible: number}): Gra
     grade: cleanValue,
     valid: true,
     score: null,
+    // @ts-expect-error
     subAssignmentTag: options.subAssignmentTag,
   }
 
@@ -205,6 +227,7 @@ function parseForPassFail(value: string, options: {pointsPossible: number}): Gra
   return result
 }
 
+// @ts-expect-error
 export function isExcused(grade) {
   return `${grade}`.trim().toLowerCase() === 'ex'
 }
@@ -219,6 +242,7 @@ type ParseResult = {
   value: null | number
 }
 
+// @ts-expect-error
 export function parseEntryValue(value, gradingScheme): ParseResult {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
@@ -257,10 +281,12 @@ export function parseEntryValue(value, gradingScheme): ParseResult {
   return result
 }
 
+// @ts-expect-error
 export function isMissing(grade) {
   return `${grade}`.trim().toLowerCase() === 'mi'
 }
 
+// @ts-expect-error
 export function parseTextValue(value: string, options): GradeResult {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
@@ -316,6 +342,7 @@ export function parseTextValue(value: string, options): GradeResult {
   }
 }
 
+// @ts-expect-error
 export function hasGradeChanged(submission, gradeInfo, options) {
   if (!gradeInfo.valid) {
     // the given submission is always assumed to be valid

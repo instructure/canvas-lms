@@ -341,6 +341,7 @@ class EnrollmentsApiController < ApplicationController
   }
 
   include Api::V1::User
+  include Api::V1::Progress
   # @API List enrollments
   # Depending on the URL given, return a paginated list of either (1) all of
   # the enrollments in a course, (2) all of the enrollments in a section or (3)
@@ -368,11 +369,11 @@ class EnrollmentsApiController < ApplicationController
   #   roles created by the {api:RoleOverridesController#add_role Add Role API}
   #   as well as the base enrollment types accepted by the `type` argument above.
   #
-  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_and_concluded"]
+  # @argument state[] [String, "active"|"invited"|"creation_pending"|"deleted"|"rejected"|"completed"|"inactive"|"current_and_invited"|"current_and_future"|"current_future_and_restricted"|"current_and_concluded"]
   #   Filter by enrollment state. If omitted, 'active' and 'invited' enrollments
   #   are returned. The following synthetic states are supported only when
   #   querying a user's enrollments (either via user_id argument or via user
-  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_and_concluded+
+  #   enrollments endpoint): +current_and_invited+, +current_and_future+, +current_future_and_restricted+, +current_and_concluded+
   #
   # @argument include[] [String, "avatar_url"|"group_ids"|"locked"|"observed_users"|"can_be_removed"|"uuid"|"current_points"]
   #   Array of additional information to include on the enrollment or user records.
@@ -437,8 +438,7 @@ class EnrollmentsApiController < ApplicationController
 
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
-      has_courses = enrollments.where_clause.instance_variable_get(:@predicates)
-                               .any? { |cond| cond.is_a?(String) && cond.include?("courses.") }
+      has_courses = enrollments.where_clause.ast.to_sql.include?("courses.")
       enrollments = enrollments.joins(:course) if has_courses
       enrollments = enrollments.shard(@shard_scope) if @shard_scope
 
@@ -510,9 +510,19 @@ class EnrollmentsApiController < ApplicationController
       collection =
         if use_bookmarking?
           enrollments = enrollments.select("users.sortable_name AS sortable_name")
-          bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } },
-                                                                  :id)
+
+          if @domain_root_account&.feature_enabled?(:temporary_enrollments)
+            temp_enroll_params = params.slice(:temporary_enrollments_for_recipient,
+                                              :temporary_enrollment_recipients_for_provider)
+          end
+
+          sorting_column = if temp_enroll_params.present?
+                             { type: { skip_collation: true }, start_at: { type: :datetime, null: false }, end_at: { type: :datetime, null: false } }
+                           else
+                             { type: { skip_collation: true }, sortable_name: { type: :string, null: false } }
+                           end
+
+          bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment, sorting_column, :id)
           ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
           enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)
@@ -568,7 +578,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @argument enrollment[type] [Required, String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Enroll the user as a student, teacher, TA, observer, or designer. If no
-  #   value is given, the type will be inferred by enrollment[role] if supplied,
+  #   value is given, the type will be inferred by +enrollment[role]+ if supplied,
   #   otherwise 'StudentEnrollment' will be used.
   #
   # @argument enrollment[role] [Deprecated, String]
@@ -793,6 +803,47 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
+  # @API Enroll multiple users to one or more courses
+  #
+  # @argument user_ids[] [Required, Integer]
+  #   The user IDs to enroll in the courses.
+  #
+  # @argument course_ids[] [Required, Integer]
+  #  The course IDs to enroll each user in.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollments \
+  #     -X POST \
+  #     -F 'user_ids[]=1' \
+  #     -F 'user_ids[]=2' \
+  #     -F 'course_ids[]=10' \
+  #     -F 'course_ids[]=11' \
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/account/:account_id/bulk_enrollments \
+  #     -X POST \
+  #     -F 'user_ids[]=1' \
+  #     -F 'course_ids[]=10' \
+  #     -F 'course_ids[]=11' \
+  #     -F 'course_ids[]=12' \
+  #
+  # @returns Progress
+  def bulk_enrollment
+    return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_users_in_bulk)
+
+    user_ids = params[:user_ids]
+    course_ids = params[:course_ids]
+    progress = Progress.create!(context: @context, user: @current_user, tag: :bulk_enrollment)
+    process_params = {
+      user_ids:,
+      course_ids:
+    }
+
+    progress.process_job(Enrollment::BulkUpdate.new(@context, @current_user), :bulk_enrollment, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)
+
+    render json: progress_json(progress, @current_user, session)
+  end
+
   # @API Conclude, deactivate, or delete an enrollment
   # Conclude, deactivate, or delete an enrollment. If the +task+ argument isn't given, the enrollment
   # will be concluded.
@@ -953,7 +1004,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @example_response
   #   {
-  #     "is_provider": false, "is_recipient": true
+  #     "is_provider": false, "is_recipient": true, "can_provide": false
   #   }
   def show_temporary_enrollment_status
     GuardRail.activate(:secondary) do
@@ -962,14 +1013,16 @@ class EnrollmentsApiController < ApplicationController
           account = api_find(Account, params[:account_id]) if params[:account_id].present?
           enrollment_scope =
             if account
-              Enrollment.active_or_pending_by_date.joins(:course).where(courses: { account_id: account.id })
+              Enrollment.all_active_or_pending.joins(:course).where(courses: { account_id: account.id })
             else
-              Enrollment.active_or_pending_by_date
+              Enrollment.all_active_or_pending
             end
           is_provider = enrollment_scope.temporary_enrollment_recipients_for_provider(user).exists?
           is_recipient = enrollment_scope.temporary_enrollments_for_recipient(user).exists?
+          # mirror provider enrollments listed in temp enrollment assign modal
+          can_provide = enrollment_scope.active_by_date.for_user(user.id).present?
 
-          render json: { is_provider:, is_recipient: }
+          render json: { is_provider:, is_recipient:, can_provide: }
         else
           render_unauthorized_action and return false
         end
@@ -1023,11 +1076,13 @@ class EnrollmentsApiController < ApplicationController
       temp_enroll_params = params.slice(:temporary_enrollments_for_recipient,
                                         :temporary_enrollment_recipients_for_provider)
       if temp_enroll_params.present?
-        enrollments =
-          temporary_enrollment_conditions(user, temp_enroll_params).to_a.select do |e|
-            e.course.account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
-          end
-        return Enrollment.where(id: enrollments) if enrollments.present?
+        enrollments = temporary_enrollment_conditions(user, temp_enroll_params)
+        return Enrollment.none unless enrollments.present?
+
+        authorized_enrollments = enrollments.select do |e|
+          e.course.account.grants_any_right?(@current_user, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
+        end
+        return Enrollment.where(id: authorized_enrollments) if authorized_enrollments.present?
 
         render_unauthorized_action and return false
       end
@@ -1045,6 +1100,7 @@ class EnrollmentsApiController < ApplicationController
                           completed
                           current_and_invited
                           current_and_future
+                          current_future_and_restricted
                           current_and_concluded]
 
         params[:state].each do |state|
@@ -1167,7 +1223,6 @@ class EnrollmentsApiController < ApplicationController
     elsif value_to_boolean(temp_enroll_params[:temporary_enrollment_recipients_for_provider])
       enrollments = Enrollment.temporary_enrollment_recipients_for_provider(user)
     end
-    return false unless enrollments.present?
 
     if params[:state].present?
       enrollments = enrollments.joins(:enrollment_state).where(enrollment_states: { state: enrollment_states_for_state_param })
@@ -1179,8 +1234,13 @@ class EnrollmentsApiController < ApplicationController
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
     states.push("active", "invited") if states.delete "current_and_invited"
-    states.push("active", "invited", "creation_pending", "pending_active", "pending_invited") if states.delete "current_and_future"
+    if states.delete "current_and_future"
+      states.push("active", "invited", "creation_pending", "pending_active", "pending_invited")
+    end
     states.push("active", "completed") if states.delete "current_and_concluded"
+    if states.delete "current_future_and_restricted"
+      states.push("active", "invited", "creation_pending", "pending_active", "pending_invited", "inactive")
+    end
     states.uniq
   end
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -34,7 +34,7 @@ import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import actions from '@canvas/blueprint-courses/react/actions'
 
-const I18n = useI18nScope('blueprint_settingsMigrationSync')
+const I18n = createI18nScope('blueprint_settingsMigrationSync')
 
 export default class MigrationSync extends Component {
   static propTypes = {
@@ -105,7 +105,7 @@ export default class MigrationSync extends Component {
             {this.props.willSendNotification && (
               <Text as="p" size="small">
                 {I18n.t(
-                  'You can leave the page and you will get a notification when the sync process is complete.'
+                  'You can leave the page and you will get a notification when the sync process is complete.',
                 )}
               </Text>
             )}

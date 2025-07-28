@@ -46,8 +46,8 @@ module Types
       object.module
     end
 
+    field :can_view, Boolean, null: true
     field :lock_at, DateTimeType, null: true
     field :unlock_at, DateTimeType, null: true
-    field :can_view, Boolean, null: true
   end
 end

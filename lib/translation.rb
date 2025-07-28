@@ -16,140 +16,93 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "aws-sdk-sagemakerruntime"
+require "aws-sdk-translate"
 require "cld"
 require "pragmatic_segmenter"
+require "nokogiri"
 
 module Translation
+  class SameLanguageTranslationError < StandardError
+  end
+
+  module TranslationType
+    AWS_TRANSLATE = :aws_translate
+    SAGEMAKER = :sagemaker
+    CEDAR = :cedar
+    DISABLED = nil
+  end
+
   class << self
-    include Aws::SageMakerRuntime
-
-    def logger
-      Rails.logger
-    end
-
-    def sagemaker_client
-      settings = YAML.safe_load(DynamicSettings.find(tree: :private)["sagemaker.yml"] || "{}")
-      config = {
-        region: settings["translation_region"] || "us-west-2",
-      }
-
-      # While reading the settings, set the endpoint value.
-      @endpoint = settings["endpoint_name"]
-
-      config[:credentials] = Canvas::AwsCredentialProvider.new("translation", settings["vault_credential_path"])
-      if config[:credentials].set?
-        Aws::SageMakerRuntime::Client.new(config)
+    # The languages are imported from https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+    # TODO: Currently we don't support dialects(trim_locale function) because the currently implemented
+    # language detector supports dialects that the translator does not. Probably we should migrate to the
+    # automatic language detection that AWS translate provides but it needs additional discovery since
+    # it incurs cost and not necessarily available in all the regions.
+    # List of languages supported by our current detector: https://github.com/google/cld3
+    def languages(flags)
+      case current_translation_provider_type(flags)
+      when TranslationType::AWS_TRANSLATE
+        AwsTranslator.languages
+      when TranslationType::SAGEMAKER
+        SagemakerTranslator.languages
+      when TranslationType::CEDAR
+        CedarTranslator.languages
+      else
+        []
       end
     end
 
-    ##
-    # Can we provide API translations?
-    #
-    def available?(context, feature_flag)
-      context&.feature_enabled?(feature_flag) && sagemaker_client.present?
+    delegate :logger, to: :Rails
+
+    def current_translation_provider_type(flags)
+      return nil unless flags.key?(:translation) && flags[:translation]
+
+      return TranslationType::CEDAR if flags[:cedar_translation]
+      return TranslationType::AWS_TRANSLATE if flags[:ai_translation_improvements]
+
+      TranslationType::SAGEMAKER
     end
 
-    ##
-    # Create a translation given the src -> target mapping
-    #
-    def create(text:, user: nil, src_lang: nil, tgt_lang: nil)
-      return unless sagemaker_client.present?
-      return if tgt_lang.nil? && user.nil?
-
-      # If source lang was not set, then detect the language.
-      if src_lang.nil?
-        result = CLD.detect_language(text)[:code][0..2]
-        if result == "un" # Unknown language code.
-          logger.warn("Could not detect language from src text, defaulting to English")
-          src_lang = "en"
+    def translation_client(flags)
+      @translation_client ||= begin
+        provider_type = current_translation_provider_type(flags)
+        case provider_type
+        when TranslationType::AWS_TRANSLATE
+          AwsTranslator.new
+        when TranslationType::SAGEMAKER
+          SagemakerTranslator.new
+        when TranslationType::CEDAR
+          CedarTranslator.new
         else
-          src_lang = result
+          nil
         end
       end
-
-      # If target lang was nil, then user must be set. Try to get locale from the user.
-      if tgt_lang.nil?
-        tgt_lang = if user.locale.nil?
-                     # Go ahead and use english as the target language. It is the system default for Canvas.
-                     "en"
-                   else
-                     user.locale[0..2]
-                   end
-      end
-
-      # TODO: Error handling of invoke endpoint.
-      response = sagemaker_client.invoke_endpoint(
-        endpoint_name: @endpoint,
-        body: { inputs: { src_lang:, tgt_lang:, text: } }.to_json,
-        content_type: "application/json",
-        accept: "application/json"
-      )
-
-      JSON.parse(response.body.read)
     end
 
-    def languages
-      [
-        { id: "en", name: "English" },
-        { id: "ga", name: "Irish" },
-        { id: "ja", name: "Japanese" },
-        { id: "de", name: "German" },
-        { id: "hu", name: "Hungarian" },
-        { id: "es", name: "Spanish" },
-        { id: "zh", name: "Chinese" }
-      ]
+    def available?(flags)
+      return false unless flags.values.any?
+
+      translation_client(flags)&.available? || false
     end
 
-    # For translating the translation controls into the users locale. Don't translate if it's english
-    def translated_languages(user)
-      # For translating into the target locale.
-      return languages if user.locale.nil?
+    def translate_text(text:, tgt_lang:, options: {}, flags: {})
+      return nil unless translation_client(flags)&.available?
 
-      locale = user.locale[0..2]
-      # Don't translate unless the browser locale is different for the current user.
-      if locale == "en"
-        return languages
-      end
-
-      translated = []
-      languages.each do |language|
-        language[:name] = create(src_lang: "en", tgt_lang: locale, text: language[:name])
-        translated << language
-      end
-
-      translated
+      translation_client(flags).translate_text(text:, tgt_lang:, options:)
     end
 
-    def language_matches_user_locale?(user, text)
-      locale = if user.locale.nil?
-                 "en"
-               else
-                 user.locale[0..2]
-               end
-      result = CLD.detect_language(text)[:code][0..2]
-      result == locale
+    def translate_html(html_string:, tgt_lang:, options: {}, flags: {})
+      return nil unless translation_client(flags)&.available?
+
+      translation_client(flags).translate_html(html_string:, tgt_lang:, options:)
     end
 
-    def translate_message(text:, user:)
-      translated_text = []
-      src_lang = CLD.detect_language(text)[:code][0..2]
-      tgt_lang = if user.locale.nil?
-                   "en"
-                 else
-                   user.locale[0..2]
-                 end
-
-      text.split("\n").map do |paragraph|
-        passage = []
-        PragmaticSegmenter::Segmenter.new(text: paragraph, language: src_lang).segment.each do |segment|
-          trans = create(src_lang:, tgt_lang:, text: segment)
-          passage << trans
-        end
-        translated_text << passage.join
-      end
-
-      translated_text.join("\n")
+    def get_translation_flags(enabled, domain_root_account)
+      {
+        translation: enabled,
+        ai_translation_improvements: domain_root_account.feature_enabled?(:ai_translation_improvements),
+        cedar_translation: domain_root_account.feature_enabled?(:cedar_translation),
+      }
     end
   end
 end

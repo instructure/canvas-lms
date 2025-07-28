@@ -73,6 +73,11 @@ describe "Common Cartridge exporting" do
       @manifest_doc = Nokogiri::XML.parse(@manifest_body)
     end
 
+    def run_export_without_file_parse(opts = {})
+      @ce.export(opts, synchronous: true)
+      expect(@ce.error_messages).to eq []
+    end
+
     def mig_id(obj)
       CC::CCHelper.create_key(obj, global: true)
     end
@@ -183,7 +188,6 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log2)}]")).not_to be_nil
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log3)}]")).to be_nil
       expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo)}]")).not_to be_nil
-      expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo2)}]")).to be_nil
       expect(ccc_schema.validate(doc)).to be_empty
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))
@@ -227,7 +231,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "creates a quizzes-only export" do
-      @q1 = @course.quizzes.create!(title: "quiz1")
+      att = attachment_model(uploaded_data: fixture_file_upload("test_image.jpg"))
+      @q1 = @course.quizzes.create!(title: "quiz1", description: %(<p><img src="/courses/#{@course.id}/files/#{att.id}/preview" width="150" height="150" /></p>"))
       @q2 = @course.quizzes.create!(title: "quiz2")
 
       @ce.export_type = ContentExport::QTI
@@ -242,7 +247,13 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       alt_mig_id1 = CC::CCHelper.create_key(@q1, "canvas_", global: true)
+      att_mig_id = CC::CCHelper.create_key(att, global: true)
+
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id1}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
+      expect(@manifest_doc.at_css("resource[identifier=#{att_mig_id}][type=\"#{CC::CCHelper::WEBCONTENT}\"]")).not_to be_nil
+      doc = Nokogiri::XML.parse(@zip_file.read("#{CC::CCHelper.create_key(@q1, global: true)}/assessment_meta.xml"))
+      expect(@zip_file.read("web_resources/test_image.jpg")).not_to be_nil
+      expect(doc.at_css("description").text).to include("$IMS-CC-FILEBASE$/test_image.jpg")
 
       alt_mig_id2 = CC::CCHelper.create_key(@q2, "canvas_", global: true)
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
@@ -353,7 +364,7 @@ describe "Common Cartridge exporting" do
                     migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
                   }]
       }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -367,7 +378,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\"></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/first.png\" loading=\"lazy\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
       check_resource_node(@att2, CC::CCHelper::WEBCONTENT, false)
@@ -393,7 +404,7 @@ describe "Common Cartridge exporting" do
                question_text: %(Image yo: <img src="/courses/#{@course.id}/files/#{att1.id}/preview">),
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       attachment_model(uploaded_data: stub_png_data)
@@ -422,8 +433,8 @@ describe "Common Cartridge exporting" do
       check_resource_node(quiz, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(quiz)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png"></div>)
-      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1"></div>)
+      expect(doc.at_css("presentation material mattext").text).to eq %(<div>Image yo: <img src="$IMS-CC-FILEBASE$/unfiled/first.png" loading="lazy"></div>)
+      expect(doc.at_css("section").children[3].at_css("presentation material mattext").text).to eq %(<div><img src="$IMS-CC-FILEBASE$/assessment_questions/test%20my%20file?%20hai!&amp;.png?canvas_download=1" loading="lazy"></div>)
 
       check_resource_node(att1, CC::CCHelper::WEBCONTENT)
       check_resource_node(att2, CC::CCHelper::WEBCONTENT)
@@ -510,19 +521,19 @@ describe "Common Cartridge exporting" do
                     migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
                   }]
       }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI
       @ce.selected_content = { all_quizzes: "1" }
       @ce.save!
 
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({
-                                                                      asset: { id: "some-kaltura-id", size: 1234, status: "2" },
-                                                                      path: "media_objects/some-kaltura-id"
-                                                                    })
-      allow(CanvasKaltura::ClientV3).to receive_messages(config: {}, flavorAssetGetPlaylistUrl: "some-url")
-      allow(CanvasKaltura::ClientV3).to receive(:startSession)
+      kaltura_session = double("kaltura_session")
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+      allow(kaltura_session).to receive_messages(
+        flavorAssetGetPlaylistUrl: "http://www.example.com/blah.mp4",
+        flavorAssetGetOriginalAsset: { id: 1, status: "2", fileExt: "mp4" }
+      )
       mock_http_response = Struct.new(:code) do
         def read_body(stream)
           stream.puts("lalala")
@@ -536,15 +547,159 @@ describe "Common Cartridge exporting" do
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
       export_html = <<~HTML.strip
-        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
-        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"><source src="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
-        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/media_objects/some-kaltura-id"></a></p></div>
+        <div><p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4?canvas_=1&amp;canvas_qs_embedded=true&amp;canvas_qs_type=video" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="video"></video></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/hidden/test.mp4"></a></p></div>
       HTML
       expect(doc.at_css("presentation material mattext").text).to match_ignoring_whitespace export_html
 
       resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(att)}]")
       expect(resource_node).to_not be_nil
       path = resource_node["href"]
+      expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
+    it "includes media objects when the associated attachment doesn't have a media id" do
+      folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+      att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "292.mp3", filename: "292.mp3", uploaded_data: StringIO.new("media"))
+      @course.media_objects.create!(
+        media_id: "some-kaltura-id",
+        media_type: "audio",
+        attachment: att
+      )
+      att.update!(media_entry_id: nil, content_type: "unknown/unknown", workflow_state: "pending_upload", display_name: "292", filename: "292", instfs_uuid: nil)
+
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_objects_iframe/some-kaltura-id?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="/media_objects/some-kaltura-id"></a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:)
+
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      client = double("kaltura_client")
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
+      allow(client).to receive(:flavorAssetGetOriginalAsset)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
+      mp3_path = "http://canvas.example/mp3_path"
+      allow(client).to receive(:media_sources).and_return([{
+                                                            isOriginal: "0",
+                                                            fileExt: "mp3",
+                                                            url: mp3_path,
+                                                            content_type: "audio/mpeg"
+                                                          }])
+      expect(CanvasHttp).to receive(:get).with(mp3_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+
+      run_export
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_html = <<~HTML.strip
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/292.mp3" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/hidden/292.mp3"></a></p>
+      HTML
+
+      expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
+      path = "web_resources/hidden/292.mp3"
+      expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
+    it "includes media objects when the media object doesn't link to an attachment or the course" do
+      course_model
+      folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+      att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"))
+      mo = @course.media_objects.create!(
+        media_id: "some-kaltura-id",
+        media_type: "video",
+        attachment: att,
+        title: "test.mp4"
+      )
+      att.update!(media_entry_id: nil, content_type: "unknown/unknown", workflow_state: "pending_upload")
+      mo.update!(attachment_id: nil)
+
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_objects_iframe/some-kaltura-id?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="/media_objects/some-kaltura-id"></a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:)
+
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      client = double("kaltura_client")
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
+      allow(client).to receive(:flavorAssetGetOriginalAsset)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
+      media_path = "http://www.example.com/blah.mp3"
+      allow(client).to receive(:media_sources).and_return([{
+                                                            isOriginal: "0",
+                                                            fileExt: "mp3",
+                                                            url: media_path,
+                                                            content_type: "audio/mpeg"
+                                                          }])
+      expect(CanvasHttp).to receive(:get).with(media_path).and_yield(FakeHttpResponse.new("200", File.read(fixture_file_upload("292.mp3", "audio/mpeg", true))))
+
+      run_export
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_html = <<~HTML.strip
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded Media/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/test.mp4"></a></p>
+      HTML
+      expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
+      path = "web_resources/Uploaded Media/test.mp4"
+      expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
+    it "includes media objects when the media object's attachment has a weird parent attachment" do
+      folder = Folder.create!(name: "hidden", context: @ce.context, hidden: true, parent_folder: Folder.root_folders(@ce.context).first)
+      weird_parent = Attachment.create!(context: @ce.context, content_type: "video/mp4", folder:, media_entry_id: "some-kaltura-id", display_name: "test", filename: "test.mp4", uploaded_data: StringIO.new("media"))
+      weird_parent.update!(workflow_state: "pending_upload")
+      course_model
+      folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+      att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"), root_attachment_id: weird_parent)
+      @course.media_objects.create!(
+        media_id: "some-kaltura-id",
+        media_type: "video",
+        attachment: att,
+        title: "test.mp4"
+      )
+
+      body = <<~HTML
+        <p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" src="/media_objects_iframe/some-kaltura-id?embedded=true&type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id"></iframe></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="/media_objects/some-kaltura-id"></a></p>
+      HTML
+
+      wiki_page_model(course: @ce.context, body:)
+
+      @ce.update(export_type: ContentExport::COMMON_CARTRIDGE)
+      @ce.save!
+
+      client = double("kaltura_client")
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(client)
+      allow(client).to receive(:flavorAssetGetOriginalAsset)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: client, config: {})
+      media_path = "http://www.example.com/blah.mp3"
+      allow(client).to receive(:media_sources).and_return([{
+                                                            isOriginal: "0",
+                                                            fileExt: "mp3",
+                                                            url: media_path,
+                                                            content_type: "audio/mpeg"
+                                                          }])
+      run_export
+
+      check_resource_node(@page, CC::CCHelper::WEBCONTENT)
+
+      export_html = <<~HTML.strip
+        <p><audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="some-kaltura-id" loading="lazy"><source src="$IMS-CC-FILEBASE$/hidden/test.mp4" data-media-id="some-kaltura-id" data-media-type="audio"></audio></p>
+        <p><a id="media_comment_some-kaltura-id" class="instructure_inline_media_comment audio_comment" href="$IMS-CC-FILEBASE$/hidden/test.mp4"></a></p>
+      HTML
+      expect(@zip_file.read("wiki_content/some-page.html")).to include export_html
+      path = "web_resources/hidden/test.mp4"
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
@@ -568,7 +723,7 @@ describe "Common Cartridge exporting" do
                question_text: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
@@ -582,7 +737,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q1, CC::CCHelper::ASSESSMENT_TYPE)
 
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_qti.xml"))
-      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\"></div>"
+      expect(doc.at_css("presentation material mattext").text).to eq "<div>Image yo: <img src=\"$IMS-CC-FILEBASE$/unfiled/not_actually_first.png\" loading=\"lazy\"></div>"
 
       check_resource_node(@att, CC::CCHelper::WEBCONTENT)
 
@@ -618,7 +773,7 @@ describe "Common Cartridge exporting" do
                "assessment_question_id" => nil,
                "question_name" => "personality",
                "points_possible" => 1 }.with_indifferent_access
-      qq.write_attribute(:question_data, data)
+      qq["question_data"] = data
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -736,10 +891,11 @@ describe "Common Cartridge exporting" do
       run_export
     end
 
-    context "media_links_use_attachment_id feature enabled" do
+    context "media track export" do
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+        client = double("kaltura_client")
+        allow(CanvasKaltura::ClientV3).to receive_messages(new: client)
+        allow(client).to receive_messages(media_sources: {})
       end
 
       it "exports media tracks" do
@@ -774,7 +930,6 @@ describe "Common Cartridge exporting" do
         )
         stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
         stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
-        expect_any_instance_of(MediaObject).to receive(:create_attachment).and_call_original
         obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
         track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
         page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
@@ -789,37 +944,6 @@ describe "Common Cartridge exporting" do
         expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
         expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
         expect(track_doc.at_css("media_tracks media track").text).to eq track.content
-        expect(ccc_schema.validate(track_doc)).to be_empty
-      end
-    end
-
-    context "media_links_use_attachment_id feature disabled" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return false
-      end
-
-      it "exports media tracks" do
-        stub_kaltura
-        kaltura_session = double("kaltura_session")
-        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
-        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
-        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
-        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!", attachment: obj.attachment
-        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
-        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
-        page.save!
-        @ce.export_type = ContentExport::COMMON_CARTRIDGE
-        @ce.save!
-        run_export
-        mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
-        key = CC::CCHelper.create_key(track.content, global: true)
-        file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
-        expect(file_node).to be_present
-        expect(@zip_file.read(file_node["href"])).to eql(track.content)
-        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
-        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
-        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
         expect(ccc_schema.validate(track_doc)).to be_empty
       end
     end
@@ -946,6 +1070,89 @@ describe "Common Cartridge exporting" do
         let(:version) { "1.3" }
 
         it_behaves_like "an export that includes lti resource links"
+      end
+    end
+
+    context "with an LTI Context Control in the course" do
+      subject do
+        run_export
+        @manifest_doc
+      end
+
+      let_once(:account) { @course.root_account }
+      let_once(:course) { @course }
+      let_once(:registration) do
+        lti_developer_key_model(account:).tap do |k|
+          lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+        end.lti_registration
+      end
+      let_once(:tool) { registration.new_external_tool(course) }
+      let_once(:tool2) { registration.new_external_tool(course) }
+
+      it "includes the context control file in the manifest file" do
+        subject
+        expect(subject.at_css("file[href='course_settings/lti_context_controls.xml']")).to be_present
+      end
+
+      it "includes the context controls in the zip file" do
+        subject
+        doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+        expect(doc).to be_present
+
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_present
+      end
+
+      context "selectively exporting the tool" do
+        before do
+          @ce.selected_content = {
+            "context_external_tools" => { mig_id(tool) => "1" },
+          }
+          @ce.save!
+        end
+
+        it "only exports the selected tool's context control" do
+          subject
+          doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+          expect(doc).to be_present
+
+          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")
+          expect(first_tool).to be_present
+          expect(first_tool.at_css("deployment_migration_id").text).to eq mig_id(tool)
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+        end
+      end
+
+      context "only exporting course settings" do
+        before do
+          @ce.selected_content = {
+            all_course_settings: "1"
+          }
+          @ce.save!
+        end
+
+        let_once(:account_level_tool) do
+          registration.new_external_tool(account)
+        end
+        let_once(:course_control) do
+          account_level_tool.context_controls.create!(
+            course:,
+            registration: account_level_tool.lti_registration,
+            available: true
+          )
+        end
+
+        it "only exports the control for the account-level tool" do
+          subject
+          doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+          expect(doc).to be_present
+
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          tool_node = doc.at_css("lti_context_control[identifier=#{mig_id(account_level_tool.context_controls.find_by(course:))}]")
+          expect(tool_node).to be_present
+          expect(tool_node.at_css("deployment_migration_id")).to be_nil
+        end
       end
     end
 
@@ -1212,6 +1419,12 @@ describe "Common Cartridge exporting" do
         check_resource_node(page, CC::CCHelper::WEBCONTENT, false)
       end
 
+      it "includes wiki page with future availability for teacher" do
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai", unlock_at: 1.week.from_now)
+        run_export
+        check_resource_node(page, CC::CCHelper::WEBCONTENT)
+      end
+
       describe "for teachers in concluded courses" do
         before :once do
           teacher_in_course active_all: true
@@ -1357,6 +1570,73 @@ describe "Common Cartridge exporting" do
           end
         end
       end
+    end
+
+    describe "setting is_discussion_checkpoints_enabled ff on BP export" do
+      subject { run_export_without_file_parse }
+
+      before do
+        @ce.update!(export_type: ContentExport::COURSE_TEMPLATE_COPY)
+      end
+
+      context "when is_discussion_checkpoints_enabled is disabled" do
+        let(:expected_settings) { { is_discussion_checkpoints_enabled: false } }
+
+        before { @course.account.disable_feature!(:discussion_checkpoints) }
+
+        it "calls converter_class with proper settings" do
+          expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original
+          subject
+        end
+      end
+
+      context "when is_discussion_checkpoints_enabled is enabled" do
+        let(:expected_settings) { { is_discussion_checkpoints_enabled: true } }
+
+        before { @course.account.enable_feature!(:discussion_checkpoints) }
+
+        it "calls converter_class with proper settings" do
+          expect(CC::Importer::Canvas::Converter).to receive(:new).with(hash_including(expected_settings)).and_call_original
+          subject
+        end
+      end
+    end
+  end
+
+  context "when adding files to zip" do
+    let(:content_export) { ContentExport.new(context: course_model) }
+    let(:cc_exporter) { CC::CCExporter.new(content_export) }
+
+    before do
+      @export_dir = Dir.mktmpdir
+      @zip_path = File.join(@export_dir, "test-export.zip")
+      @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
+    end
+
+    after do
+      @zip_file.close
+      FileUtils.remove_entry @export_dir
+    end
+
+    it "skips file if it already exists in zip" do
+      file_path = "test_file.txt"
+      file_full_path = File.join(@export_dir, file_path)
+      File.write(file_full_path, "test content")
+
+      # First add the file to zip manually
+      @zip_file.add(file_path, file_full_path)
+      @zip_file.commit
+
+      cc_exporter.instance_variable_set(:@zip_file, @zip_file)
+      cc_exporter.instance_variable_set(:@export_dirs, [@export_dir])
+      cc_exporter.instance_variable_set(:@export_dir, @export_dir)
+
+      # Should not raise an error when trying to add the same file again
+      expect { cc_exporter.send(:copy_all_to_zip) }.not_to raise_error
+
+      entry = @zip_file.find_entry(file_path)
+      expect(entry).not_to be_nil
+      expect(entry.get_input_stream.read).to eq "test content"
     end
   end
 

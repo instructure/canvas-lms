@@ -17,10 +17,123 @@
  */
 
 import React from 'react'
-import moxios from 'moxios'
-import sinon from 'sinon'
 import {fireEvent, render, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
+
+// Mock FlashAlert
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: () => jest.fn(),
+  showFlashSuccess: () => jest.fn(),
+}))
+
+jest.mock('@canvas/i18n', () => ({
+  useScope: () => ({
+    t: str => {
+      const translations = {
+        'Course files': 'Course files',
+        'Group files': 'Group files',
+      }
+      return translations[str] || str
+    },
+  }),
+}))
+
+const server = setupServer(
+  http.get('/api/v1/courses/1/folders/root', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.set('link', 'url; rel="current"'),
+      ctx.json({
+        id: 1,
+        name: 'Course files',
+        context_id: 1,
+        context_type: 'course',
+        can_upload: true,
+        locked_for_user: false,
+        parent_folder_id: null,
+      }),
+    )
+  }),
+  http.get('/api/v1/users/self/folders/root', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.set('link', 'url; rel="current"'),
+      ctx.json({
+        id: 3,
+        name: 'My files',
+        context_id: 2,
+        context_type: 'user',
+        can_upload: true,
+        locked_for_user: false,
+        parent_folder_id: null,
+      }),
+    )
+  }),
+  http.get('/api/v1/folders/1/files', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.set('link', 'url; rel="current"'),
+      ctx.json([
+        {
+          id: 2,
+          display_name: 'thumbnail.jpg',
+          folder_id: 1,
+          thumbnail_url: 'thumbnail.jpg',
+          'content-type': 'text/html',
+        },
+      ]),
+    )
+  }),
+)
+
+beforeAll(() => {
+  const elements = [
+    'flash_message_holder',
+    'flash_screenreader_holder',
+    'flashalert_message_holder',
+  ]
+
+  elements.forEach(id => {
+    if (!document.getElementById(id)) {
+      const container = document.createElement('div')
+      container.id = id
+      if (id === 'flash_screenreader_holder') {
+        container.setAttribute('role', 'alert')
+        container.setAttribute('aria-live', 'assertive')
+        container.setAttribute('aria-relevant', 'additions text')
+        container.setAttribute('aria-atomic', 'false')
+      } else if (id === 'flashalert_message_holder') {
+        container.style.position = 'fixed'
+        container.style.top = '0'
+        container.style.left = '0'
+        container.style.width = '100%'
+        container.style.zIndex = '100000'
+        container.className = 'clickthrough-container'
+      }
+      document.body.appendChild(container)
+    }
+  })
+})
+
+afterAll(() => {
+  document.body.innerHTML = ''
+})
+
+afterEach(() => {
+  // Clean up flash messages after each test
+  const elements = [
+    'flash_message_holder',
+    'flash_screenreader_holder',
+    'flashalert_message_holder',
+  ]
+  elements.forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.innerHTML = ''
+  })
+})
 
 describe('AnnotatedDocumentSelector', () => {
   describe('when attachment prop is present', () => {
@@ -46,36 +159,16 @@ describe('AnnotatedDocumentSelector', () => {
     })
 
     it('the button for removing the attachment calls onRemove', () => {
-      props.onRemove = sinon.stub()
+      props.onRemove = jest.fn()
       const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
       const button = queryByText('Remove selected attachment')
       button.click()
-      expect(props.onRemove.callCount).toBe(1)
+      expect(props.onRemove).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('when attachment prop is not present', () => {
     let props
-
-    const courseFolder = {
-      id: 1,
-      name: 'Course files',
-      context_id: 1,
-      context_type: 'course',
-      can_upload: true,
-      locked_for_user: false,
-      parent_folder_id: null,
-    }
-
-    const files = [
-      {
-        id: 2,
-        display_name: 'thumbnail.jpg',
-        folder_id: 1,
-        thumbnail_url: 'thumbnail.jpg',
-        'content-type': 'text/html',
-      },
-    ]
 
     beforeEach(() => {
       props = {
@@ -84,32 +177,19 @@ describe('AnnotatedDocumentSelector', () => {
         onRemove() {},
       }
 
-      window.ENV = {context_asset_string: 'courses_1'}
-      moxios.install()
-
-      moxios.stubRequest('/api/v1/courses/1/folders/root', {
-        status: 200,
-        responseText: courseFolder,
-        headers: {link: 'url; rel="current"'},
-      })
-
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 200,
-        responseText: files,
-        headers: {link: 'url; rel="current"'},
-      })
+      fakeENV.setup({context_asset_string: 'courses_1'})
+      server.listen()
     })
 
     afterEach(() => {
-      moxios.uninstall()
-      window.ENV = {}
+      server.resetHandlers()
+      server.close()
+      fakeENV.teardown()
     })
 
     describe('FileBrowser', () => {
       it('renders a FileBrowser', () => {
         const {getByText} = render(<AnnotatedDocumentSelector {...props} />)
-
-        expect(getByText('Loading')).toBeInTheDocument()
 
         waitFor(() => {
           expect(getByText('Available folders')).toBeInTheDocument()
@@ -117,13 +197,13 @@ describe('AnnotatedDocumentSelector', () => {
       })
 
       it('selecting a file in the FileBrowser calls onSelect', () => {
-        props.onSelect = sinon.stub()
+        props.onSelect = jest.fn()
         const {queryByText} = render(<AnnotatedDocumentSelector {...props} />)
 
         waitFor(() => {
           fireEvent.click(queryByText('Course files'))
           fireEvent.click(queryByText('thumbnail.jpg'))
-          expect(props.onSelect.callCount).toBe(1)
+          expect(props.onSelect).toHaveBeenCalledTimes(1)
         })
       })
     })

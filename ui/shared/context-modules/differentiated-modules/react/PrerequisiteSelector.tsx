@@ -23,9 +23,9 @@ import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import type {Module} from './types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export interface PrerequisiteSelectorProps {
   selection: string
@@ -63,7 +63,6 @@ export default function PrerequisiteSelector({
       <Flex.Item shouldGrow={true} shouldShrink={true}>
         <CanvasSelect
           id={`prerequisite-${index}`}
-          // @ts-expect-error
           inputRef={el => (dropdown.current = el)}
           value={selection}
           label={<ScreenReaderContent>{I18n.t('Select Prerequisite')}</ScreenReaderContent>}

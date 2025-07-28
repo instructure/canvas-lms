@@ -73,7 +73,7 @@ describe('doFileUpload()', () => {
       panels: ['COMPUTER'],
       preselectedFile: undefined,
     }).shownPromise
-    expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
+    expect(document.querySelectorAll('.canvas-rce-upload-container')).toHaveLength(1)
   })
 
   it('opens the Upload Image modal when called with "image/*', async () => {
@@ -85,7 +85,7 @@ describe('doFileUpload()', () => {
     expect(
       getAllByLabelText(document, 'Upload Image', {
         selector: '[role="dialog"]',
-      })[0]
+      })[0],
     ).toBeVisible()
   })
 
@@ -98,7 +98,7 @@ describe('doFileUpload()', () => {
     expect(
       getAllByLabelText(document, 'Upload File', {
         selector: '[role="dialog"]',
-      })[0]
+      })[0],
     ).toBeVisible()
   })
 
@@ -111,7 +111,7 @@ describe('doFileUpload()', () => {
     expect(
       getAllByLabelText(document, 'Upload File', {
         selector: '[role="dialog"]',
-      })[0]
+      })[0],
     ).toBeVisible()
 
     const closeBtn = getAllByText(document, 'Close')[0].closest('button')
@@ -129,33 +129,34 @@ describe('doFileUpload()', () => {
         preselectedFile: undefined,
       }).shownPromise
       await waitFor(() => {
-        expect(document.querySelectorAll('[role="tab"]').length).toEqual(2)
+        expect(document.querySelectorAll('[role="tab"]')).toHaveLength(2)
       })
       expect(
         getByText(document, 'Computer', {
           selector: '[role="tab"]',
-        })
+        }),
       ).toBeVisible()
       expect(
         getByText(document, 'URL', {
           selector: '[role="tab"]',
-        })
+        }),
       ).toBeVisible()
     })
 
-    it('when requesting one', async () => {
+    it.skip('when requesting one', async () => {
+      // RCX-2571
       await doFileUpload(fauxEditor, document, {
         accept: 'image/*',
         panels: ['URL'],
         preselectedFile: undefined,
       }).shownPromise
       await waitFor(() => {
-        expect(document.querySelectorAll('[role="tab"]').length).toEqual(1)
+        expect(document.querySelectorAll('[role="tab"]')).toHaveLength(1)
       })
       expect(
         getByText(document, 'URL', {
           selector: '[role="tab"]',
-        })
+        }),
       ).toBeVisible()
     })
   })

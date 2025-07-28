@@ -95,6 +95,44 @@ describe ErrorsController do
       expect(ErrorReport.last.user_id).to eq user.id
     end
 
+    it "infers user_roles" do
+      student_in_course(active_all: true)
+      user_session(@student)
+      post "create", params: { error: { id: 1, message: "it broke :(" } }
+      assert_recorded_error
+      expect(ErrorReport.order(:id).last.data["user_roles"]).to eq("user,student")
+    end
+
+    context "user_roles normalization during creation" do
+      it "normalizes array user_roles to comma-separated string" do
+        post :create,
+             params: {
+               error: {
+                 subject: "test error",
+                 user_roles: ["student", "teacher"]
+               }
+             },
+             format: :json
+
+        created_report = ErrorReport.take
+        expect(created_report.data["user_roles"]).to eq("student,teacher")
+      end
+
+      it "normalizes hash user_roles to comma-separated string" do
+        post :create,
+             params: {
+               error: {
+                 subject: "test error",
+                 user_roles: { "primary" => "student", "secondary" => "admin" }
+               }
+             },
+             format: :json
+
+        created_report = ErrorReport.take
+        expect(created_report.data["user_roles"]).to eq("student,admin")
+      end
+    end
+
     it "records the real user if they are in student view" do
       authenticate_user!
       svs = course_factory.student_view_student
@@ -116,6 +154,68 @@ describe ErrorsController do
       expect do
         post "create", params: { error: { id: "garbage" } }
       end.not_to change { ErrorReport.count }
+    end
+
+    it "400s if we're out of region" do
+      expect(Shard.current).to receive(:in_current_region?).and_return(false)
+      post "create", params: { error: { id: "garbage" } }
+      expect(response).to be_bad_request
+    end
+
+    it "400s if username is sent" do
+      post "create", params: { error: { username: "causes_error" } }
+      expect(response).to be_bad_request
+    end
+
+    describe "captcha validation" do
+      before do
+        allow(subject).to receive(:captcha_server_key).and_return("test_key")
+      end
+
+      it "skips validation if captcha key is not configured" do
+        allow(subject).to receive(:captcha_server_key).and_return(nil)
+        post "create", params: { error: { message: "test" } }
+        assert_recorded_error
+      end
+
+      it "skips validation for authenticated users" do
+        user_session(user_factory)
+        post "create", params: { error: { message: "test" } }
+        assert_recorded_error
+      end
+
+      it "validates captcha for unauthenticated users" do
+        response_double = double(code: "200", body: { success: true, hostname: "test.host" }.to_json)
+        allow(CanvasHttp).to receive(:post).and_return(response_double)
+
+        post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }
+        assert_recorded_error
+      end
+
+      it "returns error on captcha validation failure" do
+        response_double = double(code: "200", body: { success: false, "error-codes": ["invalid-input"] }.to_json)
+        allow(CanvasHttp).to receive(:post).and_return(response_double)
+
+        post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "invalid_response" }, format: :json
+        expect(response).to be_bad_request
+        expect(response.parsed_body["errors"]).to eq(["invalid-input"])
+      end
+
+      it "returns error on hostname mismatch" do
+        response_double = double(code: "200", body: { success: true, hostname: "wrong.host" }.to_json)
+        allow(CanvasHttp).to receive(:post).and_return(response_double)
+
+        post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }, format: :json
+        expect(response).to be_bad_request
+        expect(response.parsed_body["errors"]).to eq(["invalid-hostname"])
+      end
+
+      it "raises error if captcha service is unavailable" do
+        response_double = double(code: "500")
+        allow(CanvasHttp).to receive(:post).and_return(response_double)
+        post "create", params: { :error => { message: "test" }, "g-recaptcha-response" => "valid_response" }
+        expect(response).to have_http_status(:internal_server_error)
+      end
     end
   end
 end

@@ -34,40 +34,71 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
-  it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
-    @announcement.destroy
-    role_ids = [teacher_role, admin_role].map(&:id)
-    account_notification(role_ids:, message: "Announcement 1")
-    @a1 = @announcement
-    account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
-    @a2 = @announcement
-    account_notification(account: @account, message: "Announcement 3") # no roles, should go to all
-    @a3 = @announcement
+  context "for announcement access" do
+    before do
+      @announcement.destroy
+      @role_ids = [teacher_role, admin_role].map(&:id)
+      account_notification(role_ids: @role_ids, message: "Announcement 1")
+      @a1 = @announcement
+      account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
+      @a2 = @announcement
+      account_notification(account: @account, message: "Announcement 3") # no roles, should go to all
+      @a3 = @announcement
 
-    @unenrolled = @user
-    course_with_teacher(account: @account)
-    @teacher = @user
-    account_admin_user(account: @account)
-    @admin = @user
-    course_with_student(course: @course).accept(true)
-    @student = @user
+      @unenrolled = @user
+      course_with_teacher(account: @account)
+      @teacher = @user
+      account_admin_user(account: @account)
+      @admin = @user
+      course_with_student(course: @course).accept(true)
+      @student = @user
+    end
 
-    expect(AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort).to eq [@a1.id, @a3.id]
-    expect(AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort).to eq [@a1.id, @a2.id, @a3.id]
-    expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
-    expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
+    it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
+      expect(AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort).to eq [@a1.id, @a3.id]
+      expect(AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort).to eq [@a1.id, @a2.id, @a3.id]
+      expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(account: Account.site_admin, role_ids:, message: "Announcement 1")
-    @a4 = @announcement
-    account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
-    @a5 = @announcement
-    account_notification(account: Account.site_admin, message: "Announcement 3") # no roles, should go to all
-    @a6 = @announcement
+      account_notification(account: Account.site_admin, role_ids: @role_ids, message: "Announcement 1")
+      @a4 = @announcement
+      account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
+      @a5 = @announcement
+      account_notification(account: Account.site_admin, message: "Announcement 3") # no roles, should go to all
+      @a6 = @announcement
 
-    expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a6.id]
-    expect(AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a5.id, @a6.id]
-    expect(AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort).to eq [@a6.id]
-    expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a5.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort).to eq [@a6.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
+    end
+
+    it "decides for attachment access" do
+      # this is a horrible hack but i like it... we just need attach_assoc
+      # to respond to .root_account which @account happily does for us
+      attach_assoc = @account
+
+      [
+        [@admin, @a1, true],
+        [@admin, @a2, true],
+        [@admin, @a3, true],
+        [@teacher, @a1, true],
+        [@teacher, @a2, false],
+        [@teacher, @a3, true],
+        [@student, @a1, false],
+        [@student, @a2, false],
+        [@student, @a3, true],
+        [@unenrolled, @a1, false],
+        [@unenrolled, @a2, true],
+        [@unenrolled, @a3, true]
+      ].each do |user, announcement, expected|
+        if expected
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be true
+        else
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be false
+        end
+      end
+    end
   end
 
   describe "current announcements" do
@@ -145,15 +176,15 @@ describe AccountNotification do
   it "caches queries for root accounts" do
     enable_cache do
       Timecop.freeze do
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to be_nil
         # once for @account, once for site admin
         allow(AccountNotification).to receive(:where).twice.and_call_original
 
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
 
         # no more calls to `where`; this _must_ be returned from cache
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
@@ -547,7 +578,7 @@ describe AccountNotification do
       end
     end
 
-    context "queue_message_broadcast" do
+    context "queue_message_broadcast hook" do
       it "does not let site admin account notifications even try" do
         an = account_notification(account: Account.site_admin)
         an.send_message = true
@@ -565,11 +596,29 @@ describe AccountNotification do
         expect(job.run_at.to_i).to eq an.start_at.to_i
       end
 
+      it "cannot send_message when workflow is deleted" do
+        an = account_notification(account: Account.default,
+                                  send_message: true,
+                                  start_at: 1.day.ago,
+
+                                  end_at: 2.days.from_now)
+        expect(an.should_send_message?).to be true
+        an.workflow_state = "deleted"
+        expect(an.should_send_message?).to be false
+      end
+
       it "does not queue a job when saving an announcement that already had messages sent" do
         an = account_notification(account: Account.default)
         an.messages_sent_at = 1.day.ago
         an.send_message = true
         expect { an.save! }.not_to change(Delayed::Job, :count)
+      end
+
+      it "does not call queue_message_broadcast when soft deleting an account notification" do
+        an = account_notification(account: Account.default, send_message: true)
+        allow(an).to receive(:queue_message_broadcast).and_call_original
+        an.destroy
+        expect(an).not_to have_received(:queue_message_broadcast)
       end
     end
 
@@ -626,6 +675,36 @@ describe AccountNotification do
         expect(BroadcastPolicy.notifier).to receive(:send_notification).ordered.with(*send_notification_args(user_ids)).and_call_original
         an.broadcast_messages
         expect(Message.count).to eq initial_message_count
+      end
+    end
+
+    describe "create_alert hook" do
+      context "when saving a new account notification" do
+        let(:account) { Account.create! }
+        let(:unsaved_notification) do
+          account.announcements.build(
+            subject: "my subject",
+            message: "my message",
+            start_at: 5.minutes.ago.utc,
+            end_at: 1.day.from_now.utc,
+            user: User.create!
+          )
+        end
+
+        it "calls create_alert" do
+          expect(unsaved_notification).to receive(:create_alert)
+          unsaved_notification.save!
+        end
+      end
+
+      context "when soft deleting an account notification" do
+        let!(:notification) { account_notification(account: Account.default, send_message: true) }
+
+        it "does not call create_alert" do
+          allow(notification).to receive(:create_alert).and_call_original
+          notification.destroy
+          expect(notification).not_to have_received(:create_alert)
+        end
       end
     end
   end
@@ -765,15 +844,15 @@ describe AccountNotification do
           account_notification(account: @account)
           user_factory
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to be_nil
           # once for @account, once for site admin
           allow(AccountNotification).to receive(:where).twice.and_call_original
 
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
 
           # no more calls to `where`; this _must_ be returned from cache
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]

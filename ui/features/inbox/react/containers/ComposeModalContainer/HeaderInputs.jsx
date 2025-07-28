@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useMemo, useEffect} from 'react'
+import PropTypes from 'prop-types'
 import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
 import CourseSelect from '../../components/CourseSelect/CourseSelect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
-import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import {Button} from '@instructure/ui-buttons'
-import PropTypes from 'prop-types'
-import React, {useMemo, useEffect} from 'react'
 import {reduceDuplicateCourses} from '../../../util/courses_helper'
 import {SubjectInput} from '../../components/SubjectInput/SubjectInput'
-
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -34,41 +32,37 @@ import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const HeaderInputs = props => {
   let moreCourses
   if (!props.isReply && !props.isForward) {
     moreCourses = reduceDuplicateCourses(
       props.courses.enrollments,
-      props.courses.favoriteCoursesConnection.nodes
+      props.courses.favoriteCoursesConnection.nodes,
     )
   }
 
-  const canAllRecipientsHaveNotes = (recipients, selectedCourseID) => {
-    if (!recipients.length) return false
-    for (const recipient of recipients) {
-      if (recipient.hasOwnProperty('commonCoursesInfo')) {
-        let recipientCourseRoles = []
+  const [modalContextCourseFilter, setModalContextCourseFilter] = React.useState(
+    props.activeCourseFilter,
+  )
 
-        if (recipient.commonCoursesInfo) {
-          recipientCourseRoles = ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT
-            ? recipient.commonCoursesInfo.map(courseEnrollment => courseEnrollment.courseRole)
-            : recipient.commonCoursesInfo
-                .filter(courseEnrollment => courseEnrollment.courseID === selectedCourseID)
-                .map(courseEnrollment => courseEnrollment.courseRole)
-        }
+  const isAllInDifferentiationTagSelected = useMemo(() => {
+    return props.selectedRecipients?.some(
+      recipient =>
+        recipient.name?.startsWith('All in') && recipient.id?.includes('differentiation_tag'),
+    )
+  }, [props.selectedRecipients])
 
-        if (!recipientCourseRoles.includes('StudentEnrollment')) {
-          return false
-        }
-        // TODO when VICE-2535 gets finished, add all all students option as a possible note recipient
-      } else if (!recipient.id.includes('group')) {
-        return false
-      }
+  useEffect(() => {
+    if (isAllInDifferentiationTagSelected && !props.sendIndividualMessages) {
+      props.onSendIndividualMessagesChange(true)
     }
-    return true
-  }
+  }, [
+    isAllInDifferentiationTagSelected,
+    props.sendIndividualMessages,
+    props.onSendIndividualMessagesChange,
+  ])
 
   const canIncludeObservers = useMemo(() => {
     if (ENV?.CONVERSATIONS?.CAN_MESSAGE_ACCOUNT_CONTEXT) {
@@ -83,42 +77,19 @@ const HeaderInputs = props => {
     return props?.courses?.enrollments.some(
       enrollment =>
         enrollment?.course.assetString === currentCourseAssetId &&
-        enrollmentsThatCanIncludeObservers.includes(enrollment.type)
+        enrollmentsThatCanIncludeObservers.includes(enrollment.type),
     )
   }, [props.activeCourseFilter, props.courses])
-
-  const canAddUserNote = useMemo(() => {
-    let canAddFacultyNote = false
-    const selectedCourseID = props.activeCourseFilter?.contextID
-      ? props.activeCourseFilter?.contextID.split('_')[1]
-      : ''
-
-    if (
-      ENV.CONVERSATIONS.NOTES_ENABLED &&
-      (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT ||
-        ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES[selectedCourseID])
-    ) {
-      canAddFacultyNote = canAllRecipientsHaveNotes(props.selectedRecipients, selectedCourseID)
-    }
-
-    return canAddFacultyNote
-  }, [props.activeCourseFilter, props.selectedRecipients])
-
-  // If a the Faculty Journal entry checkbox becomes disabled, set userNote state to false
-  useEffect(() => {
-    if (!canAddUserNote) {
-      props.setUserNote(false)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canAddUserNote])
 
   const onContextSelect = context => {
     if (context.contextID === null && context.contextName === null) {
       props.onSelectedIdsChange([])
     }
-
+    setModalContextCourseFilter(context)
     props.onContextSelect(context)
   }
+
+  const invalidRecipient = !!props.addressBookMessages?.length
 
   return (
     <Flex direction="column" width="100%" height="100%" padding="small">
@@ -126,12 +97,12 @@ const HeaderInputs = props => {
         <ComposeInputWrapper
           title={
             <PresentationContent>
-              <Text size="small">{I18n.t('Course')}</Text>
+              <Text>{I18n.t('Course')}</Text>
             </PresentationContent>
           }
           input={
             props.isReply || props.isForward ? (
-              <Text size="small">{props.contextName}</Text>
+              <Text>{props.contextName}</Text>
             ) : (
               <CourseSelect
                 mainPage={false}
@@ -142,7 +113,7 @@ const HeaderInputs = props => {
                   groups: props.courses?.favoriteGroupsConnection.nodes,
                 }}
                 onCourseFilterSelect={onContextSelect}
-                activeCourseFilterID={props.activeCourseFilter?.contextID}
+                activeCourseFilterID={modalContextCourseFilter?.contextID}
                 courseMessages={props.courseMessages}
               />
             )
@@ -155,9 +126,15 @@ const HeaderInputs = props => {
             shouldGrow={true}
             input={
               <IndividualMessageCheckbox
-                onChange={props.onSendIndividualMessagesChange}
+                onChange={
+                  isAllInDifferentiationTagSelected || props.maxGroupRecipientsMet
+                    ? () => {}
+                    : props.onSendIndividualMessagesChange
+                }
                 checked={props.sendIndividualMessages}
-                maxGroupRecipientsMet={props.maxGroupRecipientsMet}
+                checkedAndDisabled={
+                  isAllInDifferentiationTagSelected || props.maxGroupRecipientsMet
+                }
               />
             }
           />
@@ -168,9 +145,8 @@ const HeaderInputs = props => {
           <ComposeInputWrapper
             title={
               <PresentationContent>
-                <Text id="address-book-form" size="small">
-                  {I18n.t('To')}
-                </Text>
+                <Text id="address-book-form">{I18n.t('To')}</Text>
+                <Text color={invalidRecipient ? 'danger' : 'primary'}>{' *'}</Text>
               </PresentationContent>
             }
             input={
@@ -182,26 +158,17 @@ const HeaderInputs = props => {
                   props.onSelectedIdsChange(ids)
                 }}
                 onInputValueChange={props.onAddressBookInputValueChange}
-                activeCourseFilter={props.activeCourseFilter}
+                activeCourseFilter={modalContextCourseFilter}
                 hasSelectAllFilterOption={true}
                 selectedRecipients={props.selectedRecipients}
                 addressBookMessages={props.addressBookMessages}
                 courseContextCode={props.selectedContext?.contextID || ''}
                 placeholder={I18n.t('Insert or Select Names')}
                 addressBookLabel={I18n.t('To')}
+                renderingContext="compose-modal-header"
               />
             }
             shouldGrow={true}
-          />
-        </Flex.Item>
-      )}
-      {canAddUserNote && (
-        <Flex.Item>
-          <ComposeInputWrapper
-            shouldGrow={true}
-            input={
-              <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
-            }
           />
         </Flex.Item>
       )}
@@ -249,10 +216,10 @@ const HeaderInputs = props => {
         <ComposeInputWrapper
           title={
             <PresentationContent>
-              <Text size="small">{I18n.t('Subject')}</Text>
+              <Text>{I18n.t('Subject')}</Text>
             </PresentationContent>
           }
-          input={<Text size="small">{props.subject}</Text>}
+          input={<Text>{props.subject}</Text>}
         />
       ) : (
         <SubjectInput onChange={props.onSubjectChange} value={props.subject} />
@@ -268,17 +235,14 @@ HeaderInputs.propTypes = {
   isForward: PropTypes.bool,
   onContextSelect: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
-  onUserNoteChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
   onAddressBookInputValueChange: PropTypes.func,
-  userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   activeCourseFilter: PropTypes.object,
   selectedRecipients: PropTypes.array,
   maxGroupRecipientsMet: PropTypes.bool,
-  setUserNote: PropTypes.func,
   /**
    * Bool to control open/closed state of the AddressBookContainer menu for testing
    */

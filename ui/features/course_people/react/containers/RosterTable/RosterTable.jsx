@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
@@ -32,7 +32,7 @@ import {arrayOf, object, shape} from 'prop-types'
 import {OBSERVER_ENROLLMENT, STUDENT_ENROLLMENT} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
 // InstUI Table.ColHeader id prop is not passed to HTML <th> element
 const idProps = name => ({
@@ -41,14 +41,8 @@ const idProps = name => ({
 })
 
 const RosterTable = ({data}) => {
-  const {
-    view_user_logins,
-    read_sis,
-    read_reports,
-    can_allow_admin_actions,
-    manage_admin_users,
-    manage_students,
-  } = ENV?.permissions || {}
+  const {view_user_logins, read_sis, read_reports, can_allow_admin_actions, manage_students} =
+    ENV?.permissions || {}
   const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
 
   const tableRows = data.course.usersConnection.nodes.map(node => {
@@ -56,7 +50,7 @@ const RosterTable = ({data}) => {
     const {totalActivityTime, htmlUrl, state} = enrollments[0]
     const canRemoveUser = enrollments.every(enrollment => enrollment.canBeRemoved)
     const canManageUser = enrollments.some(enrollment => enrollment.type !== STUDENT_ENROLLMENT)
-      ? can_allow_admin_actions || manage_admin_users
+      ? can_allow_admin_actions
       : manage_students
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null

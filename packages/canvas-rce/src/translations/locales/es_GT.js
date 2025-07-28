@@ -19,11 +19,6 @@
 import formatMessage from '../../format-message'
 import '../tinymce/es'
 
-const locale = {
-  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
-    "message": "{ count, plural,\n    one {}\n   many {}\n  other {}\n}"
-  }
-}
-
+const locale = {"count_plural_one_item_loaded_other_items_loaded_857023b7":{"message":"{ count, plural,\n    one {}\n   many {}\n  other {}\n}"}}
 
 formatMessage.addLocale({'es-GT': locale})

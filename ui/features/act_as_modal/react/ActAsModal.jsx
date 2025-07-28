@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 
 import React from 'react'
 import keycode from 'keycode'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ import {Button} from '@instructure/ui-buttons'
 import ActAsMask from './svg/ActAsMask'
 import ActAsPanda from './svg/ActAsPanda'
 
-const I18n = useI18nScope('act_as')
+const I18n = createI18nScope('act_as')
 
 export default class ActAsModal extends React.Component {
   static propTypes = {
@@ -51,7 +51,7 @@ export default class ActAsModal extends React.Component {
           login_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
           sis_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
           integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-        })
+        }),
       ),
     }).isRequired,
   }
@@ -204,7 +204,7 @@ export default class ActAsModal extends React.Component {
                             "as if you were this user, and from other users' points " +
                             'of views, it will be as if this user performed them. However, ' +
                             'audit logs record that you were the one who performed the ' +
-                            'actions on behalf of this user.'
+                            'actions on behalf of this user.',
                         )}
                       </Text>
                     </View>
@@ -228,7 +228,7 @@ export default class ActAsModal extends React.Component {
                         key={pseudonym.login_id}
                       >
                         {this.renderInfoTable(I18n.t('Login info'), () =>
-                          this.renderLoginInfoRows(pseudonym)
+                          this.renderLoginInfoRows(pseudonym),
                         )}
                       </View>
                     ))}

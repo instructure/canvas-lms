@@ -42,12 +42,12 @@ const selectOption = async (button, option) => {
   await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
-    })
+    }),
   )
   await userEvent.click(
     screen.getByRole('option', {
       name: option,
-    })
+    }),
   )
 }
 

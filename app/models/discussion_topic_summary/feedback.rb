@@ -41,10 +41,6 @@ class DiscussionTopicSummary
       update!(liked: false, disliked: false)
     end
 
-    def regenerate
-      update!(regenerated: true)
-    end
-
     def disable_summary
       update!(summary_disabled: true)
     end

@@ -24,5 +24,6 @@ import GradeSummary from './react/index'
 
 ready(() => {
   const $container = document.getElementById('content')
+
   ReactDOM.render(<GradeSummary />, $container)
 })

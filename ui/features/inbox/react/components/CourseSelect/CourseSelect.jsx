@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState, useEffect} from 'react'
 
@@ -24,7 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 import {CloseButton} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const ALL_COURSES_ID = 'all_courses'
 
@@ -38,7 +38,7 @@ const filterOptions = (value, options) => {
       filteredOptions[key] = options[key]?.filter(
         option =>
           option.contextName.toLowerCase().includes(value.toLowerCase()) ||
-          option.courseNickname?.toLowerCase().includes(value.toLowerCase())
+          option.courseNickname?.toLowerCase().includes(value.toLowerCase()),
       )
     }
   })
@@ -62,16 +62,16 @@ const getCourseName = (courseAssetString, options) => {
 
 const CourseSelect = props => {
   const [inputValue, setInputValue] = useState(
-    getCourseName(props.activeCourseFilterID, props.options)
+    getCourseName(props.activeCourseFilterID, props.options),
   )
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [options, setOptions] = useState(props.options)
   const [filteredOptions, setFilteredOptions] = useState(
-    filterOptions(getCourseName(props.activeCourseFilterID, props.options), props.options)
+    filterOptions(getCourseName(props.activeCourseFilterID, props.options), props.options),
   )
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
   const [selectedOptionId, setSelectedOptionId] = useState(
-    props.activeCourseFilterID ? props.activeCourseFilterID : null
+    props.activeCourseFilterID ? props.activeCourseFilterID : null,
   )
   const [autoComplete, setAutoComplete] = useState(false)
 
@@ -241,35 +241,35 @@ CourseSelect.propTypes = {
         _id: PropTypes.oneOf([ALL_COURSES_ID]).isRequired,
         contextName: PropTypes.string,
         assetString: PropTypes.string,
-      })
+      }),
     ),
     favoriteCourses: PropTypes.arrayOf(
       PropTypes.shape({
         _id: PropTypes.string,
         contextName: PropTypes.string,
         assetString: PropTypes.string,
-      })
+      }),
     ),
     moreCourses: PropTypes.arrayOf(
       PropTypes.shape({
         _id: PropTypes.string,
         contextName: PropTypes.string,
         assetString: PropTypes.string,
-      })
+      }),
     ),
     concludedCourses: PropTypes.arrayOf(
       PropTypes.shape({
         _id: PropTypes.string,
         contextName: PropTypes.string,
         assetString: PropTypes.string,
-      })
+      }),
     ),
     groups: PropTypes.arrayOf(
       PropTypes.shape({
         _id: PropTypes.string,
         contextName: PropTypes.string,
         assetString: PropTypes.string,
-      })
+      }),
     ),
   }).isRequired,
   onCourseFilterSelect: PropTypes.func,

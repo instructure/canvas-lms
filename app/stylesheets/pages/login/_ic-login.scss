@@ -73,7 +73,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
   margin-top: $ic-sp*2;
 }
 .ic-Login__content {
-  width: 400px;
+  max-width: 400px;
   margin: 0 auto;
   background: var(--ic-brand-Login-Content-bgd-color);
   border: 5px solid var(--ic-brand-Login-Content-border-color);
@@ -203,6 +203,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 
     &:focus {
       box-shadow: none;
+      outline: 2px solid var(--ic-brand-Login-Content-password-text-color);
       &::before {
         opacity: 1;
       }
@@ -365,9 +366,8 @@ body.body--login-confirmation {
   box-sizing: border-box;
   border-radius: $baseBorderRadius;
   box-shadow: 0 1px 4px 1px rgba(black, 0.4);
-  width: 400px;
   margin: $ic-sp*3 auto 0;
-  width: 696px;
+  max-width: 696px;
   form { margin-bottom: 0; } //override default margin on forms
 }
 

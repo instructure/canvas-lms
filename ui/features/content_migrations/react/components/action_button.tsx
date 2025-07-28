@@ -26,12 +26,12 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const {Item: ListItem} = List as any
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 export type MigrationIssue = {
   id: number
@@ -94,6 +94,7 @@ const MigrationIssuesModal = ({
     url.searchParams.set('page', currentPage.current.toString())
     url.searchParams.set('per_page', ISSUES_PAGE_SIZE.toString())
     doFetchApi({path: url.toString(), method: 'GET'})
+      // @ts-expect-error
       .then(({json}: {json: MigrationIssuesResponse}) => {
         if (issues) {
           const newIssues = issues.concat(json)
@@ -109,12 +110,13 @@ const MigrationIssuesModal = ({
     () =>
       migration_issues_url &&
       doFetchApi({path: migration_issues_url, method: 'GET'})
+        // @ts-expect-error
         .then(({json}: {json: MigrationIssuesResponse}) => {
           setIssues(json)
           setHaveNextPage(json.length < migration_issues_count)
         })
         .catch(() => setHasErrors(true)),
-    [migration_issues_url, migration_issues_count]
+    [migration_issues_url, migration_issues_count],
   )
 
   useEffect(() => {

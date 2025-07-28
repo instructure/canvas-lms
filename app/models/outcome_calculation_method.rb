@@ -45,7 +45,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     "average" => [].freeze,
   }.freeze
 
-  belongs_to :context, polymorphic: [:account, :course], required: true
+  belongs_to :context, polymorphic: [:account, :course], optional: false
   resolves_root_account through: :context
 
   validates :context, presence: true
@@ -61,7 +61,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
     end,
-    message: -> { t("invalid calculation_int for this calculation_method") }
+    message: ->(_object, _data) { t("invalid calculation_int for this calculation_method") }
   }
 
   before_validation :adjust_calculation_method

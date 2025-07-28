@@ -29,13 +29,13 @@ describe('awaitElement', () => {
   })
 
   beforeEach(() => {
-    jest
-      .spyOn(window, 'requestAnimationFrame')
-      .mockImplementation(function (cb: (number: number) => void): number {
-        return window.setTimeout(function () {
-          cb(0)
-        }, 50)
-      })
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation(function (
+      cb: (number: number) => void,
+    ): number {
+      return window.setTimeout(function () {
+        cb(0)
+      }, 50)
+    })
     jest.spyOn(window, 'cancelAnimationFrame').mockImplementation(function (timer: number): void {
       window.clearTimeout(timer)
     })

@@ -36,23 +36,6 @@ import {
   IconXLine,
 } from '@instructure/ui-icons'
 
-const DEFAULT_FILTER_SETTINGS = {
-  contentSubtype: 'all',
-  contentType: 'links',
-  sortValue: 'date_added',
-  searchString: '',
-}
-
-export function useFilterSettings(default_settings) {
-  const [filterSettings, setFilterSettings] = useState(default_settings || DEFAULT_FILTER_SETTINGS)
-
-  function updateFilterSettings(nextSettings) {
-    setFilterSettings({...filterSettings, ...nextSettings})
-  }
-
-  return [filterSettings, updateFilterSettings]
-}
-
 function fileLabelFromContext(contextType) {
   switch (contextType) {
     case 'user':
@@ -83,7 +66,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext('course')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -96,7 +79,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext('group')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -110,9 +93,9 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
         renderBeforeLabel={IconFolderLine}
       >
         {fileLabelFromContext(
-          contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user'
+          contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user',
         )}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
   }
 
@@ -125,7 +108,7 @@ function renderType(
   mountNode,
   onChange,
   userContextType,
-  containingContextType
+  containingContextType,
 ) {
   // Check containingContextType so that we always show context links
   if (containingContextType === 'course' || containingContextType === 'group') {
@@ -235,7 +218,7 @@ export default function Filter(props) {
           mountNode,
           onChange,
           userContextType,
-          containingContextType
+          containingContextType,
         )}
       {contentType !== 'links' && (
         <Flex margin="small none none none">

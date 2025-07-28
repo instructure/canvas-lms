@@ -16,13 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {View} from '@instructure/ui-view'
+import {assignLocation} from '@canvas/util/globalUtils'
+import type {Breakpoints} from '@canvas/with-breakpoints'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export const FormControlButtons = ({
   isAnnouncement,
@@ -32,66 +35,71 @@ export const FormControlButtons = ({
   submitForm,
   isSubmitting,
   willAnnouncementPostRightAway,
+  breakpoints,
 }: {
   isAnnouncement: boolean
   isEditing: boolean
   published: boolean
   shouldShowSaveAndPublishButton: boolean
-  submitForm: (publish: boolean) => void
+  submitForm: (publish: boolean | undefined) => void
   isSubmitting: boolean
   willAnnouncementPostRightAway: boolean
+  breakpoints: Breakpoints
 }) => {
   return (
     <View
       display="block"
       textAlign="end"
       borderWidth="small none none none"
-      margin="xx-large none"
+      margin="small none none none"
       padding="large none"
     >
-      <View margin="0 x-small 0 0">
+      <Button
+        type="button"
+        display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
+        color="secondary"
+        margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
+        data-testid="announcement-cancel-button"
+        onClick={() => {
+          // @ts-expect-error
+          assignLocation(ENV?.CANCEL_TO)
+        }}
+        disabled={isSubmitting}
+      >
+        {I18n.t('Cancel')}
+      </Button>
+
+      {shouldShowSaveAndPublishButton && (
         <Button
-          type="button"
+          type="submit"
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
+          onClick={() => submitForm(true)}
           color="secondary"
-          onClick={() => {
-            // @ts-expect-error
-            window.location.assign(ENV?.CANCEL_TO)
-          }}
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
+          data-testid="save-and-publish-button"
           disabled={isSubmitting}
         >
-          {I18n.t('Cancel')}
+          {I18n.t('Save and Publish')}
         </Button>
-      </View>
-      {shouldShowSaveAndPublishButton && (
-        <View margin="0 x-small 0 0">
-          <Button
-            type="submit"
-            onClick={() => submitForm(true)}
-            color="secondary"
-            margin="xxx-small"
-            data-testid="save-and-publish-button"
-            disabled={isSubmitting}
-          >
-            {I18n.t('Save and Publish')}
-          </Button>
-        </View>
       )}
       {/* for announcements, show publish when the available until da */}
       {isAnnouncement ? (
         <Button
           type="submit"
-          // we always process announcements as published.
-          onClick={() => submitForm(true)}
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
+          // don't publish delayed announcements
+          onClick={() => submitForm(willAnnouncementPostRightAway ? true : undefined)}
           color="primary"
-          margin="xxx-small"
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
           data-testid="announcement-submit-button"
           disabled={isSubmitting}
         >
-          {willAnnouncementPostRightAway ? I18n.t('Publish') : I18n.t('Save')}
+          {willAnnouncementPostRightAway && !isEditing ? I18n.t('Publish') : I18n.t('Save')}
         </Button>
       ) : (
         <Button
           type="submit"
+          display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
           data-testid="save-button"
           // when editing, use the current published state, otherwise:
           // students will always save as published while for moderators in this case they
@@ -101,6 +109,7 @@ export const FormControlButtons = ({
             submitForm(isEditing ? published : !ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE)
           }
           color="primary"
+          margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
           disabled={isSubmitting}
         >
           {I18n.t('Save')}

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CourseCopyPage
+class NewCourseCopyPage
   class << self
     include SeleniumDependencies
 
@@ -27,7 +27,7 @@ class CourseCopyPage
     end
 
     def create_course_button
-      f('button[type="submit"]')
+      fxpath("//button[.//*[contains(text(), 'Create course')]]")
     end
 
     def body
@@ -35,19 +35,19 @@ class CourseCopyPage
     end
 
     def course_name_input
-      f("#course_name")
+      fxpath("//*[@data-testid = 'course-name']//input")
     end
 
     def course_code_input
-      f("#course_course_code")
+      fxpath("//*[@data-testid = 'course-code']//input")
     end
 
     def date_adjust_checkbox
-      f("#dateAdjustCheckbox")
+      fxpath("//label[../input[@data-testid='date-adjust-checkbox']]")
     end
 
     def add_day_substitution_button
-      f("#addDaySubstitution")
+      f("[data-testid = 'substitution-button']")
     end
 
     def add_day_containers
@@ -55,23 +55,31 @@ class CourseCopyPage
     end
 
     def old_start_date_input
-      f("#oldStartDate")
+      f("[data-testid = 'old_start_date']")
     end
 
     def old_end_date_input
-      f("#oldEndDate")
+      f("[data-testid = 'old_end_date']")
     end
 
     def new_start_date_input
-      f("#newStartDate")
+      f("[data-testid = 'new_start_date']")
     end
 
     def new_end_date_input
-      f("#newEndDate")
+      f("[data-testid = 'new_end_date']")
+    end
+
+    def course_start_date_input
+      f("[data-testid = 'course_start_date']")
+    end
+
+    def course_end_date_input
+      f("[data-testid = 'course_end_date']")
     end
 
     def date_remove_option
-      f("#dateRemoveOption")
+      fxpath("//label[../input[@data-testid='remove-dates']]")
     end
 
     def course_copy_link
@@ -79,19 +87,35 @@ class CourseCopyPage
     end
 
     def course_start_at_input
-      f("#course_start_at")
+      f("[placeholder='Select start date']")
+    end
+
+    def course_start_error_message_selector
+      "//*[@data-testid = 'course-start-date']//*[text() = 'Start date must be before end date']"
+    end
+
+    def course_start_error_message
+      fxpath(course_start_error_message_selector)
+    end
+
+    def course_end_error_message_selector
+      "//*[@data-testid = 'course-end-date']//*[text() = 'End date must be after start date']"
+    end
+
+    def course_end_error_message
+      fxpath(course_end_error_message_selector)
     end
 
     def course_conclude_at_input
-      f("#course_conclude_at")
+      f("[placeholder='Select end date']")
     end
 
     def migration_type_options
-      ff("#Selectable_0-list > li")
+      ff("#Selectable___0-list > li")
     end
 
     def migration_type_options_values
-      ff("#Selectable_0-list > li > span")
+      ff("#Selectable___0-list > li > span")
     end
 
     def cancel_copy_button

@@ -62,7 +62,7 @@ module Lti
         ::IMS::LTI::Models::MembershipService::Context.new(
           name: @membership_collator.context.name,
           membership: @membership_collator.memberships,
-          context_id: Lti::Asset.opaque_identifier_for(@membership_collator.context)
+          context_id: Lti::V1p1::Asset.opaque_identifier_for(@membership_collator.context)
         )
       end
     end

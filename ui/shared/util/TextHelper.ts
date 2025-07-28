@@ -16,18 +16,18 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import TwitterText from 'twitter-text'
 
-const I18n = useI18nScope('lib.text_helper')
+const I18n = createI18nScope('lib.text_helper')
 
 export const AUTO_LINKIFY_PLACEHOLDER = 'linkplaceholder.example.com'
 
 export function quoteClump(lines: string[]) {
   return `<div class='quoted_text_holder'> \
 <a href='#' class='show_quoted_text_link'>${htmlEscape(
-    I18n.t('quoted_text_toggle', 'show quoted text')
+    I18n.t('quoted_text_toggle', 'show quoted text'),
   )}</a> \
 <div class='quoted_text' style='display: none;'> \
 ${raw(lines.join('\n'))} \
@@ -66,7 +66,7 @@ export function formatMessage(message: string) {
   // now put the links back in
   message = message.replace(
     new RegExp(AUTO_LINKIFY_PLACEHOLDER, 'g'),
-    () => placeholderBlocks.shift() as string
+    () => placeholderBlocks.shift() as string,
   )
 
   // replace newlines
@@ -127,7 +127,7 @@ export function truncateText(
   string: string,
   options?: {
     max?: number
-  }
+  },
 ) {
   if (options == null) {
     options = {}
@@ -142,7 +142,7 @@ export function truncateText(
   }
 
   let truncateAt = 0
-  // eslint-disable-next-line no-constant-condition
+
   while (true) {
     const pos = string.indexOf(wordSeparator, truncateAt + 1)
     if (pos < 0 || pos > max - ellipsis.length) {
@@ -160,4 +160,13 @@ export function truncateText(
 export function plainText(message: string) {
   // remove all html tags from the message returning only the text
   return message.replace(/(<([^>]+)>)/gi, '')
+}
+
+export const containsHtmlTags = (message: string): boolean => {
+  const regex = /(<([^>]+)>)/gi
+  return regex.test(message)
+}
+
+export const stripHtmlTags = (htmlText?: string): string | null => {
+  return htmlText ? new DOMParser().parseFromString(htmlText, 'text/html').body.textContent : ''
 }

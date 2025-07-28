@@ -47,7 +47,8 @@ module Types
                 request: context[:request],
                 preloaded_attachments:,
                 user: current_user,
-                options: { rewrite_api_urls: rewrite_urls }
+                options: { rewrite_api_urls: rewrite_urls, domain_root_account: context[:domain_root_account] },
+                location: object.asset_string
               )
             end
           end
@@ -59,10 +60,10 @@ module Types
     def external_tool
       return nil if object.lti_launch_url.blank?
 
-      ContextExternalTool.find_external_tool(
+      Lti::ToolFinder.from_url(
         object.lti_launch_url,
         object.submission.course,
-        object.context_external_tool_id
+        preferred_tool_id: object.context_external_tool_id
       )
     end
 

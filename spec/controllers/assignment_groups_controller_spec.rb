@@ -36,6 +36,42 @@ describe AssignmentGroupsController do
       json_response.first["assignments"].pluck("id")
     end
 
+    context "with cache" do
+      specs_require_cache(:redis_cache_store)
+      it "returns assignments for students" do
+        course_with_teacher(active_all: true)
+        @student = student_in_course(course: @course, active_enrollment: true, name: "Pedro").user
+        user_session(@student)
+        assignment1 = @course.assignments.create!(title: "assignment 1", assignment_group: @group, workflow_state: "published")
+        assignment2 = @course.assignments.create!(title: "assignment 2", assignment_group: @group, workflow_state: "published")
+        assignment3 = @course.assignments.create!(title: "assignment 3", assignment_group: @group, workflow_state: "published")
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              format: "json"
+            }
+
+        group = json_parse(response.body).first
+        assignments = group["assignments"]
+        expect(assignments.pluck("id")).to match_array([assignment1.id, assignment2.id, assignment3.id])
+
+        assignment4 = @course.assignments.create!(title: "assignment 4", assignment_group: @group, workflow_state: "published")
+        assignment5 = @course.assignments.create!(title: "assignment 5", assignment_group: @group, workflow_state: "published")
+        assignment6 = @course.assignments.create!(title: "assignment 6", assignment_group: @group, workflow_state: "published")
+        get :index,
+            params: {
+              course_id: @course.id,
+              include: ["assignments"],
+              format: "json"
+            }
+
+        group = json_parse(response.body).first
+        assignments = group["assignments"]
+        expect(assignments.pluck("id")).to match_array([assignment1.id, assignment2.id, assignment3.id, assignment4.id, assignment5.id, assignment6.id])
+      end
+    end
+
     describe "filtering by grading period and overrides" do
       let!(:assignment) { course.assignments.create!(name: "Assignment without overrides", due_at: Date.new(2015, 1, 15)) }
       let!(:assignment_with_override) do
@@ -321,6 +357,40 @@ describe AssignmentGroupsController do
           expect_any_instance_of(Assignment).not_to receive(:students_with_visibility)
           get "index", params: { course_id: @course.id, include: ["assignments", "assignment_visibility"] }, format: :json
           expect(response).to be_successful
+        end
+      end
+
+      describe "with inactive student enrollment", type: :request do
+        before do
+          @assignment = @course.assignments.create!(
+            title: "assignment",
+            assignment_group: @course.assignment_groups.first,
+            workflow_state: "published"
+          )
+          override = @assignment.assignment_overrides.create!(set_type: "ADHOC")
+          override.assignment_override_students.create!(user: @student)
+          @student.enrollments.first.deactivate
+        end
+
+        it "excludes overrides for that student" do
+          json = api_call_as_user(@teacher,
+                                  :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups",
+                                  {
+                                    controller: "assignment_groups",
+                                    action: "index",
+                                    format: "json",
+                                    course_id: @course.id,
+                                    include: ["assignments", "all_dates"]
+                                  })
+
+          expect(json[0]["assignments"][0]["all_dates"]).to eq([{
+                                                                 "due_at" => nil,
+                                                                 "unlock_at" => nil,
+                                                                 "lock_at" => nil,
+                                                                 "base" => true,
+                                                                 "title" => "Everyone"
+                                                               }])
         end
       end
     end
@@ -667,7 +737,7 @@ describe AssignmentGroupsController do
       before do
         course_with_teacher(active_all: true)
         @student1 = student_in_course(course: @course, active_enrollment: true).user
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         assignment = @course.assignments.create!(has_sub_assignments: true)
         assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
         assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)

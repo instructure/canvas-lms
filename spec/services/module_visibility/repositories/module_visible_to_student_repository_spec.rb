@@ -25,7 +25,7 @@ describe ModuleVisibility::Repositories::ModuleVisibleToStudentRepository do
     it "raises error if called with no filter parameters" do
       expect do
         ModuleVisibility::Repositories::ModuleVisibleToStudentRepository
-          .find_modules_visible_to_everyone(course_id_params: nil, user_id_params: nil, context_module_id_params: nil)
+          .find_modules_visible_to_everyone(course_ids: nil, user_ids: nil, context_module_ids: nil)
       end.to raise_error(ArgumentError, "ModulesVisibleToStudents must have a limiting where clause of at least one course_id, user_id, or context_module_id (for performance reasons)")
     end
   end

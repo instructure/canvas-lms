@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import cx from 'classnames'
 
@@ -33,7 +33,7 @@ import propTypes from '../propTypes'
 
 import {itemTypeLabels, changeTypeLabels, exceptionTypeLabels} from '../labels'
 
-const I18n = useI18nScope('blueprint_settingsSyncChange')
+const I18n = createI18nScope('blueprint_settingsSyncChange')
 
 class SyncChange extends Component {
   static propTypes = {
@@ -90,7 +90,7 @@ class SyncChange extends Component {
     return (
       <ul className="bcs__history-item__change-exceps">
         {Object.keys(exGroups).map(groupType =>
-          this.renderExceptionGroup(groupType, exGroups[groupType])
+          this.renderExceptionGroup(groupType, exGroups[groupType]),
         )}
       </ul>
     )
@@ -112,6 +112,7 @@ class SyncChange extends Component {
             <ToggleDetails
               summary={<ScreenReaderContent>{I18n.t('Show exceptions')}</ScreenReaderContent>}
               expanded={this.state.isExpanded}
+              onToggle={() => {}}
             >
               {this.renderExceptions()}
             </ToggleDetails>
@@ -126,7 +127,7 @@ class SyncChange extends Component {
               <Grid.Row>
                 <Grid.Col width={5}>
                   {this.renderText(
-                    locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name
+                    locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name,
                   )}
                 </Grid.Col>
                 <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
@@ -136,7 +137,7 @@ class SyncChange extends Component {
                     <Pill id="exceptionPill">
                       {I18n.t(
                         {one: '%{count} exception', other: '%{count} exceptions'},
-                        {count: exceptions.length}
+                        {count: exceptions.length},
                       )}
                     </Pill>
                   ) : (

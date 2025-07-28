@@ -130,16 +130,44 @@ module CC
       doc.allow_rating topic.allow_rating
       doc.only_graders_can_rate topic.only_graders_can_rate
       doc.sort_by_rating topic.sort_by_rating
+      doc.sort_order topic.sort_order
+      doc.sort_order_locked topic.sort_order_locked
+      doc.expanded topic.expanded
+      doc.expanded_locked topic.expanded_locked
       doc.todo_date topic.todo_date
       doc.locked "true" if topic.locked
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = create_key(topic.assignment)
         doc.assignment(identifier: assignment_migration_id) do |a|
           AssignmentResources.create_canvas_assignment(a, topic.assignment, @manifest)
+          create_sub_assignments(doc, topic) if discussion_checkpoints?(topic)
         end
       end
       doc.anonymous_state topic.anonymous_state unless topic.anonymous_state.nil?
       doc.is_anonymous_author "true" if topic.is_anonymous_author
+      if discussion_checkpoints?(topic) && topic.reply_to_entry_required_count
+        doc.reply_to_entry_required_count topic.reply_to_entry_required_count
+      end
+    end
+
+    def create_sub_assignments(doc, topic)
+      unless topic.sub_assignments.empty?
+        doc.sub_assignments do
+          topic.sub_assignments.each do |sub_assignment|
+            add_exported_asset(sub_assignment)
+
+            identifier = create_key(sub_assignment)
+            tag = sub_assignment.sub_assignment_tag
+            doc.sub_assignment(identifier:, tag:) do |sub_assignment_doc|
+              AssignmentResources.create_canvas_assignment(sub_assignment_doc, sub_assignment, @manifest)
+            end
+          end
+        end
+      end
+    end
+
+    def discussion_checkpoints?(topic)
+      @course.discussion_checkpoints_enabled? && topic&.assignment&.has_sub_assignments
     end
   end
 end

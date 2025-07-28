@@ -33,7 +33,7 @@ describe('AssignmentGroupModuleNav', () => {
 
     expect(moduleLink).toContainElement(container.querySelector('a[href="mocked-module-url"]'))
     expect(assignmentGroupLink).toContainElement(
-      container.querySelector('a[href="mocked-assignment-url"]')
+      container.querySelector('a[href="mocked-assignment-url"]'),
     )
   })
 
@@ -61,7 +61,7 @@ describe('AssignmentGroupModuleNav', () => {
       },
     })
     const {getByTestId, getByText, queryByTestId} = render(
-      <AssignmentGroupModuleNav assignment={assignment} />
+      <AssignmentGroupModuleNav assignment={assignment} />,
     )
 
     const moduleLink = queryByTestId('module-link')
@@ -79,7 +79,7 @@ describe('AssignmentGroupModuleNav', () => {
       },
     })
     const {getByTestId, getByText, queryByTestId} = render(
-      <AssignmentGroupModuleNav assignment={assignment} />
+      <AssignmentGroupModuleNav assignment={assignment} />,
     )
 
     const moduleLink = getByTestId('module-link')
@@ -108,7 +108,7 @@ describe('AssignmentGroupModuleNav', () => {
     const {getAllByTestId, getByText} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
     const modules = getAllByTestId('module-link')
-    expect(modules.length).toEqual(2)
+    expect(modules).toHaveLength(2)
     expect(modules[0]).toContainElement(getByText('Test Module 1'))
     expect(modules[1]).toContainElement(getByText('Test Module 2'))
   })
@@ -120,11 +120,11 @@ describe('AssignmentGroupModuleNav', () => {
       },
     })
     const {getAllByTestId, getByTestId, getByText} = render(
-      <AssignmentGroupModuleNav assignment={assignment} />
+      <AssignmentGroupModuleNav assignment={assignment} />,
     )
 
     const modules = getAllByTestId('module-link')
-    expect(modules.length).toEqual(2)
+    expect(modules).toHaveLength(2)
     const moreModules = getByTestId('more-module-link')
     expect(moreModules).toContainElement(getByText('More Modules'))
   })

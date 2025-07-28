@@ -25,6 +25,7 @@ module Types
     value "grading"
     value "peer_review"
     value "provisional_grade"
+    value "self_assessment"
   end
 
   class RubricAssessmentType < ApplicationObjectType
@@ -41,6 +42,8 @@ module Types
 
     field :score, Float, null: true
 
+    field :updated_at, Types::DateTimeType, null: true
+
     field :user, UserType, null: true
     def user
       load_association(:user)
@@ -53,13 +56,15 @@ module Types
       load_association(:assessor)
     end
 
-    field :assessment_ratings, [RubricAssessmentRatingType], <<~MD, null: false
+    field :assessment_ratings, [RubricAssessmentRatingType], <<~MD, null: true
       The assessments for the individual criteria in this rubric
     MD
     def assessment_ratings
       # Need to gimmy the rubric_id in here, so that the RubricAssessmentRating
       # criterions can associate back to the criterions on the rubric. It's all
       # sorts of terrible.
+      return if object.data.nil?
+
       object.data.map do |assessment_rating|
         assessment_rating[:rubric_assessment_id] = object.id
         assessment_rating[:rubric_id] = object.rubric_id

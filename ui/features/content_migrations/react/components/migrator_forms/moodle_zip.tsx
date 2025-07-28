@@ -16,70 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
-import CommonMigratorControls from './common_migrator_controls'
-import type {onSubmitMigrationFormCallback} from '../types'
-import QuestionBankSelector, {type QuestionBankSettings} from './question_bank_selector'
-import MigrationFileInput from './file_input'
+import React, {useRef} from 'react'
 
-const I18n = useI18nScope('content_migrations_redesign')
+import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
+import type {onSubmitMigrationFormCallback} from '../types'
+import QuestionBankSelector from './question_bank_selector'
+import MigrationFileInput from './file_input'
+import {parseDateToISOString} from '../utils'
+import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
+import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
+import {ImportClearLabel} from './import_clear_label'
 
 type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
-const MoodleZipImporter = ({onSubmit, onCancel, fileUploadProgress}: MoodleZipImporterProps) => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<boolean>(false)
-  const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
-  const [questionBankError, setQuestionBankError] = useState<boolean>(false)
-
-  const handleSubmit = useCallback(
-    formData => {
-      if (!file) {
-        setFileError(true)
-      }
-      if (questionBankSettings) {
-        setQuestionBankError(questionBankSettings.question_bank_name === '')
-        if (questionBankSettings.question_bank_name === '') {
-          return
-        }
-        formData.settings = {...formData.settings, ...questionBankSettings}
-      }
-      if (file) {
-        setFileError(false)
-        formData.pre_attachment = {
-          name: file.name,
-          size: file.size,
-          no_redirect: true,
-        }
-        onSubmit(formData, file)
-      }
-    },
-    [onSubmit, file, questionBankSettings]
-  )
+const MoodleZipImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+  isSubmitting,
+}: MoodleZipImporterProps) => {
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit, fileInputRef)
 
   return (
     <>
-      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
+      <MigrationFileInput
+        fileUploadProgress={fileUploadProgress}
+        onChange={setFile}
+        isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
+      />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
+        disable={isSubmitting}
+        questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
+        canSelectContent={true}
         fileUploadProgress={fileUploadProgress}
+        isSubmitting={isSubmitting}
         canAdjustDates={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        newStartDate={parseDateToISOString(ENV.OLD_START_DATE)}
+        newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
+        SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
+        CancelLabel={ImportClearLabel}
       />
     </>
   )

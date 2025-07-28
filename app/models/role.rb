@@ -43,7 +43,7 @@ class Role < ActiveRecord::Base
 
       self.role = shard.activate do
         # Use `default_canvas_role` even though `default_role` sounds better since default_role is a rails method in rails >= 6.1
-        Role.get_role_by_id(read_attribute(:role_id)) || (respond_to?(:default_canvas_role) ? default_canvas_role : nil)
+        Role.get_role_by_id(role_id) || (respond_to?(:default_canvas_role) ? default_canvas_role : nil)
       end
     end
 
@@ -68,8 +68,8 @@ class Role < ActiveRecord::Base
   validates :name, :workflow_state, presence: true
   validates :account_id, presence: { if: :belongs_to_account? }
 
-  validates :base_role_type, inclusion: { in: BASE_TYPES, message: -> { t("is invalid") } }
-  validates :name, exclusion: { in: KNOWN_TYPES, unless: :built_in?, message: -> { t("is reserved") } }
+  validates :base_role_type, inclusion: { in: BASE_TYPES, message: ->(_object, _data) { t("is invalid") } }
+  validates :name, exclusion: { in: KNOWN_TYPES, unless: :built_in?, message: ->(_object, _data) { t("is reserved") } }
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
@@ -147,7 +147,7 @@ class Role < ActiveRecord::Base
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
 
-    Role.where(id:).take # giving up on built-in role caching because it's silly now and we should just preload more
+    Role.find_by(id:) # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
@@ -274,19 +274,6 @@ class Role < ActiveRecord::Base
     @enrollment_types
   end
 
-  def self.manageable_roles_by_user(user, context)
-    is_blueprint = context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context)
-    manageable = []
-    if context.grants_right?(user, :manage_students) && !is_blueprint
-      manageable += %w[StudentEnrollment ObserverEnrollment]
-    end
-    if context.grants_right?(user, :manage_admin_users)
-      manageable += %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
-      manageable << "ObserverEnrollment" unless is_blueprint
-    end
-    manageable.uniq.sort
-  end
-
   def self.add_delete_roles_by_user(user, context)
     is_blueprint = context.is_a?(Course) && MasterCourses::MasterTemplate.is_master_course?(context)
     addable = []
@@ -307,27 +294,20 @@ class Role < ActiveRecord::Base
 
   def self.compile_manageable_roles(role_data, user, context)
     # for use with the old sad enrollment dialog
-    granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
-    manageable = manageable_roles_by_user(user, context) unless granular_admin
-    addable, deleteable = add_delete_roles_by_user(user, context) if granular_admin
+    addable, deleteable = add_delete_roles_by_user(user, context)
     role_data.each_with_object([]) do |role, roles|
-      is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
-      is_addable = addable.include?(role[:base_role_name]) if granular_admin
-      is_deleteable = deleteable.include?(role[:base_role_name]) if granular_admin
-      role[:manageable_by_user] = is_manageable unless granular_admin
-      if granular_admin
-        role[:addable_by_user] = is_addable
-        role[:deleteable_by_user] = is_deleteable
-      end
+      is_addable = addable.include?(role[:base_role_name])
+      is_deleteable = deleteable.include?(role[:base_role_name])
+
+      role[:addable_by_user] = is_addable
+      role[:deleteable_by_user] = is_deleteable
+
       custom_roles = role.delete(:custom_roles)
       roles << role
 
       custom_roles.each do |custom_role|
-        custom_role[:manageable_by_user] = is_manageable unless granular_admin
-        if granular_admin
-          custom_role[:addable_by_user] = is_addable
-          custom_role[:deleteable_by_user] = is_deleteable
-        end
+        custom_role[:addable_by_user] = is_addable
+        custom_role[:deleteable_by_user] = is_deleteable
         roles << custom_role
       end
     end

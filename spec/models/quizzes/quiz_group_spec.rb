@@ -25,7 +25,7 @@ describe Quizzes::QuizGroup do
       quiz = @course.quizzes.create!(title: "some quiz")
       group = quiz.quiz_groups.create!(name: "question group", pick_count: 1, question_points: 5.0)
       group.quiz_questions.create!(quiz:, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
-      quiz.published_at = Time.now
+      quiz.published_at = Time.zone.now
       quiz.publish!
       expect(quiz.unpublished_changes?).to be_falsey
 

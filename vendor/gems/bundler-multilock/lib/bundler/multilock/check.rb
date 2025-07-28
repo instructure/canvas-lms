@@ -91,7 +91,7 @@ module Bundler
       def deep_check(lockfile_definition, conflicts: nil)
         lockfile_name = lockfile_definition[:lockfile]
         @cache.deep_check(lockfile_name) do
-          success = true
+          success = true # -- work around rubocop bug
           proven_pinned = Set.new
           needs_pin_check = []
           parser = @cache.parser(lockfile_name)
@@ -100,12 +100,12 @@ module Bundler
           parent_parser = @cache.parser(parent_lockfile_name)
           unless parser.platforms == parent_parser.platforms
             Bundler.ui.error("The platforms in #{lockfile_path} do not match the parent lockfile.")
-            success = false
+            success = false # -- work around rubocop bug
           end
           unless parser.bundler_version == parent_parser.bundler_version
             Bundler.ui.error("bundler (#{parser.bundler_version}) in #{lockfile_path} " \
                              "does not match the parent lockfile's version (@#{parent_parser.bundler_version}).")
-            success = false
+            success = false # -- work around rubocop bug
           end
           unless parser.ruby_version == parent_parser.ruby_version
             Bundler.ui.error("ruby (#{parser.ruby_version || "<none>"}) in #{lockfile_path} " \

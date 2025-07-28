@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class Execute < Cop
+      class Execute < Base
         MSG = "Raw SQL in migrations must be approved by a migration reviewer"
 
         def_node_matcher :execute?, <<~PATTERN

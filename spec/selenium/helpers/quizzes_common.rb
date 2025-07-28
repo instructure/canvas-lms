@@ -401,7 +401,7 @@ module QuizzesCommon
 
     # do this as close to submission creation as possible to avoid being locked by the time the page loads
     if opts[:lock_after]
-      @quiz.lock_at = Time.now + opts[:lock_after]
+      @quiz.lock_at = Time.zone.now + opts[:lock_after]
       @quiz.save!
     end
 

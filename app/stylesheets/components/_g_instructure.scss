@@ -363,10 +363,11 @@
         @include fontSize(16px);
         vertical-align: middle;
       }
+      margin: 4px;
       &:focus {
-        outline: 1px solid var(--ic-link-color-darkened-10);
-        outline-offset: -1px;
+        @include ic-focus-variant-inst;
         padding: 2px;
+        margin: 4px;
       }
     }
   }
@@ -558,10 +559,30 @@ body .disabled_link {
   }
 }
 
+.labeled-error-message {
+  margin-top: 0.375rem;
+  .icon-warning {
+    margin-right: 0.375rem;
+  }
+}
+
 .datetime_suggest {
   font-size: 0.8em;
   padding-#{direction(left)}: 10px;
   color: $ic-dim-helper-text;
+  .error-message {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    color: $ic-color-danger;
+    i.icon-warning.icon-Solid {
+      margin-right: 8px;
+    }
+  }
+}
+.hasDatepicker.error,
+.hasDatepicker.error:focus{
+  border: 1px solid $ic-color-danger;
 }
 
 #submission_preview {
@@ -1072,6 +1093,18 @@ $wizard-bg-color: $ic-color-dark;
       color: #666;
       .header_title {
         float: direction(left);
+        button {
+          background: none;
+          color: var(--ic-link-color);
+          border: none;
+          padding: 0;
+          font: inherit;
+          text-decoration: none;
+          &:hover {
+            color: var(--ic-link-color);
+            text-decoration: underline;
+          }
+        }
       }
       .header_icon {
         float: direction(left);
@@ -1666,10 +1699,6 @@ body.padless-content .ic-Layout-contentMain,
     clear: direction(right);
     float: direction(right);
   }
-}
-
-.content_lock_icon {
-  cursor: pointer;
 }
 
 #module_prerequisites_list {

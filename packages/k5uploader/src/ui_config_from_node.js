@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import UiConfig from './ui_config'
-import filterFromNode from './filter_from_node'
+import UiConfig from './ui_config.js'
+import filterFromNode from './filter_from_node.js'
 
 export default function (xml) {
   const limits = xml.querySelector('limits')

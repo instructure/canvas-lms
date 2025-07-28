@@ -43,6 +43,9 @@ Rails.configuration.to_prepare do
         SentryExtensions::Settings.get("sentry_backend_traces_sample_rate", "0.0").to_f
       end
 
+      # Note that this sample rate is relative to the traces sample rate
+      config.profiles_sample_rate = SentryExtensions::Settings.get("sentry_backend_profiles_sample_rate", "0.0").to_f
+
       # Override the Sentry-provided ActiveRecord subscriber with our own (to normalize SQL queries)
       config.rails.tracing_subscribers.delete(Sentry::Rails::Tracing::ActiveRecordSubscriber)
       config.rails.tracing_subscribers.add(SentryExtensions::Tracing::ActiveRecordSubscriber)
@@ -60,6 +63,8 @@ Rails.configuration.to_prepare do
       # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
       # should probably be caught and solved...
       config.excluded_exceptions += %w[
+        AuthenticationMethods::RevokedAccessTokenError
+        AuthenticationMethods::ExpiredAccessTokenError
         AuthenticationMethods::AccessTokenError
         AuthenticationMethods::AccessTokenScopeError
         AuthenticationMethods::LoggedOutError

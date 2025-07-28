@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {result} from 'lodash'
 import Backbone from '@canvas/backbone'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('dialog')
+const I18n = createI18nScope('dialog')
 
 extend(DialogBaseView, Backbone.View)
 
@@ -60,7 +60,10 @@ DialogBaseView.prototype.initDialog = function () {
     ...this.defaultOptions(),
     buttons: [
       {
-        text: I18n.t('#buttons.cancel', 'Cancel'),
+        // Defer i18n lookup to render time to avoid eager loading
+        get text() {
+          return I18n.t('#buttons.cancel', 'Cancel')
+        },
         class: 'cancel_button',
         click: (function (_this) {
           return function (e) {
@@ -69,7 +72,10 @@ DialogBaseView.prototype.initDialog = function () {
         })(this),
       },
       {
-        text: I18n.t('#buttons.update', 'Update'),
+        // Defer i18n lookup to render time to avoid eager loading
+        get text() {
+          return I18n.t('#buttons.update', 'Update')
+        },
         class: 'btn-primary',
         click: (function (_this) {
           return function (e) {
@@ -111,7 +117,6 @@ DialogBaseView.prototype.close = function () {
 }
 
 DialogBaseView.prototype.update = function (_e) {
-  // eslint-disable-next-line no-throw-literal
   throw 'Not yet implemented'
 }
 

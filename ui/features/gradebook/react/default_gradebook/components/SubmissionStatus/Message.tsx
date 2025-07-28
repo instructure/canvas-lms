@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -28,7 +27,9 @@ const VARIANT_MAP = {
   warning: {color: 'danger', Icon: IconWarningLine},
 }
 
+// @ts-expect-error
 const Message = ({message, variant}) => {
+  // @ts-expect-error
   const {Icon, color} = VARIANT_MAP[variant]
   return (
     <Grid>

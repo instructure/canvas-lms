@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export const defaultUsageRights = [
   {
@@ -39,7 +39,7 @@ export const defaultUsageRights = [
   },
   {
     display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
+      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
     ),
     value: 'fair_use',
   },

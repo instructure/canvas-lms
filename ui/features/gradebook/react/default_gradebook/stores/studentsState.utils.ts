@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,12 +17,12 @@
  */
 
 import {chunk} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {RequestDispatch} from '@canvas/network'
 import type {Student, UserSubmissionGroup} from '../../../../../api.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export function flashStudentLoadError(): void {
   showFlashAlert({
@@ -41,8 +40,8 @@ export function flashSubmissionLoadError(): void {
   })
 }
 
+// @ts-expect-error
 export function reportCatch(error) {
-  // eslint-disable-next-line no-console
   console.warn(error)
 }
 
@@ -73,6 +72,7 @@ export const submissionsParams = {
     'redo_request',
     'score',
     'seconds_late',
+    'sticker',
     'submission_type',
     'submitted_at',
     'user_id',
@@ -83,7 +83,7 @@ export const submissionsParams = {
 export function getStudentsChunk(
   courseId: string,
   studentIds: string[],
-  dispatch: RequestDispatch
+  dispatch: RequestDispatch,
 ) {
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
@@ -99,15 +99,16 @@ export function getSubmissionsForStudents(
   submissionsPerPage: number,
   courseId: string,
   studentIds: string[],
+  // @ts-expect-error
   allEnqueued,
-  dispatch: RequestDispatch
+  dispatch: RequestDispatch,
 ) {
-  return new Promise((resolve, reject) => {
+  return new Promise<UserSubmissionGroup[]>((resolve, reject) => {
     const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
 
     dispatch
-      .getDepaginated<Student[]>(url, params, undefined, allEnqueued)
+      .getDepaginated<UserSubmissionGroup[]>(url, params, undefined, allEnqueued)
       .then(resolve)
       .catch(() => {
         flashSubmissionLoadError()
@@ -123,8 +124,9 @@ export function getContentForStudentIdChunk(
   submissionsChunkSize: number,
   submissionsPerPage: number,
   gotChunkOfStudents: (students: Student[]) => void,
-  gotSubmissionsChunk: (student_submission_groups: UserSubmissionGroup[]) => void
+  gotSubmissionsChunk: (student_submission_groups: UserSubmissionGroup[]) => void,
 ) {
+  // @ts-expect-error
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
@@ -136,14 +138,15 @@ export function getContentForStudentIdChunk(
   const submissionRequests: Promise<void>[] = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
-    let submissions
+    let submissions: UserSubmissionGroup[] = []
 
     const submissionRequest = getSubmissionsForStudents(
       submissionsPerPage,
       courseId,
       submissionRequestChunkIds,
+      // @ts-expect-error
       resolveEnqueued,
-      dispatch
+      dispatch,
     )
       .then(subs => (submissions = subs))
       // within the main Gradebook object, students must be received before

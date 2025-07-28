@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
-import {arrayOf, float, string, bool} from 'prop-types'
+import {gql} from '@apollo/client'
+import {arrayOf, float, string, bool, number} from 'prop-types'
 
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
 import {SubmissionComment} from './SubmissionComment'
@@ -47,6 +47,28 @@ export const Submission = {
       rubricAssessmentsConnection {
         nodes {
           ...RubricAssessment
+        }
+      }
+      ltiAssetReportsConnection(first: 10) {
+        nodes {
+          _id
+          asset {
+            _id
+            attachmentId
+            submissionAttempt
+          }
+          comment
+          errorCode
+          indicationAlt
+          indicationColor
+          launchUrlPath
+          priority
+          processingProgress
+          processorId
+          reportType
+          result
+          resultTruncated
+          title
         }
       }
     }
@@ -79,6 +101,28 @@ export const Submission = {
       }),
     }),
     rubricAssessmentsConnection: {nods: arrayOf(RubricAssessment.shape)},
+    ltiAssetReportsConnection: {
+      nodes: arrayOf({
+        _id: string,
+        asset: {
+          _id: string,
+          attachmentId: string,
+          submissionAttempt: number,
+        },
+        comment: string,
+        errorCode: string,
+        indicationAlt: string,
+        indicationColor: string,
+        launchUrlPath: string,
+        priority: number,
+        processingProgress: string,
+        processorId: string,
+        reportType: string,
+        result: string,
+        resultTruncated: string,
+        title: string,
+      }),
+    },
   },
   mock: ({
     _id = '1',
@@ -111,6 +155,9 @@ export const Submission = {
     rubricAssessmentsConnection = {
       nodes: [RubricAssessment.mock()],
     },
+    ltiAssetReportsConnection = {
+      nodes: [],
+    },
   } = {}) => ({
     _id,
     customGradeStatus,
@@ -129,5 +176,6 @@ export const Submission = {
     submittedAt,
     commentsConnection,
     rubricAssessmentsConnection,
+    ltiAssetReportsConnection,
   }),
 }

@@ -47,7 +47,7 @@ PostToSisSelector.prototype.toJSON = function () {
     postToSIS: this.parentModel.postToSIS(),
     postToSISName: this.parentModel.postToSISName(),
     nested: this.nested,
-    // eslint-disable-next-line no-void
+
     prefix: this.nested ? 'assignment' : void 0,
   }
 }

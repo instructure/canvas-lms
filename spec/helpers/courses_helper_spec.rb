@@ -27,12 +27,14 @@ describe CoursesHelper do
   context "a view with a 'Coming Up' sidebar" do
     before(:once) do
       course_with_teacher(active_all: true)
-      @assignment = factory_with_protected_attributes(@course.assignments,
-                                                      assignment_valid_attributes.merge({ points_possible: 10,
-                                                                                          submission_types: "online_text_entry" }))
-      @assignment2 = factory_with_protected_attributes(@course.assignments,
-                                                       assignment_valid_attributes.merge({ points_possible: 10,
-                                                                                           submission_types: "none" }))
+      @assignment = @course.assignments.create!(
+        assignment_valid_attributes.merge({ points_possible: 10,
+                                            submission_types: "online_text_entry" })
+      )
+      @assignment2 = @course.assignments.create!(
+        assignment_valid_attributes.merge({ points_possible: 10,
+                                            submission_types: "none" })
+      )
     end
 
     before do
@@ -41,8 +43,8 @@ describe CoursesHelper do
 
     describe "an assignment with no submissions" do
       before(:once) do
-        @student_one = factory_with_protected_attributes(User, valid_user_attributes)
-        @student_two = factory_with_protected_attributes(User, valid_user_attributes)
+        @student_one = User.create!(valid_user_attributes)
+        @student_two = User.create!(valid_user_attributes)
         [@student_one, @student_two].each do |student|
           e = @course.enroll_student(student)
           e.invite
@@ -69,8 +71,8 @@ describe CoursesHelper do
 
     describe "an assignment with submissions" do
       before(:once) do
-        @student_one = factory_with_protected_attributes(User, valid_user_attributes)
-        @student_two = factory_with_protected_attributes(User, valid_user_attributes)
+        @student_one = User.create!(valid_user_attributes)
+        @student_two = User.create!(valid_user_attributes)
         [@student_one, @student_two].each do |student|
           e = @course.enroll_student(student)
           e.invite
@@ -273,20 +275,20 @@ describe CoursesHelper do
 
   describe "sortable user course list helpers" do
     context "get_sorting_order" do
-      it "returns 'desc' if we are sorting on the current col that is in ascending order" do
+      it "returns 'desc' if you click the same column when there is no prior order" do
         expect(get_sorting_order("favorite", "favorite", nil)).to eq("desc")
       end
 
-      it "returns 'desc' if the default col is being sorted on in ascending order" do
-        expect(get_sorting_order("published", nil, nil)).to eq("desc")
+      it "starts new columns in ascending order" do
+        expect(get_sorting_order("published", nil, nil)).to eq("asc")
       end
 
-      it "returns nil if we are not sorting on the current col" do
-        expect(get_sorting_order("enrolled_as", "favorite", nil)).to be_nil
+      it "starts any column you click (that wasn’t already sorted) in ascending order" do
+        expect(get_sorting_order("enrolled_as", "favorite", nil)).to eq("asc")
       end
 
-      it "returns nil if we are sorting on the current col that is in descending order" do
-        expect(get_sorting_order("favorite", "favorite", "desc")).to be_nil
+      it "toggles back to 'asc' when you click the same column a second time" do
+        expect(get_sorting_order("favorite", "favorite", "desc")).to eq("asc")
       end
     end
 
@@ -309,7 +311,7 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table)
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
       end
 
@@ -317,7 +319,7 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new(pc_sort: "published")
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table, pc_sort: "published")
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table, pc_sort: "published")
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus, :pc_sort))
       end
 
@@ -325,9 +327,36 @@ describe CoursesHelper do
         table = "cc"
         column = "favorite"
         old_params = ActionController::Parameters.new(foo: "bar")
-        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(cc_sort: column, cc_order: "asc", focus: table)
         expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:cc_sort, :cc_order, :focus))
       end
+
+      it "works on pc table" do
+        table = "pc"
+        column = "favorite"
+        old_params = ActionController::Parameters.new(pc_sort: column, pc_order: nil, focus: table)
+        new_params = ActionController::Parameters.new(pc_sort: column, pc_order: "desc", focus: table)
+        expect(get_courses_params(table, column, old_params)).to eq(new_params.permit(:pc_sort, :pc_order, :focus))
+      end
+    end
+  end
+
+  describe "#recent_event_url" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @assignment = @course.assignments.create!(assignment_valid_attributes.merge({ points_possible: 10,
+                                                                                    submission_types: "online_text_entry" }))
+      @checkpoint_topic, @checkpoint_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "returns url for the parent assignment when event is SubAssignment" do
+      expect(recent_event_url(@checkpoint_topic)).to eq "/courses/#{@course.id}/assignments/#{@checkpoint_topic.parent_assignment.id}"
+      expect(recent_event_url(@checkpoint_entry)).to eq "/courses/#{@course.id}/assignments/#{@checkpoint_entry.parent_assignment.id}"
+    end
+
+    it "returns url for the assignment itself when event is Assignment" do
+      expect(recent_event_url(@assignment)).to eq "/courses/#{@course.id}/assignments/#{@assignment.id}"
     end
   end
 end

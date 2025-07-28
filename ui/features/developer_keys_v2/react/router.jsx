@@ -24,7 +24,8 @@ import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import storeCreator from './store/store'
 import {RegistrationSettings} from './RegistrationSettings/RegistrationSettings'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const store = storeCreator()
 
@@ -50,7 +51,7 @@ function renderShowDeveloperKeys(ctx) {
 
   if (!state.listDeveloperKeys.listDeveloperKeysSuccessful) {
     store.dispatch(
-      actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
+      actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true),
     )
 
     if (!state.listDeveloperKeyScopes.listDeveloperKeyScopesSuccessful) {
@@ -59,6 +60,7 @@ function renderShowDeveloperKeys(ctx) {
 
     const view = () => {
       const currentState = store.getState()
+
       ReactDOM.render(
         <DeveloperKeysApp
           applicationState={currentState}
@@ -66,7 +68,7 @@ function renderShowDeveloperKeys(ctx) {
           store={store}
           ctx={ctx}
         />,
-        reactRoot()
+        reactRoot(),
       )
     }
     // returns A function that unsubscribes the change listener.
@@ -78,10 +80,10 @@ function renderShowDeveloperKeys(ctx) {
 
 const renderDeveloperKeySettings = ctx => {
   ReactDOM.render(
-    <QueryProvider>
+    <QueryClientProvider client={queryClient}>
       <RegistrationSettings ctx={ctx} />
-    </QueryProvider>,
-    reactRoot()
+    </QueryClientProvider>,
+    reactRoot(),
   )
 }
 

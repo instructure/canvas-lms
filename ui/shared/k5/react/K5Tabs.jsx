@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {Tabs} from '@instructure/ui-tabs'
@@ -27,10 +27,11 @@ import {getK5ThemeVars} from './k5-theme'
 
 const k5ThemeVariables = getK5ThemeVars()
 
-const I18n = useI18nScope('k5_tabs')
+const I18n = createI18nScope('k5_tabs')
 
 export const scrollElementIntoViewIfCoveredByHeader = tabsRef => e => {
   const elementY = e.target.getBoundingClientRect().y
+  if (!tabsRef) return
   const headerHeight = tabsRef.getBoundingClientRect().y + tabsRef.getBoundingClientRect().height
   // If the focused element is positioned higher than the sticky header, scroll the window by
   // the difference in height (plus a little extra for legibility)
@@ -72,7 +73,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
       ([e]) => {
         setSticky(e.intersectionRatio < 1)
       },
-      {threshold: [1]}
+      {threshold: [1]},
     )
     observer.observe(cachedRef)
     return () => observer.unobserve(cachedRef)
@@ -82,7 +83,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
     <div
       className="ic-Dashboard-tabs"
       ref={containerRef}
-      style={{backgroundColor: k5ThemeVariables.colors.background.backgroundLightest}}
+      style={{backgroundColor: k5ThemeVariables.colors.contrasts.white1010}}
     >
       <View as="div" borderWidth="none none small none">
         {children(sticky)}
@@ -123,7 +124,7 @@ K5Tabs.propTypes = {
       id: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
       label: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   tabsRef: PropTypes.func,
   courseContext: PropTypes.string,

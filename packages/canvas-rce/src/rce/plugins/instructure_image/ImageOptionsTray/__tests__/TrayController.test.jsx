@@ -153,7 +153,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         tray.setUrl('https://www.fillmurray.com/140/100')
         tray.$doneButton.click()
         expect(editors[0].$container.querySelector('img').getAttribute('src')).toEqual(
-          'https://www.fillmurray.com/140/100'
+          'https://www.fillmurray.com/140/100',
         )
       })
     })
@@ -165,7 +165,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
         tray.setAltText('Bill Murray, always amazing')
         tray.$doneButton.click()
         expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
-          'Bill Murray, always amazing'
+          'Bill Murray, always amazing',
         )
       })
     })
@@ -180,7 +180,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
 
       it('sets a role to persist the option', () => {
         expect(editors[0].$container.querySelector('img').getAttribute('role')).toEqual(
-          'presentation'
+          'presentation',
         )
       })
     })
@@ -198,7 +198,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
 
       it('updates the image element alt text', () => {
         expect(editors[0].$container.querySelector('img').getAttribute('alt')).toEqual(
-          'Bill Murray, always amazing'
+          'Bill Murray, always amazing',
         )
       })
 

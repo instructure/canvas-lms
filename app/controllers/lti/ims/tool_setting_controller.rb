@@ -136,7 +136,7 @@ module Lti
       end
 
       def custom_settings(type, json)
-        if request.content_type == "application/vnd.ims.lti.v2.toolsettings+json"
+        if request.media_type == "application/vnd.ims.lti.v2.toolsettings+json"
           setting = json["@graph"].find { |s| s["@type"] == type }
           setting["custom"]
         else
@@ -199,9 +199,9 @@ module Lti
 
       def valid_update_request?(json)
         valid = params[:bubble].blank?
-        if valid && request.content_type == "application/vnd.ims.lti.v2.toolsettings+json"
+        if valid && request.media_type == "application/vnd.ims.lti.v2.toolsettings+json"
           valid = json["@graph"].count == 1
-        elsif valid && request.content_type == "application/vnd.ims.lti.v2.toolsettings.simple+json"
+        elsif valid && request.media_type == "application/vnd.ims.lti.v2.toolsettings.simple+json"
           valid = !json.key?("@graph")
         end
         valid

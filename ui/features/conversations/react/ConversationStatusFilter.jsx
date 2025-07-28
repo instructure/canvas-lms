@@ -17,20 +17,21 @@
  */
 
 import Backbone from '@canvas/backbone'
-import {decodeQueryString} from '@canvas/query-string-encoding'
+import {decodeQueryString} from '@instructure/query-string-encoding'
 import {FormField} from '@instructure/ui-form-field'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('ConversationStatusFilter')
+const I18n = createI18nScope('ConversationStatusFilter')
 
 export default class ConversationStatusFilter extends React.Component {
   static propTypes = {
     defaultFilter: PropTypes.string.isRequired,
     initialFilter: PropTypes.string.isRequired,
-    router: PropTypes.instanceOf(Backbone.Router).isRequired,
+    router: PropTypes.oneOfType([PropTypes.instanceOf(Backbone.Router), PropTypes.object])
+      .isRequired,
     filters: PropTypes.objectOf((obj, key) => {
       if (typeof key !== 'string' || typeof obj[key] !== 'string') {
         return new Error("Keys and values of 'filter' prop must be strings")

@@ -19,7 +19,6 @@
 import fetchMock from 'fetch-mock'
 import RceApiSource from '../api'
 import {saveClosedCaptions, saveClosedCaptionsForAttachment} from '@instructure/canvas-media'
-import RCEGlobals from '../../rce/RCEGlobals'
 
 jest.mock('@instructure/canvas-media')
 
@@ -71,8 +70,8 @@ describe('fetchImages()', () => {
     await subject()
     expect(
       fetchMock.called(
-        '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized'
-      )
+        '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized',
+      ),
     ).toEqual(true)
   })
 })
@@ -105,7 +104,7 @@ describe('fetchFilesForFolder()', () => {
     await subject()
     expect(apiSource.fetchPage).toHaveBeenCalledWith(
       `/api/files?per_page=5&search_term=${encodedSearchString}`,
-      'theJWT'
+      'theJWT',
     )
   })
 })
@@ -128,15 +127,14 @@ describe('fetchMedia', () => {
       contextId: 1,
     }
 
-    apiSource.apiFetch = jest.fn()
-    fetchMock.mock('/api/documents', '{"files": []}')
+    apiSource.apiFetch = jest.fn().mockResolvedValue({files: []})
   })
 
   it('fetches media documents', async () => {
     await subject()
     expect(apiSource.apiFetch).toHaveBeenCalledWith(
       'http://test.com/api/documents?contextType=course&contextId=1&content_types=video,audio&sort=name&order=asc',
-      {Authorization: 'Bearer theJWT'}
+      {Authorization: 'Bearer theJWT'},
     )
   })
 })
@@ -176,7 +174,7 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
@@ -193,7 +191,7 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
@@ -209,14 +207,14 @@ describe('saveClosedCaptions()', () => {
         },
         origin: 'http://test.com',
       },
-      maxBytes
+      maxBytes,
     )
   })
 
   describe('with a captions file that is too large', () => {
     beforeEach(() => {
       saveClosedCaptions.mockImplementation(
-        jest.requireActual('@instructure/canvas-media').saveClosedCaptions
+        jest.requireActual('@instructure/canvas-media').saveClosedCaptions,
       )
       maxBytes = 5
     })
@@ -236,26 +234,25 @@ describe('updateMediaData()', () => {
   const media_object_id = 'm-id',
     attachment_id = '123'
 
-  it('Uses the media object route with no attachment_id FF ON', async () => {
+  it('Uses the media object route with no attachment_id', async () => {
     apiSource.apiPost = jest.fn()
-    await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id})
+    await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id: null})
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_objects/m-id?user_entered_title=',
       expect.anything(),
       null,
-      expect.anything()
+      expect.anything(),
     )
   })
 
-  it('Uses the media attachment route with the attachment_id FF ON', async () => {
+  it('Uses the media attachment route with the attachment_id', async () => {
     apiSource.apiPost = jest.fn()
-    RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
     await apiSource.updateMediaObject(apiProps, {media_object_id, title: '', attachment_id})
     expect(apiSource.apiPost).toHaveBeenCalledWith(
       'http://test.com/api/media_attachments/123?user_entered_title=',
       expect.anything(),
       null,
-      expect.anything()
+      expect.anything(),
     )
   })
 })

@@ -88,7 +88,7 @@ describe('Search', () => {
 
   it('renders placeholder text for student_enrollment context', () => {
     const {getByPlaceholderText} = render(
-      <Search {...defaultProps} contextType="student_enrollment" />
+      <Search {...defaultProps} contextType="student_enrollment" />,
     )
 
     const searchInput = getByPlaceholderText('Search for students')
@@ -99,7 +99,7 @@ describe('Search', () => {
     it("renders a SR-only alert with the number of results when there's lots of results", () => {
       const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1, 2, 3]))
       const {getByRole, getByText} = render(
-        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )
       act(() => getByRole('button', {name: 'Search'}).click())
       expect(getByText('Showing 3 results below')).toBeInTheDocument()
@@ -108,7 +108,7 @@ describe('Search', () => {
     it('renders a SR-only alert indicating one result', () => {
       const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([1]))
       const {getByRole, getByText} = render(
-        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )
       act(() => getByRole('button', {name: 'Search'}).click())
       expect(getByText('Showing 1 result below')).toBeInTheDocument()
@@ -117,7 +117,7 @@ describe('Search', () => {
     it('renders a SR-only alert indicating no results found', () => {
       const fetchPaceContextsMock = jest.fn(({afterFetch}) => afterFetch([]))
       const {getByRole, getByText} = render(
-        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />
+        <Search {...defaultProps} fetchPaceContexts={fetchPaceContextsMock} />,
       )
       act(() => getByRole('button', {name: 'Search'}).click())
       expect(getByText('No results found')).toBeInTheDocument()

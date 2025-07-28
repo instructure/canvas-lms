@@ -33,7 +33,7 @@ describe MicrosoftSync::DebugInfoTracker do
     expect(actual_msg).to be_a(Hash)
     expect(actual_msg[:msg]).to eq(msg)
     expect(actual_msg[:timestamp]).to match(/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\z/)
-    expect(Time.parse(actual_msg[:timestamp])).to be_within(1.minute).of(Time.now)
+    expect(Time.zone.parse(actual_msg[:timestamp])).to be_within(1.minute).of(Time.zone.now)
     expect(actual_msg[:data]).to match(data)
 
     if user_ids

@@ -40,7 +40,7 @@ export default {
     const resourceName = this.resourceName || this.model.prototype.resourceName
     if (!resourceName) {
       throw new Error(
-        'Must define a `resourceName` property on collection or model prototype to use defaultUrl'
+        'Must define a `resourceName` property on collection or model prototype to use defaultUrl',
       )
     }
     return `/api/v1/${this._contextPath()}/${resourceName}`

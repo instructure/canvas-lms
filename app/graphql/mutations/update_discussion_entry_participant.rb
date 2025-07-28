@@ -37,9 +37,9 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
   graphql_name "UpdateDiscussionEntryParticipant"
 
   argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
-  argument :read, Boolean, required: false
-  argument :rating, Types::RatingInputType, required: false
   argument :forced_read_state, Boolean, required: false
+  argument :rating, Types::RatingInputType, required: false
+  argument :read, Boolean, required: false
   argument :report_type, Types::ReportType, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: false
@@ -49,7 +49,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
 
     unless input[:read].nil?
       opt = input[:forced_read_state].nil? ? {} : { forced: input[:forced_read_state] }
-      input[:read] ? discussion_entry.change_read_state("read", current_user, opt) : discussion_entry.change_read_state("unread", current_user, opt)
+      discussion_entry.change_read_state(input[:read] ? "read" : "unread", current_user, opt)
     end
 
     unless input[:rating].nil?
@@ -59,7 +59,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
     end
 
     unless input[:report_type].nil?
-      InstStatsd::Statsd.increment("discussion_entry_participant.report.created")
+      InstStatsd::Statsd.distributed_increment("discussion_entry_participant.report.created")
       discussion_entry.change_report_type(input[:report_type], current_user)
     end
 

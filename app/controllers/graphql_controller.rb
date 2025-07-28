@@ -22,21 +22,30 @@ class GraphQLController < ApplicationController
   include Api::V1
 
   before_action :require_user, if: :require_auth?
-  before_action :require_inst_access_token_auth, only: :subgraph_execute, unless: :sdl_query?
   # This makes sure that the liveEvents context is set up for graphql requests
   before_action :get_context
-
-  # This action is for use only with the federated API Gateway. See
-  # `app/graphql/README.md` for details.
-  def subgraph_execute
-    result = execute_on(CanvasSchema.for_federation)
-    render json: result
-  end
 
   def execute
     result = execute_on(CanvasSchema)
     prep_page_view_for_submit
     prep_page_view_for_create_discussion_entry
+
+    # generic errors like exceed complexity are on root level of result
+    graphql_errors = result["errors"]
+    # query specific business logic errors (e.g. permission required) are nested in the data hash
+    query_errors = result.to_h["data"]&.values&.map { |res| (res.is_a?(Hash) && res["errors"].present?) ? res["errors"] : "" }&.reject(&:blank?)
+
+    any_error_occured = graphql_errors.present? || query_errors.present?
+    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "f" : "t")
+    if any_error_occured
+      disable_page_views
+      Rails.logger.info "There are GraphQL errors: #{safe_to_json({ graphql_errors:, query_errors: }.compact)}"
+      if graphql_errors.present? && graphql_errors.is_a?(Array)
+        max_complexity_error = graphql_errors.find { |e| e.is_a?(Hash) && e["message"].to_s.include?("exceeds max complexity") }
+        log_exceed_complexity_error(max_complexity_error["message"].to_s) if max_complexity_error.present?
+      end
+    end
+
     render json: result
   end
 
@@ -45,10 +54,26 @@ class GraphQLController < ApplicationController
     render :graphiql, layout: "bare"
   end
 
+  def get_context # rubocop:disable Naming/AccessorMethodName
+    case subject&.pick(:context_type, :context_id)
+    in nil
+      return
+    in ["Course", id]
+      params[:course_id] = id
+    in ["Group", id]
+      params[:group_id] = id
+    in [context_type, _]
+      raise "Can not handle #{context_type} in GraphQL context"
+    end
+
+    super
+  end
+
   private
 
   def execute_on(schema)
-    query = params[:query]
+    query = anonymous_call? ? persisted_query["query"] : params[:query]
+
     variables = params[:variables] || {}
     context = {
       current_user: @current_user,
@@ -75,14 +100,21 @@ class GraphQLController < ApplicationController
 
   def require_auth?
     if action_name == "execute"
-      return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
-    end
-
-    if !Rails.env.production? && action_name == "subgraph_execute" && sdl_query?
-      return false
+      return false if ::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
+      if persisted_query
+        return !persisted_query["anonymous_access_allowed"]
+      end
     end
 
     true
+  end
+
+  def anonymous_call?
+    !@current_user && !require_auth? && persisted_query && in_app?
+  end
+
+  def persisted_query
+    @persisted_query ||= GraphQL::PersistedQuery.find(params[:operationName]) if @domain_root_account.feature_enabled?(:graphql_persisted_queries)
   end
 
   def sdl_query?
@@ -94,20 +126,10 @@ class GraphQLController < ApplicationController
     query == "{_service{sdl}}"
   end
 
-  def require_inst_access_token_auth
-    unless @authenticated_with_inst_access_token
-      render(
-        json: { errors: [{ message: "InstAccess token auth required" }] },
-        status: :unauthorized
-      )
-    end
-  end
-
   def prep_page_view_for_submit
     return unless params[:operationName] == "CreateSubmission"
 
     assignment = ::Assignment.active.find(params[:variables][:assignmentLid])
-    get_context
     log_asset_access(assignment, "assignments", nil, "participate")
   end
 
@@ -115,7 +137,36 @@ class GraphQLController < ApplicationController
     return unless params[:operationName] == "CreateDiscussionEntry"
 
     topic = DiscussionTopic.find(params[:variables][:discussionTopicId])
-    get_context
     log_asset_access(topic, "topics", "topics", "participate")
+  end
+
+  def subject
+    case params[:operationName]
+    when "CreateSubmission"
+      id = params[:variables][:assignmentLid]
+      ::Assignment.active.where(id:)
+    when "CreateDiscussionEntry"
+      id = params[:variables][:discussionTopicId]
+      ::DiscussionTopic.where(id:)
+    end
+  end
+
+  def safe_to_json(obj)
+    obj.to_json
+  rescue
+    obj
+  end
+
+  def log_exceed_complexity_error(err_msg)
+    tags = { operation_name: }
+    InstStatsd::Statsd.distributed_increment("graphql.errors.exceeds_max_complexity.count", tags:)
+    InstStatsd::Statsd.gauge("graphql.errors.exceeds_max_complexity.compexity", err_msg[/complexity of (\d+),/, 1]&.to_i, tags:)
+  end
+
+  def operation_name
+    document = GraphQL.parse(params[:query])
+    document&.definitions&.find { |d| d.is_a?(GraphQL::Language::Nodes::OperationDefinition) }&.name
+  rescue GraphQL::ParseError
+    "unknown"
   end
 end

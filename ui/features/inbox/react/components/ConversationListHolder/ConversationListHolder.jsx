@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState, useContext, useCallback, useMemo, useRef} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 
 import {ConversationListItem} from './ConversationListItem'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const ConversationListHolder = ({
   isLoading,
@@ -94,7 +94,7 @@ export const ConversationListHolder = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (lastConversationItem) {
@@ -267,7 +267,7 @@ export const ConversationListHolder = ({
   }
 
   return (
-    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid}>
+    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid} borderColor="secondary">
       {isLoading && !isLoadingMoreMenuData && renderLoading()}
       {(!isLoading || isLoadingMoreMenuData) && (
         <View
@@ -276,6 +276,7 @@ export const ConversationListHolder = ({
           overflowX="hidden"
           overflowY="auto"
           borderWidth="0 small small small"
+          borderColor="secondary"
         >
           {renderedItems}
           {isLoadingMoreMenuData && renderLoading()}

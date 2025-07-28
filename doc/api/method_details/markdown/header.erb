@@ -1,0 +1,16 @@
+## [<%= object.tag("API").try(:text) %>](#<%= @method_link %>)<a name='<%= @method_link %>'></a>
+
+<% if @controller_path %>
+[<%= "#{@route.requirements[:controller].camelize}Controller##{@route.requirements[:action]}" %>](https://github.com/instructure/canvas-lms/blob/master/<%= @controller_path %>)
+<% end %>
+
+<% if @deprecated_method.present? %>
+<%= hint("danger", "[DEPRECATED] This method is deprecated, effective #{ @deprecated_method.effective_date } (notice given #{ @deprecated_method.notice_date }):") %>
+<%= htmlify @deprecated_method.description  %>
+<% end %>
+
+<% if @beta %>
+<%= hint("warning", "BETA: This API endpoint is not finalized, and there could be breaking changes before its final release.") %>
+<% end %>
+
+<%= yieldall %>

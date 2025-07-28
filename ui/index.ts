@@ -39,10 +39,10 @@ import pluginBundles from 'plugin-bundles-generated'
 // so they have to be ran before any other app code runs.
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms'
-import './boot/initializers/ajax_errors'
-import './boot/initializers/activateKeyClicks'
-import './boot/initializers/activateTooltips'
-import './boot/initializers/injectAuthTokenIntoForms'
+import '@canvas/common/ajax_errors'
+import '@canvas/common/activateKeyClicks'
+import '@canvas/common/activateTooltips'
+import '@canvas/common/injectAuthTokenIntoForms'
 
 interface CustomWindow extends Window {
   bundles: string[]
@@ -86,9 +86,8 @@ up({
   },
   requires: [C.I18n],
 }).catch((e: Error) => {
-  // eslint-disable-next-line no-console
   console.error(
-    `Canvas front-end did not successfully start! Did you add any new bundles to ui/featureBundles.ts? (${e.message})`
+    `Canvas front-end did not successfully start! Did you add any new bundles to ui/featureBundles.ts? (${e.message})`,
   )
   captureException(e)
 })
@@ -117,7 +116,6 @@ const advanceReadiness = (target: string) => {
 }
 
 function afterDocumentReady() {
-  // eslint-disable-next-line promise/catch-or-return
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() => {
     advanceReadiness('deferredBundles')
   })
@@ -172,7 +170,7 @@ function setupMathML() {
     window.dispatchEvent(
       new CustomEvent(Mathml.processNewMathEventName, {
         detail: {target: document.body, features, config},
-      })
+      }),
     )
   }, 0)
 
@@ -200,7 +198,6 @@ function setupMathML() {
 }
 
 if (ENV.csp) {
-  // eslint-disable-next-line promise/catch-or-return
   import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
 }
 
@@ -208,24 +205,25 @@ if (ENV.INCOMPLETE_REGISTRATION) {
   import('./boot/initializers/warnOnIncompleteRegistration')
 }
 
+import('./boot/initializers/monitorLtiMessages')
+
 // TODO: remove the need for this
 // it is only used in submissions
 if (ENV.badge_counts) {
   import('./boot/initializers/showBadgeCounts')
 }
 
-// Load and then display the Canvas help dialog if the user has requested it
+// Decorate the help link with the React/InstUI dialog from the navigation sidenav
 async function openHelpDialog(event: Event): Promise<void> {
+  const helpLink = event.target as Element
   event.preventDefault()
   try {
-    const {default: helpDialog} = await import('./boot/initializers/enableHelpDialog')
-    helpDialog.open()
+    const {renderLoginHelp} = await import('@canvas/help-dialog')
+    renderLoginHelp(helpLink)
   } catch (e) {
-    /* eslint-disable no-console */
     console.error('Help dialog could not be displayed')
     console.error(e)
     captureException(e)
-    /* eslint-enable no-console */
   }
 }
 
@@ -239,10 +237,20 @@ async function loadNewUserTutorials() {
     const {default: initializeNewUserTutorials} = await import('./features/new_user_tutorial/index')
 
     initializeNewUserTutorials()
+  } else {
+    document.getElementsByClassName('TutorialToggleHolder')[0]?.remove() // inherited margin from parent leaves a gap
   }
 }
-
 ;(window.requestIdleCallback || window.setTimeout)(async () => {
   await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
   advanceReadiness('asyncInitializers')
 })
+
+// Allows for HMR in development without needing to mark
+// each module with this line. Once we switch pages to using react-router
+// we can remove this, as the setup for HMR is taken care of for us.
+if (typeof module !== 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  module?.hot?.accept()
+}

@@ -200,3 +200,8 @@ i.course_select_warning {
   background: var(--ic-brand-button--primary-bgd);
   color: var(--ic-brand-button--primary-text);
 }
+
+#course-copy-select-course:required:invalid {
+  // reset global style, let instui handle it
+  box-shadow: initial;
+}

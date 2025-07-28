@@ -23,14 +23,14 @@ import {DeletedPostMessage} from '../DeletedPostMessage'
 const setup = (
   deleterName = 'Rick Sanchez',
   timingDisplay = 'Jan 1 1:00pm',
-  deletedTimingDisplay = 'Feb 2 2:00pm'
+  deletedTimingDisplay = 'Feb 2 2:00pm',
 ) => {
   return render(
     <DeletedPostMessage
       deleterName={deleterName}
       timingDisplay={timingDisplay}
       deletedTimingDisplay={deletedTimingDisplay}
-    />
+    />,
   )
 }
 

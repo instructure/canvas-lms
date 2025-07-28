@@ -31,12 +31,13 @@ import {
 export const gradingPeriodRow = (
   gradingPeriod,
   queryData,
+  assignmentsData,
   calculateOnlyGradedAssignments = false,
-  courseLevelGrades = {}
+  courseLevelGrades = {},
 ) => {
   const filterByGradingPeriod = filteredAssignments(
-    queryData,
-    calculateOnlyGradedAssignments
+    assignmentsData,
+    calculateOnlyGradedAssignments,
   ).filter(assignment => {
     return assignment?.gradingPeriodId === gradingPeriod?._id
   })
@@ -50,7 +51,7 @@ export const gradingPeriodRow = (
     gradingPeriod,
     filterByGradingPeriod,
     queryData?.assignmentGroupsConnection?.nodes,
-    queryData?.applyGroupWeights
+    queryData?.applyGroupWeights,
   )
 
   const letterGrade =
@@ -80,6 +81,7 @@ export const gradingPeriodRow = (
       <Table.Cell textAlign="center">
         <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedScore}</Text>
       </Table.Cell>
+      <Table.Cell>{/* Document processors */}</Table.Cell>
     </Table.Row>
   )
 }

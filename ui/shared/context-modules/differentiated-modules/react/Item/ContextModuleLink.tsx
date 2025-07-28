@@ -20,10 +20,9 @@ import React, {useRef, useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from '@instructure/html-escape'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type ContextModuleLinkProps = {
   courseId?: string | null
@@ -94,8 +93,8 @@ function ContextModuleLink({courseId, contextModuleId, contextModuleName}: Conte
           }
         }}
         dangerouslySetInnerHTML={{
-          __html: I18n.t('Inherited from *%{context}*', {
-            context: htmlEscape(contextModuleName),
+          __html: I18n.t('Inherited from *%{contextModuleName}*', {
+            contextModuleName,
             wrappers: [
               `<a class=${linkClassRef.current} target="_blank" href="/courses/${courseId}/modules#${contextModuleId}">$1</a>`,
             ],

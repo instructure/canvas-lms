@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
@@ -43,7 +43,7 @@ import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
 import {getPermissionsWithLabels, roleIsBaseRole} from '@canvas/permissions/util'
 
-const I18n = useI18nScope('permissions_role_tray')
+const I18n = createI18nScope('permissions_role_tray')
 
 export default class RoleTray extends Component {
   static propTypes = {
@@ -104,7 +104,7 @@ export default class RoleTray extends Component {
       const message = I18n.t('Cannot change role name to %{label}: already in use', {
         label: trimmedValue,
       })
-      errorMessages = [{text: message, type: 'error'}]
+      errorMessages = [{text: message, type: 'newError'}]
     }
     this.setState({
       editRoleLabelInput: event.target.value,
@@ -142,7 +142,7 @@ export default class RoleTray extends Component {
         editRoleLabelInput: this.props.role.label,
         editRoleLabelErrorMessages: [],
       },
-      () => this.closeButton.focus()
+      () => this.closeButton.focus(),
     )
   }
 
@@ -156,7 +156,7 @@ export default class RoleTray extends Component {
         editRoleLabelInput: '',
         editRoleLabelErrorMessages: [],
       },
-      callback
+      callback,
     )
   }
 
@@ -253,7 +253,7 @@ export default class RoleTray extends Component {
           {I18n.t(
             'Warning: If there are any users with this role, they will keep ' +
               'the current permissions but you will not be able to create new ' +
-              'users with this role.'
+              'users with this role.',
           )}
         </Text>
         <Text as="p">{I18n.t('Click "ok" to continue deleting this role.')}</Text>
@@ -263,7 +263,7 @@ export default class RoleTray extends Component {
       text,
       this.state.deleteAlertVisible,
       this.deleteRole,
-      this.hideDeleteAlert
+      this.hideDeleteAlert,
     )
   }
 
@@ -279,7 +279,7 @@ export default class RoleTray extends Component {
       text,
       this.state.editBaseRoleAlertVisible,
       this.handleBaseRoleChange,
-      this.hideEditBaseRoleAlert
+      this.hideEditBaseRoleAlert,
     )
   }
 
@@ -437,6 +437,7 @@ export default class RoleTray extends Component {
           name="edit_name_box"
           value={this.state.editRoleLabelInput}
           messages={this.state.editRoleLabelErrorMessages}
+          isRequired={true}
           onBlur={this.updateRole}
           onChange={this.onChangeRoleLabel}
         />

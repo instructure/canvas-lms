@@ -16,24 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
-import {useQuery} from '@canvas/query'
+import {Text} from '@instructure/ui-text'
 import groupsQuery from '../queries/groupsQuery'
 import type {AccessibleGroup} from '../../../../api.d'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
-const I18n = useI18nScope('GroupsTray')
+const I18n = createI18nScope('GroupsTray')
 
 export default function GroupsTray() {
   const {data, isLoading, isSuccess} = useQuery<AccessibleGroup[], Error>({
     queryKey: ['groups', 'self', 'can_access'],
     queryFn: groupsQuery,
-    fetchAtLeastOnce: true,
+    persister: sessionStoragePersister,
   })
 
   return (
@@ -65,6 +67,13 @@ export default function GroupsTray() {
               <Link isWithinText={false} href={`/groups/${group.id}`}>
                 {group.name}
               </Link>
+              {/* @ts-expect-error */}
+              {group.context_type === 'Course' && (
+                <Text as="div" size="x-small" weight="light">
+                  {/* @ts-expect-error */}
+                  {group.context_name}
+                </Text>
+              )}
             </List.Item>
           ))}
       </List>

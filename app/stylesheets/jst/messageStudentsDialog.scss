@@ -21,20 +21,29 @@
     box-sizing: border-box;
     width: 100%;
     height: 200px;
+    margin-bottom: 0;
   }
 }
+
 #message-recipients {
   margin-bottom: 10px;
   max-height: 100px;
   overflow: auto;
 }
 .message-recipients-group-container {
+  display: flex;
+  align-items: baseline;
   line-height: 30px;
-  label {
-    font-weight: bold;
-    margin-bottom: 0;
+  .label-container {
+    display: flex;
+    align-items: center;
+    margin-right: 4px;
+    label {
+      font-weight: bold;
+      margin-right: 4px;
+      margin-bottom: 0;
+    }
   }
-  margin-bottom: 10px;
 }
 #message-recipients-group {
   width: auto;

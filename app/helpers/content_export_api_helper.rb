@@ -19,6 +19,8 @@
 #
 
 module ContentExportApiHelper
+  include ContentExportAssignmentHelper
+
   def create_content_export_from_api(params, context, current_user)
     export = context.content_exports.build
     export.user = current_user
@@ -54,6 +56,8 @@ module ContentExportApiHelper
     else
       export.export_type = ContentExport::COMMON_CARTRIDGE
       export.selected_content = selected_content || { everything: true }
+      selected_assignments = get_selected_assignments(export, params[:select]) if params[:select]
+      export.prepare_new_quizzes_export(selected_assignments)
     end
     # recheck, since the export type influences permissions (e.g., students can download zips of non-locked files, but not common cartridges)
     return unless authorized_action(export, current_user, :create)
@@ -65,7 +69,10 @@ module ContentExportApiHelper
     tz_identifier = ActiveSupport::TimeZone::MAPPING[Time.zone.name]
     export.settings[:user_time_zone] = tz_identifier if tz_identifier.present?
     if export.save
-      export.queue_api_job(opts)
+      export.initialize_job_progress
+
+      export.quizzes2_build_assignment(opts) if export.new_quizzes_page_enabled?
+      export.export(opts) unless export.waiting_for_external_tool?
     end
     export
   end

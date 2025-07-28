@@ -37,7 +37,8 @@ export default handleActions(
       return []
     },
     GOT_COURSE_LIST: (state, action) => {
-      return action.payload
+      // Ensure we always return an array
+      return Array.isArray(action.payload) ? action.payload : []
     },
     GOT_GRADES_SUCCESS: mergeGradesIntoCourses,
     CLEAR_COURSES: (state, action) => {
@@ -45,5 +46,5 @@ export default handleActions(
       return defaultState
     },
   },
-  defaultState
+  defaultState,
 )

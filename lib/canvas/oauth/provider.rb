@@ -23,11 +23,12 @@ module Canvas::OAuth
 
     attr_reader :client_id, :scopes, :purpose
 
-    def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil, key: nil)
+    def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil, key: nil, pkce: {})
       @client_id = client_id
       @redirect_uri = redirect_uri
       @scopes = scopes
       @purpose = purpose
+      @pkce = pkce
 
       # Some grant types have already loaded the developer key. If that's the case allow
       # passing the key into this provider rather than re-querying for it.
@@ -42,7 +43,8 @@ module Canvas::OAuth
       return false unless @client_id.present?
 
       begin
-        !!Integer(@client_id)
+        # Check if client_id is a valid integer within 64-bit range
+        Integer(@client_id).bit_length < 64
       rescue ArgumentError
         false
       end
@@ -73,8 +75,8 @@ module Canvas::OAuth
     # user
     def authorized_token?(user, real_user: nil)
       unless self.class.is_oob?(redirect_uri)
-        return true if Token.find_reusable_access_token(user, key, scopes, purpose, real_user:)
         return true if key.trusted?
+        return true if Token.find_reusable_access_token(user, key, scopes, purpose, real_user:)
       end
 
       false
@@ -99,8 +101,16 @@ module Canvas::OAuth
       @redirect_uri.presence || ""
     end
 
+    def code_challenge
+      @pkce&.dig(:code_challenge)
+    end
+
+    def code_challenge_method
+      @pkce&.dig(:code_challenge_method)
+    end
+
     def session_hash
-      { client_id: key.id, redirect_uri:, scopes:, purpose: }
+      { client_id: @client_id, redirect_uri:, scopes:, purpose:, code_challenge:, code_challenge_method: }
     end
 
     def valid_scopes?
@@ -125,7 +135,14 @@ module Canvas::OAuth
     end
 
     def self.final_redirect_params(oauth_session, current_user, real_user = nil, options = {})
-      options = { scopes: oauth_session&.dig(:scopes), remember_access: options&.dig(:remember_access), purpose: oauth_session&.dig(:purpose) }
+      options = {
+        scopes: oauth_session&.dig(:scopes),
+        remember_access: options&.dig(:remember_access),
+        purpose: oauth_session&.dig(:purpose),
+        code_challenge: oauth_session&.dig(:code_challenge),
+        code_challenge_method: oauth_session&.dig(:code_challenge_method)
+      }
+
       code = Canvas::OAuth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
       redirect_params = { code: }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]

@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class DataFixup < Cop
+      class DataFixup < Base
         include RuboCop::Canvas::MigrationTags
 
         MSG = "Data fixups should be done in postdeploy migrations"

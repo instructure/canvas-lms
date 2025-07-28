@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import ProgressBar from '@canvas/progress/react/components/ProgressBar'
 
-const I18n = useI18nScope('theme_editor')
+const I18n = createI18nScope('theme_editor')
 
 const messageToName = message =>
   message.includes('Syncing for') ? message.replace('Syncing for ', '') : message
@@ -52,7 +52,11 @@ export default function ThemeEditorModal(props) {
   const modalIsOpen = props.showProgressModal || props.showSubAccountProgress
 
   return (
-    <Modal open={modalIsOpen} size={props.showProgressModal ? 'small' : 'medium'}>
+    <Modal
+      open={modalIsOpen}
+      size={props.showProgressModal ? 'small' : 'medium'}
+      label={I18n.t('Applying new styles to subaccounts')}
+    >
       <Modal.Header>
         <Heading>
           {props.showProgressModal

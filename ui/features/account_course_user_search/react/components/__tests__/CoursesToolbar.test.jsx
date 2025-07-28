@@ -68,6 +68,34 @@ const props = {
     ],
     loading: false,
   },
+  filteredTerms: [
+    {
+      id: '1',
+      name: 'Future Term 1',
+      start_at: '2099-01-01',
+      end_at: '3099-01-01',
+    },
+    {
+      id: '2',
+      name: 'Future Term 2',
+      start_at: '2099-01-01',
+    },
+    {
+      id: '3',
+      name: 'Active Term 1',
+      start_at: '1999-01-01',
+      end_at: '3099-01-01',
+    },
+    {
+      id: '4',
+      name: 'Term With No Start Or End 1',
+    },
+    {
+      id: '5',
+      name: 'Past Term 1',
+      end_at: '1999-01-01',
+    },
+  ],
 }
 
 describe('CoursesToolbar', () => {
@@ -78,7 +106,10 @@ describe('CoursesToolbar', () => {
 
       expect(props.draftFilters.enrollment_type).toBe(null)
       enrollCheck.click()
-      expect(props.onUpdateFilters).toHaveBeenCalledWith({enrollment_type: ['student']})
+      expect(props.onUpdateFilters).toHaveBeenCalledWith({
+        enrollment_type: ['student'],
+        enrollment_workflow_state: ['active', 'invited', 'pending', 'creation_pending'],
+      })
     })
 
     it('onUpdateFilter is called when public courses checkbox is clicked', () => {
@@ -118,6 +149,51 @@ describe('CoursesToolbar', () => {
         'Future Term 2',
         'Past Term 1',
       ])
+    })
+
+    it('renders search icon in the text input', () => {
+      const {getByTestId} = render(<CoursesToolbar {...props} />)
+      const searchIcon = getByTestId('icon-search-line')
+
+      expect(searchIcon).toBeInTheDocument()
+    })
+
+    it('clear search button is not shown when search term is empty', () => {
+      const {queryByTestId} = render(<CoursesToolbar {...props} />)
+      const clearButton = queryByTestId('clear-search')
+
+      expect(clearButton).toBeNull()
+    })
+
+    it('clear search button is shown when search term is not empty', () => {
+      const propsWithSearchTerm = {
+        ...props,
+        draftFilters: {
+          ...props.draftFilters,
+          search_term: 'test search',
+        },
+      }
+      const {getByTestId} = render(<CoursesToolbar {...propsWithSearchTerm} />)
+      const clearButton = getByTestId('clear-search')
+
+      expect(clearButton).toBeInTheDocument()
+    })
+
+    it('clicking clear search button calls onUpdateFilters with empty search term', () => {
+      const propsWithSearchTerm = {
+        ...props,
+        draftFilters: {
+          ...props.draftFilters,
+          search_term: 'test search',
+        },
+      }
+      jest.clearAllMocks()
+      const {getByTestId} = render(<CoursesToolbar {...propsWithSearchTerm} />)
+      const clearButton = getByTestId('clear-search')
+
+      clearButton.click()
+
+      expect(propsWithSearchTerm.onUpdateFilters).toHaveBeenCalledWith({search_term: ''})
     })
   })
 })

@@ -151,10 +151,9 @@ class FileBrowser extends React.Component {
       },
       error => {
         this.props.onLoading(false)
-        /* eslint-disable no-console */
         console.error('Error fetching data from API')
         console.error(error)
-      }
+      },
     )
   })
 
@@ -172,7 +171,7 @@ class FileBrowser extends React.Component {
       error => {
         this.props.onLoading(false)
         console.error(error)
-      }
+      },
     )
   }
 
@@ -190,7 +189,7 @@ class FileBrowser extends React.Component {
         () => {
           this.fetchSubFolders(id)
           this.fetchFiles(id)
-        }
+        },
       )
     }
   }
@@ -210,7 +209,7 @@ class FileBrowser extends React.Component {
           collectionCollections.push(collection.id)
           newCollections[parentId].collections = this.orderedIdsFromList(
             newCollections,
-            collectionCollections
+            collectionCollections,
           )
         }
       })
@@ -267,7 +266,7 @@ class FileBrowser extends React.Component {
       existingCollections && {
         collections: existingCollections.collections,
         items: existingCollections.items,
-      }
+      },
     )
     return folder
   }
@@ -353,7 +352,7 @@ class FileBrowser extends React.Component {
             this.getFolderData(folderId)
           }
         }
-      }
+      },
     )
   }
 

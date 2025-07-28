@@ -69,7 +69,7 @@ describe('loadEventListeners', () => {
   afterAll(() => {
     window.alert.restore && window.alert.restore()
     window.getComputedStyle.restore && window.getComputedStyle.restore()
-    console.log.restore && console.log.restore() // eslint-disable-line no-console
+    console.log.restore && console.log.restore()  
   })
   afterEach(() => {
     jest.restoreAllMocks()
@@ -82,7 +82,7 @@ describe('loadEventListeners', () => {
     loadEventListeners({
       equellaCB() {
         expect(window.alert).toHaveBeenCalledWith(
-          'Equella is not properly configured for this account, please notify your system administrator.'
+          'Equella is not properly configured for this account, please notify your system administrator.',
         )
         done()
       },

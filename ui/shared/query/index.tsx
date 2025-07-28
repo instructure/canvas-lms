@@ -16,134 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {
-  useMutation as baseUseMutation,
-  useQuery as baseUseQuery,
-  hashQueryKey,
-  QueryClient,
-} from '@tanstack/react-query'
-import type {
-  UseQueryOptions,
-  QueryKey,
-  QueryFunction,
-  UseMutationOptions,
-} from '@tanstack/react-query'
-import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
-import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
+import {useEffect} from 'react'
+import {QueryClient, useInfiniteQuery} from '@tanstack/react-query'
+import type {QueryKey, UseInfiniteQueryOptions} from '@tanstack/react-query'
 import wasPageReloaded from '@canvas/util/wasPageReloaded'
-import {useBroadcastWhenFetched, useReception} from './utils'
+import {v4} from 'uuid'
+import {experimental_createPersister} from '@tanstack/query-persist-client-core'
 
-const CACHE_KEY = 'QUERY_CACHE'
-const CHANNEL_KEY = 'QUERY_CHANNEL'
+const ONE_DAY = 1000 * 60 * 60 * 24
+
+if (wasPageReloaded || localStorage.cacheBuster === undefined) {
+  localStorage.cacheBuster = v4()
+}
+
+export const sessionStoragePersister = experimental_createPersister({
+  storage: window.sessionStorage,
+  maxAge: ONE_DAY,
+  buster: localStorage.cacheBuster,
+})
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
       refetchOnReconnect: false,
       retry: false,
-      staleTime: 1000 * 60 * 60 * 24, // 1 day,
-      cacheTime: 1000 * 60 * 60 * 24 * 2, // 2 days,
+      staleTime: 0,
+      gcTime: ONE_DAY * 2,
     },
   },
 })
 
-export const persister = createSyncStoragePersister({
-  key: CACHE_KEY,
-  storage: sessionStorage,
-})
-
-export function QueryProvider({children}: {children: React.ReactNode}) {
-  return (
-    <PersistQueryClientProvider client={queryClient} persistOptions={{persister}}>
-      {children}
-    </PersistQueryClientProvider>
-  )
-}
-
-const queriesFetched = new Set<string>()
-
-window.BroadcastChannel =
-  window.BroadcastChannel ||
-  class BroadcastChannel {
-    close() {}
-
-    postMessage() {}
-
-    addEventListener() {}
-
-    removeEventListener() {}
-  }
-
-const broadcastChannel = new BroadcastChannel(CHANNEL_KEY)
-
-interface CustomUseQueryOptions<
+/**
+ * @deprecated This hook is an anti-pattern and will be removed in a future release.
+ * It fetches all pages of data at once, which can lead to performance issues with large datasets.
+ *
+ * Instead, use `useInfiniteQuery` directly with pagination controls that load data as needed
+ *
+ * @see https://tanstack.com/query/latest/docs/react/guides/infinite-queries
+ */
+export function useAllPages<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
-> extends UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
-  fetchAtLeastOnce?: boolean
-  broadcast?: boolean
-}
-
-export function useQuery<
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
->(options: CustomUseQueryOptions<TQueryFnData, TError, TData, TQueryKey>) {
-  const ensureFetch = options.fetchAtLeastOnce || wasPageReloaded
-  const hashedKey = hashQueryKey(options.queryKey || [])
-  const wasAlreadyFetched = queriesFetched.has(hashedKey)
-  queriesFetched.add(hashQueryKey(options.queryKey || []))
-
-  const refetchOnMount = ensureFetch && !wasAlreadyFetched ? 'always' : options.refetchOnMount
-
-  // Handle incoming broadcasts
-  useReception({
-    hashedKey,
-    queryKey: options.queryKey,
-    queryClient,
-    channel: broadcastChannel,
-    enabled: options.broadcast,
-  })
-
-  const mergedOptions: CustomUseQueryOptions<TQueryFnData, TError, TData, TQueryKey> = {
-    ...options,
-    refetchOnMount,
+  TQueryKey extends QueryKey = QueryKey,
+>(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('useAllPages is not recommended and may be deprecated')
   }
-  const queryResult = baseUseQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
+  const queryResult = useInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(options)
 
-  useBroadcastWhenFetched({
-    hashedKey,
-    queryResult,
-    channel: broadcastChannel,
-    enabled: options.broadcast,
-  })
+  useEffect(() => {
+    if (queryResult.hasNextPage && !queryResult.isFetchingNextPage) {
+      queryResult.fetchNextPage({
+        cancelRefetch: false,
+      })
+    }
+    // it's already exhaustive
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryResult.hasNextPage, queryResult.isFetchingNextPage, queryResult.fetchNextPage])
 
   return queryResult
-}
-
-export function useMutation(options: UseMutationOptions) {
-  return baseUseMutation(options)
-}
-
-export function prefetchQuery(queryKey: QueryKey, queryFn: QueryFunction) {
-  const hashedKey = hashQueryKey(queryKey || [])
-  const wasAlreadyFetched = queriesFetched.has(hashedKey)
-
-  if (
-    !wasAlreadyFetched &&
-    !queryClient.getQueryData(queryKey) &&
-    !queryClient.isFetching(queryKey)
-  ) {
-    queriesFetched.add(hashQueryKey(queryKey || []))
-    queryClient.prefetchQuery({
-      queryKey,
-      queryFn,
-    })
-  }
 }

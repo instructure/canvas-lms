@@ -119,7 +119,7 @@ describe Polling::PollSubmissionsController, type: :request do
 
         post_create({ poll_choice_id: @selected.id }, true)
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
         @session.reload
         expect(@session.poll_submissions.size).to be_zero
       end

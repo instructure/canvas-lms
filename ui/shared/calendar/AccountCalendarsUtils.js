@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_calendars')
+const I18n = createI18nScope('account_calendars')
 
 export const alertForMatchingAccounts = (results, showDefault) => {
   const polite = true
@@ -29,7 +29,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
         one: 'Showing 1 account calendar',
         other: 'Showing %{count} account calendars.',
       },
-      {count: results}
+      {count: results},
     )
     return $.screenReaderFlashMessageExclusive(msg, polite)
   }
@@ -39,7 +39,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
       other: '%{count} account calendars found.',
       zero: 'No matching account calendars found.',
     },
-    {count: results}
+    {count: results},
   )
   $.screenReaderFlashMessageExclusive(msg, polite)
 }

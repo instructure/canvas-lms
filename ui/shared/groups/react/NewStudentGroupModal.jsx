@@ -16,57 +16,86 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {array, bool, func, number, shape} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {bool, func, shape} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {throttle} from 'lodash'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import CanvasMultiSelect from '@canvas/multi-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
+import StudentMultiSelect from './components/StudentMultiSelect'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
-export default function NewStudentGroupModal({userCollection, loadMore, onSave, ...modalProps}) {
+export default function NewStudentGroupModal({onSave, ...modalProps}) {
   const [name, setName] = useState('')
-  const [users, setUsers] = useState([])
   const [userIds, setUserIds] = useState([])
   const [joinLevel, setJoinLevel] = useState('parent_context_auto_join')
   const [status, setStatus] = useState(null)
-  const throttledFetchMoreUsers = useCallback(throttle(loadMore, 200), [])
+  const [nameValidationMessages, setNameValidationMessages] = useState([
+    {text: '', type: 'success'},
+  ])
 
   useEffect(() => {
-    if (userCollection.length) {
-      setUsers(userCollection.toJSON().filter(u => u.id !== ENV.current_user_id))
-    } else loadMore()
     if (!modalProps.open) resetState()
-  }, [loadMore, modalProps.open, userCollection])
+  }, [modalProps.open])
+
+  const validateName = (newName, shouldFocus) => {
+    if (newName.trim().length === 0) {
+      const nameErrorText = I18n.t('A group name is required.')
+      setNameValidationMessages([{text: nameErrorText, type: 'newError'}])
+      if (shouldFocus) {
+        const input = document.getElementById(`group-name`)
+        input?.focus()
+        shouldFocus = false
+      }
+      return false
+    } else if (newName.length > 255) {
+      const nameErrorText = I18n.t('Group name must be less than 255 characters.')
+      setNameValidationMessages([{text: nameErrorText, type: 'newError'}])
+      if (shouldFocus) {
+        const input = document.getElementById(`group-name`)
+        input?.focus()
+        shouldFocus = false
+      }
+      return false
+    } else {
+      setNameValidationMessages([{text: '', type: 'success'}])
+      return true
+    }
+  }
+
+  const validateFormFields = (shouldFocus = false) => {
+    return validateName(name, shouldFocus)
+  }
 
   function handleSend() {
-    const payload = {group: {name, join_level: joinLevel}, invitees: userIds.flat()}
-    setStatus('info')
-    doFetchApi({
-      method: 'POST',
-      path: `/courses/${ENV.course_id}/groups`,
-      body: payload,
-    })
-      .then(notifyDidSave)
-      .catch(err => {
-        console.error(err) // eslint-disable-line no-console
-        captureException(err)
-        setStatus('error')
+    if (validateFormFields(true)) {
+      const payload = {group: {name, join_level: joinLevel}, invitees: userIds.flat()}
+      setStatus('info')
+      doFetchApi({
+        method: 'POST',
+        path: `/courses/${ENV.course_id}/groups`,
+        body: payload,
       })
+        .then(notifyDidSave)
+        .catch(err => {
+          console.error(err)
+          captureException(err)
+          setStatus('error')
+        })
+    }
   }
 
   function notifyDidSave() {
@@ -81,17 +110,10 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
   }
 
   function Footer() {
-    const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
-        <Button
-          type="submit"
-          interaction={saveButtonState}
-          color="primary"
-          margin="0 0 0 x-small"
-          onClick={handleSend}
-        >
+        <Button type="submit" color="primary" margin="0 0 0 x-small" onClick={handleSend}>
           {I18n.t('Submit')}
         </Button>
       </>
@@ -119,104 +141,79 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
     sessions and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of
     space to store files.  Groups can collaborate on documents, or even schedule web conferences.
     It's really like a mini-course where you can work with a smaller number of students on a
-    more focused project.`
+    more focused project.`,
   )
 
   const setOptionIds = optionIds => {
     if (optionIds) setUserIds(optionIds)
   }
 
-  const multiSelectSearch = {
-    options: users.map(user => ({id: user.id, text: user.name})),
-  }
-
-  const onScroll = event => {
-    const {scrollTop, scrollHeight, clientHeight} = event.target
-    // Subtract the scrolled height from the total scrollable height.
-    // If this is equal to the visible area, you've reached the bottom.
-    if (scrollHeight - scrollTop === clientHeight) {
-      throttledFetchMoreUsers()
-    }
-  }
-
   return (
-    <CanvasModal
-      label={I18n.t('New Student Group')}
-      size="medium"
-      shouldCloseOnDocumentClick={false}
-      footer={<Footer />}
-      onScroll={onScroll}
-      {...modalProps}
-    >
-      <FormFieldGroup
-        description={
-          <ScreenReaderContent>{I18n.t('New Student Group Description')}</ScreenReaderContent>
-        }
-        layout="stacked"
-        rowSpacing="small"
+    <QueryClientProvider client={queryClient}>
+      <CanvasModal
+        label={I18n.t('New Student Group')}
+        size="medium"
+        shouldCloseOnDocumentClick={false}
+        footer={<Footer />}
+        {...modalProps}
       >
-        <Flex direction="column" margin="none">
-          <Flex.Item padding="small">
-            <Text>{newStudentGroupDescription}</Text>
-          </Flex.Item>
-          <Flex.Item padding="small">
-            <TextInput
-              id="group-name"
-              renderLabel={I18n.t('Group Name')}
-              value={name}
-              onChange={(_event, value) => setName(value)}
-              isRequired={true}
-            />
-          </Flex.Item>
-          <Flex.Item padding="small">
-            <SimpleSelect
-              id="join-level-select"
-              renderLabel={I18n.t('Joining')}
-              defaultValue="parent_context_auto_join"
-              value={joinLevel}
-              onChange={(_event, input) => setJoinLevel(input.value)}
-            >
-              <SimpleSelect.Option id="parent_context_auto_join" value="parent_context_auto_join">
-                {I18n.t('Course members are free to join')}
-              </SimpleSelect.Option>
-              <SimpleSelect.Option id="invitation_only" value="invitation_only">
-                {I18n.t('Membership by invitation only')}
-              </SimpleSelect.Option>
-            </SimpleSelect>
-          </Flex.Item>
-          <Flex.Item padding="small">
-            <CanvasMultiSelect
-              id="invite-filter"
-              label={I18n.t('Invite Students')}
-              placeholder={I18n.t('Search')}
-              selectedOptionIds={userIds}
-              disabled={users.length === 0}
-              onChange={optionIds => setOptionIds(optionIds)}
-              customRenderBeforeInput={tags =>
-                [<IconSearchLine key="search-icon" />].concat(tags || [])
-              }
-              matchStrategy="substring"
-            >
-              {multiSelectSearch.options.map(option => (
-                <CanvasMultiSelect.Option id={option.id} key={option.id} value={option.id}>
-                  {option.text}
-                </CanvasMultiSelect.Option>
-              ))}
-            </CanvasMultiSelect>
-          </Flex.Item>
-        </Flex>
-      </FormFieldGroup>
-      {alert}
-    </CanvasModal>
+        <FormFieldGroup
+          description={
+            <ScreenReaderContent>{I18n.t('New Student Group Description')}</ScreenReaderContent>
+          }
+          layout="stacked"
+          rowSpacing="small"
+        >
+          <Flex direction="column" margin="none">
+            <Flex.Item padding="small">
+              <Text>{newStudentGroupDescription}</Text>
+            </Flex.Item>
+            <Flex.Item padding="small">
+              <TextInput
+                id="group-name"
+                renderLabel={I18n.t('Group Name')}
+                value={name}
+                onChange={(_event, value) => {
+                  setName(value)
+                }}
+                onBlur={e => {
+                  validateName(e.target.value)
+                }}
+                isRequired={true}
+                messages={nameValidationMessages}
+              />
+            </Flex.Item>
+            <Flex.Item padding="small">
+              <SimpleSelect
+                id="join-level-select"
+                renderLabel={I18n.t('Joining')}
+                defaultValue="parent_context_auto_join"
+                value={joinLevel}
+                onChange={(_event, input) => setJoinLevel(input.value)}
+              >
+                <SimpleSelect.Option id="parent_context_auto_join" value="parent_context_auto_join">
+                  {I18n.t('Course members are free to join')}
+                </SimpleSelect.Option>
+                <SimpleSelect.Option id="invitation_only" value="invitation_only">
+                  {I18n.t('Membership by invitation only')}
+                </SimpleSelect.Option>
+              </SimpleSelect>
+            </Flex.Item>
+            <Flex.Item padding="small">
+              <StudentMultiSelect
+                selectedOptionIds={userIds}
+                onSelect={optionIds => setOptionIds(optionIds)}
+              />
+            </Flex.Item>
+          </Flex>
+        </FormFieldGroup>
+        {alert}
+      </CanvasModal>
+    </QueryClientProvider>
   )
 }
 
 NewStudentGroupModal.propTypes = {
-  userCollection: shape({
-    length: number.isRequired,
-    models: array.isRequired,
-  }),
-  loadMore: func.isRequired,
   onSave: func.isRequired,
   modalProps: shape({
     open: bool.isRequired,

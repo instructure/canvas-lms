@@ -20,7 +20,7 @@
 
 require_relative "messages_helper"
 
-describe "appointment_reserved_by_user.twitter" do
+describe "appointment_reserved_by_user" do
   include MessagesCommon
 
   before :once do
@@ -37,7 +37,7 @@ describe "appointment_reserved_by_user.twitter" do
     }
   end
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     before :once do
@@ -67,18 +67,8 @@ describe "appointment_reserved_by_user.twitter" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset, message_data)
-      expect(msg.body).to include("some title")
-      expect(msg.body).to include(@user.name)
-    end
-  end
-
-  context ".twitter" do
-    let(:path_type) { :twitter }
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)

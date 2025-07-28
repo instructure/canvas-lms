@@ -38,8 +38,8 @@ describe('render available pronouns input', () => {
     fireEvent.focus(icon)
     expect(
       getAllByText(
-        'These pronouns will be available to Canvas users in your account to choose from.'
-      )[0]
+        'These pronouns will be available to Canvas users in your account to choose from.',
+      )[0],
     ).toBeVisible()
   })
 

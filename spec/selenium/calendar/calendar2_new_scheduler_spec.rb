@@ -62,7 +62,6 @@ describe "scheduler" do
     end
 
     it "shows appointment slots on calendar in Find Appointment mode", priority: "1" do
-      skip "FOO-3801 (10/7/2023)"
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       # the order they come back could vary depending on whether they split
@@ -102,12 +101,14 @@ describe "scheduler" do
     end
 
     it "reserves appointment slots in find appointment mode", priority: "1" do
+      skip "Flakey spec. Fix LX-2191"
       get "/calendar2"
       wait_for_ajaximations
       open_select_courses_modal(@course1.name)
-      f(".fc-content").click
+      ff(".fc-content")[0].click
       wait_for_ajaximations
-      move_to_click(".reserve_event_link")
+      scroll_into_view(".reserve_event_link")
+      f(".reserve_event_link").click
       refresh_page
       expected_time = calendar_time_string(@app1.new_appointments.first.start_at)
       wait_for_ajaximations
@@ -130,19 +131,22 @@ describe "scheduler" do
     end
 
     it "does not allow scheduling multiple appointment slots when it is restricted", priority: "1" do
+      skip("This test is flaky and will be fixed with VICE-5108")
+
       reserve_appointment_for(@student1, @student1, @app1)
       get "/calendar2"
       open_select_courses_modal(@course1.name)
-      expect(f(".fc-content .icon-calendar-add")).to be
+      wait_for_ajaximations
+      expect(f(".fc-content .icon-calendar-add")).to be_displayed
       scroll_into_view(".fc-content .icon-calendar-add")
-      f(".fc-content .icon-calendar-add").click
+      ff(".fc-content .icon-calendar-add")[0].click
       wait_for_ajaximations
       f(".reserve_event_link").click
       wait_for_ajaximations
       visible_dialog_element = fj(".ui-dialog:contains('You are already signed up for')")
       title = visible_dialog_element.find_element(:css, ".ui-dialog-titlebar")
       expect(title.text).to include("Cancel existing reservation and sign up for this one?")
-      f(".ui-dialog-buttonset .ui-button").click
+      ff(".ui-dialog-buttonset .ui-button")[0].click
       scroll_to(f('span[class="navigation_title_text"]'))
       ff(".fc-content .fc-title")[1].click
       wait_for_ajaximations

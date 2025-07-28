@@ -18,16 +18,20 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {updateDiscussionEntryMock} from '../../graphql/Mocks'
-
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 import {responsiveQuerySizes} from '../utils'
-
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../containers/DiscussionThreadContainer/DiscussionThreadContainer'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  openWindow: jest.fn(),
+  windowPathname: jest.fn(() => '/courses/1'),
+}))
 
 injectGlobalAlertContainers()
 
@@ -39,14 +43,14 @@ jest.mock('../utils', () => ({
 describe('DiscussionsAttachment', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
-  const openMock = jest.fn()
   beforeAll(() => {
-    delete window.location
-    window.open = openMock
-    window.ENV = {
+    fakeENV.setup({
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
-    }
+      RICH_CONTENT_CAN_UPLOAD_FILES: true,
+      context_asset_string: 'course_1',
+      current_user_id: '1',
+    })
 
     window.matchMedia = jest.fn().mockImplementation(() => {
       return {
@@ -57,6 +61,10 @@ describe('DiscussionsAttachment', () => {
         removeListener: jest.fn(),
       }
     })
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
   })
 
   const defaultProps = ({
@@ -77,7 +85,7 @@ describe('DiscussionsAttachment', () => {
         >
           <DiscussionThreadContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -89,13 +97,23 @@ describe('DiscussionsAttachment', () => {
     })
     it('updates the attachment', async () => {
       const container = setup(
-        defaultProps(),
+        defaultProps({
+          discussionEntryOverrides: {
+            quotedEntry: {
+              _id: '1337',
+              message: 'Best Paladin in the world',
+            },
+          },
+        }),
         updateDiscussionEntryMock({
           discussionEntryId: 'DiscussionEntry-default-mock',
           message: '<p>This is the parent reply</p>',
           fileId: null,
           removeAttachment: true,
-        })
+          quotedEntryId: '1337',
+          // Since we set up the mock with the quotedEntryId, the test will only pass if the mutation variables
+          // match the id, else we'd get an error
+        }),
       )
 
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
@@ -105,7 +123,7 @@ describe('DiscussionsAttachment', () => {
       fireEvent.click(container.getByTestId('edit'))
 
       await waitFor(() => {
-        expect(tinymce.editors[0]).toBeDefined()
+        expect(tinymce.get('1337')).toBeDefined()
       })
 
       document.querySelectorAll('textarea')[0].value = ''
@@ -118,7 +136,7 @@ describe('DiscussionsAttachment', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() =>
-        expect(container.queryByText('This is the parent reply')).not.toBeInTheDocument()
+        expect(container.queryByText('This is the parent reply')).not.toBeInTheDocument(),
       )
 
       await waitFor(() => {

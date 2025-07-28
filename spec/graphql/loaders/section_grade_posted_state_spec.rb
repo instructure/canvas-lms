@@ -40,7 +40,7 @@ describe Loaders::SectionGradePostedState do
   end
 
   it "returns true if the assignment has been graded" do
-    @submission.update!(posted_at: Time.now)
+    @submission.update!(posted_at: Time.zone.now)
 
     GraphQL::Batch.batch do
       loader.for(@assignment.id, @account.id).load(section).then do |is_posted|
@@ -50,7 +50,7 @@ describe Loaders::SectionGradePostedState do
   end
 
   it "returns false if the assignment has been graded but the section has no active enrollments" do
-    @submission.update!(posted_at: Time.now)
+    @submission.update!(posted_at: Time.zone.now)
     section.enrollments.update_all(workflow_state: "deleted")
 
     GraphQL::Batch.batch do

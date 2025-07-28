@@ -22,6 +22,23 @@
     assessment_request: @assessment_request,
     current_host: request.host
   )
+
+  # Create additional presenters if this is a checkpointed parent
+  if @assignment.checkpoints_parent?
+    @reply_to_topic_presenter = Submission::ShowPresenter.new(
+      submission: @reply_to_topic_submission,
+      current_user: @current_user,
+      assessment_request: @assessment_request,
+      current_host: request.host
+    )
+    @reply_to_entry_presenter = Submission::ShowPresenter.new(
+      submission: @reply_to_entry_submission,
+      current_user: @current_user,
+      assessment_request: @assessment_request,
+      current_host: request.host
+    )
+  end
+
   submission_comments = @submission.visible_submission_comments_for(@current_user)
 
   if presenter.anonymize_submission_owner?
@@ -40,7 +57,7 @@
 
   show_updated_plagiarism_icons = @assignment.context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
 
-  js_env({
+  js_env_hash = {
     GRADING_TYPE: @assignment.grading_type,
     RUBRIC_ASSESSMENT: {
       assessment_type: assessment_type,
@@ -61,9 +78,38 @@
       end,
       **submission_owner_param
     },
+    CURRENT_USER_CAN_GRADE_SUBMISSION: can_do(@assignment, @current_user, :grade),
 
     :CUSTOM_GRADE_STATUSES => @assignment.course.custom_grade_statuses.as_json(include_root: false)
-  })
+  }
+
+  # Add checkpoint submission information if necessary
+  if @assignment.checkpoints_parent?
+    js_env_hash[:CHECKPOINT_SUBMISSIONS] = {
+      reply_to_topic: if @reply_to_topic_submission.user_can_read_grade?(@current_user, session)
+        @reply_to_topic_assignment.attributes.merge(
+          entered_grade: @reply_to_topic_presenter.entered_grade,
+          entered_score: @reply_to_topic_submission.entered_score,
+          points_possible: @reply_to_topic_assignment.points_possible,
+          submission_id: @reply_to_topic_submission.id
+        )
+      else
+        {}
+      end,
+      reply_to_entry: if @reply_to_entry_submission.user_can_read_grade?(@current_user, session)
+        @reply_to_entry_assignment.attributes.merge(
+          entered_grade: @reply_to_entry_presenter.entered_grade,
+          entered_score: @reply_to_entry_submission.entered_score,
+          points_possible: @reply_to_entry_assignment.points_possible,
+          submission_id: @reply_to_entry_submission.id
+        )
+      else
+        {}
+      end
+    }
+  end
+
+  js_env(js_env_hash)
   provide :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
   provide_blank :right_side
 %>
@@ -86,53 +132,11 @@
       </h1>
       <div class="submission-details-header__grade-summary">
         <% if @submission.user_can_read_grade?(@current_user, session) %>
-        <table class="grade-values">
-          <tbody>
-            <tr>
-              <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
-              <td class="bold">
-                <% if can_do(@assignment, @current_user, :grade) %>
-                  <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
-                <% else %>
-                  <span class="entered_grade">
-                    <% if @submission.excused? %>
-                      <%= t "Excused" %>
-                    <% else %>
-                        <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
-                    <% end %>
-                  </span>
-                <% end %>
-                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
-                    <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
-                <% end %>
-              </td>
-            </tr>
-            <% if can_do(@assignment, @current_user, :grade) || @submission.user_can_read_grade?(@current_user, session)
-                points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
-                points_possible = I18n.n(round_if_whole(@assignment.points_possible))
-                grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
-            %>
-              <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Late penalty:') %></th>
-                <td class="late_penalty bold"><%= points_deducted %></td>
-              </tr>
-              <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Final grade:') %></th>
-                <td class="bold">
-                  <% if can_do(@assignment, @current_user, :grade) %>
-                    <span class="published_grade"><%= i18n_grade(round_if_whole(@submission.grade), @submission.grading_type) %></span>
-                  <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-                    <span class="grade"><%= i18n_grade(round_if_whole(@submission.published_grade), @submission.grading_type) %></span>
-                  <% end %>
-
-                  <% if @assignment.grading_type == 'points' %>
-                    / <%= points_possible %>
-                  <% end %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
+          <% if can_do(@assignment, @current_user, :grade) %>
+            <%= render partial: "grade_values_can_grade" %>
+          <% else %>
+            <%= render partial: "grade_values_can_read", locals: { presenter: } %>
+          <% end %>
         <% if can_do(@submission, @current_user, :view_turnitin_report) %>
           <% if (turnitin_score = @submission.turnitin_data[@submission.asset_string]) &&
             @submission.turnitin_data[:provider] == nil && turnitin_score[:similarity_score] %>
@@ -246,6 +250,14 @@
         <% end %>
       </div>
     </div>
+    <% if @submission.submission_type == "online_text_entry" %>
+      <%
+        js_env ASSET_REPORTS: @asset_reports
+        js_env ASSET_PROCESSORS: @asset_processors
+        js_env ASSIGNMENT_NAME: @assignment.title
+      %>
+      <div id="asset_report_text_entry_status_container" data-attempt="<%= @submission.attempt %>"></div>
+    <% end %>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
         <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>
@@ -315,6 +327,7 @@
   </div>
   <div class="submission-details-container">
     <div class="submission-details-frame">
+      <div id="asset_report_modal"></div>
       <iframe id="preview_frame" src="<%= presenter.submission_preview_frame_url %>" allowfullscreen="true" allow="<%= Lti::Launch.iframe_allowances.join('; ') %>" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
@@ -339,7 +352,7 @@
                 %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
-                  <span style="white-space: pre-wrap;"><%= comment.comment %></span>
+                  <span class="comment_content" data-content="<%= comment.comment %>" style="white-space: pre-wrap;"></span>
                   <% if comment.media_comment_id %>
                     <div class="comment_media">
                       <%= t(
@@ -394,55 +407,58 @@
             <div class="media_recording">
             </div>
           </div>
-          <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
-            <label class="add_a_comment">
-              <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
-              <div id="textarea-container">
-                <textarea class="ic-Input grading_comment"></textarea>
-                <span id="emoji-picker-container"></span>
+          <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>
+            <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
+              <label class="add_a_comment">
+                <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
+                <div id="textarea-container">
+                  <textarea class="ic-Input grading_comment"></textarea>
+                  <span id="emoji-picker-container"></span>
+                </div>
+                <div id="textarea-error-container"></div>
+                <div id="emoji-quick-picker-container"></div>
+              </label>
+              <div class="comment_attachments">
               </div>
-              <div id="emoji-quick-picker-container"></div>
-            </label>
-            <div class="comment_attachments">
-            </div>
-            <div class="clearfix" style="text-align: <%= direction('right') %>;">
-              <% if feature_enabled?(:kaltura) %>
-                <a href="#" class="media_comment_link media-comment pull-left"><%= t('media_comment', 'Media Comment') %></a>
-              <% end %>
-              <a href="#" style="float: <%= direction('right') %>;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
-              <div class="clear"></div>
-            </div>
-            <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
-              <% if @assignment.grade_as_group? %>
-                <span><%= t("All comments are sent to the whole group.") %></span>
-                <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
-              <% else %>
-                <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
-                  <div class="ic-Form-control ic-Form-control--radio">
-                    <div class="ic-Radio">
-                      <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
-                      <label class="ic-Label" for="not_submission_group_comment">
-                        <% if can_do(@submission, @current_user, :grade) %>
-                          <%= t('Send comment to this student only') %>
-                        <% else %>
-                          <%= t('Send comment to instructor only') %>
-                        <% end %>
-                      </label>
+              <div class="clearfix" style="text-align: <%= direction('right') %>;">
+                <% if feature_enabled?(:kaltura) %>
+                  <a href="#" class="media_comment_link media-comment pull-left"><%= t('media_comment', 'Media Comment') %></a>
+                <% end %>
+                <a href="#" style="float: <%= direction('right') %>;" class="attach_comment_file_link"><%= t('attach_file', 'Attach File') %></a>
+                <div class="clear"></div>
+              </div>
+              <% if @assignment.has_group_category? && can_do(@submission, @current_user, :make_group_comment) %>
+                <% if @assignment.grade_as_group? %>
+                  <span><%= t("All comments are sent to the whole group.") %></span>
+                  <input type="checkbox" name="submission[group_comment]" id="submission_group_comment" style="display:none" checked />
+                <% else %>
+                  <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+                    <div class="ic-Form-control ic-Form-control--radio">
+                      <div class="ic-Radio">
+                        <input type="radio" name="submission[group_comment]" id="not_submission_group_comment" value="0" checked />
+                        <label class="ic-Label" for="not_submission_group_comment">
+                          <% if can_do(@submission, @current_user, :grade) %>
+                            <%= t('Send comment to this student only') %>
+                          <% else %>
+                            <%= t('Send comment to instructor only') %>
+                          <% end %>
+                        </label>
+                      </div>
+                      <div class="ic-Radio">
+                        <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
+                        <label class="ic-Label" for="submission_group_comment">
+                          <%= t('sent_to_whole_group', 'Send comment to the whole group') %>
+                        </label>
+                      </div>
                     </div>
-                    <div class="ic-Radio">
-                      <input type="radio" name="submission[group_comment]" id="submission_group_comment" value="1" />
-                      <label class="ic-Label" for="submission_group_comment">
-                        <%= t('sent_to_whole_group', 'Send comment to the whole group') %>
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
+                  </fieldset>
+                <% end %>
               <% end %>
-            <% end %>
-            <div class="button-container">
-              <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              <div class="button-container">
+                <button type="button" class="Button Button--primary save_comment_button"><%= t('buttons.save', 'Save') %></button>
+              </div>
             </div>
-          </div>
+          <% end %>
         </div>
       </div>
     </div>

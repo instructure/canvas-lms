@@ -25,6 +25,8 @@ module Api
     class UnparsableContentError < StandardError; end
 
     class Content
+      ASSOCIABLE_ATTACHMENT_LINKS_REGEXP = %r{/(files|media_attachments_iframe)/([0-9~]+)}
+
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
 
@@ -43,6 +45,14 @@ module Api
 
         new(html, account, include_mobile:, rewrite_api_urls:)
           .rewritten_html(url_helper)
+      end
+
+      def self.collect_attachment_ids(html)
+        return [] unless html.try(:match?, ASSOCIABLE_ATTACHMENT_LINKS_REGEXP)
+
+        content = new(html)
+        content.validate_is_parsable!
+        content.scan_for_attachment_ids
       end
 
       attr_reader :html
@@ -92,6 +102,23 @@ module Api
         end
 
         parsed_html.to_s
+      end
+
+      def scan_for_attachment_ids
+        results = []
+
+        parsed_html.search("*").each do |node|
+          APPLICABLE_ATTRS.each do |attr|
+            next unless (link = node[attr])
+
+            match = link.match ASSOCIABLE_ATTACHMENT_LINKS_REGEXP
+            next unless match
+
+            results.push match[2]
+          end
+        end
+
+        results.uniq
       end
 
       # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }
@@ -173,6 +200,7 @@ module Api
       private
 
       APPLICABLE_ATTRS = %w[href src].freeze
+      private_constant :APPLICABLE_ATTRS
 
       def scrub_links!(node)
         APPLICABLE_ATTRS.each do |attr|

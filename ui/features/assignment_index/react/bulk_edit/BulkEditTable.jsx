@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback} from 'react'
 import {arrayOf, func, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -33,7 +33,7 @@ import BulkEditOverrideTitle from './BulkEditOverrideTitle'
 import {AssignmentShape} from './BulkAssignmentShape'
 import {canEditAll, originalDateField} from './utils'
 
-const I18n = useI18nScope('assignments_bulk_edit')
+const I18n = createI18nScope('assignments_bulk_edit')
 
 const DATE_INPUT_META = {
   due_at: {
@@ -81,7 +81,7 @@ export default function BulkEditTable({
   defaultDueTime,
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
-  const DATE_COLUMN_WIDTH_REMS = 17
+  const DATE_COLUMN_WIDTH_REMS = 15
   const ACTION_COLUMN_WIDTH_REMS = 4
   const NOTE_COLUMN_WIDTH_REMS = 3
 
@@ -139,6 +139,7 @@ export default function BulkEditTable({
         minWidth={`${
           DATE_COLUMN_WIDTH_REMS * 3 + ACTION_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS
         }rem`}
+        margin="small"
       >
         <Text size="medium" fontStyle="italic">
           {hasTooManyDates
@@ -215,7 +216,7 @@ export default function BulkEditTable({
     // It's a bit repetitive this way, but Table.Row borks if it has anything but Table.Cell children.
     if (baseOverride) {
       return (
-        <Table.Row key={`assignment_${assignment.id}`}>
+        <Table.Row key={`assignment_${assignment.id}`} data-testid="bulk-edit-table-row">
           <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, baseOverride)}</Table.Cell>
           <Table.Cell>{renderDateInput(assignment.id, 'due_at', baseOverride)}</Table.Cell>
@@ -228,7 +229,7 @@ export default function BulkEditTable({
     } else {
       // Need all Table.Cells or you get weird borders on this row
       return (
-        <Table.Row key={`assignment_${assignment.id}`}>
+        <Table.Row key={`assignment_${assignment.id}`} data-testid="bulk-edit-table-row">
           <Table.Cell>{renderAssignmentCheckbox(assignment)}</Table.Cell>
           <Table.Cell>{renderOverrideTitle(assignment, {base: true})}</Table.Cell>
           <Table.Cell>
@@ -247,7 +248,7 @@ export default function BulkEditTable({
     const overrides = assignment.all_dates.filter(dates => !dates.base)
     return overrides.map(override => {
       return (
-        <Table.Row key={`override_${override.id}`}>
+        <Table.Row key={`override_${override.id}`} data-testid="bulk-edit-table-row">
           <Table.Cell>
             <ScreenReaderContent>
               {assignment.selected
@@ -281,7 +282,7 @@ export default function BulkEditTable({
 
   const handleSelectAllAssignments = useCallback(
     () => selectAllAssignments(!allAssignmentsSelected),
-    [allAssignmentsSelected, selectAllAssignments]
+    [allAssignmentsSelected, selectAllAssignments],
   )
 
   const handleRevertClick = (assignment, override, event) => {

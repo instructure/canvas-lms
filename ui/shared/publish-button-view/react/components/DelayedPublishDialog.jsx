@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -26,11 +26,11 @@ import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('publish_btn_module')
+const I18n = createI18nScope('publish_btn_module')
 
 export default function DelayedPublishDialog({
   name,
@@ -152,7 +152,7 @@ export default function DelayedPublishDialog({
           }
         />
         <View as="div" padding="0 0 0 large">
-          <CanvasDateInput
+          <CanvasDateInput2
             timezone={tz}
             selectedDate={selectedDate}
             formatDate={formatDate}

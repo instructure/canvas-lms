@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,22 +18,24 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowEndSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {ResponsiveSizes} from '../../types'
+import type {ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
+import {paceContextsActions} from '../../actions/pace_contexts'
 import PandaShowingPaces from '../../../images/PandaShowingPaces.svg'
 import PandaUsingPaces from '../../../images/PandaUsingPaces.svg'
 
-const I18n = useI18nScope('course_paces_empty_state')
+const I18n = createI18nScope('course_paces_empty_state')
 
 interface DispatchProps {
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
+  readonly setDefaultPaceContextAsSelected: typeof paceContextsActions.setDefaultPaceContextAsSelected
 }
 
 interface PassedProps {
@@ -43,6 +44,7 @@ interface PassedProps {
 
 export const CoursePaceEmpty = ({
   setSelectedPaceContext,
+  setDefaultPaceContextAsSelected,
   responsiveSize,
 }: DispatchProps & PassedProps) => {
   return (
@@ -53,6 +55,7 @@ export const CoursePaceEmpty = ({
         justifyItems={responsiveSize !== 'small' ? 'start' : 'center'}
         margin="0 0 medium 0"
       >
+        {/* @ts-expect-error */}
         <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
@@ -72,7 +75,7 @@ export const CoursePaceEmpty = ({
               </Text>
               <Text>
                 {I18n.t(
-                  'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.'
+                  'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.',
                 )}
               </Text>
             </Flex.Item>
@@ -85,6 +88,7 @@ export const CoursePaceEmpty = ({
           </Flex.Item>
         ) : null}
 
+        {/* @ts-expect-error */}
         <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
@@ -103,7 +107,7 @@ export const CoursePaceEmpty = ({
               </Text>
               <Text>
                 {I18n.t(
-                  'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).'
+                  'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).',
                 )}
               </Text>
             </Flex.Item>
@@ -117,7 +121,9 @@ export const CoursePaceEmpty = ({
         size="large"
         display={responsiveSize !== 'small' ? 'inline-block' : 'block'}
         onClick={() => {
+          // @ts-expect-error
           setSelectedPaceContext('Course', window.ENV.COURSE_ID)
+          setDefaultPaceContextAsSelected()
         }}
       >
         {I18n.t('Get Started')}
@@ -135,7 +141,7 @@ export const CoursePaceEmpty = ({
                 wrappers: [
                   `<a target="_blank" href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">$1</a>`,
                 ],
-              }
+              },
             ),
         }}
       />
@@ -143,6 +149,10 @@ export const CoursePaceEmpty = ({
   )
 }
 
-export default connect(null, {setSelectedPaceContext: actions.setSelectedPaceContext})(
-  CoursePaceEmpty
+export default connect(null, {
+  setSelectedPaceContext: actions.setSelectedPaceContext,
+  setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected
+})(
+  // @ts-expect-error
+  CoursePaceEmpty,
 )

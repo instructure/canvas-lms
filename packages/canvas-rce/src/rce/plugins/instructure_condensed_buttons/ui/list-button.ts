@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -100,7 +99,7 @@ const listStyleInfos = typedKeyDict<RceListTypeInfoKey, ListStyleTypeInfo, 'list
       getTooltipText: () => formatMessage('uppercase Roman numeral ordered list'),
     },
   },
-  'listStyleType'
+  'listStyleType',
 )
 
 /**
@@ -121,6 +120,7 @@ function listStyleInfoForSelectionOfEditor(editor: Editor): ListStyleTypeInfo | 
 
   // Prefer to use `list-style-type`-based type infos.
   if (selectedStyleType.listStyleType) {
+    // @ts-expect-error
     const fromStyleType = listStyleInfos.byKey[selectedStyleType.listStyleType]
 
     if (fromStyleType) return fromStyleType
@@ -151,17 +151,18 @@ export default function register(editor: Editor) {
           value: listType.listStyleType,
           icon: listType.icon,
           text: listType.getTooltipText(),
-        }))
+        })),
       ),
 
     onAction: () =>
       editor.execCommand(
         listStyleInfoForSelectionOfEditor(editor)?.listType === 'OL'
           ? 'InsertOrderedList'
-          : 'InsertUnorderedList'
+          : 'InsertUnorderedList',
       ),
 
     onItemAction: (splitButtonApi, value) => {
+      // @ts-expect-error
       const desiredListStyleInfo = listStyleInfos.byKey[value] || defaultStyleInfoForListType.UL
 
       const currentListStyleInfo = listStyleInfoForSelectionOfEditor(editor)
@@ -173,7 +174,7 @@ export default function register(editor: Editor) {
         editor.execCommand(
           desiredListStyleInfo.listType === 'UL' ? 'InsertUnorderedList' : 'InsertOrderedList',
           false,
-          {'list-style-type': desiredListStyleInfo.listStyleType}
+          {'list-style-type': desiredListStyleInfo.listStyleType},
         )
       } else {
         editor.execCommand('RemoveList')
@@ -188,7 +189,7 @@ export default function register(editor: Editor) {
 
       const $iconSvgContainer = editor.$(
         `.tox-split-button[aria-label="${getButtonLabel()}"] .tox-icon`,
-        document
+        document,
       )
       const allIcons = editor.ui.registry.getAll().icons
 

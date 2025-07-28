@@ -29,7 +29,7 @@ const setup = props => {
       {...props}
     >
       <div />
-    </RemovableItem>
+    </RemovableItem>,
   )
 }
 
@@ -65,8 +65,8 @@ describe('RemovableItem', () => {
     const {getByTestId} = setup({onRemove: onRemoveMock})
     const item = getByTestId('removable-item')
     fireEvent.mouseOver(item)
-    expect(onRemoveMock.mock.calls.length).toBe(0)
+    expect(onRemoveMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByTestId('remove-button'))
-    expect(onRemoveMock.mock.calls.length).toBe(1)
+    expect(onRemoveMock.mock.calls).toHaveLength(1)
   })
 })

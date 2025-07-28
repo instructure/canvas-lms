@@ -17,11 +17,11 @@
  */
 
 import React, {type ReactElement} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Pagination} from '@instructure/ui-pagination'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('paginator')
+const I18n = createI18nScope('paginator')
 const {Page} = Pagination as any
 
 type Props = {
@@ -39,12 +39,12 @@ const Paginator = ({loadPage, page, pageCount, ...paginationProps}: Props): Reac
   return (
     <Pagination
       variant="compact"
+      margin="small"
       labelNext={I18n.t('Next Page')}
       labelPrev={I18n.t('Previous Page')}
       {...paginationProps}
     >
       {Array.from(Array(pageCount)).map((v, i) => (
-        // eslint-disable-next-line react/no-array-index-key
         <Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
           <PresentationContent>{i + 1}</PresentationContent>
           <ScreenReaderContent>{I18n.t('Page %{page}', {page: i + 1})}</ScreenReaderContent>

@@ -25,5 +25,5 @@ Rails.configuration.to_prepare do
   CanvasPandaPub.process_interval = -> { Setting.get("pandapub_process_interval_seconds", 1.0).to_f }
   # sometimes this async worker thread grabs a connection on a Setting read or similar.
   # We need it to be released or the main thread can have a real problem.
-  CanvasPandaPub.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
+  CanvasPandaPub.on_work_unit_end = -> { ActiveRecord::Base.connection_handler.clear_active_connections!(:all) }
 end

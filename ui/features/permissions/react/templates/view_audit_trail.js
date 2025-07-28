@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_68')
+const I18n = createI18nScope('permissions_templates_68')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'Allows user to review an audit trail in assignments, both moderated and anonymous.'
+        'Allows user to review an audit trail in assignments, both moderated and anonymous.',
       ),
     },
   ],
@@ -34,12 +34,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
+        'To moderate grades, Grades - Select final grade for moderation must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To post or hide grades for an assignment, Grades - edit must also be enabled.'
+        'To post or hide grades for an assignment, Grades - edit must also be enabled.',
       ),
     },
   ],
@@ -47,7 +47,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'Allows user to review an audit trail in assignments, both moderated and anonymous.'
+        'Allows user to review an audit trail in assignments, both moderated and anonymous.',
       ),
     },
   ],
@@ -55,13 +55,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
+        'To moderate grades, Grades - Select final grade for moderation must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To post or hide grades for an assignment, Grades - edit must also be enabled.'
+        'To post or hide grades for an assignment, Grades - edit must also be enabled.',
       ),
     },
-  ]
+  ],
 )

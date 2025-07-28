@@ -31,7 +31,6 @@ import {
   scaleImageForWidth,
   scaleToSize,
 } from '../ImageEmbedOptions'
-import RCEGlobals from '../../../RCEGlobals'
 
 Object.defineProperty(HTMLImageElement.prototype, 'naturalHeight', {
   get() {
@@ -474,7 +473,15 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
         expect(getImageOptions().usePercentageUnits).toEqual(true)
       })
 
-      it('is false when no percentage width or height has been applied to the image', () => {
+      it('is true when no width or height has been applied to the image', () => {
+        $image.removeAttribute('width')
+        $image.removeAttribute('height')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is false when only pixels have been applied to the image', () => {
+        $image.setAttribute('width', '50px')
+        $image.setAttribute('height', '30px')
         expect(getImageOptions().usePercentageUnits).toEqual(false)
       })
     })
@@ -631,11 +638,6 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
       beforeEach(() => {
         $video.innerHTML =
           '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
-        RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
-      })
-
-      afterEach(() => {
-        jest.resetAllMocks()
       })
 
       it('is included', () => {
@@ -646,11 +648,6 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
         $video.innerHTML =
           '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="https://canvas.docker/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
         expect(getVideoOptions().attachmentId).toEqual('17')
-      })
-
-      it('is not included', () => {
-        RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: false})
-        expect(getVideoOptions().attachmentId).toBeUndefined()
       })
 
       it('is not included due invalid src', () => {

@@ -28,7 +28,7 @@ it('returns a thunk that is identical to itself ', () => {
   expect(doSomethingThunk).toBe(doSomething)
   doSomethingThunk(
     () => {},
-    () => {}
+    () => {},
   )
   expect(called).toBe(true)
 })
@@ -41,7 +41,7 @@ it('passes arguments to the fn', () => {
   })
   doSomething('first', 'second')(
     () => {},
-    () => {}
+    () => {},
   )
 })
 
@@ -50,13 +50,13 @@ it('passes only the specified args to the function', () => {
   const doSomething = identifiableThunk(
     (...args) =>
       (_dispatch, _getState) =>
-        (passedArgs = args)
+        (passedArgs = args),
   )
   const thunk = doSomething()
   expect(doSomething.args()).toEqual([])
   thunk(
     () => {},
-    () => {}
+    () => {},
   )
   expect(passedArgs).toEqual([])
 })
@@ -68,8 +68,8 @@ it('forwards the return value of the thunked function', () => {
   expect(
     doSomething()(
       () => {},
-      () => {}
-    )
+      () => {},
+    ),
   ).toBe(42)
 })
 
@@ -80,11 +80,11 @@ it('lets us alternate between calling it with args and calling it as a thunk', (
   })
   doSomething(1)(
     () => {},
-    () => {}
+    () => {},
   )
   doSomething(2)(
     () => {},
-    () => {}
+    () => {},
   )
   expect(sum).toBe(3)
 })
@@ -102,8 +102,8 @@ it('throws if the action is invoked as a thunk before it is called with normal a
   expect(() =>
     doSomething(
       () => {},
-      () => {}
-    )
+      () => {},
+    ),
   ).toThrow()
 })
 
@@ -112,15 +112,15 @@ it('can invoke itself recursively', () => {
     if (recur)
       return doSomething(false)(
         () => {},
-        () => {}
+        () => {},
       )
     else return 'recurred'
   })
   expect(
     doSomething(true)(
       () => {},
-      () => {}
-    )
+      () => {},
+    ),
   ).toBe('recurred')
 })
 
@@ -144,7 +144,7 @@ it('can access the current args', () => {
   expect(doSomething.args()).toEqual([1, 2, 3])
   thunk(
     () => {},
-    () => {}
+    () => {},
   )
   expect(doSomething.args()).not.toBeDefined()
 })
@@ -156,10 +156,10 @@ it('can be invoked with more than 3 args', () => {
       1,
       2,
       3,
-      4
+      4,
     )(
       () => {},
-      () => {}
-    )
+      () => {},
+    ),
   ).toBe(10)
 })

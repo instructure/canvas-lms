@@ -19,7 +19,7 @@
 type ContextType = 'Account' | 'Course'
 export const canManageAccountGradingSchemes = (
   currentContextType: ContextType,
-  gradingSchemeContextType: ContextType
+  gradingSchemeContextType: ContextType,
 ): boolean => {
   return !(currentContextType === 'Course' && gradingSchemeContextType === 'Account')
 }

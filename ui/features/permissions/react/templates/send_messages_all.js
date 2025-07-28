@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_64')
+const I18n = createI18nScope('permissions_templates_64')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'Allows user to send a message to “All in [course name]” or "All in [course group]".'
+        'Allows user to send a message to “All in [course name]” or "All in [course group]".',
       ),
     },
   ],
@@ -35,9 +35,9 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'Allows user to send a message to “All in [course name],” or “All in [course group].”'
+        'Allows user to send a message to “All in [course name],” or “All in [course group].”',
       ),
     },
   ],
-  []
+  [],
 )

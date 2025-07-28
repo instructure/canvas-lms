@@ -32,12 +32,12 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {convertModuleSettingsForApi} from '../utils/miscHelpers'
 import {updateModuleUI} from '../utils/moduleHelpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import type {Module, ModuleItem, Requirement} from './types'
+import type {Module, ModuleItem, PointsInputMessages, Requirement} from './types'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingOverlay from './LoadingOverlay'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export type SettingsPanelProps = {
   bodyHeight: string
@@ -60,6 +60,7 @@ export type SettingsPanelProps = {
   mountNodeRef: React.RefObject<HTMLElement>
   updateParentData?: (data: SettingsPanelState, changed: boolean) => void
   onDidSubmit?: () => void
+  onComplete?: () => void
 }
 
 const doRequest = (
@@ -68,13 +69,14 @@ const doRequest = (
   data: any,
   onSuccess: (res: Record<string, any>) => void,
   successMessage: string,
-  errorMessage: string
+  errorMessage: string,
 ) =>
   doFetchApi({
     path,
     method,
     body: convertModuleSettingsForApi(data),
   })
+    // @ts-expect-error
     .then((response: {json: Record<string, any>}) => {
       onSuccess(response.json)
       // add the alert in the next event cycle so that the alert is added to the DOM's aria-live
@@ -91,42 +93,43 @@ const doRequest = (
       showFlashAlert({
         err: e,
         message: errorMessage,
-      })
+      }),
     )
 
-export const updateModule = ({moduleId, moduleElement, data}: any) => {
+export const updateModule = ({moduleId, moduleElement, data, onComplete}: any) => {
   if (!moduleId) return Promise.reject(I18n.t('Invalid module id.'))
 
   return doRequest(
-    `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
+    `/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${moduleId}`,
     'PUT',
     data,
-    responseData => {
+    responseJSON => {
+      const {context_module: responseData} = responseJSON
       updateModuleUI(moduleElement, data)
       const dialog = new RelockModulesDialog()
       dialog.renderIfNeeded({
-        relock_warning: responseData?.context_module?.relock_warning ?? false,
+        relock_warning: responseData?.relock_warning ?? false,
         id: moduleId,
       })
     },
     I18n.t('%{moduleName} settings updated successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName})
-  )
+    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName}),
+  ).then(() => onComplete?.())
 }
 
-export const createModule = ({moduleElement, addModuleUI, data}: any) =>
+export const createModule = ({moduleElement, addModuleUI, data, onComplete}: any) =>
   doRequest(
-    `/courses/${ENV.COURSE_ID}/modules/`,
+    `/courses/${ENV.COURSE_ID || ENV.course_id}/modules/`,
     'POST',
     data,
     res => addModuleUI(res, moduleElement),
     I18n.t('%{moduleName} created successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName})
-  )
+    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName}),
+  ).then(() => onComplete?.())
 
 export default function SettingsPanel({
   moduleElement,
@@ -149,6 +152,7 @@ export default function SettingsPanel({
   mountNodeRef,
   updateParentData,
   onDidSubmit,
+  onComplete,
 }: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
     ...defaultState,
@@ -170,7 +174,7 @@ export default function SettingsPanel({
 
   const hasErrors = () => {
     return (
-      state.nameInputMessages.length > 0 ||
+      state.nameInputMessages.length > 0 || state.pointsInputMessages.length > 0 ||
       (state.lockUntilChecked && (state.lockUntilInputMessages.length > 0 || !validDate))
     )
   }
@@ -205,6 +209,64 @@ export default function SettingsPanel({
     })
   }, [state.nameInputMessages])
 
+  const setPointsInputError = (requirement: Requirement) => {
+    if (
+      !['score', 'percentage'].includes(requirement.type) ||
+      ['view', 'mark', 'submit'].includes(requirement.type)
+    ) {
+      return
+    }
+
+    const minimumScore = 'minimumScore' in requirement ? Number(requirement.minimumScore) : 0.0
+
+    if (minimumScore <= 0) {
+      return I18n.t('Required input')
+    }
+
+    const limit = requirement.type === 'score' ? Number(requirement.pointsPossible) : 100
+
+    return minimumScore > limit ? I18n.t('Invalid input') : null
+  }
+
+  const handlePointsInputError = useCallback((pointsMessages: PointsInputMessages) => {
+    dispatch({
+      type: actions.SET_POINTS_INPUT_MESSAGES,
+      payload: pointsMessages,
+    })
+
+  }, [])
+
+  const validatePointsInput = (requirement: Requirement) => {
+    const message = setPointsInputError(requirement)
+    const pointsMessages = state.pointsInputMessages.filter((item) => item.requirementId !== requirement.id)
+
+    if (message){
+      pointsMessages.push({
+        requirementId: requirement.id,
+        message,
+      })
+    }
+
+    handlePointsInputError(pointsMessages)
+  }
+
+  const validatePointsInputList = useCallback(() => {
+    const pointsMessages : PointsInputMessages  = []
+
+    state.requirements?.forEach((requirement) => {
+
+      const message = setPointsInputError(requirement)
+
+      if (message)
+        pointsMessages.push({
+          requirementId: requirement.id,
+          message,
+        })
+    })
+
+    return pointsMessages
+  }, [state.requirements])
+
   const handleSave = useCallback(() => {
     // check for errors
     if (state.moduleName.trim().length === 0) {
@@ -212,6 +274,21 @@ export default function SettingsPanel({
       nameInputRef.current?.focus()
       return
     }
+
+    // Validation only applies if flag is enabled
+    if (window.ENV.FEATURES.modules_requirements_allow_percentage) {
+      const pointsInputsErrors = validatePointsInputList()
+      handlePointsInputError(pointsInputsErrors)
+
+      if (pointsInputsErrors && pointsInputsErrors.length > 0) {
+        return
+      }
+    }
+
+    if (state.pointsInputMessages.length > 0) {
+      return
+    }
+
     if (state.lockUntilChecked && state.unlockAt === undefined) {
       dateInputRef.current?.focus()
       return
@@ -220,11 +297,21 @@ export default function SettingsPanel({
     const handleRequest = moduleId ? updateModule : createModule
 
     setLoading(true)
-    // eslint-disable-next-line promise/catch-or-return
-    handleRequest({moduleId, moduleElement, addModuleUI, data: state})
+
+    handleRequest({ moduleId, moduleElement, addModuleUI, data: state, onComplete })
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
-  }, [state, moduleId, moduleElement, addModuleUI, handleNameError, onDidSubmit, onDismiss])
+  }, [
+    state,
+    moduleId,
+    moduleElement,
+    addModuleUI,
+    handleNameError,
+    handlePointsInputError,
+    onDidSubmit,
+    onDismiss,
+    validatePointsInputList,
+  ])
 
   function customOnDismiss() {
     if (!moduleId) {
@@ -237,7 +324,7 @@ export default function SettingsPanel({
   // Sends data to parent when unmounting
   useEffect(
     () => () => updateParentData?.(state, !_.isEqual(initialState.current, state)),
-    [state, updateParentData]
+    [state, updateParentData],
   )
 
   return (
@@ -292,7 +379,7 @@ export default function SettingsPanel({
               prevMonthLabel={I18n.t('Previous month')}
               nextMonthLabel={I18n.t('Next month')}
               allowNonStepInput={true}
-              onChange={(e, dateTimeString) => {
+              onChange={(_e, dateTimeString) => {
                 dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
                 if (dateTimeString) {
                   setValidDate(true)
@@ -398,6 +485,8 @@ export default function SettingsPanel({
                   ],
                 })
               }}
+              pointsInputMessages={state.pointsInputMessages}
+              validatePointsInput={validatePointsInput}
             />
           </View>
         )}

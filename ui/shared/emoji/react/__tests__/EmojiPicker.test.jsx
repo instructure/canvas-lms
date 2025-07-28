@@ -64,7 +64,7 @@ describe.skip('EmojiPicker', () => {
     const emoji = within(region).getByRole('button', {name: /😘, kissing_heart/})
     await userEvent.click(emoji)
     expect(insertEmoji).toHaveBeenCalledWith(
-      expect.objectContaining({id: 'kissing_heart', native: '😘'})
+      expect.objectContaining({id: 'kissing_heart', native: '😘'}),
     )
   })
 
@@ -92,7 +92,7 @@ describe.skip('EmojiPicker', () => {
     await userEvent.click(mediumSkinToneButton)
     const mediumSkinToneNumber = 4
     expect(handleSkinToneChange).toHaveBeenCalledWith(
-      expect.objectContaining({detail: mediumSkinToneNumber})
+      expect.objectContaining({detail: mediumSkinToneNumber}),
     )
     window.removeEventListener('emojiSkinChange', handleSkinToneChange)
   })
@@ -107,7 +107,7 @@ describe.skip('EmojiPicker', () => {
     const emoji = within(region).getByRole('button', {name: /😘, kissing_heart/})
     await userEvent.click(emoji)
     expect(handleEmojiSelected).toHaveBeenCalledWith(
-      expect.objectContaining({detail: 'kissing_heart'})
+      expect.objectContaining({detail: 'kissing_heart'}),
     )
     window.removeEventListener('emojiSelected', handleEmojiSelected)
   })
@@ -133,7 +133,7 @@ describe.skip('EmojiPicker', () => {
 
   it('filters out emojis passed via the excludedEmojis prop', async () => {
     const {getByRole} = render(
-      <EmojiPicker insertEmoji={insertEmoji} excludedEmojis={['kissing_heart']} />
+      <EmojiPicker insertEmoji={insertEmoji} excludedEmojis={['kissing_heart']} />,
     )
     const button = getByRole('button', {name: /Open emoji menu/})
     await userEvent.click(button)

@@ -25,6 +25,7 @@ export const DEFAULT_AVATAR_URL = 'http://canvas.instructure.com/images/messages
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 export const SUBMITTED = 'submitted'
+export const RESUMBITTED = 'resubmitted'
 export const MISSING = 'missing'
 export const LATE = 'late'
 
@@ -47,6 +48,8 @@ const searchFilter = {
   setAllThreadsStatus: () => {},
   expandedThreads: [],
   setExpandedThreads: () => {},
+  perPage: '',
+  discussionID: '',
 }
 export const SearchContext = React.createContext(searchFilter)
 
@@ -57,10 +60,19 @@ const discussionManagerUtilityContext = {
   setUserSplitScreenPreference: () => {},
   highlightEntryId: '',
   setHighlightEntryId: () => {},
+  expandedThreads: '',
+  setExpandedThreads: () => {},
+  focusSelector: '',
+  setFocusSelector: () => {},
+  setPageNumber: () => {},
   isGradedDiscussion: false,
   setIsGradedDiscussion: () => {},
   usedThreadingToolbarChildRef: null,
   isSummaryEnabled: false,
 }
+
+// use for logic that does not need or expect changes in the same page load
+export const isSpeedGraderInTopUrl =
+  window.top.location.href?.includes('gradebook/speed_grader') || false
 
 export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

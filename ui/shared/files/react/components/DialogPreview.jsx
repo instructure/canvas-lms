@@ -37,6 +37,7 @@ class DialogPreview extends React.Component {
         <FilesystemObjectThumbnail
           model={this.props.itemsToShow[0]}
           className="DialogPreview__thumbnail"
+          data-testid="single-thumbnail"
         />
       )
     } else {
@@ -48,13 +49,18 @@ class DialogPreview extends React.Component {
             left: 10 * index,
             top: -140 * index,
           }}
+          data-testid={`multi-thumbnail-${index}`}
         />
       ))
     }
   }
 
   render() {
-    return <div className="DialogPreview__container">{this.renderPreview()}</div>
+    return (
+      <div className="DialogPreview__container" data-testid="dialog-preview-container">
+        {this.renderPreview()}
+      </div>
+    )
   }
 }
 

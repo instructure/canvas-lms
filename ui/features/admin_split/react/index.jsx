@@ -22,9 +22,9 @@ import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {arrayOf, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('admin_split')
+const I18n = createI18nScope('admin_split')
 
 export default function AdminSplit({user, splitUrl, splitUsers}) {
   const [loading, setLoading] = useState(false)
@@ -44,7 +44,7 @@ export default function AdminSplit({user, splitUrl, splitUsers}) {
       _data => {
         setLoading(false)
         setFailed(true)
-      }
+      },
     )
   }, [splitUrl, setLoading, setResults, setFailed])
 
@@ -100,7 +100,7 @@ export default function AdminSplit({user, splitUrl, splitUsers}) {
       </ul>
       <p>
         {I18n.t(
-          'NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.'
+          'NOTE: This will attempt to undo the merge as fully as possible; however, merged users may not be perfectly restored to their prior state.',
         )}
       </p>
       <Button disabled={loading} margin="xx-small" color="primary" onClick={performSplit}>

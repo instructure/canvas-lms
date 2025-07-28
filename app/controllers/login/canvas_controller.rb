@@ -20,6 +20,7 @@
 
 class Login::CanvasController < ApplicationController
   include Login::Shared
+  helper NewLoginHelper
 
   before_action :validate_auth_type
   before_action :forbid_on_files_domain
@@ -29,14 +30,22 @@ class Login::CanvasController < ApplicationController
   protect_from_forgery except: :create, with: :exception
 
   def new
-    @allow_robot_indexing = true unless @domain_root_account&.disable_login_search_indexing?
+    if @domain_root_account.disable_login_search_indexing? && @domain_root_account.enable_search_indexing?
+      @allow_robot_indexing = false
+    end
     @pseudonym_session = PseudonymSession.new
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
     flash.now[:notice] = t("Your password has been changed.") if params[:password_changed] == "1"
     @include_recaptcha = recaptcha_enabled?(failsafe: false)
 
-    maybe_render_mobile_login
+    # TODO: remove feature flag check and fallback when `login_registration_ui_identity` is no longer needed
+    if @domain_root_account.feature_enabled? :login_registration_ui_identity
+      render_new_login
+    else
+      # fallback to maintain original behavior
+      maybe_render_mobile_login
+    end
   end
 
   def create
@@ -57,6 +66,8 @@ class Login::CanvasController < ApplicationController
     if params[:pseudonym_session].blank? || params[:pseudonym_session][:password].blank?
       return unsuccessful_login(t("No password was given"))
     end
+
+    increment_statsd(:attempts)
 
     # strip leading and trailing whitespace off the entered unique id. some
     # mobile clients (e.g. android) will add a space after the login when using
@@ -91,6 +102,7 @@ class Login::CanvasController < ApplicationController
         next unless pseudonym
 
         pseudonym.instance_variable_set(:@ldap_result, res.first)
+        @aac = aac
         pseudonym.infer_auth_provider(aac)
         @pseudonym_session = PseudonymSession.new(pseudonym, params[:pseudonym_session][:remember_me] == "1")
         @pseudonym_session.save
@@ -109,6 +121,7 @@ class Login::CanvasController < ApplicationController
     login_error = @pseudonym_session&.login_error || pseudonym
     case login_error
     when :remaining_attempts_2, :remaining_attempts_1, :final_attempt
+      increment_statsd(:failure, reason: :invalid_credentials)
       attempts = Canvas::Security::LoginRegistry::WARNING_ATTEMPTS[login_error]
       if login_error == :final_attempt
         unsuccessful_login t("We've received several incorrect username or password entries. To protect your account, it has been locked. Please contact your system administrator.")
@@ -117,12 +130,15 @@ class Login::CanvasController < ApplicationController
       end
       return
     when :impossible_credentials
+      increment_statsd(:failure, reason: :impossible_credentials)
       unsuccessful_login t("Please verify your username or password and try again.")
       return
     when :too_many_attempts
+      increment_statsd(:failure, reason: :too_many_attempts)
       unsuccessful_login t("Too many failed login attempts. Please try again later or contact your system administrator.")
       return
     when :too_recent_login
+      increment_statsd(:failure, reason: :too_recent_login)
       unsuccessful_login t("You have recently logged in multiple times too quickly. Please wait a few seconds and try again.")
       return
     end
@@ -157,9 +173,10 @@ class Login::CanvasController < ApplicationController
 
   protected
 
-  def validate_auth_type
-    @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
+  def aac
+    @aac ||= @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
   end
+  alias_method :validate_auth_type, :aac
 
   def unsuccessful_login(message)
     if request.format.json?
@@ -173,17 +190,40 @@ class Login::CanvasController < ApplicationController
                     end
     @errored = true
     @headers = false
-    maybe_render_mobile_login :bad_request
+
+    if @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+      render_new_login(:bad_request)
+    else
+      maybe_render_mobile_login(:bad_request)
+    end
   end
 
   def maybe_render_mobile_login(status = nil)
     if mobile_device?
-      @login_handle_name = @domain_root_account.login_handle_name_with_inference
-      @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      render :mobile_login, layout: "mobile_auth", status:
+      render_mobile_login
     else
-      @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
+      @aacs_with_buttons = auth_providers_with_buttons
       render :new, status:
     end
+  end
+
+  def render_new_login(status = nil)
+    # disable custom js/css if flag enabled
+    @exclude_account_css = @exclude_account_js = @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+    render "login/canvas/new_login", layout: "bare", status: status || :ok
+  end
+
+  def auth_providers_with_buttons
+    @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
+  end
+
+  def render_mobile_login
+    @login_handle_name = @domain_root_account.login_handle_name_with_inference
+    @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
+    render :mobile_login, layout: "mobile_auth", status:
+  end
+
+  def auth_type
+    AuthenticationProvider::Canvas.sti_name
   end
 end

@@ -30,7 +30,7 @@ common: &common
 ## 3. Create a new user and grant read-only access to databases:
 First, create the new user
 ```bash
-docker-compose run --rm web psql -h postgres -U postgres -c "CREATE USER canvas_read_only WITH PASSWORD 'sekret'"
+docker compose run --rm web psql -h postgres -U postgres -c "CREATE USER canvas_read_only WITH PASSWORD 'sekret'"
 ```
 
 When prompted for a password, use the Canvas default postgres password (`sekret` at the time of writing),
@@ -39,7 +39,7 @@ Next, grant the user read-only privileges to all tables in each database.
 
 For each database (development, test, etc.) run the following, substituting the correct name for `<database name>`:
 ```bash
-docker-compose run --rm web psql -h postgres -U postgres -d <database name> -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO canvas_read_only'
+docker compose run --rm web psql -h postgres -U postgres -d <database name> -c 'GRANT SELECT ON ALL TABLES IN SCHEMA public TO canvas_read_only'
 ```
 
 ## 4. That's it!

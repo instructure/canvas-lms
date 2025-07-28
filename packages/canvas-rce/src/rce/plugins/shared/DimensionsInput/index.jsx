@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string} from 'prop-types'
+import {bool, func, number, shape, string, object} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {IconLockLine} from '@instructure/ui-icons'
+import {IconLockLine, IconWarningSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -30,6 +30,17 @@ import DimensionInput from './DimensionInput'
 
 export {default as useDimensionsState} from './useDimensionsState'
 
+const errorMessage = message => {
+  return (
+    <Flex gap="xx-small" alignItems="center">
+      <IconWarningSolid color="error" />
+      <Text color="danger" size="small">
+        {message}
+      </Text>
+    </Flex>
+  )
+}
+
 const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
   let result = {text: formatMessage('Aspect ratio will be preserved'), type: 'hint'}
   if (dimensionsState.usePercentageUnits) {
@@ -37,7 +48,7 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
       result = {text: formatMessage('Percentage must be a number'), type: 'error'}
     } else if (!dimensionsState.isAtLeastMinimums) {
       result = {
-        text: formatMessage('Must be at least {percentage}%', {
+        text: formatMessage('Percentage must be at least {percentage}%', {
           percentage: minPercentage,
         }),
         type: 'error',
@@ -47,7 +58,7 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
     result = {text: formatMessage('Width and height must be numbers'), type: 'error'}
   } else if (!dimensionsState.isAtLeastMinimums) {
     result = {
-      text: formatMessage('Must be at least {width} x {height}px', {
+      text: formatMessage('Pixels must be at least {width} x {height}px', {
         width: minWidth,
         height: minHeight,
       }),
@@ -58,13 +69,30 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
 }
 
 export default function DimensionsInput(props) {
-  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage} = props
+  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage, dimensionsRef} = props
 
   const handleDimensionTypeChange = e => {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
   }
 
   const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
+  const secondaryMessage = {...message, text: ''}
+
+  const displayMessage = message => {
+    if (!message) {
+      return
+    }
+
+    return (
+      <div data-testid="message">
+        {message.type === 'error' ? (
+          errorMessage(message.text)
+        ) : (
+          <Text size="small">{message.text}</Text>
+        )}
+      </div>
+    )
+  }
 
   return (
     <Flex direction="column">
@@ -79,15 +107,14 @@ export default function DimensionsInput(props) {
             onChange={handleDimensionTypeChange}
             value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
           >
-            <RadioInput label={formatMessage('Pixels')} value="pixels" />
             <RadioInput label={formatMessage('Percentage')} value="percentage" />
+            <RadioInput label={formatMessage('Pixels')} value="pixels" />
           </RadioInputGroup>
         )}
       </Flex.Item>
       <Flex.Item padding="small">
         <FormFieldGroup
           description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
-          messages={[message]}
         >
           <Flex alignItems="start" direction="row" data-testid="input-number-container">
             {dimensionsState.usePercentageUnits ? (
@@ -96,6 +123,8 @@ export default function DimensionsInput(props) {
                   <DimensionInput
                     dimensionState={dimensionsState.percentageState}
                     label={formatMessage('Percentage')}
+                    messages={[secondaryMessage]}
+                    dimensionsRef={dimensionsRef}
                   />
                 </Flex.Item>
 
@@ -108,6 +137,8 @@ export default function DimensionsInput(props) {
                     dimensionState={dimensionsState.widthState}
                     label={formatMessage('Width')}
                     minValue={minWidth}
+                    messages={[secondaryMessage]}
+                    dimensionsRef={dimensionsRef}
                   />
                 </Flex.Item>
 
@@ -120,12 +151,14 @@ export default function DimensionsInput(props) {
                     dimensionState={dimensionsState.heightState}
                     label={formatMessage('Height')}
                     minValue={minHeight}
+                    messages={[secondaryMessage]}
                   />
                 </Flex.Item>
               </>
             )}
           </Flex>
         </FormFieldGroup>
+        {displayMessage(message)}
       </Flex.Item>
     </Flex>
   )
@@ -156,6 +189,7 @@ DimensionsInput.propTypes = {
   minWidth: number.isRequired,
   minPercentage: number.isRequired,
   hidePercentage: bool,
+  dimensionsRef: object,
 }
 
 DimensionsInput.defaultProps = {

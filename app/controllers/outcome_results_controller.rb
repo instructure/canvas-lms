@@ -264,6 +264,9 @@ class OutcomeResultsController < ApplicationController
       reject! "Outcomes do not belong to Course" unless course_outcome_ids.include?(outcome["outcome_id"])
     end
 
+    # Associate user with shard if they are not already
+    @current_user.associate_with_shard(@context.shard, :shadow) unless @current_user.associated_shards.include?(@context.shard)
+
     # Save Lmgb Outcome Ordering
     UserLmgbOutcomeOrderings.set_lmgb_outcome_ordering(@context.root_account_id, @current_user.id, @context.id, outcome_position_map)
   end
@@ -461,7 +464,11 @@ class OutcomeResultsController < ApplicationController
     #   app/controllers/quizzes/quizzes_controller.rb
     #   app/controllers/quizzes_next/quizzes_api_controller.rb
     #   app/controllers/application_controller.rb
-    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid]
+
+    # If there are outcome ids in the params we need to take them into consideration when caching
+    outcome_ids_key = Digest::MD5.hexdigest(params[:outcome_ids].split(",").sort.join("|")) if params[:outcome_ids].present?
+
+    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid, outcome_ids_key].compact
   end
 
   # used in sLMGB/LMGB
@@ -497,22 +504,24 @@ class OutcomeResultsController < ApplicationController
     filters << "completed" if exclude_concluded
     filters << "inactive" if exclude_inactive
 
-    ActiveRecord::Associations.preload(@users, :enrollments)
     # Only pull enrollment records for students included in the current course
     # If a user is enrolled more than once in a course - i.e. the student could be in multiple
     # sections of the course. Then we will need to one of two things:
     # 1. If the section parameter is available - filter only by the user's enrollment status in
     #    the section
     # 2. If the section parameter is not available - filter by the user's enrollment status(es) in the course.
-    #    If there are multiple enrollments available for the user, `.all?` will return false if the user is
-    #    active in one of the sections.
     # NOTE: If viewing all sections and a user is concluded or inactive in one section and not another,
     # the student should always be visible
-    @users = if params[:section_id]
-               @users.reject { |u| u.enrollments.where(course_id: @context.id, course_section_id: params[:section_id]).all? { |e| filters.include? e.workflow_state } }
-             else
-               @users.reject { |u| u.enrollments.where(course_id: @context.id).all? { |e| filters.include? e.workflow_state } }
-             end
+
+    user_query = User.joins(:enrollments)
+                     .where(enrollments: { type: ["StudentEnrollment", "StudentViewEnrollment"], course_id: @context.id })
+                     .where.not(enrollments: { workflow_state: filters })
+
+    if params[:section_id]&.to_i&.positive?
+      user_query = user_query.where(enrollments: { course_section_id: params[:section_id].to_i })
+    end
+
+    @users = user_query.distinct
   end
 
   # used in LMGB
@@ -553,7 +562,7 @@ class OutcomeResultsController < ApplicationController
 
   def handle_inst_statsd_outcomes_page_views
     if student_lmgb_view? || observer_lmgb_view?
-      InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "student_lmgb" })
+      InstStatsd::Statsd.distributed_increment("outcomes_page_views", tags: { type: "student_lmgb" })
     end
   end
 
@@ -692,7 +701,8 @@ class OutcomeResultsController < ApplicationController
     return true unless params[:sort_by]
 
     sort_by = params[:sort_by]
-    reject! "invalid sort_by parameter value" if sort_by && !%w[student outcome].include?(sort_by)
+    sortable_fields = %w[student student_name student_sis_id student_integration_id student_login_id outcome]
+    reject! "invalid sort_by parameter value" if sort_by && !sortable_fields.include?(sort_by)
     if sort_by == "outcome"
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
@@ -816,12 +826,25 @@ class OutcomeResultsController < ApplicationController
   end
 
   def apply_sort_order(relation)
-    if params[:sort_by] == "student"
-      order_clause = User.sortable_name_order_by_clause(User.quoted_table_name)
-      order_clause = "#{order_clause} DESC" if params[:sort_order] == "desc"
-      relation.order(Arel.sql(order_clause))
-    else
+    order_by = case params[:sort_by]
+               when "student_name"
+                 "name"
+               when "student_sis_id"
+                 "sis_id"
+               when "student_integration_id"
+                 "integration_id"
+               when "student_login_id"
+                 "login_id"
+               when "student"
+                 "username"
+               else
+                 nil
+               end
+
+    if order_by.nil?
       relation
+    else
+      UserSearch.order_scope(relation, @context, { sort: order_by, order: params[:sort_order] })
     end
   end
 end

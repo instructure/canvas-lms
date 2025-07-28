@@ -16,17 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {
     handleChange: PropTypes.func.isRequired,
     configurationType: PropTypes.string.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.configurationTypeRef = React.createRef()
   }
 
   componentDidMount() {
@@ -40,12 +45,12 @@ export default class ConfigurationTypeSelector extends React.Component {
     return (
       <div className="ConfigurationsTypeSelector">
         <div className="form-group">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          {}
           <label>
             {I18n.t('Configuration Type')}
             <select
               id="configuration_type_selector"
-              ref="configurationType"
+              ref={this.configurationTypeRef}
               defaultValue={this.props.configurationType}
               className="input-block-level show-tick"
             >

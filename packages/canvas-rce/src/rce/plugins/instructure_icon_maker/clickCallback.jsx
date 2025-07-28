@@ -60,7 +60,7 @@ export default function (ed, document, type) {
           />
         )}
       </StoreProvider>,
-      container
+      container,
     )
   })
 }

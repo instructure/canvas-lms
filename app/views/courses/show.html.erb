@@ -60,10 +60,15 @@
   <% js_bundle :announcements_on_home_page %>
 <% end %>
 <div id="course_home_content">
+  <% if @display_tag_converter_message %>
+    <div id="differentiation-tag-converter-message-root"></div>
+  <% end %>
   <% if @course_home_view == 'wiki' %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>
-    <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    <% unless @context.use_modules_rewrite_view?(@current_user, session) %> 
+      <%= render :partial => 'context_modules/content_next', :locals => {:course_home => true} %>
+    <% end %>
   <% elsif @course_home_view == 'assignments' %>
   <% elsif @course_home_view == 'syllabus' %>
     <%= render :partial => 'assignments/syllabus_content', :locals => {:course_home => true} %>

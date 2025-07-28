@@ -21,6 +21,8 @@ import {act, fireEvent, render} from '@testing-library/react'
 import ModuleAssignments, {type ModuleAssignmentsProps} from '../ModuleAssignments'
 import fetchMock from 'fetch-mock'
 import {FILTERED_SECTIONS_DATA, FILTERED_STUDENTS_DATA, SECTIONS_DATA, STUDENTS_DATA} from './mocks'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const props: ModuleAssignmentsProps = {
   courseId: '1',
@@ -28,11 +30,11 @@ const props: ModuleAssignmentsProps = {
   defaultValues: [],
 }
 
-const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections`
-const STUDENTS_URL = `api/v1/courses/${props.courseId}/users?enrollment_type=student`
-const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?search_term=.+/
+const SECTIONS_URL = `/api/v1/courses/${props.courseId}/sections?per_page=100`
+const FILTERED_SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=100&search_term=.+/
 const FILTERED_STUDENTS_URL =
-  /\/api\/v1\/courses\/.+\/users\?search_term=.+&enrollment_type=student/
+  /\/api\/v1\/courses\/.+\/users\?per_page=100&search_term=.+&enrollment_type=student/
+const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
 
 describe('ModuleAssignments', () => {
   beforeAll(() => {
@@ -45,10 +47,11 @@ describe('ModuleAssignments', () => {
   })
 
   beforeEach(() => {
-    fetchMock.getOnce(SECTIONS_URL, SECTIONS_DATA)
-    fetchMock.getOnce(STUDENTS_URL, STUDENTS_DATA)
-    fetchMock.getOnce(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
-    fetchMock.getOnce(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
+    fetchMock.get(SECTIONS_URL, SECTIONS_DATA)
+    fetchMock.get(FILTERED_SECTIONS_URL, FILTERED_SECTIONS_DATA)
+    fetchMock.get(FILTERED_STUDENTS_URL, FILTERED_STUDENTS_DATA)
+    fetchMock.get(COURSE_SETTINGS_URL, {hide_final_grades: false})
+    queryClient.setQueryData(['students', props.courseId, {per_page: 100}], STUDENTS_DATA)
   })
 
   afterEach(() => {
@@ -56,7 +59,11 @@ describe('ModuleAssignments', () => {
   })
 
   const renderComponent = (overrides?: Partial<typeof props>) =>
-    render(<ModuleAssignments {...props} {...overrides} />)
+    render(
+      <MockedQueryProvider>
+        <ModuleAssignments {...props} {...overrides} />
+      </MockedQueryProvider>,
+    )
 
   it('displays sections and students as options', async () => {
     const {findByTestId, findByText, getByText} = renderComponent()
@@ -67,7 +74,7 @@ describe('ModuleAssignments', () => {
       expect(getByText(section.name)).toBeInTheDocument()
     })
     STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.name)).toBeInTheDocument()
+      expect(getByText(student.value)).toBeInTheDocument()
     })
   })
 
@@ -75,9 +82,9 @@ describe('ModuleAssignments', () => {
     const {findByTestId, findByText, getByText} = renderComponent()
     const moduleAssignments = await findByTestId('assignee_selector')
     act(() => moduleAssignments.click())
-    await findByText(STUDENTS_DATA[0].name)
+    await findByText(STUDENTS_DATA[0].value)
     STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.sis_user_id)).toBeInTheDocument()
+      expect(getByText(student.sisID)).toBeInTheDocument()
     })
   })
 
@@ -91,7 +98,7 @@ describe('ModuleAssignments', () => {
       expect(getByText(section.name)).toBeInTheDocument()
     })
     FILTERED_STUDENTS_DATA.forEach(student => {
-      expect(getByText(student.name)).toBeInTheDocument()
+      expect(getByText(student.value)).toBeInTheDocument()
     })
   })
 
@@ -105,7 +112,9 @@ describe('ModuleAssignments', () => {
 
   it('shows SIS ID on existing options', async () => {
     const {findByTestId, findByText, getByTitle} = renderComponent({
-      defaultValues: [{id: 'student-2', group: 'Students', overrideId: '1234', value: 'Peter'}],
+      defaultValues: [
+        {id: 'student-2', sisID: 'peter002', group: 'Students', overrideId: '1234', value: 'Peter'},
+      ],
     })
     const moduleAssignments = await findByTestId('assignee_selector')
     act(() => moduleAssignments.click())
@@ -133,6 +142,6 @@ describe('ModuleAssignments', () => {
     const {getAllByTestId, getByText} = renderComponent({defaultValues})
     expect(getByText(defaultValues[0].value)).toBeInTheDocument()
     expect(getByText(defaultValues[1].value)).toBeInTheDocument()
-    expect(getAllByTestId('assignee_selector_selected_option').length).toBe(defaultValues.length)
+    expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(defaultValues.length)
   })
 })

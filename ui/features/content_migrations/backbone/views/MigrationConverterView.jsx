@@ -21,14 +21,14 @@ import $ from 'jquery'
 import {extend as lodashExtend, defer} from 'lodash'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(MigrationConverterView, ValidatedFormView)
 
@@ -64,7 +64,7 @@ MigrationConverterView.prototype.events = lodashExtend(
   {
     'change #chooseMigrationConverter': 'selectConverter',
     'click .cancelBtn': 'resetForm',
-  }
+  },
 )
 
 MigrationConverterView.prototype.toJSON = function (json) {
@@ -86,7 +86,7 @@ MigrationConverterView.prototype.renderConverter = function (converter) {
           _this.$converter.html(converter.render().$el)
           return _this.trigger('converterRendered')
         }
-      })(this)
+      })(this),
     )
   } else {
     this.resetForm()
@@ -127,7 +127,7 @@ MigrationConverterView.prototype.submit = function (_event) {
         return function () {
           return _this.exitUploadingState()
         }
-      })(this)
+      })(this),
     )
     return dfd.done(
       (function (_this) {
@@ -136,7 +136,7 @@ MigrationConverterView.prototype.submit = function (_event) {
           _this.model.resetModel()
           return _this.resetForm()
         }
-      })(this)
+      })(this),
     )
   } else {
     return this.exitUploadingState()
@@ -164,7 +164,7 @@ MigrationConverterView.prototype.enterUploadingState = function () {
   $(window).on('beforeunload', function () {
     return I18n.t(
       'upload_warning',
-      'Navigating away from this page will cancel the upload process.'
+      'Navigating away from this page will cancel the upload process.',
     )
   })
   if (this.model.get('migration_type') === 'course_copy_importer') {
@@ -192,13 +192,14 @@ MigrationConverterView.prototype.afterRender = function () {
   // eslint-disable-next-line react/no-children-prop
   const alert = React.createElement(Alert, {
     children: I18n.t(
-      'Importing the same course content more than once will overwrite any existing content in the course.'
+      'Previously imported content from the same course will be replaced. Manually added content will remain.',
     ),
     variant: 'warning',
     hasShadow: false,
     margin: '0 0 medium 0',
   })
   if (this.$overwriteWarning[0]) {
+    // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render(alert, this.$overwriteWarning[0])
   }
 }

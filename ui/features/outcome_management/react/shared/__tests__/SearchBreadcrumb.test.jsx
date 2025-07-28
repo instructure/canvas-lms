@@ -35,7 +35,7 @@ describe('SearchBreadcrumb', () => {
 
   it('displays spinning loader if search string provided and loading prop is true', () => {
     const {getByTestId} = render(
-      <SearchBreadcrumb {...defaultProps({searchString: 'abc', loading: true})} />
+      <SearchBreadcrumb {...defaultProps({searchString: 'abc', loading: true})} />,
     )
     expect(getByTestId('search-loading')).toBeInTheDocument()
   })

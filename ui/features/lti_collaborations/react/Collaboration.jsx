@@ -17,20 +17,20 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
 import DeleteConfirmation from './DeleteConfirmation'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
 import store from './store'
 
-const I18n = useI18nScope('react_collaborations')
+const I18n = createI18nScope('react_collaborations')
 
 class Collaboration extends React.Component {
   constructor(props) {
     super(props)
     this.state = {deleteConfirmationOpen: false}
+    this.wrapperRef = React.createRef()
   }
 
   openConfirmation = () => {
@@ -45,8 +45,8 @@ class Collaboration extends React.Component {
         deleteConfirmationOpen: false,
       },
       () => {
-        ReactDOM.findDOMNode(this.deleteButtonRef).focus()
-      }
+        this.deleteButtonRef.focus()
+      },
     )
   }
 
@@ -65,25 +65,32 @@ class Collaboration extends React.Component {
     const editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}&display=borderless`
 
     return (
-      <div ref="wrapper" className="Collaboration">
+      <div ref={this.wrapperRef} className="Collaboration">
         <div className="Collaboration-body">
           <a
             className="Collaboration-title"
             href={`/${context}/${contextId}/collaborations/${collaboration.id}`}
             target="_blank"
             rel="noreferrer"
+            data-testid="collaboration-title"
           >
             {collaboration.title}
           </a>
-          <p className="Collaboration-description">{collaboration.description}</p>
-          <a className="Collaboration-author" href={`/users/${collaboration.user_id}`}>
+          <p className="Collaboration-description" data-testid="collaboration-description">
+            {collaboration.description}
+          </p>
+          <a
+            className="Collaboration-author"
+            href={`/users/${collaboration.user_id}`}
+            data-testid="collaboration-author"
+          >
             {collaboration.user_name},
           </a>
           <DatetimeDisplay datetime={collaboration.updated_at} format="%b %d, %l:%M %p" />
         </div>
         <div className="Collaboration-actions">
           {canEdit && (
-            <a className="icon-edit" href={editUrl}>
+            <a className="icon-edit" href={editUrl} data-testid="edit-collaboration">
               <span className="screenreader-only">{I18n.t('Edit Collaboration')}</span>
             </a>
           )}
@@ -94,6 +101,7 @@ class Collaboration extends React.Component {
               ref={c => (this.deleteButtonRef = c)}
               className="btn btn-link"
               onClick={this.openConfirmation}
+              data-testid="delete-collaboration"
             >
               <i className="icon-trash" />
               <span className="screenreader-only">{I18n.t('Delete Collaboration')}</span>
@@ -105,6 +113,7 @@ class Collaboration extends React.Component {
             collaboration={collaboration}
             onCancel={this.closeConfirmation}
             onDelete={this.deleteCollaboration}
+            data-testid="delete-confirmation"
           />
         )}
       </div>

@@ -26,12 +26,12 @@ import {buildContextPath} from './buildContextPath'
 export const useDefaultGradingScheme = (): {
   loadDefaultGradingScheme: (
     contextType: 'Account' | 'Course',
-    contextId: string
+    contextId: string,
   ) => Promise<GradingScheme>
   loadDefaultGradingSchemeStatus: ApiCallStatus
 } => {
   const [loadDefaultGradingSchemeStatus, setLoadDefaultGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const loadDefaultGradingScheme = useCallback(
@@ -41,7 +41,6 @@ export const useDefaultGradingScheme = (): {
       try {
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.PENDING)
 
-        // @ts-expect-error
         const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/default`,
           method: 'GET',
@@ -49,6 +48,7 @@ export const useDefaultGradingScheme = (): {
         if (!result.response.ok) {
           throw new Error(result.response.statusText)
         }
+        // @ts-expect-error
         const defaultGradingScheme: GradingScheme = result.json
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.COMPLETED)
         return defaultGradingScheme
@@ -57,7 +57,7 @@ export const useDefaultGradingScheme = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {loadDefaultGradingScheme, loadDefaultGradingSchemeStatus}

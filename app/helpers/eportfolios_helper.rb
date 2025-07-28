@@ -27,7 +27,7 @@ module EportfoliosHelper
     "<i class='icon-edit'></i>".html_safe
   end
 
-  def delete_icon(png = false)
+  def delete_icon(png: false)
     if png
       image_tag("delete.png", alt: I18n.t("Delete"))
     else

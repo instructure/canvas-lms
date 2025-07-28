@@ -28,6 +28,6 @@ export function renderCSPSelectionBox(containerElement) {
       canManage={ENV.PERMISSIONS.manage_account_settings}
       apiLibrary={axios}
     />,
-    containerElement
+    containerElement,
   )
 }

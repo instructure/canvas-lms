@@ -29,7 +29,8 @@ class Mutations::UpdateRubricArchivedState < Mutations::BaseMutation
     rescue ActiveRecord::RecordNotFound
       raise GraphQL::ExecutionError, "Rubric not found: #{input[:id]}"
     end
-    verify_authorized_action!(@rubric, :update)
+    requested_permission = input[:archived] ? :archive : :unarchive
+    verify_authorized_action!(@rubric, requested_permission)
     if input[:archived]
       @rubric.archive
     else

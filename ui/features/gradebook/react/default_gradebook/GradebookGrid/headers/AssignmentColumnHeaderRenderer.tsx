@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -30,6 +29,7 @@ import type GridSupport from '../GridSupport/index'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 function getSubmission(student: Student, assignmentId: string) {
+  // @ts-expect-error
   const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
@@ -64,6 +64,7 @@ type Column = {
   assignmentId: string
 }
 
+// @ts-expect-error
 function getProps(column: Column, gradebook: Gradebook, options): AssignmentColumnHeaderProps {
   const assignmentId = column.assignmentId
   const columnId = column.id
@@ -88,7 +89,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
   // all loaded students, regardless of any active filters.
   const studentsThatCanSeeAssignment = gradebook.studentsThatCanSeeAssignment(assignmentId)
   const allStudents: PartialStudent[] = Object.keys(studentsThatCanSeeAssignment).map(key =>
-    processStudent(studentsThatCanSeeAssignment[key])
+    processStudent(studentsThatCanSeeAssignment[key]),
   )
 
   // For the "Message Students Who" window, we only want to show students who
@@ -99,7 +100,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
   }
 
   const hasGradesOrPostableComments = allStudents.some(
-    student => isGraded(student.submission) || student.submission.hasPostableComments
+    student => isGraded(student.submission) || student.submission.hasPostableComments,
   )
 
   return {
@@ -122,6 +123,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       postManually: assignment.post_manually,
       published: assignment.published,
       submissionTypes: assignment.submission_types,
+      hasRubric: assignment.has_rubric,
     },
 
     curveGradesAction: gradebook.getCurveGradesAction(assignmentId),
@@ -129,12 +131,13 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
 
     enterGradesAsSetting: {
       hidden: optionsForGradingType(assignment.grading_type).length < 2, // show only multiple options
+      // @ts-expect-error
       onSelect(value) {
         gradebook.updateEnterGradesAsSetting(assignmentId, value)
       },
       selected: gradebook.getEnterGradesAsSetting(assignmentId),
       showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes(
-        'gradingScheme'
+        'gradingScheme',
       ),
     },
     getCurrentlyShownStudents,
@@ -169,6 +172,8 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
 
     removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
+    rubricAssessmentImportsExportsEnabled:
+      gradebook.options.rubric_assessment_imports_exports_enabled,
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),
 
     showGradePostingPolicyAction: {
@@ -222,8 +227,10 @@ export default class AssignmentColumnHeaderRenderer {
     this.gradebook = gradebook
   }
 
+  // @ts-expect-error
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
+     
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 

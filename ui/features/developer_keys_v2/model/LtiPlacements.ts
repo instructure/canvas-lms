@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 // TODO: this list is duplicated in ui/features/external_apps/react/components/ExternalToolPlacementList.jsx
 // We should consolidate some of the lti "models" into a shared package that both features depend on
@@ -117,18 +117,22 @@ export const LtiPlacements = {
   SubmissionTypeSelection: 'submission_type_selection',
   StudentContextCard: 'student_context_card',
   ToolConfiguration: 'tool_configuration',
+  TopNavigation: 'top_navigation',
   UserNavigation: 'user_navigation',
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
   DefaultPlacements: 'default_placements',
+  ActivityAssetProcessor: 'ActivityAssetProcessor',
 } as const
 
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
+  // @ts-expect-error
   ({
     account_navigation: I18n.t('Account Navigation'),
     assignment_edit: I18n.t('Assignment Edit'),
     assignment_selection: I18n.t('Assignment Selection'),
     assignment_view: I18n.t('Assignment View'),
+    ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
     similarity_detection: I18n.t('Similarity Detection'),
     assignment_menu: I18n.t('Assignment Menu'),
     assignment_index_menu: I18n.t('Assignments Index Menu'),
@@ -163,7 +167,7 @@ export const i18nLtiPlacement = (placement: LtiPlacement): string =>
     wiki_page_menu: I18n.t('Page Menu'),
     wiki_index_menu: I18n.t('Pages Index Menu'),
     default_placements: I18n.t('Assignment and Link Selection'),
-  }[placement])
+  })[placement]
 
 /**
  * Identifier for an LTI placement.

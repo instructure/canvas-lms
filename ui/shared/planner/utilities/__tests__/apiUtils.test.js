@@ -88,6 +88,28 @@ function makePlannerNoteApiResponse(overrides = {}) {
   })
 }
 
+function makeDiscussionCheckpointApiResponse(overrides = {}) {
+  return addContextInfo({
+    plannable_id: '11',
+    context_type: 'Course',
+    course_id: '1',
+    type: 'submitting',
+    ignore: `/api/v1/users/self/todo/sub_assignment_11/submitting?permanent=0`,
+    ignore_permanently: `/api/v1/users/self/todo/sub_assignment_11/submitting?permanent=1`,
+    planner_override: null,
+    plannable_type: 'sub_assignment',
+    plannable: makeDiscussionCheckpoint(),
+    submissions: false,
+    new_activity: false,
+    plannable_date: '2024-09-08T18:58:51Z',
+    details: {
+      reply_to_entry_required_count: 3,
+    },
+    html_url: '/courses/1/assignments/10',
+    ...overrides,
+  })
+}
+
 function makePlannerNote(overrides = {}) {
   return {
     id: 10,
@@ -130,6 +152,20 @@ function makeGradedDiscussionTopic(overrides = {}) {
     assignment_id: 10,
     due_at: '2017-05-15T16:32:34Z',
     unread_count: 0,
+    ...overrides,
+  }
+}
+
+function makeDiscussionCheckpoint(overrides = {}) {
+  return {
+    id: '15',
+    due_at: '2024-09-10T05:59:59Z',
+    points_possible: 10.0,
+    sub_assignment_tag: 'reply_to_topic',
+    created_at: '2024-09-08T14:36:03Z',
+    updated_at: '2017-08-08T16:20:35Z',
+    title: 'How to be a good friend',
+    unread_count: 2,
     ...overrides,
   }
 }
@@ -192,7 +228,22 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/assignments/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Quiz')
+    expect(result.title).toBe('How to make friends')
+    expect(result.html_url).toBe('/courses/1/assignments/10')
+    expect(result.id).toBe('10')
+    expect(result.uniqueId).toBe('quiz-10')
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
+    expect(result.points).toBe(100)
   })
 
   it('extracts and transforms the proper data for a graded discussion response', () => {
@@ -204,7 +255,22 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Discussion')
+    expect(result.title).toBe('How to make friends part 2')
+    expect(result.html_url).toBe('/courses/1/discussion_topics/10')
+    expect(result.id).toBe('1')
+    expect(result.uniqueId).toBe('discussion_topic-1')
+    expect(result.overrideAssignId).toBe(10) // graded discussions have assignment ID
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper data for a discussion response', () => {
@@ -218,7 +284,23 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Discussion')
+    expect(result.title).toBe('How to make enemies')
+    expect(result.html_url).toBe('/courses/1/discussion_topics/10')
+    expect(result.id).toBe('1')
+    expect(result.uniqueId).toBe('discussion_topic-1')
+    expect(result.points).toBe(40)
+    expect(result.dateStyle).toBe('todo') // from todo_date
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper data for a graded discussion response with an unread count', () => {
@@ -234,7 +316,24 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Discussion')
+    expect(result.title).toBe('How to make enemies')
+    expect(result.html_url).toBe('/courses/1/discussion_topics/10')
+    expect(result.id).toBe('1')
+    expect(result.uniqueId).toBe('discussion_topic-1')
+    expect(result.points).toBe(40)
+    expect(result.unread_count).toBe(10)
+    expect(result.completed).toBe(true) // submitted = true
+    expect(result.status).toEqual({submitted: true, unread_count: 10})
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
   })
 
   it('extracts and transforms the proper data for an ungraded discussion reponse with an unread count', () => {
@@ -249,7 +348,24 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/discussion_topics/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Discussion')
+    expect(result.title).toBe('How to make enemies')
+    expect(result.html_url).toBe('/courses/1/discussion_topics/10')
+    expect(result.id).toBe('1')
+    expect(result.uniqueId).toBe('discussion_topic-1')
+    expect(result.unread_count).toBe(10)
+    expect(result.dateStyle).toBe('todo') // from todo_date
+    expect(result.completed).toBe(false)
+    expect(result.status).toEqual({unread_count: 10}) // submissions: false plus unread_count
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
   })
 
   it("shouldn't show new activity for discussions with a 0 unread count", () => {
@@ -267,6 +383,51 @@ describe('transformApiToInternalItem', () => {
     expect(result).toMatchObject({newActivity: false})
   })
 
+  describe('dicusssion checkpoint', () => {
+    it('extracts and transforms the proper data for a discussion checkpoint response', () => {
+      const apiResponse = makeDiscussionCheckpointApiResponse()
+      const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+
+      expect(result.type).toBe('Discussion Checkpoint')
+      expect(result.title).toBe('How to be a good friend Reply to Topic')
+      expect(result.html_url).toBe('/courses/1/assignments/10')
+      expect(result.id).toBe('15')
+      expect(result.uniqueId).toBe('sub_assignment-15')
+      expect(result.points).toBe(10)
+      expect(result.unread_count).toBe(2)
+      expect(result.status).toEqual({unread_count: 2})
+      expect(result.context).toEqual({
+        id: '1',
+        type: 'Course',
+        title: 'blah',
+        image_url: 'blah_url',
+        color: '#abffaa',
+        url: undefined,
+      })
+      expect(result.completed).toBe(false)
+    })
+
+    it('modifies properly title for reply to topic checkpoint', () => {
+      const apiResponse = makeDiscussionCheckpointApiResponse()
+      const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+      expect(result.title).toEqual('How to be a good friend Reply to Topic')
+    })
+
+    it('modifies properly title for reply to entry checkpoint', () => {
+      const apiResponse = makeDiscussionCheckpointApiResponse({
+        plannable: makeDiscussionCheckpoint({sub_assignment_tag: 'reply_to_entry'}),
+      })
+      const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+      expect(result.title).toEqual('How to be a good friend Required Replies (3)')
+    })
+
+    it('moves unread_count property to status internal property', () => {
+      const apiResponse = makeDiscussionCheckpointApiResponse()
+      const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
+      expect(result.status).toHaveProperty('unread_count')
+    })
+  })
+
   it('extracts and transforms the proper data for an assignment response', () => {
     const apiResponse = makeApiResponse({
       plannable_type: 'assignment',
@@ -278,7 +439,23 @@ describe('transformApiToInternalItem', () => {
       html_url: '/courses/1/assignments/10',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Assignment')
+    expect(result.title).toBe('How to be neutral')
+    expect(result.html_url).toBe('/courses/1/assignments/10')
+    expect(result.id).toBe('10')
+    expect(result.uniqueId).toBe('assignment-10')
+    expect(result.points).toBe(50)
+    expect(result.dateStyle).toBe('due') // no todo_date, so uses due date
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper data for a planner_note response', () => {
@@ -290,7 +467,23 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('To Do')
+    expect(result.title).toBe('Some To Do Note')
+    expect(result.details).toBe('Some To Do Note Details :)')
+    expect(result.id).toBe(10)
+    expect(result.uniqueId).toBe('planner_note-10')
+    expect(result.course_id).toBe('1') // from plannable.course_id
+    expect(result.dateStyle).toBe('todo')
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper data for a planner_note response without an associated course', () => {
@@ -304,7 +497,16 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('To Do')
+    expect(result.title).toBe('Some To Do Note')
+    expect(result.details).toBe('Some To Do Note Details :)')
+    expect(result.id).toBe(10)
+    expect(result.uniqueId).toBe('planner_note-10')
+    expect(result.course_id).toBeUndefined()
+    expect(result.context).toBeUndefined() // no associated course
+    expect(result.dateStyle).toBe('todo')
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the ID for a wiki page repsonse', () => {
@@ -323,7 +525,25 @@ describe('transformApiToInternalItem', () => {
       html_url: '/calendar?event_id=1&include_contexts=course_1',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Calendar Event')
+    expect(result.title).toBe('calendar_event title')
+    expect(result.html_url).toBe('/calendar?event_id=1&include_contexts=course_1')
+    expect(result.id).toBe(1)
+    expect(result.uniqueId).toBe('calendar_event-1')
+    expect(result.location).toBe('Home')
+    expect(result.address).toBe('Here')
+    expect(result.details).toBe('calendar event description')
+    expect(result.allDay).toBe(false)
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper data for a calendar event response with an all day date', () => {
@@ -334,7 +554,25 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Calendar Event')
+    expect(result.title).toBe('calendar_event title')
+    expect(result.html_url).toBe('/calendar?event_id=1&include_contexts=course_1')
+    expect(result.id).toBe(1)
+    expect(result.uniqueId).toBe('calendar_event-1')
+    expect(result.location).toBe('Home')
+    expect(result.address).toBe('Here')
+    expect(result.details).toBe('calendar event description')
+    expect(result.allDay).toBe(true) // This should be true for all-day events
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper date for a peer review', () => {
@@ -348,7 +586,20 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Peer Review')
+    expect(result.title).toBe('review me')
+    expect(result.id).toBe('1')
+    expect(result.uniqueId).toBe('assessment_request-1')
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('extracts and transforms the proper date for an account calendar event', () => {
@@ -363,7 +614,25 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Calendar Event')
+    expect(result.title).toBe('calendar_event title')
+    expect(result.html_url).toBe('/calendar?event_id=1&include_contexts=account_1')
+    expect(result.id).toBe(1)
+    expect(result.uniqueId).toBe('calendar_event-1')
+    expect(result.location).toBe('Home')
+    expect(result.address).toBe('Here')
+    expect(result.details).toBe('calendar event description')
+    expect(result.allDay).toBe(false)
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Account',
+      title: 'Main account',
+      image_url: undefined,
+      color: undefined,
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('adds the dateBucketMoment field', () => {
@@ -402,7 +671,15 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('To Do')
+    expect(result.title).toBe('Some To Do Note')
+    expect(result.details).toBe('Some To Do Note Details :)')
+    expect(result.id).toBe(10)
+    expect(result.uniqueId).toBe('planner_note-10')
+    expect(result.course_id).toBe(999)
+    expect(result.context).toBeUndefined() // No course found with id 999
+    expect(result.completed).toBe(false)
   })
 
   it('handles account-level group items', () => {
@@ -416,7 +693,21 @@ describe('transformApiToInternalItem', () => {
     })
 
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Page')
+    expect(result.title).toBe('wiki_page title')
+    expect(result.html_url).toBe('/groups/9/pages/25')
+    expect(result.id).toBe('25')
+    expect(result.uniqueId).toBe('wiki_page-25')
+    expect(result.context).toEqual({
+      id: '9',
+      type: 'Group',
+      title: 'group9',
+      image_url: undefined,
+      color: '#ffeeee',
+      url: '/groups/9',
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('handles feedback', () => {
@@ -442,7 +733,26 @@ describe('transformApiToInternalItem', () => {
       html_url: '/calendar?event_id=1&include_contexts=course_1',
     })
     const result = transformApiToInternalItem(apiResponse, courses, groups, 'UTC')
-    expect(result).toMatchSnapshot()
+
+    expect(result.type).toBe('Calendar Event')
+    expect(result.title).toBe('calendar_event title')
+    expect(result.html_url).toBe('/calendar?event_id=1&include_contexts=course_1')
+    expect(result.id).toBe(1)
+    expect(result.uniqueId).toBe('calendar_event-1')
+    expect(result.location).toBe('A galaxy far far away') // Updated location name
+    expect(result.address).toBe('Here') // Default address from makeCalendarEvent
+    expect(result.details).toBe('calendar event description')
+    expect(result.allDay).toBe(false)
+    expect(result.endTime).toBeDefined() // Should have end time
+    expect(result.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(result.completed).toBe(false)
   })
 
   it('sets allDay properly', () => {
@@ -613,49 +923,84 @@ describe('transformPlannerNoteApiToInternalItem', () => {
   it('transforms the planner note response to the internal item', () => {
     const apiResponse = makePlannerNoteApiResponse()
     const internalItem = transformPlannerNoteApiToInternalItem(apiResponse, courses, 'UTC')
-    expect(internalItem).toMatchSnapshot()
+
+    expect(internalItem.type).toBe('To Do')
+    expect(internalItem.title).toBe('abc123')
+    expect(internalItem.details).toBe('asdfasdfasdf')
+    expect(internalItem.id).toBe(14)
+    expect(internalItem.uniqueId).toBe('planner_note-14')
+    expect(internalItem.course_id).toBeNull()
+    expect(internalItem.context).toEqual({})
+    expect(internalItem.completed).toBe(false)
+    expect(internalItem.dateStyle).toBeUndefined()
   })
 
   it('transforms the planner note response to an internal item when the planner note has an associated course', () => {
     const apiResponse = makePlannerNoteApiResponse({course_id: '1'})
     const internalItem = transformPlannerNoteApiToInternalItem(apiResponse, courses, 'UTC')
-    expect(internalItem).toMatchSnapshot()
+
+    expect(internalItem.type).toBe('To Do')
+    expect(internalItem.title).toBe('abc123')
+    expect(internalItem.details).toBe('asdfasdfasdf')
+    expect(internalItem.id).toBe(14)
+    expect(internalItem.uniqueId).toBe('planner_note-14')
+    expect(internalItem.course_id).toBe('1')
+    expect(internalItem.context).toEqual({
+      id: '1',
+      type: 'Course',
+      title: 'blah',
+      image_url: 'blah_url',
+      color: '#abffaa',
+      url: undefined,
+    })
+    expect(internalItem.completed).toBe(false)
+    expect(internalItem.dateStyle).toBeUndefined()
   })
 })
 
 describe('transformApiToInternalGrade', () => {
   it('transforms with grading periods', () => {
-    expect(
-      transformApiToInternalGrade({
-        id: '42',
-        has_grading_periods: true,
-        enrollments: [
-          {
-            computed_current_score: 34.42,
-            computed_current_grade: 'F',
-            current_period_computed_current_score: 42.34,
-            current_period_computed_current_grade: 'D',
-          },
-        ],
-      })
-    ).toMatchSnapshot()
+    const result = transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: true,
+      enrollments: [
+        {
+          computed_current_score: 34.42,
+          computed_current_grade: 'F',
+          current_period_computed_current_score: 42.34,
+          current_period_computed_current_grade: 'D',
+        },
+      ],
+    })
+
+    expect(result.courseId).toBe('42')
+    expect(result.hasGradingPeriods).toBe(true)
+    expect(result.score).toBe(42.34) // Uses current period score when grading periods exist
+    expect(result.grade).toBe('D') // Uses current period grade when grading periods exist
+    expect(result.restrictQuantitativeData).toBeUndefined()
+    expect(result.scoreThasWasCoercedToLetterGrade).toBeUndefined()
   })
 
   it('transforms without grading periods', () => {
-    expect(
-      transformApiToInternalGrade({
-        id: '42',
-        has_grading_periods: false,
-        enrollments: [
-          {
-            computed_current_score: 34.42,
-            computed_current_grade: 'F',
-            current_period_computed_current_score: 42.34,
-            current_period_computed_current_grade: 'D',
-          },
-        ],
-      })
-    ).toMatchSnapshot()
+    const result = transformApiToInternalGrade({
+      id: '42',
+      has_grading_periods: false,
+      enrollments: [
+        {
+          computed_current_score: 34.42,
+          computed_current_grade: 'F',
+          current_period_computed_current_score: 42.34,
+          current_period_computed_current_grade: 'D',
+        },
+      ],
+    })
+
+    expect(result.courseId).toBe('42')
+    expect(result.hasGradingPeriods).toBe(false)
+    expect(result.score).toBe(34.42) // Uses overall score when no grading periods
+    expect(result.grade).toBe('F') // Uses overall grade when no grading periods
+    expect(result.restrictQuantitativeData).toBeUndefined()
+    expect(result.scoreThasWasCoercedToLetterGrade).toBeUndefined()
   })
 })
 
@@ -686,7 +1031,7 @@ describe('observedUserContextCodes', () => {
       observedUserContextCodes({
         currentUser: {id: '3'},
         selectedObservee: '3',
-      })
+      }),
     ).toBeUndefined()
   })
 
@@ -696,7 +1041,7 @@ describe('observedUserContextCodes', () => {
         currentUser: {id: '3'},
         selectedObservee: '17',
         courses: [{id: '20'}, {id: '4'}],
-      })
+      }),
     ).toStrictEqual(['course_4', 'course_20'])
   })
 })
@@ -715,7 +1060,7 @@ describe('buildURL', () => {
       start_date: 'a',
     })
     expect(url).toStrictEqual(
-      '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50'
+      '/here/there?start_date=a&end_date=b&include=i&filter=c&order=d&per_page=e&observed_user_id=f&context_codes%5B%5D=g_5&context_codes%5B%5D=g_30&course_ids%5B%5D=7&course_ids%5B%5D=50',
     )
   })
 
@@ -753,7 +1098,7 @@ describe('getContextCodesFromState', () => {
     expect(
       getContextCodesFromState({
         courses: [{id: '20'}, {id: '4'}],
-      })
+      }),
     ).toStrictEqual(['course_4', 'course_20'])
   })
 })

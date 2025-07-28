@@ -19,6 +19,11 @@
 #
 
 module Types
+  class GroupStateType < Types::BaseEnum
+    value "available"
+    value "deleted"
+  end
+
   class GroupType < ApplicationObjectType
     graphql_name "Group"
 
@@ -34,6 +39,10 @@ module Types
     field :name, String, null: true
 
     field :members_count, Integer, null: true
+
+    field :non_collaborative, Boolean, null: true
+
+    field :state, GroupStateType, method: :workflow_state, null: false
 
     field :can_message, Boolean, null: false
     def can_message
@@ -74,6 +83,13 @@ module Types
         group_memberships.where(workflow_state: GroupMembershipsController::ALLOWED_MEMBERSHIP_FILTER)
       end
     end
+
+    field :activity_stream, ActivityStreamType, null: true
+    def activity_stream
+      context.scoped_set!(:context_type, "Group")
+      object
+    end
+
     private :members_scope
   end
 end

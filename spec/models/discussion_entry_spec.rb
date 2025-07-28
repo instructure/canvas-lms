@@ -95,7 +95,7 @@ describe DiscussionEntry do
     end
 
     before do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
     end
 
     let(:student) { student_in_course(active_all: true).user }
@@ -107,7 +107,7 @@ describe DiscussionEntry do
       expect { entry.save! }.to change { entry.mentions.count }.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
       expect(entry.mentioned_users.count).to eq 1
-      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_entry.created").at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_entry.created").at_least(:once)
     end
 
     describe "edits to an entry" do
@@ -258,8 +258,21 @@ describe DiscussionEntry do
     end
 
     it "sends notification to teacher when a reply is reported" do
-      @course.enable_feature!(:react_discussions_post)
+      @course.root_account.enable_feature!(:discussions_reporting)
       topic = @course.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).once
+      entry.broadcast_report_notification("hello I have been reported")
+    end
+
+    it "sends notification to teacher when a reply is reported in a group discussion" do
+      @course.root_account.enable_feature!(:discussions_reporting)
+      group(group_context: @course)
+      @group.participating_users << @student
+      @group.save!
+
+      topic = @group.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
       topic.subscribe(@student)
       entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
       expect(BroadcastPolicy.notifier).to receive(:send_notification).once
@@ -399,6 +412,52 @@ describe DiscussionEntry do
       # delete final 'read' entry
       @entry_2.destroy
       expect(@topic.unread_count(@reader)).to eq 0
+    end
+  end
+
+  context "discussion checkpoints" do
+    before do
+      Account.site_admin.enable_feature!(:react_discussions_post)
+      course_with_student(active_all: true)
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      @replies_required = 3
+
+      @reply_to_topic_checkpoint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: 2.days.from_now }],
+        points_possible: 3
+      )
+      @reply_to_entry_checkpint = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: 3.days.from_now }],
+        points_possible: 9,
+        replies_required: @replies_required
+      )
+    end
+
+    describe "#update_topic_submission" do
+      it "doesnt break if dt.assignment.has_sub_assignments && dt.assignment.sub_assignments.empty?" do
+        entry = @checkpointed_discussion.discussion_entries.create!(message: "hello", user: @user)
+        # create the error state where dt.assignment.has_sub_assignments == true, but dt.assignment.sub_assignments == []
+        # in this case it's through discussion_topic&.assignment&.checkpoints_parent?
+        dt_assignment = @checkpointed_discussion.assignment
+        dt_sub_assignments = @checkpointed_discussion.assignment.sub_assignments
+        sub1 = dt_sub_assignments.first
+        sub2 = dt_sub_assignments.last
+        sub1.workflow_state = "deleted"
+        sub1.save(validate: false)
+        sub2.workflow_state = "deleted"
+        sub2.save(validate: false)
+        dt_assignment.reload
+        dt_assignment.has_sub_assignments = true
+        dt_assignment.save(validate: false)
+
+        expect { entry.destroy }.to_not raise_error
+      end
     end
   end
 
@@ -596,18 +655,7 @@ describe DiscussionEntry do
       course_with_teacher
     end
 
-    it "forces a root entry as parent if the discussion isn't threaded" do
-      discussion_topic_model
-      root = @topic.reply_from(user: @teacher, text: "root entry")
-      sub1 = root.reply_from(user: @teacher, html: "sub entry")
-      expect(sub1.parent_entry).to eq root
-      expect(sub1.root_entry).to eq root
-      sub2 = sub1.reply_from(user: @teacher, html: "sub-sub entry")
-      expect(sub2.parent_entry).to eq root
-      expect(sub2.root_entry).to eq root
-    end
-
-    it "allows a sub-entry as parent if the discussion is threaded" do
+    it "allows a sub-entry as parent" do
       discussion_topic_model(threaded: true)
       root = @topic.reply_from(user: @teacher, text: "root entry")
       sub1 = root.reply_from(user: @teacher, html: "sub entry")
@@ -636,7 +684,7 @@ describe DiscussionEntry do
       topic_with_nested_replies
     end
 
-    context ".read_entry_ids" do
+    describe ".read_entry_ids" do
       it "returns the ids of the read entries" do
         @root2.change_read_state("read", @teacher)
         @reply_reply1.change_read_state("read", @teacher)
@@ -649,7 +697,7 @@ describe DiscussionEntry do
       end
     end
 
-    context ".forced_read_state_entry_ids" do
+    describe ".forced_read_state_entry_ids" do
       it "returns the ids of entries that have been marked as force_read_state" do
         marked_entries = [@root2, @reply_reply1, @reply_reply2, @reply3]
         marked_entries.each do |e|
@@ -666,7 +714,7 @@ describe DiscussionEntry do
       end
     end
 
-    context ".find_existing_participant" do
+    describe ".find_existing_participant" do
       it "returns existing data" do
         @root2.change_read_state("read", @teacher, forced: true)
         participant = @root2.find_existing_participant(@teacher)
@@ -857,13 +905,41 @@ describe DiscussionEntry do
     let(:entry) { topic.discussion_entries.create!(message: "Hello!", user:) }
 
     describe "reply" do
-      context "when a user is no longer enrolled in the course" do
-        before do
-          create_enrollment(topic.course, user, { enrollment_state: "completed" })
+      context "reply permission" do
+        before :once do
+          course_with_teacher active_all: true
         end
 
-        it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :reply)).to be false
+        it "reply permission is true if the discussion is threaded" do
+          discussion_topic_model(discussion_type: "threaded")
+          entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
+          expect(entry.grants_right?(@teacher, :reply)).to be true
+        end
+
+        it "reply permission is false if the discussion is not threaded" do
+          discussion_topic_model(discussion_type: "not_threaded")
+          entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
+          expect(entry.grants_right?(@teacher, :reply)).to be false
+        end
+
+        context "group discussion" do
+          it "reply permission is true if the discussion is threaded" do
+            group(group_context: @course)
+            @group.save!
+
+            topic = @group.discussion_topics.create!(user: @teacher, message: "Hi there", discussion_type: "threaded")
+            entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+            expect(entry.grants_right?(@teacher, :reply)).to be true
+          end
+
+          it "reply permission is false if the discussion is not threaded" do
+            group(group_context: @course)
+            @group.save!
+
+            topic = @group.discussion_topics.create!(user: @teacher, message: "Hi there", discussion_type: "not_threaded")
+            entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
+            expect(entry.grants_right?(@teacher, :reply)).to be false
+          end
         end
       end
 
@@ -881,6 +957,8 @@ describe DiscussionEntry do
         end
 
         it "returns true for non-announcement discussions" do
+          topic.discussion_type = "threaded"
+          topic.save!
           expect(entry.grants_right?(user, :reply)).to be true
         end
       end
@@ -1055,10 +1133,30 @@ describe DiscussionEntry do
     reply3 = reply1.reply_from(user: @teacher, html: "sub-sub sibling entry")
     reply4 = reply2.reply_from(user: @teacher, html: "sub-sub-sub entry")
 
-    expect(root.depth).to eq 1
-    expect(reply1.depth).to eq 2
-    expect(reply2.depth).to eq 3
-    expect(reply3.depth).to eq 3
-    expect(reply4.depth).to eq 4
+    expect(root.depth).to be 1
+    expect(reply1.depth).to be 2
+    expect(reply2.depth).to be 3
+    expect(reply3.depth).to be 3
+    expect(reply4.depth).to be 4
+  end
+
+  describe "edited_at" do
+    it "returns null if no change to the title or message occurred" do
+      topic = discussion_topic_model
+      root = topic.reply_from(user: @teacher, text: "root entry")
+      expect(root.edited_at).to be_nil
+      root.depth = 3
+      root.save!
+      expect(root.edited_at).to be_nil
+    end
+
+    it "returns not null if a change to the message occured" do
+      topic = discussion_topic_model
+      root = topic.reply_from(user: @teacher, text: "root entry")
+      expect(root.edited_at).to be_nil
+      root.message = "Brand new shinny message"
+      root.save!
+      expect(root.edited_at).not_to be_nil
+    end
   end
 end

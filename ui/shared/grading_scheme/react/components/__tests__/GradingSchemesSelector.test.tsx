@@ -36,7 +36,7 @@ function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps
       archivedGradingSchemesEnabled={true}
       onChange={onChange}
       {...props}
-    />
+    />,
   )
 
   return {
@@ -47,6 +47,7 @@ function renderGradingSchemesSelector(props: Partial<GradingSchemesSelectorProps
 
 describe('GradingSchemesSelector', () => {
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockImplementation(
       (opts: {path: string; method: string; body: Record<any, any>}) => {
         switch (opts.path) {
@@ -76,11 +77,12 @@ describe('GradingSchemesSelector', () => {
             return Promise.resolve({response: {ok: false}})
           }
         }
-      }
+      },
     )
   })
 
   afterEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
   it('should render a dropdown and view, copy, and new grading scheme buttons, and loads default scheme and scheme summaries', async () => {
@@ -140,6 +142,20 @@ describe('GradingSchemesSelector', () => {
       fireEvent.click(viewButton)
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('grading-scheme-view-modal')).toBeInTheDocument()
+    })
+
+    it('opened view modal data should match course default (if any) if no other is selected', async () => {
+      const {getByTestId} = renderGradingSchemesSelector({courseDefaultSchemeId: '3'})
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const dropdown = getByTestId('grading-schemes-selector-dropdown')
+      fireEvent.click(dropdown)
+      const scheme = getByTestId('grading-schemes-selector-option-3')
+      const nameOfCourseDefaultScheme = scheme.textContent
+      const viewButton = getByTestId('grading-schemes-selector-view-button')
+      fireEvent.click(viewButton)
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const gradeModalTitle = getByTestId('grading-scheme-view-modal-title').textContent
+      expect(gradeModalTitle).toBe(nameOfCourseDefaultScheme)
     })
 
     it('should open the edit modal when the edit button is clicked', async () => {

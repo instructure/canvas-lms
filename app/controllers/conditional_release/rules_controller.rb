@@ -135,11 +135,11 @@ module ConditionalRelease
     end
 
     def require_course_assignment_edit_permissions
-      authorized_action(@context, @current_user, %i[manage_assignments manage_assignments_edit])
+      authorized_action(@context, @current_user, :manage_assignments_edit)
     end
 
     def require_course_assignment_add_or_edit_permissions
-      authorized_action(@context, @current_user, %i[manage_assignments manage_assignments_add manage_assignments_edit])
+      authorized_action(@context, @current_user, %i[manage_assignments_add manage_assignments_edit])
     end
   end
 end

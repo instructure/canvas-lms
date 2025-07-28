@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
-import {Mutation} from 'react-apollo'
+import {Mutation} from '@apollo/client/react/components'
 import React, {Component} from 'react'
 import {bool} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -35,10 +35,14 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {UploadMediaStrings, MediaCaptureStrings} from '@canvas/upload-media-translations'
+import {
+  UploadMediaStrings,
+  MediaCaptureStrings,
+  SelectStrings,
+} from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default class CommentTextArea extends Component {
   static propTypes = {
@@ -52,12 +56,24 @@ export default class CommentTextArea extends Component {
   state = {
     commentText: '',
     currentFiles: [],
+    commentTextErrors: [],
     hasError: false,
     mediaModalOpen: false,
     mediaObject: null,
     uploadingComments: false,
+    bottomValue: '0px',
   }
 
+  componentDidUpdate() {
+    if (this.state.commentTextErrors.length > 0 && this.state.bottomValue === '0px') {
+      this.setState({
+        bottomValue:
+          this._commentTextBox.ref.children[0].lastChild.getBoundingClientRect().height + 'px',
+      })
+    } else if (this.state.commentTextErrors.length === 0 && this.state.bottomValue !== '0px') {
+      this.setState({bottomValue: '0px'})
+    }
+  }
   queryVariables() {
     return {
       query: SUBMISSION_COMMENT_QUERY,
@@ -77,6 +93,7 @@ export default class CommentTextArea extends Component {
           _id: 'pending',
           attachments: [],
           comment: this.state.commentText,
+          htmlComment: this.state.commentText,
           read: true,
           updatedAt: new Date().toISOString(),
           author: {
@@ -116,7 +133,10 @@ export default class CommentTextArea extends Component {
     selectedFiles.forEach(file => {
       file.id = ++currIndex
     })
-    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...selectedFiles]}))
+    this.setState(prevState => ({
+      currentFiles: [...prevState.currentFiles, ...selectedFiles],
+      commentTextErrors: [],
+    }))
   }
 
   onMediaModalDismiss = (err, mediaObject) => {
@@ -147,7 +167,7 @@ export default class CommentTextArea extends Component {
       }
       let attachmentIds = []
       const filesWithoutMediaObject = this.state.currentFiles.filter(
-        file => file !== this.state.mediaObject
+        file => file !== this.state.mediaObject,
       )
 
       if (filesWithoutMediaObject.length) {
@@ -155,7 +175,7 @@ export default class CommentTextArea extends Component {
           const attachments = await submissionCommentAttachmentsUpload(
             filesWithoutMediaObject,
             this.props.assignment.env.courseId,
-            this.props.assignment._id
+            this.props.assignment._id,
           )
           attachmentIds = attachments.map(attachment => attachment.id)
         } catch (err) {
@@ -188,26 +208,26 @@ export default class CommentTextArea extends Component {
           if (this._commentTextBox) {
             this._commentTextBox.focus()
           }
-        }
+        },
       )
       this.props.onSendCommentSuccess?.()
     })
   }
 
   onTextChange = e => {
-    this.setState({commentText: e.target.value})
+    this.setState({commentText: e.target.value, commentTextErrors: []})
   }
 
   insertEmoji = emoji => {
     this.setState(
       state => {
-        return {commentText: state.commentText + emoji.native}
+        return {commentText: state.commentText + emoji.native, commentTextErrors: []}
       },
       () => {
         if (this._commentTextBox) {
           this._commentTextBox.focus()
         }
-      }
+      },
     )
   }
 
@@ -232,7 +252,7 @@ export default class CommentTextArea extends Component {
         } else {
           refs[this.state.currentFiles[fileIndex - 1].id].focus()
         }
-      }
+      },
     )
   }
 
@@ -275,8 +295,15 @@ export default class CommentTextArea extends Component {
                   this._commentTextBox = el
                 }}
                 value={this.state.commentText}
+                data-testid="comment-text-input"
+                messages={this.state.commentTextErrors}
               />
-              <span className="emoji-picker-container">
+              <span
+                className="emoji-picker-container"
+                style={{
+                  bottom: this.state.bottomValue,
+                }}
+              >
                 {!this.state.uploadingComments && !!ENV.EMOJIS_ENABLED && (
                   <EmojiPicker insertEmoji={this.insertEmoji} />
                 )}
@@ -309,6 +336,7 @@ export default class CommentTextArea extends Component {
                       display: 'none',
                     }}
                     type="file"
+                    data-testid="attachment-file-input"
                   />
                   <IconButton
                     id="attachmentFileButton"
@@ -324,6 +352,7 @@ export default class CommentTextArea extends Component {
                     screenReaderLabel={I18n.t('Attach a File')}
                     withBackground={false}
                     withBorder={false}
+                    data-testid="file-upload-button"
                   />
                   <IconButton
                     id="mediaCommentButton"
@@ -335,6 +364,7 @@ export default class CommentTextArea extends Component {
                     withBackground={false}
                     withBorder={false}
                     screenReaderLabel={I18n.t('Record Audio/Video')}
+                    data-testid="media-upload-button"
                   />
                   <UploadMedia
                     contextId={this.props.assignment.env.courseId}
@@ -346,19 +376,38 @@ export default class CommentTextArea extends Component {
                     }}
                     open={this.state.mediaModalOpen}
                     rcsConfig={{
-                      contextId: this.props.assignment.env.courseId,
-                      contextType: 'course',
+                      contextId: ENV.current_user.id,
+                      contextType: 'user',
                     }}
                     tabs={{embed: false, record: true, upload: true}}
-                    uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+                    uploadMediaTranslations={{
+                      UploadMediaStrings,
+                      MediaCaptureStrings,
+                      SelectStrings,
+                    }}
                     userLocale={ENV.LOCALE}
                     disableSubmitWhileUploading={true}
+                    useStudioPlayer={ENV.FEATURES?.consolidated_media_player}
                   />
                   <Button
-                    disabled={
-                      this.state.commentText.length === 0 && this.state.currentFiles.length === 0
-                    }
-                    onClick={() => this.onSendComment(createSubmissionComment)}
+                    onClick={() => {
+                      if (
+                        this.state.commentText.trim().length > 0 ||
+                        this.state.currentFiles.length > 0
+                      ) {
+                        this.onSendComment(createSubmissionComment)
+                      } else {
+                        const errorMessage = I18n.t('Comment or file required to save')
+                        this._commentTextBox.focus()
+                        this.setState({
+                          commentTextErrors: [
+                            {text: errorMessage, type: 'newError'},
+                            {text: errorMessage, type: 'screenreader-only'},
+                          ],
+                        })
+                      }
+                    }}
+                    data-testid="send-button"
                   >
                     {I18n.t('Send Comment')}
                   </Button>

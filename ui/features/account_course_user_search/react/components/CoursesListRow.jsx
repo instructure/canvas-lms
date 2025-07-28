@@ -28,18 +28,20 @@ import {
   IconPlusLine,
   IconSettingsLine,
   IconStatsLine,
-  IconPublishLine,
+  IconPublishSolid,
+  IconUnpublishedLine,
+  IconCheckSolid,
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import axios from '@canvas/axios'
 import {uniqBy} from 'lodash'
 import $ from '@canvas/rails-flash-notifications'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default class CoursesListRow extends React.Component {
   static propTypes = {
@@ -49,11 +51,11 @@ export default class CoursesListRow extends React.Component {
     total_students: number.isRequired,
     teachers: arrayOf(
       shape({
-        size: UserLink.propTypes.size,
-        href: UserLink.propTypes.href,
-        display_name: UserLink.propTypes.name,
-        avatar_url: UserLink.propTypes.avatar_url,
-      })
+        size: string,
+        href: string,
+        display_name: string.isRequired,
+        avatar_url: string,
+      }),
     ),
     teacher_count: number,
     sis_course_id: string,
@@ -88,27 +90,13 @@ export default class CoursesListRow extends React.Component {
   getSections = () =>
     this.promiseToGetSections ||
     (this.promiseToGetSections = axios.get(
-      `/api/v1/courses/${this.props.id}/sections?per_page=100`
+      `/api/v1/courses/${this.props.id}/sections?per_page=100`,
     )).then(resp => resp.data)
 
   uniqueTeachers = () => uniqBy(this.props.teachers, 'id')
 
   handleNewEnrollments = newEnrollments => {
     if (newEnrollments && newEnrollments.length) {
-      $.flashMessage({
-        html: I18n.t(
-          {
-            one: '%{user_name} successfully enrolled into *%{course_name}*.',
-            other: '%{count} people successfully enrolled into *%{course_name}*.',
-          },
-          {
-            count: newEnrollments.length,
-            user_name: newEnrollments[0].enrollment.name,
-            course_name: this.props.name,
-            wrappers: [`<a href="/courses/${this.props.id}">$1</a>`],
-          }
-        ),
-      })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
       this.setState(oldState => {
         const newlyEnrolledStudents = oldState.newlyEnrolledStudents + newStudents.length
@@ -118,22 +106,19 @@ export default class CoursesListRow extends React.Component {
   }
 
   getAvailableRoles = () => {
-    const filterFunc = ENV.FEATURES.granular_permissions_manage_users
-      ? role => role.addable_by_user
-      : role => role.manageable_by_user
+    const filterFunc = role => role.addable_by_user
 
     let roles = (this.props.roles || []).filter(filterFunc)
     if (this.props.blueprint) {
       roles = roles.filter(
         role =>
-          role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment'
+          role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment',
       )
     }
     return roles
   }
 
   openAddUsersToCourseDialog = () => {
-    // eslint-disable-next-line promise/catch-or-return
     this.getSections().then(sections => {
       this.addPeopleApp =
         this.addPeopleApp ||
@@ -181,11 +166,36 @@ export default class CoursesListRow extends React.Component {
     }
   }
 
+  renderCourseStatusIcon = () => {
+    const {workflow_state} = this.props
+    let tooltip = I18n.t('Unpublished')
+    let classname = 'unpublished-course'
+    let statusIcon = <IconUnpublishedLine size="x-small" />
+
+    if (workflow_state === 'available') {
+      tooltip = I18n.t('Published')
+      classname = 'published-course'
+      statusIcon = <IconPublishSolid size="x-small" />
+    } else if (workflow_state === 'completed') {
+      tooltip = I18n.t('Concluded')
+      classname = 'completed-course'
+      statusIcon = <IconCheckSolid size="x-small" />
+    }
+
+    return (
+      <span className={`published-status ${classname}`}>
+        <Tooltip renderTip={tooltip}>
+          {statusIcon}
+          <ScreenReaderContent>{tooltip}</ScreenReaderContent>
+        </Tooltip>
+      </span>
+    )
+  }
+
   render() {
     const {
       id,
       name,
-      workflow_state,
       sis_course_id,
       total_students,
       teachers,
@@ -200,7 +210,6 @@ export default class CoursesListRow extends React.Component {
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
     const sub_url = `/accounts/${subaccount_id}`
-    const isPublished = workflow_state !== 'unpublished'
 
     const blueprintTip = I18n.t('This is a blueprint course')
     const statsTip = I18n.t('Statistics for %{name}', {name})
@@ -209,18 +218,7 @@ export default class CoursesListRow extends React.Component {
 
     return (
       <Table.Row>
-        <Table.RowHeader textAlign="center">
-          {isPublished ? (
-            <span className="published-status published">
-              <IconPublishLine size="x-small" />
-              <ScreenReaderContent>{I18n.t('yes')}</ScreenReaderContent>
-            </span>
-          ) : (
-            <span className="published-status unpublished">
-              <ScreenReaderContent>{I18n.t('no')}</ScreenReaderContent>
-            </span>
-          )}
-        </Table.RowHeader>
+        <Table.RowHeader textAlign="center">{this.renderCourseStatusIcon()}</Table.RowHeader>
         <Table.Cell>
           <a href={url}>
             <span style={{paddingRight: '0.5em'}}>{name}</span>

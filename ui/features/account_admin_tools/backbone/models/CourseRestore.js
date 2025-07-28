@@ -17,10 +17,10 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('course_restore')
+const I18n = createI18nScope('course_restore')
 
 export default class CourseRestore extends Backbone.Model {
   baseUrl() {
@@ -90,8 +90,8 @@ export default class CourseRestore extends Backbone.Model {
       $.flashError(
         I18n.t(
           'restore_error',
-          'There was an error attempting to restore the course. Course was not restored.'
-        )
+          'There was an error attempting to restore the course. Course was not restored.',
+        ),
       )
       return deferred.reject()
     }

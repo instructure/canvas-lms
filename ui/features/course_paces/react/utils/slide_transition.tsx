@@ -22,7 +22,7 @@ import {Transition} from '@instructure/ui-motion'
 import {View} from '@instructure/ui-view'
 import type {ViewProps} from '@instructure/ui-view'
 
-interface ComponentProps {
+export interface ComponentProps {
   readonly children: any
   readonly direction: 'horizontal' | 'vertical'
   readonly expanded: boolean

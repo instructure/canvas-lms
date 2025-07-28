@@ -67,7 +67,7 @@ export default class BackoffPoller {
     this.running = true
     this.attempts++
     return jQuery.ajaxJSON(this.url, 'GET', {}, this.handle, (data, xhr) =>
-      this.handleErrors ? this.handle(data, xhr) : this.stop()
+      this.handleErrors ? this.handle(data, xhr) : this.stop(),
     )
   }
 

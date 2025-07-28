@@ -22,7 +22,7 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
 
   context "before(:all)" do
     it "allows all kinds of stubs" do
-      inspect_source(%{
+      offenses = inspect_source(%{
         before(:all) do
           stub_file_data
           stub_kaltura
@@ -31,13 +31,13 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
           collection.stubs(:table_name).returns("courses")
         end
       })
-      expect(cop.offenses.size).to eq(0)
+      expect(offenses.size).to eq(0)
     end
   end
 
   context "before(:each)" do
     it "allows all kinds of stubs" do
-      inspect_source(%{
+      offenses = inspect_source(%{
         before(:each) do
           stub_file_data
           stub_kaltura
@@ -46,13 +46,13 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
           collection.stubs(:table_name).returns("courses")
         end
       })
-      expect(cop.offenses.size).to eq(0)
+      expect(offenses.size).to eq(0)
     end
   end
 
   context "before(:once)" do
     it "disallows all kinds of stubs" do
-      inspect_source(%{
+      offenses = inspect_source(%{
         before(:once) do
           stub_file_data
           stub_kaltura
@@ -61,9 +61,9 @@ describe RuboCop::Cop::Specs::NoBeforeOnceStubs do
           collection.stubs(:table_name).returns("courses")
         end
       })
-      expect(cop.offenses.size).to eq(5)
-      expect(cop.messages.all? { |msg| msg.include?("`before(:once)`") }).to be true
-      expect(cop.offenses.all? { |off| off.severity.name == :warning }).to be true
+      expect(offenses.size).to eq(5)
+      expect(offenses.map(&:message).all? { |msg| msg.include?("`before(:once)`") }).to be true
+      expect(offenses.all? { |off| off.severity.name == :warning }).to be true
     end
   end
 end

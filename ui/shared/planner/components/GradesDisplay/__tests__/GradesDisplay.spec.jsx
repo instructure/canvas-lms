@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import GradesDisplay from '../index'
 
-it('renders some course grades', () => {
+describe('GradesDisplay', () => {
   const mockCourses = [
     {
       id: '1',
@@ -50,56 +50,89 @@ it('renders some course grades', () => {
       hasGradingPeriods: false,
     },
   ]
-  const wrapper = shallow(<GradesDisplay courses={mockCourses} />)
-  expect(wrapper).toMatchSnapshot()
-})
 
-it('does not render caveat if no courses have grading periods', () => {
-  const mockCourses = [
-    {
-      id: '1',
-      shortName: 'Ticket to Ride 101',
-      color: 'blue',
-      href: '/courses/1',
-      score: null,
-      grade: null,
-      hasGradingPeriods: false,
-      enrollmentType: 'StudentEnrollment',
-    },
-  ]
-  const wrapper = shallow(<GradesDisplay courses={mockCourses} />)
-  expect(wrapper).toMatchSnapshot()
-})
+  it('renders course grades with proper heading and structure', () => {
+    const {getByText, getByRole} = render(<GradesDisplay courses={mockCourses} />)
 
-it('renders a loading spinner when loading', () => {
-  const mockCourses = [
-    {
-      id: '1',
-      shortName: 'Ticket to Ride 101',
-      color: 'blue',
-      href: '/courses/1',
-      score: null,
-      grade: null,
-      hasGradingPeriods: true,
-    },
-    {
-      id: '2',
-      shortName: 'Ingenious 101',
-      color: 'green',
-      href: '/courses/2',
-      score: 42.34,
-      grade: 'D',
-      hasGradingPeriods: false,
-    },
-  ]
-  const wrapper = shallow(<GradesDisplay loading={true} courses={mockCourses} />)
-  expect(wrapper).toMatchSnapshot()
-})
+    expect(getByText('My Grades')).toBeInTheDocument()
 
-it('renders an ErrorAlert if there is an error loading grades', () => {
-  const mockCourses = [
-    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1'},
-  ]
-  const wrapper = shallow(<GradesDisplay courses={mockCourses} loadingError="There was an error" />)
-  expect(wrapper).toMatchSnapshot()
+    expect(getByRole('link', {name: 'Ticket to Ride 101'})).toHaveAttribute(
+      'href',
+      '/courses/1/grades',
+    )
+    expect(getByRole('link', {name: 'Ingenious 101'})).toHaveAttribute('href', '/courses/2/grades')
+    expect(getByRole('link', {name: 'Settlers of Catan 201'})).toHaveAttribute(
+      'href',
+      '/courses/3/grades',
+    )
+  })
+
+  it('displays proper grade scores and handles invalid scores', () => {
+    const {getAllByTestId} = render(<GradesDisplay courses={mockCourses} />)
+
+    const scoreTexts = getAllByTestId('my-grades-score')
+    expect(scoreTexts).toHaveLength(3)
+
+    expect(scoreTexts[0]).toHaveTextContent('No Grade')
+    expect(scoreTexts[1]).toHaveTextContent('42.34%')
+    expect(scoreTexts[2]).toHaveTextContent('No Grade')
+  })
+
+  it('renders grading period caveat when courses have grading periods', () => {
+    const {getByText} = render(<GradesDisplay courses={mockCourses} />)
+
+    expect(getByText('*Only most recent grading period shown.')).toBeInTheDocument()
+  })
+
+  it('does not render caveat if no courses have grading periods', () => {
+    const coursesWithoutGradingPeriods = [
+      {
+        id: '1',
+        shortName: 'Ticket to Ride 101',
+        color: 'blue',
+        href: '/courses/1',
+        score: null,
+        grade: null,
+        hasGradingPeriods: false,
+        enrollmentType: 'StudentEnrollment',
+      },
+    ]
+    const {queryByText} = render(<GradesDisplay courses={coursesWithoutGradingPeriods} />)
+
+    expect(queryByText('*Only most recent grading period shown.')).not.toBeInTheDocument()
+  })
+
+  it('renders a loading spinner when loading', () => {
+    const {getByText, queryByText, queryByRole} = render(
+      <GradesDisplay loading={true} courses={mockCourses} />,
+    )
+
+    expect(getByText('Grades are loading')).toBeInTheDocument()
+
+    expect(queryByRole('link')).not.toBeInTheDocument()
+    expect(queryByText('*Only most recent grading period shown.')).not.toBeInTheDocument()
+  })
+
+  it('renders an ErrorAlert if there is an error loading grades', () => {
+    const mockCoursesSimple = [
+      {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1'},
+    ]
+    const {getByText, queryByTestId} = render(
+      <GradesDisplay courses={mockCoursesSimple} loadingError="There was an error" />,
+    )
+
+    expect(getByText('Error loading grades')).toBeInTheDocument()
+    expect(getByText('My Grades')).toBeInTheDocument()
+    expect(queryByTestId('my-grades-score')).not.toBeInTheDocument()
+  })
+
+  it('applies course color to border styling', () => {
+    const {container} = render(<GradesDisplay courses={mockCourses} />)
+
+    const styledDivs = container.querySelectorAll('div[style*="border-bottom-color"]')
+
+    expect(styledDivs[0]).toHaveStyle('border-bottom-color: rgb(0, 0, 255)')
+    expect(styledDivs[1]).toHaveStyle('border-bottom-color: rgb(0, 128, 0)')
+    expect(styledDivs[2]).toHaveStyle('border-bottom-color: rgb(255, 0, 0)')
+  })
 })

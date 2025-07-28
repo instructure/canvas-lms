@@ -38,9 +38,8 @@ describe "collaborations" do
         setup_google_drive
       end
 
-      context "someone else's collaboration (:granular_permissions_manage_course_content)" do
+      context "someone else's collaboration" do
         before do
-          Account.default.enable_feature! :granular_permissions_manage_course_content
           # teacher does this
           create_collaboration!(type, "changeable collab")
 

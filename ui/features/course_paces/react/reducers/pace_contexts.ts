@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
+import type {
   PaceContext,
   PaceContextsAsyncActionPayload,
   PaceContextsApiResponse,
@@ -56,12 +55,16 @@ export const paceContextsInitialState: PaceContextsState = {
   contextsPublishing: uniqPaces,
 }
 
+export const isBulkEnrollment = (state: StoreState) => state.paceContexts.selectedContext?.type === 'BulkEnrollment'
+export const getSelectedBulkStudents = (state: StoreState) => state.paceContexts.selectedContext?.item_id.split(",") || []
+
 export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
   state.paceContexts.selectedContext
 
 export const paceContextsReducer = (
   state = paceContextsInitialState,
-  action
+  // @ts-expect-error
+  action,
 ): PaceContextsState => {
   switch (action.type) {
     case PaceContextsConstants.SET_PACE_CONTEXTS: {
@@ -140,8 +143,9 @@ export const paceContextsReducer = (
     case PaceContextsConstants.UPDATE_PUBLISHING_PACE: {
       const contextsPublishing = state.contextsPublishing.map(contextPublishing => {
         const newPublishingContext = action.payload.find(
+          // @ts-expect-error
           updatedContextPublishing =>
-            contextPublishing.progress_context_id === updatedContextPublishing.progress_context_id
+            contextPublishing.progress_context_id === updatedContextPublishing.progress_context_id,
         )
         return newPublishingContext || contextPublishing
       })
@@ -154,13 +158,14 @@ export const paceContextsReducer = (
       return {
         ...state,
         contextsPublishing: state.contextsPublishing.filter(
-          ({progress_context_id}) => action.payload.progress_context_id !== progress_context_id
+          ({progress_context_id}) => action.payload.progress_context_id !== progress_context_id,
         ),
       }
     case PaceContextsConstants.REPLACE_PACE_CONTEXTS: {
       const newPaceContexts = state.entries.map(paceContext => {
         const newPaceContext = action.payload.find(
-          updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id
+          // @ts-expect-error
+          updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id,
         )
         return newPaceContext || paceContext
       })

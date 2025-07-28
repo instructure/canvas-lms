@@ -47,12 +47,12 @@ describe('mediaCommentThumbnail', () => {
       document.getElementById('media_comment_23'),
       'normal',
       true,
-      kalturaSettings
+      kalturaSettings,
     )
 
-    expect(document.querySelectorAll('.media_comment_thumbnail').length).toEqual(1)
+    expect(document.querySelectorAll('.media_comment_thumbnail')).toHaveLength(1)
     expect(document.querySelector('.media_comment_thumbnail').style['background-image']).toContain(
-      `https://example.com/p/12345/thumbnail/entry_id/23/width/140/height/100/bgcolor/000000/type/2/vid_sec/5`
+      `https://example.com/p/12345/thumbnail/entry_id/23/width/140/height/100/bgcolor/000000/type/2/vid_sec/5`,
     )
   })
 
@@ -61,7 +61,7 @@ describe('mediaCommentThumbnail', () => {
       document.getElementById('media_comment_23'),
       'normal',
       true,
-      kalturaSettings
+      kalturaSettings,
     )
     const screenreaderText = document
       .querySelector('.media_comment_thumbnail .screenreader-only')
@@ -84,7 +84,7 @@ describe('mediaCommentThumbnail', () => {
       document.getElementById('media_comment_23'),
       'normal',
       true,
-      kalturaSettings
+      kalturaSettings,
     )
 
     const screenreaderText = document

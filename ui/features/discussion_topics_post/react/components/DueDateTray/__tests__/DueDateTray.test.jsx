@@ -38,7 +38,7 @@ beforeAll(() => {
 })
 
 const overrides = [
-  AssignmentOverride.mock({title: 'assignment override 1', adhocStudents: null}),
+  AssignmentOverride.mock({title: 'assignment override 1', set: null}),
   AssignmentOverride.mock({
     id: 'QXNzaWdubWVudE92ZXJyaWRlLTI=',
     _id: '2',
@@ -46,7 +46,7 @@ const overrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-07T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null,
+    set: null,
   }),
   AssignmentOverride.mock({
     id: 'QXNzaWdubWVudE92ZXJyaWRlLTM=',
@@ -55,7 +55,7 @@ const overrides = [
     dueAt: '2021-05-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null,
+    set: null,
   }),
 ]
 
@@ -101,19 +101,19 @@ describe('DueDateTray', () => {
         getByText(
           AdhocStudents.mock()
             .students.map(student => student.shortName)
-            .join(', ')
-        )
+            .join(', '),
+        ),
       ).toBeInTheDocument()
     })
 
     it('truncates the student names if there are more than 10', () => {
       const students = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val =>
-        Student.mock({shortName: `Student${val}`})
+        Student.mock({shortName: `Student${val}`}),
       )
       const {getByText} = setup({
         assignmentOverrides: [
           AssignmentOverride.mock({
-            adhocStudents: AdhocStudents.mock({
+            set: AdhocStudents.mock({
               students,
             }),
           }),
@@ -124,8 +124,8 @@ describe('DueDateTray', () => {
           students
             .slice(0, 5)
             .map(student => student.shortName)
-            .join(', ')
-        )
+            .join(', '),
+        ),
       ).toBeInTheDocument()
       expect(getByText('...')).toBeInTheDocument()
       expect(getByText('6 more')).toBeInTheDocument()
@@ -133,12 +133,12 @@ describe('DueDateTray', () => {
 
     it('allows expanding the student names if there are more than 10', () => {
       const students = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(val =>
-        Student.mock({shortName: `Student${val}`})
+        Student.mock({shortName: `Student${val}`}),
       )
       const {getByText} = setup({
         assignmentOverrides: [
           AssignmentOverride.mock({
-            adhocStudents: AdhocStudents.mock({
+            set: AdhocStudents.mock({
               students,
             }),
           }),

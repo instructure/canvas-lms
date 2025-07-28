@@ -36,27 +36,38 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
   let(:lti_resource_links) { subject.convert_lti_resource_links }
 
   describe "#convert_lti_resource_links" do
-    it "extract custom params and lookup_uuid" do
-      expect(lti_resource_links).to include(
-        a_hash_including(
-          custom: {
-            param1: "some string",
-            param2: 1,
-            param3: 2.56,
-            param4: true,
-            param5: false,
-            param6: "a12.5",
-            param7: "5d781f15-c6b0-4901-a1f7-2a77e7bf4982",
-            param8: "+1(855)552-2338",
-          },
-          lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a",
-          launch_url: "http://lti13testtool.docker/launch"
+    describe "with import_numeric_lti_custom_params_as_string FF on" do
+      before do
+        Account.site_admin.enable_feature!(:import_numeric_lti_custom_params_as_string)
+      end
+
+      it "extract custom params and lookup_uuid" do
+        expect(lti_resource_links).to include(
+          a_hash_including(
+            custom: {
+              param1: "some string",
+              param2: "1",
+              param3: "2.56",
+              param4: true,
+              param5: false,
+              param6: "a12.5",
+              param7: "5d781f15-c6b0-4901-a1f7-2a77e7bf4982",
+              param8: "+1(855)552-2338",
+              param9: "0011",
+            },
+            lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a",
+            launch_url: "http://lti13testtool.docker/launch"
+          )
         )
-      )
+      end
     end
 
-    context 'with a "secure_launch_url"' do
-      it "creates a resource link with the secure launch URL" do
+    describe "with import_numeric_lti_custom_params_as_string FF off" do
+      before do
+        Account.site_admin.disable_feature!(:import_numeric_lti_custom_params_as_string)
+      end
+
+      it "extract custom params and lookup_uuid" do
         expect(lti_resource_links).to include(
           a_hash_including(
             custom: {
@@ -68,6 +79,28 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
               param6: "a12.5",
               param7: "5d781f15-c6b0-4901-a1f7-2a77e7bf4982",
               param8: "+1(855)552-2338",
+              param9: "0011",
+            },
+            lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a",
+            launch_url: "http://lti13testtool.docker/launch"
+          )
+        )
+      end
+    end
+
+    context 'with a "secure_launch_url"' do
+      it "creates a resource link with the secure launch URL" do
+        expect(lti_resource_links).to include(
+          a_hash_including(
+            custom: {
+              param1: "some string",
+              param2: "1",
+              param3: "2.56",
+              param4: true,
+              param5: false,
+              param6: "a12.5",
+              param7: "5d781f15-c6b0-4901-a1f7-2a77e7bf4982",
+              param8: "+1(855)552-2338"
             },
             lookup_uuid: "123412345c1e-c0a2-42dc-88b6-c029699a7c7a",
             launch_url: "https://lti13testtool.docker/launch/secure"

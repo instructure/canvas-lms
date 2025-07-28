@@ -26,16 +26,6 @@ describe CommentBankItem do
   let(:comment) { "comment" }
   let(:creation_params) { { course:, comment:, user: } }
 
-  describe "validations" do
-    subject { CommentBankItem.create!(creation_params) }
-
-    it { is_expected.to validate_presence_of :course }
-    it { is_expected.to validate_presence_of :comment }
-    it { is_expected.to validate_presence_of :user }
-    it { is_expected.to validate_length_of(:comment).is_at_most(ActiveRecord::Base.maximum_text_length) }
-    it { is_expected.to validate_length_of(:comment).is_at_least(1) }
-  end
-
   it_behaves_like "soft deletion" do
     subject { CommentBankItem }
 

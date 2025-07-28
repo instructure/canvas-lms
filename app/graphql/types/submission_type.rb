@@ -42,19 +42,19 @@ module Types
   class SubmissionType < ApplicationObjectType
     graphql_name "Submission"
 
+    include GraphQLHelpers::AnonymousGrading
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::SubmissionInterface
     implements Interfaces::LegacyIDInterface
 
-    global_id_field :id
-
-    field :cached_due_date, DateTimeType, null: true
-
-    field :custom_grade_status, String, null: true
-    def custom_grade_status
-      CustomGradeStatus.find(object.custom_grade_status_id).name if object.custom_grade_status_id
+    def initialize(object, context)
+      super
+      anonymous_grading_scoped_context(object)
     end
+
+    global_id_field :id
 
     field :read_state, String, null: true
     def read_state
@@ -67,24 +67,74 @@ module Types
 
     field :redo_request, Boolean, null: true
 
-    field :user_id, ID, null: false
-
-    field :seconds_late, Float, null: true
-
-    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
-      argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
+    field :user_id, ID, null: true
+    def user_id
+      unless_hiding_user_for_anonymous_grading { object.user_id }
     end
-    def submission_histories_connection(filter:)
-      filter = filter.to_h
-      states, include_current_submission = filter.values_at(:states, :include_current_submission)
 
+    field :enrollments_connection, EnrollmentType.connection_type, null: true
+    def enrollments_connection
+      load_association(:course).then do |course|
+        return nil unless course.grants_any_right?(
+          current_user,
+          session,
+          :read_roster,
+          :view_all_grades,
+          :manage_grades
+        )
+
+        scope = course.apply_enrollment_visibility(course.all_enrollments, current_user, include: :inactive)
+        scope.where(user_id: submission.user_id)
+      end
+    end
+
+    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: false do
+      argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
+      argument :order_by, SubmissionHistoryOrderInputType, required: false
+    end
+    def submission_histories_connection(filter:, order_by: nil)
+      filter = filter.to_h
+      filter => states:, include_current_submission:
       Promise.all([
                     load_association(:versions),
                     load_association(:assignment)
                   ]).then do
-        histories = object.submission_history
+        histories = object.submission_history(include_version: true)
         histories.pop unless include_current_submission
-        histories.select { |h| states.include?(h.workflow_state) }
+        histories = histories.select { |h| states.include?(h.fetch(:model).workflow_state) }
+
+        if order_by
+          order_by.to_h => { direction:, field: }
+          histories = histories.sort do |h1, h2|
+            left, right = ((direction == "ascending") ? [h1, h2] : [h2, h1])
+            comparison = left.fetch(:model).public_send(field) <=> right.fetch(:model).public_send(field)
+            if comparison.zero?
+              # Fall back to comparing by version id (model ID is the same for all histories)
+              # in order to guarantee a stable sort.
+              left.fetch(:version).id <=> right.fetch(:version).id
+            else
+              comparison
+            end
+          end
+        end
+
+        histories.map { |h| h.fetch(:model) }
+      end
+    end
+
+    field :lti_asset_reports_connection,
+          LtiAssetReportType.connection_type,
+          "Lti Asset Reports with active processors, with assets preloaded",
+          null: true
+    def lti_asset_reports_connection
+      load_association(:root_account).then do |root_account|
+        next unless root_account.feature_enabled?(:lti_asset_processor)
+
+        if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+          Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
+        elsif object.user_can_read_grade?(current_user)
+          Loaders::SubmissionLtiAssetReportsStudentLoader.load(object.id)
+        end
       end
     end
 
@@ -93,6 +143,48 @@ module Types
       return object.assignment.sub_assignment_tag if object.assignment.is_a?(SubAssignment)
 
       nil
+    end
+
+    field :audit_events_connection, AuditEventType.connection_type, null: true
+    def audit_events_connection
+      return unless object.assignment.context.grants_right?(current_user, :view_audit_trail)
+
+      scoped_ctx = context.scoped
+      Loaders::AuditEventsLoader.load(object.id).then do |audit_events|
+        # The current submission is required for resolving the AuditEvent > User > Role field, and
+        # as such, it needs to be passed down through the context. Although some AuditEvents may
+        # have a `null` value for `submission_id`, these events are still included in the results
+        # if their `assignment_id` matches. In this case, the calculation for the AuditEvent > User
+        # > Role field relies on the current submission to determine the correct role.
+        scoped_ctx.set!(:parent_submission, object)
+        audit_events
+      end
+    end
+
+    field :auto_grade_submission_errors, [String], null: false, description: "Issues related to the submission"
+    def auto_grade_submission_errors
+      GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+    end
+
+    field :provisional_grades_connection, Types::ProvisionalGradeType.connection_type, null: true
+    def provisional_grades_connection
+      load_association(:assignment).then do
+        if submission.assignment.moderated_grading?
+          # The current user is an admin or moderator
+          if submission.assignment.permits_moderation?(current_user)
+            # Load all provisional grades for the submission
+            # (admins/moderators can see all grades)
+            load_association(:provisional_grades)
+          elsif submission.assignment.moderation_graders.where(user: current_user).exists?
+            # For provisional graders, only load their own grades
+            Loaders::SubmissionLoaders::ProvisionalGradesLoader.for(current_user).load(submission.id)
+          else
+            nil
+          end
+        else
+          nil
+        end
+      end
     end
   end
 end

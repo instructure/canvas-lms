@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -23,13 +22,13 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
-function defaultDurationLate(interval, secondsLate): number {
+function defaultDurationLate(interval: string, secondsLate: number): number {
   let durationLate = secondsLate / 3600
 
   if (interval === 'day') {
@@ -40,28 +39,31 @@ function defaultDurationLate(interval, secondsLate): number {
 }
 
 type Props = {
-  disabled: boolean
+  disabled?: boolean
   lateSubmissionInterval: 'day' | 'hour'
   locale: string
   renderLabelBefore: boolean
   secondsLate: number
-  onSecondsLateUpdated: (submission: {secondsLateOverride: number}) => void
+  onSecondsLateUpdated: (submission: {
+    latePolicyStatus: 'late'
+    secondsLateOverride: number
+  }) => void
   width: string
-  visible: boolean
+  visible?: boolean
 }
 
 export default function TimeLateInput({
-  disabled,
+  disabled = false,
   lateSubmissionInterval,
   locale,
   renderLabelBefore,
   secondsLate,
   onSecondsLateUpdated,
   width,
-  visible,
+  visible = true,
 }: Props) {
   const [numberInputValue, setNumberInputValue] = useState(
-    defaultDurationLate(lateSubmissionInterval, secondsLate)
+    defaultDurationLate(lateSubmissionInterval, secondsLate),
   )
   const [numberInputValueSinceBlur, setNumberInputValueSinceBlur] = useState(numberInputValue)
 
@@ -77,7 +79,7 @@ export default function TimeLateInput({
     return null
   }
 
-  const handleNumberInputBlur = ({target: {value}}) => {
+  const handleNumberInputBlur = ({target: {value}}: React.FocusEvent<HTMLInputElement>) => {
     if (!NumberHelper.validate(value)) {
       return
     }
@@ -108,14 +110,14 @@ export default function TimeLateInput({
       <Flex direction={renderLabelBefore ? 'row-reverse' : 'row'}>
         <Flex.Item>
           <NumberInput
+            allowStringValue={true}
             value={numberInputValue}
             interaction={disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-            locale={locale}
             min="0"
             onBlur={handleNumberInputBlur}
-            onChange={(e, value) => {
+            onChange={(_e, value) => {
               const inputValue = parseInt(value, 10)
               setNumberInputValue(Number.isNaN(inputValue) ? 0 : inputValue)
             }}
@@ -133,9 +135,4 @@ export default function TimeLateInput({
       </Flex>
     </span>
   )
-}
-
-TimeLateInput.defaultProps = {
-  disabled: false,
-  visible: true,
 }

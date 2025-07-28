@@ -31,9 +31,7 @@ module Canvas
           !@manifest.empty?
         end
 
-        def include?(realpath)
-          @files.include?(realpath)
-        end
+        delegate :include?, to: :@files
 
         def url_for(file)
           #   source looks like "/images/apple-touch-icon.png"
@@ -63,7 +61,7 @@ module Canvas
           normal = source.sub(%r{^/}, "")
 
           if normal.start_with?(@asset_dir)
-            normal[@asset_dir.length + 1..]
+            normal[(@asset_dir.length + 1)..]
           else
             normal
           end

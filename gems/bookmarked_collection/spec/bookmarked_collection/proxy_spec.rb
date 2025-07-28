@@ -104,6 +104,15 @@ describe BookmarkedCollection::Proxy do
         expect(pager).to eq [@scope.first, @scope.last]
         expect(pager.next_bookmark).to be_nil
       end
+
+      it "handles an empty last page" do
+        pager = @proxy.paginate(per_page: 6)
+        expect(pager).to eq [@scope.first, @scope.last]
+        pager.has_more!
+        pager = @proxy.paginate(page: pager.next_page, per_page: 6)
+        expect(pager).to eq []
+        expect(pager.next_bookmark).to be_nil
+      end
     end
 
     it "doesn't blow up when filtering everything out" do
@@ -116,6 +125,50 @@ describe BookmarkedCollection::Proxy do
       expect(collection).to receive(:execute_pager).exactly(2).times.and_call_original
       pager = @proxy.paginate(per_page: 1)
       expect(pager).to eq []
+    end
+
+    describe "sync filtering" do
+      before do
+        middle_item = @scope.limit(2).last
+        bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)
+        @proxy = BookmarkedCollection.wrap(bookmarker, @scope)
+        @proxy = BookmarkedCollection.filter(@proxy, sync: true) do |item|
+          item != middle_item
+        end
+      end
+
+      it "excludes the middle item" do
+        pager = @proxy.paginate(per_page: 6)
+        expect(pager).to eq [@scope.first, @scope.last]
+        expect(pager.next_bookmark).to be_nil
+      end
+
+      it "repeats the subpager when a page is empty" do
+        pager = @proxy.paginate(per_page: 1)
+        expect(pager).to eq [@scope.first]
+        expect(pager.next_bookmark).not_to be_nil
+        pager = @proxy.paginate(page: pager.next_page, per_page: 1)
+        expect(pager).to eq [@scope.last]
+        expect(pager.next_bookmark).to be_nil
+      end
+
+      it "returns the filtered subset of a page" do
+        pager = @proxy.paginate(per_page: 2)
+        expect(pager).to eq [@scope.first]
+        expect(pager.next_bookmark).not_to be_nil
+        pager = @proxy.paginate(page: pager.next_page, per_page: 2)
+        expect(pager).to eq [@scope.last]
+        expect(pager.next_bookmark).to be_nil
+      end
+
+      it "handles an empty last page" do
+        pager = @proxy.paginate(per_page: 6)
+        expect(pager).to eq [@scope.first, @scope.last]
+        pager.has_more!
+        pager = @proxy.paginate(page: pager.next_page, per_page: 6)
+        expect(pager).to eq []
+        expect(pager.next_bookmark).to be_nil
+      end
     end
 
     context "transforming" do

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
+// @ts-expect-error
 export default function PostGradesDialogSummaryPage(props) {
   return (
     <div className="post-summary text-center">
@@ -32,7 +32,7 @@ export default function PostGradesDialogSummaryPage(props) {
               one: 'You are ready to sync 1 assignment.',
               other: 'You are ready to sync %{count} assignments.',
             },
-            {count: props.postCount}
+            {count: props.postCount},
           )}
         </span>
       </h1>
@@ -46,7 +46,7 @@ export default function PostGradesDialogSummaryPage(props) {
                 one: '1 assignment has ungraded submissions',
                 other: '%{count} assignments have ungraded submissions',
               },
-              {count: props.needsGradingCount}
+              {count: props.needsGradingCount},
             )}
           </button>
         ) : null}

@@ -63,7 +63,7 @@ describe('checker', () => {
     child2 = node.appendChild(document.createElement('div'))
     const instanceRef = React.createRef()
     renderResult = render(
-      <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onFixError={jest.fn()} />
+      <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onFixError={jest.fn()} />,
     )
     instance = instanceRef.current
   })
@@ -81,12 +81,12 @@ describe('checker', () => {
       child.setAttribute('data-ignore-a11y-check', '')
       node.removeChild(child2)
       await promisify(instance.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(0)
+      expect(instance.state.errors).toHaveLength(0)
     })
 
     test('checks nodes without data-ignore-a11y-check', async () => {
       await promisify(instance.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(2)
+      expect(instance.state.errors).toHaveLength(2)
     })
 
     test('passes config to rule test functions', async () => {
@@ -117,11 +117,11 @@ describe('checker', () => {
           getBody={() => node}
           additionalRules={[asyncTestRule]}
           editor={fakeEditor}
-        />
+        />,
       )
       instance = instanceRef.current
       await promisify(instanceRef.current.check.bind(instance))()
-      expect(instance.state.errors.length).toBe(4)
+      expect(instance.state.errors).toHaveLength(4)
     })
 
     test('calls beforeCheck when provided it as a config option', async () => {
@@ -175,7 +175,7 @@ describe('checker', () => {
           ref={instanceRef}
           getBody={() => node}
           editor={{...fakeEditor, someObject: true}}
-        />
+        />,
       )
       instance = instanceRef.current
       const beforeCallback = jest.fn()
@@ -317,7 +317,7 @@ describe('checker', () => {
       body.appendChild(updatedNode)
       await promisify(instance.check.bind(instance))()
       rule = instance.state.errors[0].rule
-      rule.update.mockReturnValue(updatedNode)
+      jest.spyOn(rule, 'update').mockImplementation(() => updatedNode)
     })
 
     test('returns rule test of updated node', () => {
@@ -360,9 +360,10 @@ describe('checker', () => {
     })
 
     test('updates the real node', () => {
+      const updateSpy = jest.spyOn(error.rule, 'update')
       instance.fixIssue(ev)
       const formState = instance.state.formState
-      expect(error.rule.update).toHaveBeenCalledWith(error.node, formState)
+      expect(updateSpy).toHaveBeenCalledWith(error.node, formState)
     })
 
     test('checks everything after applying a fix', () => {
@@ -425,6 +426,49 @@ describe('checker', () => {
       expect(why).toBeInTheDocument()
       why.closest('button').click()
       expect(renderResult.queryByText('Link for learning more')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Send message when tray is closed or open', () => {
+    beforeEach(() => {
+      global.window.webkit = {
+        messageHandlers: {
+          modalPresentation: {
+            postMessage: jest.fn(),
+          },
+        },
+      }
+    })
+
+    afterEach(() => {
+      delete global.window.webkit
+    })
+
+    test('should send a message when the tray is closed', () => {
+      const onClose = jest.fn()
+      const instanceRef = React.createRef()
+      render(
+        <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onClose={onClose} />,
+      )
+      const instance = instanceRef.current
+
+      instance.handleClose() // Simulate closing the tray
+
+      expect(window.webkit.messageHandlers.modalPresentation.postMessage).toHaveBeenCalledWith({
+        open: false,
+      })
+    })
+
+    test('should send a message when the tray is open', () => {
+      const instanceRef = React.createRef()
+      render(<Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} />)
+      const instance = instanceRef.current
+
+      instance.check() // Simulate opening the tray
+
+      expect(window.webkit.messageHandlers.modalPresentation.postMessage).toHaveBeenCalledWith({
+        open: true,
+      })
     })
   })
 })

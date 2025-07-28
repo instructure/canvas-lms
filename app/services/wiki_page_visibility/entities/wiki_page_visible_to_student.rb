@@ -20,39 +20,6 @@
 module WikiPageVisibility
   module Entities
     # When a wiki page is visible to a (student) user
-    class WikiPageVisibleToStudent
-      attr_reader :course_id,
-                  :user_id,
-                  :wiki_page_id
-
-      def initialize(course_id:,
-                     user_id:,
-                     wiki_page_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "wiki_page_id cannot be nil" if wiki_page_id.nil?
-
-        @course_id = course_id
-        @user_id = user_id
-        @wiki_page_id = wiki_page_id
-      end
-
-      # two WikiPageVisibleToStudent DTOs are equal if all of their attributes are equal
-      def ==(other)
-        return false unless other.is_a?(WikiPageVisibleToStudent)
-
-        course_id == other.course_id &&
-          user_id == other.user_id &&
-          wiki_page_id == other.wiki_page_id
-      end
-
-      def eql?(other)
-        self == other
-      end
-
-      def hash
-        [course_id, user_id, wiki_page_id].hash
-      end
-    end
+    WikiPageVisibleToStudent = Struct.new(:course_id, :user_id, :wiki_page_id, keyword_init: true)
   end
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FileFilter from './file_filter'
+import FileFilter from './file_filter.js'
 
 export default function (node) {
   return new FileFilter({

@@ -22,35 +22,34 @@ import GradebookData from './react/default_gradebook/GradebookData'
 import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
 
-import('@canvas/context-cards/react/StudentContextCardTrigger')
-
 ready(() => {
+  import('@canvas/context-cards/react/StudentContextCardTrigger')
   const mountPoint = document.querySelector('#gradebook_app') as HTMLElement
   const gradebookMenuNode = document.querySelector(
-    '[data-component="GradebookMenu"]'
+    '[data-component="GradebookMenu"]',
   ) as HTMLSpanElement
   const actionMenuNode = document.querySelector('[data-component="ActionMenu"]') as HTMLSpanElement
   const enhancedActionMenuNode = document.querySelector(
-    '[data-component="EnhancedActionMenu"]'
+    '[data-component="EnhancedActionMenu"]',
   ) as HTMLSpanElement
   const settingsModalButtonContainer = document.getElementById(
-    'gradebook-settings-modal-button-container'
+    'gradebook-settings-modal-button-container',
   ) as HTMLSpanElement
   const gridColorNode = document.querySelector('[data-component="GridColor"]') as HTMLSpanElement
   const viewOptionsMenuNode = document.querySelector(
-    "[data-component='ViewOptionsMenu']"
+    "[data-component='ViewOptionsMenu']",
   ) as HTMLSpanElement
   const applyScoreToUngradedModalNode = document.querySelector(
-    '[data-component="ApplyScoreToUngradedModal"]'
+    '[data-component="ApplyScoreToUngradedModal"]',
   ) as HTMLSpanElement
   const gradebookGridNode = document.getElementById('gradebook_grid') as HTMLDivElement
   const gradebookSettingsModalContainer = document.querySelector(
-    "[data-component='GradebookSettingsModal']"
+    "[data-component='GradebookSettingsModal']",
   ) as HTMLSpanElement
   const flashMessageContainer = document.getElementById('flash_message_holder') as HTMLDivElement
   // AnonymousSpeedGraderAlert
   const anonymousSpeedGraderAlertNode = document.querySelector(
-    '[data-component="AnonymousSpeedGraderAlert"]'
+    '[data-component="AnonymousSpeedGraderAlert"]',
   ) as HTMLSpanElement
 
   ReactDOM.render(
@@ -70,6 +69,6 @@ ready(() => {
       settingsModalButtonContainer={settingsModalButtonContainer}
       viewOptionsMenuNode={viewOptionsMenuNode}
     />,
-    mountPoint
+    mountPoint,
   )
 })

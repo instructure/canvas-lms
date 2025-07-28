@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -44,19 +43,27 @@ export default class GradeEntry {
     return this.options.gradingScheme || null
   }
 
+  get restrictToTwoDigitsAfterSeparator() {
+    // @ts-expect-error
+    return !!this.options.restrictPointsBasedInput && !!this.gradingScheme?.pointsBased
+  }
+
+  // @ts-expect-error
   formatGradeInfoForDisplay(_gradeInfo) {
     return null
   }
 
+  // @ts-expect-error
   formatGradeInfoForInput(_gradeInfo) {
     return null
   }
 
+  // @ts-expect-error
   hasGradeChanged(_assignedGradeInfo, _currentGradeInfo, _previousGradeInfo) {
     return false
   }
 
-  parseValue(_value): GradeOverrideInfo | null {
+  parseValue(_value: unknown): GradeOverrideInfo | null {
     return null
   }
 }

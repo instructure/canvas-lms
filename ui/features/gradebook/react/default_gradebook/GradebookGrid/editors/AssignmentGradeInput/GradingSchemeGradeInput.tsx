@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -23,18 +22,25 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {hasGradeChanged, parseTextValue} from '@canvas/grading/GradeInputHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 function formatGrade(
+  // @ts-expect-error
   submission,
+  // @ts-expect-error
   assignment,
+  // @ts-expect-error
   gradingScheme,
+  // @ts-expect-error
   pointsBasedGradingScheme,
-  pendingGradeInfo
+  // @ts-expect-error
+  scalingFactor,
+  // @ts-expect-error
+  pendingGradeInfo,
 ) {
   if (pendingGradeInfo) {
     return GradeFormatHelper.formatGradeInfo(pendingGradeInfo, {defaultValue: ''})
@@ -46,18 +52,21 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'entered',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
+// @ts-expect-error
 function getGradeInfo(value, props) {
   return parseTextValue(value, {
     enterGradesAs: 'gradingScheme',
     gradingScheme: props.gradingScheme,
     pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     pointsPossible: props.assignment.pointsPossible,
+    scalingFactor: props.scalingFactor,
   })
 }
 
@@ -75,7 +84,7 @@ export default class GradingSchemeInput extends Component {
       shape({
         text: string.isRequired,
         type: string.isRequired,
-      })
+      }),
     ).isRequired,
     onMenuDismiss: func,
     onMenuShow: func,
@@ -84,6 +93,7 @@ export default class GradingSchemeInput extends Component {
       grade: string,
       valid: bool.isRequired,
     }),
+    scalingFactor: number,
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
@@ -98,15 +108,21 @@ export default class GradingSchemeInput extends Component {
     onMenuShow() {},
     pendingGradeInfo: null,
     pointsBasedGradingScheme: false,
+    scalingFactor: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
+    // @ts-expect-error
     this.bindButton = ref => {
+      // @ts-expect-error
       this.button = ref
     }
+    // @ts-expect-error
     this.bindTextInput = ref => {
+      // @ts-expect-error
       this.textInput = ref
     }
 
@@ -115,14 +131,22 @@ export default class GradingSchemeInput extends Component {
     this.handleTextChange = this.handleTextChange.bind(this)
     this.handleToggle = this.handleToggle.bind(this)
 
-    const {assignment, gradingScheme, pointsBasedGradingScheme, pendingGradeInfo, submission} =
-      props
+    const {
+      assignment,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      pendingGradeInfo,
+      scalingFactor,
+      submission,
+    } = props
+
     const value = formatGrade(
       submission,
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
-      pendingGradeInfo
+      scalingFactor,
+      pendingGradeInfo,
     )
 
     this.state = {
@@ -133,21 +157,32 @@ export default class GradingSchemeInput extends Component {
         assignment,
         gradingScheme,
         pointsBasedGradingScheme,
-        pendingGradeInfo
+        scalingFactor,
+        pendingGradeInfo,
       ),
     }
   }
 
+  // @ts-expect-error
   UNSAFE_componentWillReceiveProps(nextProps) {
+    // @ts-expect-error
     if (this.textInput !== document.activeElement) {
-      const {assignment, gradingScheme, pointsBasedGradingScheme, pendingGradeInfo, submission} =
-        nextProps
+      const {
+        assignment,
+        gradingScheme,
+        pointsBasedGradingScheme,
+        pendingGradeInfo,
+        scalingFactor,
+        submission,
+      } = nextProps
+
       const value = formatGrade(
         submission,
         assignment,
         gradingScheme,
         pointsBasedGradingScheme,
-        pendingGradeInfo
+        scalingFactor,
+        pendingGradeInfo,
       )
 
       this.setState({
@@ -157,34 +192,43 @@ export default class GradingSchemeInput extends Component {
           assignment,
           gradingScheme,
           pointsBasedGradingScheme,
-          pendingGradeInfo
+          scalingFactor,
+          pendingGradeInfo,
         ),
       })
     }
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.state.gradeInfo
   }
 
   focus() {
+    // @ts-expect-error
     if (this.button !== document.activeElement && !this.state.menuIsOpen) {
+      // @ts-expect-error
       this.textInput.focus()
+      // @ts-expect-error
       this.textInput.setSelectionRange(0, this.textInput.value.length)
     }
   }
 
+  // @ts-expect-error
   handleKeyDown(event) {
     // Tab
     if (event.which === 9) {
+      // @ts-expect-error
       if (!event.shiftKey && this.textInput === document.activeElement) {
         return false // prevent Grid behavior
+        // @ts-expect-error
       } else if (event.shiftKey && this.button === document.activeElement) {
         return false // prevent Grid behavior
       }
     }
 
     // Enter
+    // @ts-expect-error
     if (event.which === 13 && this.button === document.activeElement) {
       // the grading scheme menu opens/closes with Enter
       return false // prevent Grid behavior
@@ -193,12 +237,14 @@ export default class GradingSchemeInput extends Component {
     return undefined
   }
 
+  // @ts-expect-error
   handleSelect(event, value) {
     const gradeInfo = getGradeInfo(value, this.props)
     const formattedGrade = GradeFormatHelper.formatGradeInfo(gradeInfo)
     this.setState({gradeInfo, value: GradeFormatHelper.replaceDashWithMinus(formattedGrade)})
   }
 
+  // @ts-expect-error
   handleTextChange(event) {
     this.setState({
       gradeInfo: getGradeInfo(event.target.value, this.props),
@@ -206,16 +252,20 @@ export default class GradingSchemeInput extends Component {
     })
   }
 
+  // @ts-expect-error
   handleToggle(isOpen) {
     this.setState({menuIsOpen: isOpen}, () => {
       if (isOpen) {
+        // @ts-expect-error
         this.props.onMenuShow()
       }
     })
   }
 
   hasGradeChanged() {
+    // @ts-expect-error
     if (this.props.pendingGradeInfo) {
+      // @ts-expect-error
       if (this.props.pendingGradeInfo.valid) {
         // the pending grade is currently being submitted
         // changes are not allowed
@@ -224,25 +274,34 @@ export default class GradingSchemeInput extends Component {
 
       // the pending grade is invalid
       // return true only when the input value differs from the invalid grade
+      // @ts-expect-error
       return this.state.value.trim() !== this.props.pendingGradeInfo.grade
     }
-
-    const {assignment, gradingScheme, pointsBasedGradingScheme, submission} = this.props
+    // @ts-expect-error
+    const {assignment, gradingScheme, pointsBasedGradingScheme, scalingFactor, submission} =
+      this.props
+    // @ts-expect-error
     const formattedGrade = formatGrade(
       submission,
       assignment,
       gradingScheme,
-      pointsBasedGradingScheme
+      pointsBasedGradingScheme,
+      scalingFactor,
     )
 
+    // @ts-expect-error
     if (formattedGrade === this.state.value.trim()) {
       return false
     }
 
+    // @ts-expect-error
     const gradeInfo = getGradeInfo(this.state.value, this.props)
+    // @ts-expect-error
     return hasGradeChanged(this.props.submission, gradeInfo, {
       enterGradesAs: 'gradingScheme',
+      // @ts-expect-error
       gradingScheme: this.props.gradingScheme,
+      // @ts-expect-error
       pointsPossible: this.props.assignment.pointsPossible,
     })
   }
@@ -251,25 +310,34 @@ export default class GradingSchemeInput extends Component {
     return (
       <div className="HorizontalFlex">
         <TextInput
+          // @ts-expect-error
           disabled={this.props.disabled}
+          // @ts-expect-error
           inputRef={this.bindTextInput}
+          // @ts-expect-error
           renderLabel={this.props.label}
+          // @ts-expect-error
           messages={this.props.messages}
           onChange={this.handleTextChange}
           size="small"
+          // @ts-expect-error
           value={this.state.value}
         />
 
         <div className="Grid__GradeCell__GradingSchemeMenu">
           <Menu
+            // @ts-expect-error
             menuRef={this.props.menuContentRef}
+            // @ts-expect-error
             onDismiss={this.props.onMenuDismiss}
             onToggle={this.handleToggle}
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
               <IconButton
+                // @ts-expect-error
                 elementRef={this.bindButton}
+                // @ts-expect-error
                 disabled={this.props.disabled}
                 size="small"
                 color="secondary"
@@ -278,12 +346,12 @@ export default class GradingSchemeInput extends Component {
               />
             }
           >
+            {/* @ts-expect-error */}
             {this.props.gradingScheme.map(([key]) => (
               <Menu.Item key={key} value={key}>
                 {GradeFormatHelper.replaceDashWithMinus(key)}
               </Menu.Item>
             ))}
-
             <Menu.Item key="EX" value="EX">
               {GradeFormatHelper.excused()}
             </Menu.Item>

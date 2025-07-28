@@ -18,12 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('custom_help_link')
+const I18n = createI18nScope('custom_help_link')
 
 export default class CustomHelpLinkForm extends React.Component {
   static propTypes = {
@@ -236,7 +236,6 @@ export default class CustomHelpLinkForm extends React.Component {
               ))}
             </div>
           </fieldset>
-          {ENV?.FEATURES?.featured_help_links && (
             <>
               <fieldset className="ic-Fieldset ic-Fieldset--radio-checkbox">
                 <legend className="ic-Legend">
@@ -297,7 +296,6 @@ export default class CustomHelpLinkForm extends React.Component {
                 />
               </label>
             </>
-          )}
           <div>
             <button type="submit" className="Button Button--primary" onClick={this.handleSave}>
               {state === 'new' ? I18n.t('Add link') : I18n.t('Update link')}

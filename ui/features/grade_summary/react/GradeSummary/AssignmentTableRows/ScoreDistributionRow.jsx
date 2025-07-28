@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -28,12 +28,12 @@ import {View} from '@instructure/ui-view'
 import ScoreDistributionGraph from '../ScoreDistributionGraph'
 import {formatNumber} from '../utils'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 export const scoreDistributionRow = (
   assignment,
   setOpenAssignmentDetailIds,
-  openAssignmentDetailIds
+  openAssignmentDetailIds,
 ) => {
   const wholeNumberOrDecimal = value => {
     if (value % 1 === 0) {
@@ -44,7 +44,7 @@ export const scoreDistributionRow = (
 
   return (
     <Table.Row key={`score_distribution_${assignment._id}`}>
-      <Table.Cell colSpan="5" textAlign="center">
+      <Table.Cell colSpan="6" textAlign="center">
         <Flex direction="column" width="100%">
           <Flex.Item>
             <View as="div" margin="small" padding="0 0 small 0" borderWidth="0 0 small 0">

@@ -34,7 +34,7 @@ describe('OutcomeKebabMenu', () => {
         canDestroy: true,
         canEdit: true,
       },
-      props
+      props,
     )
 
   const renderWithProvider = (
@@ -44,7 +44,7 @@ describe('OutcomeKebabMenu', () => {
       contextId = '1',
       menuOptionForOutcomeDetailsPageFF = true,
       archiveOutcomesFF = false,
-    } = {}
+    } = {},
   ) => {
     return render(
       <OutcomesContext.Provider
@@ -58,7 +58,7 @@ describe('OutcomeKebabMenu', () => {
         }}
       >
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -140,7 +140,7 @@ describe('OutcomeKebabMenu', () => {
           <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
           {
             archiveOutcomesFF: false,
-          }
+          },
         )
         const menuButton = queryByText(groupMenuTitle)
         fireEvent.click(menuButton)
@@ -154,7 +154,7 @@ describe('OutcomeKebabMenu', () => {
           <OutcomeKebabMenu {...defaultProps({canArchive: true})} />,
           {
             archiveOutcomesFF: true,
-          }
+          },
         )
         const menuButton = getByText(groupMenuTitle)
         fireEvent.click(menuButton)
@@ -167,7 +167,7 @@ describe('OutcomeKebabMenu', () => {
           <OutcomeKebabMenu {...defaultProps({canArchive: false})} />,
           {
             archiveOutcomesFF: true,
-          }
+          },
         )
         const menuButton = getByText(groupMenuTitle)
         fireEvent.click(menuButton)
@@ -180,7 +180,7 @@ describe('OutcomeKebabMenu', () => {
           <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
           {
             archiveOutcomesFF: true,
-          }
+          },
         )
         const menuButton = getByText(groupMenuTitle)
         fireEvent.click(menuButton)
@@ -195,7 +195,7 @@ describe('OutcomeKebabMenu', () => {
         <OutcomeKebabMenu {...defaultProps({isGroup: false})} />,
         {
           menuOptionForOutcomeDetailsPageFF: false,
-        }
+        },
       )
       const menuButton = queryByText(groupMenuTitle)
       fireEvent.click(menuButton)
@@ -207,7 +207,7 @@ describe('OutcomeKebabMenu', () => {
         <OutcomeKebabMenu {...defaultProps({isGroup: false})} />,
         {
           menuOptionForOutcomeDetailsPageFF: true,
-        }
+        },
       )
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
@@ -219,7 +219,7 @@ describe('OutcomeKebabMenu', () => {
         <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
         {
           menuOptionForOutcomeDetailsPageFF: true,
-        }
+        },
       )
       const menuButton = queryByText(groupMenuTitle)
       fireEvent.click(menuButton)
@@ -292,7 +292,7 @@ describe('OutcomeKebabMenu', () => {
 
     it('handles click on View Description item', () => {
       const {getByText} = render(
-        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: 'desc'})} />
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: 'desc'})} />,
       )
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
@@ -304,7 +304,7 @@ describe('OutcomeKebabMenu', () => {
 
     it('disables View Description if groupDescription is null', () => {
       const {getByText} = render(
-        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: null})} />
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: null})} />,
       )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
@@ -313,7 +313,7 @@ describe('OutcomeKebabMenu', () => {
 
     it('disables View Description if groupDescription is an empty string', () => {
       const {getByText} = render(
-        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: ''})} />
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: ''})} />,
       )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
@@ -324,7 +324,7 @@ describe('OutcomeKebabMenu', () => {
       const {getByText} = render(
         <OutcomeKebabMenu
           {...defaultProps({isGroup: true, groupDescription: '<div><p>   </p></div>'})}
-        />
+        />,
       )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
@@ -338,7 +338,7 @@ describe('OutcomeKebabMenu', () => {
             isGroup: true,
             groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>',
           })}
-        />
+        />,
       )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))

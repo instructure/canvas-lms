@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {IconSearchLine} from '@instructure/ui-icons'
@@ -24,7 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
 export default function Filter(props) {
   return (
@@ -37,7 +37,7 @@ export default function Filter(props) {
         onChange={props.onChange}
         renderBeforeInput={<IconSearchLine />}
         aria-label={I18n.t(
-          'As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input.'
+          'As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input.',
         )}
         data-testid="group-search-input"
       />

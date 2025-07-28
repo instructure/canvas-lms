@@ -67,12 +67,7 @@ describe "Learning Outcome exporting" do
   end
 
   context "with selectable_outcomes_in_course_copy enabled" do
-    before do
-      @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
-    end
-
     after do
-      @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       @ce.selected_content = nil
     end
 

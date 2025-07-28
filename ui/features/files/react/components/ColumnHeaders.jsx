@@ -17,13 +17,13 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import classnames from 'classnames'
 import ColumnHeaders from '../legacy/components/ColumnHeaders'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 ColumnHeaders.renderColumns = function (sort, order) {
   return this.columns.map(column => {
@@ -57,7 +57,7 @@ ColumnHeaders.renderColumns = function (sort, order) {
       .map(part => window.encodeURIComponent(part))
       .join('/')
     const href = `${encoded_path}?${$.param(
-      this.queryParamsFor(this.props.query, column.property)
+      this.queryParamsFor(this.props.query, column.property),
     )}`
     const linkProps = {
       className: 'ef-plain-link',

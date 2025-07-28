@@ -34,7 +34,6 @@ module PactConfig
     CANVAS_API_VERSION = "1.0"
     CANVAS_LMS_API = "Canvas LMS API"
     SISTEMIC = "Sistemic"
-    ANDROID = "android"
     CANVAS_IOS = "canvas-ios"
     ALL = Consumers.constants.map { |c| Consumers.const_get(c) }
   end

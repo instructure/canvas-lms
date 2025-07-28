@@ -20,7 +20,7 @@ import BaseLinkContentItem from './BaseLinkContentItem'
 import {ResourceLinkContentItemJson} from '../Lti13ContentItemJson'
 import {RceLti13ContentItemContext} from '../RceLti13ContentItem'
 import {addQueryParamsToUrl} from '../../../../../util/url-util'
-import {PARENT_FRAME_CONTEXT_PARAM} from '../../ExternalToolsEnv'
+import {parentFrameContextParam} from '../../constants'
 
 export default class ResourceLinkContentItem extends BaseLinkContentItem<ResourceLinkContentItemJson> {
   static readonly type = 'ltiResourceLink'
@@ -45,7 +45,7 @@ export default class ResourceLinkContentItem extends BaseLinkContentItem<Resourc
     return addQueryParamsToUrl(this.context.ltiEndpoint, {
       display,
       resource_link_lookup_uuid: this.lookup_uuid,
-      [PARENT_FRAME_CONTEXT_PARAM]: this.context.containingCanvasLtiToolId,
+      [parentFrameContextParam]: this.context.containingCanvasLtiToolId,
     })
   }
 }

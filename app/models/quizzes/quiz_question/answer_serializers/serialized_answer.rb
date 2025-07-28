@@ -40,12 +40,12 @@ module Quizzes::QuizQuestion::AnswerSerializers
       error.blank?
     end
 
-    def reject(reason, *args)
+    def reject(reason, *)
       self.error = reason.to_s
 
       if reason.is_a?(Symbol) && ERROR_CODES.key?(reason)
         actual_reason = ERROR_CODES[reason]
-        actual_reason = actual_reason.call(*args) if actual_reason.is_a?(Proc)
+        actual_reason = actual_reason.call(*) if actual_reason.is_a?(Proc)
 
         self.error = actual_reason
       end

@@ -28,7 +28,7 @@ module CC
       scope = WikiPages::ScopedToUser.new(@course, @user, scope).scope if @user
       scope.each do |page|
         next unless export_object?(page)
-        next if @user && page.locked_for?(@user)
+        next if @user && page.locked_for?(@user, check_policies: true)
 
         begin
           add_exported_asset(page)
@@ -42,8 +42,7 @@ module CC
           name_max -= 5 if name_max
           path_max -= 5 + wiki_folder.length + 1 if path_max
           max = [name_max, path_max].compact.min
-          file_name = "#{page.url[0...max]}.html"
-
+          file_name = page.block_editor ? "#{page.url[0...max]}.json" : "#{page.url[0...max]}.html"
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
           meta_fields = { identifier: migration_id }
@@ -55,12 +54,19 @@ module CC
           if page.for_assignment?
             meta_fields[:assignment_identifier] = create_key(page.assignment)
             meta_fields[:only_visible_to_overrides] = page.assignment.only_visible_to_overrides
+            meta_fields[:assignment_overrides] = map_assignment_overrides(page.assignment)
           end
           meta_fields[:todo_date] = page.todo_date
           meta_fields[:publish_at] = page.publish_at
+          meta_fields[:unlock_at] = page.unlock_at
+          meta_fields[:lock_at] = page.lock_at
 
           File.open(path, "w") do |file|
-            file << @html_exporter.html_page(page.body, page.title, meta_fields)
+            file << if page.block_editor
+                      @html_exporter.json_page(page.block_editor, page.title, meta_fields)
+                    else
+                      @html_exporter.html_page(page.body, page.title, meta_fields)
+                    end
           end
 
           @resources.resource(
@@ -71,10 +77,25 @@ module CC
             res.file(href: relative_path)
           end
         rescue
-          title = page.title rescue I18n.t("course_exports.unknown_titles.wiki_page", "Unknown wiki page")
-          add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title:), $!)
+          add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title: page.title), $!)
         end
       end
+    end
+
+    def map_assignment_overrides(assignment)
+      assignment_overrides = assignment&.assignment_overrides
+      active_overrides = assignment_overrides&.active
+      return [] if active_overrides.blank?
+
+      active_overrides.where(set_type: "Noop", quiz_id: nil).map do |o|
+        override_attrs = o.slice(:set_type, :set_id, :title)
+        AssignmentOverride.overridden_dates.each do |field|
+          next unless o.send(:"#{field}_overridden")
+
+          override_attrs["field"] = o[field]
+        end
+        override_attrs
+      end.to_json
     end
   end
 end

@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import GraphiQLApp from './react/GraphiQLApp'
 import ready from '@instructure/ready'
 
 ready(() => {
-  ReactDOM.render(<GraphiQLApp />, document.getElementById('graphiql'))
+  const root = createRoot(document.getElementById('graphiql'))
+  root.render(<GraphiQLApp />)
 })

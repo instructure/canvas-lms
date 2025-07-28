@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import defaults from './defaults'
+import defaults from './defaults.js'
 
 function K5Options() {}
 

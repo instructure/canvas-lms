@@ -55,6 +55,7 @@ module CC
             event_node.rrule event.rrule if event.rrule
             event_node.series_uuid event.series_uuid if event.series_uuid
             event_node.series_head "true" if event.series_head
+            event_node.blackout_date "true" if event.blackout_date
           end
         end
       end

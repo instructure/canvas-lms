@@ -35,7 +35,9 @@ module Api::V1::AccountReport
     json[:created_at] = report.created_at&.iso8601
     json[:started_at] = report.start_at&.iso8601
     json[:ended_at] = report.end_at&.iso8601
+    json[:run_time] = [(report.end_at || Time.now.utc) - (report.start_at || report.created_at || Time.now.utc), 0.0].max
     json[:file_url] = (report.attachment.nil? ? nil : account_file_download_url(report.account_id, report.attachment_id))
+    json[:message] = report.message
     if report.attachment
       json[:attachment] = attachment_json(report.attachment, user)
     end

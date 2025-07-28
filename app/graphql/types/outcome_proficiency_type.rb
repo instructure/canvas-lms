@@ -26,10 +26,10 @@ module Types
 
     global_id_field :id
 
-    field :context_type, String, null: false
     field :context_id, ID, null: false
+    field :context_type, String, null: false
 
-    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
+    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: false
     def proficiency_ratings_connection
       object.outcome_proficiency_ratings
     end
@@ -38,5 +38,8 @@ module Types
     def locked
       !object.context.grants_right?(current_user, :manage_proficiency_scales)
     end
+
+    field :mastery_points, Float, null: false
+    delegate :mastery_points, to: :object
   end
 end

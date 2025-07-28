@@ -17,6 +17,7 @@
  */
 
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
+import {InfiniteData} from '@tanstack/react-query'
 import type {RubricQueryResponse} from 'features/rubrics/types/Rubric'
 
 export const RUBRICS_DATA: Rubric[] = [
@@ -55,6 +56,7 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'active',
   },
@@ -116,6 +118,7 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'archived',
   },
@@ -200,15 +203,25 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'active',
   },
 ]
 
-export const RUBRICS_QUERY_RESPONSE: RubricQueryResponse = {
-  rubricsConnection: {
-    nodes: RUBRICS_DATA,
-  },
+export const RUBRICS_QUERY_RESPONSE: InfiniteData<RubricQueryResponse> = {
+  pages: [
+    {
+      rubricsConnection: {
+        nodes: RUBRICS_DATA,
+        pageInfo: {
+          endCursor: 'asdf',
+          hasNextPage: false,
+        },
+      },
+    },
+  ],
+  pageParams: [null],
 }
 
 export const RUBRIC_PREVIEW_QUERY_RESPONSE: Pick<

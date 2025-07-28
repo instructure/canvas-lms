@@ -39,7 +39,7 @@ describe('GradingSchemeCreateModal', () => {
         archivedGradingSchemesEnabled={false}
         handleCancelCreate={handleCancelCreate}
         {...props}
-      />
+      />,
     )
     return {...funcs, handleCreateScheme, handleCancelCreate}
   }

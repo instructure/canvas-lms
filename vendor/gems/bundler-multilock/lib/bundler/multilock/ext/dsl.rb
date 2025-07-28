@@ -59,15 +59,15 @@ module Bundler
                     "#{e.is_a?(GemfileEvalError) ? "evaluating" : "parsing"} " \
                     "`#{File.basename gemfile.to_s}`: #{e.message}"
 
-          raise Bundler::Dsl::DSLError.new(message, gemfile, e.backtrace, contents)
+          raise Bundler::Dsl::DSLError.new(message, gemfile.to_s, e.backtrace, contents)
         ensure
           @gemfile = original_gemfile
         end
 
-        def lockfile(*args, **kwargs, &block)
+        def lockfile(*args, **kwargs, &)
           return true if Multilock.loaded?
 
-          Multilock.add_lockfile(*args, builder: self, **kwargs, &block)
+          Multilock.add_lockfile(*args, builder: self, **kwargs, &)
         end
       end
     end

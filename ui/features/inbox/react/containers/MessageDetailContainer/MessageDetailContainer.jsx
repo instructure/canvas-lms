@@ -21,17 +21,17 @@ import {Conversation} from '../../../graphql/Conversation'
 import {ConversationContext} from '../../../util/constants'
 import {CONVERSATION_MESSAGES_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../../graphql/Queries'
 import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {inboxMessagesWrapper} from '../../../util/utils'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -59,7 +59,7 @@ export const MessageDetailContainer = props => {
     data.legacyNode.conversationMessagesConnection.nodes =
       data.legacyNode.conversationMessagesConnection.nodes.filter(
         message =>
-          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id)
+          !result.data.deleteConversationMessages.conversationMessageIds.includes(message._id),
       )
 
     cache.writeQuery({...options, data})
@@ -67,7 +67,7 @@ export const MessageDetailContainer = props => {
     let legacyNode
     try {
       const queryResult = JSON.parse(
-        JSON.stringify(cache.readQuery(props.conversationsQueryOption))
+        JSON.stringify(cache.readQuery(props.conversationsQueryOption)),
       )
       legacyNode = queryResult.legacyNode
     } catch (e) {
@@ -80,7 +80,9 @@ export const MessageDetailContainer = props => {
     // but the mutation is run with only one.
     const conversationMessageId = result.data.deleteConversationMessages.conversationMessageIds[0]
     const matchingConversation = legacyNode.conversationsConnection.nodes.find(c =>
-      c.conversation.conversationMessagesConnection.nodes.find(m => m._id === conversationMessageId)
+      c.conversation.conversationMessagesConnection.nodes.find(
+        m => m._id === conversationMessageId,
+      ),
     )
 
     if (matchingConversation) {
@@ -95,10 +97,10 @@ export const MessageDetailContainer = props => {
 
   const handleDeleteConversationMessage = conversationMessageId => {
     const delMsg = I18n.t(
-      'Are you sure you want to delete your copy of this message? This action cannot be undone.'
+      'Are you sure you want to delete your copy of this message? This action cannot be undone.',
     )
 
-    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(delMsg)
     if (confirmResult) {
       deleteConversationMessages({variables: {ids: [conversationMessageId]}})
     }
@@ -136,7 +138,7 @@ export const MessageDetailContainer = props => {
   // Set Conversation to read when the conversationMessages are loaded
   useEffect(() => {
     const idIsStoredInSessionStorage = JSON.parse(
-      sessionStorage.getItem('conversationsManuallyMarkedUnread')
+      sessionStorage.getItem('conversationsManuallyMarkedUnread'),
     )?.includes(props.conversation._id)
 
     if (
@@ -162,7 +164,9 @@ export const MessageDetailContainer = props => {
       : conversationMessagesQuery.data?.legacyNode
 
     if (data) {
-      const canReply = isSubmissionCommentsType ? true : data?.canReply
+      const canReply = isSubmissionCommentsType
+        ? !data?.commentsConnection?.nodes?.some(el => el?.canReply === false)
+        : data?.canReply
       props.setCanReply(canReply)
     }
 
@@ -275,7 +279,7 @@ export const MessageDetailContainer = props => {
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (lastMessageItem) {
@@ -307,6 +311,7 @@ export const MessageDetailContainer = props => {
     <View
       as="div"
       borderWidth="small none none none"
+      borderColor="secondary"
       padding="small"
       key={message.id}
       elementRef={el => {
@@ -327,6 +332,7 @@ export const MessageDetailContainer = props => {
   )
 
   // Memo which returns array of ConversationListItem's
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderedItems = useMemo(() => {
     const menuData = inboxMessageData?.inboxMessages

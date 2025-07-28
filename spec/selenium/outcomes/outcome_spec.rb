@@ -201,7 +201,7 @@ describe "outcomes" do
       end
     end
 
-    context "#show" do
+    describe "#show" do
       it "shows rubrics as aligned items", priority: "2" do
         outcome_with_rubric
 

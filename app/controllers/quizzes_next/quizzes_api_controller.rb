@@ -22,7 +22,7 @@ class QuizzesNext::QuizzesApiController < ApplicationController
   include Api::V1::QuizzesNext::Quiz
 
   before_action :require_context
-
+  CACHE_EXPIRATION_TIME = 1.hour
   # @API List quizzes in a course
   #
   # Returns the paginated list of Quizzes in this course.
@@ -38,22 +38,25 @@ class QuizzesNext::QuizzesApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
       log_api_asset_access(["quizzes.next", @context], "quizzes", "other")
-      cache_key = [
-        "quizzes.next",
+
+      base_cache_key = [
         @context.id,
-        all_quizzes.count,
         @current_user,
         latest_updated_at,
-        accepts_jsonapi?,
-        params[:search_term],
-        params[:page],
-        params[:per_page]
-      ].cache_key
+        params[:search_term]
+      ]
 
-      value = Rails.cache.fetch(cache_key) do
+      all_quizzes_cache_key = (["quizzes.next"] + base_cache_key).cache_key
+      cached_all_quizzes = Rails.cache.fetch(all_quizzes_cache_key, expires_in: CACHE_EXPIRATION_TIME) { all_quizzes }
+
+      cache_key = (["page"] + base_cache_key + [params[:page], params[:per_page]]).cache_key
+
+      value = Rails.cache.fetch(cache_key, expires_in: CACHE_EXPIRATION_TIME) do
         api_route = api_v1_course_all_quizzes_url(@context)
-        @quizzes = Api.paginate(all_quizzes, self, api_route)
-
+        @quizzes = Api.paginate(cached_all_quizzes, self, api_route)
+        assignments = @quizzes.select { |q| q.is_a?(Assignment) }
+        quiz_data = ListNewQuizzesWithQuestionCountService.new(@context, @current_user, request.host_with_port, @domain_root_account, assignments).question_count
+        @quizzes = merge_question_counts(@quizzes, quiz_data)
         {
           json: quizzes_next_json(@quizzes, @context, @current_user, session),
           link: response.headers["Link"].to_s
@@ -81,11 +84,19 @@ class QuizzesNext::QuizzesApiController < ApplicationController
     end
   end
 
+  def merge_question_counts(new_quizzes, quiz_data)
+    quiz_data_map = quiz_data.index_by { |q| q["id"].to_i }
+
+    new_quizzes.each do |quiz|
+      quiz.question_count = quiz_data_map[quiz.id.to_i]&.fetch("question_count", 0)
+    end
+  end
+
   def latest_updated_at
     return @_latest_updated_at if defined?(@_latest_updated_at)
 
-    quiz_updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
-    assignment_updated = @context.assignments.active.reorder("updated_at DESC").limit(1).pluck(:updated_at).first
+    quiz_updated = @context.quizzes.active.reorder("updated_at DESC").limit(1).pick(:updated_at)
+    assignment_updated = @context.assignments.active.reorder("updated_at DESC").limit(1).pick(:updated_at)
     @_latest_updated_at = [quiz_updated, assignment_updated].compact.max
   end
 end

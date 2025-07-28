@@ -28,9 +28,9 @@ import * as actions from './actions'
 import ScoringRange from './components/scoring-range'
 import AssignmentPickerModal from './components/assignment-picker-modal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const {object, func} = PropTypes
 
@@ -64,7 +64,7 @@ class EditorView extends React.Component {
       setIndex: 0,
       assignment_set_associations: targetRange.getIn(
         ['assignment_sets', 0, 'assignment_set_associations'],
-        List()
+        List(),
       ),
       lower_bound: targetRange.get('lower_bound'),
       upper_bound: targetRange.get('upper_bound'),
@@ -207,7 +207,7 @@ class EditorView extends React.Component {
 
 const ConnectedEditorView = connect(
   state => ({state}), // mapStateToProps
-  {...actions, ...actions.assignmentPicker} // mapActionsToProps
+  {...actions, ...actions.assignmentPicker}, // mapActionsToProps
 )(DragDropContext(HTML5Backend)(EditorView))
 
 export default ConnectedEditorView

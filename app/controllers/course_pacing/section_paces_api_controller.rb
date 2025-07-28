@@ -36,6 +36,7 @@ class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
 
   def load_contexts
     @course = api_find(Course.active, params[:course_id])
+    @draft_feature_flag_enabled = @course.root_account.feature_enabled?(:course_pace_draft_state)
     @section = api_find(@course.active_course_sections, params[:course_section_id]) if params[:course_section_id]
   end
 end

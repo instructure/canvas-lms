@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -29,7 +29,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import JobStatsTable from './JobStatsTable'
 import StuckModal from './StuckModal'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function JobStats() {
   const [clusters, setClusters] = useState()
@@ -46,16 +46,16 @@ export default function JobStats() {
       error: setError,
       fetchAllPages: true,
     },
-    []
+    [],
   )
 
   const updateRow = useCallback(
     (shard_id, data) => {
       setClusters(
-        clusters.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster))
+        clusters.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster)),
       )
     },
-    [clusters]
+    [clusters],
   )
 
   const onRefresh = useCallback(
@@ -72,7 +72,7 @@ export default function JobStats() {
           updateRow(shard_id, {loading: false, error: e})
         })
     },
-    [updateRow]
+    [updateRow],
   )
 
   const addUnstuckJob = (shard_id, progress_url) => {
@@ -85,7 +85,7 @@ export default function JobStats() {
       delete newQueue[shard_id]
       setUnstuckQueue(newQueue)
     },
-    [unstuckQueue]
+    [unstuckQueue],
   )
 
   const confirmUnblock = async shard_id => {

@@ -53,23 +53,4 @@ describe CanvasSchema do
     result = CanvasSchema.execute(all_courses_query, context: gql_context)
     expect(result["data"]).to eq({ "allCourses" => [{ "name" => course_name }] })
   end
-
-  it "does not expose Apollo Federation special types" do
-    result = CanvasSchema.execute(entities_query, variables:, context: gql_context)
-    error_messages = result["errors"].pluck("message")
-    expect(error_messages).to include("Field '_entities' doesn't exist on type 'Query'")
-    expect(result["data"]).to be_nil
-  end
-
-  describe ".for_federation" do
-    it "exposes defined queries" do
-      result = CanvasSchema.for_federation.execute(all_courses_query, context: gql_context)
-      expect(result["data"]).to eq({ "allCourses" => [{ "name" => course_name }] })
-    end
-
-    it "exposes Apollo Federation special types" do
-      result = CanvasSchema.for_federation.execute(entities_query, variables:, context: gql_context)
-      expect(result["data"]).to eq({ "_entities" => [{ "name" => course_name }] })
-    end
-  end
 end

@@ -55,16 +55,18 @@ module ContextExternalToolsHelper
       "data-tool-launch-method" => tool.fetch(:launch_method, ""),
     }
 
+    link_attrs[:id] = options[:link_id] if options[:link_id]
     link_attrs[:class] = options[:link_class] if options[:link_class]
+    # When raw_output is true, we don't need to render the icon as we're just returning attributes
+    if options[:raw_output]
+      link_attrs[:title] = tool[:title]
+      return link_attrs
+    end
+
+    # Only render the icon if we're not in raw_output mode
     if options[:show_icon]
       rendered_icon = render(partial: "external_tools/helpers/icon", locals: { tool: })
       rendered_icon = sanitize(rendered_icon.squish) if options[:remove_space_between_icon_and_text]
-    end
-
-    if options[:raw_output]
-      link_attrs[:icon] = rendered_icon if rendered_icon
-      link_attrs[:title] = tool[:title]
-      return link_attrs
     end
 
     link = content_tag(:a, link_attrs) do
@@ -93,5 +95,36 @@ module ContextExternalToolsHelper
                                   raw_output: true
                                 })
     end.flatten
+  end
+
+  def external_tools_menu_items_grouped_json(tools_hash, url_params_by_group = {})
+    result = {}
+
+    tools_hash.each do |group, tools|
+      next if tools.blank?
+
+      result[group.to_s] = tools.map do |tool|
+        params = url_params_by_group[group.to_sym] || {}
+
+        display_tool =
+          if tool.respond_to?(:extension_setting)
+            external_tool_display_hash(tool, group, params)
+          else
+            base_url = tool[:base_url]
+            if base_url.present?
+              parsed = URI.parse(base_url)
+              merged_query = Rack::Utils.parse_nested_query(parsed.query).merge(params)
+              parsed.query = merged_query.to_query
+              tool = tool.merge(base_url: parsed.to_s)
+            end
+            tool
+          end
+        {
+          context_external_tool: display_tool
+        }
+      end
+    end
+
+    result
   end
 end

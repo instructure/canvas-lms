@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_57')
+const I18n = createI18nScope('permissions_templates_57')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Allows user to edit Blueprint content lock settings on individual discussions.'
+        'Allows user to edit Blueprint content lock settings on individual discussions.',
       ),
     },
     {
@@ -34,20 +34,22 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to view the Discussions link in Course Navigation.'),
     },
     {
-      description: I18n.t('Allows user to view course discussions.'),
+      description: I18n.t(
+        'Allows user to view course discussions and all replies within the discussion topics.',
+      ),
     },
   ],
   [
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
+        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a discussion to Commons, Courses - manage must also be enabled.'
+        'To share a discussion to Commons, Courses - manage must also be enabled.',
       ),
     },
     {
@@ -62,7 +64,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'Allows user to edit Blueprint content lock settings on individual settings if the user is enrolled in a Blueprint master course.'
+        'Allows user to edit Blueprint content lock settings on individual settings if the user is enrolled in a Blueprint master course.',
       ),
     },
     {
@@ -70,7 +72,9 @@ export const template = generateActionTemplates(
       description: I18n.t('Allows user to view the Discussions link in Course Navigation.'),
     },
     {
-      description: I18n.t('Allows user to view course discussions.'),
+      description: I18n.t(
+        'Allows user to view course discussions and all replies within the discussion topics.',
+      ),
     },
   ],
   [
@@ -80,18 +84,18 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course with a teacher, TA, or designer role.'
+        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course with a teacher, TA, or designer role.',
       ),
     },
     {
       description: I18n.t(
-        'To edit Blueprint lock settings from the Discussions index page, Discussions - moderate must also be enabled.'
+        'To edit Blueprint lock settings from the Discussions index page, Discussions - moderate must also be enabled.',
       ),
     },
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a discussion to Commons, Course Content - add / edit / delete must also be enabled.'
+        'To share a discussion to Commons, Course Content - add / edit / delete must also be enabled.',
       ),
     },
     {
@@ -101,5 +105,5 @@ export const template = generateActionTemplates(
     {
       description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.'),
     },
-  ]
+  ],
 )

@@ -47,7 +47,7 @@ export default function (target, ...mixins) {
         let name
         const [alreadyMixedIn, notMixedInYet] = Array.from(match.slice(1))
         ;(target[(name = `__${alreadyMixedIn || notMixedInYet}__`)] || (target[name] = [])).push(
-          prop
+          prop,
         )
       } else {
         target[key] = prop

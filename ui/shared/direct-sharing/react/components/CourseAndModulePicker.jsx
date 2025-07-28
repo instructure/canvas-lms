@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React, {useRef} from 'react'
 import {func, string, bool, object} from 'prop-types'
@@ -31,21 +31,28 @@ import useManagedCourseSearchApi, {
 } from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
 import ModulePositionPicker from './ModulePositionPicker'
+import AssignmentPicker from './AssignmentPicker'
 
-const I18n = useI18nScope('course_and_module_picker')
+const I18n = createI18nScope('course_and_module_picker')
 
 CourseAndModulePicker.propTypes = {
   selectedCourseId: string,
   setSelectedCourse: func,
+  selectedCourseError: bool,
+  courseSelectInputRef: func,
+  isCourseRequired: bool,
   selectedModuleId: string,
   setSelectedModule: func,
+  setSelectedAssignment: func,
   setModuleItemPosition: func,
   disableModuleInsertion: bool,
+  showAssignments: bool,
   moduleFilteringOpts: object,
   courseFilteringOpts: object,
 }
 
 CourseAndModulePicker.defaultProps = {
+  showAssignments: false,
   moduleFilteringOpts: {per_page: 50},
   courseFilteringOpts: {
     include: '',
@@ -56,10 +63,15 @@ CourseAndModulePicker.defaultProps = {
 export default function CourseAndModulePicker({
   selectedCourseId,
   setSelectedCourse,
+  selectedCourseError,
+  courseSelectInputRef,
+  isCourseRequired,
   selectedModuleId,
   setSelectedModule,
+  setSelectedAssignment,
   setModuleItemPosition,
   disableModuleInsertion,
+  showAssignments,
   moduleFilteringOpts,
   courseFilteringOpts,
 }) {
@@ -67,6 +79,10 @@ export default function CourseAndModulePicker({
 
   moduleFilteringOpts.include = moduleFilteringOpts.include ? 'concluded' : ''
   moduleFilteringOpts.enforce_manage_grant_requirement = moduleFilteringOpts.include ? true : ''
+
+  const messages = selectedCourseError
+    ? [{text: I18n.t('Please select a course'), type: 'newError'}]
+    : []
 
   return (
     <div ref={trayRef}>
@@ -78,6 +94,10 @@ export default function CourseAndModulePicker({
           additionalParams={courseFilteringOpts}
           mountNodeRef={trayRef}
           minimumSearchLength={MINIMUM_SEARCH_LENGTH}
+          id={'direct-share-course-select'}
+          isRequired={isCourseRequired}
+          messages={messages}
+          inputRef={courseSelectInputRef}
           isSearchableTerm={isSearchableTerm}
           renderOption={item => {
             return (
@@ -131,6 +151,14 @@ export default function CourseAndModulePicker({
           setModuleItemPosition={setModuleItemPosition}
         />
       )}
+      <View as="div" padding="0 0 small 0">
+        {selectedCourseId && showAssignments && (
+          <AssignmentPicker
+            courseId={selectedCourseId}
+            onAssignmentSelected={setSelectedAssignment}
+          />
+        )}
+      </View>
     </div>
   )
 }

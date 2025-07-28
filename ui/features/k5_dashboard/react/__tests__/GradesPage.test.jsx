@@ -24,7 +24,7 @@ import {GradesPage, getGradingPeriodsFromCourses, overrideCourseGradingPeriods} 
 import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/k5/react/utils')
-const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
+const utils = require('@canvas/k5/react/utils')
 
 const defaultCourses = [
   {
@@ -238,7 +238,7 @@ const OBSERVER_GRADING_PERIODS_URL = encodeURI(`${BASE_GRADES_URL}&include[]=obs
 describe('GradesPage', () => {
   beforeEach(() => {
     utils.transformGrades.mockImplementation(data => data)
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
+    fetchMock.get(GRADING_PERIODS_URL, defaultCourses)
   })
 
   afterEach(() => {
@@ -256,7 +256,7 @@ describe('GradesPage', () => {
       () => {
         throw new Error('oh no!')
       },
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     const {getAllByText} = render(<GradesPage {...defaultProps} />)
     // showFlashError appears to create both a regular and a screen-reader only alert on the page
@@ -285,7 +285,7 @@ describe('GradesPage', () => {
   it('does not render a grading period drop-down if the user does not have student role', async () => {
     fetchMock.get(
       GRADING_PERIODS_URL,
-      JSON.stringify([
+      [
         {
           courseId: '99',
           courseName: 'For Teachers Only',
@@ -302,8 +302,8 @@ describe('GradesPage', () => {
             },
           ],
         },
-      ]),
-      {overwriteRoutes: true}
+      ],
+      {overwriteRoutes: true},
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('For Teachers Only'))
@@ -312,7 +312,7 @@ describe('GradesPage', () => {
 
   it('updates shown courses and grades to match currently selected grading periods', async () => {
     utils.fetchGradesForGradingPeriod.mockReturnValueOnce(
-      Promise.resolve(defaultSpecificPeriodGrades)
+      Promise.resolve(defaultSpecificPeriodGrades),
     )
 
     const {getByRole, getByText, queryByText} = render(<GradesPage {...defaultProps} />)
@@ -355,7 +355,7 @@ describe('GradesPage', () => {
         },
       ],
     }
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([courseWithoutGrades]), {
+    fetchMock.get(GRADING_PERIODS_URL, [courseWithoutGrades], {
       overwriteRoutes: true,
     })
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
@@ -371,7 +371,7 @@ describe('GradesPage', () => {
 
   describe('Parent Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, defaultCourses)
       utils.getCourseGrades.mockImplementation(c => c)
     })
 
@@ -382,7 +382,7 @@ describe('GradesPage', () => {
           currentUserRoles={['observer', 'user']}
           observedUserId="4"
           currentUser={{id: '1'}}
-        />
+        />,
       )
       await waitFor(() => {
         expect(getByText('Mastering Canvas')).toBeInTheDocument()
@@ -402,7 +402,7 @@ describe('GradesPage', () => {
           currentUserRoles={['observer', 'teacher', 'user']}
           observedUserId="1"
           currentUser={{id: '1'}}
-        />
+        />,
       )
       await waitFor(() => {
         expect(getByText('Testing 4 Dummies')).toBeInTheDocument()

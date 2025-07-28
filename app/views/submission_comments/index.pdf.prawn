@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2024 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -21,19 +23,12 @@ require "prawn/emoji"
 require "pathname"
 
 prawn_document(page_layout: :portrait, page_size:) do |pdf|
-  # initialize and set primary (latin) font for normal, bold, and italic styles
-  pdf.font_families.update(
-    "LatoWeb" => {
-      normal: "public/fonts/lato/latin/LatoLatin-Regular.ttf",
-      italic: "public/fonts/lato/latin/LatoLatin-Italic.ttf",
-      bold: "public/fonts/lato/latin/LatoLatin-Bold.ttf",
-    }
-  )
-  pdf.font("LatoWeb")
+  # set primary font to Helvetica for Latin script (handles normal, bold, and italic styles)
+  pdf.font("Helvetica")
 
   # initialize and set non-Latin fallback fonts using only the “Regular” style
-  fallback_fonts = %w[NotoSansJP NotoSansKR NotoSansSC NotoSansTC NotoSansThai NotoSansArabic NotoSansHebrew NotoSansArmenian]
-  fallback_fonts.each do |font_name|
+  non_latin_fallback_fonts = %w[NotoSansJP NotoSansKR NotoSansSC NotoSansTC NotoSansThai NotoSansArabic NotoSansHebrew NotoSansArmenian]
+  non_latin_fallback_fonts.each do |font_name|
     font_path = "#{File.dirname(__FILE__)}/fonts/noto_sans/#{font_name}-Regular.ttf"
     pdf.font_families.update(font_name => {
                                normal: { file: font_path, subset: true },
@@ -41,7 +36,20 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
                                italic: { file: font_path, subset: true }
                              })
   end
-  pdf.fallback_fonts(fallback_fonts)
+
+  pdf.font_families.update(
+    # add DejaVuSans font for general Unicode support
+    "DejaVuSans" => {
+      normal: "#{File.dirname(__FILE__)}/fonts/DejaVuSans.ttf"
+    },
+    # add NotoEmoji font for emoji support
+    "NotoEmoji" => {
+      normal: "#{File.dirname(__FILE__)}/fonts/NotoEmoji-Regular.ttf"
+    }
+  )
+
+  # set the fallback fonts
+  pdf.fallback_fonts(non_latin_fallback_fonts + %w[NotoEmoji DejaVuSans])
 
   pdf.font_size 8
   pdf.text assignment_title, size: pdf.font_size * 2.375
@@ -54,7 +62,14 @@ prawn_document(page_layout: :portrait, page_size:) do |pdf|
   current_author = nil
   submission_comments.find_each do |comment|
     draft_markup = comment.draft? ? " <color rgb='ff0000'>#{draft}</color>" : ""
-    comment_body = "#{comment.body}#{draft_markup}"
+
+    # escape '<' followed by a space with a unique placeholder to prevent Nokogiri
+    # from converting '&lt;' back to '<'. This ensures that '<' is safely converted
+    # to '&lt;' after the HTML to text conversion
+    escaped_body = comment.body.to_s.gsub(/<(?=\s)/, "{{{LT_PLACEHOLDER}}}")
+    comment_body = "#{html_to_text(escaped_body)}#{draft_markup}"
+    comment_body.gsub!("{{{LT_PLACEHOLDER}}}", "&lt;")
+
     comment_body_and_timestamp = "#{comment_body} #{timestamps_by_id.fetch(comment.id)}"
 
     if comment.author_id.nil? || comment.author_id != current_author

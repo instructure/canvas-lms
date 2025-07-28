@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-import formatMessage from 'format-message'
+import formatMessage from '../../../../../format-message'
 
 import type {TrayProps} from '@instructure/ui-tray'
 

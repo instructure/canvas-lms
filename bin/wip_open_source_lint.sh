@@ -45,7 +45,7 @@ function test_migrations {
 }
 
 function eslint {
-  bundle exec ruby script/eslint
+  yarn run lint --quiet
 }
 
 function lint_commit_message {

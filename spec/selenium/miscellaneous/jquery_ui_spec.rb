@@ -78,7 +78,7 @@ describe "jquery ui" do
     active.send_keys(:tab)
     expect(active.tag_name).to eq "input"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq "a"
+    expect(active.tag_name).to eq "button"
     active.send_keys(:tab)
     expect(active.tag_name).to eq "select"
   end
@@ -96,27 +96,30 @@ describe "jquery ui" do
     expect(active.tag_name).to eq "select"
   end
 
-  context "calendar widget" do
-    it "lets you replace content by selecting and typing instead of appending" do
-      get "/courses/#{@course.id}/assignments"
+  # We need to find alternate test case for calendar since the
+  # calender widget has been replaced with InstUI in the assignments modal
 
-      f(".add_assignment").click
-      wait_for_ajaximations
-      f(".ui-datepicker-trigger").click
-      wait_for_ajaximations
-      f(".ui-datepicker-time-hour").send_keys("12")
-      f(".ui-datepicker-time-minute").send_keys("00")
-      f(".ui-datepicker-ok").click
-      wait_for_ajaximations
+  # context "calendar widget" do
+  #   it "lets you replace content by selecting and typing instead of appending" do
+  #     get "/courses/#{@course.id}/assignments"
 
-      f(".ui-datepicker-trigger").click
-      wait_for_ajaximations
+  #     f(".add_assignment").click
+  #     wait_for_ajaximations
+  #     f(".ui-datepicker-trigger").click
+  #     wait_for_ajaximations
+  #     f(".ui-datepicker-time-hour").send_keys("12")
+  #     f(".ui-datepicker-time-minute").send_keys("00")
+  #     f(".ui-datepicker-ok").click
+  #     wait_for_ajaximations
 
-      driver.execute_script("$('#ui-datepicker-time-hour').select();")
-      f("#ui-datepicker-time-hour").send_keys("5")
-      expect(f("#ui-datepicker-time-hour")).to have_attribute("value", "5")
-    end
-  end
+  #     f(".ui-datepicker-trigger").click
+  #     wait_for_ajaximations
+
+  #     driver.execute_script("$('#ui-datepicker-time-hour').select();")
+  #     f("#ui-datepicker-time-hour").send_keys("5")
+  #     expect(f("#ui-datepicker-time-hour")).to have_attribute("value", "5")
+  #   end
+  # end
 
   context "dialog titles" do
     # jquery ui doesn't escape dialog titles by default (even when inferred from
@@ -125,9 +128,9 @@ describe "jquery ui" do
     # wrap it in a jquery object.
     #
     # see http://bugs.jqueryui.com/ticket/6016
-    it "html-escapes ignored in dialog titles" do
+    it "html-escapes inferred dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "this is the title"
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
           .dialog({
             modal: true,
@@ -165,9 +168,9 @@ describe "jquery ui" do
       JS
     end
 
-    it "html-escapes are now ignored in dialog titles" do
+    it "html-escapes explicit string dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "this is the title"
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
           .dialog({
             title: #{title.inspect},
@@ -180,7 +183,7 @@ describe "jquery ui" do
       JS
 
       new_title = "and now <i>this</i> is the title"
-      expect(driver.execute_script(<<~JS)).to eq "and now this is the title"
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', #{new_title.inspect})

@@ -23,7 +23,7 @@ module Lti
   class AnalyticsService
     Token = Struct.new(:tool, :user, :course, :timestamp, :nonce) do
       def self.create(tool, user, course)
-        Token.new(tool, user, course, Time.now, SecureRandom.hex(8))
+        Token.new(tool, user, course, Time.zone.now, SecureRandom.hex(8))
       end
 
       def serialize
@@ -34,7 +34,7 @@ module Lti
 
       def self.parse_and_validate(serialized_token)
         parts = serialized_token.split("-")
-        tool = ContextExternalTool.find(parts[0].to_i)
+        tool = Lti::ToolFinder.find(parts[0].to_i)
         key = tool.shard.settings[:encryption_key]
         unless parts.size == 6 && Canvas::Security.hmac_sha1(parts[0..-2].join("-"), key) == parts[-1]
           raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid analytics service token"

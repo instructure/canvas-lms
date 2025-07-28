@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
 
-const I18n = useI18nScope('course_creation_settings')
+const I18n = createI18nScope('course_creation_settings')
 
 const locationRadioInputs = [
   {
@@ -46,13 +46,13 @@ const formatInputName = name => `account[settings][${name}]`
 
 const CourseCreationSettings = ({currentValues}) => {
   const [isTeachersChecked, setTeachersChecked] = useState(
-    currentValues.teachers_can_create_courses
+    currentValues.teachers_can_create_courses,
   )
   const [isStudentsChecked, setStudentsChecked] = useState(
-    currentValues.students_can_create_courses
+    currentValues.students_can_create_courses,
   )
   const [isNoEnrollmentsChecked, setNoEnrollmentsChecked] = useState(
-    currentValues.no_enrollments_can_create_courses
+    currentValues.no_enrollments_can_create_courses,
   )
 
   return (

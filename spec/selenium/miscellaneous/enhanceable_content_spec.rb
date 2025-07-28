@@ -57,7 +57,7 @@ describe "enhanceable_content" do
     f("#link1").click
     expect(dialog).to be_displayed
     expect(dialog).to have_class("ui-dialog")
-    f(".ui-dialog .ui-dialog-titlebar-close").click
+    fj(".ui-dialog:contains('dialog for link 1') .ui-dialog-titlebar-close").click
     expect(dialog).not_to be_displayed
     expect(f(".enhanceable_content.draggable")).to have_class("ui-draggable")
     expect(f(".enhanceable_content.resizable")).to have_class("ui-resizable")

@@ -37,7 +37,7 @@ shared_examples_for "Quiz Submissions API Restricted Endpoints" do
       attempt: 1
     }
 
-    assert_status(403)
+    assert_forbidden
     expect(response.body).to match(/requires the lockdown browser/i)
   end
 end
@@ -66,7 +66,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
   def normalize(value)
     value = 0 if value.is_a?(Float) && value.abs < Float::EPSILON
-    value.to_json.to_s
+    value.to_json
   end
 
   def qs_api_index(raw = false, data = {})
@@ -179,7 +179,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     course_with_teacher active_all: true
 
     @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.workflow_state = "available"
     @quiz.save!
   end
@@ -254,7 +254,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     it "restricts access to itself" do
       student_in_course
       qs_api_index(true)
-      assert_status(401)
+      assert_forbidden
     end
 
     it "includes submissions" do
@@ -363,7 +363,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     it "denies access by other students" do
       student_in_course
       qs_api_show(true)
-      assert_status(401)
+      assert_forbidden
     end
 
     context "Output" do
@@ -384,7 +384,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it "includes time spent" do
-        @quiz_submission.started_at = Time.now
+        @quiz_submission.started_at = Time.zone.now
         @quiz_submission.finished_at = @quiz_submission.started_at + 5.minutes
         @quiz_submission.save!
 
@@ -674,7 +674,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
           validation_token: "aaaooeeeee"
         }
 
-        assert_status(403)
+        assert_forbidden
         expect(response.body).to match(/invalid token/)
       end
     end
@@ -779,14 +779,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     it "rejects a teacher other student" do
       @user = @teacher
       qs_api_time(true)
-      assert_status(401)
+      assert_forbidden
     end
 
     it "rejects another student" do
       enroll_student
       @user = @student
       qs_api_time(true)
-      assert_status(401)
+      assert_forbidden
     end
   end
 end

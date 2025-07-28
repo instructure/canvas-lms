@@ -32,6 +32,7 @@ class DelayedMessage < ActiveRecord::Base
       :conversation_message,
       :course,
       :discussion_topic,
+      :mention,
       :enrollment,
       :attachment,
       :assignment_override,
@@ -67,9 +68,9 @@ class DelayedMessage < ActiveRecord::Base
 
   def summary=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:summary, val)
+      super
     else
-      write_attribute(:summary, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
     end
   end
 
@@ -97,7 +98,7 @@ class DelayedMessage < ActiveRecord::Base
   workflow do
     state :pending do
       event :begin_send, transitions_to: :sent do
-        self.batched_at = Time.now
+        self.batched_at = Time.zone.now
       end
       event :cancel, transitions_to: :cancelled
     end
@@ -124,11 +125,11 @@ class DelayedMessage < ActiveRecord::Base
       m.communication_channel&.active? &&
         !m.communication_channel.bouncing?
     end
-    to = first.communication_channel rescue nil
+    to = first&.communication_channel
     return nil unless to
     return nil if delayed_messages.empty?
 
-    user = to.user rescue nil
+    user = to.user
     context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 

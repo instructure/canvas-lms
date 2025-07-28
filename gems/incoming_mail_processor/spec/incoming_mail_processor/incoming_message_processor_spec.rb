@@ -35,7 +35,7 @@ end
 
 module IncomingMailProcessor
   describe IncomingMessageProcessor do
-    let(:logger) { double("logger").tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } }
+    let(:logger) { double("logger").tap { |l| expect(l).to receive(:warn).at_least(1).with(kind_of(String)) } } # rubocop:disable RSpec/ExpectInLet
     let(:mock_message_handler) do
       Class.new do
         attr_reader :account, :body, :html_body, :incoming_message, :address_tag
@@ -272,8 +272,8 @@ module IncomingMailProcessor
         let(:message) { Mail.new(content_type: "text/plain; charset=UTF-8", body: "hello") }
 
         it "increments the processed count" do
-          expect(InstStatsd::Statsd).to receive(:increment).with("incoming_mail_processor.incoming_message_processed.",
-                                                                 { short_stat: "incoming_mail_processor.incoming_message_processed", tags: { mailbox: nil } }).once
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("incoming_mail_processor.incoming_message_processed.",
+                                                                             { short_stat: "incoming_mail_processor.incoming_message_processed", tags: { mailbox: nil } }).once
           IncomingMessageProcessor.new(message_handler, error_reporter).process_single(message, "")
         end
 

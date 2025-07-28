@@ -28,7 +28,11 @@ describe('format::', () => {
   const oldENV = window.ENV
 
   beforeEach(() => {
-    window.ENV = {LOCALE: 'en'}
+    window.ENV = {LOCALE: 'en-US'}
+    configure({
+      tz: timezone,
+      momentLocale: 'en',
+    })
   })
 
   afterEach(() => {
@@ -67,7 +71,7 @@ describe('format::', () => {
       tz: timezone(french, 'fr_FR'),
       momentLocale: 'fr',
     })
-    window.ENV.LOCALE = 'fr'
+    window.ENV.LOCALE = 'fr-FR'
 
     const time = tz.parse('1969-07-21 15:00:00')
 
@@ -107,18 +111,18 @@ describe('format::', () => {
       },
     })
 
-    expect(tz.format(epoch, 'time.formats.tiny')).toBe('12:00am')
+    expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56am')
   })
 
   it('localizes when given a localization key', () => {
     configure({
-      tz: timezone('fr_FR', french),
+      tz: timezone(french, 'fr_FR'),
       momentLocale: 'fr',
       formats: {
         'date.formats.full': '%-d %b %Y %-l:%M%P',
       },
     })
-    window.ENV.LOCALE = 'fr'
+    window.ENV.LOCALE = 'fr-FR'
 
     expect(tz.format(moonwalk, 'date.formats.full')).toBe('21 juil. 1969 2:56')
   })
@@ -126,30 +130,30 @@ describe('format::', () => {
   it('automatically converts %l to %-l when given a localization key', () => {
     configure({
       formats: {
-        'time.formats.tiny': '%l:%M%P',
+        'date.formats.full': '%l',
       },
     })
 
-    expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56am')
+    expect(tz.format(moonwalk, 'date.formats.full')).toBe('2')
   })
 
   it('automatically converts %k to %-k when given a localization key', () => {
     configure({
       formats: {
-        'time.formats.tiny': '%k:%M',
+        'date.formats.full': '%k',
       },
     })
 
-    expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56')
+    expect(tz.format(moonwalk, 'date.formats.full')).toBe('2')
   })
 
   it('automatically converts %e to %-e when given a localization key', () => {
     configure({
       formats: {
-        'date.formats.short': '%b %e',
+        'date.formats.full': '%e',
       },
     })
 
-    expect(tz.format(epoch, 'date.formats.short')).toBe('Jan 1')
+    expect(tz.format(moonwalk, 'date.formats.full')).toBe('21')
   })
 })

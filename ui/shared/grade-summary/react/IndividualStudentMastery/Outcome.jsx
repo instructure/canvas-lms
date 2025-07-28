@@ -19,7 +19,7 @@
 import React from 'react'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
@@ -35,7 +35,7 @@ import TruncateWithTooltip from '../TruncateWithTooltip'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import * as shapes from './shapes'
 
-const I18n = useI18nScope('IndividualStudentMasteryOutcome')
+const I18n = createI18nScope('IndividualStudentMasteryOutcome')
 
 class Outcome extends React.Component {
   static propTypes = {
@@ -120,7 +120,7 @@ class Outcome extends React.Component {
                   one: '%{count} alignment',
                   other: '%{count} alignments',
                 },
-                {count: I18n.n(numAlignments)}
+                {count: I18n.n(numAlignments)},
               )}
             </Text>
           </View>
@@ -134,16 +134,16 @@ class Outcome extends React.Component {
     const {outcome, outcomeProficiency} = this.props
     const {assignments, results} = outcome
     const assignmentsWithResults = _.filter(results, r =>
-      r.assignment.id.startsWith('assignment_')
+      r.assignment.id.startsWith('assignment_'),
     ).map(r => r.assignment.id.split('_')[1])
     const assessmentsWithResults = _.filter(results, r =>
-      r.assignment.id.startsWith('live_assessments/assessment_')
+      r.assignment.id.startsWith('live_assessments/assessment_'),
     ).map(r => r.assignment.id.split('_')[2])
     const unassessed = _.filter(
       assignments,
       a =>
         (a.assignment_id && !_.includes(assignmentsWithResults, a.assignment_id.toString())) ||
-        (a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString()))
+        (a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString())),
     )
     return (
       <List isUnstyled={true} delimiter="dashed">

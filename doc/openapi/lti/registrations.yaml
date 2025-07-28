@@ -149,6 +149,7 @@ paths:
                 token_endpoint_auth_method: private_key_jwt
                 scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
                   https://purl.imsglobal.org/spec/lti-ags/scope/score
+                  https://purl.imsglobal.org/spec/lti/scope/noticehandlers
                 https://purl.imsglobal.org/spec/lti-tool-configuration:
                   domain: example.com
                   messages:
@@ -325,4 +326,5 @@ paths:
               - id_token
               scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
                 https://purl.imsglobal.org/spec/lti-ags/scope/score
+                https://purl.imsglobal.org/spec/lti/scope/noticehandlers
               token_endpoint_auth_method: private_key_jwt

@@ -32,14 +32,14 @@ describe('MessageDetailActions', () => {
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
     const replyButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'Reply to John Cena'
+      (role, element) => role === 'button' && element.textContent === 'Reply to John Cena',
     )
     fireEvent.click(replyButton)
     expect(props.onReply).toHaveBeenCalled()
 
     const moreOptionsButton = getByRole(
       (role, element) =>
-        role === 'button' && element.textContent === 'More options for message from John Cena'
+        role === 'button' && element.textContent === 'More options for message from John Cena',
     )
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))

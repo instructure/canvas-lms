@@ -35,4 +35,53 @@ describe Types::QuizType do
     quiz.context_module_tags.create!(context_module: module2, context: quiz.context, tag_type: "context_module")
     expect(quiz_type.resolve("modules { _id }")).to match_array([module1.id.to_s, module2.id.to_s])
   end
+
+  it "has anonymous_submissions" do
+    expect(quiz_type.resolve("anonymousSubmissions")).to be_falsey
+
+    quiz.anonymous_submissions = true
+    quiz.save!
+    expect(quiz_type.resolve("anonymousSubmissions")).to be_truthy
+  end
+
+  describe "submissions_connection" do
+    let_once(:quiz_submission) { quiz_with_submission }
+    let_once(:quiz) { quiz_submission.quiz }
+    let(:quiz_type) { GraphQLTypeTester.new(quiz, current_user: @teacher) }
+    let(:submission) { quiz_submission.submission }
+
+    it "returns submissions for the quiz's assignment" do
+      expect(
+        quiz_type.resolve("submissionsConnection { nodes { _id }}")
+      ).to eq [submission.id.to_s]
+    end
+
+    it "returns submissions with include_unsubmitted" do
+      # Creating another student ensures we have a mix of submitted and unsubmitted users
+      student_in_course(course: @course, active_all: true).user
+      expect(
+        quiz_type.resolve("submissionsConnection(filter: {includeUnsubmitted: true}) { nodes { _id }}")
+      ).to include(submission.id.to_s)
+    end
+
+    it "respects filter states" do
+      expect(
+        quiz_type.resolve("submissionsConnection(filter: {states: [unsubmitted]}) { nodes { _id }}")
+      ).not_to include(submission.id.to_s)
+    end
+
+    it "returns nil if no assignment" do
+      quiz_without_assignment = quiz_model
+      quiz_without_assignment.workflow_state = "available"
+      quiz_without_assignment.save!
+
+      type = GraphQLTypeTester.new(quiz_without_assignment, current_user: @teacher)
+      expect(type.resolve("submissionsConnection { nodes { _id }}")).to be_empty
+    end
+
+    it "returns nil if no current_user" do
+      type = GraphQLTypeTester.new(quiz, current_user: nil)
+      expect(type.resolve("submissionsConnection { nodes { _id }}")).to be_nil
+    end
+  end
 end

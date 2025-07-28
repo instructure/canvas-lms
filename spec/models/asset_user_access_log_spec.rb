@@ -32,14 +32,14 @@ describe AssetUserAccessLog do
       @course = Account.default.courses.create!(name: "My Course")
       @assignment = @course.assignments.create!(title: "My Assignment")
       @user = User.create!
-      @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: @assignment.asset_string)
+      @asset = AssetUserAccess.create!(user: @user, context: @course, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
       @asset.save!
     end
 
     describe "via postgres" do
       it "inserts to correct tables" do
-        dt = DateTime.civil(2020, 9, 4, 12, 0, 0) # a friday, index 5
+        dt = Time.iso8601("2020-09-04T12:00:00Z") # a friday, index 5
         AssetUserAccessLog::AuaLog5.delete_all
         AssetUserAccessLog.put_view(@asset, timestamp: dt)
         expect(AssetUserAccessLog::AuaLog5.count).to eq(1)
@@ -62,11 +62,26 @@ describe AssetUserAccessLog do
       @user_3 = User.create!
       @user_4 = User.create!
       @user_5 = User.create!
-      @asset_1 = factory_with_protected_attributes(AssetUserAccess, user: @user_1, context: @course, asset_code: @assignment.asset_string, root_account_id: @account.id)
-      @asset_2 = factory_with_protected_attributes(AssetUserAccess, user: @user_2, context: @course, asset_code: @assignment.asset_string, root_account_id: @account.id)
-      @asset_3 = factory_with_protected_attributes(AssetUserAccess, user: @user_3, context: @course, asset_code: @assignment.asset_string, root_account_id: @account.id)
-      @asset_4 = factory_with_protected_attributes(AssetUserAccess, user: @user_4, context: @course, asset_code: @assignment.asset_string, root_account_id: @account.id)
-      @asset_5 = factory_with_protected_attributes(AssetUserAccess, user: @user_5, context: @course, asset_code: @assignment.asset_string, root_account_id: @account.id)
+      @asset_1 = AssetUserAccess.create!(user: @user_1,
+                                         context: @course,
+                                         asset_code: @assignment.asset_string,
+                                         root_account_id: @account.id)
+      @asset_2 = AssetUserAccess.create!(user: @user_2,
+                                         context: @course,
+                                         asset_code: @assignment.asset_string,
+                                         root_account_id: @account.id)
+      @asset_3 = AssetUserAccess.create!(user: @user_3,
+                                         context: @course,
+                                         asset_code: @assignment.asset_string,
+                                         root_account_id: @account.id)
+      @asset_4 = AssetUserAccess.create!(user: @user_4,
+                                         context: @course,
+                                         asset_code: @assignment.asset_string,
+                                         root_account_id: @account.id)
+      @asset_5 = AssetUserAccess.create!(user: @user_5,
+                                         context: @course,
+                                         asset_code: @assignment.asset_string,
+                                         root_account_id: @account.id)
     end
 
     def generate_log(assets, count)

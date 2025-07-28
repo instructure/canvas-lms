@@ -35,17 +35,11 @@ module CC
       @options = opts
     end
 
-    def course
-      @exporter.course
-    end
+    delegate :course, to: :@exporter
 
-    def export_dir
-      @exporter.export_dir
-    end
+    delegate :export_dir, to: :@exporter
 
-    def zip_file
-      @exporter.zip_file
-    end
+    delegate :zip_file, to: :@exporter
 
     def close
       @file&.close

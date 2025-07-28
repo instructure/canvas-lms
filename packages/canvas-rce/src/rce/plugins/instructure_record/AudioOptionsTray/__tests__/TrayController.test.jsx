@@ -132,6 +132,13 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   })
 
   describe('#_applyAudioOptions', () => {
+    beforeEach(() => {
+      // container?.contentWindow.location.reload() is not defined in jsdom
+      const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
+      delete iframe.contentWindow.location
+      iframe.contentWindow.location = {reload: jest.fn()}
+    })
+
     it('updates the audio', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       trayController.showTrayForEditor(editors[0])
@@ -140,6 +147,30 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
         updateMediaObject,
       })
       expect(updateMediaObject).toHaveBeenCalled()
+    })
+
+    it('does not update the audio w/o a media_object_id', async () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: undefined,
+        updateMediaObject,
+      })
+      expect(updateMediaObject).not.toHaveBeenCalled()
+    })
+
+    it('does update audio w/o media_object_id if attachment_id present', async () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyAudioOptions({
+        media_object_id: undefined,
+        attachment_id: '123',
+        updateMediaObject,
+      })
+      expect(updateMediaObject).toHaveBeenCalledWith({
+        attachment_id: '123',
+        media_object_id: undefined,
+      })
     })
   })
 
@@ -151,7 +182,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
     })
   })
 
-  describe.only('#requestSubtitlesFromIframe', () => {
+  describe('#requestSubtitlesFromIframe', () => {
     let previousOrigin = ''
 
     beforeAll(() => {
@@ -166,7 +197,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
     it('posts message to iframe onload', () => {
       const postMessageMock = jest.fn()
       const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
-      iframe.contentWindow.postMessage = postMessageMock;
+      iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       expect(postMessageMock).toHaveBeenCalledTimes(1)
     })
@@ -174,7 +205,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
     it('cleans up event listener on tray close', () => {
       const postMessageMock = jest.fn()
       const iframe = contentSelection.findMediaPlayerIframe(editors[0].selection.getNode())
-      iframe.contentWindow.postMessage = postMessageMock;
+      iframe.contentWindow.postMessage = postMessageMock
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
       trayController.showTrayForEditor(editors[0])

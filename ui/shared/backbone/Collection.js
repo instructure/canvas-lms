@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from './utils'
 import mixin from './mixin'
@@ -54,7 +54,7 @@ export function patch(Backbone) {
     // # @api public
     Collection.mixin = function () {
       const mixins = arguments.length >= 1 ? slice.call(arguments, 0) : []
-      // eslint-disable-next-line prefer-spread
+       
       return mixin.apply(null, [this].concat(slice.call(mixins)))
     }
 
@@ -259,11 +259,11 @@ export function patch(Backbone) {
       }
       if (collectionKeys.length > 1) {
         if (typeof console !== 'undefined' && console !== null) {
-          // eslint-disable-next-line no-console
+           
           if (typeof console.warn === 'function') {
-            // eslint-disable-next-line no-console
+             
             console.warn(
-              "Found more then one primary collection, using '" + primaryCollectionKey + "'."
+              "Found more then one primary collection, using '" + primaryCollectionKey + "'.",
             )
           }
         }
@@ -308,7 +308,7 @@ export function patch(Backbone) {
             if (isEmpty(collection)) {
               collection = index[relation] || index[foreignKey]
               if (collection == null) {
-                // eslint-disable-next-line no-throw-literal
+                 
                 throw (
                   "Could not find linked collection for '" +
                   relation +

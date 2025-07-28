@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component, lazy, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -38,7 +38,7 @@ import BlueprintModal from '@canvas/blueprint-courses/react/components/Blueprint
 import {ConnectedMigrationSync as MigrationSync} from './MigrationSync'
 import {ConnectedMigrationOptions as MigrationOptions} from './MigrationOptions'
 
-const I18n = useI18nScope('blueprint_course_sidebar')
+const I18n = createI18nScope('blueprint_course_sidebar')
 
 const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations'))
 const SyncHistory = lazy(() => import('./ConnectedSyncHistory'))
@@ -269,7 +269,7 @@ export default class CourseSidebar extends Component {
           <Link
             aria-label={I18n.t(
               {one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes'},
-              {count: this.props.unsyncedChanges.length}
+              {count: this.props.unsyncedChanges.length},
             )}
             id="mcUnsyncedChangesBtn"
             ref={c => {
@@ -305,7 +305,7 @@ export default class CourseSidebar extends Component {
         <Link
           aria-label={I18n.t(
             {one: 'There is 1 Association', other: 'There are %{count} Associations'},
-            {count: length}
+            {count: length},
           )}
           disabled={isSyncing}
           id="mcSidebarAsscBtn"
@@ -409,7 +409,7 @@ const connectState = state =>
     {
       hasAssociationChanges: state.addedAssociations.length + state.removedAssociations.length > 0,
       willAddAssociations: state.addedAssociations.length > 0,
-    }
+    },
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedCourseSidebar = connect(connectState, connectActions)(CourseSidebar)

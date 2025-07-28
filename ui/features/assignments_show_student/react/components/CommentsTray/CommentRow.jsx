@@ -21,20 +21,27 @@ import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
+import {SubmissionHtmlComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {Link} from '@instructure/ui-link'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function CommentRow(props) {
-  const {author, mediaObject, read} = props.comment
+  const {author, mediaObject, read, htmlComment} = props.comment
+  let mediaSources = null
   let mediaTracks = null
   if (mediaObject) {
-    mediaObject.mediaSources.forEach(mediaSource => {
-      mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+    mediaSources = mediaObject.mediaSources.map(mediaSource => {
+      return {
+        ...mediaSource,
+        label: `${mediaSource.width}x${mediaSource.height}`,
+      }
     })
     mediaTracks = mediaObject?.mediaTracks.map(track => {
       return {
@@ -74,9 +81,16 @@ export default function CommentRow(props) {
             dateTime={props.comment.updatedAt}
           />
         </Text>
-        <Text color={props.comment._id === 'pending' ? 'secondary' : null} wrap="break-word">
-          {props.comment.comment}
-        </Text>
+        <Text
+          color={props.comment._id === 'pending' ? 'secondary' : null}
+          wrap="break-word"
+          data-testid="commentContent"
+          dangerouslySetInnerHTML={{
+            __html: containsHtmlTags(htmlComment)
+              ? sanitizeHtml(htmlComment)
+              : formatMessage(htmlComment),
+          }}
+        />
         {props.comment.attachments.map(attachment => (
           <Link
             key={attachment._id}
@@ -88,12 +102,20 @@ export default function CommentRow(props) {
             {attachment.displayName}
           </Link>
         ))}
-        {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
+        {mediaObject &&
+          (ENV.FEATURES?.consolidated_media_player ? (
+            <CanvasStudioPlayer
+              media_id={mediaObject._id}
+              explicitSize={{width: 368, height: 206}}
+            />
+          ) : (
+            <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
+          ))}
       </div>
     </div>
   )
 }
 
 CommentRow.propTypes = {
-  comment: SubmissionComment.shape.isRequired,
+  comment: SubmissionHtmlComment.shape.isRequired,
 }

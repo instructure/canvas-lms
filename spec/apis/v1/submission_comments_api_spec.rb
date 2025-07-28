@@ -96,6 +96,14 @@ describe "Submissions Comment API", type: :request do
       expect(response).to be_successful
     end
 
+    it "checks permissions for an assignment in a limited access account" do
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+      preflight(name: "Hello World")
+      assert_forbidden
+    end
+
     it "creates an attachment with the right the user_id" do
       preflight(name: "blah blah blah")
       expect(response).to be_successful
@@ -230,7 +238,7 @@ describe "Submissions Comment API", type: :request do
     it "checks permission of caller" do
       @user = @teacher
       annotation_notification_call(author_id: @student.to_param)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "checks that the assignment exists" do
@@ -268,7 +276,7 @@ describe "Submissions Comment API", type: :request do
                    comment: "Goodbye world!"
                  },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
         expect(@comment.reload.comment).to eq("Hello world!")
       end
     end
@@ -317,7 +325,7 @@ describe "Submissions Comment API", type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
         expect(@submission.reload.submission_comments.length).to eq(1)
       end
     end

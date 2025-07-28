@@ -42,7 +42,7 @@ const useLhsTreeBrowserSelectParentGroup = ({
       parentGroupButtonRef.current =
         treeBrowserViewRef.current &&
         getButtonsWithText(treeBrowserViewRef.current, parentName).find(
-          parentButton => getButtonsWithText(parentButton.parentNode, groupName).length > 0
+          parentButton => getButtonsWithText(parentButton.parentNode, groupName).length > 0,
         )
     }
 

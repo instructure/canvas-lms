@@ -22,16 +22,17 @@ require "saml2"
 
 class AuthenticationProvider::SAML::InCommon < AuthenticationProvider::SAML::Federation
   URN = "urn:mace:incommon"
+  MDQ = true
 
   class << self
     def endpoint
-      Setting.get("incommon_metadata_url", "http://md.incommon.org/InCommon/InCommon-metadata.xml")
+      Setting.get("incommon_metadata_query_url", "https://mdq.incommon.org/")
     end
 
     protected
 
     def cert
-      Rails.root.join("config/saml/inc-md-cert.pem").read
+      Rails.root.join("config/saml/inc-md-cert-mdq.pem").read
     end
   end
 end

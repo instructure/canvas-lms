@@ -110,7 +110,7 @@ describe AvatarHelper do
       end
 
       it "returns a fallback avatar if the user doesn't have one" do
-        request = instance_double("ActionDispatch::Request",
+        request = instance_double(ActionDispatch::Request,
                                   host: "somedomain",
                                   protocol: "http://",
                                   port: 80,
@@ -119,7 +119,7 @@ describe AvatarHelper do
       end
 
       it "returns null if use_fallback is false" do
-        request = instance_double("ActionDispatch::Request",
+        request = instance_double(ActionDispatch::Request,
                                   host: "somedomain",
                                   protocol: "http://",
                                   port: 80,
@@ -128,7 +128,7 @@ describe AvatarHelper do
       end
 
       it "returns null if params[no_avatar_fallback] is set" do
-        request = instance_double("ActionDispatch::Request",
+        request = instance_double(ActionDispatch::Request,
                                   host: "somedomain",
                                   protocol: "http://",
                                   port: 80,
@@ -137,7 +137,7 @@ describe AvatarHelper do
       end
 
       it "returns a frd avatar url if one exists" do
-        request = instance_double("ActionDispatch::Request",
+        request = instance_double(ActionDispatch::Request,
                                   host: "somedomain",
                                   protocol: "http://",
                                   port: 80,
@@ -147,7 +147,7 @@ describe AvatarHelper do
       end
 
       it "does not prepend the request base if avatar url is an empty string" do
-        request = instance_double("ActionDispatch::Request",
+        request = instance_double(ActionDispatch::Request,
                                   host: "somedomain",
                                   protocol: "http://",
                                   port: 80,

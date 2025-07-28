@@ -90,8 +90,6 @@ describe AuthenticationMethods::InstAccessToken do
     describe "#tag_identifier" do
       subject { AuthenticationMethods::InstAccessToken::Authentication.new(request).tag_identifier }
 
-      before { Account.site_admin.enable_feature! :site_admin_service_auth }
-
       let(:service_user) { user_model }
       let(:root_account) { account_model }
       let(:user_agent) { "inst-service-ninety-nine/1234567890ABCDEF" }
@@ -195,12 +193,6 @@ describe AuthenticationMethods::InstAccessToken do
             expect(subject).to eq key.global_id.to_s
           end
 
-          context "but the feature flag is disabled" do
-            before { Account.site_admin.disable_feature! :site_admin_service_auth }
-
-            it_behaves_like "contexts that do not return a tag identifier"
-          end
-
           context "but the user agent does not match an instructure service" do
             let(:user_agent) { "Chrome/115.0.0.0" }
 
@@ -212,8 +204,6 @@ describe AuthenticationMethods::InstAccessToken do
 
     describe "#blocked?" do
       subject { AuthenticationMethods::InstAccessToken::Authentication.new(request).blocked? }
-
-      before { Account.site_admin.enable_feature! :site_admin_service_auth }
 
       let(:service_user) { user_model }
       let(:root_account) { account_model }
@@ -299,12 +289,6 @@ describe AuthenticationMethods::InstAccessToken do
             end
 
             it { is_expected.to be true }
-
-            context "but the feature flag is disabled" do
-              before { Account.site_admin.disable_feature! :site_admin_service_auth }
-
-              it_behaves_like "contexts that do not block"
-            end
           end
         end
       end

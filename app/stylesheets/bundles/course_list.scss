@@ -18,6 +18,13 @@
 
 @import "base/environment";
 
+.page_header {
+  @include page_header;
+}
+.page_header_container {
+  @include page_header_container
+}
+
 .course-list-table {
   table-layout: fixed;
   white-space: nowrap;
@@ -30,9 +37,9 @@
     }
   }
   .course-list-sort-icon {
-    color: #C7CDD1;
+    color: $ic-color-medium;
     &.sorted {
-      color: $ic-font-color-dark;
+      color: $electric;
     }
   }
   .course-list-column-header {
@@ -79,7 +86,7 @@
 }
 
 .course-list-unpublished-course-row {
-  background: #f5f5f5;
+  background: #F2F4F4;
 }
 
 .content--hasMarginTop {

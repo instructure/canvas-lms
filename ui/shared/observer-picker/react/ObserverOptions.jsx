@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 import AddStudentModal from './AddStudentModal'
 import {parseObservedUsersList, parseObservedUsersResponse} from './utils'
 
-const I18n = useI18nScope('observer_options')
+const I18n = createI18nScope('observer_options')
 const ADD_STUDENT_OPTION_ID = 'new-student-option'
 
 const ObserverOptions = ({
@@ -48,7 +48,7 @@ const ObserverOptions = ({
   renderLabel,
 }) => {
   const [observedUsers, setObservedUsers] = useState(() =>
-    parseObservedUsersList(observedUsersList)
+    parseObservedUsersList(observedUsersList),
   )
   const [selectSearchValue, setSelectSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
@@ -63,7 +63,7 @@ const ObserverOptions = ({
       handleChangeObservedUser(user.id)
       saveObservedId(currentUser.id, user.id)
     },
-    [currentUser.id, handleChangeObservedUser]
+    [currentUser.id, handleChangeObservedUser],
   )
 
   const handleUserSelected = useCallback(
@@ -71,7 +71,7 @@ const ObserverOptions = ({
       const user = observedUsers.find(u => u.id === id)
       updateObservedUser(user)
     },
-    [observedUsers, updateObservedUser]
+    [observedUsers, updateObservedUser],
   )
 
   useEffect(() => {
@@ -153,7 +153,7 @@ const ObserverOptions = ({
       .filter(
         u =>
           u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
-          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase()
+          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase(),
       )
       .map(u => (
         <CanvasAsyncSelect.Option
@@ -224,7 +224,7 @@ export const ObservedUsersListShape = PropTypes.arrayOf(
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     avatar_url: PropTypes.string,
-  })
+  }),
 )
 
 export const shouldShowObserverOptions = (observedUsersList, currentUser) =>

@@ -19,14 +19,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {debounce} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('SearchGradingPeriodsField')
+const I18n = createI18nScope('SearchGradingPeriodsField')
 
 export default class SearchGradingPeriodsField extends React.Component {
   static propTypes = {
     changeSearchText: PropTypes.func.isRequired,
   }
+
+  inputRef = React.createRef()
 
   onChange = event => {
     const trimmedText = event.target.value.trim()
@@ -42,7 +44,7 @@ export default class SearchGradingPeriodsField extends React.Component {
       <div className="GradingPeriodSearchField ic-Form-control">
         <input
           type="text"
-          ref="input"
+          ref={this.inputRef}
           className="ic-Input"
           placeholder={I18n.t('Search grading periods...')}
           onChange={this.onChange}

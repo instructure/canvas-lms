@@ -1,7 +1,14 @@
 ---
 smart_search:
-  state: hidden
+  state: allowed
+  root_opt_in: true
   applies_to: Course
   display_name: Smart Search
   description: AI driven smart search feature.
   beta: true
+smart_search_enhanced_ui:
+  state: hidden
+  display_name: Smart Search Enhanced UI
+  description: Uses the enhanced Smart Search UI. Smart Search must be enabled for this to take effect.
+  applies_to: RootAccount
+  shadow: true

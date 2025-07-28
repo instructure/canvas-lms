@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import preventDefault from '@canvas/util/preventDefault'
@@ -24,7 +24,7 @@ import ReactDOM from 'react-dom'
 import SwitchEditorControl from '../../react/SwitchEditorControl'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
-const I18n = useI18nScope('EditorToggle')
+const I18n = createI18nScope('EditorToggle')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -85,7 +85,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
         focus: true,
         tinyOptions: this.options.tinyOptions || {},
       },
-      this.options.rceOptions
+      this.options.rceOptions,
     )
     if (this.options.editorBoxLabel) {
       opts.tinyOptions.aria_label = this.options.editorBoxLabel
@@ -189,8 +189,8 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
               RichContentEditor.closeRCE(this.textArea)
               this.display()
               this.editButton && this.editButton.focus()
-            })
-          )
+            }),
+          ),
       )
   },
 
@@ -200,6 +200,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
   createSwitchViews() {
     const component = <SwitchEditorControl textarea={this.textArea} />
     const $container = $("<div class='switch-views'></div>")
+
     ReactDOM.render(component, $container[0])
     return $container
   },

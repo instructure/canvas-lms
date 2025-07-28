@@ -35,6 +35,10 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     false
   end
 
+  def auth_provider_filter
+    [nil, self]
+  end
+
   # Rename db field
   def self_registration=(val)
     case val
@@ -68,6 +72,10 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     else
       settings["enable_captcha"] == true
     end
+  end
+
+  def slo?
+    false
   end
 
   def user_logout_redirect(controller, _current_user)

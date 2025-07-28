@@ -53,6 +53,7 @@ describe LiveEvents::Client do
     stub_config
     allow(LiveEvents).to receive_messages(logger: double(info: nil, error: nil, warn: nil), stream_client: fclient)
     LiveEvents.max_queue_size = -> { 100 }
+    LiveEvents.retry_throttled_events = -> { true }
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name
@@ -177,32 +178,6 @@ describe LiveEvents::Client do
       now = Time.now
 
       @client.post_event("event", {}, now, { user_id: 123, real_user_id: 321, login: "loginname", user_agent: "agent" }, "pkey")
-      LiveEvents.worker.stop!
-      expect_put_records([{
-                           data: {
-                             "attributes" => {
-                               "event_name" => "event",
-                               "event_time" => now.utc.iso8601(3),
-                               "user_id" => 123,
-                               "real_user_id" => 321,
-                               "login" => "loginname",
-                               "user_agent" => "agent"
-                             },
-                             "body" => {}
-                           },
-                           partition_key: "pkey"
-                         }])
-    end
-
-    it "does not send blacklisted conxted attributes" do
-      now = Time.now
-      @client.post_event(
-        "event",
-        {},
-        now,
-        { user_id: 123, real_user_id: 321, login: "loginname", user_agent: "agent", compact_live_events: true },
-        "pkey"
-      )
       LiveEvents.worker.stop!
       expect_put_records([{
                            data: {

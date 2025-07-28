@@ -32,7 +32,7 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
     const containerRect = containerRef.current.getBoundingClientRect()
     const delimiterRect = delimiterRef.current.getBoundingClientRect()
     const separatorPosition = Math.floor(
-      ((delimiterRect.left - containerRect.left) / containerRect.width) * 100
+      ((delimiterRect.left - containerRect.left) / containerRect.width) * 100,
     )
     return [containerRect, delimiterRect, separatorPosition]
   }
@@ -94,8 +94,7 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
       containerRef.current.addEventListener('mousedown', onMouseDown)
       containerRef.current.addEventListener('mouseup', onMouseUp)
       containerRef.current.addEventListener('mousemove', onMouseMove)
-    }
-    return () => {
+    } else {
       containerRef.current.removeEventListener('mousedown', onMouseDown)
       containerRef.current.removeEventListener('mouseup', onMouseUp)
       containerRef.current.removeEventListener('mousemove', onMouseMove)
@@ -111,8 +110,8 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
     const calcLeftWidth = !keyboard
       ? e.clientX
       : Object.keys(step).includes(String(e.keyCode))
-      ? delimiterRect.x + step[e.keyCode]
-      : delimiterRect.x
+        ? delimiterRect.x + step[e.keyCode]
+        : delimiterRect.x
     const currentLeftWidth = Math.max(minWidth, calcLeftWidth - containerRect.left)
 
     const leftWidth = Math.min(currentLeftWidth, maxLeftWidth)

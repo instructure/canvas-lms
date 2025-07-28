@@ -40,7 +40,7 @@ export default function setUsageRights(
   usageRights,
   callback,
   overrideContextId = null,
-  overrideContextType = null
+  overrideContextType = null,
 ) {
   let contextId, contextType, parentFolder
   if (

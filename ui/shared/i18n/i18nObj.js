@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'date-js'
+import '@instructure/date-js'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
 import {
@@ -161,7 +161,7 @@ I18n.strftime = function (date, format) {
   const f = format
     .replace(
       /%([DFrRTv])/g,
-      (str, p1) =>
+      (_str, p1) =>
         ({
           D: '%m/%d/%y',
           F: '%Y-%m-%d',
@@ -169,7 +169,7 @@ I18n.strftime = function (date, format) {
           R: '%H:%M',
           T: '%H:%M:%S',
           v: '%e-%b-%Y',
-        }[p1])
+        })[p1],
     )
     .replace(/%(%|\-?[a-zA-Z]|3N)/g, (str, p1) => {
       // check to see if we need an options object
@@ -275,7 +275,7 @@ I18n.pluralize = function (count, scope, options) {
 
   try {
     translation = this.lookup(scope, options)
-  } catch (error) {
+  } catch (_error) {
     // no-op
   }
 
@@ -293,10 +293,10 @@ I18n.pluralize = function (count, scope, options) {
         translation.zero != null
           ? translation.zero
           : translation.none != null
-          ? translation.none
-          : translation.other != null
-          ? translation.other
-          : this.missingTranslation(scope, 'zero')
+            ? translation.none
+            : translation.other != null
+              ? translation.other
+              : this.missingTranslation(scope, 'zero')
       break
     case 1:
       message = translation.one != null ? translation.one : this.missingTranslation(scope, 'one')
@@ -319,7 +319,7 @@ class Scope {
     let cacheKey
     try {
       cacheKey = I18n.locale + JSON.stringify(args)
-    } catch (e) {
+    } catch (_e) {
       // if there is something in the arguments we can't stringify, just do it without cache
     }
     if (cacheKey) {
@@ -374,8 +374,22 @@ Scope.prototype.n = Scope.prototype.localizeNumber
 Scope.prototype.p = Scope.prototype.pluralize
 
 export default I18n
+
+/**
+ * Creates a new scoped instance of I18n functionality
+ * @param {string} scope - The translation scope to use as a prefix for lookups
+ * @returns {Scope} A new Scope instance that provides scoped translation functionality
+ */
 export const useScope = scope => new Scope(scope)
-export const useTranslations = (locale, translations) => {
+
+/**
+ * Adds or updates translations for a specific locale
+ * @param {string} locale - The locale identifier (e.g., 'en', 'es')
+ * @param {Object} translations - Key-value pairs of translation strings to add/update
+ */
+export const registerTranslations = (locale, translations) => {
   I18n.translations[locale] = I18n.translations[locale] || {}
   Object.assign(I18n.translations[locale], translations)
 }
+
+export const useTranslations = registerTranslations

@@ -50,6 +50,8 @@ module CanvasRails
     config.encoding = "utf-8"
     require "logging_filter"
     config.filter_parameters.concat LoggingFilter.filtered_parameters
+    config.action_dispatch.rescue_responses["AuthenticationMethods::RevokedAccessTokenError"] = 401
+    config.action_dispatch.rescue_responses["AuthenticationMethods::ExpiredAccessTokenError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenScopeError"] = 401
     config.action_dispatch.rescue_responses["AuthenticationMethods::LoggedOutError"] = 401
@@ -132,8 +134,11 @@ module CanvasRails
       config.logger.formatter = ContextFormatter.new(config.logger.formatter)
     end
 
+    config.active_record.automatic_scope_inversing = true
+
     # Activate observers that should always be running
-    config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
+    config.active_record.observers ||= []
+    config.active_record.observers << %i[cacher stream_item_cache live_events_observer]
 
     config.active_support.encode_big_decimal_as_string = false
     config.active_support.remove_deprecated_time_with_zone_name = true
@@ -158,11 +163,10 @@ module CanvasRails
                                 Rails.root.join("app/stylesheets"),
                                 Rails.root.join("ui")]
 
-    config.middleware.use Rack::Chunked
-    config.middleware.use Rack::Deflater, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Deflater, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
-    config.middleware.use Rack::Brotli, if: lambda { |*|
+    config.middleware.insert_before Rack::ETag, Rack::Brotli, if: lambda { |*|
       ::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
@@ -175,53 +179,12 @@ module CanvasRails
     end
 
     module PostgreSQLEarlyExtensions
-      module ConnectionHandling
-        def postgresql_connection(config)
-          conn_params = config.symbolize_keys
-
-          hosts = Array(conn_params[:host]).presence || [nil]
-          hosts.each_with_index do |host, index|
-            conn_params[:host] = host
-
-            begin
-              return super(conn_params)
-            rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
-              # If exception occurs using parameters from a predefined pg service, retry without
-              if conn_params.key?(:service)
-                CanvasErrors.capture(e, { tags: { pg_service: conn_params[:service] } }, :warn)
-                Rails.logger.warn("Error connecting to database using pg service `#{conn_params[:service]}`; retrying without... (error: #{e.message})")
-                conn_params.delete(:service)
-                conn_params[:sslmode] = "disable"
-                retry
-              else
-                raise
-              end
-            end
-            # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
-            # for an error where the database name is in the message (i.e. a hostname lookup failure)
-          rescue ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
-            raise if index == hosts.length - 1
-            # else try next host
-          end
+      def initialize(config)
+        unless config.key?(:prepared_statements)
+          config = config.dup
+          config[:prepared_statements] = false
         end
-      end
-
-      if Rails.version < "7.1"
-        def initialize(connection, logger, connection_parameters, config)
-          unless config.key?(:prepared_statements)
-            config = config.dup
-            config[:prepared_statements] = false
-          end
-          super
-        end
-      else
-        def initialize(config)
-          unless config.key?(:prepared_statements)
-            config = config.dup
-            config[:prepared_statements] = false
-          end
-          super
-        end
+        super
       end
 
       def connect
@@ -231,12 +194,8 @@ module CanvasRails
           connection_parameters[:host] = host
 
           begin
-            if Rails.version < "7.1"
-              @connection = PG::Connection.connect(connection_parameters)
-            else
-              @raw_connection = PG::Connection.connect(connection_parameters)
-            end
-          rescue ::ActiveRecord::ActiveRecordError, ::PG::Error => e
+            @raw_connection = self.class.new_client(connection_parameters)
+          rescue ::ActiveRecord::ActiveRecordError, ::ActiveRecord::ConnectionFailed, ::ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
             # If exception occurs using parameters from a predefined pg service, retry without
             if connection_parameters.key?(:service)
               CanvasErrors.capture(e, { tags: { pg_service: connection_parameters[:service] } }, :warn)
@@ -249,19 +208,45 @@ module CanvasRails
             end
           end
 
-          configure_connection
-
-          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
+          raise "Canvas requires PostgreSQL 14 or newer" unless postgresql_version >= 14_00_00 # rubocop:disable Style/NumericLiterals
 
           break
-        rescue ::PG::Error => e
-          if e.message.include?("does not exist")
+          # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+          # for an error where the database name is in the message (i.e. a hostname lookup failure)
+        rescue ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionFailed, ActiveRecord::ConnectionNotEstablished, ::PG::Error => e
+          if e.is_a?(::PG::Error) && e.message.include?("does not exist")
             raise ActiveRecord::NoDatabaseError, e.message
           elsif index == hosts.length - 1
             raise
           end
           # else try next host
         end
+      end
+
+      def client_min_messages=(level)
+        return if level == "preset"
+
+        super
+      end
+
+      def set_standard_conforming_strings
+        # this has been the default since 9.1
+      end
+
+      def reconfigure_connection_timezone
+        return if @config[:timezone] == "preset"
+
+        super
+      end
+
+      def internal_execute(sql, name = "SCHEMA", *, **)
+        return super unless name == "SCHEMA"
+
+        if sql == "SET intervalstyle = iso_8601" && @config[:interval_style] == "preset"
+          return
+        end
+
+        super
       end
     end
 
@@ -275,9 +260,6 @@ module CanvasRails
       end
     end
 
-    Autoextend.hook(:"ActiveRecord::Base",
-                    PostgreSQLEarlyExtensions::ConnectionHandling,
-                    singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
@@ -381,8 +363,13 @@ module CanvasRails
         %w[Set-Cookie X-Request-Context-Id X-Canvas-User-Id X-Canvas-Meta]
     end
 
-    def validate_secret_key_base(_)
-      # no validation; we don't use Rails' CookieStore session middleware, so we
+    def secret_key_base
+      # we don't use Rails' CookieStore session middleware, so we
+      # don't care about secret_key_base
+    end
+
+    def secret_key_base=(_)
+      # we don't use Rails' CookieStore session middleware, so we
       # don't care about secret_key_base
     end
 
@@ -394,13 +381,11 @@ module CanvasRails
       DummyKeyGenerator
     end
 
-    # # This also depends on secret_key_base and is not a feature we use or currently intend to support
-    unless Rails.version < "7.1"
-      initializer "canvas.ignore_generated_token_verifier", before: "active_record.generated_token_verifier" do
-        config.after_initialize do
-          ActiveSupport.on_load(:active_record) do
-            self.generated_token_verifier = "UNUSED"
-          end
+    # This also depends on secret_key_base and is not a feature we use or currently intend to support
+    initializer "canvas.ignore_generated_token_verifier", before: "active_record.generated_token_verifier" do
+      config.after_initialize do
+        ActiveSupport.on_load(:active_record) do
+          self.generated_token_verifier = "UNUSED"
         end
       end
     end
@@ -422,6 +407,11 @@ module CanvasRails
           reloader.call
         end
       end
+    end
+
+    # ensure configure after dynamic settings is configured before yjit is managed
+    initializer :enable_yjit_check, before: "enable_yjit" do
+      config.yjit = ActiveModel::Type::Boolean.new.cast(::DynamicSettings.find(tree: :private)["enable_yjit", failsafe: "false"])
     end
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
@@ -448,15 +438,6 @@ module CanvasRails
       app.config.middleware.insert_before(Rack::Head, RequestThrottle)
       app.config.middleware.insert_before(Rack::MethodOverride, PreventNonMultipartParse)
       app.config.middleware.insert_before(Sentry::Rails::CaptureExceptions, SentryTraceScrubber)
-    end
-
-    initializer("set_allowed_request_id_setters", after: :finisher_hook) do |app|
-      # apparently there is no initialization hook that comes late enough for
-      # routes to already be loaded, so we have to load them explicitly
-      app.reload_routes!
-      RequestContext::Generator.allow_unsigned_request_context_for(
-        app.routes.url_helpers.api_graphql_subgraph_path
-      )
     end
   end
 end

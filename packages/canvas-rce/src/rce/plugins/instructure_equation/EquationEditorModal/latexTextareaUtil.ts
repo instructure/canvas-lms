@@ -60,11 +60,11 @@ export function planInsertTextIntoLatexTextarea(args: {
   // command in that case
   const singleParamParts = insertionText.match(
     // Match both [] and {}
-    /^(.*?\{)\s*(}.*)$|^(.*?\[)\s*(].*)$/
+    /^(.*?\{)\s*(}.*)$|^(.*?\[)\s*(].*)$/,
   )
   const doubleParamParts = insertionText.match(
     // Match two sets of [] and/or {}
-    /^(?:(.*?\{)\s*(}.*?)|(.*?\[)\s*(].*?))(?:(.*?\{)\s*(}.*?)|(.*?\[)\s*(].*))$/
+    /^(?:(.*?\{)\s*(}.*?)|(.*?\[)\s*(].*?))(?:(.*?\{)\s*(}.*?)|(.*?\[)\s*(].*))$/,
     //   1         2      3         4         5         6      7         8
   )
 

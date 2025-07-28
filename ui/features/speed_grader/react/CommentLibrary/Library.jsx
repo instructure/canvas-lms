@@ -26,10 +26,10 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {Tooltip} from '@instructure/ui-tooltip'
 import Tray from './Tray'
 import Suggestions from './Suggestions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('CommentLibrary')
+const I18n = createI18nScope('CommentLibrary')
 
 const renderTooltip = () => (
   <Tooltip renderTip={I18n.t('Comment Library (Suggestions Disabled)')} on={['hover']}>
@@ -55,6 +55,19 @@ const Library = ({
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [showResults, setShowResults] = useState(false)
 
+  const setPureTextComment = useCallback(
+    value => {
+      // Must replace new lines with <p> tags
+      const text = value
+        .split(/\n/)
+        .map(it => `<p>${it}</p>`)
+        .join('')
+
+      setComment(text)
+    },
+    [setComment],
+  )
+
   useEffect(() => {
     const parent = suggestionsRef?.parentNode
     const handleBlur = event => {
@@ -77,7 +90,7 @@ const Library = ({
     if (searchResults.length > 0) {
       showFlashAlert({
         message: I18n.t(
-          'There are new comment suggestions available. Press Tab to access the suggestions menu.'
+          'There are new comment suggestions available. Press Tab to access the suggestions menu.',
         ),
         srOnly: true,
       })
@@ -89,15 +102,15 @@ const Library = ({
     if (isTrayOpen) {
       setIsTrayOpen(false)
     }
-    setComment(comment)
+    setPureTextComment(comment)
   }
 
   const setCommentFromSuggestion = useCallback(
     comment => {
       setShowResults(false)
-      setComment(comment)
+      setPureTextComment(comment)
     },
-    [setComment]
+    [setPureTextComment],
   )
 
   const closeSuggestions = useCallback(() => {
@@ -157,7 +170,7 @@ Library.propTypes = {
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
       _id: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   setComment: PropTypes.func.isRequired,
   isAddingComment: PropTypes.bool.isRequired,

@@ -29,7 +29,7 @@ import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
 export default function ExternalToolOptions({
   activeSubmissionType,
   externalTools,
-  updateActiveSubmissionType,
+  updateActiveSubmissionType = () => {},
   selectedExternalTool,
 }) {
   if (externalTools.length === 0) {
@@ -41,7 +41,7 @@ export default function ExternalToolOptions({
   // better option, we just check the names directly, ignoring I18n.
   const isFavorite = tool =>
     ['Arc', 'Canvas Studio', 'Studio', 'Google Drive', 'Office 365'].some(
-      name => name.toLowerCase() === tool.name.toLowerCase()
+      name => name.toLowerCase() === tool.name.toLowerCase(),
     )
   const favoriteTools = externalTools.filter(isFavorite)
   const otherTools = externalTools.filter(tool => !isFavorite(tool))
@@ -98,8 +98,4 @@ ExternalToolOptions.propTypes = {
   externalTools: arrayOf(ExternalTool.shape).isRequired,
   updateActiveSubmissionType: func,
   selectedExternalTool: ExternalTool.shape,
-}
-
-ExternalToolOptions.defaultProps = {
-  updateActiveSubmissionType: () => {},
 }

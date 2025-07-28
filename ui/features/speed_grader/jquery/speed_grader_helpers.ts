@@ -19,7 +19,7 @@
 import type JQuery from 'jquery'
 import $ from 'jquery'
 import {each} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import replaceTags from '@canvas/util/replaceTags'
@@ -30,7 +30,7 @@ import type {
   SubmissionState,
 } from './speed_grader.d'
 
-const I18n = useI18nScope('speed_grader_helpers')
+const I18n = createI18nScope('speed_grader_helpers')
 
 const speedGraderHelpers = {
   getHistory() {
@@ -58,7 +58,7 @@ const speedGraderHelpers = {
       has_originality_report?: boolean
     },
     defaultEl: JQuery,
-    originalityReportEl: JQuery
+    originalityReportEl: JQuery,
   ) {
     if (submission.has_originality_report) {
       return originalityReportEl
@@ -86,7 +86,7 @@ const speedGraderHelpers = {
   determineGradeToSubmit(
     use_existing_score: boolean,
     student: StudentWithSubmission,
-    grade: JQuery
+    grade: JQuery,
   ) {
     if (use_existing_score) {
       return (student.submission.score || 0).toString()
@@ -106,6 +106,7 @@ const speedGraderHelpers = {
     }
     const select = '&version='
     // check if the version is valid, or matches the index
+    // @ts-expect-error
     const version = submission.submission_history[currentSelectedIndex].submission.version
     if (version == null || Number.isNaN(Number(version))) {
       return select + currentSelectedIndex
@@ -192,6 +193,16 @@ const speedGraderHelpers = {
         // if we are a provisional grader and it doesn't need a grade (and we haven't given one already) then we shouldn't be able to grade it
         return 'not_gradeable'
       } else if (
+        submission.submitted_at === null &&
+        submission.grade === null &&
+        submission.workflow_state === 'graded' &&
+        !submission.excused
+      ) {
+        // if a teacher entered a grade on accident and clears it out
+        // for a student that doesn't have a submission, ensure that it
+        // does not show as not_graded
+        return 'not_submitted'
+      } else if (
         !(submission.final_provisional_grade && submission.final_provisional_grade.grade) &&
         !submission.excused &&
         (typeof submission.grade === 'undefined' ||
@@ -222,7 +233,7 @@ const speedGraderHelpers = {
 
   randomizedStudentSorter(
     studentWithSubmission: StudentWithSubmission[],
-    sort_function: (student: StudentWithSubmission) => number = () => Math.random()
+    sort_function: (student: StudentWithSubmission) => number = () => Math.random(),
   ) {
     return studentWithSubmission
       .map(student => ({
@@ -244,7 +255,7 @@ const speedGraderHelpers = {
 
   plagiarismResubmitUrl(
     submission: HistoricalSubmission,
-    anonymizableUserId: 'anonymous_id' | 'user_id'
+    anonymizableUserId: 'anonymous_id' | 'user_id',
   ) {
     return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href') || '', {
       [anonymizableUserId]: submission[anonymizableUserId],
@@ -263,7 +274,7 @@ const speedGraderHelpers = {
     return (
       turnitinAsset.error_message ||
       I18n.t(
-        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+        'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.',
       )
     )
   },

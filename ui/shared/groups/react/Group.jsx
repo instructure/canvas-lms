@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import natcompare from '@canvas/util/natcompare'
 import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
 class Group extends React.Component {
   state = {open: false}
@@ -90,10 +91,14 @@ class Group extends React.Component {
         <i className="icon-user" aria-hidden="true" />
       </span>
     ) : null
+    const selfSignupClosed = this.props.group.group_category.self_signup_end_at
+      ? Date.parse(this.props.group.group_category.self_signup_end_at) < Date.now()
+      : false
     const canSelfSignup =
-      this.props.group.join_level === 'parent_context_auto_join' ||
-      this.props.group.group_category.self_signup === 'enabled' ||
-      this.props.group.group_category.self_signup === 'restricted'
+      (this.props.group.join_level === 'parent_context_auto_join' ||
+        this.props.group.group_category.self_signup === 'enabled' ||
+        this.props.group.group_category.self_signup === 'restricted') &&
+      !selfSignupClosed
     const isFull =
       this.props.group.max_membership != null &&
       this.props.group.users.length >= this.props.group.max_membership
@@ -115,16 +120,16 @@ class Group extends React.Component {
       ) : null
 
     const manageLink = isLeader ? (
-      // TODO: use InstUI button
-      // eslint-disable-next-line jsx-a11y/anchor-is-valid
-      <a
-        href="#"
-        className="manage-link"
+      // using Link to keep styling consistent w/ 'Visit' link
+      <Link
+        data-testid="open-manage-modal"
+        isWithinText={false}
+        as="button"
         aria-label={I18n.t('Manage group %{group_name}', {group_name: groupName})}
         onClick={this._onManage}
       >
         {I18n.t('Manage')}
-      </a>
+      </Link>
     ) : null
 
     const showBody = this.state.open && this.props.group.users.length > 0

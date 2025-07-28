@@ -20,6 +20,7 @@
 class Checkpoints::GroupOverrideUpdaterService < ApplicationService
   require_relative "discussion_checkpoint_error"
   include Checkpoints::DateOverrider
+  include Checkpoints::GroupOverrideCommon
 
   def initialize(checkpoint:, override:)
     super()
@@ -28,14 +29,19 @@ class Checkpoints::GroupOverrideUpdaterService < ApplicationService
   end
 
   def call
-    if @checkpoint.effective_group_category_id.nil?
+    is_differentiation_tag_override = differentiation_tag_override?(@override, @checkpoint)
+    if @checkpoint.effective_group_category_id.nil? && !is_differentiation_tag_override
       raise Checkpoints::GroupAssignmentRequiredError, "must be a group assignment in order to create group overrides"
     end
 
-    group_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
-    group = @checkpoint.course.active_groups.where(group_category_id: @checkpoint.effective_group_category_id).find(group_id)
     override = @checkpoint.assignment_overrides.find_by(id: @override[:id], set_type: AssignmentOverride::SET_TYPE_GROUP)
     raise Checkpoints::OverrideNotFoundError unless override
+
+    group_id = @override.fetch(:set_id, nil) || override.set_id
+
+    raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" if group_id.blank?
+
+    group = is_differentiation_tag_override ? get_differentiation_tag_from_override(@override, @checkpoint) : get_group_from_override(@override, @checkpoint)
 
     current_group = override.set
 

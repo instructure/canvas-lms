@@ -37,7 +37,10 @@ export type StudentSubmissionMap = {
   [assignmentId: string]: Submission | MissingSubmission
 }
 
-export function submissionGradingPeriodInformation(assignment: Assignment, student: Student) {
+export function submissionGradingPeriodInformation(
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
+  student: Student,
+) {
   const submissionInfo: {
     grading_period_id?: null | string
     in_closed_grading_period?: boolean
@@ -48,22 +51,25 @@ export function submissionGradingPeriodInformation(assignment: Assignment, stude
   }
 }
 
-export function isHiddenFromStudent(assignment: Assignment, student: Student) {
-  if (assignment.only_visible_to_overrides) {
+export function isHiddenFromStudent(
+  assignment: Pick<Assignment, 'visible_to_everyone' | 'assignment_visibility'>,
+  student: Student,
+) {
+  if (!assignment.visible_to_everyone) {
     return !(assignment.assignment_visibility || []).includes(student.id)
   }
   return false
 }
 
 export function gradingPeriodInfoForCell(
-  assignment: Assignment,
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
   student: Student,
-  selectedGradingPeriodID: string
+  selectedGradingPeriodID: string,
 ) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
   const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
     assignment,
-    student
+    student,
   )
   const inNoGradingPeriod = !gradingPeriodID
   const inOtherGradingPeriod =
@@ -77,15 +83,15 @@ export function gradingPeriodInfoForCell(
 }
 
 export function cellMappingsForMultipleGradingPeriods(
-  assignment: Assignment,
+  assignment: Pick<Assignment, 'effectiveDueDates'>,
   student: Student,
   selectedGradingPeriodID: string,
-  isAdmin: boolean
+  isAdmin: boolean,
 ) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
   const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
     assignment,
-    student
+    student,
   )
   const gradingPeriodInfo = gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID)
   let cellMapping
@@ -102,11 +108,20 @@ export function cellMappingsForMultipleGradingPeriods(
 }
 
 export function cellMapForSubmission(
-  assignment: Assignment,
+  assignment: Pick<
+    Assignment,
+    | 'published'
+    | 'anonymize_students'
+    | 'moderated_grading'
+    | 'grades_published'
+    | 'visible_to_everyone'
+    | 'assignment_visibility'
+    | 'effectiveDueDates'
+  >,
   student: Student,
   hasGradingPeriods: boolean,
   selectedGradingPeriodID: string,
-  isAdmin: boolean
+  isAdmin: boolean,
 ): Cell {
   if (!assignment.published || assignment.anonymize_students) {
     return {locked: true, hideGrade: true}
@@ -119,7 +134,7 @@ export function cellMapForSubmission(
       assignment,
       student,
       selectedGradingPeriodID,
-      isAdmin
+      isAdmin,
     )
   } else {
     return {locked: false, hideGrade: false}

@@ -18,16 +18,23 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Indicator from './Indicator'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default function MissingIndicator(props) {
   const badgeMessage = I18n.t('Missing items for %{title}', {title: props.title})
-  return <Indicator title={badgeMessage} variant="invisible" />
+  return (
+    <Indicator
+      title={badgeMessage}
+      variant="invisible"
+      testId={props.testId || 'missing-indicator'}
+    />
+  )
 }
 
 MissingIndicator.propTypes = {
   title: string.isRequired,
+  testId: string,
 }

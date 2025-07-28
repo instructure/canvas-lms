@@ -62,7 +62,7 @@ describe('useNumberInputDriver', () => {
 
   it('will not increment past max value', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: 42, maxNumberValue: 42})
+      useNumberInputDriver({initialNumberValue: 42, maxNumberValue: 42}),
     )
     act(() => result.current[1].onIncrement())
     expect(result.current[0].numberValue).toBe(42)
@@ -78,7 +78,7 @@ describe('useNumberInputDriver', () => {
 
   it('increment from null uses minValue if it is > 1', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: 42})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: 42}),
     )
     act(() => result.current[1].onIncrement())
     expect(result.current[0].numberValue).toBe(42)
@@ -101,7 +101,7 @@ describe('useNumberInputDriver', () => {
 
   it('decrement from null uses maxValue if it is < 0', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: -10, maxNumberValue: -1})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: -10, maxNumberValue: -1}),
     )
     act(() => result.current[1].onDecrement())
     expect(result.current[0].numberValue).toBe(-1)
@@ -117,7 +117,7 @@ describe('useNumberInputDriver', () => {
 
   it('allows numbers to be typed below a positive minimum value, but does not set numberValue', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: 42})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: 42}),
     )
     act(() => result.current[1].onChange({target: {value: '5'}}))
     expect(result.current[0].numberValue).toBeNull()
@@ -126,7 +126,7 @@ describe('useNumberInputDriver', () => {
 
   it('allows negative numbers to be typed above a negative maximum value, but does not set numberValue', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: -42, maxNumberValue: -30})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: -42, maxNumberValue: -30}),
     )
     act(() => result.current[1].onChange({target: {value: '-5'}}))
     expect(result.current[0].numberValue).toBeNull()
@@ -135,7 +135,7 @@ describe('useNumberInputDriver', () => {
 
   it('does not allow a positive number to be typed when the maximum value is negative', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: -42, maxNumberValue: -30})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: -42, maxNumberValue: -30}),
     )
     act(() => result.current[1].onChange({target: {value: '5'}}))
     expect(result.current[0].numberValue).toBeNull()
@@ -144,7 +144,7 @@ describe('useNumberInputDriver', () => {
 
   it('does not allow positive numbers to be typed above the positive maximum value', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: 5, maxNumberValue: 42})
+      useNumberInputDriver({initialNumberValue: 5, maxNumberValue: 42}),
     )
     act(() => result.current[1].onChange({target: {value: '50'}}))
     expect(result.current[0].numberValue).toBe(5)
@@ -153,7 +153,7 @@ describe('useNumberInputDriver', () => {
 
   it('does not allow negative numbers to be typed below the negative minimum value', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: -5, minNumberValue: -42})
+      useNumberInputDriver({initialNumberValue: -5, minNumberValue: -42}),
     )
     act(() => result.current[1].onChange({target: {value: '-50'}}))
     expect(result.current[0].numberValue).toBe(-5)
@@ -162,7 +162,7 @@ describe('useNumberInputDriver', () => {
 
   it('disallows minus if minNumberValue is >= 0', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: 0})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: 0}),
     )
     act(() => result.current[1].onChange({target: {value: '-'}}))
     expect(result.current[0].numberValue).toBeNull()
@@ -171,7 +171,7 @@ describe('useNumberInputDriver', () => {
 
   it('allows minus if minNumberValue is null', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: null})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: null}),
     )
     act(() => result.current[1].onChange({target: {value: '-'}}))
     expect(result.current[0].numberValue).toBeNull()
@@ -180,7 +180,7 @@ describe('useNumberInputDriver', () => {
 
   it('allows minus if minNumberValue is < 0', () => {
     const {result} = renderHook(() =>
-      useNumberInputDriver({initialNumberValue: null, minNumberValue: -10})
+      useNumberInputDriver({initialNumberValue: null, minNumberValue: -10}),
     )
     act(() => result.current[1].onChange({target: {value: '-'}}))
     expect(result.current[0].numberValue).toBeNull()

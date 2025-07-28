@@ -20,13 +20,15 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE} from '../../../graphql/Mutations'
-import {useMutation} from 'react-apollo'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useMutation} from '@apollo/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AllThreadsState, SearchContext} from '../../utils/constants'
+import {IconAddLine} from '@instructure/ui-icons'
+import {LineViewIcon, SplitViewIcon} from '@canvas/split-and-line-icon'
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 export const SplitScreenButton = ({
   setUserSplitScreenPreference,
@@ -36,7 +38,7 @@ export const SplitScreenButton = ({
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {setAllThreadsStatus, setExpandedThreads} = useContext(SearchContext)
-
+  const [splitted, setSplitted] = React.useState(false)
   const [updateUserDiscussionsSplitscreenView] = useMutation(
     UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE,
     {
@@ -44,14 +46,15 @@ export const SplitScreenButton = ({
         setOnSuccess('Splitscreen preference updated!')
         setUserSplitScreenPreference(
           data?.updateUserDiscussionsSplitscreenView?.user?.discussionsSplitscreenView ||
-            !userSplitScreenPreference
+            !userSplitScreenPreference,
         )
+        setSplitted(!splitted)
       },
       onError: () => {
         setOnFailure(I18n.t('Unable to update splitscreen preference.'))
         setUserSplitScreenPreference(!userSplitScreenPreference)
       },
-    }
+    },
   )
 
   const onSplitScreenClick = () => {
@@ -73,12 +76,26 @@ export const SplitScreenButton = ({
     })
   }
 
+  const getRenderIcon = () => {
+    if (props.useChangedIcon) {
+      return (
+        <PresentationContent>{splitted ? <LineViewIcon /> : <SplitViewIcon />}</PresentationContent>
+      )
+    }
+    return IconAddLine
+  }
+
   return (
-    <Button onClick={onSplitScreenClick} data-testid="splitscreenButton" display={display}>
+    <Button
+      onClick={onSplitScreenClick}
+      data-testid="splitscreenButton"
+      data-action-state={
+        userSplitScreenPreference ? 'splitscreenButtonToInline' : 'splitscreenButtonToSplit'
+      }
+      renderIcon={getRenderIcon()}
+      display={display}
+    >
       {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
-      <ScreenReaderContent>
-        {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
-      </ScreenReaderContent>
     </Button>
   )
 }
@@ -89,4 +106,5 @@ SplitScreenButton.propTypes = {
   setExpandReplies: PropTypes.func,
   closeView: PropTypes.func,
   display: PropTypes.string,
+  useChangedIcon: PropTypes.bool,
 }

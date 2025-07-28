@@ -66,7 +66,7 @@ module Api::V1::DeveloperKey
         hash["account_name"] = key.account_name
         hash["visible"] = key.visible
       end
-      hash["tool_configuration"] = key.tool_configuration&.configuration if include_tool_config
+      hash["tool_configuration"] = key.lti_registration&.canvas_configuration(context:) if include_tool_config
       hash["lti_registration"] = key.ims_registration if include_tool_config
       hash["is_lti_key"] = (key.is_lti_key.nil? ? key.public_jwk.present? : key.is_lti_key)
       hash["is_lti_registration"] = key.ims_registration?

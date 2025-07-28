@@ -29,6 +29,11 @@ import {
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../../ExternalToolsEnv'
 import RCEWrapper from '../../../../RCEWrapper'
+import {showFlashAlert} from '../../../../../common/FlashAlert'
+
+jest.mock('../../../../../common/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 describe('processEditorContentItems', () => {
   const linkContentItem: LinkContentItemJson = {
@@ -87,8 +92,6 @@ describe('processEditorContentItems', () => {
   const editor = createDeepMockProxy<ExternalToolsEditor>()
   const rceWrapper = createDeepMockProxy<RCEWrapper>()
 
-  let showFlashAlertSpy: ReturnType<typeof jest.spyOn>
-
   beforeAll(() => {
     jest.spyOn(RCEWrapper, 'getByEditor').mockImplementation(e => {
       if (e === editor) return rceWrapper
@@ -96,17 +99,15 @@ describe('processEditorContentItems', () => {
         throw new Error('Wrong editor requested')
       }
     })
-
-    showFlashAlertSpy = jest.spyOn(
-      jest.requireActual('../../../../../common/FlashAlert'),
-      'showFlashAlert'
-    )
   })
 
   beforeEach(() => {
     editor.mockClear()
     rceWrapper.mockClear()
-    showFlashAlertSpy.mockClear()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   describe('static', () => {
@@ -115,7 +116,7 @@ describe('processEditorContentItems', () => {
       const dialog = {close: jest.fn()}
       await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
       expect(dialog.close).toHaveBeenCalled()
-      expect(showFlashAlertSpy).not.toHaveBeenCalled()
+      expect(showFlashAlert).not.toHaveBeenCalled()
     })
 
     it('ignores messages without content_items', async () => {
@@ -126,9 +127,32 @@ describe('processEditorContentItems', () => {
         // Bypass type checking to ensure it can handle bad data from javascript
         ev as any,
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).not.toHaveBeenCalled()
+    })
+
+    it('shows a message with showFlashAlert() if msg is present', async () => {
+      const ev = {data: {content_items: validContentItems, msg: 'test message'}}
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        message: 'test message',
+      })
+    })
+
+    it('shows an error message with showFlashAlert() if errormsg is present', async () => {
+      const ev = {data: {content_items: validContentItems, errormsg: 'test error message'}}
+      const dialog = {close: jest.fn()}
+
+      await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
+        message: 'test error message',
+        type: 'error',
+      })
     })
 
     it('handles an event with all unsupported items, showing a warning once and closing the dialog', async () => {
@@ -146,12 +170,12 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).toHaveBeenCalled()
 
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Could not insert content: "file" items are not currently supported in Canvas.',
         type: 'warning',
         err: null,
@@ -176,12 +200,12 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        dialog
+        dialog,
       )
       expect(dialog.close).toHaveBeenCalled()
 
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message:
           'Could not insert content: "unsupported" items are not currently supported in Canvas.',
         type: 'warning',
@@ -200,28 +224,28 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        null
+        null,
       )
     })
 
     it('creates content for a link content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         1,
-        '<a href="http://www.test.com" title="link title" target="_blank">link text</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">link text</a>',
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         2,
-        '<a href="test?display=borderless" title="link title" target="_blank">link text</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">link text</a>',
       )
     })
 
     it('creates content for an image content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         3,
-        '<img src="http://www.test.com/image" width="100" height="200">'
+        '<img src="http://www.test.com/image" width="100" height="200">',
       )
     })
 
@@ -232,7 +256,7 @@ describe('processEditorContentItems', () => {
     it('inserts an ltiEndpoint link for content items with a lookup_uuid', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         5,
-        '<a href="test?display=borderless&amp;resource_link_lookup_uuid=somerandomuuid" title="link title" target="_blank">link text</a>'
+        '<a href="test?display=borderless&amp;resource_link_lookup_uuid=somerandomuuid" title="link title" target="_blank">link text</a>',
       )
     })
   })
@@ -249,21 +273,21 @@ describe('processEditorContentItems', () => {
           },
         },
         externalToolsEnvFor(editor),
-        null
+        null,
       )
     })
 
     it('creates content for a link content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         1,
-        '<a href="http://www.test.com" title="link title" target="_blank">user selection</a>'
+        '<a href="http://www.test.com" title="link title" target="_blank">user selection</a>',
       )
     })
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(rceWrapper.insertCode).toHaveBeenNthCalledWith(
         2,
-        '<a href="test?display=borderless" title="link title" target="_blank">user selection</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">user selection</a>',
       )
     })
   })

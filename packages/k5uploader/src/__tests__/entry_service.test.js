@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import EntryService from '../entry_service'
+import EntryService from '../entry_service.js'
 
 describe('EntryService', () => {
   it('parses XML entry config', () => {

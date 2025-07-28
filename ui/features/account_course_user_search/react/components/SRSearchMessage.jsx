@@ -19,12 +19,12 @@
 import React from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {oneOf, func, array, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const errorLoadingMessage = I18n.t(
-  'There was an error with your query; please try a different search'
+  'There was an error with your query; please try a different search',
 )
 const noCoursesFoundMessage = I18n.t('No courses found')
 const noUsersFoundMessage = I18n.t('No users found')

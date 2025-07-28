@@ -51,7 +51,7 @@ export default function (ed, document, _trayProps) {
         originalLatex={parseLatex(ed)}
         openAdvanced={advancedPreference.isSet()}
       />,
-      container
+      container,
     )
   })
 }

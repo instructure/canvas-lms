@@ -98,7 +98,7 @@ module WebMock::API
 end
 
 require "delayed/testing"
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Rails.root.glob("spec/support/**/*.rb") { |f| require f }
 require "sharding_spec_helper"
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
@@ -160,14 +160,18 @@ module RSpec::Core::Hooks
   end
 end
 
-Time.class_eval do
-  def compare_with_round(other)
-    other = Time.at(other.to_i, other.usec) if other.respond_to?(:usec)
-    Time.at(to_i, usec).compare_without_round(other)
+module TimeComparisonWithRounding
+  # ignore nanoseconds, since the database doesn't persist them
+  def <=>(other)
+    other = other.change(usec: other.usec) if other.respond_to?(:usec)
+    if nsec % 1_000 == 0
+      super
+    else
+      change(usec:) <=> other
+    end
   end
-  alias_method :compare_without_round, :<=>
-  alias_method :<=>, :compare_with_round
 end
+Time.prepend(TimeComparisonWithRounding)
 
 # we use ivars too extensively for factories; prevent them from
 # being propagated to views in view specs
@@ -220,6 +224,8 @@ module RSpec::Rails
         node.attr("checked") == "checked"
       elsif node.respond_to?(:checked?)
         node.checked?
+      else
+        node.attribute("checked")
       end
     end
   end
@@ -305,7 +311,11 @@ module RenderWithHelpers
   end
 
   def render(*args)
-    controller_class = ("#{@controller.controller_path.camelize}Controller".constantize rescue nil) || ApplicationController
+    controller_class = begin
+      "#{@controller.controller_path.camelize}Controller".constantize
+    rescue NameError
+      ApplicationController
+    end
 
     controller_class.instance_variable_set(:@js_env, nil)
     # this extends the controller's helper methods to the view
@@ -321,8 +331,8 @@ module RenderWithHelpers
 
       controller_class._helper_methods.each do |helper|
         class_eval <<~RUBY, __FILE__, __LINE__ + 1
-          def #{helper}(*args, &block)
-            real_controller.send(:#{helper}, *args, &block)
+          def #{helper}(*args, **kwargs, &block)
+            real_controller.send(:#{helper}, *args, **kwargs, &block)
           end
         RUBY
       end
@@ -418,15 +428,12 @@ RSpec.configure do |config|
   config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  if $canvas_rails == "7.0"
-    config.fixture_path = Rails.root.join("spec/fixtures")
-  else
-    config.fixture_paths = [Rails.root.join("spec/fixtures")]
-  end
+  config.fixture_paths = [Rails.root.join("spec/fixtures")]
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
+  config.filter_run_when_matching :focus
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
   config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
@@ -501,9 +508,9 @@ RSpec.configure do |config|
     ActiveRecord::Migration.verbose = false
     RequestStore.clear!
     MultiCache.reset
-    Course.enroll_user_call_count = 0
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
+    PageView.reset_cache! if PageView.respond_to?(:reset_cache!)
     $spec_api_tokens = {}
 
     remove_user_session
@@ -583,15 +590,44 @@ RSpec.configure do |config|
       GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb(failsafe: nil) }
     end
     CanvasCache::Redis.redis_used = false
+    @last_error_report_id = ErrorReport.maximum(:id)
   end
 
-  if Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
-    config.before do
-      Prosopite.scan
+  class ErrorReportExceptionWrapper
+    class ExceptionClassWrapper < SimpleDelegator
+      attr_reader :name
+
+      def initialize(klass, name)
+        super(klass)
+        @name = name
+      end
     end
 
-    config.after do
-      Prosopite.finish
+    def initialize(error_report)
+      @error_report = error_report
+      @klass = ExceptionClassWrapper.new(self.class, error_report.category)
+    end
+
+    delegate :message, to: :@error_report
+
+    def class
+      @klass
+    end
+
+    def cause; end
+
+    def backtrace
+      @error_report.backtrace.split("\n")
+    end
+  end
+
+  config.after do |example|
+    if %i[controller request].include?(example.metadata[:type]) &&
+       example.exception &&
+       !(errors = @last_error_report_id.nil? ? ErrorReport.all.to_a : ErrorReport.where("id>?", @last_error_report_id).to_a).empty?
+      errors.each do |er|
+        example.set_exception(ErrorReportExceptionWrapper.new(er))
+      end
     end
   end
 
@@ -776,7 +812,7 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/)) # rubocop:disable Style/AccessModifierDeclarations
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$|^object_id$)/)) # rubocop:disable Style/AccessModifierDeclarations
 
       def initialize(subject, ancestor)
         @subject = subject
@@ -882,7 +918,7 @@ RSpec.configure do |config|
     end
   end
 
-  def run_job(job)
+  def run_job(job) # rubocop:disable Rails/Delegate
     Delayed::Testing.run_job(job)
   end
 
@@ -925,9 +961,7 @@ RSpec.configure do |config|
       @code.to_s
     end
 
-    def [](arg)
-      @headers[arg]
-    end
+    delegate :[], to: :@headers
 
     def content_type
       self["content-type"]
@@ -975,13 +1009,7 @@ RSpec.configure do |config|
   end
 
   def skip_if_prepended_class_method_stubs_broken
-    versions = [
-      "2.4.6",
-      "2.4.9",
-      "2.5.1",
-      "2.5.3"
-    ]
-    skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
+    skip("stubbing prepended class methods is broken in new versions of ruby")
   end
 end
 
@@ -1016,27 +1044,23 @@ module I18nStubs
 end
 I18n.backend.class.prepend(I18nStubs)
 
-Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].each { |file| require file }
-
-Shoulda::Matchers.configure do |config|
-  config.integrate do |with|
-    with.test_framework :rspec
-    with.library :active_record
-    with.library :active_model
-    # Disable the action_controller matchers until shoulda-matchers supports new compound matchers
-    # with.library :action_controller
-    # Or, choose the following (which implies all of the above):
-    # with.library :rails
-  end
-end
+Rails.root.glob("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb") { |file| require file }
 
 module DeveloperKeyStubs
-  def get_special_key(default_key_name)
+  @@original_get_special_key = DeveloperKey.method(:get_special_key)
+
+  def original_get_special_key(*, **)
+    @@original_get_special_key.call(*, **)
+  end
+
+  def get_special_key(default_key_name, create_if_missing: true)
     Shard.birth.activate do
       @special_keys ||= {}
 
       # TODO: we have to do this because tests run in transactions
       testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+      return nil if testkey.new_record? && !create_if_missing
+
       testkey.auto_expire_tokens = false if testkey.new_record?
       testkey.sns_arn = "arn:aws:s3:us-east-1:12345678910:foo/bar"
       testkey.save! if testkey.changed?
@@ -1069,3 +1093,21 @@ Mime::SET.select { |t| t.to_s.end_with?("+json") }.map(&:ref).each do |type|
 end
 
 # rubocop:enable Lint/ConstantDefinitionInBlock
+
+module FileUpdateCheckerIgnoreTimecop
+  private
+
+  # Prevent Timecop from interfering with file update checking or we
+  # can see weird Zeitwerk issues due to inappropriate constant reloading.
+  def max_mtime(...)
+    if Timecop.travelled? || Timecop.frozen?
+      Timecop.return do
+        super
+      end
+    else
+      super
+    end
+  end
+end
+
+ActiveSupport::FileUpdateChecker.prepend(FileUpdateCheckerIgnoreTimecop)

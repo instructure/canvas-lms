@@ -37,13 +37,13 @@ describe BookmarkedCollection::SimpleBookmarker do
                                                                     :id)
 
     @bob = @example_class.create!(name: "bob")
-    @bob2 = @example_class.create!(name: "Bob", date: DateTime.now.to_s)
+    @bob2 = @example_class.create!(name: "Bob", date: Time.now.utc.to_s)
     @joe = @example_class.create!(name: "joe")
     @bobby = @example_class.create!(name: "bobby")
     @bill = @example_class.create!(name: "BILL!")
   end
 
-  context "#bookmark_for" do
+  describe "#bookmark_for" do
     it "is comparable" do
       expect(@bookmarker.bookmark_for(@bob)).to respond_to(:<=>)
     end
@@ -53,7 +53,7 @@ describe BookmarkedCollection::SimpleBookmarker do
     end
   end
 
-  context "#validate" do
+  describe "#validate" do
     it "validates the bookmark and its contents" do
       expect(@bookmarker.validate({ name: "bob", id: 1 })).to be_falsey
       expect(@bookmarker.validate(["bob"])).to be_falsey
@@ -61,10 +61,10 @@ describe BookmarkedCollection::SimpleBookmarker do
       expect(@bookmarker.validate(["bob", 1])).to be_truthy
 
       # With dates
-      expect(@date_bookmarker.validate({ date: DateTime.now.to_s, id: 1 })).to be_falsey
+      expect(@date_bookmarker.validate({ date: Time.now.utc.to_s, id: 1 })).to be_falsey
       expect(@date_bookmarker.validate(["bob"])).to be_falsey
-      expect(@date_bookmarker.validate([DateTime.now, 1])).to be true
-      expect(@date_bookmarker.validate([DateTime.now.to_s, 1])).to be true
+      expect(@date_bookmarker.validate([Time.now.utc, 1])).to be true
+      expect(@date_bookmarker.validate([Time.now.utc.to_s, 1])).to be true
 
       # with custom stuff
       expect(@custom_bookmarker.validate(["llib", 1])).to be true
@@ -72,7 +72,7 @@ describe BookmarkedCollection::SimpleBookmarker do
     end
   end
 
-  context "#restrict_scope" do
+  describe "#restrict_scope" do
     it "orders correctly" do
       pager = double(current_bookmark: nil)
       expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(

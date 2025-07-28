@@ -17,7 +17,7 @@
  */
 
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {Attachment} from './Attachment'
 
 export const CREATE_DISCUSSION_TOPIC = gql`
@@ -39,6 +39,11 @@ export const CREATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $expanded: Boolean
+    $expandedLocked: Boolean
+    $sortOrder: DiscussionSortOrderType
+    $sortOrderLocked: Boolean
+    $discussionType: DiscussionTopicDiscussionType
     $isAnnouncement: Boolean
     $specificSections: String
     $groupCategoryId: ID
@@ -58,6 +63,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState: $anonymousState
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
+        discussionType: $discussionType
         isAnonymousAuthor: $isAnonymousAuthor
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
@@ -66,6 +72,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
+        expanded: $expanded
+        expandedLocked: $expandedLocked
+        sortOrder: $sortOrder
+        sortOrderLocked: $sortOrderLocked
         isAnnouncement: $isAnnouncement
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
@@ -85,6 +95,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         anonymousState
         delayedPostAt
         lockAt
+        discussionType
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
@@ -94,6 +105,10 @@ export const CREATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts
         isAnnouncement
         replyToEntryRequiredCount
+        expanded
+        expandedLocked
+        sortOrder
+        sortOrderLocked
         assignment {
           _id
           name
@@ -112,6 +127,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
           restrictQuantitativeData
           sisId
           state
+          suppressAssignment
           peerReviews {
             automaticReviews
             count
@@ -124,6 +140,9 @@ export const CREATE_DISCUSSION_TOPIC = gql`
             onlyVisibleToOverrides
             pointsPossible
             tag
+          }
+          gradingStandard {
+            _id
           }
         }
         attachment {
@@ -155,6 +174,11 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $podcastEnabled: Boolean
     $podcastHasStudentPosts: Boolean
     $locked: Boolean
+    $expanded: Boolean
+    $expandedLocked: Boolean
+    $sortOrder: DiscussionSortOrderType
+    $sortOrderLocked: Boolean
+    $discussionType: DiscussionTopicDiscussionType
     $specificSections: String
     $fileId: ID
     $groupCategoryId: ID
@@ -163,6 +187,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
     $checkpoints: [DiscussionCheckpoints!]
     $setCheckpoints: Boolean
     $ungradedDiscussionOverrides: [AssignmentOverrideCreateOrUpdate!]
+    $anonymousState: DiscussionTopicAnonymousStateType
+    $notifyUsers: Boolean
   ) {
     updateDiscussionTopic(
       input: {
@@ -173,6 +199,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         requireInitialPost: $requireInitialPost
         delayedPostAt: $delayedPostAt
         lockAt: $lockAt
+        discussionType: $discussionType
         allowRating: $allowRating
         onlyGradersCanRate: $onlyGradersCanRate
         onlyVisibleToOverrides: $onlyVisibleToOverrides
@@ -180,6 +207,10 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastEnabled: $podcastEnabled
         podcastHasStudentPosts: $podcastHasStudentPosts
         locked: $locked
+        expanded: $expanded
+        expandedLocked: $expandedLocked
+        sortOrder: $sortOrder
+        sortOrderLocked: $sortOrderLocked
         specificSections: $specificSections
         groupCategoryId: $groupCategoryId
         fileId: $fileId
@@ -188,6 +219,8 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         checkpoints: $checkpoints
         setCheckpoints: $setCheckpoints
         ungradedDiscussionOverrides: $ungradedDiscussionOverrides
+        anonymousState: $anonymousState
+        notifyUsers: $notifyUsers
       }
     ) {
       discussionTopic {
@@ -200,6 +233,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         anonymousState
         delayedPostAt
         lockAt
+        discussionType
         isAnonymousAuthor
         allowRating
         onlyGradersCanRate
@@ -209,6 +243,10 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
         podcastHasStudentPosts
         isAnnouncement
         replyToEntryRequiredCount
+        expanded
+        expandedLocked
+        sortOrder
+        sortOrderLocked
         attachment {
           ...Attachment
         }
@@ -230,6 +268,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
           restrictQuantitativeData
           sisId
           state
+          suppressAssignment
           peerReviews {
             automaticReviews
             count

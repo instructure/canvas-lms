@@ -18,7 +18,6 @@
 
 import {render} from '@testing-library/react'
 import React from 'react'
-import {shallow} from 'enzyme'
 import {MemoryRouter} from 'react-router-dom'
 import Event from '../event'
 import K from '../../../../constants'
@@ -32,7 +31,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           startedAt="2014-11-16T13:37:19Z"
           type={K.EVT_SESSION_STARTED}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -46,7 +45,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -60,7 +59,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -74,7 +73,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[]}
           data={[]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -88,7 +87,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[]}
           data={[]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -102,7 +101,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -117,22 +116,38 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
     })
 
     it('renders a green "complete" icon when the user focus the quiz', () => {
-      const wrapper = shallow(
-        <Event {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})} />
+      const {container} = render(
+        <MemoryRouter>
+          <Event {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})} />
+        </MemoryRouter>,
       )
-      expect(wrapper.find('IconCompleteLine').props().color).toBe('success')
+      // Check that the success icon is rendered
+      const svgIcon = container.querySelector('svg[name="IconComplete"]')
+      expect(svgIcon).toBeInTheDocument()
     })
 
     it('renders a red "trouble" icon when the user leaves the quiz', () => {
-      const wrapper = shallow(
-        <Event {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})} />
+      const {container, getByText} = render(
+        <MemoryRouter>
+          <Event {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})} />
+        </MemoryRouter>,
       )
-      expect(wrapper.find('IconTroubleLine').props().color).toBe('warning')
+      // The event should show the right text
+      expect(getByText('Stopped viewing the Canvas quiz-taking page...')).toBeInTheDocument()
+      // Check that the warning icon is rendered
+      const svgIcon = container.querySelector('svg[name="IconTrouble"]')
+      expect(svgIcon).toBeInTheDocument()
     })
 
     it('renders an "empty" grey icon when the user answers a question', () => {
-      const wrapper = shallow(<Event {...defaultProps()} />)
-      expect(wrapper.find('IconEmptyLine').props().color).toBe('secondary')
+      const {container} = render(
+        <MemoryRouter>
+          <Event {...defaultProps()} />
+        </MemoryRouter>,
+      )
+      // Check that the secondary icon is rendered
+      const svgIcon = container.querySelector('svg[name="IconEmpty"]')
+      expect(svgIcon).toBeInTheDocument()
     })
   })
 })

@@ -23,7 +23,7 @@ module ContextModulesHelper
   include ApplicationHelper
 
   def cache_if_module(context_module, viewable, can_add, can_edit, can_delete, is_student, can_view_unpublished, user, context, &)
-    if context_module
+    if context_module && !module_performance_improvement_is_enabled?(context, user)
       visible_assignments = user ? user.learning_object_visibilities(context) : []
       cache_key_items = ["context_module_render_22_",
                          context_module.cache_key,
@@ -33,6 +33,7 @@ module ContextModulesHelper
                          can_delete,
                          is_student,
                          can_view_unpublished,
+                         @module_ids_with_overrides&.include?(context_module.id),
                          true,
                          Time.zone,
                          Digest::SHA256.hexdigest([visible_assignments, @section_visibility].join("/"))]
@@ -43,6 +44,27 @@ module ContextModulesHelper
     else
       yield
     end
+  end
+
+  def cache_if_no_module_perf_enabled(cache_key, context, user, &)
+    if module_performance_improvement_is_enabled?(context, user)
+      # No caching
+      yield
+    else
+      cache(cache_key, {}, &)
+    end
+  end
+
+  def module_performance_improvement_is_enabled?(context, current_user)
+    return false unless context
+    return false unless current_user
+
+    feature_flag = context.account.feature_enabled?(:modules_perf)
+    return false unless feature_flag
+
+    tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(current_user).count }
+    module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+    feature_flag && (tags_count > module_perf_threshold) # && request.path.include?("/modules")
   end
 
   def add_menu_tools_to_cache_key(cache_key)
@@ -111,17 +133,27 @@ module ContextModulesHelper
   end
 
   def preload_modules_content(modules)
-    ActiveRecord::Associations.preload(modules, content_tags: :content)
+    modules.each_slice(1000) do |slice|
+      ActiveRecord::Associations.preload(slice, content_tags: { content: %i[context external_tool_tag current_lookup wiki] })
+      assignmentable_content = slice.map(&:content_tags).flatten.select(&:can_have_assignment?)
+      ActiveRecord::Associations.preload(assignmentable_content, content: { assignment: :context }) unless assignmentable_content.empty?
+    end
     preload_can_unpublish(@context, modules) if @can_view
   end
 
-  def process_module_data(mod, is_student = false, current_user = nil, session = nil)
-    # pre-calculated module view data can be added here
-    items = mod.content_tags_visible_to(@current_user)
-    items = items.reject do |item|
+  def load_content_tags(context_module, current_user)
+    items = context_module.content_tags_visible_to(current_user)
+    items.reject do |item|
       item.content.respond_to?(:hide_on_modules_view?) && item.content.hide_on_modules_view?
     end
+  end
 
+  def process_module_data(mod, current_user = nil, session = nil, student: false)
+    items = load_content_tags(mod, current_user)
+    process_module_items_data(items, mod, current_user, session, student:)
+  end
+
+  def process_module_items_data(items, mod, current_user = nil, session = nil, student: false)
     module_data = {
       published_status: mod.published? ? "published" : "unpublished",
       items:
@@ -139,9 +171,9 @@ module ContextModulesHelper
       }
 
       if cyoe_enabled?(@context)
-        path_opts = { conditional_release_rules: rules, is_student: }
+        path_opts = { conditional_release_rules: rules, is_student: student }
         item_data[:mastery_paths] = conditional_release_rule_for_module_item(item, path_opts)
-        if is_student && item_data[:mastery_paths].present?
+        if student && item_data[:mastery_paths].present?
           item_data[:show_cyoe_placeholder] = show_cyoe_placeholder(item_data[:mastery_paths])
           item_data[:choose_url] = context_url(@context, :context_url) + "/modules/items/" + item.id.to_s + "/choose"
         end
@@ -151,13 +183,20 @@ module ContextModulesHelper
     end
 
     module_data[:items_data] = items_data
+
+    if @is_child_course && !student &&
+       @context.account.feature_enabled?(:modules_page_hide_blueprint_lock_icon_for_children)
+      module_data[:items_restrictions] =
+        MasterCourses::MasterContentTag.fetch_module_item_restrictions_for_child(module_data[:items].map(&:id))
+      module_data[:items_restrictions].transform_values!(&:any?)
+    end
     module_data
   end
 
-  def module_item_translated_content_type(item, is_student = false)
+  def module_item_translated_content_type(item, student: false)
     return "" unless item
     if item.content_type_class == "lti-quiz"
-      return is_student ? I18n.t("Quiz") : I18n.t("New Quiz")
+      return student ? I18n.t("Quiz") : I18n.t("New Quiz")
     end
 
     Context.translated_content_type(item.content_type)

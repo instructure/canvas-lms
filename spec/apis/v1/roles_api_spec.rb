@@ -773,10 +773,10 @@ describe "Roles API", type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401 unauthorized" do
+      it "returns 403 forbidden" do
         user_with_pseudonym
         raw_api_call(:put, @path, @path_options, @permissions)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 

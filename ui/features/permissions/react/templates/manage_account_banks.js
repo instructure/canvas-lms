@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_12')
+const I18n = createI18nScope('permissions_templates_12')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'Allows a user to view and manage all item banks in an account directly from within a course and account.'
+        'Allows a user to view and manage all item banks in an account directly from within a course and account.',
       ),
     },
   ],
@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.'
+        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.',
       ),
     },
   ],
@@ -42,7 +42,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'Allows a user to view and manage all item banks in an account from directly within a course.'
+        'Allows a user to view and manage all item banks in an account from directly within a course.',
       ),
     },
   ],
@@ -50,8 +50,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
-        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.'
+        'This permission must be disabled for users to only view item banks created by them, shared with them from another user, or shared indirectly via the course they are enrolled in as an instructor.',
       ),
     },
-  ]
+  ],
 )

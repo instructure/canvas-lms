@@ -23,6 +23,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
 
   argument :attempt, Integer, required: false
   argument :comment, String, required: true
+  argument :draft_comment, Boolean, required: false, default_value: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :group_comment,
            Boolean,
@@ -44,7 +45,8 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     opts = {
       attempt: input[:attempt] || latest_attempt,
       author: current_user,
-      comment: input[:comment]
+      comment: input[:comment],
+      draft_comment: input[:draft_comment]
     }
 
     if input[:media_object_id].present?

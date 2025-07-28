@@ -19,6 +19,7 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import IntegrationRow from '../IntegrationRow'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('IntegrationRow', () => {
   const onChange = jest.fn()
@@ -33,16 +34,30 @@ describe('IntegrationRow', () => {
   })
   const subject = overrides => render(<IntegrationRow {...props(overrides)} />)
 
+  beforeEach(() => {
+    fakeENV.setup()
+    jest.clearAllMocks()
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('displays the integration name', () => {
     expect(subject().getAllByText('Microsoft Sync')).not.toHaveLength(0)
   })
 
   it('shows the integration is enabled', () => {
-    expect(subject().getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
+    const {container} = subject()
+    // Use a more specific query to find the toggle
+    const toggle = container.querySelector('input[type="checkbox"]')
+    expect(toggle.checked).toBeTruthy()
   })
 
   it('calls "onChange" when toggled', () => {
-    fireEvent.click(subject().getByLabelText('Toggle Microsoft Sync'))
+    const {container} = subject()
+    const toggle = container.querySelector('input[type="checkbox"]')
+    fireEvent.click(toggle)
     expect(onChange).toHaveBeenCalled()
   })
 
@@ -50,14 +65,16 @@ describe('IntegrationRow', () => {
     const propOverrides = {enabled: false, expanded: true}
 
     it('shows the integration is not enabled', () => {
-      expect(subject(propOverrides).getByLabelText('Toggle Microsoft Sync').checked).toBeFalsy()
+      const {container} = subject(propOverrides)
+      const toggle = container.querySelector('input[type="checkbox"]')
+      expect(toggle.checked).toBeFalsy()
     })
 
     it('shows a info box saying it is not enabled', () => {
       expect(
         subject(propOverrides).getByText(
-          'This integration is not enabled. Please enable it to interact with settings.'
-        )
+          'This integration is not enabled. Please enable it to interact with settings.',
+        ),
       ).toBeInTheDocument()
     })
   })
@@ -68,8 +85,8 @@ describe('IntegrationRow', () => {
     it('does not show the info bax saying it is not enabled', () => {
       expect(
         subject(propOverrides).queryByText(
-          'This integration is not enabled. Please enable it to interact with settings.'
-        )
+          'This integration is not enabled. Please enable it to interact with settings.',
+        ),
       ).not.toBeInTheDocument()
     })
   })
@@ -111,14 +128,18 @@ describe('IntegrationRow', () => {
   describe('when the "info" is an info object', () => {
     const propOverrides = {info: {message: 'Hello there', variant: 'success'}, expanded: true}
 
-    expect(subject(propOverrides).getByText('Hello there')).toBeInTheDocument()
+    it('shows the info message with the correct variant', () => {
+      expect(subject(propOverrides).getByText('Hello there')).toBeInTheDocument()
+    })
   })
 
   describe('when "available" is falsey', () => {
     const propOverrides = {available: false}
 
     it('does not render the integration', () => {
-      expect(subject(propOverrides).queryByText('Microsoft Sync')).not.toBeInTheDocument()
+      // The component renders an empty fragment when available is false
+      const {container} = subject(propOverrides)
+      expect(container.firstChild).toBeNull()
     })
   })
 })

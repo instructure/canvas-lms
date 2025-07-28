@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -27,11 +26,12 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {ProgressResult} from '../utils/publishAllModulesHelper'
+// @ts-expect-error
+import type {ProgressResult} from '../utils/publishAllModulesHelper'
 
-const I18n = useI18nScope('context_modules_publish_menu')
+const I18n = createI18nScope('context_modules_publish_menu')
 
 interface Props {
   readonly isOpen: boolean
@@ -121,16 +121,16 @@ const ContextModulesPublishModal = ({
         <View as="div">
           <Text as="p">
             {I18n.t(
-              'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
+              'This process could take a few minutes. You may close the modal or navigate away from the page during this process.',
             )}
           </Text>
           <Text as="p">
             {skippingItems
               ? I18n.t(
-                  'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                  'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.',
                 )
               : I18n.t(
-                  'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.'
+                  'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.',
                 )}
           </Text>
         </View>

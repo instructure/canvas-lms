@@ -248,7 +248,7 @@ module CC::Exporter::WebZip
     def parse_module_data
       active_module_ids = Set.new(course.context_modules.active.map(&:id))
       course.context_modules.active.map do |mod|
-        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at&.> Time.now
+        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at&.> Time.zone.now
         {
           id: mod.id,
           name: mod.name,
@@ -347,7 +347,13 @@ module CC::Exporter::WebZip
       reqs_for_item = completion_reqs.find { |req| req[:id] == item.id }
       return unless reqs_for_item
 
-      [reqs_for_item[:type], reqs_for_item[:min_score]]
+      min_score = if reqs_for_item[:type] == "min_percentage"
+                    (item.assignment.points_possible * reqs_for_item[:min_percentage]) / 100
+                  else
+                    reqs_for_item[:min_score]
+                  end
+
+      [reqs_for_item[:type], min_score]
     end
 
     def parse_content(item_content)

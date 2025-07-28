@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {PaceContextTypes} from '../../types'
+import type {PaceContextTypes} from '../../types'
 
-const I18n = useI18nScope('unpublished_warning_modal')
+const I18n = createI18nScope('unpublished_warning_modal')
 
 export type UnpublishedWarningModalProps = {
   open: boolean
@@ -36,16 +35,17 @@ export type UnpublishedWarningModalProps = {
 
 const WARNING_MODAL_BODY_TEXT = {
   Course: I18n.t(
-    'You have unpublished changes to your course pace. Continuing will discard these changes.'
+    'You have unpublished changes to your course pace. Continuing will discard these changes.',
   ),
   Section: I18n.t(
-    'You have unpublished changes to your section pace. Continuing will discard these changes.'
+    'You have unpublished changes to your section pace. Continuing will discard these changes.',
   ),
   Enrollment: I18n.t(
-    'You have unpublished changes to your student pace. Continuing will discard these changes.'
+    'You have unpublished changes to your student pace. Continuing will discard these changes.',
   ),
 }
 
+// @ts-expect-error
 const UnpublishedWarningModal = ({open, onCancel, onConfirm, contextType}) => {
   return (
     <Modal
@@ -57,6 +57,7 @@ const UnpublishedWarningModal = ({open, onCancel, onConfirm, contextType}) => {
     >
       <Modal.Body>
         <View>
+          {/* @ts-expect-error */}
           <Text>{WARNING_MODAL_BODY_TEXT[contextType]}</Text>
         </View>
       </Modal.Body>

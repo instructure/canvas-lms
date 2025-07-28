@@ -55,27 +55,15 @@ describe Lti::AppUtil do
     end
 
     it "renders the specified display_type if the type is valid" do
-      acceptable_types = %w[borderless full_width in_context default full_width_in_context]
+      acceptable_types = %w[borderless full_width in_context default full_width_in_context full_width_with_nav]
 
       acceptable_types.each do |type|
         expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES[type])
       end
     end
 
-    context "display_type in_rce with FF disabled" do
+    context "display_type in_rce" do
       let(:type) { "in_rce" }
-
-      before { Account.site_admin.disable_feature!(:lti_rce_postmessage_support) }
-
-      it "falls back to borderless" do
-        expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES["borderless"])
-      end
-    end
-
-    context "display_type in_rce with FF enabled" do
-      let(:type) { "in_rce" }
-
-      before { Account.site_admin.enable_feature!(:lti_rce_postmessage_support) }
 
       it "renders the specified display type" do
         expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES[type])

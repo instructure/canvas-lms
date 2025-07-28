@@ -20,6 +20,8 @@
 require_relative "../common"
 require_relative "../../conditional_release_spec_helper"
 require_relative "../assignments/page_objects/assignments_index_page"
+require_relative "../content_migrations/page_objects/new_course_copy_page"
+require_relative "../content_migrations/page_objects/new_content_migration_page"
 require_relative "page_objects/conditional_release_objects"
 
 describe "native canvas conditional release" do
@@ -34,22 +36,17 @@ describe "native canvas conditional release" do
 
   before do
     course_with_teacher_logged_in
+    @course.conditional_release = true
+    @course.save!
+  end
+
+  def wait_for_migration_to_complete
+    keep_trying_for_attempt_times(attempts: 10, sleep_interval: 1) do
+      wait_for_ajaximations
+    end
   end
 
   context "Pages as part of Mastery Paths" do
-    it "shows Allow in Mastery Paths for a Page when feature enabled" do
-      get "/courses/#{@course.id}/pages/new/edit"
-      expect(ConditionalReleaseObjects.conditional_content_exists?).to be(true)
-    end
-
-    it "does not show Allow in Mastery Paths when feature disabled" do
-      account = Account.default
-      account.settings[:conditional_release] = { value: false }
-      account.save!
-      get "/courses/#{@course.id}/pages/new/edit"
-      expect(ConditionalReleaseObjects.conditional_content_exists?).to be(false)
-    end
-
     it "is not included in the assignments page" do
       page_title = "MP Page to Verify"
       @new_page = @course.wiki_pages.create!(title: page_title)
@@ -130,12 +127,14 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "72")
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff2, "40", "47")
-      ConditionalReleaseObjects.division_cutoff2.send_keys :tab
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
+      division_cutoff2 = ConditionalReleaseObjects.division_cutoff(1)
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "70", "72")
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff2, "40", "47")
+      division_cutoff2.send_keys :tab
 
-      expect(ConditionalReleaseObjects.division_cutoff1.attribute("value")).to eq("72 pts")
-      expect(ConditionalReleaseObjects.division_cutoff2.attribute("value")).to eq("47 pts")
+      expect(division_cutoff1.attribute("value")).to eq("72 pts")
+      expect(division_cutoff2.attribute("value")).to eq("47 pts")
     end
 
     it "is able to add an assignment to a range", :ignore_js_errors do
@@ -191,25 +190,25 @@ describe "native canvas conditional release" do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "")
-      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to be(true)
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "70", "")
+      expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please enter a score")
 
-      ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "", "35")
-      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to be(true)
+      ConditionalReleaseObjects.replace_mastery_path_scores(division_cutoff1, "", "35")
+      expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please adjust score order")
     end
 
     it "does not show error setting middle range to 0" do
       assignment = assignment_model(course: @course, points_possible: 4)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
-      replace_content(ConditionalReleaseObjects.division_cutoff1, "2")
-      replace_content(ConditionalReleaseObjects.division_cutoff2, "0")
+      division_cutoff1 = ConditionalReleaseObjects.division_cutoff(0)
+      division_cutoff2 = ConditionalReleaseObjects.division_cutoff(1)
+      replace_content(division_cutoff1, "2")
+      replace_content(division_cutoff2, "0")
 
-      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to be(false)
-      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to be(false)
-      expect(ConditionalReleaseObjects.must_be_a_number_exists?).to be(false)
-      expect(ConditionalReleaseObjects.number_is_too_small_exists?).to be(false)
+      expect(element_exists?(ConditionalReleaseObjects.scoring_input_error_selector)).to be_falsey
     end
   end
 
@@ -249,11 +248,79 @@ describe "native canvas conditional release" do
     end
 
     it "shows Mastery Path Breakdown for a Discussion" do
+      skip "Will be fixed in VICE-5400"
       graded_discussion = @course.discussion_topics.build(assignment: @trigger_assmt, title: "graded discussion")
       graded_discussion.save!
       get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}"
 
       expect(ConditionalReleaseObjects.breakdown_graph_exists?).to be(true)
+    end
+  end
+
+  context "Copying a course with a mastery path" do
+    it "copies a mastery path course with wiki pages correctly" do
+      course_with_admin_logged_in
+
+      Account.site_admin.enable_feature!(:wiki_page_mastery_path_no_assignment_group)
+
+      page_title = "MP Page to Verify"
+      @new_page = @course.wiki_pages.create!(title: page_title)
+      page_assignment = @new_page.course.assignments.create!(
+        wiki_page: @new_page,
+        submission_types: "wiki_page",
+        title: @new_page.title
+      )
+
+      @trigger_assignment = @course.assignments.create!(
+        title: "Trigger Assignment",
+        grading_type: "points",
+        points_possible: 100,
+        submission_types: "online_text_entry"
+      )
+
+      page_assignment.assignment_overrides.create!(
+        set_type: "Noop",
+        set_id: 1,
+        all_day: false,
+        title: "Mastery Paths",
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+        due_at_overridden: true
+      )
+
+      course_module = @course.context_modules.create!(name: "Mastery Path Module")
+      course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+      course_module.add_item(id: @new_page.id, type: "wiki_page")
+
+      ranges = [
+        ConditionalRelease::ScoringRange.new(
+          lower_bound: 0,
+          upper_bound: 0.4,
+          assignment_sets: [
+            ConditionalRelease::AssignmentSet.new(
+              assignment_set_associations: [
+                ConditionalRelease::AssignmentSetAssociation.new(
+                  assignment_id: page_assignment.id
+                )
+              ]
+            )
+          ]
+        )
+      ]
+      @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+      get "/courses/#{@course.id}/modules"
+      get "/courses/#{@course.id}/copy"
+
+      expect_new_page_load { NewCourseCopyPage.create_course_button.click }
+
+      run_jobs
+      wait_for_ajaximations
+      wait_for_migration_to_complete
+
+      @new_course = Course.last
+
+      expect(@new_course.conditional_release).to be(true)
+      expect(@new_course.assignments.count).to eq(2)
     end
   end
 end

@@ -18,7 +18,6 @@
 
 import type JQuery from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
-// @ts-expect-error
 import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submissions_form.handlebars'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
@@ -31,7 +30,7 @@ class ReuploadSubmissionsDialogManager {
 
   userAssetString: string
 
-  assignment: Assignment
+  assignment: Pick<Assignment, 'id'>
 
   downloadedSubmissionsMap: {
     [assignmentId: string]: boolean
@@ -40,12 +39,12 @@ class ReuploadSubmissionsDialogManager {
   reuploadForm: JQuery | null
 
   constructor(
-    assignment: Assignment,
+    assignment: Pick<Assignment, 'id'>,
     reuploadUrlTemplate: string,
     userAssetString: string,
     downloadedSubmissionsMap: {
       [assignmentId: string]: boolean
-    }
+    },
   ) {
     this.assignment = assignment
     this.downloadedSubmissionsMap = downloadedSubmissionsMap
@@ -65,7 +64,7 @@ class ReuploadSubmissionsDialogManager {
     }
 
     this.reuploadForm = $(
-      re_upload_submissions_form({authenticityToken: authenticity_token()})
+      re_upload_submissions_form({authenticityToken: authenticity_token()}),
     ).dialog({
       width: 400,
       modal: true,

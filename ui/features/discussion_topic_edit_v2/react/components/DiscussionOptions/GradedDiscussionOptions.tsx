@@ -16,26 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useContext} from 'react'
 
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
 import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
-import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 import {CheckpointsSettings} from './CheckpointsSettings'
 import {Text} from '@instructure/ui-text'
 import {ItemAssignToTrayWrapper} from './ItemAssignToTrayWrapper'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
+import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
+import {DiscussionDueDatesContext} from '../../util/constants'
+import {AssetProcessorsForDiscussion} from './AssetProcessorsForDiscussion'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
   pointsPossible: number
-  setPointsPossible: (points: number) => void
+  setPointsPossible: (points: number | string) => void
   displayGradeAs: string
   setDisplayGradeAs: (id: string | undefined) => void
   assignmentGroup: string
@@ -56,7 +58,7 @@ type Props = {
   canManageAssignTo: boolean
 }
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export const GradedDiscussionOptions = ({
   assignmentGroups,
@@ -81,8 +83,11 @@ export const GradedDiscussionOptions = ({
   isCheckpoints,
   canManageAssignTo,
 }: Props) => {
-  const differentiatedModulesEnabled = ENV.FEATURES?.differentiated_modules
-  const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+  const isPacedDiscussion = ENV.IN_PACED_COURSE
+  const isPacedWithMasteryPaths =
+    ENV.FEATURES.course_pace_pacing_with_mastery_paths && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+
+  const {assignedInfoList, setAssignedInfoList} = useContext(DiscussionDueDatesContext)
 
   const renderDiffModulesAssignTo = () => {
     if (!canManageAssignTo) {
@@ -90,9 +95,24 @@ export const GradedDiscussionOptions = ({
     }
     return (
       <>
-        <Text size="large">{I18n.t('Assignment Settings')}</Text>
+        <Text size="large" as="h2">
+          {I18n.t('Assignment Settings')}
+        </Text>
         {isPacedDiscussion ? (
-          <CoursePacingNotice courseId={ENV.COURSE_ID} />
+          <>
+            <CoursePacingNotice courseId={ENV.COURSE_ID} />
+            {isPacedWithMasteryPaths && (
+              <MasteryPathToggle
+                courseId={ENV.COURSE_ID}
+                fetchOwnOverrides={false}
+                overrides={assignedInfoList}
+                useCards={false}
+                onSync={setAssignedInfoList}
+                itemType="discussionTopic"
+                itemContentId={undefined}
+              />
+            )}
+          </>
         ) : (
           <ItemAssignToTrayWrapper />
         )}
@@ -105,7 +125,7 @@ export const GradedDiscussionOptions = ({
       {!isCheckpoints && (
         <View as="div" margin="medium 0">
           <PointsPossible
-            pointsPossible={pointsPossible || 0}
+            pointsPossible={pointsPossible}
             setPointsPossible={setPointsPossible}
             pointsPossibleLabel={I18n.t('Points Possible')}
             pointsPossibleDataTestId="points-possible-input"
@@ -151,13 +171,15 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
+      {ENV.FEATURES.lti_asset_processor_discussions && (
+        <AssetProcessorsForDiscussion
+          courseId={parseInt(ENV.COURSE_ID!)}
+          secureParams={'' /* TODO in another commit */}
+        />
+      )}
       {isCheckpoints && <CheckpointsSettings />}
       <View as="div" margin="medium 0">
-        {!differentiatedModulesEnabled ? (
-          <AssignmentDueDatesManager />
-        ) : (
-          renderDiffModulesAssignTo()
-        )}
+        {renderDiffModulesAssignTo()}
       </View>
     </View>
   )

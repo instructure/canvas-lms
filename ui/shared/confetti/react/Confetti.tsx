@@ -19,10 +19,10 @@
 import React, {useState, useEffect, useRef} from 'react'
 import ConfettiGenerator from '../javascript/ConfettiGenerator'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getBrandingColors, getProps} from '../javascript/confetti.utils'
 
-const I18n = useI18nScope('confetti')
+const I18n = createI18nScope('confetti')
 
 export default function Confetti({triggerCount}: {triggerCount?: number | null}) {
   const canvasRef = useRef<HTMLCanvasElement>(null)

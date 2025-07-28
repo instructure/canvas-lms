@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -52,7 +51,9 @@ class CellFormatterFactory {
     }
   }
 
+  // @ts-expect-error
   getFormatter(column) {
+    // @ts-expect-error
     return (this.formatters[column.type] || {}).render
   }
 }

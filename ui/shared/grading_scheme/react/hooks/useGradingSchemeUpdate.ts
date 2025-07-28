@@ -19,7 +19,7 @@
 import {useState, useCallback} from 'react'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {GradingScheme, GradingSchemeUpdateRequest} from '../../gradingSchemeApiModel.d'
+import type {GradingScheme, GradingSchemeUpdateRequest} from '../../gradingSchemeApiModel'
 import {ApiCallStatus} from './ApiCallStatus'
 import {buildContextPath} from './buildContextPath'
 
@@ -27,19 +27,19 @@ export const useGradingSchemeUpdate = (): {
   updateGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeUpdateRequest: GradingSchemeUpdateRequest
+    gradingSchemeUpdateRequest: GradingSchemeUpdateRequest,
   ) => Promise<GradingScheme>
   updateGradingSchemeStatus: string
 } => {
   const [updateGradingSchemeStatus, setUpdateGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const updateGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeUpdateRequest: GradingSchemeUpdateRequest
+      gradingSchemeUpdateRequest: GradingSchemeUpdateRequest,
     ): Promise<GradingScheme> => {
       setUpdateGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
 
@@ -47,7 +47,6 @@ export const useGradingSchemeUpdate = (): {
 
       try {
         setUpdateGradingSchemeStatus(ApiCallStatus.PENDING)
-        // @ts-expect-error
         const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/${gradingSchemeUpdateRequest.id}`,
           method: 'PUT',
@@ -57,13 +56,14 @@ export const useGradingSchemeUpdate = (): {
           throw new Error(result.response.statusText)
         }
         setUpdateGradingSchemeStatus(ApiCallStatus.COMPLETED)
+        // @ts-expect-error
         return result.json
       } catch (err) {
         setUpdateGradingSchemeStatus(ApiCallStatus.FAILED)
         throw err
       }
     },
-    []
+    [],
   )
   return {
     updateGradingScheme,

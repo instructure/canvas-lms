@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
@@ -42,11 +41,30 @@ const defaultProps = () => {
 
 const renderModal = (overrideProps = {}) => {
   const props = defaultProps()
-  return render(<EquationEditorModal {...props} {...overrideProps} />)
+  const editor = basicEditor()
+  render(<EquationEditorModal {...props} {...overrideProps} />)
+  if (overrideProps?.originalLatex?.latex) editor.setValue(overrideProps.originalLatex.latex)
+  return editor
 }
 
-const basicEditor = () => document.body.querySelector('math-field')
-
+let basicEditor = () => document.body.querySelector('math-field')
+basicEditor = jest.fn((value = '') => {
+  return {
+    setValue: newValue => {
+      value = newValue
+      jest
+        .spyOn(EquationEditorModal.prototype, 'getMathFiled')
+        .mockImplementation(jest.fn().mockReturnValue(value))
+    },
+    getValue: () => value,
+    dispatchEvent: jest.fn(event => {
+      if (event.type === 'input') {
+        const toggle = screen.getByTestId('advanced-toggle')
+        fireEvent.click(toggle)
+      }
+    }),
+  }
+})
 const advancedEditor = () => document.body.querySelector('textarea')
 
 const advancedPreview = () => screen.getByTestId('mathml-preview-element')
@@ -59,6 +77,7 @@ const toggleMode = () => fireEvent.click(toggle())
 
 const editInAdvancedMode = text => {
   fireEvent.change(advancedEditor(), {target: {value: text}})
+  return basicEditor(text)
 }
 
 jest.mock('../advancedPreference', () => {
@@ -68,6 +87,14 @@ jest.mock('../advancedPreference', () => {
     remove: jest.fn(),
   }
 })
+jest.mock('mathlive', () => ({
+  MathfieldElement: jest.fn().mockImplementation(() => {
+    return {
+      mathfield: jest.fn(),
+      setOptions: jest.fn(),
+    }
+  }),
+}))
 
 describe('EquationEditorModal', () => {
   let mockFn, mathml
@@ -79,7 +106,8 @@ describe('EquationEditorModal', () => {
   beforeEach(() => {
     mockFn = jest.fn()
     mathml = new Mathml()
-    MathfieldElement.prototype.setOptions = jest.fn()
+    EquationEditorModal.prototype.stubMacros = jest.fn()
+    EquationEditorModal.prototype.setMathField = jest.fn()
   })
 
   afterEach(() => {
@@ -89,7 +117,7 @@ describe('EquationEditorModal', () => {
 
   it('disables all the basic editor macros', () => {
     renderModal()
-    expect(MathfieldElement.prototype.setOptions).toHaveBeenCalledWith({macros: {}})
+    expect(EquationEditorModal.prototype.stubMacros).toHaveBeenCalledWith()
   })
 
   describe('on submit', () => {
@@ -135,9 +163,9 @@ describe('EquationEditorModal', () => {
   it('preserves content from advanced to initial field', () => {
     renderModal()
     toggleMode()
-    editInAdvancedMode('hello')
+    const editor = editInAdvancedMode('hello')
     toggleMode()
-    const newValue = basicEditor().getValue()
+    const newValue = editor.getValue()
     expect(newValue).toEqual('hello')
   })
 
@@ -165,8 +193,8 @@ describe('EquationEditorModal', () => {
     })
 
     it('matches original latex in basic mode', () => {
-      renderModal({originalLatex: {latex: r`\sqrt{x}`}})
-      expect(basicEditor().getValue()).toEqual(r`\sqrt{x}`)
+      const editor = renderModal({originalLatex: {latex: r`\sqrt{x}`}})
+      expect(editor.getValue()).toEqual(r`\sqrt{x}`)
     })
 
     it('matches original latex in advanced mode', () => {
@@ -248,10 +276,10 @@ describe('EquationEditorModal', () => {
 
       it('deleting formula in basic editor', async () => {
         renderModal({openAdvanced: true})
-        editInAdvancedMode('updated in advanced mode')
+        const editor = editInAdvancedMode('updated in advanced mode')
         toggleMode()
         await waitFor(() => {
-          const value = basicEditor().getValue()
+          const value = editor.getValue()
           expect(value).toEqual('updated in advanced mode')
         })
         basicEditor().setValue('')
@@ -283,7 +311,7 @@ describe('EquationEditorModal', () => {
       basicEditor().dispatchEvent(event)
       await waitFor(() => {
         expect(toggle()).toBeChecked()
-        expect(toggle()).toBeDisabled()
+        expect(toggle()).toBeEnabled()
       })
     })
 

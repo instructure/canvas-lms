@@ -29,6 +29,7 @@ const renderComponent = (props = {}) => {
     courseId: 1,
     toolName: 'Awesome Tool',
     previouslySelected: false,
+    hideErrors: jest.fn()
   }
   return render(<DefaultToolForm {...defaultProps} {...props} />)
 }
@@ -86,8 +87,8 @@ describe('DefaultToolForm', () => {
 
       await waitFor(() =>
         expect(
-          wrapper.getByText('The tool is not installed in the course or account')
-        ).toBeInTheDocument()
+          wrapper.getByText('The tool is not installed in the course or account'),
+        ).toBeInTheDocument(),
       )
     })
   })

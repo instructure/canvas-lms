@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createClient, gql} from '@canvas/apollo'
+import {createClient, gql} from '@canvas/apollo-v3'
 
 export const SET_COURSE_POST_POLICY_MUTATION = gql`
   mutation SetCoursePostPolicy($courseId: ID!, $postManually: Boolean!) {
@@ -33,21 +32,6 @@ export const SET_COURSE_POST_POLICY_MUTATION = gql`
   }
 `
 
-export const COURSE_ASSIGNMENT_POST_POLICIES_QUERY = gql`
-  query CourseAssignmentPostPolicies($courseId: ID!) {
-    course(id: $courseId) {
-      assignmentsConnection(filter: {gradingPeriodId: null}) {
-        nodes {
-          _id
-          postPolicy {
-            postManually
-          }
-        }
-      }
-    }
-  }
-`
-
 export function setCoursePostPolicy({
   courseId,
   postManually,
@@ -55,53 +39,31 @@ export function setCoursePostPolicy({
   courseId: string
   postManually: boolean
 }) {
-  return createClient()
-    .mutate({
-      mutation: SET_COURSE_POST_POLICY_MUTATION,
-      variables: {
-        courseId,
-        postManually,
-      },
-    })
-    .then(response => {
-      const queryResponse = response && response.data && response.data.setCoursePostPolicy
-      if (queryResponse) {
-        if (queryResponse.postPolicy) {
-          return {
-            postManually: queryResponse.postPolicy.postManually,
-          }
-        } else if (queryResponse.errors && queryResponse.errors.length > 0) {
-          throw new Error(queryResponse.errors[0].message)
-        }
-      }
-
-      throw new Error('no postPolicy or error provided in response')
-    })
-}
-
-export function getAssignmentPostPolicies({courseId}: {courseId: string}) {
-  return createClient()
-    .query({
-      query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-      variables: {courseId},
-    })
-    .then(response => {
-      const queryResponse = response && response.data && response.data.course
-      if (queryResponse) {
-        const assignments = queryResponse.assignmentsConnection.nodes
-        if (assignments != null) {
-          const assignmentPostPoliciesById = {}
-          assignments.forEach(assignment => {
-            if (assignment.postPolicy) {
-              const {postManually} = assignment.postPolicy
-              assignmentPostPoliciesById[assignment._id] = {postManually}
+  return (
+    createClient()
+      .mutate({
+        mutation: SET_COURSE_POST_POLICY_MUTATION,
+        variables: {
+          courseId,
+          postManually,
+        },
+      })
+      // @ts-expect-error
+      .then(response => {
+        const queryResponse = response?.data?.setCoursePostPolicy
+        if (queryResponse) {
+          if (queryResponse.postPolicy) {
+            return {
+              postManually: queryResponse.postPolicy.postManually,
             }
-          })
+          }
 
-          return {assignmentPostPoliciesById}
+          if (queryResponse.errors && queryResponse.errors.length > 0) {
+            throw new Error(queryResponse.errors[0].message)
+          }
         }
-      }
 
-      throw new Error('no course provided in response')
-    })
+        throw new Error('no postPolicy or error provided in response')
+      })
+  )
 }

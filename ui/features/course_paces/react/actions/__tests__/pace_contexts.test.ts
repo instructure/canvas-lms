@@ -38,7 +38,7 @@ describe('Pace contexts actions', () => {
   })
 
   it('fetches section pace contexts', async () => {
-    fetchMock.get(SECTION_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_SECTIONS_RESPONSE))
+    fetchMock.get(SECTION_CONTEXTS_API, PACE_CONTEXTS_SECTIONS_RESPONSE)
     const thunkedAction: any = paceContextsActions.fetchPaceContexts({
       contextType: 'section',
       page: 1,
@@ -52,7 +52,7 @@ describe('Pace contexts actions', () => {
   })
 
   it('fetches student pace contexts', async () => {
-    fetchMock.get(STUDENT_CONTEXTS_API, JSON.stringify(PACE_CONTEXTS_STUDENTS_RESPONSE))
+    fetchMock.get(STUDENT_CONTEXTS_API, PACE_CONTEXTS_STUDENTS_RESPONSE)
     const thunkedAction: any = paceContextsActions.fetchPaceContexts({
       contextType: 'student_enrollment',
       page: 1,

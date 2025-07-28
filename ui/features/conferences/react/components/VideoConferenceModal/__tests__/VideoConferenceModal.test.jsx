@@ -55,7 +55,7 @@ describe('VideoConferenceModal', () => {
         startCalendarDate={startCalendarDate}
         endCalendarDate={endCalendarDate}
         {...props}
-      />
+      />,
     )
   }
 
@@ -96,8 +96,8 @@ describe('VideoConferenceModal', () => {
 
   it('do not submit without a conference name', async () => {
     const container = setup()
-    expect(container.getByLabelText('Name')).toHaveValue('Amazing Course Conference')
-    await userEvent.clear(container.getByLabelText('Name'))
+    expect(container.getByLabelText('Name *')).toHaveValue('Amazing Course Conference')
+    await userEvent.clear(container.getByLabelText('Name *'))
     fireEvent.click(container.getByTestId('submit-button'))
     expect(onSubmit).not.toHaveBeenCalled()
   })
@@ -105,11 +105,11 @@ describe('VideoConferenceModal', () => {
   it.skip('submit when correct fields are filled (flaky)', async () => {
     const container = setup()
 
-    await userEvent.clear(container.getByLabelText('Name'))
-    await userEvent.type(container.getByLabelText('Name'), 'A great video conference name')
+    await userEvent.clear(container.getByLabelText('Name *'))
+    await userEvent.type(container.getByLabelText('Name *'), 'A great video conference name')
     await userEvent.type(
       container.getByLabelText('Description'),
-      'A great video conference description'
+      'A great video conference description',
     )
     await userEvent.click(container.getByTestId('submit-button'))
 
@@ -144,14 +144,14 @@ describe('VideoConferenceModal', () => {
       .querySelector("svg[name='IconArrowOpenDown']")
       .closest('button')
 
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('60')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('60')
 
     fireEvent.mouseDown(arrowUpButton)
     fireEvent.mouseDown(arrowUpButton)
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('62')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('62')
 
     fireEvent.mouseDown(arrowDownButton)
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('61')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('61')
   })
 
   it('shows attendees tab after clicking it', () => {
@@ -192,8 +192,8 @@ describe('VideoConferenceModal', () => {
 
     expect(container.getByText('Save')).toBeInTheDocument()
     expect(container.getByText('Edit Video Conference')).toBeInTheDocument()
-    expect(container.getByLabelText('Name')).toHaveValue('PHP Introduction')
-    expect(container.getByLabelText('Duration in Minutes')).toHaveValue('45')
+    expect(container.getByLabelText('Name *')).toHaveValue('PHP Introduction')
+    expect(container.getByLabelText('Duration in Minutes *')).toHaveValue('45')
     expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
     expect(container.getByLabelText('Description')).toHaveValue('An introduction to PHP.')
 

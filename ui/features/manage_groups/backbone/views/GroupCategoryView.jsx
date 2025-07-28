@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-
+import {useScope as createI18nScope} from '@canvas/i18n'
+import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import {debounce} from 'lodash'
 import GroupCategoryDetailView from './GroupCategoryDetailView'
@@ -30,7 +30,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import GroupCategoryProgress from '../../react/GroupCategoryProgress'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 let _previousSearchTerm = ''
 export default class GroupCategoryView extends View {
@@ -114,6 +114,29 @@ export default class GroupCategoryView extends View {
     })
     this.model.progressModel.on('change', this.render, this)
     return this.model.on('progressResolved', () => {
+      const status = this.model.progressModel.get('workflow_state')
+      const progressMessage = this.model.progressModel.get('message')
+      let message
+      try {
+        message = progressMessage ? JSON.parse(progressMessage) : null
+      } catch (_err) {
+        message = null
+      }
+
+      if (message && message.type === "import_groups") {
+        if (status === 'completed') {
+          if (message.groups > 0) {
+            $.flashMessage(I18n.t("Your %{groups} groups and %{users} students were successfully uploaded",
+            { groups: message.groups, users: message.users }))
+          } else {
+            $.flashError(I18n.t("No groups were found in the uploaded file."))
+          }
+        }
+        if (status === 'failed') {
+          $.flashError(I18n.t('Your groups could not be uploaded. Check formatting and try again.'))
+        }
+      }
+
       return this.model.fetch({
         success: () => {
           this.model.groups().fetch()
@@ -151,7 +174,7 @@ export default class GroupCategoryView extends View {
     if (container != null) {
       ReactDOM.render(
         <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
-        container
+        container,
       )
     }
   }
@@ -171,8 +194,8 @@ export default class GroupCategoryView extends View {
       this.model.get('allows_multiple_memberships')
         ? I18n.t('everyone', 'Everyone (%{count})', {count})
         : ENV.group_user_type === 'student'
-        ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
-        : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count})
+          ? I18n.t('unassigned_students', 'Unassigned Students (%{count})', {count})
+          : I18n.t('unassigned_users', 'Unassigned Users (%{count})', {count}),
     )
   }
 

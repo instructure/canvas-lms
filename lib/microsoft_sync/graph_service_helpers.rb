@@ -60,7 +60,7 @@ module MicrosoftSync
       graph_service.groups.update(
         ms_group_id,
         microsoft_EducationClassLmsExt: {
-          ltiContextId: course.lti_context_id || Lti::Asset.opaque_identifier_for(course),
+          ltiContextId: course.lti_context_id || Lti::V1p1::Asset.opaque_identifier_for(course),
           lmsCourseId: course.uuid,
           lmsCourseName: course.name,
           lmsCourseDescription: course.public_description&.truncate(256),

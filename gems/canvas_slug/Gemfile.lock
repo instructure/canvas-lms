@@ -7,21 +7,21 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    diff-lcs (1.5.1)
+    diff-lcs (1.6.1)
     rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
       rspec-mocks (~> 3.13.0)
-    rspec-core (3.13.0)
+    rspec-core (3.13.3)
       rspec-support (~> 3.13.0)
-    rspec-expectations (3.13.0)
+    rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-mocks (3.13.1)
+    rspec-mocks (3.13.2)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
-    rspec-support (3.13.1)
+    rspec-support (3.13.2)
     swearjar (1.4.0)
 
 PLATFORMS
@@ -32,13 +32,12 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (>= 1.5, < 3)
   canvas_slug!
   rake
   rspec (~> 3.12)
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.4.1p0
 
 BUNDLED WITH
-   2.5.10
+   2.6.7

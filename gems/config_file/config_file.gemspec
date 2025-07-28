@@ -12,8 +12,4 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "railties", ">= 5.0"
-
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "rspec"
 end

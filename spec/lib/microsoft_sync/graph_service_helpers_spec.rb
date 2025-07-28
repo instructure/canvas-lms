@@ -191,7 +191,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     it "maps course fields to Microsoft fields" do
       course_model(public_description: "classic", name: "algebra", sis_source_id: "ALG-101")
       # force generation of lti context id (normally done lazily)
-      lti_context_id = Lti::Asset.opaque_identifier_for(@course)
+      lti_context_id = Lti::V1p1::Asset.opaque_identifier_for(@course)
       expect(lti_context_id).to_not be_nil
       expect(graph_service.groups).to receive(:update).with(
         "msgroupid",
@@ -220,7 +220,7 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     it "forces generation of lti_context_id if needed" do
       course_model
-      expect(Lti::Asset).to receive(:opaque_identifier_for).with(@course).and_return("abcdef")
+      expect(Lti::V1p1::Asset).to receive(:opaque_identifier_for).with(@course).and_return("abcdef")
       expect_lms_ext_properties(ltiContextId: "abcdef")
       update_group
     end

@@ -18,12 +18,12 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import classnames from 'classnames'
 import {isEmpty, isObject} from 'lodash'
 import CourseEpubExportStore from './CourseStore'
 
-const I18n = useI18nScope('epub_exports')
+const I18n = createI18nScope('epub_exports')
 
 class GenerateLink extends React.Component {
   static displayName = 'GenerateLink'

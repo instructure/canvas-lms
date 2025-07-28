@@ -5,3 +5,6 @@ gem "canvas_mimetype_fu", path: "../canvas_mimetype_fu"
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rake"
+gem "rspec", "~> 3.12"

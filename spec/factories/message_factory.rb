@@ -20,14 +20,14 @@
 
 module Factories
   def message_model(opts = {})
-    @message = factory_with_protected_attributes(Message, message_valid_attributes.merge(opts))
+    @message = Message.create!(message_valid_attributes.merge(opts))
   end
 
   def message_valid_attributes
     {
       subject: "value for subject",
       body: "value for body",
-      sent_at: Time.now
+      sent_at: Time.zone.now
     }
   end
 

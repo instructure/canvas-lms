@@ -112,24 +112,22 @@ module SmartSearch
       version = context.search_embedding_version || EMBEDDING_VERSION
       embedding = SmartSearch.generate_embedding(query, version:, query: true)
       collections = []
-      ActiveRecord::Base.with_pgvector do
-        SmartSearch.search_scopes(context, user).each do |klass, item_scope|
-          item_scope = apply_filter(klass, item_scope, type_filter)
-          next unless item_scope
+      SmartSearch.search_scopes(context, user).each do |klass, item_scope|
+        item_scope = apply_filter(klass, item_scope, type_filter)
+        next unless item_scope
 
-          item_scope = item_scope.select(
-            ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding <=> ?) AS distance", embedding.to_s])
-          )
-                                 .joins(:embeddings)
-                                 .where(klass.embedding_class.table_name => { version: })
-                                 .group("#{klass.table_name}.id")
-                                 .reorder("distance ASC")
-          collections << [klass.name,
-                          BookmarkedCollection.wrap(
-                            BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
-                            item_scope
-                          )]
-        end
+        item_scope = item_scope.select(
+          ActiveRecord::Base.send(:sanitize_sql, ["#{klass.table_name}.*, MIN(embedding OPERATOR(#{PG::Connection.quote_ident(ActiveRecord::Base.connection.extension("vector").schema)}.<=>) ?) AS distance", embedding.to_s])
+        )
+                               .joins(:embeddings)
+                               .where(klass.embedding_class.table_name => { version: })
+                               .group("#{klass.table_name}.id")
+                               .reorder("distance ASC")
+        collections << [klass.name,
+                        BookmarkedCollection.wrap(
+                          BookmarkedCollection::SimpleBookmarker.new(klass, { distance: { type: :float, null: false } }, :id),
+                          item_scope
+                        )]
       end
       BookmarkedCollection.merge(*collections)
     end
@@ -160,6 +158,10 @@ module SmartSearch
         # otherwise everything would be 40-60% relevant using the old formula
         (100.0 * ((2.0 / (1.0 + Math.exp(-18.0 * ((1.0 - object.distance)**3)))) - 1.0)).round
       end
+    end
+
+    def up_to_date?(course)
+      smart_search_available?(course) && course.search_embedding_version == SmartSearch::EMBEDDING_VERSION
     end
 
     # returns [ready, progress]
@@ -220,6 +222,46 @@ module SmartSearch
       end
 
       (indexed * 100.0 / total).to_i
+    end
+
+    def copy_embeddings(content_migration)
+      return unless content_migration.for_course_copy? &&
+                    content_migration.source_course&.search_embedding_version == EMBEDDING_VERSION &&
+                    SmartSearch.smart_search_available?(content_migration.context)
+
+      content_migration.imported_asset_id_map&.each do |class_name, id_mapping|
+        klass = class_name.safe_constantize
+        next unless klass.respond_to?(:embedding_class)
+
+        fk = klass.embedding_foreign_key # i.e. :wiki_page_id
+
+        content_migration.context.shard.activate do
+          klass.embedding_class
+               .where(:version => EMBEDDING_VERSION, fk => id_mapping.values)
+               .in_batches
+               .delete_all
+        end
+
+        content_migration.source_course.shard.activate do
+          klass.embedding_class.where(:version => EMBEDDING_VERSION, fk => id_mapping.keys)
+               .find_in_batches(batch_size: 50) do |src_embeddings|
+            dest_embeddings = src_embeddings.map do |src_embedding|
+              {
+                :embedding => src_embedding.embedding,
+                fk => id_mapping[src_embedding[fk]],
+                :version => EMBEDDING_VERSION,
+                :root_account_id => content_migration.context.root_account_id,
+                :created_at => Time.now.utc,
+                :updated_at => Time.now.utc
+              }
+            end
+
+            content_migration.context.shard.activate do
+              klass.embedding_class.insert_all(dest_embeddings)
+            end
+          end
+        end
+      end
     end
   end
 end

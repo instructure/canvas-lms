@@ -54,13 +54,15 @@ const initializeNewUserTutorials = () => {
 
       const renderTray = () => {
         const Tray = trayObj.component
+
         ReactDOM.render(
           <TutorialTray store={store} returnFocusToFunc={getReturnFocus} label={trayObj.label}>
             <Tray />
           </TutorialTray>,
-          document.querySelector('.NewUserTutorialTray__Container')
+          document.querySelector('.NewUserTutorialTray__Container'),
         )
       }
+
       ReactDOM.render(
         <NewUserTutorialToggleButton
           ref={(c: NewUserTutorialToggleButton | null) => {
@@ -69,7 +71,7 @@ const initializeNewUserTutorials = () => {
           store={store}
         />,
         document.querySelector('.TutorialToggleHolder'),
-        () => renderTray()
+        () => renderTray(),
       )
     })
   }

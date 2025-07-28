@@ -36,7 +36,7 @@ describe('CanvasMultiSelect', () => {
             {o.text}
           </CanvasMultiSelect.Option>
         ))}
-      </CanvasMultiSelect>
+      </CanvasMultiSelect>,
     )
   }
 

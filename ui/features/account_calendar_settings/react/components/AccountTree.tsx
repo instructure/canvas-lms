@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
@@ -35,10 +35,9 @@ import type {
   VisibilityChange,
   SubscriptionChange,
   ExpandedAccounts,
-  FetchAccountDataResponse,
 } from '../types'
 
-const I18n = useI18nScope('account_calendar_settings_account_tree')
+const I18n = createI18nScope('account_calendar_settings_account_tree')
 
 type ComponentProps = {
   readonly originAccountId: number
@@ -78,13 +77,13 @@ export const AccountTree = ({
     (accountId: number, nextLink?: string, accumulatedResults: AccountData[] = []) => {
       loadingCollectionIds.current = [...loadingCollectionIds.current, accountId]
       setLoadingCollectionIdState(loadingCollectionIds.current)
-      doFetchApi({
+      doFetchApi<AccountData[]>({
         path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
         params: {
           ...(nextLink == null && {per_page: 100}),
         },
       })
-        .then((response: FetchAccountDataResponse) => {
+        .then(response => {
           const {json, link} = response
           const accountData = accumulatedResults.concat(json || [])
           if (link?.next) {
@@ -92,14 +91,14 @@ export const AccountTree = ({
           } else {
             receivedAccountData(accountData)
             loadingCollectionIds.current = loadingCollectionIds.current.filter(
-              id => id !== accountId
+              id => id !== accountId,
             )
             setLoadingCollectionIdState(loadingCollectionIds.current)
           }
         })
         .catch(showFlashError(I18n.t("Couldn't load account calendar settings")))
     },
-    [receivedAccountData]
+    [receivedAccountData],
   )
 
   useEffect(() => {
@@ -123,7 +122,7 @@ export const AccountTree = ({
       }
       onAccountExpandedToggled(account.id, expanded)
     },
-    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId]
+    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId],
   )
 
   if (!collections[originAccountId]) {

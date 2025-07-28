@@ -18,13 +18,14 @@
 
 import $ from 'jquery'
 import '@canvas/backbone'
-import {defer} from 'lodash'
 import moment from 'moment-timezone'
 import {fireEvent, within, getByText, waitFor, screen} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
@@ -32,11 +33,18 @@ jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', ()
 }))
 
 const defaultTZ = 'Asia/Tokyo'
+const server = setupServer()
 
 describe('EditEventView', () => {
   beforeAll(() => {
     moment.tz.setDefault(defaultTZ)
+    server.listen()
   })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
@@ -45,6 +53,7 @@ describe('EditEventView', () => {
   afterEach(() => {
     window.ENV = null
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   function render(overrides = {}) {
@@ -183,7 +192,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -192,7 +201,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -201,7 +210,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -241,7 +250,7 @@ describe('EditEventView', () => {
       expect(
         within(document.body).getByLabelText('Add to Course Pacing blackout dates', {
           exact: false,
-        })
+        }),
       ).toBeInTheDocument()
     })
 
@@ -292,7 +301,7 @@ describe('EditEventView', () => {
 
       expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Tuesday')
       expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
-        'Monthly on the second Tuesday'
+        'Monthly on the second Tuesday',
       )
       expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on May 12')
 
@@ -303,18 +312,22 @@ describe('EditEventView', () => {
 
       expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Thursday')
       expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
-        'Monthly on the second Thursday'
+        'Monthly on the second Thursday',
       )
       expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on April 12')
     })
 
     it('hides the frequency picker when section dates are enabled', async () => {
-      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
-        const sections = [{id: 1}]
-        return Promise.resolve(sections).then(() => {
-          successCB(sections, {getResponseHeader: () => ''})
-        })
-      })
+      const sections = [{id: 1}]
+      server.use(
+        http.get('*/api/v1/courses/21/sections', () => {
+          return HttpResponse.json(sections, {
+            headers: {
+              'X-Response-Header': '',
+            },
+          })
+        }),
+      )
 
       // jquery supplies this in the real app
       document.head.appendChild(document.createElement('style')).textContent =
@@ -337,12 +350,8 @@ describe('EditEventView', () => {
     })
 
     it('shows the duplicates when section dates are enabled', async () => {
-      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
-        const sections = [{id: 1}]
-        return Promise.resolve(sections).then(() => {
-          successCB(sections, {getResponseHeader: () => ''})
-        })
-      })
+      const sections = [{id: 1}]
+      server.use(http.get('/api/v1/courses/21/sections', () => HttpResponse.json(sections)))
 
       const event = new CalendarEvent({
         context_code: 'course_1',
@@ -370,8 +379,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes))
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes)),
       )
     })
 
@@ -382,8 +391,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).not.toHaveBeenCalled()
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).not.toHaveBeenCalled(),
       )
     })
 
@@ -396,8 +405,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).not.toHaveBeenCalled()
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).not.toHaveBeenCalled(),
       )
     })
 

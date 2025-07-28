@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine, IconCheckLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -31,7 +31,7 @@ import {getPeerReviewUrl} from '../helpers/PeerReviewHelpers'
 import type {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('assignments_2_student_header')
+const I18n = createI18nScope('assignments_2_student_header')
 
 type PeerReviewNavigationLinkProps = {
   assignedAssessments: AssignedAssessments[]
@@ -81,7 +81,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
     assessment: AssignedAssessments,
     index: number,
     testId: string,
-    peerReviewStatus: string
+    peerReviewStatus: string,
   ) => {
     return (
       <Menu.Item
@@ -92,7 +92,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
            to the theme to the rendered menu item.
         */
         themeOverride={
-          currentAssessmentIndex === index + 1 ? {background: '#6B7780', labelColor: 'white'} : {}
+          currentAssessmentIndex === index + 1 ? {background: '#6A7883', labelColor: 'white'} : {}
         }
         data-testid={`${testId}-${assessment.assetId}`}
       >
@@ -139,8 +139,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-ready',
-              I18n.t('Ready to Review')
-            )
+              I18n.t('Ready to Review'),
+            ),
         )}
 
         <Menu.Group label={I18n.t('Not Yet Submitted')} />
@@ -151,8 +151,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-not-submitted',
-              I18n.t('Peer Review Not Yet Submitted')
-            )
+              I18n.t('Peer Review Not Yet Submitted'),
+            ),
         )}
 
         <Menu.Group label={I18n.t('Completed Peer Reviews')} />
@@ -164,8 +164,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-completed',
-              I18n.t('Peer Review Completed')
-            )
+              I18n.t('Peer Review Completed'),
+            ),
         )}
       </Menu>
     </Popover>

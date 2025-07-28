@@ -27,10 +27,10 @@ import {View} from '@instructure/ui-view'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SelectMenu from './SelectMenu'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 class SelectMenuGroup extends React.Component {
   static propTypes = {
@@ -41,7 +41,7 @@ class SelectMenuGroup extends React.Component {
         nickname: PropTypes.string.isRequired,
         url: PropTypes.string.isRequired,
         gradingPeriodSetId: PropTypes.string,
-      })
+      }),
     ).isRequired,
     currentUserID: PropTypes.string.isRequired,
     displayPageContent: PropTypes.func.isRequired,
@@ -50,7 +50,7 @@ class SelectMenuGroup extends React.Component {
       PropTypes.shape({
         id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-      })
+      }),
     ).isRequired,
     saveAssignmentOrder: PropTypes.func.isRequired,
     selectedAssignmentSortOrder: PropTypes.string.isRequired,
@@ -61,7 +61,8 @@ class SelectMenuGroup extends React.Component {
       PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-      })
+        sortable_name: PropTypes.string.isRequired,
+      }),
     ).isRequired,
     breakpoints: breakpointsShape,
   }
@@ -143,7 +144,7 @@ class SelectMenuGroup extends React.Component {
     } = this
     const initialCourse = this.props.courses.find(course => course.id === initialCourseId)
     const selectedCourse = this.props.courses.find(
-      course => course.id === currentlySelectedCourseId
+      course => course.id === currentlySelectedCourseId,
     )
 
     const baseURL = selectedCourse.url
@@ -163,6 +164,10 @@ class SelectMenuGroup extends React.Component {
     this.props.goToURL(`${baseURL}${studentURL}${params}`)
   }
 
+  sortedStudents = () => {
+    return this.props.students.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
+  }
+
   render() {
     const isVertical = !this.props.breakpoints.miniTablet
     return (
@@ -177,7 +182,7 @@ class SelectMenuGroup extends React.Component {
                   id="student_select_menu"
                   label={I18n.t('Student')}
                   onChange={this.onSelectStudent}
-                  options={this.props.students}
+                  options={this.sortedStudents()}
                   textAttribute="name"
                   valueAttribute="id"
                 />

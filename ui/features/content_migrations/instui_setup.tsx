@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -17,14 +19,19 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import App from './react/app'
 import extensions from '@canvas/bundles/extensions'
 
 ready(() => {
   if (document.getElementById('instui_content_migrations')) {
-    ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
+    const node = document.getElementById('instui_content_migrations')
+    if (!node) {
+      throw new Error('Could not find element with id instui_content_migrations')
+    }
+    const root = ReactDOM.createRoot(node)
+    root.render(<App />)
   }
 
   const loadExtension = extensions['ui/features/content_migrations/instui_setup.tsx']?.()
@@ -36,7 +43,7 @@ ready(() => {
       .catch(err => {
         throw new Error(
           'Error loading extension for ui/features/content_migrations/instui_setup.tsx',
-          err
+          err,
         )
       })
   }

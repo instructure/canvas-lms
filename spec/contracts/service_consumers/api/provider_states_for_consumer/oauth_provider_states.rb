@@ -107,8 +107,7 @@ module LtiProviderStateHelper
       }
     }
     tool_config = Lti::ToolConfiguration.create!(developer_key:, settings: configuration, privacy_level: "public")
-    external_tool = tool_config.new_external_tool(developer_key.account)
-    external_tool.save!
+    tool_config.new_external_tool(developer_key.account)
   end
 end
 

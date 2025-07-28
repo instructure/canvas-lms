@@ -127,7 +127,7 @@ const RCELoader = {
         memo[attr.name] = attr.value
         return memo
       },
-      {}
+      {},
     )
 
     return pick(attrs, validAttrs)
@@ -156,7 +156,10 @@ const RCELoader = {
     //       Assignments2 student view is going to be doing their own autosave
     const autosave = {
       enabled: true,
-      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
+      maxAge:
+        Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
+          ? 3600000
+          : ENV.rce_auto_save_max_age_ms,
     }
 
     return {
@@ -183,6 +186,7 @@ const RCELoader = {
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
       resourceType: tinyMCEInitOptions.resourceType,
       resourceId: tinyMCEInitOptions.resourceId,
+      ai_text_tools: ENV?.RICH_CONTENT_AI_TEXT_TOOLS,
       externalToolsConfig: {
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
         isA2StudentView: window.ENV?.a2_student_view,

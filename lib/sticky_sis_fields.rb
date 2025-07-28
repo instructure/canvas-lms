@@ -20,7 +20,7 @@
 
 module StickySisFields
   module InstanceMethods
-    # this method is set as a before_update callback
+    # this method is set as a before_save callback
     def set_sis_stickiness
       self.class.sis_stickiness_options ||= {}
       currently_stuck_sis_fields = if self.class.sis_stickiness_options[:clear_sis_stickiness]
@@ -28,8 +28,8 @@ module StickySisFields
                                    else
                                      calculate_currently_stuck_sis_fields
                                    end
-      if load_stuck_sis_fields_cache != currently_stuck_sis_fields
-        write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(","))
+      if stuck_sis_fields_cache != currently_stuck_sis_fields
+        self["stuck_sis_fields"] = currently_stuck_sis_fields.map(&:to_s).sort.join(",")
       end
       @stuck_sis_fields_cache = currently_stuck_sis_fields
       @sis_fields_to_stick = [].to_set
@@ -79,15 +79,15 @@ module StickySisFields
 
     private
 
-    def load_stuck_sis_fields_cache
-      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").to_set(&:to_sym)
+    def stuck_sis_fields_cache
+      @stuck_sis_fields_cache ||= (self["stuck_sis_fields"] || "").split(",").to_set(&:to_sym)
     end
 
     def calculate_currently_stuck_sis_fields
       @sis_fields_to_stick ||= [].to_set
       @sis_fields_to_unstick ||= [].to_set
       changed_sis_fields = self.class.sticky_sis_fields & (changed.to_set(&:to_sym) | @sis_fields_to_stick)
-      (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
+      (stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
     end
   end
 

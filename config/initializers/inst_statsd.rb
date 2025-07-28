@@ -24,4 +24,5 @@ Rails.configuration.to_prepare do
   settings ||= ConfigFile.load("statsd").dup
   settings ||= {}
   InstStatsd.settings = settings
+  InstStatsd::Statsd.instance # ensure the singleton is initialized
 end

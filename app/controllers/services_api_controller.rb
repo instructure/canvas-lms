@@ -92,7 +92,10 @@ class ServicesApiController < ApplicationController
       serverTime: Time.zone.now.to_i
     }
     if value_to_boolean(params[:include_upload_config])
-      pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
+      pseudonym = SisPseudonym.for(@current_user,
+                                   @context || @domain_root_account,
+                                   type: :implicit,
+                                   require_sis: false)
       hash[:kaltura_setting] = CanvasKaltura::ClientV3.config.try(:slice,
                                                                   "domain",
                                                                   "resource_domain",
@@ -129,7 +132,7 @@ class ServicesApiController < ApplicationController
 
     should_add_base_url = !Canvas::Cdn.config.host
     base_url = "#{request.scheme}://#{HostUrl.context_host(@domain_root_account, request.host)}"
-    add_base_url_if_needed = ->(url) { "#{should_add_base_url ? base_url : ""}#{url}" }
+    add_base_url_if_needed = ->(url) { "#{base_url if should_add_base_url}#{url}" }
 
     high_contrast_css_urls = env[:url_for_high_contrast_tinymce_editor_css] || []
     editor_css_urls = env[:url_to_what_gets_loaded_inside_the_tinymce_editor_css] || []

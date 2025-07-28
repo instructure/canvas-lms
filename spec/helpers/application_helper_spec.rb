@@ -70,23 +70,7 @@ describe ApplicationHelper do
   context "show_user_create_course_button" do
     before(:once) { @domain_root_account = Account.default }
 
-    it "works (non-granular)" do
-      @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
-      @domain_root_account.update_attribute(
-        :settings,
-        { teachers_can_create_courses: true, students_can_create_courses: true }
-      )
-      expect(show_user_create_course_button(nil)).to be_falsey
-      user_factory
-      expect(show_user_create_course_button(@user)).to be_falsey
-      course_with_teacher
-      expect(show_user_create_course_button(@teacher)).to be_truthy
-      account_admin_user
-      expect(show_user_create_course_button(@admin)).to be_truthy
-    end
-
-    it "works for no enrollments setting (granular permissions)" do
-      @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
+    it "works for no enrollments setting" do
       @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
       expect(show_user_create_course_button(nil)).to be_falsey
       user_factory
@@ -122,28 +106,28 @@ describe ApplicationHelper do
     describe "#context_sensitive_datetime_title" do
       it "produces a string showing the local time and the course time" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am\""
+        expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am"
+        expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
-        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Mar 13 at 1:12am"
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at 1:12am\""
+        expect(context_sensitive_datetime_title(Time.zone.now, context, just_text: true)).to eq "Mar 13 at 1:12am"
+        expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at 1:12am\""
       end
 
       it "uses the simple title for nil context" do
-        expect(context_sensitive_datetime_title(Time.now, nil, just_text: true)).to eq "Mar 13 at 1:12am"
+        expect(context_sensitive_datetime_title(Time.zone.now, nil, just_text: true)).to eq "Mar 13 at 1:12am"
       end
 
       it "crosses date boundaries appropriately" do
         Timecop.freeze(Time.utc(2013, 3, 13, 7, 12)) do
           context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at 1:12am\""
+          expect(context_sensitive_datetime_title(Time.zone.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at 1:12am\""
         end
       end
     end
@@ -152,12 +136,12 @@ describe ApplicationHelper do
       let(:context) { double(time_zone: ActiveSupport::TimeZone["America/Denver"]) }
 
       it "spits out a friendly time tag" do
-        tag = friendly_datetime(Time.now)
+        tag = friendly_datetime(Time.zone.now)
         expect(tag).to eq "<time data-html-tooltip-title=\"Mar 13 at 1:12am\" data-tooltip=\"top\">Mar 13 at 1:12am</time>"
       end
 
       it "builds a whole time tag with a useful title showing the timezone offset if theres a context" do
-        tag = friendly_datetime(Time.now, context:)
+        tag = friendly_datetime(Time.zone.now, context:)
         expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -165,7 +149,7 @@ describe ApplicationHelper do
       end
 
       it "can produce an alternate tag type" do
-        tag = friendly_datetime(Time.now, context:, tag_type: :span)
+        tag = friendly_datetime(Time.zone.now, context:, tag_type: :span)
         expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -588,7 +572,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
-                                     always_on: false,
+                                     on_by_default: false,
                                      description: "<p>the description.</p>\n",
                                      favorite: false
                                    }])
@@ -611,7 +595,7 @@ describe ApplicationHelper do
                                      width: 800,
                                      height: 400,
                                      use_tray: false,
-                                     always_on: false,
+                                     on_by_default: false,
                                      description: "",
                                      favorite: false
                                    }])
@@ -818,6 +802,15 @@ describe ApplicationHelper do
     end
 
     it "returns false with no user" do
+      expect(planner_enabled?).to be false
+    end
+
+    it "returns false for student in at least one limited access account" do
+      course_with_student(active_all: true)
+      @current_user = @user
+      @course.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
       expect(planner_enabled?).to be false
     end
 
@@ -1183,14 +1176,6 @@ describe ApplicationHelper do
         allow(helper).to receive(:csp_context).and_return(account)
       end
 
-      it "doesn't set the CSP report only header if not configured" do
-        helper.add_csp_for_root
-        helper.include_custom_meta_tags
-        expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(headers).to_not have_key("Content-Security-Policy")
-        expect(js_env).not_to have_key(:csp)
-      end
-
       it "doesn't set the CSP header for non-html requests" do
         response.content_type = "application/json"
         account.enable_csp!
@@ -1209,19 +1194,12 @@ describe ApplicationHelper do
         expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
-      it "includes the report URI" do
-        allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
-        helper.add_csp_for_root
-        helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
-      end
-
-      it "includes the report URI when active" do
+      it "does not include the report URI when active" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1244,6 +1222,72 @@ describe ApplicationHelper do
         )
         helper.add_csp_for_root
         expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: *.inst_fs.instructure.com inst_fs.instructure.com localhost root_account.test root_account2.test; "
+      end
+
+      context "with default source CSP directives" do
+        before do
+          account.enable_feature!(:javascript_csp)
+          account.enable_feature!(:default_source_csp_logging)
+          account.enable_csp!
+        end
+
+        it "sets header for frames" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy"])
+            .to eq "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+        end
+
+        it "sets header for files" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          helper.add_csp_for_file
+          expect(headers["Content-Security-Policy"])
+            .to eq(helper.csp_iframe_attribute + helper.default_csp_logging_directives(include_script_src: false))
+        end
+
+        it "sets header when the content type is not text/html" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          response.content_type = "application/json"
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy"]).to eq helper.default_csp_logging_directives
+        end
+
+        it "sets header without default source CSP directives if :default_source_csp_logging feature is disabled" do
+          account.disable_feature!(:default_source_csp_logging)
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: #{helper.allow_list_domains}; "
+          headers.clear
+          helper.add_csp_for_file
+          expect(headers["Content-Security-Policy"]).to eq helper.csp_iframe_attribute
+          headers.clear
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy"]).not_to eq helper.default_csp_logging_directives
+        end
+
+        it "doesn't set the header if :javascript_csp feature is enabled but not enforced" do
+          account.disable_feature!(:default_source_csp_logging)
+          account.disable_csp!
+          allow_any_instance_of(DynamicSettings).to receive(:find).with("csp-logging").and_return({ host: "mocked_host_value" })
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy")
+        end
+
+        it "doesn't set the header if javascript_csp feature is disabled" do
+          account.disable_feature!(:javascript_csp)
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          helper.add_csp_for_root
+          expect(headers).to_not have_key("Content-Security-Policy")
+        end
+
+        it "won't override existing header" do
+          allow(helper).to receive(:csp_report_uri).and_return("report-uri https://somewhere/; ")
+          directives =
+            "frame-src 'self' blob: #{helper.allow_list_domains}; " + helper.default_csp_logging_directives
+          helper.add_csp_for_root
+          expect(headers["Content-Security-Policy"]).to eq directives
+          helper.set_default_source_csp_directive_if_enabled
+          expect(headers["Content-Security-Policy"]).to eq directives
+        end
       end
     end
   end
@@ -1424,6 +1468,61 @@ describe ApplicationHelper do
 
     it "returns nil if supplied the id of a nonexistent user" do
       expect(context_user_name(Account.default, 0)).to be_nil
+    end
+  end
+
+  describe "number_to_human_size_mb" do
+    let(:quota) { 98_765.53 }
+
+    context "when no additional options" do
+      it "returns readable string with unit truncated to two decimal points" do
+        expect(number_to_human_size_mb(quota)).to eq("98.76 KB")
+      end
+    end
+
+    context "when using options" do
+      context "when value option[:precision] = 3" do
+        it "returns 3 decimal points (truncated)" do
+          expect(number_to_human_size_mb(quota, precision: 3)).to eq("98.765 KB")
+        end
+
+        context "and option[:round] = true" do
+          it "returns 3 decimal points rounding the last digit" do
+            expect(number_to_human_size_mb(quota, precision: 3, round: true)).to eq("98.766 KB")
+          end
+        end
+      end
+
+      context "when option[:base] = 1024" do
+        let(:quota) { 500_000_000 }
+
+        it "returns the same value as number_to_human_size" do
+          readable_size_mib = number_to_human_size_mb(quota, base: 1024, precision: 0, round: true)
+          readable_size = number_to_human_size(quota)
+          expect(readable_size_mib).to eq(readable_size)
+        end
+      end
+    end
+  end
+
+  describe "#thumbnail_image_url" do
+    let(:root_account) { double("Account") }
+    let(:attachment) { double("Attachment", root_account:, uuid: "abc123") }
+
+    context "when :file_association_access feature is enabled" do
+      before do
+        allow(root_account).to receive(:feature_enabled?).with(:file_association_access).and_return(true)
+      end
+
+      it "calls thumbnail_image_plain_url with the correct arguments" do
+        expect(helper).to receive(:thumbnail_image_plain_url).with(attachment, {}).and_return("plain_url")
+        expect(helper.thumbnail_image_url(attachment)).to eq("plain_url")
+      end
+
+      it "passes url_options to thumbnail_image_plain_url" do
+        expect(helper).to receive(:thumbnail_image_plain_url).with(attachment, { foo: "bar" }).and_return("plain_url")
+        expect(helper.thumbnail_image_url(attachment, nil, { foo: "bar" })).to eq("plain_url")
+      end
     end
   end
 end

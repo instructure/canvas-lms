@@ -62,7 +62,7 @@ export function useDebouncedNumericValue({
   }
 
   const debouncedUpdateStateAfterDigest = useRef(
-    debounce(updateStateAfterDigest, CHANGE_EVENT_DELAY)
+    debounce(updateStateAfterDigest, CHANGE_EVENT_DELAY),
   )
 
   useEffect(() => {

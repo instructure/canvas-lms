@@ -83,14 +83,14 @@ describe AnnouncementsController do
 
     it "includes absolute path for rel='self' link" do
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
-      feed = Feedjira.parse(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.feed_url).to match(%r{http://})
     end
 
     it "includes an author for each entry" do
       get "public_feed", format: "atom", params: { feed_code: @enrollment.feed_code }
-      feed = Feedjira.parse(response.body) rescue nil
+      feed = Feedjira.parse(response.body)
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all? { |e| e.author.present? }).to be_truthy

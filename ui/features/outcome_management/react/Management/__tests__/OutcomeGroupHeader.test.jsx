@@ -33,7 +33,7 @@ describe('OutcomeGroupHeader', () => {
         canManage: true,
         hideOutcomesView: hideOutcomesViewMock,
       },
-      props
+      props,
     )
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe('OutcomeGroupHeader', () => {
 
   const renderWithContext = children => {
     return render(
-      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>
+      <OutcomesContext.Provider value={{env: {isMobileView}}}>{children}</OutcomesContext.Provider>,
     )
   }
 

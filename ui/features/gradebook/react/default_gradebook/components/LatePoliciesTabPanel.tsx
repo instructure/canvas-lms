@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -27,19 +26,21 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
+import type {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 import Round from '@canvas/round'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const MIN_PERCENTAGE_INPUT = 0
 const MAX_PERCENTAGE_INPUT = 100
 
 function isNumeric(input: unknown) {
+  // @ts-expect-error
   return NumberHelper.validate(input)
 }
 
@@ -68,31 +69,55 @@ const errorMessages = {
   },
 }
 
+// @ts-expect-error
 function validationErrorMessage(input, validationType) {
   const error = validationError(input)
+  // @ts-expect-error
   return errorMessages[validationType][error]
 }
 
+// @ts-expect-error
 function messages(names, validationErrors) {
+  // @ts-expect-error
   const errors = names.map(name => validationErrors[name])
   return errors.reduce(
-    (acc, error) => (error ? acc.concat([{text: error, type: 'error'}]) : acc),
-    []
+    // @ts-expect-error
+    (acc, error) =>
+      error
+        ? acc.concat([
+            {
+              text: (
+                <View textAlign="center">
+                  <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                    <IconWarningSolid />
+                  </View>
+                  {error}
+                </View>
+              ),
+              type: 'error',
+            },
+          ])
+        : acc,
+    [],
   )
 }
 
+// @ts-expect-error
 function subtractFromMax(decimal) {
   return MAX_PERCENTAGE_INPUT - decimal
 }
 
 const numberInputWillUpdateMap = {
+  // @ts-expect-error
   missingSubmissionDeduction(decimal) {
     // the missingSubmissionDeductionDisplayValue is the difference of `100% - missingSubmissionDeduction`
     return subtractFromMax(decimal)
   },
+  // @ts-expect-error
   lateSubmissionDeduction(decimal) {
     return decimal
   },
+  // @ts-expect-error
   lateSubmissionMinimumPercent(decimal) {
     return decimal
   },
@@ -127,6 +152,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
   lateSubmissionDeductionInput: HTMLInputElement | null
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
     this.missingSubmissionCheckbox = null
@@ -141,10 +167,9 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
 
-  latePolicyMessages = messages.bind(this, [
-    'lateSubmissionDeduction',
-    'lateSubmissionMinimumPercent',
-  ])
+  latePolicyMessages = messages.bind(this, ['lateSubmissionDeduction'])
+
+  letSubmissionMinimumMessages = messages.bind(this, ['lateSubmissionMinimumPercent'])
 
   componentDidUpdate(_prevProps: Props, prevState: State) {
     if (!prevState.showAlert || this.state.showAlert) {
@@ -159,12 +184,15 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
     }
   }
 
+  // @ts-expect-error
   getLatePolicyAttribute = key => {
     const {changes, data} = this.props.latePolicy
     if (key in changes) {
+      // @ts-expect-error
       return changes[key]
     }
 
+    // @ts-expect-error
     return data && data[key]
   }
 
@@ -189,69 +217,83 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
     })
   }
 
+  // @ts-expect-error
   handleBlur = name => {
+    // @ts-expect-error
     if (this.props.latePolicy.changes[name] == null) {
       return
     }
 
+    // @ts-expect-error
     const decimal = bound(NumberHelper.parse(this.props.latePolicy.changes[name]))
     const errorMessage = validationErrorMessage(decimal, name)
     if (errorMessage) {
       const validationErrors = {...this.props.latePolicy.validationErrors, [name]: errorMessage}
       return this.props.changeLatePolicy({...this.props.latePolicy, validationErrors})
     }
+    // @ts-expect-error
     const decimalDisplayValue = numberInputWillUpdateMap[name](decimal)
 
     // @ts-expect-error
     this.setState({[`${name}DisplayValue`]: Round(decimalDisplayValue, 2)}, () => {
       const changesData = {[name]: Round(decimal, 2)}
       if (name === 'lateSubmissionMinimumPercent') {
+        // @ts-expect-error
         changesData[`${name}Enabled`] = changesData[name] !== MIN_PERCENTAGE_INPUT
       }
       const updates = {
         changes: this.calculateChanges(changesData),
         validationErrors: {...this.props.latePolicy.validationErrors},
       }
+      // @ts-expect-error
       delete updates.validationErrors[name]
       this.props.changeLatePolicy({...this.props.latePolicy, ...updates})
     })
   }
 
+  // @ts-expect-error
   handleChange = (name, inputDisplayValue) => {
     const nameDisplayValue = `${name}DisplayValue`
     // @ts-expect-error
     this.setState({[nameDisplayValue]: inputDisplayValue}, () => {
       let decimal = Round(NumberHelper.parse(inputDisplayValue), 2)
+      // @ts-expect-error
       decimal = numberInputWillUpdateMap[name](decimal)
 
       const changes = this.calculateChanges(
         {[name]: decimal},
-        {[nameDisplayValue]: inputDisplayValue}
+        {[nameDisplayValue]: inputDisplayValue},
       )
       this.props.changeLatePolicy({...this.props.latePolicy, changes})
     })
   }
 
+  // @ts-expect-error
   changeLateSubmissionInterval = (_event, selectedOption) => {
     const changes = this.calculateChanges({lateSubmissionInterval: selectedOption})
     this.props.changeLatePolicy({...this.props.latePolicy, changes})
   }
 
+  // @ts-expect-error
   calculateChanges(changedData, changedDisplayValues = {}) {
     const changes = {...this.props.latePolicy.changes}
     Object.keys(changedData).forEach(key => {
       const keyDisplayValue = `${key}DisplayValue`
+      // @ts-expect-error
       const original = this.props.latePolicy.data?.[key]
       const changed = changedData[key]
       const originalAndChangedDiffer = original !== changed
       let hasChanges = originalAndChangedDiffer
       if (changedDisplayValues.hasOwnProperty(keyDisplayValue)) {
+        // @ts-expect-error
         hasChanges = originalAndChangedDiffer !== changedDisplayValues[keyDisplayValue]
       }
 
       if (hasChanges) {
+        // @ts-expect-error
         changes[key] = changed
       } else if (key in changes) {
+        // @ts-expect-error
         delete changes[key] // don't track matching values
       }
     })
@@ -262,25 +304,34 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
   closeAlert = () => {
     this.setState({showAlert: false})
   }
+  // @ts-expect-error
 
   currentInputDisplayValue = (key, defaultValue) => {
     const stateDisplayKey = `${key}DisplayValue`
 
     // If the user is in the process of entering something, display it.
+    // @ts-expect-error
     if (this.state[stateDisplayKey] != null) {
+      // @ts-expect-error
       return this.state[stateDisplayKey]
     }
 
     // If the user updated this value, switched to a different tab, then came
     // back to this tab, the updated value will be in the changes hash.
+    // @ts-expect-error
     if (this.props.latePolicy.changes?.[key] != null) {
+      // @ts-expect-error
       const value = this.props.latePolicy.changes[key]
+      // @ts-expect-error
       return numberInputWillUpdateMap[key](value)
     }
 
     // If there have been no changes, use the value we were passed in.
+    // @ts-expect-error
     if (this.props.latePolicy.data?.[key] != null) {
+      // @ts-expect-error
       const value = this.props.latePolicy.data[key]
+      // @ts-expect-error
       return numberInputWillUpdateMap[key](value)
     }
 
@@ -316,28 +367,30 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Missing policies')}</ScreenReaderContent>}
-          messages={this.missingPolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
             <div className="NumberInput__Container">
-              <Grid vAlign="bottom" colSpacing="small">
+              <Grid vAlign="top" colSpacing="small">
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.missingPolicyMessages(validationErrors)}
+                      allowStringValue={true}
+                      data-testid="missing-submission-grade"
                       id="missing-submission-grade"
                       // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={m => {
                         this.missingSubmissionDeductionInput = m
                       }}
-                      renderLabel={I18n.t('Grade for missing submissions')}
+                      renderLabel={I18n.t('Grade for missing submissions %')}
                       disabled={
                         !this.getLatePolicyAttribute('missingSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
                       }
                       value={this.currentInputDisplayValue(
                         'missingSubmissionDeduction',
-                        MAX_PERCENTAGE_INPUT
+                        MAX_PERCENTAGE_INPUT,
                       )}
                       onBlur={_event => this.handleBlur('missingSubmissionDeduction')}
                       onChange={(_event, val) =>
@@ -346,11 +399,6 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       placeholder="100"
                       showArrows={false}
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                 </Grid.Row>
               </Grid>
@@ -384,39 +432,36 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Late policies')}</ScreenReaderContent>}
-          messages={this.latePolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
             <div style={{display: 'flex', alignItems: 'center'}}>
-              <Grid vAlign="bottom" colSpacing="small">
+              <Grid vAlign="top" colSpacing="small">
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.latePolicyMessages(validationErrors)}
+                      allowStringValue={true}
                       id="late-submission-deduction"
                       // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionDeductionInput = l
                       }}
-                      renderLabel={I18n.t('Late submission deduction')}
+                      renderLabel={I18n.t('Late submission deduction %')}
                       disabled={
                         !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
                       }
                       value={this.currentInputDisplayValue(
                         'lateSubmissionDeduction',
-                        MIN_PERCENTAGE_INPUT
+                        MIN_PERCENTAGE_INPUT,
                       )}
                       onBlur={_event => this.handleBlur('lateSubmissionDeduction')}
                       onChange={(_event, val) => this.handleChange('lateSubmissionDeduction', val)}
                       placeholder="0"
                       showArrows={false}
+                      data-testid="late-submission-deduction"
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                   <Grid.Col width="auto">
                     <CanvasSelect
@@ -430,11 +475,9 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       value={data.lateSubmissionInterval}
                       data-testid="late-submission-interval"
                     >
-                      {/* @ts-expect-error */}
                       <CanvasSelect.Option key="day" id="day" value="day">
                         {I18n.t('Day')}
                       </CanvasSelect.Option>
-                      {/* @ts-expect-error */}
                       <CanvasSelect.Option key="hour" id="hour" value="hour">
                         {I18n.t('Hour')}
                       </CanvasSelect.Option>
@@ -444,16 +487,18 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      messages={this.letSubmissionMinimumMessages(validationErrors)}
+                      allowStringValue={true}
                       id="late-submission-minimum-percent"
                       // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionMinimumPercentInput = l
                       }}
-                      renderLabel={I18n.t('Lowest possible grade')}
+                      renderLabel={I18n.t('Lowest possible grade %')}
                       value={this.currentInputDisplayValue(
                         'lateSubmissionMinimumPercent',
-                        MIN_PERCENTAGE_INPUT
+                        MIN_PERCENTAGE_INPUT,
                       )}
                       disabled={
                         !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
@@ -468,11 +513,6 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       showArrows={false}
                       data-testid="late-submission-minimum-percent"
                     />
-                  </Grid.Col>
-                  <Grid.Col width="auto">
-                    <View margin="0 0 x-small" display="block">
-                      <Text weight="bold">{I18n.t('%')}</Text>
-                    </View>
                   </Grid.Col>
                 </Grid.Row>
               </Grid>

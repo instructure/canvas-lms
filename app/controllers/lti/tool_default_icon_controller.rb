@@ -19,7 +19,9 @@
 
 module Lti
   class ToolDefaultIconController < ApplicationController
-    # Generates an SVG icon for a tool based on its name and ID
+    before_action :require_name, only: :show
+
+    # Generates an SVG icon for a tool based on its name and/or ID
 
     # NOTE! If we ever change this file or the template, we'll need to
     # bust users' caches by changing the route in routes.rb or adding a
@@ -33,12 +35,16 @@ module Lti
       # Use first number/"letter-like" character ('0', 'a', 'é', '我', etc.), or none.
       @glyph = params[:name]&.match(/[0-9\p{Letter}]/)&.to_s&.upcase
       # Color based on hash of the developer key / tool (global) ID.
-      @color = COLORS[params[:id].hash % COLORS.length]
+      @color = COLORS[params[:name].hash % COLORS.length]
 
       response.headers["Cache-Control"] = "max-age=#{CACHE_MAX_AGE}"
       cancel_cache_buster
 
       render content_type: "image/svg+xml", layout: false
+    end
+
+    def require_name
+      render status: :bad_request, json: { error: "A tool name must be provided" } unless params[:name].present?
     end
   end
 end

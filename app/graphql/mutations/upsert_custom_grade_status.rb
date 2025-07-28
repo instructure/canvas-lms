@@ -36,9 +36,9 @@ module Mutations
       end
 
       if custom_grade_status.new_record?
-        InstStatsd::Statsd.increment("custom_grade_status.graphql.create")
+        InstStatsd::Statsd.distributed_increment("custom_grade_status.graphql.create")
       else
-        InstStatsd::Statsd.increment("custom_grade_status.graphql.update")
+        InstStatsd::Statsd.distributed_increment("custom_grade_status.graphql.update")
       end
 
       if custom_grade_status.update(name: input[:name], color: input[:color])

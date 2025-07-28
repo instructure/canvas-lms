@@ -300,7 +300,8 @@ class OutcomesApiController < ApplicationController
     end
 
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
-    if @outcome.update(params.permit(*DIRECT_PARAMS))
+    @outcome.saving_user = @current_user
+    if @outcome.update(process_params)
       render json: outcome_json(@outcome, @current_user, session)
     else
       render json: @outcome.errors, status: :bad_request
@@ -469,6 +470,12 @@ class OutcomesApiController < ApplicationController
       criterion[:ratings] = params[:ratings]
     end
     outcome.rubric_criterion = criterion
+  end
+
+  def process_params
+    oparams = params.permit(*DIRECT_PARAMS)
+    params[:description] = process_incoming_html_content(params[:description]) if params[:description]
+    oparams
   end
 
   # Direct params are those that have a direct correlation to attrs in the model

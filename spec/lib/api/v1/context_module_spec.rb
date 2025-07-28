@@ -21,11 +21,16 @@ describe Api::V1::ContextModule do
   let(:dummy_class) do
     Class.new do
       include Api::V1::ContextModule
+      include Rails.application.routes.url_helpers
 
       attr_reader :request
 
       def initialize(request)
         @request = request
+      end
+
+      def default_url_options
+        { host: :localhost }
       end
 
       def value_to_boolean(object)
@@ -91,6 +96,39 @@ describe Api::V1::ContextModule do
     it "infers an indent value of 0" do
       json = subject.module_item_json(@tg, @user, @session, @cm)
       expect(json[:indent]).to eq 0
+    end
+  end
+
+  describe "#module_json" do
+    subject { dummy_class.new(double(params: { frame_external_urls: "http://www.instructure.com" })) }
+
+    before do
+      course_with_teacher(account: Account.default)
+      course_with_student(course: @course)
+
+      @cm = ContextModule.new(context: @course)
+      @cm.save!
+
+      @assignment = @course.assignments.create!(name: "Suzaku Castle", points_possible: 10, due_at: 3.days.from_now)
+
+      @tg = ContentTag.new(context: @course, context_module: @cm, content_type: "ContextExternalTool", content: @assignment)
+      @tg.save!
+    end
+
+    it "returns module with assignment for teacher" do
+      json = subject.module_json(@cm, @teacher, @session, nil, ["items"])
+      expect(json[:items][0]["title"]).to eq "Suzaku Castle"
+    end
+
+    it "returns module with assignment for student" do
+      json = subject.module_json(@cm, @student, @session, nil, ["items"])
+      expect(json[:items][0]["title"]).to eq "Suzaku Castle"
+    end
+
+    it "returns module with assignment for observer" do
+      course_with_observer(course: @course)
+      json = subject.module_json(@cm, @observer, @session, nil, ["items"])
+      expect(json[:items][0]["title"]).to eq "Suzaku Castle"
     end
   end
 end

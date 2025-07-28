@@ -38,6 +38,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :learning_outcome,
                                      :media_track,
                                      :rubric,
+                                     :sub_assignment,
                                      :wiki_page,
                                      quiz: "Quizzes::Quiz"]
   belongs_to :assignment, -> { where(master_courses_master_content_tags: { content_type: "Assignment" }) }, foreign_key: "content_id", inverse_of: :master_content_tag

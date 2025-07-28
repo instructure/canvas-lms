@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -17,14 +18,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CustomColumnHeader from './CustomColumnHeader'
 import type Gradebook from '../../Gradebook'
 import type GridSupport from '../GridSupport'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 function getProps(
   column: {
@@ -32,7 +33,7 @@ function getProps(
     customColumnId: string
   },
   gradebook,
-  options
+  options,
 ) {
   const customColumn = gradebook.getCustomColumn(column.customColumnId)
 
@@ -51,6 +52,7 @@ export default class CustomColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
+
     ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
 

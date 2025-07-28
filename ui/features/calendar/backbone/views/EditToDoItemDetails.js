@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import editToDoItemTemplate from '../../jst/editToDoItem.handlebars'
 import datePickerFormat from '@instructure/moment-utils/datePickerFormat'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-import 'date-js'
+import '@instructure/date-js'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import '../../fcMomentHandlebarsHelpers'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class EditToDoItemDetails extends ValidatedFormView {
   template = editToDoItemTemplate

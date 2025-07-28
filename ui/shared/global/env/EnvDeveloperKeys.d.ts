@@ -25,5 +25,4 @@ export interface EnvDeveloperKeys {
 
   accountEndpoint: string
   enableTestClusterChecks: boolean
-  includesFeatureFlagEnabled: boolean
 }

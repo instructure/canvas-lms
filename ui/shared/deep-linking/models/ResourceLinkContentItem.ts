@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {anchorTag, type ContentItemIframe, iframeTag, linkBody, safeUrl} from './helpers'
+import {anchorTag, type ContentItemIframeDimensions, iframeTag, linkBody, safeUrl} from './helpers'
 
 export type ResourceLinkContentItem = {
   type: 'ltiResourceLink'
@@ -23,7 +23,7 @@ export type ResourceLinkContentItem = {
   custom?: Record<string, string>
   window?: {targetName: string}
   lookup_uuid?: string
-  iframe?: ContentItemIframe
+  iframe?: ContentItemIframeDimensions
   title?: string
   errors?: Record<string, string>
   lineItem?: unknown
@@ -37,6 +37,7 @@ export type ResourceLinkContentItem = {
     startDateTime?: string
     endDateTime?: string
   }
+  ['https://canvas.instructure.com/lti/preserveExistingAssignmentName']?: boolean
 }
 
 const ltiEndpointParams = (lookupUuid?: string | null | undefined) => {
@@ -50,7 +51,7 @@ const ltiEndpointParams = (lookupUuid?: string | null | undefined) => {
 }
 
 export const resourceLinkContentItem = (
-  options: Omit<ResourceLinkContentItem, 'type'>
+  options: Omit<ResourceLinkContentItem, 'type'>,
 ): ResourceLinkContentItem => ({
   type: 'ltiResourceLink',
   ...options,
@@ -59,7 +60,7 @@ export const resourceLinkContentItem = (
 export const resourceLinkContentItemToHtmlString = (
   item: ResourceLinkContentItem,
   ltiEndpoint?: string,
-  editorSelection?: string
+  editorSelection?: string,
 ) => {
   const url = safeUrl(`${ltiEndpoint}?${ltiEndpointParams(item.lookup_uuid)}`)
   if (typeof item.iframe !== 'undefined') {
@@ -83,7 +84,7 @@ export const resourceLinkContentItemToHtmlString = (
         ...item,
         url,
       },
-      linkBody(itemWithText)
+      linkBody(itemWithText),
     )
   }
 }

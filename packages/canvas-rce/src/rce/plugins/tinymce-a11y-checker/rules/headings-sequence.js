@@ -181,7 +181,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure.'
+      'Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/G141.html',

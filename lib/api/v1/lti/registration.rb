@@ -21,21 +21,38 @@
 module Api::V1::Lti::Registration
   include Api::V1::Json
   include Api::V1::User
+  include Api::V1::Lti::Overlay
+  include Api::V1::Lti::OverlayVersion
   include Api::V1::Lti::RegistrationAccountBinding
 
   JSON_ATTRS = %w[
-    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at
+    id account_id root_account_id internal_service vendor name admin_nickname workflow_state created_at updated_at description
   ].freeze
 
+  OVERLAY_VERSION_DEFAULT_LIMIT = 5
+
   # Serializes a list of LTI registrations.
+  # If you are using this method, you must provide the :account_binding and :overlay preloads, otherwise
+  # they will not be included in the response, to avoid unnecessary database queries.
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
-  def lti_registrations_json(registrations, user, session, context, includes: [])
-    registrations.map { |r| lti_registration_json(r, user, session, context, includes:) }
+  # @param preloads [Hash] Preloaded associations, indexed by global registration id. { "1" => { account_binding: ..., overlay: } }
+  def lti_registrations_json(registrations, user, session, context, includes: [], preloads: {})
+    registrations.map do |r|
+      account_binding = preloads.dig(r.global_id, :account_binding)
+      overlay = preloads.dig(r.global_id, :overlay)
+      lti_registration_json(r, user, session, context, includes:, account_binding:, overlay:)
+    end
   end
 
   # Serializes a single LTI registration.
-  # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding]
-  def lti_registration_json(registration, user, session, context, includes: [])
+  # If your includes array includes :account_binding or :overlay, you must provide the account_binding and overlay
+  # parameters, otherwise they will not be included, to avoid unnecessary database queries.
+  # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding, :overlay, :overlay_versions]
+  # @param account_binding [Lti::RegistrationAccountBinding] Preloaded account binding to include in the response.
+  # @param overlay [Lti::Overlay] Preloaded overlay to include in the response.
+  #
+  # @return [Hash] JSON representation of the LTI registration.
+  def lti_registration_json(registration, user, session, context, includes: [], account_binding: nil, overlay: nil)
     includes = includes.map(&:to_sym)
 
     api_json(registration, user, session, only: JSON_ATTRS).tap do |json|
@@ -43,19 +60,52 @@ module Api::V1::Lti::Registration
       json["lti_version"] = registration.lti_version
       json["icon_url"] = registration.icon_url
       json["dynamic_registration"] = true if registration.dynamic_registration?
+      json["developer_key_id"] = registration.developer_key&.global_id
+      json["ims_registration_id"] = registration.ims_registration&.id
+      json["manual_configuration_id"] = registration.manual_configuration&.id
 
-      if registration.created_by.present?
-        json["created_by"] = user_json(registration.created_by, user, session, [], context)
+      if registration.site_admin?
+        json["created_by"] = "Instructure"
+      elsif registration.created_by.present?
+        json["created_by"] = if Account.site_admin.grants_right?(registration.created_by, session, :read)
+                               "Instructure"
+                             else
+                               user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
+                             end
       end
-      if registration.updated_by.present?
-        json["updated_by"] = user_json(registration.updated_by, user, session, [], context)
+
+      if registration.site_admin?
+        json["updated_by"] = "Instructure"
+      elsif registration.updated_by.present?
+        json["updated_by"] = if Account.site_admin.grants_right?(registration.updated_by, session, :read)
+                               "Instructure"
+                             else
+                               user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
+                             end
       end
+
       if includes.include?(:configuration)
-        json["configuration"] = registration.configuration
+        json["configuration"] = registration.internal_lti_configuration(include_overlay: false)
       end
 
-      if includes.include?(:account_binding) && (acct_binding = registration.account_binding_for(context))
-        json["account_binding"] = lti_registration_account_binding_json(acct_binding, user, session, context)
+      if includes.include?(:overlaid_configuration)
+        json["overlaid_configuration"] = registration.internal_lti_configuration(context:)
+      end
+
+      if includes.include?(:overlaid_legacy_configuration)
+        json["overlaid_legacy_configuration"] = registration.canvas_configuration
+      end
+
+      if includes.include?(:account_binding) && account_binding.present?
+        json["account_binding"] = lti_registration_account_binding_json(account_binding, user, session, context)
+      end
+
+      if includes.include?(:overlay) && overlay.present?
+        json["overlay"] = lti_overlay_json(overlay, user, session, context)
+        if includes.include?(:overlay_versions)
+          versions = Lti::OverlayVersion.where(lti_overlay: overlay).order(created_at: :desc).limit(OVERLAY_VERSION_DEFAULT_LIMIT)
+          json["overlay"]["versions"] = lti_overlay_versions_json(versions, user, session, context)
+        end
       end
     end
   end

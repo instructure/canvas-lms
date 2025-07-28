@@ -17,21 +17,25 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import {NotificationBadge, NewActivityIndicator} from '../index'
 
-// it would be better if the snapshots contained the proper class names, but
-// jest doesn't deal with how themeable turns styles.css into code.
 it('renders an indicator', () => {
-  const wrapper = shallow(
+  const {container} = render(
     <NotificationBadge>
       <NewActivityIndicator title="blah" itemIds={['first', 'second']} />
-    </NotificationBadge>
+    </NotificationBadge>,
   )
-  expect(wrapper).toMatchSnapshot()
+  expect(container.querySelectorAll('style')).toHaveLength(1)
+  const contentDiv = container.querySelector('.NotificationBadge-styles__activityIndicator')
+  expect(contentDiv).toBeInTheDocument()
+  expect(contentDiv.children).toHaveLength(1)
 })
 
-it('renders an empty div', () => {
-  const wrapper = shallow(<NotificationBadge>{null}</NotificationBadge>)
-  expect(wrapper).toMatchSnapshot()
+it('renders an empty div when no children', () => {
+  const {container} = render(<NotificationBadge>{null}</NotificationBadge>)
+  expect(container.querySelectorAll('style')).toHaveLength(1)
+  const contentDiv = container.querySelector('.NotificationBadge-styles__activityIndicator')
+  expect(contentDiv).toBeInTheDocument()
+  expect(contentDiv.children).toHaveLength(0)
 })

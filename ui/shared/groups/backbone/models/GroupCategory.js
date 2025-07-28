@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import {omit} from 'lodash'
@@ -80,7 +80,7 @@ GroupCategory.prototype.groups = function (models) {
       return function () {
         return _this.set('groups_count', _this._groups.length)
       }
-    })(this)
+    })(this),
   )
   this._groups.on('remove', this.groupRemoved)
   this.groups = function () {
@@ -128,7 +128,7 @@ GroupCategory.prototype.reassignUser = function (user, newGroup) {
         return function () {
           return _this.groupUsersFor(newGroup).addUser(user)
         }
-      })(this)
+      })(this),
     )
   }
   return user.save({
@@ -163,7 +163,7 @@ GroupCategory.prototype.unassignedUsers = function () {
       return function () {
         return _this.set('unassigned_users_count', _this._unassignedUsers.length)
       }
-    })(this)
+    })(this),
   )
   this.unassignedUsers = function () {
     return this._unassignedUsers
@@ -204,7 +204,7 @@ GroupCategory.prototype.assignUnassignedMembers = function (group_by_section) {
     '/api/v1/group_categories/' + this.id + '/assign_unassigned_members' + qs,
     'POST',
     {},
-    this.setUpProgress
+    this.setUpProgress,
   )
 }
 

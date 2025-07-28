@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -31,7 +31,7 @@ import {Modal} from '@instructure/ui-modal'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import * as shapes from './shapes'
 
-const I18n = useI18nScope('IndividualStudentMasteryOutcomePopover')
+const I18n = createI18nScope('IndividualStudentMasteryOutcomePopover')
 
 class OutcomePopover extends React.Component {
   static propTypes = {
@@ -71,10 +71,10 @@ class OutcomePopover extends React.Component {
 
   defaultProficiency = _.memoize(mastery_points => ({
     ratings: [
-      {points: mastery_points * 1.5, color: '127A1B', description: I18n.t('Exceeds Mastery')},
-      {points: mastery_points, color: '0B874B', description: I18n.t('Meets Mastery')},
+      {points: mastery_points * 1.5, color: '02672D', description: I18n.t('Exceeds Mastery')},
+      {points: mastery_points, color: '03893D', description: I18n.t('Meets Mastery')},
       {points: mastery_points / 2, color: 'FAB901', description: I18n.t('Near Mastery')},
-      {points: 0, color: 'E0061F', description: I18n.t('Well Below Mastery')},
+      {points: 0, color: 'E62429', description: I18n.t('Well Below Mastery')},
     ],
   }))
 

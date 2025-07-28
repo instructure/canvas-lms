@@ -21,72 +21,128 @@ import $ from 'jquery'
 import actions from '../actions'
 import router from '../router'
 import {fireEvent} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Import the modules we want to mock
+import * as DeepLinking from '@canvas/deep-linking/DeepLinking'
+import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
+
+// Mock the modules - we'll control their behavior in individual tests
+jest.mock('@canvas/deep-linking/DeepLinking')
+jest.mock('@canvas/deep-linking/processors/processSingleContentItem')
 
 const sleep = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
 describe('router', () => {
-  const windowOrigin = window.origin || document.origin // TODO: JSDOM v16 Upgrade
-
   describe('LTI deep linking handlers', () => {
-    let oldEnv
+    // Define testOrigin at a higher scope so it's accessible in all tests
+    const testOrigin = 'http://localhost'
 
     beforeAll(() => {
-      oldEnv = ENV
-      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = windowOrigin
+      // Setup ENV for all tests
+      fakeENV.setup({
+        DEEP_LINKING_POST_MESSAGE_ORIGIN: testOrigin,
+      })
 
-      // this is added before listeners are attached so that this listener comes before.
-      // this adds an event.origin to all messages so that isValidDeepLinkingEvent doesn't break,
-      // since jsdom doesn't support event.origin, and then retriggers the event.
+      // Add the message event handler to handle events with empty origin
       window.addEventListener('message', event => {
         if (event.origin === '') {
           event.stopImmediatePropagation()
           const eventWithOrigin = new MessageEvent('message', {
             data: event.data,
-            origin: windowOrigin,
+            origin: testOrigin,
           })
           window.dispatchEvent(eventWithOrigin)
         }
       })
-
-      router.attachListeners()
-    })
-
-    afterAll(() => {
-      ENV = oldEnv
     })
 
     beforeEach(() => {
-      // needs to be two functions to match normal action signature
-      jest.spyOn(actions, 'externalContentReady').mockImplementation(() => () => {})
-      jest.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => () => {})
+      // Attach listeners before each test to ensure clean state
+      router.attachListeners()
     })
 
     afterEach(() => {
-      actions.externalContentReady.mockRestore()
-      actions.externalContentRetrievalFailed.mockRestore()
+      // Clean up after each test
+      window.removeEventListener('message', router.attachListeners)
+    })
+
+    afterAll(() => {
+      fakeENV.teardown()
+    })
+
+    beforeEach(() => {
+      // Reset all mocks before each test
+      jest.resetAllMocks()
+
+      // Mock the action creators to return action objects
+      jest.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
+        type: 'EXTERNAL_CONTENT_READY',
+        payload: data,
+      }))
+
+      jest.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
+        type: 'EXTERNAL_CONTENT_RETRIEVAL_FAILED',
+      }))
+
+      // Default behavior for DeepLinking.isValidDeepLinkingEvent
+      // We'll override this in specific tests as needed
+      DeepLinking.isValidDeepLinkingEvent.mockImplementation(event => {
+        return event.data?.subject === 'LtiDeepLinkingResponse'
+      })
+
+      // Default behavior for processSingleContentItem
+      // We'll override this in specific tests as needed
+      processSingleContentItem.mockImplementation(event => event.data.content_items?.[0])
+    })
+
+    afterEach(() => {
+      // Restore the original implementations
+      jest.restoreAllMocks()
     })
 
     describe('when LTI 1.3 message is received', () => {
       it('does nothing for non-deep-linking-messages', async () => {
-        window.postMessage({subject: 'lol'}, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+        // Override the validation to reject all messages
+        DeepLinking.isValidDeepLinkingEvent.mockImplementation(() => false)
+
+        // Send a message that would normally be processed
+        const messageEvent = new MessageEvent('message', {
+          data: {subject: 'LtiDeepLinkingResponse'},
+          origin: testOrigin,
+        })
+        window.dispatchEvent(messageEvent)
         await sleep(100)
+
+        // Verify no actions were called
         expect(actions.externalContentReady).not.toHaveBeenCalled()
         expect(actions.externalContentRetrievalFailed).not.toHaveBeenCalled()
       })
 
       it('sends externalContentReady action for valid message', async () => {
-        const item = {hello: 'world'}
-        window.postMessage(
-          {
-            subject: 'LtiDeepLinkingResponse',
-            content_items: [item],
-            service_id: 123,
-            tool_id: 1234,
-          },
-          ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
-        )
-        await sleep(100)
+        // Setup mocks for this specific test
+        DeepLinking.isValidDeepLinkingEvent.mockImplementation(() => true)
 
+        // Create test data
+        const item = {hello: 'world'}
+        const messageData = {
+          subject: 'LtiDeepLinkingResponse',
+          content_items: [item],
+          service_id: 123,
+          tool_id: 1234,
+        }
+
+        // Create and dispatch the event
+        const messageEvent = new MessageEvent('message', {
+          data: messageData,
+          origin: testOrigin,
+        })
+
+        // Dispatch the event and wait for processing
+        window.dispatchEvent(messageEvent)
+        await sleep(200)
+
+        // Verify the action was called with the expected data
         expect(actions.externalContentReady).toHaveBeenCalledWith({
           service_id: 123,
           tool_id: 1234,
@@ -97,23 +153,52 @@ describe('router', () => {
     })
 
     describe('when LTI 1.1 message is received', () => {
-      const origEnv = {...window.ENV}
       const origin = 'http://example.com'
-      beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
-      afterAll(() => (window.ENV = origEnv))
+
+      beforeEach(() => {
+        // Setup fakeENV with the new origin for each test
+        fakeENV.setup({
+          DEEP_LINKING_POST_MESSAGE_ORIGIN: origin,
+        })
+
+        // Reset the mocks for this test group
+        jest.resetAllMocks()
+
+        // Mock the action creators again after reset
+        jest.spyOn(actions, 'externalContentReady').mockImplementation(data => ({
+          type: 'EXTERNAL_CONTENT_READY',
+          payload: data,
+        }))
+
+        jest.spyOn(actions, 'externalContentRetrievalFailed').mockImplementation(() => ({
+          type: 'EXTERNAL_CONTENT_RETRIEVAL_FAILED',
+        }))
+
+        // Re-attach listeners with the new origin
+        router.attachListeners()
+      })
+
+      afterEach(() => {
+        fakeENV.teardown()
+      })
 
       const sendPostMessage = data => fireEvent(window, new MessageEvent('message', {data, origin}))
 
       it('sends externalContentReady action', async () => {
+        // Create test data
         const item = {service_id: 1, hello: 'world'}
-        sendPostMessage({
+        const messageData = {
           subject: 'externalContentReady',
           contentItems: [item],
           service_id: item.service_id,
-        })
+        }
 
+        // Send the message
+        sendPostMessage(messageData)
+        await sleep(100)
+
+        // Verify the action was called with the expected data
         expect(actions.externalContentReady).toHaveBeenCalledWith({
-          // subject not required to be passed in, but comes from the event and doesn't hurt
           subject: 'externalContentReady',
           service_id: item.service_id,
           contentItems: [item],

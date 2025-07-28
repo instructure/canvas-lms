@@ -18,7 +18,7 @@
 
 import {configure} from '@instructure/moment-utils'
 
-export {moonwalk, epoch} from '../specHelpers'
+export {moonwalk, epoch} from '@instructure/moment-utils/specHelpers'
 export function setup() {
   beforeEach(() => {
     configure({})

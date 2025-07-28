@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import ClearableDateTimeInput, {type ClearableDateTimeInputProps} from '../ClearableDateTimeInput'
 
 describe('ClearableDateTimeInput', () => {
@@ -55,12 +55,14 @@ describe('ClearableDateTimeInput', () => {
     expect(getByText('Clear').closest('button')).toBeDisabled()
   })
 
-  it('calls onChange when date is changed', () => {
+  it('calls onChange when date is changed', async () => {
     const {getByLabelText, getByRole} = renderComponent()
     const dateInput = getByLabelText('Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    expect(props.onChange).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(props.onChange).toHaveBeenCalled()
+    })
   })
 
   it('calls onClear when clear button is clicked', () => {

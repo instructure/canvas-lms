@@ -35,17 +35,12 @@ const renderDeveloperKeyModalTrigger = () =>
 
 describe('DeveloperKeyModalTrigger', () => {
   beforeEach(async () => {
-    window.ENV = {
-      FEATURES: {
-        lti_dynamic_registration: true,
-      },
-    }
     renderDeveloperKeyModalTrigger()
 
     await userEvent.click(
       screen.getByRole('button', {
         name: /create a developer key/i,
-      })
+      }),
     )
   })
 
@@ -57,7 +52,7 @@ describe('DeveloperKeyModalTrigger', () => {
     await userEvent.click(
       screen.getByRole('menuitem', {
         name: /create an api key/i,
-      })
+      }),
     )
 
     expect(actions.developerKeysModalOpen).toHaveBeenCalled()
@@ -67,7 +62,7 @@ describe('DeveloperKeyModalTrigger', () => {
     await userEvent.click(
       screen.getByRole('menuitem', {
         name: /create an lti key/i,
-      })
+      }),
     )
 
     expect(actions.ltiKeysSetLtiKey).toHaveBeenCalled()

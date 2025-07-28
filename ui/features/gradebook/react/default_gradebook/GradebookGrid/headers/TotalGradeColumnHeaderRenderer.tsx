@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -41,7 +42,7 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
 
   const isInBack = columns.scrollable[columns.scrollable.length - 1]?.id === 'total_grade'
   const isInFront = columns.frozen.some(
-    (frozenColumn: {id: string}) => frozenColumn.id === 'total_grade'
+    (frozenColumn: {id: string}) => frozenColumn.id === 'total_grade',
   )
 
   let onApplyScoreToUngraded
@@ -51,7 +52,11 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
     }
   }
 
-  const processStudent = (student: Student): PartialStudent => {
+  const processStudent = (
+    student: Pick<Student, 'id' | 'isInactive' | 'name' | 'sortable_name'> & {
+      enrollments: Pick<Student['enrollments'][number], 'type'>[]
+    },
+  ): PartialStudent => {
     return {
       id: student.id,
       isInactive: Boolean(student.isInactive),
@@ -63,11 +68,11 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
         ? scoreToScaledPoints(
             gradebook.calculatedGradesByStudentId[student.id]?.current.score,
             gradebook.calculatedGradesByStudentId[student.id]?.current.possible,
-            gradebook.options.grading_standard_scaling_factor
+            gradebook.options.grading_standard_scaling_factor,
           )
         : scoreToPercentage(
             gradebook.calculatedGradesByStudentId[student.id]?.current.score,
-            gradebook.calculatedGradesByStudentId[student.id]?.current.possible
+            gradebook.calculatedGradesByStudentId[student.id]?.current.possible,
           ),
     }
   }
@@ -121,9 +126,8 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups(),
-    allStudents: Object.keys(gradebook.students).map(key =>
-      processStudent(gradebook.students[key])
-    ),
+    getAllStudents: () =>
+      Object.keys(gradebook.students).map(key => processStudent(gradebook.students[key])),
     courseId: gradebook.options.context_id,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,
@@ -140,6 +144,7 @@ export default class TotalGradeColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
+
     ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 

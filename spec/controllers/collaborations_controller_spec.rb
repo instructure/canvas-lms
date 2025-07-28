@@ -134,6 +134,51 @@ describe CollaborationsController do
       expect(assigns[:collaborations]).to match_array [collab2, valid_collab]
       expect(assigns[:collaborations]).not_to include invalid_collab
     end
+
+    context "with external tools" do
+      render_views
+      let(:course) { @course }
+      let(:url) { "http://www.example.com/launch" }
+      let(:domain) { "example.com" }
+      let(:developer_key_1) { lti_developer_key_model(account: @course.account) }
+      let(:developer_key_2) { lti_developer_key_model(account: @course.account) }
+      let(:tool_1) { external_tool_1_3_model(context: @course, developer_key: developer_key_1, opts: { url:, name: "1.3 tool 1" }) }
+      let(:tool_2) { external_tool_1_3_model(context: @course, developer_key: developer_key_2, opts: { url:, name: "1.3 tool 2" }) }
+      let(:content_item_1) do
+        {
+          url: tool_1.url,
+          title: "Lti 1.3 Tool Title 1"
+        }
+      end
+      let(:content_item_2) do
+        {
+          url: tool_2.url,
+          title: "Lti 1.3 Tool Title 2"
+        }
+      end
+
+      it "allows client_id to be available for each collaboration" do
+        user_session(@teacher)
+
+        # Create first collaboration
+        post "create", params: { course_id: @course.id, contentItems: [content_item_1].to_json, tool_id: tool_1.id }
+        collab_1 = Collaboration.find(assigns[:collaboration].id)
+        collab_1.context = @course
+        collab_1.save!
+
+        # Create second collaboration
+        post "create", params: { course_id: @course.id, contentItems: [content_item_2].to_json, tool_id: tool_2.id }
+        collab_2 = Collaboration.find(assigns[:collaboration].id)
+        collab_2.context = @course
+        collab_2.save!
+
+        get "index", params: { course_id: @course.id }
+
+        # Verify client_id for each collaboration
+        expect(response.body).to include("client_id=#{developer_key_1.global_id}")
+        expect(response.body).to include("client_id=#{developer_key_2.global_id}")
+      end
+    end
   end
 
   describe "GET 'members'" do
@@ -179,7 +224,7 @@ describe CollaborationsController do
       end
 
       it "includes collaborator old_lti_id" do
-        Lti::Asset.opaque_identifier_for(@student)
+        Lti::V1p1::Asset.opaque_identifier_for(@student)
         UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
         get "members", params: { id: @collab.id, include: ["collaborator_lti_id"] }
         @student.reload
@@ -221,8 +266,20 @@ describe CollaborationsController do
 
     let(:url) { "http://www.example.com/launch" }
     let(:domain) { "example.com" }
-    let(:developer_key) { dev_key_model_1_3(account: @course.account) }
-    let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:developer_key) { lti_developer_key_model(account: @course.account) }
+    let(:registration) do
+      lti_registration_with_tool(account: @course.root_account, configuration_params: {
+                                   domain:,
+                                   target_link_uri: url,
+                                   oidc_initiation_url: url,
+                                   placements: [
+                                     {
+                                       placement: "course_navigation",
+                                     }
+                                   ]
+                                 })
+    end
+    let(:new_tool) { registration.deployments.first }
     let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
 
     context "when the collaboration includes a resource_link_lookup_uuid" do
@@ -350,6 +407,7 @@ describe CollaborationsController do
       post "create", params: { course_id: @course.id, collaboration: { collaboration_type: "EtherPad", title: "My Collab" } }
       expect(response).to be_redirect
       expect(assigns[:collaboration]).not_to be_nil
+      expect(assigns[:collaboration].root_account_id).to eq(@course.root_account_id)
       expect(assigns[:collaboration].class).to eql(EtherpadCollaboration)
       expect(assigns[:collaboration].collaboration_type).to eql("EtherPad")
       expect(Collaboration.find(assigns[:collaboration].id)).to be_is_a(EtherpadCollaboration)
@@ -396,7 +454,7 @@ describe CollaborationsController do
           let(:content_item) do
             super().merge(
               Collaboration::DEEP_LINKING_EXTENSION => {
-                groups: [Lti::Asset.opaque_identifier_for(group)]
+                groups: [Lti::V1p1::Asset.opaque_identifier_for(group)]
               }
             )
           end
@@ -459,7 +517,7 @@ describe CollaborationsController do
       it "adds users if sent" do
         user_session(@teacher)
         users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
-        lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
+        lti_user_ids = users.map { |student| Lti::V1p1::Asset.opaque_identifier_for(student) }
         content_items.first["ext_canvas_visibility"] = { users: lti_user_ids }
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
@@ -470,7 +528,7 @@ describe CollaborationsController do
         user_session(@teacher)
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
-        content_items.first["ext_canvas_visibility"] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
+        content_items.first["ext_canvas_visibility"] = { groups: [Lti::V1p1::Asset.opaque_identifier_for(group)] }
         post "create", params: { course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
@@ -563,7 +621,7 @@ describe CollaborationsController do
       it "adds users if sent" do
         user_session(@teacher)
         users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
-        lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
+        lti_user_ids = users.map { |student| Lti::V1p1::Asset.opaque_identifier_for(student) }
         content_items.first["ext_canvas_visibility"] = { users: lti_user_ids }
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
@@ -574,7 +632,7 @@ describe CollaborationsController do
         user_session(@teacher)
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
-        content_items.first["ext_canvas_visibility"] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
+        content_items.first["ext_canvas_visibility"] = { groups: [Lti::V1p1::Asset.opaque_identifier_for(group)] }
         put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
         expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
@@ -585,8 +643,8 @@ describe CollaborationsController do
         group = group_model(context: @course)
         group.add_user(@teacher, "active")
         content_items.first["ext_canvas_visibility"] = {
-          groups: [Lti::Asset.opaque_identifier_for(group)],
-          users: [Lti::Asset.opaque_identifier_for(@teacher)]
+          groups: [Lti::V1p1::Asset.opaque_identifier_for(group)],
+          users: [Lti::V1p1::Asset.opaque_identifier_for(@teacher)]
         }
         2.times do
           put "update", params: { id: collaboration.id, course_id: @course.id, contentItems: content_items.to_json }

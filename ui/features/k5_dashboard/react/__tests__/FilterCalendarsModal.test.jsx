@@ -81,7 +81,7 @@ describe('FilterCalendarsModal', () => {
 
     await waitFor(() => expect(fetchMock.called(SAVED_SELECTED_CONTEXTS_URL, 'POST')).toBe(true))
     expect(fetchMock.lastUrl(SAVED_SELECTED_CONTEXTS_URL)).toMatch(
-      'selected_contexts%5B%5D=course_3'
+      'selected_contexts%5B%5D=course_3',
     )
   })
 
@@ -117,7 +117,7 @@ describe('FilterCalendarsModal', () => {
 
   it('indicates the number of calendars left to select as checkboxes are checked', async () => {
     const {getByRole, getByText} = render(
-      <FilterCalendarsModal {...defaultProps} selectedContextCodes={[]} />
+      <FilterCalendarsModal {...defaultProps} selectedContextCodes={[]} />,
     )
     expect(getByText('You have 2 calendars left')).toBeInTheDocument()
 

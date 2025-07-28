@@ -19,10 +19,15 @@
 import React from 'react'
 import {initializeReaderButton, ImmersiveReaderButton} from '../ImmersiveReader'
 import {render} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {enableFetchMocks} from 'jest-fetch-mock'
 
-enableFetchMocks()
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('#initializeReaderButton', () => {
   it('renders the immersive reader button into the given mount point', () => {
@@ -41,7 +46,14 @@ describe('#initializeReaderButton', () => {
 
     describe('onClick', () => {
       beforeEach(() => {
-        fetch.mockResponseOnce(JSON.stringify({token: 'fakeToken', subdomain: 'fakeSubdomain'}))
+        server.use(
+          http.get('/api/v1/immersive_reader/authenticate', () =>
+            HttpResponse.json({
+              token: 'fakeToken',
+              subdomain: 'fakeSubdomain',
+            }),
+          ),
+        )
       })
 
       it('calls to launch the Immersive Reader with the proper content', async () => {
@@ -68,7 +80,7 @@ describe('#initializeReaderButton', () => {
           launchAsync: fakeLaunchAsync,
         })
         const {findByText} = render(
-          <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
+          <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />,
         )
         const button = await findByText(/Immersive Reader/)
         await user.click(button)
@@ -122,7 +134,7 @@ describe('#initializeReaderButton', () => {
           })
 
           const {findByText} = render(
-            <ImmersiveReaderButton content={fakeContentWithMath} readerSDK={fakeReaderLib} />
+            <ImmersiveReaderButton content={fakeContentWithMath} readerSDK={fakeReaderLib} />,
           )
 
           const button = await findByText(/^Immersive Reader$/)

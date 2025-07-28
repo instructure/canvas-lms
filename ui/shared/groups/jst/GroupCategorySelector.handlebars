@@ -11,7 +11,6 @@
           id="has_group_category"
           prefix=prefix
           checked=isGroupAssignment
-          aria-role="option"
           aria-controls="group_category_options"
           readonly="readonly"
           aria-readonly="true"
@@ -22,13 +21,16 @@
           id="has_group_category"
           prefix=prefix
           checked=isGroupAssignment
-          aria-role="option"
           aria-controls="group_category_options"
           disabled=hasGroupCategoryDisabled
         }}
       {{/if}}
       {{#if fieldLabel}}{{fieldLabel}}{{else}}{{#t "is_group_assignment"}}This is a Group Assignment{{/t}}{{/if}}
     </label>
+
+    <span id="has_group_category_blocked_error" style="font-size: 14px; display: none; color: crimson;">
+      {{#t "has_group_category_blocked_error"}}You must remove any groups from the Assign Access section to change this setting.{{/t}}
+    </span>
 
     {{!-- Individual grading? --}}
     <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
@@ -70,12 +72,21 @@
             aria-labelledby="assignment_group_category_id_label" {{disabledIf groupCategoryIdDisabled}}>
             <option value="blank" {{selectedIf groupCategoryUnselected}}>{{#t}}Select a group category{{/t}}</option>
             {{#each groupCategories}}
-            <option value="{{id}}" {{selectedIf ../groupCategoryId this.id}}>
+            <option value="{{id}}" {{selectedIfNumber ../groupCategoryId this.id}}>
               {{name}}
             </option>
             {{/each}}
+            <option value="new"
+              {{hiddenIf inClosedGradingPeriod}}
+              {{hiddenIf groupCategoryIdDisabled}}
+              {{hiddenIf cannotManageGroups}}>
+              {{#t}}[ Create New Group Set ]{{/t}}
+            </option>
           </select>
+          <div id="create-group-set-modal-mountpoint"></div>
+          <div id="assignment_group_category_id_errors"></div>
         </div>
+        <span id="assignment_group_category_id_blocked_error" style="font-size: 14px; display: none; color: crimson"></span>
         <div>
           <button class="Button" type="button" id="create_group_category_id"
             {{disabledIf inClosedGradingPeriod}}

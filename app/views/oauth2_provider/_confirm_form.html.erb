@@ -36,6 +36,7 @@
   <p><%= @special_confirm_message %></p>
 <% end %>
 <%= form_tag oauth2_auth_accept_path, id: "oauth2_accept_form" do %>
+  <%= hidden_field_tag :custom_csrf_token, @custom_csrf_token %>
   <div class="button_box ic-Login-confirmation__actions">
     <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>
     <%=  submit_tag(t("Authorize"),  class: "Button Button--primary Button--block", data: {disable_with: t('Please wait...')}) %>

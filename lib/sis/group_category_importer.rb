@@ -54,19 +54,19 @@ module SIS
         context = nil
         if account_id
           context = @accounts_cache[account_id]
-          context ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take
+          context ||= @root_account.all_accounts.active.find_by(sis_source_id: account_id)
           raise ImportError, "Account with id \"#{account_id}\" didn't exist for group category #{sis_id}" unless context
 
           @accounts_cache[context.sis_source_id] = context
         end
 
         if course_id
-          context = @root_account.all_courses.active.where(sis_source_id: course_id).take
+          context = @root_account.all_courses.active.find_by(sis_source_id: course_id)
           raise ImportError, "Course with id \"#{course_id}\" didn't exist for group category #{sis_id}" unless context
         end
         context ||= @root_account
 
-        gc = @root_account.all_group_categories.where(sis_source_id: sis_id).take
+        gc = @root_account.all_group_categories.find_by(sis_source_id: sis_id)
 
         if gc && gc.groups.active.exists? && !(context.id == gc.context_id && context.class.base_class.name == gc.context_type)
           raise ImportError, "Cannot move group category #{sis_id} because it has groups in it."
@@ -110,13 +110,13 @@ module SIS
       end
 
       def should_build_roll_back_data?(group_category)
-        return true if group_category.id_before_last_save.nil? || group_category.saved_change_to_deleted_at?
+        return true if group_category.previously_new_record? || group_category.saved_change_to_deleted_at?
 
         false
       end
 
       def old_status(group_category)
-        if group_category.id_before_last_save.nil?
+        if group_category.previously_new_record?
           "non-existent"
         elsif group_category.deleted_at_before_last_save.nil?
           group_category.deleted_at.nil? ? nil : "active"

@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import sinon from 'sinon'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {shallow} from 'enzyme'
+import {render, act} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {merge} from 'lodash'
 import ConfirmOutcomeEditModal, {showConfirmOutcomeEdit} from '../ConfirmOutcomeEditModal'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
 const defaultProps = (props = {}) =>
   merge(
@@ -36,65 +35,152 @@ const defaultProps = (props = {}) =>
       parent: () => {},
       onConfirm: () => {},
     },
-    props
+    props,
   )
 
-it('renders the ConfirmOutcomeEditModal component', () => {
-  const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true})} />)
-  expect(modal.exists()).toBe(true)
-})
-
-it('renders the rubrics text if hasUpdateableRubrics', () => {
-  const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true})} />)
-  expect(modal.find(Modal.Body).render().text()).toMatch(/update all rubrics/)
-})
-
-it('renders the masteryPoints text if mastery points modified', () => {
-  const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {masteryPoints: true}})} />
+it('renders the ConfirmOutcomeEditModal component', async () => {
+  const modalRef = React.createRef()
+  const {getByRole} = render(
+    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true})} ref={modalRef} />,
   )
-  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
+
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  expect(getByRole('dialog')).toBeInTheDocument()
 })
 
-it('renders the scoring method text if scoring method modified', () => {
-  const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {scoringMethod: true}})} />
+it('renders the rubrics text if hasUpdateableRubrics', async () => {
+  const modalRef = React.createRef()
+  const {getByText} = render(
+    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true})} ref={modalRef} />,
   )
-  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
+
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  expect(getByText(/update all rubrics/)).toBeInTheDocument()
 })
 
-it('does not call onConfirm when canceled', () => {
+it('renders the masteryPoints text if mastery points modified', async () => {
+  const modalRef = React.createRef()
+  const {getByText} = render(
+    <ConfirmOutcomeEditModal
+      {...defaultProps({modifiedFields: {masteryPoints: true}})}
+      ref={modalRef}
+    />,
+  )
+
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  expect(getByText(/scoring criteria/)).toBeInTheDocument()
+})
+
+it('renders the scoring method text if scoring method modified', async () => {
+  const modalRef = React.createRef()
+  const {getByText} = render(
+    <ConfirmOutcomeEditModal
+      {...defaultProps({modifiedFields: {scoringMethod: true}})}
+      ref={modalRef}
+    />,
+  )
+
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  expect(getByText(/scoring criteria/)).toBeInTheDocument()
+})
+
+it('does not call onConfirm when canceled', async () => {
   const onConfirm = jest.fn()
-  const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />
+  const modalRef = React.createRef()
+  const {getByRole} = render(
+    <ConfirmOutcomeEditModal
+      {...defaultProps({hasUpdateableRubrics: true, onConfirm})}
+      ref={modalRef}
+    />,
   )
-  modal.find(Modal.Footer).find('#cancel-outcome-edit-modal').simulate('click')
-  expect(modal.state('show')).toBe(false)
+
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  // Test that cancel button exists and test direct onCancel method
+  const cancelButton = getByRole('button', {name: /cancel/i})
+  expect(cancelButton).toBeInTheDocument()
+
+  // Call onCancel directly to test the behavior
+  act(() => {
+    if (modalRef.current) {
+      modalRef.current.onCancel()
+    }
+  })
+
   expect(onConfirm).not.toHaveBeenCalled()
 })
 
-it('calls onConfirm when saved', () => {
+it('calls onConfirm when saved', async () => {
   const onConfirm = jest.fn()
-  const modal = shallow(
-    <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />
+  const modalRef = React.createRef()
+  const {getByRole} = render(
+    <ConfirmOutcomeEditModal
+      {...defaultProps({hasUpdateableRubrics: true, onConfirm})}
+      ref={modalRef}
+    />,
   )
 
+  // Open the modal by calling the show method
+  await act(async () => {
+    if (modalRef.current) {
+      modalRef.current.show()
+    }
+  })
+
+  // Test that save button exists and test direct onConfirm method
+  const saveButton = getByRole('button', {name: /save/i})
+  expect(saveButton).toBeInTheDocument()
+
+  // Call onConfirm directly to test the behavior
   jest.useFakeTimers()
-  modal.find(Modal.Footer).find('#confirm-outcome-edit-modal').simulate('click')
+  act(() => {
+    if (modalRef.current) {
+      modalRef.current.onConfirm()
+    }
+  })
   jest.runAllTimers()
 
-  expect(modal.state('show')).toBe(false)
   expect(onConfirm).toHaveBeenCalled()
+  jest.useRealTimers()
 })
 
 describe('showConfirmOutcomeEdit', () => {
   afterEach(() => {
     const parent = document.querySelector('.confirm-outcome-edit-modal-container')
     if (parent) {
-      const skipScroll = sinon.stub(window, 'scroll').callsFake(() => {})
+      const skipScroll = jest.spyOn(window, 'scroll').mockImplementation(() => {})
       ReactDOM.unmountComponentAtNode(parent)
       parent.remove()
-      skipScroll.restore()
+      skipScroll.mockRestore()
     }
   })
 

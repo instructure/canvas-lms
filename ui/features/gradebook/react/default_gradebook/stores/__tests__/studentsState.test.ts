@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,8 +20,106 @@ import store from '../index'
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@canvas/util/xhr'
 import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../../PerformanceControls'
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {getUsers} from '../graphql/users/getUsers'
+import {
+  getSubmissions,
+  GetSubmissionsParams,
+  Submission,
+} from '../graphql/submissions/getSubmissions'
+import {numberToLetters} from '../graphql/buildGraphQLQuery'
+
+// Helper function to validate student data loading
+const verifyStudentDataLoaded = () => {
+  expect(store.getState().isStudentDataLoaded).toStrictEqual(true)
+  expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
+  expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
+  expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
+  expect(store.getState().recentlyLoadedSubmissions).toMatchObject([
+    {
+      submissions: [
+        {
+          assignment_id: '2301',
+          score: 9,
+          user_id: '1103',
+        },
+      ],
+      user_id: '1103',
+    },
+  ])
+  expect(store.getState().studentList).toMatchObject([{id: '1101'}, {id: '1102'}, {id: '1103'}])
+  expect(store.getState().studentMap).toMatchObject({
+    1101: {id: '1101'},
+    1102: {id: '1102'},
+    1103: {id: '1103'},
+  })
+  expect(store.getState().assignmentUserSubmissionMap).toStrictEqual({
+    '2301': {
+      '1101': {
+        assignment_id: '2301',
+        score: 7,
+        user_id: '1101',
+      },
+      '1102': {
+        assignment_id: '2301',
+        score: 8,
+        user_id: '1102',
+      },
+      '1103': {
+        assignment_id: '2301',
+        score: 9,
+        user_id: '1103',
+      },
+    },
+  })
+}
+
+jest.mock('../graphql/users/getUsers', () => {
+  const actual = jest.requireActual('../graphql/users/getUsers')
+  return {
+    ...actual,
+    getUsers: jest.fn(),
+  }
+})
+
+jest.mock('../graphql/enrollments/getEnrollments', () => {
+  const actual = jest.requireActual('../graphql/enrollments/getEnrollments')
+  return {
+    ...actual,
+    getEnrollments: jest.fn().mockResolvedValue({
+      course: {
+        enrollmentsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            endCursor: '',
+          },
+        },
+      },
+    }),
+  }
+})
+
+jest.mock('../graphql/users/transformUser', () => ({
+  transformUser: jest.fn(user => ({id: user._id})),
+}))
+
+jest.mock('../graphql/submissions/getSubmissions', () => {
+  const actual = jest.requireActual('../graphql/submissions/getSubmissions')
+  return {
+    ...actual,
+    getSubmissions: jest.fn(),
+  }
+})
+
+jest.mock('../graphql/submissions/transformSubmission', () => ({
+  transformSubmission: jest.fn(submission => ({
+    assignment_id: submission.assignmentId,
+    score: submission.score,
+    user_id: submission.userId,
+  })),
+}))
 
 const initialState = store.getState()
 
@@ -60,42 +157,50 @@ const urls = {
 }
 
 describe('Gradebook > fetchStudentIds', () => {
-  const url = '/courses/0/gradebook/user_ids'
+  const url = '/courses/*/gradebook/user_ids'
+  const server = setupServer()
+  const capturedRequests: any[] = []
 
-  let exampleData_
-  let network
+  let exampleData_: {studentIds: string[]}
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
+    capturedRequests.length = 0
     exampleData_ = {
       studentIds: ['1101', '1102', '1103'],
     }
   })
 
+  afterEach(() => {
+    server.resetHandlers()
+    store.setState(initialState, true)
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   describe('#fetchStudentIds()', () => {
-    beforeEach(() => {
-      network = new NetworkFake()
-    })
-
-    afterEach(() => {
-      network.restore()
-      store.setState(initialState, true)
-    })
-
-    function fetchStudentIds() {
-      store.getState().fetchStudentIds()
-      return network.allRequestsReady()
-    }
-
     function getRequestsForUserIds() {
-      return network.getRequests().filter(request => {
-        return request.url === url
+      return capturedRequests.filter(request => {
+        return request.url.includes('/user_ids')
       })
     }
 
     test('sends the request using the given course id', async () => {
-      await fetchStudentIds()
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json({user_ids: exampleData_.studentIds})
+        }),
+      )
+
+      await store.getState().fetchStudentIds()
       const requests = getRequestsForUserIds()
-      expect(requests.length).toStrictEqual(1)
+      expect(requests).toHaveLength(1)
     })
 
     describe('when student ids have been prefetched', () => {
@@ -110,13 +215,20 @@ describe('Gradebook > fetchStudentIds', () => {
       })
 
       test('does not send a request for student ids', async () => {
-        await fetchStudentIds()
+        server.use(
+          http.get(url, async ({request}) => {
+            capturedRequests.push({url: request.url})
+            return HttpResponse.json({user_ids: exampleData_.studentIds})
+          }),
+        )
+
+        await store.getState().fetchStudentIds()
         const requests = getRequestsForUserIds()
-        expect(requests.length).toStrictEqual(0)
+        expect(requests).toHaveLength(0)
       })
 
       test('removes the prefetch request', async () => {
-        await fetchStudentIds()
+        await store.getState().fetchStudentIds()
         expect(typeof getPrefetchedXHR('user_ids')).toStrictEqual('undefined')
       })
     })
@@ -124,7 +236,33 @@ describe('Gradebook > fetchStudentIds', () => {
 })
 
 describe('#loadStudentData()', () => {
-  let server
+  beforeEach(() => {
+    store.setState({loadCompositeStudentData: jest.fn(), loadGraphqlStudentData: jest.fn()})
+  })
+
+  afterEach(() => {
+    store.setState(initialState, true)
+  })
+
+  it('calls loadCompositeStudentData if useGraphQL is false', async () => {
+    await store.getState().loadStudentData(false)
+    expect(store.getState().loadCompositeStudentData).toHaveBeenCalledTimes(1)
+    expect(store.getState().loadGraphqlStudentData).not.toHaveBeenCalled()
+  })
+
+  it('calls loadGraphqlStudentData if useGraphQL is true', async () => {
+    await store.getState().loadStudentData(true)
+    expect(store.getState().loadGraphqlStudentData).toHaveBeenCalledTimes(1)
+    expect(store.getState().loadCompositeStudentData).not.toHaveBeenCalled()
+  })
+})
+
+describe('#loadCompositeStudentData()', () => {
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     const performanceControls = new PerformanceControls({
@@ -136,72 +274,140 @@ describe('#loadStudentData()', () => {
       activeRequestLimit: performanceControls.activeRequestLimit,
     })
 
-    store.setState({performanceControls, dispatch})
+    store.setState({performanceControls, dispatch, courseId: '0'})
 
-    server = new FakeServer()
-    server.for(urls.studentIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
-    server
-      .for(urls.students, {user_ids: exampleData.studentIds.slice(0, 2)})
-      .respond([{status: 200, body: exampleData.students.slice(0, 2)}])
-    server
-      .for(urls.students, {user_ids: exampleData.studentIds.slice(2, 3)})
-      .respond({status: 200, body: exampleData.students.slice(2, 3)})
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-      .respond([{status: 200, body: exampleData.submissions.slice(0, 2)}])
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
-      .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
+    server.use(
+      http.get(urls.studentIds, () => {
+        return HttpResponse.json({user_ids: exampleData.studentIds})
+      }),
+      http.get(urls.students, ({request}) => {
+        const url = new URL(request.url)
+        const userIds = url.searchParams.getAll('user_ids[]').join(',')
+        if (userIds === exampleData.studentIds.slice(0, 2).join(',')) {
+          return HttpResponse.json(exampleData.students.slice(0, 2))
+        } else if (userIds === exampleData.studentIds.slice(2, 3).join(',')) {
+          return HttpResponse.json(exampleData.students.slice(2, 3))
+        }
+        return HttpResponse.json([])
+      }),
+      http.get(urls.submissions, ({request}) => {
+        const url = new URL(request.url)
+        const studentIds = url.searchParams.getAll('student_ids[]').join(',')
+        if (studentIds === exampleData.studentIds.slice(0, 2).join(',')) {
+          return HttpResponse.json(exampleData.submissions.slice(0, 2))
+        } else if (studentIds === exampleData.studentIds.slice(2, 3).join(',')) {
+          return HttpResponse.json(exampleData.submissions.slice(2, 3))
+        }
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
-    server.teardown()
+    server.resetHandlers()
     store.setState(initialState, true)
   })
 
+  afterAll(() => {
+    server.close()
+  })
+
   test('returns student and submission data', async () => {
-    const promise1 = await store.getState().loadStudentData()
-    await promise1
-    expect(store.getState().isStudentDataLoaded).toStrictEqual(true)
-    expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
-    expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
-    expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
-    expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([
-      {
-        submissions: [
-          {
-            assignment_id: '2301',
-            score: 9,
-            user_id: '1103',
+    await store.getState().loadCompositeStudentData()
+    verifyStudentDataLoaded()
+  })
+})
+
+describe('#loadGraphqlStudentData()', () => {
+  const server = setupServer()
+  const mockUsers = [{id: '1101'}, {id: '1102'}, {id: '1103'}]
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  beforeEach(() => {
+    ;(getUsers as jest.Mock).mockImplementation((params: {after?: string}) => {
+      const firstPage = mockUsers.slice(0, 2)
+      const secondPage = mockUsers.slice(2, 3)
+      let res = null
+
+      if (params.after === '') {
+        res = {
+          course: {
+            usersConnection: {
+              nodes: firstPage.map(it => ({_id: it.id})),
+              pageInfo: {hasNextPage: true, endCursor: 'cursor-0-end'},
+            },
           },
-        ],
-        user_id: '1103',
-      },
-    ])
-    expect(store.getState().studentList).toMatchObject([{id: '1101'}, {id: '1102'}, {id: '1103'}])
-    expect(store.getState().studentMap).toMatchObject({
-      1101: {id: '1101'},
-      1102: {id: '1102'},
-      1103: {id: '1103'},
+        }
+      } else {
+        res = {
+          course: {
+            usersConnection: {
+              nodes: secondPage.map(it => ({_id: it.id})),
+              pageInfo: {hasNextPage: false, endCursor: 'cursor-1-end'},
+            },
+          },
+        }
+      }
+      return Promise.resolve(res)
     })
-    expect(store.getState().assignmentUserSubmissionMap).toStrictEqual({
-      '2301': {
-        '1101': {
-          assignment_id: '2301',
-          score: 7,
-          user_id: '1101',
-        },
-        '1102': {
-          assignment_id: '2301',
-          score: 8,
-          user_id: '1102',
-        },
-        '1103': {
-          assignment_id: '2301',
-          score: 9,
-          user_id: '1103',
-        },
-      },
+    ;(getSubmissions as jest.Mock).mockImplementation(({userIds}: GetSubmissionsParams) => {
+      const res: Awaited<ReturnType<typeof getSubmissions>> = {course: {}}
+
+      userIds.forEach(userId => {
+        const nodes = (
+          exampleData.submissions.find(it => userId === it.user_id)?.submissions ?? []
+        ).map(it => ({
+          assignmentId: it.assignment_id,
+          score: it.score,
+          userId: it.user_id,
+        })) as unknown as Submission[]
+        if (nodes) {
+          const alias = numberToLetters(parseInt(userId, 10))
+          res.course[alias] = {
+            nodes,
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: '',
+            },
+          }
+        }
+      })
+      return Promise.resolve(res)
     })
+
+    const performanceControls = new PerformanceControls({
+      studentsChunkSize: 2,
+      submissionsChunkSize: 2,
+    })
+
+    const dispatch = new RequestDispatch({
+      activeRequestLimit: performanceControls.activeRequestLimit,
+    })
+
+    store.setState({performanceControls, dispatch, courseId: '0'})
+
+    server.use(
+      http.get(urls.studentIds, () => {
+        return HttpResponse.json({user_ids: exampleData.studentIds})
+      }),
+    )
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    server.resetHandlers()
+    store.setState(initialState, true)
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  test('returns student and submission data', async () => {
+    await store.getState().loadGraphqlStudentData()
+    verifyStudentDataLoaded()
   })
 })

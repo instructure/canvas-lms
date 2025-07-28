@@ -89,15 +89,15 @@ describe ActiveRecord::Base do
       end
 
       it "supports start" do
-        expect(do_batches(Enrollment, start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
+        expect(do_batches(Enrollment.order(:id), start: @e2.id)).to eq [[@e2, @e3, @e4, @e5, @e6]]
       end
 
       it "supports finish" do
-        expect(do_batches(Enrollment, finish: @e3.id)).to eq [[@e1, @e2, @e3]]
+        expect(do_batches(Enrollment.order(:id), finish: @e3.id)).to eq [[@e1, @e2, @e3]]
       end
 
       it "supports start and finish with a small batch size" do
-        expect(do_batches(Enrollment, of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
+        expect(do_batches(Enrollment.order(:id), of: 2, start: @e2.id, finish: @e4.id)).to eq [[@e2, @e3], [@e4]]
       end
 
       it "respects order" do
@@ -195,6 +195,29 @@ describe ActiveRecord::Base do
           Account.group(:id).find_each(strategy: :id, start: 0) { nil }
         end.to raise_error(ArgumentError)
       end
+    end
+  end
+
+  # once-ler really does not like running with teardown_fixtures in the same context
+  # so this has been moved into its own block
+  context "in_batches copy without a transaction" do
+    it "handles nested queries correctly" do
+      teardown_fixtures
+
+      Setting.create!(name: "spec1")
+      Setting.create!(name: "spec2")
+      Setting.create!(name: "spec3")
+
+      old_connection = Setting.connection
+      Setting.where("name LIKE 'spec%'").in_batches(strategy: :copy, of: 1, load: false) do
+        expect(Setting.where("name LIKE 'spec%'").count).to eq(3)
+      end
+      new_connection = Setting.connection
+
+      # make sure we're not holding the connection which ran COPY forever
+      expect(old_connection).to eq(new_connection)
+    ensure
+      Setting.where("name LIKE 'spec%'").delete_all
     end
   end
 
@@ -551,6 +574,69 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe ".update_many" do
+    it "works with a single column" do
+      u1 = User.create!
+      u2 = User.create!
+
+      User.all.update_many({ u1.id => "bob", u2.id => "alice" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "alice"
+    end
+
+    it "works with multiple columns" do
+      u1 = User.create!
+      u2 = User.create!
+
+      User.all.update_many({ u1.id => ["bob", "bobby"], u2.id => ["alice", "al"] },
+                           :name,
+                           :short_name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u1.short_name).to eq "bobby"
+      expect(u2.reload.name).to eq "alice"
+      expect(u2.short_name).to eq "al"
+    end
+
+    it "doesn't update rows that aren't mentioned" do
+      u1 = User.create!
+      u2 = User.create!(name: "alice")
+
+      User.all.update_many({ u1.id => "bob" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "alice"
+    end
+
+    it "doesn't fail with no updates" do
+      User.all.update_many({}, :name)
+    end
+
+    it "errors if you don't specify any columns" do
+      expect { User.all.update_many({}) }.to raise_error(ArgumentError)
+    end
+
+    it "errors if any of the hash values have a different number of columns" do
+      expect do
+        User.all.update_many({ 1 => ["bob", "bobby"], 2 => ["alice", 3, 4] }, :name, :short_name)
+      end.to raise_error(ArgumentError)
+    end
+
+    it "errors if any of the hash values aren't an array for a multi-column update" do
+      expect do
+        User.all.update_many({ 1 => ["bob", "bobby"], 2 => "alice" }, :name, :short_name)
+      end.to raise_error(ArgumentError)
+    end
+
+    it "works with conditions" do
+      u1 = User.create!
+      u2 = User.create!(name: "george")
+
+      r = User.where(id: u1)
+      r.update_many({ u1.id => "bob", u2.id => "alice" }, :name)
+      expect(u1.reload.name).to eq "bob"
+      expect(u2.reload.name).to eq "george"
+    end
+  end
+
   describe "delete_all with_limit" do
     it "works" do
       u = User.create!
@@ -591,6 +677,75 @@ describe ActiveRecord::Base do
       expect { p2.reload }.to raise_error(ActiveRecord::RecordNotFound)
       p3.reload
     end
+
+    context "with single-table-inheritance models" do
+      before do
+        ActiveRecord::Base.connection.execute(<<~SQL.squish)
+          set local search_path to #{Shard.current.name};
+
+          create table tmp_vehicles (id integer primary key, type text, brand text);
+
+          insert into tmp_vehicles values (1, 'TmpCar', 'Mercedes');
+          insert into tmp_vehicles values (2, 'TmpCar', 'BMW');
+          insert into tmp_vehicles values (3, 'TmpPlane', 'Boeing');
+          insert into tmp_vehicles values (4, 'TmpPlane', 'Airbus');
+        SQL
+
+        stub_const("TmpVehicle", Class.new(ActiveRecord::Base))
+        stub_const("TmpCar", Class.new(TmpVehicle))
+        stub_const("TmpPlane", Class.new(TmpVehicle))
+      end
+
+      it "scopes parent class properly" do
+        TmpVehicle.delete_all
+
+        expect(TmpVehicle.all).to be_empty
+        expect(TmpCar.all).to be_empty
+        expect(TmpPlane.all).to be_empty
+      end
+
+      it "scopes child class properly" do
+        TmpPlane.delete_all
+
+        expect(TmpVehicle.pluck(:brand)).to contain_exactly("Mercedes", "BMW")
+        expect(TmpCar.pluck(:brand)).to contain_exactly("Mercedes", "BMW")
+        expect(TmpPlane.pluck(:brand)).to be_empty
+      end
+    end
+
+    context "with model subclasses that use distinct tables" do
+      before do
+        ActiveRecord::Base.connection.execute(<<~SQL.squish)
+          set local search_path to #{Shard.current.name};
+
+          create table tmp_fruit (id integer primary key, color text);
+          create table tmp_apple (id integer primary key, color text, source text);
+
+          insert into tmp_fruit values (1, 'red');
+          insert into tmp_fruit values (2, 'orange');
+
+          insert into tmp_apple values (1, 'red', 'eu');
+          insert into tmp_apple values (2, 'green', 'us');
+        SQL
+      end
+
+      let(:fruit_klass) { Class.new(ActiveRecord::Base) { self.table_name = "tmp_fruit" } }
+      let(:apple_klass) { Class.new(fruit_klass) { self.table_name = "tmp_apple" } }
+
+      it "scopes parent class properly" do
+        fruit_klass.where(color: "red").in_batches.delete_all
+
+        expect(fruit_klass.pluck(:id)).to contain_exactly(2)
+        expect(apple_klass.pluck(:id)).to contain_exactly(1, 2)
+      end
+
+      it "scopes child class properly" do
+        apple_klass.where(color: "red").in_batches.delete_all
+
+        expect(fruit_klass.pluck(:id)).to contain_exactly(1, 2)
+        expect(apple_klass.pluck(:id)).to contain_exactly(2)
+      end
+    end
   end
 
   describe "#in_batches.delete_all" do
@@ -630,20 +785,18 @@ describe ActiveRecord::Base do
 
     let_once(:u) { User.create!(name: "abcdefg") }
 
-    let(:exec_query_method) { ($canvas_rails == "7.0") ? :exec_query : :internal_exec_query }
-
     def assert_bare_update
-      allow(User.connection).to receive(exec_query_method).and_call_original
+      allow(User.connection).to receive(:internal_exec_query).and_call_original
       expect(User.connection).to receive(:exec_update).once.and_call_original
       yield
-      expect(User.connection).not_to have_received(exec_query_method)
+      expect(User.connection).not_to have_received(:internal_exec_query)
     end
 
     def assert_multi_stage_update
-      allow(User.connection).to receive(exec_query_method).and_call_original
+      allow(User.connection).to receive(:internal_exec_query).and_call_original
       expect(User.connection).to receive(:exec_update).once.and_call_original
       yield
-      expect(User.connection).to have_received(exec_query_method).once
+      expect(User.connection).to have_received(:internal_exec_query).once
     end
 
     it "just does a bare update, instead of an ordered select and then update" do
@@ -908,6 +1061,80 @@ describe ActiveRecord::Base do
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
+
+  describe "#insert" do
+    let!(:base_user) { User.create! }
+
+    context "when the item is not present in the DB" do
+      let(:timestamp) { Time.utc(1991, 4, 25, 1, 2, 3) }
+
+      let!(:new_user) do
+        Timecop.freeze(timestamp) do
+          User.new(workflow_state: 0).insert
+        end
+      end
+
+      it "creates a new record" do
+        expect(User.all).to eq [base_user, new_user]
+      end
+
+      it "sets the timestamps correctly" do
+        expect(new_user.created_at).to eq timestamp
+        expect(new_user.updated_at).to eq timestamp
+      end
+
+      it "sets the ActiveRecord state properly" do
+        user = User.new(workflow_state: 0)
+        expect(user.persisted?).to be false
+
+        user.insert
+        expect(user.persisted?).to be true
+      end
+
+      it "validates the model" do
+        user = User.new(workflow_state: 0, name: "a" * 256)
+
+        expect { user.insert }.to raise_error(/Name is too long/)
+      end
+
+      it "invokes the save callbacks" do
+        user = User.new(workflow_state: 0)
+
+        expect(user).to receive(:infer_defaults)
+
+        user.insert
+      end
+
+      it "invokes the create callbacks" do
+        user = User.new(workflow_state: 0)
+
+        expect(user).to receive(:set_default_feature_flags)
+
+        user.insert
+      end
+    end
+
+    context "when the item is already present in the DB" do
+      it "it does not create a new record" do
+        base_user.insert(on_conflict: -> {})
+        expect(User.all).to eq [base_user]
+      end
+
+      context "when on_conflict is specified" do
+        it "calls the on_conflict callback" do
+          on_conflict = -> {}
+          expect(on_conflict).to receive(:call)
+          base_user.insert(on_conflict:)
+        end
+      end
+
+      context "when on_conflict is not specified" do
+        it "raises ActiveRecord::RecordNotUnique" do
+          expect { base_user.insert }.to raise_error ActiveRecord::RecordNotUnique
+        end
+      end
+    end
+  end
 end
 
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
@@ -925,28 +1152,43 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
 
   it "doesn't evict a normal cycle" do
-    conn1 = pool.connection
+    conn1 = pool.lease_connection
+    conn1.connect
     pool.checkin(conn1)
     expect(pool).to be_connected
-    conn2 = pool.connection
+    conn2 = pool.lease_connection
+    expect(conn2).to eql conn1
+  end
+
+  it "doesn't evict a normal cycle that is almost over" do
+    allow(Process).to receive(:clock_gettime).and_return(0)
+
+    conn1 = pool.lease_connection
+    conn1.connect
+    pool.checkin(conn1)
+
+    allow(Process).to receive(:clock_gettime).and_return(29)
+    conn2 = pool.lease_connection
     expect(conn2).to eql conn1
   end
 
   it "evicts connections on checkout" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.lease_connection
+    conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(60)
-    conn2 = pool.connection
+    conn2 = pool.lease_connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.lease_connection
+    conn1.connect
     expect(conn1.runtime).to eq 0
 
     allow(Process).to receive(:clock_gettime).and_return(60)
@@ -960,7 +1202,8 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   it "evicts connections if you call flush" do
     allow(Process).to receive(:clock_gettime).and_return(0)
 
-    conn1 = pool.connection
+    conn1 = pool.lease_connection
+    conn1.connect
     pool.checkin(conn1)
 
     allow(Process).to receive(:clock_gettime).and_return(60)

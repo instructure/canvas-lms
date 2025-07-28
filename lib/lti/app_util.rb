@@ -28,6 +28,7 @@ module Lti
       "in_nav_context" => { template: "lti/full_width_in_context" }.freeze,
       "default" => { template: "lti/framed_launch" }.freeze,
       "full_width_in_context" => { template: "lti/full_width_in_context" }.freeze,
+      "full_width_with_nav" => { template: "lti/full_width_with_nav" }.freeze,
     }.freeze
     BLACKLIST_WILDCARD = "*" # to set up 'deny all' rules
 
@@ -38,10 +39,6 @@ module Lti
 
       if display_override && TOOL_DISPLAY_TEMPLATES.include?(display_override)
         display_type = display_override
-      end
-
-      if display_type == "in_rce" && !Account.site_admin.feature_enabled?(:lti_rce_postmessage_support)
-        display_type = "borderless"
       end
 
       TOOL_DISPLAY_TEMPLATES[display_type].dup

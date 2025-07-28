@@ -21,10 +21,12 @@
 class Mutations::UpdateSubmissionGrade < Mutations::BaseMutation
   graphql_name "UpdateSubmissionsGrade"
 
-  argument :submission_id, ID, required: true
   argument :score, Int, required: true
+  argument :submission_id, ID, required: true
 
+  field :parent_assignment_submission, Types::SubmissionType, null: true
   field :submission, Types::SubmissionType, null: true
+
   def resolve(input:)
     submission = Submission.find(input[:submission_id])
     errors = {}
@@ -34,7 +36,18 @@ class Mutations::UpdateSubmissionGrade < Mutations::BaseMutation
     else
       errors[submission.id.to_s] = "Not authorized to score Submission"
     end
+
     response = {}
+
+    # Grab parent submission data if this submission is for a child assignment (i.e. a checkpointed discussion)
+    if submission.course.discussion_checkpoints_enabled? && submission.assignment.is_a?(SubAssignment) && errors.none?
+      sub_assignment = submission.assignment
+      parent_assignment = Assignment.find(sub_assignment.parent_assignment_id)
+      parent_assignment_submission = Submission.find_by(assignment_id: parent_assignment.id, user_id: submission.user_id)
+
+      response[:parent_assignment_submission] = parent_assignment_submission
+    end
+
     response[:submission] = submission unless errors.any?
     response[:errors] = errors if errors.any?
     response

@@ -53,7 +53,7 @@ export class Character {
 
   draw = ctx => {
     const gameCtx = ctx
-    gameCtx.fillStyle = '#0374B5'
+    gameCtx.fillStyle = '#2B7ABC'
     gameCtx.fillRect(this.x, this.y, this.width, this.height)
   }
 }
@@ -87,7 +87,7 @@ export class GoalObject extends Character {
 
   draw = gameCtx => {
     const ctx = gameCtx
-    ctx.fillStyle = '#0B874B'
+    ctx.fillStyle = '#03893D'
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 

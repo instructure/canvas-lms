@@ -145,6 +145,18 @@ describe "communication_channels/confirm" do
       expect(merge_button["href"]).to eq registration_confirmation_path(@communication_channel.confirmation_code, enrollment: @enrollment.try(:uuid), confirm: 1)
       expect(page.css("#back.btn").first).not_to be_nil
     end
+
+    it "displays an asterisk and marks the Password field as required" do
+      assign(:merge_opportunities, [])
+      render
+      page = Nokogiri::HTML5("<document>" + response.body + "</document>")
+      label = page.css("label[for='pseudonym_password']").first
+      expect(label).not_to be_nil
+      expect(label.text).to match(/Password:?\s*\*/)
+      field = page.css("#pseudonym_password").first
+      expect(field).not_to be_nil
+      expect(field["required"]).to eq "required"
+    end
   end
 
   context "invitations" do
@@ -169,7 +181,7 @@ describe "communication_channels/confirm" do
       expect(transfer_button["href"]).to eq registration_confirmation_path(@communication_channel.confirmation_code, enrollment: @enrollment.uuid, transfer_enrollment: 1)
       login_button = page.css("#login.btn").first
       expect(login_button).not_to be_nil
-      expect(login_button["href"]).to eq login_url(enrollment: @enrollment.uuid, pseudonym_session: { unique_id: "jt@instructure.com" }, expected_user_id: @pseudonym1.user_id, host: "test.host")
+      expect(login_button["href"]).to eq login_url(enrollment: @enrollment.uuid, expected_user_id: @pseudonym1.user_id, login_hint: "jt@instructure.com")
     end
 
     context "open registration" do

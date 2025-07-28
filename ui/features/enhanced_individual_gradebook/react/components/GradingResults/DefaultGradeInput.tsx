@@ -17,20 +17,26 @@
  */
 
 import React from 'react'
-import {outOfText, passFailStatusOptions, disableGrading} from '../../../utils/gradebookUtils'
+import {
+  outOfText,
+  passFailStatusOptions,
+  disableGrading,
+  assignmentHasCheckpoints,
+} from '../../../utils/gradeInputUtils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   ApiCallStatus,
   type AssignmentConnection,
   type GradebookUserSubmissionDetails,
 } from '../../../types'
 import type {Spacing} from '@instructure/emotion'
+import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 const {Option: SimpleSelectOption} = SimpleSelect as any
 
@@ -48,8 +54,11 @@ type Props = {
   handleSubmitGrade?: () => void
   handleChangePassFailStatus: (
     e: React.SyntheticEvent<Element, Event>,
-    data: {value?: string | number}
+    data: {value?: string | number},
   ) => void
+  header?: string
+  shouldShowOutOfText?: boolean
+  width?: string
 }
 
 export default function DefaultGradeInput({
@@ -65,12 +74,42 @@ export default function DefaultGradeInput({
   handleSubmitGrade,
   handleChangePassFailStatus,
   gradingStandardPointsBased,
+  header,
+  shouldShowOutOfText = true,
+  width = '14rem',
 }: Props) {
+  const outOfTextValue = outOfText(assignment, submission, gradingStandardPointsBased)
+
   const renderOutOfText = () => {
     return (
       <View as="span" margin="0 0 0 small" data-testid={`${context}_out_of_text`}>
-        {outOfText(assignment, submission, gradingStandardPointsBased)}
+        {outOfTextValue}
       </View>
+    )
+  }
+
+  const disabledGrading =
+    disableGrading(assignment, submitScoreStatus) || assignmentHasCheckpoints(assignment)
+
+  const renderHeader = () => {
+    return (
+      header && (
+        <div>
+          <Text size="small" weight="bold">
+            {header}
+          </Text>
+        </div>
+      )
+    )
+  }
+
+  const renderSubHeader = () => {
+    return (
+      header && (
+        <Text size="x-small" weight="normal" data-testid={`${context}_out_of_text`}>
+          {outOfTextValue}
+        </Text>
+      )
     )
   }
 
@@ -78,21 +117,24 @@ export default function DefaultGradeInput({
     <>
       {assignment.gradingType === 'pass_fail' ? (
         <View as={elementWrapper} margin={margin}>
+          {renderHeader()}
           <SimpleSelect
             renderLabel={
-              <ScreenReaderContent>
-                {`${I18n.t('Student Grade Pass-Fail Grade Options')}: ${outOfText(
-                  assignment,
-                  submission,
-                  gradingStandardPointsBased
-                )}`}
-              </ScreenReaderContent>
+              <>
+                <ScreenReaderContent>
+                  {`${
+                    header || I18n.t('Student Grade Pass-Fail Grade Options')
+                  }: ${outOfTextValue}`}
+                </ScreenReaderContent>
+                {renderSubHeader()}
+              </>
             }
             size="medium"
+            width={width}
             isInline={true}
             onChange={handleChangePassFailStatus}
             value={passFailStatusOptions[passFailStatusIndex].value}
-            interaction={disableGrading(assignment, submitScoreStatus) ? 'disabled' : undefined}
+            interaction={disabledGrading ? 'disabled' : undefined}
             data-testid={`${context}_select`}
             onBlur={() => handleSubmitGrade?.()}
           >
@@ -102,31 +144,31 @@ export default function DefaultGradeInput({
               </SimpleSelectOption>
             ))}
           </SimpleSelect>
-          {renderOutOfText()}
+          {shouldShowOutOfText && renderOutOfText()}
         </View>
       ) : (
         <View as={elementWrapper} className="grade" margin={margin}>
+          {renderHeader()}
           <TextInput
             renderLabel={
-              <ScreenReaderContent>
-                {`${I18n.t('Student Grade Text Input')}: ${outOfText(
-                  assignment,
-                  submission,
-                  gradingStandardPointsBased
-                )}`}
-              </ScreenReaderContent>
+              <>
+                <ScreenReaderContent>
+                  {`${header || I18n.t('Student Grade Text Input')}: ${outOfTextValue}`}
+                </ScreenReaderContent>
+                {renderSubHeader()}
+              </>
             }
             display="inline-block"
-            width="14rem"
+            width={width}
             value={gradeInput}
-            disabled={disableGrading(assignment, submitScoreStatus)}
+            disabled={disabledGrading}
             data-testid={`${context}_input`}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               handleSetGradeInput(e.target.value)
             }
             onBlur={() => handleSubmitGrade?.()}
           />
-          {renderOutOfText()}
+          {shouldShowOutOfText && renderOutOfText()}
         </View>
       )}
     </>

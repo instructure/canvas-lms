@@ -21,7 +21,7 @@ import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
 import {map, forEach, isEqual, includes, clone, isObject, chain, keys} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
@@ -29,7 +29,7 @@ import {send} from '@canvas/rce-command-shim'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import sanitizeData from '../../sanitizeData'
 
-const I18n = useI18nScope('errors')
+const I18n = createI18nScope('errors')
 
 const slice = [].slice
 
@@ -75,7 +75,7 @@ ValidatedFormView.prototype.saveOpts = {
 ValidatedFormView.prototype.disableWhileLoadingOpts = {}
 
 // Sets the model data from the form and saves it. Called when the form
-// submits, or can be called programatically.
+// submits, or can be called programmatically.
 // set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
 // a file attachment).  if you want the form not to be re-enabled after save success (because you
 // are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
@@ -104,14 +104,14 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return function (rce) {
             return sendFunc($(rce), 'checkReadyToGetCode', window.confirm)
           }
-        })(this)
+        })(this),
       )
       .every(
         (function (_this) {
           return function (value) {
             return value
           }
-        })(this)
+        })(this),
       )
   }
   if (!okayToContinue) {
@@ -122,7 +122,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
   if (keys(errors).length === 0) {
     disablingDfd = this.disablingDfd ?? new $.Deferred()
     saveDfd = this.saveFormData(data)
-    // eslint-disable-next-line promise/catch-or-return
+
     saveDfd.then(this.onSaveSuccess.bind(this), this.onSaveFail.bind(this))
     saveDfd.fail(
       (function (_this) {
@@ -132,7 +132,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
             return _this.setFocusAfterError()
           }
         }
-      })(this)
+      })(this),
     )
     if (!this.dontRenableAfterSaveSuccess) {
       saveDfd.done(function () {
@@ -146,7 +146,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return function (rce) {
             return sendFunc($(rce), 'RCEClosed')
           }
-        })(this)
+        })(this),
       )
     }
     this.trigger('submit')
@@ -159,7 +159,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
         return function (element) {
           return $(element).attr('data-error-type')
         }
-      })(this)
+      })(this),
     )
     assignmentFieldErrors = chain(keys(errors))
       .reject(function (err) {
@@ -176,7 +176,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
           return null
         }
       })(this),
-      50
+      50,
     )
   }
 }
@@ -188,7 +188,7 @@ ValidatedFormView.prototype.cancel = function () {
       return function (rce) {
         return send($(rce), 'RCEClosed')
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -254,7 +254,6 @@ ValidatedFormView.prototype.hideErrors = function () {
 }
 
 ValidatedFormView.prototype.onSaveSuccess = function (xhr) {
-  // eslint-disable-next-line prefer-spread
   return this.trigger.apply(this, ['success', xhr].concat(slice.call(arguments)))
 }
 
@@ -263,7 +262,7 @@ ValidatedFormView.prototype.onSaveFail = function (xhr) {
   errors = this.parseErrorResponse(xhr)
   errors || (errors = {})
   this.showErrors(errors)
-  // eslint-disable-next-line prefer-spread
+
   return this.trigger.apply(this, ['fail', errors].concat(slice.call(arguments)))
 }
 
@@ -298,7 +297,7 @@ ValidatedFormView.prototype.parseErrorResponse = function (response) {
   } else {
     try {
       return JSON.parse(response.responseText).errors
-    } catch (error1) {
+    } catch (_error1) {
       return {}
     }
   }
@@ -316,7 +315,7 @@ ValidatedFormView.prototype.translations = shimGetterShorthand(
     unsaved() {
       return I18n.t('unsaved_changes', 'You have unsaved changes.')
     },
-  }
+  },
 )
 
 // Errors are displayed relative to the field to which they belong. If
@@ -340,7 +339,6 @@ ValidatedFormView.prototype.fieldSelectors = null
 ValidatedFormView.prototype.findField = function (field) {
   let $el, ref
   const selector =
-    // eslint-disable-next-line no-void
     ((ref = this.fieldSelectors) != null ? ref[field] : void 0) || "[name='" + field + "']"
   $el = this.$(selector)
   if ($el.length === 0) {
@@ -371,7 +369,7 @@ ValidatedFormView.prototype.castJSON = function (obj) {
       return function (val, key) {
         return (clone_[key] = _this.castJSON(val))
       }
-    })(this)
+    })(this),
   )
   return clone_
 }

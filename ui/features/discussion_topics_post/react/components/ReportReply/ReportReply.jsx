@@ -17,7 +17,7 @@
  */
 
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 
@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import LoadingIndicator from '@canvas/loading-indicator'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const REPORT_TYPES = [
   {value: 'inappropriate', getLabel: () => I18n.t('Inappropriate')},
@@ -75,7 +75,7 @@ export const ReportReply = props => {
             <View as="div" margin="0 0 medium 0">
               <Text>
                 {I18n.t(
-                  'Reported replies will be sent to your teacher for review. You will not be able to undo this action.'
+                  'Reported replies will be sent to your teacher for review. You will not be able to undo this action.',
                 )}
               </Text>
             </View>

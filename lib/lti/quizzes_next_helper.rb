@@ -31,10 +31,14 @@ module Lti
       return false unless quizzes_next_tool?(tool)
       return false unless current_user.roles(context.root_account).exclude?("admin")
 
-      current_user_enrollment = context.enrollments.where(user: current_user)
-      current_user_enrollment
-        .where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
-        .active_by_date.union(current_user_enrollment.of_admin_type).none?
+      current_user_enrollments = context.enrollments.where(user: current_user)
+      scoped_enrollments = current_user_enrollments.where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+      scoped_enrollments = if NewQuizzesFeaturesHelper.results_visible_after_conclusion?(context)
+                             scoped_enrollments.where(workflow_state: ["active", "completed"])
+                           else
+                             scoped_enrollments.active_by_date
+                           end
+      scoped_enrollments.union(current_user_enrollments.of_admin_type).none?
     end
 
     module_function :unavailable_for_students?

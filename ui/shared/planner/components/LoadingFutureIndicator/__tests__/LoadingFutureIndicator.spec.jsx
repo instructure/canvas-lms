@@ -16,34 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import LoadingFutureIndicator from '../index'
 
 it('renders load more by default', () => {
-  const wrapper = shallow(<LoadingFutureIndicator />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText, queryByText} = render(<LoadingFutureIndicator />)
+  expect(getByText('Load more')).toBeInTheDocument()
+  expect(queryByText('Loading...')).not.toBeInTheDocument()
+  expect(queryByText('No more items to show')).not.toBeInTheDocument()
+  expect(queryByText('Error loading more items')).not.toBeInTheDocument()
 })
 
 it('renders loading when indicated', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingFuture={true} />)
-  expect(wrapper).toMatchSnapshot()
+  const {getAllByText, queryByText} = render(<LoadingFutureIndicator loadingFuture={true} />)
+  expect(queryByText('Load more')).not.toBeInTheDocument()
+  expect(getAllByText('Loading...')).toHaveLength(2)
 })
 
 it('renders all future items loaded regardless of other props', () => {
-  const wrapper = shallow(
-    <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />
+  const {getByText, queryByText} = render(
+    <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />,
   )
-  expect(wrapper).toMatchSnapshot()
+  expect(queryByText('Load more')).not.toBeInTheDocument()
+  expect(queryByText('Loading...')).not.toBeInTheDocument()
+  expect(getByText('No more items to show')).toBeInTheDocument()
 })
 
-it('invokes the callback when the load more button is clicked', () => {
+it('invokes the callback when the load more button is clicked', async () => {
+  const user = userEvent.setup()
   const mockLoad = jest.fn()
-  const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />)
-  wrapper.find('Link').simulate('click')
+  const {getByText} = render(<LoadingFutureIndicator onLoadMore={mockLoad} />)
+  await user.click(getByText('Load more'))
   expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true})
 })
 
 it("shows an Alert when there's a query error", () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingError="uh oh" />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText, queryByText} = render(<LoadingFutureIndicator loadingError="uh oh" />)
+  expect(getByText('Error loading more items')).toBeInTheDocument()
+  expect(getByText('Load more')).toBeInTheDocument()
+  expect(queryByText('Loading...')).not.toBeInTheDocument()
 })

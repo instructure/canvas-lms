@@ -21,13 +21,13 @@ module LtiAdvantage::Serializers
   class JwtMessageSerializer
     IMS_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti/claim/"
     DL_CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
-    NRPS_CLAIM_URL = "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice"
-    AGS_CLAIM_URL = "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint"
 
+    # Remove deployment_id when removing the lti_deployment_id_in_login_request FF
     STANDARD_IMS_CLAIMS = %w[
       context
       custom
       deployment_id
+      lti_deployment_id
       launch_presentation
       lis
       message_type
@@ -39,6 +39,13 @@ module LtiAdvantage::Serializers
       target_link_uri
       lti11_legacy_user_id
       lti1p1
+      notice
+      activity
+      for_user
+      submission
+      asset
+      assetreport_type
+      eulaservice
     ].freeze
 
     DEEP_LINKING_CLAIMS = %w[
@@ -46,16 +53,26 @@ module LtiAdvantage::Serializers
       content_items
     ].freeze
 
-    NAMES_AND_ROLES_SERVICE_CLAIM = "names_and_roles_service"
-    ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = "assignment_and_grade_service"
+    CLAIM_MAPPING = [
+      *STANDARD_IMS_CLAIMS.map { [it, IMS_CLAIM_PREFIX + it] },
+      *DEEP_LINKING_CLAIMS.map { [it, DL_CLAIM_PREFIX + it] },
+    ].to_h.merge(
+      "names_and_roles_service" =>
+        "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice",
+      "assignment_and_grade_service" =>
+        "https://purl.imsglobal.org/spec/lti-ags/claim/endpoint",
+      "platform_notification_service" =>
+        "https://purl.imsglobal.org/spec/lti/claim/platformnotificationservice"
+    ).freeze
 
     def initialize(object)
       @object = object
     end
 
-    def serializable_hash
-      hash = apply_claim_prefixes(@object.as_json.compact)
-      promote_extensions(hash)
+    # TODO: remove without_validation_fields when we remove the remove_unwanted_lti_validation_claims flag
+    def serializable_hash(without_validation_fields: true)
+      hash = without_validation_fields ? @object.as_json(except: %w[validation_context errors]) : @object.as_json
+      promote_extensions(apply_claim_prefixes(hash.compact))
     end
 
     private
@@ -66,19 +83,7 @@ module LtiAdvantage::Serializers
     end
 
     def apply_claim_prefixes(hash)
-      hash.transform_keys do |key|
-        if STANDARD_IMS_CLAIMS.include?(key)
-          "#{IMS_CLAIM_PREFIX}#{key}"
-        elsif DEEP_LINKING_CLAIMS.include?(key)
-          "#{DL_CLAIM_PREFIX}#{key}"
-        elsif key == NAMES_AND_ROLES_SERVICE_CLAIM
-          NRPS_CLAIM_URL
-        elsif key == ASSIGNMENT_AND_GRADE_SERVICE_CLAIM
-          AGS_CLAIM_URL
-        else
-          key
-        end
-      end
+      hash.transform_keys { |key| CLAIM_MAPPING[key] || key }
     end
   end
 end

@@ -399,7 +399,7 @@ describe SIS::CSV::ImportRefactored do
 
     it "alsoes retry in a new job" do
       stub_const("SIS::CSV::ImportRefactored::MAX_TRIES", 2)
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).exactly(6).and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).exactly(6).and_call_original
       # now *do* run the job
@@ -415,10 +415,10 @@ describe SIS::CSV::ImportRefactored do
       process_csv_data("term_id,name,status", "T001,Winter13,active")
 
       [0, 1, 2].each do |i|
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
-                                                                          tags: { attempt: i, retry: false })
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
-                                                                          tags: { attempt: i, retry: true })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("sis_parallel_worker",
+                                                                                      tags: { attempt: i, retry: false })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("sis_parallel_worker",
+                                                                                      tags: { attempt: i, retry: true })
       end
     end
 
@@ -428,6 +428,21 @@ describe SIS::CSV::ImportRefactored do
         "term_id,name,status",
         "T001,Winter13,active"
       )
+    end
+
+    it "is aborted when the batch is aborted" do
+      batch = @account.sis_batches.create!(user: user_model)
+      file = generate_csv_file([
+                                 "term_id,name,status",
+                                 "T001,Fall24,active",
+                                 "T001,Winter25,active"
+                               ])
+      batch.abort_batch
+      SIS::CSV::ImportRefactored.process(@account, { files: [file], batch: })
+
+      batch.parallel_importers.each do |parallel_importer|
+        expect(parallel_importer.workflow_state).to eq "aborted"
+      end
     end
   end
 end

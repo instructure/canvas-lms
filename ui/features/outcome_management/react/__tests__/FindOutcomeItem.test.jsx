@@ -52,7 +52,7 @@ describe('FindOutcomeItem', () => {
 
   const render = (
     children,
-    {friendlyDescriptionFF = true, accountLevelMasteryScalesFF = true, renderer = rtlRender} = {}
+    {friendlyDescriptionFF = true, accountLevelMasteryScalesFF = true, renderer = rtlRender} = {},
   ) => {
     return renderer(
       <OutcomesContext.Provider
@@ -64,7 +64,7 @@ describe('FindOutcomeItem', () => {
         }}
       >
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -103,7 +103,7 @@ describe('FindOutcomeItem', () => {
 
   it('disables add button with Added as text if group has been imported', () => {
     const {getByText} = render(
-      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_COMPLETED})} />
+      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_COMPLETED})} />,
     )
     expect(getByText('Added')).toBeInTheDocument()
     expect(getByText('Added').closest('button')).toBeDisabled()
@@ -111,7 +111,7 @@ describe('FindOutcomeItem', () => {
 
   it('displays spinner for outcome if group import is pending and outcome import is not completed', () => {
     const {queryByText, getByTestId} = render(
-      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_PENDING})} />
+      <FindOutcomeItem {...defaultProps({importGroupStatus: IMPORT_PENDING})} />,
     )
     expect(getByTestId('outcome-import-pending')).toBeInTheDocument()
     expect(queryByText('Add')).not.toBeInTheDocument()
@@ -124,7 +124,7 @@ describe('FindOutcomeItem', () => {
           importGroupStatus: IMPORT_PENDING,
           importOutcomeStatus: IMPORT_COMPLETED,
         })}
-      />
+      />,
     )
     expect(queryByTestId('outcome-import-pending')).not.toBeInTheDocument()
     expect(getByText('Added')).toBeInTheDocument()
@@ -150,7 +150,7 @@ describe('FindOutcomeItem', () => {
   describe('Assuming the description is over a line', () => {
     it('displays down pointing caret when description is expanded', () => {
       const {queryByTestId, getByText} = render(
-        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
@@ -158,7 +158,7 @@ describe('FindOutcomeItem', () => {
 
     it('expands description when user clicks on right pointing caret', () => {
       const {queryByTestId, getByText} = render(
-        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       expect(queryByTestId('description-expanded')).toBeInTheDocument()
@@ -166,7 +166,7 @@ describe('FindOutcomeItem', () => {
 
     it('collapses description when user clicks on downward pointing caret', () => {
       const {queryByTestId, getByText} = render(
-        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />
+        <FindOutcomeItem {...defaultProps({description: '<p>Aa</p><p>Bb</p>'})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
@@ -192,7 +192,7 @@ describe('FindOutcomeItem', () => {
       />,
       {
         friendlyDescriptionFF: true,
-      }
+      },
     )
 
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))
@@ -204,7 +204,7 @@ describe('FindOutcomeItem', () => {
       <FindOutcomeItem {...defaultProps({friendlyDescription: 'test friendly description'})} />,
       {
         friendlyDescriptionFF: false,
-      }
+      },
     )
 
     fireEvent.click(getByText('Expand description for outcome Outcome Title'))

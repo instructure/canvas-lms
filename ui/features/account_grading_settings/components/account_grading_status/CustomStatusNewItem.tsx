@@ -18,13 +18,13 @@
 
 import React, {useRef} from 'react'
 import {colorPickerColors, GradingStatusListItem} from '@canvas/grading-status-list-item'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconAddSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 type CustomStatusNewItemProps = {
   index: number

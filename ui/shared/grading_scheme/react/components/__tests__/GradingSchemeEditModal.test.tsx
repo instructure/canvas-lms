@@ -38,7 +38,7 @@ function renderGradingSchemeEditModal(props: Partial<GradingSchemeEditModalProps
       viewingFromAccountManagementPage={true}
       isCourseDefault={false}
       {...props}
-    />
+    />,
   )
 
   return {
@@ -65,7 +65,7 @@ describe('GradingSchemeEditModal', () => {
   it('should render the title of the grading scheme in the modal', () => {
     const {getByTestId} = renderGradingSchemeEditModal()
     expect(getByTestId('grading-scheme-edit-modal-title')).toHaveTextContent(
-      `${DefaultGradingScheme.title}`
+      `${DefaultGradingScheme.title}`,
     )
   })
 

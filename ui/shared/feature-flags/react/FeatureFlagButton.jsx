@@ -17,8 +17,8 @@
  */
 
 import React, {useState, useRef, useEffect} from 'react'
-import {bool, object, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {bool, object, string, func} from 'prop-types'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -31,12 +31,12 @@ import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from './ConfirmationDialog'
 
 import * as flagUtils from './util'
 
-const I18n = useI18nScope('feature_flags')
+const I18n = createI18nScope('feature_flags')
 
 function setFlag(flagName, state) {
   return doFetchApi({
@@ -53,7 +53,30 @@ function removeFlag(flagName) {
   })
 }
 
-function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
+async function confirmSaveIfSiteAdmin(displayName) {
+  return confirmWithPrompt({
+    title: I18n.t('Environment Confirmation for %{featureOption}', {
+      featureOption: displayName,
+    }),
+    message: I18n.t(
+      'Changing Site Admin Feature Options impacts all customers. To proceed, please confirm the current Canvas environment by typing it in the box below.',
+    ),
+    label: I18n.t('Environment'),
+    placeholder: ENV.RAILS_ENVIRONMENT,
+    hintText: I18n.t('The current environment is %{env}, case-insensitive', {
+      env: ENV.RAILS_ENVIRONMENT,
+    }),
+    valueMatchesExpected: value => value.toLowerCase() === ENV.RAILS_ENVIRONMENT.toLowerCase(),
+  })
+}
+
+function FeatureFlagButton({
+  featureFlag,
+  disableDefaults,
+  displayName,
+  appliesTo,
+  onStateChange = () => {},
+}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const enclosingDivEl = useRef(null)
@@ -62,13 +85,9 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
 
   async function updateFlag(state) {
     if (apiBusy) return
-    const message = flagUtils.transitionMessage(effectiveFlag, state)
-    if (message) {
-      const res = await showConfirmationDialog({
-        label: displayName,
-        body: message,
-      })
-      if (!res) {
+    if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
+      const confirmSave = await confirmSaveIfSiteAdmin(displayName)
+      if (!confirmSave) {
         return
       }
     }
@@ -79,9 +98,11 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
         // Update to match the new state since this returns the old version not the new one
         json.state = json.parent_state
         setUpdatedFlag(json)
+        onStateChange(json.state)
       } else {
         const {json} = await setFlag(effectiveFlag.feature, state)
         setUpdatedFlag(json)
+        onStateChange(json.state)
       }
     } catch (e) {
       showFlashAlert({
@@ -102,7 +123,7 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
   // Show the appropriate text depending
   // Also if we are in a course context then our FFs can't ever be inherited
   const allowsDefaults = flagUtils.doesAllowDefaults(effectiveFlag, disableDefaults)
-  const description = flagUtils.buildDescription(effectiveFlag, allowsDefaults)
+  const description = flagUtils.buildDescription(effectiveFlag, allowsDefaults, appliesTo)
 
   const isLocked = flagUtils.isLocked(effectiveFlag)
 
@@ -199,6 +220,8 @@ FeatureFlagButton.propTypes = {
   featureFlag: object.isRequired,
   displayName: string,
   disableDefaults: bool,
+  appliesTo: string,
+  onStateChange: func,
 }
 
 export default React.memo(FeatureFlagButton)

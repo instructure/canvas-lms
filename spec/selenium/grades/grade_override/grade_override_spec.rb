@@ -26,9 +26,21 @@ require_relative "../pages/student_grades_page"
 require_relative "../pages/gradebook_history_page"
 require_relative "../setup/gb_history_search_setup"
 
-describe "Final Grade Override" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Final Grade Override" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookHistorySetup
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   before do
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
@@ -48,31 +60,6 @@ describe "Final Grade Override" do
 
     @students.each do |student|
       @assignment.grade_student(student, grade: 8.9, grader: @teacher)
-    end
-  end
-
-  context "Individual Gradebook" do
-    before do
-      @student = @students.first
-      @enrollment = @course.enrollments.find_by(user: @student)
-      @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
-      user_session(@teacher)
-      SRGB.visit(@course.id)
-      SRGB.allow_final_grade_override_option.click
-      SRGB.select_student(@student)
-    end
-
-    it "display override percent in individual gradebook", priority: "1" do
-      expect(SRGB.final_grade_override.text).to include "97.1%"
-    end
-
-    it "display override grade in individual gradebook", priority: "1" do
-      expect(SRGB.final_grade_override_input).to have_value "A"
-    end
-
-    it "saves overridden grade in SRGB", priority: "1" do
-      SRGB.enter_override_grade("D-")
-      expect(@enrollment.scores.find_by(course_score: true).override_score).to be 61.0
     end
   end
 
@@ -134,4 +121,9 @@ describe "Final Grade Override" do
       expect(GradeBookHistory).to be_contains_only_final_grade_override_entries
     end
   end
+end
+
+describe "Final Grade Override" do
+  it_behaves_like "Final Grade Override", true
+  it_behaves_like "Final Grade Override", false
 end

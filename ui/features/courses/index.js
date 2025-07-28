@@ -17,6 +17,7 @@
  */
 
 import ready from '@instructure/ready'
+import {clearDashboardCache} from '../../shared/dashboard-card/dashboardCardQueries'
 
 ready(() => {
   const params = new URLSearchParams(window.location.search)
@@ -26,4 +27,19 @@ ready(() => {
     const focusedHeader = document.querySelector('a#' + sortingTable + '_' + sortingCol)
     if (focusedHeader) focusedHeader.focus()
   }
+  if (ENV?.FEATURES?.dashboard_graphql_integration) {
+    addFavoriteClickListener()
+  }
 })
+
+function addFavoriteClickListener() {
+  document
+    .querySelectorAll('.course-list-favoritable, .course-list-favorite-course')
+    .forEach(element => {
+      element.addEventListener('click', handleFavoriteCourseClick)
+    })
+}
+
+function handleFavoriteCourseClick() {
+  clearDashboardCache()
+}

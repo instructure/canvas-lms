@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyCalculation from './ProficiencyCalculation'
@@ -27,11 +27,11 @@ import {
   COURSE_OUTCOME_CALCULATION_QUERY,
   SET_OUTCOME_CALCULATION_METHOD,
 } from '@canvas/outcomes/graphql/MasteryCalculation'
-import {useQuery, useMutation} from 'react-apollo'
+import {useQuery, useMutation} from '@apollo/client'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('MasteryScale')
+const I18n = createI18nScope('MasteryScale')
 
 const MasteryCalculation = ({onNotifyPendingChanges}) => {
   const {contextType, contextId} = useCanvasContext()
@@ -42,7 +42,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
   })
 
   const [setCalculationMethodQuery, {error: setCalculationMethodError}] = useMutation(
-    SET_OUTCOME_CALCULATION_METHOD
+    SET_OUTCOME_CALCULATION_METHOD,
   )
 
   const setCalculationMethod = useCallback(
@@ -53,10 +53,10 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
         showFlashAlert({
           message: I18n.t('Mastery calculation saved'),
           type: 'success',
-        })
+        }),
       )
     },
-    [contextType, contextId, setCalculationMethodQuery]
+    [contextType, contextId, setCalculationMethodQuery],
   )
 
   if (loading) {
@@ -90,7 +90,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
       {accountRoles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery calculation at the account level is enabled for:'
+            'Permission to change this mastery calculation at the account level is enabled for:',
           )}
           roles={accountRoles}
         />
@@ -99,7 +99,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
       {roles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery calculation at the course level is enabled for:'
+            'Permission to change this mastery calculation at the course level is enabled for:',
           )}
           roles={roles}
         />

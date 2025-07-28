@@ -102,7 +102,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       const container = setup()
 
       expect(
-        container.queryByText(/Loading Microsoft Teams Sync settings/i)
+        container.queryByText(/Loading Microsoft Teams Sync settings/i),
       ).not.toBeInTheDocument()
     })
 
@@ -158,7 +158,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       })
 
       expect(
-        container.getByText(/Unable to fetch current Microsoft Teams Sync settings/i)
+        container.getByText(/Unable to fetch current Microsoft Teams Sync settings/i),
       ).toBeInTheDocument()
     })
 
@@ -174,19 +174,19 @@ describe('MicrosoftSyncAccountSettings', () => {
         },
         () => {
           throw new Error('test failure!')
-        }
+        },
       )
 
       fireEvent.click(getToggle(container))
 
       const errMsg = await container.findByText(
-        /Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support/i
+        /Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support/i,
       )
       expect(errMsg).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       expect(getToggle(container)).not.toBeChecked()
       expect(
-        container.queryByText('Microsoft Teams Sync settings updated!')
+        container.queryByText('Microsoft Teams Sync settings updated!'),
       ).not.toBeInTheDocument()
     })
   })
@@ -198,7 +198,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       fireEvent.click(getToggle(container))
 
       const errMsg = await container.findByText(
-        /to toggle microsoft teams sync you need to input a tenant domain\./i
+        /to toggle microsoft teams sync you need to input a tenant domain\./i,
       )
       expect(errMsg).toBeInTheDocument()
       expect(getToggle(container)).not.toBeChecked()
@@ -220,7 +220,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       fireEvent.click(getUpdateButton(container))
 
       const errorMessage = await container.findByText(
-        /to toggle microsoft teams sync you need to input a tenant domain/i
+        /to toggle microsoft teams sync you need to input a tenant domain/i,
       )
       expect(errorMessage).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledTimes(0)
@@ -258,7 +258,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       fireEvent.click(getUpdateButton(container))
 
       const errorMessage = await container.findByText(
-        /A suffix cannot be longer than 255 characters\. Please use a shorter suffix and try again\./i
+        /A suffix cannot be longer than 255 characters\. Please use a shorter suffix and try again\./i,
       )
 
       expect(errorMessage).toBeInTheDocument()
@@ -277,7 +277,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       fireEvent.click(getUpdateButton(container))
 
       const errorMessage = await container.findByText(
-        /a suffix cannot have any tabs or spaces\. please remove them and try again\./i
+        /a suffix cannot have any tabs or spaces\. please remove them and try again\./i,
       )
 
       expect(errorMessage).toBeInTheDocument()
@@ -297,7 +297,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       fireEvent.click(getUpdateButton(container))
 
       expect(
-        await container.findByText(/microsoft teams sync settings updated/i)
+        await container.findByText(/microsoft teams sync settings updated/i),
       ).toBeInTheDocument()
       expect(doFetchApi).toHaveBeenCalledTimes(1)
     })
@@ -312,7 +312,7 @@ describe('MicrosoftSyncAccountSettings', () => {
             microsoft_sync_enabled: false,
           })
         },
-        () => {}
+        () => {},
       )
 
       expect(container.queryByText(/Grant tenant access/)).not.toBeInTheDocument()
@@ -328,7 +328,7 @@ describe('MicrosoftSyncAccountSettings', () => {
             microsoft_sync_enabled: true,
           })
         },
-        () => {}
+        () => {},
       )
 
       expect(container.queryByText(/Grant tenant access/)).not.toBeInTheDocument()
@@ -472,12 +472,12 @@ describe('MicrosoftSyncAccountSettings', () => {
             microsoft_sync_enabled: true,
           })
         },
-        () => {}
+        () => {},
       )
 
       const anchorTag = container.getByText(/Grant tenant access/)
       expect(anchorTag.href).toEqual(
-        'https://login.microsoftonline.com/testtenant.com/adminconsent?client_id=12345&redirect_uri=https%3A%2F%2Fwww.instructure.com'
+        'https://login.microsoftonline.com/testtenant.com/adminconsent?client_id=12345&redirect_uri=https%3A%2F%2Fwww.instructure.com',
       )
     })
   })

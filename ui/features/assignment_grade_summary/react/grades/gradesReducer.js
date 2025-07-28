@@ -88,7 +88,7 @@ function setUpdateGradeStatus(state, gradeInfo, status) {
   const statuses = state.grades.updateGradeStatuses.filter(
     updateGradeStatus =>
       // Remove existing items for the same student or for previous successes.
-      updateGradeStatus.gradeInfo.studentId !== gradeInfo.studentId && status !== SUCCESS
+      updateGradeStatus.gradeInfo.studentId !== gradeInfo.studentId && status !== SUCCESS,
   )
   const updateGradeStatuses = statuses.concat([{gradeInfo, status}])
   return updateIn(state, 'grades', {updateGradeStatuses})
@@ -150,23 +150,23 @@ handlers[ADD_PROVISIONAL_GRADES] = (currentState, {payload}) =>
     state =>
       addProvisionalGrades(
         state,
-        payload.provisionalGrades.filter(pg => pg.grade !== null)
+        payload.provisionalGrades.filter(pg => pg.grade !== null),
       ),
-    state => updateBulkSelectionDetails(state)
+    state => updateBulkSelectionDetails(state),
   )
 
 handlers[SET_SELECTED_PROVISIONAL_GRADE] = (currentState, {payload}) =>
   pipeState(
     currentState,
     state => setSelectedProvisionalGrade(state, payload.gradeInfo),
-    state => updateBulkSelectionDetails(state)
+    state => updateBulkSelectionDetails(state),
   )
 
 handlers[SET_SELECTED_PROVISIONAL_GRADES] = (currentState, {payload}) =>
   pipeState(
     currentState,
     state => setSelectedProvisionalGrades(state, payload.provisionalGradeIds),
-    state => updateBulkSelectionDetails(state)
+    state => updateBulkSelectionDetails(state),
   )
 
 handlers[SET_SELECT_PROVISIONAL_GRADE_STATUS] = (state, {payload}) =>

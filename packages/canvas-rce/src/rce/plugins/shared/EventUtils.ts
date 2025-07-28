@@ -45,7 +45,7 @@ export function isMicrosoftWordContent(html: string): boolean {
 
     return (
       Array.from(doc.documentElement.attributes).some(attr =>
-        /schemas[-.]microsoft[-.]com/.test(attr.value)
+        /schemas[-.]microsoft[-.]com/.test(attr.value),
       ) || /<o:|class="Mso/.test(doc.body.innerHTML || '')
     )
   }

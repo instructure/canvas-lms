@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func} from 'prop-types'
 import {connect} from 'react-redux'
@@ -37,7 +37,7 @@ import {ConnectedRSSFeedList} from './RSSFeedList'
 import actions from '../actions'
 import select from '@canvas/obj-select'
 
-const I18n = useI18nScope('announcements_v2')
+const I18n = createI18nScope('announcements_v2')
 
 const verbosityTypes = [
   {value: 'full', label: I18n.t('Full article')},
@@ -84,7 +84,7 @@ export default class AddExternalFeed extends React.Component {
       {
         isOpen: expanded,
       },
-      this.focusOnToggleHeader
+      this.focusOnToggleHeader,
     )
   }
 
@@ -220,7 +220,7 @@ export default class AddExternalFeed extends React.Component {
               this.state.phrase,
               I18n.t('Enter specific phrase'),
               this.handleTextInputSetPhrase,
-              'external-rss-feed__phrase-input'
+              'external-rss-feed__phrase-input',
             )}
         </View>
       </div>
@@ -229,7 +229,12 @@ export default class AddExternalFeed extends React.Component {
 
   render() {
     return (
-      <View id="external-rss-feed__header" display="block" textAlign="start">
+      <View
+        id="external-rss-feed__header"
+        data-testid="external-rss-feed"
+        display="block"
+        textAlign="start"
+      >
         <span id="external-rss-feed__toggle-button" ref={this.toggleRef}>
           <ToggleDetails
             id="external-rss-feed__toggle"
@@ -247,7 +252,7 @@ export default class AddExternalFeed extends React.Component {
                 this.state.feedURL,
                 I18n.t('Feed url'),
                 this.handleTextInputSetFeedURL,
-                'external-rss-feed__url-input'
+                'external-rss-feed__url-input',
               )}
               {this.renderEmbeddedSelection()}
               {this.renderSpecificHeaderPhrase()}

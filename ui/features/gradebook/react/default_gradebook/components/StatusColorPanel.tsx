@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,43 +18,59 @@
 
 import React, {useEffect, useState, useRef} from 'react'
 import {func, shape, string} from 'prop-types'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
+import type {StatusColors} from '../constants/colors'
 
-const colorPickerButtons = {}
-const colorPickerContents = {}
+interface ColorPickerRefs {
+  [key: string]: Element | null
+}
 
-export default function StatusColorPanel({colors: initialColors, onColorsUpdated}) {
-  const [colors, setColors] = useState({...initialColors})
-  const [openPopover, setOpenPopover] = useState(null)
+const colorPickerButtons: ColorPickerRefs = {}
+const colorPickerContents: ColorPickerRefs = {}
+
+interface StatusColorPanelProps {
+  colors: StatusColors
+  onColorsUpdated: (colors: StatusColors) => void
+}
+
+export default function StatusColorPanel({
+  colors: initialColors,
+  onColorsUpdated,
+}: StatusColorPanelProps) {
+  const [colors, setColors] = useState<StatusColors>({...initialColors})
+  const [openPopover, setOpenPopover] = useState<string | null>(null)
   const lastSelectedStatusRef = useRef<string>()
 
-  const bindColorPickerButton = status => button => {
+  const bindColorPickerButton = (status: string) => (button: Element | null) => {
     colorPickerButtons[status] = button
   }
 
-  const bindColorPickerContent = status => content => {
+  const bindColorPickerContent = (status: string) => (content: Element | null) => {
     colorPickerContents[status] = content
   }
 
-  const updateStatusColors = status => color => {
+  const updateStatusColors = (status: keyof StatusColors) => (color: string) => {
     const newColors = {...colors, [status]: color}
     setColors(newColors)
     setOpenPopover(null)
     onColorsUpdated(newColors)
   }
 
-  const handleOnToggle = status => toggle => {
+  const handleOnToggle = (status: string) => (toggle: boolean) => {
     setOpenPopover(toggle ? status : null)
   }
 
-  const handleColorPickerAfterClose = _status => () => {
+  const handleColorPickerAfterClose = (_status: string) => () => {
     setOpenPopover(null)
   }
 
   useEffect(() => {
     if (openPopover == null) {
-      colorPickerButtons[lastSelectedStatusRef.current || '']?.focus()
+      const button = colorPickerButtons[lastSelectedStatusRef.current || '']
+      if (button instanceof HTMLElement) {
+        button.focus()
+      }
     } else {
       lastSelectedStatusRef.current = openPopover
     }
@@ -63,17 +78,17 @@ export default function StatusColorPanel({colors: initialColors, onColorsUpdated
 
   return (
     <ul className="Gradebook__StatusModalList">
-      {statuses.map(status => (
+      {getStatuses().map(status => (
         <StatusColorListItem
           key={status}
           status={status}
-          color={colors[status]}
+          color={colors[status as keyof StatusColors]}
           isColorPickerShown={openPopover === status}
           colorPickerOnToggle={handleOnToggle(status)}
           colorPickerButtonRef={bindColorPickerButton(status)}
           colorPickerContentRef={bindColorPickerContent(status)}
           colorPickerAfterClose={handleColorPickerAfterClose(status)}
-          afterSetColor={updateStatusColors(status)}
+          afterSetColor={updateStatusColors(status as keyof StatusColors)}
         />
       ))}
     </ul>
@@ -87,6 +102,7 @@ StatusColorPanel.propTypes = {
     resubmitted: string.isRequired,
     dropped: string.isRequired,
     excused: string.isRequired,
+    extended: string.isRequired,
   }).isRequired,
   onColorsUpdated: func.isRequired,
 }

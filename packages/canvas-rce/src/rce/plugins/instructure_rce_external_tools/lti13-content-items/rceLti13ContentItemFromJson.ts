@@ -38,12 +38,12 @@ import {
  */
 export function rceLti13ContentItemFromJson<TJson extends Lti13ContentItemJson>(
   itemJson: TJson,
-  context: RceLti13ContentItemContext
+  context: RceLti13ContentItemContext,
 ): RceLti13ContentItem<TJson> | null {
   if (!itemJson.type) return null
 
   const clazz = typeRegistry[itemJson.type] as RceLti13ContentItemClass<TJson> | undefined
-  // eslint-disable-next-line new-cap
+   
   return clazz ? new clazz(itemJson, context) : null
 }
 

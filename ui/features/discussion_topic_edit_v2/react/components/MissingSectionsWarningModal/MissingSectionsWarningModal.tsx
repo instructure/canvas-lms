@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -19,31 +18,21 @@
 
 import React from 'react'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussion_create')
-
-type Section = {
-  id: string
-  name: string
-  end_at: string | null
-  override_course_and_term_dates: boolean | null
-  start_at: string | null
-}
+const I18n = createI18nScope('discussion_create')
 
 type Props = {
-  sections: Section[]
   onClose: () => void
   onContinue: () => void
 }
 
-export const MissingSectionsWarningModal = ({sections, onClose, onContinue}: Props) => {
+export const MissingSectionsWarningModal = ({onClose, onContinue}: Props) => {
   const renderCloseButton = () => {
     return <CloseButton onClick={onClose} screenReaderLabel={I18n.t('Close')} />
   }
@@ -70,16 +59,9 @@ export const MissingSectionsWarningModal = ({sections, onClose, onContinue}: Pro
       </Modal.Header>
       <Modal.Body padding="small">
         <p>
-          <Text>{I18n.t('Not all sections will be assigned this item.')}</Text>
+          <Text>{I18n.t('Not everyone will be assigned this item!')}</Text>
         </p>
-        <Text>{I18n.t('Would you like to go back to include:')}</Text>
-        <List margin="0 0 medium">
-          {sections.map(section => (
-            <List.Item key={section.id}>
-              <Text weight="bold">{section.name}</Text>
-            </List.Item>
-          ))}
-        </List>
+        <Text>{I18n.t('Would you like to continue?')}</Text>
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={onClose} margin="0 x-small 0 0" data-testid="go-back-button">

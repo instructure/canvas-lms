@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import customPropTypes from '../modules/customPropTypes'
 import filesEnv from '../modules/filesEnv'
 import setUsageRights from '../../util/setUsageRights'
@@ -26,7 +26,7 @@ import updateModelsUsageRights from '../../util/updateModelsUsageRights'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('usage_rights_modal')
+const I18n = createI18nScope('usage_rights_modal')
 
 export default {
   displayName: 'ManageUsageRightsModal',
@@ -56,7 +56,7 @@ export default {
       $(this.usageSelection.usageRightSelection).errorBox(
         I18n.t('You must specify a usage right.'),
         null,
-        'fixed'
+        'fixed',
       )
       return false
     }
@@ -100,7 +100,7 @@ export default {
       this.props.itemsToManage.every(
         item =>
           (item.get('usage_rights') && item.get('usage_rights').use_justification) ===
-          useJustification
+          useJustification,
       )
     ) {
       return useJustification
@@ -118,7 +118,7 @@ export default {
       this.props.itemsToManage.every(
         item =>
           (item.get('usage_rights') && item.get('usage_rights').legal_copyright) === copyright ||
-          (item.get('usage_rights') && item.get('usage_rights').license) === copyright
+          (item.get('usage_rights') && item.get('usage_rights').license) === copyright,
       )
     ) {
       return copyright

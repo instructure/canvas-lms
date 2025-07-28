@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -33,6 +32,10 @@ declare const ENV: {
 
 const FORMAT_JS_DIR = '/dist/@formatjs'
 
+// TODO:  FOO-4658  to research and generally clean this up the right way.
+// Short-circuiting this factored-out funcion for now until we get to the bottom
+// of the pathname mapping issue.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function localeDataFor(sys: string, locale: string): string {
   return `${FORMAT_JS_DIR}/intl-${sys}/locale-data/${locale}.js`
 }
@@ -58,6 +61,7 @@ function polyfillerFactory({
   polyfill,
   localeLoader,
 }: PolyfillerArgs): Capability {
+  // @ts-expect-error
   const subsys = Intl[subsysName]
   const native = subsys
   const nativeName = 'Native' + subsysName
@@ -87,8 +91,9 @@ function polyfillerFactory({
     const fallback = locales[0] ?? 'en'
 
     try {
-      /* eslint-disable no-await-in-loop */ // it's actually fine in for-loops
+      // it's actually fine in for-loops
       for (const locale of locales) {
+        // @ts-expect-error
         const nativeSupport = Intl[subsysName].supportedLocalesOf([locale])
         if (nativeSupport.length > 0)
           return {subsys: subsysName, locale: nativeSupport[0], source: 'native'}
@@ -97,12 +102,13 @@ function polyfillerFactory({
         if (!doable || doable === 'en') continue
         await polyfill()
         if (typeof doable === 'string') await localeLoader(doable)
+        // @ts-expect-error
         Intl[nativeName] = native
         const retval: PolyfillerUpValue = {subsys: subsysName, locale, source: 'polyfill'}
         if (typeof doable === 'string') retval.loaded = doable
         return retval
       }
-      /* eslint-enable no-await-in-loop */
+
       return {subsys: subsysName, locale: fallback, error: 'polyfill unavailable'}
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e)
@@ -112,7 +118,9 @@ function polyfillerFactory({
 
   function down(): void {
     if (subsysName) {
+      // @ts-expect-error
       delete Intl[nativeName]
+      // @ts-expect-error
       Intl[subsysName] = native
     }
   }
@@ -143,7 +151,7 @@ const subsystems: {[subsys: string]: Capability} = {
     subsysName: 'PluralRules',
     should: spfPR,
     polyfill: () => import('@formatjs/intl-pluralrules/polyfill-force'),
-    localeLoader: (l: string) => import(localeDataFor('pluralrules', l)),
+    localeLoader: (l: string) => import('@formatjs/intl-pluralrules/locale-data/' + l),
   }),
 
   datetimeformat: polyfillerFactory({
@@ -153,21 +161,21 @@ const subsystems: {[subsys: string]: Capability} = {
       await import('@formatjs/intl-datetimeformat/polyfill-force')
       await import('@formatjs/intl-datetimeformat/add-all-tz')
     },
-    localeLoader: (l: string) => import(localeDataFor('datetimeformat', l)),
+    localeLoader: (l: string) => import('@formatjs/intl-datetimeformat/locale-data/' + l),
   }),
 
   numberformat: polyfillerFactory({
     subsysName: 'NumberFormat',
     should: spfNF,
     polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
-    localeLoader: (l: string) => import(localeDataFor('numberformat', l)),
+    localeLoader: (l: string) => import('@formatjs/intl-numberformat/locale-data/' + l),
   }),
 
   relativetimeformat: polyfillerFactory({
     subsysName: 'RelativeTimeFormat',
     should: spfRTF,
     polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
-    localeLoader: (l: string) => import(localeDataFor('relativetimeformat', l)),
+    localeLoader: (l: string) => import('@formatjs/intl-relativetimeformat/locale-data/' + l),
   }),
 }
 
@@ -177,14 +185,13 @@ function polyfillUp(...polyfills: unknown[]) {
     const r = polyfillResult as PolyfillerUpValue
     if (r.error) {
       const errorMessage = `${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`
-      // eslint-disable-next-line no-console
+
       console.error(errorMessage)
       captureException(
-        new Error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`)
+        new Error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`),
       )
     }
     if (r.source === 'polyfill')
-      // eslint-disable-next-line no-console
       console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`)
   })
 }

@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, flatten, filter, difference} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -30,7 +30,7 @@ import {View} from '@instructure/ui-view'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('assignmentsToggleShowByView')
+const I18n = createI18nScope('assignmentsToggleShowByView')
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {
@@ -55,24 +55,33 @@ export default class ToggleShowByView extends Backbone.View {
 
   initializeDateGroups() {
     const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
-    const dated = filter(assignments, a => a.dueAt())
-    const undated = difference(assignments, dated)
+    const undated = []
     const past = []
     const overdue = []
     const upcoming = []
-    each(dated, a => {
-      if (new Date() < Date.parse(a.dueAt())) return upcoming.push(a)
 
-      const isOverdue = a.allowedToSubmit() && a.withoutGradedSubmission()
-      // only handles observer observing one student, this needs to change to handle multiple users in the future
-      const canHaveOverdueAssignment =
-        !ENV.current_user_has_been_observer_in_this_course ||
-        (ENV.observed_student_ids && ENV.observed_student_ids.length) === 1
-
-      if (isOverdue && canHaveOverdueAssignment) return overdue.push(a)
-      past.push(a)
+    each(assignments, a => {
+      let group
+      if (a.hasSubAssignments()) {
+        group = a.getCheckpointDateGroup()
+      } else {
+        group = a.getDateSortGroup()
+      }
+      switch (group) {
+        case 'undated':
+          undated.push(a)
+          break
+        case 'upcoming':
+          upcoming.push(a)
+          break
+        case 'overdue':
+          overdue.push(a)
+          break
+        case 'past':
+          past.push(a)
+          break
+      }
     })
-
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),
@@ -141,7 +150,7 @@ export default class ToggleShowByView extends Backbone.View {
 
   renderToggle() {
     ReactDOM.render(
-      ENV.FEATURES.instui_nav ? (
+      ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>
           <Menu.Group label="" selected={[this.showByDate() ? 'date' : 'type']}>
             <Menu.Item
@@ -173,7 +182,7 @@ export default class ToggleShowByView extends Backbone.View {
           <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
         </RadioInputGroup>
       ),
-      this.el
+      this.el,
     )
   }
 

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState, useEffect} from 'react'
+import {useCallback, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
 import TreeBrowser from './TreeBrowser'
@@ -50,7 +50,7 @@ import {getOutcomeGroupAncestorsWithSelf} from '../../helpers/getOutcomeGroupAnc
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const OutcomeManagementPanel = ({
   importNumber,
@@ -113,7 +113,7 @@ const OutcomeManagementPanel = ({
       for (let i = createdOutcomeGroupIds.length - 1; i >= 0; i--) {
         if (collections[createdOutcomeGroupIds[i]]) {
           setParentsToUnload(
-            getOutcomeGroupAncestorsWithSelf(collections, createdOutcomeGroupIds[i])
+            getOutcomeGroupAncestorsWithSelf(collections, createdOutcomeGroupIds[i]),
           )
           break
         }
@@ -130,11 +130,11 @@ const OutcomeManagementPanel = ({
             targetGroupId === ROOT_GROUP
               ? [...acc, rootId]
               : [...acc, ...getOutcomeGroupAncestorsWithSelf(collections, targetGroupId)],
-          []
-        )
+          [],
+        ),
       )
       const lhsTargetGroupIdsToRefetch = targetGroupIdsToRefetch.map(gid =>
-        gid === ROOT_GROUP ? rootId : gid
+        gid === ROOT_GROUP ? rootId : gid,
       )
       setLhsGroupIdsToRefetch(lhsTargetGroupIdsToRefetch)
       setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...groupIdsToRefetch])])
@@ -253,7 +253,7 @@ const OutcomeManagementPanel = ({
       openGroupMoveModal,
       openGroupRemoveModal,
       openImportOutcomesModal,
-    ]
+    ],
   )
 
   const outcomeMenuHandler = useCallback(
@@ -279,7 +279,7 @@ const OutcomeManagementPanel = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [group]
+    [group],
   )
 
   // set the initial target group as the lhs group

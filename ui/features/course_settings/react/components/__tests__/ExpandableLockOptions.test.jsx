@@ -63,7 +63,7 @@ describe('ExpandableLockOptions', () => {
 
   it('renders the locked lock Icon when locked', () => {
     const {getByTestId, queryByTestId} = render(
-      <ExpandableLockOptions {...{...defaultProps(), locks: {content: true}}} />
+      <ExpandableLockOptions {...{...defaultProps(), locks: {content: true}}} />,
     )
     expect(getByTestId('lock-icon')).not.toBeNull()
     expect(queryByTestId('unlock-icon')).toBeNull()

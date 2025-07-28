@@ -24,13 +24,13 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriod from './AccountGradingPeriod'
 import GradingPeriodForm from './GradingPeriodForm'
 import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('GradingPeriodSet')
+const I18n = createI18nScope('GradingPeriodSet')
 
 const sortPeriods = function (periods) {
   return sortBy(periods, 'startDate')
@@ -45,7 +45,7 @@ const anyPeriodsOverlap = function (periods) {
   const overlapping = some(
     otherPeriods,
     otherPeriod =>
-      otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate
+      otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate,
   )
   return overlapping || anyPeriodsOverlap(otherPeriods)
 }
@@ -66,7 +66,7 @@ const validatePeriods = function (periods, weighted) {
   const validDates = every(
     periods,
     period =>
-      isValidDate(period.startDate) && isValidDate(period.endDate) && isValidDate(period.closeDate)
+      isValidDate(period.startDate) && isValidDate(period.endDate) && isValidDate(period.closeDate),
   )
 
   if (!validDates) {
@@ -153,14 +153,29 @@ export default class GradingPeriodSet extends React.Component {
       },
     }
     this._refs = {}
+    this.editButtonRef = React.createRef()
+    this.deleteButtonRef = React.createRef()
+    this.addPeriodButtonRef = React.createRef()
+    this.setBodyRef = React.createRef()
+    this.gradingPeriodListRef = React.createRef()
+    this.toggleSetBodyRef = React.createRef()
+    this.titleRef = React.createRef()
+    this.editPeriodFormRef = React.createRef()
+    this.newPeriodFormRef = React.createRef()
+    this.periodRefs = {}
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.newPeriod.period && !this.state.newPeriod.period) {
-      this._refs.addPeriodButton.focus()
+      if (this.addPeriodButtonRef.current) {
+        this.addPeriodButtonRef.current.focus()
+      }
     } else if (isEditingPeriod(prevState) && !isEditingPeriod(this.state)) {
       const period = {id: prevState.editPeriod.id}
-      this._refs[getShowGradingPeriodRef(period)]._refs.editButton.focus()
+      const refKey = getShowGradingPeriodRef(period)
+      if (this.periodRefs[refKey] && this.periodRefs[refKey].current) {
+        this.periodRefs[refKey].current._refs.editButton.focus()
+      }
     }
   }
 
@@ -294,14 +309,20 @@ export default class GradingPeriodSet extends React.Component {
     })
   }
 
+  getOrCreatePeriodRef = period => {
+    const refKey = getShowGradingPeriodRef(period)
+    if (!this.periodRefs[refKey]) {
+      this.periodRefs[refKey] = React.createRef()
+    }
+    return this.periodRefs[refKey]
+  }
+
   renderEditButton = () => {
     if (!this.props.readOnly && this.props.permissions.update) {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
         <IconButton
-          elementRef={ref => {
-            this._refs.editButton = ref
-          }}
+          elementRef={el => (this.editButtonRef.current = el)}
           disabled={disabled}
           withBackground={false}
           withBorder={false}
@@ -320,9 +341,7 @@ export default class GradingPeriodSet extends React.Component {
       const disabled = isActionsDisabled(this.state, this.props)
       return (
         <IconButton
-          elementRef={ref => {
-            this._refs.deleteButton = ref
-          }}
+          elementRef={el => (this.deleteButtonRef.current = el)}
           disabled={disabled}
           onClick={this.promptDeleteSet}
           withBackground={false}
@@ -347,18 +366,8 @@ export default class GradingPeriodSet extends React.Component {
     if (!this.props.expanded) return null
 
     return (
-      <div
-        ref={ref => {
-          this._refs.setBody = ref
-        }}
-        className="ig-body"
-      >
-        <div
-          className="GradingPeriodList"
-          ref={ref => {
-            this._refs.gradingPeriodList = ref
-          }}
-        >
+      <div ref={this.setBodyRef} className="ig-body">
+        <div className="GradingPeriodList" ref={this.gradingPeriodListRef}>
           {this.renderGradingPeriods()}
         </div>
         {this.renderNewPeriod()}
@@ -376,9 +385,7 @@ export default class GradingPeriodSet extends React.Component {
             className="GradingPeriodList__period--editing pad-box"
           >
             <GradingPeriodForm
-              ref={ref => {
-                this._refs.editPeriodForm = ref
-              }}
+              ref={this.editPeriodFormRef}
               period={period}
               weighted={this.state.weighted}
               disabled={this.state.editPeriod.saving}
@@ -391,9 +398,7 @@ export default class GradingPeriodSet extends React.Component {
         return (
           <GradingPeriod
             key={`show-grading-period-${period.id}`}
-            ref={ref => {
-              this._refs[getShowGradingPeriodRef(period)] = ref
-            }}
+            ref={this.getOrCreatePeriodRef(period)}
             period={period}
             weighted={this.state.weighted}
             actionsDisabled={actionsDisabled}
@@ -424,9 +429,7 @@ export default class GradingPeriodSet extends React.Component {
       <div className="GradingPeriodList__new-period center-xs border-rbl border-round-b">
         <Link
           as="button"
-          elementRef={ref => {
-            this._refs.addPeriodButton = ref
-          }}
+          elementRef={el => (this.addPeriodButtonRef.current = el)}
           disabled={disabled}
           aria-label={I18n.t('Add Grading Period')}
           onClick={this.showNewPeriodForm}
@@ -442,9 +445,7 @@ export default class GradingPeriodSet extends React.Component {
     <div className="GradingPeriodList__new-period--editing border border-rbl border-round-b pad-box">
       <GradingPeriodForm
         key="new-grading-period"
-        ref={ref => {
-          this._refs.newPeriodForm = ref
-        }}
+        ref={this.newPeriodFormRef}
         weighted={this.state.weighted}
         disabled={this.state.newPeriod.saving}
         onSave={this.saveNewPeriod}
@@ -459,13 +460,7 @@ export default class GradingPeriodSet extends React.Component {
     return (
       <div className={`GradingPeriodSet--${setStateSuffix}`}>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-        <div
-          className="ItemGroup__header"
-          ref={ref => {
-            this._refs.toggleSetBody = ref
-          }}
-          onClick={this.toggleSetBody}
-        >
+        <div className="ItemGroup__header" ref={this.toggleSetBodyRef} onClick={this.toggleSetBody}>
           <div>
             <div className="ItemGroup__header__title">
               <button
@@ -478,12 +473,7 @@ export default class GradingPeriodSet extends React.Component {
               >
                 <i className={`icon-mini-arrow-${arrow}`} />
               </button>
-              <h2
-                ref={ref => {
-                  this._refs.title = ref
-                }}
-                className="GradingPeriodSet__title"
-              >
+              <h2 ref={this.titleRef} className="GradingPeriodSet__title">
                 {this.props.set.title}
               </h2>
             </div>

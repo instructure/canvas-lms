@@ -39,11 +39,12 @@ const defaultProps = () => ({
   isToggleLocking: false,
   permissions: defaultPermissions(),
   atomFeedUrl: null,
-  searchAnnouncements: () => Promise.reject(new Error('Not Implemented')),
+  searchAnnouncements: () => {},
   toggleSelectedAnnouncementsLock: () => Promise.reject(new Error('Not Implemented')),
   deleteSelectedAnnouncements: () => Promise.reject(new Error('Not Implemented')),
   searchInputRef: null,
   announcementsLocked: false,
+  markAllAnnouncementRead: jest.fn(),
 })
 
 describe('IndexHeader', () => {
@@ -68,16 +69,11 @@ describe('IndexHeader', () => {
     expect(screen.getByRole('combobox', {name: 'Announcement Filter'})).toBeInTheDocument()
   })
 
-  it('renders search input', () => {
-    render(<IndexHeader {...defaultProps()} />)
-    expect(screen.getByRole('textbox', {name: 'Search announcements by title'})).toBeInTheDocument()
-  })
-
   it('lets me add an announcement when I have the permission', () => {
     render(
-      <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
+      <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />,
     )
-    expect(screen.getByText('Add announcement')).toBeInTheDocument()
+    expect(screen.getByText('Add Announcement')).toBeInTheDocument()
   })
 
   it('lets me lock an announcement when I have the permission and it is unlocked', () => {
@@ -86,9 +82,12 @@ describe('IndexHeader', () => {
         {...defaultProps()}
         isToggleLocking={true}
         permissions={{...defaultPermissions(), manage_course_content_edit: true}}
-      />
+      />,
     )
     expect(screen.getByText('Lock Selected Announcements')).toBeInTheDocument()
+
+    const lockButton = screen.getByTestId('lock_announcements')
+    expect(lockButton).toHaveAttribute('data-action-state', 'lockSelectedButton')
   })
 
   it('lets me unlock an announcement when I have the permission and it is locked', () => {
@@ -96,9 +95,12 @@ describe('IndexHeader', () => {
       <IndexHeader
         {...defaultProps()}
         permissions={{...defaultPermissions(), manage_course_content_edit: true}}
-      />
+      />,
     )
     expect(screen.getByText('Unlock Selected Announcements')).toBeInTheDocument()
+
+    const lockButton = screen.getByTestId('lock_announcements')
+    expect(lockButton).toHaveAttribute('data-action-state', 'unlockSelectedButton')
   })
 
   it('lets me delete an announcement when I have the permission', () => {
@@ -106,7 +108,7 @@ describe('IndexHeader', () => {
       <IndexHeader
         {...defaultProps()}
         permissions={{...defaultPermissions(), manage_course_content_delete: true}}
-      />
+      />,
     )
     expect(screen.getByText('Delete Selected Announcements')).toBeInTheDocument()
   })
@@ -124,7 +126,7 @@ describe('IndexHeader', () => {
 
     it('renders title', () => {
       render(<IndexHeader {...defaultProps()} />)
-      expect(screen.getByText('All Announcements')).toBeInTheDocument()
+      expect(screen.getByText('Announcements')).toBeInTheDocument()
     })
 
     it('renders icon dropdown next to title', () => {
@@ -139,9 +141,8 @@ describe('IndexHeader', () => {
       const filterButton = screen.getByRole('button', {name: 'Announcement Filter'})
       await user.click(filterButton)
 
-      const filterMenu = screen.getAllByRole('menu')[1]
-      const allKeys = filterMenu.querySelectorAll('li')
-      expect(allKeys.length).toBe(2)
+      const allKeys = screen.getAllByRole('menuitemradio')
+      expect(allKeys).toHaveLength(2)
 
       await user.click(allKeys[1])
       expect(screen.getByText('Unread Announcements')).toBeInTheDocument()

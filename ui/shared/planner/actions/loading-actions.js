@@ -27,10 +27,13 @@ import {
   buildURL,
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {itemsToDays} from '../utilities/daysUtils'
+import {processDashboardCards} from '@canvas/dashboard-card/util/dashboardUtils'
+import {queryClient} from '@canvas/query'
+import {fetchDashboardCardsAsync} from '@canvas/dashboard-card/dashboardCardQueries'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const {
   startLoadingItems,
@@ -87,14 +90,14 @@ export const {
   'GOT_WAY_FUTURE_ITEM_DATE',
   'GOT_WAY_PAST_ITEM_DATE',
   'GOT_COURSE_LIST',
-  'CLEAR_LOADING'
+  'CLEAR_LOADING',
 )
 
 export const gettingPastItems = createAction(
   'GETTING_PAST_ITEMS',
   (opts = {seekingNewActivity: false}) => {
     return opts
-  }
+  },
 )
 
 export const gotDaysSuccess = createAction('GOT_DAYS_SUCCESS', (newDays, response) => {
@@ -145,7 +148,7 @@ export function getFirstNewActivityDate(fromMoment) {
             response.data[0],
             getState().courses,
             getState().groups,
-            getState().timeZone
+            getState().timeZone,
           )
           dispatch(foundFirstNewActivityDate(first.dateBucketMoment))
         }
@@ -178,10 +181,31 @@ export function getPlannerItems(fromMoment) {
 export function getCourseList() {
   return (dispatch, getState) => {
     if (getState().singleCourse) {
-      return Promise.resolve({data: getState().courses}) // set via INITIAL_OPTIONS
+      const courses = getState().courses
+      // Ensure courses is always an array
+      const coursesArray = Array.isArray(courses) ? courses : []
+      return Promise.resolve({data: coursesArray}) // set via INITIAL_OPTIONS
     }
     const observeeId = observedUserId(getState())
     const observeeParam = observeeId ? `?observed_user_id=${observeeId}` : ''
+
+    if (ENV?.FEATURES?.dashboard_graphql_integration) {
+      const queryKey = ['dashboard_cards', {userID: ENV?.current_user_id}]
+      if (observeeId) queryKey[1].observedUserID = observeeId
+      const data = queryClient.getQueryData(queryKey)
+      // If data exists in query cache, return it
+      if (data) {
+        const processedData = processDashboardCards(data)
+        return Promise.resolve({data: processedData})
+      } else {
+        // If data doesn't exist in query cache, fetch it and set it in query cache
+        return fetchDashboardCardsAsync({queryKey}).then(fetchedData => {
+          queryClient.setQueryData(queryKey, fetchedData)
+          const processedData = processDashboardCards(fetchedData)
+          return {data: processedData}
+        })
+      }
+    }
     const url = `/api/v1/dashboard/dashboard_cards${observeeParam}`
     const request = asAxios(getPrefetchedXHR(url)) || axios.get(url)
     return request
@@ -205,7 +229,7 @@ function loadPastItems(byScrolling) {
     dispatch(
       gettingPastItems({
         seekingNewActivity: false,
-      })
+      }),
     )
     dispatch(startLoadingPastSaga())
   }
@@ -223,7 +247,7 @@ export const loadPastUntilNewActivity = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: true,
-    })
+    }),
   )
   dispatch(startLoadingPastUntilNewActivitySaga())
   return 'loadPastUntilNewActivity' // for testing
@@ -233,7 +257,7 @@ export const loadPastUntilToday = () => dispatch => {
   dispatch(
     gettingPastItems({
       seekingNewActivity: false,
-    })
+    }),
   )
   dispatch(startLoadingPastUntilTodaySaga())
   return 'loadPastUntilToday' // for testing
@@ -245,7 +269,7 @@ export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems())
     const coursesPromise = getState().singleCourse
-      ? Promise.resolve({data: getState().courses}) // set in INITIAL_OPTIONS for the singleCourse case
+      ? Promise.resolve({data: Array.isArray(getState().courses) ? getState().courses : []}) // set in INITIAL_OPTIONS for the singleCourse case
       : dispatch(getCourseList())
     return coursesPromise
       .then(res => {
@@ -476,7 +500,7 @@ function transformItems(loadingOptions, items) {
       item,
       loadingOptions.getState().courses,
       loadingOptions.getState().groups,
-      loadingOptions.getState().timeZone
-    )
+      loadingOptions.getState().timeZone,
+    ),
   )
 }

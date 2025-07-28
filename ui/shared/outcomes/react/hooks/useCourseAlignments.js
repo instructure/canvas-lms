@@ -17,14 +17,14 @@
  */
 
 import {useState, useEffect, useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useQuery} from 'react-apollo'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useQuery} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {SEARCH_OUTCOME_ALIGNMENTS} from '../../graphql/Management'
 import useCanvasContext from './useCanvasContext'
 import useSearch from './useSearch'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const useCourseAlignments = shouldWait => {
   const {contextType, contextId, rootOutcomeGroup} = useCanvasContext()
@@ -74,8 +74,8 @@ const useCourseAlignments = shouldWait => {
             ? I18n.t('More Search Results Have Been Loaded')
             : I18n.t('Showing Search Results Below')
           : isSameSearch
-          ? I18n.t('More Outcomes Have Been Loaded')
-          : ''
+            ? I18n.t('More Outcomes Have Been Loaded')
+            : ''
       }
       showFlashAlert({
         message: screenreaderText,

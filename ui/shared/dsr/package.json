@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/dsr",
+  "private": true,
+  "version": "1.0.0",
+  "owner": "AE",
+  "main": "index.ts"
+}

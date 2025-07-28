@@ -134,7 +134,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   end
 
   private_class_method def self.account_microsoft_sync_settings_changed?(root_account)
-    current_settings = Account.where(id: root_account.id).take.settings
+    current_settings = Account.find_by(id: root_account.id).settings
     DEPENDED_ON_ACCOUNT_SETTINGS.any? { |key| root_account.settings[key] != current_settings[key] }
   end
 
@@ -181,7 +181,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
           GuardRail.activate(:primary) do
             where(user:, root_account: acct)
-              .update_all(updated_at: Time.now, needs_updating: true)
+              .update_all(updated_at: Time.zone.now, needs_updating: true)
           end
         end
       end

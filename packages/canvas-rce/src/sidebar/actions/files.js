@@ -74,8 +74,8 @@ export function requestFiles(id, bookmark) {
     return source.fetchFiles(bookmark || folders[id].filesUrl).then(({files, bookmark}) => {
       dispatch(files.map(createAddFile).concat(createReceiveFiles(id, files)))
       if (bookmark) {
-        // Page through all in folder, pagination links if a tree may be
-        // weird, epecially since files and folders are independent.
+        // Page through all in folder, pagination links of a tree may be
+        // weird, especially since files and folders are independent.
         dispatch(requestFiles(id, bookmark))
       }
     })

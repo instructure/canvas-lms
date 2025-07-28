@@ -32,7 +32,7 @@ export const notificationActions = createActions(
     NOTIFY_ERROR: payload =>
       typeof payload === 'string' ? {type: 'error', message: payload} : {type: 'error', ...payload},
   },
-  'CLEAR_NOTIFICATION'
+  'CLEAR_NOTIFICATION',
 )
 
 const createNotification = data => ({
@@ -52,7 +52,7 @@ const handleNotificationActions = handleActions(
     [notificationActions.clearNotification.toString()]: (state, action) =>
       state.slice().filter(not => not.id !== action.payload),
   },
-  []
+  [],
 )
 
 /**
@@ -100,7 +100,10 @@ export function subscribeFlashNotifications(store, key = 'notifications') {
   store.subscribe(() => {
     const notifications = store.getState()[key]
     notifications.forEach(notification => {
-      showFlashAlert(notification)
+      if (document) {
+        // as a courtesy to Jest
+        showFlashAlert(notification)
+      }
       store.dispatch(notificationActions.clearNotification(notification.id))
     })
   })

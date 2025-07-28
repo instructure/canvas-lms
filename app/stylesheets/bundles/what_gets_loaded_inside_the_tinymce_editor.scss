@@ -47,6 +47,10 @@ h6 {
   font-family: inherit;
 }
 
+pre {
+  font-family: $ic-font-family-monospace;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -57,10 +61,10 @@ td {
 
 a {
   // Canvas High-Contrast link color
-  color: darken($electric, 0%);
   text-decoration: underline;
-  &:focus, &:hover {
-    color: darken($electric, 20%);
+
+  &:focus,
+  &:hover {
     text-decoration: underline;
   }
 }
@@ -68,6 +72,7 @@ a {
 .mce-content-body {
   box-sizing: border-box;
   padding: 11px;
+
   td {
     padding: 2px;
     min-width: 20px;
@@ -106,8 +111,7 @@ body#tinyrce {
   min-height: 100vh;
 }
 
-.Underline-All-Links__enabled
-  a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
+.Underline-All-Links__enabled a:not(.Button):not(.ui-button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
   text-decoration: underline;
 }
 
@@ -131,7 +135,7 @@ iframe[data-media-id] {
 .mceNonEditable.mention {
   cursor: default;
   background: rgba(102, 24, 157, 0.1);
-  color: #66189d;
+  color: #5C1C78;
   border-radius: 0.25rem;
   padding: 0.125rem;
   height: 1.5rem;
@@ -147,17 +151,20 @@ iframe[data-media-id] {
 
 /* the svg and keyframe styles are lifted from instui spinner */
 span[data-placeholder-for] {
-  border: solid 1px #6B7780;
+  border: solid 1px #6A7883;
   background-color: #ccc;
   display: inline-block;
   max-width: 100%;
+
   svg {
     max-height: 90%;
     max-width: 90%;
     animation: 2s linear infinite rotate;
+
     circle.c1 {
-      stroke: #f5f5f5;
+      stroke: #F2F4F4;
     }
+
     circle.c2 {
       stroke: $electric;
       stroke-dasharray: 148px;

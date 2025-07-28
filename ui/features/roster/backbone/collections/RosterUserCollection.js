@@ -16,10 +16,23 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
-
 import RosterUser from '../models/RosterUser'
 
 export default class RosterUserCollection extends PaginatedCollection {
+  constructor(models, options = {}) {
+    super(models, options)
+    // Keep track of selected user IDs in this collection
+    this.selectedUserIds = []
+    // Flag to remember if the 'master checkbox' is fully checked
+    this.masterSelected = false
+
+    // Keep track of *manually* de-selected users when masterSelected is true
+    this.deselectedUserIds = []
+
+    // Keep track of the last checked index for the checkbox
+    this.lastCheckedIndex = null
+  }
+
   url() {
     return `/api/v1/courses/${this.options.course_id}/users?include_inactive=true`
   }

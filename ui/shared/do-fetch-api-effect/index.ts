@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,10 +17,13 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import parseLinkHeader from '@canvas/parse-link-header'
+import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import {defaultFetchOptions} from '@canvas/util/xhr'
-import {toQueryString} from '@canvas/query-string-encoding'
-import type {QueryParameterRecord} from '@canvas/query-string-encoding'
+import {toQueryString} from '@instructure/query-string-encoding'
+import type {QueryParameterRecord} from '@instructure/query-string-encoding/index.d'
+import z from 'zod'
+
+const jsonRegEx = /^application\/json/i
 
 function constructRelativeUrl({
   path,
@@ -32,68 +34,124 @@ function constructRelativeUrl({
 }): string {
   const queryString = toQueryString(params)
   if (queryString.length === 0) return path
-  return path + '?' + queryString
+  return `${path}?${queryString}`
 }
 
 // https://fetch.spec.whatwg.org/#requestinit
 interface RequestInit {
   signal?: AbortSignal
+  cache?: RequestCache
 }
 
 export type DoFetchApiOpts = {
   path: string
   method?: string
-  headers?: {[k: string]: string}
+  headers?: {[k: string]: string} | Headers
   params?: QueryParameterRecord
-  // eslint-disable-next-line no-undef
-  body?: BodyInit
+  body?: string | FormData | object
   fetchOpts?: RequestInit
+  signal?: AbortSignal
 }
 
 export type DoFetchApiResults<T> = {
+  text: string
   json?: T
   response: Response
-  link?: parseLinkHeader.Links
+  link?: Links
 }
 
-// NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
-// in the headers arg instead.
+export class FetchApiError extends Error {
+  response: Response
+
+  constructor(message: string, response: Response) {
+    super(message)
+    this.response = response
+  }
+}
+
 export default async function doFetchApi<T = unknown>({
   path,
   method = 'GET',
-  headers = {},
+  headers = {}, // can be object or Headers
   params = {},
   body,
-  fetchOpts = {},
+  signal,
+  fetchOpts = {}, // do not specify headers in fetchOpts.headers ... use headers instead
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
-  const finalFetchOptions = {...defaultFetchOptions()}
-  finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
+  const {credentials, headers: defaultHeaders} = defaultFetchOptions()
+  const suppliedHeaders = new Headers(headers)
+  const fetchHeaders = new Headers(defaultHeaders)
 
-  if (body && typeof body !== 'string') {
-    body = JSON.stringify(body)
-    finalFetchOptions.headers['Content-Type'] = 'application/json'
+  suppliedHeaders.forEach((v, k) => fetchHeaders.set(k, v))
+  fetchHeaders.set('X-CSRF-Token', getCookie('_csrf_token'))
+
+  // properly encode and set the content type if a body was given
+  if (body) {
+    if (body instanceof FormData) {
+      fetchHeaders.delete('Content-Type') // must let the browser handle it
+    } else if (typeof body !== 'string') {
+      body = JSON.stringify(body)
+      fetchHeaders.set('Content-Type', 'application/json')
+    }
   }
-  Object.assign(finalFetchOptions.headers, headers)
-  Object.assign(finalFetchOptions, fetchOpts)
 
   const url = constructRelativeUrl({path, params})
   const response = await fetch(url, {
     body,
     method,
-    ...finalFetchOptions,
-    // eslint-disable-next-line no-undef
-    credentials: finalFetchOptions.credentials as RequestCredentials,
+    ...fetchOpts,
+    headers: fetchHeaders,
+    signal,
+    credentials,
   })
   if (!response.ok) {
-    const err = new Error(
-      `doFetchApi received a bad response: ${response.status} ${response.statusText}`
+    throw new FetchApiError(
+      `doFetchApi received a bad response: ${response.status} ${response.statusText}`,
+      response,
     )
-    Object.assign(err, {response}) // in case anyone wants to check it for something
-    throw err
   }
   const linkHeader = response.headers.get('Link')
+  const contentType = response.headers.get('Content-Type') ?? ''
   const link = (linkHeader && parseLinkHeader(linkHeader)) || undefined
   const text = await response.text()
-  const json = text.length > 0 ? (JSON.parse(text) as T) : undefined
+  if (text.length > 0 && jsonRegEx.test(contentType)) {
+    const json = JSON.parse(text) as T
+    return {json, response, link, text}
+  }
+  return {response, link, text}
+}
+
+export type SafelyFetchResults<T> = {
+  json?: T
+  response: Response
+  link?: Links
+}
+
+export async function safelyFetch<T = unknown>(
+  {path, method = 'GET', headers = {}, params = {}, signal, body}: DoFetchApiOpts,
+  schema: z.Schema<T>,
+): Promise<SafelyFetchResults<T>> {
+  if (!schema) {
+    throw new Error('safelyFetch requires a schema')
+  }
+
+  const {json, response, link} = await doFetchApi<T>({path, method, headers, params, signal, body})
+
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      schema.parse(json)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        console.group(`Zod parsing error for ${path}`)
+        for (const issue of err.issues) {
+          console.error(`Error at ${issue.path.join('.')} - ${issue.message}`)
+        }
+        console.groupEnd()
+
+        throw err
+      }
+    }
+  }
+
   return {json, response, link}
 }

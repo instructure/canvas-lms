@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -20,6 +19,7 @@
 import {find, forEach, isArray, isDate, isString, sortBy} from 'lodash'
 import type {CamelizedGradingPeriod} from './grading.d'
 
+// @ts-expect-error
 function validateDate(date, nullAllowed = false) {
   let valid = isDate(date)
   if (nullAllowed && !valid) {
@@ -29,6 +29,7 @@ function validateDate(date, nullAllowed = false) {
   if (!valid) throw new Error(`\`${date}\` must be a Date or null`)
 }
 
+// @ts-expect-error
 function validateGradingPeriodDates(gradingPeriods) {
   if (gradingPeriods == null) throw new Error(`\'${gradingPeriods}\' must be an array or object`)
 
@@ -49,6 +50,7 @@ function validatePeriodID(id: string) {
 class GradingPeriodsHelper {
   gradingPeriods: CamelizedGradingPeriod[]
 
+  // @ts-expect-error
   constructor(gradingPeriods) {
     this.gradingPeriods = validateGradingPeriodDates(gradingPeriods)
   }
@@ -69,6 +71,7 @@ class GradingPeriodsHelper {
     }
   }
 
+  // @ts-expect-error
   gradingPeriodForDueAt(dueAt) {
     validateDate(dueAt, true)
 
@@ -78,6 +81,7 @@ class GradingPeriodsHelper {
     )
   }
 
+  // @ts-expect-error
   isDateInGradingPeriod(date, gradingPeriodID, runValidations = true) {
     if (runValidations) {
       validateDate(date, true)
@@ -94,6 +98,7 @@ class GradingPeriodsHelper {
     }
   }
 
+  // @ts-expect-error
   isDateInClosedGradingPeriod(date) {
     const period = this.gradingPeriodForDueAt(date)
     return !!period && period.isClosed

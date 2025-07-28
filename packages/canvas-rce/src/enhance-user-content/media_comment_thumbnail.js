@@ -27,7 +27,7 @@ const MEDIA_COMMENT_THUMBNAIL_SIZES = {
 function createMediaCommentThumbnail(elem, size, keepOriginalText, kalturaSettings) {
   // a lot of places in canvas rely on INST.kalturaSettings. Fallback if they are not provided
   const kalturaSettings_ = kalturaSettings || window.INST?.kalturaSettings
-  // eslint-disable-next-line no-console
+   
   if (!kalturaSettings_) return console.log('Kaltura has not been enabled for this account')
   let idAttr, url
   const $link = elem
@@ -37,7 +37,7 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText, kalturaSettin
     a.href = $link.getAttribute('href')
     url = a
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error(error)
   }
 
@@ -120,7 +120,7 @@ export default function mediaCommentThumbnail(
   size = 'normal',
   keepOriginalText,
   kalturaSettings,
-  jqueryData = undefined
+  jqueryData = undefined,
 ) {
   // defer each thumbnail generation till the next time through the event loop to not kill browser rendering,
   // has the effect of saying "only work on thumbnailing these while the browser is not doing something else"
@@ -131,6 +131,6 @@ export default function mediaCommentThumbnail(
       }
       createMediaCommentThumbnail(comment_element, size, keepOriginalText, kalturaSettings)
       resolve()
-    }, 1)
+    }, 1),
   )
 }

@@ -53,7 +53,7 @@ describe.skip('handleAssignmentIndexDeepLinking', () => {
 
         expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
           alertUserModuleCreatedKey,
-          true.toString()
+          true.toString(),
         )
         expect(DeepLinking.reloadPage).toHaveBeenCalledTimes(1)
       })
@@ -69,7 +69,7 @@ describe.skip('handleAssignmentIndexDeepLinking', () => {
 
         expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
           alertUserModuleCreatedKey,
-          false.toString()
+          false.toString(),
         )
         expect(DeepLinking.reloadPage).toHaveBeenCalledTimes(1)
       })
@@ -86,7 +86,7 @@ describe.skip('handleAssignmentIndexDeepLinking', () => {
 
       expect(window.sessionStorage.setItem).toHaveBeenCalledWith(
         alertUserModuleCreatedKey,
-        false.toString()
+        false.toString(),
       )
       expect(DeepLinking.reloadPage).toHaveBeenCalledTimes(1)
     })

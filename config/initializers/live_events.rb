@@ -20,9 +20,9 @@
 class StubbedClient
   def self.put_records(records:, stream_name:)
     events = records.map { |e| JSON.parse(e[:data]).dig("attributes", "event_name") }.join(" | ")
-    puts "Events #{events} put to stream #{stream_name}: #{records}"
-    OpenStruct.new(
-      records: records.map { OpenStruct.new(error_code: nil) }
+    puts "Events #{events} put to stream #{stream_name}: #{records}" # rubocop:disable Rails/Output
+    Aws::Kinesis::Types::PutRecordsOutput.new(
+      records: records.map { Aws::Kinesis::Types::PutRecordsResultEntry.new }
     )
   end
 
@@ -36,6 +36,7 @@ Rails.configuration.to_prepare do
   LiveEvents.cache = Rails.cache
   LiveEvents.statsd = InstStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get("live_events_max_queue_size", 5000).to_i }
+  LiveEvents.retry_throttled_events = -> { Setting.get("live_events_retry_throttled_events", true) == true }
   LiveEvents.settings = -> { YAML.safe_load(DynamicSettings.find(tree: :private, default_ttl: 2.hours)["live_events.yml", failsafe_cache: Rails.root.join("config")] || "{}") }
   LiveEvents.aws_credentials = lambda do |settings|
     if settings["vault_credential_path"]
@@ -47,5 +48,5 @@ Rails.configuration.to_prepare do
   LiveEvents.stream_client = ->(settings) { StubbedClient if settings["stub_kinesis"] }
   # sometimes this async worker thread grabs a connection on a Setting read or similar.
   # We need it to be released or the main thread can have a real problem.
-  LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
+  LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.connection_handler.clear_active_connections!(:all) }
 end

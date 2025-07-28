@@ -167,7 +167,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
                  format: "json" }
 
       api_call_as_user(user, :get, path, params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 
@@ -301,7 +301,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
       params = @params.merge({ user_id: user.to_param, threshold: "50" })
 
       api_call_as_user(user, :put, path, params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 
@@ -330,7 +330,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
       params = @params.merge({ user_id: user.to_param })
 
       api_call_as_user(user, :delete, path, params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 end

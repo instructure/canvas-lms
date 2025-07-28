@@ -69,8 +69,8 @@ describe ConferencesController do
     @group = @course.groups.create!(name: "some group")
     @group.add_user(@user)
 
-    course_conference = @course.web_conferences.create!(conference_type: "Wimba", user: @user) { |c| c.start_at = Time.now }
-    group_conference = @group.web_conferences.create!(conference_type: "Wimba", user: @user) { |c| c.start_at = Time.now }
+    course_conference = @course.web_conferences.create!(conference_type: "Wimba", user: @user) { |c| c.start_at = Time.zone.now }
+    group_conference = @group.web_conferences.create!(conference_type: "Wimba", user: @user) { |c| c.start_at = Time.zone.now }
     course_conference.add_initiator(@user)
     group_conference.add_initiator(@user)
 
@@ -111,7 +111,7 @@ describe ConferencesController do
       course_with_teacher(active_all: true)
       @course.enroll_student(@student).accept!
 
-      course_conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher) { |c| c.start_at = Time.now }
+      course_conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher) { |c| c.start_at = Time.zone.now }
       course_conference.add_invitee(@student)
 
       user_session(@student)

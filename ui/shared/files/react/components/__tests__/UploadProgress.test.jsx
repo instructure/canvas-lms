@@ -48,7 +48,7 @@ describe('UploadProgress', () => {
     expect(container.querySelector('[aria-valuenow="35"]')).toBeInTheDocument()
 
     expect(showFlashAlert).toHaveBeenLastCalledWith(
-      makeFlashAlertMessage('foo.txt - 35 percent uploaded')
+      makeFlashAlertMessage('foo.txt - 35 percent uploaded'),
     )
 
     // File upload 75% complete
@@ -56,7 +56,7 @@ describe('UploadProgress', () => {
     rerender(<UploadProgress uploader={uploader} />)
     expect(container.querySelector('[aria-valuenow="75"]')).toBeInTheDocument()
     expect(showFlashAlert).toHaveBeenLastCalledWith(
-      makeFlashAlertMessage('foo.txt - 75 percent uploaded')
+      makeFlashAlertMessage('foo.txt - 75 percent uploaded'),
     )
 
     // File upload complete
@@ -64,7 +64,7 @@ describe('UploadProgress', () => {
     rerender(<UploadProgress uploader={uploader} />)
     expect(container.querySelector('[aria-valuenow="100"]')).toBeInTheDocument()
     expect(showFlashAlert).toHaveBeenLastCalledWith(
-      makeFlashAlertMessage('foo.txt uploaded successfully!')
+      makeFlashAlertMessage('foo.txt uploaded successfully!'),
     )
   })
 

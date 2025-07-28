@@ -21,61 +21,61 @@ describe RuboCop::Cop::Datafixup::StrandDownstreamJobs do
   subject(:cop) { described_class.new }
 
   it "requires a strand on a delay" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           User.delay.recompute_rainbow_asteroid_field
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/strand/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/strand/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "requires a strand on a delay when there are other arguments" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           User.delay(run_at: 5.minutes.from_now).recompute_rainbow_asteroid_field
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/strand/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/strand/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "doesn't register an offsense when the job is stranded" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           User.delay(strand: "space").recompute_rainbow_asteroid_field
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "doesn't register an offsense when the job is n-stranded" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           User.delay(n_strand: "space").recompute_rainbow_asteroid_field
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "doesn't register an offsense when the job is a singleton" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       module DataFixup::RecomputeRainbowAsteroidField
         def self.run
           User.delay(singleton: "space").recompute_rainbow_asteroid_field
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 end

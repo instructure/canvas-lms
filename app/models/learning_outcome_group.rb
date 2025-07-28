@@ -22,6 +22,17 @@ class LearningOutcomeGroup < ActiveRecord::Base
   include Workflow
   include MasterCourses::Restrictor
   extend RootAccountResolver
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[description]
+  end
+
+  def attachment_associations_enabled?
+    return root_account.feature_enabled?(:file_association_access) if root_account_id != 0 && root_account.respond_to?(:feature_enabled?)
+
+    Account.site_admin.feature_enabled?(:file_association_access)
+  end
 
   restrict_columns :state, [:workflow_state]
 
@@ -29,8 +40,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
   belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
   has_many :destination_outcome_groups, class_name: "LearningOutcomeGroup", inverse_of: :source_outcome_group, dependent: :nullify
   has_many :child_outcome_groups, class_name: "LearningOutcomeGroup"
-  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset
+  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset, inverse_of: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   before_save :infer_defaults
   resolves_root_account through: ->(group) { group.context_id ? group.context.resolved_root_account_id : 0 }
@@ -168,10 +180,11 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # TODO: this is certainly not the behavior we want, but it matches existing
   # behavior, and I'm not getting into a full refactor of copy course in this
   # commit!
-  def add_outcome_group(original, opts = {})
+  def add_outcome_group(original, opts = {}, saving_user = nil)
     # copy group into this group
     transaction do
       copy = child_outcome_groups.build
+      copy.saving_user = saving_user
       copy.title = original.title
       copy.description = original.description
       copy.vendor_guid = original.vendor_guid
@@ -184,7 +197,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
       original.child_outcome_groups.active.each do |group|
         next if opts[:only] && opts[:only][group.asset_string] != "1"
 
-        copy.add_outcome_group(group, copy_opts)
+        copy.add_outcome_group(group, copy_opts, saving_user)
       end
 
       original.child_outcome_links.active.each do |link|

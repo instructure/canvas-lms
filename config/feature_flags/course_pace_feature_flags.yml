@@ -1,0 +1,41 @@
+---
+course_pace_draft_state:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Drafts
+  description: Allows for creating course paces in a draft/unpublished state, and allows for updating a pace draft unlimited times before publishing
+
+course_pace_download_document:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Download Document
+  description: Allows for downloading a document that contains the course pace information
+
+course_pace_time_selection:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Select dates and time
+  description: Allows for selecting dates and times for the course pace
+
+course_pace_pacing_status_labels:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Display student and assignment pace status
+  description: Allows for diaplaying On Pace or Off Pace labels for students and module items
+
+course_pace_pacing_with_mastery_paths:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Paces with Mastery Paths
+  description: Supplemental logic and UX for supporting Course Paces with Mastery Paths
+
+course_pace_weighted_assignments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Weighted Assignments
+  description: Allows for setting the weight of assignments in the course pace
+course_pace_allow_bulk_pace_assign:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Allow bulk pace assignment to multiple students
+  description: Allows for selecting various students and applying a bulk pace to all of them

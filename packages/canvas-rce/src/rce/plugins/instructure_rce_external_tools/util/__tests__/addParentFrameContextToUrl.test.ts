@@ -35,11 +35,11 @@ describe('addParentFrameContextToUrl.ts', () => {
 
   it('should handle absolute URLs', () => {
     expect(addParentFrameContextToUrl('http://some.url/whatever', 'x')).toEqual(
-      'http://some.url/whatever?parent_frame_context=x'
+      'http://some.url/whatever?parent_frame_context=x',
     )
 
     expect(addParentFrameContextToUrl('http://some.url/whatever?name=value', 'x')).toEqual(
-      'http://some.url/whatever?name=value&parent_frame_context=x'
+      'http://some.url/whatever?name=value&parent_frame_context=x',
     )
   })
 
@@ -47,7 +47,7 @@ describe('addParentFrameContextToUrl.ts', () => {
     expect(addParentFrameContextToUrl('/whatever', 'x')).toEqual('/whatever?parent_frame_context=x')
 
     expect(addParentFrameContextToUrl('/whatever?name=value', 'x')).toEqual(
-      '/whatever?name=value&parent_frame_context=x'
+      '/whatever?name=value&parent_frame_context=x',
     )
   })
 })

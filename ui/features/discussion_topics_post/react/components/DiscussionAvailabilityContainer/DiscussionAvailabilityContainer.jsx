@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useMemo, useState} from 'react'
 
 import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
@@ -30,28 +30,73 @@ import {responsiveQuerySizes} from '../../utils/index'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function DiscussionAvailabilityContainer({...props}) {
   const [availabilityTrayOpen, setAvailabilityTrayOpen] = useState(false)
-  const prefixText =
-    props.anonymousState === 'full_anonymity'
-      ? I18n.t('Anonymous Discussion')
-      : props.anonymousState === 'partial_anonymity'
-      ? I18n.t('Partially Anonymous Discussion')
-      : null
-  let availabilities = []
-  if (!props.groupSet) {
-    availabilities = props.courseSections.length
-      ? props.courseSections
-      : [{userCount: props.totalUserCount, name: I18n.t('All Sections'), id: '1'}]
-  } else if (props.groupSet.currentGroup) {
-    availabilities = [props.groupSet.currentGroup]
-  } else if (props.groupSet?.groupsConnection?.nodes) {
-    availabilities = props.groupSet.groupsConnection.nodes
-  } else {
-    availabilities = [{userCount: props.totalUserCount, name: props.groupSet.name, id: '1'}]
-  }
+  const prefixText = useMemo(
+    () =>
+      props.anonymousState === 'full_anonymity'
+        ? I18n.t('Anonymous Discussion')
+        : props.anonymousState === 'partial_anonymity'
+          ? I18n.t('Partially Anonymous Discussion')
+          : null,
+    [props.anonymousState],
+  )
+
+  const availabilities = useMemo(() => {
+    let selectedAvailabilities = []
+    let haveGroupsOverrideType = false
+    if (!props.groupSet) {
+      selectedAvailabilities = props.courseSections.length
+        ? JSON.parse(JSON.stringify(props.courseSections))
+        : [{userCount: props.totalUserCount, name: I18n.t('All Sections'), id: '1'}]
+    } else if (props.groupSet.currentGroup) {
+      selectedAvailabilities = JSON.parse(JSON.stringify([props.groupSet.currentGroup]))
+      haveGroupsOverrideType = true
+    } else if (props.groupSet?.groups) {
+      selectedAvailabilities = JSON.parse(JSON.stringify(props.groupSet.groups))
+      haveGroupsOverrideType = true
+    } else {
+      selectedAvailabilities = [
+        {userCount: props.totalUserCount, name: props.groupSet.name, id: '1'},
+      ]
+    }
+
+    if (props.assignment) {
+      // Gets all assignment overrides if is graded
+      const overrides = props.assignment.assignmentOverrides?.nodes || []
+      selectedAvailabilities.forEach(availability => {
+        // Searches for a group override that has the same id in assignmentOverrides
+        const foundOverride =
+          haveGroupsOverrideType &&
+          overrides.find(
+            override =>
+              override.set.__typename === 'Group' && override.set._id === availability._id,
+          )
+        // If we don't find a matching override we'll use the 'Everyone' dates, if there is
+        // no everyone dates it will be null
+        availability.lockAt = foundOverride ? foundOverride.lockAt : props.assignment.lockAt
+        availability.delayedPostAt = foundOverride
+          ? foundOverride.unlockAt
+          : props.assignment.unlockAt
+      })
+    } else {
+      // If is not graded the availabilities share the same dates
+      selectedAvailabilities.forEach(availability => {
+        availability.lockAt = props.lockAt
+        availability.delayedPostAt = props.delayedPostAt
+      })
+    }
+    return selectedAvailabilities
+  }, [
+    props.assignment,
+    props.courseSections,
+    props.delayedPostAt,
+    props.groupSet,
+    props.lockAt,
+    props.totalUserCount,
+  ])
 
   return (
     <Responsive
@@ -77,9 +122,10 @@ export function DiscussionAvailabilityContainer({...props}) {
               {availabilities.length === 1 ? (
                 <AssignmentAvailabilityWindow
                   availabilityWindowName={availabilities[0].name}
-                  availableDate={props.delayedPostAt}
-                  untilDate={props.lockAt}
-                  anonymousState={props.anonymousState}
+                  availableDate={availabilities[0].delayedPostAt}
+                  untilDate={availabilities[0].lockAt}
+                  anonymousState={availabilities[0].anonymousState}
+                  showDateWithTime={true}
                 />
               ) : (
                 <>
@@ -101,13 +147,7 @@ export function DiscussionAvailabilityContainer({...props}) {
                     setTrayOpen={setAvailabilityTrayOpen}
                     trayTitle="Availability"
                     isTrayOpen={availabilityTrayOpen}
-                    trayComponent={
-                      <DiscussionAvailabilityTray
-                        lockAt={props.lockAt}
-                        delayedPostAt={props.delayedPostAt}
-                        availabilities={availabilities}
-                      />
-                    }
+                    trayComponent={<DiscussionAvailabilityTray availabilities={availabilities} />}
                   />
                 </>
               )}
@@ -126,4 +166,5 @@ DiscussionAvailabilityContainer.propTypes = {
   delayedPostAt: PropTypes.string,
   totalUserCount: PropTypes.number,
   groupSet: PropTypes.object,
+  assignment: PropTypes.object,
 }

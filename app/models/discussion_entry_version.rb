@@ -20,4 +20,5 @@ class DiscussionEntryVersion < ActiveRecord::Base
   belongs_to :discussion_entry, inverse_of: :discussion_entry_versions
   belongs_to :root_account, class_name: "Account"
   belongs_to :user, inverse_of: :discussion_entry_versions
+  has_many :discussion_topic_insight_entries, class_name: "DiscussionTopicInsight::Entry", inverse_of: :discussion_entry_version
 end

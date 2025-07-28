@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -57,11 +58,11 @@ function getProps(column, gradebook: Gradebook, options) {
         ? scoreToScaledPoints(
             student[`assignment_group_${assignmentGroupId}`]?.score,
             student[`assignment_group_${assignmentGroupId}`]?.possible,
-            gradebook.options.grading_standard_scaling_factor
+            gradebook.options.grading_standard_scaling_factor,
           )
         : scoreToPercentage(
             student[`assignment_group_${assignmentGroupId}`]?.score,
-            student[`assignment_group_${assignmentGroupId}`]?.possible
+            student[`assignment_group_${assignmentGroupId}`]?.possible,
           ),
     }
   }
@@ -104,9 +105,10 @@ function getProps(column, gradebook: Gradebook, options) {
     pointsBasedGradingScheme: pointsBased,
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
     weightedGroups: gradebook.weightedGroups(),
-    allStudents: Object.keys(gradebook.students).map(key =>
-      processStudent(gradebook.students[key], assignmentGroup.id)
-    ),
+    getAllStudents: () =>
+      Object.keys(gradebook.students).map(key =>
+        processStudent(gradebook.students[key], assignmentGroup.id),
+      ),
     courseId: gradebook.options.context_id,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,
@@ -123,6 +125,7 @@ export default class AssignmentGroupColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
+
     ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 

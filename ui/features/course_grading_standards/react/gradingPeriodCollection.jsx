@@ -20,12 +20,12 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, isEmpty, every, find, reject, some} from 'lodash'
 import {camelizeProperties} from '@canvas/convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('gradinggradingPeriodCollection')
+const I18n = createI18nScope('gradinggradingPeriodCollection')
 
 const periodsAreLoaded = state => state.periods !== null
 
@@ -109,7 +109,7 @@ class GradingPeriodCollection extends React.Component {
         this.isTitleCompleted(period) &&
         this.areDatesValid(period) &&
         this.isStartDateBeforeEndDate(period) &&
-        this.areNoDatesOverlapping(period)
+        this.areNoDatesOverlapping(period),
     )
 
   areDatesOverlapping = targetPeriod => {
@@ -120,7 +120,7 @@ class GradingPeriodCollection extends React.Component {
       otherPeriods,
       period =>
         // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-        target.startDate < period.endDate && period.startDate < target.endDate
+        target.startDate < period.endDate && period.startDate < target.endDate,
     )
   }
 
@@ -165,7 +165,7 @@ class GradingPeriodCollection extends React.Component {
       true,
       {},
       updatedGradingPeriodComponent.props,
-      updatedGradingPeriodComponent.state
+      updatedGradingPeriodComponent.state,
     )
     const existingGradingPeriod = this.getPeriodById(attrs.id)
     const indexToUpdate = this.state.periods.indexOf(existingGradingPeriod)
@@ -254,7 +254,9 @@ class GradingPeriodCollection extends React.Component {
 
   render() {
     return (
-      <div>
+      <div
+        data-testid={periodsAreLoaded(this.state) ? 'grading-periods' : 'grading-periods-loading'}
+      >
         <div id="grading_periods" className="content-box">
           {this.renderGradingPeriods()}
         </div>

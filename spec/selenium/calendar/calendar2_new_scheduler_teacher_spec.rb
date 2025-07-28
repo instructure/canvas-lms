@@ -53,7 +53,7 @@ describe "scheduler" do
       expect(fj("span.ui-dialog-title:contains('Edit #{title}')")).not_to be_nil
     end
 
-    it "creates an Appointment Group with the feature flag ON", priority: "1" do
+    it "creates an Appointment Group with the feature flag ON", :ignore_js_errors, priority: "1" do
       title = "my appt"
       location = "office"
       start_time_text = "02"
@@ -64,9 +64,6 @@ describe "scheduler" do
       calendar_create_event_button.click
       wait_for_ajax_requests
       appointment_group_tab_button.click
-
-      set_value(f('input[name="title"]'), title)
-      set_value(f('input[name="location"]'), location)
 
       # select the first course calendar
       f(".select-calendar-container .ag_contexts_selector").click
@@ -82,6 +79,8 @@ describe "scheduler" do
         set_value(fj(".time_field.start_time:visible"), start_time_text)
         set_value(fj(".time_field.end_time:visible"), end_time_text)
         set_value(fj(".date_field:visible"), date)
+        set_value(f('input[name="title"]'), title)
+        set_value(f('input[name="location"]'), location)
         find(".scheduler-event-details-footer .btn-primary").click
         wait_for_ajax_requests
       end
@@ -94,7 +93,7 @@ describe "scheduler" do
       expect(last_group.end_at.strftime("%I")).to eq end_time_text
     end
 
-    it "shows page for editing Appointment Groups", priority: "1" do
+    it "shows page for editing Appointment Groups", :ignore_js_errors, priority: "1" do
       create_appointment_group(contexts: [@course])
       get "/calendar2"
       # navigate to the next month for end of month

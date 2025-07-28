@@ -17,7 +17,7 @@
  */
 
 import {string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {ContextModule} from './ContextModule'
 
 export const AssignmentOverride = {
@@ -38,6 +38,7 @@ export const AssignmentOverride = {
           students {
             _id
             id
+            name
           }
         }
         ... on Course {
@@ -59,6 +60,7 @@ export const AssignmentOverride = {
         ... on Group {
           id
           name
+          nonCollaborative
           _id
         }
       }

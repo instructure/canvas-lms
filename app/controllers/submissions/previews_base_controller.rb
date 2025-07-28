@@ -23,6 +23,7 @@ module Submissions
     include KalturaHelper
     include Submissions::ShowHelper
     include CoursesHelper
+    include AssetProcessorStudentHelper
 
     before_action :require_context
 
@@ -54,17 +55,21 @@ module Submissions
                                           @assignment.anonymous_instructor_annotations
 
       unless @assignment.visible_to_user?(@current_user)
-        flash[:notice] = t("This assignment will no longer count towards your grade.")
+        flash_message = t("This assignment will no longer count towards your grade.")
       end
 
       @headers = false
       if authorized_action(@submission, @current_user, :read)
         if redirect? && @assignment&.quiz&.id
+          flash[:notice] = flash_message if flash_message
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?
+          @asset_reports = asset_reports(submission: @submission)
+          @asset_processors = asset_processors(assignment: @assignment)
+          flash.now[:notice] = flash_message if flash_message
           render template: "submissions/show_preview", locals: {
-            anonymize_students: @anonymize_students
+            anonymize_students: @anonymize_students,
           }
         end
       end
@@ -131,7 +136,7 @@ module Submissions
     end
 
     def redirect_to_quiz_history?
-      !redirect_to_quiz? && (@submission.submission_type == "online_quiz" && @submission.quiz_submission_version)
+      !redirect_to_quiz? && @submission.submission_type == "online_quiz" && @submission.quiz_submission_version
     end
   end
 end

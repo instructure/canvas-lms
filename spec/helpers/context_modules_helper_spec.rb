@@ -125,7 +125,7 @@ describe ContextModulesHelper do
         }
       )
       item = t_module.add_item(type: "assignment", id: assignment.id)
-      expect(module_item_translated_content_type(item, true)).to eq "Quiz"
+      expect(module_item_translated_content_type(item, student: true)).to eq "Quiz"
     end
 
     it "returns a string for a recognized content type" do
@@ -158,7 +158,7 @@ describe ContextModulesHelper do
     it "does not set mastery_paths if cyoe is disabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       expect(ConditionalRelease::Service).not_to receive(:rules_for)
-      module_data = process_module_data(t_module, true, @student, @session)
+      module_data = process_module_data(t_module, @student, @session, student: true)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:mastery_paths]).to be_nil
     end
@@ -169,14 +169,14 @@ describe ContextModulesHelper do
       end
 
       it "sets mastery_paths for a cyoe trigger assignment module item" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:mastery_paths][:locked]).to be false
         expect(item_data[:mastery_paths][:assignment_sets]).to eq [{}, {}]
       end
 
       it "returns the correct choose_url for a cyoe trigger assignment module item" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + "/modules/items/" + item.id.to_s + "/choose"
       end
@@ -189,13 +189,13 @@ describe ContextModulesHelper do
                                                                                  assignment_sets: [],
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be true
       end
 
       it "is true if no set has been selected and sets are available" do
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be true
       end
@@ -209,7 +209,7 @@ describe ContextModulesHelper do
                                                                                  still_processing: true
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -222,7 +222,7 @@ describe ContextModulesHelper do
                                                                                  assignment_sets: [],
                                                                                }
                                                                              ])
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -237,7 +237,7 @@ describe ContextModulesHelper do
                                                                                }
                                                                              ])
 
-        module_data = process_module_data(t_module, true, @student, @session)
+        module_data = process_module_data(t_module, @student, @session, student: true)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to be false
       end
@@ -249,9 +249,91 @@ describe ContextModulesHelper do
       hidden_assignment = course.assignments.create!(workflow_state: "failed_to_duplicate")
       test_module.add_item(type: "assignment", id: hidden_assignment.id)
 
-      module_data = process_module_data(test_module, true, @student, @session)
+      module_data = process_module_data(test_module, @student, @session, student: true)
 
       expect(module_data[:items]).to be_empty
+    end
+
+    context "feature flag modules_page_hide_blueprint_lock_icon_for_children" do
+      context "is on" do
+        before(:once) do
+          t_course.account.feature_flags.create!(feature: "modules_page_hide_blueprint_lock_icon_for_children", state: "on")
+        end
+
+        it "returns blueprinit item restrictions for a teacher in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).not_to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a student in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, @student, @session, student: true)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a teacher if not a blueprint child" do
+          @is_child_course = nil
+          module_data = process_module_data(t_module, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+      end
+
+      context "is off" do
+        it "does not return blueprinit item restrictions for a teacher in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, @teacher, @session)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+
+        it "does not return blueprinit item restrictions for a student in a child course" do
+          @is_child_course = true
+          module_data = process_module_data(t_module, @student, @session, student: true)
+
+          expect(module_data[:items_restrictions]).to be_nil
+        end
+      end
+    end
+
+    describe "process_module_items_data" do
+      it "works with module items input" do
+        module_data = process_module_items_data([item], t_module, @student, @session, student: true)
+
+        expect(module_data[:items].length).to eq(1)
+        expect(module_data[:items].first).to eq(item)
+      end
+    end
+
+    describe "load_content_tags" do
+      let(:visible_content_tag_mock) { double("ContentTag1", content: double("Content1", hide_on_modules_view?: false)) }
+      let(:hidden_content_tag_mock) { double("ContentTag2", content: double("Content2", hide_on_modules_view?: true)) }
+
+      before do
+        allow(t_module)
+          .to receive(:content_tags_visible_to)
+          .with(@current_user)
+          .and_return(content_tags_mock)
+      end
+
+      context "when content_tags is NOT empty" do
+        let(:content_tags_mock) { [visible_content_tag_mock, hidden_content_tag_mock] }
+
+        it "returns content tags visible to the current user" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(1)
+        end
+      end
+
+      context "when content_tags is empty" do
+        let(:content_tags_mock) { [] }
+
+        it "returns empty array" do
+          expect(load_content_tags(t_module, @current_user).size).to eq(0)
+        end
+      end
     end
   end
 
@@ -358,6 +440,158 @@ describe ContextModulesHelper do
       item = @mod.add_item type: "discussion_topic", id: topic.id
 
       expect(cyoe_able?(item)).to be false
+    end
+  end
+
+  describe "module_performance_improvement_is_enabled?" do
+    subject { module_performance_improvement_is_enabled?(context, current_user) }
+
+    context "when provided context and user are falsey" do
+      let(:context) { nil }
+      let(:current_user) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context is falsey" do
+      let(:context) { nil }
+      let(:current_user) { double }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided current_user is falsey" do
+      let(:context) { double }
+      let(:current_user) { nil }
+
+      it { is_expected.to be_falsey }
+    end
+
+    context "when provided context and user exist" do
+      let(:current_user) { double("current_user") }
+      let(:visible_items) { double("count_mock", count: items_count) }
+      let(:items_count) { 100 }
+      let(:context) do
+        course = course_model
+        allow(course).to receive(:module_items_visible_to).with(current_user).and_return(visible_items)
+        course
+      end
+
+      context "when modules_perf FF is on" do
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(true) }
+
+        it "should call the module_items_visible_to" do
+          expect(context).to receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
+
+        it "should call the Settings.get with correct key and default value" do
+          expect(Setting).to receive(:get).with("module_perf_threshold", 100)
+
+          subject
+        end
+
+        context "when there is more than 100 modules" do
+          let(:items_count) { 101 }
+
+          it { is_expected.to be_truthy }
+        end
+
+        context "when there is less than 100 modules" do
+          let(:items_count) { 99 }
+
+          it { is_expected.to be_falsey }
+        end
+
+        context "when there are 100 modules" do
+          let(:items_count) { 100 }
+
+          it { is_expected.to be_falsey }
+        end
+      end
+
+      context "when modules_perf FF is off" do
+        before { allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(false) }
+
+        it { is_expected.to be_falsey }
+
+        it "should not call the module_items_visible_to" do
+          expect(context).to_not receive(:module_items_visible_to).with(current_user)
+
+          subject
+        end
+      end
+    end
+  end
+
+  describe "cache_if_no_module_perf_enabled" do
+    let(:context) { double("Context", account: double("Account")) }
+    let(:user) { double("User") }
+    let(:cache_key) { "test_cache_key" }
+
+    before do
+      allow(context.account).to receive(:feature_enabled?).with(:modules_perf).and_return(false)
+    end
+
+    it "yields when module performance improvement is enabled" do
+      allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(true)
+
+      expect(helper).to_not receive(:cache).with(cache_key, {}).and_yield
+      expect { |b| helper.cache_if_no_module_perf_enabled(cache_key, context, user, &b) }.to yield_control
+    end
+
+    it "caches when module performance improvement is not enabled" do
+      allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(false)
+
+      expect(helper).to receive(:cache).with(cache_key, {}).and_yield
+      expect { |b| helper.cache_if_no_module_perf_enabled(cache_key, context, user, &b) }.to yield_control
+    end
+  end
+
+  describe "cache_if_module" do
+    subject { helper.cache_if_module(nil, true, true, true, true, true, true, user, context, &proc {}) }
+
+    let(:context_module) { double("ContextModule", cache_key: "context_module_key", id: 1) }
+    let(:user) { double("User", learning_object_visibilities: %w[assignment1 assignment2]) }
+    let(:context) { double("Context") }
+    let(:cache_key) { "test_cache_key" }
+
+    before do
+      allow(helper).to receive_messages(
+        add_menu_tools_to_cache_key: cache_key,
+        add_mastery_paths_to_cache_key: cache_key,
+        cache: proc { |&block| block.call }
+      )
+    end
+
+    context "when context_module is present and module performance improvement is not enabled" do
+      before do
+        allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(false)
+      end
+
+      it "caches the result with the correct cache key" do
+        expect(helper).to receive(:cache).with(cache_key, {}).and_yield
+        expect { |b| helper.cache_if_module(context_module, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
+    end
+
+    context "when context_module is present and module performance improvement is enabled" do
+      before do
+        allow(helper).to receive(:module_performance_improvement_is_enabled?).with(context, user).and_return(true)
+      end
+
+      it "does not cache and directly yields" do
+        expect(helper).not_to receive(:cache)
+        expect { |b| helper.cache_if_module(context_module, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
+    end
+
+    context "when context_module is not present" do
+      it "does not cache and directly yields" do
+        expect(helper).not_to receive(:cache)
+        expect { |b| helper.cache_if_module(nil, true, true, true, true, true, true, user, context, &b) }.to yield_control
+      end
     end
   end
 end

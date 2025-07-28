@@ -25,14 +25,14 @@
 import Backbone from '@canvas/backbone'
 import {extend as lodashExtend} from 'lodash'
 import Section from '@canvas/sections/backbone/models/Section'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
 let AssignmentOverride
 
-const I18n = useI18nScope('assignmentOverride')
+const I18n = createI18nScope('assignmentOverride')
 
-export default AssignmentOverride = (function () {
+export default (AssignmentOverride = (function () {
   AssignmentOverride = class AssignmentOverride extends Backbone.Model {
     constructor(...args) {
       super(...args)
@@ -62,7 +62,7 @@ export default AssignmentOverride = (function () {
           name() {
             return I18n.t('Mastery Paths')
           },
-        }
+        },
       )
     }
 
@@ -103,6 +103,10 @@ export default AssignmentOverride = (function () {
       return this.get('course_section_id')
     }
 
+    getCourseID() {
+      return this.get('course_id')
+    }
+
     representsDefaultDueDate() {
       return this.getCourseSectionID() === Section.defaultDueDateSectionID
     }
@@ -116,4 +120,4 @@ export default AssignmentOverride = (function () {
   }
   AssignmentOverride.initClass()
   return AssignmentOverride
-})()
+})())

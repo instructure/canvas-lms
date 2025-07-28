@@ -24,6 +24,7 @@ class DiscussionEntriesController < ApplicationController
 
   def show
     @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }
+    page_has_instui_topnav
     if @entry.deleted?
       flash[:notice] = t :deleted_entry_notice, "That entry has been deleted"
       redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
@@ -38,14 +39,15 @@ class DiscussionEntriesController < ApplicationController
 
   def create
     @topic = @context.discussion_topics.active.find(params[:discussion_entry].delete(:discussion_topic_id))
-    params[:discussion_entry].delete :remove_attachment rescue nil
+    params[:discussion_entry].delete(:remove_attachment)
     parent_id = params[:discussion_entry].delete(:parent_id)
 
     entry_params = params.require(:discussion_entry).permit(:message, :plaintext_message)
+    entry_params[:message] = process_incoming_html_content(entry_params[:message]) if entry_params[:message]
 
     @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user
-    @entry.user_id = @current_user ? @current_user.id : nil
+    @entry.user_id = @current_user&.id
     @entry.parent_id = parent_id
     if authorized_action(@entry, @current_user, :create)
 
@@ -177,7 +179,7 @@ class DiscussionEntriesController < ApplicationController
           channel.title = t :podcast_feed_title, "%{title} Posts Podcast Feed", title: @topic.title
           channel.description = t :podcast_description, "Any media files linked from or embedded within entries in the topic \"%{title}\" will appear in this feed.", title: @topic.title
           channel.link = polymorphic_url([@context, @topic])
-          channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
+          channel.pubDate = Time.zone.now.strftime("%a, %d %b %Y %H:%M:%S %z")
           elements = Announcement.podcast_elements(@entries, @context)
           elements.each do |item|
             channel.items << item

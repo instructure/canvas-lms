@@ -229,6 +229,12 @@ describe CanvadocSessionsController do
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
+    it "creates a CanvadocsSubmission if needed" do
+      blob = @blob.merge(submission_id: @submission.id)
+      get :show, params: { blob: blob.to_json, hmac: Canvas::Security.hmac_sha1(blob.to_json) }
+      expect(@attachment1.canvadoc.canvadocs_submissions.where(submission_id: @submission)).to exist
+    end
+
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
       expect_any_instance_of(Attachment).not_to receive(:submit_to_canvadocs)
@@ -245,6 +251,11 @@ describe CanvadocSessionsController do
 
       get :show, params: { blob: @blob.to_json, hmac: }
       assert_status(401)
+    end
+
+    it "needs an HMAC and blob" do
+      get :show
+      assert_status(400)
     end
 
     it "sends o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do

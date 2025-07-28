@@ -60,7 +60,7 @@ GroupUser.prototype.joinGroup = function (group) {
       return function (data) {
         return _this.trigger('ajaxJoinGroupSuccess', data)
       }
-    })(this)
+    })(this),
   )
 }
 

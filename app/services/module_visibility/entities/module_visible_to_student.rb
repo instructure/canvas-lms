@@ -20,39 +20,6 @@
 module ModuleVisibility
   module Entities
     # When a module is visible to a (student) user
-    class ModuleVisibleToStudent
-      attr_reader :course_id,
-                  :user_id,
-                  :context_module_id
-
-      def initialize(course_id:,
-                     user_id:,
-                     context_module_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "context_module_id cannot be nil" if context_module_id.nil?
-
-        @course_id = course_id
-        @user_id = user_id
-        @context_module_id = context_module_id
-      end
-
-      # two ModuleVisibleToStudent DTOs are equal if all of their attributes are equal
-      def ==(other)
-        return false unless other.is_a?(ModuleVisibleToStudent)
-
-        course_id == other.course_id &&
-          user_id == other.user_id &&
-          context_module_id == other.context_module_id
-      end
-
-      def eql?(other)
-        self == other
-      end
-
-      def hash
-        [course_id, user_id, context_module_id].hash
-      end
-    end
+    ModuleVisibleToStudent = Struct.new(:course_id, :user_id, :context_module_id, keyword_init: true)
   end
 end

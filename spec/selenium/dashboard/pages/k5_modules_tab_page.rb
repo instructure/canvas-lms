@@ -37,10 +37,6 @@ module K5ModulesTabPageObject
     "#select_context_content_dialog"
   end
 
-  def add_module_modal_selector
-    "#add_context_module_form"
-  end
-
   def drag_handle_selector
     "[title='Drag to reorder or move item to another module']"
   end
@@ -81,10 +77,6 @@ module K5ModulesTabPageObject
 
   def add_module_item_modal
     f(add_module_item_modal_selector)
-  end
-
-  def add_module_modal
-    f(add_module_modal_selector)
   end
 
   def drag_handle

@@ -42,7 +42,7 @@ export default function buildStyle() {
     secondaryFontWeight: variables.typography.fontWeightBold,
     secondaryLineHeight: variables.typography.lineHeightCondensed,
 
-    color: variables.colors.oxford,
+    color: variables.colors.contrasts.grey100100,
     background: variables.colors.white,
 
     marginTop: variables.spacing.large,
@@ -58,7 +58,7 @@ export default function buildStyle() {
     background: ${theme.background};
     margin-top: ${theme.marginTop};
   }
-  
+
   .${classNames.secondary} {
     font-size: ${theme.secondaryFontSize};
     font-weight: ${theme.secondaryFontWeight};

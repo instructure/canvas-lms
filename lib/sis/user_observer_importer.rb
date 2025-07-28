@@ -60,10 +60,10 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for a user_observer" unless /\A(active|deleted)\z/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
-        o_pseudo = @root_account.pseudonyms.active.where(sis_user_id: observer_id).take
+        o_pseudo = @root_account.pseudonyms.active.find_by(sis_user_id: observer_id)
         raise ImportError, "An observer referenced a non-existent user #{observer_id}" unless o_pseudo
 
-        s_pseudo = @root_account.pseudonyms.active.where(sis_user_id: student_id).take
+        s_pseudo = @root_account.pseudonyms.active.find_by(sis_user_id: student_id)
         raise ImportError, "A student referenced a non-existent user #{student_id}" unless s_pseudo
 
         observer = o_pseudo.user
@@ -79,7 +79,7 @@ module SIS
           check_observer_notification_settings(observer)
           user_observer = UserObservationLink.create_or_restore(observer:, student:, root_account: @root_account)
         when "deleted"
-          user_observer = observer.as_observer_observation_links.for_root_accounts(@root_account).where(user_id: student).take
+          user_observer = observer.as_observer_observation_links.for_root_accounts(@root_account).find_by(user_id: student)
           if user_observer
             user_observer.destroy
           else

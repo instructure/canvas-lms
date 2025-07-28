@@ -97,7 +97,7 @@ const addAssignments = (state, action) => {
 
   return state.concat(
     // check if assignments are immutable, otherwise convert them to immutable
-    Immutable.Iterable.isIterable(assignments) ? assignments : Immutable.fromJS(assignments)
+    Immutable.Iterable.isIterable(assignments) ? assignments : Immutable.fromJS(assignments),
   )
 }
 
@@ -109,7 +109,7 @@ const insertAssignment = (state, action) => {
   const assignment = action.payload.path.assignment
   return state.insert(
     assignment !== undefined ? assignment + 1 : state.size,
-    Map({assignment_id: action.payload.assignment})
+    Map({assignment_id: action.payload.assignment}),
   )
 }
 
@@ -130,7 +130,7 @@ const mergeAssignmentSets = (state, action) => {
 
     newAssignments.forEach(newAssg => {
       const isFound = assignments.find(
-        assg => assg.get('assignment_id') === newAssg.get('assignment_id')
+        assg => assg.get('assignment_id') === newAssg.get('assignment_id'),
       )
       if (!isFound) assignments = assignments.push(newAssg.delete('id'))
     })
@@ -157,7 +157,7 @@ const splitAssignmentSet = (state, action) => {
     assignmentSetIndex + 1,
     Map({
       assignment_set_associations: assignments.slice(splitIndex).map(assg => assg.delete('id')),
-    })
+    }),
   )
 
   return state
@@ -218,7 +218,7 @@ const overallAssignmentSetReducer = handleActions(
     [actions.MERGE_ASSIGNMENT_SETS]: mergeAssignmentSets,
     [actions.SPLIT_ASSIGNMENT_SET]: splitAssignmentSet,
   },
-  List(emptyAssignmentSet())
+  List(emptyAssignmentSet()),
 )
 
 const singleAssignmentSetReducer = combineReducers({
@@ -235,7 +235,7 @@ const singleAssignmentSetReducer = combineReducers({
       [actions.INSERT_ASSIGNMENT]: insertAssignment,
       [actions.UPDATE_ASSIGNMENT_INDEX]: updateAssignmentIndex,
     },
-    List()
+    List(),
   ),
 })
 
@@ -246,7 +246,7 @@ const overallScoringRangesReducer = handleActions(
     [actions.SAVE_RULE]: savedRuleSetScoringRanges,
     [actions.SET_SCORE_AT_INDEX]: juggleBounds,
   },
-  List()
+  List(),
 )
 
 const structuredSingleScoringRangeReducer = combineReducers({
@@ -254,7 +254,7 @@ const structuredSingleScoringRangeReducer = combineReducers({
     {
       [actions.SET_ERROR_AT_SCORE_INDEX]: (_s, a) => a.payload.error,
     },
-    ''
+    '',
   ),
 
   assignment_sets: assignmentSetReducer,

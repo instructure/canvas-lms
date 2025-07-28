@@ -35,8 +35,8 @@ export default function buildStyle() {
     fontSize: variables.typography.fontSizeMedium,
     fontFamily: variables.typography.fontFamily,
     fontWeight: variables.typography.fontWeightNormal,
-    color: variables.colors.oxford,
-    background: variables.colors.white,
+    color: variables.colors.contrasts.grey100100,
+    background: variables.colors.contrasts.white1010,
   }
 
   const css = `

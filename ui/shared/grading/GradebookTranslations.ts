@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebooktranslations')
+const I18n = createI18nScope('gradebooktranslations')
 
 const GRADEBOOK_TRANSLATIONS = {
   submission_tooltip_unpublished_assignment: I18n.t('This assignment is unpublished'),
@@ -41,19 +41,19 @@ const GRADEBOOK_TRANSLATIONS = {
   submission_tooltip_online_quiz: I18n.t('Quiz Submission'),
   submission_tooltip_turnitin: I18n.t('Has similarity score'),
   submission_tooltip_not_in_any_grading_period: I18n.t(
-    'This submission is not in any grading period'
+    'This submission is not in any grading period',
   ),
   submission_tooltip_in_another_grading_period: I18n.t(
-    'This submission is in another grading period'
+    'This submission is in another grading period',
   ),
   submission_tooltip_in_closed_grading_period: I18n.t(
-    'This submission is in a closed grading period'
+    'This submission is in a closed grading period',
   ),
   submission_update_error: I18n.t(
-    'There was an error updating this assignment. Please refresh the page and try again.'
+    'There was an error updating this assignment. Please refresh the page and try again.',
   ),
   submission_too_many_points_warning: I18n.t(
-    'This student was just awarded an unusually high grade.'
+    'This student was just awarded an unusually high grade.',
   ),
   submission_negative_points_warning: I18n.t('This student was just awarded negative points.'),
   submission_pass: I18n.t('pass'),

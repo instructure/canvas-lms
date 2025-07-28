@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
@@ -37,7 +37,7 @@ import {
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 import useRatings from '@canvas/outcomes/react/hooks/useRatings'
@@ -46,7 +46,7 @@ import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHe
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const componentOverrides = {
   Mask: {
@@ -57,7 +57,7 @@ const componentOverrides = {
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
   const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(
-    outcome.displayName || ''
+    outcome.displayName || '',
   )
   const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
@@ -122,7 +122,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   if (friendlyDescriptionChanged && friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error',
+      type: 'newError',
     })
   }
 
@@ -170,7 +170,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
               variables: {
                 input,
               },
-            })
+            }),
           )
         }
 
@@ -185,7 +185,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   outcomeId: outcome._id,
                 },
               },
-            })
+            }),
           )
         }
 
@@ -226,7 +226,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={title}
-                  messages={invalidTitle ? [{text: invalidTitle, type: 'error'}] : []}
+                  messages={invalidTitle ? [{text: invalidTitle, type: 'newError'}] : []}
                   renderLabel={I18n.t('Name')}
                   onChange={titleChangeHandler}
                   data-testid="name-input"
@@ -247,7 +247,9 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   type="text"
                   size="medium"
                   value={displayName}
-                  messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+                  messages={invalidDisplayName
+                    ? [{text: invalidDisplayName, type: 'newError'}]
+                    : []}
                   renderLabel={I18n.t('Friendly Name')}
                   onChange={displayNameChangeHandler}
                   data-testid="display-name-input"

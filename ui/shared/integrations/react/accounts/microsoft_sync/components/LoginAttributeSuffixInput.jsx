@@ -20,9 +20,9 @@ import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_settings_jsx_bundle')
+const I18n = createI18nScope('account_settings_jsx_bundle')
 
 /**
  * @param {Object} props
@@ -55,7 +55,7 @@ LoginAttributeSuffixInput.propTypes = {
     PropTypes.shape({
       text: PropTypes.string,
       type: PropTypes.oneOf(['error', 'hint', 'success', 'screenreader-only']),
-    })
+    }),
   ),
 }
 

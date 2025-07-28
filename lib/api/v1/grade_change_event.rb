@@ -88,7 +88,7 @@ module Api::V1::GradeChangeEvent
     courses ||= []
 
     assignment_ids = events.filter_map(&:assignment_id)
-    assignments = Assignment.where(id: assignment_ids).to_a unless assignment_ids.empty?
+    assignments = AbstractAssignment.where(id: assignment_ids).to_a unless assignment_ids.empty?
     assignments ||= []
 
     user_ids = events.filter_map(&:grader_id)

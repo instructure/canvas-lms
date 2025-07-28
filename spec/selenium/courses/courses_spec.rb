@@ -47,7 +47,7 @@ describe "courses" do
         wait_for(method: nil, timeout: 5) do
           assert_flash_notice_message("successfully updated")
         end
-        expect(unpublish_btn).to have_class("disabled")
+        expect(unpublish_btn).to have_attribute("aria-disabled", "true")
       end
 
       it "loads the users page using ajax", custom_timeout: 30 do
@@ -59,6 +59,85 @@ describe "courses" do
 
         expect_no_flash_message :error
         expect(course_user_list.length).to eq 50
+      end
+    end
+
+    context "differentiation tag rollback plan" do
+      before :once do
+        @course = course_model(name: "Tag Conversion Course")
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+
+        @teacher = teacher_in_course(active_all: true, course: @course).user
+        @student = student_in_course(active_all: true, course: @course).user
+
+        @diff_tag_category = @course.group_categories.create!(name: "Tag Category", non_collaborative: true)
+        @diff_tag = @course.groups.create!(name: "Tag 1", group_category: @diff_tag_category, non_collaborative: true)
+
+        @diff_tag.add_user(@student)
+
+        @assignment = @course.assignments.create!(title: "Test Assignment")
+        @assignment.assignment_overrides.create!(set_type: "Group", set: @diff_tag)
+
+        # disable differentiation tag feature for the course
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+      end
+
+      it "allows teacher to convert tag overrides to adhoc overrides for entire course" do
+        user_session(@teacher)
+        visit_course(@course)
+
+        convert_button = f('[data-testid="course-tag-conversion-button"]')
+        convert_button.click
+
+        wait_for_ajaximations
+        expect(@course.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG).count).to eq(1)
+        progress_bar = f('[data-testid="course-tag-conversion-progress-bar"]')
+        expect(progress_bar).to be_displayed
+
+        # manually complete the job for testing purposes
+        @course.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG).update(workflow_state: "completed")
+
+        # verify that the success message is displayed
+        wait_for_ajaximations
+        success_message = f('[data-testid="course-differentiation-tag-conversion-success"]')
+        expect(success_message).to be_displayed
+      end
+
+      it "progress bar is shown if conversion job is already in progress" do
+        @course.progresses.create!(tag: DifferentiationTag::DELAYED_JOB_TAG, workflow_state: "running")
+
+        user_session(@teacher)
+        visit_course(@course)
+
+        progress_bar = f('[data-testid="course-tag-conversion-progress-bar"]')
+        expect(progress_bar).to be_displayed
+      end
+
+      it "shows error if the conversion job fails" do
+        user_session(@teacher)
+        visit_course(@course)
+
+        convert_button = f('[data-testid="course-tag-conversion-button"]')
+        convert_button.click
+
+        wait_for_ajaximations
+        @course.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG).update(workflow_state: "failed")
+
+        wait_for_ajaximations
+        error_message = f('[data-testid="course-differentiation-tag-conversion-error"]')
+        expect(error_message).to be_displayed
+      end
+
+      it "does not display warning message if there are no tag overrides in the course" do
+        @assignment.assignment_overrides.destroy_all
+
+        user_session(@teacher)
+        visit_course(@course)
+
+        expect(element_exists?('[data-testid="course-differentiation-tag-converter-warning"]')).to be_falsey
       end
     end
   end

@@ -19,7 +19,7 @@
 import * as tz from '@instructure/moment-utils'
 import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
-import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
+import I18nObj, {useScope as createI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
 import $ from 'jquery'
 import {chain, defaults, isDate, map, reduce} from 'lodash'
 import htmlEscape, {raw} from '@instructure/html-escape'
@@ -39,7 +39,7 @@ import {
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('handlebars_helpers')
+const I18n = createI18nScope('handlebars_helpers')
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -76,8 +76,7 @@ const object = {
       }
     }
     if (options.i18n_scope) {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useI18nScope(options.i18n_scope)
+      createI18nScope(options.i18n_scope)
     }
     return new Handlebars.SafeString(htmlEscape(I18nObj.t(...Array.from(args), options)))
   },
@@ -142,7 +141,7 @@ const object = {
       const courseDatetime = datetimeString(datetime, {timezone: ENV.CONTEXT_TIMEZONE})
       if (localDatetime !== courseDatetime) {
         titleText = `${htmlEscape(localText)}: ${htmlEscape(localDatetime)}<br>${htmlEscape(
-          courseText
+          courseText,
         )}: ${htmlEscape(courseDatetime)}`
       }
     }
@@ -151,7 +150,7 @@ const object = {
       return new Handlebars.SafeString(titleText)
     } else {
       return new Handlebars.SafeString(
-        `data-tooltip data-html-tooltip-title=\"${htmlEscape(titleText)}\"`
+        `data-tooltip data-html-tooltip-title=\"${htmlEscape(titleText)}\"`,
       )
     }
   },
@@ -288,7 +287,7 @@ const object = {
   // helper for easily creating icon font markup
   addIcon(icontype) {
     return new Handlebars.SafeString(
-      `<i role='presentation' class='icon-${htmlEscape(icontype)}'></i>`
+      `<i role='presentation' class='icon-${htmlEscape(icontype)}'></i>`,
     )
   },
 
@@ -670,7 +669,7 @@ const object = {
             return memo[key_]
           }
         },
-        this
+        this,
       )
       if (value) {
         inputProps.checked = true
@@ -761,6 +760,12 @@ const object = {
     }
   },
 
+  selectedIfNumber(thing, thingToCompare) {
+    const thingNumber = Number(thing)
+    const thingToCompareNumber = Number(thingToCompare)
+    return thingNumber === thingToCompareNumber ? 'selected' : ''
+  },
+
   disabledIf(thing, _hash) {
     if (thing) {
       return 'disabled'
@@ -818,7 +823,7 @@ const object = {
   },
   truncate_left(string, max) {
     return Handlebars.Utils.escapeExpression(
-      truncateText(string.split('').reverse().join(''), {max}).split('').reverse().join('')
+      truncateText(string.split('').reverse().join(''), {max}).split('').reverse().join(''),
     )
   },
 
@@ -946,7 +951,7 @@ const object = {
         near: 'plus',
       }[status] || 'x'
     return new Handlebars.SafeString(
-      `<i aria-hidden='true' class='icon-${htmlEscape(iconType)}'></i>`
+      `<i aria-hidden='true' class='icon-${htmlEscape(iconType)}'></i>`,
     )
   },
 

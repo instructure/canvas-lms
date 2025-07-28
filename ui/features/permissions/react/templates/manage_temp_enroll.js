@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_78')
+const I18n = createI18nScope('permissions_templates_78')
 
 export const template = generateActionTemplates([
   {
     title: I18n.t('Manage Temporary Enrollments'),
     description: I18n.t(
-      'Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course.'
+      'Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course.',
     ),
   },
   {
     description: I18n.t(
-      'The temporarily enrolled user can only view and participate in a course between the start and end dates that were chosen when making the temporary enrollment.'
+      'The temporarily enrolled user can only view and participate in a course between the start and end dates that were chosen when making the temporary enrollment.',
     ),
   },
   {
     title: I18n.t('Temporary Enrollments - add'),
     description: I18n.t(
-      'Allows users to add a temporary enrollment with a start date, end date, and role'
+      'Allows users to add a temporary enrollment with a start date, end date, and role',
     ),
   },
   {

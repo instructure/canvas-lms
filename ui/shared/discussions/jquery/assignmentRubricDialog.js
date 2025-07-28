@@ -14,24 +14,24 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import 'jquery-tinypubsub'
+import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 
-const I18n = useI18nScope('assignmentRubricDialog')
+const I18n = createI18nScope('assignmentRubricDialog')
 
 const assignmentRubricDialog = {
-  // the markup for the trigger should look like:
-  // <a class="rubric_dialog_trigger" href="#" data-rubric-exists="<%= !!attached_rubric %>" data-url="<%= context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) %>">
-  //   <%= attached_rubric ? t(:show_rubric, "Show Rubric") : t(:add_rubric, "Add Rubric") %>
-  // </a>
+  focusRegion: null,
+
   initTriggers() {
     const $trigger = $('.rubric_dialog_trigger')
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
-      const selector = $trigger.data('focusReturnsTo')
+      const selector =
+        $trigger.data('focusReturnsTo') ?? '[data-testid="discussion-post-menu-trigger"]'
       try {
         this.$focusReturnsTo = $(document.querySelector(selector))
       } catch (err) {
@@ -54,7 +54,18 @@ const assignmentRubricDialog = {
       modal: false,
       resizable: true,
       autoOpen: false,
-      close: () => this.$focusReturnsTo.focus(),
+      close: () => {
+        const $container = this.$dialog.dialog('widget')
+        this.focusRegion && FocusRegionManager.blurRegion($container[0], this.focusRegion.id)
+        this.$focusReturnsTo?.focus()
+      },
+      open: () => {
+        const $container = this.$dialog.dialog('widget')
+        $container.attr('aria-modal', 'true')
+        $container.find('.ui-dialog-titlebar-close').attr('tabindex', '0')
+        $container.find('.add_rubric_link').attr('tabindex', '0')
+        $container.find('.ui-dialog-title').attr('role', 'heading').attr('aria-level', '2')
+      },
       zIndex: 1000,
     })
 
@@ -63,13 +74,23 @@ const assignmentRubricDialog = {
       // since that is the point of why they clicked the link.
       if (assignmentRubricDialog.noRubricExists) {
         $.subscribe('edit_rubric/initted', () =>
-          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click()
+          assignmentRubricDialog.$dialog.find('.btn.add_rubric_link').click(),
         )
       }
 
       // weird hackery because the server returns a <div id="rubrics" style="display:none">
       // as it's root node, so we need to show it before we inject it
       assignmentRubricDialog.$dialog.html($(html).show())
+      assignmentRubricDialog.$dialog
+        .find('#rubrics .rubric_container div.rubric-screenreader-title')
+        .remove()
+
+      const $container = assignmentRubricDialog.$dialog.dialog('widget')
+      this.focusRegion = FocusRegionManager.activateRegion($container[0], {
+        shouldContainFocus: true,
+        shouldFocusOnOpen: true,
+        shouldReturnFocus: false,
+      })
     })
   },
 

@@ -16,167 +16,120 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useCallback} from 'react'
-import type {SetStateAction, Dispatch} from 'react'
-// @ts-ignore
-import {canvas} from '@instructure/ui-theme-tokens'
-import {Flex} from '@instructure/ui-flex'
+import React from 'react'
+import {canvas} from '@instructure/ui-themes'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
-import type {ContentMigrationItem} from './types'
+import type {ContentMigrationItem, UpdateMigrationItemType} from './types'
 import MigrationRow from './migration_row'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
+import InfiniteScroll from '@canvas/infinite-scroll/react/components/InfiniteScroll'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
-type MigrationsResponse = {json: ContentMigrationItem[]}
-type MigrationResponse = {json: ContentMigrationItem}
+const LoadingSpinner = () => (
+  <Table.Row>
+    <Table.Cell colSpan={headerData.length} textAlign="center">
+      <View as="div" margin="medium none" textAlign="center">
+        <Spinner size="small" renderTitle={I18n.t('Loading')} />
+      </View>
+    </Table.Cell>
+  </Table.Row>
+)
 
-type ContentMigrationsTableViewProps = {
+type HeaderData = {
+  id: string
+  label: React.ReactNode
+  textAlign?: 'start' | 'center' | 'end'
+}
+
+const headerData: HeaderData[] = [
+  {id: 'content_type', label: <strong>{I18n.t('Content Type')}</strong>},
+  {id: 'source_link', label: <strong>{I18n.t('Source Link')}</strong>},
+  {id: 'date_imported', label: <strong>{I18n.t('Date Imported')}</strong>},
+  {id: 'status', label: <strong>{I18n.t('Status')}</strong>, textAlign: 'center'},
+  {id: 'progress', label: <strong>{I18n.t('Progress')}</strong>, textAlign: 'center'},
+  {id: 'action', label: <strong>{I18n.t('Action')}</strong>, textAlign: 'center'},
+]
+
+export type ContentMigrationsTableProps = {
   migrations: ContentMigrationItem[]
-  updateMigrationItem: (migrationId: string, data: any, noXHR: boolean | undefined) => void
-}
-
-const ContentMigrationsTableCondensedView = ({
-  migrations,
-  updateMigrationItem,
-}: ContentMigrationsTableViewProps) => {
-  return (
-    <Flex direction="column" gap="small">
-      {migrations.map((cm: ContentMigrationItem) => (
-        <MigrationRow
-          key={cm.id}
-          migration={cm}
-          view="condensed"
-          updateMigrationItem={updateMigrationItem}
-        />
-      ))}
-    </Flex>
-  )
-}
-
-const ContentMigrationsTableExpandedView = ({
-  migrations,
-  updateMigrationItem,
-}: ContentMigrationsTableViewProps) => {
-  return (
-    <Table caption={I18n.t('Content Migrations')}>
-      {renderTableHeader()}
-      <Table.Body>
-        {migrations.map((cm: ContentMigrationItem) => (
-          <MigrationRow
-            key={cm.id}
-            migration={cm}
-            view="expanded"
-            updateMigrationItem={updateMigrationItem}
-          />
-        ))}
-      </Table.Body>
-    </Table>
-  )
+  isLoading: boolean
+  hasMore?: boolean
+  fetchNext: () => void
+  updateMigrationItem: UpdateMigrationItemType
 }
 
 export const ContentMigrationsTable = ({
   migrations,
-  setMigrations,
-}: {
-  migrations: ContentMigrationItem[]
-  setMigrations: Dispatch<SetStateAction<ContentMigrationItem[]>>
-}) => {
-  useEffect(() => {
-    doFetchApi({
-      path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
-      params: {per_page: 25},
-    })
-      .then((response: MigrationsResponse) => setMigrations(_prevMigrations => response.json))
-      .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
-  }, [setMigrations])
+  isLoading,
+  hasMore = false,
+  fetchNext,
+  updateMigrationItem,
+}: ContentMigrationsTableProps) => {
+  const loadMore = () => {
+    if (isLoading || !hasMore) return
+    fetchNext()
+  }
 
-  const updateMigrationItem = useCallback(
-    (migrationId: string, data: any, noXHR: boolean | undefined) => {
-      if (noXHR) {
-        setMigrations(prevMigrations =>
-          prevMigrations.map((m: ContentMigrationItem) =>
-            m.id === migrationId ? {...m, ...data} : m
-          )
-        )
-      } else {
-        doFetchApi({
-          path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/${migrationId}`,
-        })
-          .then((response: MigrationResponse) => {
-            setMigrations(prevMigrations =>
-              prevMigrations.map((m: ContentMigrationItem) =>
-                m.id === migrationId ? {...response.json, ...data} : m
-              )
-            )
-          })
-          .catch(showFlashError(I18n.t("Couldn't update content migrations")))
-      }
-    },
-    [setMigrations]
-  )
+  const migrationsExpireDays = ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS
 
   return (
-    <>
-      <Heading level="h2" as="h2" margin="small 0">
-        {I18n.t('Import Queue')}
+    <View as="div" borderWidth="small 0 0 0" padding="small 0 0 0">
+      <Heading level="h3" as="h3" margin="small 0">
+        {I18n.t('Content imports')}
       </Heading>
-      <hr role="presentation" aria-hidden="true" />
+      {!!migrationsExpireDays && (
+        <View as="div" margin="small 0 medium 0">
+          {I18n.t('Content import files cannot be downloaded after %{days} days.', {
+            days: migrationsExpireDays,
+          })}
+        </View>
+      )}
       <Responsive
         match="media"
         query={{
           expanded: {minWidth: canvas.breakpoints.medium},
         }}
         render={(_, matches) => {
-          if (matches?.includes('expanded')) {
-            return (
-              <ContentMigrationsTableExpandedView
-                migrations={migrations}
-                updateMigrationItem={updateMigrationItem}
-              />
-            )
-          } else {
-            return (
-              <ContentMigrationsTableCondensedView
-                migrations={migrations}
-                updateMigrationItem={updateMigrationItem}
-              />
-            )
-          }
+          const layout = matches?.includes('expanded') ? 'auto' : 'stacked'
+          return (
+            <InfiniteScroll pageStart={1} loadMore={loadMore} hasMore={!isLoading && hasMore}>
+              <Table caption={I18n.t('Content Migrations')} layout={layout}>
+                <Table.Head>
+                  <Table.Row>
+                    {headerData.map(header => (
+                      <Table.ColHeader
+                        key={header.id}
+                        id={header.id}
+                        themeOverride={{padding: '0.6rem 0'}}
+                        textAlign={header.textAlign || 'start'}
+                      >
+                        {header.label}
+                      </Table.ColHeader>
+                    ))}
+                  </Table.Row>
+                </Table.Head>
+                <Table.Body>
+                  {migrations.map((cm: ContentMigrationItem) => (
+                    <MigrationRow
+                      key={cm.id}
+                      migration={cm}
+                      layout={layout}
+                      updateMigrationItem={updateMigrationItem}
+                    />
+                  ))}
+                  {isLoading && <LoadingSpinner />}
+                </Table.Body>
+              </Table>
+            </InfiniteScroll>
+          )
         }}
       />
-    </>
-  )
-}
-
-const renderTableHeader = () => {
-  return (
-    <Table.Head>
-      <Table.Row>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="content_type">
-          {I18n.t('Content Type')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="source_link">
-          {I18n.t('Source Link')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="date_imported">
-          {I18n.t('Date Imported')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="status">
-          {I18n.t('Status')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="progress">
-          {I18n.t('Progress')}
-        </Table.ColHeader>
-        <Table.ColHeader themeOverride={{padding: '0.6rem 0'}} id="action">
-          {I18n.t('Action')}
-        </Table.ColHeader>
-      </Table.Row>
-    </Table.Head>
+    </View>
   )
 }
 

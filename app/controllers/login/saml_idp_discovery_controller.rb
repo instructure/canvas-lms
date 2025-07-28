@@ -31,6 +31,7 @@ class Login::SamlIdpDiscoveryController < ApplicationController
     params << ["return", saml_login_base_url]
     uri.query = URI.encode_www_form(params)
     redirect_to uri.to_s
+    increment_statsd(:attempts)
   end
 
   private

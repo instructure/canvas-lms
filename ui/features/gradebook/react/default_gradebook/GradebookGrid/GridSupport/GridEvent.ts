@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,12 +19,14 @@
 export default class GridEvent {
   handlers: any[] = []
 
+  // @ts-expect-error
   subscribe(handler) {
     if (!this.handlers.includes(handler)) {
       this.handlers.push(handler)
     }
   }
 
+  // @ts-expect-error
   unsubscribe(handler) {
     const index = this.handlers.indexOf(handler)
     if (index !== -1) {
@@ -33,6 +34,7 @@ export default class GridEvent {
     }
   }
 
+  // @ts-expect-error
   trigger(event, data) {
     for (let i = 0; i < this.handlers.length; i++) {
       if (this.handlers[i](event, data) === false) {

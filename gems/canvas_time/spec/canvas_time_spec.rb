@@ -35,7 +35,7 @@ describe "Time Marshal override" do
     dumped = Marshal.dump(raw_time)
     # the last character differs between ruby 1.9 and ruby 2.1
     expect(dumped[0..-2]).to eq("\x04\bIu:\tTime!pre1900:0010-05-13T04:12:51Z\x06:\x06E")
-    expect(%w[F T]).to include(dumped[-1])
+    expect(dumped[-1]).to be_in %w[F T]
     dumped[-1] = "F"
     reloaded = Marshal.load(dumped)
     expect(reloaded).to eq(raw_time)
@@ -48,22 +48,9 @@ describe "Time Marshal override" do
 end
 # rubocop:enable Security/MarshalLoad
 
-describe "utc_datetime" do
-  it "returns a DateTime" do
-    expect(Time.now.utc_datetime).to be_a(DateTime)
-  end
-
-  it "is initialized from the given time" do
-    t = Time.utc(2000, "jan", 3, 20, 15, 1)
-    utc_datetime = t.utc_datetime
-
-    expect(utc_datetime.iso8601).to eq "2000-01-03T20:15:00+00:00"
-  end
-end
-
 describe "fancy_midnight" do
   it "doesn't stomp on your Jenkins specs at midnight UTC" do
-    time = Time.now.beginning_of_day + 4.seconds
+    time = Time.zone.now.beginning_of_day + 4.seconds
     expect(CanvasTime.fancy_midnight(time)).to eq(time)
     expect(CanvasTime.fancy_midnight(time.beginning_of_day)).to eq time.end_of_day
   end

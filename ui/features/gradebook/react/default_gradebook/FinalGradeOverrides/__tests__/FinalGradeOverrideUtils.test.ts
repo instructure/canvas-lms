@@ -60,7 +60,7 @@ describe('FinalGradeOverride.utils Tests', () => {
       }
       const gradingPeriodId = '0'
       expect(gradeOverrideCustomStatus(finalGradeOverrides, studentId, gradingPeriodId)).toBe(
-        undefined
+        undefined,
       )
     })
 
@@ -90,7 +90,7 @@ describe('FinalGradeOverride.utils Tests', () => {
       }
       const gradingPeriodId = '2'
       expect(gradeOverrideCustomStatus(finalGradeOverrides, studentId, gradingPeriodId)).toBe(
-        undefined
+        undefined,
       )
     })
   })

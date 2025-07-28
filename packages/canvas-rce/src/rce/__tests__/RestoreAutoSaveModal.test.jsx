@@ -24,12 +24,14 @@ describe('RestoreAutoSaveModal', () => {
   it('renders all its content', () => {
     const onNo = jest.fn()
     const {getByText} = render(
-      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={() => {}} />
+      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={() => {}} />,
     )
 
     expect(getByText('Found auto-saved content')).toBeInTheDocument()
     expect(
-      getByText('Auto-saved content exists. Would you like to load the auto-saved content instead?')
+      getByText(
+        'Auto-saved content exists. Would you like to load the auto-saved content instead?',
+      ),
     ).toBeInTheDocument()
     expect(getByText('Preview')).toBeInTheDocument()
     expect(getByText('Click to show preview')).toBeInTheDocument()
@@ -45,7 +47,7 @@ describe('RestoreAutoSaveModal', () => {
     const onNo = jest.fn()
     const onYes = jest.fn()
     const {getByText} = render(
-      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={onYes} />
+      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={onYes} />,
     )
 
     const yesButton = getByText('Yes').closest('button')
@@ -58,7 +60,7 @@ describe('RestoreAutoSaveModal', () => {
     const onNo = jest.fn()
     const onYes = jest.fn()
     const {getByText} = render(
-      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={onYes} />
+      <RestoreAutoSaveModal savedContent="<p>hello world</p>" open onNo={onNo} onYes={onYes} />,
     )
 
     const noButton = getByText('No').closest('button')
@@ -74,7 +76,7 @@ describe('RestoreAutoSaveModal', () => {
         open
         onNo={() => {}}
         onYes={() => {}}
-      />
+      />,
     )
 
     const previewButton = getByText('Click to show preview')

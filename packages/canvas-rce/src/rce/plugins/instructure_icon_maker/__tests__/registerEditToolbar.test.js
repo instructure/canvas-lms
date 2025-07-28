@@ -57,7 +57,7 @@ describe('registerEditToolbar()', () => {
       EDIT_ALT_TEXT_BUTTON_ID,
       expect.objectContaining({
         text: 'Icon Options',
-      })
+      }),
     )
   })
 

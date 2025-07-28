@@ -492,7 +492,7 @@ describe "Jobs V2 API", type: :request do
       end
 
       it "finds a job by id" do
-        job = Delayed::Job.where(locked_by: "foo").take
+        job = Delayed::Job.find_by(locked_by: "foo")
         json = api_call(:get,
                         "/api/v1/jobs2/#{job.id}",
                         { controller: "jobs_v2", action: "lookup", format: "json", id: job.to_param })
@@ -700,7 +700,7 @@ describe "Jobs V2 API", type: :request do
                  { controller: "jobs_v2", action: "manage", format: "json" },
                  { strand: "foobar", max_concurrent: 11, priority: 23 },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -789,6 +789,12 @@ describe "Jobs V2 API", type: :request do
     context "global admin" do
       specs_require_sharding
 
+      def remove_jobs_scope_empty_variable_if_present
+        if Switchman::Shard.instance_variable_defined?(:@jobs_scope_empty)
+          Switchman::Shard.remove_instance_variable(:@jobs_scope_empty)
+        end
+      end
+
       before :once do
         Shard.default.update delayed_jobs_shard_id: Shard.default.id
 
@@ -814,10 +820,12 @@ describe "Jobs V2 API", type: :request do
       end
 
       before do
-        if Switchman::Shard.instance_variable_defined?(:@jobs_scope_empty)
-          Switchman::Shard.remove_instance_variable(:@jobs_scope_empty)
-        end
+        remove_jobs_scope_empty_variable_if_present
         allow(HostUrl).to receive(:default_host).and_return("www.example.com")
+      end
+
+      after do
+        remove_jobs_scope_empty_variable_if_present
       end
 
       it "enumerates job clusters" do

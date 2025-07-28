@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {func, number, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import GroupMembershipInput from './GroupMembershipInput'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 GroupModal.propTypes = {
   groupCategory: shape({id: string}),
@@ -90,7 +90,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
       showFlashAlert({
         type: 'error',
         message: I18n.t(
-          'Group membership limit must be equal to or greater than current members count.'
+          'Group membership limit must be equal to or greater than current members count.',
         ),
       })
     } else if (groupMembershipLimit === 1) {
@@ -108,8 +108,8 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     startSendOperation()
       .then(notifyDidSave)
       .catch(err => {
-        console.error(err) // eslint-disable-line no-console
-        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        console.error(err)
+        if (err.response) console.error(err.response)
         setStatus('error')
       })
   }
@@ -142,8 +142,11 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
-        <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
+        <Button data-testid="group-modal-cancel-button" onClick={modalProps.onDismiss}>
+          {I18n.t('Cancel')}
+        </Button>
         <Button
+          data-testid="group-modal-save-button"
           type="submit"
           interaction={saveButtonState}
           color="primary"

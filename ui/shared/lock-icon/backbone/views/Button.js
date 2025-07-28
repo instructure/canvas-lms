@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('LockButton')
+const I18n = createI18nScope('LockButton')
 
 extend(LockButton, Backbone.View)
 
@@ -44,7 +44,7 @@ LockButton.optionProperty('lockedText')
 
 LockButton.optionProperty(
   'unlockedText',
-  LockButton.optionProperty('course_id', LockButton.optionProperty('content_id'))
+  LockButton.optionProperty('course_id', LockButton.optionProperty('content_id')),
 )
 
 LockButton.optionProperty('content_type')
@@ -176,7 +176,7 @@ LockButton.prototype.setLockState = function (locked) {
       return function (_error) {
         return _this.setFocusToElement()
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -204,6 +204,17 @@ LockButton.prototype.reset = function () {
 }
 
 LockButton.prototype.closeTooltip = function () {
+  var now = new Date().getTime()
+  if (!window.closeTooltipDebouncer) {
+    window.closeTooltipDebouncer = now - 200
+  }
+
+  if (window.closeTooltipDebouncer > now - 200) {
+    return
+  }
+
+  window.closeTooltipDebouncer = now
+
   return $('.ui-tooltip').remove()
 }
 

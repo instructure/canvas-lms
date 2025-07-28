@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,15 +18,15 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import {Button, ButtonProps} from '@instructure/ui-buttons'
+import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_posting_policy_tray')
+const I18n = createI18nScope('assignment_posting_policy_tray')
 
 const MANUAL_POST = 'manual'
 const AUTOMATIC_POST = 'auto'
@@ -71,7 +70,7 @@ export default function Layout(props: LayoutProps) {
         <View as="div">
           <Text size="small" as="p">
             {I18n.t(
-              'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:'
+              'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:',
             )}
           </Text>
 
@@ -94,6 +93,7 @@ export default function Layout(props: LayoutProps) {
     </View>
   )
 
+  // @ts-expect-error
   const handlePostPolicyChanged = event => {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }

@@ -1,0 +1,29 @@
+<%
+  # Copyright (C) 2024 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% provide :page_title, t("Log in to Canvas") %>
+
+<%#
+  renders a container <div> with data attributes used by the new login UI
+  uses Rails’s `tag.div` with a `data:` hash to auto-generate `data-*` attributes
+  keys are dasherized, and values are properly escaped for valid HTML output
+  https://api.rubyonrails.org/v7.2/classes/ActionView/Helpers/TagHelper.html#method-i-tag
+%>
+<%= tag.div id: "new_login_data", data: new_login_data_attributes %>
+
+<div id="new_login_safe_to_mount"></div>

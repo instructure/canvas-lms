@@ -64,6 +64,8 @@ module Canvas::LiveEventsCallbacks
       end
     when AccountNotification
       Canvas::LiveEvents.account_notification_created(obj)
+    when Account
+      Canvas::LiveEvents.account_created(obj)
     when User
       Canvas::LiveEvents.user_created(obj)
     when CourseSection
@@ -148,11 +150,17 @@ module Canvas::LiveEventsCallbacks
           Canvas::LiveEvents.attachment_deleted(obj)
         end
       end
+    when Account
+      Canvas::LiveEvents.account_updated(obj)
     when Submission
       if obj.just_submitted?
         Canvas::LiveEvents.submission_created(obj)
       elsif !obj.unsubmitted?
         Canvas::LiveEvents.submission_updated(obj)
+      end
+
+      if changes["custom_grade_status_id"]
+        Canvas::LiveEvents.submission_custom_grade_status(obj, changes["custom_grade_status_id"].first)
       end
     when User
       Canvas::LiveEvents.user_updated(obj)

@@ -251,6 +251,37 @@ describe SectionTabHelper do
             expect(available_section_tabs.to_a.pluck(:id)).to include("context_external_tool_0")
           end
         end
+
+        context "and tabs include TAB_FILES" do
+          let(:available_section_tabs) do
+            SectionTabHelperSpec::AvailableSectionTabs.new(
+              course, @student, domain_root_account, session
+            )
+          end
+
+          before do
+            course_with_student({ course: @course })
+            allow(course).to receive(:tabs_available).and_return(Course.default_tabs)
+          end
+
+          it "includes TAB_FILES if limited access for students is disabled on account" do
+            expect(available_section_tabs.to_a.pluck(:id)).to include(Course::TAB_FILES)
+          end
+
+          it "includes TAB_FILES if limited access for students is enabled on account and context is not a Course" do
+            available_section_tabs = SectionTabHelperSpec::AvailableSectionTabs.new(
+              domain_root_account, account_admin_user, domain_root_account, session
+            )
+            expect(available_section_tabs.to_a.pluck(:id)).to include(Course::TAB_FILES)
+          end
+
+          it "does not include TAB_FILES if limited access for students is enabled on account and context is a Course" do
+            course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+            course.account.settings[:enable_limited_access_for_students] = true
+            course.account.save!
+            expect(available_section_tabs.to_a.pluck(:id)).not_to include(Course::TAB_FILES)
+          end
+        end
       end
     end
   end
@@ -345,6 +376,10 @@ describe SectionTabHelper do
           icon = html.xpath("i")
           expect(icon).to be_empty
         end
+
+        it "has an id with the label" do
+          expect(html.attributes["id"].value).to eq "#{tab_assignments[:label].downcase}-link"
+        end
       end
 
       context "when tab is unused" do
@@ -357,8 +392,8 @@ describe SectionTabHelper do
 
         it "has a tooltip" do
           expect(html.attributes).to include("data-tooltip")
-          expect(html.attributes).to include("title")
-          expect(html.attributes["title"].value).to eq "No content. Not visible to students"
+          expect(html.attributes).to include("data-html-tooltip-title")
+          expect(html.attributes["data-html-tooltip-title"].value).to eq "No content. Not visible to students"
         end
 
         it "includes icon indicating it is not visible to students" do
@@ -377,8 +412,8 @@ describe SectionTabHelper do
 
         it "has a tooltip" do
           expect(html.attributes).to include("data-tooltip")
-          expect(html.attributes).to include("title")
-          expect(html.attributes["title"].value).to eq "Disabled. Not visible to students"
+          expect(html.attributes).to include("data-html-tooltip-title")
+          expect(html.attributes["data-html-tooltip-title"].value).to eq "Disabled. Not visible to students"
         end
 
         it "includes icon indicating it is not visible to students" do

@@ -18,9 +18,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "railties", "~> 7.0"
   spec.add_dependency "rubocop", "~> 1.19"
   spec.add_dependency "rubocop-rails", "~> 2.19"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
 end

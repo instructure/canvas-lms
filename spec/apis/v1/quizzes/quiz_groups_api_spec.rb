@@ -202,7 +202,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     it "is unauthorized for unenrolled users" do
       @user = User.create!(name: "unenrolled user")
       raw_api_call(:get, path, params)
-      assert_status 401
+      assert_forbidden
     end
   end
 end

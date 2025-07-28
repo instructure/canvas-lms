@@ -19,13 +19,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
-export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...props}) => {
+export const IndividualMessageCheckbox = ({checked, checkedAndDisabled, ...props}) => {
   return (
     <Responsive
       match="media"
@@ -33,22 +33,21 @@ export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...pr
       props={{
         mobile: {
           variant: 'toggle',
-          dataTestId: 'individual-message-checkbox-mobile',
+          'data-testid': 'individual-message-checkbox-mobile',
         },
         desktop: {
           variant: 'simple',
-          dataTestId: 'individual-message-checkbox',
+          'data-testid': 'individual-message-checkbox',
         },
       }}
       render={responsiveProps => (
         <Checkbox
-          data-testid={responsiveProps.dataTestId}
+          data-testid={responsiveProps['data-testid']}
           label={I18n.t('Send an individual message to each recipient')}
-          size="small"
           variant={responsiveProps.variant}
           {...props}
-          checked={checked || maxGroupRecipientsMet}
-          disabled={maxGroupRecipientsMet}
+          checked={checked || checkedAndDisabled}
+          disabled={checkedAndDisabled}
         />
       )}
     />
@@ -58,7 +57,7 @@ export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...pr
 IndividualMessageCheckbox.propTypes = {
   onChange: PropTypes.func.isRequired,
   checked: PropTypes.bool,
-  maxGroupRecipientsMet: PropTypes.bool,
+  checkedAndDisabled: PropTypes.bool,
 }
 
 IndividualMessageCheckbox.defaultProps = {

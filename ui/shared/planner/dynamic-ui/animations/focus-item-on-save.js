@@ -17,10 +17,10 @@
  */
 
 import Animation from '../animation'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {alert} from '../../utilities/alertUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class FocusItemOnSave extends Animation {
   fixedElement() {

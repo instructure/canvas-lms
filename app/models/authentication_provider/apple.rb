@@ -24,64 +24,81 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   self.plugin = :apple
   plugin_settings :client_id, client_secret: :client_secret_dec
 
-  SENSITIVE_PARAMS = [:client_secret].freeze
+  class << self
+    def login_message
+      display_name
+    end
 
-  def self.display_name
-    "Sign in with Apple"
-  end
+    def sti_name
+      "apple"
+    end
 
-  def self.login_message
-    display_name
-  end
+    def singleton?
+      true
+    end
 
-  def self.sti_name
-    "apple"
-  end
+    def login_attributes
+      ["sub", "email"].freeze
+    end
 
-  def self.singleton?
-    true
-  end
+    def recognized_params
+      [*(super - open_id_connect_params), :login_attribute, :jit_provisioning].freeze
+    end
 
-  def self.login_attributes
-    ["sub", "email"].freeze
+    def sensitive_params
+      [*super, :client_secret].freeze
+    end
+
+    def recognized_federated_attributes
+      %w[
+        email
+        firstName
+        lastName
+        sub
+      ].freeze
+    end
+
+    def supports_autoconfirmed_email?
+      false
+    end
+
+    # few enough schools use Apple auth, that we can just use the regular cache
+    def jwks_cache
+      Rails.cache
+    end
   end
   validates :login_attribute, inclusion: login_attributes
 
-  def self.recognized_params
-    [*(super - open_id_connect_params), :login_attribute, :jit_provisioning].freeze
+  def issuer
+    "https://appleid.apple.com"
   end
 
-  def self.recognized_federated_attributes
-    %w[
-      email
-      firstName
-      lastName
-      sub
-    ].freeze
-  end
+  Token = Struct.new(:params, :options)
+  private_constant :Token
 
   def get_token(_code, _redirect_uri, params)
-    jwt_string = params["id_token"]
-    debug_set(:id_token, jwt_string) if instance_debugging
-    id_token = JSON::JWT.decode(jwt_string, apple_public_keys)
-    unless id_token[:iss] == "https://appleid.apple.com" &&
-           id_token[:aud] == client_id &&
-           id_token[:sub].present? &&
-           id_token[:exp] > Time.now.to_i
-      Rails.logger.warn("Failed to decode Sign in with Apple id_token: #{jwt_string.inspect}")
-      raise Canvas::Security::InvalidToken
-    end
+    # all we need is given as a parameter in the callback; don't
+    # attempt to actually fetch a token
+    Token.new(params, {})
+  end
 
-    user = JSON.parse(params[:user]) if params[:user]
+  def claims(token)
+    id_token = super
+    user = JSON.parse(token.params[:user]) if token.params[:user]
     id_token.merge!(user["name"].slice("firstName", "lastName")) if user && user["name"]
     id_token
   end
 
-  def claims(token)
-    token
+  def jwks_uri
+    "https://appleid.apple.com/auth/keys"
   end
 
-  protected
+  def persist_to_session(_request, _session, _pseudonym, _domain_root_account, _token)
+    # Apple doesn't support single log out of any kind;
+    # don't waste space in the session supporting it
+  end
+
+  private
 
   def authorize_url
     "https://appleid.apple.com/auth/authorize"
@@ -99,10 +116,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     result.join(" ")
   end
 
-  # fetch from https://appleid.apple.com/auth/keys
-  def apple_public_keys
-    keys_json = Setting.get("apple_public_key", nil).presence ||
-                CanvasHttp.get("https://appleid.apple.com/auth/keys").body
-    JSON::JWK::Set.new(JSON.parse(keys_json))
+  def download_jwks(...)
+    # cache against the default shard
+    Shard.default.activate do
+      super
+    end
   end
 end

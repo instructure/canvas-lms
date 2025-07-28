@@ -27,11 +27,8 @@ module CanvasCache
     module ClassMethods
       ActiveSupport::Cache::RedisCacheStore.singleton_class.prepend(self)
 
-      # Rails.version < "7.1"
-      unless ActiveSupport.version < Gem::Version.new("7.1")
-        def retrieve_pool_options(_options)
-          false
-        end
+      def retrieve_pool_options(_options)
+        false
       end
 
       def build_redis(**redis_options)

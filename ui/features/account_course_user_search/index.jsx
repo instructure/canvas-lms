@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import App from './react/index'
 import router from './react/router'
 import configureStore from './react/store/configureStore'
@@ -26,49 +26,59 @@ import initialState from './react/store/initialState'
 import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
-// eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
-initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]
-
-// Note. Only the UsersPane/Tab is using a redux store. The courses tab is
-// still using the old store model. That is why this might seem kind of weird.
-const store = configureStore(initialState)
-
-const props = {
-  permissions: ENV.PERMISSIONS,
-  rootAccountId: ENV.ROOT_ACCOUNT_ID.toString(),
-  accountId: ENV.ACCOUNT_ID.toString(),
-  roles: Array.prototype.slice.call(ENV.COURSE_ROLES),
-  addUserUrls: ENV.URLS,
-  store,
-}
-
-// this is where we take care of the 3 things we need to do outside of the
-// happy React/redux  declarative/vDOM blessed path. It's so when we click
-// either the "Courses" or "People" tabs on the left, it highlights the right
-// tab and updates the crumb and document title
-const originalDocumentTitle = document.title
-function updateDocumentTitleBreadcrumbAndActiveTab(activeTab) {
-  // give the correct left nav item an active class
-  $('#section-tabs .section a').each(function () {
-    const $tab = $(this)
-    $tab[$tab.hasClass(activeTab.button_class) ? 'addClass' : 'removeClass']('active')
-  })
-
-  // update the page title
-  document.title = `${activeTab.title}: ${originalDocumentTitle}`
-
-  // toggle the breadcrumb between "Corses" and "People"
-  $('#breadcrumbs a:last span').text(activeTab.title)
-}
 ready(() => {
-  initializeTopNavPortal(document.getElementById('react-instui-topnav'))
+  // eg: '/accounts/xxx' for anything like '/accounts/xxx/whatever`
+  initialState.tabList.basePath = window.location.pathname.match(/.*accounts\/[^/]*/)[0]
+
+  // Note. Only the UsersPane/Tab is using a redux store. The courses tab is
+  // still using the old store model. That is why this might seem kind of weird.
+  const store = configureStore(initialState)
+
+  const props = {
+    permissions: ENV.PERMISSIONS,
+    rootAccountId: ENV.ROOT_ACCOUNT_ID.toString(),
+    accountId: ENV.ACCOUNT_ID.toString(),
+    roles: Array.prototype.slice.call(ENV.COURSE_ROLES),
+    addUserUrls: ENV.URLS,
+    store,
+  }
+
+  // this is where we take care of the 3 things we need to do outside of the
+  // happy React/redux  declarative/vDOM blessed path. It's so when we click
+  // either the "Courses" or "People" tabs on the left, it highlights the right
+  // tab and updates the crumb and document title
+  const originalDocumentTitle = document.title
+  function updateDocumentTitleBreadcrumbAndActiveTab(activeTab, setCrumb) {
+    // give the correct left nav item an active class
+    $('#section-tabs .section a').each(function () {
+      const $tab = $(this)
+      $tab[$tab.hasClass(activeTab.button_class) ? 'addClass' : 'removeClass']('active')
+    })
+
+    // update the page title
+    document.title = `${activeTab.title}: ${originalDocumentTitle}`
+
+    // toggle the breadcrumb between "Corses" and "People"
+    $('#breadcrumbs a:last span').text(activeTab.title)
+    setCrumb()({name: activeTab.title, href: activeTab.href})
+  }
+
+  let setBreadCrumb = () => {}
+  const setFunction = f => {
+    setBreadCrumb = f?.setCrumbs || (() => {})
+  }
+
+  initializeTopNavPortal({getBreadCrumbSetter: setFunction})
+
   const content = document.getElementById('content')
+  const root = createRoot(content)
+
   store.subscribe(() => {
     const tabState = store.getState().tabList
     const selectedTab = tabState.tabs[tabState.selected]
-    updateDocumentTitleBreadcrumbAndActiveTab(selectedTab)
+    updateDocumentTitleBreadcrumbAndActiveTab(selectedTab, () => setBreadCrumb)
 
-    ReactDOM.render(<App {...props} />, content)
+    root.render(<App {...props} />)
   })
 
   router.start(store)

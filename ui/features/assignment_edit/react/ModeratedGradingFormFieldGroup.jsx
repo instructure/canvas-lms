@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FinalGraderSelectMenu from './FinalGraderSelectMenu'
 import GraderCommentVisibilityCheckbox from './GraderCommentVisibilityCheckbox'
 import GraderCountNumberInput from './GraderCountNumberInput'
@@ -26,7 +26,7 @@ import GraderNamesVisibleToFinalGraderCheckbox from './GraderNamesVisibleToFinal
 import ModeratedGradingCheckbox from './ModeratedGradingCheckbox'
 import {direction} from '@canvas/i18n/rtlHelper'
 
-const I18n = useI18nScope('ModeratedGradingFormFieldGroup')
+const I18n = createI18nScope('ModeratedGradingFormFieldGroup')
 
 export default class ModeratedGradingFormFieldGroup extends React.Component {
   static propTypes = {
@@ -44,6 +44,8 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     moderatedGradingEnabled: bool.isRequired,
     onGraderCommentsVisibleToGradersChange: func.isRequired,
     onModeratedGradingChange: func.isRequired,
+    hideNumberInputErrors: func,
+    hideFinalGraderErrors: func,
   }
 
   static defaultProps = {
@@ -88,6 +90,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
                   currentGraderCount={this.props.currentGraderCount}
                   availableGradersCount={this.props.availableGradersCount}
                   locale={this.props.locale}
+                  hideErrors={this.props.hideNumberInputErrors}
                 />
 
                 <GraderCommentVisibilityCheckbox
@@ -98,6 +101,7 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
                 <FinalGraderSelectMenu
                   availableModerators={this.props.availableModerators}
                   finalGraderID={this.props.finalGraderID}
+                  hideErrors={this.props.hideFinalGraderErrors}
                 />
 
                 <GraderNamesVisibleToFinalGraderCheckbox

@@ -19,17 +19,8 @@
 #
 
 describe OutcomeProficiency do
-  describe "associations" do
-    it { is_expected.to have_many(:outcome_proficiency_ratings).dependent(:destroy).order("points DESC, id ASC").inverse_of(:outcome_proficiency) }
-    it { is_expected.to belong_to(:context).required }
-  end
-
   describe "validations" do
     subject { outcome_proficiency_model(account_model) }
-
-    it { is_expected.to validate_presence_of :outcome_proficiency_ratings }
-    it { is_expected.to validate_presence_of :context }
-    it { is_expected.to validate_uniqueness_of(:context_id).scoped_to(:context_type) }
 
     describe "strictly descending points" do
       it "valid proficiency" do

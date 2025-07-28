@@ -20,12 +20,13 @@ module Api::V1::SearchResult
   include Api::V1::Json
   include HtmlTextHelper
 
-  def search_results_json(objects)
-    objects.map { |object| search_result_json(object) }
+  def search_results_json(objects, user, includes)
+    objects.map { |object| search_result_json(object, user, includes) }
   end
 
-  def search_result_json(object)
+  def search_result_json(object, user, includes)
     hash = {}
+
     hash["content_id"] = object.id
     hash["content_type"] = object.class.name
     hash["readable_type"] = Context.translated_content_type(object.class.name)
@@ -34,6 +35,28 @@ module Api::V1::SearchResult
     hash["html_url"] = polymorphic_url([object.context, object])
     hash["distance"] = object.try(:distance)
     hash["relevance"] = SmartSearch.result_relevance(object)
+    hash = include_modules_json(object, hash) if includes.include?("modules")
+    hash = include_status_json(object, user, hash) if includes.include?("status")
+    hash
+  end
+
+  def include_modules_json(object, hash)
+    module_sequence = context_module_sequence_items_by_asset_id(object.id.to_s, object.class.name)
+    hash["modules"] = module_sequence[:modules]
+    hash
+  end
+
+  def include_status_json(object, user, hash)
+    due_date = if object.is_a?(DifferentiableAssignment)
+                 assignment = object.differentiable
+                 overridden_assignment = assignment&.overridden_for(user)
+                 # announcements and wikpages are differentiable w/ no due date
+                 if overridden_assignment.respond_to?(:due_at)
+                   overridden_assignment.due_at
+                 end
+               end
+    hash["published"] = object.published?
+    hash["due_date"] = due_date
     hash
   end
 end

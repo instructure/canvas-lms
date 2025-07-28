@@ -51,7 +51,6 @@ describe "submissions" do
     end
 
     it "is able to create a new student group category from the assignment edit page", priority: "1" do
-      skip "FOO-3799 (10/7/2023)"
       original_number_of_assignment = Assignment.count
       original_number_of_group = Group.count
       create_assignment_preparation
@@ -64,6 +63,7 @@ describe "submissions" do
       f(%(button[data-testid="group-set-save"])).click
       run_jobs
       wait_for_ajaximations
+      wait_for_dialog_close
       submit_assignment_form
       validate_edit_and_publish_links_exist
       expect(Assignment.count).to be(original_number_of_assignment + 1)

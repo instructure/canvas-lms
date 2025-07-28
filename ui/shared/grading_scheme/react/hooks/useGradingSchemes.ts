@@ -27,26 +27,25 @@ export const useGradingSchemes = (): {
   loadGradingSchemes: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    includeArchived?: boolean
+    includeArchived?: boolean,
   ) => Promise<GradingScheme[]>
   loadGradingSchemesStatus: string
 } => {
   const [loadGradingSchemesStatus, setLoadGradingSchemesStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const loadGradingSchemes = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      includeArchived = false
+      includeArchived = false,
     ): Promise<GradingScheme[]> => {
       setLoadGradingSchemesStatus(ApiCallStatus.NOT_STARTED)
       const contextPath = buildContextPath(contextType, contextId)
       try {
         setLoadGradingSchemesStatus(ApiCallStatus.PENDING)
 
-        // @ts-expect-error
         const result = await doFetchApi<GradingScheme[]>({
           path: `${contextPath}/grading_schemes?include_archived=${includeArchived}`,
           method: 'GET',
@@ -62,7 +61,7 @@ export const useGradingSchemes = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

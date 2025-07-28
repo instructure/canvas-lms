@@ -136,18 +136,49 @@ class GroupMembershipsController < ApplicationController
   # @subtopic Group Memberships
   #
   # Join, or request to join, a group, depending on the join_level of the
-  # group.  If the membership or join request already exists, then it is simply
-  # returned
+  # group. If the membership or join request already exists, then it is simply
+  # returned.
   #
-  # @argument user_id [String]
+  # For differentiation tags, you can bulk add users using one of two methods:
   #
-  # @example_request
+  # 1. Provide an array of user IDs via the `members[]` parameter.
+  #
+  # 2. Use the course-wide option with the following parameters:
+  #    - `all_in_group_course` [Boolean]: If set to true, the endpoint will add
+  #      every currently enrolled student (from the course context) to the
+  #      differentiation tag.
+  #    - `exclude_user_ids[]` [Integer]: When using `all_in_group_course`, you can
+  #      optionally exclude specific users by providing their IDs in this parameter.
+  #
+  # In this context, these parameters only apply to differentiation tag memberships.
+  #
+  # @argument user_id [String] - The ID of the user for individual membership creation.
+  # @argument members[] [Integer] - Bulk add multiple users to a differentiation tag.
+  # @argument all_in_group_course [Boolean] - If true, add all enrolled students from the course.
+  # @argument exclude_user_ids[] [Integer] - An array of user IDs to exclude when using all_in_group_course.
+  #
+  # @example_request (Individual membership creation)
   #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
-  #          -F 'user_id=self'
+  #          -F 'user_id=self' \
   #          -H 'Authorization: Bearer <token>'
   #
-  # @returns GroupMembership
+  # @example_request (Bulk addition using members array)
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
+  #          -F 'members[]=123' \
+  #          -F 'members[]=456' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request (Bulk addition using all_in_group_course with exclusions)
+  #     curl https://<canvas>/api/v1/groups/<group_id>/memberships \
+  #          -F 'all_in_group_course=true' \
+  #          -F 'exclude_user_ids[]=123' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns GroupMembership or a JSON response detailing partial failures
+  #          if some memberships could not be created.
   def create
+    return create_differentiation_tag_membership if params[:members] || params[:all_in_group_course]
+
     @user = api_find(User, params[:user_id])
     if authorized_action(GroupMembership.new(group: @group, user: @user), @current_user, :create)
       SubmissionLifecycleManager.with_executing_user(@current_user) do
@@ -157,6 +188,54 @@ class GroupMembershipsController < ApplicationController
           render json: group_membership_json(@membership, @current_user, session, include: ["just_created"])
         else
           render json: @membership.errors, status: :bad_request
+        end
+      end
+    end
+  end
+
+  def create_differentiation_tag_membership
+    differentiation_tag_context = @group.context
+
+    return head :bad_request if differentiation_tag_context.is_a?(Account)
+    return head :bad_request unless @group.non_collaborative?
+
+    # Determine the user IDs to process based on the provided parameters.
+    user_ids = if params[:all_in_group_course].present? && value_to_boolean(params[:all_in_group_course])
+                 ids = differentiation_tag_context.student_enrollments.pluck(:user_id)
+                 if params[:exclude_user_ids].present?
+                   ids -= Array(params[:exclude_user_ids]).map(&:to_i)
+                 end
+                 ids
+               else
+                 Array(params[:members]).map(&:to_i)
+               end
+
+    return head :bad_request if user_ids.blank?
+
+    if authorized_action(GroupMembership.new(group: @group, user: @current_user), @current_user, :create)
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
+        active_user_ids = differentiation_tag_context.all_current_enrollments.where(user_id: user_ids).pluck(:user_id)
+        invalid_user_ids = user_ids - active_user_ids
+
+        memberships = @group.bulk_add_users_to_differentiation_tag(active_user_ids)
+        membership_errors = memberships.select { |m| m.errors.any? }
+
+        # Recompute submissions for the added users
+        # - Typically this is handled by update_cached_due_dates callback in group_membership.rb, but since we are
+        #   bulk creating memberships, it will bypass callbacks.
+        added_user_ids = (memberships - membership_errors).map(&:user_id)
+        assignments = AssignmentOverride.active.where(set_type: "Group", set_id: @group.id).pluck(:assignment_id)
+        SubmissionLifecycleManager.recompute_users_for_course(added_user_ids, @group.context_id, assignments) if assignments.any?
+
+        if membership_errors.any? || invalid_user_ids.any?
+          render json: {
+                   message: "Partial failure encountered",
+                   invalid_user_ids:,
+                   membership_errors: membership_errors.map(&:errors)
+                 },
+                 status: :ok
+        else
+          head :ok
         end
       end
     end

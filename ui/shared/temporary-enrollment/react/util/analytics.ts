@@ -47,7 +47,7 @@ export type AnalyticProps = {
  */
 export const createAnalyticPropsGenerator = (
   prefix: string = '',
-  delimiter: string = ''
+  delimiter: string = '',
 ): ((uniqueKey: string) => AnalyticProps) => {
   // return generator function that takes uniqueKey and generates AnalyticProps
   return (uniqueKey: string): AnalyticProps => {

@@ -34,7 +34,7 @@ describe Autoextend do
 
       # not found via autoloading? maybe it's a migration
       unless extension.used
-        ActiveRecord::Base.connection.migration_context.migrations.map(&:disable_ddl_transaction)
+        ActiveRecord::Base.migration_context.migrations.map(&:disable_ddl_transaction)
       end
 
       extension_name = if extension.module.is_a?(Module)

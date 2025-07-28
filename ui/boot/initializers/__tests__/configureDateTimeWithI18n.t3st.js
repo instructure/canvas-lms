@@ -32,7 +32,9 @@ import '../../../ext/custom_moment_locales/de'
 import '../../../ext/custom_moment_locales/he'
 import '../../../ext/custom_moment_locales/pl'
 import '../../../ext/custom_moment_locales/fa'
+ 
 import '../../../ext/custom_moment_locales/fr'
+ 
 import '../../../ext/custom_moment_locales/fr_ca'
 import '../../../ext/custom_moment_locales/ht_ht'
 import '../../../ext/custom_moment_locales/mi_nz'
@@ -40,11 +42,11 @@ import '../../../ext/custom_moment_locales/hy_am'
 import '../../../ext/custom_moment_locales/sl'
 
 import {parse, format, hasMeridiem, dateString} from '@instructure/moment-utils'
-import * as configureDateTime from '../configureDateTime'
-import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
+import * as configureDateTime from '@canvas/datetime/configureDateTime'
+import * as configureDateTimeMomentParser from '@canvas/datetime/configureDateTimeMomentParser'
 // eslint-disable-next-line import/no-nodejs-modules
 import fs from 'fs'
-import I18n, {useTranslations} from '@canvas/i18n'
+import I18n, {registerTranslations} from '@canvas/i18n'
 // eslint-disable-next-line import/no-nodejs-modules
 import path from 'path'
 import YAML from 'yaml'
@@ -91,7 +93,7 @@ const tzLocales = [
   uk_UA,
 ]
 
-useTranslations(CoreTranslations)
+registerTranslations(CoreTranslations)
 
 const locales = loadAvailableLocales()
 const tzLocaleData = tzLocales.reduce((acc, locale) => {
@@ -102,7 +104,6 @@ const tzLocaleData = tzLocales.reduce((acc, locale) => {
 const dates = createDateSamples()
 
 for (const locale of locales) {
-  // eslint-disable-next-line jest/valid-describe
   describe(locale.key, () => {
     beforeAll(() => {
       I18n.locale = locale.key

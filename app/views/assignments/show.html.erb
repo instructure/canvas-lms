@@ -66,12 +66,13 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
+        <span id="overlay-loading-spinner"></span>
         <button
           id="assignment_publish_button"
           data-id='<%= @assignment.id %>'
-          class='btn <%= "published" if @assignment.published? %> <%= "disabled" unless assignment_publishing_enabled?(@assignment, @current_user) %>'>
+          class='btn <%= "published" if @assignment.published? %> <%= "disabled" if @context.horizon_course? || !assignment_publishing_enabled?(@assignment, @current_user) %>'
         </button>
-        <% if @assignment.grants_right?(@current_user, :manage_assign_to) && Account.site_admin.feature_enabled?(:differentiated_modules) %>
+        <% if @assignment.grants_right?(@current_user, :manage_assign_to) %>
           <button
             class='btn assign-to-link'
             data-assignment-name="<%= @assignment.title %>"
@@ -82,7 +83,7 @@
             <i class='icon-permissions'></i> <%= t('Assign To') %>
           </button>
         <% end %>
-        <% if @context.grants_any_right?(@current_user, :manage_assignments, :manage_assignments_edit) %>
+        <% if @context.grants_right?(@current_user, :manage_assignments_edit) %>
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
             <% unless can_do(@assignment, @current_user, :update) %>
@@ -146,6 +147,9 @@
         <%= assignment_submission_button(@assignment, @current_user, @current_user_submission, @first_annotation_submission) %>
       </div>
     </div>
+    <% if @domain_root_account&.feature_enabled?(:lti_asset_processor) %>
+      <div id="assignment_asset_processor_eula"></div>
+    <% end %>
     <%= render "student_assignment_overview" %>
   <% end %>
 
@@ -157,7 +161,11 @@
 
   <div class="clear"></div>
 
-  <% description = @assignment.description.present? ? public_user_content(@assignment.description) : t("No additional details were added for this assignment.") %>
+  <% if @current_user_submission&.has_submission? && @domain_root_account&.feature_enabled?(:lti_before_assignment_results) %>
+  <div id="assignment_external_tools"></div>
+  <% end %>
+
+  <% description = @assignment.description.present? ? user_content(@assignment.description, location: (@assignment.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) : t("No additional details were added for this assignment.") %>
 
   <% if @assignment.annotated_document? %>
     <div class="accessibility_warning">
@@ -223,7 +231,7 @@
       </fieldset>
     </form>
 
-    <% if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? && @assignment.context_module_tags.length > 0 %>
+    <% if @context.enable_course_paces? && @assignment.context_module_tags.size > 0 %>
       <div id="course_paces_due_date_notice"></div>
     <% else %>
       <table class="ic-Table assignment_dates">
@@ -242,17 +250,21 @@
       </table>
     <% end %>
 
-    <% if can_do(@assignment, @current_user, :update) %>
-      <div class="content-box">
-        <a
-          href="<%= context_url(@context, :context_rubrics_url) %>"
-          class="add_rubric_link Button icon-plus"
-          style="<%= hidden if @assignment.active_rubric_association? %>"
-        >
-          <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
-          <span class="screenreader-only"><%= t('Add Rubric') %></span>
-        </a>
-      </div>
+    <% if can_do(@assignment, @current_user, :update) && !@context.horizon_course? %>
+      <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+        <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+      <% else %>
+        <div class="content-box">
+          <a
+            href="<%= context_url(@context, :context_rubrics_url) %>"
+            class="add_rubric_link Button icon-plus"
+            style="<%= hidden if @assignment.active_rubric_association? %>"
+          >
+            <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
+            <span class="screenreader-only"><%= t('Add Rubric') %></span>
+          </a>
+        </div>
+      <% end %>
     <% end %>
 
     <div class="course_id" style="display: none;"><%= @context.id if @context && @context.is_a?(Course) %></div>
@@ -272,4 +284,14 @@
   <%= render :partial => "submit_assignment", locals: { eula_url: eula_url }%>
 <% end %>
 
-<%= render partial: "shared/rubrics_component" %>
+<!--Show partial rubrics ERB if enhanced_rubrics_assignments is not enabled or in Student View-->
+<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) || !can_do(@context, @current_user, :read_as_admin) %>
+  <%= render partial: "shared/rubrics_component" %>
+  <% if Rubric.rubric_self_assessment_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
+<% end %>
+
+<% if Rubric.enhanced_rubrics_assignments_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
+  <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>
+<% end %>

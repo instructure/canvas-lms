@@ -28,7 +28,7 @@ describe "annotation_notification" do
   let(:path_type) { :email }
   let(:data) { { data: { author_name: "User 1" } } }
 
-  context ".email" do
+  describe ".email" do
     context "base case" do
       before :once do
         assignment_model

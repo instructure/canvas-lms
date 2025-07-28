@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -18,46 +19,27 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import {RequestDispatch} from '@canvas/network'
+import {render, screen} from '@testing-library/react'
 import GradebookData from '../GradebookData'
-import Gradebook from '../Gradebook'
-import PerformanceControls from '../PerformanceControls'
-import {defaultGradebookProps} from './GradebookSpecHelper'
+import {defaultGradebookEnv, defaultGradebookProps} from './GradebookSpecHelper'
 
 const defaultProps = {
   ...defaultGradebookProps,
   gradebookEnv: {
-    context_id: '1',
-    enhanced_gradebook_filters: false,
-    course_settings: {
-      allow_final_grade_override: true,
-    },
-    settings: {
-      filter_rows_by: {
-        section_id: null,
-        student_group_id: null,
-      },
-      filter_columns_by: {
-        assignment_group_id: null,
-        context_module_id: null,
-        grading_period_id: null,
-      },
-    },
+    ...defaultGradebookEnv,
   },
   performance_controls: {
     students_chunk_size: 2, // students per page
   },
 }
 
+window.ENV.SETTINGS = {}
+
 describe('GradebookData', () => {
   it('renders', () => {
-    const wrapper = shallow(<GradebookData {...defaultProps} />)
-    expect(wrapper.find(Gradebook).exists()).toBeTruthy()
-    expect(wrapper.prop('isFiltersLoading')).toStrictEqual(false)
-    expect(wrapper.prop('isModulesLoading')).toStrictEqual(false)
-    expect(wrapper.prop('modules')).toStrictEqual([])
-    expect(wrapper.prop('dispatch')).toBeInstanceOf(RequestDispatch)
-    expect(wrapper.prop('performanceControls')).toBeInstanceOf(PerformanceControls)
+    render(<GradebookData {...defaultProps} />)
+    expect(screen.getByTitle(/Loading Gradebook/i)).toBeInTheDocument()
+    expect(screen.getByText(/Student Names/i)).toBeInTheDocument()
+    expect(screen.getByText(/Assignment Names/i)).toBeInTheDocument()
   })
 })

@@ -34,11 +34,7 @@
             <%= t 'links.add_another_file', "Add Another File" %>
           </button>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none; margin-bottom: 1em;">
-            <% if @assignment.allowed_extensions.blank? || @assignment.allowed_extensions.include?("png") %>
-              <div class="attachment_wrapper" style="display: inline-block;"></div>
-            <% else %>
-              <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
-            <% end %>
+          <div class="attachment_wrapper" style="display: inline-block;"></div>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
@@ -50,32 +46,33 @@
       </tr>
       <% unless @current_user.attachments.active.empty? %>
       <tr>
-        <td></td>
         <td style="font-size: 0.8em;">
           <button class="Button Button--link toggle_uploaded_files_link"><%= t 'links.find_file', "Click here to find a file you've already uploaded" %></button><br/>
           <div id="uploaded_files" style="display: none;" />
         </td>
       </tr>
       <% end %>
-      <tr>
-        <td colspan="2">
-          <div class="textarea-emoji-container">
-            <div class="textarea-container">
-              <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-              <span class="emoji-picker-container" style="display: none;"></span>
+      <% unless @context.account.grants_right?(@current_user, :make_submission_comments) %>
+        <tr>
+          <td colspan="2">
+            <div class="textarea-emoji-container">
+              <div class="textarea-container">
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+                <span class="emoji-picker-container" style="display: none;"></span>
+              </div>
+              <div class="emoji-quick-picker-container" style="display: none;"></div>
             </div>
-            <div class="emoji-quick-picker-container" style="display: none;"></div>
-          </div>
-        </td>
-      </tr>
-      <%= render :partial => "group_comment" %>
+          </td>
+        </tr>
+        <%= render :partial => "group_comment" %>
+      <% end %>
       <% if @assignment.turnitin_enabled? %>
         <%= render :partial => "turnitin" %>
       <% end %>
       <% if @assignment.vericite_enabled? %>
         <%= render :partial => "vericite" %>
       <% end %>
-      <%= render partial: 'assignments/eula_checkbox', locals: { eula_url: eula_url } %>
+      <%= render partial: 'assignments/eula_checkbox', locals: { eula_url: eula_url, type: 'online_upload' } %>
       <tr>
         <td colspan="2" class='button-container'>
           <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>

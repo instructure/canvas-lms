@@ -139,12 +139,21 @@ describe OAuth2ProviderController do
       end
 
       context "if the user has no token" do
-        it "redirects to the confirm url if the user has no token" do
+        it "redirects to the confirm url" do
           get :auth,
               params: { client_id: key.id,
                         redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                         response_type: "code" }
           expect(response).to redirect_to(oauth2_auth_confirm_url)
+        end
+
+        it "redirects to login_url with ?force_login=1 if prompt is login" do
+          get :auth,
+              params: { client_id: key.id,
+                        redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                        response_type: "code",
+                        prompt: "login" }
+          expect(response).to redirect_to(login_url(force_login: true))
         end
 
         it "shows a confirm page that allows being embedded (as an iframe) by trusted tools" do
@@ -168,6 +177,15 @@ describe OAuth2ProviderController do
                       response_type: "code",
                       force_login: 1 }
         expect(response).to redirect_to(login_url(force_login: 1))
+      end
+
+      it "redirects to login_url with ?force_login=1 if prompt is login" do
+        get :auth,
+            params: { client_id: key.id,
+                      redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                      response_type: "code",
+                      prompt: "login" }
+        expect(response).to redirect_to(login_url(force_login: true))
       end
 
       it "redirects to login_url when oauth2 session is nil" do
@@ -505,7 +523,7 @@ describe OAuth2ProviderController do
       it_behaves_like "common oauth2 token checks" do
         let(:success_params) { { code: valid_code } }
         let(:success_setup) do
-          expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once)
+          expect(redis).to receive(:del).with(valid_code_redis_key).at_least(:once) # rubocop:disable RSpec/ExpectInLet
         end
         let(:success_token_keys) { %w[access_token refresh_token user expires_in token_type canvas_region] }
       end
@@ -552,6 +570,111 @@ describe OAuth2ProviderController do
       end
     end
 
+    context "authorization code with verifier" do
+      subject(:token_request) { post :token, params: }
+
+      let(:grant_type) { "authorization_code" }
+      let(:valid_code) { "thecode" }
+
+      let(:code_verifier) { SecureRandom.uuid }
+      let(:code_challenge) { Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier), padding: false) }
+
+      let(:valid_code_redis_key) { "#{Canvas::OAuth::Token::REDIS_PREFIX}#{valid_code}" }
+      let(:code_challenge_key) { "#{Canvas::OAuth::PKCE::KEY_PREFIX}#{valid_code}" }
+
+      let(:redis) do
+        redis = double("Redis")
+
+        allow(redis).to receive(:get)
+
+        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
+        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
+
+        allow(redis).to receive(:get).with(code_challenge_key).and_return(code_challenge)
+        allow(redis).to receive(:del).with(code_challenge_key)
+
+        redis
+      end
+
+      let(:params) do
+        {
+          client_id:,
+          code: valid_code,
+          code_verifier:,
+          redirect_uri: key.redirect_uri,
+          grant_type: "authorization_code"
+        }
+      end
+
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
+        allow(Canvas).to receive_messages(redis:)
+        key.update!(redirect_uri: "https://example.com", client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
+      end
+
+      context "when the request is valid" do
+        it { is_expected.to be_successful }
+
+        it "returns a token" do
+          token_request
+          expect(json_parse.keys).to match_array %w[
+            access_token
+            refresh_token
+            user
+            expires_in
+            token_type
+            canvas_region
+          ]
+        end
+
+        it "deletes the code challenge from Redis" do
+          expect(redis).to receive(:del).with(code_challenge_key)
+          token_request
+        end
+
+        it "sets an permanent expiration on the token" do
+          token_request
+          token = AccessToken.authenticate(json_parse["access_token"])
+
+          expect(token.permanent_expires_at).to be_within(2.minutes).of(2.hours.from_now)
+        end
+      end
+
+      context "when the included code verifier does not verify the code" do
+        let(:params) { super().merge(code_verifier: "invalid") }
+
+        it { is_expected.to be_bad_request }
+
+        it "includes the proper error in the response" do
+          token_request
+          expect(json_parse["error"]).to eq "invalid_grant"
+        end
+      end
+
+      context "when the client is confidential" do
+        before { key.update!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }
+
+        it { is_expected.to be_unauthorized }
+
+        it "includes the proper error in the response" do
+          token_request
+          expect(json_parse["error"]).to eq "invalid_client"
+        end
+      end
+
+      context "when no code challenge is found in Redis" do
+        before { allow(redis).to receive(:get).with(code_challenge_key).and_return(nil) }
+
+        it { is_expected.to be_bad_request }
+
+        it "includes the proper error in the response" do
+          token_request
+          expect(json_parse["error"]).to eq "invalid_grant"
+        end
+      end
+    end
+
     context "grant_type refresh_token" do
       let(:grant_type) { "refresh_token" }
       let(:refresh_token) { old_token.plaintext_refresh_token }
@@ -572,6 +695,11 @@ describe OAuth2ProviderController do
         expect(json["access_token"]).to_not eq old_token.full_token
       end
 
+      it "does not rotate the refresh token" do
+        post :token, params: base_params.merge(refresh_token:)
+        expect(json_parse["refresh_token"]).to be_blank
+      end
+
       it "errors with a mismatched client id and refresh_token" do
         post :token, params: base_params.merge(client_id: other_key.id, client_secret: other_key.api_key, refresh_token:)
         assert_status(400)
@@ -590,6 +718,71 @@ describe OAuth2ProviderController do
         json = response.parsed_body
         expect(json["access_token"]).to_not eq access_token
       end
+
+      context "with public clients" do
+        subject(:refresh_token_request) { post :token, params: }
+
+        let(:refresh_token) { old_token.plaintext_refresh_token }
+
+        let(:params) do
+          {
+            grant_type: "refresh_token",
+            client_id:,
+            refresh_token:
+          }
+        end
+
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:pkce).and_return(true)
+          key.update!(client_type: DeveloperKey::PUBLIC_CLIENT_TYPE)
+        end
+
+        context "with a valid parameters" do
+          it { is_expected.to be_successful }
+
+          it "returns a token" do
+            refresh_token_request
+            expect(json_parse.keys).to match_array %w[
+              access_token
+              user
+              expires_in
+              token_type
+              canvas_region
+              refresh_token
+            ]
+          end
+
+          it "rotates the refresh token" do
+            refresh_token_request
+            expect(json_parse["refresh_token"]).to_not eq old_token.plaintext_refresh_token
+          end
+
+          it "extends the permanent expiration on the token" do
+            old_token.set_permanent_expiration
+            old_token.save!
+
+            old_perm_expires_at = old_token.permanent_expires_at
+
+            refresh_token_request
+            token = AccessToken.authenticate(json_parse["access_token"])
+
+            expect(token.permanent_expires_at).to be_within(2.minutes).of(2.hours.from_now)
+            expect(token.permanent_expires_at).to be > old_perm_expires_at
+          end
+        end
+
+        context "when the client is confidential" do
+          before { key.update!(client_type: DeveloperKey::CONFIDENTIAL_CLIENT_TYPE) }
+
+          it { is_expected.to be_unauthorized }
+
+          it "includes the proper error in the response" do
+            refresh_token_request
+            expect(json_parse["error"]).to eq "invalid_client"
+          end
+        end
+      end
     end
 
     context "with client_credentials grant type and service key" do
@@ -599,8 +792,7 @@ describe OAuth2ProviderController do
       let(:service_user) { user_model }
 
       before do
-        Account.site_admin.enable_feature!(:site_admin_service_auth)
-        key.update!(service_user:, internal_service: true)
+        key.update!(service_user:, authorized_flows: ["service_user_client_credentials"])
       end
 
       context "with valid parameters" do
@@ -634,7 +826,7 @@ describe OAuth2ProviderController do
         it { is_expected.to be_bad_request }
       end
 
-      context "whent the service user is not active" do
+      context "when the service user is not active" do
         before do
           service_user.destroy!
           post :token, params: base_params
@@ -785,7 +977,20 @@ describe OAuth2ProviderController do
             other_key.save!
           end
 
-          it { is_expected.to have_http_status :bad_request }
+          it { expect(subject).to have_http_status :bad_request }
+        end
+
+        context "with public key url setting and invalid kid in the header" do
+          before do
+            allow(CanvasHttp).to receive(:get).and_return(double(body: '{"keys": []}'))
+            key.public_jwk_url = "http://localhost"
+            key.save!
+          end
+
+          it do
+            expect(subject).to have_http_status :bad_request
+            expect(response.body).to match(/KidNotFound/)
+          end
         end
 
         context "with missing assertion" do
@@ -842,27 +1047,71 @@ describe OAuth2ProviderController do
   describe "POST accept" do
     let_once(:user) { User.create! }
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
-    let(:oauth_accept) { post :accept, session: session_hash }
+    let(:custom_csrf_token) { "123" }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI, custom_csrf_token: } } }
+    let(:oauth_accept) { post :accept, params: { custom_csrf_token: }, session: session_hash }
 
     before { user_session user }
 
+    it "skips standard CSRF protection" do
+      allow(controller).to receive(:action_name).and_return("accept")
+      expect(controller.send(:skip_csrf?)).to be true
+    end
+
+    it "with wrong custom CSRF token" do
+      post :accept, session: session_hash, params: { custom_csrf_token: "456" }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    context "with custom_csrf_token FF off" do
+      before do
+        Account.site_admin.disable_feature! :csrf_oauth2_fix
+      end
+
+      it "does NOT skip standard CSRF protection if :csrf_oauth2_fix is off" do
+        allow(controller).to receive(:action_name).and_return("accept")
+        expect(controller.send(:skip_csrf?)).to be false
+      end
+
+      it "and custom_csrf_token is empty" do
+        post :accept, session: session_hash
+        expect(response).to have_http_status(:redirect)
+      end
+    end
+
     it "uses the global id of the user for generating the code" do
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: nil, remember_access: nil, purpose: nil }).and_return("code")
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
+        user.global_id,
+        user.global_id,
+        key.id,
+        { code_challenge: nil, code_challenge_method: nil, purpose: nil, remember_access: nil, scopes: nil }
+      ).and_return("code")
       oauth_accept
+
       expect(response).to redirect_to(oauth2_auth_url(code: "code"))
     end
 
     it "saves the requested scopes with the code" do
       scopes = "userinfo"
       session_hash[:oauth2][:scopes] = scopes
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes:, remember_access: nil, purpose: nil }).and_return("code")
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
+        user.global_id,
+        user.global_id,
+        key.id,
+        { scopes:, remember_access: nil, purpose: nil, code_challenge: nil, code_challenge_method: nil }
+      ).and_return("code")
+
       oauth_accept
     end
 
     it "remembers the users access preference with the code" do
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: nil, remember_access: "1", purpose: nil }).and_return("code")
-      post :accept, params: { remember_access: "1" }, session: session_hash
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
+        user.global_id,
+        user.global_id,
+        key.id,
+        { scopes: nil, remember_access: "1", purpose: nil, code_challenge: nil, code_challenge_method: nil }
+      ).and_return("code")
+      post :accept, params: { remember_access: "1", custom_csrf_token: }, session: session_hash
     end
 
     it "removes oauth session info after code generation" do
@@ -881,6 +1130,41 @@ describe OAuth2ProviderController do
     it "gracefully errors if the session has been destroyed" do
       post :accept, session: {}
       expect(response.code.to_i).to eq(400)
+    end
+
+    context "when PKCE options are present" do
+      let(:code_verifier) { SecureRandom.uuid }
+      let(:code_challenge) { Base64.urlsafe_encode64(Digest::SHA256.digest(code_verifier), padding: false) }
+      let(:code_challenge_method) { "S256" }
+
+      let(:session_hash) do
+        {
+          oauth2: {
+            client_id: key.id,
+            redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+            code_challenge:,
+            code_challenge_method:,
+            custom_csrf_token:
+          }
+        }
+      end
+
+      it "saves the requested scopes with the code" do
+        expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(
+          user.global_id,
+          user.global_id,
+          key.id,
+          {
+            scopes: nil,
+            remember_access: nil,
+            purpose: nil,
+            code_challenge:,
+            code_challenge_method:,
+          }
+        ).and_return("code")
+
+        oauth_accept
+      end
     end
   end
 

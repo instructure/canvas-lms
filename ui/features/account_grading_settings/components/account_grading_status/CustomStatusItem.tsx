@@ -20,7 +20,7 @@ import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 type CustomStatusItemProps = {
   editable: boolean
@@ -52,7 +52,7 @@ export const CustomStatusItem = ({
   const confirmStatusDelete = async () => {
     const confirmed = await showConfirmationDialog({
       body: I18n.t(
-        'Are you sure you want to delete this custom status? This action cannot be undone. All submissions and scores currently marked with this custom status will have their status removed.'
+        'Are you sure you want to delete this custom status? This action cannot be undone. All submissions and scores currently marked with this custom status will have their status removed.',
       ),
       confirmColor: 'danger',
       confirmText: I18n.t('Delete'),

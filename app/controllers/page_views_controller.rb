@@ -160,15 +160,21 @@ class PageViewsController < ApplicationController
 
   include Api::V1::PageView
 
-  def update
-    render json: { ok: true }
-    # page view update happens in log_page_view after_action
-  end
-
   # @API List user page views
   # Return a paginated list of the user's page view history in json format,
   # similar to the available CSV download. Page views are returned in
   # descending order, newest to oldest.
+  #
+  # **Disclaimer**: The data is a best effort attempt, and is not guaranteed
+  # to be complete or wholly accurate. This data is meant to be used for
+  # rollups and analysis in the aggregate, not in isolation for auditing,
+  # or other high-stakes analysis involving examining single users or
+  # small samples. Page Views data is generated from the Canvas logs files,
+  # not a transactional database, there are many places along the way
+  # data can be lost and/or duplicated (though uncommon). Additionally,
+  # given the size of this data, our processes ensure that errors can be
+  # rectified at any point in time, with corrections integrated as soon as
+  # they are identified and processed.
   #
   # @argument start_time [DateTime]
   #   The beginning of the time range from which you want page views.
@@ -228,5 +234,25 @@ class PageViewsController < ApplicationController
         send_data(csv, options)
       end
     end
+  rescue PageView::Pv4Client::Pv4BadRequest => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views received an invalid or malformed request.") }, status: :bad_request
+  rescue PageView::Pv4Client::Pv4NotFound, PageView::Pv4Client::Pv4Unauthorized => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views resource not found.") }, status: :not_found
+  rescue PageView::Pv4Client::Pv4TooManyRequests => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views rate limit exceeded. Please wait and try again.") }, status: :too_many_requests
+  rescue PageView::Pv4Client::Pv4EmptyResponse => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views data is not available at this time.") }, status: :service_unavailable
+  rescue PageView::Pv4Client::Pv4Timeout => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page Views service is temporarily unavailable.") }, status: :bad_gateway
+  end
+
+  def update
+    render json: { ok: true }
+    # page view update happens in log_page_view after_action
   end
 end

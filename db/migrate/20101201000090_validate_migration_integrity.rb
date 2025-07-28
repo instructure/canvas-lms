@@ -31,13 +31,9 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[7.0]
 
   def up
     initial_migration_version = "20101210192618"
-    last_squashed_migration_version = "20231220155354"
+    last_squashed_migration_version = "20241211152045"
 
-    versions = if $canvas_rails == "7.1"
-                 ActiveRecord::SchemaMigration.new(ActiveRecord::Base.connection).versions
-               else
-                 ActiveRecord::SchemaMigration.all_versions
-               end
+    versions = ActiveRecord::Base.schema_migration.versions
     initial_migration_has_run = versions.include?(initial_migration_version)
     last_squashed_migration_has_run = versions.include?(last_squashed_migration_version)
 

@@ -320,7 +320,7 @@ describe "quizzes question banks" do
       expect_new_page_load { view_bank_link.click }
     end
 
-    it "lets account admins view question banks without :manage_assignments (but not edit)", custom_timeout: 30, priority: "2" do
+    it "lets account admins view question banks without :manage_assignments_add (but not edit)", custom_timeout: 30, priority: "2" do
       user_factory(active_all: true)
       user_session(@user)
       @role = custom_account_role "weakling", account: @course.account

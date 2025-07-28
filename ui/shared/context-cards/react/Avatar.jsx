@@ -16,16 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Avatar as InstUIAvatar} from '@instructure/ui-avatar'
 
-const I18n = useI18nScope('student_context_trayAvatar')
+const I18n = createI18nScope('student_context_trayAvatar')
 
-// eslint-disable-next-line react/prefer-stateless-function
 class Avatar extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -54,6 +53,7 @@ class Avatar extends React.Component {
           {canMasquerade && (
             <Text size="x-small" weight="bold" as="div">
               <a
+                id="act-as-user" // EVAL-4241
                 href={`/courses/${courseId}?become_user_id=${user._id}`}
                 aria-label={I18n.t('Act as %{name}', {name: user.short_name})}
               >

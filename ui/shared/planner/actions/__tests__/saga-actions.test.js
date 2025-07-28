@@ -65,12 +65,12 @@ describe('mergeFutureItems', () => {
     const mockDays = itemsToDays(mockItems)
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialFutureDays: mockDays}})
+      getStateFn({loading: {partialFutureDays: mockDays}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(gotPartialFutureDays(mockDays, 'mock response'))
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays([mockItems[0], mockItems[1]]), 'mock response')
+      gotDaysSuccess(itemsToDays([mockItems[0], mockItems[1]]), 'mock response'),
     )
   })
 
@@ -79,11 +79,11 @@ describe('mergeFutureItems', () => {
     const mockItems = [mockItem(), mockItem()]
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialFutureDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialFutureDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialFutureDays(itemsToDays(mockItems), 'mock response')
+      gotPartialFutureDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -93,14 +93,16 @@ describe('mergeFutureItems', () => {
     const mockItems = [mockItem(), mockItem()]
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialFutureDays: itemsToDays(mockItems), allFutureItemsLoaded: true}})
+      getStateFn({
+        loading: {partialFutureDays: itemsToDays(mockItems), allFutureItemsLoaded: true},
+      }),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialFutureDays(itemsToDays(mockItems), 'mock response')
+      gotPartialFutureDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays(mockItems), 'mock response')
+      gotDaysSuccess(itemsToDays(mockItems), 'mock response'),
     )
   })
 
@@ -109,7 +111,7 @@ describe('mergeFutureItems', () => {
     const mockItems = []
     const result = mergeFutureItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialFutureDays: [], allFutureItemsLoaded: true}})
+      getStateFn({loading: {partialFutureDays: [], allFutureItemsLoaded: true}}),
     )
     expect(result).toBe(true)
     // still want to pretend something was loaded so all the loading states get updated.
@@ -124,14 +126,14 @@ describe('mergePastItems', () => {
     const mockItems = [mockItem('2017-12-17'), mockItem('2017-12-18')]
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response')
+      gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response'),
     )
   })
 
@@ -140,14 +142,14 @@ describe('mergePastItems', () => {
     const mockItems = [mockItem(), mockItem()]
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays(mockItems), 'mock response')
+      gotDaysSuccess(itemsToDays(mockItems), 'mock response'),
     )
   })
 
@@ -156,7 +158,7 @@ describe('mergePastItems', () => {
     const mockItems = []
     const result = mergePastItems(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: [], allPastItemsLoaded: true}})
+      getStateFn({loading: {partialPastDays: [], allPastItemsLoaded: true}}),
     )
     expect(result).toBe(true)
     // still want to pretend something was loaded so all the loading states get updated.
@@ -171,11 +173,11 @@ describe('mergePastItemsForNewActivity', () => {
     const mockItems = [mockItem('2017-12-17'), mockItem('2017-12-18')]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -185,11 +187,11 @@ describe('mergePastItemsForNewActivity', () => {
     const mockItems = [mockItem('2017-12-18', {newActivity: true})]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -199,14 +201,14 @@ describe('mergePastItemsForNewActivity', () => {
     const mockItems = [mockItem('2017-12-18')]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays(mockItems), 'mock response')
+      gotDaysSuccess(itemsToDays(mockItems), 'mock response'),
     )
   })
 
@@ -219,14 +221,14 @@ describe('mergePastItemsForNewActivity', () => {
     ]
     const result = mergePastItemsForNewActivity(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays([mockItems[1], mockItems[2]]), 'mock response')
+      gotDaysSuccess(itemsToDays([mockItems[1], mockItems[2]]), 'mock response'),
     )
   })
 })
@@ -245,11 +247,11 @@ describe('mergePastItemsForToday', () => {
     const mockItems = [mockItem('2017-12-23'), mockItem('2017-12-24')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -259,11 +261,11 @@ describe('mergePastItemsForToday', () => {
     const mockItems = [mockItem('2017-12-18')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -273,14 +275,14 @@ describe('mergePastItemsForToday', () => {
     const mockItems = [mockItem('2017-12-14')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems), allPastItemsLoaded: true}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays(mockItems), 'mock response')
+      gotDaysSuccess(itemsToDays(mockItems), 'mock response'),
     )
   })
 
@@ -289,14 +291,14 @@ describe('mergePastItemsForToday', () => {
     const mockItems = [mockItem('2017-12-15'), mockItem('2017-12-16')]
     const result = mergePastItemsForToday(mockItems, 'mock response')(
       mockDispatch,
-      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}})
+      getStateFn({loading: {partialPastDays: itemsToDays(mockItems)}}),
     )
     expect(result).toBe(true)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialPastDays(itemsToDays(mockItems), 'mock response')
+      gotPartialPastDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response')
+      gotDaysSuccess(itemsToDays([mockItems[1]]), 'mock response'),
     )
   })
 })
@@ -364,8 +366,8 @@ describe('mergeWeekItems', () => {
           weekStart: sunday,
           isPreload: false,
         },
-        'mock response'
-      )
+        'mock response',
+      ),
     )
   })
 
@@ -385,7 +387,7 @@ describe('mergeWeekItems', () => {
     })
     expect(result).toBe(false)
     expect(mockDispatch).toHaveBeenCalledWith(
-      gotPartialWeekDays(itemsToDays(mockItems), 'mock response')
+      gotPartialWeekDays(itemsToDays(mockItems), 'mock response'),
     )
     expect(mockDispatch).toHaveBeenCalledTimes(1)
   })
@@ -407,8 +409,8 @@ describe('mergeWeekItems', () => {
     expect(mockDispatch).toHaveBeenCalledWith(
       weekLoaded(
         {initialWeeklyLoad: false, weekDays: [], weekStart: sunday, isPreload: false},
-        'mock response'
-      )
+        'mock response',
+      ),
     )
   })
 })

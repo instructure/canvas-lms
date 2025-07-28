@@ -18,14 +18,16 @@
 
 const Helpers = {
   isValidImageType(mimeType) {
-    switch (mimeType) {
-      case 'image/jpeg':
-      case 'image/gif':
-      case 'image/png':
-        return true
-      default:
-        return false
-    }
+    return [
+      'image/apng',
+      'image/avif',
+      'image/bmp',
+      'image/gif',
+      'image/jpeg',
+      'image/png',
+      'image/svg+xml',
+      'image/webp',
+    ].includes(mimeType)
   },
 
   extractInfoFromEvent(event) {

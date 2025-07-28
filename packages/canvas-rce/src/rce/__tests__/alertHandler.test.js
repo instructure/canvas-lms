@@ -26,7 +26,7 @@ describe('AlertHandler', () => {
         alerter.handleAlert({
           text: 'Something went wrong uploading, check your connection and try again.',
           variant: 'error',
-        })
+        }),
       ).toThrow('Tried to alert without alertFunc being set first')
     })
     it('calls alertFunc when it has been set', () => {

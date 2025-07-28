@@ -64,12 +64,12 @@ describe('JobsIndex', () => {
     const {getByText, getAllByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
     expect(getByText('fake_job_list_group_value')).toBeInTheDocument()
-    expect(getAllByText('00:01:40').length).toEqual(2)
-    expect(getAllByText('Page 5').length).toEqual(2)
+    expect(getAllByText('00:01:40')).toHaveLength(2)
+    expect(getAllByText('Page 5')).toHaveLength(2)
     expect(getByText('3606')).toBeInTheDocument()
-    expect(getAllByText('fake_job_list_tag_value').length).toEqual(2)
-    expect(getAllByText('fake_job_list_strand_value').length).toEqual(2)
-    expect(getAllByText('fake_job_list_singleton_value').length).toEqual(2)
+    expect(getAllByText('fake_job_list_tag_value')).toHaveLength(2)
+    expect(getAllByText('fake_job_list_strand_value')).toHaveLength(2)
+    expect(getAllByText('fake_job_list_singleton_value')).toHaveLength(2)
   })
 
   it('switches scope', async () => {
@@ -78,7 +78,7 @@ describe('JobsIndex', () => {
     fireEvent.click(getByText('Test Academy'))
     expect(window.location.search).toMatch(/jobs_scope=account/)
     expect(doFetchApi).toHaveBeenLastCalledWith(
-      expect.objectContaining({params: expect.objectContaining({scope: 'account'})})
+      expect.objectContaining({params: expect.objectContaining({scope: 'account'})}),
     )
   })
 
@@ -87,7 +87,7 @@ describe('JobsIndex', () => {
     fireEvent.click(getByLabelText('Failed'))
     expect(window.location.search).toMatch(/bucket=failed/)
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({path: '/api/v1/jobs2/failed/by_tag'})
+      expect.objectContaining({path: '/api/v1/jobs2/failed/by_tag'}),
     )
   })
 
@@ -96,7 +96,7 @@ describe('JobsIndex', () => {
     fireEvent.click(getByLabelText('Singleton'))
     expect(window.location.search).toMatch(/group_type=singleton/)
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({path: '/api/v1/jobs2/running/by_singleton'})
+      expect.objectContaining({path: '/api/v1/jobs2/running/by_singleton'}),
     )
   })
 
@@ -109,7 +109,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running/by_tag',
         params: expect.objectContaining({page: 5}),
-      })
+      }),
     )
   })
 
@@ -122,7 +122,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({page: 2}),
-      })
+      }),
     )
   })
 
@@ -135,7 +135,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({tag: 'fake_job_list_group_value'}),
-      })
+      }),
     )
   })
 
@@ -148,7 +148,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({tag: 'fake_job_list_tag_value'}),
-      })
+      }),
     )
   })
 
@@ -162,7 +162,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({strand: 'fake_job_list_strand_value'}),
-      })
+      }),
     )
   })
 
@@ -176,7 +176,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({singleton: 'fake_job_list_singleton_value'}),
-      })
+      }),
     )
   })
 
@@ -200,7 +200,7 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({tag: 'fake_group_search_value_1'}),
-      })
+      }),
     )
   })
 
@@ -235,7 +235,7 @@ describe('JobsIndex', () => {
           start_date: '2022-04-02T13:00:00.000Z',
           end_date: '2022-04-03T03:00:00.000Z',
         }),
-      })
+      }),
     )
 
     // note we saw 7:02 AM in an earlier test, but we've changed the time zone to Eastern now
@@ -247,7 +247,7 @@ describe('JobsIndex', () => {
     window.history.replaceState(
       '',
       '',
-      '?bucket=failed&group_type=strand&group_order=count&jobs_order=tag&groups_page=2&jobs_page=3&scope=account&start_date=2022-04-01T01%3A00%3A00.000Z&end_date=2022-04-02T01%3A00%3A00.000Z&time_zone=UTC'
+      '?bucket=failed&group_type=strand&group_order=count&jobs_order=tag&groups_page=2&jobs_page=3&scope=account&start_date=2022-04-01T01%3A00%3A00.000Z&end_date=2022-04-02T01%3A00%3A00.000Z&time_zone=UTC',
     )
     render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
@@ -261,7 +261,7 @@ describe('JobsIndex', () => {
           start_date: '2022-04-01T01:00:00.000Z',
           end_date: '2022-04-02T01:00:00.000Z',
         }),
-      })
+      }),
     )
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -273,7 +273,7 @@ describe('JobsIndex', () => {
           start_date: '2022-04-01T01:00:00.000Z',
           end_date: '2022-04-02T01:00:00.000Z',
         }),
-      })
+      }),
     )
   })
 })

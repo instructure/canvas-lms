@@ -17,11 +17,11 @@
  */
 
 import {camelizeProperties} from '@canvas/convert-case'
-import {createClient, gql} from '@canvas/apollo'
+import {createClient, gql} from '@canvas/apollo-v3'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
 export const POST_ASSIGNMENT_GRADES = gql`
-  mutation ($assignmentId: ID!, $gradedOnly: Boolean) {
+  mutation PostAssignmentGrades($assignmentId: ID!, $gradedOnly: Boolean) {
     postAssignmentGrades(input: {assignmentId: $assignmentId, gradedOnly: $gradedOnly}) {
       progress {
         _id

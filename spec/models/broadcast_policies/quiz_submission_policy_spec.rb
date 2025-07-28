@@ -20,10 +20,10 @@
 module BroadcastPolicies
   describe QuizSubmissionPolicy do
     let(:course) do
-      instance_double("Course", available?: true, id: 1)
+      instance_double(Course, available?: true, id: 1)
     end
     let(:assignment) do
-      instance_double("Assignment", context: course)
+      instance_double(Assignment, context: course)
     end
     let(:quiz) do
       double(
@@ -37,7 +37,7 @@ module BroadcastPolicies
       )
     end
     let(:submission) do
-      instance_double("Submission", graded_at: Time.zone.now, posted?: true)
+      instance_double(Submission, graded_at: Time.zone.now, posted?: true)
     end
     let(:enrollment) do
       double("Enrollment", course_id: course.id, inactive?: false)

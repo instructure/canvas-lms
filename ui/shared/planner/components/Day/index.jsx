@@ -26,16 +26,18 @@ import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {itemShape, sizeShape, userShape} from '../plannerPropTypes'
 import {getDynamicFullDate, getFriendlyDate, isToday} from '../../utilities/dateUtils'
 import buildStyle from './style'
-// eslint-disable-next-line import/no-named-as-default
+
 import MissingAssignments from '../MissingAssignments'
-// eslint-disable-next-line import/no-named-as-default
+
 import Grouping from '../Grouping'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class Day extends Component {
+  static componentId = 'Day'
+
   static propTypes = {
     day: string.isRequired,
     itemsForDay: arrayOf(shape(itemShape)),
@@ -82,7 +84,7 @@ export class Day extends Component {
       'day',
       this,
       nextProps.animatableIndex,
-      this.itemUniqueIds(nextProps)
+      this.itemUniqueIds(nextProps),
     )
   }
 
@@ -104,6 +106,7 @@ export class Day extends Component {
     const groupColor = (courseInfo.color ? courseInfo.color : this.props.currentUser.color) || null
     return (
       <Grouping
+        key={groupKey}
         title={courseInfo.title}
         image_url={courseInfo.image_url}
         color={groupColor}
@@ -112,7 +115,6 @@ export class Day extends Component {
         items={groupItems}
         animatableIndex={this.props.animatableIndex * 100 + index + 1}
         url={courseInfo.url}
-        key={groupKey}
         themeOverride={{
           titleColor: groupColor,
         }}
@@ -157,6 +159,7 @@ export class Day extends Component {
     <>
       <style>{this.style.css}</style>
       <div
+        data-testid="day"
         className={classnames(this.style.classNames.root, 'planner-day', {
           'planner-today': this.thisIsToday,
         })}
@@ -164,13 +167,15 @@ export class Day extends Component {
         <Heading border={this.hasItems() ? 'none' : 'bottom'}>
           {this.thisIsToday ? (
             <>
-              <Text as="div" size="large" weight="bold">
+              <Text data-testid="today-text" as="div" size="large" weight="bold">
                 {this.friendlyName}
               </Text>
-              <div className={this.style.classNames.secondary}>{this.date}</div>
+              <div data-testid="today-date" className={this.style.classNames.secondary}>
+                {this.date}
+              </div>
             </>
           ) : (
-            <div className={this.style.classNames.secondary}>
+            <div data-testid="not-today" className={this.style.classNames.secondary}>
               {this.friendlyName}, {this.date}
             </div>
           )}
@@ -180,16 +185,18 @@ export class Day extends Component {
           {this.hasItems() ? (
             this.renderGroupings()
           ) : (
-            <View textAlign="center" display="block" margin="small 0 0 0">
+            <View data-testid="no-items" textAlign="center" display="block" margin="small 0 0 0">
               {I18n.t('Nothing Planned Yet')}
             </View>
           )}
         </div>
         {this.thisIsToday && this.props.showMissingAssignments && (
-          <MissingAssignments
-            timeZone={this.props.timeZone}
-            responsiveSize={this.props.responsiveSize}
-          />
+          <div data-testid="missing-assignments">
+            <MissingAssignments
+              timeZone={this.props.timeZone}
+              responsiveSize={this.props.responsiveSize}
+            />
+          </div>
         )}
       </div>
     </>

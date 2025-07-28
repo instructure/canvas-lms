@@ -1,6 +1,8 @@
 {
   "name": "@instructure/translations",
   "version": "1.0.0",
+  "type": "commonjs",
+  "main": "index.js",
   "engines": {
     "node": ">= 10.10"
   },
@@ -11,10 +13,10 @@
   "scripts": {
     "split": "node bin/cli.js",
     "test": "jest --env jsdom --color",
-    "lint": "prettier bin/**/*.js lib/**/*.json --write"
+    "lint": "biome lint bin/**/*.js lib/**/*.json"
   },
   "devDependencies": {
     "jest": "^28",
-    "prettier": "^2"
+    "@biomejs/biome": "*"
   }
 }

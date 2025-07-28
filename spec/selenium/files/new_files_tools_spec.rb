@@ -25,13 +25,13 @@ describe "files page with tools" do
   context "file index menu tools" do
     before do
       course_with_teacher_logged_in
-
+      @teacher.set_preference(:files_ui_version, "v1")
       @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tool.file_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
       @tool.save!
     end
 
-    it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
+    it "is able to launch the index menu tool via the tray", custom_timeout: 60, upgrade_files_v2: "waiting for deployment" do
       get "/courses/#{@course.id}/files"
 
       gear = f("#file_menu_link")

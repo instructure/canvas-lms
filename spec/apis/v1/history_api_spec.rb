@@ -110,18 +110,6 @@ describe HistoryController, type: :request do
         expect(json.pluck("asset_name")).to eq(["Course People", "Assign 1"])
       end
 
-      it "gracefully handles a pv4 timeout" do
-        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
-        json = api_call(:get,
-                        "/api/v1/users/self/history",
-                        controller: "history",
-                        action: "index",
-                        format: "json",
-                        user_id: "self",
-                        expected_status: :bad_gateway)
-        expect(json["error"]).to_not be_nil
-      end
-
       it "removes verifier from file preview url" do
         page_view_for url: "http://example.com/courses/X/files/A/file_preview?annotate=B&verifier=C",
                       context: @course,
@@ -135,6 +123,80 @@ describe HistoryController, type: :request do
                         format: "json",
                         user_id: "self")
         expect(json[3]["visited_url"]).to eq "http://example.com/courses/X/files/A/file_preview?annotate=B"
+      end
+    end
+
+    context "Page Views service client errors" do
+      it "gracefully handles an invalid request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4BadRequest)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :bad_request)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles an unauthorized request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Unauthorized)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :not_found)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles not found request" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4NotFound)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :not_found)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles rate limit exceeded" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4TooManyRequests)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :too_many_requests)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles a pv4 timeout" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :bad_gateway)
+        expect(json["error"]).to_not be_nil
+      end
+
+      it "gracefully handles an empty response" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4EmptyResponse)
+        json = api_call(:get,
+                        "/api/v1/users/self/history",
+                        controller: "history",
+                        action: "index",
+                        format: "json",
+                        user_id: "self",
+                        expected_status: :service_unavailable)
+        expect(json["error"]).to_not be_nil
       end
     end
 
@@ -157,7 +219,7 @@ describe HistoryController, type: :request do
                          { controller: "history", action: "index", format: "json", user_id: @student.to_param },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
         UserObservationLink.create_or_restore(observer:, student: @student, root_account: Account.default)
         api_call_as_user(observer,
                          :get,
@@ -187,7 +249,7 @@ describe HistoryController, type: :request do
                          { controller: "history", action: "index", format: "json", user_id: @student.to_param },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
     end
 

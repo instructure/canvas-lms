@@ -18,7 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {IconAddSolid} from '@instructure/ui-icons'
@@ -29,7 +29,7 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 
-const I18n = useI18nScope('assignment_index_menu')
+const I18n = createI18nScope('assignment_index_menu')
 
 type Props = {
   store: any
@@ -169,11 +169,11 @@ export default class IndexMenu extends React.Component<Props, State> {
     }
   }
 
-  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string}) {
+  iconForTrayTool(tool: {canvas_icon_class: string; icon_url: string; title: string}) {
     if (tool.canvas_icon_class) {
       return <i className={tool.canvas_icon_class} />
     } else if (tool.icon_url) {
-      return <img className="icon" alt="" src={tool.icon_url} />
+      return <img className="icon lti_tool_icon" alt={tool.title} src={tool.icon_url} />
     }
   }
 
@@ -199,6 +199,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         type: 'assignment_group',
       },
     ]
+
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}
@@ -211,7 +212,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         onExternalContentReady={() => window.location.reload()}
         open={tool !== null}
       />,
-      document.getElementById('external-tool-mount-point')
+      document.getElementById('external-tool-mount-point'),
     )
   }
 

@@ -36,7 +36,7 @@
 # set_broadcast_policy do
 #   dispatch :new_assignment
 #   to { self.students }
-#   whenever { |record| record.just_created }
+#   whenever { |record| record.previously_new_record? }
 #   data { course_id: self.context.id, root_account_id: self.context.root_account_id }
 # end
 #

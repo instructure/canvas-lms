@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool} from 'prop-types'
 import classnames from 'classnames'
 import UploadForm, {UploadFormPropTypes} from '@canvas/files/react/components/UploadForm'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 
-const I18n = useI18nScope('upload_button')
+const I18n = createI18nScope('upload_button')
 
 const UploadButton = function (props) {
   const formRef = useRef(null)
@@ -44,14 +44,14 @@ const UploadButton = function (props) {
   const renameFileMessage = nameToUse => {
     return I18n.t(
       'A file named "%{name}" already exists in this folder. Do you want to replace the existing file?',
-      {name: nameToUse}
+      {name: nameToUse},
     )
   }
 
   const lockFileMessage = nameToUse => {
     return I18n.t(
       'A locked file named "%{name}" already exists in this folder. Please enter a new name.',
-      {name: nameToUse}
+      {name: nameToUse},
     )
   }
 

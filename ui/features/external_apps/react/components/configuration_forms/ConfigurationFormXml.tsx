@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -25,9 +25,8 @@ import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
 import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n: I18nType = useI18nScope('external_tools')
+const I18n: I18nType = createI18nScope('external_tools')
 
 export interface ConfigurationFormXmlProps {
   name?: string
@@ -39,8 +38,7 @@ export interface ConfigurationFormXmlProps {
 }
 
 interface ConfigurationFormXmlErrors {
-  name?: FormMessage[]
-  xml?: FormMessage[]
+  missing?: FormMessage[]
 }
 
 export interface ConfigurationFormXmlState {
@@ -49,11 +47,20 @@ export interface ConfigurationFormXmlState {
   sharedSecret: string
   xml: string
   allowMembershipServiceAccess: boolean
-  errors: ConfigurationFormXmlErrors
+  showMessages?: boolean
+  isNameValid: boolean
+  isXmlValid: boolean
 }
 
 export interface ConfigurationFormXmlFormData
-  extends Omit<ConfigurationFormXmlState, 'errors' | 'allowMembershipServiceAccess'> {
+  extends Omit<
+    ConfigurationFormXmlState,
+    'allowMembershipServiceAccess' | 'isNameValid' | 'isXmlValid' | 'showMessages'
+  > {
+  name: string
+  consumerKey: string
+  sharedSecret: string
+  xml: string
   allow_membership_service_access?: boolean
   verifyUniqueness: 'true'
 }
@@ -68,38 +75,51 @@ export default class ConfigurationFormXml extends React.Component<
     sharedSecret: this.props.sharedSecret ?? '',
     xml: this.props.xml ?? '',
     allowMembershipServiceAccess: this.props.allowMembershipServiceAccess ?? false,
-    errors: {},
+    showMessages: false,
+    isNameValid: true,
+    isXmlValid: true,
+  }
+
+  nameRef = React.createRef<TextInput>()
+  xmlRef = React.createRef<TextArea>()
+
+  errors: ConfigurationFormXmlErrors = {
+    missing: [{text: I18n.t('This field is required'), type: 'error'}],
+  }
+
+  valid = true
+
+  validateField = (
+    fieldValue: string,
+    fieldStateKey: 'isNameValid' | 'isXmlValid',
+    fieldRef: React.RefObject<TextInput | TextArea>,
+  ) => {
+    if (!fieldValue) {
+      this.invalidate(fieldStateKey, fieldRef)
+    } else {
+      this.setState(prevState => ({...prevState, [fieldStateKey]: true}))
+    }
+  }
+
+  invalidate = (
+    fieldStateKey: 'isNameValid' | 'isXmlValid',
+    fieldRef: React.RefObject<TextInput | TextArea>,
+  ) => {
+    this.setState(prevState => ({...prevState, [fieldStateKey]: false}))
+    if (this.valid) {
+      fieldRef.current?.focus()
+      this.valid = false
+      this.setState({showMessages: true})
+    }
   }
 
   isValid = () => {
-    const fields: (keyof ConfigurationFormXmlErrors & keyof ConfigurationFormXmlState)[] = [
-        'name',
-        'xml',
-      ],
-      formErrors: string[] = []
+    this.valid = true
 
-    const errors: ConfigurationFormXmlErrors = {}
-    fields.forEach(field => {
-      const value = this.state[field]
-      if (!value) {
-        errors[field] = [{text: I18n.t('This field is required'), type: 'error'}]
-        formErrors.push(I18n.t('This field "%{name}" is required.', {name: field}))
-      }
-    })
-    this.setState({errors})
+    this.validateField(this.state.name, 'isNameValid', this.nameRef)
+    this.validateField(this.state.xml, 'isXmlValid', this.xmlRef)
 
-    let isValid = true
-    if (formErrors.length > 0) {
-      isValid = false
-      showFlashAlert({
-        message: I18n.t('There were errors with the form: %{errors}', {
-          errors: formErrors.join(' '),
-        }),
-        type: 'error',
-        politeness: 'assertive',
-      })
-    }
-    return isValid
+    return this.valid
   }
 
   getFormData = (): ConfigurationFormXmlFormData => {
@@ -121,15 +141,36 @@ export default class ConfigurationFormXml extends React.Component<
   handleChange: (field: Exclude<keyof ConfigurationFormXmlState, 'xml'>) => TextInputChangeHandler =
     field => {
       return (_, value) => {
+        if (field === 'name') {
+          this.validateField(value, 'isNameValid', this.nameRef)
+        }
         this.setState(prevState => ({...prevState, [field]: value}))
       }
     }
 
   handleXmlChange: TextAreaChangeHandler = e => {
+    this.validateField(e.target.value, 'isXmlValid', this.xmlRef)
     this.setState({xml: e.target.value})
   }
 
+  handleXmlPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>): void => {
+    const value = e.clipboardData.getData('text')
+    this.validateField(value, 'isXmlValid', this.xmlRef)
+    this.setState({xml: value})
+  }
+
   render() {
+    const {
+      name,
+      xml,
+      consumerKey,
+      sharedSecret,
+      allowMembershipServiceAccess,
+      showMessages,
+      isNameValid,
+      isXmlValid,
+    } = this.state
+
     return (
       <div className="ConfigurationFormXml">
         <Grid hAlign="space-between" colSpacing="none" rowSpacing="small">
@@ -137,11 +178,12 @@ export default class ConfigurationFormXml extends React.Component<
             <Grid.Col>
               <TextInput
                 id="name"
-                value={this.state.name}
+                value={name}
                 renderLabel={I18n.t('Name')}
+                ref={this.nameRef}
                 onChange={this.handleChange('name')}
-                isRequired={true}
-                messages={this.state.errors.name}
+                isRequired
+                messages={showMessages && !isNameValid ? this.errors.missing : []}
               />
             </Grid.Col>
           </Grid.Row>
@@ -149,7 +191,7 @@ export default class ConfigurationFormXml extends React.Component<
             <Grid.Col>
               <TextInput
                 id="consumerKey"
-                value={this.state.consumerKey}
+                value={consumerKey}
                 onChange={this.handleChange('consumerKey')}
                 renderLabel={I18n.t('Consumer Key')}
               />
@@ -157,7 +199,7 @@ export default class ConfigurationFormXml extends React.Component<
             <Grid.Col>
               <TextInput
                 id="sharedSecret"
-                value={this.props.sharedSecret}
+                value={sharedSecret}
                 renderLabel={I18n.t('Shared Secret')}
                 onChange={this.handleChange('sharedSecret')}
               />
@@ -168,7 +210,7 @@ export default class ConfigurationFormXml extends React.Component<
             <Grid.Col>
               <MembershipServiceAccess
                 membershipServiceFeatureFlagEnabled={this.props.membershipServiceFeatureFlagEnabled}
-                checked={this.state.allowMembershipServiceAccess}
+                checked={allowMembershipServiceAccess}
                 onChange={() =>
                   this.setState(prevState => ({
                     allowMembershipServiceAccess: !prevState.allowMembershipServiceAccess,
@@ -182,13 +224,17 @@ export default class ConfigurationFormXml extends React.Component<
             <Grid.Col>
               <TextArea
                 id="xml"
-                value={this.state.xml}
+                value={xml}
                 label={I18n.t('XML Configuration')}
+                required
+                ref={this.xmlRef}
                 onChange={this.handleXmlChange}
+                // @ts-expect-error
+                onPaste={this.handleXmlPaste}
                 // Initially 12 rows of text, will grow if needed
                 height="12rem"
                 resize="vertical"
-                messages={this.state.errors.xml}
+                messages={showMessages && !isXmlValid ? this.errors.missing : []}
               />
             </Grid.Col>
           </Grid.Row>

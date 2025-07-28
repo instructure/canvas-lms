@@ -1,4 +1,7 @@
 en:
+  attributes:
+    idp_entity_id: IdP Entity ID
+    unique_id: Unique ID
   date:
     datepicker:
       column_headings:

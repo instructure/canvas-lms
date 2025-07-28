@@ -77,7 +77,7 @@ function testInsertionPlan(inputState: string, insertionText: string, expectedSt
 
   if (selStart < 0 || selEnd < 0) {
     throw new Error(
-      `inputState must contain a selection start (${selStartIndicator}) and end indicator (${selEndIndicator})`
+      `inputState must contain a selection start (${selStartIndicator}) and end indicator (${selEndIndicator})`,
     )
   }
 

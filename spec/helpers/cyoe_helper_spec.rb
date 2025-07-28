@@ -59,6 +59,7 @@ describe CyoeHelper do
       @mod = @course.context_modules.create!
       @tag = @mod.add_item(type: "assignment", id: @trigger_assmt.id)
       @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
+      run_jobs
     end
 
     it "returns rules for the mastery path for a matched assignment" do
@@ -89,7 +90,6 @@ describe CyoeHelper do
       it "lists as processing if all requirements are met but assignment is not yet visible" do
         student2 = student_in_course(course: @course, active_all: true).user
         @current_user = student2
-        expect(ConditionalRelease::OverrideHandler).to receive(:handle_grade_change).and_return(nil) # and do nothing
         @trigger_assmt.grade_student(student2, grade: 9, grader: @teacher)
 
         mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: student2 })

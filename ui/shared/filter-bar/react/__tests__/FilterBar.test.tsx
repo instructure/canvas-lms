@@ -30,14 +30,14 @@ describe('FilterBar', () => {
 
   it('renders', () => {
     const {getByRole} = render(
-      <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />
+      <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />,
     )
     expect(getByRole('searchbox')).toBeInTheDocument()
   })
 
   it('always includes an "All" option', async () => {
     const {getByRole} = render(
-      <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />
+      <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />,
     )
     await userEvent.click(getByRole('combobox', {name: 'Filter by'}))
     expect(getByRole('option', {name: 'All'})).toBeInTheDocument()
@@ -47,7 +47,7 @@ describe('FilterBar', () => {
     it('calls onFilter', async () => {
       const onFilter = jest.fn()
       const {getByRole} = render(
-        <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />
+        <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />,
       )
       await userEvent.click(getByRole('combobox', {name: 'Filter by'}))
       await userEvent.click(getByRole('option', {name: 'Active'}))
@@ -68,7 +68,7 @@ describe('FilterBar', () => {
       const user = userEvent.setup({delay: null})
       const onSearch = jest.fn()
       const {getByRole} = render(
-        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
+        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )
       await user.click(getByRole('searchbox'))
       await user.keyboard('hello')
@@ -81,7 +81,7 @@ describe('FilterBar', () => {
       const user = userEvent.setup({delay: null})
       const onSearch = jest.fn()
       const {getByRole} = render(
-        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
+        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )
       await user.type(getByRole('searchbox'), 'h')
       jest.runOnlyPendingTimers()
@@ -93,7 +93,7 @@ describe('FilterBar', () => {
     it('calls onFilter with "all"', async () => {
       const onFilter = jest.fn()
       const {getByRole} = render(
-        <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />
+        <FilterBar onFilter={onFilter} onSearch={() => {}} filterOptions={filterOptions} />,
       )
       await userEvent.click(getByRole('button', {name: 'Clear'}))
       expect(onFilter).toHaveBeenCalledWith('all')
@@ -102,7 +102,7 @@ describe('FilterBar', () => {
     it('calls onSearch with ""', async () => {
       const onSearch = jest.fn()
       const {getByRole} = render(
-        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />
+        <FilterBar onFilter={() => {}} onSearch={onSearch} filterOptions={[]} />,
       )
       await userEvent.type(getByRole('searchbox'), 'hello')
       await userEvent.click(getByRole('button', {name: 'Clear'}))
@@ -113,7 +113,7 @@ describe('FilterBar', () => {
   describe('searchScreenReaderLabel', () => {
     it('uses default', () => {
       const {getByLabelText} = render(
-        <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />
+        <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />,
       )
 
       expect(getByLabelText('Search')).toBeInTheDocument()
@@ -127,7 +127,7 @@ describe('FilterBar', () => {
           onSearch={() => {}}
           filterOptions={[]}
           searchScreenReaderLabel={label}
-        />
+        />,
       )
 
       expect(getByLabelText(label)).toBeInTheDocument()
@@ -137,7 +137,7 @@ describe('FilterBar', () => {
   describe('searchPlaceholder', () => {
     it('uses default', () => {
       const {getByPlaceholderText} = render(
-        <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />
+        <FilterBar onFilter={() => {}} onSearch={() => {}} filterOptions={[]} />,
       )
 
       expect(getByPlaceholderText('Search')).toBeInTheDocument()
@@ -151,7 +151,7 @@ describe('FilterBar', () => {
           onSearch={() => {}}
           filterOptions={[]}
           searchPlaceholder={placeholder}
-        />
+        />,
       )
 
       expect(getByPlaceholderText(placeholder)).toBeInTheDocument()

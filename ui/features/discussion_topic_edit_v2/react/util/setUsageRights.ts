@@ -31,7 +31,7 @@ type UsageRightsFunc = (
   filesystemObject: BasicFileSystemObject[],
   usageRights: UsageRights,
   contextId: string,
-  contextType: string
+  contextType: string,
 ) => void
 
 /**
@@ -65,7 +65,7 @@ export const setUsageRights: UsageRightsFunc = async (
   filesystemObject,
   usageRights,
   contextId,
-  contextType
+  contextType,
 ) => {
   const folderIds: (number | string)[] = []
   const fileIds: (number | string)[] = []

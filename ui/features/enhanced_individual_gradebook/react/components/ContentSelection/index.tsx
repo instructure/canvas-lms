@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 
 import type {GradebookOptions, SortableAssignment, SortableStudent} from '../../../types'
@@ -29,7 +29,7 @@ import {
 } from '../../hooks/useContentDropdownOptions'
 import {studentDisplayName} from '../../../utils/gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type ContentSelectionComponentProps = {
   courseId: string
@@ -86,7 +86,7 @@ export default function ContentSelection({
 
     if (selectedStudentId) {
       const studentIndex = studentDropdownOptions.findIndex(
-        studentOption => studentOption.id === selectedStudentId
+        studentOption => studentOption.id === selectedStudentId,
       )
 
       if (studentIndex !== -1) {
@@ -105,7 +105,7 @@ export default function ContentSelection({
 
     if (selectedAssignmentId) {
       const assignmentIndex = assignmentDropdownOptions.findIndex(
-        assignmentOption => assignmentOption.id === selectedAssignmentId
+        assignmentOption => assignmentOption.id === selectedAssignmentId,
       )
 
       if (assignmentIndex >= 0) {
@@ -143,7 +143,7 @@ export default function ContentSelection({
 
   const handleChangeAssignment = (
     event?: React.ChangeEvent<HTMLSelectElement>,
-    newIndex?: number
+    newIndex?: number,
   ) => {
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
     setSelectedAssignmentIndex(selectedIndex)
@@ -179,6 +179,7 @@ export default function ContentSelection({
         </View>
         <View as="div" className="span8">
           <select
+            id="student_select"
             className="student_select"
             onChange={handleChangeStudent}
             value={studentDropdownOptions[selectedStudentIndex]?.id}
@@ -233,6 +234,7 @@ export default function ContentSelection({
         </View>
         <View as="div" className="span8">
           <select
+            id="assignment_select"
             className="assignment_select"
             onChange={handleChangeAssignment}
             value={assignmentDropdownOptions[selectedAssignmentIndex]?.id}

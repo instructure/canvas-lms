@@ -75,6 +75,28 @@ describe QuestionBanksController do
       @bank1.reload
       expect(@bank1.assessment_questions.count).to eq 2
     end
+
+    it "copies questions and prevents SQL injection" do
+      malicious_input =  {
+        @question1.id => 1,
+        @question2.id => 1,
+        "1; DROP TABLE assessment_questions;" => 1
+      }
+
+      post "move_questions", params: {
+        course_id: @course.id,
+        question_bank_id: @bank1.id,
+        assessment_question_bank_id: @bank2.id,
+        questions: malicious_input
+      }
+
+      expect(response).to be_successful
+
+      @bank1.reload
+      @bank2.reload
+      expect(@bank1.assessment_questions.count).to eq 2
+      expect(@bank2.assessment_questions.count).to eq 2
+    end
   end
 
   describe "bookmark" do

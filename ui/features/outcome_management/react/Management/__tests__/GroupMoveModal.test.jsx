@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
 import {
   smallOutcomeTree,
@@ -25,17 +25,18 @@ import {
   createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import GroupMoveModal from '../GroupMoveModal'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 jest.useFakeTimers()
 
 describe('GroupMoveModal', () => {
   let cache
   let onCloseHandlerMock
-  let showFlashAlertSpy
   let mocks
 
   const defaultProps = (props = {}) => ({
@@ -56,7 +57,6 @@ describe('GroupMoveModal', () => {
     })
     cache = createCache()
     onCloseHandlerMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -70,7 +70,7 @@ describe('GroupMoveModal', () => {
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider
@@ -79,7 +79,7 @@ describe('GroupMoveModal', () => {
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -150,7 +150,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: '"Group 100 folder 0" was moved to "Group 100 folder 1".',
       type: 'success',
     })
@@ -174,7 +174,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
     })
@@ -199,7 +199,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
     })
@@ -224,7 +224,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
       type: 'error',
     })
@@ -282,14 +282,14 @@ describe('GroupMoveModal', () => {
       })
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"new group" was successfully created.',
         type: 'success',
       })
       expect(getByText('Move').closest('button')).toBeEnabled()
       fireEvent.click(getByText('Move'))
       await act(async () => jest.runOnlyPendingTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: '"Group 100 folder 0" was moved to "new group".',
         type: 'success',
       })

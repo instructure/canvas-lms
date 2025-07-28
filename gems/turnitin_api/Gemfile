@@ -5,3 +5,7 @@ source "https://rubygems.org"
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rake"
+gem "rspec", "~> 3.12"
+gem "webmock", "~> 3.0"

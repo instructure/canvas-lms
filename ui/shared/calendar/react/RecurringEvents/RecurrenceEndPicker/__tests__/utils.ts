@@ -36,7 +36,7 @@ export async function changeUntilDate(
   enddate: moment.Moment,
   newenddate: moment.Moment,
   locale: string,
-  timezone: string
+  timezone: string,
 ) {
   const displayedUntil = formatDate(enddate.toDate(), locale, timezone)
   const dateinput = screen.getByDisplayValue(displayedUntil)

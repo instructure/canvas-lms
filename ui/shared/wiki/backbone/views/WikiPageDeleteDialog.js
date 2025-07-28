@@ -16,10 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 const dialogDefaults = {
   fixDialogButtons: false,
@@ -71,7 +71,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
         $.flashMessage(
           I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', {
             title: page_title,
-          })
+          }),
         )
         dfd.resolve()
         return this.close()
@@ -82,7 +82,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
       $.flashError(
         I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', {
           title: page_title,
-        })
+        }),
       )
       return dfd.reject()
     })

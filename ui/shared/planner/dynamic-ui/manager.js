@@ -23,10 +23,10 @@ import {AnimationCollection} from './animation-collection'
 import {specialFallbackFocusId} from './util'
 import {daysToItems} from '../utilities/daysUtils'
 import {srAlert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {setNaiAboveScreen} from '../actions'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class DynamicUiManager {
   static defaultOptions = {
@@ -163,7 +163,7 @@ export class DynamicUiManager {
   triggerFocusOpportunity() {
     const oppToFocus = this.animatableRegistry.getComponent(
       'opportunity',
-      this.animationPlan.focusOpportunity
+      this.animationPlan.focusOpportunity,
     )
     if (oppToFocus == null) return
     this.animator.focusElement(oppToFocus.component.getFocusable(this.animationPlan.trigger))
@@ -224,8 +224,8 @@ export class DynamicUiManager {
         },
         {
           count: newItems.length,
-        }
-      )
+        },
+      ),
     )
   }
 
@@ -249,7 +249,7 @@ export class DynamicUiManager {
   planDeletedComponent(doomedComponentType, doomedComponentId) {
     const sortedComponents = this.sortedComponentsFor(doomedComponentType)
     const doomedComponentIndex = sortedComponents.findIndex(
-      c => c.componentIds[0] === doomedComponentId
+      c => c.componentIds[0] === doomedComponentId,
     )
     const newComponentIndex = this.findFocusIndexAfterDelete(sortedComponents, doomedComponentIndex)
     const animationPlanFocusField = changeCase.camelCase(`focus-${doomedComponentType}`)

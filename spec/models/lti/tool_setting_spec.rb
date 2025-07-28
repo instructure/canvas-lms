@@ -50,7 +50,7 @@ module Lti
       subject.tool_proxy = tool_proxy
       subject.resource_link_id = "123456"
       expect(subject.save).to be false
-      expect(subject.errors.first).to eq [:context, "can't be blank"]
+      expect(subject.errors[:context].first).to eq "can't be blank"
     end
 
     describe "#custom_settings" do

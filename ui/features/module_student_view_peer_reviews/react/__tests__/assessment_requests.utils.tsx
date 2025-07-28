@@ -131,7 +131,7 @@ describe('Assessment Requests', () => {
               }),
             }),
           }),
-        })
+        }),
       )
     })
   })

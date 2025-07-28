@@ -19,22 +19,22 @@
 import sanitizeUrl from '../sanitizeUrl'
 
 it('replaces javascript: scheme urls with about:blank', () => {
-  // eslint-disable-next-line no-script-url
+   
   expect(sanitizeUrl('javascript:prompt(document.cookie);prompt(document.domain);')).toBe(
-    'about:blank'
+    'about:blank',
   )
 })
 
 it('is not fooled by obfuscating the scheme with newlines and stuff', () => {
   expect(sanitizeUrl('javascri\npt:prompt(document.cookie);prompt(document.domain);')).toBe(
-    'about:blank'
+    'about:blank',
   )
 })
 
 it('is not hoodwinked by mixed-case tomfoolery', () => {
-  // eslint-disable-next-line no-script-url
+   
   expect(sanitizeUrl('jaVascripT:prompt(document.cookie);prompt(document.domain);')).toBe(
-    'about:blank'
+    'about:blank',
   )
 })
 

@@ -45,6 +45,7 @@ class CanvasCropperMaker {
   }
 
   render() {
+     
     ReactDOM.render(
       <CanvasCropper
         height={this.height}
@@ -55,7 +56,7 @@ class CanvasCropperMaker {
         }}
         width={this.width}
       />,
-      this.root
+      this.root,
     )
   }
 

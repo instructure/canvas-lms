@@ -30,7 +30,7 @@ describe "submission_grade_changed" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "only includes the score if opted in (and still enabled on root account)" do
@@ -85,11 +85,6 @@ describe "submission_grade_changed" do
       student.preferences[:send_scores_in_emails] = true
       student.save!
       asset.save!
-    end
-
-    it "shows only the letter grade when RQD is enabled - twitter" do
-      message = generate_message(:submission_grade_changed, :twitter, asset, user: student)
-      expect(message.body).to include("grade: F")
     end
 
     it "shows only the letter grade when RQD is enabled - sms" do

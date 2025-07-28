@@ -1,17 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable eqeqeq */
-/* eslint-disable @typescript-eslint/semi */
-/* eslint-disable prettier/prettier */
-/* eslint-disable prefer-spread */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable no-useless-concat */
-/* eslint-disable radix */
-/* eslint-disable vars-on-top */
-/* eslint-disable object-shorthand */
-/* eslint-disable no-var */
-/* eslint-disable spaced-comment */
-/* eslint-disable notice/notice */
-
 // INSTRUCTURE modified
 
 import $ from 'jquery'

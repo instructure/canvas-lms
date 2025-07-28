@@ -35,9 +35,7 @@ class ObjectView < HashView
     @object = object
   end
 
-  def text
-    @object.text
-  end
+  delegate :text, to: :@object
 
   def name
     text.lines.first.chomp

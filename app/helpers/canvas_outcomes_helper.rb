@@ -21,6 +21,7 @@
 module CanvasOutcomesHelper
   MAX_RETRIES = 3
   THREAD_COUNT = 8
+  DEFAULT_PER_PAGE = 200
   class OSFetchError < StandardError; end
 
   def get_outcome_alignments(context, outcome_ids, additional_params = nil)
@@ -30,27 +31,12 @@ module CanvasOutcomesHelper
       context_uuid: context.uuid,
       external_outcome_id_list: outcome_ids
     }
-
-    domain, jwt = extract_domain_jwt(
-      context.root_account,
-      "lmgb_results.show",
-      **params
-    )
-    return if domain.nil? || jwt.nil?
-
     params = params.merge(additional_params) unless additional_params.nil?
-    response = CanvasHttp.get(
-      build_request_url(protocol, domain, "api/outcomes/list", params),
-      {
-        "Authorization" => jwt
-      }
-    )
 
-    if /^2/.match?(response.code.to_s)
+    response_parser_callback = lambda do |response|
       JSON.parse(response.body, symbolize_names: true)
-    else
-      raise "Error retrieving aligned assets from Outcomes Service: #{response.body}"
     end
+    threaded_request(context, "lmgb_results.show", "api/outcomes/list", params, response_parser_callback)
   end
 
   def get_lmgb_results(context, assignment_ids, assignment_type, outcome_ids, user_uuids = "", artifact_type = "quizzes.quiz")
@@ -67,7 +53,7 @@ module CanvasOutcomesHelper
     threaded_request(context, "lmgb_results.show", "api/authoritative_results", params)
   end
 
-  def threaded_request(context, scope, endpoint, params)
+  def threaded_request(context, scope, endpoint, params, response_parser_callback = nil)
     responses = []
     mutex = Mutex.new
     batcher = OutcomesRequestBatcher.new(protocol, endpoint, context, scope, params)
@@ -76,7 +62,7 @@ module CanvasOutcomesHelper
     Array.new(THREAD_COUNT) do
       Thread.new(requests, responses) do |reqs, resp|
         while (r = mutex.synchronize { reqs.pop })
-          response = get_request(context, r[:domain], r[:endpoint], r[:jwt], r[:params])
+          response = get_request(context, r[:domain], r[:endpoint], r[:jwt], r[:params], DEFAULT_PER_PAGE, response_parser_callback)
           mutex.synchronize { resp.concat(response) } unless response.nil?
         end
       end
@@ -84,12 +70,12 @@ module CanvasOutcomesHelper
     responses
   end
 
-  def get_request(context, domain, endpoint, jwt, params, per_page = 200)
+  def get_request(context, domain, endpoint, jwt, params, per_page = DEFAULT_PER_PAGE, response_parser_callback = nil)
     page_num = 1
     total_pages = 1
     all_results = []
     loop do
-      results, total_pages = get_request_page(context, domain, endpoint, jwt, params, page_num, per_page).values_at(:results, :total_pages)
+      get_request_page(context, domain, endpoint, jwt, params, page_num, per_page, response_parser_callback) => results:, total_pages:
       all_results.concat(results)
       break if page_num >= total_pages
 
@@ -98,7 +84,7 @@ module CanvasOutcomesHelper
     all_results
   end
 
-  def get_request_page(context, domain, endpoint, jwt, params, page_num, per_page = 200)
+  def get_request_page(context, domain, endpoint, jwt, params, page_num, per_page = DEFAULT_PER_PAGE, response_parser_callback = nil)
     retry_count = 0
     pagination_params = {
       per_page:,
@@ -123,17 +109,22 @@ module CanvasOutcomesHelper
       per_page = response.header["Per-Page"].to_i
       total_pages = (response.header["Total"].to_f / per_page).ceil
       begin
-        results = JSON.parse(response.body).deep_symbolize_keys[:results]
-        results.each do |result|
-          next if result[:attempts].nil?
+        # If a response_parser_callback is provided, use it to parse the response
+        if response_parser_callback
+          results = response_parser_callback.call(response)
+        else
+          results = JSON.parse(response.body).deep_symbolize_keys[:results]
+          results.each do |result|
+            next if result[:attempts].nil?
 
-          result[:attempts].each do |attempt|
-            # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
-            # to parse the result returned from outcome service
-            next unless attempt[:metadata].is_a? String
+            result[:attempts].each do |attempt|
+              # Initially metadata was a string, now it's a jsonb data type. When it was a string, canvas needed
+              # to parse the result returned from outcome service
+              next unless attempt[:metadata].is_a? String
 
-            attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
-            attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
+              attempt[:metadata] = JSON.parse(attempt[:metadata]) unless attempt[:metadata].nil?
+              attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
+            end
           end
         end
         { results:, total_pages: }

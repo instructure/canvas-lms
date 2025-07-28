@@ -23,7 +23,10 @@ require_relative "../pages/gradebook_grade_detail_tray_page"
 require_relative "../../helpers/gradebook_common"
 require_relative "../setup/gradebook_setup"
 
-describe "Enhanced Gradebook Filters" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Enhanced Gradebook Filters" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GradebookSetup
@@ -35,6 +38,12 @@ describe "Enhanced Gradebook Filters" do
   end
 
   before(:once) do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
     Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
     Account.site_admin.enable_feature!(:custom_gradebook_statuses)
     init_course_with_students(2)
@@ -331,12 +340,10 @@ describe "Enhanced Gradebook Filters" do
       end
 
       it "can filter and unfilter by date range of assignment due dates" do
-        skip "FOO-3793 (10/6/2023)"
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Start & End Date")
         Gradebook.input_start_date(6.days.from_now(@now))
         Gradebook.input_end_date(8.days.from_now(@now))
-        # not working in the test but works manually in the browser
         Gradebook.apply_date_filter
         expect(Gradebook.fetch_assignment_names).to eq [@a5.name, @a6.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
@@ -344,18 +351,15 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.select_filter_type_menu_item("Start & End Date")
         Gradebook.clear_start_date_input
         Gradebook.clear_end_date_input
-        # not working in the test but works manually in the browser
         Gradebook.apply_date_filter
         expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
       it "can filter by date range of assignment due dates with just a start date" do
-        skip "FOO-3793 (10/6/2023)"
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Start & End Date")
         Gradebook.input_start_date(9.days.from_now(@now))
-        # not working in the test but works manually in the browser
         Gradebook.apply_date_filter
 
         expect(Gradebook.fetch_assignment_names).to eq [@a2.name]
@@ -363,11 +367,9 @@ describe "Enhanced Gradebook Filters" do
       end
 
       it "can filter by date range of assignment due dates with just an end date" do
-        skip "FOO-3793 (10/6/2023)"
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Start & End Date")
         Gradebook.input_end_date(3.days.from_now(@now))
-        # not working in the test but works manually in the browser
         Gradebook.apply_date_filter
 
         expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a3.name]
@@ -418,7 +420,6 @@ describe "Enhanced Gradebook Filters" do
       end
 
       it "can filter by multiple types(sections, assignment groups, status, dates) of filters each are shown above the gradebook in a pill where they can be deseleted" do
-        skip "FOO-3793 (10/6/2023)"
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Sections")
         Gradebook.select_filter_menu_item("Section1")
@@ -552,4 +553,9 @@ describe "Enhanced Gradebook Filters" do
       end
     end
   end
+end
+
+describe "Enhanced Gradebook Filters" do
+  it_behaves_like "Enhanced Gradebook Filters", true
+  it_behaves_like "Enhanced Gradebook Filters", false
 end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
@@ -29,7 +29,7 @@ import fetchOutcomes from './fetchOutcomes'
 import {Set} from 'immutable'
 import * as shapes from './shapes'
 
-const I18n = useI18nScope('IndividualStudentMasteryIndex')
+const I18n = createI18nScope('IndividualStudentMasteryIndex')
 
 class IndividualStudentMastery extends React.Component {
   static propTypes = {
@@ -84,7 +84,7 @@ class IndividualStudentMastery extends React.Component {
         expandedGroups: groups,
         expandedOutcomes: outcomes,
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 
@@ -94,7 +94,7 @@ class IndividualStudentMastery extends React.Component {
         expandedGroups: Set(),
         expandedOutcomes: Set(),
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 
@@ -107,7 +107,7 @@ class IndividualStudentMastery extends React.Component {
           expandedOutcomes: Set(outcomes.map(o => o.expansionId)),
         }
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 

@@ -206,7 +206,7 @@ describe ContentParticipationCount do
     it "is read if other submission fields change" do
       @submission = @assignment.submit_homework(@student)
       @submission.workflow_state = "graded"
-      @submission.graded_at = Time.now
+      @submission.graded_at = Time.zone.now
       @submission.save!
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end

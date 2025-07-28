@@ -34,7 +34,7 @@ describe('canvas_quizzes/events/views/question_inspector/answers/multiple_dropdo
         answer={{
           one: '1',
         }}
-      />
+      />,
     )
 
     expect(document.body.textContent).toMatch('yea!')

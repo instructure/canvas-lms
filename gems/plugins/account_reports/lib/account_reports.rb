@@ -103,36 +103,39 @@ module AccountReports
     return REPORTS.dup unless settings
 
     enabled_reports = settings.select { |_report, enabled| enabled }.map(&:first)
-    REPORTS.select { |report, _details| enabled_reports.include?(report) }
+    REPORTS.slice(*enabled_reports)
   end
 
   def self.generate_report(account_report, attempt: 1)
     account_report.capture_job_id
-    account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
+      raise ReportHelper::ReportStopped if account_report.stopped?
+
+      account_report.update(workflow_state: "running", start_at: Time.zone.now)
       I18n.with_locale(account_report.parameters["locale"]) do
         REPORTS[account_report.report_type].proc.call(account_report)
       end
+    rescue ReportHelper::ReportStopped
+      finalize_report(account_report, "Generating the report, #{account_report.title}, stopped.")
     rescue => e
       if retry_exception?(e) && attempt < Setting.get("account_report_attempts", "3").to_i
         account_report.run_report(attempt: attempt + 1) # this will queue a new job
         return
       end
       error_report_id = report_on_exception(e, { user: account_report.user })
-      title = account_report.report_type.to_s.titleize
-      error_message = "Generating the report, #{title}, failed."
+      error_message = "Generating the report, #{account_report.title}, failed."
       error_message += if error_report_id
                          " Please report the following error code to your system administrator: ErrorReport:#{error_report_id}"
                        else
                          " Unable to create error_report_id for #{e}"
                        end
-      finalize_report(account_report, error_message)
+      finalize_report(account_report, error_message, exception: e)
       @er = nil
     end
   end
 
   def self.retry_exception?(exception)
-    exception.is_a?(PG::ConnectionBad)
+    [PG::ConnectionBad, ActiveRecord::ConnectionFailed].any? { |e| exception.is_a?(e) }
   end
 
   def self.report_on_exception(exception, context, level: :error)
@@ -231,25 +234,32 @@ module AccountReports
     account_report.attachment = attachment
   end
 
-  def self.failed_report(account_report)
+  def self.failed_report(account_report, exception: nil)
     fail_text = if @er
                   I18n.t("Failed, please report the following error code to your system administrator: ErrorReport:%{error};",
                          error: @er.id.to_s)
+                elsif exception.is_a?(CustomReports::Rubrics::RootAccountRequiredError)
+                  I18n.t("This report can only be run on the root account.")
                 else
                   I18n.t("Failed, the report failed to generate a file. Please try again.")
                 end
     account_report.parameters["extra_text"] = fail_text
   end
 
-  def self.finalize_report(account_report, message, csv = nil)
-    report_attachment(account_report, csv)
+  def self.finalize_report(account_report, message, csv = nil, exception: nil)
+    account_report.reload
     account_report.message = message
-    failed_report(account_report) unless csv
-    if account_report.workflow_state == "aborted"
+
+    if account_report.stopped?
       account_report.parameters["extra_text"] = I18n.t("Report has been aborted")
+    elsif csv
+      report_attachment(account_report, csv)
+      account_report.workflow_state = "complete"
     else
-      account_report.workflow_state = csv ? "complete" : "error"
+      failed_report(account_report, exception:)
+      account_report.workflow_state = "error"
     end
+
     account_report.update_attribute(:progress, 100)
     account_report.end_at ||= Time.zone.now
     account_report.save!

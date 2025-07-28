@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -18,17 +17,26 @@
  */
 
 import React from 'react'
-import {bool, func, shape} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
-export default function AdvancedTabPanel(props) {
-  const {courseSettings, onCourseSettingsChange} = props
+type CourseSettings = {
+  allowFinalGradeOverride: boolean
+}
 
+type AdvancedTabPanelProps = {
+  courseSettings: CourseSettings
+  onCourseSettingsChange: (settings: {allowFinalGradeOverride: boolean}) => void
+}
+
+export default function AdvancedTabPanel({
+  courseSettings,
+  onCourseSettingsChange,
+}: AdvancedTabPanelProps) {
   return (
     <div id="AdvancedTabPanel__Container">
       <View as="div" margin="small">
@@ -42,11 +50,4 @@ export default function AdvancedTabPanel(props) {
       </View>
     </div>
   )
-}
-
-AdvancedTabPanel.propTypes = {
-  courseSettings: shape({
-    allowFinalGradeOverride: bool.isRequired,
-  }).isRequired,
-  onCourseSettingsChange: func.isRequired,
 }

@@ -203,7 +203,7 @@ describe "Outcome Groups API", type: :request do
                      action: "redirect",
                      account_id: @account.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "redirects to the root group" do
@@ -342,41 +342,37 @@ describe "Outcome Groups API", type: :request do
     end
 
     context "assessed trait on outcome link object" do
-      let(:check_outcome) do
-        lambda do |outcome, can_edit|
-          expect(outcome).to include({
-                                       "id" => @outcome.id,
-                                       "vendor_guid" => @outcome.vendor_guid,
-                                       "context_type" => @account.class.to_s,
-                                       "context_id" => @account.id,
-                                       "title" => @outcome.title.to_s,
-                                       "display_name" => nil,
-                                       "url" => api_v1_outcome_path(id: @outcome.id),
-                                       "can_edit" => can_edit,
-                                       "has_updateable_rubrics" => false
-                                     })
-        end
+      def check_outcome(outcome, can_edit)
+        expect(outcome).to include({
+                                     "id" => @outcome.id,
+                                     "vendor_guid" => @outcome.vendor_guid,
+                                     "context_type" => @account.class.to_s,
+                                     "context_id" => @account.id,
+                                     "title" => @outcome.title.to_s,
+                                     "display_name" => nil,
+                                     "url" => api_v1_outcome_path(id: @outcome.id),
+                                     "can_edit" => can_edit,
+                                     "has_updateable_rubrics" => false
+                                   })
       end
 
-      let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_edit, can_unlink|
-          expect(outcome_link).to include({
-                                            "context_type" => context.class.to_s,
-                                            "context_id" => context.id,
-                                            "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
-                                            "assessed" => assessed,
-                                            "can_unlink" => can_unlink,
-                                            "outcome_group" => {
-                                              "id" => group.id,
-                                              "title" => group.title,
-                                              "vendor_guid" => group.vendor_guid,
-                                              "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
-                                              "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
-                                              "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
-                                              "can_edit" => can_edit
-                                            }
-                                          })
-        end
+      def check_outcome_link(outcome_link, context, group, assessed, can_edit, can_unlink)
+        expect(outcome_link).to include({
+                                          "context_type" => context.class.to_s,
+                                          "context_id" => context.id,
+                                          "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
+                                          "assessed" => assessed,
+                                          "can_unlink" => can_unlink,
+                                          "outcome_group" => {
+                                            "id" => group.id,
+                                            "title" => group.title,
+                                            "vendor_guid" => group.vendor_guid,
+                                            "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
+                                            "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
+                                            "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
+                                            "can_edit" => can_edit
+                                          }
+                                        })
       end
 
       it "outcome is not assessed" do
@@ -389,9 +385,9 @@ describe "Outcome Groups API", type: :request do
                         account_id: @account.id,
                         format: "json")
 
-        check_outcome.call(json.last["outcome"], true)
+        check_outcome(json.last["outcome"], true)
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.last.tap { |j| j.delete("outcome") },
           @account,
           @group,
@@ -421,8 +417,8 @@ describe "Outcome Groups API", type: :request do
                           course_id: @course.id,
                           format: "json")
 
-          check_outcome.call(json.last["outcome"], false)
-          check_outcome_link.call(
+          check_outcome(json.last["outcome"], false)
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @course,
             @course.root_outcome_group,
@@ -441,8 +437,8 @@ describe "Outcome Groups API", type: :request do
                           course_id: @course.id,
                           format: "json")
 
-          check_outcome.call(json.last["outcome"], false)
-          check_outcome_link.call(
+          check_outcome(json.last["outcome"], false)
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @course,
             @course.root_outcome_group,
@@ -461,7 +457,7 @@ describe "Outcome Groups API", type: :request do
                           account_id: @account.id,
                           format: "json")
 
-          check_outcome_link.call(
+          check_outcome_link(
             json.last.tap { |j| j.delete("outcome") },
             @account,
             @account.root_outcome_group,
@@ -705,7 +701,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global outcomes" do
@@ -719,7 +715,7 @@ describe "Outcome Groups API", type: :request do
                    action: "update",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails for root groups" do
@@ -748,6 +744,39 @@ describe "Outcome Groups API", type: :request do
       @group.reload
       expect(@group.title).to eq "New Title"
       expect(@group.description).to eq "New Description"
+    end
+
+    it "updates attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:put,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
+               { controller: "outcome_groups_api",
+                 action: "update",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "New Title",
+                 description: aa_test_data.added_html })
+
+      @group.reload
+      attachment_ids = @group.attachment_associations.pluck(:attachment_id)
+      expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+    end
+
+    it "removes attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:put,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
+               { controller: "outcome_groups_api",
+                 action: "update",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "New Title",
+                 description: aa_test_data.removed_html })
+
+      @group.reload
+      expect(@group.attachment_associations.size).to eq 0
     end
 
     it "leaves alone fields not provided" do
@@ -866,7 +895,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global outcomes" do
@@ -880,7 +909,7 @@ describe "Outcome Groups API", type: :request do
                    action: "destroy",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails for root groups" do
@@ -1079,41 +1108,37 @@ describe "Outcome Groups API", type: :request do
     end
 
     context "assessed trait on outcome link object" do
-      let(:check_outcome) do
-        lambda do |outcome|
-          expect(outcome).to include({
-                                       "id" => @outcome.id,
-                                       "vendor_guid" => @outcome.vendor_guid,
-                                       "context_type" => @account.class.to_s,
-                                       "context_id" => @account.id,
-                                       "title" => @outcome.title.to_s,
-                                       "display_name" => nil,
-                                       "url" => api_v1_outcome_path(id: @outcome.id),
-                                       "can_edit" => !LearningOutcome.find(@outcome.id).assessed?,
-                                       "has_updateable_rubrics" => @outcome.updateable_rubrics?
-                                     })
-        end
+      def check_outcome(outcome)
+        expect(outcome).to include({
+                                     "id" => @outcome.id,
+                                     "vendor_guid" => @outcome.vendor_guid,
+                                     "context_type" => @account.class.to_s,
+                                     "context_id" => @account.id,
+                                     "title" => @outcome.title.to_s,
+                                     "display_name" => nil,
+                                     "url" => api_v1_outcome_path(id: @outcome.id),
+                                     "can_edit" => !LearningOutcome.find(@outcome.id).assessed?,
+                                     "has_updateable_rubrics" => @outcome.updateable_rubrics?
+                                   })
       end
 
-      let(:check_outcome_link) do
-        lambda do |outcome_link, context, group, assessed, can_unlink|
-          expect(outcome_link).to include({
-                                            "context_type" => context.class.to_s,
-                                            "context_id" => context.id,
-                                            "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
-                                            "assessed" => assessed,
-                                            "can_unlink" => can_unlink,
-                                            "outcome_group" => {
-                                              "id" => group.id,
-                                              "title" => group.title,
-                                              "vendor_guid" => group.vendor_guid,
-                                              "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
-                                              "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
-                                              "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
-                                              "can_edit" => !assessed
-                                            }
-                                          })
-        end
+      def check_outcome_link(outcome_link, context, group, assessed, can_unlink)
+        expect(outcome_link).to include({
+                                          "context_type" => context.class.to_s,
+                                          "context_id" => context.id,
+                                          "url" => polymorphic_path([:api_v1, context, :outcome_link], id: group.id, outcome_id: @outcome.id),
+                                          "assessed" => assessed,
+                                          "can_unlink" => can_unlink,
+                                          "outcome_group" => {
+                                            "id" => group.id,
+                                            "title" => group.title,
+                                            "vendor_guid" => group.vendor_guid,
+                                            "url" => polymorphic_path([:api_v1, context, :outcome_group], id: group.id),
+                                            "subgroups_url" => polymorphic_path([:api_v1, context, :outcome_group_subgroups], id: group.id),
+                                            "outcomes_url" => polymorphic_path([:api_v1, context, :outcome_group_outcomes], id: group.id),
+                                            "can_edit" => !assessed
+                                          }
+                                        })
       end
 
       it "outcome is not assessed" do
@@ -1130,8 +1155,8 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome.call(json.first["outcome"])
-        check_outcome_link.call(json.first.tap { |j| j.delete("outcome") }, @account, @group, false, true)
+        check_outcome(json.first["outcome"])
+        check_outcome_link(json.first.tap { |j| j.delete("outcome") }, @account, @group, false, true)
       end
 
       it "outcome is assessed" do
@@ -1158,9 +1183,9 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome.call(json.first["outcome"])
+        check_outcome(json.first["outcome"])
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.first.tap { |j| j.delete("outcome") },
           @course,
           @course.root_outcome_group,
@@ -1188,7 +1213,7 @@ describe "Outcome Groups API", type: :request do
           format: "json"
         )
 
-        check_outcome_link.call(
+        check_outcome_link(
           json.first.tap { |j| j.delete("outcome") },
           @course,
           @course.root_outcome_group,
@@ -1271,7 +1296,7 @@ describe "Outcome Groups API", type: :request do
                      id: @group.id.to_s,
                      outcome_id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "requires manage_global_outcomes permission for global groups" do
@@ -1285,7 +1310,7 @@ describe "Outcome Groups API", type: :request do
                      id: @group.id.to_s,
                      outcome_id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "fails if the outcome isn't available to the context" do
@@ -1421,6 +1446,35 @@ describe "Outcome Groups API", type: :request do
       @account = Account.default
       @account_user = @user.account_users.create(account: @account)
       @group = @account.root_outcome_group
+    end
+
+    it "requires permission" do
+      revoke_permission(@account_user, :manage_outcomes)
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                   { controller: "outcome_groups_api",
+                     action: "link",
+                     account_id: @account.id.to_s,
+                     id: @group.id.to_s,
+                     format: "json" },
+                   { title: "My Outcome",
+                     description: "Description of my outcome" })
+      assert_forbidden
+    end
+
+    it "requires manage_global_outcomes permission for global groups" do
+      @account_user = @user.account_users.create(account: Account.site_admin)
+      @group = LearningOutcomeGroup.global_root_outcome_group
+      revoke_permission(@account_user, :manage_global_outcomes)
+      raw_api_call(:post,
+                   "/api/v1/global/outcome_groups/#{@group.id}/outcomes",
+                   { controller: "outcome_groups_api",
+                     action: "link",
+                     id: @group.id.to_s,
+                     format: "json" },
+                   { title: "My Outcome",
+                     description: "Description of my outcome" })
+      assert_forbidden
     end
 
     it "fails (400) if the new outcome is invalid" do
@@ -1706,7 +1760,7 @@ describe "Outcome Groups API", type: :request do
                    id: @group.id.to_s,
                    outcome_id: @outcome.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -1721,7 +1775,7 @@ describe "Outcome Groups API", type: :request do
                    id: @group.id.to_s,
                    outcome_id: @outcome.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "404s if the outcome isn't linked in the group" do
@@ -1921,7 +1975,7 @@ describe "Outcome Groups API", type: :request do
                    account_id: @account.id.to_s,
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -1934,7 +1988,7 @@ describe "Outcome Groups API", type: :request do
                    action: "create",
                    id: @group.id.to_s,
                    format: "json")
-      assert_status(401)
+      assert_forbidden
     end
 
     it "creates a new outcome group" do
@@ -1952,6 +2006,23 @@ describe "Outcome Groups API", type: :request do
       @subgroup = @group.child_outcome_groups.active.first
       expect(@subgroup.title).to eq "My Subgroup"
       expect(@subgroup.description).to eq "Description of my subgroup"
+    end
+
+    it "adds attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
+               { controller: "outcome_groups_api",
+                 action: "create",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "My Subgroup",
+                 description: aa_test_data.base_html })
+      @subgroup = @group.child_outcome_groups.active.first
+      aas = AttachmentAssociation.where(context_type: "LearningOutcomeGroup", context_id: @subgroup.id)
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
     end
 
     it "returns json of the new subgroup" do
@@ -2013,7 +2084,7 @@ describe "Outcome Groups API", type: :request do
                      id: @target_group.id.to_s,
                      format: "json" },
                    { source_outcome_group_id: @source_group.id.to_s })
-      assert_status(401)
+      assert_forbidden
     end
 
     it "requires manage_global_outcomes permission for global groups" do
@@ -2027,7 +2098,7 @@ describe "Outcome Groups API", type: :request do
                      id: @target_group.id.to_s,
                      format: "json" },
                    { source_outcome_group_id: @source_group.id.to_s })
-      assert_status(401)
+      assert_forbidden
     end
 
     it "fails if the source group doesn't exist (or is deleted)" do

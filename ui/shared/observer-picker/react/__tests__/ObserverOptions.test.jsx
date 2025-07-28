@@ -58,7 +58,7 @@ describe('ObserverOptions', () => {
     const student2 = props.observedUsersList[2]
     expect(getByText(student2.name)).toBeInTheDocument()
     expect(
-      getByText(student2.name).parentElement.querySelector(`[src="${student2.avatar_url}"]`)
+      getByText(student2.name).parentElement.querySelector(`[src="${student2.avatar_url}"]`),
     ).toBeInTheDocument()
 
     const student4 = props.observedUsersList[1]
@@ -78,7 +78,7 @@ describe('ObserverOptions', () => {
   it('calls handleChangeObservedUser and saves cookie when changing the user', () => {
     const handleChangeObservedUser = jest.fn()
     const {getByRole, getByText} = render(
-      <ObserverOptions {...getProps({handleChangeObservedUser})} />
+      <ObserverOptions {...getProps({handleChangeObservedUser})} />,
     )
     const select = getByRole('combobox', {name: 'Select a student to view'})
     act(() => select.click())
@@ -89,7 +89,7 @@ describe('ObserverOptions', () => {
 
   it('renders a label if there is only one observed student', () => {
     const {getByText, queryByRole} = render(
-      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[2]]})} />
+      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[2]]})} />,
     )
     expect(getByText('You are observing Student 2')).toBeInTheDocument()
     expect(getByText('Student 2')).toBeInTheDocument()
@@ -103,7 +103,7 @@ describe('ObserverOptions', () => {
 
   it('does not render if only user is self', () => {
     const {container} = render(
-      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[0]]})} />
+      <ObserverOptions {...getProps({observedUsersList: [MOCK_OBSERVED_USERS_LIST[0]]})} />,
     )
     expect(container).toBeEmptyDOMElement()
   })
@@ -125,7 +125,7 @@ describe('ObserverOptions', () => {
 
   it("does not display the add student option if the user can't add observees", () => {
     const {getByRole, queryByText} = render(
-      <ObserverOptions {...getProps()} canAddObservee={false} />
+      <ObserverOptions {...getProps()} canAddObservee={false} />,
     )
     const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select).toBeInTheDocument()

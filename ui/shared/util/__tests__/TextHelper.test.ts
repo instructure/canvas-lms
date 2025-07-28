@@ -24,7 +24,7 @@ describe('formatMessage', () => {
     let link: HTMLAnchorElement
     let str: string
     str = TextHelper.formatMessage(
-      'click here: (http://www.instructure.com) to check things out\nnewline'
+      'click here: (http://www.instructure.com) to check things out\nnewline',
     )
     testNode.innerHTML = str
     link = testNode.getElementsByTagName('a')[0]
@@ -46,7 +46,7 @@ describe('formatMessage', () => {
     expect(link.href).toBe('http://www.instructure.com/')
 
     str = TextHelper.formatMessage(
-      'click here: http://www.instructure.com/courses/1/pages/informação'
+      'click here: http://www.instructure.com/courses/1/pages/informação',
     )
     testNode.innerHTML = str
     link = testNode.getElementsByTagName('a')[0]
@@ -58,7 +58,7 @@ describe('formatMessage', () => {
     expect(link.href).toBe('http://www.instructure.com/courses/1/pages#anchor')
 
     str = TextHelper.formatMessage(
-      "click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline"
+      "click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline",
     )
     testNode.innerHTML = str
     link = testNode.getElementsByTagName('a')[0]
@@ -66,21 +66,21 @@ describe('formatMessage', () => {
 
     // > ~15 chars in parens used to blow up the parser to take forever
     str = TextHelper.formatMessage(
-      'click here: http://www.instructure.com/(012345678901234567890123456789012345678901234567890)'
+      'click here: http://www.instructure.com/(012345678901234567890123456789012345678901234567890)',
     )
     testNode.innerHTML = str
     link = testNode.getElementsByTagName('a')[0]
     expect(link.href).toBe(
-      'http://www.instructure.com/(012345678901234567890123456789012345678901234567890)'
+      'http://www.instructure.com/(012345678901234567890123456789012345678901234567890)',
     )
   })
 
   test('handles having the placeholder in the text body', () => {
     const str = TextHelper.formatMessage(
-      `this text has the placeholder ${TextHelper.AUTO_LINKIFY_PLACEHOLDER} embedded right in it.\nhttp://www.instructure.com/\n`
+      `this text has the placeholder ${TextHelper.AUTO_LINKIFY_PLACEHOLDER} embedded right in it.\nhttp://www.instructure.com/\n`,
     )
     expect(str).toBe(
-      `this text has the placeholder ${TextHelper.AUTO_LINKIFY_PLACEHOLDER} embedded right in it.<br />\n<a href='http:&#x2F;&#x2F;www.instructure.com&#x2F;'>http:&#x2F;&#x2F;www.instructure.com&#x2F;</a><br />\n`
+      `this text has the placeholder ${TextHelper.AUTO_LINKIFY_PLACEHOLDER} embedded right in it.<br />\n<a href='http:&#x2F;&#x2F;www.instructure.com&#x2F;'>http:&#x2F;&#x2F;www.instructure.com&#x2F;</a><br />\n`,
     )
   })
 })
@@ -113,7 +113,7 @@ describe('delimit', () => {
 describe('truncateText', () => {
   test('should work in the basic case', () => {
     expect(TextHelper.truncateText('this is longer than 30 characters')).toBe(
-      'this is longer than 30...'
+      'this is longer than 30...',
     )
   })
 
@@ -132,5 +132,35 @@ describe('truncateText', () => {
   test('should break up the first word if it exceeds max', () => {
     expect(TextHelper.truncateText('zomgzomg', {max: 6})).toBe('zom...')
     expect(TextHelper.truncateText('zomgzomg', {max: 7})).toBe('zomg...')
+  })
+})
+
+describe('containsHtmlTags', () => {
+  test('should return true if html tags present', () => {
+    expect(TextHelper.containsHtmlTags('<p>Html detected</p>')).toBeTruthy()
+  })
+
+  test('should return false if not present', () => {
+    expect(TextHelper.containsHtmlTags('No html present')).toBeFalsy()
+  })
+})
+
+describe('stripHtmlTags', () => {
+  const htmlText = '<p>Test <strong>Content</strong></p>'
+  const strippedText = 'Test Content'
+
+  it('returns stripped text if arg is HTML text', () => {
+    const result = TextHelper.stripHtmlTags(htmlText)
+    expect(result).toEqual(strippedText)
+  })
+
+  it('returns empty string if arg is empty', () => {
+    const result = TextHelper.stripHtmlTags('')
+    expect(result).toEqual('')
+  })
+
+  it('returns empty string if undefined provided', () => {
+    const result = TextHelper.stripHtmlTags()
+    expect(result).toEqual('')
   })
 })

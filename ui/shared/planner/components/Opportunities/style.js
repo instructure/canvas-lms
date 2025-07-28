@@ -38,8 +38,8 @@ export default function buildStyle() {
 
   const theme = {
     padding: `${variables.spacing.xSmall} ${variables.spacing.small} ${variables.spacing.small}`,
-    borderBottom: `${variables.borders.widthSmall} ${variables.borders.style} ${variables.colors.tiara}`,
-    borderColor: variables.colors.tiara,
+    borderBottom: `${variables.borders.widthSmall} ${variables.borders.style} ${variables.colors.contrasts.grey1214}`,
+    borderColor: variables.colors.contrasts.grey1214,
     borderWidth: variables.borders.widthSmall,
     borderStyle: variables.borders.style,
     itemMargin: variables.spacing.small,
@@ -57,13 +57,13 @@ export default function buildStyle() {
     max-width: 100%;
     line-height: ${theme.lineHeight};
   }
-  
+
   .${classNames.header} {
     border-bottom: ${theme.borderBottom};
     text-align: center;
     margin-bottom: 0.25rem;
   }
-  
+
   .${classNames.list} {
     list-style-type: none;
     color: ${theme.color};
@@ -71,7 +71,7 @@ export default function buildStyle() {
     padding: 0;
     box-sizing: border-box;
   }
-  
+
   .${classNames.item} {
     margin: 0;
     padding: 0;
@@ -83,11 +83,11 @@ export default function buildStyle() {
     border-top: ${theme.borderWidth} ${theme.borderStyle} ${theme.borderColor};
     padding-top: ${theme.itemPadding};
   }
-  
+
   .${classNames.loading} {
     text-align: center;
   }
-  
+
   #${classNames.tabs_container} > div:first-child {
     display: inline-block;
   }

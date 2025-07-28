@@ -25,8 +25,8 @@ describe NotificationPolicy do
 
   context "channels" do
     before(:once) do
-      @course = factory_with_protected_attributes(Course, name: "test course", workflow_state: "available")
-      @student = factory_with_protected_attributes(User, name: "student", workflow_state: "registered")
+      @course = Course.create!(name: "test course", workflow_state: "available")
+      @student = User.create!(name: "student", workflow_state: "registered")
       e = @course.enroll_student(@student)
       e.accept!
       Notification.all.each(&:destroy)
@@ -339,7 +339,7 @@ describe NotificationPolicy do
 
   context "find_all_for" do
     it "only returns course type notification policies if provided a course context type" do
-      student = factory_with_protected_attributes(User, name: "student", workflow_state: "registered")
+      student = User.create!(name: "student", workflow_state: "registered")
       channel = communication_channel(student, { username: "default@example.com", active_cc: true })
 
       course_type_notification = Notification.create!(name: "Course Type", subject: "Test", category: "Due Date")
@@ -355,7 +355,7 @@ describe NotificationPolicy do
     end
 
     it "creates NotificationPolicies with default frequencies when they don't exist" do
-      student = factory_with_protected_attributes(User, name: "student", workflow_state: "registered")
+      student = User.create!(name: "student", workflow_state: "registered")
       channel = communication_channel(student, { username: "default@example.com", active_cc: true })
       notification = Notification.create!(name: "Panda Express", subject: "Test", category: "Whatever")
 

@@ -64,7 +64,7 @@ describe('CourseSelect', () => {
     const {getByTestId} = render(
       <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
         <CourseSelect {...props} />
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
     expect(getByTestId('course-select')).toBeInTheDocument()
   })
@@ -76,7 +76,7 @@ describe('CourseSelect', () => {
     const {getByTestId, getByText} = render(
       <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
         <CourseSelect {...props} />
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
     const select = getByTestId('course-select')
     fireEvent.click(select)
@@ -89,7 +89,7 @@ describe('CourseSelect', () => {
     const {getByTestId, queryByText} = render(
       <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
         <CourseSelect {...props} />
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
     const select = getByTestId('course-select')
     fireEvent.click(select)
@@ -104,7 +104,7 @@ describe('CourseSelect', () => {
       const {getByTestId, queryByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <CourseSelect {...props} />
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
       const select = getByTestId('course-select')
       fireEvent.click(select)
@@ -120,14 +120,14 @@ describe('CourseSelect', () => {
       const {getByTestId, getByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <CourseSelect {...props} />
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
       const select = getByTestId('course-select')
       fireEvent.click(select)
       fireEvent.click(getByText('All Courses'))
       expect(select.value).toBe('')
       // assert filter id is updated to null for network request
-      expect(filterMock.mock.calls.length).toBe(1)
+      expect(filterMock.mock.calls).toHaveLength(1)
       expect(filterMock.mock.calls[0][0].contextID).toBe(null)
     })
   })

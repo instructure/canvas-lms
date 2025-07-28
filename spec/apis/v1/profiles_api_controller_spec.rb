@@ -21,7 +21,7 @@
 require_relative "../api_spec_helper"
 
 def call_setting(opts)
-  status_assertion = opts[:assert_unauthorized] ? { expected_status: 401 } : {}
+  status_assertion = opts[:assert_unauthorized] ? { expected_status: 403 } : {}
   api_call_as_user(opts[:as_user],
                    :get,
                    "/api/v1/users/#{opts[:for_user].id}/profile.json",

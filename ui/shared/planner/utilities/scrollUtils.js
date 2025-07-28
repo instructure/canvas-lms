@@ -117,7 +117,7 @@ export function registerScrollEvents({
     undefined,
     scrollIntoPastCb,
     scrollIntoFutureCb,
-    wind
+    wind,
   )
   wind.addEventListener('wheel', boundWindowWheel)
 
@@ -127,7 +127,7 @@ export function registerScrollEvents({
     undefined,
     scrollIntoPastCb,
     scrollIntoFutureCb,
-    wind
+    wind,
   )
   wind.addEventListener('touchmove', boundTouchMove)
 

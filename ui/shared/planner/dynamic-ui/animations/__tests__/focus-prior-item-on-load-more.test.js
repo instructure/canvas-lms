@@ -24,7 +24,7 @@ function createReadyAnimation() {
   const result = createAnimation(FocusPriorItemOnLoadMore)
   result.animation.acceptAction(gettingFutureItems({loadMoreButtonClicked: true}))
   result.animation.acceptAction(
-    gotDaysSuccess([['2018-03-28', [{uniqueId: 'new-item-1'}, {uniqueId: 'new-item-2'}]]])
+    gotDaysSuccess([['2018-03-28', [{uniqueId: 'new-item-1'}, {uniqueId: 'new-item-2'}]]]),
   )
   return result
 }

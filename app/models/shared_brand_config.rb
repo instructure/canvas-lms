@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SharedBrandConfig < ActiveRecord::Base
-  belongs_to :brand_config, foreign_key: "brand_config_md5"
+  belongs_to :brand_config, foreign_key: "brand_config_md5", inverse_of: :shared_brand_configs
   belongs_to :account
 
   validates :brand_config, presence: true

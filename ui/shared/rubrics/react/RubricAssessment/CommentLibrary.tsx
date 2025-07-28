@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import type {UpdateAssessmentData} from '../types/rubric'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 type CommentLibraryProps = {
   rubricSavedComments: string[]
@@ -37,9 +37,10 @@ export const CommentLibrary = ({
   updateAssessmentData,
 }: CommentLibraryProps) => {
   const COMMENT_LIBRARY_FIRST_STRING = '[ Select ]'
+  const COMMENT_LIBRARY_SELECT_ID = 'select-comment-initialized'
 
   const first = (
-    <SimpleSelect.Option key="first" id="first" value="">
+    <SimpleSelect.Option key="first" id={COMMENT_LIBRARY_SELECT_ID} value="">
       {COMMENT_LIBRARY_FIRST_STRING}
     </SimpleSelect.Option>
   )
@@ -55,8 +56,9 @@ export const CommentLibrary = ({
     <SimpleSelect.Option
       key={slug(comment).slice(-8)}
       id={`${slug(comment).slice(-6)}_${index}`}
-      value={truncate(comment)}
+      value={index.toString()}
       label={truncate(comment)}
+      data-testid={`comment-library-option-${criterionId}-${index}`}
     >
       {truncate(comment)}
     </SimpleSelect.Option>
@@ -66,10 +68,14 @@ export const CommentLibrary = ({
     <SimpleSelect
       renderLabel={false}
       assistiveText={I18n.t('Select from saved comments')}
-      onChange={(_unused, el) => setCommentText(el.value?.toString() ?? '')}
-      onBlur={e => {
-        e.target.value !== COMMENT_LIBRARY_FIRST_STRING &&
-          updateAssessmentData({comments: e.target.value})
+      onChange={(_unused, el) => {
+        if (el.id === COMMENT_LIBRARY_SELECT_ID) {
+          return
+        }
+        const selectedIndex = Number.parseInt(el.value?.toString() ?? '', 10)
+        const fullComment = rubricSavedComments[selectedIndex]
+        setCommentText(fullComment)
+        updateAssessmentData({comments: fullComment})
       }}
       key={criterionId}
       data-testid={`comment-library-${criterionId}`}

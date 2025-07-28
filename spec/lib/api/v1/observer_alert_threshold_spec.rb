@@ -22,9 +22,7 @@ require_relative "../../../spec_helper"
 class ObserverAlertThresholdApiHarness
   include Api::V1::ObserverAlertThreshold
 
-  def value_to_boolean(value)
-    Canvas::Plugin.value_to_boolean(value)
-  end
+  delegate :value_to_boolean, to: :"Canvas::Plugin"
 
   def session
     Object.new

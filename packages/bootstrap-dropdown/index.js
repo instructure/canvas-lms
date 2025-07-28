@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable spaced-comment */
 /* eslint-disable vars-on-top */
 /* eslint-disable no-bitwise */

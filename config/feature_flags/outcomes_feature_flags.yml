@@ -8,17 +8,16 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-selectable_outcomes_in_course_copy:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Selectable outcomes during course content migration"
-  description: "Allows learning outcomes to be selectable when migrating course content"
 limit_section_visibility_in_lmgb:
   state: hidden
   applies_to: RootAccount
   display_name: Restricted view for teachers in LMGB
-  description: Hides certain students and sections in the LMGB if the teacher only
+  description:
+    Hides certain students and sections in the LMGB if the teacher only
     has access to a particular section
+  environments:
+    development:
+      state: on
 outcome_alignments_course_migration:
   state: hidden
   applies_to: RootAccount
@@ -28,22 +27,21 @@ outcome_alignments_course_migration:
 account_level_mastery_scales:
   state: hidden
   display_name: Account and Course Level Outcome Mastery Scales
-  description: Allows setting Account & Course Level mastery scales and calculation methods,
+  description:
+    Allows setting Account & Course Level mastery scales and calculation methods,
     replacing per-outcome criterion ratings & calculation methods
   after_state_change_proc: mastery_scales_after_change_hook
   applies_to: RootAccount
-usage_rights_discussion_topics:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Usage Rights on Discussion Topics
-  description: On courses with usage rights enabled, enforces usage rights
-    selection on discussion topic file attachments
 improved_outcomes_management:
   state: hidden
   applies_to: RootAccount
   display_name: Improved Outcomes Management
-  description: Helps administrators and teachers make more meaningful decisions as they import,
+  description:
+    Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
+  environments:
+    development:
+      state: on
 assignment_comment_library:
   type: setting
   state: hidden
@@ -68,32 +66,51 @@ menu_option_for_outcome_details_page:
   applies_to: SiteAdmin
   display_name: Menu Option for Outcome Details Page
   description: Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management
+  environments:
+    development:
+      state: on
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
   display_name: Outcomes Friendly Description
-  description: Allows users to add a friendly description to outcomes for student and parent view
+  description:
+    Allows users to add a friendly description to outcomes for student and parent view
     in the Student Learning Mastery Gradebook.
+  environments:
+    development:
+      state: on
 outcome_service_results_to_canvas:
   state: hidden
   applies_to: Course
   display_name: Outcome Service Results to Canvas Reporting
   description: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
+  environments:
+    development:
+      state: on
 outcome_average_calculation:
   state: allowed_on
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
   description: Allows users to use average as a calculation method for a given outcome.
+  environments:
+    development:
+      state: on
 outcome_alignment_summary_with_new_quizzes:
   state: hidden
   applies_to: Course
   display_name: New Quizzes included on Outcome Alignment Summary Tab
   description: New Quizzes outcome alignments are included on the Outcome Alignment Summary Tab, which provides a list of alignments for each outcome in a course.
+  environments:
+    development:
+      state: on
 outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
   display_name: Outcomes New Decaying Average Calculation Method
   description: Allows users to use new decaying average as a calculation method for a given outcome.
+  environments:
+    development:
+      state: on
 archive_outcomes:
   state: hidden
   applies_to: SiteAdmin
@@ -110,3 +127,12 @@ prevent_deletion_outcomes_with_os_alignments:
   applies_to: SiteAdmin
   display_name: Prevent deletion of outcomes with alignments in OS
   description: This FF is for development purposes only and should not be adjusted without first consulting product and engineering. This flag will prevent deletion of outcomes that have alignments within the outcomes service, which is used for New Quizzes.
+improved_outcome_report_generation:
+  state: hidden
+  display_name: Improved Outcome Report Generation
+  description: Enables postprocessing records after SQL execution to reduce query complexity in Outcome reports.
+  applies_to: SiteAdmin
+  shadow: true
+  environments:
+    development:
+      state: on

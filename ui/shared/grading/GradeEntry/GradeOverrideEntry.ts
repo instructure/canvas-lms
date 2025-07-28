@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -29,9 +28,15 @@ import GradeOverrideInfo from './GradeOverrideInfo'
 import GradeEntry, {EnterGradesAs} from './index'
 import type {GradeType, DeprecatedGradingScheme, GradeEntryMode} from '../grading.d'
 
+// @ts-expect-error
 function schemeKeyForPercentage(percentage, gradingScheme: DeprecatedGradingScheme) {
   if (gradingScheme) {
-    const grade = scoreToGrade(percentage, gradingScheme.data, gradingScheme.pointsBased)
+    const grade = scoreToGrade(
+      percentage,
+      gradingScheme.data,
+      gradingScheme.pointsBased,
+      gradingScheme.scalingFactor,
+    )
     return GradeFormatHelper.replaceDashWithMinus(grade)
   }
   return null
@@ -43,6 +48,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     return EnterGradesAs.PERCENTAGE
   }
 
+  // @ts-expect-error
   formatGradeInfoForDisplay(gradeInfo) {
     const {valid, enteredValue, grade} = gradeInfo
     if (!valid) {
@@ -64,6 +70,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     })
   }
 
+  // @ts-expect-error
   formatGradeInfoForInput({enteredValue, grade, valid}) {
     if (!valid) {
       return enteredValue
@@ -84,6 +91,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     })
   }
 
+  // @ts-expect-error
   gradeInfoFromGrade(grade, inputByUser: boolean) {
     if (!grade) {
       return this.parseValue(null)
@@ -94,9 +102,11 @@ export default class GradeOverrideEntry extends GradeEntry {
   }
 
   hasGradeChanged(
+    // @ts-expect-error
     assignedGradeInfo,
+    // @ts-expect-error
     currentGradeInfo,
-    previousGradeInfo: null | GradeOverrideInfo = null
+    previousGradeInfo: null | GradeOverrideInfo = null,
   ) {
     const effectiveGradeInfo = previousGradeInfo || assignedGradeInfo
 
@@ -119,7 +129,9 @@ export default class GradeOverrideEntry extends GradeEntry {
     return currentGradeInfo.grade.percentage !== effectiveGradeInfo.grade.percentage
   }
 
+  // @ts-expect-error
   parseValue(value, inputByUser: boolean = true): GradeOverrideInfo {
+    // @ts-expect-error
     const gradingScheme: string | {data: DeprecatedGradingScheme[]} = this.options.gradingScheme
     const parseResult = parseEntryValue(value, gradingScheme)
 
@@ -138,12 +150,14 @@ export default class GradeOverrideEntry extends GradeEntry {
       }
       valid = true
       // points based grading scheme
+      // @ts-expect-error
     } else if (gradingScheme?.pointsBased) {
       // entered percentage or is from backend which should be treated as percentage
       if (parseResult.isPercentage || !inputByUser) {
         enteredAs = EnterGradesAs.PERCENTAGE
         grade = {
           percentage: parseResult.value,
+          // @ts-expect-error
           schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
         }
         valid = true
@@ -151,6 +165,7 @@ export default class GradeOverrideEntry extends GradeEntry {
       } else if (parseResult.isPoints) {
         enteredAs = EnterGradesAs.POINTS
         grade = {
+          // @ts-expect-error
           percentage: gradePointsToPercentage(parseResult.value, gradingScheme),
           schemeKey: null,
         }
@@ -161,9 +176,11 @@ export default class GradeOverrideEntry extends GradeEntry {
       enteredAs = EnterGradesAs.PERCENTAGE
       grade = {
         percentage: parseResult.value,
+        // @ts-expect-error
         schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
       valid = true
+      // @ts-expect-error
       if (gradingScheme && gradingScheme.pointsBased) {
         // points based scheme
         if (inputByUser) {

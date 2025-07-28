@@ -78,7 +78,6 @@ describe MasterCourses::MasterTemplatesController do
         end
 
         it "works with media tracks" do
-          expect(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return(true)
           media = media_object
           attachment = media.attachment
           mt = attachment.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", media_object: media)
@@ -89,6 +88,56 @@ describe MasterCourses::MasterTemplatesController do
           expect(json["asset_name"]).to eq(attachment.filename)
           expect(json["asset_type"]).to eq("media_track")
           expect(json["change_type"]).to eq("created")
+        end
+      end
+    end
+  end
+
+  describe "PUT restrict_item" do
+    subject do
+      put "restrict_item", params:
+    end
+
+    let(:params) do
+      {
+        course_id: @course.id,
+        template_id: "default",
+        content_type:,
+        content_id: content.id,
+        restricted: true,
+      }
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    context "discussion_topic as content" do
+      let(:content) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
+      let(:content_type) { "discussion_topic" }
+
+      it "updates master tag for discussion topic" do
+        subject
+        expect(MasterCourses::MasterContentTag.find_by(content:).restrictions).to match(hash_including(@template.default_restrictions))
+      end
+
+      context "when provided restrictions is invalid" do
+        before do
+          params[:restrictions] = { invalid: "restriction" }
+        end
+
+        it "returns bad request if tag is invalid" do
+          subject
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+
+      context "with sub assignments" do
+        let!(:sub_assignment) { content.assignment.sub_assignments.create!(context: content.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC) }
+
+        it "updates master tag for sub assignments" do
+          subject
+          expect(MasterCourses::MasterContentTag.find_by(content: sub_assignment).restrictions).to match(hash_including(@template.default_restrictions))
         end
       end
     end

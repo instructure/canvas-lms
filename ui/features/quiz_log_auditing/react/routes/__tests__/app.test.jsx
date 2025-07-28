@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/AppRoute', () => {
     render(
       <MemoryRouter>
         <AppRoute params={{id: 1}} query={{}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

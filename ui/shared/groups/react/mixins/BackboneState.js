@@ -47,7 +47,7 @@ const BackboneState = {
               stateObject,
               'add remove reset sort fetch beforeFetch change',
               this._forceUpdate,
-              this
+              this,
             )
           } else if (stateObject instanceof Backbone.Model) {
             func(stateObject, 'change', this._forceUpdate, this)

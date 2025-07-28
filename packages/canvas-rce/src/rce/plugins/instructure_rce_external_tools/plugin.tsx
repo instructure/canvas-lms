@@ -20,16 +20,13 @@ import tinymce from 'tinymce'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {
-  RceToolWrapper,
-  buildToolMenuItems,
-  ExternalToolMenuItem,
-  externalToolsForToolbar,
-} from './RceToolWrapper'
+import {RceToolWrapper, buildToolMenuItems, ExternalToolMenuItem} from './RceToolWrapper'
 import formatMessage from '../../../format-message'
 import {ExternalToolSelectionDialog} from './components/ExternalToolSelectionDialog/ExternalToolSelectionDialog'
 import {ensureToolDialogContainerElem} from './dialog-helper'
-import {ExternalToolsEditor, externalToolsEnvFor} from './ExternalToolsEnv'
+import {externalToolsEnvFor} from './ExternalToolsEnv'
+import {externalToolsForToolbar} from './util/externalToolsForToolbar'
+import {ExternalToolsEditor} from '../../types'
 
 // Register plugin
 tinymce.PluginManager.add('instructure_rce_external_tools', initExternalToolsLocalPlugin)
@@ -77,13 +74,13 @@ function registerFavoriteAppsToolbarButtons(editor: ExternalToolsEditor) {
   externalToolsForToolbar(allTools).forEach(toolInfo =>
     editor.ui.registry.addButton(
       `instructure_external_button_${toolInfo.id}`,
-      toolInfo.asToolbarButton()
-    )
+      toolInfo.asToolbarButton(),
+    ),
   )
 }
 
 function registerAppsToolbarButton(editor: ExternalToolsEditor) {
-  const tooltip = formatMessage('Apps')
+  const tooltip = 'apps-temp'
   editor.ui.registry.addMenuButton('lti_mru_button', {
     tooltip,
     icon: 'lti',
@@ -93,6 +90,9 @@ function registerAppsToolbarButton(editor: ExternalToolsEditor) {
       callback(toolMenuItems)
     },
     onSetup(_api) {
+      const e = document.querySelector("button[title='apps-temp']")
+      e?.setAttribute('title', formatMessage('Apps'))
+      e?.setAttribute('id', 'plug-apps-button')
       return () => undefined
     },
   })
@@ -110,7 +110,7 @@ function openToolSelectionDialog(editor: ExternalToolsEditor) {
 
   ReactDOM.render(
     <ExternalToolSelectionDialog onDismiss={handleDismiss} ltiButtons={availableTools} />,
-    ensureToolDialogContainerElem()
+    ensureToolDialogContainerElem(),
   )
 }
 

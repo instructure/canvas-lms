@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import GradingTypes from './grading-types'
 import numberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const TEN_E_8 = 10e8
 
@@ -184,6 +184,6 @@ const externalPercentToPercent = score => {
 
 export const getScoringRangeSplitWarning = () => {
   return I18n.t(
-    'Splitting disabled: there can only be a maximum of three assignment groups in a scoring range.'
+    'Splitting disabled: there can only be a maximum of three assignment groups in a scoring range.',
   )
 }

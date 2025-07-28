@@ -197,7 +197,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
           one = answer_and_generate_event({
                                             question_1: 11
                                           },
-                                          Time.now)
+                                          Time.zone.now)
 
           two = answer_and_generate_event({
                                             question_1: 11,

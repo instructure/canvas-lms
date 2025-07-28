@@ -17,12 +17,12 @@
  */
 
 import {z} from 'zod'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import resolveProgress from '@canvas/progress/resolve_progress'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 const POST_ASSIGNMENT_GRADES = gql`
-  mutation ($assignmentId: ID!, $gradedOnly: Boolean) {
+  mutation PostAssignmentGrades($assignmentId: ID!, $gradedOnly: Boolean) {
     postAssignmentGrades(input: {assignmentId: $assignmentId, gradedOnly: $gradedOnly}) {
       progress {
         _id

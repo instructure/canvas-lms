@@ -110,7 +110,7 @@ class UserProfile < ActiveRecord::Base
   private
 
   def insert_profile_tab(tabs, user, opts)
-    if user && opts[:root_account] && opts[:root_account].enable_profiles?
+    if user && opts[:root_account]&.enable_profiles?
       tabs.insert 1,
                   {
                     id: TAB_PROFILE,

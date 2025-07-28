@@ -21,13 +21,13 @@ import SelectContent from '../select_content'
 describe('isContentMessage', () => {
   it('returns true if placements includes "resource_selection"', () => {
     expect(
-      SelectContent.isContentMessage({message_type: ''}, {resource_selection: {}})
+      SelectContent.isContentMessage({message_type: ''}, {resource_selection: {}}),
     ).toBeTruthy()
   })
 
   it('returns true if message type includes "ContentItemSelectionRequest"', () => {
     expect(
-      SelectContent.isContentMessage({message_type: 'ContentItemSelectionRequest'})
+      SelectContent.isContentMessage({message_type: 'ContentItemSelectionRequest'}),
     ).toBeTruthy()
   })
 
@@ -39,8 +39,8 @@ describe('isContentMessage', () => {
     expect(
       SelectContent.isContentMessage(
         {message_type: 'ResourceLinkRequest'},
-        {assignment_selection: {}}
-      )
+        {assignment_selection: {}},
+      ),
     ).toBeFalsy()
   })
 
@@ -53,7 +53,7 @@ describe('errorForUrlItem', () => {
   describe('when the item does not have a url', () => {
     it('returns an error describing the absence of a URL', () => {
       expect(SelectContent.errorForUrlItem({'@type': 'LtiLinkItem'})).toEqual(
-        'Error: The tool did not return a URL to Canvas'
+        'Error: The tool did not return a URL to Canvas',
       )
     })
   })
@@ -61,7 +61,7 @@ describe('errorForUrlItem', () => {
   describe('when the item does not have the expected type', () => {
     it('returns an error describing the invalid message type', () => {
       expect(
-        SelectContent.errorForUrlItem({'@type': 'InvalidType', url: 'http://www.test.com'})
+        SelectContent.errorForUrlItem({'@type': 'InvalidType', url: 'http://www.test.com'}),
       ).toEqual('Error: The tool returned an invalid content type "InvalidType"')
     })
   })
@@ -69,7 +69,7 @@ describe('errorForUrlItem', () => {
   describe('when the item does not have a recognized error', () => {
     it('returns a generic error message', () => {
       expect(
-        SelectContent.errorForUrlItem({'@type': 'LtiLinkItem', url: 'http://www.test.com'})
+        SelectContent.errorForUrlItem({'@type': 'LtiLinkItem', url: 'http://www.test.com'}),
       ).toEqual('Error embedding content from tool')
     })
   })

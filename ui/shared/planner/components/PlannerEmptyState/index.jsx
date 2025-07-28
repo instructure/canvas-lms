@@ -23,12 +23,12 @@ import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 
 import {InlineList} from '@instructure/ui-list'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DesertSvg from './EmptyDesert' // Currently uses react-svg-loader
 import BalloonsSvg from './Balloons'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default class PlannerEmptyState extends Component {
   static propTypes = {
@@ -73,7 +73,7 @@ export default class PlannerEmptyState extends Component {
         className={classnames(
           this.style.classNames.root,
           'planner-empty-state',
-          this.style.classNames[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize],
         )}
       >
         <DesertSvg
@@ -116,7 +116,7 @@ export default class PlannerEmptyState extends Component {
         className={classnames(
           this.style.classNames.root,
           'planner-empty-state',
-          this.style.classNames[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize],
         )}
       >
         <BalloonsSvg

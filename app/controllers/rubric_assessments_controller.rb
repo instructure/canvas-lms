@@ -128,7 +128,8 @@ class RubricAssessmentsController < ApplicationController
       begin
         ensure_adjudication_possible(provisional:) do
           @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
-          unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
+          assessment_type = params.dig(:rubric_assessment, :assessment_type)
+          unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user, assessment_type:)
             return render_unauthorized_action
           end
 
@@ -209,6 +210,29 @@ class RubricAssessmentsController < ApplicationController
     end
   end
 
+  def export
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    assignment = Assignment.find(params[:assignment_id])
+
+    if !assignment || !assignment.rubric_association
+      return render json: { message: I18n.t("Assignment not found or does not have a rubric association") }, status: :bad_request
+    end
+
+    if assignment.anonymize_students?
+      return render json: { message: I18n.t("Rubric export is not supported for assignments with anonymous grading") }, status: :bad_request
+    end
+
+    options = { filter: params[:filter] }
+
+    send_data(
+      RubricAssessmentExport.new(rubric_association: assignment.rubric_association, user: @current_user, options:).generate_file,
+      type: "text/csv",
+      filename: "export_rubric_assessments.csv",
+      disposition: "attachment"
+    )
+  end
+
   private
 
   def resolve_user_id
@@ -227,7 +251,7 @@ class RubricAssessmentsController < ApplicationController
     value_to_boolean(params[:final]) && @association_object.permits_moderation?(@current_user)
   end
 
-  def ensure_adjudication_possible(provisional:, &block)
+  def ensure_adjudication_possible(provisional:, &)
     # Non-assignment association objects crash if they're passed into this
     # controller, since find_asset_for_assessment only exists on assignments.
     # The check here thus serves only to make sure the crash doesn't happen on
@@ -238,7 +262,7 @@ class RubricAssessmentsController < ApplicationController
       grader: @current_user,
       provisional:,
       occupy_slot: true,
-&block
+      &
     )
   end
 end

@@ -19,7 +19,7 @@
 .cr-scoring-range {
   display: flex;
   flex-direction: row;
-  height: 215px;
+  min-height: 215px;
   position: relative;
 
   & + & {
@@ -29,9 +29,8 @@
   .cr-scoring-range__bounds {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 60px;
+    align-items: flex-start;
+    width: 104px;
     padding: 10px;
     flex-shrink: 0;
   }
@@ -40,14 +39,14 @@
     display: flex;
     flex-direction: row;
     flex-shrink: 0;
-    align-items: center;
+    top: 12px;
+    position: relative;
     padding-#{direction(left)}: 30px;
   }
 
   .cr-scoring-range__add-assignment-button {
     font-size: 26px;
     cursor: pointer;
-    position: absolute;
     border: 2px dashed $ic-border-color;
     #{direction(left)}: 12px;
     top: 30px;
@@ -55,7 +54,13 @@
     margin: auto;
     background: transparent;
     color: var(--ic-brand-font-color-dark);
-    width: 60px;
+    width: 104px;
+    height: 130px;
   }
 
+  .cr-scoring-range__center{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+  }
 }

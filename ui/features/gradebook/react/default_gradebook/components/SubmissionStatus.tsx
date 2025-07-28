@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,41 +17,44 @@
  */
 
 import React from 'react'
-import {bool, instanceOf, number, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
 import Message from './SubmissionStatus/Message'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
-export default class SubmissionStatus extends React.Component {
+interface Assignment {
+  anonymizeStudents: boolean
+  postManually: boolean
+  published: boolean
+}
+
+interface Submission {
+  drop?: boolean
+  excused?: boolean
+  hasPostableComments?: boolean
+  postedAt: Date | null
+  score: number | null
+  workflowState: string
+}
+
+interface Props {
+  assignment: Assignment
+  isConcluded: boolean
+  isInClosedGradingPeriod: boolean
+  isInNoGradingPeriod: boolean
+  isInOtherGradingPeriod: boolean
+  isNotCountedForScore: boolean
+  submission: Submission
+}
+
+export default class SubmissionStatus extends React.Component<Props> {
   static defaultProps = {
     submission: {
       drop: false,
     },
-  }
-
-  static propTypes = {
-    assignment: shape({
-      anonymizeStudents: bool.isRequired,
-      postManually: bool.isRequired,
-      published: bool.isRequired,
-    }).isRequired,
-    isConcluded: bool.isRequired,
-    isInClosedGradingPeriod: bool.isRequired,
-    isInNoGradingPeriod: bool.isRequired,
-    isInOtherGradingPeriod: bool.isRequired,
-    isNotCountedForScore: bool.isRequired,
-    submission: shape({
-      drop: bool,
-      excused: bool,
-      hasPostableComments: bool,
-      postedAt: instanceOf(Date),
-      score: number,
-      workflowState: string.isRequired,
-    }).isRequired,
   }
 
   getStatusPills() {
@@ -63,7 +65,7 @@ export default class SubmissionStatus extends React.Component {
       statusPillComponents.push(
         <Pill key="unpublished-assignment" color="danger" margin="0 0 x-small">
           {I18n.t('Unpublished')}
-        </Pill>
+        </Pill>,
       )
     }
 
@@ -76,7 +78,7 @@ export default class SubmissionStatus extends React.Component {
       statusPillComponents.push(
         <Pill key="hidden-submission" color="warning" margin="0 0 x-small">
           {I18n.t('Hidden')}
-        </Pill>
+        </Pill>,
       )
     }
 
@@ -84,7 +86,7 @@ export default class SubmissionStatus extends React.Component {
       statusPillComponents.push(
         <Pill key="dropped-submission" color="primary" margin="0 0 x-small">
           {I18n.t('Dropped')}
-        </Pill>
+        </Pill>,
       )
     }
 
@@ -92,7 +94,7 @@ export default class SubmissionStatus extends React.Component {
       statusPillComponents.push(
         <Pill key="excused-assignment" color="primary" margin="0 0 x-small">
           {I18n.t('Excused')}
-        </Pill>
+        </Pill>,
       )
     }
 
@@ -107,13 +109,13 @@ export default class SubmissionStatus extends React.Component {
 
     if (this.props.isConcluded) {
       const concludedEnrollmentStatusMessage = I18n.t(
-        "This student's enrollment has been concluded"
+        "This student's enrollment has been concluded",
       )
 
       statusNotificationComponents.push(
         <div key="concluded-enrollment-status" style={statusNotificationContainerStyle}>
           <Message variant="warning" message={concludedEnrollmentStatusMessage} />
-        </div>
+        </div>,
       )
     }
 
@@ -122,7 +124,7 @@ export default class SubmissionStatus extends React.Component {
       statusNotificationComponents.push(
         <div key="grading-period-status" style={statusNotificationContainerStyle}>
           <Message variant="warning" message={gradingPeriodStatusMessage} />
-        </div>
+        </div>,
       )
     }
 
@@ -132,7 +134,7 @@ export default class SubmissionStatus extends React.Component {
       statusNotificationComponents.push(
         <div key="is-not-counted-for-score-status" style={statusNotificationContainerStyle}>
           <Message variant="info" message={isNotCountedForScoreMessage} />
-        </div>
+        </div>,
       )
     }
 

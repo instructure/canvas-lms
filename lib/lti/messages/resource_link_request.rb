@@ -44,12 +44,12 @@ module Lti::Messages
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     def generate_post_payload_for_homework_submission(assignment)
       @assignment = assignment
-      generate_post_payload
+      to_cached_hash
     end
 
     private
@@ -61,7 +61,7 @@ module Lti::Messages
     def add_resource_link_request_claims!
       @message.resource_link.id = launch_resource_link_id
       @message.resource_link.description = @assignment&.description
-      @message.resource_link.title = resource_link&.title.presence || @assignment&.title.presence || tag_from_resource_link&.title.presence || @context.name
+      @message.resource_link.title = @assignment&.title.presence || resource_link&.title.presence || tag_from_resource_link&.title.presence || @context.name
     end
 
     def add_lti1p1_claims!
@@ -83,12 +83,12 @@ module Lti::Messages
     # the associated assignment or from the request parameters. fall back to the
     # context rlid only if needed
     def launch_resource_link_id
-      resource_link&.resource_link_uuid || Lti::Asset.opaque_identifier_for(@context)
+      resource_link&.resource_link_uuid || Lti::V1p1::Asset.opaque_identifier_for(@context)
     end
 
     def unexpanded_custom_parameters
       # Add in link-specific custom params (e.g. created by deep linking)
-      super.merge!(resource_link&.custom || {})
+      super.merge(resource_link&.custom || {})
     end
 
     def resource_link
@@ -103,7 +103,7 @@ module Lti::Messages
         unless @assignment.external_tool?
           raise launch_error.new(nil, api_message: "Assignment not configured for external tool launches")
         end
-        unless ContextExternalTool.from_assignment(@assignment) == @tool
+        unless Lti::ToolFinder.from_assignment(@assignment) == @tool
           raise launch_error.new(nil, api_message: "Assignment not configured for launches with specified tool")
         end
 

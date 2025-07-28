@@ -25,7 +25,7 @@ export default class PopoverMenuView extends View {
 
     this.prototype.events = {
       mousedown: 'disableHide',
-      mouseup: 'enableHide',
+      mouseup: 'delayedEnableHide',
       click: 'cancelHide',
       focusin: 'cancelHide',
       focusout: 'hidePopover',
@@ -40,6 +40,10 @@ export default class PopoverMenuView extends View {
 
   enableHide() {
     return (this.hideDisabled = false)
+  }
+
+  delayedEnableHide() {
+    setTimeout(() => this.enableHide(), 0)
   }
 
   hidePopover() {
@@ -69,6 +73,15 @@ export default class PopoverMenuView extends View {
           return this.setPopoverContentHeight(this.$el, content, $('#content'))
         },
       })
+
+      // Because the popover is rendered after the triggering mouse event,
+      // it doesn’t receive the original mousedown that would have set hideDisabled.
+      // To prevent the outerclick (triggered by the mouseup) from immediately hiding
+      // the popover, we manually disable hiding for a short time.
+      this.hideDisabled = true
+      setTimeout(() => {
+        this.hideDisabled = false
+      }, 150)
 
       if (focus) {
         if (typeof this.focus === 'function') {

@@ -32,7 +32,7 @@ import formatMessage from '../../../../format-message'
 import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
 import {containsAdvancedSyntax} from './advancedOnlySyntax'
 import * as advancedPreference from './advancedPreference'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 import {css} from 'aphrodite'
 import {MathJaxDirective, Mathml} from '../../../../enhance-user-content/mathml'
@@ -108,7 +108,7 @@ export default class EquationEditorModal extends Component {
 
   handleModalDone = () => {
     const {onModalDismiss, onEquationSubmit} = this.props
-    const output = this.state.advanced ? this.state.workingFormula : this.mathField.getValue()
+    const output = this.state.advanced ? this.state.workingFormula : this.getMathFiled()
 
     if (output) {
       onEquationSubmit(output)
@@ -128,7 +128,7 @@ export default class EquationEditorModal extends Component {
     {
       leading: false,
       trailing: true,
-    }
+    },
   )
 
   setPreviewElementContent() {
@@ -142,10 +142,10 @@ export default class EquationEditorModal extends Component {
   toggleAdvanced = () => {
     this.setState(state => {
       if (state.advanced) {
-        this.mathField.setValue(state.workingFormula || '')
+        this.setMathField(state.workingFormula || '')
         return {advanced: false, workingFormula: ''}
       } else {
-        return {advanced: true, workingFormula: this.mathField.getValue()}
+        return {advanced: true, workingFormula: this.getMathFiled()}
       }
     })
     this.setPreviewElementContent()
@@ -217,7 +217,7 @@ export default class EquationEditorModal extends Component {
     this.registerBasicEditorListener()
     this.setPreviewElementContent()
     this.stubMacros()
-    if (!this.state.advanced) this.mathField.setValue(this.state.workingFormula)
+    if (!this.state.advanced) this.setMathField(this.state.workingFormula)
     this.insertNewRange()
   }
 
@@ -235,6 +235,14 @@ export default class EquationEditorModal extends Component {
     this.mathField?.setOptions({macros: {}})
   }
 
+  setMathField(formula) {
+    this.mathField.setValue(formula)
+  }
+
+  getMathFiled() {
+    return this.mathField.getValue()
+  }
+
   render = () => {
     const {onModalClose} = this.props
 
@@ -242,7 +250,7 @@ export default class EquationEditorModal extends Component {
       <Modal
         data-mce-component={true}
         label={formatMessage('Equation Editor')}
-        mountNode={instuiPopupMountNode}
+        mountNode={instuiPopupMountNodeFn}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}
         open={true}

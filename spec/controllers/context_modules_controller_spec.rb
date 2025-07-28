@@ -19,6 +19,8 @@
 #
 
 describe ContextModulesController do
+  include TextHelper
+
   describe "GET 'index'" do
     before :once do
       course_with_teacher(active_all: true)
@@ -120,6 +122,382 @@ describe ContextModulesController do
       end
     end
 
+    context "module selection features" do
+      before :once do
+        @mod1 = @course.context_modules.create!(name: "Module 1")
+        @mod2 = @course.context_modules.create!(name: "Module 2")
+        @mod3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      context "with modules_student_module_selection enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id)
+        end
+
+        it "shows all modules to teachers regardless of student module selection" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "shows only selected module to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "shows all modules to teachers even when course is concluded" do
+          user_session(@teacher)
+          @course.complete!
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+
+      context "with modules_teacher_module_selection enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "shows selected module to teachers when teacher selection is enabled" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "shows all modules to students when only teacher selection is enabled" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+
+        it "shows all modules to TAs when teacher selection is enabled (TAs don't get teacher filtering)" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+
+      context "with both module selection features enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id, show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "shows teacher-selected module to teachers" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "shows student-selected module to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+      end
+
+      context "with no module selection features enabled" do
+        it "shows all modules to teachers" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+
+        it "shows all modules to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+      end
+
+      context "edge cases" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id)
+        end
+
+        it "handles TA enrollments correctly (should see all modules)" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "handles designer enrollments correctly (should see all modules)" do
+          course_with_designer(course: @course, active_all: true)
+          user_session(@designer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "handles observers correctly (should see selected module)" do
+          course_with_observer(course: @course, active_all: true)
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "handles site admins correctly (should see all modules)" do
+          site_admin = site_admin_user
+          user_session(site_admin)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+    end
+
+    context "complex feature flag combinations" do
+      before :once do
+        @mod1 = @course.context_modules.create!(name: "Module 1")
+        @mod2 = @course.context_modules.create!(name: "Module 2")
+        @mod3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      context "modules_page_rewrite + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with page rewrite enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with page rewrite enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection is enabled with page rewrite" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection is enabled with page rewrite" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "modules_page_rewrite_student_view + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite_student_view)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with student view rewrite enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with student view rewrite enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection enabled with student view rewrite" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection enabled with student view rewrite" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "modules_perf + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with performance features enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with performance features enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection enabled with perf features" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection enabled with perf features" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "all module-related flags enabled together" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite)
+          @course.account.enable_feature!(:modules_page_rewrite_student_view)
+          @course.account.enable_feature!(:modules_perf)
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id, show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "teachers see teacher-selected module with all flags enabled" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "students see student-selected module with all flags enabled" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "TAs see all modules with all flags enabled" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "observers see student-selected module with all flags enabled" do
+          course_with_observer(course: @course, active_all: true)
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+      end
+
+      context "problematic flag combinations from the original bug report" do
+        context "modules_page_rewrite_student_view OFF, modules_teacher_module_selection ON, modules_page_rewrite OFF, modules_student_module_selection ON" do
+          before :once do
+            # Ensure these are explicitly disabled
+            @course.account.disable_feature!(:modules_page_rewrite_student_view)
+            @course.account.disable_feature!(:modules_page_rewrite)
+            # Enable the problematic combination
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules (not filtered by student selection)" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "only modules_student_module_selection ON (original failing case)" do
+          before :once do
+            # Ensure all other flags are disabled
+            @course.account.disable_feature!(:modules_page_rewrite_student_view)
+            @course.account.disable_feature!(:modules_page_rewrite)
+            @course.account.disable_feature!(:modules_teacher_module_selection)
+            # Enable only student selection
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules (this was the original bug - teachers saw only student module)" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+
+          it "works correctly with modules_perf enabled as well" do
+            @course.account.enable_feature!(:modules_perf)
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+        end
+      end
+    end
+
     context "default post to SIS" do
       before :once do
         @course.account.tap do |a|
@@ -146,6 +524,45 @@ describe ContextModulesController do
         end
         get "index", params: { course_id: @course.id }
         expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to be false
+      end
+    end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+      end
+
+      it "is true if account setting is on" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "is false if account setting is off" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          a.save!
+        end
+
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be false
+      end
+
+      it "'CAN_MANAGE_DIFFERENTIATION_TAGS' env variable is true for permitted users" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "'CAN_MANAGE_DIFFERENTIATION_TAGS' env variable is false for non permitted users" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id }
+        expect(controller.js_env[:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
       end
     end
 
@@ -507,7 +924,6 @@ describe ContextModulesController do
         @m2 = @course.context_modules.create!
         time = 1.minute.ago
         ContextModule.where(id: [@m1, @m2]).update_all(updated_at: time)
-        @course.account.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.save!
         @primary_pace = course_pace_model(course: @course)
@@ -701,6 +1117,23 @@ describe ContextModulesController do
       expect(@external_url_item.reload.indent).to eq 2
     end
 
+    describe "with horizon course" do
+      before do
+        @course.account.enable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: true)
+      end
+
+      after do
+        @course.account.disable_feature!(:horizon_course_setting)
+        @course.update!(horizon_course: false)
+      end
+
+      it "does not update indent" do
+        put "update_item", params: { course_id: @course.id, id: @external_url_item.id, content_tag: { indent: 2 } }
+        expect(@external_url_item.reload.indent).to eq 0
+      end
+    end
+
     it "updates the url for an external url item" do
       new_url = "http://example.org/new_url"
       put "update_item", params: { course_id: @course.id, id: @external_url_item.id, content_tag: { url: new_url } }
@@ -770,6 +1203,58 @@ describe ContextModulesController do
         @teacher.set_preference(:module_links_default_new_tab, false)
         put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { new_tab: 1 } }
         expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
+      end
+    end
+
+    describe "estimated_duration" do
+      before do
+        @assignment_item.estimated_duration = EstimatedDuration.new
+        @assignment_item.save!
+      end
+
+      describe "without horizon course" do
+        before do
+          @course.account.disable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: false)
+        end
+
+        it "does not create estimated_duration" do
+          expect_any_instance_of(ContextModulesController).not_to receive(:get_estimated_duration)
+          put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
+        end
+      end
+
+      describe "with horizon course" do
+        before do
+          @course.account.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+        end
+
+        after do
+          @assignment_item.reload.estimated_duration&.destroy!
+        end
+
+        describe "create" do
+          it "does create estimated_duration" do
+            @assignment_item.reload.estimated_duration.destroy!
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 30 } }
+            expect(@assignment_item.reload.estimated_duration).to_not be_nil
+          end
+        end
+
+        describe "update" do
+          it "does update estimated_duration" do
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: 40 } }
+            expect(@assignment_item.reload.estimated_duration.duration.iso8601).to eq("PT40M")
+          end
+        end
+
+        describe "delete" do
+          it "does delete estimated_duration" do
+            put "update_item", params: { course_id: @course.id, id: @assignment_item.id, content_tag: { estimated_duration_minutes: nil } }
+            expect(@assignment_item.reload.estimated_duration).to be_nil
+          end
+        end
       end
     end
   end
@@ -1123,6 +1608,255 @@ describe ContextModulesController do
       expect(response).to be_successful
     end
 
+    context "discussion_checkpoints" do
+      before :once do
+        Account.default.enable_feature!(:discussion_checkpoints)
+      end
+
+      it "returns basic info for discussion checkpoints" do
+        course_with_teacher_logged_in(active_all: true)
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 1.week.from_now }],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 2.weeks.from_now }],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("sub_assignment_tag")).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([c1.due_at.utc.iso8601, c2.due_at.utc.iso8601])
+        expect(content_tag_json["sub_assignments"].pluck("points_possible")).to match_array([c1.points_possible, c2.points_possible])
+        expect(content_tag_json["sub_assignments"].pluck("replies_required")).to match_array([nil, topic.reply_to_entry_required_count])
+      end
+
+      it "shows has_many_overrides instead of due dates for discussion checkpoints when over ALL_DATES_LIMIT" do
+        stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 1)
+
+        course_with_teacher_logged_in(active_all: true)
+        main_student = student_in_course(active_all: true)
+        other_student = student_in_course(active_all: true)
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: 1.week.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [main_student.id],
+              due_at: 3.days.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [other_student.id],
+              due_at: 6.days.from_now
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: 1.week.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [main_student.id],
+              due_at: 2.days.from_now
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [other_student.id],
+              due_at: 4.days.from_now
+            }
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("sub_assignment_tag")).to match_array([CheckpointLabels::REPLY_TO_TOPIC, CheckpointLabels::REPLY_TO_ENTRY])
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([nil, nil])
+        expect(content_tag_json["sub_assignments"].pluck("has_many_overrides")).to match_array([true, true])
+        expect(content_tag_json["sub_assignments"].pluck("points_possible")).to match_array([c1.points_possible, c2.points_possible])
+        expect(content_tag_json["sub_assignments"].pluck("replies_required")).to match_array([nil, topic.reply_to_entry_required_count])
+      end
+
+      it "shows vdd_tooltip discussion checkpoints when under ALL_DATES_LIMIT" do
+        stub_const("Api::V1::Assignment::ALL_DATES_LIMIT", 25)
+
+        course_with_teacher_logged_in(active_all: true)
+        student_in_course(active_all: true)
+        student_in_course(active_all: true)
+
+        s1 = add_section("s1")
+        s2 = add_section("s2")
+
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-01-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s1.id,
+              due_at: "2012-01-08 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s2.id,
+              due_at: "2012-01-09 12:00:00"
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-02-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s1.id,
+              due_at: "2012-02-08 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "CourseSection",
+              set_id: s2.id,
+              due_at: "2012-02-09 12:00:00"
+            }
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+        expect(content_tag_json["points_possible"]).to eq 15
+        expect(content_tag_json["due_date"]).to be_nil
+        expect(content_tag_json["sub_assignments"].pluck("due_date")).to match_array([nil, nil])
+        expect(content_tag_json["sub_assignments"].pluck("has_many_overrides")).to match_array([nil, nil])
+
+        reply_to_topic_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_TOPIC }["vdd_tooltip"]
+        expect(reply_to_topic_tooltip["selector"]).to eq "subassignment_#{c1.id}"
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c1.due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == s1.name }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_id: s1.id).due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == s2.name }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_id: s2.id).due_at))
+
+        reply_to_entry_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_ENTRY }["vdd_tooltip"]
+        expect(reply_to_entry_tooltip["selector"]).to eq "subassignment_#{c2.id}"
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c2.due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == s1.name }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_id: s1.id).due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == s2.name }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_id: s2.id).due_at))
+      end
+
+      it "shows vdd_tooltip for discussion checkpoints with AD-HOC overrides" do
+        course_with_teacher_logged_in(active_all: true)
+        student_in_course(active_all: true)
+
+        mod = @course.context_modules.create!
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        c1 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2012-01-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [@student.id],
+              due_at: "2013-01-07 12:00:00"
+            }
+          ],
+          points_possible: 5
+        )
+
+        c2 = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "everyone",
+              due_at: "2014-02-07 12:00:00"
+            },
+            {
+              type: "override",
+              set_type: "ADHOC",
+              student_ids: [@student.id],
+              due_at: "2015-01-07 12:00:00"
+            },
+          ],
+          points_possible: 10,
+          replies_required: 2
+        )
+        mod.add_item(type: "discussion_topic", id: topic.id)
+        get "content_tag_assignment_data", params: { course_id: @course.id }, format: "json"
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        content_tag_json = json[ContentTag.last.id.to_s]
+
+        reply_to_topic_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_TOPIC }["vdd_tooltip"]
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c1.due_at))
+        expect(reply_to_topic_tooltip["due_dates"].find { |dd| dd["due_for"] == "1 student" }["due_at"]).to eq(datetime_string(c1.assignment_overrides.find_by(set_type: "ADHOC").due_at))
+
+        reply_to_entry_tooltip = content_tag_json["sub_assignments"].find { |sub_assignment| sub_assignment["sub_assignment_tag"] == CheckpointLabels::REPLY_TO_ENTRY }["vdd_tooltip"]
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "Everyone else" }["due_at"]).to eq(datetime_string(c2.due_at))
+        expect(reply_to_entry_tooltip["due_dates"].find { |dd| dd["due_for"] == "1 student" }["due_at"]).to eq(datetime_string(c2.assignment_overrides.find_by(set_type: "ADHOC").due_at))
+      end
+    end
+
     it "returns mastery connect objectives correctly" do
       ext_data = {
         key: "https://canvas.instructure.com/lti/mastery_connect_assessment",
@@ -1134,11 +1868,10 @@ describe ContextModulesController do
       }
 
       course_with_teacher_logged_in(active_all: true)
-      @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                url: "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                shared_secret: "test123",
-                                                consumer_key: "test123",
-                                                name: "mytool")
+      @tool = @course.context_external_tools.create!(url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                                     shared_secret: "test123",
+                                                     consumer_key: "test123",
+                                                     name: "mytool")
       @mod = @course.context_modules.create!
       @assign = @course.assignments.create! title: "WHAT",
                                             submission_types: "external_tool",
@@ -1417,6 +2150,47 @@ describe ContextModulesController do
       expect(response).to be_successful
       progression1 = module1.evaluate_for(@student)
       expect(progression1.collapsed).to be_falsey
+    end
+  end
+
+  describe "POST 'toggle_collapse'" do
+    it "should not create N+1 queries for assignment content tags" do
+      course_with_teacher_logged_in(active_all: true)
+
+      @module = @course.context_modules.create!(name: "Test Module")
+
+      # Create multiple assignments and add them to the module
+      assignments = []
+      5.times do |i|
+        assignment = @course.assignments.create!(title: "Assignment #{i + 1}")
+        assignments << assignment
+        @module.add_item(type: "assignment", id: assignment.id)
+      end
+
+      # Ensure module is not collapsed initially
+      progression = @module.evaluate_for(@teacher)
+      progression.update!(collapsed: false)
+
+      # Count queries to ensure no N+1 when rendering JSON
+      query_count = 0
+      query_counter = lambda do |_name, _started, _finished, _unique_id, payload|
+        query_count += 1 if payload[:sql]&.include?("SELECT assignments.* FROM")
+      end
+
+      ActiveSupport::Notifications.subscribed(query_counter, "sql.active_record") do
+        post "toggle_collapse", params: {
+          course_id: @course.id,
+          context_module_id: @module.id,
+          collapse: "1",
+          format: "json"
+        }
+      end
+
+      expect(response).to be_successful
+      expect(query_count).to be <= 1, "Expected at most 1 assignment query, got #{query_count}"
+
+      response_data = response.parsed_body
+      expect(response_data).to eq(JSON.parse(progression.reload.to_json))
     end
   end
 end

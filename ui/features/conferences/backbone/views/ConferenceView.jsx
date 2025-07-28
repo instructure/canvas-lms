@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import template from '../../jst/newConference.handlebars'
@@ -29,9 +27,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ReactDOM from 'react-dom'
 import React from 'react'
-import '@canvas/jquery/jquery.instructure_forms' // formSubmit
+import '@canvas/jquery/jquery.instructure_forms'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('conferences')
+const I18n = createI18nScope('conferences')
 
 extend(ConferenceView, View)
 
@@ -53,12 +52,22 @@ ConferenceView.prototype.events = {
   'click .delete_conference_link': 'delete',
   'click .close_conference_link': 'close',
   'click .start-button': 'start',
-  'click .external_url': 'external',
   'click .delete_recording_link': 'deleteRecording',
 }
 
 ConferenceView.prototype.initialize = function () {
   ConferenceView.__super__.initialize.apply(this, arguments)
+
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const currentCrumbs = getCrumbs()
+    currentCrumbs.at(-1).url = ''
+    setCrumbs(currentCrumbs)
+  }
+
+  initializeTopNavPortalWithDefaults({
+    getBreadCrumbSetter: handleBreadCrumbSetter,
+  })
+
   return this.model.on('change', this.render)
 }
 
@@ -82,9 +91,10 @@ ConferenceView.prototype.syncAttendees = function (e) {
     {
       size: 'small',
     },
-    I18n.t(' Attendee sync in progress... ')
+    I18n.t(' Attendee sync in progress... '),
   )
   const spinnerDomEl = this.el.querySelector('.conference-loading-indicator')
+
   ReactDOM.render([spinner, spinnerText], spinnerDomEl)
   this.el.querySelector('.conference-loading-indicator').style.display = 'block'
   this.$(form).formSubmit({
@@ -139,7 +149,6 @@ ConferenceView.prototype.delete = function (e) {
   let allCogs, curIndex, currentCog
   e.preventDefault()
   if (
-    // eslint-disable-next-line no-alert
     !window.confirm(I18n.t('confirm.delete', 'Are you sure you want to delete this conference?'))
   ) {
     return $(e.currentTarget).parents('.inline-block').find('.al-trigger').focus()
@@ -165,12 +174,11 @@ ConferenceView.prototype.delete = function (e) {
 ConferenceView.prototype.close = function (e) {
   e.preventDefault()
   if (
-    // eslint-disable-next-line no-alert
     !window.confirm(
       I18n.t(
         'confirm.close',
-        'Are you sure you want to end this conference?\n\nYou will not be able to reopen it.'
-      )
+        'Are you sure you want to end this conference?\n\nYou will not be able to reopen it.',
+      ),
     )
   ) {
     return
@@ -183,7 +191,7 @@ ConferenceView.prototype.close = function (e) {
       return function (_data) {
         return window.router.close(_this.model)
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -216,70 +224,10 @@ ConferenceView.prototype.start = function (e) {
   }, 100))
 }
 
-ConferenceView.prototype.external = function (e) {
-  e.preventDefault()
-  const loading_text = I18n.t('loading_urls_message', 'Loading, please wait...')
-  const $self = $(e.currentTarget)
-  const link_text = $self.text()
-  if (link_text === loading_text) {
-    return
-  }
-  $self.text(loading_text)
-  return $.ajaxJSON($self.attr('href'), 'GET', {}, function (data) {
-    let $a, $box, datum, j, len
-    $self.text(link_text)
-    if (data.length === 0) {
-      return $.flashError(
-        I18n.t(
-          'no_urls_error',
-          "Sorry, it looks like there aren't any %{type} pages for this conference yet.",
-          {
-            type: $self.attr('name'),
-          }
-        )
-      )
-    } else if (data.length > 1) {
-      $box = $(document.createElement('DIV'))
-      $box.append(
-        $('<p />').text(
-          I18n.t(
-            'multiple_urls_message',
-            'There are multiple %{type} pages available for this conference. Please select one:',
-            {
-              type: $self.attr('name'),
-            }
-          )
-        )
-      )
-      for (j = 0, len = data.length; j < len; j++) {
-        datum = data[j]
-        $a = $('<a />', {
-          href: datum.url || $self.attr('href') + '&url_id=' + datum.id,
-          target: '_blank',
-        })
-        $a.text(datum.name)
-        $box.append($a).append('<br>')
-      }
-      return $box.dialog({
-        width: 425,
-        minWidth: 425,
-        minHeight: 215,
-        resizable: true,
-        height: 'auto',
-        title: $self.text(),
-        modal: true,
-        zIndex: 1000,
-      })
-    } else {
-      return window.open(data[0].url)
-    }
-  })
-}
-
 ConferenceView.prototype.deleteRecording = function (e) {
   let $button
   e.preventDefault()
-  // eslint-disable-next-line no-alert
+
   if (window.confirm(I18n.t('Are you sure you want to delete this recording?'))) {
     $button = $(e.currentTarget).parents('div.ig-button')
     return $.ajaxJSON($button.data('url') + '/recording', 'DELETE', {
@@ -292,19 +240,19 @@ ConferenceView.prototype.deleteRecording = function (e) {
               return _this.removeRecordingRow($button)
             }
             return $.flashError(
-              I18n.t('Sorry, the action performed on this recording failed. Try again later')
+              I18n.t('Sorry, the action performed on this recording failed. Try again later'),
             )
           }
-        })(this)
+        })(this),
       )
       .fail(
         (function (_this) {
           return function (_xhr, _status) {
             return $.flashError(
-              I18n.t('Sorry, the action performed on this recording failed. Try again later')
+              I18n.t('Sorry, the action performed on this recording failed. Try again later'),
             )
           }
-        })(this)
+        })(this),
       )
   }
 }
@@ -326,7 +274,7 @@ ConferenceView.prototype.updateConferenceDetails = function (id) {
     $detailRecordings.text(
       I18n.t('%{count} Recordings', {
         count: recordings,
-      })
+      }),
     )
     return
   }
@@ -334,7 +282,7 @@ ConferenceView.prototype.updateConferenceDetails = function (id) {
     $detailRecordings.text(
       I18n.t('%{count} Recording', {
         count: 1,
-      })
+      }),
     )
     return
   }

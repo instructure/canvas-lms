@@ -57,7 +57,7 @@ describe "course settings/blueprint" do
 
     it "enables blueprint course and set default restrictions", priority: "1" do
       get "/courses/#{@course.id}/settings"
-      f(".bcs_check-box").find_element(:xpath, "../div").click
+      f(".bcs_check-box div div div").click
       wait_for_animations
       expect(blueprint_settings_options).to be_displayed
 
@@ -105,7 +105,7 @@ describe "course settings/blueprint" do
       expect(due_dates_checkbox_state).to be true
       expect(availability_dates_checkbox_state).to be false
 
-      f(".bcs_check-box").find_element(:xpath, "../div").click
+      f(".bcs_check-box div div div").click
       wait_for_animations
       expect_new_page_load { submit_form("#course_form") }
       expect(template.reload).to be_deleted
@@ -117,7 +117,7 @@ describe "course settings/blueprint" do
       get "/courses/#{@course.id}/settings"
 
       expect(f(".bcs_radio_input-group")).to be_displayed
-      ff(".bcs_radio_input-group")[1].click
+      ff('[class$="radioInput__control"')[1].click
 
       fj(".bcs__object-tab:contains('Assignments') .bcs_tab_indicator-icon button").click
       fj(".bcs__object-tab:contains('Assignments') .bcs_check_box-group label:contains('Content')").click

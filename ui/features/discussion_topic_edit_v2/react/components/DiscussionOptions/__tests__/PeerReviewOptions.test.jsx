@@ -35,23 +35,23 @@ const renderPeerReviewOptions = (props = {}) => {
 }
 describe('PeerReviewOptions', () => {
   it('renders', () => {
-    const {getByText, queryByText} = renderPeerReviewOptions(defaultProps)
-    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    const {getAllByText, getByText, queryByText} = renderPeerReviewOptions(defaultProps)
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     expect(getByText('Assign manually')).toBeInTheDocument()
     expect(getByText('Automatically assign')).toBeInTheDocument()
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()
-    expect(queryByText('Reviews Due')).not.toBeInTheDocument()
+    expect(queryByText('Assign Reviews')).not.toBeInTheDocument()
     expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
     expect(queryByText('Allow intra-group peer reviews')).not.toBeInTheDocument()
   })
 
   it('shows more options when peer review is set to automatically', () => {
-    const {getByText, getByTestId} = renderPeerReviewOptions({
+    const {getAllByText, getByText, getByTestId} = renderPeerReviewOptions({
       ...defaultProps,
       peerReviewAssignment: 'automatically',
     })
-    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     expect(getByText('Reviews Per Student')).toBeInTheDocument()
     expect(getByTestId('peer-review-due-date-container')).toBeInTheDocument()
@@ -60,11 +60,11 @@ describe('PeerReviewOptions', () => {
   })
 
   it('does not show extra options when peer review is set to manually', () => {
-    const {getByText, queryByText, queryByTestId} = renderPeerReviewOptions({
+    const {getAllByText, getByText, queryByText, queryByTestId} = renderPeerReviewOptions({
       ...defaultProps,
       peerReviewAssignment: 'manually',
     })
-    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    expect(getAllByText('Peer Reviews')).toHaveLength(1)
     expect(getByText('Off')).toBeInTheDocument()
     // Expect these options to not exist for manually set peer reviews
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()

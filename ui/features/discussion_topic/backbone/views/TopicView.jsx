@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -32,7 +32,7 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 export default class TopicView extends Backbone.View {
   static initClass() {
@@ -120,7 +120,7 @@ export default class TopicView extends Backbone.View {
           elementToRenderInto,
           'assignment_view',
           parseInt(context_id, 10),
-          ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID, 10) : undefined
+          ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID, 10) : undefined,
         )
       }
     }
@@ -138,7 +138,7 @@ export default class TopicView extends Backbone.View {
     $(event.currentTarget).text(
       this.$dueDates.hasClass('hidden')
         ? I18n.t('show_due_dates', 'Show Due Dates')
-        : I18n.t('hide_due_dates', 'Hide Due Dates')
+        : I18n.t('hide_due_dates', 'Hide Due Dates'),
     )
   }
 
@@ -192,10 +192,10 @@ export default class TopicView extends Backbone.View {
     if (this.reply == null) {
       this.reply = new Reply(this, {topLevel: true, focus: true})
       this.reply.on('edit', () =>
-        this.$addRootReply != null ? this.$addRootReply.hide() : undefined
+        this.$addRootReply != null ? this.$addRootReply.hide() : undefined,
       )
       this.reply.on('hide', () =>
-        this.$addRootReply != null ? this.$addRootReply.show() : undefined
+        this.$addRootReply != null ? this.$addRootReply.show() : undefined,
       )
       this.reply.on('save', entry => {
         if (!ENV.DISCUSSION.TOPIC.IS_ANNOUNCEMENT) {
@@ -269,6 +269,7 @@ export default class TopicView extends Backbone.View {
 
   openSendTo(event, open = true) {
     if (event) event.preventDefault()
+
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -279,12 +280,13 @@ export default class TopicView extends Backbone.View {
           this.$announcementCog.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
   openCopyTo(event, open = true) {
     if (event) event.preventDefault()
+
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -295,7 +297,7 @@ export default class TopicView extends Backbone.View {
           this.$announcementCog.focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 

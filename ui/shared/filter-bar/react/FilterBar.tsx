@@ -26,9 +26,9 @@ import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import debounce from '@instructure/debounce'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('filter_bar')
+const I18n = createI18nScope('filter_bar')
 const SEARCH_DELAY = 350
 
 export interface FilterOption<T extends string> {
@@ -87,9 +87,9 @@ export default function FilterBar<T extends string>({
         onSearch(query)
       },
       searchDebounceDelay,
-      {leading: false, trailing: true}
+      {leading: false, trailing: true},
     ),
-    [searchDebounceDelay]
+    [searchDebounceDelay],
   )
 
   const acceptSearchInput = (_e: SyntheticEvent, val: string) => {
@@ -103,7 +103,7 @@ export default function FilterBar<T extends string>({
 
   const updateFilter = (
     _e: SyntheticEvent,
-    data: {value?: string | number | undefined; id?: string | undefined}
+    data: {value?: string | number | undefined; id?: string | undefined},
   ) => {
     if (typeof data.value === 'string') {
       setFilter(data.value)

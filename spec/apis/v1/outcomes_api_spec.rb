@@ -186,7 +186,7 @@ describe "Outcomes API", type: :request do
                      action: "show",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "does not require any permission for global outcomes" do
@@ -427,7 +427,7 @@ describe "Outcomes API", type: :request do
                      action: "update",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "requires manage_global_outcomes permission for global outcomes" do
@@ -440,7 +440,7 @@ describe "Outcomes API", type: :request do
                      action: "update",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "fails (400) if the outcome is invalid" do
@@ -490,6 +490,21 @@ describe "Outcomes API", type: :request do
                                                            { points: 0, description: "Does Not Meet Expectations" }
                                                          ]
                                                        })
+      end
+
+      it "updates attachment associations" do
+        aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+        api_call(:put,
+                 "/api/v1/outcomes/#{@outcome.id}",
+                 { controller: "outcomes_api",
+                   action: "update",
+                   id: @outcome.id.to_s,
+                   format: "json" },
+                 { title: "Updated Outcome",
+                   description: aa_test_data.added_html })
+        @outcome.reload
+        attachment_ids = @outcome.attachment_associations.pluck(:attachment_id)
+        expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
       end
 
       it "leaves alone fields not provided" do

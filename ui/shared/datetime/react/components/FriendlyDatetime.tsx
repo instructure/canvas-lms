@@ -32,6 +32,8 @@ type Props = {
   prefix?: string
   prefixMobile?: string
   showTime?: boolean
+  includeScreenReaderContent?: boolean
+  alwaysUseSpecifiedFormat?: boolean
 }
 
 class FriendlyDatetime extends Component<Props> {
@@ -42,6 +44,8 @@ class FriendlyDatetime extends Component<Props> {
     prefix: '',
     prefixMobile: null,
     showTime: false,
+    includeScreenReaderContent: true,
+    alwaysUseSpecifiedFormat: false,
   }
 
   // The original render function is really slow because of all
@@ -51,7 +55,13 @@ class FriendlyDatetime extends Component<Props> {
   render = memoize(
     () => {
       // Separate props not used by the `time` element
-      const {prefixMobile, showTime, ...timeElementProps} = this.props
+      const {
+        prefixMobile,
+        showTime,
+        includeScreenReaderContent,
+        alwaysUseSpecifiedFormat,
+        ...timeElementProps
+      } = this.props
 
       let datetime = this.props.dateTime
       if (!datetime) {
@@ -89,30 +99,42 @@ class FriendlyDatetime extends Component<Props> {
         fixedPrefixMobile += ' '
       }
 
+      const visibleElements = (
+        <>
+          <span className="visible-desktop">
+            {/* something like: Mar 6, 2014 */}
+            {fixedPrefix + friendly}
+          </span>
+          <span className="hidden-desktop">
+            {/* something like: 3/3/2014 or formatted when alwaysUseSpecifiedFormat is true */}
+            {(fixedPrefixMobile || '') +
+              (alwaysUseSpecifiedFormat ? friendly : fudged.toLocaleDateString())}
+          </span>
+        </>
+      )
+
       return (
         <span data-testid="friendly-date-time">
-          <ScreenReaderContent>{fixedPrefix + friendly}</ScreenReaderContent>
-
-          <time
-            {...timeProps}
-            ref={c => {
-              this.time = c
-            }}
-            aria-hidden="true"
-          >
-            <span className="visible-desktop">
-              {/* something like: Mar 6, 2014 */}
-              {fixedPrefix + friendly}
-            </span>
-            <span className="hidden-desktop">
-              {/* something like: 3/3/2014 */}
-              {(fixedPrefixMobile || '') + fudged.toLocaleDateString()}
-            </span>
-          </time>
+          {includeScreenReaderContent ? (
+            <>
+              <ScreenReaderContent>{fixedPrefix + friendly}</ScreenReaderContent>
+              <time
+                {...timeProps}
+                ref={c => {
+                  this.time = c
+                }}
+                aria-hidden="true"
+              >
+                {visibleElements}
+              </time>
+            </>
+          ) : (
+            visibleElements
+          )}
         </span>
       )
     },
-    () => this.props.dateTime
+    () => this.props.dateTime,
   )
 }
 

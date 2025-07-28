@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -50,6 +51,7 @@ export default class ReactCellEditor {
      * `createElement()` is required for subclasses to implement.
      */
     const element = this.createElement(props)
+
     ReactDOM.render(element, this.container)
   }
 

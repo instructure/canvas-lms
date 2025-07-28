@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import CollaboratorPickerView from './CollaboratorPickerView'
@@ -25,13 +25,12 @@ import editForm from '../../jst/edit.handlebars'
 import editIframe from '../../jst/EditIframe.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
-const I18n = useI18nScope('collaborations')
+const I18n = createI18nScope('collaborations')
 
 extend(CollaborationView, View)
 
 function CollaborationView() {
   this.delete = this.delete.bind(this)
-  this.handleAlertBlur = this.handleAlertBlur.bind(this)
   return CollaborationView.__super__.constructor.apply(this, arguments)
 }
 
@@ -41,25 +40,11 @@ CollaborationView.prototype.events = {
   'click .delete_collaboration_link': 'onDelete',
   'keyclick .delete_collaboration_link': 'onDelete',
   'click .cancel_button': 'onCloseForm',
-  'focus .before_external_content_info_alert': 'handleAlertFocus',
-  'focus .after_external_content_info_alert': 'handleAlertFocus',
-  'blur .before_external_content_info_alert': 'handleAlertBlur',
-  'blur .after_external_content_info_alert': 'handleAlertBlur',
 }
 
 CollaborationView.prototype.initialize = function () {
   CollaborationView.__super__.initialize.apply(this, arguments)
   return (this.id = this.$el.data('id'))
-}
-
-CollaborationView.prototype.handleAlertFocus = function (e) {
-  $(e.target).removeClass('screenreader-only')
-  return this.$el.find('iframe').addClass('info_alert_outline')
-}
-
-CollaborationView.prototype.handleAlertBlur = function (e) {
-  $(e.target).addClass('screenreader-only')
-  return this.$el.find('iframe').removeClass('info_alert_outline')
 }
 
 // Internal: Create collaboration edit form HTML.
@@ -73,25 +58,27 @@ CollaborationView.prototype.handleAlertBlur = function (e) {
 CollaborationView.prototype.formTemplate = function (arg) {
   const action = arg.action
   const data = arg.data
+  const collaborationId = this.id
   const $form = $(
     editForm(
       extend(data, {
         action,
-        id: this.id,
-      })
-    )
+        id: collaborationId,
+      }),
+    ),
   )
-  return $form.on(
-    'keydown',
-    (function (_this) {
-      return function (e) {
-        if (e.which === 27) {
-          e.preventDefault()
-          return _this.onCloseForm(e)
-        }
+
+  const view = this
+  return $form
+    .on('keydown', function (e) {
+      if (e.which === 27) {
+        e.preventDefault()
+        return view.onCloseForm(e)
       }
-    })(this)
-  )
+    })
+    .on('submit', function (e) {
+      view.trigger('validate', e, $form, collaborationId)
+    })
 }
 
 CollaborationView.prototype.iframeTemplate = function (arg) {
@@ -101,7 +88,7 @@ CollaborationView.prototype.iframeTemplate = function (arg) {
       id: this.id,
       url,
       allowances: iframeAllowances(),
-    })
+    }),
   )
   return $iframe.on(
     'keydown',
@@ -112,7 +99,7 @@ CollaborationView.prototype.iframeTemplate = function (arg) {
           return _this.onCloseForm(e)
         }
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -149,7 +136,7 @@ CollaborationView.prototype.delete = function () {
       return function () {
         return _this.$el.remove()
       }
-    })(this)
+    })(this),
   )
   this.trigger('delete', this)
   const otherDeleteLinks = $('.delete_collaboration_link').toArray()

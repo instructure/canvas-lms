@@ -19,7 +19,7 @@
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import Group from '../models/Group'
 import natcompare from '@canvas/util/natcompare'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 export default class ContextGroupCollection extends PaginatedCollection {
   comparator = (x, y) =>
@@ -35,6 +35,16 @@ export default class ContextGroupCollection extends PaginatedCollection {
       filter: this.options?.filter ?? '',
     }
     return url_base + encodeQueryString(params)
+  }
+
+  fetch(options = {}) {
+    if (this.options?.disableCache) {
+      options.headers = {
+        ...options.headers,
+        'Cache-Control': 'no-cache',
+      }
+    }
+    return super.fetch(options)
   }
 }
 ContextGroupCollection.prototype.model = Group

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import UploadFileModal from '../UploadFileModal'
 
 describe('UploadFileModal', () => {
@@ -109,7 +109,7 @@ describe('UploadFileModal', () => {
       expect(queryByText('Attributes')).not.toBeInTheDocument()
     })
 
-    it('is not renderedd when requireA11yAttributes is false', () => {
+    it('is not rendered when requireA11yAttributes is false', () => {
       modalProps.accept = '*/*'
       modalProps.requireA11yAttributes = false
 
@@ -117,5 +117,12 @@ describe('UploadFileModal', () => {
 
       expect(queryByText('Attributes')).not.toBeInTheDocument()
     })
+  })
+
+  it('disables the submit button during upload when used by the block editor', () => {
+    modalProps.forBlockEditorUse = true
+    modalProps.uploading = true
+    render(<UploadFileModal {...modalProps} />)
+    expect(screen.getByText('Submitting...').closest('button').disabled).toBe(true)
   })
 })

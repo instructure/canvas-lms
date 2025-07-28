@@ -77,6 +77,9 @@
     "content_type_2cf90d95": {
         "message": "Բովանդակության տեսակ"
     },
+    "copy_9748f9f": {
+        "message": "Պատճենել"
+    },
     "copyright_holder_66ee111": {
         "message": "Հեղինակային իրավունք ունեցող անձը՝"
     },
@@ -353,6 +356,9 @@
     "reset_95a81614": {
         "message": "Սկզբնական Վիճակին Բերել"
     },
+    "retry_ebd5f8ba": {
+        "message": "Փորձել կրկին"
+    },
     "rich_content_editor_2708ef21": {
         "message": "Ֆորմատավորված տեքստի խմբագիր"
     },
@@ -373,6 +379,9 @@
     },
     "submit_a3cc6859": {
         "message": "Ուղարկել"
+    },
+    "submitting_b90fac62": {
+        "message": "Ուղարկվում է..."
     },
     "syllabus_f191f65b": {
         "message": "Դասընթացի ծրագիր"

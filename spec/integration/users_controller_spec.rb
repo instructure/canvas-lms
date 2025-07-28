@@ -68,28 +68,6 @@ describe UsersController do
       expect(response.body).not_to match(/studentname2/)
     end
 
-    context "when the deprecate_faculty_journal flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "shows user notes if enabled" do
-        get user_course_teacher_activity_url(@teacher, @course)
-        expect(response.body).not_to match(/journal entry/i)
-        @course.root_account.update_attribute(:enable_user_notes, true)
-        get user_course_teacher_activity_url(@teacher, @course)
-        expect(response.body).to match(/journal entry/i)
-      end
-    end
-
-    context "when the deprecate_faculty_journal flag is enabled" do
-      it "does not show user notes if enabled" do
-        get user_course_teacher_activity_url(@teacher, @course)
-        expect(response.body).not_to match(/journal entry/i)
-        @course.root_account.update_attribute(:enable_user_notes, true)
-        get user_course_teacher_activity_url(@teacher, @course)
-        expect(response.body).to_not match(/journal entry/i)
-      end
-    end
-
     it "shows individual user info across courses" do
       @course1 = @course
       @course2 = course_factory(active_course: true)
@@ -347,50 +325,20 @@ describe UsersController do
     end
   end
 
-  describe "admin_merge" do
-    it "works for the whole flow" do
-      user_with_pseudonym(active_all: 1)
-      Account.default.account_users.create!(user: @user)
-      @admin = @user
-      user_with_pseudonym(active_all: 1, username: "user2@instructure.com")
-      user_session(@admin)
-
-      get user_admin_merge_url(@user, pending_user_id: @admin.id)
-      expect(response).to be_successful
-      expect(assigns["pending_other_user"]).to eq @admin
-      expect(assigns["other_user"]).to be_nil
-
-      get user_admin_merge_url(@user, new_user_id: @admin.id)
-      expect(response).to be_successful
-      expect(assigns["pending_other_user"]).to be_nil
-      expect(assigns["other_user"]).to eq @admin
-
-      post user_merge_url(@user, new_user_id: @admin.id)
-      expect(response).to redirect_to(user_profile_url(@admin))
-
-      expect(@user.reload).to be_deleted
-      expect(@admin.reload).to be_registered
-      expect(@admin.pseudonyms.count).to eq 2
-    end
-  end
-
   context "media_download url" do
     let(:kaltura_client) do
-      kaltura_client = instance_double("CanvasKaltura::ClientV3")
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
       kaltura_client
     end
 
-    let(:media_source_fetcher) do
-      media_source_fetcher = instance_double("MediaSourceFetcher")
-      expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
-      media_source_fetcher
-    end
+    let(:media_source_fetcher) { instance_double(MediaSourceFetcher) }
 
     before do
       account = Account.create!
       course_with_student(active_all: true, account:)
       user_session(@student)
+      expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
     end
 
     it "passes the type down to the media fetcher even with a malformed url" do

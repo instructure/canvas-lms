@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,23 +17,38 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope(
-  'gradebook_default_gradebook_components_content_filters_assignment_group_filter'
+const I18n = createI18nScope(
+  'gradebook_default_gradebook_components_content_filters_assignment_group_filter',
 )
 
 const ALL_ITEMS_ID = '0'
 
-export default function AssignmentGroupFilter(props) {
-  const {assignmentGroups, selectedAssignmentGroupId, ...filterProps} = props
+interface AssignmentGroup {
+  id: string
+  name: string
+}
 
+interface AssignmentGroupFilterProps {
+  assignmentGroups: AssignmentGroup[]
+  selectedAssignmentGroupId?: string | null
+  disabled?: boolean
+  onSelect?: (id: string) => void
+}
+
+export default function AssignmentGroupFilter({
+  assignmentGroups,
+  selectedAssignmentGroupId = null,
+  disabled = false,
+  onSelect,
+}: AssignmentGroupFilterProps) {
   return (
     <ContentFilter
-      {...filterProps}
+      disabled={disabled}
+      onSelect={onSelect || (() => {})}
       allItemsId={ALL_ITEMS_ID}
       allItemsLabel={I18n.t('All Assignment Groups')}
       items={assignmentGroups}
@@ -43,19 +57,4 @@ export default function AssignmentGroupFilter(props) {
       sortAlphabetically={true}
     />
   )
-}
-
-AssignmentGroupFilter.propTypes = {
-  assignmentGroups: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired,
-    })
-  ).isRequired,
-
-  selectedAssignmentGroupId: string,
-}
-
-AssignmentGroupFilter.defaultProps = {
-  selectedAssignmentGroupId: null,
 }

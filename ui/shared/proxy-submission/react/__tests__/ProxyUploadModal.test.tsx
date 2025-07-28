@@ -17,9 +17,14 @@
  */
 
 import React from 'react'
+import {MockedProvider} from '@apollo/client/testing'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProxyUploadModal, {type ProxyUploadModalProps} from '../ProxyUploadModal'
+
+jest.mock('@canvas/upload-file', () => ({
+  uploadFile: jest.fn(() => Promise.resolve({id: '123', display_name: 'my-image.png'})),
+}))
 
 const defaultProps: ProxyUploadModalProps = {
   student: {
@@ -40,7 +45,11 @@ const defaultProps: ProxyUploadModalProps = {
 
 function renderComponent(overrideProps = {}) {
   const props = {...defaultProps, ...overrideProps}
-  return render(<ProxyUploadModal {...props} />)
+  return render(
+    <MockedProvider>
+      <ProxyUploadModal {...props} />
+    </MockedProvider>,
+  )
 }
 
 describe('ProxyUploadModal', () => {
@@ -48,16 +57,22 @@ describe('ProxyUploadModal', () => {
     global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders', () => {
     const {getByText} = renderComponent()
     expect(getByText('Upload File')).toBeInTheDocument()
   })
+
   it('indicates files are being uploaded once added to input', async () => {
     const user = userEvent.setup({delay: null})
-    const {getByTestId, getAllByText} = renderComponent()
+    const {getByTestId, findByRole} = renderComponent()
     const input = await waitFor(() => getByTestId('proxyInputFileDrop'))
     const file = new File(['my-image'], 'my-image.png', {type: 'image/png'})
     await user.upload(input, file)
-    expect(getAllByText('Uploading files')[0]).toBeInTheDocument()
+    const alert = await findByRole('alert')
+    expect(alert).toHaveTextContent('Uploading files')
   })
 })

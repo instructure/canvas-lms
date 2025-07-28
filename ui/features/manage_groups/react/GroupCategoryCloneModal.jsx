@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {shape, string} from 'prop-types'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {reloadWindow} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
+import {shape, string} from 'prop-types'
+import React, {useEffect, useState, useRef} from 'react'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 GroupCategoryCloneModal.propTypes = {
   groupCategory: shape({
@@ -37,29 +38,53 @@ GroupCategoryCloneModal.propTypes = {
   }),
 }
 
+export const CATEGORY_NAME_MAX_LENGTH = 255
+
 export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) {
   const [name, setName] = useState('')
   const [status, setStatus] = useState(null)
+  const [categoryNameMessages, setCategoryNameMessages] = useState([])
+  const categoryNameRef = useRef(null)
 
   useEffect(() => {
     if (groupCategory.name)
       setName(I18n.t('(Clone) %{groupCategoryName}', {groupCategoryName: groupCategory.name}))
-    if (!modalProps.open) resetState()
+    if (!modalProps.open) {
+      resetState()
+      setCategoryNameMessages([])
+    }
   }, [groupCategory.name, modalProps.open])
 
   function handleSend() {
+    const categoryNameErrors = []
+    const trimmedName = name.trim()
+    if (!trimmedName.length) {
+      categoryNameErrors.push({type: 'newError', text: I18n.t('Group set name is required')})
+    } else if (trimmedName.length > CATEGORY_NAME_MAX_LENGTH) {
+      categoryNameErrors.push({
+        type: 'newError',
+        text: I18n.t('Must be fewer than %{number} characters', {number: CATEGORY_NAME_MAX_LENGTH}),
+      })
+    }
+
+    if (categoryNameErrors.length) {
+      setCategoryNameMessages(categoryNameErrors)
+      categoryNameRef.current?.focus()
+      return
+    }
+
     setStatus('info')
-    startSendOperation()
+    startSendOperation(trimmedName)
       .then(res => notifyDidSave(res))
       .catch(err => {
-        console.error(err) // eslint-disable-line no-console
+        console.error(err)
         captureException(err)
-        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        if (err.response) console.error(err.response)
         setStatus('error')
       })
   }
 
-  function startSendOperation() {
+  function startSendOperation(name) {
     const path = `/group_categories/${groupCategory.id}/clone_with_name`
     return doFetchApi({
       method: 'POST',
@@ -70,7 +95,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
 
   function refreshGroupSet(res) {
     window.location.hash = `#tab-${res.json.group_category.id}`
-    window.location.reload()
+    reloadWindow()
   }
 
   function notifyDidSave(res) {
@@ -83,11 +108,22 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     setStatus(null)
   }
 
+  function handleCategoryNameRef(ref) {
+    categoryNameRef.current = ref
+  }
+
+  function handleCategoryNameChange(value) {
+    setName(value)
+    setCategoryNameMessages([])
+  }
+
   function Footer() {
-    const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
+    const saveButtonState = status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
-        <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
+        <Button data-testid="cancel_clone_group_set" onClick={modalProps.onDismiss}>
+          {I18n.t('Cancel')}
+        </Button>
         <Button
           type="submit"
           interaction={saveButtonState}
@@ -125,11 +161,14 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
       {alert}
       <TextInput
         id="cloned_category_name"
+        data-testid="cloned_category_name_input"
         renderLabel={I18n.t('Group Set Name')}
         placeholder={I18n.t('Name')}
         value={name}
-        onChange={(_event, value) => setName(value)}
+        onChange={(_event, value) => handleCategoryNameChange(value)}
         isRequired={true}
+        messages={categoryNameMessages}
+        ref={ref => handleCategoryNameRef(ref)}
       />
     </CanvasModal>
   )

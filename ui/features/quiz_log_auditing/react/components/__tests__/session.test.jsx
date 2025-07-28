@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/views/session', () => {
     render(
       <MemoryRouter>
         <Session />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -34,7 +34,7 @@ describe('canvas_quizzes/events/views/session', () => {
     const {queryByTestId, getByTestId} = render(
       <MemoryRouter>
         <Session availableAttempts={[1, 2, 3]} attempt={2} />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
 
     expect(queryByTestId('attempt-1')).toBeTruthy()

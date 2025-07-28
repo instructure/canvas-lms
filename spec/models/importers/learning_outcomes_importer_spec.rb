@@ -43,24 +43,14 @@ describe "Importing Learning Outcomes" do
     expect(log.child_outcome_links.detect { |link| link.content == lo2 }).not_to be_nil
   end
 
-  context "selectable_outcomes_in_course_copy enabled" do
-    before do
-      @context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
-    end
-
-    after do
-      @context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
-    end
-
-    it "imports group" do
-      migration = ContentMigration.create!(context: @context)
-      migration.migration_ids_to_import = { copy: {} }
-      data = [{ type: "learning_outcome_group", title: "hey", migration_id: "x" }.with_indifferent_access]
-      data = { "learning_outcomes" => data }
-      expect do
-        Importers::LearningOutcomeImporter.process_migration(data, migration)
-      end.to change { LearningOutcomeGroup.count }.by 1
-    end
+  it "imports group" do
+    migration = ContentMigration.create!(context: @context)
+    migration.migration_ids_to_import = { copy: {} }
+    data = [{ type: "learning_outcome_group", title: "hey", migration_id: "x" }.with_indifferent_access]
+    data = { "learning_outcomes" => data }
+    expect do
+      Importers::LearningOutcomeImporter.process_migration(data, migration)
+    end.to change { LearningOutcomeGroup.count }.by 1
   end
 
   it "does not fail when passing an outcome that already exists" do
@@ -75,7 +65,7 @@ describe "Importing Learning Outcomes" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
-    existing_outcome.write_attribute("migration_id", "7321d12e-3705-430d-9dfd-2511b0c73c14")
+    existing_outcome.migration_id = "7321d12e-3705-430d-9dfd-2511b0c73c14"
     existing_outcome.save!
     lo_data[:migration_id] = "7321d12e-3705-430d-9dfd-2511b0c73c14"
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
@@ -102,7 +92,7 @@ describe "Importing Learning Outcomes" do
                                          context: context2,
                                          description: friendly_description
                                        })
-    outcome.write_attribute("migration_id", "bdf6dc13-5d8f-43a8-b426-03380c9b6781")
+    outcome.migration_id = "bdf6dc13-5d8f-43a8-b426-03380c9b6781"
     identifier = outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
     Account.site_admin.enable_feature! :outcomes_friendly_description

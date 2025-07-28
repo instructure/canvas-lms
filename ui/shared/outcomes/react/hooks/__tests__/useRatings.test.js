@@ -25,7 +25,7 @@ const expectDescriptions = (result, expectedDescriptions) => {
 
 const expectDescriptionErrors = (result, expectedDescriptionsErrors) => {
   expect(result.current.ratings.map(r => r.descriptionError)).toStrictEqual(
-    expectedDescriptionsErrors
+    expectedDescriptionsErrors,
   )
 }
 
@@ -278,7 +278,7 @@ describe('useRatings', () => {
           useRatings({
             initialRatings: defaultRatings.filter(r => r.points !== 0),
             initialMasteryPoints,
-          })
+          }),
         )
 
         changeMasteryPoints(result, 0)
@@ -292,7 +292,7 @@ describe('useRatings', () => {
           useRatings({
             initialRatings: null,
             initialMasteryPoints,
-          })
+          }),
         )
 
         changeMasteryPoints(result, 0)
@@ -315,7 +315,7 @@ describe('useRatings', () => {
 
     it('should return an empty array if no ratings', () => {
       const result = prepareRatings()
-      expect(result.length).toBe(0)
+      expect(result).toHaveLength(0)
     })
   })
 })

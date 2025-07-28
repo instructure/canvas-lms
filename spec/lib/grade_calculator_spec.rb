@@ -94,6 +94,37 @@ describe GradeCalculator do
       end.not_to raise_error
     end
 
+    it "correctly rounds weighted assignment groups by percent with irrational numbers" do
+      # matches test found in ui/shared/round/__tests__/round.spec.js to check rounding consistency
+      group1 = @course.assignment_groups.create!(name: "Group 1", group_weight: 12)
+      group2 = @course.assignment_groups.create!(name: "Group 2", group_weight: 10)
+      group3 = @course.assignment_groups.create!(name: "Group 3", group_weight: 15)
+      group4 = @course.assignment_groups.create!(name: "Group 4", group_weight: 21)
+      group5 = @course.assignment_groups.create!(name: "Group 5", group_weight: 21)
+      group6 = @course.assignment_groups.create!(name: "Group 6", group_weight: 21)
+
+      @course.update!(group_weighting_scheme: "percent")
+
+      a1 = @course.assignments.create!(title: "Assignment 1", points_possible: 12, assignment_group: group1)
+      a2 = @course.assignments.create!(title: "Assignment 2", points_possible: 82, assignment_group: group2)
+      a3 = @course.assignments.create!(title: "Assignment 3", points_possible: 100, assignment_group: group3)
+      a4 = @course.assignments.create!(title: "Assignment 4", points_possible: 100, assignment_group: group4)
+      a5 = @course.assignments.create!(title: "Assignment 5", points_possible: 100, assignment_group: group5)
+      a6 = @course.assignments.create!(title: "Assignment 6", points_possible: 100, assignment_group: group6)
+
+      a1.grade_student(@student, grade: 11.8, grader: @teacher)
+      a2.grade_student(@student, grade: 82, grader: @teacher)
+      a3.grade_student(@student, grade: 89.5, grader: @teacher)
+      a4.grade_student(@student, grade: 85, grader: @teacher)
+      a5.grade_student(@student, grade: 85, grader: @teacher)
+      a6.grade_student(@student, grade: 83, grader: @teacher)
+
+      GradeCalculator.recompute_final_score(@student.id, @course.id)
+      @student.reload
+
+      expect(@student.enrollments.first.computed_current_score).to eq 88.36
+    end
+
     it "deletes irrelevant scores for inactive grading periods" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
@@ -822,26 +853,6 @@ describe GradeCalculator do
       @user.reload
       expect(@user.enrollments.first.computed_current_score).to equal(40.0)
       expect(@user.enrollments.first.computed_final_score).to equal(40.0)
-    end
-  end
-
-  describe "#number_or_null" do
-    it "returns a valid score" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = 23.4
-      expect(calc.send(:number_or_null, score)).to equal(score)
-    end
-
-    it "converts NaN to NULL" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = 0 / 0.0
-      expect(calc.send(:number_or_null, score)).to eql("NULL::float")
-    end
-
-    it "converts nil to NULL" do
-      calc = GradeCalculator.new [@user.id], @course.id
-      score = nil
-      expect(calc.send(:number_or_null, score)).to eql("NULL::float")
     end
   end
 
@@ -1911,6 +1922,72 @@ describe GradeCalculator do
 
         expect { calc.send(:save_course_and_grading_period_scores) }.to raise_error(Delayed::RetriableError)
       end
+    end
+  end
+
+  context "what if scores" do
+    let(:calc) { GradeCalculator.new([@student.id], @course, use_what_if_scores: true) }
+
+    before do
+      @assignment1 = @course.assignments.create! points_possible: 100
+      @assignment2 = @course.assignments.create! points_possible: 100
+    end
+
+    it "uses student_entered_score" do
+      @assignment1.grade_student @student, grade: 50, grader: @teacher
+      @assignment2.grade_student @student, grade: 90, grader: @teacher
+      submission = @assignment2.submissions.find_by(user: @student)
+      expect { submission.update_column(:student_entered_score, 10) }.to change { submission.reload.student_entered_score }.from(nil).to(10)
+
+      scores = calc.compute_scores
+
+      expect(scores.first[:current][:grade]).to eq 30
+    end
+
+    it "includes student_entered_scores even if the submission is unposted" do
+      @assignment2.ensure_post_policy(post_manually: true)
+      @assignment1.grade_student @student, grade: 50, grader: @teacher
+      @assignment2.grade_student @student, grade: 90, grader: @teacher
+      submission = @assignment2.submissions.find_by(user: @student)
+      submission.update_column(:student_entered_score, 10)
+
+      scores = calc.compute_scores
+
+      expect(scores.first[:current][:grade]).to eq 30
+    end
+
+    it "drops student_entered_score if necessary" do
+      @assignment1.assignment_group.rules_hash = { drop_lowest: 1 }.with_indifferent_access
+      @assignment1.assignment_group.save!
+      expect(@assignment1.assignment_group.id).to eq @assignment2.assignment_group.id
+      @assignment1.grade_student @student, grade: 50, grader: @teacher
+      @assignment2.grade_student @student, grade: 90, grader: @teacher
+      submission = @assignment2.submissions.find_by(user: @student)
+      expect { submission.update_column(:student_entered_score, 10) }.to change { submission.reload.student_entered_score }.from(nil).to(10)
+
+      scores = calc.compute_scores
+
+      expect(scores.first[:current][:grade]).to eq 50
+    end
+  end
+
+  context "include_discussion_checkpoints" do
+    before(:once) do
+      @course.account.enable_feature!(:discussion_checkpoints)
+      student_in_course(course: @course, active_all: true)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "includes discussion checkpoints when true" do
+      calc = GradeCalculator.new([@student.id], @course, include_discussion_checkpoints: true)
+      expect(calc.submissions.pluck(:assignment_id)).to include(@reply_to_topic.id)
+      expect(calc.submissions.pluck(:assignment_id)).to include(@reply_to_entry.id)
+    end
+
+    it "does not include discussion checkpoints when false" do
+      calc = GradeCalculator.new([@student.id], @course, include_discussion_checkpoints: false)
+      expect(calc.submissions.pluck(:assignment_id)).to_not include(@reply_to_topic.id)
+      expect(calc.submissions.pluck(:assignment_id)).to_not include(@reply_to_entry.id)
     end
   end
 end

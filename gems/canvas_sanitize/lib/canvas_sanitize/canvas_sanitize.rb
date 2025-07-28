@@ -95,7 +95,6 @@ module CanvasSanitize # :nodoc:
       "span",
       "strike",
       "strong",
-      "style",
       "sub",
       "sup",
       "abbr",
@@ -223,6 +222,7 @@ module CanvasSanitize # :nodoc:
                "aria-relevant",
                "aria-autocomplete",
                "aria-checked",
+               "aria-description",
                "aria-disabled",
                "aria-expanded",
                "aria-haspopup",
@@ -257,6 +257,7 @@ module CanvasSanitize # :nodoc:
                    "scrolling",
                    "allow", # TODO: remove explicit allow with domain whitelist account setting
                    "sandbox",
+                   "loading",
                    "allowfullscreen",
                    "webkitallowfullscreen",
                    "mozallowfullscreen"].freeze,
@@ -740,6 +741,7 @@ module CanvasSanitize # :nodoc:
   SANITIZE[:protocols].freeze
   SANITIZE.freeze
 
+  Config = Struct.new(:sanitizer, :fields, :allow_comments)
   module ClassMethods
     def sanitize_field(*args)
       # Calls this as many times as a field is configured.  Will this play
@@ -747,7 +749,7 @@ module CanvasSanitize # :nodoc:
       include CanvasSanitize::InstanceMethods
       extend CanvasSanitize::SingletonMethods
 
-      @config = OpenStruct.new
+      @config = Config.new
       @config.sanitizer = []
       @config.fields = []
       @config.allow_comments = true
@@ -800,7 +802,7 @@ module CanvasSanitize # :nodoc:
         next unless f.is_a?(String) || f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
-        send((field.to_s + "="), val)
+        send(field.to_s + "=", val)
       end
     end
   end # InstanceMethods

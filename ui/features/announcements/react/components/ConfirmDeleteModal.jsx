@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, number, node, object, oneOfType} from 'prop-types'
@@ -24,7 +24,7 @@ import {func, number, node, object, oneOfType} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('announcements_v2')
+const I18n = createI18nScope('announcements_v2')
 
 export function showConfirmDelete(props) {
   const parent = document.createElement('div')
@@ -37,7 +37,7 @@ export function showConfirmDelete(props) {
 
   ReactDOM.render(
     <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
-    parent
+    parent,
   )
 }
 
@@ -105,12 +105,13 @@ export default class ConfirmDeleteModal extends Component {
               one: 'You are about to delete 1 announcement. Are you sure?',
               other: 'You are about to delete %{count} announcements. Are you sure?',
             },
-            {count: this.props.selectedCount}
+            {count: this.props.selectedCount},
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button
             id="cancel_delete_announcements"
+            data-testid="cancel-delete-announcements"
             ref={c => {
               this.cancelBtn = c
             }}
@@ -124,6 +125,7 @@ export default class ConfirmDeleteModal extends Component {
               this.confirmBtn = c
             }}
             id="confirm_delete_announcements"
+            data-testid="confirm-delete-announcements"
             onClick={this.onConfirm}
             color="danger"
           >

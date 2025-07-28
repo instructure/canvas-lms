@@ -134,7 +134,7 @@ module Lti::IMS
       end
 
       if tool !=
-         ContextExternalTool.from_content_tag(
+         Lti::ToolFinder.from_content_tag(
            progress.context.external_tool_tag,
            progress.context
          )

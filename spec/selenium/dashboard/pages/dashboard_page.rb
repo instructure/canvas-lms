@@ -45,6 +45,14 @@ module DashboardPage
     ".todo-list-header"
   end
 
+  def todo_list_selector
+    ".to-do-list"
+  end
+
+  def todo_disable_item_link_selector
+    "button.disable_item_link"
+  end
+
   #------------------------- Elements --------------------------
   def card_container
     f(card_container_selector)
@@ -68,5 +76,13 @@ module DashboardPage
 
   def todo_list_header
     f(todo_list_header_selector)
+  end
+
+  def todo_list
+    f(todo_list_selector)
+  end
+
+  def todo_disable_item_link
+    f(todo_disable_item_link_selector)
   end
 end

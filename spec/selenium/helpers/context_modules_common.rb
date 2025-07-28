@@ -59,12 +59,12 @@ module ContextModulesCommon
     @tool = course.context_external_tools.create!(name: "new tool",
                                                   consumer_key: "key",
                                                   shared_secret: "secret",
-                                                  domain: "example.com",
+                                                  url: "http://localhost:3000/",
                                                   custom_fields: { "a" => "1", "b" => "2" })
     @external_tool_tag = @module.add_item({
                                             type: "context_external_tool",
                                             title: "Example",
-                                            url: "http://www.example.com",
+                                            url: "http://localhost:3000/",
                                             new_tab: "0"
                                           })
     @external_tool_tag.publish!
@@ -72,7 +72,7 @@ module ContextModulesCommon
     @external_url_tag = @module.add_item({
                                            type: "external_url",
                                            title: "pls view",
-                                           url: "http://example.com/lolcats"
+                                           url: "http://localhost:3000/lolcats"
                                          })
     @external_url_tag.publish!
 
@@ -180,11 +180,7 @@ module ContextModulesCommon
   end
 
   def manually_add_module_item(item_select_selector, module_name, item_name)
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      add_module_with_tray(module_name + "Module")
-    else
-      add_module(module_name + "Module")
-    end
+    add_module_with_tray(module_name + "Module")
     f(".ig-header-admin .al-trigger").click
     wait_for_ajaximations
     f(".add_module_item_link").click
@@ -201,6 +197,7 @@ module ContextModulesCommon
   def add_existing_module_item(module_name, module_assignment)
     new_module = @course.context_modules.create!(name: module_name, workflow_state: "active")
     new_module.add_item(id: module_assignment.id, type: "assignment")
+    new_module
   end
 
   def add_existing_module_file_items(item_select_selector, file_names)
@@ -263,41 +260,28 @@ module ContextModulesCommon
     click_option(select_element_css, item_text)
   end
 
-  def new_module_form
-    f(".add_module_link").click
-    fj("#add_context_module_form:visible")
-  end
-
-  def add_module(module_name = "Test Module")
-    wait_for_modules_ui
-    add_form = new_module_form
-    replace_content(add_form.find_element(:id, "context_module_name"), module_name)
-    submit_form(add_form)
-    wait_for_ajaximations
-    expect(add_form).not_to be_displayed
-    expect(f("#context_modules")).to include_text(module_name)
-  end
-
   def add_module_with_tray(module_name = "Test Module")
     click_new_module_link
     update_module_name(module_name)
     click_add_tray_add_module_button
   end
 
-  def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text)
+  def add_new_module_item_and_yield(item_select_selector, module_name, new_item_text, item_title_text = nil)
     f(".ig-header-admin .al-trigger").click
     f(".add_module_item_link").click
     select_module_item("#add_module_item_select", module_name)
     select_module_item(item_select_selector + " .module_item_select", new_item_text)
-    item_title = fj(".item_title:visible")
-    expect(item_title).to be_displayed
-    replace_content(item_title, item_title_text)
-    yield if block_given?
+    if item_title_text
+      item_title = fj(".item_title:visible")
+      expect(item_title).to be_displayed
+      replace_content(item_title, item_title_text)
+      yield if block_given?
+    end
     f(".add_item_button.ui-button").click
     wait_for_ajaximations
     tag = ContentTag.last
     module_item = f("#context_module_item_#{tag.id}")
-    expect(module_item).to include_text(item_title_text)
+    item_title_text ? expect(module_item).to(include_text(item_title_text)) : expect(module_item).to(include_text(new_item_text))
   end
 
   def add_new_external_item(module_item, url_text, page_name_text)
@@ -401,13 +385,6 @@ module ContextModulesCommon
     move_to_click("label[for=unlock_module_at]")
   end
 
-  def differentiated_modules_on
-    Account.site_admin.enable_feature!(:differentiated_modules)
-    Setting.set("differentiated_modules_setting", "true")
-    AssignmentStudentVisibility.reset_table_name
-    Quizzes::QuizStudentVisibility.reset_table_name
-  end
-
   # Ugly page retrieval for when footer doesn't show up in flakey_spec_catcher mode
   def get_page_with_footer(url)
     max_attempts = 20
@@ -426,5 +403,28 @@ module ContextModulesCommon
     @already_waited_for_modules_ui = false
     super
     wait_for_modules_ui if %r{\A/courses/\d+/modules\z}.match?(url)
+  end
+
+  def create_module_with_two_items
+    modules = create_modules(1, true)
+    modules[0].add_item({ id: @assignment.id, type: "assignment" })
+    modules[0].add_item({ id: @assignment2.id, type: "assignment" })
+    modules[0]
+  end
+
+  def module_with_two_items
+    mod = create_module_with_two_items
+    get "/courses/#{@course.id}/modules"
+    mod
+  end
+
+  def uncollapse_all_modules(course, user)
+    uncollapse_modules(course.context_modules, user)
+  end
+
+  def uncollapse_modules(modules, user)
+    modules.each do |mod|
+      mod.find_or_create_progression(user)&.uncollapse!
+    end
   end
 end

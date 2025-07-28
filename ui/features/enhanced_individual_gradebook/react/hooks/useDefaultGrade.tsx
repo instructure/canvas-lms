@@ -31,9 +31,11 @@ export type DefaultGradeSubmissionParams = {
       set_by_default_grade: boolean
       late_policy_status?: string
       grade?: string
+      sub_assignment_tag?: string
     }
   }
   dont_overwrite_grades: boolean
+  sub_assignment_tag?: string
 }
 
 export type ApiResultType = {
@@ -42,7 +44,7 @@ export type ApiResultType = {
 
 export const useDefaultGrade = () => {
   const [defaultGradeStatus, setDefaultGradeStatus] = useState<ApiCallStatus>(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
   const [savedGrade, setSavedGrade] = useState<string>('')
   const [updatedSubmissions, setUpdatedSubmissions] = useState<SubmissionGradeChange[]>([])
@@ -55,7 +57,7 @@ export const useDefaultGrade = () => {
     async (
       contextUrl: string,
       gradeInput: string,
-      submissionParams: DefaultGradeSubmissionParams
+      submissionParams: DefaultGradeSubmissionParams,
     ) => {
       setDefaultGradeStatus(ApiCallStatus.PENDING)
       setUpdatedSubmissions([])
@@ -79,7 +81,7 @@ export const useDefaultGrade = () => {
         setDefaultGradeStatus(ApiCallStatus.FAILED)
       }
     },
-    []
+    [],
   )
 
   return {

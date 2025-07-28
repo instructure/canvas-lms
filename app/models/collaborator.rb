@@ -49,9 +49,9 @@ class Collaborator < ActiveRecord::Base
     end
     p.whenever do |record|
       if record.group_id.nil?
-        record.just_created && record.collaboration && record.user != record.collaboration.user
+        record.previously_new_record? && record.collaboration && record.user != record.collaboration.user
       else
-        record.just_created && record.collaboration
+        record.previously_new_record? && record.collaboration
       end
     end
     p.data { course_broadcast_data }

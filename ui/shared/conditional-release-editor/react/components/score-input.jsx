@@ -21,10 +21,11 @@ import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import shortid from '@canvas/shortid'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingTypes from '../grading-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {TextInput} from '@instructure/ui-text-input'
 
 import {
   scoreToPercent,
@@ -34,7 +35,7 @@ import {
   isNumeric,
 } from '../score-helpers'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const {string, func, object, number} = PropTypes
 
@@ -102,22 +103,16 @@ export default class ScoreInput extends React.Component {
     return !!this.props.error
   }
 
-  errorMessageId() {
-    return 'error-' + this.shortid
+  errorMessage() {
+    return (
+      <span data-testid="cr-score-input-error" style={{whiteSpace: 'nowrap'}}>
+        {this.props.error}
+      </span>
+    )
   }
 
-  screenreaderErrorMessage() {
-    if (this.hasError()) {
-      return (
-        <div>
-          <ScreenReaderContent>
-            <span id={this.errorMessageId()}>{this.props.error}</span>
-          </ScreenReaderContent>
-        </div>
-      )
-    } else {
-      return null
-    }
+  errorMessageId() {
+    return 'error-' + this.shortid
   }
 
   render() {
@@ -150,20 +145,18 @@ export default class ScoreInput extends React.Component {
             {srLabel}
           </label>
         </ScreenReaderContent>
-        <Tooltip renderTip={this.props.error} isShowingContent={this.hasError()} color="primary">
-          <input
-            className="cr-input cr-percent-input__input"
-            id={this.shortid}
-            type="text"
-            value={this.value()}
-            title={this.props.label}
-            onChange={this.changed}
-            onFocus={this.focused}
-            onBlur={this.blurred}
-            {...optionalProps}
-          />
-        </Tooltip>
-        {this.screenreaderErrorMessage()}
+        <TextInput
+          className="cr-input cr-percent-input__input"
+          id={this.shortid}
+          type="text"
+          value={this.value()}
+          title={this.props.label}
+          onChange={this.changed}
+          onFocus={this.focused}
+          onBlur={this.blurred}
+          messages={this.hasError() ? [{text: this.errorMessage(), type: 'error'}] : null}
+          {...optionalProps}
+        />
       </div>
     )
   }

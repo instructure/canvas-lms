@@ -1,11 +1,8 @@
 <div>
   <p>
-    {{#t}}Not all sections will be assigned this item.{{/t}}
+    {{#t}}Not everyone will be assigned this item!{{/t}}
   </p>
-  {{#t}}Would you like to go back to include:{{/t}}
-  <ul aria-label="{{#toSentence sections}}{{this}}{{/toSentence}}">
-    {{#each sections}}<li><b>{{this}}</b></li>{{/each}}
-  </ul>
+  {{#t}}Would you like to continue?{{/t}}
 
   <div class="button-container form-actions">
     <button type="button" class="btn">{{#t}}Go Back{{/t}}</button>

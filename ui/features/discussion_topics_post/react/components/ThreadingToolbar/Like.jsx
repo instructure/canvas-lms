@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function Like({...props}) {
   function icon() {
@@ -57,36 +57,41 @@ export function Like({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small',
-          itemSpacing: '0 small 0 0',
+          isMobile: true,
         },
         desktop: {
-          textSize: 'medium',
-          itemSpacing: 'none',
+          isMobile: false,
         },
       }}
       render={responsiveProps => (
-        <View className="discussion-like-btn" margin={responsiveProps.itemSpacing}>
+        <View className="discussion-like-btn">
           <Link
             isWithinText={false}
             as="button"
             onClick={props.onClick}
-            renderIcon={icon()}
             data-testid="like-button"
+            data-action-state={props.isLiked ? 'unlikeButton' : 'likeButton'}
             interaction={props.interaction}
           >
-            {props.likeCount > 0 && (
-              <>
-                <PresentationContent>
-                  <Text weight="bold" data-testid="like-count" size={responsiveProps.textSize}>
-                    {props.likeCount}
-                  </Text>
-                </PresentationContent>
-                <ScreenReaderContent>
-                  {I18n.t('Like count: %{count}', {count: props.likeCount})}
-                </ScreenReaderContent>
-              </>
-            )}
+            <PresentationContent>
+              <Text weight="bold" data-testid="like-count" size="medium">
+                {icon()}
+                {props.likeCount > 0 && <View margin="0 0 0 xx-small">{props.likeCount}</View>}
+                {!responsiveProps.isMobile &&
+                  !props.isSplitScreenView &&
+                  ` ${I18n.t(
+                    {
+                      zero: 'Like',
+                      one: 'Like',
+                      other: 'Likes',
+                    },
+                    {count: props.likeCount},
+                  )}`}
+              </Text>
+            </PresentationContent>
+            <ScreenReaderContent>
+              {I18n.t('Like count: %{count}', {count: props.likeCount})}
+            </ScreenReaderContent>
           </Link>
         </View>
       )}
@@ -121,4 +126,6 @@ Like.propTypes = {
    * Name of the author of the post being liked
    */
   authorName: PropTypes.string.isRequired,
+
+  isSplitScreenView: PropTypes.bool,
 }

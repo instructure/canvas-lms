@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import useImmediate from '@canvas/use-immediate-hook'
 import {Heading} from '@instructure/ui-heading'
@@ -36,7 +36,7 @@ import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
-const I18n = useI18nScope('homeroom_page')
+const I18n = createI18nScope('homeroom_page')
 
 const HomeroomPage = ({
   cards,
@@ -56,17 +56,18 @@ const HomeroomPage = ({
         setDashboardCards(
           createDashboardCards(cards.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
             headingLevel: 'h3',
-          })
+          }),
         )
       }
     },
     [cards],
     // Need to do deep comparison on cards to only re-trigger if they actually changed
-    {deep: true}
+    {deep: true},
   )
 
-  const skeletonCard = props => (
+  const skeletonCard = ({key, ...props}) => (
     <div
+      key={key}
       {...props}
       className="ic-DashboardCard"
       style={{

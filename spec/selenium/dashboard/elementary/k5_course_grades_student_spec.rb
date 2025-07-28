@@ -86,6 +86,19 @@ describe "student k5 course grades tab" do
 
       expect(grades_assignments_list[0].text).to include("#{student_score}%")
     end
+
+    it "does not show the assignment marked as ungraded" do
+      @subject_course.assignments.create!(
+        title: "UNGRADED",
+        description: "ungraded assignment",
+        grading_type: "not_graded",
+        submission_types: "online_text_entry",
+        workflow_state: "published"
+      )
+
+      get "/courses/#{@subject_course.id}#grades"
+      expect(grades_assignments_list.count).to eq 1
+    end
   end
 
   context "assignment groups" do

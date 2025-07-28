@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import EditorToggle from '@canvas/editor-toggle'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
-const I18n = useI18nScope('EntryEditor')
+const I18n = createI18nScope('EntryEditor')
 
 /*
 xsslint safeString.property content
@@ -72,7 +72,7 @@ export default class EntryEditor extends EditorToggle {
         {
           success: this.onSaveSuccess.bind(this),
           error: this.onSaveError.bind(this),
-        }
+        },
       )
     } else {
       return this.getAttachmentElement().show() // may have been hidden if user deleted attachment then cancelled
@@ -80,24 +80,22 @@ export default class EntryEditor extends EditorToggle {
   }
 
   createCancelButton() {
-    return (
-      $('<a/>')
-        .text(I18n.t('Cancel'))
-        .css({marginLeft: '5px'})
-        // eslint-disable-next-line no-script-url
-        .attr('href', 'javascript:')
-        .addClass('cancel_button')
-        .click(() => {
-          this.cancel()
-          this.display({cancel: true})
-        })
-    )
+    return $('<a/>')
+      .text(I18n.t('Cancel'))
+      .css({marginLeft: '5px'})
+
+      .attr('href', 'javascript:')
+      .addClass('cancel_button')
+      .click(() => {
+        this.cancel()
+        this.display({cancel: true})
+      })
   }
 
   createDeleteAttachmentButton() {
     return (
       $('<a/>')
-        // eslint-disable-next-line no-script-url
+
         .attr('href', 'javascript:')
         .text('x')
         .addClass('cancel_button')

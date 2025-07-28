@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ActionButton} from '../action_button'
@@ -49,7 +49,7 @@ const renderComponent = (overrideProps?: any) =>
       migration_issues_count={1}
       migration_issues_url="https://mock.issues.url"
       {...{...overrideProps}}
-    />
+    />,
   )
 
 describe('ActionButton', () => {
@@ -66,9 +66,10 @@ describe('ActionButton', () => {
   })
 
   describe('modal', () => {
-    beforeEach(() =>
+    beforeEach(() => {
+      // @ts-expect-error
       doFetchApi.mockReturnValue(Promise.resolve({json: generateMigrationIssues(1)}))
-    )
+    })
 
     afterEach(() => {
       jest.clearAllMocks()
@@ -79,7 +80,7 @@ describe('ActionButton', () => {
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
       expect(
-        screen.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        screen.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
       ).toBeInTheDocument()
     })
 
@@ -103,6 +104,7 @@ describe('ActionButton', () => {
         const page1 = issues.slice(0, 10)
         const page2 = issues.slice(10, 15)
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: page1}))
           .mockReturnValueOnce(Promise.resolve({json: page2}))
       })
@@ -147,8 +149,10 @@ describe('ActionButton', () => {
       })
 
       it('shows alert if fetch fails', async () => {
+        // @ts-expect-error
         doFetchApi.mockReset()
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
           .mockImplementationOnce(() => Promise.reject())
         renderComponent({migration_issues_count: 15})
@@ -156,12 +160,13 @@ describe('ActionButton', () => {
         await userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
 
         expect(
-          await screen.findByText('Failed to fetch migration issues data.')
+          await screen.findByText('Failed to fetch migration issues data.'),
         ).toBeInTheDocument()
       })
 
       it.skip('shows spinner when loading more issues', async () => {
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
           .mockReturnValueOnce(new Promise(resolve => setTimeout(resolve, 5000)))
         renderComponent({migration_issues_count: 15})
@@ -172,6 +177,7 @@ describe('ActionButton', () => {
     })
 
     it('shows alert if fetch fails', async () => {
+      // @ts-expect-error
       doFetchApi.mockImplementation(() => Promise.reject())
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
@@ -180,6 +186,7 @@ describe('ActionButton', () => {
     })
 
     it('shows spinner when loading', async () => {
+      // @ts-expect-error
       doFetchApi.mockReturnValue(new Promise(resolve => setTimeout(resolve, 5000)))
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
@@ -194,9 +201,11 @@ describe('ActionButton', () => {
       const xButton = screen.queryAllByText('Close')[0]
       await user.click(xButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
+        ).not.toBeInTheDocument()
+      })
     })
 
     it('closes with close button', async () => {
@@ -206,9 +215,11 @@ describe('ActionButton', () => {
       const closeButton = screen.queryAllByText('Close')[1]
       await user.click(closeButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })

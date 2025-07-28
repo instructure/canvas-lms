@@ -76,7 +76,7 @@ describe('SearchResultsRow', () => {
 
   it('displays placeholder text if assignment is anonymous and muted', () => {
     expect(renderAndGetRow(2, {assignment: {name: '', anonymousGrading: true, muted: true}})).toBe(
-      'Not available; assignment is anonymous'
+      'Not available; assignment is anonymous',
     )
   })
 

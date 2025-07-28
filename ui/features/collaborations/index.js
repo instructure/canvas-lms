@@ -20,10 +20,11 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import CollaborationsPage from './backbone/views/CollaborationsPage'
 import './jquery/index'
-// eslint-disable-next-line import/extensions
-import '../../boot/initializers/activateKeyClicks.js'
+import '@canvas/common/activateKeyClicks'
+import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 ready(() => {
   const page = new CollaborationsPage({el: $('body')})
   page.initPageState()
+  initializeTopNavPortalWithDefaults()
 })

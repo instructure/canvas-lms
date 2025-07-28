@@ -33,7 +33,7 @@ if config[:components].present?
         end
 
         def job_tag
-          Delayed::Worker.current_job&.tag
+          Delayed::Worker.current_job&.[]("tag")
         end
       end
     end

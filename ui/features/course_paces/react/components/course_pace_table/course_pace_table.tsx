@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-import {CoursePace, ModuleWithDueDates, ResponsiveSizes, StoreState} from '../../types'
+import type {CoursePace, ModuleWithDueDates, ResponsiveSizes, StoreState} from '../../types'
 import {
   getCoursePace,
   getCompression,
@@ -51,6 +50,7 @@ export const CoursePaceTable = ({
           key={module.id}
           index={index + 1}
           module={module}
+          // @ts-expect-error
           coursePace={coursePace}
           responsiveSize={responsiveSize}
           showProjections={showProjections}

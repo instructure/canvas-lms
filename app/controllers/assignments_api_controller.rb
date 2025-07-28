@@ -753,6 +753,24 @@
 #         }
 #       }
 #     }
+#
+# @model BasicUser
+#     {
+#       "id": "BasicUser",
+#       "properties": {
+#         "id": {
+#           "description": "The user's ID",
+#           "example": "123456",
+#           "type": "string"
+#         },
+#         "name": {
+#           "description": "The user's name",
+#           "example": "Dankey Kang",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class AssignmentsApiController < ApplicationController
   before_action :require_context
   before_action :require_user_visibility, only: [:user_index]
@@ -791,17 +809,21 @@ class AssignmentsApiController < ApplicationController
   #   Return only New Quizzes assignments
   # @returns [Assignment]
   def index
-    error_or_array = get_assignments(@current_user)
-    render json: error_or_array unless performed?
+    GuardRail.activate(:secondary) do
+      error_or_array = get_assignments(@current_user)
+      render json: error_or_array unless performed?
+    end
   end
 
   # @API List assignments for user
   # Returns the paginated list of assignments for the specified user if the current user has rights to view.
   # See {api:AssignmentsApiController#index List assignments} for valid arguments.
   def user_index
-    @user.shard.activate do
-      error_or_array = get_assignments(@user)
-      render json: error_or_array unless performed?
+    GuardRail.activate(:secondary) do
+      @user.shard.activate do
+        error_or_array = get_assignments(@user)
+        render json: error_or_array unless performed?
+      end
     end
   end
 
@@ -843,8 +865,7 @@ class AssignmentsApiController < ApplicationController
     return unless authorized_action(old_assignment, @current_user, :create)
 
     if target_course.present?
-      course_permission = target_course.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
-      return unless authorized_action(target_course, @current_user, course_permission)
+      return unless authorized_action(target_course, @current_user, :manage_assignments_add)
     end
 
     new_assignment = old_assignment.duplicate(
@@ -951,16 +972,12 @@ class AssignmentsApiController < ApplicationController
                     assignment_json(target_assignment, @current_user, session)
                   end
     result_json["new_positions"] = { target_assignment.id => target_assignment.position }
-    Canvas::LiveEvents.quizzes_next_quiz_duplicated(
+    Canvas::LiveEvents.outcomes_retry_outcome_alignment_clone(
       {
         original_course_uuid: old_assignment.context.uuid,
         new_course_uuid: target_course.uuid,
         new_course_resource_link_id: target_course.lti_context_id,
         domain: target_course.root_account&.domain(ApplicationController.test_cluster_name),
-        new_course_name: target_course.name,
-        created_on_blueprint_sync: false,
-        resource_map_url: "",
-        remove_alignments: false,
         original_assignment_resource_link_id: old_assignment.lti_resource_link_id,
         new_assignment_resource_link_id: target_assignment.lti_resource_link_id,
         status: "outcome_alignment_cloning"
@@ -994,6 +1011,10 @@ class AssignmentsApiController < ApplicationController
 
       if params[:new_quizzes]
         scope = scope.type_quiz_lti
+      end
+
+      if params[:exclude_checkpoints]
+        scope = scope.where.not(has_sub_assignments: true)
       end
 
       if params[:assignment_ids]
@@ -1049,13 +1070,13 @@ class AssignmentsApiController < ApplicationController
       include_visibility = include_params.include?("assignment_visibility") && @context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       if include_visibility
-        assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
+        assignment_visibilities = AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(course_id: @context.id, assignment_ids: assignments.map(&:id))
       end
 
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
-      if @context.grants_any_right?(user, :manage_assignments, :manage_assignments_edit)
+      if @context.grants_right?(user, :manage_assignments_edit)
         Assignment.preload_can_unpublish(assignments)
       end
 
@@ -1073,7 +1094,13 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations.preload(assignments, rubric: { learning_outcome_alignments: :learning_outcome })
       end
 
+      if include_params.include?("checkpoints")
+        ActiveRecord::Associations.preload(assignments, :sub_assignments)
+      end
+
       mc_status = setup_master_course_restrictions(assignments, context)
+
+      DatesOverridable.preload_override_data_for_objects(assignments)
 
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
@@ -1103,6 +1130,22 @@ class AssignmentsApiController < ApplicationController
                         master_course_status: mc_status,
                         include_checkpoints: include_params.include?("checkpoints"))
       end
+    end
+  end
+
+  # @API List group members for a student on an assignment
+  # Returns student ids and names for the group.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/assignments/1/users/1/group_members
+  #
+  # @returns [BasicUser]
+  def student_group_members
+    assignment = api_find(@context.active_assignments, params[:assignment_id])
+    if authorized_action(assignment, @current_user, :read)
+      student = @context.students.find(params[:user_id])
+      _, students = assignment.group_students(student)
+      render json: students.map { |user| { id: user.id.to_s, name: user.name } }
     end
   end
 
@@ -1154,7 +1197,7 @@ class AssignmentsApiController < ApplicationController
         include_can_submit: included_params.include?("can_submit"),
         include_webhook_info: included_params.include?("webhook_info"),
         include_ab_guid: included_params.include?("ab_guid"),
-        include_checkpoints: included_params.include?("checkpoints")
+        include_checkpoints: included_params.include?("checkpoints"),
       }
 
       result_json = if use_quiz_json?
@@ -1619,7 +1662,7 @@ class AssignmentsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+    return render_json_unauthorized unless @context.grants_right?(@current_user, session, :manage_assignments_edit)
 
     data = params.permit(_json: [:id, all_dates: %i[id base due_at unlock_at lock_at]]).to_h[:_json]
     return render json: { message: "expected array" }, status: :bad_request unless data.is_a?(Array)
@@ -1745,11 +1788,11 @@ class AssignmentsApiController < ApplicationController
 
   def track_update_metrics(assignment, _params)
     if assignment.hide_in_gradebook_changed?(to: true)
-      InstStatsd::Statsd.increment("assignment.hide_in_gradebook")
+      InstStatsd::Statsd.distributed_increment("assignment.hide_in_gradebook")
     end
   end
 
   def track_create_metrics(assignment)
-    InstStatsd::Statsd.increment("assignment.hide_in_gradebook") if assignment.hide_in_gradebook
+    InstStatsd::Statsd.distributed_increment("assignment.hide_in_gradebook") if assignment.hide_in_gradebook
   end
 end

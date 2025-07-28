@@ -30,6 +30,7 @@ module CC
     include BasicLTILinks
     include ToolProfiles
     include LtiResourceLinks
+    include LtiContextControls
 
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, to: :@manifest
     delegate :referenced_files, to: :@html_exporter
@@ -65,7 +66,8 @@ module CC
         @for_common_cartridge = @manifest.exporter.common_cartridge?
         run_and_set_progress(:add_canvas_non_cc_data, 15, I18n.t("course_exports.errors.canvas_meta", "Failed to export canvas-specific meta data"))
         run_and_set_progress(:add_wiki_pages, 30, I18n.t("course_exports.errors.wiki_pages", "Failed to export wiki pages"))
-        run_and_set_progress(:add_lti_resource_links, 32, I18n.t("Failed to import some LTI resource links"))
+        run_and_set_progress(:add_lti_resource_links, 32, I18n.t("Failed to export some LTI resource links"))
+        run_and_set_progress(:add_lti_context_controls, 33, I18n.t("Failed to export some LTI context controls"))
         run_and_set_progress(:add_assignments, 35, I18n.t("course_exports.errors.assignments", "Failed to export some assignments"))
         run_and_set_progress(:add_topics, 37, I18n.t("course_exports.errors.topics", "Failed to export some topics"))
         run_and_set_progress(:add_web_links, 40, I18n.t("course_exports.errors.web_links", "Failed to export some web links"))
@@ -79,18 +81,17 @@ module CC
 
         # these need to go last, to gather up all the references to the files
         run_and_set_progress(:add_course_files, 70, I18n.t("course_exports.errors.files", "Failed to export some files"))
-        run_and_set_progress(:add_media_objects, 89, I18n.t("course_exports.errors.media_files", "Failed to export some media files"))
-        run_and_set_progress(:add_media_tracks, 90, I18n.t("course_exports.errors.media_tracks", "Failed to export some media captions")) if Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-        run_and_set_progress(:create_basic_lti_links, 91, I18n.t("course_exports.errors.lti_links", "Failed to export some external tool configurations"))
+        run_and_set_progress(:add_media_tracks, 80, I18n.t("course_exports.errors.media_tracks", "Failed to export some media captions"))
+        run_and_set_progress(:create_basic_lti_links, 90, I18n.t("course_exports.errors.lti_links", "Failed to export some external tool configurations"))
         run_and_set_progress(:create_tool_profiles, 92, I18n.t("course_exports.errors.tool_profiles", "Failed to export some tool profiles"))
         run_and_set_progress(:create_blueprint_settings, 93, I18n.t("Failed to export blueprint course settings"))
       end
     end
 
-    def run_and_set_progress(method, progress, fail_message, *args)
+    def run_and_set_progress(method, progress, fail_message, *)
       res = nil
       begin
-        res = send(method, *args)
+        res = send(method, *)
       rescue
         add_error(fail_message, $!)
       end

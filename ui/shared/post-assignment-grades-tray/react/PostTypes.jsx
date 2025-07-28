@@ -21,9 +21,9 @@ import {bool, func, oneOf} from 'prop-types'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 export const EVERYONE = 'everyone'
 export const GRADED = 'graded'
@@ -61,7 +61,7 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
             <br />
             <Text size="small">
               {I18n.t(
-                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
+                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.',
               )}
             </Text>
           </>

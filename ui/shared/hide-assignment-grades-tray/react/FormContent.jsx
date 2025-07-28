@@ -24,12 +24,12 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Description from './Description'
 import SpecificSections from '@canvas/grading/react/SpecificSections'
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 export default function FormContent({
   assignment: {anonymousGrading, gradesPublished},
@@ -41,6 +41,7 @@ export default function FormContent({
   sectionSelectionChanged,
   sections,
   selectedSectionIds,
+  showSectionValidation,
 }) {
   if (hidingGrades) {
     return (
@@ -64,6 +65,7 @@ export default function FormContent({
           sections={sections}
           sectionSelectionChanged={sectionSelectionChanged}
           selectedSectionIds={selectedSectionIds}
+          showSectionValidation={showSectionValidation}
         />
       )}
 
@@ -84,7 +86,12 @@ export default function FormContent({
           </Flex.Item>
 
           <Flex.Item>
-            <Button onClick={onHideClick} disabled={!gradesPublished} color="primary">
+            <Button
+              onClick={onHideClick}
+              disabled={!gradesPublished}
+              color="primary"
+              data-testid="hide-grades-button"
+            >
               {I18n.t('Hide')}
             </Button>
           </Flex.Item>
@@ -108,7 +115,7 @@ FormContent.propTypes = {
     shape({
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ).isRequired,
   sectionSelectionChanged: func.isRequired,
   selectedSectionIds: arrayOf(string).isRequired,

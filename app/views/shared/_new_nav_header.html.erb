@@ -36,13 +36,15 @@
     dashboard_icon_path = "shared/svg/#{'k12/' if k12?}svg_icon_dashboard"
     courses_title = t('Courses')
   end
+
+  student_view_label = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
 %>
 
 <header id="mobile-header" class="no-print">
   <button type="button" class="Button Button--icon-action-rev Button--large mobile-header-hamburger">
     <i class="icon-solid icon-hamburger"></i>
     <span id="mobileHeaderInboxUnreadBadge" class="menu-item__badge" style="min-width: 0; top: 12px; height: 12px; right: 6px; display:none;"></span>
-    <span class="screenreader-only"><%= dashboard_title %></span>
+    <span class="screenreader-only"><%= t('global_navigation_menu', "Global Navigation Menu") %></span>
   </button>
   <div class="mobile-header-space"></div>
   <% context_crumb = crumbs.length > 1 && crumbs[1] %>
@@ -61,7 +63,7 @@
     <div id="immersive_reader_mobile_mount_point"></div>
   <% end %>
   <% if show_student_view_button? %>
-    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => t('View as Student'), :role => "button", :method => :post do %>
+    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => student_view_label, :role => "button", :method => :post do %>
       <i class="icon-student-view"></i>
     <% end %>
   <% else %>
@@ -85,7 +87,7 @@
 </header>
 <nav id="mobileContextNavContainer"></nav>
 
-<header id="header" class="ic-app-header no-print <%= 'no-user' unless @current_user %>">
+<header id="header" class="ic-app-header no-print <%= 'no-user' unless @current_user %>" aria-label="<%= t('Global Header') %>">
   <a href="#content" id="skip_navigation_link"><%= t 'links.skip_to_content', "Skip To Content" %></a>
   <div role="region" class="ic-app-header__main-navigation" aria-label="<%= t('Global Navigation') %>">
     <% unless @current_user.try(:prefers_high_contrast?) %>
@@ -190,31 +192,6 @@
           </div>
         </a>
       </li>
-      <% if @current_user.present? &&  @domain_root_account && @domain_root_account.feature_enabled?(:learner_passport) %>
-        <% if (["admin", "teacher"] & @current_user.roles(@domain_root_account)).present? %>
-          <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?("/users/#{@current_user.id}/passport") %>">
-            <a id="global_nav_passport_link" role="button" href="<%="/users/#{@current_user.id}/passport/admin"%>" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" aria-hidden="true">
-                <%= render(partial: "shared/svg/svg_icon_passport", formats: [:svg]) %>
-              </div>
-              <div class="menu-item__text">
-                <%= t('Passport') %>
-              </div>
-            </a>
-          </li>
-        <% else %>
-          <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?("/users/#{@current_user.id}/passport") %>">
-            <a id="global_nav_passport_link" role="button" href="<%="/users/#{@current_user.id}/passport/learner"%>" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" aria-hidden="true">
-                <%= render(partial: "shared/svg/svg_icon_passport", formats: [:svg]) %>
-              </div>
-              <div class="menu-item__text">
-                <%= t('Passport') %>
-              </div>
-            </a>
-          </li>
-        <% end %>
-      <% end %>
       <% if PageView.page_views_enabled? %>
         <li class="menu-item ic-app-header__menu-list-item" <%= ' ic-app-header__menu-list-item--active' if active_path?('/history') %>>
           <a id="global_nav_history_link" role="button" href="#" class="ic-app-header__menu-list-link">
@@ -249,6 +226,18 @@
           </div>
         <% end %>
       </li>
+      <% if show_career_switch? %>
+        <li class="menu-item ic-app-header__menu-list-item">
+          <%= link_to career_switch_experience_path(experience: 'career'),
+                      class: "ic-app-header__menu-list-link",
+                      method: :post do %>
+            <div class="menu-item-icon-container" aria-hidden="true">
+              <%= render partial: "shared/svg/svg_icon_arrow_end", formats: [:svg] %>
+            </div>
+            <div class="menu-item__text"><%= t('Canvas Career') %></div>
+          <% end %>
+        </li>
+      <% end %>
     </ul>
   </div>
   <div class="ic-app-header__secondary-navigation">

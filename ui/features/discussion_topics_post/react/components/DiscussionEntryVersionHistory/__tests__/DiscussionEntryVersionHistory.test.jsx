@@ -26,13 +26,13 @@ const setup = (
     DiscussionEntryVersion.mock({version: 3, message: 'Message 3'}),
     DiscussionEntryVersion.mock({version: 2, message: 'Message 2'}),
     DiscussionEntryVersion.mock({version: 1, message: 'Message 1'}),
-  ]
+  ],
 ) =>
   render(
     <DiscussionEntryVersionHistory
       textSize="small"
       discussionEntryVersions={discussionEntryVersions}
-    />
+    />,
   )
 
 describe('DiscussionEntryVersionHistory', () => {

@@ -33,7 +33,7 @@ function renderComponent(props) {
       type="assignments"
       collection={{links: [], hasMore: false, isLoading: false}}
       {...props}
-    />
+    />,
   )
 }
 

@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_80')
+const I18n = createI18nScope('permissions_templates_80')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Impact - Manage'),
       description: I18n.t(
-        'Allows an account administrator to manage the Impact service integration.'
+        'Allows an account administrator to manage the Impact service integration.',
       ),
     },
   ],
@@ -35,5 +35,5 @@ export const template = generateActionTemplates(
       title: I18n.t('Impact'),
       description: I18n.t('Impact is an add-on to Canvas LMS. Contact your CSM if interested.'),
     },
-  ]
+  ],
 )

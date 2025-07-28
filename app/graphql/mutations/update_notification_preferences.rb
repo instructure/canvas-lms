@@ -42,18 +42,18 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   graphql_name "UpdateNotificationPreferences"
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
-  argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
   argument :context_type, Types::NotificationPreferencesContextType, required: true
+  argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
 
   argument :enabled, Boolean, required: false
   argument :has_read_privacy_notice, Boolean, required: false
-  argument :send_scores_in_emails, Boolean, required: false
   argument :send_observed_names_in_notifications, Boolean, required: false
+  argument :send_scores_in_emails, Boolean, required: false
 
   argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("CommunicationChannel")
-  argument :notification_category, Types::NotificationCategoryType, required: false
   argument :frequency, Types::NotificationFrequencyType, required: false
   argument :is_policy_override, Boolean, required: false
+  argument :notification_category, Types::NotificationCategoryType, required: false
 
   field :user, Types::UserType, null: true
   def resolve(input:)

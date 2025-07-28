@@ -21,7 +21,7 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 import {selectFinalGrade} from '../grades/GradeActions'
@@ -30,7 +30,7 @@ import FlashMessageHolder from './FlashMessageHolder'
 import GradesGrid from './GradesGrid/index'
 import Header from './Header'
 
-const I18n = useI18nScope('assignment_grade_summary')
+const I18n = createI18nScope('assignment_grade_summary')
 
 class Layout extends Component {
   static propTypes = {
@@ -47,7 +47,7 @@ class Layout extends Component {
     graders: arrayOf(
       shape({
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     loadStudents: func.isRequired,
     provisionalGrades: shape({}).isRequired,
@@ -56,7 +56,7 @@ class Layout extends Component {
     students: arrayOf(
       shape({
         id: string.isRequired,
-      })
+      }),
     ).isRequired,
   }
 

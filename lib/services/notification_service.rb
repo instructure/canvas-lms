@@ -37,12 +37,17 @@ module Services
     end
 
     class << self
+      def configured?
+        notification_sqs.present?
+      end
+
       private
 
       QUEUE_NAME_KEYS = {
         priority: "notification_service_priority_queue_name",
         default: "notification_service_queue_name"
       }.freeze
+      private_constant :QUEUE_NAME_KEYS
 
       def notification_sqs
         return nil if config.blank?

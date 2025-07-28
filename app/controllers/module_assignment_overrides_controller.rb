@@ -23,8 +23,7 @@
 #
 # If any active AssignmentOverrides exist on a ContextModule, then only students who have an
 # applicable override can access the module and are assigned its items. AssignmentOverrides can
-# be created for a (group of) student(s) or a section. *This module overrides feature is still
-# under development and is not yet enabled.*
+# be created for a (group of) student(s) or a section.
 #
 # @model ModuleAssignmentOverride
 #     {
@@ -74,8 +73,8 @@
 #     }
 class ModuleAssignmentOverridesController < ApplicationController
   include Api::V1::ModuleAssignmentOverride
+  include DifferentiationTag
 
-  before_action :require_feature_flag # remove when differentiated_modules flag is removed
   before_action :require_user
   before_action :require_context
   before_action :check_authorized_action
@@ -84,8 +83,6 @@ class ModuleAssignmentOverridesController < ApplicationController
   # @API List a module's overrides
   #
   # Returns a paginated list of AssignmentOverrides that apply to the ContextModule.
-  #
-  # Note: this API is still under development and will not function until the feature is enabled.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides \
@@ -105,14 +102,13 @@ class ModuleAssignmentOverridesController < ApplicationController
   # Accepts a list of overrides and applies them to the ContextModule. Returns 204 No Content response
   # code if successful.
   #
-  # Note: this API is still under development and will not function until the feature is enabled.
-  #
   # @argument overrides[] [Required, Array]
   #   List of overrides to apply to the module. Overrides that already exist should include an ID
   #   and will be updated if needed. New overrides will be created for overrides in the list
   #   without an ID. Overrides not included in the list will be deleted. Providing an empty list
   #   will delete all of the module's overrides. Keys for each override object can include: 'id',
-  #   'title', 'student_ids', and 'course_section_id'.
+  #   'title', 'student_ids', and 'course_section_id'. 'group_id' is accepted if the Differentiation
+  #   Tags account setting is enabled.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/modules/:context_module_id/assignment_overrides \
@@ -126,6 +122,10 @@ class ModuleAssignmentOverridesController < ApplicationController
   #               "course_section_id": 3564
   #             },
   #             {
+  #               "id": 56,
+  #               "group_id": 7809
+  #             },
+  #             {
   #               "title": "an assignment override",
   #               "student_ids": [1, 2, 3]
   #             }
@@ -137,9 +137,24 @@ class ModuleAssignmentOverridesController < ApplicationController
     return render json: { error: "List of overrides required" }, status: :bad_request unless override_list.is_a?(Array)
 
     override_list.each do |override|
-      unless override["id"].present? || override["student_ids"].present? || override["course_section_id"].present?
-        return render json: { error: "id, student_ids, or course_section_id required with each override" }, status: :bad_request
+      if @context.account.allow_assign_to_differentiation_tags? && override["group_id"].present?
+        if override["student_ids"].present? && override["course_section_id"].present?
+          return render json: { error: "cannot provide group_id, course_section_id, and student_ids on the same override" }, status: :bad_request
+        elsif override["course_section_id"].present?
+          return render json: { error: "cannot provide group_id and course_section_id on the same override" }, status: :bad_request
+        elsif override["student_ids"].present?
+          return render json: { error: "cannot provide group_id and student_ids on the same override" }, status: :bad_request
+        end
+      elsif override["group_id"].present?
+        return render json: { error: "group_id is not allowed as an override" }, status: :bad_request
       end
+
+      required_params = %w[id student_ids course_section_id]
+      required_params << "group_id" if @context.account.allow_assign_to_differentiation_tags?
+      unless required_params.any? { |param| override[param].present? }
+        return render json: { error: "#{[required_params[0...-1].join(", "), required_params.last].join(", or ")} required with each override" }, status: :bad_request
+      end
+
       if override["course_section_id"].present? && override["student_ids"].present?
         return render json: { error: "cannot provide course_section_id and student_ids on the same override" }, status: :bad_request
       end
@@ -149,14 +164,23 @@ class ModuleAssignmentOverridesController < ApplicationController
     head :no_content
   end
 
-  private
+  def convert_tag_overrides_to_adhoc_overrides
+    errors = OverrideConverterService.convert_tags_to_adhoc_overrides_for(
+      learning_object: @context_module,
+      course: @context
+    )
 
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled? :differentiated_modules
+    if errors
+      return render json: { errors: }, status: :bad_request
+    end
+
+    head :no_content
   end
 
+  private
+
   def check_authorized_action
-    render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_content, :manage_course_content_edit)
+    render_unauthorized_action unless @context.grants_right?(@current_user, :manage_course_content_edit)
   end
 
   def require_context_module
@@ -185,9 +209,13 @@ class ModuleAssignmentOverridesController < ApplicationController
     overrides.each do |override|
       current_override = @context_module.assignment_overrides.active.find(override["id"])
       current_override.title = override["title"] if override["title"].present?
+
       if override["course_section_id"].present?
         current_override.assignment_override_students.delete_all if current_override.set_type == "ADHOC"
         current_override.course_section = @context.course_sections.find(override["course_section_id"])
+      elsif override["group_id"].present? && @context.account.allow_assign_to_differentiation_tags?
+        group = find_group(override["group_id"])
+        current_override.group = group if group.non_collaborative?
       elsif override["student_ids"].present?
         if current_override.set_type == "ADHOC"
           user_ids_to_delete = current_override.assignment_override_students.pluck(:user_id) - override["student_ids"].map(&:to_i)
@@ -211,10 +239,17 @@ class ModuleAssignmentOverridesController < ApplicationController
       new_override.title = override["title"] if override["title"].present?
       if override["course_section_id"].present?
         new_override.course_section = @context.course_sections.find(override["course_section_id"])
+      elsif override["group_id"].present? && @context.account.allow_assign_to_differentiation_tags?
+        group = find_group(override["group_id"])
+        new_override.group = group if group.non_collaborative?
       elsif override["student_ids"].present?
         override["student_ids"].each { |student_id| new_override.assignment_override_students.build(user: @context.students.find(student_id)) }
       end
       new_override.save!
     end
+  end
+
+  def find_group(group_id)
+    Group.non_collaborative.find_by(context: @context, id: group_id)
   end
 end

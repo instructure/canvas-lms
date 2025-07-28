@@ -41,7 +41,7 @@ class MediaTrack < ActiveRecord::Base
   RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
-    message: -> { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
+    message: ->(_object, _data) { t("TTML tracks are not allowed because they are susceptible to xss attacks") }
   }
 
   # MasterCourses::CollectionRestrictor handles soft-deletes, but doesn't handle
@@ -60,11 +60,11 @@ class MediaTrack < ActiveRecord::Base
   end
 
   def webvtt_content
-    read_attribute(:webvtt_content) || content
+    super || content
   end
 
   def convert_srt_to_wvtt
-    if content.exclude?("WEBVTT") && (content_changed? || read_attribute(:webvtt_content).nil?)
+    if content.exclude?("WEBVTT") && (content_changed? || self["webvtt_content"].nil?)
       srt_content = content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
       srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})(,)([0-9]{3})/, '\1.\3')

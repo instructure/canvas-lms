@@ -27,53 +27,63 @@
 # 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
 
 # the default version (corresponding to the bare Gemfile.lock) must be listed first
-SUPPORTED_RAILS_VERSIONS = %w[7.0 7.1].freeze
+SUPPORTED_RAILS_VERSIONS = %w[7.2].freeze
 
 unless defined?($canvas_rails)
   file_path = File.expand_path("RAILS_VERSION", __dir__)
 
   if ENV["CANVAS_RAILS"]
     $canvas_rails = ENV["CANVAS_RAILS"]
+    source = "the CANVAS_RAILS environment variable"
   elsif File.exist?(file_path)
     $canvas_rails = File.read(file_path).strip
+    source = file_path
   else
     begin
-      # have to do the consul communication without any gems, because
-      # we're in the context of loading the gemfile
-      require "base64"
-      require "json"
-      require "net/http"
-      require "yaml"
+      consul_environment = File.expand_path("consul_environment.txt", __dir__)
+      consul_canary = File.expand_path("consul_canary.txt", __dir__)
+      if File.exist?(consul_environment)
+        # have to do the consul communication without any gems, because
+        # we're in the context of loading the gemfile
+        require "bundler/vendored_net_http"
 
-      environment = YAML.safe_load_file(File.expand_path("consul.yml", __dir__)).dig(ENV["RAILS_ENV"] || "development", "environment")
+        environment = File.read(consul_environment)
+        canary = (File.exist?(consul_canary) ? File.read(consul_canary).strip : nil) == "true"
 
-      keys = ($canvas_clusters || []).map do |canvas_cluster| # rubocop:disable Style/GlobalVars
-        "private/canvas/#{environment}/#{canvas_cluster}/rails_version"
-      end
+        keys = [
+          canary ? ["private/canvas", environment, "canary", "rails_version"].compact.join("/") : nil,
+          ["private/canvas", environment, "rails_version"].compact.join("/"),
+          ["private/canvas", "rails_version"].compact.join("/"),
+          canary ? ["global/private/canvas", environment, "canary", "rails_version"].compact.join("/") : nil,
+          ["global/private/canvas", environment, "rails_version"].compact.join("/"),
+          ["global/private/canvas", "rails_version"].compact.join("/")
+        ].compact.uniq
 
-      keys.push(
-        ["private/canvas", environment, "rails_version"].compact.join("/"),
-        ["private/canvas", "rails_version"].compact.join("/"),
-        ["global/private/canvas", environment, "rails_version"].compact.join("/"),
-        ["global/private/canvas", "rails_version"].compact.join("/")
-      )
-      keys.uniq!
-
-      result = nil
-      Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
-        keys.each do |key|
-          result = http.request_get("/v1/kv/#{key}?stale")
-          result = nil unless result.is_a?(Net::HTTPSuccess)
-          break if result
+        result = nil
+        Gem::Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
+          keys.each do |key|
+            result = http.request_get("/v1/kv/#{key}?stale&raw")
+            result = nil unless result.is_a?(Gem::Net::HTTPSuccess)
+            if result
+              source = "the Consul key #{key}"
+              break
+            end
+          end
         end
       end
-      $canvas_rails = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
-    rescue
+
+      $canvas_rails = if result
+                        result.body
+                      else
+                        SUPPORTED_RAILS_VERSIONS.first
+                      end
+    rescue => e
+      puts "Error Loading Rails Version: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}" # rubocop:disable Rails/Output -- rails is not available here
       $canvas_rails = SUPPORTED_RAILS_VERSIONS.first
     end
   end
 end
 
 unless SUPPORTED_RAILS_VERSIONS.any?($canvas_rails)
-  raise "unsupported Rails version specified #{$canvas_rails}"
+  raise "unsupported Rails version #{$canvas_rails} specified in #{source}"
 end

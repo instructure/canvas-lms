@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -63,7 +62,6 @@ const buildResponseMessages = ({
     if (targetWindow) {
       targetWindow.postMessage({...message, ...contents}, origin)
     } else {
-      // eslint-disable-next-line no-console
       console.error('Error sending response postMessage: target window does not exist')
     }
   }
@@ -84,6 +82,7 @@ const buildResponseMessages = ({
     sendError(GENERIC_ERROR_CODE, message)
   }
 
+  // @ts-expect-error
   const sendBadRequestError = message => {
     sendError(BAD_REQUEST_ERROR_CODE, message)
   }
@@ -100,6 +99,7 @@ const buildResponseMessages = ({
     sendError(UNAUTHORIZED_ERROR_CODE)
   }
 
+  // @ts-expect-error
   const isResponse = message => !!message.data?.subject?.endsWith('.response')
 
   return {

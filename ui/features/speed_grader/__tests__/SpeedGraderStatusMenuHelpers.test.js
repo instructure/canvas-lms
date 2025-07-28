@@ -20,7 +20,8 @@ import {
   determineSubmissionSelection,
   makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('determineSubmissionSelection', () => {
   let submission
@@ -55,18 +56,17 @@ describe('determineSubmissionSelection', () => {
   })
 })
 
+const server = setupServer()
+
 describe('makeSubmissionUpdateRequest', () => {
   let data
   let isAnonymous
   let courseId
   let submission
 
-  function setupMocks() {
-    moxios.stubRequest('/api/v1/courses/1/assignments/2/submissions/3', {
-      status: 200,
-      response: {},
-    })
-  }
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     data = {latePolicyStatus: 'none'}
@@ -76,38 +76,55 @@ describe('makeSubmissionUpdateRequest', () => {
       assignment_id: 2,
       user_id: 3,
     }
-
-    moxios.install()
-    setupMocks()
   })
 
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
   })
 
-  it('makes a request to the proper endpoint', function (done) {
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toEqual('/api/v1/courses/1/assignments/2/submissions/3')
-      done()
-    })
+  afterAll(() => {
+    server.close()
   })
 
-  it('makes a request to the "anonymous" endpoint if the assignment is anonymous', function (done) {
+  it('makes a request to the proper endpoint', async () => {
+    let capturedUrl
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/submissions/3', ({request}) => {
+        capturedUrl = request.url
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    const url = new URL(capturedUrl)
+    expect(url.pathname).toEqual('/api/v1/courses/1/assignments/2/submissions/3')
+  })
+
+  it('makes a request to the "anonymous" endpoint if the assignment is anonymous', async () => {
     isAnonymous = true
     submission.anonymous_id = 'i9Z1a'
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toEqual(
-        `/api/v1/courses/1/assignments/2/anonymous_submissions/${submission.anonymous_id}`
-      )
-      done()
-    })
+    let capturedUrl
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/anonymous_submissions/i9Z1a', ({request}) => {
+        capturedUrl = request.url
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    const url = new URL(capturedUrl)
+    expect(url.pathname).toEqual(
+      `/api/v1/courses/1/assignments/2/anonymous_submissions/${submission.anonymous_id}`,
+    )
   })
 
-  it('makes a request with the expected params underscored properly when submission status is "none"', function (done) {
+  it('makes a request with the expected params underscored properly when submission status is "none"', async () => {
     const expectedData = {
       submission: {
         assignment_id: 2,
@@ -116,15 +133,22 @@ describe('makeSubmissionUpdateRequest', () => {
       },
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(JSON.parse(request.config.data)).toEqual(expectedData)
-      done()
-    })
+    let capturedBody
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/submissions/3', async ({request}) => {
+        capturedBody = await request.json()
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    expect(capturedBody).toEqual(expectedData)
   })
 
-  it('makes a request with the expected params underscored properly when submission status is "missing"', function (done) {
+  it('makes a request with the expected params underscored properly when submission status is "missing"', async () => {
     data = {latePolicyStatus: 'missing'}
 
     const expectedData = {
@@ -135,15 +159,22 @@ describe('makeSubmissionUpdateRequest', () => {
       },
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(JSON.parse(request.config.data)).toEqual(expectedData)
-      done()
-    })
+    let capturedBody
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/submissions/3', async ({request}) => {
+        capturedBody = await request.json()
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    expect(capturedBody).toEqual(expectedData)
   })
 
-  it('makes a request with the expected params underscored properly when submission status is "late"', function (done) {
+  it('makes a request with the expected params underscored properly when submission status is "late"', async () => {
     data = {latePolicyStatus: 'late', secondsLateOverride: 100}
 
     const expectedData = {
@@ -155,15 +186,22 @@ describe('makeSubmissionUpdateRequest', () => {
       },
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(JSON.parse(request.config.data)).toEqual(expectedData)
-      done()
-    })
+    let capturedBody
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/submissions/3', async ({request}) => {
+        capturedBody = await request.json()
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    expect(capturedBody).toEqual(expectedData)
   })
 
-  it('makes a request with the expected params underscored properly when submission status is "excused"', function (done) {
+  it('makes a request with the expected params underscored properly when submission status is "excused"', async () => {
     data = {excuse: true}
 
     const expectedData = {
@@ -174,11 +212,18 @@ describe('makeSubmissionUpdateRequest', () => {
       },
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(JSON.parse(request.config.data)).toEqual(expectedData)
-      done()
-    })
+    let capturedBody
+    server.use(
+      http.put('*/api/v1/courses/1/assignments/2/submissions/3', async ({request}) => {
+        capturedBody = await request.json()
+        return new HttpResponse(JSON.stringify({}), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }),
+    )
+
+    await makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    expect(capturedBody).toEqual(expectedData)
   })
 })

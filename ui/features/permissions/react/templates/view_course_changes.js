@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_69')
+const I18n = createI18nScope('permissions_templates_69')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'Determines visibility of the Course Activity option in the Admin Tools Logging tab.'
+        'Determines visibility of the Course Activity option in the Admin Tools Logging tab.',
       ),
     },
     {
@@ -35,5 +35,5 @@ export const template = generateActionTemplates(
   ],
   [],
   [],
-  []
+  [],
 )

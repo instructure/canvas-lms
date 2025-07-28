@@ -18,10 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe "QTI Generator" do
-  def qti_generator
+  before :once do
     quiz_with_question_group_pointing_to_question_bank
+  end
+
+  def qti_generator(user: nil)
     @rn = Object.new
-    allow(@rn).to receive_messages(user: {}, course: @course, export_dir: {})
+    allow(@rn).to receive_messages(user:, course: @course, export_dir: {})
     allow(@rn).to receive(:export_object?).with(anything).and_return(true)
     @qg = CC::Qti::QtiGenerator.new @rn, nil, nil
   end
@@ -33,6 +36,21 @@ describe "QTI Generator" do
         expect(bank.class.to_s).to eq "AssessmentQuestionBank"
       end
       @result = @qg.generate_banks [@bank.id]
+    end
+
+    context "permissions" do
+      it "includes question banks for teachers" do
+        teacher_in_course
+        qti_generator(user: @teacher)
+        expect(@qg).to receive(:generate_question_bank).at_least(:once)
+        @qg.generate_banks [@bank.id]
+      end
+
+      it "excludes question banks for students" do
+        qti_generator(user: @student)
+        expect(@qg).not_to receive :generate_question_bank
+        @qg.generate_banks [@bank.id]
+      end
     end
   end
 
@@ -71,6 +89,62 @@ describe "QTI Generator" do
         XML
 
       expect(@qg.generate_bank(doc, bank, "somemigrationid")).to eq expected_xml
+    end
+  end
+
+  describe "add_question for text_only_question" do
+    it "includes the passage meta_field when question type is text_only_question" do
+      qti_generator
+      allow(@qg).to receive_messages(aq_mig_id: "dummy_id", qq_mig_id: "dummy_id")
+
+      html_exporter = double("HtmlExporter")
+      allow(html_exporter).to receive(:html_content) { |s| s }
+      @qg.instance_variable_set(:@html_exporter, html_exporter)
+
+      question = {
+        "question_type" => "text_only_question",
+        "points_possible" => 5,
+        "answers" => [],
+        "name" => "Text Only Question",
+        "question_name" => "Text Only Question",
+        "question_text" => "Some text"
+      }
+
+      output = +""
+      doc = Builder::XmlMarkup.new(target: output, indent: 2)
+      @qg.send(:add_question, doc, question)
+
+      expected_xml = <<~XML
+        <item ident="dummy_id" title="Text Only Question">
+          <itemmetadata>
+            <qtimetadata>
+              <qtimetadatafield>
+                <fieldlabel>question_type</fieldlabel>
+                <fieldentry>text_only_question</fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>points_possible</fieldlabel>
+                <fieldentry>5</fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>original_answer_ids</fieldlabel>
+                <fieldentry></fieldentry>
+              </qtimetadatafield>
+              <qtimetadatafield>
+                <fieldlabel>passage</fieldlabel>
+                <fieldentry>true</fieldentry>
+              </qtimetadatafield>
+            </qtimetadata>
+          </itemmetadata>
+          <presentation>
+            <material>
+              <mattext texttype="text/html">&lt;div&gt;Some text&lt;/div&gt;</mattext>
+            </material>
+          </presentation>
+        </item>
+      XML
+
+      expect(output).to eq(expected_xml)
     end
   end
 

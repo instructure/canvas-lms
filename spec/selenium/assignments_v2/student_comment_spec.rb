@@ -82,5 +82,29 @@ describe "assignments" do
 
       expect(StudentAssignmentPageV2.comment_container).to include_text("First")
     end
+
+    it "displays error if user tries to submit an empty comment" do
+      StudentAssignmentPageV2.send_comment_button.click
+
+      expect(StudentAssignmentPageV2.comment_container).to include_text("Comment or file required to save")
+    end
+
+    it "Error message disappears after user input text in textarea" do
+      StudentAssignmentPageV2.send_comment_button.click
+
+      expect(StudentAssignmentPageV2.comment_container).to include_text("Comment or file required to save")
+      StudentAssignmentPageV2.comment_text_area.send_keys("5vpat test")
+      expect(StudentAssignmentPageV2.comment_container).not_to include_text("Comment or file required to save")
+      StudentAssignmentPageV2.send_comment_button.click
+      expect(StudentAssignmentPageV2.comment_container).to include_text("5vpat test")
+    end
+
+    it "Error message disappears after user adds an emoji" do
+      StudentAssignmentPageV2.send_comment_button.click
+
+      expect(StudentAssignmentPageV2.comment_container).to include_text("Comment or file required to save")
+      ff("button.emoji-mart-emoji")[0].click
+      expect(StudentAssignmentPageV2.comment_container).not_to include_text("Comment or file required to save")
+    end
   end
 end

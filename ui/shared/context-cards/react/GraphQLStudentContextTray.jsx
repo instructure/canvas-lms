@@ -18,7 +18,7 @@
 
 import React from 'react'
 import StudentContextTray from './StudentContextTray'
-import {createClient, ApolloProvider, Query, gql} from '@canvas/apollo'
+import {createClient, ApolloProvider, Query, gql} from '@canvas/apollo-v3'
 
 const client = createClient()
 
@@ -114,7 +114,7 @@ export default props => (
   <ApolloProvider client={client}>
     <Query query={SCC_QUERY} variables={{courseId: props.courseId, studentId: props.studentId}}>
       {({data, loading}) => {
-        const {course, user} = data
+        const {course, user} = data || {}
         return (
           <StudentContextTray
             data={{loading, course: course || placeholderCourse(props.courseId), user}}

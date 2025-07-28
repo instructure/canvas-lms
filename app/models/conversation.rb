@@ -25,7 +25,7 @@ class Conversation < ActiveRecord::Base
   include ConversationHelper
 
   has_many :conversation_participants, dependent: :destroy
-  has_many :conversation_messages, -> { order("created_at DESC, id DESC") }, dependent: :delete_all
+  has_many :conversation_messages, -> { order(created_at: :desc, id: :desc) }, dependent: :delete_all
   has_many :conversation_message_participants, through: :conversation_messages
   has_one :stream_item, as: :asset
   belongs_to :context, polymorphic: %i[account course group]
@@ -35,6 +35,33 @@ class Conversation < ActiveRecord::Base
   validates :subject, length: { maximum: maximum_string_length, allow_nil: true }
 
   attr_accessor :latest_messages_from_stream_item
+
+  def self.caller_tag
+    immediate_caller = caller_locations(3..3).first
+    file_name = File.basename(immediate_caller.path)
+
+    "#{file_name}:#{immediate_caller.label}"
+  end
+
+  module DeleteAllLogger
+    def delete_all(*args)
+      InstStatsd::Statsd.distributed_increment(
+        "conversation.delete_all",
+        tags: { caller: klass.caller_tag }
+      )
+      super
+    end
+  end
+
+  # rubocop:disable Rails/DefaultScope
+  default_scope { extending(DeleteAllLogger) }
+  # rubocop:enable Rails/DefaultScope
+
+  def delete
+    InstStatsd::Statsd.distributed_increment("conversation.delete", tags: { caller: self.class.send(:caller_tag) })
+
+    super
+  end
 
   def participants(reload = false)
     if !@participants || reload
@@ -75,7 +102,7 @@ class Conversation < ActiveRecord::Base
       workflow_state: "read",
       has_attachments: has_attachments?,
       has_media_objects: has_media_objects?,
-      root_account_ids: read_attribute(:root_account_ids)
+      root_account_ids: self["root_account_ids"]
     }.merge(options)
     ConversationParticipant.bulk_insert(user_ids.map do |user_id|
       options.merge({ user_id: })
@@ -189,7 +216,7 @@ class Conversation < ActiveRecord::Base
           # NOTE: individual messages in group conversations don't have tags
           self.class.connection.execute(sanitize_sql([<<~SQL.squish, id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state, root_account_ids)
-            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active', '#{read_attribute(:root_account_ids)}'
+            SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active', '#{self["root_account_ids"]}'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}
             WHERE conversation_messages.conversation_id = ?
               AND conversation_messages.conversation_id = conversation_participants.conversation_id
@@ -271,7 +298,7 @@ class Conversation < ActiveRecord::Base
       # ids have changed, but the participants' root_account_ids were not being set for
       # a long time so we set them all the time for fixing up purposes
       # add this check back in when the data is fixed or we decide to run a fixup.
-      options[:root_account_ids] = read_attribute(:root_account_ids) # if self.root_account_ids_changed?
+      options[:root_account_ids] = self["root_account_ids"] # if self.root_account_ids_changed?
       save! if new_tags.present? || root_account_ids_changed?
 
       # so we can take advantage of other preloaded associations
@@ -313,6 +340,7 @@ class Conversation < ActiveRecord::Base
     message.author_id = current_user.id
     message.body = body
     message.generated = options[:generated] || false
+    message.automated = options[:automated] || false
     if options[:root_account_id]
       message.context_type = "Account"
       message.context_id = options[:root_account_id]
@@ -330,7 +358,12 @@ class Conversation < ActiveRecord::Base
       # TODO: optimize me
       message.forwarded_message_ids = messages.map(&:id).join(",")
     end
-    message.generate_user_note = true if options[:generate_user_note]
+
+    # Grab snapshot hash of user's inbox settings and save to message (If FF is enabled)
+    if Account.site_admin.feature_enabled?(:inbox_settings)
+      message.inbox_settings_ooo_hash = Inbox::InboxService.inbox_settings_ooo_hash(user_id: current_user.id, root_account_id: options[:root_account_id])
+    end
+
     message
   end
 
@@ -407,7 +440,7 @@ class Conversation < ActiveRecord::Base
             user_id: cp.user_id,
             tags: message_tags ? serialized_tags(message_tags) : nil,
             workflow_state: "active",
-            root_account_ids: read_attribute(:root_account_ids)
+            root_account_ids: self["root_account_ids"]
           }
         end
         # some of the participants we're about to insert may have been soft-deleted,
@@ -474,7 +507,7 @@ class Conversation < ActiveRecord::Base
     updated = false
     conversation_participants.shard(self).activate do |conversation_participants|
       if options[:only_users]
-        conversation_participants = conversation_participants.where(user_id:           (options[:only_users]).map(&:id))
+        conversation_participants = conversation_participants.where(user_id:           options[:only_users].map(&:id))
       end
 
       skip_ids = options[:skip_users].try(:map, &:id) || [message.author_id]
@@ -534,7 +567,7 @@ class Conversation < ActiveRecord::Base
     if message.length < 64.kilobytes - 1
       message
     else
-      message[0..64.kilobytes - 100] + I18n.t("... This message was truncated.")
+      message[0..(64.kilobytes - 100)] + I18n.t("... This message was truncated.")
     end
   end
 
@@ -568,7 +601,7 @@ class Conversation < ActiveRecord::Base
 
     existing = shard.activate do
       ConversationParticipant.unscoped do
-        ConversationParticipant.where(private_hash:).take&.conversation
+        ConversationParticipant.find_by(private_hash:)&.conversation
       end
     end
     if existing
@@ -676,7 +709,7 @@ class Conversation < ActiveRecord::Base
   def update_root_account_ids
     if root_account_ids_changed?
       # ids must be sorted for the scope to work
-      latest_ids = read_attribute(:root_account_ids)
+      latest_ids = self["root_account_ids"]
       %w[conversation_participants conversation_messages conversation_message_participants].each do |assoc|
         scope = send(assoc).where("#{assoc}.root_account_ids IS DISTINCT FROM ?", latest_ids).limit(1_000)
         until scope.update_all(root_account_ids: latest_ids) < 1_000; end
@@ -799,7 +832,7 @@ class Conversation < ActiveRecord::Base
 
   def maybe_update_timestamp(col, val, additional_conditions = [])
     scope = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions)
-    condition = scope.where_clause.send(:predicates).join(" AND ")
+    condition = /WHERE (.+)$/.match(scope.to_sql)[1]
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end

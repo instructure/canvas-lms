@@ -17,11 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../lti_1_3_spec_helper"
-
 RSpec.describe DeveloperKeyAccountBinding do
-  include_context "lti_1_3_spec_helper"
-
   let(:account) { account_model }
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_binding) do
@@ -34,11 +30,15 @@ RSpec.describe DeveloperKeyAccountBinding do
   let(:root_account_key) { DeveloperKey.create!(account:, **params) }
   let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
+  before do
+    DeveloperKey.default # create default before any other needed keys
+  end
+
   describe "validations and callbacks" do
     it "requires an account" do
       dev_key_binding.account = nil
       dev_key_binding.validate
-      expect(dev_key_binding.errors.keys).to match_array(
+      expect(dev_key_binding.errors.attribute_names).to match_array(
         [:account]
       )
     end
@@ -46,33 +46,29 @@ RSpec.describe DeveloperKeyAccountBinding do
     it "requires a developer key" do
       dev_key_binding.developer_key = nil
       dev_key_binding.validate
-      expect(dev_key_binding.errors.keys).to match_array(
+      expect(dev_key_binding.errors.attribute_names).to match_array(
         [:developer_key]
       )
     end
 
-    it "creates and updates the corresponding lti registration account binding" do
-      user = user_model
-      user2 = user_model
-      lti_registration = Lti::Registration.create!(
-        name: "an lti registration",
-        account:,
-        created_by: user,
-        updated_by: user
-      )
-      dev_key_binding.lti_registration_account_binding = Lti::RegistrationAccountBinding.create!(
-        workflow_state: dev_key_binding.workflow_state,
-        account: dev_key_binding.account,
-        registration: lti_registration
-      )
-      dev_key_binding.save!
-      expect(dev_key_binding.lti_registration_account_binding).to be_persisted
+    context "for default key" do
+      let(:developer_key) { DeveloperKey.default }
+      let(:account) { Account.site_admin }
 
-      dev_key_binding.update!(workflow_state: :on, current_user: user2)
+      it "does not allow default key to be set to off" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "off") }.to raise_error("Please don't turn off the default developer key")
+      end
 
-      lrab = dev_key_binding.lti_registration_account_binding
-      expect(lrab.workflow_state).to eq("on")
-      expect(lrab.updated_by).to eq(user2)
+      it "does not allow default key to be set to allow" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "allow") }.to raise_error("Please don't turn off the default developer key")
+      end
+
+      it "does not allow default key binding to be deleted" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "deleted") }.to raise_error("Please don't turn off the default developer key")
+      end
     end
 
     describe "workflow state" do
@@ -200,6 +196,21 @@ RSpec.describe DeveloperKeyAccountBinding do
             dev_key_binding.save!
             expect(dev_key_binding.root_account).to eq account.root_account
           end
+        end
+      end
+    end
+  end
+
+  describe ".skip_dev_key_association_cache" do
+    specs_require_cache
+
+    it "does not cache developer key associations" do
+      DeveloperKeyAccountBinding.transaction do
+        dev_key = DeveloperKey.create!(account:)
+        binding = DeveloperKeyAccountBinding.find_or_initialize_by(account:, developer_key: dev_key)
+        binding.skip_dev_key_association_cache do
+          expect(DeveloperKey).not_to receive(:find_cached)
+          expect { binding.save! }.not_to raise_error
         end
       end
     end

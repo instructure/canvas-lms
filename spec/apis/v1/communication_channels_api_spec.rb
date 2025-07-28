@@ -74,10 +74,10 @@ describe "CommunicationChannels API", type: :request do
     end
 
     context "an unauthorized user" do
-      it "returns 401" do
+      it "returns 403" do
         user_with_pseudonym
         raw_api_call(:get, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not list channels for a teacher's students" do
@@ -86,7 +86,7 @@ describe "CommunicationChannels API", type: :request do
         @user = @teacher
 
         raw_api_call(:get, @path, @path_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -111,12 +111,12 @@ describe "CommunicationChannels API", type: :request do
     end
 
     it "registers user if skip_confirmation is truthy" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       json = api_call(:post, @path, @path_options, @post_params)
       channel = CommunicationChannel.find(json["id"])
       channel.update(workflow_state: "retired")
       api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
-      expect(InstStatsd::Statsd).to have_received(:increment).once.with("communication_channels.create.skip_confirmation")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).once.with("communication_channels.create.skip_confirmation")
 
       expect(channel.reload.workflow_state).to eq "active"
       expect(@someone.reload.registered?).to be_truthy
@@ -240,7 +240,7 @@ describe "CommunicationChannels API", type: :request do
                      @path_options.merge(user_id: @admin.to_param),
                      @post_params)
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       context "not configured push" do
@@ -374,7 +374,7 @@ describe "CommunicationChannels API", type: :request do
                      "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(user_id: admin.to_param, id: admin_channel.to_param))
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is able to delete by path, instead of id" do

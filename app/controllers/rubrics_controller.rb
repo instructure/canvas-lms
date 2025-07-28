@@ -21,14 +21,24 @@
 # @API Rubrics
 class RubricsController < ApplicationController
   before_action :require_context
+
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index, :show]
+
   before_action { |c| c.active_tab = "rubrics" }
 
   include Api::V1::Outcome
+  include Api::V1::Progress
   include K5Mode
 
   def index
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
+
+    if @context.is_a?(Course) && @context.horizon_course?
+      redirect_to named_context_url(@context, :context_context_modules_url)
+      return
+    end
 
     js_env ROOT_OUTCOME_GROUP: get_root_outcome,
            PERMISSIONS: {
@@ -41,8 +51,12 @@ class RubricsController < ApplicationController
     mastery_scales_js_env
     set_tutorial_js_env
 
-    if @domain_root_account.feature_enabled?(:enhanced_rubrics)
+    if @context.feature_enabled?(:enhanced_rubrics)
       js_env breadcrumbs: rubric_breadcrumbs
+      js_env enhanced_rubrics_enabled: true
+      js_env rubric_imports_exports: Account.site_admin.feature_enabled?(:rubric_imports_exports)
+      js_env enhanced_rubrics_copy_to: Account.site_admin.feature_enabled?(:enhanced_rubrics_copy_to)
+      js_env enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
       return show_rubrics_redesign
     end
@@ -57,7 +71,7 @@ class RubricsController < ApplicationController
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
 
-    is_enhanced_rubrics = @domain_root_account.feature_enabled?(:enhanced_rubrics)
+    is_enhanced_rubrics = @context.feature_enabled?(:enhanced_rubrics)
 
     if params[:id].match?(Api::ID_REGEX) || is_enhanced_rubrics
       js_env ROOT_OUTCOME_GROUP: get_root_outcome,
@@ -69,6 +83,8 @@ class RubricsController < ApplicationController
 
       if is_enhanced_rubrics
         js_env breadcrumbs: rubric_breadcrumbs
+        js_env enhanced_rubrics_enabled: true
+        js_env enhanced_rubric_assignments_enabled: Rubric.enhanced_rubrics_assignments_enabled?(@context)
 
         return show_rubrics_redesign
       end
@@ -83,7 +99,7 @@ class RubricsController < ApplicationController
   end
 
   def show_rubrics_redesign
-    css_bundle :learning_outcomes
+    css_bundle :enhanced_rubrics
     render html: "".html_safe, layout: true
   end
 
@@ -106,7 +122,8 @@ class RubricsController < ApplicationController
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
-  #   The id of the object with which this rubric is associated
+  #   The id of the rubric association object (not the course/assignment itself, but the join table record id).
+  #   It can be used in place of +rubric_association[association_id]+ and +rubric_association[association_type]+ if desired.
   # @argument rubric[title] [String]
   #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]
@@ -150,7 +167,8 @@ class RubricsController < ApplicationController
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
-  #   The id of the object with which this rubric is associated
+  #   The id of the rubric association object (not the course/assignment itself, but the join table record id).
+  #   It can be used in place of +rubric_association[association_id]+ and +rubric_association[association_type]+ if desired.
   # @argument rubric[title] [String]
   #   The title of the rubric
   # @argument rubric[free_form_criterion_comments] [Boolean]
@@ -187,7 +205,7 @@ class RubricsController < ApplicationController
       association_params[:update_if_existing] = params[:action] == "update"
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       association_params[:skip_updating_points_possible] = skip_points_update
-      @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
+      @rubric = @association.rubric if params[:id] && (@association&.rubric_id == params[:id].to_i || (@association&.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))
       @rubric ||= @context.rubrics.where(id: params[:id]).first if params[:id].present?
       @association = nil unless @association && @rubric && @association.rubric_id == @rubric.id
       association_params[:id] = @association.id if @association
@@ -216,6 +234,7 @@ class RubricsController < ApplicationController
         @rubric = @association.rubric if @association
       end
       @rubric.reconcile_criteria_models(@current_user)
+      track_metrics
       json_res = {}
       json_res[:rubric] = @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user, session: }) if @rubric
       json_res[:rubric_association] = @association.as_json(include_root: false, include: [:assessment_requests], permissions: { user: @current_user, session: }) if @association
@@ -224,7 +243,46 @@ class RubricsController < ApplicationController
     end
   end
 
-  # @API Delete a single rubric
+  ALLOWED_GENERATE_PARAMS = %w[criteria_count rating_count points_per_criterion use_range additional_prompt_info grade_level].freeze
+  def llm_criteria
+    association_object = RubricAssociation.get_association_object(params[:rubric_association])
+    generate_options = (params[:generate_options] || {}).permit(*ALLOWED_GENERATE_PARAMS)
+    generate_options[:use_range] = value_to_boolean(generate_options[:use_range])
+    generate_options[:additional_prompt_info] = generate_options[:additional_prompt_info].presence
+    if generate_options[:criteria_count].present? && !(2..8).cover?(generate_options[:criteria_count].to_i)
+      return render json: { error: "criteria_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if generate_options[:rating_count].present? && !(2..8).cover?(generate_options[:rating_count].to_i)
+      return render json: { error: "rating_count must be between 2 and 8 inclusive" }, status: :bad_request
+    end
+    if generate_options[:additional_prompt_info].present? && generate_options[:additional_prompt_info].length > 1000
+      return render json: { error: "additional_prompt_info must be less than 1000 characters" }, status: :bad_request
+    end
+
+    return render_unauthorized_action unless Rubric.ai_rubrics_enabled?(context)
+
+    @rubric = @context.rubrics.build(user: @current_user)
+    if can_manage_rubrics_or_association_object?(association_object) && authorized_action(@rubric, @current_user, :update)
+      progress = Progress.create!(context: association_object, user: @current_user, tag: "llm_rubric_generation")
+      progress.process_job(
+        Rubric,
+        :process_generate_criteria_via_llm,
+        {
+          priority: Delayed::NORMAL_PRIORITY,
+          n_strand: ["Rubric.process_generate_criteria_via_llm", @domain_root_account.global_id],
+          max_attempts: 3,
+        },
+        @context,
+        @current_user,
+        association_object,
+        generate_options.to_h
+      )
+
+      render json: progress_json(progress, @current_user, session)
+    end
+  end
+
+  # @API Delete a single
   #
   # Deletes a Rubric and removes all RubricAssociations.
   #
@@ -273,5 +331,11 @@ class RubricsController < ApplicationController
 
   def can_manage_rubrics_context?
     @context.grants_right?(@current_user, session, :manage_rubrics)
+  end
+
+  def track_metrics
+    if @association_object.is_a?(Assignment)
+      InstStatsd::Statsd.distributed_increment("#{@context.class.to_s.downcase}.rubrics.created_from_assignment")
+    end
   end
 end

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -17,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {max, invert} from 'lodash'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
 import type {SubmissionOriginalityData, SubmissionWithOriginalityReport} from './grading.d'
 
-const I18n = useI18nScope('turnitin')
+const I18n = createI18nScope('turnitin')
 
 export const extractDataTurnitin = function (submission: SubmissionWithOriginalityReport) {
   let attachment, i, item, len, plagData, ref, turnitin
@@ -79,10 +78,12 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     const results: number[] = []
     for (j = 0, len1 = ref2.length; j < len1; j++) {
       item = ref2[j]
+      // @ts-expect-error
       results.push(parseInt(stateMap[item.state || 'no'], 10))
     }
     return results
   })()
+  // @ts-expect-error
   data.state = stateList[max(states)]
   return data
 }
@@ -90,7 +91,7 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
 export const extractDataForTurnitin = function (
   submission: SubmissionWithOriginalityReport,
   key: string,
-  urlPrefix: string
+  urlPrefix: string,
 ) {
   let data, type
   data = submission?.turnitin_data

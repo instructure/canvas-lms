@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {render, waitFor, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import ContentMigrationsTable from '../migrations_table'
 import fetchMock from 'fetch-mock'
 import type {ContentMigrationItem} from '../types'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const migrations: ContentMigrationItem[] = [
   {
@@ -39,11 +40,26 @@ const migrations: ContentMigrationItem[] = [
     created_at: 'Apr 15 at 9:11pm',
   },
 ]
-let setMigrationsMock: () => void
 
-const renderComponent = () => {
+const fetchNext = jest.fn()
+
+const renderComponent = ({
+  migrationArray = migrations,
+  isLoading = false,
+  hasMore = false,
+}: {
+  migrationArray?: ContentMigrationItem[]
+  isLoading?: boolean
+  hasMore?: boolean
+}) => {
   return render(
-    <ContentMigrationsTable migrations={migrations} setMigrations={setMigrationsMock} />
+    <ContentMigrationsTable
+      migrations={migrationArray}
+      isLoading={isLoading}
+      updateMigrationItem={jest.fn()}
+      fetchNext={fetchNext}
+      hasMore={hasMore}
+    />,
   )
 }
 
@@ -56,7 +72,6 @@ describe('ContentMigrationTable', () => {
   })
 
   beforeAll(() => {
-    setMigrationsMock = jest.fn(() => {})
     window.ENV.COURSE_ID = '0'
     fetchMock.mock('/api/v1/courses/0/content_migrations?per_page=25', ['api_return'])
   })
@@ -73,11 +88,16 @@ describe('ContentMigrationTable', () => {
     })
 
     it('renders the table', () => {
-      renderComponent()
+      renderComponent({})
 
-      const headers = Array.from(document.querySelectorAll('span[as="th"]')).map(e => e.textContent)
-      const data = Array.from(document.querySelectorAll('span[as="td"]')).map(e => e.textContent)
+      const headers = Array.from(document.querySelectorAll('[role="cell"] strong')).map(
+        e => e.textContent,
+      )
 
+      // Get all cells
+      const cells = Array.from(document.querySelectorAll('[role="cell"]'))
+
+      // Verify headers
       expect(headers).toEqual([
         'Content Type',
         'Source Link',
@@ -86,23 +106,24 @@ describe('ContentMigrationTable', () => {
         'Progress',
         'Action',
       ])
-      expect(data).toEqual([
-        'Copy a Canvas Course',
-        'Other course',
-        'Apr 15 at 9:11pm',
-        'Waiting for selection',
-        'Select content',
-        '',
-      ])
+
+      // Verify cell content for the first 4 cells and the last cell
+      expect(cells[0].textContent).toBe('Content Type: Copy a Canvas Course')
+      expect(cells[1].textContent).toBe('Source Link: Other course')
+      expect(cells[2].textContent).toBe('Date Imported: Apr 15 at 9:11pm')
+      expect(cells[3].textContent).toBe('Status: Waiting for selection')
+      expect(cells[5].textContent).toBe('Action: ')
+
+      // For the Progress cell, we just verify it exists
+      // The content may vary based on the migration state and view mode
+      const progressCell = cells[4]
+      expect(progressCell).toBeInTheDocument()
     })
 
-    it('calls the API', async () => {
-      renderComponent()
+    it('displays the loading spinner', () => {
+      renderComponent({isLoading: true})
 
-      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
-      await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
-      })
+      expect(screen.getByLabelText('Loading')).toBeInTheDocument()
     })
   })
 
@@ -118,24 +139,58 @@ describe('ContentMigrationTable', () => {
     })
 
     it('renders the table', () => {
-      renderComponent()
+      renderComponent({})
 
-      expect(screen.getByRole('table', {hidden: false})).toBeInTheDocument()
+      // Verify table exists
+      expect(screen.getByRole('table')).toBeInTheDocument()
+
+      // Verify that key content is present
+      expect(screen.getByText(/Content Type/)).toBeInTheDocument()
+      expect(screen.getByText(/Copy a Canvas Course/)).toBeInTheDocument()
+      expect(screen.getByText(/Source Link/)).toBeInTheDocument()
+      expect(screen.getByText(/Other course/)).toBeInTheDocument()
+      expect(screen.getByText(/Date Imported/)).toBeInTheDocument()
+      expect(screen.getByText(/Status/)).toBeInTheDocument()
+
+      // Verify migration status pill is present
+      expect(screen.getByTestId('migrationStatus')).toBeInTheDocument()
+      expect(screen.getByText(/Waiting for selection/)).toBeInTheDocument()
+    })
+
+    it('displays the loading spinner', () => {
+      renderComponent({isLoading: true})
+
+      expect(screen.getByLabelText('Loading')).toBeInTheDocument()
+    })
+
+    it('fetches next page of migrations when scrolled to the bottom', async () => {
+      renderComponent({isLoading: false, hasMore: true})
+
+      fireEvent.scroll(window, {target: {scrollY: 10000}})
+
+      await waitFor(() => {
+        expect(fetchNext).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('Content migration expire', () => {
+    it('renders the message with correct days', () => {
+      fakeENV.setup({CONTENT_MIGRATIONS_EXPIRE_DAYS: 30})
+      renderComponent({})
+
       expect(
-        screen.getByRole('row', {
-          name: 'Content Type Source Link Date Imported Status Progress Action',
-          hidden: false,
-        })
+        screen.getByText('Content import files cannot be downloaded after 30 days.'),
       ).toBeInTheDocument()
     })
 
-    it('calls the API', async () => {
-      renderComponent()
+    it('does not renders the message when ENV.CONTENT_MIGRATIONS_EXPIRE_DAYS is not set', () => {
+      fakeENV.setup({CONTENT_MIGRATIONS_EXPIRE_DAYS: undefined})
+      renderComponent({})
 
-      expect(fetchMock.called('/api/v1/courses/0/content_migrations?per_page=25', 'GET')).toBe(true)
-      await waitFor(() => {
-        expect(setMigrationsMock).toHaveBeenCalledWith(expect.any(Function))
-      })
+      expect(
+        screen.queryByText(/Content import files cannot be downloaded after/),
+      ).not.toBeInTheDocument()
     })
   })
 })

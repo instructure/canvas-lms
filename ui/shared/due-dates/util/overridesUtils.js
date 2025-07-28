@@ -56,7 +56,7 @@ export const getAllOverrides = givenRows => {
       map(row.overrides, override => {
         override.attributes.persisted = row.persisted
         return override
-      })
+      }),
     )
     .flatten()
     .compact()

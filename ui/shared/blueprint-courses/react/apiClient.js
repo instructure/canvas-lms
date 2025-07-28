@@ -73,7 +73,7 @@ const ApiClient = {
     const params = this._queryString([{per_page: '100'}, {teacher_limit: '5'}])
 
     return this._depaginate(
-      `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/associated_courses?${params}`
+      `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/associated_courses?${params}`,
     )
   },
 
@@ -83,7 +83,7 @@ const ApiClient = {
       {
         course_ids_to_add: addedAssociations.map(c => c.id),
         course_ids_to_remove: removedAssociations.map(c => c.id),
-      }
+      },
     )
   },
 
@@ -98,6 +98,7 @@ const ApiClient = {
     notificationMessage,
     willIncludeCourseSettings,
     willPublishCourses,
+    willSendItemNotifications,
   }) {
     const params = {
       send_notification: willSendNotification,
@@ -111,9 +112,12 @@ const ApiClient = {
     if (willPublishCourses) {
       params.publish_after_initial_sync = true
     }
+    if (willSendItemNotifications) {
+      params.send_item_notifications = true
+    }
     return axios.post(
       `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/migrations`,
-      params
+      params,
     )
   },
 
@@ -132,19 +136,19 @@ const ApiClient = {
 
   getMigration(
     {course},
-    {blueprintType = 'blueprint_templates', templateId = 'default', changeId}
+    {blueprintType = 'blueprint_templates', templateId = 'default', changeId},
   ) {
     return axios.get(
-      `/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}`
+      `/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}`,
     )
   },
 
   getMigrationDetails(
     {course},
-    {blueprintType = 'blueprint_templates', templateId = 'default', changeId}
+    {blueprintType = 'blueprint_templates', templateId = 'default', changeId},
   ) {
     return axios.get(
-      `/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}/details`
+      `/api/v1/courses/${course.id}/${blueprintType}/${templateId}/migrations/${changeId}/details`,
     )
   },
 
@@ -154,8 +158,8 @@ const ApiClient = {
         Object.assign(data, {
           changeId: params.changeId,
           changes: res.data,
-        })
-      )
+        }),
+      ),
     )
   },
 
@@ -167,10 +171,10 @@ const ApiClient = {
           .slice(0, 5)
           .map(mig =>
             this.getMigrationDetails({course: masterCourse}, {changeId: mig.id}).then(res =>
-              Object.assign(mig, {changes: res.data})
-            )
-          )
-      )
+              Object.assign(mig, {changes: res.data}),
+            ),
+          ),
+      ),
     )
   },
 
@@ -184,7 +188,7 @@ const ApiClient = {
 
   loadUnsyncedChanges({masterCourse}) {
     return axios.get(
-      `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/unsynced_changes`
+      `/api/v1/courses/${masterCourse.id}/blueprint_templates/default/unsynced_changes`,
     )
   },
 }

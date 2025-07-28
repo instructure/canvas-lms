@@ -170,6 +170,7 @@ describe('SettingsPanel', () => {
       {
         lockUntilChecked: false,
         moduleName: 'Week 12',
+        moduleNameDirty: true,
         nameInputMessages: [],
         lockUntilInputMessages: [],
         prerequisites: [],
@@ -178,8 +179,9 @@ describe('SettingsPanel', () => {
         requirementCount: 'all',
         requirements: [],
         unlockAt: '',
+        pointsInputMessages: []
       },
-      true
+      true,
     )
   })
 
@@ -191,6 +193,7 @@ describe('SettingsPanel', () => {
       {
         lockUntilChecked: false,
         moduleName: 'Week 1',
+        moduleNameDirty: false,
         nameInputMessages: [],
         lockUntilInputMessages: [],
         prerequisites: [],
@@ -199,8 +202,9 @@ describe('SettingsPanel', () => {
         requirementCount: 'all',
         requirements: [],
         unlockAt: '',
+        pointsInputMessages: []
       },
-      false
+      false,
     )
   })
 
@@ -211,6 +215,7 @@ describe('SettingsPanel', () => {
 
     beforeEach(() => {
       jest.clearAllMocks()
+      // @ts-expect-error
       doFetchApi.mockReset()
     })
 
@@ -226,6 +231,7 @@ describe('SettingsPanel', () => {
     })
 
     it('makes a request to the modules update endpoint', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -235,11 +241,12 @@ describe('SettingsPanel', () => {
           path: '/courses/1/modules/1',
           method: 'PUT',
           body: expect.anything(),
-        })
+        }),
       )
     })
 
     it('formats the form state for the request body', () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -247,6 +254,7 @@ describe('SettingsPanel', () => {
     })
 
     it('updates the modules page UI', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -256,6 +264,7 @@ describe('SettingsPanel', () => {
     })
 
     it('shows a flash alert on success', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -270,6 +279,7 @@ describe('SettingsPanel', () => {
 
     it('shows a flash alert on failure', async () => {
       const e = new Error('error')
+      // @ts-expect-error
       doFetchApi.mockRejectedValue(e)
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -282,6 +292,7 @@ describe('SettingsPanel', () => {
     })
 
     it('calls the render function on the re-lock dialog', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole} = renderComponent()
       getByRole('button', {name: 'Save'}).click()
@@ -291,6 +302,7 @@ describe('SettingsPanel', () => {
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
       const onDidSubmitMock = jest.fn()
       const onDismissMock = jest.fn()
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent({
         onDidSubmit: onDidSubmitMock,
@@ -302,11 +314,89 @@ describe('SettingsPanel', () => {
       expect(onDidSubmitMock).toHaveBeenCalled()
       expect(onDismissMock).not.toHaveBeenCalled()
     })
+
+    it('calls updateParentData with moduleNameDirty state', async () => {
+      const updateParentDataMock = jest.fn()
+      const {unmount, findByTestId} = renderComponent({updateParentData: updateParentDataMock})
+      await userEvent.type(await findByTestId('module-name-input'), '2')
+      unmount()
+      expect(updateParentDataMock).toHaveBeenCalledWith(
+        {
+          lockUntilChecked: false,
+          moduleName: 'Week 12',
+          moduleNameDirty: true,
+          nameInputMessages: [],
+          lockUntilInputMessages: [],
+          prerequisites: [],
+          publishFinalGrade: false,
+          requireSequentialProgress: false,
+          requirementCount: 'all',
+          requirements: [],
+          unlockAt: '',
+          pointsInputMessages: [],
+        },
+        true,
+      )
+    })
+    describe('modules_requirements_allow_percentage is enabled', () => {
+      beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.modules_requirements_allow_percentage = true
+      })
+
+      it('Invalid input message is shown for points', () => {
+      const overrideProps = {
+        moduleItems: [{ id: '1', name: 'Assignments' }],
+        requirements: [
+        {
+          id: '1',
+          name: 'Assignment 1',
+          resource: 'assignment',
+          type: 'percentage',
+          minimumScore: '150',
+          pointsPossible: '30',
+        },
+        ],
+        pointsInputMessages: [{ requirementId: '1', message: 'Invalid input' }],
+      }
+      const { getByRole, getByText } = renderComponent(overrideProps)
+      const updateButton = getByRole('button', { name: 'Save' })
+      updateButton.click()
+
+      expect(getByText('Invalid input')).toBeInTheDocument()
+      })
+
+      it('addModuleUI is not called if error in requirements', () => {
+      const addModuleUI = jest.fn()
+
+      const overrideProps = {
+        moduleItems: [{ id: '1', name: 'Assignments' }],
+        requirements: [
+        {
+          id: '1',
+          name: 'Assignment 1',
+          resource: 'assignment',
+          type: 'percentage',
+          minimumScore: '150',
+          pointsPossible: '30',
+        },
+        ],
+        pointsInputMessages: [{ requirementId: '1', message: 'Invalid input' }],
+        addModuleUI,
+      }
+      const { getByRole } = renderComponent(overrideProps)
+      const updateButton = getByRole('button', { name: 'Save' })
+      updateButton.click()
+
+      expect(addModuleUI).not.toHaveBeenCalled()
+      })
+    })
   })
 
   describe('on create', () => {
     it('calls addModuleUI when module is created', async () => {
       const addModuleUI = jest.fn()
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent({moduleId: undefined, addModuleUI})
       getByRole('button', {name: 'Add Module'}).click()
@@ -324,6 +414,7 @@ describe('SettingsPanel', () => {
     it('calls onDidSubmit instead of onDismiss if passed', async () => {
       const onDidSubmitMock = jest.fn()
       const onDismissMock = jest.fn()
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: {}})
       const {getByRole, findByTestId} = renderComponent({
         moduleId: undefined,

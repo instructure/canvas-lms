@@ -42,13 +42,23 @@ describe ActiveSupport::Cache::HaStore do
   end
 
   describe "consume_consul_events" do
+    before do
+      secret_key = SecureRandom.uuid
+      Canvas.redis.set(secret_key, "1", ex: 5)
+      begin
+        value = redis.get(secret_key)
+      rescue
+        # ignore
+      end
+      skip "Can't run this spec unless redis is default configured" unless value == "1"
+    end
+
     it "works" do
       # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
       # I would normally compare against `id`, but that might have localhost vs. 127.0.0.1
       redis = Redis.new(connect_timeout: 0.5)
       secret_key = SecureRandom.uuid
       Canvas.redis.set(secret_key, "1", ex: 5)
-      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
       Bundler.with_unbundled_env do
@@ -71,7 +81,6 @@ describe ActiveSupport::Cache::HaStore do
       Canvas.redis.set(secret_key2, "1", ex: 5)
       secret_key3 = "prefix2/#{SecureRandom.uuid}"
       Canvas.redis.set(secret_key3, "1", ex: 5)
-      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
       Bundler.with_unbundled_env do
@@ -94,7 +103,6 @@ describe ActiveSupport::Cache::HaStore do
       Canvas.redis.set(secret_key, "1", ex: 5)
       secret_key2 = SecureRandom.uuid
       Canvas.redis.set(secret_key2, "1", ex: 5)
-      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
       Bundler.with_unbundled_env do
@@ -116,7 +124,6 @@ describe ActiveSupport::Cache::HaStore do
       secret_key2 = SecureRandom.uuid
       Canvas.redis.set(secret_key, "1", ex: 5)
       Canvas.redis.set(secret_key2, "1", ex: 5)
-      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
       Bundler.with_unbundled_env do

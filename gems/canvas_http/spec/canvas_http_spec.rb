@@ -298,8 +298,9 @@ describe "CanvasHttp" do
   end
 
   describe ".tempfile_for_url" do
+    let(:tempfile) { double("tempfile") }
+
     before do
-      tempfile = double("tempfile")
       allow(tempfile).to receive(:binmode)
       allow(Tempfile).to receive(:new).and_return(tempfile)
     end
@@ -307,6 +308,16 @@ describe "CanvasHttp" do
     it "truncates uris to 100 characters" do
       expect(Tempfile).to receive(:new).with("1234567890" * 10)
       CanvasHttp.tempfile_for_uri(URI.parse("1234567890" * 12))
+    end
+
+    it "truncates basenames to 100 characters, even if there are intermediate periods" do
+      expect(Tempfile).to receive(:new).with(["1234567890" * 10, ".xyz"])
+      CanvasHttp.tempfile_for_uri(URI.parse("#{"1234567890" * 12}.#{"1234567890" * 12}.xyz"))
+    end
+
+    it "doesn't crash when given a URI with no path" do
+      res = CanvasHttp.tempfile_for_uri(URI.parse("http://example.com"))
+      expect(res).to eq(tempfile)
     end
   end
 
@@ -326,6 +337,10 @@ describe "CanvasHttp" do
   end
 
   describe ".validate_url" do
+    it "raises an ArgumentError when passed a nil url" do
+      expect { CanvasHttp.validate_url(nil) }.to raise_error(ArgumentError)
+    end
+
     it "accepts a valid url" do
       value, _ = CanvasHttp.validate_url("http://example.com")
       expect(value).to eq "http://example.com"
@@ -360,6 +375,18 @@ describe "CanvasHttp" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
       expect { CanvasHttp.validate_url("http://127.0.0.1/嘊", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
       expect { CanvasHttp.validate_url("http://example.com/whät", allowed_schemes: ["https"]) }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe "::ALL_HTTP_ERRORS" do
+    it "comprises all the HTTP network errors and 'CanvasHttp::Error's" do
+      expect(CanvasHttp::ALL_HTTP_ERRORS).to match_array([
+                                                           CanvasHttp::Error,
+                                                           Timeout::Error,
+                                                           SocketError,
+                                                           SystemCallError,
+                                                           OpenSSL::SSL::SSLError
+                                                         ])
     end
   end
 end

@@ -19,11 +19,6 @@
 #
 
 describe ScoreMetadata do
-  it { is_expected.to belong_to(:score).required }
-  it { is_expected.to validate_presence_of(:score) }
-  it { is_expected.to validate_presence_of(:calculation_details) }
-  it { is_expected.to validate_uniqueness_of(:score_id) }
-
   include_examples "has_one soft deletion" do
     subject { score.create_score_metadata!(calculation_details:) }
 

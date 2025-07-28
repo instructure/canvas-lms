@@ -18,7 +18,7 @@
 
 import {Error} from '../../../shared/graphql/Error'
 import {Submission} from './Submission'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const UPDATE_SUBMISSIONS_READ_STATE = gql`
   mutation UpdateSubmissionsReadState($submissionIds: [ID!]!, $read: Boolean!) {

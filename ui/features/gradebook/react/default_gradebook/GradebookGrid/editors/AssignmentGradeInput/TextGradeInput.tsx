@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -25,12 +24,19 @@ import type {PendingGradeInfo} from '../../../gradebook.d'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 
 function formatGrade(
+  // @ts-expect-error
   submission,
+  // @ts-expect-error
   assignment,
+  // @ts-expect-error
   gradingScheme,
+  // @ts-expect-error
   pointsBasedGradingScheme,
+  // @ts-expect-error
+  scalingFactor,
+  // @ts-expect-error
   enterGradesAs,
-  pendingGradeInfo: PendingGradeInfo
+  pendingGradeInfo: PendingGradeInfo,
 ) {
   if (pendingGradeInfo) {
     return GradeFormatHelper.formatGradeInfo(pendingGradeInfo, {defaultValue: ''})
@@ -42,18 +48,21 @@ function formatGrade(
     gradingScheme,
     pointsBasedGradingScheme,
     pointsPossible: assignment.pointsPossible,
+    scalingFactor,
     version: 'entered',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
 }
 
+// @ts-expect-error
 function getGradeInfo(value, props) {
   return parseTextValue(value, {
     enterGradesAs: props.enterGradesAs,
     gradingScheme: props.gradingScheme,
     pointsBasedGradingScheme: props.pointsBasedGradingScheme,
     pointsPossible: props.assignment.pointsPossible,
+    scalingFactor: props.scalingFactor,
   })
 }
 
@@ -77,6 +86,7 @@ type Props = {
     excused: boolean
     id: string
   }
+  scalingFactor: number
 }
 
 type State = {
@@ -99,6 +109,7 @@ export default class TextGradeInput extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
 
+    // @ts-expect-error
     this.bindTextInput = ref => {
       this.textInput = ref
     }
@@ -112,6 +123,7 @@ export default class TextGradeInput extends Component<Props, State> {
       gradingScheme,
       pointsBasedGradingScheme,
       pendingGradeInfo,
+      scalingFactor,
       submission,
     } = props
     const value = formatGrade(
@@ -119,13 +131,25 @@ export default class TextGradeInput extends Component<Props, State> {
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
+      scalingFactor,
       enterGradesAs,
-      pendingGradeInfo
+      pendingGradeInfo,
     )
 
     this.state = {
       gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, this.props),
-      grade: formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo),
+      grade:
+        enterGradesAs === 'percent'
+          ? value
+          : formatGrade(
+              submission,
+              assignment,
+              gradingScheme,
+              pointsBasedGradingScheme,
+              scalingFactor,
+              enterGradesAs,
+              pendingGradeInfo,
+            ),
     }
   }
 
@@ -137,6 +161,7 @@ export default class TextGradeInput extends Component<Props, State> {
         gradingScheme,
         pointsBasedGradingScheme,
         pendingGradeInfo,
+        scalingFactor,
         submission,
       } = nextProps
 
@@ -146,8 +171,9 @@ export default class TextGradeInput extends Component<Props, State> {
           assignment,
           gradingScheme,
           pointsBasedGradingScheme,
+          scalingFactor,
           enterGradesAs,
-          pendingGradeInfo
+          pendingGradeInfo,
         ),
       })
     }
@@ -158,7 +184,9 @@ export default class TextGradeInput extends Component<Props, State> {
   }
 
   focus() {
+    // @ts-expect-error
     this.textInput.focus()
+    // @ts-expect-error
     this.textInput.setSelectionRange(0, this.textInput.value.length)
   }
 
@@ -175,14 +203,22 @@ export default class TextGradeInput extends Component<Props, State> {
       return this.state.grade.trim() !== this.props.pendingGradeInfo.grade
     }
 
-    const {assignment, enterGradesAs, gradingScheme, pointsBasedGradingScheme, submission} =
-      this.props
+    const {
+      assignment,
+      enterGradesAs,
+      gradingScheme,
+      pointsBasedGradingScheme,
+      scalingFactor,
+      submission,
+    } = this.props
+    // @ts-expect-error
     const formattedGrade = formatGrade(
       submission,
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
-      enterGradesAs
+      scalingFactor,
+      enterGradesAs,
     )
 
     if (formattedGrade === this.state.grade.trim()) {
@@ -201,6 +237,7 @@ export default class TextGradeInput extends Component<Props, State> {
     return undefined
   }
 
+  // @ts-expect-error
   handleTextChange(event) {
     this.setState({
       gradeInfo: getGradeInfo(event.target.value, this.props),
@@ -215,9 +252,12 @@ export default class TextGradeInput extends Component<Props, State> {
   render() {
     return (
       <TextInput
+        autoComplete="off"
         disabled={this.props.disabled}
+        // @ts-expect-error
         inputRef={this.bindTextInput}
         renderLabel={this.props.label}
+        // @ts-expect-error
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"

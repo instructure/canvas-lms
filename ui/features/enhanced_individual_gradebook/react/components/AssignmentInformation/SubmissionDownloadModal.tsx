@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconDownloadSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import DownloadSubmissionsDialog from './downloadSubmissionsDialog'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   downloadSubmissionsUrl: string
@@ -47,7 +47,7 @@ export default function SubmissionDownloadModal({downloadSubmissionsUrl}: Props)
         <View as="span" margin="0 0 0 xx-small">
           <Text weight="bold">{I18n.t('Your student submissions are being gathered')} </Text>
           {I18n.t(
-            'and compressed into a zip file. This may take some time, depending on the size and number of submission files.'
+            'and compressed into a zip file. This may take some time, depending on the size and number of submission files.',
           )}
         </View>
         <View as="div" className="progress" margin="small" />

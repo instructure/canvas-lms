@@ -33,7 +33,7 @@ export default function buildStyle() {
   }
 
   const theme = {
-    backgroundPrimary: variables.colors.backgroundLightest,
+    backgroundPrimary: variables.colors.contrasts.white1010,
   }
 
   const css = `
@@ -43,7 +43,7 @@ export default function buildStyle() {
     display: flex;
     justify-content: flex-end;
   }
-  
+
   .${classNames.root}::before {
     content: "";
     position: absolute;
@@ -53,7 +53,7 @@ export default function buildStyle() {
     bottom: 0;
     background-image: linear-gradient(to top, rgba(255, 255, 255, 0), #fafafa);
   }
-  
+
   .${classNames.errorbox} {
     background: ${theme.backgroundPrimary};
     z-index: 2;

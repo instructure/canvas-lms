@@ -96,8 +96,10 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
   def availability
     all_availabilities = all_guards.filter_map do |guard|
       case guard
-      when "ALWAYS", "CONTROLLER_GUARD"
+      when "ALWAYS", "CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD"
         "always"
+      when "CONTROLLER_GUARD"
+        "when a tool is launched (excludes background messages like PNS notices)"
       when "USER_GUARD"
         "when launched by a logged in user"
       when "SIS_USER_GUARD"
@@ -109,9 +111,9 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       when "PSEUDONYM_GUARD"
         "when pseudonym is in use"
       when "ENROLLMENT_GUARD"
-        "when launched from a course"
+        "when launched from a course (or a Group within a course)"
       when "ROLES_GUARD"
-        "when launched from a course or an account"
+        "when launched from a course or an account (or a Group within a course or account)"
       when "CONTENT_TAG_GUARD"
         "when content tag is present"
       when "ASSIGNMENT_GUARD"
@@ -123,9 +125,15 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       when "MASQUERADING_GUARD"
         "when the user is being masqueraded"
       when "COURSE_GUARD"
-        "when launched in a course"
+        "when launched in a course (or a Group within a course)"
       when "TERM_START_DATE_GUARD"
-        "when launched in a course that has a term with a start date"
+        "when launched in a course (or a Group within a course) that has a term with a start date"
+      when "TERM_END_DATE_GUARD"
+        "when launched in a course (or a Group within a course) that has a term with a end date"
+      when "TERM_NAME_GUARD"
+        "when launched in a course (or a Group within a course) that has a term with a name"
+      when "TERM_ID_GUARD"
+        "when launched in a course (or a Group within a course) that has a term "
       when "STUDENT_ASSIGNMENT_GUARD"
         "when launched as an assignment by a student"
       when "EDITOR_GUARD"
@@ -134,6 +142,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
         "when the tool is used to upload a file as an assignment submission"
       when "INTERNAL_TOOL_GUARD"
         "internal LTI tools"
+      when "INSTRUCTURE_IDENTITY_GUARD"
+        "Instructure Identity is enabled"
       end
     end
     "**Availability**: *#{all_availabilities.join(" and ")}*  " if all_availabilities.size

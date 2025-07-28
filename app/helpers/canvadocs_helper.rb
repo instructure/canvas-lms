@@ -23,7 +23,7 @@ module CanvadocsHelper
 
   private
 
-  def canvadocs_session_url(user, annotation_context, submission, disable_annotation_notifications = false, enable_annotations = true)
+  def canvadocs_session_url(user, annotation_context, submission, disable_annotation_notifications: false, enable_annotations: true)
     assignment = submission.assignment
     opts = {
       annotation_context: annotation_context.launch_id,

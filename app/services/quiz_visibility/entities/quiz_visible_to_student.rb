@@ -20,39 +20,6 @@
 module QuizVisibility
   module Entities
     # When a quiz is visible to a (student) user
-    class QuizVisibleToStudent
-      attr_reader :course_id,
-                  :user_id,
-                  :quiz_id
-
-      def initialize(course_id:,
-                     user_id:,
-                     quiz_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "quiz_id cannot be nil" if quiz_id.nil?
-
-        @course_id = course_id
-        @user_id = user_id
-        @quiz_id = quiz_id
-      end
-
-      # two QuizVisibleToStudent DTOs are equal if all of their attributes are equal
-      def ==(other)
-        return false unless other.is_a?(QuizVisibleToStudent)
-
-        course_id == other.course_id &&
-          user_id == other.user_id &&
-          quiz_id == other.quiz_id
-      end
-
-      def eql?(other)
-        self == other
-      end
-
-      def hash
-        [course_id, user_id, quiz_id].hash
-      end
-    end
+    QuizVisibleToStudent = Struct.new(:course_id, :user_id, :quiz_id, keyword_init: true)
   end
 end

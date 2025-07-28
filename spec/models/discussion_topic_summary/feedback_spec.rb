@@ -71,13 +71,6 @@ describe DiscussionTopicSummary::Feedback do
       end
     end
 
-    context "when action is regenerate" do
-      it "sets regenerated to true" do
-        @feedback.regenerate
-        expect(@feedback.regenerated).to be true
-      end
-    end
-
     context "when action is disable_summary" do
       it "sets summary_disabled to true" do
         @feedback.disable_summary

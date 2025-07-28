@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {act, render, within} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-import {Footer} from '../footer'
+import {Footer, type ComponentProps} from '../footer'
 
 const syncUnpublishedChanges = jest.fn()
 const onResetPace = jest.fn()
 const removePace = jest.fn()
 const handleCancel = jest.fn()
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   autoSaving: false,
   pacePublishing: false,
   isSyncing: false,
@@ -47,64 +46,62 @@ const defaultProps = {
   anyActiveRequests: false,
   isUnpublishedNewPace: false,
   paceName: 'Cool Class',
+  isSavingDraft: false,
+  blueprintLocked: false,
+  isDraftPace: false,
+  isBulkEnrollment: false,
 }
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 describe('Footer', () => {
-  it('renders cancel and publish buttons when there are unpublished changes', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
+  afterEach(() => {
+    fakeENV.teardown()
+    jest.clearAllMocks()
+  })
 
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    expect(cancelButton).toBeInTheDocument()
-    act(() => cancelButton.click())
-    expect(onResetPace).toHaveBeenCalled()
-
-    const publishButton = getByRole('button', {name: 'Publish'})
+  it('renders apply changes buttons when there are unpublished changes', () => {
+    const {getByRole} = renderConnected(<Footer {...defaultProps} />)
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
     expect(publishButton).toBeInTheDocument()
     act(() => publishButton.click())
     expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 
-  it('shows cannot cancel and publish tooltip when there are no unpublished changes', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} unpublishedChanges={false} />)
-    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
-    expect(getByText('There are no pending changes to publish')).toBeInTheDocument()
+  it('shows apply changes tooltip when there are no unpublished changes', () => {
+    const {getByRole} = renderConnected(<Footer {...defaultProps} unpublishedChanges={false} />)
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
-  it('shows cannot cancel and publish tooltip while publishing', () => {
-    const {getByText} = renderConnected(
-      <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />
+  it('shows apply changestooltip while publishing', () => {
+    const {getByRole} = renderConnected(
+      <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />,
     )
-    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
-    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+    const publishButton = getByRole('button', {name: 'Publishing...'})
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
-  it('shows cannot cancel and publish tooltip while auto saving', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} autoSaving={true} />)
-    expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
-    expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
+  it('shows apply changes tooltip while auto saving', () => {
+    const {getByRole} = renderConnected(<Footer {...defaultProps} autoSaving={true} />)
+    const publishButton = getByRole('button', {name: 'Apply Changes'})
+    expect(publishButton).toHaveAttribute('aria-describedby')
   })
 
   it('shows cannot cancel and publish tooltip while loading', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} showLoadingOverlay={true} />)
+    const {getByText} = renderConnected(<Footer {...defaultProps} showLoadingOverlay={true} anyActiveRequests={true}/>)
     expect(getByText('You cannot cancel while loading the pace')).toBeInTheDocument()
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })
 
   it('shows cannot cancel when a new pace', () => {
     const {getByText, queryByText} = renderConnected(
-      <Footer {...defaultProps} unpublishedChanges={false} newPace={true} />
+      <Footer {...defaultProps} unpublishedChanges={false} newPace={true} />,
     )
-    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
     expect(queryByText('You cannot publish while loading the pace')).not.toBeInTheDocument()
   })
 
   it('renders a loading spinner inside the publish button when publishing is ongoing', () => {
     const {getByRole} = renderConnected(
-      <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />
+      <Footer {...defaultProps} pacePublishing={true} isSyncing={true} />,
     )
 
     const publishButton = getByRole('button', {name: 'Publishing...'})
@@ -114,26 +111,10 @@ describe('Footer', () => {
     expect(spinner).toBeInTheDocument()
   })
 
-  it('renders nothing for student paces', () => {
-    const {queryByRole} = renderConnected(<Footer {...defaultProps} studentPace={true} />)
-    expect(queryByRole('button')).not.toBeInTheDocument()
-  })
-
-  it('keeps focus on Cancel button after clicking', () => {
+  it('keeps focus on Publish button after clicking', () => {
     const {getByRole} = renderConnected(<Footer {...defaultProps} />)
 
-    const cancelButton = getByRole('button', {name: 'Cancel'})
-    act(() => {
-      cancelButton.focus()
-      cancelButton.click()
-    })
-    expect(document.activeElement).toBe(cancelButton)
-  })
-
-  it('keeps focus on Publish button after clicking', () => {
-    const {getByRole} = render(<Footer {...defaultProps} />)
-
-    const pubButton = getByRole('button', {name: 'Publish'})
+    const pubButton = getByRole('button', {name: 'Apply Changes'})
     act(() => {
       pubButton.focus()
       pubButton.click()
@@ -142,20 +123,9 @@ describe('Footer', () => {
   })
 
   describe('with course paces for students', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_for_students = true
-    })
-
     it('renders everything for student paces', () => {
-      const {getByRole} = render(<Footer {...defaultProps} studentPace={true} />)
-
-      const cancelButton = getByRole('button', {name: 'Cancel'})
-      expect(cancelButton).toBeInTheDocument()
-      act(() => cancelButton.click())
-      expect(onResetPace).toHaveBeenCalled()
-
-      const publishButton = getByRole('button', {name: 'Publish'})
+      const {getByRole} = renderConnected(<Footer {...defaultProps} studentPace={true} />)
+      const publishButton = getByRole('button', {name: 'Apply Changes'})
       expect(publishButton).toBeInTheDocument()
       act(() => publishButton.click())
       expect(syncUnpublishedChanges).toHaveBeenCalled()
@@ -163,14 +133,9 @@ describe('Footer', () => {
   })
 
   describe('with course_paces_redesign flag', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.course_paces_redesign = true
-    })
-
     it('includes the correct components for new pace', () => {
       const {getByText, queryByText} = renderConnected(
-        <Footer {...defaultProps} sectionPace={true} newPace={true} isUnpublishedNewPace={true} />
+        <Footer {...defaultProps} sectionPace={true} newPace={true} isUnpublishedNewPace={true} />,
       )
       const closeButton = getByText('Close').closest('button')
       expect(closeButton).toBeInTheDocument()
@@ -190,7 +155,7 @@ describe('Footer', () => {
           isUnpublishedNewPace={true}
           anyActiveRequests={true}
           isSyncing={true}
-        />
+        />,
       )
       const closeButton = getByText('Close').closest('button')
       expect(closeButton).toBeInTheDocument()
@@ -204,7 +169,7 @@ describe('Footer', () => {
 
     it('includes the correct components for an existing, unchanged pace', () => {
       const {getByText} = renderConnected(
-        <Footer {...defaultProps} sectionPace={true} unpublishedChanges={false} />
+        <Footer {...defaultProps} sectionPace={true} unpublishedChanges={false} />,
       )
       const closeButton = getByText('Close').closest('button')
       expect(closeButton).toBeInTheDocument()
@@ -215,7 +180,7 @@ describe('Footer', () => {
       const removeButton = getByText('Remove Pace').closest('button')
       expect(removeButton).toBeInTheDocument()
       expect(removeButton).toBeEnabled()
-      expect(getByText('No pending changes to apply')).toBeInTheDocument()
+      expect(getByText('No pending changes')).toBeInTheDocument()
     })
 
     it('includes the correct components for an existing, changed pace', () => {
@@ -239,7 +204,7 @@ describe('Footer', () => {
           isSyncing={true}
           pacePublishing={true}
           anyActiveRequests={true}
-        />
+        />,
       )
       const closeButton = getByText('Close').closest('button')
       expect(closeButton).toBeInTheDocument()
@@ -261,7 +226,7 @@ describe('Footer', () => {
           isSyncing={true}
           pacePublishing={true}
           anyActiveRequests={false}
-        />
+        />,
       )
       const closeButton = getByText('Close').closest('button')
       expect(closeButton).toBeInTheDocument()
@@ -283,13 +248,13 @@ describe('Footer', () => {
 
       it('does not render a button for existing course pace types', () => {
         const {getByText, queryByText} = renderConnected(<Footer {...defaultProps} />)
-        expect(getByText('No pending changes to apply')).toBeInTheDocument()
+        expect(getByText('No pending changes')).toBeInTheDocument()
         expect(queryByText('Remove Pace', {selector: 'button span'})).not.toBeInTheDocument()
       })
 
       it('does not render a button for new section paces', () => {
         const {getByText, queryByText} = renderConnected(
-          <Footer {...defaultProps} sectionPace={true} newPace={true} />
+          <Footer {...defaultProps} sectionPace={true} newPace={true} />,
         )
         expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
         expect(queryByText('Remove Pace', {selector: 'button span'})).not.toBeInTheDocument()
@@ -302,14 +267,14 @@ describe('Footer', () => {
         expect(getByText('Remove this Section Pace?')).toBeInTheDocument()
         expect(
           getByText(
-            'Cool Class Pace will be removed. This pace will revert back to the default pace.'
-          )
+            'Cool Class Pace will be removed. This pace will revert back to the default pace.',
+          ),
         ).toBeInTheDocument()
       })
 
       it('closes modal when close button is clicked', () => {
         const {getByText, getAllByText} = renderConnected(
-          <Footer {...defaultProps} sectionPace={true} />
+          <Footer {...defaultProps} sectionPace={true} />,
         )
         const removeButton = getByText('Remove Pace', {selector: 'button span'})
         act(() => removeButton.click())

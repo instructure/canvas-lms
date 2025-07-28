@@ -18,10 +18,8 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import ChildContent from '../ChildContent'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
-import sinon from 'sinon'
 
 describe('ChildContent app', () => {
   const defaultProps = () => ({
@@ -35,45 +33,48 @@ describe('ChildContent app', () => {
   })
 
   test('renders the ChildContent component', () => {
-    const tree = shallow(<ChildContent {...defaultProps()} />)
-    const node = tree.find('.bcc__wrapper')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<ChildContent {...defaultProps()} />)
+    const node = container.querySelector('.bcc__wrapper')
+    expect(node).toBeInTheDocument()
   })
 
   test('clearRoutes removes blueprint path', () => {
     const props = defaultProps()
-    props.routeTo = sinon.spy()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    props.routeTo = jest.fn()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.clearRoutes()
-    expect(props.routeTo.getCall(0).args[0]).toEqual('#!/blueprint')
+    expect(props.routeTo).toHaveBeenCalledWith('#!/blueprint')
   })
 
   test('showChangeLog calls selectChangeLog prop with argument', () => {
     const props = defaultProps()
-    props.selectChangeLog = sinon.spy()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    props.selectChangeLog = jest.fn()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.showChangeLog('5')
-    expect(props.selectChangeLog.getCall(0).args[0]).toEqual('5')
+    expect(props.selectChangeLog).toHaveBeenCalledWith('5')
   })
 
   test('hideChangeLog calls selectChangeLog prop with null', () => {
     const props = defaultProps()
-    props.selectChangeLog = sinon.spy()
-    const tree = shallow(<ChildContent {...props} />)
-    const instance = tree.instance()
+    props.selectChangeLog = jest.fn()
+    const ref = React.createRef()
+    render(<ChildContent {...props} ref={ref} />)
+    const instance = ref.current
     instance.hideChangeLog()
-    expect(props.selectChangeLog.getCall(0).args[0]).toEqual(null)
+    expect(props.selectChangeLog).toHaveBeenCalledWith(null)
   })
 
   test('realRef gets called with component instance on mount', () => {
     const props = defaultProps()
-    props.realRef = sinon.spy()
+    props.realRef = jest.fn()
     const ref = React.createRef()
     const tree = render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
-    expect(props.realRef.callCount).toEqual(1)
-    expect(props.realRef.getCall(0).args[0]).toEqual(instance)
+    expect(props.realRef).toHaveBeenCalledTimes(1)
+    expect(props.realRef).toHaveBeenCalledWith(instance)
   })
 })

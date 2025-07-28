@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import moment from 'moment'
 import natcompare from '@canvas/util/natcompare'
@@ -37,10 +37,10 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '../../fcMomentHandlebarsHelpers'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   initialize(selector, event, contextChangeCB, closeCB) {
@@ -77,7 +77,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       this.$el.attr('method', 'PUT')
       return this.$el.attr(
         'action',
-        replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id)
+        replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id),
       )
     }
   }
@@ -105,8 +105,8 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
   enableDateField() {
     if (this.event.endDate) {
-      this.$el.find('#assignment_due_at').val(this.event.endDate().format('ddd ll'))
-      this.$el.find('#assignment_override_due_at').val(this.event.endDate().format('ddd ll'))
+      this.$el.find('#assignment_due_at').val(this.event.endDate()?.format('ddd ll'))
+      this.$el.find('#assignment_override_due_at').val(this.event.endDate()?.format('ddd ll'))
     }
     this.$el.find('#assignment_due_at').prop('disabled', false)
     this.$el.find('#assignment_override_due_at').prop('disabled', false)
@@ -168,10 +168,17 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     this.$el.find('#important_dates').toggle(this.currentContextInfo.k5_course)
     // Set default due time if a value is set
     if (this.currentContextInfo.default_due_time) {
+      const assignmentDueDate = moment(this?.event?.assignment?.due_at)
       const currentDate = moment(this.$el.find('#assignment_due_at').val())
       const [hour, minute, second] = this.currentContextInfo.default_due_time.split(':')
       currentDate.set({hour, minute, second})
-      if (currentDate.isValid()) {
+
+      if (!this.event.isNewEvent() && assignmentDueDate.isValid()) {
+        this.$el
+          .find('#assignment_due_at')
+          .val(tz.format(fcUtil.unwrap(assignmentDueDate), 'date.formats.full_with_weekday'))
+          .change()
+      } else if (currentDate.isValid()) {
         this.$el
           .find('#assignment_due_at')
           .val(tz.format(fcUtil.unwrap(currentDate), 'date.formats.full_with_weekday'))
@@ -311,7 +318,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       dueDate = moment(this.event.start)
       if (!withinMomentDates(dueDate, startDate, endDate)) {
         const rangeErrorMessage = I18n.t(
-          'Assignment has a locked date. Due date cannot be set outside of locked date range.'
+          'Assignment has a locked date. Due date cannot be set outside of locked date range.',
         )
         errors.lock_range = [{message: rangeErrorMessage}]
         showFlashAlert({

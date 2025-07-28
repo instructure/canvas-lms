@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createClient, gql} from '@canvas/apollo'
+import {createClient, gql} from '@canvas/apollo-v3'
 
 export const SET_ASSIGNMENT_POST_POLICY_MUTATION = gql`
   mutation SetAssignmentPostPolicy($assignmentId: ID!, $postManually: Boolean!) {
@@ -33,22 +32,26 @@ export const SET_ASSIGNMENT_POST_POLICY_MUTATION = gql`
   }
 `
 
+// @ts-expect-error
 export function setAssignmentPostPolicy({assignmentId, postManually}) {
-  return createClient()
-    .mutate({
-      mutation: SET_ASSIGNMENT_POST_POLICY_MUTATION,
-      variables: {assignmentId, postManually},
-    })
-    .then(response => {
-      const queryResponse = response && response.data && response.data.setAssignmentPostPolicy
-      if (queryResponse) {
-        if (queryResponse.postPolicy) {
-          return {postManually: queryResponse.postPolicy.postManually}
-        } else if (queryResponse.errors && queryResponse.errors.length > 0) {
-          throw new Error(queryResponse.errors[0].message)
+  return (
+    createClient()
+      .mutate({
+        mutation: SET_ASSIGNMENT_POST_POLICY_MUTATION,
+        variables: {assignmentId, postManually},
+      })
+      // @ts-expect-error
+      .then(response => {
+        const queryResponse = response && response.data && response.data.setAssignmentPostPolicy
+        if (queryResponse) {
+          if (queryResponse.postPolicy) {
+            return {postManually: queryResponse.postPolicy.postManually}
+          } else if (queryResponse.errors && queryResponse.errors.length > 0) {
+            throw new Error(queryResponse.errors[0].message)
+          }
         }
-      }
 
-      throw new Error('no postPolicy or error provided in response')
-    })
+        throw new Error('no postPolicy or error provided in response')
+      })
+  )
 }

@@ -27,9 +27,10 @@ describe "Importing Rubrics" do
     it "imports from #{system}" do
       data = get_import_data(system, "rubric")
       context = get_import_context(system)
+      assignment = Assignment.create!(course: @course)
       migration = double
-      allow(migration).to receive(:context).and_return(context)
       allow(migration).to receive(:add_imported_item)
+      allow(migration).to receive_messages(context:, migration_settings: {})
 
       data[:rubrics_to_import] = {}
       expect(Importers::RubricImporter.import_from_migration(data, migration)).to be_nil
@@ -40,6 +41,9 @@ describe "Importing Rubrics" do
       Importers::RubricImporter.import_from_migration(data, migration)
       expect(context.rubrics.count).to eq 1
       r = Rubric.where(migration_id: data[:migration_id]).first
+
+      assignment.reload
+      expect(assignment.rubric_association).to be_nil
 
       expect(r.title).to eq data[:title]
       expect(r.description).to include(data[:description]) if data[:description]
@@ -53,6 +57,68 @@ describe "Importing Rubrics" do
         id = crit[:migration_id] || crit[:id]
         expect(crit_ids.member?(id)).to be_truthy
       end
+    end
+
+    context "when rubric has an assessment" do
+      let(:migration_id) { "g74ae39cd0bf07b03d73506c457f437b0" }
+
+      before do
+        course_with_teacher(active_all: true)
+        course_with_student(active_all: true, course: @course)
+        @context = @course
+        @assignment = @context.assignments.create!(
+          title: "some assignment",
+          workflow_state: "published"
+        )
+
+        submission_model assignment: @assignment, user: @student
+        @viewing_user = @teacher
+        @assessed_user = @student
+        rubric_association_model association_object: @assignment, purpose: "grading"
+        @rubric.update(migration_id:)
+        [@teacher, @student].each do |user|
+          @rubric_association.rubric_assessments.create!({
+                                                           artifact: @submission,
+                                                           assessment_type: "grading",
+                                                           assessor: user,
+                                                           rubric: @rubric,
+                                                           user: @assessed_user
+                                                         })
+        end
+      end
+
+      it "doesn't import from #{system}" do
+        data = get_import_data(system, "rubric")
+
+        migration = double
+        allow(migration).to receive(:add_imported_item)
+        allow(migration).to receive_messages(context: @context, migration_settings: {})
+        expect(migration).to receive(:add_import_warning).once
+
+        data[:rubrics_to_import] = { "#{migration_id}": true }
+        data[:migration_id] = migration_id
+        Importers::RubricImporter.import_from_migration(data, migration)
+      end
+    end
+
+    it "imports from #{system} with associated assignment" do
+      data = get_import_data(system, "rubric")
+      context = get_import_context(system)
+      assignment = Assignment.create!(course: @course)
+      migration = double
+      allow(migration).to receive(:add_imported_item)
+      allow(migration).to receive_messages(context:, migration_settings: { associate_with_assignment_id: assignment.id })
+
+      data[:rubrics_to_import] = {}
+      data[:rubrics_to_import][data[:migration_id]] = true
+      Importers::RubricImporter.import_from_migration(data, migration)
+      Importers::RubricImporter.import_from_migration(data, migration)
+      expect(context.rubrics.count).to eq 1
+      r = Rubric.where(migration_id: data[:migration_id]).first
+
+      assignment.reload
+      expect(assignment.rubric_association.purpose).to eq "grading"
+      expect(assignment.rubric_association.rubric_id).to eq r.id
     end
   end
 

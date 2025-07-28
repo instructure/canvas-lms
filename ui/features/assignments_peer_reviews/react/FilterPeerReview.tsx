@@ -16,11 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
-import {TextInput} from '@instructure/ui-text-input'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Flex} from '@instructure/ui-flex'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {TextInput} from '@instructure/ui-text-input'
+import React, {useState, useEffect} from 'react'
+
+const I18n = createI18nScope('assignments_2')
 
 export default () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -48,7 +52,7 @@ export default () => {
 
     const peerReviewUrl = `${window.location.origin}/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/peer_reviews`
     const fullUrl = `${peerReviewUrl}?${queryParams.toString()}`
-    window.location.href = fullUrl
+    assignLocation(fullUrl)
   }
 
   const onFilterChange = (e: React.SyntheticEvent, data: {value?: string | number | undefined}) => {
@@ -70,7 +74,7 @@ export default () => {
             renderLabel=""
             type="text"
             value={searchTerm}
-            placeholder="Search"
+            placeholder={I18n.t('Search')}
             onChange={onSearchChange}
           />
         </Flex.Item>
@@ -82,19 +86,19 @@ export default () => {
             onChange={onFilterChange}
           >
             <SimpleSelect.Option id="all" value="all">
-              All
+              {I18n.t('All')}
             </SimpleSelect.Option>
             <SimpleSelect.Option id="reviewer" value="reviewer">
-              Search by Reviewer
+              {I18n.t('Search by Reviewer')}
             </SimpleSelect.Option>
             <SimpleSelect.Option id="student" value="student">
-              Search by Peer Review
+              {I18n.t('Search by Peer Review')}
             </SimpleSelect.Option>
           </SimpleSelect>
         </Flex.Item>
         <Flex.Item>
           <Button data-testid="peer-review-submit" onClick={submitChange} color="primary">
-            Submit
+            {I18n.t('Submit')}
           </Button>
         </Flex.Item>
       </Flex>

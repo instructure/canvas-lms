@@ -99,7 +99,7 @@ module Gradebook
         button = grading_cell_menu_button(student, assignment, menu_selector:)
         button.click
 
-        grade_item = ff("ul[aria-labelledby='#{button.attribute("id")}'] li").detect do |element|
+        grade_item = ff("div[aria-labelledby='#{button.attribute("id")}'] [class*=menuItem__label]").detect do |element|
           element.text.chomp == grade # find exact grade match "B+" != "B"
         end
         grade_item.click

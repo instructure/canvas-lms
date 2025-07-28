@@ -77,7 +77,7 @@ DateShiftView.prototype.afterRender = function () {
       return function () {
         return _this.$el.find('#addDaySubstitution').focus()
       }
-    })(this)
+    })(this),
   )
   return this.toggleContent()
 }
@@ -111,14 +111,18 @@ DateShiftView.prototype.createDaySubView = function (event) {
   this.collection.add(new DaySubModel())
   let ref
   // Focus on the last date substitution added
-  // eslint-disable-next-line no-void
+
   const $lastDaySubView = (ref = this.collection.last()) != null ? ref.view.$el : void 0
   return $lastDaySubView.find('select').first().focus()
 }
 
 DateShiftView.prototype.updateNewDates = function (course) {
-  this.$oldStartDate.val(course.start_at).trigger('change')
-  return this.$oldEndDate.val(course.end_at).trigger('change')
+  // Prefer locale date, fallback if unavailable
+  const startDate = course.start_at_locale || course.start_at;
+  const endDate = course.end_at_locale || course.end_at;
+
+  this.$oldStartDate.val(startDate).trigger('change')
+  return this.$oldEndDate.val(endDate).trigger('change')
 }
 
 export default DateShiftView

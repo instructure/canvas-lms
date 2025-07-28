@@ -17,24 +17,37 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {escapeNewLineText} from './utils/rubricUtils'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 type CriteriaReadonlyCommentProps = {
   commentText?: string
 }
 export const CriteriaReadonlyComment = ({commentText}: CriteriaReadonlyCommentProps) => {
+  if (!commentText) return null
+
   return (
-    <View as="div" margin="0">
-      {commentText && (
-        <View as="div" margin="0">
-          <Text weight="bold">{I18n.t('Comment')}</Text>
-        </View>
-      )}
-      <Text data-testid="comment-preview-text-area">{commentText}</Text>
-    </View>
+    <Flex
+      as="div"
+      margin="0"
+      direction="column"
+      gap="xx-small"
+      role="region"
+      aria-label={I18n.t('Assessment Comment')}
+    >
+      <Text weight="bold" id="comment-label">
+        {I18n.t('Comment')}
+      </Text>
+      <Text
+        data-testid="comment-preview-text-area"
+        themeOverride={{paragraphMargin: 0}}
+        dangerouslySetInnerHTML={escapeNewLineText(commentText)}
+        aria-labelledby="comment-label"
+      />
+    </Flex>
   )
 }

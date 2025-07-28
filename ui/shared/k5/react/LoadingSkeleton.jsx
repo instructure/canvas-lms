@@ -30,7 +30,7 @@ export default function LoadingSkeleton({screenReaderLabel, width, height, margi
           width: '100%',
           height: '100%',
           borderRadius: '0.25rem',
-          background: 'linear-gradient(-90deg, #F5F5F5 5%, #E6E6E6 25%, #F5F5F5 40%)',
+          background: 'linear-gradient(-90deg, #F2F4F4 5%, #E6E6E6 25%, #F2F4F4 40%)',
           backgroundSize: '500% 100%',
           animation: 'shimmer 2s ease-in infinite', // shimmer defined in k5_dashboard.scss
         }}

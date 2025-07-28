@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -23,7 +22,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import classnames from 'classnames'
 import TimeLateInput from '@canvas/grading/TimeLateInput'
 
-function styles({color, showNumberInput}) {
+function styles({color, showNumberInput}: {color?: string; showNumberInput: boolean}) {
   return {
     backgroundColor: color,
     height: showNumberInput ? '5rem' : '2rem',
@@ -39,13 +38,13 @@ type Props = {
   value: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   latePolicy: {
-    lateSubmissionInterval: string
+    lateSubmissionInterval: 'day' | 'hour'
   }
   submission: {
     id: string
     secondsLate: number
   }
-  updateSubmission: (submission: {secondsLate: number}) => void
+  updateSubmission: (submission: {secondsLateOverride: number}) => void
 }
 
 export default class SubmissionTrayRadioInput extends React.Component<Props> {
@@ -55,7 +54,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     color: 'transparent',
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.radioInputClasses = classnames('SubmissionTray__RadioInput', {
@@ -63,7 +62,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     })
   }
 
-  handleRadioInputChange = event => {
+  handleRadioInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.props.onChange(event)
   }
 

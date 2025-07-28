@@ -1,0 +1,14 @@
+<% define_content :link do %>
+  <% if user&.account&.primary_domain&.host %>
+    <%= url_for({ controller: :profile, action: :settings, host: user.account.primary_domain.host }) %>
+  <% else %>
+    <%= settings_profile_url %>
+  <% end %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t "Access Token Deleted" %>
+<% end %>
+
+<%= t "A Canvas security token was just deleted for your account by you or an account admin. You can view and interact with any remaining tokens here:" %>
+<%= content :link %>

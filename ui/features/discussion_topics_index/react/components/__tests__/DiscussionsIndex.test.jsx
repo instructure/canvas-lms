@@ -50,6 +50,7 @@ describe('DiscussionIndex', () => {
     DIRECT_SHARE_ENABLED: false,
     pinnedDiscussions: [],
     pinnedDiscussionIds: [],
+    breakpoints: {mobileOnly: false},
   }
 
   const initialState = {
@@ -64,16 +65,6 @@ describe('DiscussionIndex', () => {
     },
   }
 
-  const oldEnv = window.ENV
-
-  beforeEach(() => {
-    window.ENV.FEATURES.differentiated_modules = true
-  })
-
-  afterEach(() => {
-    window.ENV = oldEnv
-  })
-
   function mockStore(initialState) {
     return applyMiddleware(thunk)(createStore)(rootReducer, initialState)
   }
@@ -83,7 +74,7 @@ describe('DiscussionIndex', () => {
     return render(
       <Provider store={mockStore(storeState)}>
         <DiscussionsIndex {...props} />
-      </Provider>
+      </Provider>,
     )
   }
 
@@ -131,13 +122,13 @@ describe('DiscussionIndex', () => {
       ],
     }
     renderConnectedComponent(overrideProps)
-    expect(screen.getAllByTestId('discussion-connected-container').length).toBe(3)
+    expect(screen.getAllByTestId('discussion-connected-container')).toHaveLength(3)
   })
 
   it('does not render pinned discussions in studentView if there are no pinned discussions', () => {
     const overrideProps = {closedForCommentsDiscussions: []}
     renderConnectedComponent(overrideProps)
-    expect(screen.getAllByTestId('discussion-connected-container').length).toBe(2)
+    expect(screen.getAllByTestId('discussion-connected-container')).toHaveLength(2)
   })
 
   it('does not render droppable container when student', () => {
@@ -152,6 +143,6 @@ describe('DiscussionIndex', () => {
     }
 
     renderConnectedComponent(overrideProps)
-    expect(screen.getAllByTestId('discussion-droppable-connected-container').length).toBe(3)
+    expect(screen.getAllByTestId('discussion-droppable-connected-container')).toHaveLength(3)
   })
 })

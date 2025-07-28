@@ -152,87 +152,36 @@ describe "Excuse an Assignment" do
       expect(f("#combo_box_container .ui-selectmenu-item-icon i")).to have_class "icon-check"
       expect(f("#combo_box_container .ui-selectmenu-item-header").text).to eq "Student"
     end
+
+    it "excuses a checkpointed discussion correctly", :ignore_js_errors do
+      user_session(@teacher)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      reply_to_topic, reply_to_entry, dt = graded_discussion_topic_with_checkpoints(context: @course)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{dt.assignment.id}&student_id=#{@student.id}"
+
+      expect(reply_to_topic.submissions.find_by(user: @student).excused).to be_nil
+      expect(reply_to_entry.submissions.find_by(user: @student).excused).to be_nil
+
+      reply_to_topic_select = f("[data-testid='reply_to_topic-checkpoint-status-select']")
+      reply_to_topic_select.click
+      fj("span[role='option']:contains('Excused')").click
+
+      reply_to_entry_select = f("[data-testid='reply_to_entry-checkpoint-status-select']")
+      reply_to_entry_select.click
+      fj("span[role='option']:contains('Excused')").click
+
+      expect(reply_to_topic.submissions.find_by(user: @student).excused).to be true
+      expect(reply_to_entry.submissions.find_by(user: @student).excused).to be true
+
+      driver.navigate.refresh
+
+      expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Excused")
+      expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Excused")
+    end
   end
 
   shared_examples "Basic Behavior" do |view|
-    context "Group Assignments", :group do
-      it "preserves assignment excused status", priority: "1" do
-        course_with_teacher_logged_in
-        group_test_setup 4, 1, 1
-
-        @students.each { |student| @testgroup[0].add_user student }
-        @testgroup[0].save!
-
-        assignment = @course.assignments.create!(
-          title: "Group Assignment",
-          group_category_id: @group_category[0].id,
-          grade_group_students_individually: false,
-          points_possible: 20
-        )
-
-        assignment.grade_student @students[1], excuse: true, grader: @teacher
-        assignment.grade_student @students[0], grade: 15, grader: @teacher
-
-        score_values = []
-
-        if view == "srgb"
-          get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-          click_option f("#assignment_select"), assignment.title
-          next_student = f(".student_navigation button.next_object")
-          4.times do
-            next_student.click
-            wait_for_ajaximations
-            score_values << f("#student_and_assignment_grade").attribute("value")
-          end
-        else
-          get "/courses/#{@course.id}/gradebook/"
-          wait_for_ajaximations
-          score_values = ff(".canvas_1 .slick-row .slick-cell:first-child").map(& :text)
-        end
-        expect(score_values).to eq %w[15 Excused 15 15]
-      end
-
-      it "excuses assignments on individual basis", priority: "1" do
-        course_with_teacher_logged_in
-        group_test_setup 2, 1, 1
-
-        @students.each { |student| @testgroup[0].add_user student }
-        @testgroup[0].save!
-
-        a1 = @course.assignments.create!(
-          title: "Group Assignment",
-          group_category_id: @group_category[0].id,
-          grade_group_students_individually: false,
-          points_possible: 10
-        )
-        a2 = @course.assignments.create! title: "Assignment", points_possible: 20
-
-        @students.each do |student|
-          a1.grade_student student, grade: 5, grader: @teacher
-          a2.grade_student student, grade: 20, grader: @teacher
-        end
-
-        a1.grade_student @students[1], excuse: true, grader: @teacher
-
-        totals = []
-        if view == "srgb"
-          get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
-          next_student = f(".student_navigation button.next_object")
-          2.times do
-            next_student.click
-            wait_for_ajaximations
-            totals << f("span.total-grade").text[/\d+(\.\d+)?%/]
-          end
-        else
-          get "/courses/#{@course.id}/gradebook/"
-          wait_for_ajaximations
-          totals = ff(".canvas_1 .slick-row .slick-cell:last-child").map(& :text)
-        end
-
-        expect(totals).to eq(["83.33%", "100%"]).or eq ["83.3%", "100%"]
-      end
-    end
-
     it "formats excused grade like dropped assignment", priority: "1" do
       assignment = @course.assignments.create! title: "Excuse Me", points_possible: 20
 

@@ -24,6 +24,6 @@ test('parses from payload.quiz_statistics', function () {
 
   subject.add(fixture, {parse: true})
 
-  expect(subject.length).toEqual(1)
+  expect(subject).toHaveLength(1)
   expect(subject.first().get('id')).toEqual('267')
 })

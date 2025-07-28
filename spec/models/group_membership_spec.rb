@@ -57,7 +57,7 @@ describe GroupMembership do
     group.group_memberships.create!(user: user_model, workflow_state: "accepted")
     group.group_memberships.create!(user: user_model, workflow_state: "accepted")
     # expect
-    membership = group.group_memberships.build(user: user_model, workflow_state: "accepted")
+    membership = group.reload.group_memberships.build(user: user_model, workflow_state: "accepted")
     expect(membership).not_to be_valid
     expect(membership.errors[:group_id]).to eq ["The group is full."]
   end
@@ -316,6 +316,57 @@ describe GroupMembership do
       community_group.add_user(@teacher, "accepted", false)
       expect(GroupMembership.where(group_id: community_group.id, user_id: @teacher.id).first.grants_right?(@admin, :delete)).to be_truthy
     end
+
+    it "does not allow students in group to have any membership permissions" do
+      student_in_course(active_all: true)
+      @category = @course.group_categories.build(name: "category 1", non_collaborative: true)
+      @category.save!
+      @group = @category.groups.create!(context: @course)
+      @membership = @group.add_user(@student)
+
+      expect(@membership.grants_right?(@student, :read)).to be_falsey
+      expect(@membership.grants_right?(@student, :delete)).to be_falsey
+      expect(@membership.grants_right?(@student, :update)).to be_falsey
+      expect(@membership.grants_right?(@student, :create)).to be_falsey
+      expect(@membership.check_policy(@student)).to be_empty
+
+      expect(@membership.user_id).to eq @student.id
+    end
+
+    it "does not allow ta without permissions to add to a tag" do
+      Account.default.enable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
+      teacher_in_course(active_all: true)
+      student_in_course(active_all: true)
+      ta_in_course(active_all: true)
+      @category = @course.group_categories.build(name: "category 1", non_collaborative: true)
+      @category.save!
+
+      @group = @category.groups.create!(context: @course)
+      @membership = @group.add_user(@student)
+
+      # By default TAs don't have Dif tag permissions
+      expect(@membership.grants_right?(@ta, :read)).to be_falsey
+      expect(@membership.grants_right?(@ta, :delete)).to be_falsey
+      expect(@membership.grants_right?(@ta, :update)).to be_falsey
+      expect(@membership.grants_right?(@ta, :create)).to be_falsey
+      expect(@membership.check_policy(@ta)).to be_empty
+
+      # Students shouldn't have these permissions for dif tags
+      expect(@membership.grants_right?(@student, :read)).to be_falsey
+      expect(@membership.grants_right?(@student, :delete)).to be_falsey
+      expect(@membership.grants_right?(@student, :update)).to be_falsey
+      expect(@membership.grants_right?(@student, :create)).to be_falsey
+      expect(@membership.check_policy(@student)).to be_empty
+
+      # Teachers have these permissions by default
+      expect(@membership.grants_right?(@teacher, :read)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :delete)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :update)).to be_truthy
+      expect(@membership.grants_right?(@teacher, :create)).to be_truthy
+    end
   end
 
   it "updates group leadership as membership changes" do
@@ -379,6 +430,51 @@ describe GroupMembership do
       expect(SubmissionLifecycleManager).not_to receive(:recompute_course)
       @group = Account.default.groups.create!(name: "Group!")
       @group.group_memberships.create!(user: user_factory)
+    end
+
+    context "non-collaborative group" do
+      before do
+        account = @course.account
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+        student1 = user_factory
+        diff_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag = @course.groups.create!(name: "Diff Tag 1", group_category: diff_tag_category, non_collaborative: true)
+        @dt_membership = @diff_tag.group_memberships.create(user: student1)
+
+        @da = assignment_model(course: @course)
+        diff_tag_override = assignment_override_model(assignment: @da)
+        diff_tag_override.set_type = "Group"
+        diff_tag_override.set_id = @diff_tag.id
+        diff_tag_override.save!
+        @da.update!(only_visible_to_overrides: true)
+      end
+
+      it "triggers a batch when membership is created" do
+        new_user = user_factory
+
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+          new_user.id,
+          @course.id,
+          match_array([@da.id])
+        )
+
+        @diff_tag.group_memberships.create(user: new_user)
+      end
+
+      it "triggers a batch when membership is deleted" do
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+          @dt_membership.user.id,
+          @course.id,
+          match_array([@da.id])
+        )
+        @dt_membership.destroy
+      end
     end
   end
 

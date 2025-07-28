@@ -118,14 +118,14 @@ export default class Animation {
   acceptedAction(actionType) {
     if (!this.isExpectedAction(actionType)) {
       throw new Error(
-        `ERROR: ${this.constructor.name} tried to access unexpected action '${actionType}'`
+        `ERROR: ${this.constructor.name} tried to access unexpected action '${actionType}'`,
       )
     }
 
     const action = this.acceptedActions[actionType]
     if (!action) {
       throw new Error(
-        `ERROR: ${this.constructor.name} tried to retrieve action '${actionType}' before it was accepted`
+        `ERROR: ${this.constructor.name} tried to retrieve action '${actionType}' before it was accepted`,
       )
     }
 

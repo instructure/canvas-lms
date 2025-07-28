@@ -28,7 +28,7 @@ export function isDefaultSortOrder(sortOrder: string) {
 export function localeSort(
   a: null | string,
   b: null | string,
-  {asc = true, nullsLast = false} = {}
+  {asc = true, nullsLast = false} = {},
 ): number {
   if (nullsLast) {
     if (a != null && b == null) {
@@ -46,7 +46,7 @@ export function localeSort(
 
 export function wrapColumnSortFn(
   wrappedFn: (a: GridColumn, b: GridColumn) => number,
-  direction = 'ascending'
+  direction = 'ascending',
 ) {
   return function (a: GridColumn, b: GridColumn): number {
     if (b.type === 'total_grade_override') {
@@ -79,14 +79,14 @@ export function wrapColumnSortFn(
 
 export function compareAssignmentPointsPossible(
   a: Pick<GridColumn, 'object'>,
-  b: Pick<GridColumn, 'object'>
+  b: Pick<GridColumn, 'object'>,
 ): number {
   return (a.object?.points_possible || 0) - (b.object?.points_possible || 0)
 }
 
 export function compareAssignmentPositions(
   a: Pick<GridColumn, 'object'>,
-  b: Pick<GridColumn, 'object'>
+  b: Pick<GridColumn, 'object'>,
 ): number {
   const diffOfAssignmentGroupPosition =
     (a.object?.assignment_group?.position || 0) - (b.object?.assignment_group?.position || 0)
@@ -105,7 +105,7 @@ export function idSort(a: {id: string}, b: {id: string}, ascending = true): numb
 export function secondaryAndTertiarySort(
   a: Pick<Student, 'id' | 'sortable_name'>,
   b: Pick<Student, 'id' | 'sortable_name'>,
-  {asc = true}
+  {asc = true},
 ) {
   let result
   result = localeSort(a.sortable_name || '', b.sortable_name || '', {asc})

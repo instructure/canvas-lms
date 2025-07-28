@@ -209,4 +209,46 @@ describe "permissions index" do
       expect { PermissionsIndex.permissions_tray_viewable_permissions.count }.to become > 3
     end
   end
+
+  context "differentiation tags permission", :ignore_js_errors do
+    before do
+      @permission_name = "Manage Differentiation Tags"
+    end
+
+    it "shows when differentiation tags setting is enabled" do
+      Account.default.enable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiation_tags']")).to be_truthy
+      expect(PermissionsIndex.permission_link("manage_differentiation_tags")).to be_displayed
+    end
+
+    it "does not show when differentiation tags setting is disabled" do
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: false, locked: true }
+      Account.default.save!
+      Account.default.reload
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiation_tags']")).to be_falsey
+    end
+
+    it "does not show when differentiation tags FF is disabled" do
+      Account.default.disable_feature! :assign_to_differentiation_tags
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
+
+      user_session(@admin)
+      PermissionsIndex.visit(@account)
+      PermissionsIndex.enter_search(@permission_name)
+      expect(element_exists?("[data-testid='expand_manage_differentiation_tags']")).to be_falsey
+    end
+  end
 end

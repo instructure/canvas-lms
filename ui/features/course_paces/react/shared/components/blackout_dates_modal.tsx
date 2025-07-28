@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,12 +23,12 @@ import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {BlackoutDate} from '../types'
+import type {BlackoutDate} from '../types'
 import BlackoutDates from './blackout_dates'
 
-const I18n = useI18nScope('course_paces_blackout_dates_modal')
+const I18n = createI18nScope('course_paces_blackout_dates_modal')
 
 interface PassedProps {
   readonly open: boolean

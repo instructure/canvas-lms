@@ -18,6 +18,7 @@
 
 import * as dom from './utils/dom'
 import rules from './rules'
+import { enhanceRules } from './utils/rule-enhancer'
 
 export default function checkNode(node, done, config = {}, additionalRules = []) {
   if (!node) {
@@ -26,9 +27,9 @@ export default function checkNode(node, done, config = {}, additionalRules = [])
   const errors = []
   const childNodeCheck = child => {
     if (child.hasAttribute('data-ignore-a11y-check')) return
-    const composedRules = rules.concat(additionalRules)
+    // Enhance all rules with TinyMCE notification functionality
+    const composedRules = enhanceRules(rules.concat(additionalRules))
     for (const rule of composedRules) {
-      // eslint-disable-next-line promise/catch-or-return
       Promise.resolve(rule.test(child, config)).then(result => {
         if (!result) {
           errors.push({node: child, rule})

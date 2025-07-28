@@ -91,13 +91,16 @@ module LtiOutbound
 
       hash["resource_link_id"] = link_code
       hash["resource_link_title"] = overrides["resource_link_title"] || tool.name
-      hash["user_id"] = user.opaque_identifier
       hash["text"] = CGI.escape(selected_html) if selected_html
 
       hash["roles"] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
       hash["ext_roles"] = "$Canvas.xuser.allRoles"
 
       hash["custom_canvas_enrollment_state"] = "$Canvas.enrollment.enrollmentState"
+
+      if !tool.anonymous? || !edu_apps_url?
+        hash["user_id"] = user.opaque_identifier
+      end
 
       if tool.include_name?
         hash["lis_person_name_given"] = user.first_name
@@ -194,6 +197,10 @@ module LtiOutbound
         hash["ext_content_file_extensions"] = "zip,imscc"
         hash["ext_content_return_url"] = return_url
       end
+    end
+
+    def edu_apps_url?
+      url.include? "edu-apps.org"
     end
   end
 end

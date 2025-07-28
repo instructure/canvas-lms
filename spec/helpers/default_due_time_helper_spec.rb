@@ -82,7 +82,7 @@ describe DefaultDueTimeHelper do
 
       it "retrieves correct account-subaccount inherited time" do
         @root.update settings: { default_due_time: { value: "22:00:00" } }
-        stuff = default_due_time_options(@subaccount)
+        stuff = default_due_time_options(@subaccount.reload)
         expect(stuff[0]).to eq(["Account default (10:00pm)", "inherit"])
       end
     end

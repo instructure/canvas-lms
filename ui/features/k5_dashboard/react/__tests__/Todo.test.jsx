@@ -141,8 +141,8 @@ describe('Todo', () => {
     const {queryByText} = render(<Todo {...defaultProps} assignment={undefined} />)
     expect(queryByText('Plant some plants')).not.toBeInTheDocument()
   })
-
-  it('displays a button that ignores the associated todo and removes it from the rendered list', async () => {
+  // Skip with LX-2092
+  it.skip('displays a button that ignores the associated todo and removes it from the rendered list', async () => {
     ignoreTodo.mockResolvedValue({ignored: true})
 
     const {getByRole, queryByText} = render(<Todo {...defaultProps} />)

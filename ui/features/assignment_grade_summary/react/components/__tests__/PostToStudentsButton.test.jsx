@@ -48,7 +48,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is disabled', () => {
@@ -68,12 +68,12 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is not read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly'),
       ).not.toBe('true')
     })
 
@@ -91,12 +91,12 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Posting to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Posting to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Posting to Students'})).toBeInTheDocument()
     })
 
     test('is read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Posting to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Posting to Students'}).getAttribute('aria-readonly'),
       ).toBe('true')
     })
 
@@ -114,14 +114,14 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Grades Posted to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Grades Posted to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Grades Posted to Students'})).toBeInTheDocument()
     })
 
     test('is read-only', () => {
       expect(
         screen
           .getByRole('button', {name: 'Grades Posted to Students'})
-          .getAttribute('aria-readonly')
+          .getAttribute('aria-readonly'),
       ).toBe('true')
     })
 
@@ -139,12 +139,12 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is not read-only', () => {
       expect(
-        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly')
+        screen.getByRole('button', {name: 'Post to Students'}).getAttribute('aria-readonly'),
       ).toBe('false')
     })
 

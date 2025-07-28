@@ -37,9 +37,10 @@ afterEach(() => {
 
 it('renders nothing if lockAt and unlockAt are null', async () => {
   const assignment = await mockAssignment()
+   
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('#fixtures')
   expect(element.text()).toEqual('')
@@ -47,9 +48,10 @@ it('renders nothing if lockAt and unlockAt are null', async () => {
 
 it('renders correctly if lockAt is set and and unlockAt is null', async () => {
   const assignment = await mockAssignment({Assignment: {lockAt: '2016-07-11T23:00:00-00:00'}})
+   
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('#fixtures')
 
@@ -61,9 +63,10 @@ it('renders correctly if lockAt is set and and unlockAt is null', async () => {
 
 it('renders correctly if unlockAt is set and and lockAt is null', async () => {
   const assignment = await mockAssignment({Assignment: {unlockAt: '2016-07-11T23:00:00-00:00'}})
+   
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('#fixtures')
 
@@ -77,9 +80,10 @@ it('renders correctly if unlockAt and lockAt are set', async () => {
   const assignment = await mockAssignment({
     Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
+   
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('#fixtures')
 
@@ -93,9 +97,10 @@ it('renders correctly if unlockAt and lockAt are set and rendered in short mode'
   const assignment = await mockAssignment({
     Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
+   
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} formatStyle="short" />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('#fixtures')
 

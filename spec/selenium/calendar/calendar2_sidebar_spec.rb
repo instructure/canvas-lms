@@ -73,7 +73,7 @@ describe "calendar2" do
       it "shows the event in the mini calendar", priority: "1" do
         # lock to a particular day (the 13th because why not)
         # otherwise it turns out this spec will break on almost every 31st
-        date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
+        date = Date.new(Time.zone.now.year, Time.zone.now.month, 13) - 1.month
         assignment_model(course: @course,
                          title: "ricochet",
                          due_at: date.to_time)
@@ -93,7 +93,7 @@ describe "calendar2" do
 
       describe "contexts list" do
         it "toggles event display when context is clicked" do
-          make_event context: @course, start: Time.now
+          make_event context: @course, start: Time.zone.now
           get "/calendar2"
 
           f(".context_list_context .context-list-toggle-box").click
@@ -121,8 +121,8 @@ describe "calendar2" do
           end
 
           create_courses 17, enroll_user: @user
-
-          get "/calendar2"
+          # Page takes an extra second or two to load, so we need to increase the timeout
+          with_timeouts({ script: 7 }) { get "/calendar2" }
           ff(".context_list_context").each(&:click)
           expect(ff(".context_list_context.checked").count).to eq 15
         end
@@ -134,9 +134,19 @@ describe "calendar2" do
           expect(f("#calendar_feed_box")).to be_displayed
         end
 
+        it "uses a proper button element for the calendar feed modal close button" do
+          get "/calendar2"
+
+          f("#calendar-feed button").click
+          close_button = fj(".ui-dialog-titlebar-close:visible")
+          expect(close_button.tag_name).to eq("button")
+          expect(close_button.attribute("type")).to eq("button")
+          expect(close_button.attribute("aria-label")).to eq("Close")
+        end
+
         it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
-          make_event(context: @course, start: Time.now, title:)
+          make_event(context: @course, start: Time.zone.now, title:)
           load_month_view
 
           # expect event to be on the calendar
@@ -173,6 +183,37 @@ describe "calendar2" do
           undated_events = ff("#undated-events > ul > li")
           expect(undated_events.size).to eq 1
           expect(undated_events.first.text).to eq "asdfjkasldfjklasdjfklasdjfklasjf..."
+        end
+
+        it "shouldn't show unpublished undated events for observer" do
+          course_with_observer_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          expect(f("#undated-events").text).to eq "No undated items."
+        end
+
+        it "shouldn't show unpublished undated events for student" do
+          course_with_student_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          expect(f("#undated-events").text).to eq "No undated items."
+        end
+
+        it "should show unpublished undated events for teacher" do
+          course_with_teacher_logged_in
+          @course.assignments.create!(title: "pizza party", workflow_state: "unpublished")
+          get "/calendar2"
+
+          f("#undated-events-button").click
+          wait_for_ajaximations
+          undated_events = ff("#undated-events > ul > li")
+          expect(undated_events.size).to eq 1
         end
       end
     end

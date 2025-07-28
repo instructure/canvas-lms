@@ -69,6 +69,25 @@ describe "teacher k5 course dashboard" do
 
       expect(driver.current_url).to match(/#schedule/)
     end
+
+    it "shows recent announcements when teacher is also a student", :ignore_js_errors do
+      create_course(
+        enroll_user: @homeroom_teacher,
+        enrollment_type: "StudentEnrollment",
+        account_associations: true
+      )
+
+      announcement_heading = "Do science stuff"
+      announcement = new_announcement(@homeroom_course, announcement_heading, "it is super fun!")
+      announcement.update!(posted_at: 14.days.ago)
+
+      get "/"
+      wait_for_ajaximations
+
+      keep_trying_for_attempt_times(attempts: 2, sleep_interval: 0.5) do
+        expect(announcement_title(announcement_heading)).to be_displayed
+      end
+    end
   end
 
   context "home tab" do
@@ -142,15 +161,6 @@ describe "teacher k5 course dashboard" do
       expect(assignment_edit_button).to be_displayed
     end
 
-    it "shows add module modal when +Module button is clicked" do
-      Account.site_admin.disable_feature! :differentiated_modules
-      get "/courses/#{@subject_course.id}#modules"
-
-      click_add_module_button
-
-      expect(add_module_modal).to be_displayed
-    end
-
     it "shows add module items modal when + button is clicked" do
       get "/courses/#{@subject_course.id}#modules"
 
@@ -169,7 +179,6 @@ describe "teacher k5 course dashboard" do
   context "course color selection" do
     it "allows for available color to be selected", :ignore_js_errors, custom_timeout: 30 do
       get "/courses/#{@subject_course.id}/settings"
-      visit_course_details_tab
 
       click_pink_color_button
 
@@ -182,7 +191,6 @@ describe "teacher k5 course dashboard" do
 
     it "allows for hex color to be input", :ignore_js_errors do
       get "/courses/#{@subject_course.id}/settings"
-      visit_course_details_tab
 
       new_color = "#07AB99"
       input_color_hex_value(new_color)

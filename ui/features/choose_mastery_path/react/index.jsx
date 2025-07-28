@@ -43,7 +43,7 @@ export default {
       <Provider store={store}>
         <ConnectedApp selectOption={boundActions.selectOption} />
       </Provider>,
-      root
+      root,
     )
   },
 }

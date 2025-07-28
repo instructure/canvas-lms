@@ -5,7 +5,7 @@
       "processor": "js"
     },
     {
-      "pattern": "**/*.{handlebars,hbs}",
+      "pattern": "**/*.handlebars",
       "processor": "hbs"
     }
   ]

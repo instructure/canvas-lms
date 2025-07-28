@@ -34,6 +34,10 @@ ready(() => {
         },
       }}
     />,
-    document.getElementById('react_grading_tabs')
+    document.getElementById('react_grading_tabs'),
   )
 })
+
+export function Component() {
+  return null
+}

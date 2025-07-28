@@ -30,13 +30,11 @@ ready(() => {
     navigator.serviceWorker
       .register('/inst-fs-sw.js')
       .then(() => {
-        // eslint-disable-next-line no-console
         console.log(
-          'Registration succeeded. Refresh page to proxy Inst-FS requests through ServiceWorker.'
+          'Registration succeeded. Refresh page to proxy Inst-FS requests through ServiceWorker.',
         )
       })
       .catch(function (err) {
-        // eslint-disable-next-line no-console
         console.log('Inst-FS ServiceWorker registration failed. :(', err)
       })
   }

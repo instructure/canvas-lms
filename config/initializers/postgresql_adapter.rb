@@ -31,11 +31,14 @@ module PostgreSQLAdapterExtensions
     @max_update_limit = DEFAULT_MAX_UPDATE_LIMIT
   end
 
+  def get_database_version # rubocop:disable Naming/AccessorMethodName -- original method name in Rails
+    with_raw_connection(materialize_transactions: false, &:server_version)
+  end
+
   def configure_connection
     super
 
-    conn = (Rails.version < "7.1") ? @connection : @raw_connection
-    conn.set_notice_receiver do |result|
+    @raw_connection.set_notice_receiver do |result|
       severity = result.result_error_field(PG::PG_DIAG_SEVERITY_NONLOCALIZED)
       rails_severity = case severity
                        when "WARNING", "NOTICE"
@@ -115,10 +118,6 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  def set_standard_conforming_strings
-    # not needed in PG 9.1+
-  end
-
   # we always use the default sequence name, so override it to not actually query the db
   # (also, it doesn't matter if you're using PG 8.2+)
   def default_sequence_name(table, pk)
@@ -191,16 +190,7 @@ module PostgreSQLAdapterExtensions
       if indkey.include?(0)
         columns = expressions
       else
-        columns = if $canvas_rails == "7.0"
-                    query(<<~SQL.squish, "SCHEMA").to_h.values_at(*indkey).compact
-                      SELECT a.attnum, a.attname
-                      FROM pg_attribute a
-                      WHERE a.attrelid = #{oid}
-                      AND a.attnum IN (#{indkey.join(",")})
-                    SQL
-                  else
-                    column_names_from_column_numbers(oid, indkey)
-                  end
+        columns = column_names_from_column_numbers(oid, indkey)
 
         # prevent INCLUDE columns from being matched
         columns.reject! { |c| include_columns.include?(c) }
@@ -259,10 +249,10 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def add_column(table_name, column_name, type, if_not_exists: false, **options)
+  def add_column(table_name, column_name, type, if_not_exists: false, **)
     return if if_not_exists && column_exists?(table_name, column_name)
 
-    super(table_name, column_name, type, **options)
+    super(table_name, column_name, type, **)
   end
 
   def remove_column(table_name, column_name, type = nil, if_exists: false, **options)
@@ -271,24 +261,25 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, **options)
-    super
+  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **)
+    force_opts = force ? { force: } : { if_not_exists: }
+    super(table_name, id:, primary_key:, **force_opts, **)
 
-    add_guard_excessive_updates(table_name)
+    add_guard_excessive_updates(table_name, force: if_not_exists)
   end
 
-  def add_guard_excessive_updates(table_name)
+  def add_guard_excessive_updates(table_name, force: false)
     # Don't try to install this on rails-internal tables; they need to be created for
     # internal_metadata to exist and this guard isn't really useful there either
     return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
     # If the function doesn't exist yet it will be backfilled
-    return unless ((Rails.version < "7.1") ? ::ActiveRecord::InternalMetadata : ::ActiveRecord::InternalMetadata.new(self))[:guard_dangerous_changes_installed]
+    return unless ::ActiveRecord::Base.internal_metadata[:guard_dangerous_changes_installed]
 
     ["UPDATE", "DELETE"].each do |operation|
       trigger_name = "guard_excessive_#{operation.downcase}s"
 
       execute(<<~SQL.squish)
-        CREATE TRIGGER #{trigger_name}
+        CREATE #{"OR REPLACE " if force}TRIGGER #{trigger_name}
           AFTER #{operation}
           ON #{quote_table_name(table_name)}
           REFERENCING OLD TABLE AS oldtbl
@@ -396,14 +387,14 @@ module PostgreSQLAdapterExtensions
   def execute(...)
     super
   rescue AbortExceptionMatcher
-    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
+    @raw_connection.cancel
     raise
   end
 
   def exec_query(...)
     super
   rescue AbortExceptionMatcher
-    (($canvas_rails == "7.1") ? @raw_connection : @connection).cancel
+    @raw_connection.cancel
     raise
   end
 
@@ -453,7 +444,7 @@ module SchemaCreationExtensions
   end
 
   def visit_ForeignKeyDefinition(o, constraint_type: :table)
-    sql = +"CONSTRAINT #{quote_column_name(o.name)}"
+    sql = "CONSTRAINT #{quote_column_name(o.name)}"
     sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
     sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete
@@ -510,12 +501,12 @@ end
 module SchemaStatementsExtensions
   # TODO: move this to activerecord-pg-extensions
   def valid_column_definition_options
-    super + [:delay_validation]
+    super + [:delay_validation, :foreign_key]
   end
 
-  def add_column_for_alter(table_name, column_name, type, **options)
+  def add_column_for_alter(table_name, column_name, type, **)
     td = create_table_definition(table_name)
-    cd = td.new_column_definition(column_name, type, **options)
+    cd = td.new_column_definition(column_name, type, **)
     schema = schema_creation
     schema.set_table_context(table_name)
     schema.accept(ActiveRecord::ConnectionAdapters::AddColumnDefinition.new(cd))
@@ -529,15 +520,10 @@ module IndexDefinitionExtensions
     klass.attr_reader :replica_identity
   end
 
-  def initialize(*args, replica_identity: false, **kwargs)
+  def initialize(*, replica_identity: false, **)
     @replica_identity = replica_identity
-    if $canvas_rails == "7.0"
-      kwargs.delete(:include)
-      kwargs.delete(:nulls_not_distinct)
-      kwargs.delete(:valid)
-    end
 
-    super(*args, **kwargs)
+    super(*, **)
   end
 
   def defined_for?(*, replica_identity: nil, **)

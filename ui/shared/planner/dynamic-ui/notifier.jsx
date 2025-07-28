@@ -47,9 +47,15 @@ export function notifier(WrappedComponent) {
     }
 
     render() {
+      let props = this.props
+      if (this.props.forwardedRef) {
+        props = {...props, ref: this.props.forwardedRef}
+        delete props.forwardedRef
+      }
+
       return (
         <WrappedComponent
-          {...this.props}
+          {...props}
           triggerDynamicUiUpdates={this.triggerUpdates}
           preTriggerDynamicUiUpdates={this.preTriggerUpdates}
         />

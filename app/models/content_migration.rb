@@ -136,7 +136,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_settings
-    read_or_initialize_attribute(:migration_settings, {}.with_indifferent_access)
+    self["migration_settings"] ||= {}.with_indifferent_access
   end
 
   # this is needed by Attachment#clone_for, which is used to allow a ContentExport to be directly imported
@@ -155,8 +155,15 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def content_export
-    if persisted? && !association(:content_export).loaded? && source_course_id && Shard.shard_for(source_course_id) != shard
-      association(:content_export).target = Shard.shard_for(source_course_id).activate { ContentExport.where(content_migration_id: self).first }
+    if persisted? && !association(:content_export).loaded? && source_course_id
+      association(:content_export).target = Shard.shard_for(source_course_id).activate do
+        ContentExport.where(content_migration_id: self).first ||
+          # since reusing content_exports in multiple content_migrations breaks the nominal 1:1 association
+          # find the content_export by source_course_id and attachment_id instead
+          (attachment_id && ContentExport.where(context_type: "Course",
+                                                context_id: source_course_id,
+                                                attachment_id:).first)
+      end
     end
     super
   end
@@ -201,11 +208,11 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def zip_path
-    (migration_settings || {})[:export_archive_path]
+    migration_settings[:export_archive_path]
   end
 
   def question_bank_name=(name)
-    if (name = name&.strip) != ""
+    if name.present?
       migration_settings[:question_bank_name] = name
     end
   end
@@ -241,11 +248,11 @@ class ContentMigration < ActiveRecord::Base
   def root_account
     return super if root_account_id
 
-    context.root_account rescue nil
+    context.root_account
   end
 
   def migration_type
-    read_attribute(:migration_type) || migration_settings["migration_type"]
+    super || migration_settings["migration_type"]
   end
 
   def plugin_type
@@ -421,7 +428,7 @@ class ContentMigration < ActiveRecord::Base
         # it's ready to be imported
         self.workflow_state = :importing
         save
-        delay(**queue_opts.merge(on_permanent_failure: :fail_with_error!)).import_content
+        delay(**queue_opts, on_permanent_failure: :fail_with_error!).import_content
       else
         # find worker and queue for conversion
         begin
@@ -567,6 +574,14 @@ class ContentMigration < ActiveRecord::Base
     migration_settings[:migration_ids_to_import][:copy][asset_type][mig_id] = "1"
   end
 
+  def import_module?(mig_id)
+    import_object?("context_modules", mig_id) || import_object?("modules", mig_id)
+  end
+
+  def import_module_item?(mig_id)
+    import_object?("module_items", mig_id)
+  end
+
   def is_set?(option)
     Canvas::Plugin.value_to_boolean option
   end
@@ -588,7 +603,7 @@ class ContentMigration < ActiveRecord::Base
     capture_job_id
     save
 
-    Lti::Asset.opaque_identifier_for(context)
+    Lti::V1p1::Asset.opaque_identifier_for(context)
 
     all_files_path = nil
     begin
@@ -621,6 +636,9 @@ class ContentMigration < ActiveRecord::Base
         MasterCourses::FolderHelper.update_folder_names_and_states(context, source_export)
         context.copy_attachments_from_course(source_export.context, content_export: source_export, content_migration: self)
         MasterCourses::FolderHelper.recalculate_locked_folders(context)
+      elsif for_course_template?
+        data = JSON.parse(exported_attachment.open, max_nesting: 50)
+        data = prepare_data(data)
       else
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -644,6 +662,7 @@ class ContentMigration < ActiveRecord::Base
       import!(data)
 
       process_master_deletions(deletions.slice("LearningOutcome", "AssignmentGroup")) if deletions
+      SmartSearch.copy_embeddings(self) if for_master_course_import?
 
       unless import_immediately?
         update_import_progress(100)
@@ -667,7 +686,7 @@ class ContentMigration < ActiveRecord::Base
   alias_method :import_content_without_send_later, :import_content
 
   def import!(data)
-    return import_quizzes_next!(data) if cc_qti_migration? || quizzes_next_migration?
+    return import_quizzes_next!(data) if quizzes_next_import_process?
 
     Importers.content_importer_for(context_type)
              .import_content(
@@ -678,6 +697,10 @@ class ContentMigration < ActiveRecord::Base
              )
   end
 
+  def quizzes_next_import_process?
+    cc_qti_migration? || quizzes_next_migration?
+  end
+
   def cc_qti_migration?
     context.instance_of?(Course) &&
       NewQuizzesFeaturesHelper.common_cartridge_qti_new_quizzes_import_enabled?(context) &&
@@ -685,7 +708,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_quizzes_next?
-    !!migration_settings[:import_quizzes_next]
+    Canvas::Plugin.value_to_boolean(migration_settings[:import_quizzes_next])
   end
 
   def quizzes_next_migration?
@@ -740,6 +763,10 @@ class ContentMigration < ActiveRecord::Base
     migration_type == "course_copy_importer" || for_master_course_import?
   end
 
+  def for_course_template?
+    initiated_source == :course_template
+  end
+
   def for_common_cartridge?
     ["common_cartridge_importer", "canvas_cartridge_importer"].include? migration_type
   end
@@ -791,6 +818,12 @@ class ContentMigration < ActiveRecord::Base
           Rails.logger.debug { "skipping deletion sync for #{content.asset_string} due to there are active Alignments to Content" }
           add_skipped_item(child_tag)
         else
+          if content.is_a?(Attachment)
+            Attachment.not_deleted_content_tags_for_attachments([content.id]).find_each do |tag|
+              tag.skip_downstream_changes!
+              tag.destroy
+            end
+          end
           Rails.logger.debug("syncing deletion of #{content.asset_string} from master course")
           content.skip_downstream_changes! if content.respond_to?(:skip_downstream_changes!)
           content.destroy
@@ -869,13 +902,25 @@ class ContentMigration < ActiveRecord::Base
     end
   end
 
+  def send_item_notifications?
+    @send_item_notifications ||= Canvas::Plugin.value_to_boolean(migration_settings[:send_item_notifications])
+  end
+
   def date_shift_options
     migration_settings[:date_shift_options]
   end
 
   def valid_date_shift_options
-    if date_shift_options && Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates]) && Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
-      errors.add(:date_shift_options, t("errors.cannot_shift_and_remove", "cannot specify shift_dates and remove_dates simultaneously"))
+    if date_shift_options
+      shift_dates = Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates])
+      remove_dates = Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
+      if shift_dates && remove_dates
+        errors.add(:date_shift_options, t("errors.cannot_shift_and_remove", "cannot specify shift_dates and remove_dates simultaneously"))
+      end
+      send_item_notifications = Canvas::Plugin.value_to_boolean(migration_settings[:send_item_notifications])
+      if send_item_notifications && (shift_dates || remove_dates)
+        errors.add(:date_shift_options, t("shift_dates or remove_dates cannot be combined with send_item_notifications"))
+      end
     end
   end
 
@@ -934,7 +979,7 @@ class ContentMigration < ActiveRecord::Base
   def progress
     return nil if workflow_state == "created"
 
-    mig_prog = read_attribute(:progress) || 0
+    mig_prog = super || 0
     if for_course_copy?
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
@@ -970,12 +1015,32 @@ class ContentMigration < ActiveRecord::Base
     @html_converter ||= CanvasImportedHtmlConverter.new(self)
   end
 
-  def convert_html(*args, **keyword_args)
-    html_converter.convert(*args, **keyword_args)
+  def convert_html(*, **keyword_args)
+    html_converter.convert(*, **keyword_args)
+  end
+
+  def convert_single_link(single_link, link_type: false)
+    return html_converter.convert_single_link(single_link, link_type:) unless single_link.include?("/block_editor/templates/") || single_link.blank?
+
+    single_link
   end
 
   def convert_text(text)
     format_message(text || "")[0]
+  end
+
+  def convert_block(block, context, migration_id)
+    if block["type"]["resolvedName"] == "MediaBlock" && (url = block["props"]["src"])
+      block["props"]["src"] = convert_single_link(url, link_type: :media_object)
+    elsif block["type"]["resolvedName"] == "ImageBlock" && (url = block["props"]["src"])
+      block["props"]["src"] = convert_single_link(url)
+    elsif block["type"]["resolvedName"] == "RCETextBlock" && (html = block["props"]["text"])
+      block["props"]["text"] = convert_html(html, context, migration_id, :block_editor_text)
+    end
+  end
+
+  def convert_block_editor_blocks(blocks_json, migration_id, context)
+    blocks_json.each_value { |block| convert_block(block, context, migration_id) }
   end
 
   delegate :resolve_content_links!, to: :html_converter
@@ -1144,7 +1209,7 @@ class ContentMigration < ActiveRecord::Base
   def handle_import_in_progress_notice
     return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
 
-    if (just_created || (saved_change_to_workflow_state? && %w[created queued].include?(workflow_state_before_last_save))) &&
+    if (previously_new_record? || (saved_change_to_workflow_state? && %w[created queued].include?(workflow_state_before_last_save))) &&
        %w[pre_processing pre_processed exporting importing].include?(workflow_state)
       context.add_content_notice(:import_in_progress, 4.hours)
     elsif saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
@@ -1159,7 +1224,7 @@ class ContentMigration < ActiveRecord::Base
        (next_cm = context.content_migrations.where(workflow_state: "queued").order(:id).first) &&
        (job_id = next_cm.job_progress.try(:delayed_job_id)) &&
        (job = Delayed::Job.where(id: job_id, locked_at: nil).first)
-      job.run_at = Time.now # it's okay to try it again now
+      job.run_at = Time.zone.now # it's okay to try it again now
       job.save
     end
   end
@@ -1189,6 +1254,10 @@ class ContentMigration < ActiveRecord::Base
   }.freeze
 
   def migration_data_fields_for(asset_type)
+    if asset_type == "Attachment" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+      return MIGRATION_DATA_FIELDS[asset_type].clone << :uuid
+    end
+
     MIGRATION_DATA_FIELDS[asset_type] || []
   end
 
@@ -1196,7 +1265,6 @@ class ContentMigration < ActiveRecord::Base
     # mig_ids are md5 hashes (eg they have 32 digits), so there should be zero overlap with
     # the src_ids which are DB primary keys or global_ids and they can safely be stored on the same
     # hash.
-    #
     src_asset_fields[:id] = src_asset_fields[:id].to_s if src_asset_fields[:id]
     dest_asset_fields[:id] = dest_asset_fields[:id].to_s
 
@@ -1248,15 +1316,17 @@ class ContentMigration < ActiveRecord::Base
         end
       end
 
+      if key == "files" && context.root_account.feature_enabled?(:file_verifiers_for_quiz_links)
+        dest_id_to_dest_uuid = {}
+        scope.each do |file|
+          dest_id_to_dest_uuid[file.id] = file.uuid
+        end
+        mapping["verifiers"] = dest_id_to_dest_uuid unless dest_id_to_dest_uuid.empty?
+      end
+
       next if mig_id_to_dest_id.empty?
 
       mapping[key] ||= {}
-      unless source_course.present?
-        mig_id_to_dest_id.each do |mig_id, mig_fields|
-          add_asset_pair_to_mapping(mapping, key, mig_id, {}, mig_fields)
-        end
-        next
-      end
 
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
@@ -1295,16 +1365,16 @@ class ContentMigration < ActiveRecord::Base
         src_fields = [:id, *migration_data_fields_for(asset_type)]
         # with course copy, there is no stored mapping between source id and migration_id,
         # so we will need to recompute migration_ids to discover the mapping
-        source_course.shard.activate do
-          srcs = klass.where(context: source_course).pluck(*src_fields).map do |field_values|
-            src_fields.zip(Array.wrap(field_values)).to_h
+        srcs = {}
+        if source_course.present?
+          source_course.shard.activate do
+            srcs = klass.where(context: source_course).select(*src_fields).each_with_object({}) do |src, by_mig_id|
+              by_mig_id[CC::CCHelper.create_key(src.asset_string, global: global_ids)] = src.attributes.with_indifferent_access.slice(*src_fields)
+            end
           end
-          srcs.each do |src|
-            asset_string = klass.asset_string(src[:id])
-            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
-
-            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id]
-          end
+        end
+        mig_id_to_dest_id.each do |mig_id, mig_fields|
+          add_asset_pair_to_mapping(mapping, key, mig_id, srcs[mig_id] || {}, mig_fields)
         end
       end
     end
@@ -1314,15 +1384,15 @@ class ContentMigration < ActiveRecord::Base
 
   def asset_map_url(generate_if_needed: false)
     generate_asset_map if !asset_map_attachment && generate_if_needed
-    asset_map_attachment && file_download_url(
-      asset_map_attachment,
-      {
-        verifier: asset_map_attachment.uuid,
-        download: "1",
-        download_frd: "1",
-        host: context.root_account.domain(ApplicationController.test_cluster_name)
-      }
-    )
+    return nil unless asset_map_attachment
+
+    options = {
+      download: "1",
+      download_frd: "1",
+      host: context.root_account.domain(ApplicationController.test_cluster_name)
+    }
+    options[:verifier] = asset_map_attachment.uuid unless context.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api)
+    file_download_url(asset_map_attachment, options)
   end
 
   def asset_map_v2?
@@ -1337,7 +1407,8 @@ class ContentMigration < ActiveRecord::Base
       "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id&.to_s,
       "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
-      "resource_mapping" => data
+      "resource_mapping" => data,
+      "migration_user_uuid" => user&.uuid
     }
 
     if asset_map_v2?
@@ -1352,6 +1423,53 @@ class ContentMigration < ActiveRecord::Base
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
     asset_map_attachment.save!
     save!
+  end
+
+  # this is a much-simplified subset of asset_id_mapping that includes only ids,
+  # for only the items imported in this migration
+  def imported_asset_id_map
+    return nil unless imported? && for_course_copy?
+
+    mapping = {}
+    master_template = migration_type == "master_course_import" &&
+                      master_course_subscription&.master_template
+    global_ids = master_template.present? || use_global_identifiers?
+
+    migration_settings[:imported_assets].each do |asset_type, dest_ids|
+      klass = asset_type.safe_constantize
+      next unless klass&.column_names&.include? "migration_id"
+
+      dest_ids = dest_ids.split(",").map(&:to_i)
+      mig_id_to_dest_id = context.shard.activate do
+        scope = klass.where(context:, id: dest_ids)
+        scope = scope.only_discussion_topics if asset_type == "DiscussionTopic"
+        scope.where.not(migration_id: nil)
+             .pluck(:migration_id, :id)
+             .to_h
+      end
+
+      mapping[asset_type] ||= {}
+      if master_template
+        master_template.master_content_tags
+                       .where(migration_id: mig_id_to_dest_id.keys)
+                       .pluck(:content_id, :migration_id)
+                       .each do |src_id, mig_id|
+          mapping[asset_type][src_id] = mig_id_to_dest_id[mig_id]
+        end
+      else
+        source_course.shard.activate do
+          src_ids = klass.where(context: source_course).pluck(:id)
+          src_ids.each do |src_id|
+            asset_string = klass.asset_string(src_id)
+            mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
+            dest_id = mig_id_to_dest_id[mig_id]
+            mapping[asset_type][src_id] = dest_id if dest_id
+          end
+        end
+      end
+    end
+
+    mapping
   end
 
   def destination_hosts

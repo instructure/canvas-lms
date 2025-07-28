@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../cassandra_spec_helper"
-
 describe PageViewsController do
   # Factory-like thing for page views.
   def page_view(user, url, options = {})
@@ -81,26 +79,12 @@ describe PageViewsController do
     include_examples "GET 'index' as csv"
   end
 
-  context "with cassandra page views" do
-    include_examples "cassandra page views"
-    include_examples "GET 'index' as csv"
-
-    context "POST 'update'" do
-      it "catches a cassandra error" do
-        allow(PageView).to receive(:find_for_update).and_raise(CassandraCQL::Error::InvalidRequestException)
-        pv = page_view(@student, "/somewhere/in/app/1", created_at: 1.day.ago)
-
-        user_session(@student)
-        put "update", params: { id: pv.token, interaction_seconds: "5", page_view_token: pv.token }, xhr: true
-        expect(response).to have_http_status :ok
-      end
-    end
-  end
-
   context "pv4" do
     before do
       allow(PageView).to receive(:pv4?).and_return(true)
       ConfigFile.stub("pv4", {})
+      account_admin_user
+      user_session(@user)
     end
 
     after do
@@ -109,12 +93,9 @@ describe PageViewsController do
 
     describe "GET 'index'" do
       it "properly plumbs through time restrictions" do
-        account_admin_user
-        user_session(@user)
-
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
-            @user.global_id,
+            @user,
             start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
             end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
             last_page_view_id: nil,
@@ -131,12 +112,10 @@ describe PageViewsController do
       end
 
       it "plumbs through time restrictions in csv also" do
-        account_admin_user
-        user_session(@user)
         Setting.set("page_views_csv_export_rows", "99")
         expect_any_instance_of(PageView::Pv4Client).to receive(:fetch)
           .with(
-            @user.global_id,
+            @user,
             start_time: Time.zone.parse("2016-03-14T12:25:55Z"),
             end_time: Time.zone.parse("2016-03-15T00:00:00Z"),
             last_page_view_id: nil,
@@ -149,6 +128,50 @@ describe PageViewsController do
                       end_time: "2016-03-15T00:00:00Z" },
             format: :csv
         expect(response).to be_successful
+      end
+
+      context "client errors" do
+        it "returns bad_request status when PageView::Pv4Client::Pv4BadRequest is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4BadRequest)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:bad_request)
+          expect(response.parsed_body["error"]).to eq("Page Views received an invalid or malformed request.")
+        end
+
+        it "returns not_found status when PageView::Pv4Client::Pv4NotFound is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4NotFound)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body["error"]).to eq("Page Views resource not found.")
+        end
+
+        it "returns not_found status when PageView::Pv4Client::Pv4Unauthorized is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Unauthorized)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:not_found)
+          expect(response.parsed_body["error"]).to eq("Page Views resource not found.")
+        end
+
+        it "returns too_many_requests status when PageView::Pv4Client::Pv4TooManyRequests is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4TooManyRequests)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:too_many_requests)
+          expect(response.parsed_body["error"]).to eq("Page Views rate limit exceeded. Please wait and try again.")
+        end
+
+        it "returns service_unavailable status when PageView::Pv4Client::Pv4EmptyResponse is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4EmptyResponse)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:service_unavailable)
+          expect(response.parsed_body["error"]).to eq("Page Views data is not available at this time.")
+        end
+
+        it "returns bad_gateway status when PageView::Pv4Client::Pv4Timeout is raised" do
+          allow_any_instance_of(PageView::Pv4Client).to receive(:fetch).and_raise(PageView::Pv4Client::Pv4Timeout)
+          get :index, params: { user_id: @user.id }, format: :json
+          expect(response).to have_http_status(:bad_gateway)
+          expect(response.parsed_body["error"]).to eq("Page Views service is temporarily unavailable.")
+        end
       end
     end
   end

@@ -51,7 +51,7 @@ const setup = ({
       initialAssignedToInformation={initialAssignedToInformation}
       errorMessage={errorMessage}
       onOptionDismiss={onOptionDismiss}
-    />
+    />,
   )
 }
 
@@ -108,21 +108,21 @@ describe('AssignTo', () => {
 
     // Verify that all options appear
     let availableOptions = getAllByTestId('assign-to-select-option')
-    expect(availableOptions.length).toBe(Object.values(DEFAULT_LIST_OPTIONS).flat().length)
+    expect(availableOptions).toHaveLength(Object.values(DEFAULT_LIST_OPTIONS).flat().length)
 
     // Verify that the input is correctly filtered when text is inputted
     // 'Master Path Option' and 'Omar' are the only 2 options that should be visible with an ma filter
     fireEvent.input(selectOption, {target: {value: 'ma'}})
     availableOptions = getAllByTestId('assign-to-select-option')
-    expect(availableOptions.length).toBe(2)
+    expect(availableOptions).toHaveLength(2)
 
     // Verify that when you use keyboard navigation that the options are not further filtered
     // Key down to the 2nd option which is 'Omar'
     fireEvent.keyDown(selectOption, {keyCode: 40})
     availableOptions = getAllByTestId('assign-to-select-option')
-    expect(availableOptions.length).toBe(2)
+    expect(availableOptions).toHaveLength(2)
 
     // Omar will appear once in in the text input and once in the menu
-    expect(screen.getAllByText('Omar').length).toBe(2)
+    expect(screen.getAllByText('Omar')).toHaveLength(2)
   })
 })

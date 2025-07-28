@@ -59,8 +59,8 @@ describe('Reply Preview', () => {
     const container = setup(mockProps())
     expect(
       container.getByText(
-        'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.'
-      )
+        'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
+      ),
     ).toBeTruthy()
   })
 
@@ -79,7 +79,7 @@ describe('Reply Preview', () => {
       mockProps({
         message:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus. Phasellus laoreet ante eget augue mollis sollicitudin. Quisque congue',
-      })
+      }),
     )
     expect(container.getByText('Read More')).toBeTruthy()
   })
@@ -89,7 +89,7 @@ describe('Reply Preview', () => {
       mockProps({
         message:
           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus.',
-      })
+      }),
     )
     expect(container.queryByText('Read More')).toBeNull()
   })
@@ -105,7 +105,7 @@ describe('Reply Preview', () => {
 
     it('renders name', () => {
       const container = setup(
-        mockProps({author: null, editor: null, anonymousAuthor: AnonymousUser.mock()})
+        mockProps({author: null, editor: null, anonymousAuthor: AnonymousUser.mock()}),
       )
       expect(container.getByText('Anonymous 1')).toBeTruthy()
     })

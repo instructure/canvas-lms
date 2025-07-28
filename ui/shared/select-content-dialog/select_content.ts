@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('select_content_dialog')
+const I18n = createI18nScope('select_content_dialog')
 
 export default class {
   static contentPlacements = ['resource_selection']
@@ -39,7 +39,7 @@ export default class {
       '@type'?: string
       url?: string
     },
-    expectedType = 'LtiLinkItem'
+    expectedType = 'LtiLinkItem',
   ) {
     if (item['@type'] !== expectedType) {
       return I18n.t('Error: The tool returned an invalid content type "%{contentType}"', {

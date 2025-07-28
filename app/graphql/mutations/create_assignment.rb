@@ -73,7 +73,9 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase::Mutation
       ensure_modules(module_ids) if module_ids
       { assignment: @working_assignment }
     else
-      { errors: @working_assignment.errors.entries }
+      { errors: @working_assignment.errors.entries.map do |error|
+        [error.attribute, error.message]
+      end }
     end
   end
 end

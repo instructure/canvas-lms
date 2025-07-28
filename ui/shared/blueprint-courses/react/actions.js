@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 
 import api from './apiClient'
 import LoadStates from './loadStates'
 import MigrationStates from './migrationStates'
 
-const I18n = useI18nScope('blueprint_settings_actions')
+const I18n = createI18nScope('blueprint_settings_actions')
 
 const types = [
   'LOAD_COURSES_START',
@@ -64,6 +64,7 @@ const types = [
   'CLEAR_NOTIFICATION',
   'INCLUDE_COURSE_SETTINGS',
   'ENABLE_PUBLISH_COURSES',
+  'ENABLE_ITEM_NOTIFICATIONS',
 ]
 const actions = createActions(...types)
 
@@ -86,8 +87,8 @@ actions.loadChange = params => (dispatch, getState) => {
     .then(data => dispatch(actions.loadChangeSuccess(data)))
     .catch(err =>
       dispatch(
-        actions.loadChangeFail({err, message: I18n.t('An error occurred while loading changes')})
-      )
+        actions.loadChangeFail({err, message: I18n.t('An error occurred while loading changes')}),
+      ),
     )
 }
 
@@ -112,8 +113,8 @@ actions.loadHistory = () => (dispatch, getState) => {
         actions.loadHistoryFail({
           err,
           message: I18n.t('An error ocurred while loading sync history'),
-        })
-      )
+        }),
+      ),
     )
 }
 
@@ -138,8 +139,8 @@ actions.checkMigration =
           actions.checkMigrationFail({
             err,
             message: I18n.t('An error occurred while checking the migration status'),
-          })
-        )
+          }),
+        ),
       )
   }
 
@@ -167,7 +168,7 @@ actions.checkMigration =
         case MigrationStates.states.imports_failed:
         case MigrationStates.states.exports_failed:
           dispatch(
-            actions.notifyError({message: I18n.t('There was an unexpected problem with the sync')})
+            actions.notifyError({message: I18n.t('There was an unexpected problem with the sync')}),
           )
           break
         default:
@@ -182,7 +183,7 @@ actions.checkMigration =
     actions.checkMigration()(dispatch, getState)
     migInterval = setInterval(
       () => actions.pollMigrationStatus()(dispatch, getState),
-      actions.constants.MIGRATION_POLL_TIME
+      actions.constants.MIGRATION_POLL_TIME,
     )
   }
 })()
@@ -204,8 +205,8 @@ actions.beginMigration =
           actions.beginMigrationFail({
             err,
             message: I18n.t('An error occurred while starting migration'),
-          })
-        )
+          }),
+        ),
       )
   }
 
@@ -269,8 +270,8 @@ actions.loadCourses = filters => (dispatch, getState) => {
     })
     .catch(err =>
       dispatch(
-        actions.loadCoursesFail({err, message: I18n.t('An error occurred while loading courses')})
-      )
+        actions.loadCoursesFail({err, message: I18n.t('An error occurred while loading courses')}),
+      ),
     )
 }
 
@@ -299,8 +300,8 @@ actions.loadAssociations = () => (dispatch, getState) => {
         actions.loadAssociationsFail({
           err,
           message: I18n.t('An error occurred while loading associations'),
-        })
-      )
+        }),
+      ),
     )
 }
 
@@ -314,7 +315,7 @@ actions.saveAssociations = () => (dispatch, getState) => {
         actions.saveAssociationsSuccess({
           added: state.addedAssociations,
           removed: state.removedAssociations,
-        })
+        }),
       )
       dispatch(actions.notifyInfo({message: I18n.t('Associations saved successfully')}))
       if (state.addedAssociations.length > 0) {
@@ -326,8 +327,8 @@ actions.saveAssociations = () => (dispatch, getState) => {
         actions.saveAssociationsFail({
           err,
           message: I18n.t('An error occurred while saving associations'),
-        })
-      )
+        }),
+      ),
     )
 }
 
@@ -341,14 +342,14 @@ actions.loadUnsyncedChanges = () => (dispatch, getState) => {
         actions.loadUnsyncedChangesFail({
           err,
           message: I18n.t('An error ocurred while loading unsynced changes'),
-        })
-      )
+        }),
+      ),
     )
 }
 
 const actionTypes = types.reduce(
   (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
-  {}
+  {},
 )
 
 export {actionTypes, actions as default}

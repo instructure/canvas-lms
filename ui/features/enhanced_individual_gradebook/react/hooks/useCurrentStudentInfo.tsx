@@ -17,14 +17,15 @@
  */
 
 import {useCallback, useEffect, useState} from 'react'
-import {useQuery} from 'react-apollo'
 import type {
   GradebookStudentDetails,
   GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,
   SubmissionGradeChange,
 } from '../../types'
-import {GRADEBOOK_STUDENT_QUERY} from '../../queries/Queries'
+import {fetchStudentSubmission, getNextStudentSubmissionPage} from '../../queries/Queries'
+import type {InfiniteData} from '@tanstack/react-query'
+import {useAllPages} from '@canvas/query'
 
 type Response = {
   currentStudent?: GradebookStudentDetails
@@ -37,10 +38,23 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
   const [currentStudent, setCurrentStudent] = useState<GradebookStudentDetails>()
   const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>()
 
-  const {data, error, loading} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
-    variables: {courseId, userIds: userId},
-    fetchPolicy: 'cache-and-network',
-    skip: !userId,
+  const queryKey: [string, string, string] = [
+    'individual-gradebook-student',
+    courseId,
+    userId ?? '',
+  ]
+
+  const {data, error, hasNextPage, isLoading} = useAllPages<
+    GradebookStudentQueryResponse,
+    Error,
+    InfiniteData<GradebookStudentQueryResponse>,
+    [string, string, string]
+  >({
+    queryKey,
+    queryFn: fetchStudentSubmission,
+    getNextPageParam: getNextStudentSubmissionPage,
+    initialPageParam: null,
+    enabled: !!userId,
   })
 
   useEffect(() => {
@@ -55,11 +69,19 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
       // TODO: handle error
     }
 
-    if (data?.course) {
-      setCurrentStudent(data.course.usersConnection.nodes[0])
-      setStudentSubmissions(data.course.submissionsConnection.nodes)
+    const firstPage = data?.pages[0]
+    if (firstPage) {
+      setCurrentStudent(firstPage.course.usersConnection.nodes[0])
+
+      // The consuming components do not handle rendering partially loaded submissions
+      // (e.g. Assignment Group Grade and Final Grade calculations assume all submissions are loaded)
+      // so we only populate the student submissions when we have all of them.
+      const submissions = hasNextPage
+        ? []
+        : data.pages.flatMap(page => page.course.submissionsConnection.nodes)
+      setStudentSubmissions(submissions)
     }
-  }, [data, error])
+  }, [currentStudent, data, error, hasNextPage])
 
   const updateSubmissionDetails = useCallback(
     (newSubmission: SubmissionGradeChange) => {
@@ -72,13 +94,13 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
         return [...submissions]
       })
     },
-    [setStudentSubmissions]
+    [setStudentSubmissions],
   )
 
   return {
     currentStudent,
     studentSubmissions,
-    loadingStudent: loading,
+    loadingStudent: isLoading,
     updateSubmissionDetails,
   }
 }

@@ -17,7 +17,7 @@
  */
 
 import {mergeTimeAndDate as subject} from '@instructure/moment-utils'
-import {moonwalk, epoch} from '../specHelpers'
+import {moonwalk, epoch} from '@instructure/moment-utils/specHelpers'
 
 test('mergeTimeAndDate() finds the given time of day on the given date.', () => {
   expect(+subject(moonwalk, epoch)).toEqual(+Date.UTC(1970, 0, 1, 2, 56))

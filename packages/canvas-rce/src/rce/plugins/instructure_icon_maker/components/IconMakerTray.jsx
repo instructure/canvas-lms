@@ -38,14 +38,14 @@ import {validIcon} from '../utils/iconValidation'
 import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
 import {shouldIgnoreClose} from '../utils/IconMakerClose'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 const INVALID_MESSAGE = formatMessage(
-  'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
+  'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image',
 )
 
 const UNSAVED_CHANGES_MESSAGE = formatMessage(
-  'You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?'
+  'You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?',
 )
 
 function renderHeader(title, settings, onKeyDown, onAlertDismissal, onClose) {
@@ -96,7 +96,7 @@ function renderBody(
   allowNameChange,
   nameRef,
   canvasOrigin,
-  isLoading
+  isLoading,
 ) {
   return isLoading() ? (
     <Flex justifyItems="center">
@@ -123,7 +123,7 @@ function renderFooter(
   replaceAll,
   setReplaceAll,
   applyRef,
-  isModified
+  isModified,
 ) {
   return (
     <View as="div" background="primary">
@@ -156,10 +156,10 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
   const [initialSettings, setInitialSettings] = useState({...defaultState})
   const isModified = useRef(false)
 
-  const [mountNode, setMountNode] = useState(instuiPopupMountNode())
+  const [mountNode, setMountNode] = useState(instuiPopupMountNodeFn())
 
   const handleFullscreenChange = useCallback(() => {
-    setMountNode(instuiPopupMountNode())
+    setMountNode(instuiPopupMountNodeFn())
   }, [])
 
   // These useRef objects are needed because when the tray is closed using the escape key
@@ -175,12 +175,12 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
   useEffect(() => {
     editor?.rceWrapper?._elementRef?.current?.addEventListener(
       'fullscreenchange',
-      handleFullscreenChange
+      handleFullscreenChange,
     )
     return () => {
       editor?.rceWrapper?._elementRef?.current?.removeEventListener(
         'fullscreenchange',
-        handleFullscreenChange
+        handleFullscreenChange,
       )
     }
   }, [editor, handleFullscreenChange])
@@ -188,7 +188,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
   useEffect(() => {
     const formHasChanges = new IconMakerFormHasChanges(
       initialSettingsRef.current,
-      settingsRef.current
+      settingsRef.current,
     )
     isModified.current = formHasChanges.hasChanges()
   }, [settings, initialSettings])
@@ -198,14 +198,19 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
   const onClose = event => {
     if (shouldIgnoreClose(event?.target, editor?.id)) return
     if (statusRef?.current === statuses.LOADING) return
+    // Uploading an image creates a modal on the page. If that modal is open, we don't want to close the tray
+    // eslint-disable-next-line no-extra-boolean-cast
+    if (!!hasOpenModal()) return
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
-    // eslint-disable-next-line no-restricted-globals, no-alert
+
     if (isModified.current && !confirm(UNSAVED_CHANGES_MESSAGE)) {
       return
     }
     setIsOpen(false)
   }
+
+  const hasOpenModal = () => document.querySelector('[data-cid="Modal"]')
 
   const isLoading = () => status === statuses.LOADING
 
@@ -257,12 +262,11 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
         },
         {
           onDuplicate: replaceFile && 'overwrite',
-        }
+        },
       )
       .then(writeIconToRCE)
       .then(() => setIsOpen(false))
       .catch(err => {
-        // eslint-disable-next-line no-console
         console.error(err)
         setStatus(statuses.ERROR)
       })
@@ -338,6 +342,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
       onDismiss={onClose}
       onUnmount={onUnmount}
       mountNode={mountNode}
+      shouldCloseOnDocumentClick={false}
       renderHeader={() => renderHeader(title, settings, onKeyDown, handleAlertDismissal, onClose)}
       renderBody={() =>
         renderBody(
@@ -348,7 +353,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
           !replaceAll,
           nameRef,
           canvasOrigin,
-          isLoading
+          isLoading,
         )
       }
       renderFooter={() =>
@@ -360,7 +365,7 @@ export function IconMakerTray({editor, onUnmount, editing, canvasOrigin}) {
           replaceAll,
           setReplaceAll,
           applyRef,
-          isModified.current
+          isModified.current,
         )
       }
       bodyAs="form"

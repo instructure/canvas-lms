@@ -40,7 +40,7 @@ describe "user_content" do
     describe "iframes" do
       it "serves embed tags from a safefiles iframe" do
         skip_if_chrome("research")
-        factory_with_protected_attributes(Announcement, context: @course, title: "hey all read this k", message: message_body)
+        Announcement.create!(context: @course, title: "hey all read this k", message: message_body)
         get "/courses/#{@course.to_param}/discussion_topics/#{Announcement.first.to_param}"
         name = ff(".user_content_iframe").first.attribute("name")
         in_frame(name) do
@@ -50,7 +50,7 @@ describe "user_content" do
 
       it "iframes calendar json requests" do
         skip_if_chrome("research")
-        factory_with_protected_attributes(CalendarEvent, context: @course, title: "super fun party", description: message_body, start_at: 5.minutes.ago, end_at: 5.minutes.from_now)
+        CalendarEvent.create!(context: @course, title: "super fun party", description: message_body, start_at: 5.minutes.ago, end_at: 5.minutes.from_now)
         get "/calendar2"
 
         expect(f("body")).not_to contain_css(".user_content_iframe")

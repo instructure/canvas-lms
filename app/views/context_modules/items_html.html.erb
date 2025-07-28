@@ -1,0 +1,46 @@
+<%
+  # Copyright (C) 2025 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%
+  context_module = @module
+  items = @items
+  total_items = @items_count
+  can_view = @can_view
+  module_data = context_module ? process_module_items_data(items, context_module, @current_user, @session, student: @is_student) : { published_status: 'unpublished' }
+%>
+
+<%# This part of code is copy of _context_module_next.html.erb as a temporary solution %>
+<ul class="ig-list items context_module_items <%= 'manageable' if can_view %>" data-total-items="<%= total_items %>">
+  <% if context_module && module_data[:items]%>
+    <% module_data[:items].each do |item| %>
+      <%
+        item_data = module_data[:items_data][item.id]
+        locals = {
+          item_restrictions: module_data.dig(:items_restrictions, item.id),
+          completion_criteria: context_module.completion_requirements,
+          item_data: item_data,
+          viewable: can_view,
+        }
+      %>
+      <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
+      <% if item_data[:show_cyoe_placeholder] %>
+        <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+      <% end %>
+    <% end %>
+  <% end %>
+</ul>

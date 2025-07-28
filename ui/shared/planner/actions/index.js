@@ -21,7 +21,7 @@ import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import parseLinkHeader from '@canvas/parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
 import {
   getPlannerItems,
@@ -37,7 +37,7 @@ import {
   buildURL,
 } from '../utilities/apiUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 configureAxios(axios)
 
@@ -92,7 +92,7 @@ export const {
   'CLEAR_OPPORTUNITIES',
   'CLEAR_DAYS',
   'CLEAR_COURSES',
-  'CLEAR_SIDEBAR'
+  'CLEAR_SIDEBAR',
 )
 
 export * from './loading-actions'
@@ -118,7 +118,7 @@ export const getNextOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities())
     if (getState().opportunities.nextUrl) {
-      axios({
+      return axios({
         method: 'get',
         url: getState().opportunities.nextUrl,
       })
@@ -128,7 +128,7 @@ export const getNextOpportunities = () => {
               addOpportunities({
                 items: response.data,
                 nextUrl: parseLinkHeader(getResponseHeader(response, 'link')).next.url,
-              })
+              }),
             )
           } else {
             dispatch(addOpportunities({items: response.data, nextUrl: null}))
@@ -147,7 +147,6 @@ export const getInitialOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities())
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const {courses, selectedObservee} = getState()
     const url =
       getState().opportunities.nextUrl ||
@@ -161,7 +160,7 @@ export const getInitialOpportunities = () => {
       })
     const request = asAxios(getPrefetchedXHR(url)) || axios({method: 'get', url})
 
-    request
+    return request
       .then(response => {
         const next = parseLinkHeader(getResponseHeader(response, 'link')).next
         dispatch(addOpportunities({items: response.data, nextUrl: next ? next.url : null}))
@@ -205,7 +204,7 @@ export const savePlannerItem = plannerItem => {
         apiItem = transformPlannerNoteApiToInternalItem(
           response.data,
           getState().courses,
-          getState().timeZone
+          getState().timeZone,
         )
         return {
           item: updateOverrideDataOnItem(apiItem, overrideData),
@@ -230,8 +229,8 @@ export const deletePlannerItem = plannerItem => {
         transformPlannerNoteApiToInternalItem(
           response.data,
           getState().courses,
-          getState().timeZone
-        )
+          getState().timeZone,
+        ),
       )
       .catch(() => alert(I18n.t('Failed to delete to do'), true))
     dispatch(clearUpdateTodo())
@@ -271,6 +270,10 @@ export const togglePlannerItemCompletion = plannerItem => {
     const savingItem = {...plannerItem, toggleAPIPending: true, show: true}
     dispatch(savingPlannerItem({item: savingItem, isNewItem: false, wasToggled: true}))
     const apiOverride = transformInternalToApiOverride(plannerItem, getState().currentUser.id)
+    // Ensure marked_complete has a default value if it's undefined
+    if (apiOverride.marked_complete === undefined) {
+      apiOverride.marked_complete = false
+    }
     apiOverride.marked_complete = !apiOverride.marked_complete
     let promise = apiOverride.id
       ? saveExistingPlannerOverride(apiOverride)

@@ -60,7 +60,7 @@ function renderComponent(renderer, props) {
       fetchNextPage={() => {}}
       onLinkClick={() => {}}
       {...props}
-    />
+    />,
   )
 }
 

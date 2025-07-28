@@ -71,6 +71,21 @@ describe LtiOutbound::LTITool do
     end
   end
 
+  describe "#anonymous?" do
+    it "returns true IFF the privacy level is anonymous" do
+      subject.privacy_level = :something
+      expect(subject.anonymous?).to be false
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+      expect(subject.anonymous?).to be false
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
+      expect(subject.anonymous?).to be false
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
+      expect(subject.anonymous?).to be false
+      subject.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
+      expect(subject.anonymous?).to be true
+    end
+  end
+
   describe "#settings" do
     it "attribute setter, but returns {} instead of nil" do
       expect(subject.settings).to eq({})

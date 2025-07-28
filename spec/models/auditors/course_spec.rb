@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../cassandra_spec_helper"
-
 describe Auditors::Course do
   let(:request_id) { 42 }
 

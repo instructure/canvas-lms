@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ import {Modal} from '@instructure/ui-modal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {DEFAULT_COURSE_COLOR, saveSelectedContexts} from '@canvas/k5/react/utils'
 
-const I18n = useI18nScope('filter_calendars_modal')
+const I18n = createI18nScope('filter_calendars_modal')
 
 export const ContextCheckbox = ({
   assetString,
@@ -98,7 +98,7 @@ const FilterCalendarsModal = ({
 
   const submitSelectedContexts = () => {
     saveSelectedContexts(pendingSelectedContexts).catch(
-      showFlashError(I18n.t('Failed to save selected calendars'))
+      showFlashError(I18n.t('Failed to save selected calendars')),
     )
     updateSelectedContextCodes([...pendingSelectedContexts])
     closeModal()
@@ -125,7 +125,7 @@ const FilterCalendarsModal = ({
                 one: 'Choose up to 1 subject calendar',
                 other: 'Choose up to %{count} subject calendars',
               },
-              {count: selectedContextsLimit}
+              {count: selectedContextsLimit},
             )}
           </Text>
         </View>
@@ -155,7 +155,7 @@ const FilterCalendarsModal = ({
                     one: 'You have 1 calendar left',
                     other: 'You have %{count} calendars left',
                   },
-                  {count: selectedContextsLimit - pendingSelectedContexts.length}
+                  {count: selectedContextsLimit - pendingSelectedContexts.length},
                 )}
               </Text>
             </Flex.Item>

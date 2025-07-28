@@ -43,7 +43,7 @@ $cell-icon-width: 32px;
 $header-height: 38px;
 $header-content-height: $header-height - 2px; // subtract border
 
-$grid-border-color: #c7cdd1;
+$grid-border-color: #E8EAEC;
 $active-border-color: #1790df;
 
 $gradebook_cell_padding_top: 8px;
@@ -421,11 +421,8 @@ $gradebook_cell_padding_top: 8px;
 
 .total-column-tooltip {
   width: 250px;
-  height: 60px;
   white-space: pre-line;
-  padding-top: 5px;
-  padding-bottom: 55px;
-  margin-bottom: -50px;
+  padding: 5px 0;
 }
 
 .container_1 .slick-cell:last-child .gradebook-tooltip {
@@ -968,7 +965,7 @@ $gradebook_checkbox_size: 16px;
 .Gradebook__StatusModalListItem {
   padding: 7px;
   margin-bottom: 5px;
-  border: 1px solid #C7CDD1;
+  border: 1px solid #E8EAEC;
   border-radius: 3px;
 }
 

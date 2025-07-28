@@ -29,14 +29,14 @@ import Big from 'big.js'
  */
 
 /**
- * @deprecated Use scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[], points_based) instead, which takes
+ * @deprecated @deprecated Use scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[], points_based) instead, which takes
  * a more reasonably typed object model than the 2d array that this function takes in for gradingScheme data rows.
  * @param {number} score
  * @param {GradingStandard[]} gradingSchemes
  * @param {boolean} pointsBased
  * @returns {?string}
  */
-export function scoreToGrade(score, gradingSchemes, pointsBased = false) {
+export function scoreToGrade(score, gradingSchemes, pointsBased = false, scalingFactor = 1) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
   if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemes == null) {
@@ -46,7 +46,7 @@ export function scoreToGrade(score, gradingSchemes, pointsBased = false) {
   // convert deprecated 2d array format to newer GradingSchemeDataRow[] format
   const gradingSchemeDataRows = gradingSchemes.map(row => ({name: row[0], value: row[1]}))
 
-  return scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased)
+  return scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased, scalingFactor)
 }
 
 /**
@@ -55,16 +55,23 @@ export function scoreToGrade(score, gradingSchemes, pointsBased = false) {
  * @param {boolean} pointsBased
  * @returns {string}
  */
-export function scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased = false) {
+export function scoreToLetterGrade(
+  score,
+  gradingSchemeDataRows,
+  pointsBased = false,
+  scalingFactor = null
+) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
   if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemeDataRows == null) {
     return null
   }
 
+  const scaledScore =
+    pointsBased && typeof scalingFactor === 'number' ? scaleScore(score, scalingFactor) : score
   const roundedScore = pointsBased
-    ? parseFloat(Big(score).round(2)) // round to 2 decimal places because points based grading schemes lower bounds are rounded to 2 decimal places
-    : parseFloat(Big(score).round(4))
+    ? parseFloat(Big(scaledScore).round(2)) // round to 2 decimal places because points based grading schemes lower bounds are rounded to 2 decimal places
+    : parseFloat(Big(scaledScore).round(4))
   const scoreWithLowerBound = Math.max(roundedScore, 0)
   const letter = gradingSchemeDataRows.find((row, i) => {
     const schemeScore = (row.value * 100).toPrecision(4)
@@ -75,4 +82,13 @@ export function scoreToLetterGrade(score, gradingSchemeDataRows, pointsBased = f
   }
 
   return letter.name
+}
+
+function scaleScore(score, scalingFactor) {
+  if (scalingFactor === 100 || scalingFactor <= 0) {
+    return score
+  }
+  const scaled = Big(score).div(Big(100).div(scalingFactor))
+  const rounded = scaled.round(2)
+  return rounded.div(scalingFactor).times(100)
 }

@@ -29,6 +29,7 @@ class Mutations::CreateLearningOutcome < Mutations::BaseLearningOutcomeMutation
     outcome_input = attrs(input, outcome_group)
 
     record = LearningOutcome.new(context: outcome_group.context, **outcome_input)
+    record.saving_user = current_user
     check_permission(record)
     return errors_for(record) unless record.save
 

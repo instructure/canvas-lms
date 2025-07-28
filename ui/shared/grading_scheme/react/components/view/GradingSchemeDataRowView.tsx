@@ -17,13 +17,13 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import type {GradingSchemeDataRow} from '@instructure/grading-utils'
 import {roundToTwoDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 interface ComponentProps {
   schemeScaleFactor: number
@@ -41,7 +41,7 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
   viewAsPercentage,
 }) => {
   const [entryScale /* setEntryScale */] = useState<number>(
-    schemeScaleFactor * (viewAsPercentage ? 100 : 1)
+    schemeScaleFactor * (viewAsPercentage ? 100 : 1),
   )
   function renderHighRange() {
     return String(roundToTwoDecimalPlaces(highRange * entryScale))

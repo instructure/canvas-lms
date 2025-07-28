@@ -13,9 +13,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "canvas_cache"
   spec.add_dependency "legacy_multipart"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "webmock", "~> 3.18"
+  spec.add_dependency "logger", "~> 1.5"
 end

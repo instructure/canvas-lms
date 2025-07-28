@@ -38,7 +38,7 @@ describe QuizzesHelper do
       quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = "available"
       quiz.last_edited_at = 10.minutes.ago
-      quiz.published_at   = Time.now
+      quiz.published_at   = Time.zone.now
 
       allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_falsey
@@ -55,7 +55,7 @@ describe QuizzesHelper do
     it "is true if quiz has unpublished changes" do
       quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = "available"
-      quiz.last_edited_at = Time.now
+      quiz.last_edited_at = Time.zone.now
       quiz.published_at   = 10.minutes.ago
 
       allow(self).to receive(:can_publish).and_return(true)
@@ -444,17 +444,20 @@ describe QuizzesHelper do
       expect(message).to match(/last attempt/)
     end
 
-    it 'provides a useful message when "no"' do
-      quiz = double({
-                      show_correct_answers_last_attempt: nil,
-                      show_correct_answers: false,
-                      show_correct_answers_at: nil,
-                      hide_correct_answers_at: nil
-                    })
-      quiz_submission = double(last_attempt_completed?: false)
+    context("when correct answers are hidden") do
+      let(:quiz) do
+        double({
+                 show_correct_answers_last_attempt: nil,
+                 show_correct_answers: false,
+                 show_correct_answers_at: nil,
+                 hide_correct_answers_at: nil
+               })
+      end
+      let(:quiz_submission) { double(last_attempt_completed?: false) }
 
-      message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match(/are hidden/)
+      it "provides a useful message" do
+        expect(render_correct_answer_protection(quiz, quiz_submission)).to match(/are hidden/)
+      end
     end
 
     it 'provides nothing when "yes"' do
@@ -497,7 +500,7 @@ describe QuizzesHelper do
     end
   end
 
-  context "#point_value_for_input" do
+  describe "#point_value_for_input" do
     let(:user_answer) { @user_answer }
     let(:question) { { points_possible: 5 } }
     let(:quiz) { @quiz }
@@ -531,7 +534,7 @@ describe QuizzesHelper do
     end
   end
 
-  context "#comment_get" do
+  describe "#comment_get" do
     it "returns _html field if present" do
       comment = comment_get({ foo_html: "<div>Foo</div>", foo: "Bar" }, "foo")
       expect(comment).to eq "<div>Foo</div>"
@@ -560,6 +563,23 @@ describe QuizzesHelper do
                             },
                             "foo")
       expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
+    end
+  end
+
+  describe "#link_to_take_quiz" do
+    before do
+      @quiz = instance_double("Quiz", cant_go_back?: false)
+      allow(self).to receive_messages(preview_quiz_url: "/preview_quiz_url", take_quiz_url: "/take_quiz_url")
+    end
+
+    context 'when opts["class"] includes "btn"' do
+      let(:link_body) { "Take the Quiz Again" }
+      let(:opts) { { "class" => "btn btn-primary", "id" => "take_quiz_link" } }
+
+      it 'adds role="button"' do
+        result = link_to_take_quiz(link_body, opts)
+        expect(result).to include('role="button"')
+      end
     end
   end
 end

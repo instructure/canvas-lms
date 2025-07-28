@@ -74,6 +74,7 @@ module BroadcastPolicies
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
         user_has_visibility? &&
+        !submission.autograded? &&
         (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
@@ -163,7 +164,7 @@ module BroadcastPolicies
     end
 
     def user_has_visibility?
-      AssignmentStudentVisibility.where(assignment_id: submission.assignment_id, user_id: submission.user_id).any?
+      AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: submission.user_id, assignment_ids: submission.assignment_id).any?
     end
 
     def user_active_or_invited?

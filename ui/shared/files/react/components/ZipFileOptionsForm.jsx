@@ -16,20 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/modal'
 import ModalContent from '@canvas/modal/react/content'
 import ModalButtons from '@canvas/modal/react/buttons'
 
-const I18n = useI18nScope('zip_file_options_form')
+const I18n = createI18nScope('zip_file_options_form')
 
 class ZipFileOptionsForm extends React.Component {
   static displayName = 'ZipFileOptionsForm'
 
   static propTypes = {
     onZipOptionsResolved: PropTypes.func.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.canvasModalRef = React.createRef()
   }
 
   handleExpandClick = () => {
@@ -47,7 +52,7 @@ class ZipFileOptionsForm extends React.Component {
       message = I18n.t(
         'message',
         'Would you like to expand the contents of "%{fileName}" into the current folder, or upload the zip file as is?',
-        {fileName: name}
+        {fileName: name},
       )
     }
     return message
@@ -58,7 +63,7 @@ class ZipFileOptionsForm extends React.Component {
       <Modal
         className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
         isOpen={!!this.props.fileOptions}
-        ref="canvasModal"
+        ref={this.canvasModalRef}
         title={I18n.t('zip_options', 'Zip file options')}
         onRequestClose={this.props.onClose}
       >

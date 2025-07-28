@@ -60,8 +60,8 @@ You can bring icons into Canvas using CSS classes. There are two weights to our 
 
 */
 
-@import "../../../node_modules/@instructure/ui-icons/es/font/Line/InstructureIcons-Line_icon-map.scss";
-@import "../../../node_modules/@instructure/ui-icons/es/font/Solid/InstructureIcons-Solid_icon-map.scss";
+@import "../../../public/fonts/instructure_icons/Line/InstructureIcons-Line_icon-map.scss";
+@import "../../../public/fonts/instructure_icons/Solid/InstructureIcons-Solid_icon-map.scss";
 
 $icon_default: "Line";
 

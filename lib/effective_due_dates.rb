@@ -150,6 +150,23 @@ class EffectiveDueDates
     end
   end
 
+  def filter_non_collaborative_groups_sql(table)
+    # Checking the feature flag instead of the account setting for differentiation tags.
+    # Reason: The feature flag is for development and testing purposes. If something happens
+    # during testing and we need to turn the feature off quickly, we can do so
+    # with the feature flag. The feature flag will eventually be removed once the feature is
+    # stable in production. The account setting is for production use and since the rollback plan
+    # states that students need to see the assignments that are assigned to them via a
+    # differentiation tag (non-collaborative) until the AssignmentOverride is deleted,
+    # we do not want to check if the account setting is disabled and will rely purely on the
+    # workflow state.
+    # Given this, we will remove this filter when the feature is stable in production.
+    # REF: https://instructure.atlassian.net/browse/EGG-463
+    unless @context.account.feature_enabled?(:assign_to_differentiation_tags)
+      "#{table}.non_collaborative IS FALSE AND"
+    end
+  end
+
   def active_in_section_sql
     if Account.site_admin.feature_enabled?(:deprioritize_section_overrides_for_nonactive_enrollments)
       "e.workflow_state = 'active'"
@@ -159,8 +176,7 @@ class EffectiveDueDates
   end
 
   def context_module_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "/* fetch all module overrides for this assignment */
+    "/* fetch all module overrides for this assignment */
       tags AS (
         SELECT
           t.id,
@@ -184,12 +200,14 @@ class EffectiveDueDates
 
       modules AS (
         SELECT
+          a.id AS item_assignment_id,
           m.id
         FROM
+          models a,
           tags t
         INNER JOIN #{ContextModule.quoted_table_name} m ON m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
-        WHERE
-          m.workflow_state <>'deleted'
+        WHERE m.workflow_state <>'deleted'
+          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
       ),
 
       module_overrides AS (
@@ -209,49 +227,37 @@ class EffectiveDueDates
         WHERE
            o.workflow_state = 'active' AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id) AND
            a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
-      ),"
-    else
-      ""
-    end
+    ),"
   end
 
   def visible_to_everyone
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (SELECT * FROM modules) OR EXISTS (
-        SELECT
-          *
-        FROM
-          tags t,
-          modules m
-        LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
-        WHERE
-          o.context_module_id IS NULL
-          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
-          AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
-        )
-      )"
-    else
-      "a.only_visible_to_overrides IS NOT TRUE"
-    end
+    "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (
+      SELECT 1 FROM modules m WHERE m.item_assignment_id = a.id AND m.id IS NOT NULL
+      ) OR EXISTS (
+      SELECT
+        *
+      FROM
+        tags t,
+        modules m
+      LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
+      WHERE
+        o.context_module_id IS NULL
+        AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
+        AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
+      )
+    )"
   end
 
   def union_all_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "overrides AS (
-        SELECT * FROM assignment_overrides
-        UNION ALL
-        SELECT * FROM module_overrides
-      ),"
-    else
-      "overrides AS (
-        SELECT * FROM assignment_overrides
-      ),"
-    end
+    "overrides AS (
+      SELECT * FROM assignment_overrides
+      UNION ALL
+      SELECT * FROM module_overrides
+    ),"
   end
 
   def course_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "/* fetch all students affected by course overrides */
+    "/* fetch all students affected by course overrides */
       override_course_students AS (
         SELECT
           e.user_id AS student_id,
@@ -272,28 +278,17 @@ class EffectiveDueDates
           e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
           #{filter_students_sql("e")}
-          ),"
-    else
-      ""
-    end
+    ),"
   end
 
   def union_course_overrides
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "SELECT * FROM override_course_students
-        UNION ALL"
-    else
-      ""
-    end
+    "UNION ALL
+     SELECT * FROM override_course_students"
   end
 
   def unassign_item
-    if Account.site_admin.feature_enabled?(:differentiated_modules)
-      "WHERE
-        overrides.unassign_item = FALSE"
-    else
-      ""
-    end
+    "WHERE
+      unassign_item = FALSE"
   end
 
   # This beauty of a method brings together assignment overrides,
@@ -409,6 +404,7 @@ class EffectiveDueDates
             WHERE
               o.set_type = 'Group' AND
               g.workflow_state <> 'deleted' AND
+              #{filter_non_collaborative_groups_sql("g")}
               gm.workflow_state = 'accepted'
               #{filter_students_sql("gm")}
           ),
@@ -465,15 +461,40 @@ class EffectiveDueDates
           ),
 
           /* join all these students together into a single table */
-          override_all_students AS (
+          /* these queries are separated to ensure unassign_item overrides are properly removed when sorting the overrides */
+          override_adhoc_everyoneelse_students AS (
+            SELECT * FROM override_everyonelse_students
+            UNION ALL
             SELECT * FROM override_adhoc_students
+          ),
+
+          calculated_adhoc_overrides AS (
+            SELECT DISTINCT ON (student_id, assignment_id)
+              *
+            FROM override_adhoc_everyoneelse_students
+            ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
+          ),
+
+          override_group_section_students AS (
+            SELECT * FROM calculated_adhoc_overrides
+            #{unassign_item}
             UNION ALL
             SELECT * FROM override_groups_students
             UNION ALL
             SELECT * FROM override_sections_students
-            UNION ALL
+          ),
+
+          calculated_group_section_overrides AS (
+            SELECT DISTINCT ON (student_id, assignment_id)
+              *
+            FROM override_group_section_students
+            ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
+          ),
+
+          override_all_students AS (
+            SELECT * FROM calculated_group_section_overrides
+            #{unassign_item}
             #{union_course_overrides}
-            SELECT * FROM override_everyonelse_students
           ),
 
           /* and pick the latest override date as the effective due date */
@@ -558,7 +579,6 @@ class EffectiveDueDates
           /* match the effective due date with its grading period */
           LEFT OUTER JOIN applied_grading_periods periods ON
               periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date
-          #{unassign_item}
         SQL
       end
     end

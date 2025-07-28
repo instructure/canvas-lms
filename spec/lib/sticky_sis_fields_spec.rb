@@ -267,7 +267,7 @@ describe StickySisFields do
   it "doesn't write to the database when there's not a change" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
-    expect(ac).not_to receive(:write_attribute).with(:stuck_sis_fields, anything)
+    expect(ac).not_to receive(:[]=).with(:stuck_sis_fields, anything)
     ac.save!
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
@@ -277,11 +277,10 @@ describe StickySisFields do
   it "writes to the database when there's a change" do
     ac = create_abstract_course
     ac.add_sis_stickiness(:name)
-    expect(ac).to receive(:write_attribute).with(:workflow_state, "active")
-    allow(ac).to receive(:write_attribute).with("root_account_id", Account.default.id)
-    allow(ac).to receive(:write_attribute).with("account_id", Account.default.id)
-    allow(ac).to receive(:write_attribute).with("enrollment_term_id", Account.default.default_enrollment_term.id)
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, "name")
+    allow(ac).to receive(:[]=).with("root_account_id", Account.default.id)
+    allow(ac).to receive(:[]=).with("account_id", Account.default.id)
+    allow(ac).to receive(:[]=).with("enrollment_term_id", Account.default.default_enrollment_term.id)
+    expect(ac).to receive(:[]=).with("stuck_sis_fields", "name")
     ac.save!
   end
 
@@ -384,13 +383,13 @@ describe StickySisFields do
       ac.stuck_sis_fields = [:short_name]
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [:short_name].to_set
       expect(ac.instance_variable_get(:@sis_fields_to_unstick)).to eq [:name].to_set
-      expect(ac.send(:load_stuck_sis_fields_cache)).to eq [:name].to_set
+      expect(ac.send(:stuck_sis_fields_cache)).to eq [:name].to_set
       AbstractCourse.process_as_sis clear_sis_stickiness: true do
         ac.save!
       end
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [].to_set
       expect(ac.instance_variable_get(:@sis_fields_to_unstick)).to eq [].to_set
-      expect(ac.send(:load_stuck_sis_fields_cache)).to eq [].to_set
+      expect(ac.send(:stuck_sis_fields_cache)).to eq [].to_set
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
   end

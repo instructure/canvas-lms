@@ -66,7 +66,7 @@ const brandableCss = {
     invariant(
       bundles.hasOwnProperty(id),
       `requested to load stylesheet for template "${bundle}" (${id}) but no ` +
-        `mapping is available for it!`
+        `mapping is available for it!`,
     )
 
     // "includesNoVariables" true; there's only one file regardless of variant

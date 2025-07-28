@@ -17,11 +17,11 @@
  */
 
 import {useMemo, useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {v1 as uuid} from 'uuid'
 import useBoolean from './useBoolean'
 
-const I18n = useI18nScope('useRatings')
+const I18n = createI18nScope('useRatings')
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 
@@ -30,7 +30,7 @@ export const createRating = (
   points,
   mastery,
   focusField = null,
-  color = '#ffffff'
+  color = '#ffffff',
 ) => ({
   description,
   points,
@@ -52,7 +52,7 @@ export const defaultMasteryPoints = 3
 
 export const prepareRatings = ratings =>
   (ratings || []).map(({description, points, focusField}) =>
-    createRating(description, points, focusField)
+    createRating(description, points, focusField),
   )
 
 const invalidDescription = description => (description?.trim() || '').length === 0
@@ -70,7 +70,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
       const points = parseFloat(r.points)
       const pointsIndex = allPoints.findIndex(p =>
         // if float, test parsing float, otherwise, test string
-        floatRegex.test(p) ? parseFloat(p) === parseFloat(r.points) : p === r.points
+        floatRegex.test(p) ? parseFloat(p) === parseFloat(r.points) : p === r.points,
       )
 
       const descriptionError = invalidDescription(r.description)
@@ -133,12 +133,12 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
 
   const ratingsError = useMemo(
     () => ratingsWithValidations.some(r => r.pointsError || r.descriptionError),
-    [ratingsWithValidations]
+    [ratingsWithValidations],
   )
 
   const masteryPointsError = useMemo(
     () => Boolean(masteryPointsWithValidations.error),
-    [masteryPointsWithValidations]
+    [masteryPointsWithValidations],
   )
 
   const changeRatings = useCallback(
@@ -146,7 +146,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
       if (!hasChanged) setHasChanged()
       setRatings(value)
     },
-    [hasChanged, setHasChanged]
+    [hasChanged, setHasChanged],
   )
 
   const changeMasteryPoints = useCallback(
@@ -154,7 +154,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
       if (!hasChanged) setHasChanged()
       setMasteryPoints(value)
     },
-    [hasChanged, setHasChanged]
+    [hasChanged, setHasChanged],
   )
 
   const prepareFocusClear = ratingsArr => ratingsArr.map(r => ({...r, focusField: null}))

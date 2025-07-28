@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import ShowFolder from '../ShowFolder'
-import sinon from 'sinon'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import {merge} from 'lodash'
@@ -46,12 +45,12 @@ const defaultProps = (props = {}) => {
       userCanEditFilesForContext: true,
       userCanRestrictFilesForContext: true,
     },
-    props
+    props,
   )
 }
 
 describe('ShowFolder', () => {
-  let oldEnv, sandbox
+  let oldEnv
 
   beforeEach(() => {
     oldEnv = window.ENV
@@ -59,12 +58,11 @@ describe('ShowFolder', () => {
       COURSE_ID: '101',
       context_asset_string: 'course_17',
     }
-    sandbox = sinon.createSandbox()
-    sandbox.stub(Folder, 'resolvePath').returns(new Promise(() => {}))
+    jest.spyOn(Folder, 'resolvePath').mockReturnValue(new Promise(() => {}))
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
     window.ENV = oldEnv
   })
 
@@ -91,14 +89,14 @@ describe('ShowFolder', () => {
 
   it('renders empty text if the folder is empty', () => {
     const props = defaultProps()
-    sandbox.stub(props.currentFolder, 'isEmpty').returns(true)
+    jest.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(true)
     const {getByText} = render(<ShowFolder {...props} />)
     expect(getByText('This folder is empty')).toBeInTheDocument()
   })
 
   it('does not render empty text if the folder isnt empty', () => {
     const props = defaultProps()
-    sandbox.stub(props.currentFolder, 'isEmpty').returns(false)
+    jest.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(false)
     const {queryByText} = render(<ShowFolder {...props} />)
     expect(queryByText('This folder is empty')).not.toBeInTheDocument()
   })

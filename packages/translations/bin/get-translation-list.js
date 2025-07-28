@@ -1,3 +1,4 @@
+/* eslint-disable import/no-nodejs-modules */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -23,12 +24,10 @@ const path = require('path')
  * This returns an index of all the translation files for a given package
  * If packageName is omitted, then the base combined files.
  */
-async function getTranslationList(packageName) {
+exports.getTranslationList = async function (packageName) {
   const translationList = await fs.promises.readdir(
     path.resolve(__dirname, `../lib/${packageName || ''}`),
-    {withFileTypes: true}
+    {withFileTypes: true},
   )
   return translationList.filter(t => t.isFile()).map(t => t.name)
 }
-
-module.exports = getTranslationList

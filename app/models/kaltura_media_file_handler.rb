@@ -71,10 +71,10 @@ class KalturaMediaFileHandler
       if wait_for_completion
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
-        started_at = Time.now
+        started_at = Time.zone.now
         timeout = Setting.get("media_bulk_upload_timeout", 30.minutes.to_s).to_i
         until res[:ready]
-          if Time.now > started_at + timeout
+          if Time.zone.now > started_at + timeout
             refresh_later(res[:id], attachments, root_account_id)
             break
           end

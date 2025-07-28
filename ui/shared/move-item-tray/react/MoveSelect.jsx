@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {arrayOf, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {itemShape, moveOptionsType} from './propTypes'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {positions} from '@canvas/positions'
 import SelectPosition, {RenderSelect} from '@canvas/select-position'
-import React from 'react'
-
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
+import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {fetchItemTitles} from '@canvas/context-modules/utils/fetchItemTitles'
+import {itemShape, moveOptionsType} from './propTypes'
 
-const I18n = useI18nScope('move_select')
+const I18n = createI18nScope('move_select')
 
 export default class MoveSelect extends React.Component {
   static propTypes = {
@@ -109,15 +109,59 @@ export default class MoveSelect extends React.Component {
     }
   }
 
+  fetchItems() {
+    fetchItemTitles(ENV.COURSE_ID, this.state.selectedGroup.id)
+      .then(items => {
+        const groupitems = items.map(item => ({id: String(item.id), title: item.title}))
+        this.setState(state => {
+          const selectedGroup = state.selectedGroup
+          selectedGroup.items = groupitems
+          return {
+            selectedGroup,
+          }
+        })
+      })
+      .catch(error => {
+        this.setState(state => {
+          const selectedGroup = state.selectedGroup
+          selectedGroup.items = error
+          return {
+            selectedGroup,
+          }
+        })
+      })
+  }
+
+  componentDidMount() {
+    const {selectedGroup} = this.state
+    if (selectedGroup && selectedGroup.items === undefined) {
+      this.fetchItems()
+    }
+  }
+
+  componentDidUpdate(_prevProps, prevState) {
+    const {selectedGroup} = this.state
+    const prevSelectedGroup = prevState.selectedGroup
+
+    // Only fetch items if we have a selected group that's different from the previous one
+    // and it doesn't have items loaded yet
+    if (
+      selectedGroup &&
+      (!prevSelectedGroup || prevSelectedGroup.id !== selectedGroup.id) &&
+      selectedGroup.items === undefined
+    ) {
+      this.fetchItems()
+    }
+  }
+
   renderSelectGroup() {
     const {selectedGroup, selectedPosition} = this.state
     const {items} = this.props
-    const selectPosition = !!(selectedGroup && selectedGroup.items && selectedGroup.items.length)
     const groups = this.getFilteredGroups(this.props)
     return (
       <div>
         <RenderSelect
-          label={I18n.t('Group Select')}
+          label={this.props.moveOptions.groupsLabel ? this.props.moveOptions.groupsLabel : null}
           className="move-select__group"
           onChange={this.selectGroup}
           options={groups.map(group => (
@@ -127,15 +171,14 @@ export default class MoveSelect extends React.Component {
           ))}
           selectOneDefault={false}
         />
-        {selectPosition ? (
-          <SelectPosition
-            items={items}
-            siblings={selectedGroup.items}
-            selectedPosition={selectedPosition}
-            selectPosition={this.selectPosition}
-            selectSibling={this.selectSibling}
-          />
-        ) : null}
+
+        <SelectPosition
+          items={items}
+          siblings={selectedGroup?.items}
+          selectedPosition={selectedPosition}
+          selectPosition={this.selectPosition}
+          selectSibling={this.selectSibling}
+        />
       </div>
     )
   }
@@ -146,9 +189,6 @@ export default class MoveSelect extends React.Component {
     const {selectedPosition} = this.state
     return (
       <div className="move-select">
-        {this.props.moveOptions.groupsLabel && (
-          <Text weight="bold">{this.props.moveOptions.groupsLabel}</Text>
-        )}
         {groups ? (
           this.renderSelectGroup()
         ) : (

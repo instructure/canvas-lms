@@ -131,6 +131,22 @@ describe PandataEvents do
       it { is_expected.to be_truthy }
     end
 
+    context "when 'true' is set in Consul" do
+      before do
+        allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({ enabled_for_canvas: "true" })
+      end
+
+      it { is_expected.to be_truthy }
+    end
+
+    context "when 'false' is set in Consul" do
+      before do
+        allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({ enabled_for_canvas: "false" })
+      end
+
+      it { is_expected.to be_falsy }
+    end
+
     context "when Consul is not configured" do
       before do
         allow(DynamicSettings).to receive(:find).with("pandata/events", service: "canvas").and_return({})
@@ -178,12 +194,12 @@ describe PandataEvents do
 
       before do
         allow(Thread).to receive(:new).and_raise(ThreadError)
-        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_return(nil)
       end
 
       it "logs to statsd" do
         subject
-        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error.queue_failure", tags: { event_type: })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("pandata_events.error.queue_failure", tags: { event_type: })
       end
 
       it "swallows the error" do
@@ -248,7 +264,7 @@ describe PandataEvents do
 
       before do
         allow(CanvasHttp).to receive(:post).and_return(response)
-        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_return(nil)
       end
 
       it "returns false" do
@@ -257,7 +273,7 @@ describe PandataEvents do
 
       it "logs to statsd" do
         subject
-        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error.http_failure", tags: { event_type:, status_code: response.code })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("pandata_events.error.http_failure", tags: { event_type:, status_code: response.code })
       end
     end
 
@@ -266,7 +282,7 @@ describe PandataEvents do
 
       before do
         allow(CanvasHttp).to receive(:post).and_raise(exception)
-        allow(InstStatsd::Statsd).to receive(:increment).and_return(nil)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_return(nil)
       end
 
       it "returns false" do
@@ -275,7 +291,7 @@ describe PandataEvents do
 
       it "logs to statsd" do
         subject
-        expect(InstStatsd::Statsd).to have_received(:increment).with("pandata_events.error", tags: { event_type: })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("pandata_events.error", tags: { event_type: })
       end
     end
   end

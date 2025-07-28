@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 import {Error} from './Error'
 import {Submission} from './Submission'
-import {SubmissionComment} from './SubmissionComment'
+import {SubmissionHtmlComment} from './SubmissionComment'
 import {SubmissionDraft} from './SubmissionDraft'
 
 export const DefaultMocks = {
@@ -88,7 +88,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
       }
     ) {
       submissionComment {
-        ...SubmissionComment
+        ...SubmissionHtmlComment
       }
       errors {
         ...Error
@@ -96,7 +96,7 @@ export const CREATE_SUBMISSION_COMMENT = gql`
     }
   }
   ${Error.fragment}
-  ${SubmissionComment.fragment}
+  ${SubmissionHtmlComment.fragment}
 `
 
 export const CREATE_SUBMISSION_DRAFT = gql`

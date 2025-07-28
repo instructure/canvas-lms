@@ -34,10 +34,13 @@ export const UploadFormPropTypes = {
   disabled: bool,
   alwaysRename: bool, // if false offer to rename files
   alwaysUploadZips: bool, // if false offer to expand zip files
+  errorOnDuplicate: bool,
   onChange: func,
   onEmptyOrClose: func,
   onRenameFileMessage: func,
   onLockFileMessage: func,
+  onFileOptionsChange: func,
+  useCanvasModals: bool,
 }
 
 class UploadForm extends React.Component {
@@ -53,6 +56,8 @@ class UploadForm extends React.Component {
     onEmptyOrClose: () => {},
     onRenameFileMessage: () => {},
     onLockFileMessage: () => {},
+    onFileOptionsChange: () => {},
+    useCanvasModals: true,
   }
 
   constructor(props) {
@@ -99,8 +104,8 @@ class UploadForm extends React.Component {
     this.setState({showResolveModals: false})
   }
 
-  setUploadOptions({alwaysRename, alwaysUploadZips}) {
-    FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips})
+  setUploadOptions({alwaysRename, alwaysUploadZips, errorOnDuplicate}) {
+    FileOptionsCollection.setUploadOptions({alwaysRename, alwaysUploadZips, errorOnDuplicate})
   }
 
   _actualQueueUploads() {
@@ -119,7 +124,7 @@ class UploadForm extends React.Component {
     }
   }
 
-  addFiles = () => {
+  addFiles() {
     return this.addFileInputRef.current.click()
   }
 
@@ -185,6 +190,8 @@ class UploadForm extends React.Component {
         }
       }
     }
+
+    this.props.onFileOptionsChange(this.state)
   }
 
   UNSAFE_componentWillMount() {
@@ -199,27 +206,39 @@ class UploadForm extends React.Component {
     this.setState(FileOptionsCollection.getState(), callback)
   }
 
+  renderZipFileOptionsForm() {
+    if (!this.props.useCanvasModals) return null
+
+    return (
+      <ZipFileOptionsForm
+        fileOptions={this.state.zipOptions[0]}
+        onZipOptionsResolved={this.onZipOptionsResolved}
+        onClose={this.onClose}
+      />
+    )
+  }
+
+  renderFileRenameForm() {
+    if (!this.props.useCanvasModals) return null
+
+    return (
+      <FileRenameForm
+        data-testid="rename-dialog"
+        fileOptions={this.state.nameCollisions[0]}
+        onNameConflictResolved={this.onNameConflictResolved}
+        onClose={this.onClose}
+        allowSkip={this.props.allowSkip}
+        onRenameFileMessage={this.props.onRenameFileMessage}
+        onLockFileMessage={this.props.onLockFileMessage}
+      />
+    )
+  }
+
   buildPotentialModal = () => {
     if (this.state.zipOptions.length && !this.props.alwaysUploadZips) {
-      return (
-        <ZipFileOptionsForm
-          fileOptions={this.state.zipOptions[0]}
-          onZipOptionsResolved={this.onZipOptionsResolved}
-          onClose={this.onClose}
-        />
-      )
+      return this.renderZipFileOptionsForm()
     } else if (this.state.nameCollisions.length && !this.props.alwaysRename) {
-      return (
-        <FileRenameForm
-          data-testid="rename-dialog"
-          fileOptions={this.state.nameCollisions[0]}
-          onNameConflictResolved={this.onNameConflictResolved}
-          onClose={this.onClose}
-          allowSkip={this.props.allowSkip}
-          onRenameFileMessage={this.props.onRenameFileMessage}
-          onLockFileMessage={this.props.onLockFileMessage}
-        />
-      )
+      return this.renderFileRenameForm()
     }
   }
 

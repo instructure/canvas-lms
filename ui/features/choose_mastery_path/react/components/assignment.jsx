@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import assignmentShape from '../shapes/assignment-shape'
 
-const I18n = useI18nScope('choose_mastery_path')
+const I18n = createI18nScope('choose_mastery_path')
 
 const {bool} = PropTypes
 
@@ -57,7 +57,7 @@ export default class Assignment extends React.Component {
     const assgClasses = classNames(
       'cmp-assignment',
       'context_module_item',
-      this.props.assignment.category.contentTypeClass
+      this.props.assignment.category.contentTypeClass,
     )
 
     return (

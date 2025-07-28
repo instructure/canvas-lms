@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import sinon from 'sinon'
 import SpeedGraderSettingsMenu from '../SpeedGraderSettingsMenu'
 import {render, waitFor} from '@testing-library/react'
 
@@ -32,18 +31,18 @@ describe('Webzip export app', () => {
     openKeyboardShortcutsModal() {},
     showHelpMenuItem: false,
     showModerationMenuItem: false,
+    showKeyboardShortcutsMenuItem: false, // Add missing required prop
   }
 
   beforeEach(() => {
     $container = document.createElement('div')
     document.body.appendChild($container)
-    sinon.stub(SpeedGraderSettingsMenu, 'setURL')
-    sinon.stub(window, 'open')
+    jest.spyOn(SpeedGraderSettingsMenu, 'setURL').mockImplementation(() => {})
+    jest.spyOn(window, 'open').mockImplementation(() => {})
   })
 
   afterEach(() => {
-    window.open.restore()
-    SpeedGraderSettingsMenu.setURL.restore()
+    jest.restoreAllMocks()
     $container.remove()
   })
 
@@ -57,14 +56,14 @@ describe('Webzip export app', () => {
   })
 
   test('calls the openOptionsModal prop when "Options" is clicked', async () => {
-    props.openOptionsModal = sinon.stub()
+    props.openOptionsModal = jest.fn()
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     await waitFor(() => {
       expect(wrapper.getByText('Options')).toBeInTheDocument()
     })
     wrapper.getByText('Options').click()
-    expect(props.openOptionsModal.callCount).toBe(1)
+    expect(props.openOptionsModal).toHaveBeenCalledTimes(1)
   })
 
   test('includes a "Keyboard Shortcuts" menu item when keyboard shortcuts are enabled', async () => {
@@ -83,15 +82,16 @@ describe('Webzip export app', () => {
 
   test('calls the openKeyboardShortcutsModal prop when "Keyboard Shortcuts" is clicked', async () => {
     props.showKeyboardShortcutsMenuItem = true
-    props.openKeyboardShortcutsModal = sinon.stub()
+    props.openKeyboardShortcutsModal = jest.fn()
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     wrapper.getByText('Keyboard Shortcuts').click()
-    expect(props.openOptionsModal.callCount).toBe(1)
+    expect(props.openKeyboardShortcutsModal).toHaveBeenCalledTimes(1)
   })
 
   test('does not include a "Moderation Page" menu item if passed showModerationMenuItem: false', async () => {
-    props.showKeyboardShortcutsMenuItem = false
+    // Make sure showModerationMenuItem is explicitly set to false
+    props.showModerationMenuItem = false
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     expect(wrapper.queryByText('Moderation Page')).toBeNull()
@@ -109,7 +109,7 @@ describe('Webzip export app', () => {
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     await wrapper.getByText('Moderation Page').click()
-    expect(window.open.callCount).toBe(1)
+    expect(window.open).toHaveBeenCalledTimes(1)
   })
 
   test('opens the moderation page when the "Moderation Page" is clicked', async () => {
@@ -118,7 +118,7 @@ describe('Webzip export app', () => {
     await wrapper.getByRole('button').click()
     await wrapper.getByText('Moderation Page').click()
     const expectedURL = `/courses/${props.courseID}/assignments/${props.assignmentID}/moderate`
-    expect(window.open.lastCall.args[0]).toBe(expectedURL)
+    expect(window.open).toHaveBeenCalledWith(expectedURL, '_blank')
   })
 
   test('opens the page in a new tab when the "Moderation Page" is clicked', async () => {
@@ -127,11 +127,12 @@ describe('Webzip export app', () => {
     await wrapper.getByRole('button').click()
     await wrapper.getByText('Moderation Page').click()
     const openInNewTabArgument = '_blank'
-    expect(window.open.lastCall.args[1]).toBe(openInNewTabArgument)
+    expect(window.open).toHaveBeenCalledWith(expect.any(String), openInNewTabArgument)
   })
 
   test('does not include a "Help" menu item if passed showHelpMenuItem: false', async () => {
-    props.showModerationMenuItem = false
+    // Explicitly set showHelpMenuItem to false
+    props.showHelpMenuItem = false
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     expect(wrapper.queryByText('Help')).toBeNull()
@@ -149,7 +150,7 @@ describe('Webzip export app', () => {
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     await wrapper.getByText('Help').click()
-    expect(SpeedGraderSettingsMenu.setURL.callCount).toBe(1)
+    expect(SpeedGraderSettingsMenu.setURL).toHaveBeenCalledTimes(1)
   })
 
   test('navigates to the help URL when "Help" is clicked', async () => {
@@ -157,6 +158,6 @@ describe('Webzip export app', () => {
     const wrapper = render(<SpeedGraderSettingsMenu {...props} />, {attachTo: $container})
     await wrapper.getByRole('button').click()
     await wrapper.getByText('Help').click()
-    expect(SpeedGraderSettingsMenu.setURL.lastCall.args[0]).toBe(props.helpURL)
+    expect(SpeedGraderSettingsMenu.setURL).toHaveBeenCalledWith(props.helpURL)
   })
 })

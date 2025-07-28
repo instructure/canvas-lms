@@ -56,7 +56,7 @@ class AssignmentSet extends React.Component {
       setAssignments: object.isRequired,
       allAssignments: object.isRequired,
       removeAssignment: func.isRequired,
-      moveAssignment: func.isRequired /* eslint-disable-line react/no-unused-prop-types */,
+      moveAssignment: func.isRequired  ,
       toggleSetCondition: func.isRequired,
       showOrToggle: bool,
       disableSplit: bool,
@@ -160,7 +160,7 @@ class AssignmentSet extends React.Component {
           <h3>{this.props.label}</h3>
         </ScreenReaderContent>
         {this.renderAssignments()}
-      </div>
+      </div>,
     )
   }
 }

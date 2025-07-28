@@ -143,36 +143,16 @@ module RequestContext
       add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
     end
 
-    class << self
-      def allow_unsigned_request_context_for(*paths)
-        unsigned_context_allowed_paths.merge(paths)
-      end
-
-      def allows_unsigned_request_context_for?(path)
-        unsigned_context_allowed_paths.include?(path)
-      end
-
-      def reset_unsigned_request_context_paths
-        @unsigned_context_allowlist = Set.new
-      end
-
-      private
-
-      def unsigned_context_allowed_paths
-        @unsigned_context_allowlist ||= Set.new
-      end
-    end
-
     private
 
     def generate_request_id(env)
-      if env["HTTP_X_REQUEST_CONTEXT_ID"]
+      if env["HTTP_X_REQUEST_CONTEXT_ID"] && env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"]
         request_context_id = CanvasSecurity.base64_decode(env["HTTP_X_REQUEST_CONTEXT_ID"])
-        req_path = Rack::Request.new(env).path
+        Rack::Request.new(env).path
         # we accept a request context id on some paths without requiring a
         # signature, e.g. because we already have some other means by which to
         # ensure those paths are only used by trusted services
-        if self.class.allows_unsigned_request_context_for?(req_path) || valid_signature?(request_context_id, env)
+        if valid_signature?(request_context_id, env)
           return request_context_id
         else
           Rails.logger.info("ignoring X-Request-Context-Id header, signature could not be verified")

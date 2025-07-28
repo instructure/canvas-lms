@@ -18,7 +18,7 @@
 
 <div class="content-box auth-form-container--new"
      id="<%= "#{aac.auth_type}_form" if aac.new_record? %>"
-     <%= hidden(true) if aac.new_record? %>>
+     <%= hidden(include_style: true) if aac.new_record? %>>
   <div class="grid-row">
     <div class="col-xs-12 col-lg-11 off-lg-1">
       <% url = aac.new_record? ? account_authentication_providers_url(account) :
@@ -33,7 +33,7 @@
                    }) do |f| %>
       <%= f.hidden_field :auth_type, value: aac.auth_type, id: nil %>
       <%= f.hidden_field :id, id: nil %>
-        <h3 tabindex="0"><%= aac.class.display_name %></h3>
+        <h3><%= aac.class.display_name %></h3>
         <% if !aac.new_record? %>
           <p><%= mt "You can log in directly with this provider by going to %{url}",
                     url: url_for(presenter.login_url_options(aac)) %></p>
@@ -41,6 +41,8 @@
 
         <%= render partial: "#{aac.auth_type}_fields",
                  locals: {aac: aac, presenter: presenter, f: f}%>
+
+        <%= render partial: "additional_settings", locals: { f:, presenter:, provider: aac } %>
 
         <% if aac.class.recognized_federated_attributes != [] %>
           <%= render partial: "federated_attributes", locals: { aac: aac, presenter: presenter, f: f } %>
@@ -60,7 +62,7 @@
                                  checked: !!aac.settings["mfa_required"] || (!aac.skip_internal_mfa? && aac.account.mfa_settings == :required) %>
               <%= f.label :mfa_option, t('Canvas enforces MFA *When logging in through this Provider, Canvas will challenge the user with MFA, or require it to be configured.*',
                                          wrappers: ['<br/><span class="ic-Form-help-text">\1</span>']), for: "mfa_option_required_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
-            
+
             </div>
             <% if aac.auth_type != 'canvas' %>
               <div class="ic-Checkbox-group" style="margin-left: 22px">

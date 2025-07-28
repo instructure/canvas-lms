@@ -167,7 +167,7 @@ describe CanvasSanitize do
   end
 
   it "removes and not escape contents of style tags" do
-    str = %(<p><style type="text/css">pleaseignoreme: blahblahblah</style>but not me</p>)
+    str = %(<p><style>button { color: white !important; }</style>but not me</p>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).to eq "<p>but not me</p>"
   end

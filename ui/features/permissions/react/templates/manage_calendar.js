@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_18')
+const I18n = createI18nScope('permissions_templates_18')
 
 export const template = generateActionTemplates(
   [
@@ -30,7 +30,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Scheduler'),
       description: I18n.t(
-        'Allows user to create and manage appointments on the calendar using Scheduler.'
+        'Allows user to create and manage appointments on the calendar using Scheduler.',
       ),
     },
   ],
@@ -38,7 +38,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
-        'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.'
+        'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.',
       ),
     },
     {
@@ -54,7 +54,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Scheduler'),
       description: I18n.t(
-        'Allows user to create and manage appointments on the calendar using Scheduler.'
+        'Allows user to create and manage appointments on the calendar using Scheduler.',
       ),
     },
   ],
@@ -62,12 +62,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
-        'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.'
+        'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.',
       ),
     },
     {
       title: I18n.t('Scheduler'),
       description: I18n.t('Scheduler must be enabled by your Canvas admin.'),
     },
-  ]
+  ],
 )

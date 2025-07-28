@@ -55,4 +55,64 @@ describe MessagesController do
       end
     end
   end
+
+  describe "html_message" do
+    before do
+      site_admin_user
+      user_session(@user)
+    end
+
+    context "with unsafe HTML input" do
+      let(:message) { Message.create!(user: @user, subject: "Test", html_body:, sent_at: Time.zone.now) }
+      let(:html_body) do
+        <<~HTML
+          <div>Safe</div>
+          <script>alert("XSS")</script>
+          <p>Paragraph</p>
+          <img src="x" onerror="alert('XSS')">
+          <svg/onload=alert(1)>
+          <body onload=alert(1)>
+          "><input onfocus=alert(1) autofocus>Hello
+          <a href="javascript:alert(1)">Click</a>
+          <meta http-equiv="refresh" content="0;url=javascript:alert(1)">
+          <sCrIpT>alert(1)</ScRiPt>
+        HTML
+      end
+
+      it "does not allow unsanitized HTML" do
+        get :html_message, params: { user_id: @user.to_param, message_id: message.id }
+
+        expect(response).to have_http_status :ok
+        expect(response.body).not_to include("<script>")
+        expect(response.body).not_to include("alert(")
+        expect(response.body).to include("<div>Safe</div>")
+        expect(response.body).to include("Click")
+        expect(response.body).to include("Hello")
+      end
+    end
+
+    context "with safe HTML input" do
+      let(:html_body) { "<div>some random HTML</div>" }
+      let(:message) { Message.create!(user: @user, subject: "Test", html_body:, sent_at: Time.zone.now) }
+
+      it "renders allowed HTML" do
+        get :html_message, params: { user_id: @user.to_param, message_id: message.id }
+
+        expect(response).to have_http_status :ok
+        expect(response.body).to include("<div>some random HTML</div>")
+      end
+    end
+
+    context "when html_body is blank" do
+      let(:html_body) { nil }
+      let(:message) { Message.create!(user: @user, subject: "Test", html_body:, sent_at: Time.zone.now) }
+
+      it "renders with no content" do
+        get :html_message, params: { user_id: @user.to_param, message_id: message.id }
+
+        expect(response).to have_http_status :ok
+        expect(response.body).to eq("")
+      end
+    end
+  end
 end

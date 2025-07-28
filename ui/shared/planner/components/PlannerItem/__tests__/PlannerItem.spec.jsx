@@ -17,14 +17,14 @@
  */
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
+import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import {PlannerItem_raw as PlannerItem} from '../index'
 
 const MY_TIMEZONE = 'America/Los_Angeles'
 const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', MY_TIMEZONE)
-const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
+const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#03893D'}
 
 function defaultProps(option = {}) {
   return {
@@ -42,11 +42,13 @@ function defaultProps(option = {}) {
     toggleCompletion: () => {},
     updateTodo: () => {},
     currentUser: user,
+    registerAnimatable: () => {},
+    deregisterAnimatable: () => {},
     ...option,
   }
 }
 
-function noteProps(option) {
+function noteProps(option = {}) {
   return {
     id: '22',
     uniqueId: 'twenty-two',
@@ -60,823 +62,204 @@ function noteProps(option) {
     updateTodo: () => {},
     currentUser: user,
     dateStyle: 'todo',
+    registerAnimatable: () => {},
+    deregisterAnimatable: () => {},
     ...option,
   }
 }
 
-function groupProps() {
-  return {
-    color: '#F06291',
-    completed: false,
-    id: '25',
-    uniqueId: 'wiki_page-25',
-    courseName: 'Account-level group 1',
-    context: {
-      type: 'Group',
-      id: '9',
-      title: 'Account-level group 1',
-      color: '#F06291',
-      url: '/groups/9',
-    },
-    date: DEFAULT_DATE,
-    associated_item: 'Page',
-    title: 'this is an account-level group page',
-    html_url: '/groups/9/pages/this-is-an-account-level-group-page',
-    timeZone: 'America/Denver',
-    badges: [],
-    toggleCompletion: () => {},
-    updateTodo: () => {},
-    currentUser: user,
-  }
-}
-
-it('renders correctly', () => {
-  const wrapper = shallow(<PlannerItem {...defaultProps({points: 35, date: DEFAULT_DATE})} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Quiz correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Quiz',
-        completed: true,
-        title: 'I am a Quiz',
-        points: 4,
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Quiz correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Quiz',
-        completed: false,
-        title: 'I am a Quiz',
-        points: 2,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Quiz correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Quiz',
-        completed: false,
-        title: 'I am a Quiz',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Quiz correctly with just date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Quiz',
-        completed: false,
-        title: 'I am a Quiz',
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Assignment correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Assignment',
-        completed: true,
-        title: 'I am an Assignment',
-        points: 4,
-        html_url: 'http://www.non_default_url.com',
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Assignment correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Assignment',
-        completed: false,
-        title: 'I am an Assignment',
-        points: 2,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Assignment correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Assignment',
-        completed: false,
-        title: 'I am an Assignment',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Assignment correctly with just date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Assignment',
-        completed: false,
-        title: 'I am an Assignment',
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders assignment peer reviews correctly', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Peer Review',
-        title: 'some reviewable assignment',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Discussion correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Discussion',
-        completed: true,
-        title: 'I am a Discussion',
-        points: 4,
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Discussion correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Discussion',
-        completed: false,
-        title: 'I am a Discussion',
-        points: 2,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Discussion correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Discussion',
-        completed: false,
-        title: 'I am a Discussion',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Discussion correctly with just date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Discussion',
-        completed: false,
-        title: 'I am a Discussion',
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Announcement correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Announcement',
-        completed: true,
-        title: 'I am an Announcement',
-        points: 4,
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Announcement correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Announcement',
-        completed: false,
-        title: 'I am an Announcement',
-        points: 2,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Announcement correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Announcement',
-        completed: false,
-        title: 'I am an Announcement',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Announcement correctly with just date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Announcement',
-        completed: false,
-        title: 'I am an Announcement',
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Calendar Event correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Calendar Event',
-        completed: true,
-        title: 'I am a Calendar Event',
-        points: 4,
-        date: DEFAULT_DATE,
-        dateStyle: 'due',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Calendar Event correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Calendar Event',
-        completed: false,
-        title: 'I am a Calendar Event',
-        dateStyle: 'due',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Calendar Event correctly with just date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Calendar Event',
-        completed: false,
-        title: 'I am a Calendar Event',
-        date: DEFAULT_DATE,
-        dateStyle: 'due',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Calendar Event correctly with start and end time', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Calendar Event',
-        completed: false,
-        title: 'I am a Calendar Event',
-        date: DEFAULT_DATE,
-        endTime: DEFAULT_DATE.clone().add(2, 'hours'),
-        dateStyle: 'due',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Calendar Event correctly with an all day date', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Calendar Event',
-        completed: false,
-        title: 'I am a Calendar Event',
-        date: DEFAULT_DATE,
-        allDay: true,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Page correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Page',
-        completed: true,
-        title: 'I am a Page',
-        points: 4,
-        date: DEFAULT_DATE,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Page correctly with just points', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Page',
-        completed: false,
-        title: 'I am a Page',
-        points: 2,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Page correctly without right side content', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: 'Page',
-        completed: false,
-        title: 'I am a Page',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Page correctly with just date', () => {
-  const props = defaultProps({
-    associated_item: 'Page',
-    completed: false,
-    title: 'I am a Page',
-    date: DEFAULT_DATE,
-    timeZone: 'America/Denver',
-  })
-  props.courseName = null
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Note correctly with everything', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...noteProps({
-        associated_item: 'To Do',
-        completed: true,
-        title: 'I am a Note',
-        date: DEFAULT_DATE,
-        courseName: 'Math 101',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Note correctly without Course', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...noteProps({
-        associated_item: 'To Do',
-        completed: false,
-        title: 'I am a Note',
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders user-created Todo correctly', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        associated_item: null,
-        completed: false,
-        title: 'do that one thing',
-        courseName: 'To Do',
-        color: null,
-      })}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders Note correctly with Group', () => {
-  const wrapper = shallow(<PlannerItem {...groupProps()} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('displays Pills when given them', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({points: 35, date: DEFAULT_DATE})}
-      onClick={() => {}}
-      itemCount={3}
-      badges={[{id: 'new_grades', text: 'Graded'}]}
-    />
-  )
-
-  expect(wrapper.find('Pill')).toHaveLength(1)
-})
-
-it('calls toggleCompletion when the checkbox is clicked', () => {
-  const mock = jest.fn()
-  const wrapper = shallow(
-    <PlannerItem {...defaultProps({points: 35, date: DEFAULT_DATE})} toggleCompletion={mock} />
-  )
-  wrapper.find('Checkbox').simulate('change')
-  expect(mock).toHaveBeenCalled()
-})
-
-it('disables the checkbox when toggleAPIPending is true', () => {
-  const mock = jest.fn()
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({points: 35, date: DEFAULT_DATE})}
-      toggleAPIPending={true}
-      toggleCompletion={mock}
-    />
-  )
-  wrapper.find('Checkbox').simulate('change')
-  expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
-})
-
-it('registers itself as animatable', () => {
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
-  const ref = React.createRef()
-  const wrapper = render(
-    <PlannerItem
-      {...defaultProps()}
-      id="1"
-      uniqueId="first"
-      animatableIndex={42}
-      registerAnimatable={fakeRegister}
-      deregisterAnimatable={fakeDeregister}
-      ref={ref}
-    />
-  )
-  expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['first'])
-
-  wrapper.rerender(
-    <PlannerItem
-      {...defaultProps()}
-      id="1"
-      uniqueId="second"
-      animatableIndex={42}
-      registerAnimatable={fakeRegister}
-      deregisterAnimatable={fakeDeregister}
-      ref={ref}
-    />
-  )
-  expect(fakeDeregister).toHaveBeenCalledWith('item', ref.current, ['first'])
-  expect(fakeRegister).toHaveBeenCalledWith('item', ref.current, 42, ['second'])
-})
-
-it('renders a NewActivityIndicator when asked to', () => {
-  const props = defaultProps({points: 35, date: DEFAULT_DATE})
-  props.newActivity = true
-  props.showNotificationBadge = true
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper.find('Animatable(NewActivityIndicator)')).toHaveLength(1)
-})
-
-it('renders feedback if available', () => {
-  const props = defaultProps({
-    feedback: {
-      author_avatar_url: '/avatar/is/here/',
-      author_name: 'Boyd Crowder',
-      comment: 'Death will not be the end of your suffering.',
-      is_media: false,
-    },
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders the location if available', () => {
-  const props = defaultProps({
-    location: 'Columbus, OH',
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders feedback anonymously according to the assignment settings', () => {
-  const props = defaultProps({
-    feedback: {
-      comment: 'Open the pod bay doors, HAL.',
-    },
-    location: 'NYC',
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('prefers to render feedback if it and the location are available', () => {
-  // I don't believe this is possible, but it's how the code handles it.
-  const props = defaultProps({
-    feedback: {
-      author_avatar_url: '/avatar/is/here/',
-      author_name: 'Dr. David Bowman',
-      comment: 'Open the pod bay doors, HAL.',
-    },
-    location: 'NYC',
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders the end time if available', () => {
-  const props = defaultProps({
-    associated_item: 'Calendar Event',
-    endTime: DEFAULT_DATE.clone().add(2, 'hours'),
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('does not render end time if the same as start time', () => {
-  const props = defaultProps({
-    associated_item: 'Calendar Event',
-    endTime: DEFAULT_DATE.clone(),
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-it('renders media feedback if available', () => {
-  const props = defaultProps({
-    feedback: {
-      author_avatar_url: '/avatar/is/here/',
-      author_name: 'Howard Stern',
-      comment: 'This is a media comment.',
-      is_media: true,
-    },
-  })
-  const wrapper = shallow(<PlannerItem {...props} />)
-  expect(wrapper).toMatchSnapshot()
-})
-
-describe('with isObserving', () => {
-  it('renders the checkbox as disabled when isObserving', () => {
-    const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving={true} />)
-    expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
+describe('PlannerItem', () => {
+  beforeEach(() => {
+    MockDate.set('2017-04-24', 0)
   })
 
-  it('does not render the edit button when isObserving', () => {
-    const wrapper = shallow(
-      <PlannerItem
-        {...defaultProps({
-          associated_item: 'To Do',
-          completed: false,
-          title: 'I am a to do',
-        })}
-        isObserving={true}
-      />
-    )
-    expect(wrapper.find('[data-testid="edit-event-button"]').exists()).toBeFalsy()
-  })
-})
-
-it('shows the "Join" button for zoom calendar events', () => {
-  const wrapper = shallow(
-    <PlannerItem
-      {...defaultProps({
-        simplifiedControls: false, // not k5Mode
-        associated_item: 'Calendar Event',
-        completed: false,
-        title: 'I am a Calendar Event',
-        date: DEFAULT_DATE,
-        dateStyle: 'due',
-        onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-      })}
-    />
-  )
-  expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
-})
-
-describe('with simplifiedControls', () => {
-  const props = defaultProps({simplifiedControls: true})
-
-  // LF-1022
-  it.skip('renders the title link in turquoise', () => {
-    const {getByRole} = render(<PlannerItem {...props} deregisterAnimatable={jest.fn()} />)
-    const titleLink = getByRole('link')
-    expect(titleLink).toHaveStyle('color: rgb(3, 116, 181)')
+  afterEach(() => {
+    MockDate.reset()
   })
 
-  it('does not render the details sub-heading', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    expect(wrapper.find('.PlannerItem-styles__type').length).toBe(0)
+  it('renders basic planner item correctly', () => {
+    const props = defaultProps({points: 35, date: DEFAULT_DATE})
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText(props.title)).toBeInTheDocument()
+    expect(getByText('35')).toBeInTheDocument()
+    expect(getByText('pts')).toBeInTheDocument()
   })
 
-  it('does not render the item type icon in course color', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    expect(wrapper.find('.PlannerItem-styles__icon').prop('style').color).toBe(undefined)
+  it('renders assignment with icon', () => {
+    const props = defaultProps({associated_item: 'Assignment'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconAssignment"]')).toBeInTheDocument()
   })
 
-  describe('the "Join" button', () => {
-    describe('as inactive', () => {
-      it('for all day events on another day', () => {
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: moment().add(1, 'days'),
-              allDay: true,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
-      })
+  it('renders quiz with icon', () => {
+    const props = defaultProps({associated_item: 'Quiz'})
+    const {container} = render(<PlannerItem {...props} />)
 
-      it("for events with no end time that haven't started", () => {
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: moment().add(1, 'hours'),
-              allDay: false,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
-      })
+    expect(container.querySelector('[name="IconQuiz"]')).toBeInTheDocument()
+  })
 
-      it("for events with an end time that aren't active", () => {
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: moment().add(1, 'hours'),
-              end_time: moment().add(2, 'hours'),
-              allDay: false,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
-      })
+  it('renders discussion with icon', () => {
+    const props = defaultProps({associated_item: 'Discussion'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconDiscussion"]')).toBeInTheDocument()
+  })
+
+  it('renders announcement with icon', () => {
+    const props = defaultProps({associated_item: 'Announcement'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconAnnouncement"]')).toBeInTheDocument()
+  })
+
+  it('renders calendar event with icon', () => {
+    const props = defaultProps({associated_item: 'Calendar Event'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconCalendarMonth"]')).toBeInTheDocument()
+  })
+
+  it('renders page with icon', () => {
+    const props = defaultProps({associated_item: 'Page'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconDocument"]')).toBeInTheDocument()
+  })
+
+  it('renders peer review with icon', () => {
+    const props = defaultProps({associated_item: 'Peer Review'})
+    const {container} = render(<PlannerItem {...props} />)
+
+    expect(container.querySelector('[name="IconPeerReview"]')).toBeInTheDocument()
+  })
+
+  it('renders todo item correctly', () => {
+    const props = noteProps({})
+    const {getByText, container} = render(<PlannerItem {...props} />)
+
+    expect(getByText(props.title)).toBeInTheDocument()
+    // Todo items render user avatar, not an icon
+    expect(container.querySelector('[data-fs-exclude="true"]')).toBeInTheDocument()
+  })
+
+  it('renders todo item with course name when missing', () => {
+    const props = noteProps({courseName: 'some course', isMissingItem: true})
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText(props.title)).toBeInTheDocument()
+    expect(getByText('some course')).toBeInTheDocument()
+  })
+
+  it('renders calendar event with location', () => {
+    const props = defaultProps({
+      associated_item: 'Calendar Event',
+      location: 'A fine location',
     })
+    const {getByText} = render(<PlannerItem {...props} />)
 
-    describe('as active', () => {
-      beforeAll(() => {
-        moment.tz.setDefault(MY_TIMEZONE)
-        const tzoffset = moment.tz(MY_TIMEZONE).format('Z')
-        MockDate.set(`2021-09-01T13:00:00${tzoffset}`)
-      })
+    expect(getByText('A fine location')).toBeInTheDocument()
+  })
 
-      afterAll(() => {
-        MockDate.reset()
-        moment.tz.setDefault()
-      })
-
-      it('for all day events today', () => {
-        const today = moment()
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: today,
-              allDay: true,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
-      })
-
-      it('for started events today with no end time', () => {
-        const today = moment()
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: today.add(-1, 'hour'),
-              allDay: false,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
-      })
-
-      it('for started events currently taking place', () => {
-        const wrapper = shallow(
-          <PlannerItem
-            {...defaultProps({
-              simplifiedControls: true,
-              associated_item: 'Calendar Event',
-              completed: false,
-              title: 'I am a Calendar Event',
-              date: moment().add(-1, 'hour'),
-              end_time: moment().add(1, 'hour'),
-              allDay: false,
-              dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
-            })}
-          />
-        )
-        expect(wrapper.find('[data-testid="join-button-hot"]').exists()).toBeTruthy()
-      })
+  it('renders new activity badge', () => {
+    const props = defaultProps({
+      associated_item: 'Discussion',
+      title: 'I am a Discussion',
+      newActivity: true,
+      showNotificationBadge: true,
     })
-  })
-})
+    const {getByText} = render(<PlannerItem {...props} />)
 
-describe('with isMissingItem', () => {
-  const props = defaultProps({isMissingItem: true})
-
-  it('renders a warning icon instead of a completed checkbox', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    expect(wrapper.find('Checkbox').exists()).toBeFalsy()
-    expect(wrapper.find('IconWarningLine').exists()).toBeTruthy()
+    expect(getByText('New activity for I am a Discussion')).toBeInTheDocument()
   })
 
-  it('renders a course name in course color', () => {
-    const {getByTestId} = render(<PlannerItem {...props} deregisterAnimatable={jest.fn()} />)
-    const courseNameText = getByTestId('MissingAssignments-CourseName')
-    expect(courseNameText).toBeInTheDocument()
-    expect(courseNameText).toHaveTextContent('A Course about being Diffrient')
-    expect(courseNameText).toHaveStyle('color: rgb(215, 31, 133);')
+  it('renders missing badge', () => {
+    const props = defaultProps({
+      associated_item: 'Assignment',
+      title: 'I am an Assignment',
+      showNotificationBadge: true,
+      status: {missing: true},
+      context: {type: 'Course'},
+    })
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText('Missing items for I am an Assignment')).toBeInTheDocument()
   })
 
-  it('renders dates with both date and time', () => {
-    const wrapper = shallow(<PlannerItem {...props} />)
-    const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
-    expect(dateText.childAt(0).text()).toBe('Due: Dec 17, 2011 at 3:30 AM')
+  it('renders badges for assignments', () => {
+    const props = defaultProps({
+      badges: [
+        {id: 'late', text: 'Late', type: 'Badge', variant: 'danger'},
+        {id: 'feedback', text: 'Feedback', type: 'Badge', variant: 'primary'},
+      ],
+    })
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText('Late')).toBeInTheDocument()
+    expect(getByText('Feedback')).toBeInTheDocument()
   })
 
-  it('still renders even when there is no date', () => {
-    const wrapper = shallow(<PlannerItem {...props} date={null} />)
-    const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
-    expect(dateText.children().length).toEqual(0)
+  it('renders checkbox for non-read-only items', () => {
+    const props = defaultProps({completed: false})
+    const {getByRole} = render(<PlannerItem {...props} />)
+
+    const checkbox = getByRole('checkbox')
+    expect(checkbox).toBeInTheDocument()
+    expect(checkbox).not.toBeChecked()
+  })
+
+  it('renders checked checkbox for completed items', () => {
+    const props = defaultProps({completed: true})
+    const {getByRole} = render(<PlannerItem {...props} />)
+
+    const checkbox = getByRole('checkbox')
+    expect(checkbox).toBeInTheDocument()
+    expect(checkbox).toBeChecked()
+  })
+
+  it('renders warning icon for missing items instead of checkbox', () => {
+    const props = defaultProps({isMissingItem: true})
+    const {queryByRole, container} = render(<PlannerItem {...props} />)
+
+    expect(queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(container.querySelector('[name="IconWarning"]')).toBeInTheDocument()
+  })
+
+  it('calls toggleCompletion when checkbox is clicked', async () => {
+    const toggleCompletion = jest.fn()
+    const props = defaultProps({toggleCompletion, completed: false})
+    const {getByRole} = render(<PlannerItem {...props} />)
+
+    const checkbox = getByRole('checkbox')
+    await userEvent.click(checkbox)
+
+    expect(toggleCompletion).toHaveBeenCalled()
+  })
+
+  it('renders link to assignment with correct href', () => {
+    const props = defaultProps({html_url: 'http://www.example.com'})
+    const {getByRole} = render(<PlannerItem {...props} />)
+
+    const link = getByRole('link', {name: new RegExp(props.title)})
+    expect(link).toHaveAttribute('href', 'http://www.example.com')
+  })
+
+  it('renders points when provided', () => {
+    const props = defaultProps({points: 42})
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText('42')).toBeInTheDocument()
+    expect(getByText('pts')).toBeInTheDocument()
+  })
+
+  it('renders all day events correctly', () => {
+    const props = defaultProps({
+      associated_item: 'Calendar Event',
+      allDay: true,
+    })
+    const {getByText} = render(<PlannerItem {...props} />)
+
+    expect(getByText('All Day')).toBeInTheDocument()
   })
 })

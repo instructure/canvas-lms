@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_52')
+const I18n = createI18nScope('permissions_templates_52')
 
 export const template = generateActionTemplates(
   [
@@ -32,12 +32,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'To view discussions in a course, Discussions - view must also be enabled.'
+        'To view discussions in a course, Discussions - view must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If the option requiring users to post before seeing replies is selected in a discussion, users must post a reply to view all posts unless Discussions - moderate is also enabled.'
+        'If the option requiring users to post before seeing replies is selected in a discussion, users must post a reply to view all posts unless Discussions - moderate is also enabled.',
       ),
     },
   ],
@@ -51,11 +51,11 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'To view discussions in a course, Discussions - view must also be enabled.'
+        'To view discussions in a course, Discussions - view must also be enabled.',
       ),
     },
     {
       description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
     },
-  ]
+  ],
 )

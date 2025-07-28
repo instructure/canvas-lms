@@ -18,17 +18,29 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class LatePolicyApplicator
-  def self.for_course(course)
+  def self.for_course(course, assignment_ids = [])
     return unless course.published?
     return unless course.assignments.published.exists?
 
-    new(course).delay_if_production(
-      singleton: "late_policy_applicator:calculator:Course:#{course.global_id}",
+    # If assignment_ids is empty, we will process all assignments in the course.
+    # If assignment_ids is present, we will only process those specific assignments.
+    # This allows for flexibility in processing specific assignments if needed.
+    assignments = if assignment_ids.present?
+                    AbstractAssignment.where(context: course, id: assignment_ids).published.has_no_sub_assignments
+                  else
+                    []
+                  end
+
+    assignment_hash = assignment_ids.present? ? Digest::SHA256.hexdigest(assignment_ids.map(&:to_i).sort.join(",")) : "N/A"
+
+    new(course, assignments).delay_if_production(
+      singleton: "late_policy_applicator:calculator:Course:#{course.global_id}:AssignmentsHash:#{assignment_hash}",
       n_strand: ["LatePolicyApplicator", course.root_account.global_id]
     ).process
   end
 
   def self.for_assignment(assignment)
+    return if assignment.has_sub_assignments?
     return unless assignment.published? && assignment.points_possible&.positive?
     return unless assignment.course
 
@@ -41,9 +53,9 @@ class LatePolicyApplicator
   def initialize(course, assignments = [])
     @course = course
     @assignments = if assignments.present?
-                     assignments.select(&:published?)
+                     assignments.select { |a| a.published? && !a.has_sub_assignments? }
                    else
-                     @course.assignments.published
+                     AbstractAssignment.where(context_id: course.id, context_type: "Course").published.has_no_sub_assignments
                    end
 
     @relevant_submissions = {}
@@ -54,7 +66,6 @@ class LatePolicyApplicator
 
     late_policy = @course.late_policy
     user_ids = []
-
     @assignments.each do |assignment|
       relevant_submissions(assignment).find_each do |submission|
         submission.assignment = assignment

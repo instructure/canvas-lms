@@ -29,7 +29,7 @@ const activeAddTrayReducer = handleActions(
   {
     show: false,
     loading: false,
-  }
+  },
 )
 
 export default activeAddTrayReducer

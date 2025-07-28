@@ -49,8 +49,8 @@ module Lti
       nil
     end
 
-    def pluck(*args)
-      scopes.inject([]) { |agg, scope| agg.concat(scope.pluck(*args)) }
+    def pluck(*)
+      scopes.inject([]) { |agg, scope| agg.concat(scope.pluck(*)) }
     end
 
     def each(&)

@@ -32,11 +32,23 @@
     "additional_considerations_f3801683": {
         "message": "Extra overwegingen"
     },
+    "address_applied_64269b0b": {
+        "message": "Adres toegepast"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adres verwijderd"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Aangrenzende koppelingen met dezelfde URL moeten één koppeling zijn."
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
+    },
+    "ai_response_9624e8e8": {
+        "message": "AI-reactie"
+    },
+    "ai_tools_fda01177": {
+        "message": "AI-tools"
     },
     "albanian_21ed929e": {
         "message": "Albanees"
@@ -76,6 +88,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Er is een fout opgetreden bij het maken van een netwerkaanvraag"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Er is een fout opgetreden bij het verwerken van je aanvraag "
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Er is een fout opgetreden bij het uploaden van je media."
@@ -158,6 +173,9 @@
     "available_folders_694d0436": {
         "message": "Beschikbare mappen"
     },
+    "background_1bc88842": {
+        "message": "Achtergrond"
+    },
     "backslash_b2d5442d": {
         "message": "Backslash"
     },
@@ -190,6 +208,15 @@
     },
     "blue_daf8fea9": {
         "message": "Blauw"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Vet toegepast"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Vet verwijderd"
+    },
+    "border_5b08b06d": {
+        "message": "Rand"
     },
     "bottom_15a2a9be": {
         "message": "Onder"
@@ -332,11 +359,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Inklappen om te verbergen { types }"
     },
+    "color_a363e1b0": {
+        "message": "Kleur"
+    },
+    "color_contrast_4c418add": {
+        "message": "Kleurcontrast"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Kleurcontrastverhouding"
+    },
     "color_picker_6b359edf": {
         "message": "Kleurenkiezer"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Kleurenkiezer ({ colorName } geselecteerd)"
+    },
+    "color_popup_af39810f": {
+        "message": "Kleuren-pop-up"
     },
     "column_e1ae5c64": {
         "message": "Kolom"
@@ -346,6 +385,9 @@
     },
     "complex_numbers_a543d004": {
         "message": "Complexe getallen"
+    },
+    "compose_44c904f4": {
+        "message": "Samenstellen"
     },
     "computer_1d7dfa6f": {
         "message": "Computer"
@@ -373,6 +415,9 @@
     },
     "coproduct_e7838082": {
         "message": "Coproduct"
+    },
+    "copy_9748f9f": {
+        "message": "Kopiëren"
     },
     "copyright_holder_66ee111": {
         "message": "Houder van auteursrecht:"
@@ -476,8 +521,14 @@
     "decrease_indent_d9cf469d": {
         "message": "Inspringen verkleinen"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Rich Content-gebied verkleinen"
+    },
     "deep_purple_bb3e2907": {
         "message": "Diep paars"
+    },
+    "default_9db103d": {
+        "message": "Standaard"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "standaard ongeordende opsommingslijst"
@@ -551,11 +602,20 @@
     "disjoint_union_e74351a8": {
         "message": "Disjuncte verbinding"
     },
+    "dislike_14befc48": {
+        "message": "Afkeuren"
+    },
     "display_options_315aba85": {
         "message": "Weergaveopties"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Tekstkoppeling weergeven (Opent in een nieuw tabblad)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div toegepast"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div verwijderd"
     },
     "division_sign_72190870": {
         "message": "Deelteken"
@@ -629,8 +689,8 @@
     "edit_link_7f53bebb": {
         "message": "Link bewerken"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Statusbalk van editor"
+    "editor_status_bar_653f44ee": {
+        "message": "Statusbalk editor"
     },
     "element_starting_with_start_91bf4c3b": {
         "message": "Element dat begint met { start }"
@@ -695,6 +755,9 @@
     "enter_search_text_26cb4459": {
         "message": "voer zoektekst in"
     },
+    "enter_text_8b35c65b": {
+        "message": "Tekst invoeren"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -758,8 +821,14 @@
     "f_function_fe422d65": {
         "message": "F (functie)"
     },
+    "fail_544e5dde": {
+        "message": "MISLUKT"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kan geen bestandsinhoud ophalen"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Kopiëren van reactie mislukt"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kan geen inhoud ophalen uit externe tool"
@@ -872,6 +941,9 @@
     "grades_a61eba0a": {
         "message": "Cijfers"
     },
+    "graphics_text_bc9568bc": {
+        "message": "Graphics text"
+    },
     "greater_than_e98af662": {
         "message": "Groter dan"
     },
@@ -941,6 +1013,12 @@
     "heading_4_b2e74be7": {
         "message": "Koptekst 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Koptekst { h } toegepast"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Koptekst { h } verwijderd"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Koptekstniveaus mogen niet worden overgeslagen."
     },
@@ -961,6 +1039,12 @@
     },
     "height_69b03e15": {
         "message": "Hoogte"
+    },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Hallo. Beschrijf de wijzigingen die je aan je compositie wilt aanbrengen."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Hallo. Beschrijf de wijzigingen die je aan je selectie wilt aanbrengen."
     },
     "hexagon_d8468e0d": {
         "message": "Zeshoek"
@@ -994,6 +1078,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ik heb het auteursrecht"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Het spijt me maar ik kan het antwoord van de AI niet vinden"
     },
     "icelandic_9d6d35de": {
         "message": "IJslands"
@@ -1070,6 +1157,9 @@
     "increase_indent_6af90f7c": {
         "message": "Inspringen vergroten"
     },
+    "increase_rich_content_area_340b775": {
+        "message": "Rich Content-gebied vergroten"
+    },
     "indefinite_integral_6623307e": {
         "message": "Onbepaalde integraal"
     },
@@ -1088,6 +1178,18 @@
     "infinity_7a10f206": {
         "message": "Oneindigheid"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Invoerveld voor alpha"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Invoerveld voor blauw"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Invoerveld voor groen"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Invoerveld voor rood"
+    },
     "insert_593145ef": {
         "message": "Invoegen"
     },
@@ -1102,6 +1204,9 @@
     },
     "intersection_cd4590e4": {
         "message": "Snijpunt"
+    },
+    "invalid_description_991e23bb": {
+        "message": "Ongeldige beschrijving"
     },
     "invalid_entry_f7d2a0f5": {
         "message": "Ongeldige invoer."
@@ -1126,6 +1231,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italiaans"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Cursief toegepast"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Cursief verwijderd"
     },
     "japanese_b5721ca7": {
         "message": "Japans"
@@ -1156,6 +1267,9 @@
     },
     "large_9c5e80e7": {
         "message": "Groot"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Grote tekst"
     },
     "latvian_2bbb6aab": {
         "message": "Lets"
@@ -1261,6 +1375,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Koppelingen naar een externe site."
+    },
+    "lists_cd1336fc": {
+        "message": "Lijsten"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Lijsten moeten als lijst worden opgemaakt."
@@ -1382,6 +1499,9 @@
     "miscellaneous_e9818229": {
         "message": "Diversen"
     },
+    "modify_6b0b13e3": {
+        "message": "Wijzigen"
+    },
     "module_90d9fd32": {
         "message": "Module"
     },
@@ -1402,12 +1522,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Muziekpictogram"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Moet ten minste { percentage }% zijn"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Moet minstens { width } x { height }px zijn"
     },
     "my_files_2f621040": {
         "message": "Mijn bestanden"
@@ -1523,6 +1637,9 @@
     "none_selected_b93d56d2": {
         "message": "Geen geselecteerd"
     },
+    "normal_text_7b03da48": {
+        "message": "Normale tekst"
+    },
     "norwegian_53f391ec": {
         "message": "Noors"
     },
@@ -1601,8 +1718,8 @@
     "outline_size_a6059a21": {
         "message": "Omtrtekgrootte"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } is geen geldig protocol; dat moet ftp, http, https, mailto, skype of tel zijn, of het kan worden weggelaten"
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } is geen geldig protocol."
     },
     "page_50c4823d": {
         "message": "Pagina"
@@ -1613,6 +1730,12 @@
     "paragraph_5e5ad8eb": {
         "message": "Alinea"
     },
+    "paragraph_applied_959b3fe5": {
+        "message": "Paragraaf toegepast"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Paragraaf verwijderd"
+    },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Alinea die begint met { start }"
     },
@@ -1621,6 +1744,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Partiële afgeleide"
+    },
+    "pass_1c19a2b3": {
+        "message": "GESLAAGD"
     },
     "paste_5963d1c1": {
         "message": "Plakken"
@@ -1639,6 +1765,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Percentage moet een getal zijn"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Percentage moet minstens { percentage }% zijn"
     },
     "performing_arts_icon_f3497486": {
         "message": "Pictogram voor uitvoerende kunsten"
@@ -1664,11 +1793,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variant)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Kies een kleur"
+    },
     "pink_68ad45cb": {
         "message": "Roze"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pixels moeten minstens { width } x { height }px zijn"
     },
     "play_1a47eaa7": {
         "message": "Afspelen"
@@ -1681,6 +1816,18 @@
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Geef Canvas toegang tot je microfoon en webcam."
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "Kies een bestand"
+    },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Beschrijf wat je wilt opstellen."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Voer een bestandsnaam in"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Selecteer een bestand van een ondersteund type"
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1732,6 +1879,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Vorige { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Eerder gekozen kleuren"
     },
     "prime_917ea60e": {
         "message": "Priem"
@@ -1832,11 +1982,17 @@
     "resize_ec83d538": {
         "message": "Grootte wijzigen"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Reactie gekopieerd naar klembord"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Automatisch opslaan herstellen?"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Resultaat { index } van { max }."
+    },
+    "retry_ebd5f8ba": {
+        "message": "Opnieuw proberen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Inverse tourniquet (conclusie volgt)"
@@ -1997,6 +2153,9 @@
     "shortcut_911d6255": {
         "message": "Snelkoppeling"
     },
+    "show_all_967a90f0": {
+        "message": "Alles tonen"
+    },
     "show_audio_options_b489926b": {
         "message": "Audio-opties weergeven"
     },
@@ -2129,6 +2288,9 @@
     "submit_a3cc6859": {
         "message": "Inleveren"
     },
+    "submitting_b90fac62": {
+        "message": "Bezig met inleveren..."
+    },
     "subscript_59744f96": {
         "message": "Subscript"
     },
@@ -2252,8 +2414,11 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "De eerste koptekst op een pagina moet een H2 zijn."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "De volgende inhoud is door een partner geleverd"
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "De hoogte van het Rich Content-gebied is verlaagd."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "De hoogte van het Rich Content-gebied is verhoogd."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Het materiaal bevindt zich in het openbaar domein"
@@ -2263,9 +2428,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Op het materiaal is een uitzondering van toepassing, bijvoorbeeld redelijk gebruik, het recht om te citeren of andere toepasselijke wetgeving op het auteursrecht"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "De voorgaande inhoud is door een partner geleverd"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "De pretty HTML-editor is niet toetsenbordtoegankelijk. Druk op Shift O om de raw HTML-editor te openen."
@@ -2362,6 +2524,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Kan geen bronselectie-URL vaststellen"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Onderstreept toegepast "
+    },
+    "underline_removed_3693e17c": {
+        "message": "Onderstreept verwijderd"
     },
     "union_e6b57a53": {
         "message": "Vereniging"
@@ -2552,6 +2720,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Aantal woorden en tekens bekijken"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Wachten op antwoord"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "We kunnen geen werkende microfoon detecteren die op je apparaat is aangesloten."
     },
@@ -2572,6 +2743,9 @@
     },
     "welsh_42ab94b1": {
         "message": "Welsh"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Wat wil je doen?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Wanneer een markering is gebruikt die items visueel opmaakt als een lijst maar de lijstrelatie niet aangeeft, kan het voor gebruikers moeilijk zijn om door de informatie te navigeren."
@@ -2603,6 +2777,9 @@
     "wreath_product_200b38ef": {
         "message": "Kransproduct"
     },
+    "writing_assistant_a30ac16a": {
+        "message": "Schrijfassistent"
+    },
     "xi_149681d0": {
         "message": "Xi"
     },
@@ -2611,6 +2788,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Dit is een kleurpalet. Gebruik de knoppen ''W'', ''A'', ''S'' en ''D'' om respectievelijk omhoog, naar links, omlaag of naar rechts te navigeren op het palet"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Dit is een kleurenschuifregelaar. Gebruik de knoppen ''A'' en ''D’ om op de schuifregelaar respectievelijk naar links of rechts te navigeren"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Dit is een alphaschuifregelaar. Gebruik de knoppen ''A'' en ''D’ om op de schuifregelaar respectievelijk naar links of rechts te navigeren"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Je kunt dit vervangen door een nieuw ondertitelingsbestand te uploaden."

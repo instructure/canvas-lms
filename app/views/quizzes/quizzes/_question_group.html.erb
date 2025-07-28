@@ -52,14 +52,22 @@
               '#' => '<span class="question_points">\1</span>'
             }) %>
     </span>
-    <span class="group_edit">
+    <span class="group_edit form-control">
       <%= t(:edit_questions_and_points, "Pick *%{num_questions}* questions, #%{num_points}# pts per question",
             :num_questions => hash_get(group, :pick_count, 1),
             :num_points => render_score(hash_get(group, :question_points, 1)),
             :wrapper => {
-              '*' => "<input name='quiz_group[pick_count]' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>",
-              '#' => "<input name='quiz_group[question_points]' class='float_value' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/>"
+              '*' => "<span class='form-control questions_number_container'><input name='quiz_group[pick_count]' class='form-control__input questions_number' aria-describedby='questions_number_message_#{hash_get(group, :id, 'new')}' aria-label='#{h(t('labels.number_of_questions', "Number of Questions"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/></span>",
+              '#' => "<span class='form-control question_points_container'><input name='quiz_group[question_points]' class='form-control__input question_points float_value' aria-describedby='question_points_message_#{hash_get(group, :id, 'new')}' aria-label='#{h(t('labels.points_per_question', "Points per Question"))}' type='text' style='width: 20px;' value='\1' #{'readonly' if points_are_locked}/></span>"
             }) %>
+      <span style="margin-bottom: 10px" class="form-control__message input-message__container questions_number_message_container hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="questions_number_message_<%= hash_get(group, :id, 'new') %>" class="input-message__text"></span>
+      </span>
+      <span style="margin-bottom: 10px" class="form-control__message input-message__container question_points_message_container hidden">
+        <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+        <span id="question_points_message_<%= hash_get(group, :id, 'new') %>" class="input-message__text"></span>
+      </span>
     </span>
     <% if !group && @context.grants_right?(@current_user, :read_question_banks) %>
       <div class="group_edit">

@@ -25,6 +25,10 @@ import GradebookExportManager from '../../../shared/GradebookExportManager'
 import ActionMenu from '../ActionMenu'
 import {getActionMenuProps} from './helpers'
 
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
+
 let props: any = {}
 
 describe('ActionMenu', () => {
@@ -157,7 +161,7 @@ describe('ActionMenu', () => {
         Promise.resolve({
           attachmentUrl: 'http://attachmentUrl',
           updatedAt: '2009-01-20T17:00:00Z',
-        })
+        }),
       )
       $.flashMessage = jest.fn()
       const spy = jest.spyOn(ActionMenu, 'gotoUrl')
@@ -168,10 +172,10 @@ describe('ActionMenu', () => {
         expect.anything(),
         undefined,
         expect.anything(),
-        true
+        true,
       )
       expect($.flashMessage).toHaveBeenCalledWith(
-        'Gradebook export has started. This may take a few minutes.'
+        'Gradebook export has started. This may take a few minutes.',
       )
       expect($.flashMessage).toHaveBeenCalledWith('Gradebook export has completed')
       expect(spy).toHaveBeenCalledWith('http://attachmentUrl')
@@ -186,7 +190,7 @@ describe('ActionMenu', () => {
 
     test('On failure, shows an error and reenables the export buttons', async function () {
       GradebookExportManager.prototype.startExport = jest.fn(() =>
-        Promise.reject(new Error('Mocked failure'))
+        Promise.reject(new Error('Mocked failure')),
       )
       $.flashError = jest.fn()
       await subject(props)

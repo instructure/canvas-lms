@@ -22,10 +22,6 @@ describe "Discussion Topic Search" do
   include_context "in-process server selenium tests"
 
   context "when Discussions Redesign feature flag is ON" do
-    before :once do
-      Account.default.enable_feature!(:react_discussions_post)
-    end
-
     before do
       course_with_teacher(active_course: true, active_all: true, name: "teacher")
       @topic_title = "Our Discussion Topic"
@@ -35,6 +31,23 @@ describe "Discussion Topic Search" do
         posted_at: "2017-07-09 16:32:34",
         user: @teacher
       )
+    end
+
+    it "doesn't render error page when searching", :ignore_js_errors do
+      @topic.discussion_entries.create!(
+        user: @teacher, message: "bar"
+      )
+      (1..5).each do |number|
+        @topic.discussion_entries.create!(
+          user: @teacher,
+          message: "foo #{number}"
+        )
+      end
+      student = student_in_course(course: @course, name: "Jeff", active_all: true).user
+      user_session(student)
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("input[placeholder='Search entries or author...']").send_keys("bar")
+      expect(f("body")).not_to contain_jqcss("h1:contains('Sorry, Something Broke')")
     end
 
     it "search only replies that matches parameter" do
@@ -101,7 +114,7 @@ describe "Discussion Topic Search" do
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for(method: nil, timeout: 5) { fj("span:contains('foo bar)").displayed? }
       expect(fj("span:contains('foo bar')")).to be_present
-      f("span.discussions-filter-by-menu").click
+      f("[data-testid='toggle-filter-menu']").click
       wait_for_ajaximations
       fj("li li:contains('Unread')").click
       wait_for_ajaximations
@@ -129,11 +142,11 @@ describe "Discussion Topic Search" do
       driver.execute_script("ENV.per_page = 1")
       # rubocop:enable Specs/NoExecuteScript
 
-      expect(fj("h2:contains('#{@topic_title}')")).to be_present
+      expect(fj("span:contains('#{@topic_title}')")).to be_present
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for_ajaximations
 
-      expect(f("body")).not_to contain_jqcss("h2:contains('#{@topic_title}')")
+      expect(f("body")).not_to contain_jqcss("[data-testid=\"edit-event-button\"]:contains('#{@topic_title}')")
       expect(fj("span:contains('foo 2')")).to be_present
       expect(f("#content")).not_to contain_jqcss("span:contains('bar')")
 
@@ -145,7 +158,7 @@ describe "Discussion Topic Search" do
       f("button[data-testid='clear-search-button']").click
       wait_for_ajaximations
 
-      expect(fj("h2:contains('#{@topic_title}')")).to be_present
+      expect(fj("span:contains('#{@topic_title}')")).to be_present
       expect(fj("button[aria-current='page']:contains('1')")).to be_present
       expect(fj("span:contains('bar')")).to be_present
     end
@@ -177,7 +190,7 @@ describe "Discussion Topic Search" do
       expect(fj("span:contains('foo 9')")).to be_present
       expect(fj("button[aria-current='page']:contains('2')")).to be_present
 
-      f("span.discussions-filter-by-menu").click
+      f("[data-testid='toggle-filter-menu']").click
       wait_for_ajaximations
       fj("li li:contains('Unread')").click
       wait_for_ajaximations

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -29,7 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const IntegrationRow = ({
   available,
@@ -107,7 +107,7 @@ const IntegrationRow = ({
                 {enabled
                   ? info?.message || info
                   : I18n.t(
-                      'This integration is not enabled. Please enable it to interact with settings.'
+                      'This integration is not enabled. Please enable it to interact with settings.',
                     )}
               </Text>
             </Alert>

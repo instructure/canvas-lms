@@ -23,7 +23,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :learning_outcome
-  belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id
+  belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id, inverse_of: :learning_outcome_results
   belongs_to :association_object,
              polymorphic:
                    [:rubric_association,
@@ -98,7 +98,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def save_to_version(attempt)
-    InstStatsd::Statsd.increment("learning_outcome_result.create") if new_record?
+    InstStatsd::Statsd.distributed_increment("learning_outcome_result.create") if new_record?
     current_version = versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }
@@ -189,7 +189,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   def infer_defaults
     self.learning_outcome_id = alignment.learning_outcome_id
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
     self.original_score ||= score
     self.original_possible ||= possible
     self.original_mastery = mastery if original_mastery.nil?

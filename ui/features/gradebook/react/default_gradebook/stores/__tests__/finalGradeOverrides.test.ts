@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -17,16 +18,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../index'
 
 describe('Gradebook > store > fetchFinalGradeOverrides', () => {
   const url = '/courses/0/gradebook/final_grade_overrides'
+  const server = setupServer()
+  const capturedRequests: any[] = []
 
   let exampleData
-  let network
 
   beforeEach(() => {
+    capturedRequests.length = 0
     exampleData = {
       finalGradeOverrides: {
         '1': {
@@ -44,49 +48,70 @@ describe('Gradebook > store > fetchFinalGradeOverrides', () => {
   })
 
   describe('#fetchFinalGradeOverrides()', () => {
-    beforeEach(() => {
-      network = new NetworkFake()
+    beforeAll(() => {
+      server.listen()
     })
 
     afterEach(() => {
-      network.restore()
+      server.resetHandlers()
     })
 
-    function resolveRequest() {
-      const [request] = getRequests()
-      request.response.setJson({
-        final_grade_overrides: {
-          '1': {
-            course_grade: {
-              percentage: 88.1,
-            },
-            grading_period_grades: {
-              '2': {
-                percentage: 90,
-              },
-            },
-          },
-        },
-      })
-      request.response.send()
-    }
+    afterAll(() => {
+      server.close()
+    })
 
     function getRequests() {
-      return network.getRequests(request => request.url === url)
+      return capturedRequests.filter(request => request.url.includes('/final_grade_overrides'))
     }
 
     test('sends the request', async () => {
-      store.getState().fetchFinalGradeOverrides()
-      await network.allRequestsReady()
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json({
+            final_grade_overrides: {
+              '1': {
+                course_grade: {
+                  percentage: 88.1,
+                },
+                grading_period_grades: {
+                  '2': {
+                    percentage: 90,
+                  },
+                },
+              },
+            },
+          })
+        }),
+      )
+
+      await store.getState().fetchFinalGradeOverrides()
       const requests = getRequests()
-      expect(requests.length).toStrictEqual(1)
+      expect(requests).toHaveLength(1)
     })
 
     test('saves final grade overrides to the store', async () => {
-      const promise = store.getState().fetchFinalGradeOverrides()
-      await network.allRequestsReady()
-      resolveRequest()
-      await promise
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json({
+            final_grade_overrides: {
+              '1': {
+                course_grade: {
+                  percentage: 88.1,
+                },
+                grading_period_grades: {
+                  '2': {
+                    percentage: 90,
+                  },
+                },
+              },
+            },
+          })
+        }),
+      )
+
+      await store.getState().fetchFinalGradeOverrides()
       expect(store.getState().finalGradeOverrides).toStrictEqual(exampleData.finalGradeOverrides)
     })
   })

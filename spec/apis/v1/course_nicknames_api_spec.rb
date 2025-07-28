@@ -39,6 +39,12 @@ describe "Course Nicknames API", type: :request do
       course_with_student active_all: true
     end
 
+    def enable_limited_access_for_students
+      @course.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     describe "index" do
       it "lists all nicknames" do
         @student.set_preference(:course_nicknames, @course.id, "nickname")
@@ -86,7 +92,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "show", course_id: other_course.to_param),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -150,7 +156,18 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "update", course_id: other_course.to_param, nickname: "blah"),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
+      end
+
+      it "rejects for students in limited access accounts" do
+        enable_limited_access_for_students
+
+        api_call(:put,
+                 "/api/v1/users/self/course_nicknames/#{@course.id}?nickname=new_nickname",
+                 @params.merge(action: "update", course_id: @course.to_param, nickname: "new_nickname"),
+                 {},
+                 {},
+                 { expected_status: 403 })
       end
     end
 
@@ -163,6 +180,17 @@ describe "Course Nicknames API", type: :request do
         expect(json).to eq({ "course_id" => @course.id, "name" => @course.name, "nickname" => nil })
         expect(@student.reload.course_nickname(@course)).to be_nil
       end
+
+      it "rejects for students in limited access accounts" do
+        enable_limited_access_for_students
+
+        api_call(:delete,
+                 "/api/v1/users/self/course_nicknames/#{@course.id}",
+                 @params.merge(action: "delete", course_id: @course.to_param),
+                 {},
+                 {},
+                 { expected_status: 403 })
+      end
     end
 
     describe "clear" do
@@ -174,6 +202,17 @@ describe "Course Nicknames API", type: :request do
                  "/api/v1/users/self/course_nicknames",
                  @params.merge(action: "clear"))
         expect(@student.reload.preferences[:course_nicknames]).to eq({})
+      end
+
+      it "rejects for students in limited access accounts" do
+        enable_limited_access_for_students
+
+        api_call(:delete,
+                 "/api/v1/users/self/course_nicknames",
+                 @params.merge(action: "clear"),
+                 {},
+                 {},
+                 { expected_status: 403 })
       end
     end
   end

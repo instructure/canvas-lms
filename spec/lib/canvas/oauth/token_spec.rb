@@ -208,16 +208,18 @@ module Canvas::OAuth
                                      "id" => user.id,
                                      "name" => user.name,
                                      "global_id" => user.global_id.to_s,
-                                     "effective_locale" => "en"
+                                     "effective_locale" => "en",
+                                     "fake_student" => false
                                    })
       end
 
       it "returns the expires_in parameter" do
-        allow(Time).to receive(:now).and_return(DateTime.parse("2015-07-10T09:29:00Z").utc.to_time)
-        access_token = token.access_token
-        access_token.expires_at = DateTime.parse("2015-07-10T10:29:00Z")
-        access_token.save!
-        expect(json["expires_in"]).to eq 3600
+        Timecop.freeze(Time.zone.parse("2015-07-10T09:29:00Z")) do
+          access_token = token.access_token
+          access_token.expires_at = Time.zone.parse("2015-07-10T10:29:00Z")
+          access_token.save!
+          expect(json["expires_in"]).to eq 3600
+        end
       end
 
       it "does not put anything else into the json" do
@@ -267,6 +269,7 @@ module Canvas::OAuth
 
     describe ".generate_code_for" do
       let(:code) { "brand_new_code" }
+      let(:redis) { double(setex: true) }
 
       before { allow(SecureRandom).to receive_messages(hex: code) }
 
@@ -276,12 +279,25 @@ module Canvas::OAuth
       end
 
       it "sets the new data hash into redis with 10 min ttl" do
-        redis = Object.new
         code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
         # should have 10 min (in seconds) ttl passed as second param
         expect(redis).to receive(:setex).with("oauth2:brand_new_code", 600, code_data.to_json)
         allow(Canvas).to receive_messages(redis:)
         Token.generate_code_for(1, 2, 3)
+      end
+
+      context "when PKCE is used in the authorization request" do
+        before do
+          allow(Canvas::OAuth::PKCE).to receive(:use_pkce_in_authorization?).and_return(true)
+          allow(Canvas::OAuth::PKCE).to receive(:store_code_challenge)
+        end
+
+        it "stores the code challenge" do
+          code_challenge = "code_challenge"
+
+          expect(Canvas::OAuth::PKCE).to receive(:store_code_challenge).with(code_challenge, code)
+          Token.generate_code_for(1, 2, 3, { code_challenge: })
+        end
       end
     end
 

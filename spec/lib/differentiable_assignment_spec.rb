@@ -46,12 +46,12 @@ shared_examples_for "a differentiable_object" do
       before { student_in_course(course: @course) }
 
       it "with a visibility it should be true" do
-        allow(differentiable_view).to receive(:where).and_return([:a_record])
+        allow(differentiable_service).to receive(service_method).and_return([:a_record])
         expect(differentiable.visible_to_user?(@user)).to be_truthy
       end
 
       it "without a visibility should be false" do
-        allow(differentiable_view).to receive(:where).and_return([])
+        allow(differentiable_service).to receive(service_method).and_return([])
         expect(differentiable.visible_to_user?(@user)).to be_falsey
       end
     end
@@ -60,7 +60,7 @@ shared_examples_for "a differentiable_object" do
       before { student_in_course(course: @course) }
 
       it "with visibility should be true no matter the active shard" do
-        allow(differentiable_view).to receive(:where).and_return([:a_record])
+        allow(differentiable_service).to receive(service_method).and_return([:a_record])
         @shard2.activate do
           expect(differentiable.visible_to_user?(@user)).to be_truthy
         end
@@ -75,7 +75,7 @@ shared_examples_for "a differentiable_object" do
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
-        create_section_override_for_assignment(differentiable, { course_section: @section })
+        create_section_override_for_assignment(differentiable, { course_section: @section, due_at: nil, due_at_overridden: false })
         @course.reload
         @observer = User.create(name: "observer")
       end
@@ -141,6 +141,10 @@ shared_examples_for "a differentiable_object" do
         expect(differentiable.visible_to_user?(@user)).to be_truthy
       end
     end
+
+    it "returns false if user is nil" do
+      expect(differentiable.visible_to_user?(nil)).to be_falsey
+    end
   end
 
   describe "filter" do
@@ -194,7 +198,8 @@ shared_examples_for "a differentiable_object" do
 end
 
 describe Assignment do
-  let(:differentiable_view) { AssignmentStudentVisibility }
+  let(:differentiable_service) { AssignmentVisibility::AssignmentVisibilityService }
+  let(:service_method) { :assignments_visible_to_students }
   let(:differentiable) { assignment_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a non-module differentiable object"
@@ -202,7 +207,8 @@ describe Assignment do
 end
 
 describe Quizzes::Quiz do
-  let(:differentiable_view) { Quizzes::QuizStudentVisibility }
+  let(:differentiable_service) { QuizVisibility::QuizVisibilityService }
+  let(:service_method) { :quizzes_visible_to_students }
   let(:differentiable) { quiz_model(due_at: 5.days.ago, only_visible_to_overrides: true) }
 
   include_examples "a non-module differentiable object"
@@ -210,7 +216,8 @@ describe Quizzes::Quiz do
 end
 
 describe ContextModule do
-  let(:differentiable_view) { ModuleStudentVisibility }
+  let(:differentiable_service) { ModuleVisibility::ModuleVisibilityService }
+  let(:service_method) { :modules_visible_to_students }
   let(:differentiable) do
     course = course_factory(active_all: true)
     cm = course.context_modules.create!(name: "test module")

@@ -48,15 +48,6 @@ module CanvasTime
     default
   end
 
-  def utc_datetime
-    timestamp = getutc
-    DateTime.civil(timestamp.year,
-                   timestamp.month,
-                   timestamp.day,
-                   timestamp.hour,
-                   timestamp.min)
-  end
-
   # Ruby 1.9+ made the somewhat odd decision to shave off a few bits by
   # marshalling Time objects with the year stored as (year - 1900), and raising
   # an exception if year < 1900.

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAction, ActionsUnion} from '../shared/types'
+import {createAction, type ActionsUnion} from '../shared/types'
 import * as Api from '../api/pace_contexts_api'
-import {
+import type {
   APIPaceContextTypes,
   OrderType,
   PaceContext,
@@ -28,21 +27,23 @@ import {
   SortableColumn,
   StoreState,
 } from '../types'
-import {ThunkAction} from 'redux-thunk'
-import {Action} from 'redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import type {ThunkAction} from 'redux-thunk'
+import type {Action} from 'redux'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {CONTEXT_TYPE_MAP} from '../utils/utils'
-import {coursePaceActions} from './course_paces'
 
-const I18n = useI18nScope('pace_contexts_actions')
+const I18n = createI18nScope('pace_contexts_actions')
 
-export interface FetchContextsActionParams {
-  contextType: APIPaceContextTypes
+export interface CommonFilterParams {
   page?: number
   searchTerm?: string
   sortBy?: SortableColumn
   orderType?: OrderType
+}
+export interface FetchContextsActionParams extends CommonFilterParams {
+  contextType: APIPaceContextTypes
   contextIds?: string[]
+  // @ts-expect-error
   afterFetch?: (contexts) => void
 }
 
@@ -116,21 +117,21 @@ const thunkActions = {
           searchTerm,
           sortBy,
           orderType,
-        })
+        }),
       )
       if (afterFetch) {
         afterFetch(response.pace_contexts)
       }
     }
   },
-  syncPublishingPaces: (restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
+  syncPublishingPaces: (loadLatestPaceByContextAction: Function, restart: boolean = false): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       const {contextsPublishing, entries} = getState().paceContexts
       const loadedCodes = entries.map(({type, item_id}) => `${type}${item_id}`)
       const contextsToLoad = contextsPublishing.filter(
         ({pace_context, polling}) =>
           (restart || !polling) &&
-          loadedCodes.includes(`${pace_context.type}${pace_context.item_id}`)
+          loadedCodes.includes(`${pace_context.type}${pace_context.item_id}`),
       )
       const updatedPaceContextsProgress = contextsToLoad.map(context => ({
         ...context,
@@ -139,7 +140,7 @@ const thunkActions = {
       contextsToLoad.forEach(({pace_context}) => {
         const contextType = CONTEXT_TYPE_MAP[pace_context.type]
         dispatch(
-          coursePaceActions.loadLatestPaceByContext(contextType, pace_context.item_id, null, false)
+          loadLatestPaceByContextAction(contextType, pace_context.item_id, null, false),
         )
         dispatch(regularActions.updatePublishingPaces(updatedPaceContextsProgress))
       })
@@ -153,20 +154,20 @@ const thunkActions = {
       dispatch(
         createAction<Constants, PaceContextsAsyncActionPayload>(
           Constants.SET_DEFAULT_PACE_CONTEXT,
-          {result: response}
-        )
+          {result: response},
+        ),
       )
     }
   },
   refreshPublishedContext: (
-    progressContextId: string
+    progressContextId: string,
   ): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       const {selectedContextType, contextsPublishing} = getState().paceContexts
       const {course_id: courseId} = getState().coursePace
       // We only need to refresh the pace context if the user is seeing the affected tab
       const contextToRefresh = contextsPublishing.find(
-        context => context.progress_context_id === progressContextId
+        context => context.progress_context_id === progressContextId,
       )
       if (contextToRefresh) {
         const {pace_contexts: updatedPaceContexts} = await Api.getPaceContexts({

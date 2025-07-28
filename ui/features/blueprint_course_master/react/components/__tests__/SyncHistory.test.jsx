@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import SyncHistory from '../SyncHistory'
 import getSampleData from './getSampleData'
 
@@ -34,23 +33,22 @@ describe('SyncHistory component', () => {
   })
 
   test('renders the SyncHistory component', () => {
-    const tree = shallow(<SyncHistory {...defaultProps()} />)
-    const node = tree.find('.bcs__history')
+    const {container} = render(<SyncHistory {...defaultProps()} />)
+    const node = container.querySelector('.bcs__history')
     expect(node).toBeTruthy()
   })
 
   test('displays spinner when loading courses', () => {
     const props = defaultProps()
     props.isLoadingHistory = true
-    const tree = shallow(<SyncHistory {...props} />)
-    const node = tree.find('.bcs__history Spinner')
-    expect(node).toBeTruthy()
+    const {container} = render(<SyncHistory {...props} />)
+    const spinner = container.querySelector('svg[role="img"]')
+    expect(spinner).toBeTruthy()
   })
 
   test('renders SyncHistoryItem components for each migration', () => {
     const tree = render(<SyncHistory {...defaultProps()} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelectorAll('.bcs__history-item')
-    expect(node.length).toEqual(1)
+    expect(node).toHaveLength(1)
   })
 })

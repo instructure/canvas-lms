@@ -25,7 +25,7 @@ const setup = (searchTerm = '') => {
   return render(
     <SearchContext.Provider value={{searchTerm}}>
       <NoResultsFound />
-    </SearchContext.Provider>
+    </SearchContext.Provider>,
   )
 }
 

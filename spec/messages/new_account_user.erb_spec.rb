@@ -32,7 +32,7 @@ describe "new_account_user" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "uses the custom From: setting" do

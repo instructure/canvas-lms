@@ -81,7 +81,7 @@ module CanvasSecurity
     def public_keyset
       JSON::JWK::Set.new(retrieve_keys.values.compact.map do |private_jwk|
         public_jwk = private_jwk.to_key.public_key.to_jwk
-        public_jwk.merge(private_jwk.select { |k, _| %w[alg use kid].include?(k) })
+        public_jwk.merge(private_jwk.slice("alg", "use", "kid"))
       end)
     end
 
@@ -92,9 +92,7 @@ module CanvasSecurity
       get_key(PRESENT)
     end
 
-    def max_cache_age
-      self.class.max_cache_age
-    end
+    delegate :max_cache_age, to: :class
 
     private
 

@@ -25,10 +25,10 @@ import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import plainStoreShape from '@canvas/util/react/proptypes/plainStoreShape'
 
-const I18n = useI18nScope('course_home_dialog')
+const I18n = createI18nScope('course_home_dialog')
 
 class CourseHomeDialog extends React.Component {
   static propTypes = {
@@ -130,7 +130,7 @@ class CourseHomeDialog extends React.Component {
 
     const instructions = this.props.isPublishing
       ? I18n.t(
-          'Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.'
+          'Before publishing your course, you must either publish a module in the Modules page, or choose a different home page.',
         )
       : I18n.t("Select what you'd like to display on the home page.")
 

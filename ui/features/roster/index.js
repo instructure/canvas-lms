@@ -17,7 +17,7 @@
  */
 
 import ready from '@instructure/ready'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Model} from '@canvas/backbone'
 import Role from './backbone/models/Role'
 import RoleSelectView from './backbone/views/RoleSelectView'
@@ -35,94 +35,100 @@ import ResendInvitationsView from './backbone/views/ResendInvitationsView'
 import $ from 'jquery'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-const I18n = useI18nScope('roster_publicjs')
+const I18n = createI18nScope('roster_publicjs')
 
-const fetchOptions = {
-  include: [
-    'avatar_url',
-    'enrollments',
-    'email',
-    'observed_users',
-    'can_be_removed',
-    'custom_links',
-  ],
-  per_page: 50,
-}
-const users = new RosterUserCollection(null, {
-  course_id: ENV.context_asset_string.split('_')[1],
-  sections: new SectionCollection(ENV.SECTIONS),
-  params: fetchOptions,
-})
-const rolesCollection = new RolesCollection(
-  Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes))
-)
-const course = new Model(ENV.course)
-const inputFilterView = new InputFilterView({collection: users, minLength: 2})
-const usersView = new PaginatedCollectionView({
-  collection: users,
-  itemView: RosterUserView,
-  itemViewOptions: {
-    course: ENV.course,
-  },
-  canViewLoginIdColumn: ENV.permissions.view_user_logins,
-  canViewSisIdColumn: ENV.permissions.read_sis,
-  buffer: 1000,
-  hideSectionsOnCourseUsersPage: ENV.course.hideSectionsOnCourseUsersPage,
-  template: rosterUsersTemplate,
-})
-const roleSelectView = new RoleSelectView({
-  collection: users,
-  rolesCollection,
-})
-const resendInvitationsView = new ResendInvitationsView({
-  model: course,
-  resendInvitationsUrl: ENV.resend_invitations_url,
-  canResend:
-    ENV.permissions.manage_students ||
-    ENV.permissions.manage_admin_users ||
-    ENV.permissions.can_allow_course_admin_actions,
-})
-
-class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
-GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${
-  ENV.course && ENV.course.id
-}/group_categories?per_page=50`
-
-const groupCategories = new GroupCategoryCollectionForThisCourse()
-
-const rosterTabsView = new RosterTabsView({collection: groupCategories})
-
-rosterTabsView.fetch()
-
-const app = new RosterView({
-  usersView,
-  rosterTabsView,
-  inputFilterView,
-  roleSelectView,
-  resendInvitationsView,
-  collection: users,
-  roles: ENV.ALL_ROLES,
-  permissions: ENV.permissions,
-  course: ENV.course,
-})
-
-users.once('reset', () =>
-  users.on('reset', () => {
-    let msg
-    const numUsers = users.length
-    if (numUsers === 0) {
-      msg = I18n.t('filter_no_users_found', 'No matching users found.')
-    } else if (numUsers === 1) {
-      msg = I18n.t('filter_one_user_found', '1 user found.')
-    } else {
-      msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {
-        userCount: numUsers,
-      })
-    }
-    return $('#aria_alerts').empty().text(msg)
+ready(() => {
+  const fetchOptions = {
+    include: [
+      'avatar_url',
+      'enrollments',
+      'email',
+      'observed_users',
+      'can_be_removed',
+      'custom_links',
+    ],
+    per_page: 50,
+  }
+  const users = new RosterUserCollection(null, {
+    course_id: ENV.context_asset_string.split('_')[1],
+    sections: new SectionCollection(ENV.SECTIONS),
+    params: fetchOptions,
   })
-)
+  const rolesCollection = new RolesCollection(
+    Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes)),
+  )
+  const course = new Model(ENV.course)
+  const inputFilterView = new InputFilterView({collection: users, minLength: 2})
+  const usersView = new PaginatedCollectionView({
+    collection: users,
+    itemView: RosterUserView,
+    itemViewOptions: {
+      course: ENV.course,
+    },
+    canViewLoginIdColumn: ENV.permissions.view_user_logins,
+    canViewSisIdColumn: ENV.permissions.read_sis,
+    buffer: 1000,
+    hideSectionsOnCourseUsersPage: ENV.course.hideSectionsOnCourseUsersPage,
+    template: rosterUsersTemplate,
+  })
+  const roleSelectView = new RoleSelectView({
+    collection: users,
+    rolesCollection,
+  })
+  const resendInvitationsView = new ResendInvitationsView({
+    model: course,
+    resendInvitationsUrl: ENV.resend_invitations_url,
+    canResend: ENV.permissions.manage_students || ENV.permissions.can_allow_course_admin_actions,
+  })
 
-app.render()
-ready(() => app.$el.appendTo($('#content')))
-users.fetch()
+  class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
+  GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${
+    ENV.course && ENV.course.id
+  }/group_categories?per_page=50`
+
+  const groupCategories = new GroupCategoryCollectionForThisCourse()
+
+  const rosterTabsView = new RosterTabsView({collection: groupCategories})
+
+  rosterTabsView.fetch()
+
+  const app = new RosterView({
+    usersView,
+    rosterTabsView,
+    inputFilterView,
+    roleSelectView,
+    resendInvitationsView,
+    collection: users,
+    roles: ENV.ALL_ROLES,
+    permissions: ENV.permissions,
+    course: ENV.course,
+  })
+
+  users.once('reset', () =>
+    users.on('reset', () => {
+      let msg
+      const numUsers = users.length
+      if (numUsers === 0) {
+        msg = I18n.t('filter_no_users_found', 'No matching users found.')
+      } else if (numUsers === 1) {
+        msg = I18n.t('filter_one_user_found', '1 user found.')
+      } else {
+        msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {
+          userCount: numUsers,
+        })
+      }
+      return $('#aria_alerts').empty().text(msg)
+    }),
+  )
+
+  app.render()
+  ready(() => app.$el.appendTo($('#content')))
+  users.fetch({
+    success() {
+      if (users.length === 0) return
+      // PaginatedCollectionView first's attempt to get the container does not wait for the DOM to be ready
+      // so when we recieve the users data we need to reset the scroll container, to be sure
+      usersView.resetScrollContainer(document.getElementById('drawer-layout-content') || window)
+    },
+  })
+})

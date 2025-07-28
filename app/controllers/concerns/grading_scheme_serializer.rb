@@ -19,6 +19,7 @@
 
 module GradingSchemeSerializer
   JSON_METHODS = %i[context_name].freeze
+
   def to_grading_scheme_summary_json(grading_standard)
     {
       title: grading_standard.title,
@@ -36,6 +37,7 @@ module GradingSchemeSerializer
     base_grading_scheme_json(grading_standard, user).tap do |json|
       # instead of using the JSON convention for boolean properties
       json["assessed_assignment"] = grading_standard.assessed_assignment?
+      json["used_as_default"] = grading_standard.used_as_default?
     end
   end
 

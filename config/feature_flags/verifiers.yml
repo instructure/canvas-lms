@@ -1,0 +1,48 @@
+---
+file_association_access:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: File Association Access
+  description: Allow users to access files associated with a course
+disable_file_verifier_access:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Disable File Verifier Access
+  description: Disable access to the file verifier through UUID
+disable_adding_uuid_verifier_in_api:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Disable adding verifiers to file URLs in the API
+  description: This will disable self-authorized file URLs in the API.  When this is enabled, file URLs will need to be accessed with authentication.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+disable_file_verifiers_in_public_syllabus:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Disable verifiers in Public Syllabus
+  description: Disable url file verifiers in the public syllabus
+disable_verified_content_export_links:
+  state: allowed_on
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Disable Verified Content Export Links
+  description: When turning this on, links on the Content Exports page will not use JWT-verified links.
+  environments:
+enable_file_access_with_api_tokens:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Enable File Access with API Tokens
+  description: Allow file authorization with API tokens.  This will allow API users to download files without a file verifier.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

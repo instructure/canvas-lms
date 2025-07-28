@@ -29,9 +29,13 @@ describe GroupAndMembershipImporter do
     end
   end
 
-  def create_group_import(data)
+  def create_group_import(data, error: false, is_tags: false)
     Dir.mktmpdir("sis_rspec") do |tmpdir|
-      path = "#{tmpdir}/csv_0.csv"
+      path = if error
+               "#{tmpdir}/csv_0.invalid"
+             else
+               "#{tmpdir}/csv_0.csv"
+             end
       File.write(path, data)
 
       import = File.open(path, "rb") do |tmp|
@@ -40,15 +44,15 @@ describe GroupAndMembershipImporter do
           File.basename(path)
         end
 
-        GroupAndMembershipImporter.create_import_with_attachment(gc1, tmp)
+        GroupAndMembershipImporter.create_import_with_attachment(is_tags ? @course : gc1, tmp)
       end
       yield import if block_given?
       import
     end
   end
 
-  def import_csv_data(data)
-    create_group_import(data) do |progress|
+  def import_csv_data(data, error: false, is_tags: false)
+    create_group_import(data, error:, is_tags:) do |progress|
       run_jobs
       progress.reload
     end
@@ -73,6 +77,43 @@ describe GroupAndMembershipImporter do
       expect(import.reload.workflow_state).to eq "failed"
     end
 
+    describe "progress.message" do
+      it "contains the number of imported groups and users when import succeeds" do
+        progress = import_csv_data(%(user_id,group_name
+                                    user_0, first group
+                                    user_1, second group
+                                    user_2, third group
+                                    user_3, third group
+                                    user_4, first group))
+        message = {
+          type: "import_groups",
+          groups: 3,
+          users: 5,
+          error: nil
+        }.to_json
+        expect(progress.workflow_state).to eq "completed"
+        expect(progress.message).to eq message
+      end
+
+      it "contains an error message when import fails" do
+        progress = import_csv_data(%(user_id,group_name
+                                    user_0, first group
+                                    user_1, second group
+                                    user_2, third group
+                                    user_3, third group
+                                    user_4, first group),
+                                   error: true)
+        message = {
+          type: "import_groups",
+          groups: 0,
+          users: 0,
+          error: "Only CSV files are supported."
+        }.to_json
+        expect(progress.workflow_state).to eq "failed"
+        expect(progress.message).to eq message
+      end
+    end
+
     it "works" do
       progress = import_csv_data(%(user_id,group_name
                                    user_0, first group
@@ -81,9 +122,9 @@ describe GroupAndMembershipImporter do
                                    user_3, third group
                                    user_4, first group))
       expect(gc1.groups.pluck(:name).sort).to eq ["first group", "second group", "third group"]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq ["user_0", "user_4"]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id)).to eq ["user_1"]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq ["user_2", "user_3"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq ["user_0", "user_4"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "second group").users).pluck(:sis_user_id)).to eq ["user_1"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "third group").users).pluck(:sis_user_id).sort).to eq ["user_2", "user_3"]
       expect(progress.completion).to eq 100.0
       expect(progress.workflow_state).to eq "completed"
     end
@@ -96,9 +137,9 @@ describe GroupAndMembershipImporter do
                         user_3, third group
                         user_4, first group))
 
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_4]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq ["user_1"]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_2 user_3]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq %w[user_0 user_4]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "second group").users).pluck(:sis_user_id).sort).to eq ["user_1"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "third group").users).pluck(:sis_user_id).sort).to eq %w[user_2 user_3]
 
       import_csv_data(%(user_id,group_name
                         user_0, first group
@@ -107,9 +148,9 @@ describe GroupAndMembershipImporter do
                         user_3, third group
                         user_4, third group))
 
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_3 user_4]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "second group").users).pluck(:sis_user_id).sort).to eq []
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "third group").users).pluck(:sis_user_id).sort).to eq %w[user_3 user_4]
 
       import_csv_data(%(user_id,group_name
                         user_0, third group
@@ -118,9 +159,9 @@ describe GroupAndMembershipImporter do
                         user_3, third group
                         user_4, third group))
 
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq []
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "second group").users).pluck(:sis_user_id).sort).to eq []
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "third group").users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
 
       import_csv_data(%(user_id,group_name
                         user_0, first group
@@ -129,9 +170,9 @@ describe GroupAndMembershipImporter do
                         user_3, first group
                         user_4, first group))
 
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
-      expect(Pseudonym.where(user: gc1.groups.where(name: "second group").take.users).pluck(:sis_user_id).sort).to eq []
-      expect(Pseudonym.where(user: gc1.groups.where(name: "third group").take.users).pluck(:sis_user_id).sort).to eq []
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq %w[user_0 user_1 user_2 user_3 user_4]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "second group").users).pluck(:sis_user_id).sort).to eq []
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "third group").users).pluck(:sis_user_id).sort).to eq []
     end
 
     it "skips invalid_users" do
@@ -139,7 +180,7 @@ describe GroupAndMembershipImporter do
                                    user_0, first group
                                    invalid, first group
                                    user_2, first group))
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq ["user_0", "user_2"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq ["user_0", "user_2"]
       expect(progress.completion).to eq 100.0
       expect(progress.workflow_state).to eq "completed"
     end
@@ -149,7 +190,7 @@ describe GroupAndMembershipImporter do
                                    user_0, first group,sections
                                    user_4, first group,"s1,s2"))
       expect(gc1.groups.count).to eq 1
-      expect(Pseudonym.where(user: gc1.groups.where(name: "first group").take.users).pluck(:sis_user_id).sort).to eq ["user_0", "user_4"]
+      expect(Pseudonym.where(user: gc1.groups.find_by(name: "first group").users).pluck(:sis_user_id).sort).to eq ["user_0", "user_4"]
       expect(progress.completion).to eq 100.0
       expect(progress.workflow_state).to eq "completed"
     end
@@ -249,6 +290,110 @@ describe GroupAndMembershipImporter do
           root_account_name: gc1.root_account&.name
         }
       )
+    end
+  end
+
+  context "differentiation tags" do
+    before do
+      @tag_set_1 = @course.differentiation_tag_categories.create!(name: "tag set 1")
+      @tag_0 = @tag_set_1.groups.create!(name: "tag 0", context: @course, sis_source_id: "tag_0", non_collaborative: true)
+    end
+
+    it "creates and assigns tags properly" do
+      progress = import_csv_data(%(user_id,tag_id,tag_name,canvas_tag_set_id
+                                   user_0,tag_1,tag 1,#{@tag_set_1.id}
+                                   user_1,tag_2,tag 2,#{@tag_set_1.id}
+                                   user_2,tag_3,tag 3,#{@tag_set_1.id}
+                                   user_3,tag_3,tag 3,#{@tag_set_1.id}
+                                   user_4,tag_1,tag 1,#{@tag_set_1.id}
+                                  ),
+                                 is_tags: true)
+
+      expect(@tag_set_1.groups.pluck(:name).sort).to eq ["tag 0", "tag 1", "tag 2", "tag 3"]
+
+      tag_1 = @tag_set_1.groups.find_by(name: "tag 1")
+      tag_2 = @tag_set_1.groups.find_by(name: "tag 2")
+      tag_3 = @tag_set_1.groups.find_by(name: "tag 3")
+
+      expect(Pseudonym.where(user: tag_1.users).pluck(:sis_user_id).sort).to eq ["user_0", "user_4"]
+      expect(Pseudonym.where(user: tag_2.users).pluck(:sis_user_id)).to eq ["user_1"]
+      expect(Pseudonym.where(user: tag_3.users).pluck(:sis_user_id).sort).to eq ["user_2", "user_3"]
+
+      expect(progress.completion).to eq 100.0
+      expect(progress.workflow_state).to eq "completed"
+    end
+
+    it "finds tag by canvas_tag_id" do
+      progress = import_csv_data(%(user_id,canvas_tag_id
+                                   user_1,#{@tag_0.id}
+                                  ),
+                                 is_tags: true)
+
+      expect(@tag_set_1.groups.count).to eq 1
+      expect(Pseudonym.where(user: @tag_0.users).pluck(:sis_user_id)).to eq ["user_1"]
+      expect(progress.workflow_state).to eq "completed"
+    end
+
+    it "creates new tag if it doesn't exist" do
+      import_csv_data(%(user_id,tag_name
+                        user_0,new tag
+                        ),
+                      is_tags: true)
+
+      new_tag_set = @course.differentiation_tag_categories.find_by(name: "new tag")
+      expect(new_tag_set).not_to be_nil
+
+      new_tag = new_tag_set.groups.find_by(name: "new tag")
+      expect(new_tag).not_to be_nil
+      expect(Pseudonym.where(user: new_tag.users).pluck(:sis_user_id)).to eq ["user_0"]
+    end
+
+    it "does not add new tag to given tag set if it is invalid (collaborative group set)" do
+      group_category = @course.group_categories.new(name: "group set")
+      import_csv_data(%(user_id,tag_name,canvas_tag_set_id
+                                   user_0,new tag,#{group_category.id}
+                                  ),
+                      is_tags: true)
+      tag_set = @course.differentiation_tags.find_by(name: "new tag").group_category
+      expect(tag_set).not_to eq(group_category)
+      expect(tag_set.name).to eq("new tag")
+      expect(tag_set.non_collaborative).to be(true)
+    end
+
+    it "creates a new tag if the given tag id is invalid (collaborative group)" do
+      group = @course.groups.create!(name: "group")
+      import_csv_data(%(user_id,tag_name,canvas_tag_id
+                        user_0,new tag,#{group.id}
+                        ),
+                      is_tags: true)
+      new_tag = @course.differentiation_tags.find_by(name: "new tag")
+      expect(group.id).not_to eq(new_tag.id)
+      expect(new_tag.name).to eq("new tag")
+      expect(new_tag.non_collaborative).to be(true)
+    end
+
+    it "moves the existing tag to the given tag set" do
+      user_1 = Pseudonym.find_by(sis_user_id: "user_1").user
+      @tag_0.add_user(user_1)
+      tag_set_2 = @course.differentiation_tag_categories.create!(name: "tag set 2")
+      import_csv_data(%(user_id,canvas_tag_id,canvas_tag_set_id
+                                   user_0,#{@tag_0.id},#{tag_set_2.id}
+                                  ),
+                      is_tags: true)
+      existing_tag = @course.differentiation_tags.find_by(id: @tag_0.id)
+      expect(existing_tag.group_category.id).to eq(tag_set_2.id)
+      expect(Pseudonym.where(user: existing_tag.users).pluck(:sis_user_id)).to eq ["user_0", "user_1"]
+    end
+
+    it "restores deleted tags" do
+      @tag_0.destroy
+      expect(@tag_0).to be_deleted
+      import_csv_data(%(user_id,canvas_tag_id
+                                   user_0,#{@tag_0.id}
+                                  ),
+                      is_tags: true)
+      expect(@tag_0.reload.workflow_state).to eq "available"
+      expect(Pseudonym.where(user: @tag_0.users).pluck(:sis_user_id)).to eq ["user_0"]
     end
   end
 end

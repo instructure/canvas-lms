@@ -19,7 +19,7 @@
 import React from 'react'
 // @ts-expect-error
 import Reactour from '@instructure/reactour/dist/reactour.cjs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import tourPubSub from '@canvas/tour-pubsub'
 import TourContainer from './TourContainer'
 import {Heading} from '@instructure/ui-heading'
@@ -29,7 +29,7 @@ import teacherTour from './tours/teacherTour'
 import studentTour from './tours/studentTour'
 import handleOpenTray from './handleOpenTray'
 
-const I18n = useI18nScope('TourPoints')
+const I18n = createI18nScope('TourPoints')
 
 export type Role = 'student' | 'teacher' | 'admin'
 
@@ -88,14 +88,12 @@ const Tour = ({roles}: ITour) => {
   React.useEffect(() => {
     // Override the tray dismiss function while this
     // tour is open;
-    if (open) {
-      tourPubSub.publish('navigation-tray-override-dismiss', true)
-    }
-    return () => tourPubSub.publish('navigation-tray-override-dismiss', false)
+    tourPubSub.publish('navigation-tray-override-dismiss', open)
   }, [open])
 
   const handleSoftClose = React.useCallback(
     async (options = {}) => {
+      // @ts-expect-error
       const {forceClose} = options
       setHasOpened(true)
       if (softClose || forceClose) {
@@ -113,19 +111,20 @@ const Tour = ({roles}: ITour) => {
         }
       }
     },
-    [setHasOpened, softClose]
+    [setHasOpened, softClose],
   )
 
   React.useEffect(() => {
     const escapeClose = (e: any) => {
-      if (e.keyCode === 27) {
-        // Escape Key
+      const hasEscapeKeyPressed = e.keyCode === 27
+
+      if (hasEscapeKeyPressed && !hasOpened) {
         handleSoftClose()
       }
     }
     document.addEventListener('keydown', escapeClose)
     return () => document.removeEventListener('keydown', escapeClose)
-  }, [handleSoftClose])
+  }, [handleSoftClose, hasOpened])
 
   const restoreTrayScreenReader = () => {
     // Restore the nav tray's screen reader visibility
@@ -153,8 +152,9 @@ const Tour = ({roles}: ITour) => {
   React.useEffect(() => {
     if (open) {
       blockApplicationScreenReader()
+    } else {
+      restoreTrayScreenReader()
     }
-    return () => restoreTrayScreenReader()
   }, [open])
 
   React.useEffect(() => {
@@ -196,14 +196,14 @@ const Tour = ({roles}: ITour) => {
     return () => unsub()
   }, [roles])
 
-  if (!currentRole || !steps) return null
+  if (!currentRole || !steps || !open) return null
 
   const firstStepLabels = {
     student: I18n.t('Student Tour'),
     teacher: I18n.t('Teacher Tour'),
     admin: I18n.t('Admin Tour'),
   }
-  if (!open) return null
+
   return (
     <Reactour
       key={`${softClose}-${open}-${currentRole}`}

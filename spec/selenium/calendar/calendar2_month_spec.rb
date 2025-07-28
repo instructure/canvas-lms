@@ -42,6 +42,40 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
+    def element_location
+      # rubocop:disable Specs/NoExecuteScript
+      driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
+      .find('tbody td.fc-event-container').index()")
+      # rubocop:enable Specs/NoExecuteScript
+    end
+
+    def create_checkpoint(
+      topic:,
+      type: "reply_to_topic",
+      due_at: nil,
+      points_possible: 5,
+      override: false,
+      override_due_at: nil,
+      student_ids: []
+    )
+      checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
+
+      # Build the dates array dynamically based on whether an override is needed
+      dates = []
+      dates << { type: "everyone", due_at: } unless due_at.nil?
+      if override && !override_due_at.nil? && !student_ids.empty?
+        dates << { type: "override", set_type: "ADHOC", student_ids:, due_at: override_due_at }
+      end
+
+      # Call the service with the constructed parameters
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: topic,
+        checkpoint_label:,
+        dates:,
+        points_possible:
+      )
+    end
+
     it "navigates to month view when month button is clicked", :xbrowser do
       load_week_view
       f("#month").click
@@ -203,24 +237,72 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@three_days_earlier)
         end
 
-        it "extends event to multiple days by draging", priority: "2" do
+        it "extends event to multiple days by dragging", priority: "2" do
           skip("dragging events are flaky and need more research FOO-4335")
 
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute("data-date")
-          date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime("%Y-%m-%d")
+          date_of_next_day = (Time.zone.parse(date_of_middle_day) + 1.day).strftime("%Y-%m-%d")
           f(".fc-content-skeleton .fc-event-container .fc-resizer")
           next_day = fj("[data-date=#{date_of_next_day}]")
           drag_and_drop_element(f(".fc-content-skeleton .fc-event-container .fc-resizer"), next_day)
           fj(".fc-event:visible").click
           # observe the event details show date range from event start to date to end date
-          original_day_text = format_time_for_view(date_of_middle_day.to_datetime)
-          extended_day_text = format_time_for_view(date_of_next_day.to_datetime + 1.day)
+          original_day_text = format_time_for_view(Time.zone.parse(date_of_middle_day))
+          extended_day_text = format_time_for_view(Time.zone.parse(date_of_next_day) + 1.day)
           expect(f(".event-details-timestring .date-range").text).to eq("#{original_day_text} - #{extended_day_text}")
+        end
+
+        it "prevents drag and drop for discussion checkpoints", priority: "1" do
+          @course.account.enable_feature!(:discussion_checkpoints)
+          topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+          checkpoint = create_checkpoint(topic:, due_at: @initial_time)
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          # Expect errors message with drag and drop
+          expect_instui_flash_message("Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.")
+          wait_for_ajaximations
+
+          # Checkpoint should not not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Checkpoint time should stay at 9:00am
+          checkpoint.reload
+          expect(checkpoint.start_at).to eql(@initial_time)
+        end
+
+        it "prevents drag and drop for discussion checkpoint overrides", priority: "2" do
+          @course.account.enable_feature!(:discussion_checkpoints)
+          student_in_course(active_all: true)
+          topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+          checkpoint = create_checkpoint(topic:, override_due_at: @initial_time, override: true, student_ids: [@student.id])
+
+          get "/calendar2"
+          quick_jump_to_date(@initial_time_str)
+
+          # Move assignment from Thursday to Friday
+          drag_and_drop_element(find(".calendar .fc-event"),
+                                find(".calendar .fc-day.fc-widget-content.fc-fri.fc-past"))
+
+          # Expect errors message with drag and drop
+          expect_instui_flash_message("Discussion checkpoints are not draggable. You can update their due dates by editing the parent discussion topic.")
+          wait_for_ajaximations
+
+          # Checkpoint should not not be moved to Friday
+          expect(element_location).not_to eq @friday
+
+          # Checkpoint time should stay at 9:00am
+          checkpoint.reload
+          expect(checkpoint.assignment_overrides.first.due_at).to eql(@initial_time)
         end
       end
 
-      it "more options link should go to calendar event edit page" do
+      it "more options link should go to calendar event edit page", :ignore_js_errors do
         create_middle_day_event
         f(".fc-event").click
         expect(fj(".popover-links-holder:visible")).not_to be_nil
@@ -257,6 +339,131 @@ describe "calendar2" do
         expect(find("#assignment-draft-state")).not_to include_text("Not Published")
       end
 
+      it "loads discussion edit page when click on edit button in discussion checkpoint info modal" do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc + 1.day
+        title = "graded discussion with checkpoints"
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+        create_checkpoint(topic:, due_at:)
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at))
+        f(".fc-event").click
+        click_edit_event_button
+        expect(find("h1")).to include_text(title)
+      end
+
+      it "loads discussion page when click on title in discussion checkpoint info modal", :ignore_js_errors do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc + 1.day
+        title = "graded discussion with checkpoints"
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title:)
+        create_checkpoint(topic:, due_at:)
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at))
+        f(".fc-event").click
+        expect_new_page_load { hover_and_click ".view_event_link" }
+        expect(find('[data-testid="message_title"]')).to include_text(title)
+      end
+
+      context "discussion checkpoint titles" do
+        before do
+          @course.account.enable_feature!(:discussion_checkpoints)
+        end
+
+        it "displays the full title for reply to topic checkpoint in info modal" do
+          due_date_reply_to_topic = 1.day.from_now
+          due_date_reply_to_entry = 60.days.from_now
+          reply_to_topic, = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            due_date_reply_to_topic:,
+            due_date_reply_to_entry:
+          )
+
+          get "/calendar2"
+          quick_jump_to_date(format_date_for_view(due_date_reply_to_topic))
+          f(".fc-event").click
+          reply_to_topic_title = find(".event-details-header h2.details_title.title a").text
+          expect(reply_to_topic_title).to eq "#{reply_to_topic.title} Reply to Topic"
+        end
+
+        it "displays the full title for reply to entry checkpoint in info modal" do
+          due_date_reply_to_entry = 1.day.from_now
+          due_date_reply_to_topic = 60.days.from_now
+          required_replies = 2
+          _, reply_to_entry = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            due_date_reply_to_topic:,
+            due_date_reply_to_entry:,
+            reply_to_entry_required_count: required_replies
+          )
+
+          get "/calendar2"
+          quick_jump_to_date(format_date_for_view(due_date_reply_to_entry))
+          f(".fc-event").click
+          reply_to_entry_title = find(".event-details-header h2.details_title.title a").text
+          expect(reply_to_entry_title).to eq "#{reply_to_entry.title} Required Replies (#{required_replies})"
+        end
+      end
+
+      context "discussion checkpoints in sub-accounts" do
+        before do
+          @root_account = Account.default
+          @sub_account = @root_account.sub_accounts.create!(name: "sub-account")
+          @nested_sub_account = @sub_account.sub_accounts.create!(name: "nested-sub-account")
+          course_with_teacher_logged_in(user: @teacher, account: @sub_account)
+          @course_in_sub_account = @course
+          course_with_teacher_logged_in(user: @teacher, account: @nested_sub_account)
+          @course_in_nested_sub_account = @course
+          @start_of_month = Time.zone.today.beginning_of_month
+          @root_account.allow_feature!(:discussion_checkpoints)
+          @sub_account.allow_feature!(:discussion_checkpoints)
+        end
+
+        context "when discussion checkpoints FF is enabled in the corresponding sub-account" do
+          it "displays checkpoints from sub-account" do
+            @sub_account.enable_feature!(:discussion_checkpoints)
+            graded_discussion_topic_with_checkpoints(
+              title: "Sub Account Checkpointed Discussion",
+              context: @course_in_sub_account,
+              due_date_reply_to_topic: @start_of_month + 1.day,
+              due_date_reply_to_entry: @start_of_month + 5.days
+            )
+
+            get "/calendar2"
+            wait_for_ajaximations
+
+            # Check that events are visible in the calendar
+            expect(all_events_in_month_view.length).to be > 0
+
+            # Get the event titles to verify which checkpoints are showing
+            event_titles = all_events_in_month_view.map(&:text)
+            expect(event_titles.any? { |title| title.include?("Sub Account Checkpointed Discussion") }).to be_truthy
+          end
+
+          it "displays checkpoints from nested sub-account" do
+            @nested_sub_account.enable_feature!(:discussion_checkpoints)
+            graded_discussion_topic_with_checkpoints(
+              title: "Nested Sub Account Checkpointed Discussion",
+              context: @course_in_nested_sub_account,
+              due_date_reply_to_topic: @start_of_month + 3.days,
+              due_date_reply_to_entry: @start_of_month + 8.days
+            )
+
+            get "/calendar2"
+            wait_for_ajaximations
+
+            # Check that events are visible in the calendar
+            expect(all_events_in_month_view.length).to be > 0
+
+            # Get the event titles to verify which checkpoints are showing
+            event_titles = all_events_in_month_view.map(&:text)
+            expect(event_titles.any? { |title| title.include?("Nested Sub Account Checkpointed Discussion") }).to be_truthy
+          end
+        end
+      end
+
       it "deletes an event" do
         create_middle_day_event("doomed event")
         f(".fc-event").click
@@ -276,6 +483,30 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css(".fc-event")
         # make sure it was actually deleted and not just removed from the interface
+        get("/calendar2")
+        expect(f("#content")).not_to contain_css(".fc-event")
+      end
+
+      it "deletes a discussion checkpoint and all checkpoints and overrides for the same discussion topic" do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+        due_at_time1 = Time.zone.parse("2024-1-1")
+        due_at_time2 = Time.zone.parse("2024-1-3")
+        due_at_time3 = Time.zone.parse("2024-1-5")
+        due_at_time4 = Time.zone.parse("2024-1-6")
+        # Create a graded topic with 2 checkpoints and 2 checkpoint overrides
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with checkpoints")
+        create_checkpoint(topic:, due_at: due_at_time1, override_due_at: due_at_time2, override: true, student_ids: [@student.id])
+        create_checkpoint(topic:, type: "reply_to_entry", due_at: due_at_time3, override_due_at: due_at_time4, override: true, student_ids: [@student.id])
+
+        get "/calendar2"
+        quick_jump_to_date(format_date_for_view(due_at_time1))
+        f(".fc-event").click
+        hover_and_click ".delete_event_link"
+        click_delete_confirm_button
+        wait_for_ajaximations
+        expect(f("#content")).not_to contain_css(".fc-event")
+        # make sure all discussion related checkpoints and overrides were actually deleted and not just removed from the interface
         get("/calendar2")
         expect(f("#content")).not_to contain_css(".fc-event")
       end
@@ -358,7 +589,7 @@ describe "calendar2" do
       it "shows section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(name: "other section!")
-        date = Date.today
+        date = Time.zone.today
         e1 = @course.calendar_events.build title: "ohai",
                                            child_event_data: [
                                              { start_at: "#{date} 12:00:00", end_at: "#{date} 13:00:00", context_code: @course.default_section.asset_string },
@@ -380,7 +611,7 @@ describe "calendar2" do
 
       it "has a working today button", priority: "1" do
         load_month_view
-        date = Time.now.strftime("%-d")
+        date = Time.zone.now.strftime("%-d")
 
         # Check for highlight to be present on this month
         # this class is also present on the mini calendar so we need to make
@@ -454,6 +685,35 @@ describe "calendar2" do
         expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
       end
 
+      it "strikethroughs past due discussion checkpoint", priority: "1" do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        due_at = Time.zone.now.utc - 2.days
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint")
+        create_checkpoint(topic:, due_at:)
+        get "/calendar2"
+
+        # go to the same month as the date_due
+        quick_jump_to_date(format_date_for_view(due_at))
+        # verify discussion checkpoint has line-through
+        expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
+      end
+
+      it "strikethroughs past due discussion checkpoint override", priority: "1" do
+        @course.account.enable_feature!(:discussion_checkpoints)
+        student_in_course(active_all: true)
+        due_at = Time.zone.now.utc + 1.day
+        due_at_override = due_at - 3.days
+        topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded discussion with past due checkpoint override")
+        create_checkpoint(topic:, due_at:, override_due_at: due_at_override, override: true, student_ids: [@student.id])
+
+        get "/calendar2"
+
+        # go to the same month as the date_due
+        quick_jump_to_date(format_date_for_view(due_at_override))
+        # verify discussion checkpoint override has line-through
+        expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
+      end
+
       it "returns back to the original calendar view after editing a section child event" do
         calendar_event_model(start_at: "Sep 3 2008", title: "some event")
         child = @event.child_events.build
@@ -511,7 +771,7 @@ describe "calendar2" do
         expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
       end
 
-      it "strikethroughs completed graded discussion", priority: "1" do
+      it "strikethroughs completed graded discussion", :ignore_js_errors, priority: "1" do
         date_due = Time.zone.now.utc + 2.days
         reply = "Replying to discussion"
 
@@ -520,9 +780,11 @@ describe "calendar2" do
         @pub_graded_discussion_due.save!
 
         get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
-        find(".discussion-reply-action").click
-        type_in_tiny(".reply-textarea", reply)
-        find(".btn.btn-primary").click
+        find('[data-testid="discussion-topic-reply"]').click
+        wait_for_ajaximations
+        wait_for_rce
+        type_in_tiny("textarea", reply)
+        f('[data-testid="DiscussionEdit-submit"]').click
         wait_for_ajaximations
         get "/calendar2"
 
@@ -534,7 +796,7 @@ describe "calendar2" do
       end
 
       it "loads events from adjacent months correctly" do
-        time = DateTime.parse("2016-04-01")
+        time = Time.zone.parse("2016-04-01")
         @course.calendar_events.create! title: "aprilfools", start_at: time, end_at: time + 5.minutes
 
         get "/calendar2"
@@ -547,7 +809,7 @@ describe "calendar2" do
       end
 
       it "doesn't duplicate events when enabling calendars" do
-        time = DateTime.parse("2016-04-01")
+        time = Time.zone.parse("2016-04-01")
         @course.calendar_events.create! title: "aprilfools", start_at: time, end_at: time + 5.minutes
         get "/calendar2?include_contexts=#{@course.asset_string}#view_name=month&view_start=2016-04-01"
         wait_for_ajaximations
@@ -556,6 +818,42 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(ff(".fc-title").count).to be(1)
         expect(f(".fc-title")).to include_text("aprilfools") # should still load cached event
+      end
+
+      it "does not include the module override in the assignment list" do
+        skip "FOO-5060"
+        @section1 = CourseSection.create!(name: "Section 1", course: @course)
+        student_in_section(@section1, user: @student)
+        @assignment = @course.assignments.create!(title: "new assignment")
+        module0 = ContextModule.create!(name: "Alpha Mod", context: @course)
+        module0.content_tags.create!(context: @course, content: @assignment, tag_type: "context_module")
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active", context_module_id: module0.id)
+
+        @assignment.assignment_overrides.create!(due_at: 1.week.from_now, due_at_overridden: true, set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active")
+        get "/calendar2"
+        wait_for_ajaximations
+        expect(f(".fc-event").text).to include("new assignment")
+      end
+
+      it "student sees assignment on calendar when in section" do
+        @section1 = CourseSection.create!(name: "Section 1", course: @course)
+        @section2 = CourseSection.create!(name: "Section 2", course: @course)
+        student_in_section(@section1, user: @student)
+        @assignment = @course.assignments.create!(title: "new assignment")
+        @assignment.assignment_overrides.create!(due_at: 1.week.from_now, due_at_overridden: true, set_type: "CourseSection", set_id: @section2.id, title: @section2.name, workflow_state: "active")
+
+        module0 = ContextModule.create!(name: "Alpha Mod", context: @course)
+        module0.content_tags.create!(context: @course, content: @assignment, tag_type: "context_module")
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active", context_module_id: module0.id)
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section2.id, title: @section2.name, workflow_state: "active", context_module_id: module0.id)
+
+        get "/calendar2"
+        wait_for_ajaximations
+
+        f("#undated-events-button").click
+        wait_for_ajaximations
+        undated_events = ff("#undated-events > ul > li")
+        expect(undated_events.size).to eq 1
       end
     end
   end

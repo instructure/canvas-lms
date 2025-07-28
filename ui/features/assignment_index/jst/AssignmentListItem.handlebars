@@ -109,6 +109,9 @@
             </div>
           {{/if}}
         {{/if}}
+        {{#if isCheckpoint}}
+          <div id="assignment_teacher_checkpoint_info_{{id}}"></div>
+        {{/if}}
         {{#if showAvailability}}
         <div class="ig-details__item assignment-date-available" data-view="date-available">
         </div>
@@ -117,25 +120,25 @@
           <div class="ig-details__item assignment-date-due" data-view="date-due">
           </div>
         {{/if}}
-        {{#unless restrict_quantitative_data}}
-            {{#if pointsPossible}}
-              <div class="ig-details__item js-score">
-                <span class="screenreader-only">
-                  {{#t}}{{n pointsPossible}} Points Possible{{/t}}
-                </span>
-                <span class="non-screenreader" aria-hidden="true">
-                  {{#t}}{{n pointsPossible}} pts{{/t}}
-                </span>
-              </div>
-            {{else}}
-              <span class="js-score screenreader-only">
-                {{#t}}No Points Possible{{/t}}
-              </span>
-            {{/if}}
+        {{#if (or isCheckpoint restrict_quantitative_data)}}
+          <div class="ig-details__item js-score">
+          </div>
         {{else}}
+          {{#if pointsPossible}}
             <div class="ig-details__item js-score">
+              <span class="screenreader-only">
+                {{#t}}{{n pointsPossible}} Points Possible{{/t}}
+              </span>
+              <span class="non-screenreader" aria-hidden="true">
+                {{#t}}{{n pointsPossible}} pts{{/t}}
+              </span>
             </div>
-        {{/unless}}
+          {{else}}
+            <span class="js-score screenreader-only">
+              {{#t}}No Points Possible{{/t}}
+            </span>
+          {{/if}}
+        {{/if}}
         {{#if isMasteryConnectTool}}
           <div class="ig-details__item mc-objectives">{{externalToolData.objectives}}</div>
         {{/if}}
@@ -163,6 +166,7 @@
             class="al-trigger al-trigger-gray Button--icon-action"
             id="assign_{{id}}_manage_link"
             tabindex="0"
+            data-popup-collision="fit flipfit"
           >
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only">{{#t}}Settings for Assignment {{name}}{{/t}}</span>
@@ -239,7 +243,6 @@
                 </li>
                 {{/if}}
                 {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -249,12 +252,12 @@
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      title="<%= {{#t}}Assign this Assignment{{/t}} %>"
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"
+                      title="{{#t}}Assign this Assignment{{/t}}"
                       aria-label="{{#t}}Assign To...{{/t}}"
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
                 {{/if}}
             {{/if}}
             {{#unless is_locked}}
@@ -413,7 +416,6 @@
                 </li>
                 {{/if}}
                 {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -423,12 +425,12 @@
                       data-assignment-context-id="{{courseId}}"
                       data-assignment-id="{{id}}"
                       data-assignment-type="{{item_assignment_type}}"
-                      title="<%= {{#t}}Assign this Assignment{{/t}} %>"
+                      data-assignment-has-checkpoint="{{isCheckpoint}}"
+                      title="{{#t}}Assign this Assignment{{/t}}"
                       aria-label="{{#t}}Assign To...{{/t}}"
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
                 {{/if}}
                 {{#if canMove}}
                 <li>
@@ -505,9 +507,10 @@
     {{/if}}
     </div>
 
-    {{#if canManage}}<form data-view="edit-assignment" class="form-dialog"></form>{{/if}}
   {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>
+<div id="assignment_student_checkpoints_{{id}}"></div>
 <div id="assignment_student_peer_review_{{id}}">
 <div id="assign-to-mount-point"></div>
+<div id="create-edit-mount-point"></div>
 </div>

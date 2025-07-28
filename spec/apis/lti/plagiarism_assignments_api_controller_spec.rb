@@ -45,7 +45,7 @@ module Lti
         student
       end
       let(:assignment) do
-        a = course.assignments.new(title: "some assignment", points_possible: 10, description: "<p>Dude...</p>", due_at: DateTime.now)
+        a = course.assignments.new(title: "some assignment", points_possible: 10, description: "<p>Dude...</p>", due_at: Time.zone.now)
         a.workflow_state = "published"
         a.tool_settings_tool = message_handler
         a.save!
@@ -59,7 +59,7 @@ module Lti
           "due_at" => assignment.due_at.iso8601,
           "points_possible" => assignment.points_possible,
           "lti_id" => assignment.lti_context_id,
-          "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+          "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
           "course_id" => assignment.context.global_id
         }
       end

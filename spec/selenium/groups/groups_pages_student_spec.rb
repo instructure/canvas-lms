@@ -200,7 +200,7 @@ describe "groups" do
         expect(f("#content-wrapper")).not_to contain_css(".edit-btn")
       end
 
-      it "student in group can see teachers announcement in index" do
+      it "student in group can see teachers announcement in index", :ignore_js_errors do
         announcement = @testgroup.first.announcements.create!(
           title: "Group Announcement",
           message: "Group",
@@ -209,8 +209,8 @@ describe "groups" do
         user_session(@students.first)
         AnnouncementIndex.visit_groups_index(@testgroup.first)
         expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement.title) }
-        expect(f(".discussion-title").text).to eq "Group Announcement"
-        expect(f(".message").text).to eq "Group"
+        expect(f('[data-testid="message_title"]')).to include_text("Group Announcement")
+        expect(f(".userMessage").text).to eq "Group"
       end
 
       it "only allows group members to access announcements" do
@@ -239,7 +239,7 @@ describe "groups" do
         AnnouncementIndex.visit_groups_index(@testgroup.first)
         expect(ff(".ic-announcement-row").size).to eq 1
         expect_new_page_load { ff('[data-testId="single-announcement-test-id"]')[0].click }
-        expect(f(".discussion-title")).to include_text(@announcement.title)
+        expect(f('[data-testid="message_title"]')).to include_text(@announcement.title)
       end
     end
 
@@ -283,7 +283,7 @@ describe "groups" do
         edit_topic("from a student", "tell me a story")
       end
 
-      it "allows group members to access a discussion", priority: "1" do
+      it "allows group members to access a discussion", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @teacher,
                                      title: "Discussion Topic",
@@ -291,16 +291,16 @@ describe "groups" do
         get discussions_page
         # Verifies group member can access the teacher's group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
-        expect(f(".message.user_content")).to include_text(dt.message)
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text(dt.message)
       end
 
       it "has two options when creating a discussion", priority: "1" do
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
-        expect(f("#threaded")).to be_displayed
-        expect(f("#allow_rating")).to be_displayed
+        expect(f('[name="allow_rating"]')).to be_present
+        expect(f('[name="allow_todo_date"]')).to be_present
         # Shouldn't be Enable Podcast Feed option
-        expect(f("#content")).not_to contain_css("#podcast_enabled")
+        expect(f("#content")).not_to contain_css('[name="podcast_enabled"]')
       end
 
       it "only allows group members to access discussions", priority: "1" do
@@ -331,29 +331,29 @@ describe "groups" do
         expect(f(".discussions-container__wrapper")).not_to contain_css("#discussions-index-manage-menu")
       end
 
-      it "allows group members to edit their discussions", priority: "1" do
+      it "allows group members to edit their discussions", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @user,
                                      title: "White Snow",
                                      message: "Where are my skis?")
         get discussions_page
-        f("[data-testid='discussion-link-#{dt.id}']").click
-        f(".edit-btn").click
+        expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.title).to eq "Edit Discussion Topic"
-        type_in_tiny("textarea[name=message]", "The slopes are ready,")
-        f(".btn-primary").click
-        wait_for_ajaximations
-        expect(f(".user_content")).to include_text("The slopes are ready,")
+        edit_topic(dt.title, "The slopes are ready,")
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text("The slopes are ready,")
       end
 
-      it "does not allow group member to edit discussions by other creators", priority: "1" do
+      it "does not allow group member to edit discussions by other creators", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: "White Snow",
                                      message: "Where are my skis?")
         get discussions_page
-        f("[data-testid='discussion-link-#{dt.id}']").click
-        expect(f("#content")).not_to contain_css(".edit-btn")
+        expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f('[data-position-content="discussion-post-menu"]')).not_to contain_css('[data-testid="discussion-thread-menuitem-edit"]')
       end
     end
 
@@ -393,67 +393,39 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
-    describe "Files page" do
-      it_behaves_like "files_page", :student
-
-      it "allows group members to add a new folder", priority: "1" do
-        get files_page
-        add_folder
-        expect(ff(".ef-name-col__text").first.text).to eq "new folder"
+    describe "Files page on old UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows group members to delete a folder", priority: "1" do
-        skip("RCX-1829: files cog items not working with react 18")
-        skip_if_safari(:alert)
-        get files_page
-        add_folder
-        delete_file(0, :cog_icon)
-        expect(f("body")).not_to contain_css(".ef-item-row")
+      before do
+        @student.set_preference(:files_ui_version, "v1")
       end
 
-      it "allows group members to move a folder", priority: "1" do
-        get files_page
-        create_folder_structure
-        move_folder(@inner_folder)
-      end
+      it_behaves_like "files_page_old_ui", :student
 
       it "only allows group members to access files", priority: "1" do
         get files_page
         verify_no_course_user_access(files_page)
       end
+    end
 
-      it "allows a group member to delete a file", priority: "1" do
-        skip("RCX-1829: files cog items not working")
-        skip_if_safari(:alert)
-        add_test_files(false)
-        get files_page
-        delete_file(0, :cog_icon)
-        wait_for_ajaximations
-        expect(all_files_folders.count).to eq 1
-        # Now try to delete the other one using toolbar menu
-        delete_file(0, :toolbar_menu)
-        expect(f("body")).not_to contain_css(".ef-item-row")
+    describe "Files page on files rewrite UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows group members to move a file", priority: "1" do
-        add_test_files
-        get files_page
-        add_folder("destination_folder")
-        move_file_to_folder("example.pdf", "destination_folder")
+      before do
+        @student.set_preference(:files_ui_version, "v2")
       end
 
-      it "hides the publish cloud", priority: "1" do
-        add_test_files
-        get files_page
-        expect(f("#content")).not_to contain_css(".btn-link.published-status")
-      end
+      it_behaves_like "files_page_files_rewrite_ui", :student
 
-      it "does not allow group members to restrict access to a file", priority: "1" do
-        add_test_files
+      it "only allows group members to access files on new files UI", priority: "1" do
         get files_page
-        f(".ef-item-row .ef-date-created-col").click
-        expect(f(".ef-header")).to contain_css(".ef-header__secondary")
-        expect(f(".ef-header__secondary")).not_to contain_css(".btn-restrict")
+        verify_no_course_user_access(files_page)
       end
     end
 
@@ -479,11 +451,13 @@ describe "groups" do
         active_student.update_attribute(:name, "imsoactive")
 
         get conferences_page
-        f(".new-conference-btn").click
-        f(".all_users_checkbox").click
 
-        expect(f("#members_list")).to_not include_text(inactive_student.name)
-        expect(f("#members_list")).to include_text(active_student.name)
+        # create a new conference
+        f(".new-conference-btn").click
+        wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+
+        new_conference = WebConference.last
+        expect(new_conference.users).not_to include(inactive_student)
       end
     end
     #-------------------------------------------------------------------------------------------------------------------

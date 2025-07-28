@@ -28,10 +28,12 @@ group :test do
 
   gem "rubocop-canvas", require: false, path: "../gems/rubocop-canvas"
   gem "rubocop-inst", "~> 1", require: false
+  gem "rubocop-factory_bot", "~> 2.22", require: false
   gem "rubocop-graphql", "~> 1.3", require: false
   gem "rubocop-rails", "~> 2.19", require: false
   gem "rubocop-rake", "~> 0.6", require: false
-  gem "rubocop-rspec", "~> 2.22", require: false
+  gem "rubocop-rspec", "~> 3.0", require: false
+  gem "rubocop-rspec_rails", "~> 2.29", require: false
 end
 
 eval_gemfile("_before.rb") # have to put this here too, since this file is loaded directly by bin/rubocop

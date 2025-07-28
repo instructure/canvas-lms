@@ -1,0 +1,38 @@
+@import "mixins/typography";
+
+@mixin page_header_container {
+  margin-bottom: 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 1.5rem;
+  column-gap: 15px;
+  @media (max-width: 1024px) {
+    margin-bottom: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@mixin page_header {
+  @include fontSize(38px);
+  margin: 0;
+  font-weight: 700;
+  @media (max-width: 991px) {
+    @include fontSize(28px);
+  }
+}
+
+@mixin action_buttons_container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+  @media(max-width: 767px) {
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
+  }
+}

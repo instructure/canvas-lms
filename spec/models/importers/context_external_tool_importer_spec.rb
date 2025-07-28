@@ -79,7 +79,11 @@ describe Importers::ContextExternalToolImporter do
     end
 
     let(:course) { @course }
-    let(:developer_key) { DeveloperKey.create!(account: course.account) }
+    let(:developer_key) do
+      lti_developer_key_model(account: course.account).tap do |key|
+        lti_tool_configuration_model(developer_key: key, lti_registration: key.lti_registration)
+      end
+    end
     let(:migration) { course.content_migrations.create! }
     let(:settings) { { client_id: developer_key.global_id } }
     let(:tool_hash) do
@@ -91,12 +95,18 @@ describe Importers::ContextExternalToolImporter do
       }
     end
 
-    it "sets the developer key id" do
+    it "sets the developer key and lti registration" do
       expect(subject.developer_key).to eq developer_key
+      expect(subject.lti_registration).to eq developer_key.lti_registration
     end
 
     it "sets the lti_version" do
       expect(subject.lti_version).to eq "1.3"
+    end
+
+    it "allows nil domain" do
+      tool_hash[:domain] = nil
+      expect(subject.domain).to be_nil
     end
 
     context "when lti_version isn't present in hash" do
@@ -141,15 +151,14 @@ describe Importers::ContextExternalToolImporter do
     subject do
       Importers::ContextExternalToolImporter.import_from_migration(
         tool_hash,
-        course.account,
+        @course.account,
         migration,
         tool
       )
     end
 
-    let(:course) { @course }
-    let(:migration) { course.content_migrations.create! }
-    let(:tool) { external_tool_model(context: course) }
+    let(:migration) { @course.content_migrations.create! }
+    let(:tool) { external_tool_model(context: @course) }
     let(:tool_hash) do
       {
         title: "test tool",
@@ -192,6 +201,50 @@ describe Importers::ContextExternalToolImporter do
       it "does not change" do
         subject
         expect(tool).to have_received(:settings=)
+      end
+    end
+  end
+
+  context "unified_tool_id" do
+    subject do
+      Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        @course.account,
+        migration,
+        tool
+      )
+    end
+
+    let(:migration) { @course.content_migrations.create! }
+    let(:tool) do
+      t = external_tool_model(context: @course)
+      t.unified_tool_id = "222"
+      t
+    end
+    let(:unified_tool_id) { "utid" }
+    let(:tool_hash) do
+      {
+        title: "test tool",
+        settings: {
+          oauth_compliant: true
+        },
+        unified_tool_id:
+      }
+    end
+
+    context "when unified_tool_id is present in the hash" do
+      it "updates the unified_tool_id" do
+        subject
+        expect(tool.unified_tool_id).to eq "utid"
+      end
+    end
+
+    context "when unified_tool_id is not present in hash" do
+      let(:unified_tool_id) { nil }
+
+      it "keeps the tool's unified_tool_id" do
+        subject
+        expect(tool.unified_tool_id).to eq "222"
       end
     end
   end

@@ -21,8 +21,8 @@
 class Mutations::UpdateCommentBankItem < Mutations::BaseMutation
   graphql_name "UpdateCommentBankItem"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem")
   argument :comment, String, required: true
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem")
 
   field :comment_bank_item, Types::CommentBankItemType, null: true
 

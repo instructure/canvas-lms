@@ -30,7 +30,7 @@ describe CommunicationChannel do
   end
 
   it "creates a new instance given valid attributes" do
-    factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
+    CommunicationChannel.create!(communication_channel_valid_attributes)
   end
 
   describe "::trusted_confirmation_redirect?" do
@@ -178,6 +178,13 @@ describe CommunicationChannel do
     expect(cc.reload.confirmation_sent_count).to eq conf_count
   end
 
+  it "does not break with missing context" do
+    @u1 = User.create!
+    cc = communication_channel(@u1, { username: "mortgage@tomnook.com" })
+    cc.send_confirmation!(nil)
+    expect(cc.reload.confirmation_sent_count).to eq 1
+  end
+
   it "is able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
@@ -227,10 +234,10 @@ describe CommunicationChannel do
 
   it "provides a confirmation url" do
     expect(HostUrl).to receive(:protocol).and_return("https")
-    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
+    expect(HostUrl).to receive(:context_host).and_return("test.canvas.com").at_least(:once)
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
-    mock_request = instance_double("ActionDispatch::Request", host_with_port: "test.canvas.com")
+    mock_request = instance_double(ActionDispatch::Request, host_with_port: "test.canvas.com")
     presenter = CommunicationChannelPresenter.new(@cc, mock_request)
     expect(presenter.confirmation_url).to eql("https://test.canvas.com/register/abc123")
   end
@@ -254,6 +261,40 @@ describe CommunicationChannel do
     user = User.create!
     invalid_stuff = { username: "invalid", user:, pseudonym_id: "1" }
     expect { communication_channel(user, invalid_stuff) }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it "blocks account-level forbidden emails" do
+    account = account_model
+    user = user_with_pseudonym(account:)
+    expect { communication_channel(user, { username: "test1@test.com", user:, pseudonym_id: "1" }) }.not_to raise_error
+    expect { communication_channel(user, { username: "test2@test2.com", user:, pseudonym_id: "2" }) }.not_to raise_error
+
+    account.settings[:banned_email_domains] = ["test2.com"]
+    account.save!
+    user.reload
+
+    expect { communication_channel(user, { username: "test3@test.com", user:, pseudonym_id: "3" }) }.not_to raise_error
+    expect { communication_channel(user, { username: "test4@test2.com", user:, pseudonym_id: "4" }) }.to raise_error(ActiveRecord::RecordInvalid)
+  end
+
+  it "blocks account-level forbidden emails for unsaved users" do
+    account = account_model
+    account.settings[:banned_email_domains] = ["test2.com"]
+    account.save!
+
+    expect do
+      user = User.new
+      user.pseudonyms.build(user:, account:, unique_id: "user1")
+      user.communication_channels.build(path_type: "email", path: "test1@test.com")
+      user.valid?
+      user.save!
+    end.not_to raise_error
+    expect do
+      user = User.new
+      user.pseudonyms.build(user:, account:, unique_id: "user1")
+      user.communication_channels.build(path_type: "email", path: "test2@test2.com")
+      user.save!
+    end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "limits quantity of channels a user can have" do
@@ -601,6 +642,7 @@ describe CommunicationChannel do
           set_root_account_ids
           after_save_flag_old_microsoft_sync_user_mappings
           consider_building_notification_policies
+          initialize_synced_with_identity
         ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end
@@ -801,48 +843,61 @@ describe CommunicationChannel do
       it "doesn't flag old mappings if path type is not email" do
         cc.update!(path_type: described_class::TYPE_SMS, path: "8005551212")
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(path_type: described_class::TYPE_TWITTER)
+        cc.update!(path_type: described_class::TYPE_PUSH)
         cc.update!(path: "instructure")
       end
 
       it "doesn't flag old mappings if nothing relevant has changed" do
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.now)
+        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.zone.now)
       end
     end
   end
 
   describe "#otp_impaired?" do
-    let(:us_cc) do
-      communication_channel(user_model, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS })
-    end
-    let(:eu_cc) do
-      communication_channel(user_model, { username: "+353872337277", path_type: CommunicationChannel::TYPE_SMS })
-    end
+    let(:us_cc) { communication_channel(user_model, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:eu_cc) { communication_channel(user_model, { username: "+353872337277", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:new_us_format) { communication_channel(user_model, { username: "8015555555", path_type: CommunicationChannel::TYPE_SMS }) }
+    let(:malformed_number) { communication_channel(user_model, { username: "8015555abc", path_type: CommunicationChannel::TYPE_SMS }) }
 
-    context "no impaired channels" do
-      it "returns false for US channels" do
-        expect(us_cc.otp_impaired?).to be false
-      end
-
-      it "returns false for EU channels" do
-        expect(eu_cc.otp_impaired?).to be false
-      end
+    it "returns false for US channels with old format" do
+      expect(us_cc.otp_impaired?).to be false
     end
 
-    context "only US impaired channels" do
-      before do
-        allow(Setting).to receive(:get).and_call_original
-        allow(Setting).to receive(:get).with("otp_impaired_country_codes", "").and_return("1")
-      end
+    it "returns true for EU channels" do
+      expect(eu_cc.otp_impaired?).to be true
+    end
 
-      it "returns true for US channels" do
-        expect(us_cc.otp_impaired?).to be true
-      end
+    it "returns false for US channels with new format" do
+      expect(new_us_format.otp_impaired?).to be false
+    end
 
-      it "returns false for EU channels" do
-        expect(eu_cc.otp_impaired?).to be false
-      end
+    it "returns false for malformed numbers" do
+      expect(malformed_number.otp_impaired?).to be false
+    end
+  end
+
+  describe "#e164_path" do
+    let(:sms_user) { user_model }
+
+    it "returns the number in E.164 format if already formatted" do
+      cc = communication_channel(sms_user, username: "+18015555555", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "formats a US number with a domain to E.164" do
+      cc = communication_channel(sms_user, username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "prepends the default US country code to a plain number" do
+      cc = communication_channel(sms_user, username: "8015555555", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to eq "+18015555555"
+    end
+
+    it "returns nil for malformed numbers" do
+      cc = communication_channel(sms_user, username: "8015555abc", path_type: CommunicationChannel::TYPE_SMS)
+      expect(cc.e164_path).to be_nil
     end
   end
 

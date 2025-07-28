@@ -27,7 +27,7 @@ class Quizzes::QuizQuestion::FileUploadAnswer < Quizzes::QuizQuestion::UserAnswe
   def attachment_ids
     return nil unless (data = @answer_data[:"question_#{question_id}"])
 
-    ids = data.select(&:present?)
+    ids = data.compact_blank
     ids.presence
   end
 end

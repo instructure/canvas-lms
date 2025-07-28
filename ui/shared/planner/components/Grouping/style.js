@@ -40,7 +40,7 @@ export default function buildStyle() {
       themeAdditionalStyles = {
         heroTextDecoration: 'underline',
         heroTextDecorationHover: 'none',
-        titleColor: variables.colors.licorice,
+        titleColor: variables.colors.contrasts.grey125125,
       }
       break
   }
@@ -63,7 +63,7 @@ export default function buildStyle() {
     lineHeight: variables.typography.lineHeightCondensed,
     margin: `${variables.spacing.medium} 0 0 0`,
 
-    groupColor: variables.colors.brand,
+    groupColor: variables.colors.contrasts.blue4570,
 
     borderTopWidth: variables.borders.widthSmall,
     borderTopWidthTablet: variables.borders.widthMedium,
@@ -72,7 +72,7 @@ export default function buildStyle() {
     heroWidth: '12rem',
     heroWidthLarge: '14rem',
     heroPadding: '0.0625rem',
-    heroColor: variables.colors.brand,
+    heroColor: variables.colors.contrasts.blue4570,
     heroBorderRadius: variables.borders.radiusMedium,
 
     overlayOpacity: 0.75,
@@ -81,13 +81,13 @@ export default function buildStyle() {
     titleFontSizeTablet: '0.875rem',
     titleFontWeight: variables.typography.fontWeightBold,
     titleLetterSpacing: '0.0625rem',
-    titleBackground: variables.colors.white,
+    titleBackground: variables.colors.contrasts.white1010,
     titleTextTransform: 'uppercase',
     titlePadding: `${variables.spacing.xxSmall} ${variables.spacing.xSmall}`,
     titleOverflowGradientHeight: variables.spacing.xxSmall,
     titleTextDecoration: 'none',
     titleTextDecorationHover: 'underline',
-    titleColor: variables.colors.brand,
+    titleColor: variables.colors.contrasts.blue4570,
     ...themeAdditionalStyles,
     ...variables.media,
   }
@@ -102,7 +102,7 @@ export default function buildStyle() {
     position: relative;
     display: flex;
   }
-  
+
   .${classNames.title} {
     position: relative;
     z-index: 1;
@@ -133,7 +133,7 @@ export default function buildStyle() {
     left: 0;
     background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, ${theme.titleBackground} 100%);
   }
-  
+
   .${classNames.hero} {
     position: relative;
     display: flex;
@@ -152,20 +152,20 @@ export default function buildStyle() {
   .${classNames.hero} .${classNames.groupingName} {
     text-decoration: ${theme.heroLinkTextDecoration};
   }
-  
+
   .${classNames.hero},
   .${classNames.overlay} {
     border-bottom-inline-start-radius: ${theme.heroBorderRadius};
     border-top-inline-start-radius: ${theme.heroBorderRadius};
   }
-  
+
   .${classNames.heroHover}:focus, .${classNames.heroHover}:hover {
     text-decoration: none;
   }
   .${classNames.heroHover}:focus .${classNames.title}, .${classNames.heroHover}:hover .${classNames.title} {
     text-decoration: ${theme.titleTextDecorationHover};
   }
-  
+
   .${classNames.overlay} {
     background-color: ${theme.groupColor};
     opacity: 1;
@@ -178,7 +178,7 @@ export default function buildStyle() {
   .${classNames.overlay}.${classNames.withImage} {
     opacity: ${theme.overlayOpacity};
   }
-  
+
   .${classNames.items} {
     flex: 1;
     list-style-type: none;
@@ -189,7 +189,7 @@ export default function buildStyle() {
     color: ${theme.groupColor};
     min-width: 1px;
   }
-  
+
   .${classNames.medium}.${classNames.root}, .${classNames.small}.${classNames.root} {
     display: block;
     margin: 0;

@@ -24,6 +24,10 @@ module Canvas::Reloader
   class << self
     attr_reader :pending_reload
 
+    def reload
+      reload! if pending_reload
+    end
+
     def reload!
       Rails.logger.info("Canvas::Reloader fired")
       @pending_reload = false

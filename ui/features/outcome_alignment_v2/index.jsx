@@ -31,7 +31,7 @@ ready(() => {
         has_rubric_association={$(li).data('has-rubric-association')}
         url={$(li).data('url')}
       />,
-      $div
+      $div,
     )
   })
 })

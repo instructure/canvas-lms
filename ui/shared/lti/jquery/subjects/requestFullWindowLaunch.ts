@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {assignLocation, openWindow} from '@canvas/util/globalUtils'
 import type {LtiMessageHandler} from '../lti_message_handler'
 import {ltiState} from '../messages'
 import {hasKey} from '../util'
@@ -32,7 +33,7 @@ const parseData = (
         placement?: string
         resource_link_id?: string
       }
-    | string
+    | string,
 ): {
   url: string
   display: string
@@ -75,7 +76,7 @@ const buildLaunchUrl = (
   messageUrl: string,
   placement: string | undefined,
   display: string,
-  resource_link_id: string | undefined
+  resource_link_id: string | undefined,
 ) => {
   let context = ENV.context_asset_string.replace('_', 's/')
   if (!(context.startsWith('account') || context.startsWith('course'))) {
@@ -114,7 +115,7 @@ const handler: LtiMessageHandler<{
   }
 }> = ({message}) => {
   const {url, launchType, launchOptions, placement, display, resource_link_id} = parseData(
-    message.data
+    message.data,
   )
 
   const launchUrl = buildLaunchUrl(url, placement, display, resource_link_id)
@@ -124,19 +125,19 @@ const handler: LtiMessageHandler<{
     case 'popup': {
       const width = launchOptions.width || 800
       const height = launchOptions.height || 600
-      proxy = window.open(
+      proxy = openWindow(
         launchUrl,
         'popupLaunch',
-        `toolbar=no,menubar=no,location=no,status=no,resizable,scrollbars,width=${width},height=${height}`
+        `toolbar=no,menubar=no,location=no,status=no,resizable,scrollbars,width=${width},height=${height}`,
       )
       break
     }
     case 'new_window': {
-      proxy = window.open(launchUrl, 'newWindowLaunch')
+      proxy = openWindow(launchUrl, 'newWindowLaunch')
       break
     }
     case 'same_window': {
-      window.location.assign(launchUrl)
+      assignLocation(launchUrl)
       break
     }
     default: {

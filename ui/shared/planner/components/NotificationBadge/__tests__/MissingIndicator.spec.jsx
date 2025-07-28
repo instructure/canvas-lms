@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import MissingIndicator from '../MissingIndicator'
 
-it('renders an indicator with the danger variant and a title', () => {
-  const wrapper = shallow(<MissingIndicator title="blah" />)
-  expect(wrapper).toMatchSnapshot()
+it('renders missing items message for screen readers', () => {
+  const {getByText} = render(<MissingIndicator title="blah" />)
+  expect(getByText('Missing items for blah')).toBeInTheDocument()
 })

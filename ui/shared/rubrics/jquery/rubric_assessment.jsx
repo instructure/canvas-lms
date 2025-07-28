@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -32,7 +32,7 @@ import '@canvas/rails-flash-notifications'
 import Rubric from '../react/Rubric'
 import {fillAssessment, updateAssociationData} from '../react/helpers'
 
-const I18n = useI18nScope('rubric_assessment')
+const I18n = createI18nScope('rubric_assessment')
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /* global rubricAssessment */
@@ -194,8 +194,8 @@ window.rubricAssessment = {
         I18n.t(
           'Extra credit not permitted on outcomes, ' +
             'score adjusted to maximum possible for %{outcome}',
-          {outcome: criterionDescription}
-        )
+          {outcome: criterionDescription},
+        ),
       )
     }
   },
@@ -230,7 +230,7 @@ window.rubricAssessment = {
           const $ratingsContainers = $ratings.find('.rating .container').css('height', ''),
             maxHeight = Math.max(
               $ratings.height(),
-              $this.find('.criterion_description .container').height()
+              $this.find('.criterion_description .container').height(),
             )
           // the -10 here is the padding on the .container.
           $ratingsContainers.css('height', maxHeight - 10 + 'px')
@@ -268,7 +268,7 @@ window.rubricAssessment = {
         const section = key => `${pre}${key}`
         const points = criteriaAssessment.points.value
         data[section('[rating_id]')] = rubricAssessment.getCriteriaAssessmentId(
-          criteriaAssessment.id
+          criteriaAssessment.id,
         )
         data[section('[points]')] = !Number.isNaN(points) ? points : undefined
         data[section('[description]')] = criteriaAssessment.description
@@ -335,7 +335,7 @@ window.rubricAssessment = {
                 htmlEscape(comments[jdx]) +
                 '">' +
                 htmlEscape(truncateText(comments[jdx], {max: 50})) +
-                '</option>'
+                '</option>',
             )
             $holder.show()
           }
@@ -369,12 +369,12 @@ window.rubricAssessment = {
           >
             {null}
           </Rubric>,
-          container.get(0)
+          container.get(0),
         )
       }
 
       setCurrentAssessment(
-        rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT)
+        rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT),
       )
       const header = container.find('th').first()
       header.attr('tabindex', -1).focus()
@@ -500,8 +500,9 @@ window.rubricAssessment = {
         const filled = rubricAssessment.fillAssessment(
           ENV.rubric,
           assessment || {},
-          ENV.RUBRIC_ASSESSMENT
+          ENV.RUBRIC_ASSESSMENT,
         )
+
         ReactDOM.render(
           <Rubric
             customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
@@ -512,7 +513,7 @@ window.rubricAssessment = {
           >
             {null}
           </Rubric>,
-          el
+          el,
         )
       } else {
         el.innerHTML = ''

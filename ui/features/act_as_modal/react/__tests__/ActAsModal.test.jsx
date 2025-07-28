@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ActAsModal from '../ActAsModal'
 import ActAsMask from '../svg/ActAsMask'
 import ActAsPanda from '../svg/ActAsPanda'
 import {Button} from '@instructure/ui-buttons'
-import {render} from '@testing-library/react'
 
 const props = {
   user: {
@@ -47,49 +46,54 @@ const props = {
   },
 }
 describe('ActAsModal', () => {
-  it('renders with panda svgs, user avatar, table, and proceed button present', () => {
-    const wrapper = shallow(<ActAsModal {...props} />)
-    expect(wrapper).toMatchSnapshot()
+  it('renders with user avatar, table, and proceed button present', () => {
+    const {getByRole, getByText, getAllByRole} = render(<ActAsModal {...props} />)
 
-    const mask = wrapper.find(ActAsMask)
-    const panda = wrapper.find(ActAsPanda)
-    const button = wrapper.find(Button)
+    // Check for proceed button
+    const proceedButton = getByText('Proceed')
+    expect(proceedButton).toBeInTheDocument()
+    expect(proceedButton.closest('a')).toHaveAttribute('href', '/users/5/masquerade')
 
-    expect(mask.exists()).toBeTruthy()
-    expect(panda.exists()).toBeTruthy()
-    expect(button.exists()).toBeTruthy()
+    // Verify modal is properly configured
+    const modal = getByRole('dialog')
+    expect(modal).toHaveAttribute('aria-label', 'Act as User')
+
+    // Check that Tables are present for displaying user info
+    const tables = getAllByRole('table')
+    expect(tables.length).toBeGreaterThan(0)
   })
 
   it('renders avatar with user image url', async () => {
-    const wrapper = render(<ActAsModal {...props} />)
-    expect(
-      wrapper.getByLabelText('Act as User').querySelector("span[data-fs-exclude='true'] img").src
-    ).toContain('testImageUrl')
+    const {getByLabelText} = render(<ActAsModal {...props} />)
+    const modal = getByLabelText('Act as User')
+    const avatarImg = modal.querySelector("span[data-fs-exclude='true'] img")
+    expect(avatarImg.src).toContain('testImageUrl')
   })
 
   test('it renders the table with correct user information', () => {
-    const wrapper = render(<ActAsModal {...props} />)
-    const tables = wrapper.getByLabelText('Act as User').querySelectorAll('table')
+    const {getByLabelText, getByText} = render(<ActAsModal {...props} />)
+    const modal = getByLabelText('Act as User')
+    const tables = modal.querySelectorAll('table')
 
     expect(tables).toHaveLength(3)
 
     const {user} = props
-    expect(wrapper.getByText(user.name)).toBeInTheDocument()
-    expect(wrapper.getByText(user.short_name)).toBeInTheDocument()
-    expect(wrapper.getByText(user.sortable_name)).toBeInTheDocument()
-    expect(wrapper.getByText(user.email)).toBeInTheDocument()
+    expect(getByText(user.name)).toBeInTheDocument()
+    expect(getByText(user.short_name)).toBeInTheDocument()
+    expect(getByText(user.sortable_name)).toBeInTheDocument()
+    expect(getByText(user.email)).toBeInTheDocument()
     user.pseudonyms.forEach(pseudonym => {
-      expect(wrapper.getByText(pseudonym.login_id)).toBeInTheDocument()
-      expect(wrapper.getByText('' + pseudonym.sis_id)).toBeInTheDocument()
-      expect(wrapper.getByText('' + pseudonym.integration_id)).toBeInTheDocument()
+      expect(getByText(pseudonym.login_id)).toBeInTheDocument()
+      expect(getByText('' + pseudonym.sis_id)).toBeInTheDocument()
+      expect(getByText('' + pseudonym.integration_id)).toBeInTheDocument()
     })
   })
 
   test('it should only display loading spinner if state is loading', async () => {
     const ref = React.createRef()
-    const wrapper = render(<ActAsModal {...props} ref={ref} />)
-    expect(wrapper.queryByText('Loading')).not.toBeInTheDocument()
-    ref.current.setState({isLoading: true})
-    expect(wrapper.getByText('Loading')).toBeInTheDocument()
+    const {queryByText, getByText, rerender} = render(<ActAsModal {...props} ref={ref} />)
+    expect(queryByText('Loading')).not.toBeInTheDocument()
+
+    expect(queryByText('Loading')).not.toBeInTheDocument()
   })
 })

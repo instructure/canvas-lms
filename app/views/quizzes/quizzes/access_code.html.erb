@@ -35,7 +35,7 @@
       <input type="hidden" name="preview" value="1"/>
     <% end %>
     <label for="quiz_access_code" style="font-size: 1.2em;"><%= before_label(:access_code, "Access Code") %></label>
-    <input type="password" name="access_code" style="font-size: 1.2em;" title="<%= before_label(:access_code, "Access Code") %>" id="quiz_access_code"/>
+    <input type="password" name="access_code" style="font-size: 1.2em;margin-bottom:0px;" title="<%= before_label(:access_code, "Access Code") %>" id="quiz_access_code"/>
     <button class="btn" type="submit" class="btn btn-large" disabled><%= t('buttons.submit', "Submit") %></button>
   <% end %>
 </div>

@@ -21,7 +21,7 @@ included as collaborators on the collaboration created for the returned resource
 
 Example deep linking response (decoded JWT):
 
-```
+```json
 {
   "type": "ltiResourceLink",
   "url": "http://www.test-tool.com/launch?deep_linking=true",
@@ -38,9 +38,9 @@ Example deep linking response (decoded JWT):
 
 This example would create a collaboration associated with the launch `url` and include all users included in the `users` property of the extension. Additionally it would include all users in the group identified by the `groups` property of the extension.
 
-The IDs in the `users` array are the same IDs available in the <a href="https://canvas.instructure.com/doc/api/names_and_role.html">Names & Roles Provisioning Service</a>. These IDs are also the value of the `sub` claim in an LTI 1.3 launch.
+The IDs in the `users` array are the same IDs available in the <a href="names_and_role.html">Names & Roles Provisioning Service</a>. These IDs are also the value of the `sub` claim in an LTI 1.3 launch.
 
-The IDs in the `groups` array are also IDs available in the <a href="https://canvas.instructure.com/doc/api/names_and_role.html">Names & Roles Provisioning Service</a>. When making a request in the NRPS to list Group Memberships, the response's `context.id` attribute is the ID to include.
+The IDs in the `groups` array are also IDs available in the <a href="names_and_role.html">Names & Roles Provisioning Service</a>. When making a request in the NRPS to list Group Memberships, the response's `context.id` attribute is the ID to include.
 
 ### Migrating from LTI 1.1 to 1.3
 

@@ -34,8 +34,8 @@ describe Api::V1::CalendarEvent do
     WebConference.create!(context:, user:, conference_type: type)
   end
 
-  def api_user_content(description, context)
-    "api_user_content(#{description}, #{context.id}"
+  def api_user_content(description, context, location: nil)
+    "api_user_content(#{description}, #{context.id})"
   end
 
   def api_conference_json(conference, user, _)

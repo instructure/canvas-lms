@@ -17,6 +17,7 @@
           value="{{name}}"
           placeholder='{{#t "example_group_name"}}e.g., Essay Group 1{{/t}}'
         />
+        <div id="ag_{{label_id}}_name_errors"></div>
       </div>
     </div>
 
@@ -34,6 +35,7 @@
         <label style="display:inline-block" for="ag_{{label_id}}_group_weight">
           {{#t "percent_of_total"}}% of total grade{{/t}}
         </label>
+        <div id="ag_{{label_id}}_group_weight_errors"></div>
       </div>
     </div>
     {{/if}}
@@ -47,32 +49,18 @@
             {{#t "drop_lowest"}}Lowest Scores:{{/t}}
           </label>
           <div class="controls">
-            <input
-              type={{number_input}}
-              id="ag_{{label_id}}_drop_lowest"
-              class="span1 field"
-              name="rules[drop_lowest]"
-              value="{{n drop_lowest}}"
-              min="0"
-              {{#unless can_change_weighting}}readonly{{/unless}}
-            />
+            <div class="ag_{{label_id}}_drop_lowest_container" data-value="{{n drop_lowest}}" data-canEdit="{{can_change_weighting}}" style="width:6rem"></div>
           </div>
+          <div id="ag_{{label_id}}_drop_lowest_errors" style="margin-left:4rem"></div>
         </div>
         <div class="control-group">
           <label class="control-label" for="ag_{{label_id}}_drop_highest">
             {{#t "drop_highest"}}Highest Scores:{{/t}}
           </label>
           <div class="controls">
-            <input
-              type={{number_input}}
-              id="ag_{{label_id}}_drop_highest"
-              class="span1 field"
-              name="rules[drop_highest]"
-              value="{{n drop_highest}}"
-              min="0"
-              {{#unless can_change_weighting}}readonly{{/unless}}
-            />
+            <div class="ag_{{label_id}}_drop_highest_container" data-value="{{n drop_highest}}" data-canEdit="{{can_change_weighting}}" style="width:6rem"></div>
           </div>
+          <div id="ag_{{label_id}}_drop_highest_errors" style="margin-left:4rem"></div>
         </div>
 
         <hr/>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import formatMessage from '../../../../format-message'
 import {Header, CountRow} from '../utils/tableContent'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 const renderBody = (headers: Header[], rows: CountRow[]) => {
   return (
@@ -61,7 +60,7 @@ export const WordCountModal = ({headers, rows, onDismiss}: WordCountModalProps) 
   return (
     <Modal
       label={formatMessage('Word Count')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn()}
       open={true}
       data-mce-component={true}
     >

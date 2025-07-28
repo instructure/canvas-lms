@@ -42,7 +42,7 @@ export default class EditorConfig {
       baseURL: string
     },
     public readonly instConfig: any,
-    public readonly idAttribute: string
+    public readonly idAttribute: string,
   ) {
     this.baseURL = tinymce.baseURL
     this.extraButtons = instConfig.editorButtons || []

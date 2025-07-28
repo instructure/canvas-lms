@@ -21,6 +21,7 @@
 describe AuthenticationProvider::SAML do
   before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
+    allow_any_instance_of(Account).to receive(:environment_specific_domain)
     @account = Account.create!(name: "account")
     @file_that_exists = File.expand_path(__FILE__)
   end
@@ -72,7 +73,7 @@ describe AuthenticationProvider::SAML do
       ap = Account.default.authentication_providers.new(auth_type: "saml")
       ap.log_out_url = "https:// your.adfserverurl.com /adfs/ls/"
       expect(ap).not_to be_valid
-      expect(ap.errors.keys).to eq [:log_out_url]
+      expect(ap.errors.attribute_names).to eq [:log_out_url]
     end
   end
 
@@ -81,7 +82,8 @@ describe AuthenticationProvider::SAML do
       saml = Account.default.authentication_providers.new(auth_type: "saml",
                                                           metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
       expect(saml).not_to be_valid
-      expect(saml.errors.first.first).to eq :idp_entity_id
+      expect(saml.errors.attribute_names).to eq [:idp_entity_id]
+      expect(saml.errors.full_messages).to eq ["IdP Entity ID can't be blank"]
     end
 
     it "changes InCommon URI to the URN for it" do
@@ -89,6 +91,14 @@ describe AuthenticationProvider::SAML do
                                                           metadata_uri: AuthenticationProvider::SAML::InCommon.endpoint)
       expect(saml).not_to be_valid
       expect(saml.metadata_uri).to eq AuthenticationProvider::SAML::InCommon::URN
+    end
+
+    it "populates InCommon metadata from MDQ-constructed URI" do
+      saml = Account.default.authentication_providers.new(auth_type: "saml",
+                                                          metadata_uri: AuthenticationProvider::SAML::InCommon::URN,
+                                                          idp_entity_id: "urn:mace:incommon:myschool.edu")
+      expect(saml).to receive(:populate_from_metadata_url).with("https://mdq.incommon.org/entities/urn%3Amace%3Aincommon%3Amyschool.edu")
+      saml.save!
     end
 
     it "overwrite sig_alg field as appropriate" do

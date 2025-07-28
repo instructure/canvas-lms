@@ -22,10 +22,10 @@ import {loadSignupDialog} from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from '@instructure/html-escape'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import extensions from '@canvas/bundles/extensions'
 
-const I18n = useI18nScope('registration')
+const I18n = createI18nScope('registration')
 
 let $loginForm = null
 
@@ -38,7 +38,7 @@ $('.signup_link').click(
       .catch(error => {
         throw new Error('Error loading signup dialog: ', error)
       })
-  })
+  }),
 )
 
 $('#registration_video a').click(
@@ -49,7 +49,7 @@ $('#registration_video a').click(
         ENV.REGISTRATION_VIDEO_URL +
         "' width='800' height='450' frameborder='0' title='" +
         htmlEscape(I18n.t('Video Player')) +
-        "' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>"
+        "' webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe></div>",
     ).dialog({
       width: 800,
       title: I18n.t('Canvas Introduction Video'),
@@ -60,12 +60,11 @@ $('#registration_video a').click(
       },
       zIndex: 1000,
     })
-  })
+  }),
 )
 
 $('body').click(function (e) {
   if (!$(e.target).closest('#registration_login, #login_form').length) {
-    // eslint-disable-next-line no-void
     return $loginForm != null ? $loginForm.hide() : void 0
   }
 })
@@ -79,7 +78,7 @@ if (loadExtension) {
     .catch(error => {
       throw new Error(
         'Error loading extension for ui/features/registration/jquery/index.js: ',
-        error
+        error,
       )
     })
 }
@@ -94,12 +93,12 @@ export default $('#registration_login').on(
         loginForm({
           login_handle_name: ENV.ACCOUNT.registration_settings.login_handle_name,
           auth_token: authenticity_token(),
-        })
+        }),
       )
       $loginForm.appendTo($(this).closest('.registration-content'))
     }
     if ($loginForm.is(':visible')) {
       return $loginForm.find('input:visible').eq(0).focus()
     }
-  })
+  }),
 )

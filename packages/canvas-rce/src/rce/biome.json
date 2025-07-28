@@ -1,0 +1,8 @@
+{
+  "files": {
+    "ignore": [
+      "tinymce.oxide.skin.min.css.js",
+      "tinymce.oxide.content.min.css.js"
+    ]
+  }
+}

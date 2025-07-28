@@ -116,7 +116,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       end
     end
     allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.key?(:domain_root_account)
-    __send__(method, path, headers:, params: params.except(*route_params.keys).merge(body_params))
+    __send__(method, path, headers:, params: params.except(*route_params.keys).merge(body_params), as: opts[:as])
   end
 end
 
@@ -141,14 +141,14 @@ end
 
 def check_document(html, course, attachment, include_verifiers)
   doc = Nokogiri::HTML5.fragment(html)
-  img1 = doc.at_css("img#1")
+  img1 = doc.at_css("img[data-testid='1']")
   expect(img1).to be_present
   params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""
   expect(img1["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview#{params}"
-  img2 = doc.at_css("img#2")
+  img2 = doc.at_css("img[data-testid='2']")
   expect(img2).to be_present
   expect(img2["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
-  img3 = doc.at_css("img#3")
+  img3 = doc.at_css("img[data-testid='3']")
   expect(img3).to be_present
   expect(img3["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
   video = doc.at_css("video")
@@ -158,24 +158,69 @@ def check_document(html, course, attachment, include_verifiers)
   expect(video["src"]).to match(/entryId=qwerty/)
   expect(doc.css("a").last["data-api-endpoint"]).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   expect(doc.css("a").last["data-api-returntype"]).to eq "Page"
+  iframe1 = doc.at_css("iframe[data-testid='1']")
+  expect(iframe1).to be_present
+  expect(iframe1["src"]).to eq "http://www.example.com/media_objects_iframe/m-some_id?type=video"
+  iframe2 = doc.at_css("iframe[data-testid='2']")
+  expect(iframe2).to be_present
+  expect(iframe2["src"]).to eq "http://www.example.com/media_attachments_iframe/#{attachment.id}#{params}"
+end
+
+def check_document_with_disable_adding_uuid_verifier_in_api_ff(html, course, attachment)
+  doc = Nokogiri::HTML5.fragment(html)
+  img1 = doc.at_css("img[data-testid='1']")
+  expect(img1).to be_present
+  expect(img1["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview"
+  img2 = doc.at_css("img[data-testid='2']")
+  expect(img2).to be_present
+  expect(img2["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download"
+  img3 = doc.at_css("img[data-testid='3']")
+  expect(img3).to be_present
+  expect(img3["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}"
+  video = doc.at_css("video")
+  expect(video).to be_present
+  expect(video["poster"]).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+  expect(video["src"]).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
+  expect(video["src"]).to match(/entryId=qwerty/)
+  iframe1 = doc.at_css("iframe[data-testid='1']")
+  expect(iframe1).to be_present
+  expect(iframe1["src"]).to eq "http://www.example.com/media_objects_iframe/m-some_id?type=video"
+  iframe2 = doc.at_css("iframe[data-testid='2']")
+  expect(iframe2).to be_present
+  expect(iframe2["src"]).to eq "http://www.example.com/media_attachments_iframe/#{attachment.id}"
 end
 
 # passes the cb a piece of user content html text. the block should return the
 # response from the api for that field, which will be verified for correctness.
 def should_translate_user_content(course, include_verifiers = true)
   attachment = attachment_model(context: course)
+  attachment.root_account.set_feature_flag!(:disable_adding_uuid_verifier_in_api, include_verifiers ? Feature::STATE_OFF : Feature::STATE_ON)
   content = <<~HTML
     <p>
       Hello, students.<br>
-      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
-      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
-      This might explain something:  <img id="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
+      This will explain everything: <img data-testid="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This won't explain anything:  <img data-testid="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      This might explain something:  <img data-testid="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>
+    <iframe
+      data-testid="1"
+      title="Video player for rick_and_morty_interdimensional_cable.mp4" data-media-type="video"
+      src="/media_objects_iframe/m-some_id?type=video">
+    </iframe>
+    <iframe
+      data-testid="2"
+      title="Video player for rick_and_morty_interdimensional_cable.mp4" data-media-type="video"
+      src="/media_attachments_iframe/#{attachment.id}">
+    </iframe>
   HTML
   html = yield content
   check_document(html, course, attachment, include_verifiers)
+
+  attachment.root_account.enable_feature!(:disable_adding_uuid_verifier_in_api)
+  html = yield content
+  check_document_with_disable_adding_uuid_verifier_in_api_ff(html, course, attachment)
 
   if include_verifiers
     # try again but with cookie auth; shouldn't have verifiers now

@@ -36,14 +36,15 @@ describe CC::Qti::MigrationIdsReplacer do
     @doc = Builder::XmlMarkup.new(target: +"", indent: 2)
     @new_quiz_1 = @course.assignments.create!(title: "New Quiz 1", submission_types: "external_tool")
     @new_quiz_2 = @course.assignments.create!(title: "New Quiz 2", submission_types: "external_tool")
+    @new_assignment_group = @course.assignment_groups.create!(name: "Test Group")
   end
 
   let(:manifest) { CC::Manifest.new(@exporter) }
   let(:new_quizzes_migration_ids_map) do
     {
       "g7a6297c8c5fe5c3dabc42d0ee182dcb8" => { "external_assignment_id" => @new_quiz_1.id },
-      "gdbb1b3860016ed4d2392d017a493f0ec" => { "external_assignment_id" => @new_quiz_2.id }
-
+      "gdbb1b3860016ed4d2392d017a493f0ec" => { "external_assignment_id" => @new_quiz_2.id },
+      "6a557cfa6d3cbf67840002e9b445abbb" => { "external_assignment_group_id" => @new_assignment_group.id }
     }
   end
 
@@ -146,7 +147,7 @@ describe CC::Qti::MigrationIdsReplacer do
               <post_policy>
                 <post_manually>false</post_manually>
               </post_policy>
-              <assignment_group_identifierref>6a557cfa6d3cbf67840002e9b445abbb</assignment_group_identifierref>
+              <assignment_group_identifierref>#{CC::CCHelper.create_key(@new_assignment_group, global: true)}</assignment_group_identifierref>
               <assignment_overrides/>
             </assignment>
           </quiz>

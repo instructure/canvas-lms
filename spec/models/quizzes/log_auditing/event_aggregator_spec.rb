@@ -33,7 +33,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       event.quiz_submission_id = @qs.id
       event.event_type = event_type
       event.event_data = event_data
-      event.created_at = Time.now + time_step
+      event.created_at = Time.zone.now + time_step
       event.attempt = @qs.attempt
     end
   end

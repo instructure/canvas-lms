@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, find, every} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
@@ -29,7 +29,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* errorBox */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\.detect/ */
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('gradebook_uploads')
+const I18n = createI18nScope('gradebook_uploads')
 /* fillTemplateData */
 
 function shouldHighlightScoreChange(oldValue, newValue) {
@@ -368,7 +368,7 @@ const GradebookUploader = {
 
           $.each(uploadedGradebook.missing_objects[`${thing}s`], function () {
             $(
-              `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`
+              `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`,
             ).appendTo($select)
           })
 
@@ -393,7 +393,7 @@ const GradebookUploader = {
               })
           })
           $(
-            `#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .${thing}_section`
+            `#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .${thing}_section`,
           ).show()
         }
       })
@@ -450,7 +450,7 @@ const GradebookUploader = {
                       submission.assignment_id = val
                       const original_submission = find(
                         uploadedGradebook.original_submissions,
-                        sub => sub.user_id == student.id && sub.assignment_id == val
+                        sub => sub.user_id == student.id && sub.assignment_id == val,
                       )
                       if (original_submission) {
                         submission.original_grade =
@@ -464,7 +464,7 @@ const GradebookUploader = {
                       const original_submission = find(
                         uploadedGradebook.original_submissions,
                         sub =>
-                          sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
+                          sub.user_id == obj.id && sub.assignment_id == submission.assignment_id,
                       )
                       if (original_submission) {
                         submission.original_grade =

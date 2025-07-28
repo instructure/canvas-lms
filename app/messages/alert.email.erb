@@ -21,8 +21,6 @@
       t('ungraded_count_description', '%{count} or more submissions have not been graded', :count => n(criterion.threshold))
     when 'UngradedTimespan'
       t('ungraded_timespan_description', 'A submission has been left ungraded for %{count} days', :count => n(criterion.threshold))
-    when 'UserNote'
-      t('usernote_description', 'No faculty journal entries for %{count} days', :count => n(criterion.threshold))
     end
   %>
 <% end %>

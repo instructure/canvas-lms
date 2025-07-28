@@ -19,12 +19,12 @@
 import React from 'react'
 import classnames from 'classnames'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type PendingUpdateData = {
   customGradeStatusId?: string

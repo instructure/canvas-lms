@@ -71,13 +71,13 @@ describe('CourseColorSelector', () => {
       const {getAllByRole} = render(<CourseColorSelector />)
       const presetButtons = getAllByRole('button')
 
-      expect(presetButtons.length).toBe(15)
+      expect(presetButtons).toHaveLength(15)
     })
 
     it('renders screenreader-only instructions for how to navigate the preset buttons', () => {
       const {getByText} = render(<CourseColorSelector />)
       const instructions = getByText(
-        'Set course color to a preset hexadecimal color code. Use the left and right arrow keys to navigate presets.'
+        'Set course color to a preset hexadecimal color code. Use the left and right arrow keys to navigate presets.',
       )
 
       expect(instructions).toBeInTheDocument()

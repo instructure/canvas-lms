@@ -40,7 +40,7 @@ export const blackoutDatesReducer = (
     syncing: SyncState.SYNCED,
     blackoutDates: getInitialBlackoutDates(),
   },
-  action: BlackoutDatesAction
+  action: BlackoutDatesAction,
 ): BlackoutDateState => {
   switch (action.type) {
     case Constants.UPDATE_BLACKOUT_DATES:

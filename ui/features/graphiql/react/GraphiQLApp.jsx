@@ -19,11 +19,12 @@
 import React from 'react'
 import GraphiQL from 'graphiql'
 import GraphiQLExplorer from 'graphiql-explorer'
+import {ToolbarButton, PrettifyIcon, ChevronLeftIcon, ChevronDownIcon} from '@graphiql/react'
 import {getIntrospectionQuery, buildClientSchema} from 'graphql'
 import axios from '@canvas/axios'
 import 'graphiql/graphiql.css'
+import './graphiql-overrides.css'
 import {makeDefaultArg, getDefaultScalarArgValue} from '../CustomArgs'
-import StorageAPI from 'graphiql/dist/utility/StorageAPI'
 
 function fetcher(params) {
   return axios
@@ -37,26 +38,33 @@ export default class GraphiQLApp extends React.Component {
   constructor(props) {
     super(props)
 
-    this._graphql = null
-    this._storage = new StorageAPI()
-
-    // "true" or missing => open. explicit "false" => closed
-    const explorerPaneOpen = this._storage.get('explorerPaneOpen') !== 'false'
+    this._graphql = React.createRef()
 
     this.state = {
       schema: null,
-      explorerIsOpen: explorerPaneOpen,
+      explorerIsOpen: true,
+      error: null,
     }
   }
 
   componentDidMount() {
     return fetcher({
       query: getIntrospectionQuery(),
-    }).then(result => {
-      this.setState({
-        schema: buildClientSchema(result.data),
-      })
     })
+      .then(result => {
+        if (result && result.data) {
+          this.setState({
+            schema: buildClientSchema(result.data),
+          })
+        } else {
+          console.error('Failed to fetch schema:', result)
+          this.setState({error: 'An error occurred while fetching the schema.'})
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching schema:', error)
+        this.setState({error: 'An error occurred while fetching the schema.'})
+      })
   }
 
   _handleEditQuery = query => {
@@ -64,15 +72,21 @@ export default class GraphiQLApp extends React.Component {
   }
 
   _handleToggleExplorer = () => {
-    this.setState((state, _props) => {
-      const isOpen = !state.explorerIsOpen
-      this._storage.set('explorerPaneOpen', isOpen.toString())
-      return {explorerIsOpen: isOpen}
-    })
+    this.setState(state => ({
+      explorerIsOpen: !state.explorerIsOpen,
+    }))
   }
 
   render() {
-    const {query, schema, explorerIsOpen} = this.state
+    const {query, schema, explorerIsOpen, error} = this.state
+
+    if (error) {
+      return <div>{error}</div>
+    }
+
+    if (!schema) {
+      return <div>Loading schema...</div>
+    }
 
     return (
       <div className="graphiql-container">
@@ -86,30 +100,26 @@ export default class GraphiQLApp extends React.Component {
           makeDefaultArg={makeDefaultArg}
         />
         <GraphiQL
-          ref={ref => {
-            this._graphiql = ref
-          }}
+          ref={this._graphql}
           fetcher={fetcher}
           schema={schema}
           query={query}
           onEditQuery={this._handleEditQuery}
         >
           <GraphiQL.Toolbar>
-            <GraphiQL.Button
-              onClick={() => this._graphiql.handlePrettifyQuery()}
-              label="Prettify"
+            <ToolbarButton
+              onClick={() => this.graphiqlRef.current?.handlePrettifyQuery()}
               title="Prettify Query (Shift-Ctrl-P)"
-            />
-            <GraphiQL.Button
-              onClick={() => this._graphiql.handleToggleHistory()}
-              label="History"
-              title="Show History"
-            />
-            <GraphiQL.Button
-              onClick={this._handleToggleExplorer}
-              label="Explorer"
-              title="Toggle Explorer"
-            />
+            >
+              <PrettifyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarButton onClick={this._handleToggleExplorer} title="Toggle Explorer">
+              {explorerIsOpen ? (
+                <ChevronLeftIcon className="graphiql-chevron-icon" aria-hidden="true" />
+              ) : (
+                <ChevronDownIcon className="graphiql-chevron-icon" aria-hidden="true" />
+              )}
+            </ToolbarButton>
           </GraphiQL.Toolbar>
         </GraphiQL>
       </div>

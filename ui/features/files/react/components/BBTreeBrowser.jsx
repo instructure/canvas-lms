@@ -20,11 +20,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import BBTreeBrowserView from '../legacy/modules/BBTreeBrowserView'
 import RootFoldersFinder from '../../RootFoldersFinder'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 class BBTreeBrowser extends React.Component {
   static displayName = 'BBTreeBrowser'
@@ -32,6 +32,11 @@ class BBTreeBrowser extends React.Component {
   static propTypes = {
     rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
     onSelectFolder: PropTypes.func.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.folderTreeHolderRef = React.createRef()
   }
 
   componentDidMount() {
@@ -49,14 +54,14 @@ class BBTreeBrowser extends React.Component {
         selectedStyleClass: 'MoveDialog__folderItem--selected',
       },
       {
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
-      }
+        element: ReactDOM.findDOMNode(this.folderTreeHolderRef.current),
+      },
     ).index
 
     window.setTimeout(() => {
       BBTreeBrowserView.getView(this.treeBrowserViewId)
         .render()
-        .$el.appendTo(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+        .$el.appendTo(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
         .find(':tabbable:first')
         .focus()
     }, 0)
@@ -69,7 +74,7 @@ class BBTreeBrowser extends React.Component {
   render() {
     return (
       <aside role="region" aria-label={I18n.t('folder_browsing_tree', 'Folder Browsing Tree')}>
-        <div ref="FolderTreeHolder" />
+        <div ref={this.folderTreeHolderRef} />
       </aside>
     )
   }

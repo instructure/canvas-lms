@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {find, flatten, groupBy, map, sortBy} from 'lodash'
 import {arrayOf, func, shape, string} from 'prop-types'
@@ -24,16 +24,14 @@ import customTypes from '@canvas/theme-editor/react/PropTypes'
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 import ThemeCard from './ThemeCard'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {Button} from '@instructure/ui-buttons'
+import {reloadWindow} from '@canvas/util/globalUtils'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
-import {Link} from '@instructure/ui-link'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Menu} from '@instructure/ui-menu'
 import {IconAddSolid, IconQuestionLine} from '@instructure/ui-icons'
-import {Popover} from '@instructure/ui-popover'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('theme_collection_view')
+const I18n = createI18nScope('theme_collection_view')
 
 function NewTheme({onNewTheme, bases}) {
   return (
@@ -61,7 +59,7 @@ NewTheme.propTypes = {
     shape({
       md5: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ),
 }
 
@@ -102,7 +100,7 @@ export default function CollectionView(props) {
     if (sharedBrandConfigToStartEditing) {
       sessionStorage.setItem(
         'sharedBrandConfigBeingEdited',
-        JSON.stringify(sharedBrandConfigToStartEditing)
+        JSON.stringify(sharedBrandConfigToStartEditing),
       )
     } else {
       sessionStorage.removeItem('sharedBrandConfigBeingEdited')
@@ -110,7 +108,7 @@ export default function CollectionView(props) {
     submitHtmlForm(
       `/accounts/${accountID}/brand_configs/save_to_user_session`,
       'POST',
-      md5ToActivate
+      md5ToActivate,
     )
   }
 
@@ -119,7 +117,7 @@ export default function CollectionView(props) {
       path: `/api/v1/shared_brand_configs/${id}`,
       method: 'DELETE',
     })
-    window.location.reload()
+    reloadWindow()
   }
 
   function isActiveBrandConfig(config) {
@@ -167,7 +165,7 @@ export default function CollectionView(props) {
     // Split the globally shared themes and the ones that people in this account
     // have shared apart
     return groupBy(sortedCards, sbc =>
-      isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes'
+      isSystemTheme(sbc) ? 'globalThemes' : 'accountSpecificThemes',
     )
   }
 
@@ -218,11 +216,11 @@ export default function CollectionView(props) {
   const cards = thingsToShow()
   const bases = flatten(
     map(['globalThemes', 'accountSpecificThemes'], coll =>
-      map(cards[coll], config => ({md5: config.brand_config.md5, label: config.name}))
-    )
+      map(cards[coll], config => ({md5: config.brand_config.md5, label: config.name})),
+    ),
   )
   const explainerText = I18n.t(
-    'Default templates are used as starting points for new themes and cannot be deleted.'
+    'Default templates are used as starting points for new themes and cannot be deleted.',
   )
 
   return (
@@ -243,18 +241,19 @@ export default function CollectionView(props) {
           <h2 className="ic-ThemeCard-container__Heading">
             <span className="ic-ThemeCard-container__Heading-text">
               {I18n.t('Templates')}
-              <Popover
-                renderTrigger={
-                  <Link size="small" renderIcon={IconQuestionLine}>
-                    <ScreenReaderContent>{explainerText}</ScreenReaderContent>
-                  </Link>
-                }
-                placement="top center"
+              <Tooltip
+                style={{color: 'black'}}
+                placement="top"
+                renderTip={explainerText}
+                on={['click', 'hover', 'focus']}
               >
-                <View display="block" padding="small" maxWidth="15rem">
-                  {explainerText}
-                </View>
-              </Popover>
+                <IconButton
+                  renderIcon={IconQuestionLine}
+                  withBackground={false}
+                  withBorder={false}
+                  screenReaderLabel={explainerText}
+                />
+              </Tooltip>
             </span>
           </h2>
 

@@ -55,6 +55,10 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
     raise GraphQL::ExecutionError, "not found" unless obj.grants_right?(current_user, session, perm)
   end
 
+  def verify_any_authorized_actions!(obj, perms)
+    raise GraphQL::ExecutionError, "not found" unless obj.grants_any_right?(current_user, session, *Array(perms))
+  end
+
   # TODO: replace this with model validation where applicable
   def validation_error(message, attribute: "message")
     {
@@ -78,7 +82,9 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
     input_fields = self.class.arguments.values.to_h { |a| [a.keyword, a.name] }
 
     {
-      errors: model.errors.entries.map do |attribute, message|
+      errors: model.errors.entries.map do |error|
+        attribute = error.attribute
+        message = error.message
         key = override_keys.key?(attribute) ? override_keys[attribute] : attribute
         [input_fields[key], message]
       end

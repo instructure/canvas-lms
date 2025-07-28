@@ -69,7 +69,7 @@ module BroadcastPolicies
 
     def accepting_messages?
       context_sendable? &&
-        !assignment.just_created
+        !assignment.previously_new_record?
     end
 
     def created_before(time)
@@ -77,7 +77,7 @@ module BroadcastPolicies
     end
 
     def published_on_create?
-      assignment.just_created && assignment.published?
+      assignment.previously_new_record? && assignment.published?
     end
 
     def just_published?

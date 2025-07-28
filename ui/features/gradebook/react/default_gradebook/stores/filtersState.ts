@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {SetState, GetState} from 'zustand'
+import type {StoreApi} from 'zustand'
 import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
   Filter,
   FilterPreset,
@@ -38,7 +38,7 @@ import GradebookApi from '../apis/GradebookApi'
 import type {GradebookStore} from './index'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type FiltersState = {
   appliedFilters: Filter[]
@@ -55,7 +55,7 @@ export type FiltersState = {
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
     customGradeStatuses: GradeStatus[],
-    multiselectGradebookFiltersEnabled: boolean
+    multiselectGradebookFiltersEnabled: boolean,
   ) => void
   initializeStagedFilters: () => void
   fetchFilters: () => Promise<void>
@@ -65,7 +65,7 @@ export type FiltersState = {
   validateFilterPreset: (
     name: string,
     filters: Filter[],
-    otherFilterPresets: FilterPreset[]
+    otherFilterPresets: FilterPreset[],
   ) => boolean
 }
 
@@ -88,7 +88,10 @@ export type InitialRowFilterSettings = {
   student_group_ids?: null | string[]
 }
 
-export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): FiltersState => ({
+export default (
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState'],
+): FiltersState => ({
   appliedFilters: [],
 
   filterPresets: [],
@@ -106,25 +109,25 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   addFilters: (filters: Filter[]) => {
     const types = filters.map(c => c.type)
     const newFilters = [...get().appliedFilters.filter(c => !types.includes(c.type))].concat(
-      filters
+      filters,
     )
     get().applyFilters(newFilters)
   },
 
   toggleFilter: (filter: Filter) => {
     const existingFilter = get().appliedFilters.find(
-      f => f.type === filter.type && f.value === filter.value
+      f => f.type === filter.type && f.value === filter.value,
     )
     set({
       appliedFilters: [...get().appliedFilters.filter(f => f.type !== filter.type)].concat(
-        existingFilter ? [] : [filter]
+        existingFilter ? [] : [filter],
       ),
     })
   },
 
   toggleFilterMultiSelect: (filter: Filter) => {
     const existingFilter = get().appliedFilters.find(
-      f => f.type === filter.type && f.value === filter.value
+      f => f.type === filter.type && f.value === filter.value,
     )
 
     let appliedFilters = [...get().appliedFilters]
@@ -143,7 +146,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings,
     customStatuses: GradeStatus[],
-    multiselectGradebookFiltersEnabled: boolean
+    multiselectGradebookFiltersEnabled: boolean,
   ) => {
     const appliedFilters: Filter[] = []
 
@@ -188,6 +191,33 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           created_at: new Date().toISOString(),
         })
       })
+      if (typeof initialColumnFilterSettings.grading_period_id === 'string') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.grading_period_id,
+          type: 'grading-period',
+          created_at: new Date().toISOString(),
+        })
+      }
+      if (
+        initialColumnFilterSettings.start_date &&
+        initialColumnFilterSettings.start_date !== '0'
+      ) {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.start_date,
+          type: 'start-date',
+          created_at: new Date().toISOString(),
+        })
+      }
+      if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
+        appliedFilters.push({
+          id: uuid.v4(),
+          value: initialColumnFilterSettings.end_date,
+          type: 'end-date',
+          created_at: new Date().toISOString(),
+        })
+      }
       // NOTE: all "saved" filters will be wiped out when multi select
       // filters are enabled, could look into preserving this when
       // the feature gets turned on if it is an issue
@@ -294,7 +324,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     const appliedFilters = get().appliedFilters
 
     const savedFiltersAlreadyMatch = get().filterPresets.some(filterPreset =>
-      doFiltersMatch(filterPreset.filters, appliedFilters)
+      doFiltersMatch(filterPreset.filters, appliedFilters),
     )
 
     set({
@@ -305,33 +335,36 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   fetchFilters: async () => {
     set({isFiltersLoading: true})
     const path = `/api/v1/courses/${get().courseId}/gradebook_filters`
-    return doFetchApi({path})
-      .then((response: {json: GradebookFilterApiResponse[]}) => {
-        set({
-          filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
-          isFiltersLoading: false,
+    return (
+      doFetchApi({path})
+        // @ts-expect-error
+        .then((response: {json: GradebookFilterApiResponse[]}) => {
+          set({
+            filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
+            isFiltersLoading: false,
+          })
+          get().initializeStagedFilters()
         })
-        get().initializeStagedFilters()
-      })
-      .catch(() => {
-        set({
-          filterPresets: [],
-          isFiltersLoading: false,
-          flashMessages: get().flashMessages.concat([
-            {
-              key: `filter-presets-loading-error-${Date.now()}`,
-              message: I18n.t('There was an error fetching gradebook filters.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            filterPresets: [],
+            isFiltersLoading: false,
+            flashMessages: get().flashMessages.concat([
+              {
+                key: `filter-presets-loading-error-${Date.now()}`,
+                message: I18n.t('There was an error fetching gradebook filters.'),
+                variant: 'error',
+              },
+            ]),
+          })
         })
-      })
+    )
   },
 
   validateFilterPreset: (
     name: string,
     filters: Filter[],
-    otherFilterPresets: FilterPreset[]
+    otherFilterPresets: FilterPreset[],
   ): boolean => {
     const filtersNotEmpty = filters.filter(isFilterNotEmpty)
 
@@ -402,28 +435,31 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       stagedFilters: [],
     })
 
-    return GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
-      .then((response: {json: GradebookFilterApiResponse}) => {
-        const newFilter = deserializeFilter(response.json)
-        set({
-          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),
+    return (
+      GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
+        // @ts-expect-error
+        .then((response: {json: GradebookFilterApiResponse}) => {
+          const newFilter = deserializeFilter(response.json)
+          set({
+            filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),
+          })
+          return true
         })
-        return true
-      })
-      .catch(() => {
-        set({
-          stagedFilterPresetName: filterPreset.name,
-          stagedFilters: filterPreset.filters,
-          flashMessages: get().flashMessages.concat([
-            {
-              key: `filter-presets-create-error-${Date.now()}`,
-              message: I18n.t('There was an error creating a new filter.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            stagedFilterPresetName: filterPreset.name,
+            stagedFilters: filterPreset.filters,
+            flashMessages: get().flashMessages.concat([
+              {
+                key: `filter-presets-create-error-${Date.now()}`,
+                message: I18n.t('There was an error creating a new filter.'),
+                variant: 'error',
+              },
+            ]),
+          })
+          return false
         })
-        return false
-      })
+    )
   },
 
   updateFilterPreset: async (filterPreset: FilterPreset) => {
@@ -446,6 +482,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
     try {
       const response = await GradebookApi.updateGradebookFilterPreset(get().courseId, filterPreset)
+      // @ts-expect-error
       const updatedFilter = deserializeFilter(response.json)
       set({
         filterPresets: get()
@@ -481,6 +518,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
   },
 
+  // @ts-expect-error
   deleteFilterPreset: (filterPreset: FilterPreset) => {
     const appliedFilters = get().appliedFilters
     const isFilterApplied = doFiltersMatch(filterPreset.filters, get().appliedFilters)

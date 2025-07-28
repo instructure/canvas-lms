@@ -18,7 +18,7 @@
 
 import React from 'react'
 import shortid from '@canvas/shortid'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
@@ -31,7 +31,7 @@ import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
 import {Heading} from '@instructure/ui-heading'
 import type {GradingScheme} from '../../../index'
 
-const I18n = useI18nScope('GradingSchemes')
+const I18n = createI18nScope('GradingSchemes')
 
 interface ComponentProps {
   gradingScheme: GradingScheme
@@ -51,7 +51,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
   archivedGradingSchemesDisableEdit = false,
   onEditRequested,
   onDeleteRequested,
-}) => {
+}: ComponentProps) => {
   return (
     <View
       as="div"
@@ -124,7 +124,7 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
         <Flex.Item>
           <Table
             caption={I18n.t(
-              'A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.'
+              'A table that contains the grading scheme data.  Each row contains a name, a maximum percentage, and a minimum percentage.',
             )}
             layout="fixed"
             data-testid={`grading_scheme_${gradingScheme.id}_data_table`}

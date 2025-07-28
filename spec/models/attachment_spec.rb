@@ -21,7 +21,7 @@
 describe Attachment do
   context "validation" do
     it "creates a new instance given valid attributes" do
-      attachment_model
+      expect { attachment_model }.not_to raise_error
     end
 
     it "requires a context" do
@@ -113,6 +113,26 @@ describe Attachment do
         submission = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(user_model)
         attachment = attachment_with_context(submission)
         expect(get(attachment.public_url)).to be_routable
+      end
+    end
+
+    context "with the :disable_file_verifier_access flag off" do
+      before(:once) { @course.root_account.disable_feature!(:file_association_access) }
+
+      it "returns a URL with a uuid verifier" do
+        attachment = attachment_with_context(@course)
+        expect(attachment.public_url).to end_with("/files/#{attachment.id}/download?verifier=#{attachment.uuid}")
+      end
+    end
+
+    context "with the :disable_file_verifier_access flag on" do
+      before(:once) { @course.root_account.enable_feature!(:file_association_access) }
+
+      it "returns a URL with with a jwt verifier" do
+        attachment = attachment_with_context(@course)
+        md = attachment.public_url(user: @teacher).match(%r{/files/#{attachment.id}/download\?verifier=(.+)$})
+
+        expect(CanvasSecurity.decode_jwt(md[1])).to_not be_nil
       end
     end
   end
@@ -249,7 +269,7 @@ describe Attachment do
         # first attempt
         @attachment.submit_to_crocodoc
 
-        time = Time.now
+        time = Time.zone.now
         # nth attempt won't create more jobs
         attempts.times do
           time += 1.hour
@@ -345,7 +365,7 @@ describe Attachment do
       it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
         configure_crocodoc
         configure_canvadocs "annotations_supported" => false
-        stub_const("Canvadoc::DEFAULT_MIME_TYPES", (Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"]))
+        stub_const("Canvadoc::DEFAULT_MIME_TYPES", Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"])
 
         crocodocable = crocodocable_attachment_model
         canvadocable = canvadocable_attachment_model content_type: "application/blah"
@@ -546,7 +566,7 @@ describe Attachment do
     end
 
     it "delays the creation of the media object" do
-      now = Time.now
+      now = Time.zone.now
       allow(Time).to receive(:now).and_return(now)
       track_jobs do
         @attachment.save!
@@ -632,6 +652,15 @@ describe Attachment do
     end
   end
 
+  context "sanitized_full_display_path" do
+    let(:f) { folder_model(name: "folder<with>bad:chars", context: course_model) }
+    let(:a) { attachment_model(filename: "file\"with\\bad|chars?in*name.txt", folder: f) }
+
+    it "replaces disallowed characters in the attachment path" do
+      expect(a.sanitized_full_display_path).to end_with("folder_with_bad_chars/file_with_bad_chars_in_name.txt")
+    end
+  end
+
   context "destroy" do
     let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
 
@@ -672,7 +701,7 @@ describe Attachment do
     it "replaces uploaded data on destroy_content_and_replace" do
       expect(a.content_type).to eq "application/msword"
       a.destroy_content_and_replace
-      expect(a.content_type).to eq "application/pdf"
+      expect(a.reload.content_type).to eq "application/pdf"
     end
 
     it "also destroys thumbnails" do
@@ -703,6 +732,15 @@ describe Attachment do
       s3object = a.s3object
       expect(s3object).not_to receive(:delete)
       a.destroy_content
+    end
+
+    it "logs and continues when InstFS file deletion fails" do
+      a = attachment_model
+      allow(a).to receive_messages(instfs_hosted?: true, instfs_uuid: "some-uuid")
+      expect(a).to receive(:instfs_uuid=).with(nil)
+      allow(InstFS).to receive(:delete_file).and_raise(InstFS::DeletionError, "deletion failed")
+      expect(Rails.logger).to receive(:warn).with("InstFS file deletion failed for attachment #{a.id}: deletion failed")
+      expect { a.destroy_content }.not_to raise_error
     end
 
     it "allows destroy_content_and_replace when s3object is already deleted" do
@@ -787,15 +825,38 @@ describe Attachment do
         allow(InstFS).to receive(:duplicate_file)
         allow(Attachment).to receive(:file_removed_base_instfs_uuid).and_return(base_uuid)
         old_filename = a.filename
-        allow(a).to receive(:destroy_content).and_raise
-        a.destroy_content_and_replace rescue nil
+        allow(a).to receive(:destroy_content).and_raise("spec error")
+        expect { a.destroy_content_and_replace }.to raise_error("spec error")
         purgatory = Purgatory.find_by(attachment_id: a)
         expect(purgatory).not_to be_nil
         expect(a.reload.filename).to eq old_filename
         allow(a).to receive(:destroy_content).and_return(true)
         expect { a.destroy_content_and_replace }.not_to change { purgatory }
+        a.reload
         expect(a.filename).to eq "file_removed.pdf"
         expect(a.display_name).to eq "file_removed.pdf"
+      end
+
+      context "an attachment have more copies" do
+        it "succeeds in destroying content and replacing for the main attachment as well as for the copies" do
+          attachment = attachment_model(uploaded_data: default_uploaded_data, instfs_uuid: "instfs_uuid")
+          attachment.clone_for(course_factory(course_name: "Course 1", account: @account)).save!
+          attachment.clone_for(course_factory(course_name: "Course 2", account: @account)).save!
+          allow(InstFS).to receive(:duplicate_file)
+          allow(InstFS).to receive(:delete_file)
+          allow(InstFS).to receive(:direct_upload)
+
+          attachment.destroy_content_and_replace
+
+          attachment.cloned_item.attachments.each do |att|
+            expect(att.filename).to eq "file_removed.pdf"
+            expect(att.display_name).to eq "file_removed.pdf"
+            expect(att.content_type).to eq "application/pdf"
+            expect(att.instfs_uuid).to eq attachment.instfs_uuid
+            expect(att.md5).to eq attachment.md5
+            expect(att.size).to eq attachment.size
+          end
+        end
       end
     end
 
@@ -858,7 +919,7 @@ describe Attachment do
         old_file_state = a.file_state
         old_workflow_state = a.workflow_state
         a.destroy_content_and_replace
-        purgatory = Purgatory.where(attachment_id: a).take
+        purgatory = Purgatory.find_by(attachment_id: a)
         expect(purgatory.old_filename).to eq old_filename
         expect(purgatory.old_display_name).to eq old_filename
         expect(purgatory.old_content_type).to eq old_content_type
@@ -919,6 +980,21 @@ describe Attachment do
       expect(attachment).to be_available
       expect(child_folder.workflow_state).to eq "visible"
       expect(parent_folder.workflow_state).to eq "visible"
+    end
+
+    it "restores to unfiled folder when the parent folder has a unique conflict" do
+      course_factory
+      parent_folder = folder_model(unique_type: "media")
+      attachment = attachment_model(folder: parent_folder)
+      parent_folder.destroy
+
+      folder_model(unique_type: "media")
+
+      attachment.reload
+      attachment.restore
+
+      expect(attachment).to be_available
+      expect(attachment.folder).to eq Folder.unfiled_folder(@course)
     end
   end
 
@@ -1052,6 +1128,18 @@ describe Attachment do
           expect(attachment.instfs_uuid).to eq "more_uuid"
         end
       end
+
+      it "handles a duplication error and attempts to re-upload instead" do
+        expect(InstFS).to receive(:duplicate_file).with("instfs_uuid").and_raise(InstFS::DuplicationError)
+        expect(@attachment).to receive(:open).and_return(StringIO.new("fake content"))
+        expect(InstFS).to receive(:direct_upload) { |args| args[:file_object].read == "fake content" }
+        @shard1.activate do
+          account_model
+          course_model(account: @account)
+          attachment = @attachment.clone_for(@course, nil, { force_copy: true })
+          attachment.save!
+        end
+      end
     end
 
     it "clones to another context" do
@@ -1060,7 +1148,7 @@ describe Attachment do
       new_a = a.clone_for(@course)
       expect(new_a.context).not_to eql(a.context)
       expect(new_a.filename).to eql(a.filename)
-      expect(new_a.read_attribute(:filename)).to be_nil
+      expect(new_a["filename"]).to be_nil
       expect(new_a.root_attachment_id).to eql(a.id)
     end
 
@@ -1369,6 +1457,33 @@ describe Attachment do
         expect(@attachment.grants_right?(@student2, :download)).to be false
       end
 
+      context "with observer" do
+        let(:observer) do
+          observer = user_model
+          observer_enrollment = @course.enroll_user(observer, "ObserverEnrollment")
+          observer_enrollment.update!(associated_user_id: student.id)
+          observer
+        end
+
+        it "allows observers to access attachments on submission comments associated to their observees submissions" do
+          @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+
+          @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+        end
+
+        it "allows observers to access attachments on submission comments associated to their concluded observees submissions" do
+          @course.enrollments.find_by(user_id: student.id).conclude
+
+          @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+
+          @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+        end
+      end
+
       it "allows students to access attachments on submissions" do
         attachment_model(context: @assignment)
         @assignment.submit_homework(student, attachments: [@attachment])
@@ -1532,6 +1647,26 @@ describe Attachment do
       expect(@a1.reload.replacement_attachment).to eql again
     end
 
+    it "updates a maximum of 50 replacement pointers" do
+      attachments = [
+        { display_name: "dummy",
+          context_type: "Course",
+          context_id: @course.id,
+          replacement_attachment_id: @a1.id }
+      ] * 51
+      Attachment.bulk_insert(attachments)
+
+      @a.update_attribute(:display_name, "a1")
+      @a.handle_duplicates(:overwrite)
+
+      expect(@course.attachments.where(display_name: "dummy").group(:replacement_attachment_id).count).to eq({
+                                                                                                               @a.id => 50,
+                                                                                                               @a1.id => 1
+                                                                                                             })
+      expect(@course.attachments.where(display_name: "dummy").order(:id).last.replacement_attachment_id).to eq @a1.id
+      expect(@a1.reload.replacement_attachment_id).to eq @a.id
+    end
+
     it "handles renaming duplicates" do
       @a.display_name = "a1"
       deleted = @a.handle_duplicates(:rename)
@@ -1621,6 +1756,13 @@ describe Attachment do
       @a.handle_duplicates(:overwrite)
       @a1.update_attribute(:replacement_attachment_id, nil)
       expect(@course.attachments.find(@a1.id)).to eql @a
+    end
+
+    it "finds replacement beyond replacement_attachment_id update threshold" do
+      files = Array.new(4) { attachment_with_context(@course, display_name: "foo") }
+      files.each_cons(2) { |a, b| a.update! replacement_attachment: b, file_state: "deleted" }
+
+      expect(@course.attachments.find(files.first.id)).to eql files.last
     end
 
     it "preserves hidden state" do
@@ -1749,7 +1891,8 @@ describe Attachment do
           id: 1,
           context: content_export,
           display_name: "attachment",
-          uuid: SecureRandom.uuid
+          uuid: SecureRandom.uuid,
+          root_account: @course.root_account
         )
       end
 
@@ -1762,7 +1905,8 @@ describe Attachment do
           id: 1,
           context: @course,
           display_name: "attachment",
-          uuid: SecureRandom.uuid
+          uuid: SecureRandom.uuid,
+          root_account: @course.root_account
         )
       end
 
@@ -1786,6 +1930,7 @@ describe Attachment do
     end
 
     it "allows custom ttl for root_account" do
+      Attachment.current_root_account = @course.root_account
       attachment = attachment_with_context(@course, display_name: "foo")
       root = @course.root_account
       root.settings[:s3_url_ttl_seconds] = 3.days.seconds.to_s
@@ -1840,37 +1985,29 @@ describe Attachment do
       @a = attachment_with_context(@course)
     end
 
-    it "returns account id for normal namespaces" do
-      @a.namespace = "account_#{@account.id}"
-      expect(@a.root_account_id).to eq @account.id
-    end
-
-    it "returns account id for localstorage namespaces" do
-      @a.namespace = "_localstorage_/#{@account.file_namespace}"
-      expect(@a.root_account_id).to eq @account.id
+    before do
+      Attachment.current_root_account = @account
     end
 
     it "immediately infers the namespace if not yet set" do
-      Attachment.current_root_account = nil
       @a = Attachment.new(context: @course)
       expect(@a).to be_new_record
-      expect(@a.read_attribute(:namespace)).to be_nil
+      expect(@a["namespace"]).to be_nil
       expect(@a.namespace).not_to be_nil
-      @a.set_root_account_id
-      expect(@a.read_attribute(:namespace)).not_to be_nil
-      expect(@a.root_account_id).to eq @account.id
+      @a.set_root_account
+      expect(@a["namespace"]).not_to be_nil
+      expect(@a.root_account.id).to eq @account.id
     end
 
     it "does not infer the namespace if it's not a new record" do
-      Attachment.current_root_account = nil
       attachment_model(context: submission_model)
       original_namespace = @attachment.namespace
       @attachment.context = @course
       @attachment.save!
       expect(@attachment).not_to be_new_record
-      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment["namespace"]).to eq original_namespace
       expect(@attachment.namespace).to eq original_namespace
-      expect(@attachment.read_attribute(:namespace)).to eq original_namespace
+      expect(@attachment["namespace"]).to eq original_namespace
     end
 
     context "sharding" do
@@ -1880,11 +2017,11 @@ describe Attachment do
         Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
-        att.set_root_account_id
+        att.set_root_account
         expect(att.namespace).to eq Account.default.asset_string
-        expect(att.root_account_id).to eq Account.default.local_id
+        expect(att.root_account.id).to eq Account.default.local_id
         @shard1.activate do
-          expect(att.root_account_id).to eq Account.default.global_id
+          expect(att.root_account.id).to eq Account.default.global_id
         end
       end
 
@@ -1896,11 +2033,11 @@ describe Attachment do
           Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
-          att.set_root_account_id
+          att.set_root_account
           expect(att.namespace).to eq a.global_asset_string
-          expect(att.root_account_id).to eq a.local_id
+          expect(att.root_account.id).to eq a.local_id
         end
-        expect(att.root_account_id).to eq a.global_id
+        expect(att.root_account.id).to eq a.global_id
       end
 
       it "interprets root_account_id correctly, even when local on not the birth shard" do
@@ -1908,12 +2045,13 @@ describe Attachment do
         att = nil
         @shard1.activate do
           a = Account.create!
+          Attachment.current_root_account = a
           att = Attachment.new
           att.namespace = a.asset_string
-          att.set_root_account_id
-          expect(att.root_account_id).to eq a.local_id
+          att.set_root_account
+          expect(att.root_account.id).to eq a.local_id
         end
-        expect(att.root_account_id).to eq a.global_id
+        expect(att.root_account.id).to eq a.global_id
       end
 
       it "stores ID for a cross-shard attachment" do
@@ -1922,11 +2060,11 @@ describe Attachment do
         @shard1.activate do
           att = Attachment.new
           att.infer_namespace
-          att.set_root_account_id
+          att.set_root_account
           expect(att.namespace).to eq Account.default.global_asset_string
-          expect(att.root_account_id).to eq Account.default.global_id
+          expect(att.root_account.id).to eq Account.default.global_id
         end
-        expect(att.root_account_id).to eq Account.default.local_id
+        expect(att.root_account.id).to eq Account.default.local_id
       end
 
       it "links a cross-shard cloned_item correctly" do
@@ -2017,7 +2155,7 @@ describe Attachment do
     end
   end
 
-  context "#change_namespace and #make_childless" do
+  describe "#change_namespace and #make_childless" do
     before :once do
       @old_account = account_model
       @new_account = account_model
@@ -2067,7 +2205,25 @@ describe Attachment do
       @root.make_childless(@child)
       expect(@root.reload.children).to eq []
       expect(@child.reload.root_attachment_id).to be_nil
-      expect(@child.read_attribute(:filename)).to eq @root.filename
+      expect(@child["filename"]).to eq @root.filename
+    end
+  end
+
+  describe "make_rootless" do
+    before do
+      local_storage!
+    end
+
+    before :once do
+      @root = attachment_model(uploaded_data: default_uploaded_data)
+      @child = attachment_model(root_attachment: @root)
+    end
+
+    it "makes independent copy from root attachment" do
+      @child.make_rootless
+      expect(@child.reload.root_attachment_id).to be_nil
+      expect(@child.filename).not_to eq @root.filename
+      expect(@child.open.read).to eq @root.open.read
     end
   end
 
@@ -2437,16 +2593,24 @@ describe Attachment do
   end
 
   context "quota" do
+    before(:once) do
+      @file_counter = 0
+    end
+
+    def stub_text_data
+      stub_file_data("file.txt", "some data#{@file_counter += 1}", "text/plain")
+    end
+
     it "gives small files a minimum quota size" do
       course_model
-      attachment_model(context: @course, uploaded_data: stub_png_data, size: 25)
+      attachment_model(context: @course, uploaded_data: stub_text_data, size: 25)
       quota = Attachment.get_quota(@course)
       expect(quota[:quota_used]).to eq Attachment::MINIMUM_SIZE_FOR_QUOTA
     end
 
     it "does not count attachments a student has used for submissions towards the quota" do
       course_with_student(active_all: true)
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "homework.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "homework.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2455,7 +2619,7 @@ describe Attachment do
       @assignment = @course.assignments.create!
       @assignment.submit_homework(@user, attachments: [@attachment])
 
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "otherfile.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "otherfile.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2464,7 +2628,7 @@ describe Attachment do
 
     it "does not count attachments a student has used for graded discussion replies towards the quota" do
       course_with_student(active_all: true)
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "homework.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "homework.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
@@ -2476,16 +2640,25 @@ describe Attachment do
       entry.attachment = @attachment
       entry.save!
 
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "otherfile.png")
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "otherfile.txt")
       @attachment.update_attribute(:size, 1.megabyte)
 
       quota = Attachment.get_quota(@user)
       expect(quota[:quota_used]).to eq 1.megabyte
     end
 
+    it "excludes attachments in the root account's root folder from the quota calculation" do
+      account_model
+      root_folder = Folder.root_folders(@account).first
+      attachment_model(context: @account, uploaded_data: stub_text_data, filename: "whatever.txt", folder: root_folder)
+      @attachment.update_attribute(:size, 1.megabyte)
+      quota = Attachment.get_quota(@account)
+      expect(quota[:quota_used]).to eq 0
+    end
+
     it "does not count attachments in submissions folders toward the quota" do
       user_model
-      attachment_model(context: @user, uploaded_data: stub_png_data, filename: "whatever.png", folder: @user.submissions_folder)
+      attachment_model(context: @user, uploaded_data: stub_text_data, filename: "whatever.txt", folder: @user.submissions_folder)
       @attachment.update_attribute(:size, 1.megabyte)
       quota = Attachment.get_quota(@user)
       expect(quota[:quota_used]).to eq 0
@@ -2493,7 +2666,7 @@ describe Attachment do
 
     it "does not count attachments in group submissions folders toward the quota" do
       group_model
-      attachment_model(context: @group, uploaded_data: stub_png_data, filename: "whatever.png", folder: @group.submissions_folder)
+      attachment_model(context: @group, uploaded_data: stub_text_data, filename: "whatever.txt", folder: @group.submissions_folder)
       @attachment.update_attribute(:size, 1.megabyte)
       quota = Attachment.get_quota(@group)
       expect(quota[:quota_used]).to eq 0
@@ -2502,7 +2675,7 @@ describe Attachment do
     it "returns available quota" do
       course_model
       @course.update storage_quota: 5.megabytes
-      attachment_model(context: @course, uploaded_data: stub_png_data, filename: "whatever.png")
+      attachment_model(context: @course, uploaded_data: stub_text_data, filename: "whatever.txt")
       @attachment.update_attribute :size, 1.megabyte
       expect(Attachment.quota_available(@course)).to eq 4.megabytes
 
@@ -2512,7 +2685,73 @@ describe Attachment do
     end
   end
 
-  context "#open" do
+  describe ".excluded_ids_for_context" do
+    let_once(:root_account) { Account.default }
+    let_once(:sub_account) { root_account.sub_accounts.create! }
+    let_once(:user) { user_model }
+    let_once(:group) { group_model }
+    let(:stub_text_data) { stub_file_data("file.txt", "some data", "text/plain") }
+    let(:file_size) { 1.decimal_megabytes }
+
+    context "when context is a Account" do
+      it "returns excluded attachment ids for root folder" do
+        folder = Folder.root_folders(root_account).first
+        attachment = attachment_model(context: root_account,
+                                      uploaded_data: stub_text_data,
+                                      filename: "account.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(root_account)).to match_array(attachment.id)
+      end
+
+      it "returns excluded attachment ids for root sub-folders" do
+        root_folder = Folder.root_folders(root_account).first
+        sub_folder = root_folder.sub_folders.create!(name: "sub-folder", context: root_account)
+        attachment = attachment_model(context: root_account,
+                                      uploaded_data: stub_text_data,
+                                      filename: "account.txt",
+                                      folder: sub_folder,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(root_account)).to match_array(attachment.id)
+      end
+
+      it "does not return excluded attachment ids for root folder of a non root account" do
+        folder = Folder.root_folders(sub_account).first
+        attachment_model(context: sub_account,
+                         uploaded_data: stub_text_data,
+                         filename: "account.txt",
+                         folder:,
+                         size: file_size)
+        expect(Attachment.excluded_ids_for_context(sub_account)).to be_empty
+      end
+    end
+
+    context "when context is a User" do
+      it "returns excluded attachment ids for submissions" do
+        folder = user.submissions_folder
+        attachment = attachment_model(context: user,
+                                      uploaded_data: stub_text_data,
+                                      filename: "user.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(user)).to match_array(attachment.id)
+      end
+    end
+
+    context "when context is a Group" do
+      it "returns excluded attachment ids for group submissions" do
+        folder = group.submissions_folder
+        attachment = attachment_model(context: group,
+                                      uploaded_data: stub_text_data,
+                                      filename: "group.txt",
+                                      folder:,
+                                      size: file_size)
+        expect(Attachment.excluded_ids_for_context(group)).to match_array(attachment.id)
+      end
+    end
+  end
+
+  describe "#open" do
     include WebMock::API
 
     context "instfs branch" do
@@ -2662,9 +2901,9 @@ describe Attachment do
     end
   end
 
-  context "#process_s3_details!" do
+  describe "#process_s3_details!" do
     before :once do
-      attachment_model(filename: "new filename")
+      attachment_model(filename: "new_filename")
     end
 
     before do
@@ -2725,7 +2964,7 @@ describe Attachment do
 
         it "does not retire the new attachment's filename" do
           @attachment.process_s3_details!({})
-          @attachment.reload.filename == "new filename"
+          expect(@attachment.reload.filename).to eq("new_filename")
         end
 
         it "puts the existing attachment under the new attachment" do
@@ -2735,7 +2974,7 @@ describe Attachment do
 
         it "retires the existing attachment's filename" do
           @attachment.process_s3_details!({})
-          expect(@existing_attachment.reload.read_attribute(:filename)).to be_nil
+          expect(@existing_attachment.reload["filename"]).to be_nil
           expect(@existing_attachment.filename).to eq @attachment.filename
         end
 
@@ -2943,6 +3182,19 @@ describe Attachment do
         new_attachment = @merge_user_3.attachments.find_by(filename: @user_1_file.title, md5: @user_1_file.md5)
         expect(new_attachment.folder.submission_context_code).to eq @course.global_asset_string
       end
+
+      context "when the attachment is using S3 file store" do
+        let(:s3_error) { Aws::S3::Errors::NoSuchKey.new(nil, "The specified key does not exist.") }
+
+        before { s3_storage! }
+
+        it "rescues Aws::S3::Errors::NoSuchKey and logs the error" do
+          allow_any_instance_of(Attachment).to receive(:service_side_clone).and_return(false)
+          allow_any_instance_of(Aws::S3::Object).to receive(:get).and_raise(s3_error)
+          expect(Canvas::Errors).to receive(:capture_exception).with(:attachment, s3_error, :warn).once
+          expect { Attachment.migrate_attachments(@merge_user_1, @merge_user_3) }.not_to raise_error
+        end
+      end
     end
   end
 
@@ -3121,14 +3373,17 @@ describe Attachment do
 
   context "create" do
     it "sets the root_account_id using course context" do
-      attachment_model filename: "test.txt"
-      expect(@attachment.root_account_id).to eq @course.root_account_id
+      Attachment.current_root_account = Account.default
+      course_model
+      attachment_model filename: "test.txt", context: @course
+      expect(@attachment.root_account.id).to eq @course.root_account.id
     end
 
     it "sets the root_account_id using account context" do
       account_model
+      Attachment.current_root_account = @account
       attachment_model filename: "test.txt", context: @account
-      expect(@attachment.root_account_id).to eq @account.id
+      expect(@attachment.root_account.id).to eq @account.id
     end
 
     describe "word count" do
@@ -3160,6 +3415,20 @@ describe Attachment do
         attachment_model(filename: "test.png", uploaded_data: fixture_file_upload("instructure.png", "image/png"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 0
+      end
+
+      it "applies a memory limit" do
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
+        expect(MemoryLimit).to receive(:apply).with(4.gigabytes).and_call_original
+        @attachment.update_word_count
+      end
+
+      it "applies a time limit" do
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
+        Setting.set("attachment_calculate_words_time_limit", "0.001")
+        expect(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
+        expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
+        @attachment.calculate_words
       end
     end
   end
@@ -3275,6 +3544,57 @@ describe Attachment do
     it "returns soft-deleted media objects" do
       @media_object.destroy
       expect(@attachment.media_object_by_media_id).to eq @media_object
+    end
+  end
+
+  describe "used_in_submission_history?" do
+    before do
+      course_with_student
+      @assignment = assignment_model(course: @course)
+      @att = attachment_model(context: @user)
+    end
+
+    it "returns true when the attachment is submitted" do
+      @assignment.submit_homework(
+        @user,
+        attachments: [@att],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be true
+    end
+
+    it "returns false when the attachment is not used in any submissions" do
+      other_attachment = attachment_model(context: @user)
+      @assignment.submit_homework(
+        @user,
+        attachments: [other_attachment],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be false
+    end
+
+    it "returns false when there are no submissions" do
+      expect(@att.used_in_submission_history?(@course)).to be false
+    end
+
+    it "returns true if attachment is used in an earlier version but not current submission" do
+      other_attachment = attachment_model(context: @user)
+      Timecop.freeze(1.second.ago) do
+        @assignment.submit_homework(
+          @user,
+          attachments: [@att],
+          submission_type: "online_upload"
+        )
+      end
+      @assignment.submit_homework(
+        @user,
+        attachments: [other_attachment],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be true
     end
   end
 end

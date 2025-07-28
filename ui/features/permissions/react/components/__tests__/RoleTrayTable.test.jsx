@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 
 import {ROLES} from '../../__tests__/examples'
 import RoleTrayTable from '../RoleTrayTable'
@@ -29,51 +29,67 @@ function createRowProps(title, roleId) {
   const permission = role.permissions[permissionName]
   const onChange = Function.prototype
 
-  return {title, role, permission, permissionName, permissionLabel: 'whatever', onChange}
+  return {
+    title,
+    role,
+    permission,
+    permissionName,
+    permissionLabel: 'whatever',
+    onChange,
+    permButton: () => <div>Mock Button</div>,
+    permCheckbox: () => <div>Mock Checkbox</div>,
+  }
 }
 
 it('renders the component with only one child', () => {
-  const tree = shallow(
+  const {container} = render(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
-  const childrenNodes = tree.find('RoleTrayTableRow')
-  expect(childrenNodes).toHaveLength(1)
+  // RoleTrayTable wraps each child in a span, so count those
+  const wrappers = container.querySelectorAll('.ic-permissions_role_tray > span')
+  expect(wrappers).toHaveLength(1)
 })
 
 it('renders the component with multiple children', () => {
-  const tree = shallow(
+  const {container} = render(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
       <RoleTrayTableRow {...createRowProps('apple', '2')} />
       <RoleTrayTableRow {...createRowProps('mango', '3')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
-  const childrenNodes = tree.find('RoleTrayTableRow')
-  expect(childrenNodes).toHaveLength(3)
+  const wrappers = container.querySelectorAll('.ic-permissions_role_tray > span')
+  expect(wrappers).toHaveLength(3)
 })
 
 it('renders the title', () => {
-  const tree = shallow(
+  const {getByRole} = render(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
-  const node = tree.find('Text')
-  expect(node.at(0).children().text()).toEqual('fruit')
+  const heading = getByRole('heading', {level: 3})
+  expect(heading).toHaveTextContent('fruit')
 })
 
 it('sorts the children by title', () => {
-  const tree = shallow(
+  const {getByText} = render(
     <RoleTrayTable title="fruit">
       <RoleTrayTableRow {...createRowProps('banana', '1')} />
       <RoleTrayTableRow {...createRowProps('apple', '2')} />
       <RoleTrayTableRow {...createRowProps('mango', '3')} />
-    </RoleTrayTable>
+    </RoleTrayTable>,
   )
-  const nodes = tree.find('RoleTrayTableRow')
-  expect(nodes.at(0).props().title).toEqual('apple')
-  expect(nodes.at(1).props().title).toEqual('banana')
-  expect(nodes.at(2).props().title).toEqual('mango')
+
+  // Check that the rows are rendered in sorted order
+  const apple = getByText('apple')
+  const banana = getByText('banana')
+  const mango = getByText('mango')
+
+  // Use compareDocumentPosition to check DOM order
+  // If apple comes before banana, the result should include DOCUMENT_POSITION_FOLLOWING (4)
+  expect(apple.compareDocumentPosition(banana) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(banana.compareDocumentPosition(mango) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 })

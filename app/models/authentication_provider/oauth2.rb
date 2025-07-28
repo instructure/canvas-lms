@@ -23,8 +23,15 @@ require "oauth2"
 class OAuthValidationError < RuntimeError
 end
 
+class RetriableOAuthValidationError < OAuthValidationError
+end
+
 class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
-  SENSITIVE_PARAMS = [:client_secret].freeze
+  class << self
+    def sensitive_params
+      [*super, :client_secret].freeze
+    end
+  end
 
   # rename DB fields to something that makes sense for OAuth2
   alias_method :client_secret=, :auth_password=
@@ -38,8 +45,10 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
     @client ||= ::OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
-  def generate_authorize_url(redirect_uri, state)
-    client.auth_code.authorize_url({ redirect_uri:, state: }.merge(authorize_options))
+  def generate_authorize_url(redirect_uri, state, nonce:, **authorize_options)
+    client.auth_code.authorize_url({ redirect_uri:, state: }
+                                   .merge(self.authorize_options)
+                                   .merge(authorize_options))
   end
 
   def get_token(code, redirect_uri, _params)
@@ -48,6 +57,25 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
 
   def provider_attributes(_token)
     {}
+  end
+
+  # Invoked prior to logging a user in with the found pseudonym.
+  #
+  # The AuthenticationProvider can apply an custom validations and raise
+  # one of the following errors if validation fails:
+  #   - RetriableOAuthValidationError (the user should be redirected to the auth provider's
+  #     validation_error_retry_url for retrying
+  #   - OAuthValidationError (The login should fail without a redirect to the auth provider's
+  #      validation_error_retry_url)
+  def validate_found_pseudonym!(pseudonym:, session:, token:, target_auth_provider:)
+    nil
+  end
+
+  # Used when #validate_found_pseudonym! raises a RetriableOAuthValidationError.
+  #
+  # The authentication provider should return a URL to redirect the user to for retrying
+  def validation_error_retry_url(_error, controller:, target_auth_provider:)
+    nil
   end
 
   protected

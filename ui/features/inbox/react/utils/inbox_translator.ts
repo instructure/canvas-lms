@@ -26,15 +26,15 @@ import type React from 'react'
 interface TranslateArgs {
   subject?: string
   body?: string
-  callback: (arg: string) => void
-  srcLang: string
+  srcLang?: string
   tgtLang: string
+  signature?: string
 }
 
 /**
  * Translate the message based on the parameters
  * */
-export function translateMessage(args: TranslateArgs) {
+export async function translateMessage(args: TranslateArgs) {
   if (!args.body) {
     return
   }
@@ -53,44 +53,33 @@ export function translateMessage(args: TranslateArgs) {
   }
 
   // Translate the payload, then with that text.
-  translateText(args, payload).then(text => {
-    args.callback(text)
-  })
+  return translateText(args, payload)
 }
 
-/**
- * Call the translate paragraph action, using the concocted payload as the string. The result should be
- * exactly the text to place into the TextArea.
- * */
 export async function translateText(args: TranslateArgs, text: string): Promise<string> {
-  const result = await doFetchApi({
-    method: 'POST',
-    path: `/courses/${ENV.course_id}/translate/paragraph`,
-    body: {
-      inputs: {
-        tgt_lang: args.tgtLang,
-        text,
-      },
-    },
-  })
-  return result.json.translated_text
-}
+  const apiPath = `/courses/${ENV.course_id}/translate/paragraph`
 
-export async function translateInboxMessage(
-  text: string,
-  callback: (arg: string) => void
-): Promise<void> {
-  const result = await doFetchApi({
-    method: 'POST',
-    path: '/translate/message',
-    body: {
-      inputs: {
-        text,
+  try {
+    const {json} = await doFetchApi({
+      method: 'POST',
+      path: apiPath,
+      body: {
+        inputs: {
+          tgt_lang: args.tgtLang,
+          text,
+          feature_slug: 'inbox',
+        },
       },
-    },
-  })
+    })
 
-  callback(result.json)
+    return (json as {translated_text: string}).translated_text
+  } catch (e) {
+    // @ts-expect-error
+    const response = await e.response.json()
+    const error = new Error()
+    Object.assign(error, {...response})
+    throw error
+  }
 }
 
 /**
@@ -106,14 +95,20 @@ export function stripSignature(body: string): string {
 /**
  * Set the modal body properly, with signature and body text.
  * */
-export function handleTranslatedModalBody(
+export function updateTranslatedModalBody(
   translatedText: string,
   isPrimary: boolean,
-  activeSignature: string,
-  bodySetter: React.SetStateAction<string>
+  bodySetter: React.Dispatch<React.SetStateAction<string>>,
+  activeSignature?: string,
+  newBody?: string,
 ) {
   bodySetter(prevBody => {
-    let message = [translatedText, stripSignature(prevBody)]
+    let message
+    if (typeof newBody !== 'undefined') {
+      message = [translatedText, newBody]
+    } else {
+      message = [translatedText, stripSignature(prevBody)]
+    }
     if (!isPrimary) {
       message = message.reverse()
     }

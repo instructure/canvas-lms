@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_62')
+const I18n = createI18nScope('permissions_templates_62')
 
 export const template = generateActionTemplates(
   [
@@ -32,24 +32,24 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'To add students to a moderation set, Grades - view all grades must also be enabled.'
+        'To add students to a moderation set, Grades - view all grades must also be enabled.',
       ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To publish final grades for a moderated assignment, Grades - edit must also be enabled.'
+        'To publish final grades for a moderated assignment, Grades - edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.'
+        'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.',
       ),
     },
     {
       title: I18n.t('SpeedGrader'),
       description: I18n.t(
-        'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.'
+        'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.',
       ),
     },
   ],
@@ -63,25 +63,25 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
-        'To add students to a moderation set, Grades - view all grades must also be enabled.'
+        'To add students to a moderation set, Grades - view all grades must also be enabled.',
       ),
     },
     {
       title: I18n.t('SpeedGrader'),
       description: I18n.t(
-        'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.'
+        'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.',
       ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        'To publish final grades for a moderated assignment, Grades - edit must also be enabled.'
+        'To publish final grades for a moderated assignment, Grades - edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.'
+        'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.',
       ),
     },
-  ]
+  ],
 )

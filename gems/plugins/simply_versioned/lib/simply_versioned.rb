@@ -103,6 +103,8 @@ module SimplyVersioned
       cattr_accessor :simply_versioned_options
       self.simply_versioned_options = options
 
+      include InstanceMethods
+
       class_eval do
         def versioning_enabled=(enabled)
           instance_variable_set(:@simply_versioned_enabled, enabled)
@@ -319,11 +321,6 @@ module SimplyVersioned
     end
     alias_method :previous, :previous_version
   end
-
-  def self.included(receiver)
-    receiver.extend ClassMethods
-    receiver.include InstanceMethods
-  end
 end
 
-ActiveRecord::Base.include SimplyVersioned
+ActiveRecord::Base.singleton_class.include(SimplyVersioned::ClassMethods)

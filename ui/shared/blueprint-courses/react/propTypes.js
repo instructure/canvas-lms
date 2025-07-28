@@ -44,7 +44,7 @@ propTypes.course = shape({
   teachers: arrayOf(
     shape({
       display_name: string.isRequired,
-    })
+    }),
   ),
   teacher_count: string,
   sis_course_id: string,

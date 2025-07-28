@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {bool, string} from 'prop-types'
 import React from 'react'
 
 import {Pill} from '@instructure/ui-pill'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export const isStatusPillPresent = submission => {
   return (
@@ -35,7 +35,7 @@ export const isStatusPillPresent = submission => {
 }
 
 const StatusPill = ({label, testId, color = 'primary'}) => {
-  return window.ENV.FEATURES.instui_nav ? (
+  return window.ENV.FEATURES?.instui_nav ? (
     <Pill data-testid={testId} color={color}>
       {label}
     </Pill>

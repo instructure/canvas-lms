@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import PlannerEmptyState from '../index'
 
 function defaultProps(opts = {}) {
@@ -31,51 +31,57 @@ function defaultProps(opts = {}) {
 }
 
 it('renders desert when completely empty', () => {
-  const wrapper = shallow(<PlannerEmptyState {...defaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
+  const {container, getByText} = render(<PlannerEmptyState {...defaultProps()} />)
+  expect(container.querySelector('.desert')).toBeInTheDocument()
+  expect(container.querySelector('.balloons')).not.toBeInTheDocument()
+  expect(getByText('No Due Dates Assigned')).toBeInTheDocument()
+  expect(getByText("Looks like there isn't anything here")).toBeInTheDocument()
+  expect(getByText('Go to Card View Dashboard')).toBeInTheDocument()
+  expect(getByText('Add To-Do')).toBeInTheDocument()
 })
 
 it('renders balloons when not completely empty', () => {
-  const wrapper = shallow(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: false})} />)
-  expect(wrapper.find('.balloons').length).toEqual(1)
-  expect(wrapper.find('.desert').length).toEqual(0)
-  expect(wrapper.contains('Nothing More To Do')).toBeTruthy()
-  expect(wrapper.contains('Add To-Do')).toBeTruthy()
+  const {container, getByText} = render(
+    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false})} />,
+  )
+  expect(container.querySelector('.balloons')).toBeInTheDocument()
+  expect(container.querySelector('.desert')).not.toBeInTheDocument()
+  expect(getByText('Nothing More To Do')).toBeInTheDocument()
+  expect(getByText('Add To-Do')).toBeInTheDocument()
 })
 
 it('renders balloons and different text when weekly', () => {
-  const wrapper = shallow(
-    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false, isWeekly: true})} />
+  const {container, getByText, queryByText} = render(
+    <PlannerEmptyState {...defaultProps({isCompletelyEmpty: false, isWeekly: true})} />,
   )
-  expect(wrapper.find('.balloons').length).toEqual(1)
-  expect(wrapper.find('.desert').length).toEqual(0)
-  expect(wrapper.contains('Nothing Due This Week')).toBeTruthy()
-  expect(wrapper.contains('Add To-Do')).toBeFalsy()
+  expect(container.querySelector('.balloons')).toBeInTheDocument()
+  expect(container.querySelector('.desert')).not.toBeInTheDocument()
+  expect(getByText('Nothing Due This Week')).toBeInTheDocument()
+  expect(queryByText('Add To-Do')).not.toBeInTheDocument()
 })
 
 it('does not changeDashboardView on mount', () => {
-  const mockDispatch = jest.fn()
-  const changeDashboardView = mockDispatch
+  const changeDashboardView = jest.fn()
   render(<PlannerEmptyState {...defaultProps({changeDashboardView})} />)
   expect(changeDashboardView).not.toHaveBeenCalled()
 })
 
-it('calls changeDashboardView on link click', () => {
-  const mockDispatch = jest.fn()
-  const changeDashboardView = mockDispatch
-  const wrapper = render(
-    <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />
+it('calls changeDashboardView on link click', async () => {
+  const user = userEvent.setup()
+  const changeDashboardView = jest.fn()
+  const {getByText} = render(
+    <PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} />,
   )
-  const button = wrapper.getByText('Go to Card View Dashboard')
-  fireEvent.click(button)
+  const button = getByText('Go to Card View Dashboard')
+  await user.click(button)
   expect(changeDashboardView).toHaveBeenCalledWith('cards')
 })
 
-it('does not call changeDashboardView on false prop', () => {
-  const wrapper = render(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: true})} />)
-  const button = wrapper.getByText('Go to Card View Dashboard')
-  fireEvent.click(button)
-  expect(() => {
-    fireEvent.click(button)
+it('does not call changeDashboardView on false prop', async () => {
+  const user = userEvent.setup()
+  const {getByText} = render(<PlannerEmptyState {...defaultProps({isCompletelyEmpty: true})} />)
+  const button = getByText('Go to Card View Dashboard')
+  await expect(async () => {
+    await user.click(button)
   }).not.toThrow()
 })

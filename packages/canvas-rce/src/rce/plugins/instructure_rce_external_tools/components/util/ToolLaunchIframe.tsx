@@ -27,7 +27,7 @@ import formatMessage from '../../../../../format-message'
 const ToolLaunchIframe = React.forwardRef(
   (
     props: PropsWithChildren<React.IframeHTMLAttributes<HTMLIFrameElement>>,
-    ref: ForwardedRef<HTMLIFrameElement>
+    ref: ForwardedRef<HTMLIFrameElement>,
   ) => {
     return (
       <iframe
@@ -38,7 +38,7 @@ const ToolLaunchIframe = React.forwardRef(
         data-lti-launch="true"
       />
     )
-  }
+  },
 )
 
 export default ToolLaunchIframe

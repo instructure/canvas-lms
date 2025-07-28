@@ -18,8 +18,15 @@
 
 <%
     editable ||= false
+    entry_type_class = case question_type.entry_type
+                       when 'file' then 'file-upload-question-holder'
+                       when 'text_box' then 'text-box-question-holder'
+                       when 'numerical_text_box' then 'numerical-question-holder'
+                       when 'textarea' then 'textarea-question-holder'
+                       else ''
+                       end
 %>
-<div <%= 'class=file-upload-question-holder' if question_type.entry_type == 'file' %> >
+<div class="form-control <%= entry_type_class unless entry_type_class.empty? %>">
   <% value = (@stored_params.present?) ? h(@stored_params["question_#{hash_get(question, :id)}"]) : h(hash_get(user_answer, :text).to_s) %>
 <% if question_type.entry_type == "text_box" %>
   <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %> aria-label="<%= label_for_question_type(question_type) %>" />
@@ -35,11 +42,15 @@
     type="text"
     name="question_<%= hash_get(question, :id) %>"
     value="<%= value %>"
-    class="question_input <%= answer_type_class %>"
+    class="form-control__input question_input <%= answer_type_class %>"
     autocomplete='off'
     <%= 'readonly="readonly"' unless editable %>
     aria-label="<%= label_for_question_type(question_type) %>"
   />
+  <div class="form-control__message input-message__container hidden">
+    <i class="input-message__icon icon-warning icon-Solid" aria-hidden="true"></i>
+    <span id="numerical_input_message" class="input-message__text"></span>
+  </div>
 <% elsif question_type.entry_type == "textarea" %>
   <textarea name="question_<%= hash_get(question, :id) %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>><%= value %></textarea>
 <% elsif question_type.entry_type == "file" %>

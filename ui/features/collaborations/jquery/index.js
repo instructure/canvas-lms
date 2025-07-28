@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
@@ -27,7 +27,7 @@ import '@canvas/rails-flash-notifications'
 import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 
-const I18n = useI18nScope('collaborations')
+const I18n = createI18nScope('collaborations')
 
 const CollaborationsPage = {}
 
@@ -65,21 +65,8 @@ CollaborationsPage.Events = {
     $('#delete_collaboration_dialog .delete_button').on('click', this.onDelete)
     $(document).fragmentChange(this.onFragmentChange)
     $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
-    $('#collaboration_selection_row').css('display: block;')
-    $('#collaboration_selection_label').css([
-      'white-space: nowrap; text-align: left; display: block;',
-    ])
     addDeepLinkingListener()
     handleExternalContentMessages({ready: onExternalContentReady})
-    $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', function (_e) {
-        $(this).removeClass('screenreader-only')
-        $('#lti_new_collaboration_iframe').addClass('info_alert_outline')
-      })
-      .on('blur', function (_e) {
-        $(this).addClass('screenreader-only')
-        $('#lti_new_collaboration_iframe').removeClass('info_alert_outline')
-      })
   },
 
   onClose(_e) {
@@ -87,13 +74,14 @@ CollaborationsPage.Events = {
   },
 
   onDelete(_e) {
+    const $delete_dialog = $('#delete_collaboration_dialog')
     const deleteDocument = $(this).hasClass('delete_document_button'),
       data = {delete_doc: deleteDocument},
-      $collaboration = $('#delete_collaboration_dialog').data('collaboration'),
+      $collaboration = $delete_dialog.data('collaboration'),
       url = $collaboration.find('.delete_collaboration_link').attr('href')
 
     $collaboration.dim()
-    $('#delete_collaboration_dialog').dialog('close')
+    $delete_dialog.dialog('close')
 
     $.ajaxJSON(
       url,
@@ -103,11 +91,11 @@ CollaborationsPage.Events = {
         CollaborationsPage.Util.removeCollaboration($collaboration)
         $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'))
       },
-      $.noop
+      $.noop,
     )
   },
 
-  onFragmentChange(e, hash) {
+  onFragmentChange(_e, hash) {
     if (hash !== '#add_collaboration') return
 
     if ($('#collaborations .collaboration').length === 0) {
@@ -125,10 +113,8 @@ CollaborationsPage.Events = {
       $('.collaborate_data, #google_docs_description').hide()
       $('#collaborate_authorize_google_docs').hide()
       $('#lti_new_collaboration_iframe').attr('src', launch_url).show()
-      $('.before_external_content_info_alert, .after_external_content_info_alert').show()
     } else {
       $('#lti_new_collaboration_iframe').hide()
-      $('.before_external_content_info_alert, .after_external_content_info_alert').hide()
       $('.collaborate_data, #google_docs_description').show()
       if (ENV.collaboration_types) {
         for (const i in ENV.collaboration_types) {

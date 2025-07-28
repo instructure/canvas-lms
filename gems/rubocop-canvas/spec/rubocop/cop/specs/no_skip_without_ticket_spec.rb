@@ -21,7 +21,7 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
   subject(:cop) { described_class.new }
 
   it "disallows skipping without referencing a ticket" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           skip("fragile")
@@ -29,13 +29,13 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
         end
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/Reference a ticket if skipping/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/Reference a ticket if skipping/)
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "allows skipping if referencing a ticket" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           skip("CNVS-1234")
@@ -43,11 +43,11 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
         end
       end
     })
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "allows conditional skipping without a ticket" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       describe "date stuff" do
         it 'should do date stuff' do
           skip("redis required") unless Canvas.redis_eanbled?
@@ -55,6 +55,6 @@ describe RuboCop::Cop::Specs::NoSkipWithoutTicket do
         end
       end
     })
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 end

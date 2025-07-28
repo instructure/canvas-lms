@@ -40,7 +40,7 @@
         <% end %>
       </span>
       <span style="padding-<%= direction('left') %>: 10px;">
-        <a style="font-size: 0.8em; padding: 3px 6px" href="#" class="btn hide_time_link"><%= t('links.hide_time_running', "Hide Time") %></a>
+        <a style="font-size: 0.8em; padding: 3px 6px" href="#" role="button" class="btn hide_time_link"><%= t('links.hide_time_running', "Hide Time") %></a>
       </span>
     </div>
     <% if @quiz.due_at %>

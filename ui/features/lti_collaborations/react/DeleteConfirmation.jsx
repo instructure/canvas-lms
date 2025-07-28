@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('react_collaborations')
+const I18n = createI18nScope('react_collaborations')
 
 class DeleteConfirmation extends React.Component {
   componentDidMount() {
@@ -31,17 +31,27 @@ class DeleteConfirmation extends React.Component {
   render() {
     return (
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-      <div className="DeleteConfirmation" tabIndex="0">
-        <p className="DeleteConfirmation-message">
+      <div className="DeleteConfirmation" tabIndex="0" data-testid="delete-confirmation">
+        <p className="DeleteConfirmation-message" data-testid="delete-message">
           {I18n.t('Remove "%{collaborationTitle}"?', {
             collaborationTitle: this.props.collaboration.title,
           })}
         </p>
         <div className="DeleteConfirmation-actions">
-          <button type="button" className="Button Button--danger" onClick={this.props.onDelete}>
+          <button
+            type="button"
+            className="Button Button--danger"
+            onClick={this.props.onDelete}
+            data-testid="confirm-delete-button"
+          >
             {I18n.t('Yes, remove')}
           </button>
-          <button type="button" className="Button" onClick={this.props.onCancel}>
+          <button
+            type="button"
+            className="Button"
+            onClick={this.props.onCancel}
+            data-testid="cancel-delete-button"
+          >
             {I18n.t('Cancel')}
           </button>
         </div>

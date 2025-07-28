@@ -23,7 +23,7 @@ export type LoadingImage = {
   (
     options: 'register_image',
     image_size: 'normal' | 'small',
-    imageDef: {url: string; width: number; height: number}
+    imageDef: {url: string; width: number; height: number},
   ): JQuery<HTMLElement>
   (options: {
     paddingTop?: number

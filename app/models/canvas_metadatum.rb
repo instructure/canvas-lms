@@ -39,7 +39,7 @@ class CanvasMetadatum < ActiveRecord::Base
   def self.get(key, default = {})
     raise MetadataArgumentError, "default payload should be a hash: #{default}" unless default.is_a?(Hash)
 
-    object = CanvasMetadatum.where(key:).take
+    object = CanvasMetadatum.find_by(key:)
     (object&.payload || default).with_indifferent_access
   end
 

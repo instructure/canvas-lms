@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import ReactDOM from 'react-dom'
-import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {tabIdFromElement} from './course_settings_helper'
 import {isMidnight} from '@instructure/moment-utils'
@@ -30,7 +29,6 @@ import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
-import '@canvas/link-enrollment' /* global link_enrollment */
 import 'jquery-tinypubsub' /* /\.publish/ */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/menu'
@@ -40,7 +38,7 @@ import 'jqueryui/tabs'
 
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const GradePublishing = {
   status: null,
@@ -49,7 +47,7 @@ const GradePublishing = {
       if (!data.hasOwnProperty('sis_publish_overall_status')) return
       GradePublishing.status = data.sis_publish_overall_status
       GradePublishing.update(
-        data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {}
+        data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {},
       )
     })
   },
@@ -100,10 +98,9 @@ const GradePublishing = {
       GradePublishing.status === 'published'
         ? I18n.t('Are you sure you want to resync these grades to the student information system?')
         : I18n.t(
-            'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.'
+            'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.',
           )
 
-    // eslint-disable-next-line no-alert
     if (!window.confirm(confirmMessage)) {
       return
     }
@@ -116,8 +113,8 @@ const GradePublishing = {
       GradePublishing.status = 'unknown'
       $.flashError(
         I18n.t(
-          'Something went wrong when trying to sync grades to the student information system. Please try again later.'
-        )
+          'Something went wrong when trying to sync grades to the student information system. Please try again later.',
+        ),
       )
       GradePublishing.update({})
     }
@@ -135,10 +132,10 @@ const GradePublishing = {
         }
         GradePublishing.status = data.sis_publish_overall_status
         GradePublishing.update(
-          data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {}
+          data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {},
         )
       },
-      error
+      error,
     )
   },
 }
@@ -158,7 +155,7 @@ function checkHomeroomSyncProgress(progress) {
       },
       _data => {
         checkHomeroomSyncProgress(progress)
-      }
+      },
     )
   }, 1000)
 }
@@ -167,35 +164,7 @@ $(document).ready(function () {
   const $add_section_form = $('#add_section_form'),
     $edit_section_form = $('#edit_section_form'),
     $course_form = $('#course_form'),
-    $enrollment_dialog = $('#enrollment_dialog'),
-    $tabBar = $('#course_details_tabs')
-
-  const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
-  // find the index of the tab whose href matches the URL's hash
-  const initialTab = Array.from(settingsTabs || []).findIndex(
-    t => `#${t.id}` === `${window.location.hash}-link`
-  )
-  // Sync the location hash with window.history, this fixes some issues with the browser back
-  // button when going back to or from the details tab
-  if (!window.location.hash) {
-    const defaultTab = settingsTabs[0]?.href
-    window.history.replaceState(null, null, defaultTab)
-  }
-  $tabBar
-    .on('tabsactivate', (event, ui) => {
-      try {
-        const $tabLink = ui.newTab.children('a:first-child')
-        const hash = new URL($tabLink.prop('href')).hash
-        if (window.location.hash !== hash) {
-          window.history.pushState(null, null, hash)
-        }
-        $tabLink.focus()
-      } catch (_ignore) {
-        // if the URL can't be parsed, so be it.
-      }
-    })
-    .tabs({active: initialTab >= 0 ? initialTab : null})
-    .show()
+    $enrollment_dialog = $('#enrollment_dialog')
 
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
@@ -241,7 +210,6 @@ $(document).ready(function () {
     },
   })
   $('.cant_delete_section_link').click(function (_event) {
-    // eslint-disable-next-line no-alert
     window.alert($(this).attr('title'))
     return false
   })
@@ -298,7 +266,7 @@ $(document).ready(function () {
           const $prevItem = $(this).prev()
           const $toFocus = $prevItem.length
             ? $prevItem.find('.delete_section_link,.cant_delete_section_link')
-            : $('#sections_tab > a')
+            : $('#tab-sections')
           $(this).slideUp(function () {
             $(this).remove()
             $toFocus.focus()
@@ -346,7 +314,7 @@ $(document).ready(function () {
 
   $(document).fragmentChange((event, hash) => {
     function handleFragmentType(val) {
-      $('#tab-users-link').click()
+      $('#tab-users').click()
       $('.add_users_link:visible').click()
       $("#enroll_users_form select[name='enrollment_type']").val(val)
     }
@@ -388,6 +356,7 @@ $(document).ready(function () {
         // special value indicating the default grading scheme
         selectedGradingSchemeId = undefined
       }
+
       ReactDOM.render(
         <GradingSchemesSelector
           canManage={ENV.PERMISSIONS.manage_grading_schemes}
@@ -398,7 +367,7 @@ $(document).ready(function () {
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
           shrinkSearchBar={true}
         />,
-        grading_scheme_selector
+        grading_scheme_selector,
       )
     }
   }
@@ -419,6 +388,7 @@ $(document).ready(function () {
           renderGradingSchemeSelector($('#grading_standard_id').val())
         } else {
           $('#grading_standard_id').val('')
+
           ReactDOM.render(<></>, grading_scheme_selector)
           $course_form.find('.grading_scheme_selector').hide()
         }
@@ -452,13 +422,27 @@ $(document).ready(function () {
         .find('.grading_standard_checkbox')
         .prop('checked')
 
+      const errorMessages = []
       if (rqdEnabled && !hasCourseDefaultGradingScheme) {
-        $.flashError(
+        errorMessages.push(
           I18n.t(
-            'errors.restrict_quantitative_data',
-            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.'
-          )
+            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.',
+          ),
         )
+      }
+
+      if (
+        data['course[start_at]'].length > 0 &&
+        data['course[conclude_at]'].length > 0 &&
+        data['course[conclude_at]'] < data['course[start_at]']
+      ) {
+        errorMessages.push(
+          I18n.t('The course end date can not occur before the course start date.'),
+        )
+      }
+
+      if (errorMessages.length > 0) {
+        renderFlashError(errorMessages.join(' '))
         return false
       }
 
@@ -471,35 +455,10 @@ $(document).ready(function () {
       $('#course_reload_form').submit()
     },
     error(_data) {
+      renderFlashError(I18n.t('There was an error saving the changes to the course.'))
       $(this).loadingImage('remove')
     },
     disableWhileLoading: 'spin_on_success',
-  })
-  $('.associated_user_link').click(function (event) {
-    event.preventDefault()
-    const $user = $(this).parents('.user')
-    const $enrollment = $(this).parents('.enrollment_link')
-    const user_data = $user.getTemplateData({textValues: ['name']})
-    const enrollment_data = $enrollment.getTemplateData({
-      textValues: ['enrollment_id', 'associated_user_id'],
-    })
-    link_enrollment.choose(
-      user_data.name,
-      enrollment_data.enrollment_id,
-      enrollment_data.associated_user_id,
-      enrollment => {
-        if (enrollment) {
-          // eslint-disable-next-line @typescript-eslint/no-shadow
-          const $user = $('.observer_enrollments .user_' + enrollment.user_id)
-          const $enrollment_link = $user.find('.enrollment_link.enrollment_' + enrollment.id)
-          $enrollment_link.find('.associated_user.associated').showIf(enrollment.associated_user_id)
-          $enrollment_link.fillTemplateData({data: enrollment})
-          $enrollment_link
-            .find('.associated_user.unassociated')
-            .showIf(!enrollment.associated_user_id)
-        }
-      }
-    )
   })
   $('.course_info')
     .not('.uneditable')
@@ -539,19 +498,23 @@ $(document).ready(function () {
       },
       _data => {
         $link.text(I18n.t('errors.invitation', 'Invitation Failed.  Please try again.'))
-      }
+      },
     )
   })
+
+  const renderFlashError = errorMessage => {
+    $.flashError(errorMessage)
+  }
 
   const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
   $default_edit_roles_select.data(
     'current_default_wiki_editing_roles',
-    $default_edit_roles_select.val()
+    $default_edit_roles_select.val(),
   )
   $default_edit_roles_select.change(function () {
     const $this = $(this)
     $('.changed_default_wiki_editing_roles').showIf(
-      $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles')
+      $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles'),
     )
     $('.default_wiki_editing_roles_change').text($this.find(':selected').text())
   })
@@ -586,7 +549,7 @@ $(document).ready(function () {
         $button
           .text(I18n.t('errors.re_send_all', 'Send Failed, Please Try Again'))
           .prop('disabled', false)
-      }
+      },
     )
   })
 
@@ -644,12 +607,11 @@ $(document).ready(function () {
 
       const allow_tighter = ['tighter', 'any'].includes($(sel).data('flexibility'))
       const allow_looser = ['looser', 'any', null, undefined, ''].includes(
-        $(sel).data('flexibility')
+        $(sel).data('flexibility'),
       )
 
       let found_current = false
       visibility_options.each((_index, item) => {
-        // eslint-disable-next-line eqeqeq
         const isCourseSel = item == course_visibility[0]
         if (isCourseSel) found_current = true
         if (isCourseSel || (allow_tighter && !found_current) || (allow_looser && found_current)) {
@@ -676,7 +638,6 @@ $(document).ready(function () {
 
   $('#course_enable_course_paces')
     .change(function () {
-      $('#course_paces_caution_text').toggleClass('shown', this.checked)
       $('#homeroom_disabled_tooltip').toggleClass('shown', this.checked)
       $('#course_homeroom_course').prop('disabled', $(this).prop('checked'))
     })
@@ -691,12 +652,5 @@ $(document).ready(function () {
 
   $('#course_conditional_release').change(function () {
     $('#conditional_release_caution_text').toggleClass('shown', !this.checked)
-  })
-
-  window.addEventListener('popstate', () => {
-    const openTab = window.location.hash
-    if (openTab) {
-      document.querySelector(`[href="${openTab}"]`)?.click()
-    }
   })
 })

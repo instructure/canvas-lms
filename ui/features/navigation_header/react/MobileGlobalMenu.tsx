@@ -16,53 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Badge} from '@instructure/ui-badge'
+import HelpDialog from '@canvas/help-dialog'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {sessionStoragePersister} from '@canvas/query'
 import {Avatar} from '@instructure/ui-avatar'
-import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
-import {Heading} from '@instructure/ui-heading'
+import {Badge} from '@instructure/ui-badge'
 import {IconButton} from '@instructure/ui-buttons'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {
-  IconXLine,
   IconAdminLine,
-  IconCoursesLine,
-  IconGroupLine,
-  IconDashboardLine,
-  IconLockLine,
-  IconQuestionLine,
-  IconInboxLine,
+  IconArrowEndSolid,
   IconCalendarMonthLine,
   IconClockLine,
+  IconCoursesLine,
+  IconDashboardLine,
+  IconExternalLinkLine,
+  IconGroupLine,
   IconHomeLine,
+  IconInboxLine,
+  IconLockLine,
+  IconQuestionLine,
+  IconXLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import HelpDialog from './HelpDialog/index'
+import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-view'
+import {useQuery} from '@tanstack/react-query'
+import {ExperienceSummary} from 'api'
+import {useMemo} from 'react'
+import AccountsList from './lists/AccountsList'
 import CoursesList from './lists/CoursesList'
 import GroupsList from './lists/GroupsList'
-import AccountsList from './lists/AccountsList'
-import ProfileTabsList from './lists/ProfileTabsList'
 import HistoryList from './lists/HistoryList'
-import {useQuery} from '@canvas/query'
+import ProfileTabsList from './lists/ProfileTabsList'
+import {useSwitchExperience} from './mutations/useSwitchExperience'
+import experienceSummaryQuery from './queries/experienceSummaryQuery'
 import {getUnreadCount} from './queries/unreadCountQuery'
-import {getExternalTools} from './utils'
-import type {ExternalTool} from './utils'
+import {filterAndProcessTools, getExternalApps, type ProcessedTool} from './utils'
 
-const I18n = useI18nScope('MobileGlobalMenu')
+const I18n = createI18nScope('MobileGlobalMenu')
 
 type Props = {
   onDismiss: () => void
 }
 
 export default function MobileGlobalMenu(props: Props) {
-  const externalTools = useMemo<ExternalTool[]>(() => getExternalTools(), [])
   const showGroups = useMemo(() => Boolean(document.getElementById('global_nav_groups_link')), [])
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
   const k5User = window.ENV.K5_USER
   const showAdmin =
@@ -73,12 +79,49 @@ export default function MobileGlobalMenu(props: Props) {
     avatar_image_url: string
   } = window.ENV.current_user
 
+  const {data: externalToolsData} = useQuery({
+    queryKey: ['external_tools'],
+    queryFn: getExternalApps,
+    staleTime: 2 * 60 * 1000, // two minutes,
+    enabled: true,
+    persister: sessionStoragePersister,
+  })
+  const processedTools = useMemo(
+    () => filterAndProcessTools(externalToolsData || []),
+    [externalToolsData],
+  )
+
   const {data: unreadConversationsCount, isSuccess: unreadConversationsCountHasLoaded} = useQuery({
     queryKey: ['unread_count', 'conversations'],
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    persister: sessionStoragePersister,
   })
+
+  const {data: hasCareerEnrollment} = useQuery({
+    queryKey: ['experience_summary'],
+    queryFn: experienceSummaryQuery,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    persister: sessionStoragePersister,
+    select: (data: ExperienceSummary) => {
+      const {available_apps} = data
+      return (
+        available_apps.includes('career_learner') ||
+        available_apps.includes('career_learning_provider')
+      )
+    },
+  })
+
+  const {mutate: switchExperience} = useSwitchExperience()
+
+  const showCareer = useMemo(() => {
+    const features = ENV.FEATURES
+    return (
+      hasCareerEnrollment &&
+      (features.horizon_learner_app || features.horizon_learning_provider_app_on_contextless_routes)
+    )
+  }, [hasCareerEnrollment])
 
   return (
     <View
@@ -253,27 +296,24 @@ export default function MobileGlobalMenu(props: Props) {
           </Link>
         </List.Item>
 
-        {externalTools.map(tool => (
-          <List.Item key={tool.href}>
-            <Link href={tool.href || ''} isWithinText={false} display="block">
+        {processedTools.map((tool: ProcessedTool) => (
+          <List.Item key={tool.toolId}>
+            <Link href={tool.href || '#'} isWithinText={false} display="block">
               <Flex>
                 <Flex.Item width="3rem">
-                  {'svgPath' in tool ? (
-                    <svg
-                      version="1.1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlnsXlink="http://www.w3.org/1999/xlink"
+                  {tool.svgPath ? (
+                    <SVGIcon
+                      size="small"
                       viewBox="0 0 64 64"
-                      dangerouslySetInnerHTML={{__html: tool.svgPath ?? ''}}
-                      width="1em"
-                      height="1em"
-                      aria-hidden="true"
-                      role="presentation"
-                      focusable="false"
-                      style={{fill: 'currentColor', fontSize: 32}}
-                    />
+                      title="svg-external-tool"
+                      color="auto"
+                    >
+                      <path d={tool.svgPath} />
+                    </SVGIcon>
+                  ) : tool.toolImg ? (
+                    <Img width="26px" height="26px" src={tool.toolImg} alt="" />
                   ) : (
-                    <img width="1em" height="1em" src={tool.imgSrc} alt="" />
+                    <IconExternalLinkLine data-testid="IconExternalLinkLine" size="small" />
                   )}
                 </Flex.Item>
                 <Flex.Item>
@@ -325,6 +365,30 @@ export default function MobileGlobalMenu(props: Props) {
             </View>
           </ToggleDetails>
         </List.Item>
+
+        {showCareer && (
+          <List.Item>
+            <Link
+              href="/career"
+              isWithinText={false}
+              display="block"
+              role="button"
+              onClick={e => {
+                e.preventDefault()
+                switchExperience()
+              }}
+            >
+              <Flex>
+                <Flex.Item width="3rem">
+                  <IconArrowEndSolid inline={false} size="small" />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="medium">{I18n.t('Canvas Career')}</Text>
+                </Flex.Item>
+              </Flex>
+            </Link>
+          </List.Item>
+        )}
       </List>
     </View>
   )

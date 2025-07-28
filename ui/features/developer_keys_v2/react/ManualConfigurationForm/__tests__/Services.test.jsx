@@ -34,7 +34,7 @@ it('generates the toolConfiguration', () => {
   const ref = React.createRef()
   render(<Services {...props({ref})} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(1)
+  expect(toolConfig).toHaveLength(1)
   expect(toolConfig[0]).toEqual('ascope')
 })
 
@@ -43,6 +43,6 @@ it('changes the scopes on select', () => {
   render(<Services {...props({ref})} />)
   ref.current.handleScopesSelectionChange(['ascope', 'bscope'])
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(2)
+  expect(toolConfig).toHaveLength(2)
   expect(toolConfig[1]).toEqual('bscope')
 })

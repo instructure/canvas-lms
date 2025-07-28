@@ -18,11 +18,11 @@
 
 import React, {Component} from 'react'
 import {arrayOf, string, number, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 import Indicator from './Indicator'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class NewActivityIndicator extends Component {
   static propTypes = {
@@ -32,6 +32,7 @@ export class NewActivityIndicator extends Component {
     deregisterAnimatable: func,
     animatableIndex: number,
     getFocusable: func,
+    testId: string,
   }
 
   static defaultProps = {
@@ -44,7 +45,7 @@ export class NewActivityIndicator extends Component {
       'new-activity-indicator',
       this,
       this.props.animatableIndex,
-      this.props.itemIds
+      this.props.itemIds,
     )
   }
 
@@ -54,7 +55,7 @@ export class NewActivityIndicator extends Component {
       'new-activity-indicator',
       this,
       newProps.animatableIndex,
-      newProps.itemIds
+      newProps.itemIds,
     )
   }
 
@@ -77,6 +78,7 @@ export class NewActivityIndicator extends Component {
         indicatorRef={ref => (this.indicatorElt = ref)}
         title={badgeMessage}
         variant="primary"
+        testId={this.props.testId || 'new-activity-indicator'}
       />
     )
   }

@@ -18,15 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# disabled RSpec/EmptyExampleGroup for whole file because it doesn't recognize it_expands:
+# rubocop:disable RSpec/EmptyExampleGroup
+
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.create!(lti_guid: "test-lti-guid") }
     let(:account) { Account.new(root_account:, name: "Test Account") }
-    let(:course) { Course.new(account:, course_code: "CS 124", sis_source_id: "1234") }
+    let(:course) { Course.new(account:, name: "Computers 4", course_code: "CS 124", sis_source_id: "c-sis-id") }
     let(:group_category) { course.group_categories.new(name: "Category") }
     let(:group) { course.groups.new(name: "Group", group_category:) }
     let(:user) { User.new }
-    let(:assignment) { Assignment.new }
+    let(:assignment) { Assignment.new(context: course) }
     let(:collaboration) do
       ExternalToolCollaboration.new(
         title: "my collab",
@@ -35,7 +38,7 @@ module Lti
       )
     end
     let(:substitution_helper) { double.as_null_object }
-    let(:right_now) { DateTime.now }
+    let(:right_now) { Time.current }
     let(:tool) do
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
@@ -94,6 +97,34 @@ module Lti
     end
     let(:editor_contents) { "<p>This is the contents of the editor</p>" }
     let(:editor_selection) { "is the contents" }
+    let(:differentiation_tag) do
+      course.save!
+      user.save!
+
+      # Enable differentiation tags feature flag and setting on course account
+      course.account.enable_feature!(:assign_to_differentiation_tags)
+      course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      course.account.save!
+
+      # Create a non-collaborative group category (differentiation tag category)
+      tag_category = course.group_categories.create!(name: "Test Category", non_collaborative: true)
+      # Create a group (differentiation tag) in that category
+      tag = course.groups.create!(name: "Test Tag", group_category: tag_category, non_collaborative: true)
+      # Add the user to the group and ensure the membership is accepted
+      membership = tag.add_user(user)
+      membership&.update!(workflow_state: "accepted")
+      tag
+    end
+    let(:external_tool_assignment) do
+      course.save!
+      user.save!
+      assignment = course.assignments.create!(
+        name: "External Tool Assignment",
+        submission_types: "external_tool",
+        points_possible: 100
+      )
+      assignment
+    end
     let(:variable_expander) do
       VariableExpander.new(
         root_account,
@@ -102,14 +133,44 @@ module Lti
         variable_expander_opts
       )
     end
+    let(:variable_expander_with_originality_report) do
+      # Creating originality report is slow, only do it in specs that need it
+      VariableExpander.new(
+        root_account,
+        account,
+        controller,
+        variable_expander_opts.merge(originality_report:)
+      )
+    end
     let(:variable_expander_opts) do
       {
         current_user: user,
         tool:,
-        originality_report:,
         editor_contents:,
         editor_selection:
       }
+    end
+
+    before do
+      root_account.disable_feature!(:refactor_custom_variables)
+      # Enable the differentiation tags feature
+      course.account.enable_feature!(:assign_to_differentiation_tags)
+      root_account.settings = { allow_assign_to_differentiation_tags: { value: true } }
+      course.account.save!
+    end
+
+    def self.it_expands(expansion, val = nil, &blk)
+      it "expands #{expansion}" do
+        val ||= blk
+        val = instance_eval(&val) if val.respond_to?(:call)
+        expect(expand!(expansion)).to eq val
+      end
+    end
+
+    def self.it_leaves_unexpanded(expansion)
+      it "leaves #{expansion} unexpanded" do
+        expect_unexpanded!(expansion)
+      end
     end
 
     describe ".deregister_expansion" do
@@ -125,20 +186,6 @@ module Lti
       it "removes the requested expansion" do
         expect(subject).not_to include(:"$#{expansion}")
       end
-    end
-
-    it "returns sis_id for enrollment" do
-      user.save!
-      course.save!
-      course.offer!
-      managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
-      login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
-      course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
-
-      exp_hash = { test: "$Canvas.user.sisSourceId" }
-      variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
-      variable_expander.expand_variables!(exp_hash)
-      expect(exp_hash[:test]).to eq "sis id2!"
     end
 
     it "clears the lti_helper instance variable when you set the current_user" do
@@ -433,6 +480,20 @@ module Lti
         expect(expand!(subst_name, expander:)).to eq(subst_name)
       end
 
+      it "expands $Canvas.user.sisSourceId as sis_id for enrollment" do
+        user.save!
+        course.save!
+        course.offer!
+        managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
+        login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
+        course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
+
+        exp_hash = { test: "$Canvas.user.sisSourceId" }
+        variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
+        variable_expander.expand_variables!(exp_hash)
+        expect(exp_hash[:test]).to eq "sis id2!"
+      end
+
       context "$com.instructure.Assignment.anonymous_grading" do
         let(:exp_hash) { { test: "$com.instructure.Assignment.anonymous_grading" } }
 
@@ -557,7 +618,6 @@ module Lti
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
-
           course.save!
           managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
           login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
@@ -641,11 +701,15 @@ module Lti
       end
 
       it "has a substitution for com.instructure.Assignment.lti.id" do
-        expect(expand!("$com.instructure.Assignment.lti.id")).to \
+        expander = variable_expander_with_originality_report
+        expect(expand!("$com.instructure.Assignment.lti.id", expander:)).to \
           eq(originality_report.submission.assignment.lti_context_id)
       end
 
       it "has a substitution for com.instructure.Assignment.lti.id when there is no tool setting" do
+        # the account does not have an `id` hence the mock below.
+        # creating the account with Account.create! creates an ID bu t breaks other tests.
+        allow(course).to receive(:horizon_course?).and_return(false)
         assignment.update(context: course)
         expander = VariableExpander.new(root_account,
                                         account,
@@ -707,7 +771,8 @@ module Lti
       end
 
       it "has substitution for vnd.Canvas.OriginalityReport.url" do
-        expect(expand!("$vnd.Canvas.OriginalityReport.url")).to \
+        expander = variable_expander_with_originality_report
+        expect(expand!("$vnd.Canvas.OriginalityReport.url", expander:)).to \
           eq "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
       end
 
@@ -743,16 +808,19 @@ module Lti
       end
 
       it "has substitution for com.instructure.OriginalityReport.id" do
-        expect(expand!("$com.instructure.OriginalityReport.id")).to eq originality_report.id
+        expander = variable_expander_with_originality_report
+        expect(expand!("$com.instructure.OriginalityReport.id", expander:)).to eq originality_report.id
       end
 
       it "has substitution for com.instructure.Submission.id" do
-        expect(expand!("$com.instructure.Submission.id")).to \
+        expander = variable_expander_with_originality_report
+        expect(expand!("$com.instructure.Submission.id", expander:)).to \
           eq originality_report.submission.id
       end
 
       it "has substitution for com.instructure.File.id" do
-        expect(expand!("$com.instructure.File.id")).to \
+        expander = variable_expander_with_originality_report
+        expect(expand!("$com.instructure.File.id", expander:)).to \
           eq originality_report.attachment.id
       end
 
@@ -886,6 +954,88 @@ module Lti
         expect(expand!("$Canvas.root_account.global_id")).to eq 10_054_321
       end
 
+      context "when the new_quizzes_separators feature flag is enabled for decimal separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "has substitution for $Canvas.account.decimal_separator when sub account has setting" do
+          account_settings = { decimal_separator: { value: "period" } }
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.decimal_separator")).to eq "period"
+        end
+
+        it "has substitution for $Canvas.account.decimal_separator with fallback to root account setting" do
+          account_settings = {}
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.decimal_separator")).to eq "comma"
+        end
+      end
+
+      context "when the new_quizzes_separators feature flag is disabled for decimal separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "does not expand $Canvas.account.decimal_separator" do
+          account_settings = { decimal_separator: { value: "period" } }
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect_unexpanded!("$Canvas.account.decimal_separator")
+        end
+      end
+
+      context "when the new_quizzes_separators feature flag is enabled for thousand separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "has substitution for $Canvas.account.thousand_separator when sub account has setting" do
+          account_settings = { thousand_separator: { value: "period" } }
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.thousand_separator")).to eq "period"
+        end
+
+        it "has substitution for $Canvas.account.thousand_separator with fallback to root account setting" do
+          account_settings = {}
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.thousand_separator")).to eq "comma"
+        end
+      end
+
+      context "when the new_quizzes_separators feature flag is disabled for thousand separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "does not expand $Canvas.account.thousand_separator" do
+          account_settings = { thousand_separator: { value: "period" } }
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect_unexpanded!("$Canvas.account.thousand_separator")
+        end
+      end
+
       it "has substitution for $Canvas.shard.id" do
         expect(expand!("$Canvas.shard.id")).to eq Shard.current.id
       end
@@ -912,6 +1062,206 @@ module Lti
         ).to eq(
           [{ "id" => "1", "name" => "item 1" }, { "id" => "2", "name" => "item 2" }]
         )
+      end
+
+      # tests for only the variables that were being returned as a raw boolean
+      context "custom_variables_booleans_as_strings feature flag" do
+        context "when the ff is disabled and the output is a boolean it should be returned as a boolean" do
+          before do
+            Account.site_admin.enable_feature! :disallow_null_custom_variables
+            Account.site_admin.disable_feature! :custom_variables_booleans_as_strings
+          end
+
+          let(:tool) do
+            course.context_external_tools.create!(domain: "example.com",
+                                                  consumer_key: "12345",
+                                                  shared_secret: "secret",
+                                                  privacy_level: "anonymous",
+                                                  name: "tool",
+                                                  use_1_3: true)
+          end
+
+          it "has a substitution for Canvas.user.isRootAccountAdmin" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.user.isRootAccountAdmin", expander:)).to be false
+          end
+
+          it "has a substitution for com.instructure.Assignment.anonymous_grading" do
+            assignment.anonymous_grading = true
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$com.instructure.Assignment.anonymous_grading", expander:)).to be true
+          end
+
+          it "has a substitution for Canvas.assignment.lockdownEnabled" do
+            allow(assignment).to receive(:settings).and_return({
+                                                                 "lockdown_browser" => {
+                                                                   "require_lockdown_browser" => true
+                                                                 }
+                                                               })
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.lockdownEnabled", expander:)).to be true
+          end
+
+          it "has a substitution for Canvas.assignment.hideInGradebook" do
+            allow(assignment).to receive(:hideInGradebook).and_return(false)
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.hideInGradebook", expander:)).to be false
+          end
+
+          it "has a substitution for com.instructure.User.student_view" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$com.instructure.User.student_view", expander:)).to be false
+          end
+
+          it "has a substitution for Canvas.course.aiQuizGeneration" do
+            course.save!
+            course.enable_feature!(:new_quizzes_ai_quiz_generation)
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.course.aiQuizGeneration", expander:)).to be true
+          end
+
+          it "has a substitution for Canvas.course.sectionRestricted" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:section_restricted).and_return(true)
+            course.save!
+            course.enable_feature!(:new_quizzes_ai_quiz_generation)
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.course.sectionRestricted", expander:)).to be true
+          end
+
+          it "has a substitution for Canvas.assignment.published" do
+            allow(assignment).to receive(:workflow_state).and_return("published")
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.published", expander:)).to be true
+          end
+
+          it "has a substitution for Canvas.assignment.omitFromFinalGrade" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.omitFromFinalGrade", expander:)).to be false
+          end
+        end
+
+        context "when the ff is enabled and the output is a boolean it should be returned as a string" do
+          before do
+            Account.site_admin.enable_feature! :disallow_null_custom_variables
+            Account.site_admin.enable_feature! :custom_variables_booleans_as_strings
+          end
+
+          let(:tool) do
+            course.context_external_tools.create!(domain: "example.com",
+                                                  consumer_key: "12345",
+                                                  shared_secret: "secret",
+                                                  privacy_level: "anonymous",
+                                                  name: "tool",
+                                                  use_1_3: true)
+          end
+
+          it "has a substitution for Canvas.user.isRootAccountAdmin" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.user.isRootAccountAdmin", expander:)).to eq "false"
+          end
+
+          it "has a substitution for com.instructure.Assignment.anonymous_grading" do
+            assignment.anonymous_grading = true
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$com.instructure.Assignment.anonymous_grading", expander:)).to eq "true"
+          end
+
+          it "has a substitution for Canvas.assignment.lockdownEnabled" do
+            allow(assignment).to receive(:settings).and_return({
+                                                                 "lockdown_browser" => {
+                                                                   "require_lockdown_browser" => true
+                                                                 }
+                                                               })
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.lockdownEnabled", expander:)).to eq "true"
+          end
+
+          it "has a substitution for Canvas.assignment.hideInGradebook" do
+            allow(assignment).to receive(:hideInGradebook).and_return(false)
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.hideInGradebook", expander:)).to eq "false"
+          end
+
+          it "has a substitution for com.instructure.User.student_view" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$com.instructure.User.student_view", expander:)).to eq "false"
+          end
+
+          it "has a substitution for Canvas.course.aiQuizGeneration" do
+            course.save!
+            course.enable_feature!(:new_quizzes_ai_quiz_generation)
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.course.aiQuizGeneration", expander:)).to eq "true"
+          end
+
+          it "has a substitution for Canvas.course.sectionRestricted" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:section_restricted).and_return(true)
+            course.save!
+            course.enable_feature!(:new_quizzes_ai_quiz_generation)
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.course.sectionRestricted", expander:)).to eq "true"
+          end
+
+          it "has a substitution for Canvas.assignment.published" do
+            allow(assignment).to receive(:workflow_state).and_return("published")
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.published", expander:)).to eq "true"
+          end
+
+          it "has a substitution for Canvas.assignment.omitFromFinalGrade" do
+            course.save!
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:)
+            expect(expand!("$Canvas.assignment.omitFromFinalGrade", expander:)).to eq "false"
+          end
+        end
+      end
+
+      context "Canvas.course.aiQuizGeneration expansion" do
+        let(:subst_name) { "$Canvas.course.aiQuizGeneration" }
+
+        it "returns true when the feature flag is enabled for the course" do
+          course.save!
+          course.enable_feature!(:new_quizzes_ai_quiz_generation)
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to be(true)
+        end
+
+        it "returns false when the feature flag is not enabled for the course" do
+          course.save!
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to be(false)
+        end
       end
 
       context "modules resources expansion" do
@@ -1031,406 +1381,427 @@ module Lti
       end
 
       context "context is a course" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
-
-        it "has substitution for $ToolProxyBinding.memberships.url when context is a course" do
-          allow(course).to receive(:id).and_return("1")
-          allow(controller).to receive(:polymorphic_url).and_return("/api/lti/courses/#{course.id}/membership_service")
-          expect(expand!("$ToolProxyBinding.memberships.url")).to eq \
-            "/api/lti/courses/1/membership_service"
+        let(:variable_expander) do
+          VariableExpander.new(root_account, course, controller, current_user: user, tool:)
         end
 
-        it "has substitution for $Canvas.course.id" do
-          allow(course).to receive(:id).and_return(123)
-          expect(expand!("$Canvas.course.id")).to eq 123
-        end
-
+        # See also specs for: context is a #{tested_context_type}
         it "has substitution for $Context.sourcedId" do
           allow(course).to receive(:sis_source_id).and_return("123")
           expect(expand!("$Context.sourcedId")).to eq "123"
         end
+      end
 
-        it "has substitution for $Context.id.history" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return("xyz,abc")
-          expect(expand!("$Context.id.history")).to eq "xyz,abc"
-        end
-
-        it "has substitution for $vnd.instructure.Course.uuid" do
-          allow(course).to receive(:uuid).and_return("Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo")
-          expect(expand!("$vnd.instructure.Course.uuid")).to eq "Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo"
-        end
-
-        it "has substitution for $Canvas.course.name" do
-          allow(course).to receive(:name).and_return("Course 101")
-          expect(expand!("$Canvas.course.name")).to eq "Course 101"
-        end
-
-        it "has substitution for $Canvas.course.workflowState" do
-          course.workflow_state = "available"
-          expect(expand!("$Canvas.course.workflowState")).to eq "available"
-        end
-
-        it "has substitution for $Canvas.course.hideDistributionGraphs" do
-          course.hide_distribution_graphs = true
-          expect(expand!("$Canvas.course.hideDistributionGraphs")).to be true
-        end
-
-        it "has substitution for $Canvas.course.gradePassbackSetting" do
-          course.grade_passback_setting = "nightly sync"
-          expect(expand!("$Canvas.course.gradePassbackSetting")).to eq "nightly sync"
-        end
-
-        it "has substitution for $CourseSection.sourcedId" do
-          course.sis_source_id = "course1"
-          expect(expand!("$CourseSection.sourcedId")).to eq "course1"
-        end
-
-        it "has substitution for $Canvas.course.sisSourceId" do
-          course.sis_source_id = "course1"
-          expect(expand!("$Canvas.course.sisSourceId")).to eq "course1"
-        end
-
-        it "has substitution for $com.instructure.Course.integrationId" do
-          course.integration_id = "integration1"
-          expect(expand!("$com.instructure.Course.integrationId")).to eq "integration1"
-        end
-
-        it "has substitution for $Canvas.enrollment.enrollmentState" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:enrollment_state).and_return("active")
-          expect(expand!("$Canvas.enrollment.enrollmentState")).to eq "active"
-        end
-
-        it "has substitution for $Canvas.membership.roles" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:current_canvas_roles).and_return("teacher,student")
-          expect(expand!("$Canvas.membership.roles")).to eq "teacher,student"
-        end
-
-        it "has substitution for $com.Instructure.membership.roles" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with("lis2").and_return(
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
-          )
-          expect(expand!("$com.Instructure.membership.roles")).to eq \
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
-        end
-
-        it "has substitution for foo" do
-          allow(tool).to receive(:use_1_3?).and_return(true)
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with("lti1_3").and_return(
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
-          )
-          expect(expand!("$com.Instructure.membership.roles")).to eq \
-            "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
-        end
-
-        it "has substitution for $Canvas.membership.concludedRoles" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:concluded_lis_roles).and_return("learner")
-          expect(expand!("$Canvas.membership.concludedRoles")).to eq "learner"
-        end
-
-        it "has substitution for $Canvas.course.previousContextIds" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:previous_lti_context_ids).and_return("abc,xyz")
-          expect(expand!("$Canvas.course.previousContextIds")).to eq "abc,xyz"
-        end
-
-        it "has substitution for $Canvas.course.previousContextIds.recursive" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return("abc,xyz")
-          expect(expand!("$Canvas.course.previousContextIds.recursive")).to eq "abc,xyz"
-        end
-
-        it "has substitution for $Canvas.course.previousCourseIds" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:previous_course_ids).and_return("1,2")
-          expect(expand!("$Canvas.course.previousCourseIds")).to eq "1,2"
-        end
-
-        it "has a substitution for com.instructure.contextLabel" do
-          expect(expand!("$com.instructure.contextLabel")).to eq course.course_code
-        end
-
-        context "when the course has multiple sections" do
-          # User.new leads to empty/null columns, which causes yet more AR
-          # complaints. The user_factory takes care of this.
-          let(:user) { user_factory }
-
-          before do
-            # AR complains if you don't save the course to the database first.
-            course.save!
-            enrolled_section = add_section("section one", { course: })
-            add_section("section two", { course: })
-            create_enrollment(course, user, { section: enrolled_section })
+      ["course", "group with a course context"].each do |tested_context_type|
+        context "context is a #{tested_context_type}" do
+          let(:tested_context) { (tested_context_type == "course") ? course : group }
+          let(:variable_expander) do
+            VariableExpander.new(root_account, tested_context, controller, current_user: user, tool:)
           end
 
-          it "has a substitution for com.instructure.User.sectionNames" do
-            expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to match_array ["section one"]
+          # Simple substitutions of course properties:
+          it_expands "$Canvas.course.name", "Computers 4"
+          it_expands("$com.instructure.contextLabel") { course.course_code }
+          it_expands "$CourseSection.sourcedId", "c-sis-id"
+          it_expands "$Canvas.course.sisSourceId", "c-sis-id"
+          it_expands "$CourseOffering.sourcedId", "c-sis-id"
+
+          it_expands "$Canvas.course.id" do
+            allow(course).to receive(:id).and_return(123)
+            123
           end
 
-          it "works with a user enrolled in both sections" do
-            create_enrollment(course, user, { section: course.course_sections.find_by(name: "section two") })
-            expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to \
-              match_array ["section one", "section two"]
+          it_expands "$ToolProxyBinding.memberships.url" do
+            allow(course).to receive(:id).and_return("1")
+            allow(controller).to receive(:polymorphic_url).and_return("/api/lti/courses/#{course.id}/membership_service")
+            "/api/lti/courses/1/membership_service"
           end
 
-          it "orders the names by section id" do
-            add_section("section three", { course: })
-            s1 = course.course_sections.find_by(name: "section one")
-            s2 = course.course_sections.find_by(name: "section two")
-            s3 = course.course_sections.find_by(name: "section three")
-            create_enrollment(course, user, { section: s3 }) # Create the enrollment "out of order" based on section id
-            create_enrollment(course, user, { section: s2 })
-            exp_hash = { test: "$com.instructure.User.sectionNames" }
-            variable_expander.expand_variables!(exp_hash)
-            expect(s1.id).to be < s2.id
-            expect(s2.id).to be < s3.id
-            expect(JSON.parse(exp_hash[:test])).to eq ["section one", "section two", "section three"]
-          end
-        end
-
-        context "when the course has groups" do
-          let(:course_with_groups) do
-            course = variable_expander.context
-            course.save!
-            course
+          it "has substitution for $Context.id.history" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return("xyz,abc")
+            expect(expand!("$Context.id.history")).to eq "xyz,abc"
           end
 
-          let!(:group_one) { course_with_groups.groups.create!(name: "Group One") }
-          let!(:group_two) { course_with_groups.groups.create!(name: "Group Two") }
+          it "has substitution for $vnd.instructure.Course.uuid" do
+            allow(course).to receive(:uuid).and_return("Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo")
+            expect(expand!("$vnd.instructure.Course.uuid")).to eq "Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo"
+          end
 
-          describe "$com.instructure.Course.groupIds" do
-            it "has substitution" do
-              expected_ids = [group_one, group_two].map { |g| g.id.to_s }
-              expanded = expand!("$com.instructure.Course.groupIds")
-              expect(expanded.split(",")).to match_array expected_ids
+          it "has substitution for $Canvas.course.workflowState" do
+            course.workflow_state = "available"
+            expect(expand!("$Canvas.course.workflowState")).to eq "available"
+          end
+
+          it "has substitution for $Canvas.course.hideDistributionGraphs" do
+            course.hide_distribution_graphs = true
+            expect(expand!("$Canvas.course.hideDistributionGraphs")).to be true
+          end
+
+          it "has substitution for $Canvas.course.gradePassbackSetting" do
+            course.grade_passback_setting = "nightly sync"
+            expect(expand!("$Canvas.course.gradePassbackSetting")).to eq "nightly sync"
+          end
+
+          it "has substitution for $com.instructure.Course.integrationId" do
+            course.integration_id = "integration1"
+            expect(expand!("$com.instructure.Course.integrationId")).to eq "integration1"
+          end
+
+          it "has substitution for $Canvas.enrollment.enrollmentState" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:enrollment_state).and_return("active")
+            expect(expand!("$Canvas.enrollment.enrollmentState")).to eq "active"
+          end
+
+          it "has substitution for $Canvas.membership.roles" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:current_canvas_roles).and_return("teacher,student")
+            expect(expand!("$Canvas.membership.roles")).to eq "teacher,student"
+          end
+
+          it "has substitution for $com.Instructure.membership.roles for 1.1 tools" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with("lis2").and_return(
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+            )
+            expect(expand!("$com.Instructure.membership.roles")).to eq \
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+          end
+
+          it "has substitution for $com.Instructure.membership.roles for 1.3 tools" do
+            allow(tool).to receive(:use_1_3?).and_return(true)
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with("lti1_3").and_return(
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+            )
+            expect(expand!("$com.Instructure.membership.roles")).to eq \
+              "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
+          end
+
+          it "has substitution for $Canvas.membership.concludedRoles" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:concluded_lis_roles).and_return("learner")
+            expect(expand!("$Canvas.membership.concludedRoles")).to eq "learner"
+          end
+
+          it "has substitution for $Canvas.course.previousContextIds" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:previous_lti_context_ids).and_return("abc,xyz")
+            expect(expand!("$Canvas.course.previousContextIds")).to eq "abc,xyz"
+          end
+
+          it "has substitution for $Canvas.course.previousContextIds.recursive" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return("abc,xyz")
+            expect(expand!("$Canvas.course.previousContextIds.recursive")).to eq "abc,xyz"
+          end
+
+          it "has substitution for $Canvas.course.previousCourseIds" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:previous_course_ids).and_return("1,2")
+            expect(expand!("$Canvas.course.previousCourseIds")).to eq "1,2"
+          end
+
+          context "when the course has multiple sections" do
+            # User.new leads to empty/null columns, which causes yet more AR
+            # complaints. The user_factory takes care of this.
+            let(:user) { user_factory }
+
+            before do
+              # AR complains if you don't save the course to the database first.
+              course.save!
+              enrolled_section = add_section("section one", { course: })
+              add_section("section two", { course: })
+              create_enrollment(course, user, { section: enrolled_section })
             end
 
-            it "does not include groups outside of the course" do
-              second_course = variable_expander.context.dup
-              second_course.update!(sis_source_id: SecureRandom.uuid)
-              second_course.groups.create!(name: "Group Three")
-              expected_ids = [group_two, group_one].map { |g| g.id.to_s }
-              expanded = expand!("$com.instructure.Course.groupIds")
-              expect(expanded.split(",")).to match_array expected_ids
+            it "has a substitution for com.instructure.User.sectionNames" do
+              expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to match_array ["section one"]
             end
 
-            it "only includes active group ids" do
-              group_one.update!(workflow_state: "deleted")
-              expect(expand!("$com.instructure.Course.groupIds")).to eq group_two.id.to_s
+            it "works with a user enrolled in both sections" do
+              create_enrollment(course, user, { section: course.course_sections.find_by(name: "section two") })
+              expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to \
+                match_array ["section one", "section two"]
             end
 
-            it "guards against the course being nil" do
-              VariableExpander.new(root_account, nil, controller, current_user: user)
-              expect do
-                expand!("$com.instructure.Course.groupIds")
-              end.not_to raise_exception
+            it "orders the names by section id" do
+              add_section("section three", { course: })
+              s1 = course.course_sections.find_by(name: "section one")
+              s2 = course.course_sections.find_by(name: "section two")
+              s3 = course.course_sections.find_by(name: "section three")
+              create_enrollment(course, user, { section: s3 }) # Create the enrollment "out of order" based on section id
+              create_enrollment(course, user, { section: s2 })
+              exp_hash = { test: "$com.instructure.User.sectionNames" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(s1.id).to be < s2.id
+              expect(s2.id).to be < s3.id
+              expect(JSON.parse(exp_hash[:test])).to eq ["section one", "section two", "section three"]
             end
           end
-        end
 
-        describe "$com.instructure.User.student_view" do
-          subject { expand!("$com.instructure.User.student_view") }
+          context "when a user has multiple enrollments in one course" do
+            let(:user) { user_factory }
+            let(:section) { add_section("section one", { course: }) }
 
-          context "user is not logged in" do
-            let(:user) { nil }
+            before do
+              course.save!
+              create_enrollment(course, user, { section:, enrollment_type: "StudentEnrollment" })
+              create_enrollment(course, user, { section:, enrollment_type: "TaEnrollment" })
+            end
 
-            it { is_expected.to eq "$com.instructure.User.student_view" }
+            it "does not list duplicate sections" do
+              expect(JSON.parse(expand!("$com.instructure.User.sectionNames"))).to match_array ["section one"]
+            end
           end
 
-          context "user is generated by student view" do
-            before { allow_any_instance_of(User).to receive(:fake_student?).and_return(true) }
+          context "when the course has groups" do
+            before do
+              # AR complains if you don't save the course to the database before
+              # adding the group (triggered in let(:group) when making a expander
+              course.save!
+            end
 
-            it { is_expected.to be true }
+            let(:course_with_groups) do
+              variable_expander.lti_helper.course.tap(&:save!)
+            end
+
+            let!(:group_one) { group }
+            let!(:group_two) { course_with_groups.groups.create!(name: "Group Two") }
+
+            describe "$com.instructure.Course.groupIds" do
+              it "has substitution" do
+                expected_ids = [group_one, group_two].map { |g| g.id.to_s }
+                expanded = expand!("$com.instructure.Course.groupIds")
+                expect(expanded.split(",")).to match_array expected_ids
+              end
+
+              it "does not include groups outside of the course" do
+                second_course = variable_expander.lti_helper.course.dup
+                second_course.update!(sis_source_id: SecureRandom.uuid)
+                second_course.groups.create!(name: "Group Three")
+                expected_ids = [group_two, group_one].map { |g| g.id.to_s }
+                expanded = expand!("$com.instructure.Course.groupIds")
+                expect(expanded.split(",")).to match_array expected_ids
+              end
+
+              it "only includes active group ids" do
+                group_one.update!(workflow_state: "deleted")
+                expect(expand!("$com.instructure.Course.groupIds")).to eq group_two.id.to_s
+              end
+
+              it "guards against the course being nil" do
+                VariableExpander.new(root_account, nil, controller, current_user: user)
+                expect do
+                  expand!("$com.instructure.Course.groupIds")
+                end.not_to raise_exception
+              end
+            end
           end
 
-          context "user is not from student view" do
-            before { allow_any_instance_of(User).to receive(:fake_student?).and_return(nil) }
+          describe "$com.instructure.User.student_view" do
+            subject { expand!("$com.instructure.User.student_view") }
 
-            it { is_expected.to be false }
-          end
-        end
+            context "user is not logged in" do
+              let(:user) { nil }
 
-        describe "$com.instructure.instui_nav" do
-          subject { expand!("$com.instructure.instui_nav") }
+              it { is_expected.to eq "$com.instructure.User.student_view" }
+            end
 
-          context "internal tool" do
-            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(true) }
-
-            context "release flag instui_nav is true" do
-              before { root_account.enable_feature!(:instui_nav) }
+            context "user is generated by student view" do
+              before { allow_any_instance_of(User).to receive(:fake_student?).and_return(true) }
 
               it { is_expected.to be true }
             end
 
-            context "release flag instui_nav is false" do
-              before { root_account.disable_feature!(:instui_nav) }
+            context "user is not from student view" do
+              before { allow_any_instance_of(User).to receive(:fake_student?).and_return(nil) }
 
               it { is_expected.to be false }
             end
           end
 
-          context "not internal tool" do
-            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
+          describe "$com.instructure.instui_nav" do
+            subject { expand!("$com.instructure.instui_nav") }
 
-            context "release flag instui_nav is true" do
-              before { root_account.enable_feature!(:instui_nav) }
+            context "internal tool" do
+              before { allow(tool).to receive(:internal_service?).with(any_args).and_return(true) }
 
-              it { is_expected.to eq "$com.instructure.instui_nav" }
+              context "release flag instui_nav is true" do
+                before { root_account.enable_feature!(:instui_nav) }
+
+                it { is_expected.to be true }
+              end
+
+              context "release flag instui_nav is false" do
+                before { root_account.disable_feature!(:instui_nav) }
+
+                it { is_expected.to be false }
+              end
             end
 
-            context "release flag instui_nav is false" do
-              before { root_account.disable_feature!(:instui_nav) }
+            context "not internal tool" do
+              before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
 
-              it { is_expected.to eq "$com.instructure.instui_nav" }
+              context "release flag instui_nav is true" do
+                before { root_account.enable_feature!(:instui_nav) }
+
+                it { is_expected.to eq "$com.instructure.instui_nav" }
+              end
+
+              context "release flag instui_nav is false" do
+                before { root_account.disable_feature!(:instui_nav) }
+
+                it { is_expected.to eq "$com.instructure.instui_nav" }
+              end
             end
           end
-        end
 
-        describe "$com.instructure.RCS.app_host" do
-          subject { expand!("$com.instructure.RCS.app_host") }
+          describe "$com.instructure.RCS.app_host" do
+            subject { expand!("$com.instructure.RCS.app_host") }
 
-          let(:app_host) { "rich-content-iad.inscloudgate.net" }
+            let(:app_host) { "rich-content-iad.inscloudgate.net" }
 
-          context "when the RCS in configured" do
+            context "when the RCS in configured" do
+              before do
+                allow(DynamicSettings).to receive(:find)
+                                      .with(any_args)
+                  .and_call_original
+
+                allow(DynamicSettings).to receive(:find)
+                                      .with("rich-content-service", default_ttl: 5.minutes)
+                  .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => app_host }))
+              end
+
+              it { is_expected.to eq app_host }
+            end
+          end
+
+          describe "$com.instructure.RCS.service_jwt" do
+            subject do
+              allow(controller).to receive(:rce_js_env_base).with(any_args).and_return(JWT: "service-jwt")
+              expand!("$com.instructure.RCS.service_jwt")
+            end
+
+            context "when tool is an internal service" do
+              before do
+                allow(tool).to receive(:internal_service?).with(any_args).and_return(true)
+              end
+
+              it { is_expected.to eq("service-jwt") }
+
+              context "when controller is not set" do
+                let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool:) }
+
+                it { is_expected.to eq("") }
+              end
+            end
+
+            context "when tool is NOT an internal service" do
+              before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
+
+              it { is_expected.to eq("$com.instructure.RCS.service_jwt") }
+            end
+          end
+
+          describe "$com.instructure.User.observees" do
+            subject { expand!("$com.instructure.User.observees") }
             before do
-              allow(DynamicSettings).to receive(:find)
-                .with(any_args)
-                .and_call_original
-
-              allow(DynamicSettings).to receive(:find)
-                .with("rich-content-service", default_ttl: 5.minutes)
-                .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => app_host }))
+              # AR complains if you don't save the course to the database first
+              # before using the Course-based group
+              course.save!
             end
 
-            it { is_expected.to eq app_host }
-          end
-        end
+            let(:context) do
+              c = variable_expander.context
+              c.save!
+              c
+            end
+            let(:student) { user_factory }
+            let(:observer) { user_factory }
 
-        describe "$com.instructure.RCS.service_jwt" do
-          subject do
-            allow(controller).to receive(:rce_js_env_base).with(any_args).and_return(JWT: "service-jwt")
-            expand!("$com.instructure.RCS.service_jwt")
-          end
-
-          context "when tool is an internal service" do
             before do
-              allow(tool).to receive(:internal_service?).with(any_args).and_return(true)
+              course.enroll_student(student)
+              variable_expander.current_user = observer
             end
 
-            it { is_expected.to eq("service-jwt") }
+            context "when the current user is observing users in the course" do
+              before do
+                observer_enrollment = course.enroll_user(observer, "ObserverEnrollment")
+                observer_enrollment.update!(associated_user_id: student.id)
+              end
 
-            context "when controller is not set" do
-              let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool:) }
+              it "produces a comma-separated string of user UUIDs" do
+                expect(subject.split(",")).to match_array [
+                  Lti::V1p1::Asset.opaque_identifier_for(student)
+                ]
+              end
 
-              it { is_expected.to eq("") }
+              context "the tool in use is a LTI 1.3 tool" do
+                before do
+                  allow(tool).to receive(:use_1_3?).and_return(true)
+                end
+
+                it "returns the users' lti id instead of lti 1.1 user_id" do
+                  expect(subject.split(",")).to match_array [
+                    student.lti_id
+                  ]
+                end
+              end
             end
-          end
 
-          context "when tool is NOT an internal service" do
-            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
-
-            it { is_expected.to eq("$com.instructure.RCS.service_jwt") }
+            context "when the current user is not observing users in the course" do
+              it { is_expected.to eq "" }
+            end
           end
         end
 
-        describe "$com.instructure.User.observees" do
-          subject { expand!("$com.instructure.User.observees") }
+        describe "$com.instructure.Observee.sisIds (context is a #{tested_context_type})" do
+          subject { expand!("$com.instructure.Observee.sisIds") }
 
-          let(:context) do
-            c = variable_expander.context
-            c.save!
-            c
-          end
-          let(:student) { user_factory }
+          let(:student_a) { user_factory }
+          let(:student_b) { user_factory }
+          let(:student_c) { user_factory }
           let(:observer) { user_factory }
+          let(:tested_context) { (tested_context_type == "course") ? course : group }
+          let(:variable_expander) { VariableExpander.new(root_account, tested_context, controller, current_user: observer, tool:) }
 
           before do
-            context.enroll_student(student)
+            course.save!
+            tested_context.save!
+            managed_pseudonym(student_a, account: root_account, sis_user_id: "SIS_A")
+            managed_pseudonym(student_b, account: root_account, sis_user_id: "SIS_B")
+
+            course.enroll_student(student_a)
+            course.enroll_student(student_b)
+            course.enroll_student(student_c)
+
             variable_expander.current_user = observer
           end
 
-          context "when the current user is observing users in the context" do
+          context "when the current user is observing students in the course context" do
             before do
-              observer_enrollment = context.enroll_user(observer, "ObserverEnrollment")
-              observer_enrollment.update!(associated_user_id: student.id)
+              student_a_enrollment = course.enroll_user(observer, "ObserverEnrollment")
+              student_a_enrollment.update!(associated_user_id: student_a.id)
+
+              student_b_enrollment = course.enroll_user(observer, "ObserverEnrollment")
+              student_b_enrollment.update!(associated_user_id: student_b.id)
+
+              student_c_enrollment = course.enroll_user(observer, "ObserverEnrollment")
+              student_c_enrollment.update!(associated_user_id: student_c.id)
             end
 
-            it "produces a comma-separated string of user UUIDs" do
-              expect(subject.split(",")).to match_array [
-                Lti::Asset.opaque_identifier_for(student)
-              ]
-            end
-
-            context "the tool in use is a LTI 1.3 tool" do
-              before do
-                allow(tool).to receive(:use_1_3?).and_return(true)
-              end
-
-              it "returns the users' lti id instead of lti 1.1 user_id" do
-                expect(subject.split(",")).to match_array [
-                  student.lti_id
-                ]
-              end
+            it "return an array of all student that has a SIS IDs" do
+              id_set = subject.split(",").to_set
+              expect(Set["SIS_A", "SIS_B"]).to eq(id_set)
             end
           end
 
-          context "when the current user is not observing users in the context" do
-            it { is_expected.to eq "" }
-          end
-        end
-      end
-
-      describe "$com.instructure.Observee.sisIds" do
-        subject { expand!("$com.instructure.Observee.sisIds") }
-
-        let(:student_a) { user_factory }
-        let(:student_b) { user_factory }
-        let(:student_c) { user_factory }
-        let(:observer) { user_factory }
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: observer, tool:) }
-        let(:context) do
-          c = variable_expander.context
-          c.save!
-          c
-        end
-
-        before do
-          managed_pseudonym(student_a, account: root_account, sis_user_id: "SIS_A")
-          managed_pseudonym(student_b, account: root_account, sis_user_id: "SIS_B")
-
-          context.enroll_student(student_a)
-          context.enroll_student(student_b)
-          context.enroll_student(student_c)
-
-          variable_expander.current_user = observer
-        end
-
-        context "when the current user is observing students in the course context" do
-          before do
-            student_a_enrollment = context.enroll_user(observer, "ObserverEnrollment")
-            student_a_enrollment.update!(associated_user_id: student_a.id)
-
-            student_b_enrollment = context.enroll_user(observer, "ObserverEnrollment")
-            student_b_enrollment.update!(associated_user_id: student_b.id)
-
-            student_c_enrollment = context.enroll_user(observer, "ObserverEnrollment")
-            student_c_enrollment.update!(associated_user_id: student_c.id)
-          end
-
-          it "return an array of all student that has a SIS IDs" do
-            id_set = subject.split(",").to_set
-            expect(Set["SIS_A", "SIS_B"]).to eq(id_set)
-          end
-        end
-
-        context "when the current user is not observing students in the course context" do
-          it "return a empty array of student SIS IDs" do
-            expect(subject).to be_empty
+          context "when the current user is not observing students in the course context" do
+            it "return a empty array of student SIS IDs" do
+              expect(subject).to be_empty
+            end
           end
         end
       end
@@ -1439,124 +1810,10 @@ module Lti
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
         let(:user) { user_factory }
 
-        it "has substitution for com.instructure.User.sectionNames" do
-          course.save!
-          first_section = add_section("Section 1, M-T", { course: })
-          second_section = add_section("Section 2, W-Th", { course: })
-          create_enrollment(course, user, { section: first_section })
-          create_enrollment(course, user, { section: second_section })
-          expanded = expand!("$com.instructure.User.sectionNames")
-          expect(JSON.parse(expanded)).to match_array ["Section 1, M-T", "Section 2, W-Th"]
-        end
-
         it "has substitution for $Canvas.xapi.url" do
           allow(Lti::XapiService).to receive(:create_token).and_return("abcd")
           allow(controller).to receive(:lti_xapi_url).and_return("/xapi/abcd")
           expect(expand!("$Canvas.xapi.url")).to eq "/xapi/abcd"
-        end
-
-        it "has substitution for $Canvas.course.sectionIds" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:section_ids).and_return("5,6")
-          expect(expand!("$Canvas.course.sectionIds")).to eq "5,6"
-        end
-
-        it "has substitution for $Canvas.course.sectionRestricted" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:section_restricted).and_return(true)
-          expect(expand!("$Canvas.course.sectionRestricted")).to be true
-        end
-
-        it "has substitution for $Canvas.course.sectionSisSourceIds" do
-          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:section_sis_ids).and_return("5a,6b")
-          expect(expand!("$Canvas.course.sectionSisSourceIds")).to eq "5a,6b"
-        end
-
-        it "has substitution for $Canvas.course.startAt" do
-          course.start_at = "2015-04-21 17:01:36"
-          course.save!
-          expect(expand!("$Canvas.course.startAt")).to eq "2015-04-21 17:01:36"
-        end
-
-        it "has a functioning guard for $Canvas.term.startAt when term.start_at is not set" do
-          expect(course.enrollment_term&.start_at).to be_falsey
-          expect_unexpanded!("$Canvas.term.startAt")
-        end
-
-        it "has substitution for $Canvas.term.startAt when term.start_at is set" do
-          course.enrollment_term = EnrollmentTerm.new(start_at: "2015-05-21 17:01:36")
-          expect(expand!("$Canvas.term.startAt")).to eq "2015-05-21 17:01:36"
-        end
-
-        it "has substitution for $Canvas.course.endAt" do
-          course.conclude_at = "2019-04-21 17:01:36"
-          course.save!
-          expect(expand!("$Canvas.course.endAt")).to eq "2019-04-21 17:01:36"
-        end
-
-        it "has a functioning guard for $Canvas.term.endAt when term.start_at is not set" do
-          expect(course.enrollment_term&.end_at).to be_falsey
-          expect_unexpanded!("$Canvas.term.endAt")
-        end
-
-        it "has substitution for $Canvas.term.endAt when term.start_at is set" do
-          course.enrollment_term = EnrollmentTerm.new(end_at: "2015-05-21 17:01:36")
-          expect(expand!("$Canvas.term.endAt")).to eq "2015-05-21 17:01:36"
-        end
-
-        it "has a functioning guard for $Canvas.term.name when term.name is not set" do
-          expect(course.enrollment_term&.name).to be_falsey
-          expect_unexpanded!("$Canvas.term.name")
-        end
-
-        it "has substitution for $Canvas.term.name when term.name is set" do
-          course.enrollment_term = EnrollmentTerm.new(name: "W1 2017")
-          expect(expand!("$Canvas.term.name")).to eq "W1 2017"
-        end
-
-        it "has a functioning guard for $Canvas.term.id when there is no term or term ID" do
-          # This may not be possible, but regardless it's good not to crash
-          expect(course.enrollment_term).to be_nil
-          expect_unexpanded!("$Canvas.term.id")
-          course.enrollment_term = EnrollmentTerm.new
-          expect_unexpanded!("$Canvas.term.id")
-        end
-
-        it "has substitution for $Canvas.term.id when there is a term" do
-          term = EnrollmentTerm.create!(root_account:)
-          course.enrollment_term = term
-          expect(expand!("$Canvas.term.id")).to eq term.id
-        end
-
-        it "has substitution for $Canvas.externalTool.global_id" do
-          course.save!
-          tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
-          expect(expand!("$Canvas.externalTool.global_id", expander:)).to eq tool.global_id
-        end
-
-        it "does not substitute $Canvas.externalTool.global_id when the controller is unset" do
-          variable_expander.instance_variable_set(:@controller, nil)
-          variable_expander.instance_variable_set(:@request, nil)
-          expect_unexpanded! "$Canvas.externalTool.global_id"
-        end
-
-        it "has substitution for $Canvas.externalTool.url" do
-          course.save!
-          tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-          expect(controller).to receive(:named_context_url).with(course,
-                                                                 :api_v1_context_external_tools_update_url,
-                                                                 tool.id,
-                                                                 include_host: true).and_return("url")
-          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
-          expect(expand!("$Canvas.externalTool.url", expander:)).to eq "url"
-        end
-
-        it "does not substitute $Canvas.externalTool.url when the controller is unset" do
-          variable_expander.instance_variable_set(:@controller, nil)
-          variable_expander.instance_variable_set(:@request, nil)
-          expect_unexpanded! "$Canvas.externalTool.url"
         end
 
         it "returns the opaque identifiers for the active groups the user is a part of" do
@@ -1582,6 +1839,128 @@ module Lti
           expect(ids.size).to eq 2
           expect(ids.include?(g1.lti_context_id)).to be true
           expect(ids.include?(g2.lti_context_id)).to be true
+        end
+      end
+
+      ["course", "group with a course context"].each do |tested_context_type|
+        context "context is a #{tested_context_type} and there is a user" do
+          let(:tested_context) { (tested_context_type == "course") ? course : group }
+          let(:variable_expander) { VariableExpander.new(root_account, tested_context, controller, current_user: user, tool:) }
+          let(:user) { user_factory }
+
+          it "has substitution for com.instructure.User.sectionNames" do
+            course.save!
+            first_section = add_section("Section 1, M-T", { course: })
+            second_section = add_section("Section 2, W-Th", { course: })
+            create_enrollment(course, user, { section: first_section })
+            create_enrollment(course, user, { section: second_section })
+            expanded = expand!("$com.instructure.User.sectionNames")
+            expect(JSON.parse(expanded)).to match_array ["Section 1, M-T", "Section 2, W-Th"]
+          end
+
+          it "has substitution for $Canvas.course.sectionIds" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:section_ids).and_return("5,6")
+            expect(expand!("$Canvas.course.sectionIds")).to eq "5,6"
+          end
+
+          it "has substitution for $Canvas.course.sectionRestricted" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:section_restricted).and_return(true)
+            expect(expand!("$Canvas.course.sectionRestricted")).to be true
+          end
+
+          it "has substitution for $Canvas.course.sectionSisSourceIds" do
+            allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+            allow(substitution_helper).to receive(:section_sis_ids).and_return("5a,6b")
+            expect(expand!("$Canvas.course.sectionSisSourceIds")).to eq "5a,6b"
+          end
+
+          it "has substitution for $Canvas.course.startAt" do
+            course.start_at = "2015-04-21 17:01:36"
+            course.save!
+            expect(expand!("$Canvas.course.startAt")).to eq "2015-04-21 17:01:36"
+          end
+
+          it "has a functioning guard for $Canvas.term.startAt when term.start_at is not set" do
+            expect(course.enrollment_term&.start_at).to be_falsey
+            expect_unexpanded!("$Canvas.term.startAt")
+          end
+
+          it "has substitution for $Canvas.term.startAt when term.start_at is set" do
+            course.enrollment_term = EnrollmentTerm.new(start_at: "2015-05-21 17:01:36")
+            expect(expand!("$Canvas.term.startAt")).to eq "2015-05-21 17:01:36"
+          end
+
+          it "has substitution for $Canvas.course.endAt" do
+            course.conclude_at = "2019-04-21 17:01:36"
+            course.save!
+            expect(expand!("$Canvas.course.endAt")).to eq "2019-04-21 17:01:36"
+          end
+
+          it "has a functioning guard for $Canvas.term.endAt when term.start_at is not set" do
+            expect(course.enrollment_term&.end_at).to be_falsey
+            expect_unexpanded!("$Canvas.term.endAt")
+          end
+
+          it "has substitution for $Canvas.term.endAt when term.start_at is set" do
+            course.enrollment_term = EnrollmentTerm.new(end_at: "2015-05-21 17:01:36")
+            expect(expand!("$Canvas.term.endAt")).to eq "2015-05-21 17:01:36"
+          end
+
+          it "has a functioning guard for $Canvas.term.name when term.name is not set" do
+            expect(course.enrollment_term&.name).to be_falsey
+            expect_unexpanded!("$Canvas.term.name")
+          end
+
+          it "has substitution for $Canvas.term.name when term.name is set" do
+            course.enrollment_term = EnrollmentTerm.new(name: "W1 2017")
+            expect(expand!("$Canvas.term.name")).to eq "W1 2017"
+          end
+
+          it "has a functioning guard for $Canvas.term.id when there is no term or term ID" do
+            # This may not be possible, but regardless it's good not to crash
+            expect(course.enrollment_term).to be_nil
+            expect_unexpanded!("$Canvas.term.id")
+            course.enrollment_term = EnrollmentTerm.new
+            expect_unexpanded!("$Canvas.term.id")
+          end
+
+          it "has substitution for $Canvas.term.id when there is a term" do
+            term = EnrollmentTerm.create!(root_account:)
+            course.enrollment_term = term
+            expect(expand!("$Canvas.term.id")).to eq term.id
+          end
+
+          it "has substitution for $Canvas.externalTool.global_id" do
+            course.save!
+            tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
+            expect(expand!("$Canvas.externalTool.global_id", expander:)).to eq tool.global_id
+          end
+
+          it "does not substitute $Canvas.externalTool.global_id when the controller is unset" do
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            expect_unexpanded! "$Canvas.externalTool.global_id"
+          end
+
+          it "has substitution for $Canvas.externalTool.url" do
+            course.save!
+            tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
+            expect(controller).to receive(:named_context_url).with(course,
+                                                                   :api_v1_context_external_tools_update_url,
+                                                                   tool.id,
+                                                                   include_host: true).and_return("url")
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
+            expect(expand!("$Canvas.externalTool.url", expander:)).to eq "url"
+          end
+
+          it "does not substitute $Canvas.externalTool.url when the controller is unset" do
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            expect_unexpanded! "$Canvas.externalTool.url"
+          end
         end
       end
 
@@ -1658,39 +2037,12 @@ module Lti
             )
           end
 
-          context "when the resource_link_uuid_in_custom_substitution feature flag is on" do
-            before :once do
-              Account.site_admin.enable_feature!(:resource_link_uuid_in_custom_substitution)
-            end
-
-            it "substitutes the resource_link_uuid for $ResourceLink.id" do
-              expect(expand!("$ResourceLink.id")).to eq resource_link_uuid
-            end
-          end
-
-          it "has substitution for $ResourceLink.id" do
-            expect(expand!("$ResourceLink.id")).to eq "abc"
-          end
-
-          it "has substitution for $ResourceLink.description" do
-            expect(expand!("$ResourceLink.description")).to eq "This is a super fun activity"
-          end
-
-          it "has substitution for $ResourceLink.title" do
-            expect(expand!("$ResourceLink.title")).to eq "Activity XYZ"
-          end
-
-          it "has substitution for $ResourceLink.available.startDateTime" do
-            expect(expand!("$ResourceLink.available.startDateTime")).to eq right_now.iso8601(3)
-          end
-
-          it "has substitution for $ResourceLink.available.endDateTime" do
-            expect(expand!("$ResourceLink.available.endDateTime")).to eq right_now.iso8601(3)
-          end
-
-          it "has substitution for $ResourceLink.submission.endDateTime" do
-            expect(expand!("$ResourceLink.submission.endDateTime")).to eq right_now.iso8601(3)
-          end
+          it_expands("$ResourceLink.id") { resource_link_uuid }
+          it_expands "$ResourceLink.description", "This is a super fun activity"
+          it_expands "$ResourceLink.title", "Activity XYZ"
+          it_expands("$ResourceLink.available.startDateTime") { right_now.iso8601(3) }
+          it_expands("$ResourceLink.available.endDateTime") { right_now.iso8601(3) }
+          it_expands("$ResourceLink.submission.endDateTime") { right_now.iso8601(3) }
         end
 
         context "when there is no assignment" do
@@ -1732,25 +2084,10 @@ module Lti
             expect(expand!("$ResourceLink.id")).to eq resource_link_uuid
           end
 
-          it "has substitution for $ResourceLink.description" do
-            expect_unexpanded! "$ResourceLink.description"
-          end
-
-          it "has substitution for $ResourceLink.title" do
-            expect_unexpanded! "$ResourceLink.title"
-          end
-
-          it "has substitution for $ResourceLink.available.startDateTime" do
-            expect_unexpanded! "$ResourceLink.available.startDateTime"
-          end
-
-          it "has substitution for $ResourceLink.available.endDateTime" do
-            expect_unexpanded! "$ResourceLink.available.endDateTime"
-          end
-
-          it "has substitution for $ResourceLink.submission.endDateTime" do
-            expect_unexpanded! "$ResourceLink.submission.endDateTime"
-          end
+          it_leaves_unexpanded "$ResourceLink.description"
+          it_leaves_unexpanded "$ResourceLink.title"
+          it_leaves_unexpanded "$ResourceLink.startDateTime"
+          it_leaves_unexpanded "$ResourceLink.endDateTime"
         end
 
         context "when ResourceLink.title is populated" do
@@ -1779,9 +2116,7 @@ module Lti
             )
           end
 
-          it "has substitution for $ResourceLink.title" do
-            expect(expand!("$ResourceLink.title")).to eq resource_link_title
-          end
+          it_expands("$ResourceLink.title") { resource_link_title }
         end
       end
 
@@ -1809,7 +2144,7 @@ module Lti
           expect(expand!("$Canvas.assignment.description")).to eq "desc"
         end
 
-        it "has substitution for $Canvas.assignment.description longer than 1000 chracters" do
+        it "has substitution for $Canvas.assignment.description longer than 1000 characters" do
           str = SecureRandom.urlsafe_base64(1000)
           allow(assignment).to receive(:description).and_return(str)
           expect(expand!("$Canvas.assignment.description")).to eq str[0..984] + "... (truncated)"
@@ -1834,6 +2169,23 @@ module Lti
           it "rounds if whole" do
             allow(assignment).to receive(:points_possible).and_return(9.0)
             expect(expand!("$Canvas.assignment.pointsPossible").to_s).to eq "9"
+          end
+        end
+
+        describe "$LineItem.resultValue.max" do
+          it "has substitution for $LineItem.resultValue.max" do
+            allow(assignment).to receive(:points_possible).and_return(10.0)
+            expect(expand!("$LineItem.resultValue.max")).to eq 10
+          end
+
+          it "does not round if not whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.5)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9.5"
+          end
+
+          it "rounds if whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.0)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9"
           end
         end
 
@@ -1899,6 +2251,11 @@ module Lti
           expect(expand!("$Canvas.assignment.allowedAttempts")).to eq 5
         end
 
+        it "handles a nil assignment.allowedAttempts" do
+          assignment.allowed_attempts = nil
+          expect(expand!("$Canvas.assignment.allowedAttempts")).to eq "$Canvas.assignment.allowedAttempts"
+        end
+
         describe "$Canvas.assignment.submission.studentAttempts" do
           before do
             user.save
@@ -1919,6 +2276,13 @@ module Lti
             allow(course).to receive(:user_is_student?).and_return(true)
             expect(expand!("$Canvas.assignment.submission.studentAttempts")).to eq 2
           end
+
+          it "has substitution when the user is a student and context is a course-based Group" do
+            exp = VariableExpander.new(root_account, group, controller, current_user: user, tool:, assignment:)
+            expect(exp.lti_helper.course).to_not be_nil
+            expect(exp.lti_helper.course).to receive(:user_is_student?).and_return(true)
+            expect(expand!("$Canvas.assignment.submission.studentAttempts", expander: exp)).to eq 2
+          end
         end
 
         context "iso8601" do
@@ -1932,9 +2296,74 @@ module Lti
             expect(expand!("$Canvas.assignment.lockAt.iso8601")).to eq right_now.utc.iso8601
           end
 
-          it "has substitution for $Canvas.assignment.dueAt.iso8601" do
-            allow(assignment).to receive(:due_at).and_return(right_now)
-            expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+          describe "$Canvas.assignment.dueAt.iso8601" do
+            before do
+              course.save!
+              user.save!
+              assignment.update!(course:)
+            end
+
+            context "for student" do
+              before do
+                course.enroll_user(user, "StudentEnrollment")
+              end
+
+              it "is expanded" do
+                assignment.update!(due_at: right_now)
+                expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+              end
+
+              it "handles a nil due_at" do
+                assignment.update!(due_at: nil)
+                expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+              end
+
+              context "with an due_date override" do
+                it "is expanded" do
+                  assignment.update!(due_at: right_now - 1.day)
+                  assignment.submissions[0].update!(cached_due_date: right_now)
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+              end
+            end
+
+            context "for teacher" do
+              before do
+                course.enroll_user(user, "TeacherEnrollment")
+              end
+
+              context "with enrollments" do
+                before do
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                end
+
+                it "is expanded" do
+                  subm1, subm2 = assignment.submissions.to_a
+                  subm1.update! cached_due_date: right_now
+                  subm2.update! cached_due_date: right_now - 1.day
+                  expect(assignment.due_at).to be_nil
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
+              end
+
+              context "without enrollments" do
+                it "is expanded if there is due date set" do
+                  assignment.update!(due_at: right_now)
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
+              end
+            end
           end
 
           it "has substitution for $Canvas.assignment.allDueAts.iso8601" do
@@ -1950,11 +2379,6 @@ module Lti
           it "handles a nil lock_at" do
             allow(assignment).to receive(:lock_at).and_return(nil)
             expect_unexpanded! "$Canvas.assignment.lockAt.iso8601"
-          end
-
-          it "handles a nil due_at" do
-            allow(assignment).to receive(:lock_at).and_return(nil)
-            expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
           end
         end
 
@@ -1978,6 +2402,14 @@ module Lti
             it "expands to an empty string if there is no due date for the student" do
               course.enroll_user(user, "StudentEnrollment")
               expect(expand!("$Canvas.assignment.earliestEnrollmentDueAt.iso8601")).to eq ""
+            end
+
+            context "with an due_date override" do
+              it "is expanded" do
+                assignment.update!(due_at: right_now - 1.day)
+                assignment.submissions[0].update!(cached_due_date: right_now)
+                expect(expand!("$Canvas.assignment.earliestEnrollmentDueAt.iso8601")).to eq right_now.utc.iso8601
+              end
             end
           end
 
@@ -2011,34 +2443,26 @@ module Lti
       end
 
       context "user is logged in" do
-        it "has substitution for $Person.name.full" do
-          user.name = "Uncle Jake"
-          expect(expand!("$Person.name.full")).to eq "Uncle Jake"
-        end
+        describe "name" do
+          before do
+            user.name = "Uncle Jake"
+            user.short_name = "Unc J"
+            user.sortable_name = "Jake, Uncle"
+            user.pronouns = "He/Him"
+          end
 
-        it "has substitution for $Person.name.display" do
-          user.name = "Uncle Jake"
-          user.short_name = "Unc J"
-          expect(expand!("$Person.name.display")).to eq "Unc J"
-        end
-
-        it "has substitution for $Person.name.family" do
-          user.name = "Uncle Jake"
-          expect(expand!("$Person.name.family")).to eq "Jake"
-        end
-
-        it "has substitution for $Person.name.given" do
-          user.name = "Uncle Jake"
-          expect(expand!("$Person.name.given")).to eq "Uncle"
-        end
-
-        it "has substitution for $com.instructure.Person.name_sortable" do
-          user.sortable_name = "Jake, Uncle"
-          expect(expand!("$com.instructure.Person.name_sortable")).to eq "Jake, Uncle"
+          it_expands "$Person.name.full", "Uncle Jake"
+          it_expands "$Person.name.display", "Unc J"
+          it_expands "$Person.name.family", "Jake"
+          it_expands "$Person.name.given", "Uncle"
+          it_expands "$com.instructure.Person.name_sortable", "Jake, Uncle"
         end
 
         it "has substitution for $com.instructure.Person.pronouns" do
           user.pronouns = "She/Her"
+          user.account.settings[:can_add_pronouns] = true
+          user.account.save!
+
           expect(expand!("$com.instructure.Person.pronouns")).to eq "She/Her"
         end
 
@@ -2160,25 +2584,10 @@ module Lti
             allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 
-          it "has substitution for $Canvas.user.sisSourceId" do
-            pseudonym.sis_user_id = "1a2b3c"
-            expect(expand!("$Canvas.user.sisSourceId")).to eq "1a2b3c"
-          end
-
-          it "has substitution for $Person.sourcedId" do
-            pseudonym.sis_user_id = "1a2b3c"
-            expect(expand!("$Person.sourcedId")).to eq "1a2b3c"
-          end
-
-          it "has substitution for $Canvas.user.loginId" do
-            pseudonym.unique_id = "username"
-            expect(expand!("$Canvas.user.loginId")).to eq "username"
-          end
-
-          it "has substitution for $User.username" do
-            pseudonym.unique_id = "username"
-            expect(expand!("$User.username")).to eq "username"
-          end
+          it_expands("$Canvas.user.sisSourceId") { pseudonym.sis_user_id = "1a2b3c" }
+          it_expands("$Person.sourcedId") { pseudonym.sis_user_id = "1a2b3c" }
+          it_expands("$Canvas.user.loginId") { pseudonym.unique_id = "username" }
+          it_expands("$User.username") { pseudonym.unique_id = "username" }
 
           context "when in the :user_navigation placement" do
             let(:variable_expander_opts) { super().merge({ placement: :user_navigation }) }
@@ -2190,17 +2599,13 @@ module Lti
             context "when the context is a User" do
               let(:variable_expander_opts) { super().merge({ context: user }) }
 
-              it "has substitution for $Context.sourcedId" do
-                expect(expand!("$Context.sourcedId")).to eq "1a2b3c"
-              end
+              it_expands "$Context.sourcedId", "1a2b3c"
             end
 
             context "when the context is not a User" do
               let(:variable_expander_opts) { super().merge({ context: account }) }
 
-              it "does not have substitution for $Context.sourcedId" do
-                expect_unexpanded! "$Context.sourcedId"
-              end
+              it_leaves_unexpanded "$Context.sourcedId"
             end
           end
         end
@@ -2238,41 +2643,22 @@ module Lti
             expect(expand!("$Canvas.file.media.id")).to eq "4567"
           end
 
-          it "has substitution for $Canvas.file.media.type" do
-            expect(expand!("$Canvas.file.media.type")).to eq "video"
-          end
-
-          it "has substitution for $Canvas.file.media.duration" do
-            expect(expand!("$Canvas.file.media.duration")).to eq 555
-          end
-
-          it "has substitution for $Canvas.file.media.size" do
-            expect(expand!("$Canvas.file.media.size")).to eq 444
-          end
-
-          it "has substitution for $Canvas.file.media.title" do
-            expect(expand!("$Canvas.file.media.title")).to eq "some title"
-          end
+          it_expands "$Canvas.file.media.type", "video"
+          it_expands "$Canvas.file.media.duration", 555
+          it_expands "$Canvas.file.media.size", 444
+          it_expands "$Canvas.file.media.title", "some title"
 
           it "uses user_entered_title for $Canvas.file.media.title if present" do
             media_object.user_entered_title = "user title"
             expect(expand!("$Canvas.file.media.title")).to eq "user title"
           end
 
-          it "has substitution for $Canvas.file.usageRights.name" do
-            expect(expand!("$Canvas.file.usageRights.name")).to eq "Private (Copyrighted)"
-          end
-
-          it "has substitution for $Canvas.file.usageRights.url" do
-            expect(expand!("$Canvas.file.usageRights.url")).to eq "http://en.wikipedia.org/wiki/Copyright"
-          end
-
-          it "has substitution for $Canvas.file.usageRights.copyright_text" do
-            expect(expand!("$Canvas.file.usageRights.copyrightText")).to eq "legit"
-          end
+          it_expands "$Canvas.file.usageRights.name", "Private (Copyrighted)"
+          it_expands "$Canvas.file.usageRights.url", "http://en.wikipedia.org/wiki/Copyright"
+          it_expands "$Canvas.file.usageRights.copyrightText", "legit"
         end
 
-        describe "masquerading user substititions" do
+        describe "masquerading user substitutions" do
           before do
             masqueradee = User.new
             allow(masqueradee).to receive(:id).and_return(7878)
@@ -2280,9 +2666,7 @@ module Lti
             variable_expander.instance_variable_set(:@current_user, masqueradee)
           end
 
-          it "has substitution for $Canvas.masqueradingUser.id" do
-            expect(expand!("$Canvas.masqueradingUser.id")).to eq 42
-          end
+          it_expands "$Canvas.masqueradingUser.id", 42
 
           it "does not expand $Canvas.masqueradingUser.id when the controller is unset" do
             variable_expander.instance_variable_set(:@controller, nil)
@@ -2298,7 +2682,9 @@ module Lti
             before { allow(tool).to receive(:use_1_3?).and_return(true) }
 
             it "returns the user's lti id instead of lti 1.1 user_id" do
-              expect(expand!("$Canvas.masqueradingUser.userId")).to eq user.lti_id
+              user.lti_id = "fake_lti_id"
+              expanded = expand!("$Canvas.masqueradingUser.userId")
+              expect(expanded).to eq user.lti_id
             end
           end
         end
@@ -2321,6 +2707,78 @@ module Lti
           expander = VariableExpander.new(root_account, account, controller, current_user: user, tool: ToolProxy.new)
           expect(expand!("$ToolConsumerProfile.url", expander:)).to eq "url"
         end
+
+        it "has substitution for $com.instructure.user.lti_1_1_id.history" do
+          course.save!
+          user.lti_context_id = "current_context_id"
+          UserPastLtiId.create!(user:, context: account, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user:, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user: User.new, context: account, user_lti_id: "old_lti_id2", user_lti_context_id: "", user_uuid: "old_uuid2")
+          expect(expand!("$com.instructure.user.lti_1_1_id.history")).to eq "old_context_id,current_context_id"
+        end
+      end
+
+      context "refactor_custom_variables FF is on" do
+        before do
+          root_account.enable_feature!(:refactor_custom_variables)
+        end
+
+        it "has substitution for $Canvas.api.domain" do
+          allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+          expect(expand!("$Canvas.api.domain")).to eq "localhost"
+        end
+
+        context "context is a course with an assignment" do
+          let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool:, collaboration:) }
+
+          it "has substitution for $Canvas.api.collaborationMembers.url" do
+            allow(collaboration).to receive(:id).and_return(1)
+            allow(tool.context).to receive(:environment_specific_domain).and_return("localhost")
+            allow(Rails.application.routes.url_helpers).to receive(:api_v1_collaboration_members_url)
+              .and_return("https://www.example.com/api/v1/collaborations/1/members")
+            expect(expand!("$Canvas.api.collaborationMembers.url")).to \
+              eq "https://www.example.com/api/v1/collaborations/1/members"
+          end
+
+          it "has substitution for $ToolProxyBinding.memberships.url even if the controller is unset" do
+            course.save!
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            expect(expand!("$ToolProxyBinding.memberships.url")).to eq \
+              "http://localhost/api/lti/courses/#{course.id}/membership_service"
+          end
+
+          it "has substitution for $Canvas.externalTool.url even if the controller is unset" do
+            course.save!
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
+            expander.instance_variable_set(:@controller, nil)
+            expander.instance_variable_set(:@request, nil)
+            expect(expand!("$Canvas.externalTool.url", expander:)).to eq "http://localhost/api/v1/courses/#{course.id}/external_tools/#{tool.id}"
+          end
+
+          it "has substitution for $Canvas.xapi.url even if no controller" do
+            course.save!
+            allow(Lti::AnalyticsService).to receive(:create_token).and_return("--token--")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            variable_expander.instance_variable_set(:@current_user, user)
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            expect(expand!("$Canvas.xapi.url")).to eq "http://localhost/api/lti/v1/xapi/--token--"
+          end
+
+          it "has substitution for $Caliper.url even if no controller" do
+            course.save!
+            allow(Lti::AnalyticsService).to receive(:create_token).and_return("--token--")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            variable_expander.instance_variable_set(:@current_user, user)
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            expect(expand!("$Caliper.url")).to eq "http://localhost/api/lti/v1/caliper/--token--"
+          end
+        end
       end
 
       it "has substitution for $Canvas.membership.permissions" do
@@ -2331,6 +2789,14 @@ module Lti
         expect(expand!(subst, expander:)).to eq "read_forum,create_forum"
       end
 
+      it "has substitution for $Canvas.membership.permissions (checking Group#grants_right?) when context is a group-based course" do
+        course_with_student(active_all: true)
+        subst = "$Canvas.membership.permissions<read>"
+        expander = VariableExpander.new(@course.root_account, Group.new(course: @course), controller, current_user: @teacher, tool:)
+
+        expect(expand!(subst, expander:)).to eq "read"
+      end
+
       it "substitutes $Canvas.membership.permissions inside substring" do
         course_with_student(active_all: true)
         subst = "string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}"
@@ -2338,6 +2804,364 @@ module Lti
 
         expect(expand!(subst, expander:)).to eq "string stuff: create_forum,read_forum"
       end
+
+      context "com.instructure.Tag.id" do
+        let(:subst_name) { "$com.instructure.Tag.id" }
+
+        it "has the expansion registered" do
+          expect(VariableExpander.expansions).to have_key(:"$com.instructure.Tag.id")
+        end
+
+        it "returns the differentiation tag id when student has a tag assigned" do
+          # Ensure models are persisted before reloading
+          user.save! if user.new_record?
+          differentiation_tag.save! if differentiation_tag.new_record?
+
+          # Reload models to ensure database state is visible
+          user.reload
+          differentiation_tag.reload
+
+          # Create assignment override for the differentiation tag
+          external_tool_assignment.assignment_overrides.create!(
+            set: differentiation_tag,
+            title: differentiation_tag.name
+          )
+
+          # Create variable expander with assignment context
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: external_tool_assignment
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq differentiation_tag.id
+        end
+
+        it "returns placeholder when student has no tag assigned" do
+          # Create course, user, and assignment without tag assignment
+          course.save!
+          user.save!
+
+          assignment = course.assignments.create!(
+            name: "Assignment without tag",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+
+        it "returns placeholder when there is no assignment" do
+          variable_expander_without_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_without_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+
+        it "returns the correct tag when student has multiple tags assigned)" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting on course account
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment assigned ONLY to Tag B
+          assignment = course.assignments.create!(
+            name: "Assignment for Tag B",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          # Create assignment override for Tag B only
+          assignment.assignment_overrides.create!(
+            set: tag_b,
+            title: tag_b.name
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return Tag B's ID (not Tag A's ID) because the assignment is assigned to Tag B
+          expect(expanded).to eq tag_b.id
+        end
+
+        it "returns placeholder when student has multiple tags but none are assigned to the assignment" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment but don't assign it to any specific tag (no overrides)
+          assignment = course.assignments.create!(
+            name: "Assignment for everyone",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return placeholder since no tag is specifically assigned to this assignment
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+      end
+
+      context "com.instructure.Tag.name" do
+        let(:subst_name) { "$com.instructure.Tag.name" }
+
+        it "has the expansion registered" do
+          expect(VariableExpander.expansions).to have_key(:"$com.instructure.Tag.name")
+        end
+
+        it "returns the differentiation tag name when student has a tag assigned" do
+          # Ensure models are persisted before reloading
+          user.save! if user.new_record?
+          differentiation_tag.save! if differentiation_tag.new_record?
+
+          # Reload models to ensure database state is visible
+          user.reload
+          differentiation_tag.reload
+
+          # Create assignment override for the differentiation tag
+          external_tool_assignment.assignment_overrides.create!(
+            set: differentiation_tag,
+            title: differentiation_tag.name
+          )
+
+          # Create variable expander with assignment context
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: external_tool_assignment
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq differentiation_tag.name
+        end
+
+        it "returns placeholder when student has no tag assigned" do
+          # Create course, user, and assignment without tag assignment
+          course.save!
+          user.save!
+
+          assignment = course.assignments.create!(
+            name: "Assignment without tag",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
+
+        it "returns placeholder when there is no assignment" do
+          variable_expander_without_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_without_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
+
+        it "returns the correct tag name when student has multiple tags assigned (bug fix scenario)" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment assigned ONLY to Tag B
+          assignment = course.assignments.create!(
+            name: "Assignment for Tag B",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          # Create assignment override for Tag B only
+          assignment.assignment_overrides.create!(
+            set: tag_b,
+            title: tag_b.name
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return Tag B's name (not Tag A's name) because the assignment is assigned to Tag B
+          expect(expanded).to eq "Tag B"
+        end
+
+        it "returns placeholder when student has multiple tags but none are assigned to the assignment" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment but don't assign it to any specific tag (no overrides)
+          assignment = course.assignments.create!(
+            name: "Assignment for everyone",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return placeholder since no tag is specifically assigned to this assignment
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
+      end
     end
   end
 end
+
+# rubocop:enable RSpec/EmptyExampleGroup

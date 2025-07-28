@@ -23,12 +23,14 @@ require_relative "../../support/boolean_translator"
 module GroupCategories
   MockGroupCategory = Struct.new(:name,
                                  :self_signup,
+                                 :self_signup_end_at,
                                  :auto_leader,
                                  :group_limit,
                                  :create_group_count,
                                  :create_group_member_count,
                                  :assign_unassigned_members,
-                                 :group_by_section)
+                                 :group_by_section,
+                                 :non_collaborative)
 
   describe ParamsPolicy do
     let(:populate_options) do
@@ -77,7 +79,8 @@ module GroupCategories
       end
 
       describe "when context is a course" do
-        let(:context) { Course.new }
+        let(:account) { Account.new }
+        let(:context) { Course.new(account:) }
 
         it "populates group count" do
           policy.populate_with({ enable_self_signup: "1", create_group_count: 2 }, populate_options)
@@ -87,6 +90,11 @@ module GroupCategories
         it "populates group member count" do
           policy.populate_with({ split_groups: "2", create_group_member_count: 5 }, populate_options)
           expect(category.create_group_member_count).to eq 5
+        end
+
+        it "sets up the non_collaborative value" do
+          policy.populate_with({ non_collaborative: true }, populate_options)
+          expect(category.non_collaborative).to be true
         end
       end
     end

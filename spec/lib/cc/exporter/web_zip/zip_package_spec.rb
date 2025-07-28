@@ -26,9 +26,7 @@ describe "ZipPackage" do
     end
   end
 
-  def create_key(obj)
-    CC::CCHelper.create_key(obj)
-  end
+  delegate :create_key, to: :"CC::CCHelper"
 
   before :once do
     course_with_student(active_all: true)
@@ -430,6 +428,18 @@ describe "ZipPackage" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(@module).first
       expect(module_item_data[:requiredPoints]).to eq 7
+    end
+
+    it "parses required points if module item requirement is min_percentage" do
+      assign = @course.assignments.create!(title: "Assignment 1", points_possible: 10)
+      assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      @module.content_tags.create!(content: assign, context: @course)
+      @module.completion_requirements = [{ id: assign_item.id, type: "min_percentage", min_percentage: 60 }]
+      @module.save!
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:requiredPoints]).to eq 6
     end
 
     it "parses export id for assignments, quizzes, discussions and wiki pages" do
@@ -999,7 +1009,7 @@ describe "ZipPackage" do
           exportId: create_key(survey),
           title: "Survey 1",
           type: "Quizzes::Quiz",
-          content: "<img src=\"viewer/files/cn_image.jpg\">",
+          content: %(<img src="viewer/files/cn_image.jpg" loading="lazy">),
           assignmentExportId: create_key(survey.assignment),
           questionCount: 0,
           timeLimit: nil,
@@ -1069,7 +1079,7 @@ describe "ZipPackage" do
           exportId: create_key(disc),
           title: "Discussion 1",
           type: "DiscussionTopic",
-          content: "<img src=\"viewer/files/folder%231/cn_image.jpg\">",
+          content: %(<img src="viewer/files/folder%231/cn_image.jpg" loading="lazy">),
           lockAt: nil,
           unlockAt: nil,
           graded: false

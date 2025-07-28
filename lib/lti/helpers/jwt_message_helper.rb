@@ -22,16 +22,16 @@
 module Lti::Helpers::JwtMessageHelper
   # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#oauth_consumer_key_sign
   # This value MAY be included by a platform. However, it is recommended.
-  def self.generate_oauth_consumer_key_sign(associated_1_1_tool, message)
-    return nil if associated_1_1_tool.blank?
+  def self.generate_oauth_consumer_key_sign(assoc_tool_data, message, nonce)
+    return nil if assoc_tool_data.blank?
 
-    CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac([associated_1_1_tool.consumer_key,
-                                                           message.deployment_id,
-                                                           message.iss,
-                                                           message.aud,
-                                                           message.exp,
-                                                           message.nonce].join("&").encode("utf-8"),
-                                                          associated_1_1_tool.shared_secret.to_s.encode("utf-8"),
+    CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac([assoc_tool_data["consumer_key"],
+                                                           message[LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX + "deployment_id"],
+                                                           message["iss"],
+                                                           message["aud"],
+                                                           message["exp"],
+                                                           nonce].join("&").encode("utf-8"),
+                                                          assoc_tool_data["shared_secret"].to_s.encode("utf-8"),
                                                           "sha256"))
   end
 end

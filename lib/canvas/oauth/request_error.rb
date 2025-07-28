@@ -65,6 +65,11 @@ module Canvas::OAuth
       unsupported_grant_type: {
         error: :unsupported_grant_type,
         error_description: "The grant_type you requested is not currently supported"
+      }.freeze,
+
+      invalid_grant: {
+        error: :invalid_grant,
+        error_description: "The provided authorization grant is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client."
       }.freeze
     }.freeze
 

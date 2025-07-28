@@ -22,8 +22,9 @@ import controller from './controller'
 import initialize from './config/initializer'
 import Layout from './react/components/app'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
+let root
 let container
 
 /**
@@ -53,7 +54,8 @@ export const mount = function (node, options) {
   container = node
 
   return initialize().then(function () {
-    ReactDOM.render(<Layout />, container)
+    root = createRoot(container)
+    root.render(<Layout />)
     return controller.start(update)
   })
 }
@@ -61,7 +63,7 @@ export const mount = function (node, options) {
 export const isMounted = () => !!container
 
 export const update = props => {
-  ReactDOM.render(<Layout {...props} />, container)
+  root.render(<Layout {...props} />)
 }
 
 export const reload = () => controller.load()
@@ -69,7 +71,8 @@ export const reload = () => controller.load()
 export const unmount = function () {
   if (isMounted()) {
     controller.stop()
-    ReactDOM.unmountComponentAtNode(container)
+    root.unmount()
+    root = undefined
     container = undefined
   }
 }

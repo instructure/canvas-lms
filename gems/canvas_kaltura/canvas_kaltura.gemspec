@@ -14,11 +14,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "canvas_http"
   spec.add_dependency "canvas_slug"
   spec.add_dependency "canvas_sort"
+  spec.add_dependency "csv"
   spec.add_dependency "legacy_multipart"
   spec.add_dependency "nokogiri"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "webmock", "~> 3.18"
 end

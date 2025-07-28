@@ -88,7 +88,7 @@ export default class UnassignedUsersView extends GroupUsersView {
     const listElements = $('ul.collectionViewItems li.group-user', this.$el)
     if (this.elementIndex > -1 && listElements.length > 0) {
       const focusElement = $(
-        listElements[this.elementIndex] || listElements[listElements.length - 1]
+        listElements[this.elementIndex] || listElements[listElements.length - 1],
       )
       return focusElement.find('a.assign-to-group').focus()
     }
@@ -139,8 +139,8 @@ export default class UnassignedUsersView extends GroupUsersView {
         options =>
           (this.elementIndex = Array.prototype.indexOf.apply(
             $('ul.collectionViewItems li.group-user', this.$el),
-            $(options.target).parent('li')
-          ))
+            $(options.target).parent('li'),
+          )),
       )
       this.assignToGroupMenu.on('close', options => {
         const studentElements = $('li.group-user a.assign-to-group', this.$el)
@@ -149,7 +149,7 @@ export default class UnassignedUsersView extends GroupUsersView {
             $('.filterable-unassigned-users').focus()
           } else if (options.escapePressed) {
             $(
-              studentElements[this.elementIndex] || studentElements[studentElements.length - 1]
+              studentElements[this.elementIndex] || studentElements[studentElements.length - 1],
             ).focus()
           } else if (options.userMoved) {
             if (this.elementIndex === 0) {
@@ -157,7 +157,7 @@ export default class UnassignedUsersView extends GroupUsersView {
             } else {
               $(
                 studentElements[this.elementIndex - 1] ||
-                  studentElements[studentElements.length - 1]
+                  studentElements[studentElements.length - 1],
               ).focus()
             }
           }

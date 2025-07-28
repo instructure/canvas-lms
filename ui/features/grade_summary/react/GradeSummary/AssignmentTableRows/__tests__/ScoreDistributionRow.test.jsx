@@ -37,10 +37,10 @@ const setup = (props = defaultProps) => {
         {scoreDistributionRow(
           props.assignment,
           props.setOpenAssignmentDetailIds,
-          props.openAssignmentDetailIds
+          props.openAssignmentDetailIds,
         )}
       </Table.Body>
-    </Table>
+    </Table>,
   )
 }
 

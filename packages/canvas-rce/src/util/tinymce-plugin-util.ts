@@ -40,7 +40,7 @@ export function toolbarIconHelperFor(editor: Editor, ariaLabel: string) {
 
   if ($svgContainer.length === 0) {
     console.error(
-      `Failed to find TinyMCE toolbar button for ariaLabel "${ariaLabel}" using selector: ${containerSelector}`
+      `Failed to find TinyMCE toolbar button for ariaLabel "${ariaLabel}" using selector: ${containerSelector}`,
     )
   }
 

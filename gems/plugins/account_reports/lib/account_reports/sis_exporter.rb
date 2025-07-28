@@ -40,7 +40,7 @@ module AccountReports
       @account_report = account_report
       @reports = SIS_CSV_REPORTS & @account_report.parameters.select { |_k, v| value_to_boolean(v) }.keys
       @sis_format = params[:sis_format]
-      @created_by_sis = @account_report.parameters["created_by_sis"]
+      @created_by_sis = value_to_boolean(@account_report.parameters["created_by_sis"])
       extra_text_term(@account_report)
       include_deleted_objects
       include_enrollment_filter
@@ -123,6 +123,9 @@ module AccountReports
         headers << "created_by_sis"
       end
       headers << "pronouns" if should_add_pronouns?
+
+      # Add after pronouns for backwards-compatibility
+      headers << "uuid" unless @sis_format
       headers
     end
 
@@ -138,11 +141,11 @@ module AccountReports
 
     def user_query
       root_account.shard.activate do
-        root_account.pseudonyms.except(:preload).joins(:user).select(
+        root_account.pseudonyms.not_instructure_identity.except(:preload).joins(:user).select(
           "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
            pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
            pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-           users.name, users.short_name, users.pronouns AS db_pronouns"
+           users.name, users.short_name, users.pronouns AS db_pronouns, users.uuid"
         ).where("NOT EXISTS (SELECT user_id
                              FROM #{Enrollment.quoted_table_name} e
                              WHERE e.type = 'StudentViewEnrollment'
@@ -181,6 +184,7 @@ module AccountReports
       row << user.workflow_state
       row << user.sis_batch_id? unless @sis_format
       row << translate_pronouns(user.db_pronouns) if should_add_pronouns?
+      row << user.uuid unless @sis_format
       row
     end
 
@@ -590,7 +594,8 @@ module AccountReports
       if @include_deleted
         enrol.where!("enrollments.workflow_state<>'deleted' OR enrollments.sis_batch_id IS NOT NULL")
       else
-        enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'")
+        enrol.where!("enrollments.workflow_state<>'deleted' AND enrollments.workflow_state<>'completed'
+                        AND es.state<>'completed'")
       end
 
       if @sis_format
@@ -614,6 +619,7 @@ module AccountReports
                 cs.sis_source_id AS course_section_sis_id,
                 CASE WHEN cs.workflow_state = 'deleted' THEN 'deleted'
                      WHEN courses.workflow_state = 'deleted' THEN 'deleted'
+                     WHEN es.state = 'completed' THEN 'concluded'
                      WHEN enrollments.workflow_state = 'invited' THEN 'invited'
                      WHEN enrollments.workflow_state = 'creation_pending' THEN 'invited'
                      WHEN enrollments.workflow_state = 'active' THEN 'active'
@@ -622,6 +628,7 @@ module AccountReports
                      WHEN enrollments.workflow_state = 'deleted' THEN 'deleted'
                      WHEN enrollments.workflow_state = 'rejected' THEN 'rejected' END AS enroll_state")
                           .joins("INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = enrollments.course_section_id
+               INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON enrollments.id = es.enrollment_id
                INNER JOIN #{Course.quoted_table_name} ON courses.id = cs.course_id")
                           .where("enrollments.type <> 'StudentViewEnrollment'")
       enrol = enrol.where.not(enrollments: { sis_batch_id: nil }) if @created_by_sis

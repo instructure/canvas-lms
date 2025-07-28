@@ -83,7 +83,10 @@ module GradebookCommon
 
   def init_course_with_students(num = 1)
     course_with_teacher(active_all: true)
+    register_and_enroll_students(num)
+  end
 
+  def register_and_enroll_students(num = 1)
     @students = []
     (1..num).each do |i|
       student = User.create!(name: "Student_#{i} lastname#{i}")
@@ -102,6 +105,45 @@ module GradebookCommon
     move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery(".ui-dialog:visible")
     f(".grading_value").send_keys(points)
+    submit_dialog(dialog, ".ui-button")
+    accept_alert
+  end
+
+  def set_checkpoints_default_grade(reply_to_topic_value, reply_to_entry_value)
+    move_to_click('[data-menu-item-id="set-default-grade"]')
+    dialog = find_with_jquery(".ui-dialog:visible")
+    ff("[data-testid='default-grade-input']")[0].send_keys(reply_to_topic_value)
+    ff("[data-testid='default-grade-input']")[1].send_keys(reply_to_entry_value)
+    submit_dialog(dialog, ".ui-button")
+    accept_alert
+  end
+
+  def select_pass_fail_type(value)
+    if value == "Complete"
+      "complete-dropdown-option"
+    elsif value == "Incomplete"
+      "incomplete-dropdown-option"
+    elsif value == "---"
+      "empty-dropdown-option"
+    end
+  end
+
+  def set_checkpoints_default_grade_for_pass_fail(reply_to_topic_value, reply_to_entry_value)
+    move_to_click('[data-menu-item-id="set-default-grade"]')
+    dialog = find_with_jquery(".ui-dialog:visible")
+
+    reply_to_topic_select = ff("[data-testid='select-dropdown']")[0]
+    reply_to_topic_select_option = select_pass_fail_type(reply_to_topic_value)
+
+    reply_to_topic_select.click
+    f("[data-testid='#{reply_to_topic_select_option}'").click
+
+    reply_to_entry_select = ff("[data-testid='select-dropdown']")[1]
+    reply_to_entry_select_option = select_pass_fail_type(reply_to_entry_value)
+
+    reply_to_entry_select.click
+    f("[data-testid='#{reply_to_entry_select_option}']").click
+
     submit_dialog(dialog, ".ui-button")
     accept_alert
   end

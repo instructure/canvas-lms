@@ -198,7 +198,8 @@ describe SisImportsApiController, type: :request do
                                     "Enrollment" => { "created" => 0, "concluded" => 0, "deactivated" => 0, "restored" => 0, "deleted" => 0 },
                                     "GroupMembership" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "UserObserver" => { "created" => 0, "restored" => 0, "deleted" => 0 },
-                                    "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
+                                    "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "AssignmentOverrideStudent" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
       "progress" => 100,
       "id" => batch.id,
       "workflow_state" => "imported",
@@ -221,20 +222,50 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq expected_data
   end
 
-  it "restores batch on restore_states and return progress" do
-    batch = @account.sis_batches.create
-    json = api_call(:put,
-                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
-                    { controller: "sis_imports_api",
-                      action: "restore_states",
-                      format: "json",
-                      account_id: @account.id.to_s,
-                      id: batch.id.to_s })
-    run_jobs
-    expect(batch.reload.workflow_state).to eq "restored"
+  describe "restore_states" do
+    before :once do
+      @term = @account.enrollment_terms.create!(name: "baleeted", workflow_state: "deleted")
+      @batch = @account.sis_batches.create!(workflow_state: "imported", started_at: 5.minutes.ago, ended_at: 1.minute.ago)
+      @batch.roll_back_data.create!(context: @term, previous_workflow_state: "active", updated_workflow_state: "deleted")
+      @path = "/api/v1/accounts/#{@account.id}/sis_imports/#{@batch.id}/restore_states"
+      @params = { controller: "sis_imports_api",
+                  action: "restore_states",
+                  format: "json",
+                  account_id: @account.to_param,
+                  id: @batch.to_param }
+    end
 
-    params = { controller: "progress", action: "show", id: json["id"].to_param, format: "json" }
-    api_call(:get, "/api/v1/progress/#{json["id"]}", params, {}, {}, expected_status: 200)
+    it "restores batch on restore_states and return progress" do
+      json = api_call(:put, @path, @params)
+      run_jobs
+      expect(@batch.reload.workflow_state).to eq "restored"
+      expect(@term.reload.workflow_state).to eq "active"
+
+      params = { controller: "progress", action: "show", id: json["id"].to_param, format: "json" }
+      api_call(:get, "/api/v1/progress/#{json["id"]}", params, {}, {}, expected_status: 200)
+    end
+
+    it "checks permissions" do
+      user_factory
+      api_call(:put, @path, @params, {}, {}, expected_status: 403)
+    end
+
+    it "returns an error if no rollback data exists" do
+      @batch.roll_back_data.delete_all
+      json = api_call(:put, @path, @params, {}, {}, expected_status: 400)
+      expect(json["message"]).to eq "restore data unavailable"
+    end
+
+    it "returns an error if any rollback data is expired (possibly being actively deleted)" do
+      @batch.roll_back_data.update_all(created_at: 31.days.ago)
+      json = api_call(:put, @path, @params, {}, {}, expected_status: 400)
+      expect(json["message"]).to eq "restore data unavailable"
+    end
+
+    it "returns an error if undelete_only and unconclude_only are combined" do
+      json = api_call(:put, @path, @params.merge(undelete_only: true, unconclude_only: true), {}, {}, expected_status: 400)
+      expect(json["message"]).to eq "cannot set both undelete_only and unconclude_only"
+    end
   end
 
   it "shows current running sis import" do
@@ -916,7 +947,8 @@ describe SisImportsApiController, type: :request do
                                     "Enrollment" => { "created" => 0, "concluded" => 0, "deactivated" => 0, "restored" => 0, "deleted" => 0 },
                                     "GroupMembership" => { "created" => 0, "restored" => 0, "deleted" => 0 },
                                     "UserObserver" => { "created" => 0, "restored" => 0, "deleted" => 0 },
-                                    "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
+                                    "AccountUser" => { "created" => 0, "restored" => 0, "deleted" => 0 },
+                                    "AssignmentOverrideStudent" => { "created" => 0, "restored" => 0, "deleted" => 0 } } },
       "progress" => 100,
       "id" => batch.id,
       "workflow_state" => "imported",
@@ -1081,7 +1113,7 @@ describe SisImportsApiController, type: :request do
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
-             expected_status: 401)
+             expected_status: 403)
   end
 
   it "works with import permissions" do
@@ -1116,20 +1148,39 @@ describe SisImportsApiController, type: :request do
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
   end
 
-  it "expires the errors_attachment after an hour" do
-    batch = @account.sis_batches.create!
-    batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
-    batch.finish(false)
-    json = api_call(:get,
-                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { controller: "sis_imports_api",
-                      action: "show",
-                      format: "json",
-                      account_id: @account.id.to_s,
-                      id: batch.id.to_s })
-    url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
-    expiration = Time.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
+  shared_examples_for "disable_adding_uuid_verifier_in_api" do
+    it "verifier on errors_attachment" do
+      batch = @account.sis_batches.create!
+      batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
+      batch.finish(false)
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                      { controller: "sis_imports_api",
+                        action: "show",
+                        format: "json",
+                        account_id: @account.id.to_s,
+                        id: batch.id.to_s })
+      url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
 
-    expect(expiration).to be_within(1.minute).of(1.hour.from_now)
+      expect(url_params["verifier"]).to eq @feature_on ? nil : batch.errors_attachment.uuid
+    end
+  end
+
+  context "when the disable_adding_uuid_verifier_in_api flag is on" do
+    before do
+      @feature_on = true
+      Account.default.enable_feature!(:disable_adding_uuid_verifier_in_api)
+    end
+
+    it_behaves_like "disable_adding_uuid_verifier_in_api"
+  end
+
+  context "when the disable_adding_uuid_verifier_in_api flag is off" do
+    before do
+      @feature_on = false
+      Account.default.disable_feature!(:disable_adding_uuid_verifier_in_api)
+    end
+
+    it_behaves_like "disable_adding_uuid_verifier_in_api"
   end
 end

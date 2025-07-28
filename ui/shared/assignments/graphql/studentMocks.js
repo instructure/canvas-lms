@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import glob from 'glob'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 import {Assignment} from './student/Assignment'
 import {Submission} from './student/Submission'
 
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
+import {createRef} from 'react'
 
 // Dynamically load and cache all of the `DefaultMocks` defined in `./student/*.js`
 let _dynamicDefaultMockImports = null
@@ -35,7 +36,7 @@ async function loadDefaultMocks() {
     filesToImport.map(async file => {
       const fileImport = await import(file)
       return fileImport.DefaultMocks || {}
-    })
+    }),
   )
   _dynamicDefaultMockImports = defaultMocks.filter(m => m !== undefined)
   return _dynamicDefaultMockImports
@@ -57,6 +58,7 @@ const ASSIGNMENT_QUERY = gql`
       rubric {
         id
       }
+      rubricSelfAssessmentEnabled
     }
   }
   ${Assignment.fragment}
@@ -99,5 +101,6 @@ export async function mockAssignmentAndSubmission(overrides = []) {
     assignment: result[0],
     submission: result[1],
     onChangeSubmission: () => {},
+    submitButtonRef: createRef()
   }
 }

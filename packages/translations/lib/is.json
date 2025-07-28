@@ -32,11 +32,23 @@
     "additional_considerations_f3801683": {
         "message": "Auka umhugsunarefni"
     },
+    "address_applied_64269b0b": {
+        "message": "Heimilisfang notað"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Heimilisfang fjarlægt"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Samliggjandi tenglar með sömu vefslóð eiga að vera stakur tengill."
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
+    },
+    "ai_response_9624e8e8": {
+        "message": "Gervigreindarsvörun"
+    },
+    "ai_tools_fda01177": {
+        "message": "Gervigreindarverkfæri"
     },
     "albanian_21ed929e": {
         "message": "Albanska"
@@ -76,6 +88,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Villa kom upp við netbeiðni"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Villa kom upp við að vinna úr beiðni þinni"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Villa kom upp við að hlaða upp margmiðlunarefninu."
@@ -158,6 +173,9 @@
     "available_folders_694d0436": {
         "message": "Tiltækar möppur"
     },
+    "background_1bc88842": {
+        "message": "Bakgrunnur"
+    },
     "backslash_b2d5442d": {
         "message": "Öfugt skástrik"
     },
@@ -190,6 +208,15 @@
     },
     "blue_daf8fea9": {
         "message": "Blár"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Feitletrað notað"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Feitletrað fjarlægt"
+    },
+    "border_5b08b06d": {
+        "message": "Rammi"
     },
     "bottom_15a2a9be": {
         "message": "Neðst"
@@ -332,11 +359,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Fella saman til að fela { types }"
     },
+    "color_a363e1b0": {
+        "message": "Litur"
+    },
+    "color_contrast_4c418add": {
+        "message": "Birtuhlutfall litar"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Birtuhlutfall litar"
+    },
     "color_picker_6b359edf": {
         "message": "Litaval"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Litaval ({ colorName } valið)"
+    },
+    "color_popup_af39810f": {
+        "message": "Litasprettigluggi"
     },
     "column_e1ae5c64": {
         "message": "Dálkur"
@@ -346,6 +385,9 @@
     },
     "complex_numbers_a543d004": {
         "message": "Tvinntölur"
+    },
+    "compose_44c904f4": {
+        "message": "Semja"
     },
     "computer_1d7dfa6f": {
         "message": "Tölva"
@@ -373,6 +415,9 @@
     },
     "coproduct_e7838082": {
         "message": "Hjámargfeldi"
+    },
+    "copy_9748f9f": {
+        "message": "Afrita"
     },
     "copyright_holder_66ee111": {
         "message": "Handhafi útgáfuréttar:"
@@ -476,8 +521,14 @@
     "decrease_indent_d9cf469d": {
         "message": "Minnka inndrátt"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Minnka Rich Content svæði"
+    },
     "deep_purple_bb3e2907": {
         "message": "Dökkfjólublár"
+    },
+    "default_9db103d": {
+        "message": "Sjálfgilt"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "sjálfvalinn áherslumerktur óraðaður listi"
@@ -551,11 +602,20 @@
     "disjoint_union_e74351a8": {
         "message": "Ósamræmt samband"
     },
+    "dislike_14befc48": {
+        "message": "Líka ekki"
+    },
     "display_options_315aba85": {
         "message": "Sýningar valkostir"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Sýna textatengil (opnast í nýjum flipa)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Deiling notuð"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Deiling fjarlægð"
     },
     "division_sign_72190870": {
         "message": "Deilingartákn"
@@ -629,8 +689,8 @@
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Stöðuslá ritils"
+    "editor_status_bar_653f44ee": {
+        "message": "Stöðustika ritils"
     },
     "element_starting_with_start_91bf4c3b": {
         "message": "Eining byrjar á { start }"
@@ -695,6 +755,9 @@
     "enter_search_text_26cb4459": {
         "message": "færðu inn leitartexta"
     },
+    "enter_text_8b35c65b": {
+        "message": "Settu inn texta"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsílon"
     },
@@ -758,8 +821,14 @@
     "f_function_fe422d65": {
         "message": "F (virkni)"
     },
+    "fail_544e5dde": {
+        "message": "FALL"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Gat ekki sótt skráarinnihald"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Ekki tókst að afrita svar"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Mistókst að sækja efni frá ytra verkfæri"
@@ -872,6 +941,9 @@
     "grades_a61eba0a": {
         "message": "Einkunnir"
     },
+    "graphics_text_bc9568bc": {
+        "message": "Grafískur texti"
+    },
     "greater_than_e98af662": {
         "message": "Stærra en"
     },
@@ -941,6 +1013,12 @@
     "heading_4_b2e74be7": {
         "message": "Fyrirsögn 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Haus { h } notaður"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Haus { h } fjarlægður"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Ekki ætti að sleppa stigi hauss."
     },
@@ -961,6 +1039,12 @@
     },
     "height_69b03e15": {
         "message": "Hæð"
+    },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Halló. Vinsamlegast lýstu breytingunum sem þú vilt gera á samsetningu þinni."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Halló. Vinsamlegast lýstu breytingunum sem þú vilt gera á vali þínu."
     },
     "hexagon_d8468e0d": {
         "message": "Sexhyrningur"
@@ -994,6 +1078,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ég hef höfundarréttinn"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Því miður finn ég ekki svar gervigreindar"
     },
     "icelandic_9d6d35de": {
         "message": "Íslenska"
@@ -1070,6 +1157,9 @@
     "increase_indent_6af90f7c": {
         "message": "Auka inndrátt"
     },
+    "increase_rich_content_area_340b775": {
+        "message": "Stækka Rich Content svæði"
+    },
     "indefinite_integral_6623307e": {
         "message": "Óákveðin heild"
     },
@@ -1088,6 +1178,18 @@
     "infinity_7a10f206": {
         "message": "Óendanleiki"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Inntaksreitur fyrir alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Inntaksreitur fyrir bláan"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Inntaksreitur fyrir grænan"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Inntaksreitur fyrir rauðan"
+    },
     "insert_593145ef": {
         "message": "Setja inn"
     },
@@ -1102,6 +1204,9 @@
     },
     "intersection_cd4590e4": {
         "message": "Sniðmengi"
+    },
+    "invalid_description_991e23bb": {
+        "message": "Ógild lýsing"
     },
     "invalid_entry_f7d2a0f5": {
         "message": "Ógild færsla."
@@ -1126,6 +1231,12 @@
     },
     "italian_bd3c792d": {
         "message": "Ítalska"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Skáletrað notað"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Skáletrað fjarlægt"
     },
     "japanese_b5721ca7": {
         "message": "Japanska"
@@ -1156,6 +1267,9 @@
     },
     "large_9c5e80e7": {
         "message": "Stór"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Stór texti"
     },
     "latvian_2bbb6aab": {
         "message": "Lettneska"
@@ -1261,6 +1375,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Tenglar á ytra svæði."
+    },
+    "lists_cd1336fc": {
+        "message": "Listar"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Lista ætti að sníða sem lista."
@@ -1382,6 +1499,9 @@
     "miscellaneous_e9818229": {
         "message": "Ýmislegt"
     },
+    "modify_6b0b13e3": {
+        "message": "Breyta"
+    },
     "module_90d9fd32": {
         "message": "Eining"
     },
@@ -1402,12 +1522,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Tónlistar tákn"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Verður að vera að minnsta kosti { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Verður að vera að minnsta kosti { width } x { height }pt"
     },
     "my_files_2f621040": {
         "message": "Mínar skrár"
@@ -1523,6 +1637,9 @@
     "none_selected_b93d56d2": {
         "message": "Ekkert valið"
     },
+    "normal_text_7b03da48": {
+        "message": "Venjulegur texti"
+    },
     "norwegian_53f391ec": {
         "message": "Norska"
     },
@@ -1601,8 +1718,8 @@
     "outline_size_a6059a21": {
         "message": "Útlínustærð"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } er ekki gild samskiptaregla, hún verður að vera ftp, http, https, mailto, skype, tel eða henni verður sleppt. "
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } er ekki gild samskiptaregla."
     },
     "page_50c4823d": {
         "message": "Síða"
@@ -1613,6 +1730,12 @@
     "paragraph_5e5ad8eb": {
         "message": "Málsgrein"
     },
+    "paragraph_applied_959b3fe5": {
+        "message": "Málsgrein notuð"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Málsgrein fjarlægð"
+    },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Málsgrein byrjar á { start }"
     },
@@ -1621,6 +1744,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Hluti (afleitt)"
+    },
+    "pass_1c19a2b3": {
+        "message": "STAÐIÐ"
     },
     "paste_5963d1c1": {
         "message": "Líma"
@@ -1639,6 +1765,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prósenta verður að vera tala"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Prósenta verður að vera að minnsta kosti { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Sviðslista tákn"
@@ -1664,11 +1793,17 @@
     "pi_variant_10f5f520": {
         "message": "Pí (afbrigði)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Veldu lit"
+    },
     "pink_68ad45cb": {
         "message": "Bleikur"
     },
     "pixels_52ece7d1": {
         "message": "Punktar"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Punktar verða að vera að minnsta kosti { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Spila"
@@ -1681,6 +1816,18 @@
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Leyfðu Canvas að fá aðgang að hljóðnemanum og vefmyndavélinni."
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "Veldu skrá"
+    },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Lýstu því sem þú vilt semja."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Settu inn skráarheiti"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Veldu skrá af studdri tegund"
     },
     "plus_d43cd4ec": {
         "message": "Plús"
@@ -1732,6 +1879,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Fyrri { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Áður valdir litir"
     },
     "prime_917ea60e": {
         "message": "Frum"
@@ -1832,11 +1982,17 @@
     "resize_ec83d538": {
         "message": "Breyta stærð"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Svar afritað á klemmuspjald"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Endurheimta sjálfvirka vistun?"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Niðurstaða { index } af { max }."
+    },
+    "retry_ebd5f8ba": {
+        "message": "Reyna aftur"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Afturkross (gefur ekki af sér)"
@@ -1997,6 +2153,9 @@
     "shortcut_911d6255": {
         "message": "Flýtileið"
     },
+    "show_all_967a90f0": {
+        "message": "Sýna allt"
+    },
     "show_audio_options_b489926b": {
         "message": "Sýna valkosti hljóðs"
     },
@@ -2129,6 +2288,9 @@
     "submit_a3cc6859": {
         "message": "Leggja fram"
     },
+    "submitting_b90fac62": {
+        "message": "Skila..."
+    },
     "subscript_59744f96": {
         "message": "Undirskrift"
     },
@@ -2252,8 +2414,11 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Fyrsti haus á síðu ætti að vera H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Eftirfarandi efni er gefið upp af samstarfsaðila"
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Hæð Rich Content svæðis er minnkuð."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Hæð Rich Content svæðis er stækkuð."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Efnið er öllum heimilt"
@@ -2263,9 +2428,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Efnið er háð undantekningum - t.d. lögleg notkun, tilvitnunarréttur eða annað undir viðeigandi höfundarréttarlögum"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Framangreint efni er gefið upp af samstarfsaðila"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Ekki hægt að nota lyklaborð með pretty HTML ritlinum. Ýttu á Shift O til að opna hráa html ritilinn."
@@ -2362,6 +2524,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Ekki er hægt að ákvarða url tilfangsvals"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Undirstrikað notað"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Undirstrikað fjarlægt"
     },
     "union_e6b57a53": {
         "message": "Samtök"
@@ -2552,6 +2720,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Skoða orða- og stafatalingu"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Bíður eftir svari"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Ekki greindist tengdur og virkur hljóðnemi í tækinu þínu."
     },
@@ -2572,6 +2743,9 @@
     },
     "welsh_42ab94b1": {
         "message": "Velska"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Hvað viltu gera?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Þegar merkingar eru notaðar sem sníða atriði sjónrænt sem lista en sýna ekki lista-sambandið, gætu notendur átt í erfiðleikum við að átta sig á upplýsingunum."
@@ -2603,6 +2777,9 @@
     "wreath_product_200b38ef": {
         "message": "Sveigfeldi"
     },
+    "writing_assistant_a30ac16a": {
+        "message": "Ritráðgjafi"
+    },
     "xi_149681d0": {
         "message": "Xi"
     },
@@ -2611,6 +2788,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddíska"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Þú ert á litaspjaldi. Til að fletta á spjaldinu upp, til vinstri, niður eða hægri skaltu nota „W“, „A“, „S“ og „D“ hnappana í sömu röð"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Þú ert á litasleða. Til að vafra um sleðann til vinstri eða hægri skaltu nota „A“ og „D“ hnappana í sömu röð"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Þú ert á alfasleða. Til að vafra um sleðann til vinstri eða hægri skaltu nota „A“ og „D“ hnappana í sömu röð"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Þú getur skipt út með því að hlaða upp nýrri skjátextaskrá."

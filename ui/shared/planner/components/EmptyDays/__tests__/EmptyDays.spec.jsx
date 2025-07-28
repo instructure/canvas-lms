@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import MockDate from 'mockdate'
 import EmptyDays from '../index'
 
@@ -35,20 +35,51 @@ const getDefaultProps = (overrides = {}) => {
   }
 }
 
-beforeAll(() => {
-  MockDate.set('2017-04-22', TZ)
-})
+describe('EmptyDays', () => {
+  beforeAll(() => {
+    MockDate.set('2017-04-22', TZ)
+  })
 
-afterAll(() => {
-  MockDate.reset()
-})
+  afterAll(() => {
+    MockDate.reset()
+  })
 
-it('renders the component', () => {
-  const wrapper = shallow(<EmptyDays {...getDefaultProps()} />)
-  expect(wrapper).toMatchSnapshot()
-})
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
 
-it('renders the today className when surrounds Today', () => {
-  const wrapper = shallow(<EmptyDays {...getDefaultProps({day: '2017-04-22'})} />)
-  expect(wrapper).toMatchSnapshot()
+  it('renders the date range and empty state message', () => {
+    const {getByText} = render(<EmptyDays {...getDefaultProps()} />)
+
+    // Check that the date range is displayed correctly
+    expect(getByText('April 23 to April 26')).toBeInTheDocument()
+
+    // Check that the empty state message is displayed
+    expect(getByText('Nothing Planned Yet')).toBeInTheDocument()
+  })
+
+  it('applies the today class when date range includes today', () => {
+    const {container} = render(<EmptyDays {...getDefaultProps({day: '2017-04-22'})} />)
+
+    // Check that the today class is applied when the date range includes today
+    const emptyDaysElement = container.querySelector('.planner-empty-days')
+    expect(emptyDaysElement).toHaveClass('planner-today')
+  })
+
+  it('does not apply the today class when date range does not include today', () => {
+    const {container} = render(<EmptyDays {...getDefaultProps({day: '2017-04-23'})} />)
+
+    // Check that the today class is not applied when the date range doesn't include today
+    const emptyDaysElement = container.querySelector('.planner-empty-days')
+    expect(emptyDaysElement).not.toHaveClass('planner-today')
+  })
+
+  it('renders the date range in the correct format', () => {
+    const {getByText} = render(
+      <EmptyDays {...getDefaultProps({day: '2017-05-01', endday: '2017-05-05'})} />,
+    )
+
+    // Check that the date range is formatted correctly
+    expect(getByText('May 1 to May 5')).toBeInTheDocument()
+  })
 })

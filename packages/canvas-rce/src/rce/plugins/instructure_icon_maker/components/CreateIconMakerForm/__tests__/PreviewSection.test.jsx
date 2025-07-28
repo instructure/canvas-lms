@@ -33,7 +33,7 @@ describe('<Preview />', () => {
           shape: 'triangle',
           size: 'large',
         }}
-      />
+      />,
     )
 
     expect(container.querySelector('svg')).toMatchInlineSnapshot(`
@@ -90,7 +90,7 @@ describe('<Preview />', () => {
           shape: 'triangle',
           size: 'large',
         }}
-      />
+      />,
     )
 
     const ariaLabelDiv = getByText(container, 'Icon Preview')

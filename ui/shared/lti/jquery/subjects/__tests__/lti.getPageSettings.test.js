@@ -53,6 +53,7 @@ describe('lti.getPageSettings handler', () => {
         time_zone: '',
         use_high_contrast: false,
         active_brand_config_json_url: '',
+        window_width: 1024,
       }
     })
 
@@ -74,6 +75,7 @@ describe('lti.getPageSettings handler', () => {
         time_zone: 'America/New_York',
         use_high_contrast: true,
         active_brand_config_json_url: 'http://example.com/config.json',
+        window_width: 1024,
       }
     })
 
@@ -92,6 +94,7 @@ describe('lti.getPageSettings handler', () => {
         time_zone: '',
         use_high_contrast: false,
         active_brand_config_json_url: '',
+        window_width: 1024,
       }
     })
 

@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
-const I18n = useI18nScope('CollectionView')
+const I18n = createI18nScope('CollectionView')
 
 extend(CollectionView, Backbone.View)
 
@@ -76,7 +74,7 @@ CollectionView.prototype.defaults = shimGetterShorthand(
     emptyMessage() {
       return I18n.t('no_items', 'No items.')
     },
-  }
+  },
 )
 
 // When using a different template ensure it contains an element with a
@@ -229,11 +227,10 @@ CollectionView.prototype.renderItem = function (model) {
 // Creates the item view instance, extend this when you need to do things
 // like instantiate with child views, etc.
 CollectionView.prototype.createItemView = function (model) {
-  // eslint-disable-next-line new-cap
   const view = new this.itemView(
     $.extend({}, this.itemViewOptions || {}, {
       model,
-    })
+    }),
   )
   model.itemView = view
   return view

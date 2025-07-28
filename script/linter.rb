@@ -173,7 +173,7 @@ class Linter
     end
 
     comments.each do |comment|
-      message = +"[#{comment[:source]}] "
+      message = "[#{comment[:source]}] "
       message << "#{comment[:rule]}: " if comment[:rule]
       message << comment[:message]
 

@@ -127,6 +127,7 @@ describe('WithBreakpoints', () => {
           'desktop',
           'desktopNavOpen',
           'desktopOnly',
+          'ICEDesktop',
         ])
       })
     })

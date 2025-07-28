@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {shape, string, bool, number} from 'prop-types'
 import {User} from './User'
 import {Assignment} from './Assignment'
@@ -30,6 +30,7 @@ export const SubmissionComment = {
       submissionId
       createdAt
       attempt
+      canReply
       author {
         ...User
       }
@@ -37,6 +38,7 @@ export const SubmissionComment = {
         ...Assignment
       }
       comment
+      htmlComment
       course {
         ...Course
       }
@@ -53,8 +55,10 @@ export const SubmissionComment = {
     submissionId: string,
     createdAt: string,
     attempt: number,
+    canReply: bool,
     author: User.shape,
     assignment: Assignment.shape,
+    htmlComment: string,
     comment: string,
     course: Course.shape,
     read: bool,
@@ -66,8 +70,10 @@ export const SubmissionComment = {
     submissionId = '15',
     createdAt = '2022-02-15T06:50:54-07:00',
     attempt = 0,
+    canReply = true,
     author = User.mock(),
     assignment = Assignment.mock(),
+    htmlComment = '<p>Hey!</p>',
     comment = 'Hey!',
     course = Course.mock(),
     read = true,
@@ -77,9 +83,11 @@ export const SubmissionComment = {
     submissionId,
     createdAt,
     attempt,
+    canReply,
     author,
     assignment,
     comment,
+    htmlComment,
     course,
     read,
     __typename: 'SubmissionComment',

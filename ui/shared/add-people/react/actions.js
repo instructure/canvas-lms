@@ -96,7 +96,7 @@ actions.resolveValidationIssues = () => (dispatch, getState) => {
 
   const newUsers = resolveValidationIssues(
     state.userValidationResult.duplicates,
-    state.userValidationResult.missing
+    state.userValidationResult.missing,
   )
 
   // the list of users to be enrolled
@@ -121,14 +121,14 @@ actions.resolveValidationIssues = () => (dispatch, getState) => {
           user.user_name = u.name
           user.address = u.email
           return user
-        })
+        }),
       )
       dispatch(actions.enqueueUsersToBeEnrolled(usersToBeEnrolled))
     })
     .catch(err => dispatch(actions.createUsersError(err)))
 }
 
-actions.enrollUsers = () => (dispatch, getState) => {
+actions.enrollUsers = onSuccess => (dispatch, getState) => {
   dispatch(actions.enrollUsersStart())
   const state = getState()
   const courseId = state.courseParams.courseId
@@ -148,6 +148,7 @@ actions.enrollUsers = () => (dispatch, getState) => {
   const limitPrivilege = state.inputParams.limitPrivilege || false
   api
     .enrollUsers({courseId, user_tokens, role, section, limitPrivilege})
+    .then(res => onSuccess().then(() => res))
     .then(res => dispatch(actions.enrollUsersSuccess(res.data)))
     .catch(err => dispatch(actions.enrollUsersError(err)))
 }

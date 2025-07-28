@@ -17,12 +17,13 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen as testScreen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import IndexHeader from '../IndexHeader'
 import merge from 'lodash/merge'
 
 const user = userEvent.setup()
+const SEARCH_FIELD_PLACEHOLDER = 'Search by title or author...'
 
 describe('IndexHeader', () => {
   const makeProps = (props = {}) =>
@@ -47,7 +48,7 @@ describe('IndexHeader', () => {
         selectedCount: 0,
         applicationElement: () => document.getElementById('fixtures'),
       },
-      props
+      props,
     )
 
   it('renders the component', () => {
@@ -59,28 +60,28 @@ describe('IndexHeader', () => {
   it('renders the search input', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(screen.getByPlaceholderText('Search by title or author...')).toBeInTheDocument()
+    expect(testScreen.getByPlaceholderText(SEARCH_FIELD_PLACEHOLDER)).toBeInTheDocument()
   })
 
   it('renders the filter input', () => {
     const props = makeProps()
     render(<IndexHeader {...props} />)
-    expect(screen.getByRole('combobox')).toBeInTheDocument()
+    expect(testScreen.getByRole('combobox')).toBeInTheDocument()
   })
 
   it('renders create discussion button if we have create permissions', () => {
     render(<IndexHeader {...makeProps({permissions: {create: true}})} />)
-    expect(screen.getByText('Add discussion')).toBeInTheDocument()
+    expect(testScreen.getByText('Add Discussion')).toBeInTheDocument()
   })
 
   it('does not render create discussion button if we do not have create permissions', () => {
     render(<IndexHeader {...makeProps({permissions: {create: false}})} />)
-    expect(screen.queryByText('Add discussion')).not.toBeInTheDocument()
+    expect(testScreen.queryByText('Add Discussion')).not.toBeInTheDocument()
   })
 
   it('renders discussionSettings', () => {
     render(<IndexHeader {...makeProps()} />)
-    expect(screen.getByText('Discussion Settings')).toBeInTheDocument()
+    expect(testScreen.getByText('Discussion Settings')).toBeInTheDocument()
   })
 
   it('calls onFilterChange when entering a search term', async () => {
@@ -88,7 +89,7 @@ describe('IndexHeader', () => {
     const props = makeProps({searchDiscussions: searchMock()})
 
     render(<IndexHeader {...props} />)
-    const input = screen.getByPlaceholderText('Search by title or author...')
+    const input = testScreen.getByPlaceholderText(SEARCH_FIELD_PLACEHOLDER)
     user.type(input, 'foobar')
 
     await waitFor(() => expect(searchMock).toHaveBeenCalled())
@@ -96,23 +97,46 @@ describe('IndexHeader', () => {
 
   it('calls onFilterChange when selecting a new filter', async () => {
     const filterMock = jest.fn()
-    const props = makeProps({searchDiscussions: filterMock()})
+    const props = makeProps({
+      searchDiscussions: () => filterMock(),
+      permissions: {
+        create: true,
+        manage_content: true,
+        moderate: true,
+      },
+    })
 
     render(<IndexHeader {...props} />)
 
-    const filterDDown = screen.getByRole('combobox', {name: 'Discussion Filter'})
+    const filterDDown = testScreen.getByRole('combobox', {name: 'Discussion Filter'})
+    expect(filterDDown).toBeInTheDocument()
 
     await userEvent.click(filterDDown)
 
-    const secondOption = screen.getByText(/Unread/i)
-
-    expect(screen.getByText(/All/i)).toBeInTheDocument()
+    const secondOption = await testScreen.findByText(/Unread/i)
     expect(secondOption).toBeInTheDocument()
 
     await userEvent.click(secondOption)
 
     await waitFor(() => {
-      return expect(filterMock).toHaveBeenCalledWith()
+      expect(filterMock).toHaveBeenCalled()
+    })
+  })
+
+  describe('instui_nav feature flag is enabled', () => {
+    const oldEnv = window.ENV
+
+    beforeEach(() => {
+      window.ENV = {FEATURES: {instui_nav: true}}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
+    it('renders title', () => {
+      render(<IndexHeader {...makeProps()} />)
+      expect(testScreen.getByText('Discussions')).toBeInTheDocument()
     })
   })
 })

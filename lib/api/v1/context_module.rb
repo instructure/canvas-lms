@@ -44,6 +44,7 @@ module Api::V1::ContextModule
   def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
     hash = api_json(context_module, current_user, session, only: MODULE_JSON_ATTRS)
     hash["require_sequential_progress"] = !!context_module.require_sequential_progress?
+    hash["requirement_type"] = context_module.requirement_type
     hash["publish_final_grade"] = context_module.publish_final_grade?
     hash["prerequisite_module_ids"] = context_module.prerequisites.select { |p| p[:type] == "context_module" }.pluck(:id)
     if progression
@@ -52,18 +53,24 @@ module Api::V1::ContextModule
     end
     can_view_published = context_module.grants_right?(current_user, :update) || opts[:can_view_published]
     hash["published"] = context_module.active? if can_view_published
-    tags = context_module.content_tags_visible_to(@current_user, opts.slice(:observed_student_ids))
+    tags = context_module.content_tags_visible_to(current_user, opts.slice(:observed_student_ids))
     count = tags.count
     hash["items_count"] = count
     hash["items_url"] = polymorphic_url([:api_v1, context_module.context, context_module, :items])
+
+    if includes.include?("estimated_durations") && opts.fetch(:can_have_estimated_time, false)
+      ests = tags.filter_map { |t| estimated_duration_num(t) }.sum
+      hash["estimated_duration"] = (ests == 0) ? nil : ests.iso8601
+    end
+
     if includes.include?("items") && count <= Api::MAX_PER_PAGE
       if opts[:search_term].present? && !context_module.matches_attribute?(:name, opts[:search_term])
         tags = ContentTag.search_by_attribute(tags, :title, opts[:search_term])
         return nil if tags.count == 0
       end
-      item_includes = includes & ["content_details"]
+      item_includes = includes & ["content_details", "estimated_durations"]
       hash["items"] = tags.map do |tag|
-        module_item_json(tag, current_user, session, context_module, progression, item_includes, can_view_published:)
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, opts)
       end
     end
     hash
@@ -148,6 +155,7 @@ module Api::V1::ContextModule
     if (criterion = context_module.completion_requirements&.detect { |r| r[:id] == content_tag.id })
       ch = { "type" => criterion[:type] }
       ch["min_score"] = criterion[:min_score] if criterion[:type] == "min_score"
+      ch["min_percentage"] = criterion[:min_percentage] if criterion[:type] == "min_percentage"
       ch["completed"] = !!(progression.requirements_met.present? && progression.requirements_met.detect { |r| r[:type] == criterion[:type] && r[:id] == content_tag.id }) if progression
       hash["completion_requirement"] = ch
     end
@@ -164,8 +172,24 @@ module Api::V1::ContextModule
 
     hash["content_details"] = content_details(content_tag, current_user) if includes.include?("content_details")
 
+    if opts.fetch(:can_have_estimated_time, false) && includes.include?("estimated_durations")
+      hash["estimated_duration"] = estimated_duration(content_tag)
+    end
+
     if includes.include?("mastery_paths")
       hash["mastery_paths"] = conditional_release_json(content_tag, current_user, opts)
+    end
+
+    # this is a bit of a hack.
+    # of the only param is set, we return only the id, title, and any other
+    # field requested in params[:only]
+    # in support of the modules performance update
+    # TODO: remove once the module page reactification is complete and rolled out to everyone
+    if defined?(params) && params && params[:only]
+      hash = hash.slice(:id, :title)
+      if params[:only].include?("type")
+        hash["type"] = content_tag.content_type_class
+      end
     end
 
     hash
@@ -194,5 +218,14 @@ module Api::V1::ContextModule
     end
 
     details
+  end
+
+  def estimated_duration(content_tag)
+    est = estimated_duration_num(content_tag)
+    est.presence ? est.iso8601 : nil
+  end
+
+  def estimated_duration_num(content_tag)
+    content_tag.estimated_duration.try("duration")
   end
 end

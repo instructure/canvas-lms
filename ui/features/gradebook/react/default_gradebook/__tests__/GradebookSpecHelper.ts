@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -156,7 +157,7 @@ export function createGradebook(
     performance_controls?: any
     gradebook_is_editable?: any
     gradebookGridNode?: HTMLElement
-  } = {}
+  } = {},
 ): Gradebook & {
   props: GradebookProps
 } {

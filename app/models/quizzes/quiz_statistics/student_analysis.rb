@@ -105,7 +105,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       score_counter << sub.score.to_f
       correct_cnt += answers.count { |a| a[:correct] == true }
       incorrect_cnt += answers.count { |a| a[:correct] == false }
-      total_duration += ((sub.finished_at - sub.started_at).to_i rescue 30)
+      total_duration += if sub.finished_at && sub.started_at
+                          sub.finished_at - sub.started_at
+                        else
+                          30
+                        end
       sub.quiz_data.each do |question|
         questions_hash[question[:id]] ||= question
       end
@@ -417,8 +421,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       weight: 0,
       text: I18n.t("statistics.no_answer", "No Answer"),
       user_ids: question[:user_ids] - question[:answers].pluck(:user_ids).flatten
-    } rescue nil
-    question[:answers] << none if none && none[:responses] > 0
+    }
+    question[:answers] << none if none[:responses] > 0
     question.to_hash.with_indifferent_access
   end
 end

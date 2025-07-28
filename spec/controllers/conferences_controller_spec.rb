@@ -210,7 +210,7 @@ describe ConferencesController do
       post "create", params: { course_id: @course.id, web_conference: { title: long_str, conference_type: "Wimba" } }, format: "json"
       expect(response).to have_http_status :bad_request
       res_body = response.parsed_body
-      expect(res_body["errors"]["title"][0]["message"]).to eq "too_long"
+      expect(res_body["errors"]["title"][0]["type"]).to eq "too_long"
     end
 
     it "creates a conference with observers removed" do
@@ -282,8 +282,8 @@ describe ConferencesController do
 
       it "creates a calendar event when calendar_event is set, with start_at and end_at params" do
         user_session(@teacher)
-        start_time = Date.today
-        end_time = Date.today + 1.day
+        start_time = Time.zone.today
+        end_time = Time.zone.today + 1.day
 
         post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: "1", start_at: start_time, end_at: end_time } }, format: "json"
         created_conference = WebConference.last
@@ -298,7 +298,7 @@ describe ConferencesController do
 
       it "does not create a calendar_event when checkbox unchecked" do
         allow(WebConference).to receive(:plugins).and_return(
-          [instance_double("Canvas::Plugin",
+          [instance_double(Canvas::Plugin,
                            id: "big_blue_button",
                            name: "BigBlueButton",
                            settings: { domain: "bbb.instructure.com", secret_dec: "secret" },
@@ -369,7 +369,7 @@ describe ConferencesController do
     it "deletes calendar event when calendar_event is not set" do
       user_session(@teacher)
       allow(WebConference).to receive(:plugins).and_return(
-        [instance_double("Canvas::Plugin",
+        [instance_double(Canvas::Plugin,
                          id: "big_blue_button",
                          name: "BigBlueButton",
                          settings: { domain: "bbb.instructure.com", secret_dec: "secret" },
@@ -404,7 +404,7 @@ describe ConferencesController do
     it "does NOT delete calendar event when sync_attendees is passed" do
       user_session(@teacher)
       allow(WebConference).to receive(:plugins).and_return(
-        [instance_double("Canvas::Plugin",
+        [instance_double(Canvas::Plugin,
                          id: "big_blue_button",
                          name: "BigBlueButton",
                          settings: { domain: "bbb.instructure.com", secret_dec: "secret" },
@@ -439,7 +439,7 @@ describe ConferencesController do
     it "creates a calendar event when calendar_event is set, with start_at and end_at params" do
       user_session(@teacher)
       allow(WebConference).to receive(:plugins).and_return(
-        [instance_double("Canvas::Plugin",
+        [instance_double(Canvas::Plugin,
                          id: "big_blue_button",
                          name: "BigBlueButton",
                          settings: { domain: "bbb.instructure.com", secret_dec: "secret" },
@@ -447,8 +447,8 @@ describe ConferencesController do
                          enabled?: true)]
       )
 
-      start_time = Date.today
-      end_time = Date.today + 1.day
+      start_time = Time.zone.today
+      end_time = Time.zone.today + 1.day
       @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", user: @teacher)
 
       params = {
@@ -621,7 +621,7 @@ describe ConferencesController do
       end
     end
 
-    context "#index" do
+    describe "#index" do
       it "lists include LTI conference types" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id }
@@ -631,7 +631,7 @@ describe ConferencesController do
       end
     end
 
-    context "#create" do
+    describe "#create" do
       it "can create LTI conferences" do
         user_session(@teacher)
         post "create",

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import React, {useState} from 'react'
 import keycode from 'keycode'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
@@ -33,8 +32,8 @@ import {View} from '@instructure/ui-view'
 
 import UnpublishedWarningModal from './unpublished_warning_modal'
 
-import {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
-import {Course} from '../../shared/types'
+import type {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
+import type {Course} from '../../shared/types'
 import {getUnappliedChangesExist} from '../../reducers/course_paces'
 import {getSortedEnrollments} from '../../reducers/enrollments'
 import {getSortedSections} from '../../reducers/sections'
@@ -42,7 +41,7 @@ import {getCourse} from '../../reducers/course'
 import {actions} from '../../actions/ui'
 import {getSelectedContextId, getSelectedContextType, getResponsiveSize} from '../../reducers/ui'
 
-const I18n = useI18nScope('course_paces_pace_picker')
+const I18n = createI18nScope('course_paces_pace_picker')
 
 const PICKER_WIDTH = '20rem'
 
@@ -107,6 +106,7 @@ export const PacePicker = ({
     }
   }
 
+  // @ts-expect-error
   const handleSelect = (_, value: string | string[]) => {
     const option = Array.isArray(value) ? value[0] : value
     if (unappliedChangesExist) {
@@ -150,14 +150,16 @@ export const PacePicker = ({
 
   const trigger: JSX.Element = (
     <TextInput
+      key={selectedContextKey}
+      defaultValue={selectedContextName}
       renderLabel={I18n.t('Course Pacing')}
       renderAfterInput={
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
-      defaultValue={selectedContextName}
       data-testid="course-pace-picker"
       interaction="readonly"
       role="button"
+      // @ts-expect-error
       onKeyDown={handleKeyDown}
       width={PICKER_WIDTH}
     />
@@ -180,22 +182,23 @@ export const PacePicker = ({
         trigger={trigger}
         show={open}
         onToggle={setOpen}
+        // @ts-expect-error
         onSelect={handleSelect}
       >
         {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
         {sections.length > 0 &&
           renderSubMenu(
             sections.map(s =>
-              renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`)
+              renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`),
             ),
             'course-pace-section-menu',
-            I18n.t('Sections')
+            I18n.t('Sections'),
           )}
         {enrollments.length > 0 &&
           renderSubMenu(
             enrollments.map(e => renderStudentOption(e)),
             'course-pace-student-menu',
-            I18n.t('Students')
+            I18n.t('Students'),
           )}
       </Menu>
       <UnpublishedWarningModal
@@ -225,4 +228,5 @@ const mapStateToProps = (state: StoreState) => ({
 
 export default connect(mapStateToProps, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
+  // @ts-expect-error
 })(PacePicker)

@@ -174,6 +174,10 @@ describe UserSearch do
         it { is_expected.to include("Tyler Pickett") }
         it { is_expected.to include("Tyler Student") }
         it { is_expected.not_to include("Tyler Teacher") }
+
+        it "does not return results if role id is invalid" do
+          expect(UserSearch.for_user_in_context("", course, student, nil, enrollment_role_id: student_role.id + 99_999).size).to eq 0
+        end
       end
     end
 
@@ -206,12 +210,37 @@ describe UserSearch do
           expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
         end
 
-        it "by integrtion id" do
+        it "by integration id" do
           expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
         end
 
         it "by user name" do
           expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
+        end
+      end
+
+      describe "will match deleted users/pseudonyms if including deleted users" do
+        before do
+          pseudonym.update(workflow_state: "deleted")
+          user.update(workflow_state: "pre_registered")
+          account_admin_user
+          @account = Account.default
+        end
+
+        it "by sis id" do
+          expect(UserSearch.for_user_in_context("SOME_SIS", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by integration id" do
+          expect(UserSearch.for_user_in_context("ACME", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by user name" do
+          expect(UserSearch.for_user_in_context("admin", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by user id" do
+          expect(UserSearch.for_user_in_context(user.id, @account, @user, nil, { include_deleted_users: true })).to eq [user]
         end
       end
 
@@ -259,7 +288,7 @@ describe UserSearch do
 
       it "returns the last_login column when searching and sorting" do
         results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: "last_login")
-        expect(results.first.read_attribute("last_login")).to eq(Time.utc(2019, 11, 11))
+        expect(results.first["last_login"]).to eq(Time.utc(2019, 11, 11))
       end
 
       it "can match an SIS id and a user name in the same query" do
@@ -291,6 +320,17 @@ describe UserSearch do
                                                                account_id: course.root_account_id)
         users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "integration_id")
         expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
+      end
+
+      it "chooses user pseudonym based on collation_key" do
+        # the unique_id "a" is the chosen pseudonym since we sort by collation_key
+        User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "b", sis_user_id: "9", account_id: course.root_account_id)
+        User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "a", sis_user_id: "1", account_id: course.root_account_id)
+        User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
+                                                               sis_user_id: "5",
+                                                               account_id: course.root_account_id)
+        users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "sis_id")
+        expect(users.map(&:name)).to eq ["Rose Tyler", "Tyler Pickett", "Tyler Teacher"]
       end
 
       it "does not return users twice if it matches their name and an old login" do
@@ -329,7 +369,7 @@ describe UserSearch do
       end
 
       it "will not match channels where the type is not email" do
-        cc.update!(path_type: CommunicationChannel::TYPE_TWITTER)
+        cc.update!(path_type: CommunicationChannel::TYPE_SMS)
         expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
       end
 
@@ -369,6 +409,16 @@ describe UserSearch do
           course.enroll_student(user)
           expect(UserSearch.for_user_in_context(user.global_id, course, user)).to eq [user]
           expect(UserSearch.for_user_in_context(user.global_id, course.account, user)).to eq [user]
+        end
+
+        it "doesn't try to query cross-shard when the search term is a foreign global id in account context with include_deleted_users" do
+          user = @shard1.activate { user_model }
+          course.enroll_student(user)
+          scope = UserSearch.for_user_in_context(user.global_id, Account.default, account_admin_user, nil, include_deleted_users: true)
+          sql = scope.to_sql
+          expect(sql).to include user.global_id.to_s
+          expect(sql).not_to include(@shard1.activate { User.quoted_table_name })
+          expect(scope).to include user
         end
       end
     end
@@ -563,6 +613,691 @@ describe UserSearch do
         # don't include users not enrolled
         it { is_expected.not_to include("not enrolled 01") }
         it { is_expected.not_to include("not enrolled 02") }
+      end
+    end
+
+    describe "sorting" do
+      before do
+        @test_teacher = User.create!(name: "Woody Walton")
+        TeacherEnrollment.create!(user: @test_teacher, course:, workflow_state: "active")
+        @sorted_by_name = ["Ĭńşŧřůćƭǜȑȩ Person", "Jon Stewart", "Martha Jones", "Martha Stewart", "Rose Tyler", "Rosemary Giver", "Stewart Little", "Tyler Pickett", "Woody Walton"]
+      end
+
+      describe "single value columns" do
+        context "name" do
+          it "sorts by name ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "asc").to_a
+            expect(users.map(&:name)).to eq @sorted_by_name
+          end
+
+          it "sorts by name descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "name", order: "desc").to_a
+            expect(users.map(&:name)).to eq @sorted_by_name.reverse
+          end
+        end
+
+        context "login_id" do
+          before do
+            User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "tyler@example.com", account_id: course.root_account_id)
+            User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "pickett@example.com", account_id: course.root_account_id)
+          end
+
+          it "sorts by login_id ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "asc").to_a
+            login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+            expect(login_ids).to include("pickett@example.com")
+            expect(login_ids).to include("tyler@example.com")
+            expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+          end
+
+          it "sorts by login_id descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "login_id", order: "desc").to_a
+            login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+            expect(login_ids).to include("tyler@example.com")
+            expect(login_ids).to include("pickett@example.com")
+            expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+          end
+
+          context "with include_deleted_users" do
+            before do
+              @deleted_user = User.create!(name: "Deleted User")
+              User.find_by(name: "Deleted User").pseudonyms.create!(unique_id: "deleted@example.com", account_id: course.root_account_id)
+              @deleted_user.remove_from_root_account(course.root_account)
+            end
+
+            describe "when include_deleted_users is true" do
+              it "includes deleted users when sorting by login_id ascending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc", include_deleted_users: true).to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..2]).to eq ["deleted@example.com", "pickett@example.com", "tyler@example.com"]
+              end
+
+              it "includes deleted users when sorting by login_id descending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc", include_deleted_users: true).to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("deleted@example.com")
+                expect(login_ids[0..2]).to eq ["tyler@example.com", "pickett@example.com", "deleted@example.com"]
+              end
+            end
+
+            describe "when include_deleted_users is false (default)" do
+              it "excludes deleted users when sorting by login_id ascending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "asc").to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).not_to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..1]).to eq ["pickett@example.com", "tyler@example.com"]
+              end
+
+              it "excludes deleted users when sorting by login_id descending" do
+                users = UserSearch.scope_for(course.root_account, @test_teacher, sort: "login_id", order: "desc").to_a
+                login_ids = users.map { |u| u.pseudonyms&.first&.unique_id }
+
+                expect(login_ids).not_to include("deleted@example.com")
+                expect(login_ids).to include("pickett@example.com")
+                expect(login_ids).to include("tyler@example.com")
+                expect(login_ids[0..1]).to eq ["tyler@example.com", "pickett@example.com"]
+              end
+            end
+          end
+        end
+
+        context "total_activity_time" do
+          before do
+            User.find_by(name: "Rose Tyler").enrollments&.first&.update!(total_activity_time: 100)
+            User.find_by(name: "Tyler Pickett").enrollments&.first&.update!(total_activity_time: 200)
+          end
+
+          it "sorts by total activity time ascending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "asc").to_a
+            total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+            expect(total_activity_times[0..1]).to eq [100, 200]
+          end
+
+          it "sorts by total activity time descending" do
+            users = UserSearch.scope_for(course, @test_teacher, sort: "total_activity_time", order: "desc").to_a
+            total_activity_times = users.map { |u| u.enrollments&.first&.total_activity_time }
+
+            expect(total_activity_times[0..1]).to eq [200, 100]
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, @test_teacher, sort: "total_activity_time", order: "asc")
+            end.to raise_error(RequestError, "Sorting by total_activity_time is only available within a course context")
+          end
+        end
+      end
+
+      describe "multiple value columns" do
+        let(:course2) { Course.create! }
+        let(:teacher1) { user_model(name: "Teacher One") }
+        let(:ta1) { user_model(name: "TA One") }
+        let(:student1) { user_model(name: "Student One") }
+        let(:student2) { user_model(name: "Student Two") }
+        let(:observer1) { user_model(name: "Observer One") }
+        let(:designer1) { user_model(name: "Designer One") }
+        let(:section1) { course2.course_sections.create!(name: "A Section") }
+        let(:section2) { course2.course_sections.create!(name: "B Section") }
+        let(:section3) { course2.course_sections.create!(name: "C Section") }
+        let(:section4) { course2.course_sections.create!(name: "D Section") }
+        let(:section5) { course2.course_sections.create!(name: "E Section") }
+        let(:section6) { course2.course_sections.create!(name: "F Section") }
+        let(:one_day_ago) { 1.day.ago }
+        let(:two_days_ago) { 2.days.ago }
+        let(:three_days_ago) { 3.days.ago }
+
+        before do
+          StudentEnrollment
+            .create!(user: student1, course: course2, course_section: section3)
+            .update!(last_activity_at: three_days_ago)
+          StudentEnrollment
+            .create!(user: student2, course: course2, course_section: section4)
+            .update!(last_activity_at: two_days_ago)
+          TeacherEnrollment
+            .create!(user: teacher1, course: course2, course_section: section1)
+            .update!(last_activity_at: one_day_ago)
+          TaEnrollment.create!(user: ta1, course: course2, course_section: section2)
+        end
+
+        def sort_user_ids(sort, order = "asc")
+          UserSearch.scope_for(course2, teacher1, sort:, order:).map(&:id)
+        end
+
+        context "last_activity_at" do
+          context "single value per user" do
+            it "sorts by last_activity_at ascending" do
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id]
+            end
+
+            it "sorts by last_activity_at descending" do
+              # student1 - 3 days ago
+              # student2 - 2 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student1.id, student2.id, teacher1.id, ta1.id]
+            end
+
+            context "multiple users with the same last_activity_at" do
+              it "sorts by last_activity_at ascending and then by user id ascending" do
+                student1.enrollments.where(course_section: section3).update!(last_activity_at: two_days_ago)
+                # teacher1 - 1 day ago
+                # student1 - 2 days ago, student1.id < student2.id as student1 was created before student2
+                # student2 - 2 days ago
+                # ta1 - none
+                expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student1.id, student2.id, ta1.id]
+              end
+
+              it "sorts by last_activity_at descending and then by user id descending" do
+                student1.enrollments.where(course_section: section3).update!(last_activity_at: two_days_ago)
+                # student2 - 2 days ago, student2.id > student1.id as student2 was created after student1
+                # student1 - 2 days ago
+                # teacher1 - 1 day ago
+                # ta1 - none
+                expect(sort_user_ids("last_activity_at", "desc")).to eq [student2.id, student1.id, teacher1.id, ta1.id]
+              end
+            end
+
+            it "ignores last_activity_at for observers" do
+              ObserverEnrollment
+                .create!(user: observer1, course: course2)
+                .update!(last_activity_at: 1.day.ago)
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none (ta1 ranks before observer1 in ascending order because ta1.id < observer1.id as ta1 was created before observer1)
+              # observer1 - none (even though observer1 has a last_activity_at, it is ignored)
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id, observer1.id]
+
+              # student1 - 3 days ago
+              # student2 - 2 days ago
+              # teacher1 - 1 day ago
+              # observer1 - none (even though observer1 has a last_activity_at, it is ignored)
+              # ta1 - none (ta1 ranks after observer1 in descending order because ta1.id < observer1.id as ta1 was created before observer1)
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student1.id, student2.id, teacher1.id, observer1.id, ta1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "last_activity_at")
+            end.to raise_error(RequestError, "Sorting by last_activity_at is only available within a course context")
+          end
+
+          context "multiple values per user" do
+            before do
+              # student1 - 3 days ago, 4 days ago
+              # student2 - 2 days ago, 5 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              enrollment4 = StudentEnrollment.create!(user: student1, course: course2)
+              enrollment4.update!(last_activity_at: 4.days.ago)
+
+              enrollment5 = StudentEnrollment.create!(user: student2, course: course2)
+              enrollment5.update!(last_activity_at: 5.days.ago)
+            end
+
+            it "sorts by last_activity_at ascending" do
+              # teacher1 - 1 day ago
+              # student2 - 2 days ago
+              # student1 - 3 days ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at")).to eq [teacher1.id, student2.id, student1.id, ta1.id]
+            end
+
+            it "sorts by last_activity_at descending" do
+              # student2 - 5 days ago
+              # student1 - 4 days ago
+              # teacher1 - 1 day ago
+              # ta1 - none
+              expect(sort_user_ids("last_activity_at", "desc")).to eq [student2.id, student1.id, teacher1.id, ta1.id]
+            end
+          end
+        end
+
+        context "section_name" do
+          context "single value per user" do
+            it "sorts by section_name ascending" do
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id]
+            end
+
+            it "sorts by section_name descending" do
+              # student2 - D Section
+              # student1 - C Section
+              # ta1 - B Section
+              # teacher1 - A Section
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, student1.id, ta1.id, teacher1.id]
+            end
+
+            it "ignores section_name for observers" do
+              # observer1 - A Section
+              ObserverEnrollment.create!(user: observer1, course: course2, course_section: section1)
+
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              # observer1 - none (even though observer1 has section_name, it is ignored)
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id, observer1.id]
+
+              # student2 - D Section
+              # student1 - C Section
+              # ta1 - B Section
+              # teacher1 - A Section
+              # observer1 - none (even though observer1 has section_name, it is ignored)
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, student1.id, ta1.id, teacher1.id, observer1.id]
+            end
+          end
+
+          context "multiple values per user" do
+            before do
+              # teacher1 - A Section
+              # ta1 - B Section, E Section
+              # student1 - C Section, D Section
+              # student2 - D Section, F Section
+              StudentEnrollment.create!(user: student1, course: course2, course_section: section4)
+              StudentEnrollment.create!(user: student2, course: course2, course_section: section6)
+              TaEnrollment.create!(user: ta1, course: course2, course_section: section5)
+            end
+
+            it "sorts by section_name ascending" do
+              # teacher1 - A Section
+              # ta1 - B Section
+              # student1 - C Section
+              # student2 - D Section
+              expect(sort_user_ids("section_name")).to eq [teacher1.id, ta1.id, student1.id, student2.id]
+            end
+
+            it "sorts by section_name descending" do
+              # student2 - F Section
+              # ta1 - E Section
+              # student1 - D Section
+              # teacher1 - A Section
+              expect(sort_user_ids("section_name", "desc")).to eq [student2.id, ta1.id, student1.id, teacher1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "section_name")
+            end.to raise_error(RequestError, "Sorting by section_name is only available within a course context")
+          end
+        end
+
+        context "role" do
+          before do
+            # student2 from course to reduce test flakiness (there is no guaranteed order of multiple users with the same role)
+            student2.enrollments.first.destroy
+            ObserverEnrollment.create!(user: observer1, course: course2)
+            DesignerEnrollment.create!(user: designer1, course: course2)
+          end
+
+          context "single value per user" do
+            it "sorts by role ascending" do
+              # teacher1 - teacher role
+              # ta1 - ta role
+              # student1 - student role
+              # observer1 - observer role
+              # designer1 - designer role
+              expect(sort_user_ids("role")).to eq [teacher1.id, ta1.id, student1.id, observer1.id, designer1.id]
+            end
+
+            it "sorts by role descending" do
+              # designer1 - designer role
+              # observer1 - observer role
+              # student1 - student role
+              # ta1 - ta role
+              # teacher1 - teacher role
+              expect(sort_user_ids("role", "desc")).to eq [designer1.id, observer1.id, student1.id, ta1.id, teacher1.id]
+            end
+          end
+
+          context "multiple values per user" do
+            before do
+              # teacher1 - teacher role, designer role
+              # ta1 - ta role, student role
+              # student1 - student role, observer role
+              # observer1 - observer role
+              # designer1 - designer role
+              StudentEnrollment.create!(user: ta1, course: course2, course_section: section5)
+              ObserverEnrollment.create!(user: student1, course: course2, course_section: section5)
+              DesignerEnrollment.create!(user: teacher1, course: course2, course_section: section5)
+            end
+
+            it "sorts by role ascending" do
+              # teacher1 - teacher role
+              # ta1 - ta role
+              # student1 - student role
+              # observer1 - observer role
+              # designer1 - designer role
+              expect(sort_user_ids("role")).to eq [teacher1.id, ta1.id, student1.id, observer1.id, designer1.id]
+            end
+
+            it "sorts by role descending" do
+              # users with the same role are ordered by their id in the same sort order
+              # designer1 - designer role (designer1.id > teacher1.id since designer1 was created after teacher1)
+              # teacher1 - designer role
+              # observer1 - observer role (observer1.id > student1.id since observer1 was created after student1)
+              # student1 - observer role
+              # ta1 - student role
+              expect(sort_user_ids("role", "desc")).to eq [designer1.id, teacher1.id, observer1.id, student1.id, ta1.id]
+            end
+          end
+
+          it "raises an error when context is not a course" do
+            account = Account.create!
+            expect do
+              UserSearch.scope_for(account, teacher1, sort: "role")
+            end.to raise_error(RequestError, "Sorting by role is only available within a course context")
+          end
+        end
+      end
+    end
+  end
+
+  describe "Bookmarker" do
+    before :once do
+      @user1 = Account.default.users.create!
+      @user2 = Account.default.users.create!
+    end
+
+    describe "with include_bookmark: false" do
+      it "works with id ascending by default" do
+        bookmarker = UserSearch::Bookmarker.new
+        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: false)
+        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user2
+      end
+
+      it "works with id descending" do
+        bookmarker = UserSearch::Bookmarker.new(order: "desc")
+        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: false)
+        expect(bookmarker.restrict_scope(Account.default.users, pager).first).to eq @user1
+      end
+    end
+
+    describe "with include_bookmark: true" do
+      it "works with id ascending by default" do
+        bookmarker = UserSearch::Bookmarker.new
+        pager = double(current_bookmark: bookmarker.bookmark_for(@user1), include_bookmark: true)
+        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user1, @user2]
+      end
+
+      it "works with id descending" do
+        bookmarker = UserSearch::Bookmarker.new(order: "desc")
+        pager = double(current_bookmark: bookmarker.bookmark_for(@user2), include_bookmark: true)
+        expect(bookmarker.restrict_scope(Account.default.users, pager).first(2)).to eq [@user2, @user1]
+      end
+    end
+  end
+
+  describe "#differentiation_tag_scope" do
+    let(:account) { Account.create! }
+    let(:course) { course_model(name: "Differentiation Tag Course", account:) }
+    let(:searcher) { user_model(name: "Searcher") }
+    let(:user1) { user_model(name: "User 1") }
+    let(:user2) { user_model(name: "User 2") }
+    let(:user3) { user_model(name: "User 3") }
+    let(:users_scope) { User.where(id: [searcher.id, user1.id, user2.id, user3.id]) }
+    let(:differentiation_tag_category) { course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true) }
+    let(:differentiation_tag) { course.groups.create!(name: "Differentiation Tag", group_category: differentiation_tag_category) }
+    let(:options_with_tag_id) { { differentiation_tag_id: differentiation_tag.id } }
+
+    before do
+      TeacherEnrollment.create!(user: searcher, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user1, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user2, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user3, course:, workflow_state: "active")
+
+      account.enable_feature!(:assign_to_differentiation_tags)
+      allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(true)
+    end
+
+    describe "early exit (returns original users scope)" do
+      describe "missing differentiation_tag_id" do
+        it "returns original users scope when differentiation_tag_id is nil" do
+          options = { differentiation_tag_id: nil }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when differentiation_tag_id is empty string" do
+          options = { differentiation_tag_id: "" }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to be_empty
+        end
+
+        it "returns original users scope when differentiation_tag_id is empty array" do
+          options = { differentiation_tag_id: [] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "context is not a Course" do
+        it "returns original users scope when context is an Account" do
+          result = UserSearch.differentiation_tag_scope(users_scope, account, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when context is nil" do
+          result = UserSearch.differentiation_tag_scope(users_scope, nil, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when context is any other object" do
+          other_object = "not a course"
+          result = UserSearch.differentiation_tag_scope(users_scope, other_object, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "feature flag or setting not enabled" do
+        it "returns original users scope when assign_to_differentiation_tags feature is disabled" do
+          account.disable_feature!(:assign_to_differentiation_tags)
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when account setting for assign to differentiation tags is disabled" do
+          allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(false)
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "searcher lacks required permissions" do
+        before do
+          # Remove all granular manage tags permissions from the searcher
+          RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+            account.role_overrides.create!(
+              permission:,
+              role: teacher_role,
+              enabled: false
+            )
+          end
+        end
+
+        it "returns original users scope when searcher has none of the granular manage tags permissions" do
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+    end
+
+    describe "users scope filtering" do
+      before do
+        differentiation_tag.add_user(user1)
+        differentiation_tag.add_user(user2)
+      end
+
+      it "includes users who are members of the differentiation tag" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+        expect(result).to include(user2)
+      end
+
+      it "excludes users who are not members of the differentiation tag" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).not_to include(user3)
+        expect(result).not_to include(searcher)
+      end
+
+      it "ignores inactive group memberships" do
+        # Make user2's membership inactive
+        membership = differentiation_tag.group_memberships.find_by(user: user2)
+        membership.update!(workflow_state: "deleted")
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result.to_a).to contain_exactly(user1)
+      end
+
+      describe "complex scenarios" do
+        let(:differentiation_tag_category2) { course.group_categories.create!(name: "Second Tag Category", non_collaborative: true) }
+        let(:differentiation_tag2) { course.groups.create!(name: "Second Tag", group_category: differentiation_tag_category2) }
+
+        before do
+          differentiation_tag2.add_user(user2)
+          differentiation_tag2.add_user(user3)
+        end
+
+        it "filters correctly for first differentiation tag" do
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "filters correctly for second differentiation tag" do
+          options = { differentiation_tag_id: differentiation_tag2.id }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user2, user3)
+        end
+
+        it "filters correctly for multiple differentiation tags" do
+          options = { differentiation_tag_id: [differentiation_tag.id, differentiation_tag2.id] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2, user3)
+        end
+
+        it "handles array with single differentiation tag" do
+          options = { differentiation_tag_id: [differentiation_tag.id] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "handles mixed valid and invalid tag IDs in array" do
+          options = { differentiation_tag_id: [differentiation_tag.id, 99_999] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "handles empty users scope" do
+          empty_scope = User.none
+          result = UserSearch.differentiation_tag_scope(empty_scope, course, searcher, options_with_tag_id)
+          expect(result.to_a).to be_empty
+        end
+
+        it "handles users scope that doesn't include diffrentiation tag members" do
+          user4 = User.create!(name: "User 4")
+          StudentEnrollment.create!(user: user4, course:, workflow_state: "active")
+          scope_without_tag_members = User.where(id: user4.id)
+
+          result = UserSearch.differentiation_tag_scope(scope_without_tag_members, course, searcher, options_with_tag_id)
+          expect(result.to_a).to be_empty
+        end
+      end
+    end
+
+    describe "user permissions" do
+      before do
+        differentiation_tag.add_user(user1)
+      end
+
+      it "allows access when searcher has manage_tags_add permission only" do
+        account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_delete, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has manage_tags_manage permission only" do
+        account.role_overrides.create!(permission: :manage_tags_add, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_delete, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has manage_tags_delete permission only" do
+        account.role_overrides.create!(permission: :manage_tags_add, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has multiple granular manage tags permissions" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+    end
+
+    describe "edge cases" do
+      it "returns empty users scope when differentiation tag ID doesn't exist" do
+        options = { differentiation_tag_id: 99_999 }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when group exists but is in different context" do
+        other_course = Course.create!(workflow_state: "available")
+        other_tag_category = other_course.group_categories.create!(name: "Other Category", non_collaborative: true)
+        other_tag = other_tag_category.groups.create!(name: "Other Tag", context: other_course)
+        other_tag.add_user(user1)
+
+        options = { differentiation_tag_id: other_tag.id }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when group is collaborative (not a differentiation tag)" do
+        collaborative_group_category = course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+        collaborative_group = course.groups.create!(name: "Collaborative Group", group_category: collaborative_group_category)
+        collaborative_group.add_user(user1)
+
+        options = { differentiation_tag_id: collaborative_group.id }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when differentiation tag is deleted/inactive" do
+        differentiation_tag.add_user(user1)
+        differentiation_tag.update!(workflow_state: "deleted")
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result.to_a).to be_empty
       end
     end
   end

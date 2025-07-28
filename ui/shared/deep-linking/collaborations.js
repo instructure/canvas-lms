@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import {addDeepLinkingListener as addOriginalListener} from './DeepLinking'
 import processSingleContentItem from './processors/processSingleContentItem'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('collaborations')
+const I18n = createI18nScope('collaborations')
 
 export const addDeepLinkingListener = () => {
   window.removeEventListener('message', handleDeepLinking)
@@ -52,7 +52,9 @@ export function onExternalContentReady({contentItems, service_id, tool_id}) {
 export const handleDeepLinking = async event => {
   try {
     const item = processSingleContentItem(event)
-    if (typeof item !== 'object') {
+    if (item === undefined || item === null) {
+      $.flashWarning(I18n.t('Tool returned with no content'))
+    } else if (typeof item !== 'object') {
       $.flashError(I18n.t('Error retrieving content from tool (bad content item)'))
     } else {
       onExternalContentReady({

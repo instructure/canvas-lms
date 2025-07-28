@@ -201,6 +201,58 @@ describe GroupCategory do
     expect(category.unrestricted_self_signup?).to be_falsey
   end
 
+  it "default to no self signup end date" do
+    category = GroupCategory.new
+    expect(category.self_signup_end_at).to be_nil
+  end
+
+  it "clears student permissions cache after self signup update" do
+    expect_any_instance_of(GroupCategory).to receive(:clear_permissions_cache)
+    course_with_student(active_all: true)
+    group_category = GroupCategory.create!(name: "Test Self Signup", course: @course)
+    group_category.self_signup = "enabled"
+    group_category.save!
+  end
+
+  it "clears student permissions cache after self signup end date update" do
+    expect_any_instance_of(GroupCategory).to receive(:clear_permissions_cache)
+    course_with_student(active_all: true)
+    group_category = GroupCategory.create!(name: "Test Self Signup", course: @course, self_signup: "enabled")
+    group_category.self_signup_end_at = 1.day.from_now
+    group_category.save!
+  end
+
+  context "past_self_signup_end_at?" do
+    it "is true if self sign up is enabled and end date has passed" do
+      category = group_category(self_signup: "enabled", self_signup_end_at: 1.day.ago.utc)
+      category.context.account.enable_feature!(:self_signup_deadline)
+      expect(category.past_self_signup_end_at?).to be_truthy
+    end
+
+    it "is false if self sign up is enabled and end date has not yet passed" do
+      category = group_category(self_signup: "enabled", self_signup_end_at: 1.day.from_now.utc)
+      category.context.account.enable_feature!(:self_signup_deadline)
+      expect(category.past_self_signup_end_at?).to be_falsey
+    end
+
+    it "is false if self sign up is not enabled" do
+      category = group_category(self_signup: nil, self_signup_end_at: 1.day.ago.utc)
+      category.context.account.enable_feature!(:self_signup_deadline)
+      expect(category.past_self_signup_end_at?).to be_falsey
+    end
+
+    it "is false if self sign up is enabled but no end date is set" do
+      category = group_category(self_signup: "enabled", self_signup_end_at: nil)
+      category.context.account.enable_feature!(:self_signup_deadline)
+      expect(category.past_self_signup_end_at?).to be_falsey
+    end
+
+    it "is false if self sign up is enabled and self_signup_deadline FF is disabled" do
+      category = group_category(self_signup: "enabled", self_signup_end_at: 1.day.from_now.utc)
+      expect(category.past_self_signup_end_at?).to be_falsey
+    end
+  end
+
   context "has_heterogenous_group?" do
     it "is false for accounts" do
       category = group_category(context: account)
@@ -270,7 +322,7 @@ describe GroupCategory do
     end
   end
 
-  context "#distribute_members_among_groups" do
+  describe "#distribute_members_among_groups" do
     it "prefers groups with fewer users" do
       category = @course.group_categories.create(name: "Group Category")
       group1 = category.groups.create(name: "Group 1", context: @course)
@@ -320,7 +372,7 @@ describe GroupCategory do
     end
   end
 
-  context "#assign_unassigned_members_in_background" do
+  describe "#assign_unassigned_members_in_background" do
     it "uses the progress object" do
       category = @course.group_categories.create(name: "Group Category")
       category.groups.create(name: "Group 1", context: @course)
@@ -337,7 +389,7 @@ describe GroupCategory do
     end
   end
 
-  context "#assign_unassigned_members" do
+  describe "#assign_unassigned_members" do
     before(:once) do
       @category = @course.group_categories.create(name: "Group Category")
     end
@@ -460,7 +512,7 @@ describe GroupCategory do
     end
   end
 
-  context "#calculate_group_count_by_membership" do
+  describe "#calculate_group_count_by_membership" do
     before(:once) do
       @category = @course.group_categories.create(name: "Group Category")
     end
@@ -495,7 +547,7 @@ describe GroupCategory do
     end
   end
 
-  context "#current_progress" do
+  describe "#current_progress" do
     it "returns a new progress if the other progresses are completed" do
       category = @course.group_categories.create!(name: "Group Category")
       # given existing completed progress
@@ -511,7 +563,7 @@ describe GroupCategory do
     end
   end
 
-  context "#clone_groups_and_memberships" do
+  describe "#clone_groups_and_memberships" do
     it "does not duplicate wiki ids" do
       category = @course.group_categories.create!(name: "Group Category")
       group = category.groups.create!(name: "Group 1", context: @course)
@@ -704,6 +756,136 @@ describe GroupCategory do
     new_account = Account.create
     gc = GroupCategory.create!(name: "Test3", account: new_account, sis_source_id: 1)
     expect(gc.sis_source_id).to eq("1")
+  end
+
+  context "non_collaborative group_category" do
+    it "can have the same names as a collaborative group_category" do
+      category = GroupCategory.create(name: "Test Category", context: @course)
+      expect(category).to be_valid
+      non_collaborative = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      expect(non_collaborative).to be_valid
+    end
+
+    it "can have the same names as a collaborative group_category restricted name" do
+      non_collaborative = GroupCategory.create(name: "Imported Groups", context: @course, non_collaborative: true)
+      expect(non_collaborative).to be_valid
+    end
+
+    it "attribute can be set on creation but cannot be changed afterwards" do
+      # Set non_collaborative on creation
+      category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      expect(category.non_collaborative).to be true
+
+      # Attempt to change non_collaborative
+      category.non_collaborative = false
+      category.save
+      expect(category.reload.non_collaborative).to be true
+
+      # Attempt to change non_collaborative using update
+      category.update(non_collaborative: false)
+      expect(category.reload.non_collaborative).to be true
+
+      # Create a category without setting non_collaborative
+      another_category = GroupCategory.create(name: "Another Test Category", context: @course)
+      expect(another_category.non_collaborative).to be false
+
+      # Attempt to set non_collaborative after creation
+      another_category.non_collaborative = true
+      another_category.save
+      expect(another_category.reload.non_collaborative).to be false
+    end
+
+    it "can filter out collaborative and noncollaborative groups" do
+      non_collaborative_group_category = GroupCategory.create(name: "Test Category", context: @course, non_collaborative: true)
+      collaborative_group_category = GroupCategory.create(name: "Test Category 2", context: @course, non_collaborative: false)
+
+      expect(GroupCategory.non_collaborative).to eq [non_collaborative_group_category]
+      expect(GroupCategory.collaborative).to include(collaborative_group_category)
+      expect(GroupCategory.collaborative).not_to include(non_collaborative_group_category)
+    end
+
+    it "can only be created for courses" do
+      course_category = GroupCategory.new(name: "Course Category", context: @course, non_collaborative: true)
+      expect(course_category).to be_valid
+
+      account_category = GroupCategory.new(name: "Account Category", context: account, non_collaborative: true)
+      expect(account_category).not_to be_valid
+      expect(account_category.errors[:base]).to include("Non-collaborative group categories can only be created for courses")
+    end
+
+    it "cannot be student organized or communities" do
+      student_organized = GroupCategory.new(name: "Student Organized", context: @course, non_collaborative: true, role: "student_organized")
+      expect(student_organized).not_to be_valid
+      expect(student_organized.errors[:base]).to include("Non-collaborative group categories cannot be student organized or communities")
+
+      communities = GroupCategory.new(name: "Communities", context: @course, non_collaborative: true, role: "communities")
+      expect(communities).not_to be_valid
+      expect(communities.errors[:base]).to include("Non-collaborative group categories cannot be student organized or communities")
+
+      normal = GroupCategory.new(name: "Normal", context: @course, non_collaborative: true)
+      expect(normal).to be_valid
+    end
+
+    context "permissions" do
+      before do
+        @course = Course.create!(name: "Test Course")
+        @teacher1 = User.create!(name: "Teacher 1")
+        @teacher2 = User.create!(name: "Teacher 2")
+        @student = User.create!(name: "Student")
+        teacher_in_course(course: @course, user: @teacher1, active_all: true)
+        teacher_in_course(course: @course, user: @teacher2, active_all: true)
+        student_in_course(course: @course, user: @student, active_all: true)
+
+        @category = GroupCategory.create!(name: "Test Category", context: @course)
+        @relevant_permissions = %i[read]
+      end
+
+      it "does not grant read permissions if non_collaborative and user lacks manage_groups rights" do
+        @category.update!(non_collaborative: true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to be_empty
+      end
+
+      it "grants read permissions if non_collaborative but user has manage_groups rights" do
+        @category.update!(non_collaborative: true)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
+      end
+
+      it "grants read permissions if not non_collaborative" do
+        @category.update!(non_collaborative: false)
+        allow(@course).to receive(:grants_any_right?).with(@teacher2, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(false)
+
+        expect(@category.check_policy(@teacher2) & @relevant_permissions).to eq @relevant_permissions
+      end
+    end
+  end
+
+  describe "single_tag?" do
+    before do
+      @category = GroupCategory.create!(name: "test tag", context: @course)
+    end
+
+    it "returns true when there is only one group and the group name is the same as the category" do
+      Group.create!(name: "test tag", group_category: @category, context: @course)
+
+      expect(@category.single_tag?).to be true
+    end
+
+    it "returns false if there is more than one group within the category" do
+      Group.create!(name: "test tag", group_category: @category, context: @course)
+      Group.create!(name: "test tag 2", group_category: @category, context: @course)
+
+      expect(@category.single_tag?).to be false
+    end
+
+    it "returns false if group name and category name are not equals" do
+      Group.create!(name: "test tag 1", group_category: @category, context: @course)
+
+      expect(@category.single_tag?).to be false
+    end
   end
 end
 

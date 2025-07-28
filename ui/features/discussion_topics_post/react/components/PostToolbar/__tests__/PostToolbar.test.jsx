@@ -44,7 +44,7 @@ const setup = props => {
       onReadAll={Function.prototype}
       {...props}
       discussionTopic={props?.discussion || Discussion.mock()}
-    />
+    />,
   )
 }
 
@@ -52,15 +52,15 @@ describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
       const {queryAllByText} = setup({repliesCount: 1})
-      expect(queryAllByText('1 Reply').length).toBe(2)
+      expect(queryAllByText('1 Reply')).toHaveLength(2)
     })
     it('not displayed if replies = 0', () => {
       const {queryAllByText} = setup({repliesCount: 0})
-      expect(queryAllByText('0 Reply').length).toBe(0)
+      expect(queryAllByText('0 Reply')).toHaveLength(0)
     })
     it('correct pluralization displayed', () => {
       const {queryAllByText} = setup({repliesCount: 2})
-      expect(queryAllByText('2 Replies').length).toBe(2)
+      expect(queryAllByText('2 Replies')).toHaveLength(2)
     })
   })
 
@@ -72,14 +72,15 @@ describe('PostToolbar', () => {
 
     it('displays if callback is provided', () => {
       const onTogglePublishMock = jest.fn()
-      const {getByText} = setup({
+      const {getByText, getByTestId} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
         canUnpublish: true,
       })
-      expect(onTogglePublishMock.mock.calls.length).toBe(0)
+      expect(getByTestId('publishToggle')).toHaveAttribute('data-action-state', 'unpublishButton')
+      expect(onTogglePublishMock.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Published'))
-      expect(onTogglePublishMock.mock.calls.length).toBe(1)
+      expect(onTogglePublishMock.mock.calls).toHaveLength(1)
     })
 
     it('displays as disabled if canUnpublish is false', () => {
@@ -91,6 +92,16 @@ describe('PostToolbar', () => {
       })
       expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
+
+    it('adds proper tracing state when it is unpublished', () => {
+      const onTogglePublishMock = jest.fn()
+      const {getByTestId} = setup({
+        onTogglePublish: onTogglePublishMock,
+        isPublished: false,
+        canUnpublish: true,
+      })
+      expect(getByTestId('publishToggle')).toHaveAttribute('data-action-state', 'publishButton')
+    })
   })
 
   describe('subscription button', () => {
@@ -101,15 +112,29 @@ describe('PostToolbar', () => {
 
     it('displays if callback is provided', () => {
       const onToggleSubscriptionMock = jest.fn()
-      const {queryByText, getByText} = setup({
+      const {queryByText, getByText, getByTestId} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
         discussion: Discussion.mock({groupSet: null}),
       })
       expect(queryByText('Subscribed')).toBeTruthy()
-      expect(onToggleSubscriptionMock.mock.calls.length).toBe(0)
+      expect(getByTestId('subscribeToggle')).toHaveAttribute(
+        'data-action-state',
+        'unsubscribeButton',
+      )
+      expect(onToggleSubscriptionMock.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Subscribed'))
-      expect(onToggleSubscriptionMock.mock.calls.length).toBe(1)
+      expect(onToggleSubscriptionMock.mock.calls).toHaveLength(1)
+    })
+
+    it('adds proper tracing state when it is unsubscibed', () => {
+      const onToggleSubscriptionMock = jest.fn()
+      const {getByTestId} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: false,
+        discussion: Discussion.mock({groupSet: null}),
+      })
+      expect(getByTestId('subscribeToggle')).toHaveAttribute('data-action-state', 'subscribeButton')
     })
 
     it('displays if user does not have teacher, designer, ta', () => {
@@ -152,6 +177,21 @@ describe('PostToolbar', () => {
       })
       expect(queryByText('Subscribed')).toBeFalsy()
     })
+
+    it('makes the button disabled if cannot subscribe', () => {
+      window.ENV.current_user_roles = ['student']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryAllByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        discussion: Discussion.mock({
+          subscriptionDisabledForUser: true,
+          groupSet: null,
+        }),
+        isSubscribed: false,
+      })
+      const buttonElement = queryAllByText('Reply to subscribe')[0].closest('button')
+      expect(buttonElement.disabled).toBe(true)
+    })
   })
 
   describe('menu options', () => {
@@ -160,9 +200,11 @@ describe('PostToolbar', () => {
         const onReadAllMock = jest.fn()
         const {getByTestId, getByText} = setup({onReadAll: onReadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onReadAllMock.mock.calls.length).toBe(0)
+        expect(onReadAllMock.mock.calls).toHaveLength(0)
+        // This attribute is used for user tracking
+        expect(getByTestId('discussion-thread-menuitem-read-all')).toBeDefined()
         fireEvent.click(getByText('Mark All as Read'))
-        expect(onReadAllMock.mock.calls.length).toBe(1)
+        expect(onReadAllMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -171,9 +213,11 @@ describe('PostToolbar', () => {
         const onUnreadAllMock = jest.fn()
         const {getByTestId, getByText} = setup({onUnreadAll: onUnreadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onUnreadAllMock.mock.calls.length).toBe(0)
+        expect(onUnreadAllMock.mock.calls).toHaveLength(0)
+        // This attribute is used for user tracking
+        expect(getByTestId('discussion-thread-menuitem-unread-all')).toBeDefined()
         fireEvent.click(getByText('Mark All as Unread'))
-        expect(onUnreadAllMock.mock.calls.length).toBe(1)
+        expect(onUnreadAllMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -188,9 +232,9 @@ describe('PostToolbar', () => {
         const onEditMock = jest.fn()
         const {getByTestId, getByText} = setup({onEdit: onEditMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onEditMock.mock.calls.length).toBe(0)
+        expect(onEditMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Edit'))
-        expect(onEditMock.mock.calls.length).toBe(1)
+        expect(onEditMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -205,9 +249,9 @@ describe('PostToolbar', () => {
         const onDeleteMock = jest.fn()
         const {getByTestId, getByText} = setup({onDelete: onDeleteMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onDeleteMock.mock.calls.length).toBe(0)
+        expect(onDeleteMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Delete'))
-        expect(onDeleteMock.mock.calls.length).toBe(1)
+        expect(onDeleteMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -235,9 +279,9 @@ describe('PostToolbar', () => {
             onCloseForComments: onToggleCommentsMock,
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-          expect(onToggleCommentsMock.mock.calls.length).toBe(0)
+          expect(onToggleCommentsMock.mock.calls).toHaveLength(0)
           fireEvent.click(getByText('Close for Comments'))
-          expect(onToggleCommentsMock.mock.calls.length).toBe(1)
+          expect(onToggleCommentsMock.mock.calls).toHaveLength(1)
         })
       })
 
@@ -257,9 +301,9 @@ describe('PostToolbar', () => {
             onOpenForComments: onToggleCommentsMock,
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-          expect(onToggleCommentsMock.mock.calls.length).toBe(0)
+          expect(onToggleCommentsMock.mock.calls).toHaveLength(0)
           fireEvent.click(getByText('Open for Comments'))
-          expect(onToggleCommentsMock.mock.calls.length).toBe(1)
+          expect(onToggleCommentsMock.mock.calls).toHaveLength(1)
         })
       })
     })
@@ -275,9 +319,9 @@ describe('PostToolbar', () => {
         const onSendMock = jest.fn()
         const {getByTestId, getByText} = setup({onSend: onSendMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onSendMock.mock.calls.length).toBe(0)
+        expect(onSendMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Send To...'))
-        expect(onSendMock.mock.calls.length).toBe(1)
+        expect(onSendMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -292,9 +336,9 @@ describe('PostToolbar', () => {
         const onCopyMock = jest.fn()
         const {getByTestId, getByText} = setup({onCopy: onCopyMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onCopyMock.mock.calls.length).toBe(0)
+        expect(onCopyMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Copy To...'))
-        expect(onCopyMock.mock.calls.length).toBe(1)
+        expect(onCopyMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -309,9 +353,9 @@ describe('PostToolbar', () => {
         const onOpenSpeedgraderMock = jest.fn()
         const {getByTestId, getByText} = setup({onOpenSpeedgrader: onOpenSpeedgraderMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onOpenSpeedgraderMock.mock.calls.length).toBe(0)
+        expect(onOpenSpeedgraderMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Open in SpeedGrader'))
-        expect(onOpenSpeedgraderMock.mock.calls.length).toBe(1)
+        expect(onOpenSpeedgraderMock.mock.calls).toHaveLength(1)
       })
     })
 
@@ -329,9 +373,9 @@ describe('PostToolbar', () => {
           showRubric: true,
         })
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-        expect(onDisplayRubricMock.mock.calls.length).toBe(0)
+        expect(onDisplayRubricMock.mock.calls).toHaveLength(0)
         fireEvent.click(getByText('Show Rubric'))
-        expect(onDisplayRubricMock.mock.calls.length).toBe(1)
+        expect(onDisplayRubricMock.mock.calls).toHaveLength(1)
       })
     })
 

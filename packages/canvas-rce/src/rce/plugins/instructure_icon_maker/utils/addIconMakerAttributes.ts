@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,7 +20,9 @@ import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../svg/constan
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 
 const addIconMakerAttributes = (imageAttributes: {src: string}) => {
+  // @ts-expect-error
   imageAttributes[ICON_MAKER_ATTRIBUTE] = true
+  // @ts-expect-error
   imageAttributes[ICON_MAKER_DOWNLOAD_URL_ATTR] = buildDownloadUrl(imageAttributes.src)
 }
 export default addIconMakerAttributes

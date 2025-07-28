@@ -20,6 +20,11 @@
 require_relative "course_copy_helper"
 
 describe ContentMigration do
+  before do
+    stub_const("EXCLUDE_WEEKENDS_WORK_WEEK_DAYS", [])
+    stub_const("NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS", %w[sun sat])
+  end
+
   context "course paces" do
     include_context "course copy"
 
@@ -28,8 +33,9 @@ describe ContentMigration do
       course_pace.workflow_state = "active"
       course_pace.end_date = 1.day.from_now.beginning_of_day
       course_pace.published_at = Time.now.utc
-      course_pace.exclude_weekends = false
+      course_pace.selected_days_to_skip = NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       course_pace.hard_end_dates = true
+      course_pace.time_to_complete_calendar_days = 10
       course_pace.save!
 
       run_course_copy
@@ -41,8 +47,9 @@ describe ContentMigration do
       expect(course_pace_to.start_date).to eq course_pace.start_date
       expect(course_pace_to.end_date).to eq course_pace.end_date
       expect(course_pace_to.published_at.to_i).to eq course_pace.published_at.to_i
-      expect(course_pace_to.exclude_weekends).to be false
+      expect(course_pace_to.selected_days_to_skip).to eq NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       expect(course_pace_to.hard_end_dates).to be true
+      expect(course_pace_to.time_to_complete_calendar_days).to eq 10
     end
 
     context "module items" do
@@ -62,9 +69,9 @@ describe ContentMigration do
       it "copies course pace module item durations" do
         run_course_copy
 
-        tag1_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag1)).take
-        tag2_to = @copy_to.context_module_tags.where(migration_id: mig_id(@tag2)).take
-        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
+        tag1_to = @copy_to.context_module_tags.find_by(migration_id: mig_id(@tag1))
+        tag2_to = @copy_to.context_module_tags.find_by(migration_id: mig_id(@tag2))
+        course_pace_to = @copy_to.course_paces.find_by(workflow_state: "unpublished")
 
         expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag1_to.id).duration).to eq 1
         expect(course_pace_to.course_pace_module_items.find_by(module_item_id: tag2_to.id).duration).to eq 2
@@ -77,14 +84,8 @@ describe ContentMigration do
         }
         run_course_copy
 
-        course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
+        course_pace_to = @copy_to.course_paces.find_by(workflow_state: "unpublished")
         expect(course_pace_to.course_pace_module_items.count).to eq 1
-      end
-
-      it "does not copy paces if the FF is off" do
-        @copy_from.root_account.disable_feature!(:course_paces)
-        run_course_copy
-        expect(@copy_to.course_paces).to eq []
       end
     end
   end

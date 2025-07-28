@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import MoveDialog from '../legacy/components/MoveDialog'
@@ -26,7 +26,11 @@ import ModalButtons from '@canvas/modal/react/buttons'
 import BBTreeBrowser from './BBTreeBrowser'
 import classnames from 'classnames'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
+
+MoveDialog.componentWillMount = function () {
+  this.canvasModalRef = React.createRef()
+}
 
 MoveDialog.renderMoveButton = function () {
   const buttonClassNames = classnames({
@@ -64,7 +68,7 @@ MoveDialog.render = function () {
     <Modal
       className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
       overlayClassName="ReactModal__Overlay--canvas"
-      ref="canvasModal"
+      ref={this.canvasModalRef}
       isOpen={this.state.isOpen}
       title={this.getTitle()}
       onRequestClose={this.closeDialog}

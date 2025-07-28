@@ -31,7 +31,7 @@ import ShowOnFocusButton from '../ShowOnFocusButton'
 import LoadingFutureIndicator from '../LoadingFutureIndicator'
 import LoadingPastIndicator from '../LoadingPastIndicator'
 import PlannerEmptyState from '../PlannerEmptyState'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   loadFutureItems,
   loadPastButtonClicked,
@@ -47,7 +47,7 @@ import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
 import {observedUserId, observedUserContextCodes} from '../../utilities/apiUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class PlannerApp extends Component {
   static propTypes = {
@@ -187,7 +187,7 @@ export class PlannerApp extends Component {
     }
     const plannerTop = this._plannerElem || document
     const fixedResponsiveElem = findFirstVisible(
-      '.planner-day, .planner-grouping, .planner-empty-days'
+      '.planner-day, .planner-grouping, .planner-empty-days',
     )
     if (fixedResponsiveElem) {
       if (!this.animator) this.animator = new Animator()
@@ -200,7 +200,7 @@ export class PlannerApp extends Component {
     if (this.fixedResponsiveMemo) {
       this.animator.maintainViewportPositionFromMemo(
         this.fixedResponsiveMemo.element,
-        this.fixedResponsiveMemo
+        this.fixedResponsiveMemo,
       )
       this.fixedResponsiveMemo = null
     }
@@ -399,7 +399,7 @@ export class PlannerApp extends Component {
           children.splice(
             children.length,
             0,
-            ...this.renderEmptyDays(numEmptyDays, workingDay, dayIndex)
+            ...this.renderEmptyDays(numEmptyDays, workingDay, dayIndex),
           )
           dayIndex += numEmptyDays
         } else {
@@ -430,7 +430,7 @@ export class PlannerApp extends Component {
         this.props.thisWeek.weekStart.clone(),
         this.props.thisWeek.weekEnd.clone(),
         dayHash,
-        dayIndex
+        dayIndex,
       )
     }
 

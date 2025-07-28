@@ -37,7 +37,7 @@ module Canvas::Migration
       # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
       # or an integer epoch * 1000
       if timestamp.to_s.match?(/^-?[0-9.]+$/)
-        timestamp = timestamp.to_i / 1000 rescue 0
+        timestamp = timestamp.to_i / 1000
         t = nil
         if timestamp > 0
           t = Time.at(timestamp).utc
@@ -95,9 +95,7 @@ module Canvas::Migration
       end
     end
 
-    def logger
-      Rails.logger
-    end
+    delegate :logger, to: :Rails
 
     def find_export_dir
       slug = if @settings[:content_migration_id] && @settings[:user_id]
@@ -458,8 +456,7 @@ module Canvas::Migration
         end
       end
 
-      selectable_outcomes = content_migration.respond_to?(:root_account) &&
-                            content_migration.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
+      selectable_outcomes = content_migration.respond_to?(:root_account)
 
       if @course[:learning_outcomes]
         @overview[:learning_outcomes] = []

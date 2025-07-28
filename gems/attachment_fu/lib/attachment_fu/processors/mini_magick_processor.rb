@@ -37,8 +37,6 @@ module AttachmentFu # :nodoc:
             binary_data = nil
           end
           yield binary_data if block_given? && binary_data
-        ensure
-          !binary_data.nil?
         end
       end
 
@@ -58,6 +56,8 @@ module AttachmentFu # :nodoc:
             @resized = true
           end
         end
+      rescue MiniMagick::Error => e
+        logger.warn("MiniMagick processing failed: #{e}")
       end
 
       # Performs the actual resizing operation for a thumbnail

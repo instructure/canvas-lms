@@ -67,18 +67,18 @@ describe CollaborationsController, type: :request do
     it "requires authorization" do
       user_factory
       raw_api_call(:get, url, url_options)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
-    it "is unauthorized when trying to access a courses collaboration when they are not a member of the course" do
+    it "is forbidden when trying to access a courses collaboration when they are not a member of the course" do
       user_with_pseudonym(active_all: true)
       raw_api_call(:get, url, url_options)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
-    it "is unauthorized when trying to access a groups collaborations they are not a member of" do
+    it "is forbidden when trying to access a groups collaborations they are not a member of" do
       raw_api_call(:get, group_url, group_url_options)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "doesnt return course collaborations for which the user is not a collaborator on" do
@@ -177,9 +177,9 @@ describe CollaborationsController, type: :request do
         user_factory
       end
 
-      it "receives a 401" do
+      it "receives a 403" do
         raw_api_call(:get, url, url_options)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end
@@ -199,7 +199,7 @@ describe CollaborationsController, type: :request do
                  course_id: @course.to_param },
                {},
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "returns course members for course collaborations" do

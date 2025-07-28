@@ -288,6 +288,56 @@ module Lti
           expect(subject.dig(:placements, :assignment_edit, :launch_height)).to eq 300
         end
       end
+
+      context "with assignment_view and assignment_edit placements" do
+        let(:tool) { new_valid_external_tool(account) }
+
+        shared_examples_for "a placement that uses target_link_uri when enabled" do |placement_type|
+          context "with lti_target_link_uri_for_assignment_edit_view feature disabled" do
+            before do
+              Account.site_admin.disable_feature!(:lti_target_link_uri_for_assignment_edit_view)
+            end
+
+            it "uses the placement specific url for the url property" do
+              tool.public_send(:"#{placement_type}=", {
+                                 enabled: true,
+                                 url: "https://www.test.tool.com",
+                                 target_link_uri: "https://target_link.test.tool.com",
+                               })
+              tool.save!
+              expect(subject.dig(:placements, placement_type, :url)).to eq "https://www.test.tool.com"
+            end
+          end
+
+          context "with lti_target_link_uri_for_assignment_edit_view feature enabled" do
+            before do
+              Account.site_admin.enable_feature!(:lti_target_link_uri_for_assignment_edit_view)
+            end
+
+            it "uses the placement specific target_link_uri for the url property" do
+              tool.public_send(:"#{placement_type}=", {
+                                 enabled: true,
+                                 url: "https://www.test.tool.com",
+                                 target_link_uri: "https://target_link.test.tool.com",
+                               })
+              tool.save!
+              expect(subject.dig(:placements, placement_type, :url)).to eq "https://target_link.test.tool.com"
+            end
+          end
+        end
+
+        context "with assignment_view placement" do
+          let(:placement) { :assignment_view }
+
+          it_behaves_like "a placement that uses target_link_uri when enabled", :assignment_view
+        end
+
+        context "with assignment_edit placement" do
+          let(:placement) { :assignment_edit }
+
+          it_behaves_like "a placement that uses target_link_uri when enabled", :assignment_edit
+        end
+      end
     end
   end
 end

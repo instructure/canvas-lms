@@ -19,10 +19,11 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import filesEnv from '../modules/filesEnv'
+import { Text } from '@instructure/ui-text'
 
-const I18n = useI18nScope('usageRightsSelectBox')
+const I18n = createI18nScope('usageRightsSelectBox')
 
 function omitEmptyValues(obj) {
   Object.keys(obj).forEach(k => {
@@ -50,7 +51,7 @@ const CONTENT_OPTIONS = [
   },
   {
     display: I18n.t(
-      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
+      'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws',
     ),
     value: 'fair_use',
   },
@@ -68,6 +69,7 @@ export default class UsageRightsSelectBox extends React.Component {
     showMessage: PropTypes.bool,
     contextType: PropTypes.string,
     contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hideErrors: PropTypes.func,
   }
 
   state = {
@@ -79,10 +81,18 @@ export default class UsageRightsSelectBox extends React.Component {
     usageRightSelectionValue: this.props.use_justification
       ? this.props.use_justification
       : undefined,
+    validationError: false,
   }
 
   componentDidMount() {
     this.getUsageRightsOptions()
+    $(document).on("validateUsageRightsSelectedValue", (_e, data) => {
+      this.setValidationError(!!data.error)
+    })
+  }
+
+  setValidationError(validationError) {
+    this.setState({validationError})
   }
 
   apiUrl() {
@@ -120,6 +130,8 @@ export default class UsageRightsSelectBox extends React.Component {
       showCreativeCommonsOptions: event.target.value === 'creative_commons',
       showMessage: this.props.showMessage && event.target.value === 'choose',
     })
+    if(this.props.hideErrors)
+      this.props.hideErrors()
   }
 
   // This method only really applies to firefox which doesn't handle onChange
@@ -130,7 +142,7 @@ export default class UsageRightsSelectBox extends React.Component {
         {
           usageRightSelectionValue: event.target.value,
         },
-        this.handleChange(event)
+        this.handleChange(event),
       )
     }
   }
@@ -180,7 +192,7 @@ export default class UsageRightsSelectBox extends React.Component {
           <i className="icon-warning" />
           <span style={{paddingLeft: '10px'}}>
             {I18n.t(
-              "If you do not select usage rights now, this file will be unpublished after it's uploaded."
+              "If you do not select usage rights now, this file will be unpublished after it's uploaded.",
             )}
           </span>
         </span>
@@ -194,7 +206,7 @@ export default class UsageRightsSelectBox extends React.Component {
       <div className="UsageRightsSelectBox__container">
         <div className="control-group">
           <label className="control-label" htmlFor="usageRightSelector">
-            {I18n.t('Usage Right:')}
+            {I18n.t('Usage Rights')}<Text color={this.state.validationError ? 'danger' : 'primary'}>*</Text>:
           </label>
           <div className="controls">
             <select
@@ -208,6 +220,8 @@ export default class UsageRightsSelectBox extends React.Component {
               {this.renderContentOptions()}
             </select>
           </div>
+          {/* Usage Rights Error Container */}
+          <div id="usage_rights_use_justification_errors"></div>
         </div>
         {this.state.showCreativeCommonsOptions && this.renderShowCreativeCommonsOptions()}
         <div className="control-group">

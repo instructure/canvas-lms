@@ -27,7 +27,7 @@ describe "assignment rubrics" do
   context "assignment rubrics as a teacher" do
     before do
       course_with_teacher_logged_in
-      @course.root_account.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:enhanced_rubrics)
     end
 
     def get(url)
@@ -69,7 +69,7 @@ describe "assignment rubrics" do
       end.to change(Rubric, :count).by(1)
       expect(f(".rubric_table tbody tr:nth-of-type(3) .description_title"))
         .to include_text("criterion 1")
-      expect(f(".rubric_table tbody tr:nth-of-type(3) .ratings td:nth-of-type(2) .rating_description_value"))
+      expect(f(".rubric_table tbody tr:nth-of-type(3) div.ratings div.rating:nth-of-type(2) .rating_description_value"))
         .to include_text("rating 1")
     end
 
@@ -197,14 +197,14 @@ describe "assignment rubrics" do
 
         it "uses the course mastery scale for outcome criterion when editing account rubrics within an assignment" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          points_before_edit = ff("tr.learning_outcome_criterion td.rating .points").map(&:text)
+          points_before_edit = ff("tr.learning_outcome_criterion div.rating .points").map(&:text)
           f("#rubric_#{@rubric.id} .edit_rubric_link").click
           driver.switch_to.alert.accept
           wait_for_ajax_requests
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text).reject!(&:empty?)).to eq @proficiency_rating_points
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text).reject!(&:empty?)).to eq @proficiency_rating_points
           f(".cancel_button").click
           wait_for_ajaximations
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text)).to eq points_before_edit
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text)).to eq points_before_edit
         end
       end
 
@@ -215,11 +215,11 @@ describe "assignment rubrics" do
 
         it "does not change existing outcome criterion when editing account rubrics within an assignment" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-          points_before_edit = ff("tr.learning_outcome_criterion td.rating .points").map(&:text)
+          points_before_edit = ff("tr.learning_outcome_criterion div.rating .points").map(&:text)
           f("#rubric_#{@rubric.id} .edit_rubric_link").click
           driver.switch_to.alert.accept
           wait_for_ajax_requests
-          expect(ff("tr.learning_outcome_criterion td.rating .points").map(&:text).reject!(&:empty?)).to eq points_before_edit
+          expect(ff("tr.learning_outcome_criterion div.rating .points").map(&:text).reject!(&:empty?)).to eq points_before_edit
         end
       end
     end
@@ -317,10 +317,24 @@ describe "assignment rubrics" do
       f(".assess_submission_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".hide_rubric_link"))
-      expect(f(".save_rubric_button").enabled?).to be_falsey
       f(".hide_rubric_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".assess_submission_link"))
+    end
+
+    it "blocks rubric submission if comment is empty", priority: "2" do
+      student_in_course(active_all: true)
+      outcome_with_rubric
+      @assignment = @course.assignments.create(name: "assignment with rubric")
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      @submission = @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
+      wait_for_ajaximations
+      f(".assess_submission_link").click
+      wait_for_ajaximations
+      f("button[data-testid=\"add-comment-button\"]").click
+      f(".save_rubric_button").click
+      expect(ff('[class="error-message"]')[0].text).to eq "A comment is required."
     end
 
     it "allows multiple rubric associations for grading", priority: "1" do
@@ -370,7 +384,7 @@ describe "assignment rubrics" do
       f(".rubric_title .icon-edit").click
       wait_for_ajaximations
 
-      hover_and_click(".criterion:nth-of-type(1) tbody tr td:nth-of-type(1) .edit_rating_link")
+      hover_and_click(".criterion:nth-of-type(1) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
       wait_for_ajaximations
 
       set_value(f("#edit_rating_form .rating_long_description"), "long description")
@@ -413,7 +427,7 @@ describe "assignment rubrics" do
       it "hides range option when using custom ratings", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         expect(ffj(".criterion_use_range:visible").count).to eq 1
@@ -426,7 +440,7 @@ describe "assignment rubrics" do
       it "hides range option when using learning outcomes", priority: "1" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         expect(f(".criterion:nth-of-type(1) .criterion_use_range_div").css_value("display")).to eq "none"
@@ -450,16 +464,16 @@ describe "assignment rubrics" do
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
-        f(" .rubric_title .icon-edit").click
+        f(".rubric_title .icon-edit").click
         wait_for_ajaximations
 
         # The min points of the rating being edited should start at 3.
         expect(ffj(".range_rating:visible .min_points")[0]).to include_text "3"
 
         # The max points of the rating to the right should start at 3.
-        expect(ff(".criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .points")[1]).to include_text "3"
+        expect(ff(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(2) .points")[1]).to include_text "3"
 
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "2")
@@ -528,9 +542,9 @@ describe "assignment rubrics" do
         f(" .rubric_title .icon-edit").click
         wait_for_ajaximations
 
-        range_rating_element = ".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .range_rating"
+        range_rating_element = ".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .range_rating"
         expect(f(range_rating_element).css_value("display")).to eq "inline"
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(1) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(1) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "2")
@@ -539,7 +553,7 @@ describe "assignment rubrics" do
         f(".ui-dialog-buttonset .save_button").click
         wait_for_ajaximations
 
-        range_rating_element = ".criterion:nth-of-type(3) tbody tr td:nth-of-type(1) .range_rating"
+        range_rating_element = ".criterion:nth-of-type(3) div.ratings div.rating:nth-of-type(1) .range_rating"
         expect(f(range_rating_element).css_value("display")).to eq "none"
       end
 
@@ -552,7 +566,7 @@ describe "assignment rubrics" do
         f(" .rubric_title .icon-edit").click
         wait_for_ajaximations
 
-        hover_and_click(".criterion:nth-of-type(2) tbody tr td:nth-of-type(2) .edit_rating_link")
+        hover_and_click(".criterion:nth-of-type(2) div.ratings div.rating:nth-of-type(2) .edit_rating_link")
         wait_for_ajaximations
 
         set_value(f("#edit_rating_form .min_points"), "-1")
@@ -640,7 +654,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
 
         f("#add_criterion_container a:nth-of-type(1)").click
-        f("#criterion_duplicate_menu ul li:nth-of-type(2)").click
+        ff("#criterion_duplicate_menu [class*='menuItem__label']")[1].click
         wait_for_ajaximations
         f(".ui-dialog-buttonset .save_button").click
 
@@ -656,7 +670,7 @@ describe "assignment rubrics" do
         wait_for_ajaximations
 
         f("#add_criterion_container a:nth-of-type(1)").click
-        f("#criterion_duplicate_menu ul li:nth-of-type(1)").click
+        ff("#criterion_duplicate_menu [class*='menuItem__label']")[0].click
         wait_for_ajaximations
 
         expect(ffj(".criterion:visible .description_title")[2]).to include_text "Outcome row"
@@ -724,7 +738,7 @@ describe "assignment rubrics" do
   context "assignment rubrics as an designer" do
     before do
       course_with_designer_logged_in
-      @course.root_account.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:enhanced_rubrics)
     end
 
     it "allows a designer to create a course rubric", priority: "2" do

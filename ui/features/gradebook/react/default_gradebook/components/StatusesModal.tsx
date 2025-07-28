@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,17 +19,17 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 import type {StatusColors} from '../constants/colors'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
-const {Body: ModalBody, Footer: ModalFooter} = Modal as any
+const {Body: ModalBody, Footer: ModalFooter} = Modal
 
 type Props = {
   onClose: () => void
@@ -38,7 +37,7 @@ type Props = {
   afterUpdateStatusColors: (
     colors: StatusColors,
     successFn: () => void,
-    errorFn: any
+    errorFn: any,
   ) => Promise<any>
 }
 
@@ -56,9 +55,10 @@ class StatusesModal extends React.Component<Props, State> {
     [key: string]: HTMLDivElement
   }
 
-  doneButton: HTMLButtonElement | null = null
+  doneButton: InstanceType<typeof Button> | null = null
 
   modalContentRef: HTMLDivElement | null = null
+  statuses: string[]
 
   constructor(props: Props) {
     super(props)
@@ -66,6 +66,7 @@ class StatusesModal extends React.Component<Props, State> {
     this.colorPickerButtons = {}
     this.colorPickerContents = {}
     this.state = {colors: props.colors, openPopover: null}
+    this.statuses = getStatuses()
   }
 
   updateStatusColorsFn =
@@ -78,7 +79,7 @@ class StatusesModal extends React.Component<Props, State> {
             this.setState({openPopover: null})
           }
           this.props.afterUpdateStatusColors(this.state.colors, successFnAndClosePopover, failureFn)
-        }
+        },
       )
     }
 
@@ -104,27 +105,34 @@ class StatusesModal extends React.Component<Props, State> {
     })
   }
 
-  bindColorPickerButton = (status: string) => button => {
-    this.colorPickerButtons[status] = button
+  bindColorPickerButton = (status: string) => (button: Element | null) => {
+    if (button instanceof HTMLButtonElement) {
+      this.colorPickerButtons[status] = button
+    }
   }
 
-  bindColorPickerContent = (status: string) => content => {
-    this.colorPickerContents[status] = content
+  bindColorPickerContent = (status: string) => (content: Element | null) => {
+    if (content instanceof HTMLDivElement) {
+      this.colorPickerContents[status] = content
+    }
   }
 
-  bindDoneButton = button => {
+  bindDoneButton = (button: InstanceType<typeof Button> | null) => {
     this.doneButton = button
   }
 
-  bindContentRef = content => {
-    this.modalContentRef = content
+  bindContentRef = (content: Element | null) => {
+    if (content instanceof HTMLDivElement) {
+      this.modalContentRef = content
+    }
   }
 
   renderListItems() {
-    return statuses.map(status => (
+    return this.statuses.map(status => (
       <StatusColorListItem
         key={status}
         status={status}
+        // @ts-expect-error
         color={this.state.colors[status]}
         isColorPickerShown={this.isPopoverShown(status)}
         colorPickerOnToggle={this.handleOnToggle(status)}

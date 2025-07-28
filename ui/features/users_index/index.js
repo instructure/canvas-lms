@@ -20,5 +20,5 @@ import $ from 'jquery'
 $(document).ready(() =>
   $('#enrollment_term_id').change(function () {
     $(this).closest('form').submit()
-  })
+  }),
 )

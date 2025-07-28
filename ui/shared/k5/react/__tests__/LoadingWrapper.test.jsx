@@ -44,7 +44,7 @@ describe('LoadingWrapper', () => {
     rerender(
       <LoadingWrapper {...getProps()}>
         <View>This is a child component</View>
-      </LoadingWrapper>
+      </LoadingWrapper>,
     )
     expect(getByText('This is a child component')).toBeInTheDocument()
   })
@@ -68,24 +68,24 @@ describe('LoadingWrapper', () => {
           defaultSkeletonsNum: 3,
           renderCustomSkeleton,
         })}
-      />
+      />,
     )
     expect(renderCustomSkeleton).toHaveBeenCalledTimes(3)
     const customSkeletons = getAllByText('Custom Loading...')
-    expect(customSkeletons.length).toBe(3)
+    expect(customSkeletons).toHaveLength(3)
   })
 
   it('passes the skeletons to renderSkeletonsContainer when provided and shows it when loading', () => {
     const renderSkeletonsContainer = jest.fn(c => <div className="container">{c}</div>)
     const {getByText, container, rerender} = render(
-      <LoadingWrapper {...getProps({isLoading: true, renderSkeletonsContainer})} />
+      <LoadingWrapper {...getProps({isLoading: true, renderSkeletonsContainer})} />,
     )
     expect(renderSkeletonsContainer).toHaveBeenCalled()
     expect(container.querySelector('div.container')).toBeInTheDocument()
     rerender(
       <LoadingWrapper {...getProps({renderSkeletonsContainer})}>
         <View>This is the loaded child component</View>
-      </LoadingWrapper>
+      </LoadingWrapper>,
     )
     expect(container.querySelector('div.container')).not.toBeInTheDocument()
     expect(getByText('This is the loaded child component')).toBeInTheDocument()
@@ -94,13 +94,13 @@ describe('LoadingWrapper', () => {
   it('passes the loaded content to renderLoadedContainer when provided and shows it when finish loading', () => {
     const renderLoadedContainer = jest.fn(content => <div className="container">{content}</div>)
     const {getByText, container, rerender} = render(
-      <LoadingWrapper {...getProps({isLoading: true, renderLoadedContainer})} />
+      <LoadingWrapper {...getProps({isLoading: true, renderLoadedContainer})} />,
     )
     expect(container.querySelector('div.container')).not.toBeInTheDocument()
     rerender(
       <LoadingWrapper {...getProps({renderLoadedContainer})}>
         <View>This is the loaded child component</View>
-      </LoadingWrapper>
+      </LoadingWrapper>,
     )
     expect(renderLoadedContainer).toHaveBeenCalledTimes(1)
     expect(container.querySelector('div.container')).toBeInTheDocument()
@@ -110,10 +110,10 @@ describe('LoadingWrapper', () => {
   it('renders the number of skeletons based on localstorage if the key exists', () => {
     localStorage.setItem('loading-skeletons-wrapper-num', '5')
     const {getAllByText} = render(
-      <LoadingWrapper {...getProps({id: 'wrapper', defaultSkeletonsNum: 3, isLoading: true})} />
+      <LoadingWrapper {...getProps({id: 'wrapper', defaultSkeletonsNum: 3, isLoading: true})} />,
     )
     const skeletons = getAllByText('Loading content...')
-    expect(skeletons.length).toBe(5)
+    expect(skeletons).toHaveLength(5)
   })
 
   it('renders the number of skeletons based on defaultSkeletonsNum if the key is not found in localstorage', () => {
@@ -125,10 +125,10 @@ describe('LoadingWrapper', () => {
           skeletonsNum: null,
           isLoading: true,
         })}
-      />
+      />,
     )
     const skeletons = getAllByText('Loading content...')
-    expect(skeletons.length).toBe(5)
+    expect(skeletons).toHaveLength(5)
   })
 
   it('renders 1 skeleton if allowZeroSkeletons is false and cached skeletonsNum is 0', () => {
@@ -142,10 +142,10 @@ describe('LoadingWrapper', () => {
           allowZeroSkeletons: false,
           isLoading: true,
         })}
-      />
+      />,
     )
     const skeletons = getAllByText('Loading content...')
-    expect(skeletons.length).toBe(1)
+    expect(skeletons).toHaveLength(1)
   })
 
   it('persists skeletonsNum in cache by default', () => {
@@ -156,7 +156,7 @@ describe('LoadingWrapper', () => {
           skeletonsNum: null,
           isLoading: true,
         })}
-      />
+      />,
     )
 
     rerender(
@@ -168,7 +168,7 @@ describe('LoadingWrapper', () => {
         })}
       >
         <View>This is the loaded child component</View>
-      </LoadingWrapper>
+      </LoadingWrapper>,
     )
 
     expect(window.localStorage.getItem('loading-skeletons-wrapper-1-num')).toBe('4')
@@ -184,10 +184,10 @@ describe('LoadingWrapper', () => {
           isLoading: true,
           persistInCache: false,
         })}
-      />
+      />,
     )
     const skeletons = getAllByText('Loading content...')
-    expect(skeletons.length).toBe(3)
+    expect(skeletons).toHaveLength(3)
 
     rerender(
       <LoadingWrapper
@@ -200,7 +200,7 @@ describe('LoadingWrapper', () => {
         })}
       >
         <View>This is the loaded child component</View>
-      </LoadingWrapper>
+      </LoadingWrapper>,
     )
 
     expect(window.localStorage.getItem('loading-skeletons-wrapper-2-num')).toBe(null)

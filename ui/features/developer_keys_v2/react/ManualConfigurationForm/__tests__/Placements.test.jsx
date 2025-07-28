@@ -41,8 +41,8 @@ const props = (overrides = {}, placementOverrides = {}) => {
 }
 
 it('allows empty placements', () => {
-  const propsNoPlacements = {...props(), placements: []}
   const ref = React.createRef()
+  const propsNoPlacements = {...props(), placements: []}
   render(<Placements {...props({placements: [], ref})} />)
   expect(ref.current.valid()).toEqual(true)
 })
@@ -51,7 +51,7 @@ it('generates the toolConfiguration', () => {
   const ref = React.createRef()
   render(<Placements {...props({ref})} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(1)
+  expect(toolConfig).toHaveLength(1)
   expect(toolConfig[0].icon_url).toEqual('http://example.com/icon')
 })
 
@@ -59,6 +59,36 @@ it('generates the displayNames correctly', () => {
   render(<Placements {...props()} />)
   expect(screen.getByRole('combobox', {name: /Account Navigation/i})).toBeInTheDocument()
   expect(screen.queryByRole('combobox', {name: /Course Navigation/i})).not.toBeInTheDocument()
+})
+
+it('displays "Assignment Document Processor" for ActivityAssetProcessor placement', () => {
+  const propsWithActivityAssetProcessor = props({
+    validPlacements: ['ActivityAssetProcessor', 'account_navigation'],
+    placements: [
+      {
+        placement: 'ActivityAssetProcessor',
+        target_link_uri: 'http://example.com',
+        message_type: 'LtiResourceLinkRequest',
+      },
+    ],
+  })
+  render(<Placements {...propsWithActivityAssetProcessor} />)
+  expect(screen.getAllByText('Assignment Document Processor')).toHaveLength(2)
+})
+
+it('placementDisplayName returns correct names', () => {
+  const ref = React.createRef()
+  render(<Placements {...props({ref})} />)
+  const component = ref.current
+
+  // Test the special case
+  expect(component.placementDisplayName('ActivityAssetProcessor')).toBe(
+    'Assignment Document Processor',
+  )
+
+  // Test regular cases
+  expect(component.placementDisplayName('account_navigation')).toBe('Account Navigation')
+  expect(component.placementDisplayName('course_navigation')).toBe('Course Navigation')
 })
 
 it('adds placements', async () => {
@@ -74,6 +104,6 @@ it('adds new placements to output', () => {
   render(<Placements {...props({ref})} />)
   ref.current.handlePlacementSelect(['account_navigation', 'course_navigation'])
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(toolConfig.length).toEqual(2)
+  expect(toolConfig).toHaveLength(2)
   expect(toolConfig[1].placement).toEqual('course_navigation')
 })

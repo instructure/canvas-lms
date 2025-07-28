@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import React, {useCallback, useRef, useEffect, useState} from 'react'
 import moment, {type Moment} from 'moment-timezone'
@@ -30,7 +30,7 @@ import {getSelectTextWidth} from '../utils'
 import type {FrequencyOptionValue} from '../types'
 
 const {Option} = SimpleSelect as any
-const I18n = useScope('calendar_frequency_picker')
+const I18n = createI18nScope('calendar_frequency_picker')
 
 export type FrequencyOption = {id: FrequencyOptionValue; label: string}
 
@@ -66,6 +66,7 @@ export class FrequencyPickerErrorBoundary extends React.Component {
         </div>
       )
     }
+    // @ts-expect-error
     return this.props.children
   }
 }
@@ -117,22 +118,22 @@ export default function FrequencyPicker({
     return frequency === 'saved-custom' && rrule ? rrule : null
   })
   const [options, setOptions] = useState<FrequencyOption[]>(
-    generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
+    generateFrequencyOptions(parsedMoment, locale, timezone, customRRule),
   )
   const [selectTextWidth, setSelectTextWidth] = useState<string>(() =>
-    getFrequencySelectWidth(width, options)
+    getFrequencySelectWidth(width, options),
   )
   const freqPickerRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (date === undefined && interaction === 'enabled') {
       throw new FrequencyPickerError(
-        'FrequencyPicker: date is required when interaction is enabled'
+        'FrequencyPicker: date is required when interaction is enabled',
       )
     }
     if (date === undefined && initialFrequency !== 'not-repeat') {
       throw new FrequencyPickerError(
-        'FrequencyPicker: date is required when initialFrequency is not not-repeat'
+        'FrequencyPicker: date is required when initialFrequency is not not-repeat',
       )
     }
   }, [date, initialFrequency, interaction])
@@ -178,7 +179,7 @@ export default function FrequencyPicker({
         setCurrRRule(newRRule)
       }
     },
-    [customRRule, parsedMoment]
+    [customRRule, parsedMoment],
   )
 
   const handleCloseModal = useCallback(() => {
@@ -210,7 +211,7 @@ export default function FrequencyPicker({
       setOptions(newOpts)
       setSelectTextWidth(getFrequencySelectWidth(width, newOpts))
     },
-    [locale, parsedMoment, timezone, width]
+    [locale, parsedMoment, timezone, width],
   )
 
   return (

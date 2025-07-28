@@ -29,7 +29,7 @@ module Types
       argument :_id, ID, required: true
       argument :type, LegacyNodeType, required: true
     end
-    def legacy_node(type:, _id:) # rubocop:disable Lint/UnderscorePrefixedVariableName named for DSL reasons
+    def legacy_node(type:, _id:) # rubocop:disable Lint/UnderscorePrefixedVariableName -- named for DSL reasons
       GraphQLNodeLoader.load(type, _id, context)
     end
 
@@ -111,14 +111,22 @@ module Types
                "a graphql or legacy user id",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User")
+
+      argument :anonymous_id,
+               ID,
+               "an anonymous id in use when grading anonymously",
+               required: false
     end
-    def submission(id: nil, assignment_id: nil, user_id: nil)
-      if id && !assignment_id && !user_id
+
+    def submission(id: nil, assignment_id: nil, user_id: nil, anonymous_id: nil)
+      if id && !assignment_id && !user_id && !anonymous_id
         GraphQLNodeLoader.load("Submission", id, context)
       elsif !id && assignment_id && user_id
         GraphQLNodeLoader.load("SubmissionByAssignmentAndUser", { assignment_id:, user_id: }, context)
+      elsif !id && assignment_id && anonymous_id
+        GraphQLNodeLoader.load("SubmissionByAssignmentAndAnonymousId", { assignment_id:, anonymous_id: }, context)
       else
-        raise GraphQL::ExecutionError, "Must specify an id or an assignment_id and user_id"
+        raise GraphQL::ExecutionError, "Must specify an id or an assignment_id and user_id or an assignment_id and an anonymous_id"
       end
     end
 
@@ -253,6 +261,18 @@ module Types
     end
     def rubric(id:)
       GraphQLNodeLoader.load("Rubric", id, context)
+    end
+
+    field :folder, Types::FolderType, null: true do
+      description "Folder"
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Folder")
+    end
+    def folder(id:)
+      GraphQLNodeLoader.load("Folder", id, context)
     end
 
     field :my_inbox_settings, Types::InboxSettingsType, null: true

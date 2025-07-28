@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const {bool, func, object} = PropTypes
 
@@ -50,8 +50,8 @@ export default class ConditionToggle extends React.Component {
     return this.props.isDisabled
       ? I18n.t('Splitting disabled: reached maximum of three assignment groups in a scoring range')
       : this.props.isAnd
-      ? I18n.t('Click to split set here')
-      : I18n.t('Click to merge sets here')
+        ? I18n.t('Click to split set here')
+        : I18n.t('Click to merge sets here')
   }
 
   handleToggle() {

@@ -19,12 +19,16 @@
 import React from 'react'
 import {render, act, within} from '@testing-library/react'
 import {Provider} from 'react-redux'
-import sinon from 'sinon'
 
 import * as GradeActions from '../../grades/GradeActions'
 import * as StudentActions from '../../students/StudentActions'
 import GradersTable from '../GradersTable/index'
 import configureStore from '../../configureStore'
+
+jest.mock('../../grades/GradeActions', () => ({
+  ...jest.requireActual('../../grades/GradeActions'),
+  acceptGraderGrades: jest.fn(),
+}))
 
 describe('GradeSummary GradersTable', () => {
   let provisionalGrades
@@ -33,6 +37,7 @@ describe('GradeSummary GradersTable', () => {
   let wrapper
 
   beforeEach(() => {
+    jest.clearAllMocks()
     storeEnv = {
       assignment: {
         courseId: '1201',
@@ -94,7 +99,7 @@ describe('GradeSummary GradersTable', () => {
     wrapper = render(
       <Provider store={store}>
         <GradersTable />
-      </Provider>
+      </Provider>,
     )
   }
 
@@ -115,20 +120,20 @@ describe('GradeSummary GradersTable', () => {
 
   function getAcceptGradesColumnHeader() {
     return [...wrapper.container.querySelectorAll('div')].find(el =>
-      el.textContent.includes('Accept Grades')
+      el.textContent.includes('Accept Grades'),
     )
   }
 
   test('includes a row for each grader', () => {
     mountComponent()
-    expect(wrapper.container.querySelectorAll('.grader-label').length).toBe(4)
+    expect(wrapper.container.querySelectorAll('.grader-label')).toHaveLength(4)
   })
 
   test('displays grader names in the row headers', () => {
     mountComponent()
     const rowHeaders = wrapper.container.querySelectorAll('.grader-label')
     expect([...rowHeaders].map(header => header.textContent)).toEqual(
-      storeEnv.graders.map(grader => grader.graderName)
+      storeEnv.graders.map(grader => grader.graderName),
     )
   })
 
@@ -189,26 +194,24 @@ describe('GradeSummary GradersTable', () => {
       mountAndFinishLoading()
       act(() => {
         store.dispatch(
-          GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
+          GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED),
         )
       })
       const row = getGraderRow('1101')
       expect(
-        within(row.querySelector('[aria-hidden="true"]')).getByText('Accepting')
+        within(row.querySelector('[aria-hidden="true"]')).getByText('Accepting'),
       ).toBeInTheDocument()
     })
 
     test('accepts grades for the related grader when clicked', () => {
-      sinon
-        .stub(GradeActions, 'acceptGraderGrades')
-        .callsFake(graderId =>
-          GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED)
-        )
+      GradeActions.acceptGraderGrades.mockImplementation(graderId => dispatch => {
+        dispatch(GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED))
+      })
       mountAndFinishLoading()
       const button = getGraderAcceptGradesButton('1101')
       button.click()
       expect(store.getState().grades.bulkSelectProvisionalGradeStatuses[1101]).toBe(
-        GradeActions.STARTED
+        GradeActions.STARTED,
       )
     })
 

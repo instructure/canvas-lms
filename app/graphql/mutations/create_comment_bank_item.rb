@@ -21,8 +21,8 @@
 class Mutations::CreateCommentBankItem < Mutations::BaseMutation
   graphql_name "CreateCommentBankItem"
 
-  argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
   argument :comment, String, required: true
+  argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
   field :comment_bank_item, Types::CommentBankItemType, null: true
 
   def resolve(input:)

@@ -119,7 +119,7 @@ describe "API Authentication", type: :request do
           get response["Location"]
           expect(response).to render_template("oauth2_provider/confirm")
 
-          post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+          post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
           expect(response).to be_redirect
           expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
@@ -132,7 +132,7 @@ describe "API Authentication", type: :request do
           expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
           json = JSON.parse(response.body)
           token = json["access_token"]
-          expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en" })
+          expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en", "fake_student" => false })
           reset!
 
           # try an api call
@@ -235,7 +235,7 @@ describe "API Authentication", type: :request do
         expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
         get response["Location"]
         expect(response).to render_template("oauth2_provider/confirm")
-        post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+        post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
         expect(response).to be_redirect
         expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
         code = response["Location"].match(/code=([^?&]+)/)[1]
@@ -285,7 +285,7 @@ describe "API Authentication", type: :request do
         follow_redirect!
         expect(response).to be_successful
 
-        post "/login/oauth2/accept", params: { authenticity_token: controller.send(:form_authenticity_token) }
+        post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
         code = response["Location"].match(/code=([^?&]+)/)[1]
         expect(code).to be_present
@@ -330,7 +330,7 @@ describe "API Authentication", type: :request do
             expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
             get response["Location"]
             expect(response).to render_template("oauth2_provider/confirm")
-            post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+            post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
             expect(response).to be_redirect
             expect(response["Location"]).to match(%r{/login/oauth2/auth\?})
@@ -343,7 +343,7 @@ describe "API Authentication", type: :request do
             expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
             json = JSON.parse(response.body)
             @token = json["access_token"]
-            expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en" })
+            expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en", "fake_student" => false })
             reset!
           end
 
@@ -395,7 +395,7 @@ describe "API Authentication", type: :request do
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{/login/oauth2/confirm$})
               get response["Location"]
-              post "/login/oauth2/accept", params: { authenticity_token: cookies["_csrf_token"] }
+              post "/login/oauth2/accept", params: { custom_csrf_token: session[:oauth2][:custom_csrf_token] }
 
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{http://www.example.com/my_uri?})
@@ -727,6 +727,25 @@ describe "API Authentication", type: :request do
       get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       assert_status(401)
       expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
+    end
+
+    it "errors if the access token is revoked" do
+      @token.update_attribute(:workflow_state, "deleted")
+      get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      assert_status(401)
+      expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
+      json = JSON.parse(response.body)
+      expect(json["errors"].first["message"]).to eq "Revoked access token."
+    end
+
+    it "errors if the access token is permanently expired" do
+      @token.update_attribute(:permanent_expires_at, 1.hour.ago)
+      get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      assert_status(401)
+      expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
+      json = JSON.parse(response.body)
+      expect(json["errors"].first["message"]).to eq "Expired access token."
+      expect(json["errors"].first["expired_at"]).to eq @token.permanent_expires_at.iso8601
     end
 
     it "errors if the developer key is inactive" do

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,12 +18,12 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {APIPaceContextTypes, OrderType, SortableColumn, StoreState} from '../types'
+import type {APIPaceContextTypes, OrderType, SortableColumn, StoreState} from '../types'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -32,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {getSearchTerm} from '../reducers/course_paces'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('course_paces_search')
+const I18n = createI18nScope('course_paces_search')
 
 interface StoreProps {
   readonly searchTerm: string
@@ -59,12 +58,14 @@ export const Search = ({
   currentOrderType,
   currentSortBy,
 }: ComponentProps) => {
+  // @ts-expect-error
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')
     fetchPaceContexts({contextType, page: 1, searchTerm: ''})
   }
 
+  // @ts-expect-error
   const handleSearch = e => {
     e.preventDefault()
 
@@ -82,7 +83,7 @@ export const Search = ({
               one: 'Showing 1 result below',
               other: 'Showing %{count} results below',
             },
-            {count: contexts.length}
+            {count: contexts.length},
           ),
           srOnly: true,
           err: null,
@@ -164,4 +165,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSearchTerm: paceContextsActions.setSearchTerm,
+  // @ts-expect-error
 })(Search)

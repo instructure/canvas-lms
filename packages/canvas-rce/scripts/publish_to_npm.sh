@@ -34,7 +34,7 @@ if [ -z "$SKIP_ALERT" ]; then
     # runs the get-user command and throws away output
     # checks for nonzero exit code to determine if the
     # user is logged in or not
-    aws iam get-user > /dev/null 2>&1
+    aws sts get-caller-identity > /dev/null 2>&1
     if [[ ! $? -eq 0 ]]; then
         echo -e "\n⚠️  Please log into AWS and try again. ⚠️\n"
         exit 1

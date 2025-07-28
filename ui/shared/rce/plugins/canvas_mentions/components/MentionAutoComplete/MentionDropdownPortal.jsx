@@ -55,7 +55,7 @@ const MentionDropdownPortal = props => {
     <ScreenReaderContent>
       <MentionDropdownMenu isInteractive={false} {...props} />
     </ScreenReaderContent>,
-    node.current
+    node.current,
   )
 }
 

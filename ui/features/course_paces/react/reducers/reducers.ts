@@ -27,6 +27,7 @@ import {blackoutDatesReducer} from '../shared/reducers/blackout_dates'
 import {originalReducer} from './original'
 import uiReducer from './ui'
 import {paceContextsReducer} from './pace_contexts'
+import {bulkEditStudentsReducer} from './bulk_edit_students_reducer'
 
 export default combineReducers<StoreState>({
   coursePace: coursePacesReducer,
@@ -37,4 +38,5 @@ export default combineReducers<StoreState>({
   blackoutDates: blackoutDatesReducer,
   original: originalReducer,
   paceContexts: paceContextsReducer,
+  bulkEditStudents: bulkEditStudentsReducer
 })

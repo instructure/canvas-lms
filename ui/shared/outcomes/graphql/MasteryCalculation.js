@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 export const ACCOUNT_OUTCOME_CALCULATION_QUERY = gql`
   query GetOutcomeProficiencyData($contextId: ID!) {

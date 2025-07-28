@@ -16,26 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-type HTMLElement = import('react').HTMLElement
-type FC = import('react').FC
-type KeyboardEventHandler = import('react').KeyboardEventHandler
-type MouseEventHandler = import('react').MouseEventHandler
-type ReactNode = import('react').ReactNode
-type ChangeEvent = import('react').ChangeEvent
-
 // These are special webpack-processed imports that Typescript doesn't understand
 // by default. Declaring them as wildcard modules allows TS to recognize them as
 // bare-bones interfaces with the `any` type.
 // See https://www.typescriptlang.org/docs/handbook/modules.html#wildcard-module-declarations
 declare module '*.graphql'
 declare module '*.handlebars'
-declare module '*.svg'
-
-declare module 'convert-case' {
-  export function camelize<T>(props: {[key: string]: unknown}): T
-  export function underscore<T>(props: {[key: string]: unknown}): T
+declare module '*.svg' {
+  const value: string
+  export default value
 }
-
-// Global scope declarations are only allowed in module contexts, so we
-// need this to make Typescript think this is a module. 🙄
-export {}

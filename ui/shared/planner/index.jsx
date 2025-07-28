@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Provider} from 'react-redux'
 import moment from 'moment-timezone'
 import {Spinner} from '@instructure/ui-spinner'
@@ -125,10 +125,10 @@ function mergeDefaultOptions(options) {
 
 function getCourseColor(
   {assetString, color},
-  {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}}
+  {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}},
 ) {
   if (K5_USER || K5_SUBJECT_COURSE) {
-    return color || '#394B58'
+    return color || '#334451'
   } else {
     return custom_colors[assetString]
   }
@@ -185,7 +185,7 @@ export async function initializePlanner(options) {
 
       if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
         throw new Error(
-          'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
+          'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner',
         )
       }
 
@@ -222,7 +222,7 @@ export async function initializePlanner(options) {
           'item',
           externalFocusableWrapper(options.externalFallbackFocusable),
           -1,
-          [specialFallbackFocusId('item')]
+          [specialFallbackFocusId('item')],
         )
       }
 
@@ -242,7 +242,7 @@ export function resetPlanner() {
 }
 
 function loading() {
-  return <Spinner renderTitle="Loading..." size="small" />
+  return <Spinner renderTitle="Loading..." size="small" data-testid="todo-sidebar-spinner" />
 }
 
 export function createPlannerApp() {
@@ -292,7 +292,9 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
-  ReactDOM.render(createPlannerApp(), element)
+
+  const root = createRoot(element)
+  root.render(createPlannerApp())
 }
 
 // This method allows you to render the header items into a separate DOM node
@@ -300,7 +302,9 @@ function renderHeader(element, auxElement) {
   const ariaHideElement = document.getElementById('application')
 
   // Using this pattern because default params don't merge objects
-  ReactDOM.render(
+
+  const root = createRoot(element)
+  root.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
         <Suspense fallback={loading()}>
@@ -314,8 +318,7 @@ function renderHeader(element, auxElement) {
           />
         </Suspense>
       </Provider>
-    </DynamicUiProvider>,
-    element
+    </DynamicUiProvider>
   )
 }
 
@@ -331,7 +334,9 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
-  ReactDOM.render(
+
+  const root = createRoot(element)
+  root.render(
     <Provider store={store}>
       <Suspense fallback={loading()}>
         <ToDoSidebar
@@ -342,8 +347,7 @@ export function renderToDoSidebar(element) {
           additionalTitleContext={additionalTitleContext}
         />
       </Suspense>
-    </Provider>,
-    element
+    </Provider>
   )
 }
 

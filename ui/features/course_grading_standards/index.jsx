@@ -24,6 +24,6 @@ import ready from '@instructure/ready'
 ready(() => {
   ReactDOM.render(
     <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,
-    document.getElementById('react_grading_tabs')
+    document.getElementById('react_grading_tabs'),
   )
 })

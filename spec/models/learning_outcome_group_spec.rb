@@ -26,15 +26,10 @@ describe LearningOutcomeGroup do
 
   def long_text(max = 65_535)
     text = +""
-    (0...max + 1).each do |num|
+    (0...(max + 1)).each do |num|
       text.concat(num.to_s)
     end
     text
-  end
-
-  describe "associations" do
-    it { is_expected.to belong_to(:source_outcome_group).class_name("LearningOutcomeGroup").inverse_of(:destination_outcome_groups) }
-    it { is_expected.to have_many(:destination_outcome_groups).class_name("LearningOutcomeGroup").inverse_of(:source_outcome_group).dependent(:nullify) }
   end
 
   context "object creation" do

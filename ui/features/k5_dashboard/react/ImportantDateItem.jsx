@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
   IconCalendarMonthLine,
@@ -36,7 +36,7 @@ import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 
 const k5ThemeVariables = getK5ThemeVars()
 
-const I18n = useI18nScope('important_date_item')
+const I18n = createI18nScope('important_date_item')
 
 const itemTypes = [
   {
@@ -96,8 +96,8 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
           href={url}
           isWithinText={false}
           themeOverride={{
-            color: k5ThemeVariables.colors.textDarkest,
-            hoverColor: k5ThemeVariables.colors.textDarkest,
+            color: k5ThemeVariables.colors.contrasts.grey125125,
+            hoverColor: k5ThemeVariables.colors.contrasts.grey125125,
             fontWeight: 700,
           }}
         >

@@ -17,7 +17,7 @@
  */
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo'
+import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo-v3'
 import CanvasInbox from './containers/CanvasInbox'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'

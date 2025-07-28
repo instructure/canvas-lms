@@ -128,7 +128,7 @@ export default class TakePictureView extends BaseView {
 
       // width and height of the source image to draw to the destination
       canvas.width,
-      canvas.height
+      canvas.height,
     )
     const url = canvas.toDataURL()
 
@@ -157,7 +157,7 @@ export default class TakePictureView extends BaseView {
 
         // width and height of the image in the destination
         this.$clip.width(),
-        this.$clip.height()
+        this.$clip.height(),
       )
 
       this.preview = canvas.toDataURL()

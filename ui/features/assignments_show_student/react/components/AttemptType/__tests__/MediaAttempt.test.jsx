@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MediaAttempt from '../MediaAttempt'
+// eslint-disable-next-line import/default
 import MediaPlayer from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
-import React from 'react'
+import React, {createRef} from 'react'
 import StudentViewContext from '../../Context'
-import {enableFetchMocks} from 'jest-fetch-mock'
-
-enableFetchMocks()
 
 // We need to set up a mock, as for some reason, jest.spyOn does not work on the original MediaPlayer
 jest.mock('@instructure/ui-media-player', () => {
@@ -64,12 +62,18 @@ const makeProps = async overrides => {
     setIframeURL: jest.fn(),
     uploadingFiles: false,
     focusOnInit: false,
+    submitButtonRef: createRef(),
   }
 }
 
 // LS-1339  created to figure out why these are failing
 describe('MediaAttempt', () => {
-  global.ENV = {current_user: {id: '1'}}
+  beforeEach(() => {
+    global.ENV = {current_user: {id: '1'}}
+    global.ENV.FEATURES = {}
+    global.ENV.FEATURES.consolidated_media_player = false
+  })
+
   describe('unsubmitted', () => {
     it('renders record and upload buttons', async () => {
       const props = await makeProps()
@@ -97,7 +101,7 @@ describe('MediaAttempt', () => {
       const {getByTestId} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
           <MediaAttempt {...props} />
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
       expect(getByTestId('open-record-media-modal-button')).toBeDisabled()
       expect(getByTestId('open-upload-media-modal-button')).toBeDisabled()
@@ -119,7 +123,7 @@ describe('MediaAttempt', () => {
     it('renders an iframe if iframeURL is given', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const wrapper = render(
-        <MediaAttempt {...props} iframeURL="https://www.youtube.com/embed/U9t-slLl30E" />
+        <MediaAttempt {...props} iframeURL="https://www.youtube.com/embed/U9t-slLl30E" />,
       )
       expect(wrapper.getByTitle('preview')).toBeInTheDocument()
     })
@@ -138,6 +142,42 @@ describe('MediaAttempt', () => {
         },
       })
     })
+
+    describe('validation', () => {
+      it('displays an error if the user has not uploaded media and tries to submit', async () => {
+        const props = await makeProps()
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+      })
+
+      it('clears the error when the user clicks the record media button', async () => {
+        const props = await makeProps()
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+        fireEvent.click(getByTestId('open-record-media-modal-button'))
+        expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
+      })
+
+      it('clears the error when the user clicks the upload media button', async () => {
+        const props = await makeProps()
+        props.submission = {submissionDraft: {meetsMediaRecordingCriteria: false}}
+        const submitButton = document.createElement('button')
+        props.submitButtonRef.current = submitButton
+        const {getByText, queryByText, getByTestId} = render(<MediaAttempt {...props} />)
+        fireEvent.click(props.submitButtonRef.current)
+        expect(getByText('At least one submission type is required')).toBeInTheDocument()
+        fireEvent.click(getByTestId('open-upload-media-modal-button'))
+        expect(queryByText('At least one submission type is required')).not.toBeInTheDocument()
+      })
+    })
   })
 
   describe('submitted', () => {
@@ -153,7 +193,7 @@ describe('MediaAttempt', () => {
         },
       })
       const {getByTestId, queryByTestId} = render(
-        <MediaAttempt {...props} uploadingFiles={false} />
+        <MediaAttempt {...props} uploadingFiles={false} />,
       )
       expect(queryByTestId('remove-media-recording')).not.toBeInTheDocument()
       expect(getByTestId('media-recording')).toBeInTheDocument()
@@ -205,6 +245,85 @@ describe('MediaAttempt', () => {
       render(<MediaAttempt {...props} uploadingFiles={false} />)
       // doesn't render anything, so nothing to check for
       // expect no errors to be thrown
+    })
+  })
+
+  describe('MediaPlayer', () => {
+    it('renders MediaPlayer', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov',
+            mediaTracks: [
+              {
+                _id: 1,
+                locale: 'en',
+                kind: 'captions',
+              },
+              {
+                _id: 2,
+                locale: 'es',
+                kind: 'captions',
+              },
+            ],
+          },
+          state: 'submitted',
+        },
+      })
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-recording')).toBeInTheDocument()
+    })
+
+    it('does not render MediaPlayer when mediaObject is null', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: null,
+        },
+      })
+      const {queryByTestId} = render(<MediaAttempt {...props} />)
+      expect(queryByTestId('media-recording')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('StudioPlayer', () => {
+    it('renders StudioPlayer', async () => {
+      global.ENV.FEATURES.consolidated_media_player = true
+      const props = await makeProps({
+        Submission: {
+          mediaObject: {
+            _id: 'm-123456',
+            id: '1',
+            title: 'dope_vid.mov',
+            mediaTracks: [
+              {
+                _id: 1,
+                locale: 'en',
+                kind: 'captions',
+              },
+              {
+                _id: 2,
+                locale: 'es',
+                kind: 'captions',
+              },
+            ],
+          },
+          state: 'submitted',
+        },
+      })
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('canvas-studio-player')).toBeInTheDocument()
+    })
+
+    it('does not render StudioPlayer when mediaObject is null', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: null,
+        },
+      })
+      const {queryByTestId} = render(<MediaAttempt {...props} />)
+      expect(queryByTestId('canvas-studio-player')).not.toBeInTheDocument()
     })
   })
 

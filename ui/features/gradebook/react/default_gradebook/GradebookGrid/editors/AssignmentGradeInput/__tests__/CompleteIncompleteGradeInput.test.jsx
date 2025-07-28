@@ -68,15 +68,15 @@ describe('GradebookGrid CompleteIncompleteGradeInput', () => {
   test('adds the CompleteIncompleteInput-suffix class to the container', () => {
     mountComponent()
     expect(
-      wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput')
+      wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput'),
     ).toBeInTheDocument()
   })
 
   test('renders a text container', () => {
     mountComponent()
     expect(
-      wrapper.container.querySelectorAll('.Grid__GradeCell__CompleteIncompleteValue').length
-    ).toBe(1)
+      wrapper.container.querySelectorAll('.Grid__GradeCell__CompleteIncompleteValue'),
+    ).toHaveLength(1)
   })
 
   test('optionally disables the menu button', () => {

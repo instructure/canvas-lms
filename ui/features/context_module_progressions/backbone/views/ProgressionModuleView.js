@@ -15,16 +15,16 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ProgressionModuleView.handlebars'
 
-const I18n = useI18nScope('context_modules')
+const I18n = createI18nScope('context_modules')
 
 let ProgressionModuleView
 
-export default ProgressionModuleView = (function () {
+export default (ProgressionModuleView = (function () {
   ProgressionModuleView = class ProgressionModuleView extends Backbone.View {
     static initClass() {
       this.prototype.tagName = 'li'
@@ -72,4 +72,4 @@ export default ProgressionModuleView = (function () {
   }
   ProgressionModuleView.initClass()
   return ProgressionModuleView
-})()
+})())

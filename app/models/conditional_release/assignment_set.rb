@@ -21,7 +21,7 @@ module ConditionalRelease
   class AssignmentSet < ActiveRecord::Base
     include Deletion
 
-    belongs_to :scoring_range, required: true
+    belongs_to :scoring_range, optional: false
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
     accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
     acts_as_list scope: { scoring_range: self, deleted_at: nil }

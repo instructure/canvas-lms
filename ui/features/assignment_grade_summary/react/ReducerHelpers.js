@@ -29,7 +29,7 @@ export function buildReducer(handlers, initialState) {
       } catch (e) {
         // If the handling function throws an error, it must be caught.
         // Otherwise, the application can crash without a chance to recover.
-        console.error(e) // eslint-disable-line no-console
+        console.error(e)
         captureException(e)
       }
     }

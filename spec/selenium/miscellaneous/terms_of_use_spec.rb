@@ -56,17 +56,24 @@ describe "terms of use test" do
 
     it "is able to update custom terms" do
       get "/accounts/#{@account.id}/settings"
-
+      expect(f("#account_settings")).to be_present
       click_option("#account_terms_of_service_terms_type", "custom", :value)
+      rce_container = f("#custom_tos_rce_container")
+      expect(rce_container).to be_displayed
       wait_for_tiny(f("#custom_tos_rce_container textarea"))
       type_in_tiny("textarea", "stuff")
       submit_form("#account_settings")
 
+      expect_new_page_load do
+        submit_form("#account_settings")
+      end
+
+      @account.reload
       expect(@account.terms_of_service.terms_of_service_content.content).to include("stuff")
     end
 
     it "populates the custom terms in the text area" do
-      @account.update_terms_of_service(terms_type: "custom", content: "other stuff")
+      @account.update_terms_of_service({ terms_type: "custom", content: "other stuff" }, @admin)
 
       get "/accounts/#{@account.id}/settings"
 
@@ -128,7 +135,7 @@ describe "terms of use SOC2 compliance test" do
 
   it "prevents a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms" do
     # Create a user after SOC2 implemented
-    after_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime + 10.days
+    after_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time + 10.days
 
     Timecop.freeze(after_soc2_start_date) do
       user_with_pseudonym
@@ -156,7 +163,7 @@ describe "terms of use SOC2 compliance test" do
 
   it "grandfathers in previously registered users without prompting them to reaccept the terms", priority: "1" do
     # Create a user before SOC2 implemented
-    before_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
+    before_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time - 10.days
 
     Timecop.freeze(before_soc2_start_date) do
       user_with_pseudonym

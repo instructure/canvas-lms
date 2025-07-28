@@ -47,7 +47,7 @@ describe('ManageUserLabels', () => {
   it('correctly adds labels', () => {
     const props = createProps()
     const {getByLabelText, getByTestId, getAllByTestId, getByText} = render(
-      <ManageUserLabels {...props} />
+      <ManageUserLabels {...props} />,
     )
 
     fireEvent.change(getByLabelText('Label Name'), {target: {value: 'New Label'}})
@@ -60,7 +60,7 @@ describe('ManageUserLabels', () => {
   it('shows error if trying to add a label that already exists', () => {
     const props = createProps()
     const {getByLabelText, getByTestId, getAllByTestId, getByText} = render(
-      <ManageUserLabels {...props} />
+      <ManageUserLabels {...props} />,
     )
 
     fireEvent.change(getByLabelText('Label Name'), {target: {value: 'Important'}})
@@ -68,7 +68,7 @@ describe('ManageUserLabels', () => {
 
     expect(getAllByTestId('label')).toHaveLength(2)
     expect(
-      getByText('The specified label already exists. Please enter a different label name.')
+      getByText('The specified label already exists. Please enter a different label name.'),
     ).toBeInTheDocument()
   })
 
@@ -141,7 +141,7 @@ describe('ManageUserLabels', () => {
   it('does not calls onDelete when the Save button is clicked and unsaved labels are deleted', () => {
     const props = createProps()
     const {getByLabelText, getByTestId, getAllByTestId, getByText} = render(
-      <ManageUserLabels {...props} />
+      <ManageUserLabels {...props} />,
     )
 
     fireEvent.change(getByLabelText('Label Name'), {target: {value: 'Beta'}})
@@ -156,7 +156,7 @@ describe('ManageUserLabels', () => {
   it('component resets to its initial state when the modal is closed', () => {
     const props = createProps()
     const {getByLabelText, getByTestId, getAllByTestId, getByText, getAllByText} = render(
-      <ManageUserLabels {...props} />
+      <ManageUserLabels {...props} />,
     )
 
     fireEvent.change(getByLabelText('Label Name'), {target: {value: 'New Label'}})

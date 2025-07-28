@@ -1,6 +1,4 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-
+/* eslint-disable @typescript-eslint/no-array-constructor */
 /*
  * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message
  * Digest Algorithm, as defined in RFC 1321.
@@ -182,14 +180,14 @@ function str2rstr_utf8(input) {
       output += String.fromCharCode(
         0xe0 | ((x >>> 12) & 0x0f),
         0x80 | ((x >>> 6) & 0x3f),
-        0x80 | (x & 0x3f)
+        0x80 | (x & 0x3f),
       )
     else if (x <= 0x1fffff)
       output += String.fromCharCode(
         0xf0 | ((x >>> 18) & 0x07),
         0x80 | ((x >>> 12) & 0x3f),
         0x80 | ((x >>> 6) & 0x3f),
-        0x80 | (x & 0x3f)
+        0x80 | (x & 0x3f),
       )
   }
   return output
@@ -220,7 +218,7 @@ function rstr2binl(input) {
   const output = Array(input.length >> 2)
   for (var i = 0; i < output.length; i++) output[i] = 0
   for (var i = 0; i < input.length * 8; i += 8)
-    output[i >> 5] |= (input.charCodeAt(i / 8) & 0xff) << i % 32
+    output[i >> 5] |= (input.charCodeAt(i / 8) & 0xff) << (i % 32)
   return output
 }
 
@@ -230,7 +228,7 @@ function rstr2binl(input) {
 function binl2rstr(input) {
   let output = ''
   for (let i = 0; i < input.length * 32; i += 8)
-    output += String.fromCharCode((input[i >> 5] >>> i % 32) & 0xff)
+    output += String.fromCharCode((input[i >> 5] >>> (i % 32)) & 0xff)
   return output
 }
 
@@ -239,7 +237,7 @@ function binl2rstr(input) {
  */
 function binl_md5(x, len) {
   /* append padding */
-  x[len >> 5] |= 0x80 << len % 32
+  x[len >> 5] |= 0x80 << (len % 32)
   x[(((len + 64) >>> 9) << 4) + 14] = len
 
   let a = 1732584193
@@ -365,6 +363,4 @@ function bit_rol(num, cnt) {
   return (num << cnt) | (num >>> (32 - cnt))
 }
 
-module.exports = {
-  encrypt: hex_md5,
-}
+export const encrypt = hex_md5

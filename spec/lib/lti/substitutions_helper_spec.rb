@@ -34,31 +34,127 @@ module Lti
     let(:account) do
       Account.create!(root_account:)
     end
+    let(:course_group) { Group.new(context: course) }
+    let(:account_group) { Group.new(context: account) }
     let(:user) { User.create! }
 
     def set_up_persistance!
       @shard1.activate { user.save! }
       @shard2.activate do
         root_account.save!
+
         account.save!
         course.save!
+        course_group.save!
+        account_group.save!
       end
     end
 
-    describe "#account" do
-      it "returns the context when it is an account" do
-        helper = SubstitutionsHelper.new(account, root_account, user)
-        expect(helper.account).to eq account
+    def helper_with_context(type, persistence: false)
+      if persistence
+        set_up_persistance!
       end
 
-      it "returns the account when it is a course" do
-        helper = SubstitutionsHelper.new(course, root_account, user)
-        expect(helper.account).to eq account
+      ctxt =
+        case type.to_s
+        when "course"
+          course
+        when "account"
+          account
+        when "course_group", "course-based group"
+          course_group
+        when "account_group", "account-based group"
+          account_group
+        when ""
+          nil
+        else
+          raise NotImplementedError
+        end
+
+      if persistence
+        ctxt.save!
+      end
+
+      SubstitutionsHelper.new(ctxt, root_account, user)
+    end
+
+    describe "#account" do
+      before do
+        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
+        # this (only needed to check feature flag):
+        set_up_persistance!
+      end
+
+      it "returns the context when context is an account" do
+        expect(helper_with_context(:account).account).to eq(account)
+      end
+
+      it "returns the account when context is a course" do
+        expect(helper_with_context(:course).account).to eq(account)
+      end
+
+      it "returns the account when context is a account-based group" do
+        expect(helper_with_context(:account_group, persistence: true).account).to eq(account)
+      end
+
+      it "returns the account when context is a course-based group" do
+        expect(helper_with_context(:course_group, persistence: true).account).to eq(account)
+      end
+
+      context "when the feature flag lti_variable_expansions_use_group_course_as_course is disabled" do
+        before do
+          # NOTE: Apparently due to caching inside Account model (?), just
+          # need to disable on the same model object instance (root_account).
+          # e.g. Account.find(root_account.id).disable_feature!(...) won't work :(
+          root_account.disable_feature!(:lti_variable_expansions_use_group_course_as_course)
+        end
+
+        it "returns the root account when context is a course-based group" do
+          expect(helper_with_context(:course_group, persistence: true).account).to eq(root_account)
+        end
+
+        it "returns the root account when context is a account-based group" do
+          expect(helper_with_context(:account_group, persistence: true).account).to eq(root_account)
+        end
       end
 
       it "returns the root_account by default" do
-        helper = SubstitutionsHelper.new(nil, root_account, user)
-        expect(helper.account).to eq root_account
+        expect(helper_with_context(nil).account).to eq(root_account)
+      end
+    end
+
+    describe "#course_or_account" do
+      before do
+        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
+        # this (only needed to check feature flag):
+        set_up_persistance!
+      end
+
+      it { expect(subject.course_or_account).to eq course }
+      it { expect(helper_with_context(:account).course_or_account).to eq account }
+      it { expect(helper_with_context(:account_group).course_or_account).to eq account }
+      it { expect(helper_with_context(:course_group).course_or_account).to eq course }
+      it { expect(helper_with_context(nil).course_or_account).to be_nil }
+    end
+
+    describe "#course" do
+      before do
+        # When we remove :lti_variable_expansions_use_group_course_as_course, we can remove
+        # this (only needed to check feature flag):
+        set_up_persistance!
+      end
+
+      it { expect(helper_with_context(:course).course).to eq course }
+      it { expect(helper_with_context(:account).course).to be_nil }
+      it { expect(helper_with_context(:account_group).course).to be_nil }
+      it { expect(helper_with_context(:course_group).course).to eq course }
+
+      describe "when the lti_variable_expansions_use_group_course_as_course feature flag is disabled" do
+        before do
+          root_account.disable_feature!(:lti_variable_expansions_use_group_course_as_course)
+        end
+
+        it { expect(helper_with_context(:course_group).course).to be_nil }
       end
     end
 
@@ -213,27 +309,36 @@ module Lti
         expect(helper.course_enrollments).to eq []
       end
 
-      it "returns the active enrollments in a course for a user" do
-        set_up_persistance!
+      ["course", "course-based group"].each do |type|
+        describe "when the context is a #{type}" do
+          subject { helper_with_context(type, persistence: true) }
+          before do
+            # AR gets confused if you don't save models before creating
+            # certain other related models
+            subject
+          end
 
-        student_enrollment = student_in_course(user:, course:, active_enrollment: true)
-        teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
-        inactive_enrollment = course_with_observer(user:, course:)
-        inactive_enrollment.update_attribute(:workflow_state, "inactive")
+          it "returns the active enrollments in a course for a user" do
+            student_enrollment = student_in_course(user:, course:, active_enrollment: true)
+            teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
+            inactive_enrollment = course_with_observer(user:, course:)
+            inactive_enrollment.update_attribute(:workflow_state, "inactive")
 
-        expect(subject.course_enrollments).to include student_enrollment
-        expect(subject.course_enrollments).to include teacher_enrollment
-        expect(subject.course_enrollments).not_to include inactive_enrollment
-      end
+            expect(subject.course_enrollments).to include student_enrollment
+            expect(subject.course_enrollments).to include teacher_enrollment
+            expect(subject.course_enrollments).not_to include inactive_enrollment
+          end
 
-      it "returns an empty array if there is no user" do
-        helper = SubstitutionsHelper.new(account, root_account, nil)
-        expect(helper.course_enrollments).to eq []
+          it "returns an empty array if there is no user" do
+            helper = SubstitutionsHelper.new(account, root_account, nil)
+            expect(helper.course_enrollments).to eq []
+          end
+        end
       end
     end
 
     describe "#account_enrollments" do
-      subject { SubstitutionsHelper.new(account, root_account, user) }
+      subject { helper_with_context(:account) }
 
       it "returns enrollments in an account for a user" do
         set_up_persistance!
@@ -327,7 +432,7 @@ module Lti
     end
 
     describe "#concluded_course_enrollments" do
-      it "returns an empty array if the context is not a course" do
+      it "returns an empty array if the context is not a course/group-based course" do
         helper = SubstitutionsHelper.new(account, root_account, user)
         expect(helper.concluded_course_enrollments).to eq []
       end
@@ -337,18 +442,23 @@ module Lti
         expect(helper.concluded_course_enrollments).to eq []
       end
 
-      it "returns the active enrollments in a course for a user" do
-        set_up_persistance!
+      ["course", "course-based group"].each do |type|
+        describe "when the context is a #{type}" do
+          subject { helper_with_context(type) }
 
-        student_enrollment = student_in_course(user:, course:, active_enrollment: true)
-        student_enrollment.conclude
-        teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
-        observer_enrollment = course_with_observer(user:, course:)
-        observer_enrollment.conclude
+          it "returns the active enrollments in a course for a user" do
+            set_up_persistance!
 
-        expect(subject.concluded_course_enrollments).to include student_enrollment
-        expect(subject.concluded_course_enrollments).not_to include teacher_enrollment
-        expect(subject.concluded_course_enrollments).to include observer_enrollment
+            student_enrollment = student_in_course(user:, course:, active_enrollment: true)
+            student_enrollment.conclude
+            teacher_enrollment = teacher_in_course(user:, course:, active_enrollment: true)
+            observer_enrollment = course_with_observer(user:, course:)
+            observer_enrollment.conclude
+            expect(subject.concluded_course_enrollments).to include student_enrollment
+            expect(subject.concluded_course_enrollments).not_to include teacher_enrollment
+            expect(subject.concluded_course_enrollments).to include observer_enrollment
+          end
+        end
       end
     end
 
@@ -450,244 +560,264 @@ module Lti
     end
 
     describe "#enrollment_state" do
-      it "is active if there are any active enrollments" do
-        set_up_persistance!
-        enrollment = student_in_course(user:, course:, active_enrollment: true)
-        enrollment.start_at = 4.days.ago
-        enrollment.end_at = 2.days.ago
-        enrollment.save!
+      ["course", "course-based group"].each do |type|
+        context "when the context is a #{type}" do
+          subject { helper_with_context(type) }
 
-        teacher_in_course(user:, course:, active_enrollment: true)
+          it "is active if there are any active enrollments" do
+            set_up_persistance!
 
-        expect(subject.enrollment_state).to eq "active"
-      end
+            enrollment = student_in_course(user:, course:, active_enrollment: true)
+            enrollment.start_at = 4.days.ago
+            enrollment.end_at = 2.days.ago
+            enrollment.save!
 
-      it "is inactive if there are no active enrollments" do
-        set_up_persistance!
-        enrollment = student_in_course(user:, course:, active_enrollment: true)
-        enrollment.start_at = 4.days.ago
-        enrollment.end_at = 2.days.ago
-        enrollment.save!
+            teacher_in_course(user:, course:, active_enrollment: true)
 
-        expect(subject.enrollment_state).to eq "inactive"
-      end
+            expect(subject.enrollment_state).to eq "active"
+          end
 
-      it "is inactive if the course is concluded" do
-        set_up_persistance!
-        student_in_course(user:, course:, active_enrollment: true)
-        course.complete
+          it "is inactive if there are no active enrollments" do
+            set_up_persistance!
 
-        expect(subject.enrollment_state).to eq "inactive"
-      end
+            enrollment = student_in_course(user:, course:, active_enrollment: true)
+            enrollment.start_at = 4.days.ago
+            enrollment.end_at = 2.days.ago
+            enrollment.save!
 
-      it "is blank if there are no enrollments" do
-        set_up_persistance!
-        expect(subject.enrollment_state).to eq ""
+            expect(subject.enrollment_state).to eq "inactive"
+          end
+
+          it "is inactive if the course is concluded" do
+            set_up_persistance!
+
+            student_in_course(user:, course:, active_enrollment: true)
+            course.complete
+
+            expect(subject.enrollment_state).to eq "inactive"
+          end
+
+          it "is blank if there are no enrollments" do
+            expect(subject.enrollment_state).to eq ""
+          end
+        end
       end
     end
 
     describe "#previous_course_ids_and_context_ids" do
-      before do
-        course.save!
-        @c1 = Course.create!
-        @c1.root_account = root_account
-        @c1.account = account
-        @c1.lti_context_id = "abc"
-        @c1.save
+      ["course", "course-based group"].each do |type|
+        context "when the context is a #{type}" do
+          subject { helper_with_context(type) }
 
-        course.content_migrations.create!.tap do |cm|
-          cm.context = course
-          cm.workflow_state = "imported"
-          cm.source_course = @c1
-          cm.save!
+          before do
+            course.save!
+            @c1 = Course.create!
+            @c1.root_account = root_account
+            @c1.account = account
+            @c1.lti_context_id = "abc"
+            @c1.save
+
+            course.content_migrations.create!.tap do |cm|
+              cm.context = course
+              cm.workflow_state = "imported"
+              cm.source_course = @c1
+              cm.save!
+            end
+
+            @c2 = Course.create!
+            @c2.root_account = root_account
+            @c2.account = account
+            @c2.lti_context_id = "def"
+            @c2.save!
+
+            course.content_migrations.create!.tap do |cm|
+              cm.context = course
+              cm.workflow_state = "imported"
+              cm.source_course = @c2
+              cm.save!
+            end
+
+            @c3 = Course.create!
+            @c3.root_account = root_account
+            @c3.account = account
+            @c3.lti_context_id = "hij"
+            @c3.save!
+
+            @c1.content_migrations.create!.tap do |cm|
+              cm.context = @c1
+              cm.workflow_state = "imported"
+              cm.source_course = @c3
+              cm.save!
+            end
+          end
+
+          it "returns previous canvas course ids" do
+            expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(",")
+          end
+
+          it "returns previous lti context_ids" do
+            expect(subject.previous_lti_context_ids.split(",")).to match_array %w[abc def]
+          end
         end
-
-        @c2 = Course.create!
-        @c2.root_account = root_account
-        @c2.account = account
-        @c2.lti_context_id = "def"
-        @c2.save!
-
-        course.content_migrations.create!.tap do |cm|
-          cm.context = course
-          cm.workflow_state = "imported"
-          cm.source_course = @c2
-          cm.save!
-        end
-
-        @c3 = Course.create!
-        @c3.root_account = root_account
-        @c3.account = account
-        @c3.lti_context_id = "hij"
-        @c3.save!
-
-        @c1.content_migrations.create!.tap do |cm|
-          cm.context = @c1
-          cm.workflow_state = "imported"
-          cm.source_course = @c3
-          cm.save!
-        end
-      end
-
-      it "returns previous canvas course ids" do
-        expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(",")
-      end
-
-      it "returns previous lti context_ids" do
-        expect(subject.previous_lti_context_ids.split(",")).to match_array %w[abc def]
       end
     end
 
     describe "#recursively_fetch_previous_lti_context_ids" do
-      context "without any course copies" do
-        before do
-          course.save!
-        end
+      ["course", "course-based group"].each do |type|
+        context "when the context is a #{type}" do
+          subject { helper_with_context(type) }
 
-        it "returns empty (no previous lti context_ids)" do
-          expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
-        end
-      end
+          context "without any course copies" do
+            before do
+              course.save!
+            end
 
-      context "with course copies" do
-        before do
-          course.save!
-          @c1 = Course.create!
-          @c1.root_account = root_account
-          @c1.account = account
-          @c1.lti_context_id = "abc"
-          @c1.save
-
-          course.content_migrations.create!(
-            workflow_state: "imported",
-            source_course: @c1
-          )
-
-          @c2 = Course.create!
-          @c2.root_account = root_account
-          @c2.account = account
-          @c2.lti_context_id = "def"
-          @c2.save!
-
-          course.content_migrations.create!(
-            workflow_state: "imported",
-            source_course: @c2
-          )
-
-          @c3 = Course.create!
-          @c3.root_account = root_account
-          @c3.account = account
-          @c3.lti_context_id = "ghi"
-          @c3.save!
-
-          @c1.content_migrations.create!(
-            workflow_state: "imported",
-            source_course: @c3
-          )
-        end
-
-        it "returns previous lti context_ids" do
-          expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc"
-        end
-
-        it "invalidates cache on last copied migration" do
-          enable_cache do
-            expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc"
-            @c4 = Course.create!(root_account:, account:, lti_context_id: "jkl")
-            @c1.content_migrations.create!(workflow_state: "imported", source_course: @c4)
-            expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc" # not copied into subject course yet
-
-            @c5 = Course.create!(root_account:, account:, lti_context_id: "mno")
-            course.content_migrations.create!(workflow_state: "imported", source_course: @c5) # direct copy
-            expect(subject.recursively_fetch_previous_lti_context_ids).to eq "mno,jkl,ghi,def,abc"
-          end
-        end
-
-        context "when there are multiple content migrations pointing to the same source course" do
-          before do
-            @c3.content_migrations.create!(
-              workflow_state: "imported",
-              source_course: @c2
-            )
+            it "returns empty (no previous lti context_ids)" do
+              expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
+            end
           end
 
-          it "does not return duplicates but still return in chronological order" do
-            expect(subject.recursively_fetch_previous_lti_context_ids).to eq "def,ghi,abc"
-          end
-        end
-
-        context "when there are more than (limit=1000) content migration courses in the history" do
-          it "truncates after the limit of ids" do
-            4.upto(11) do
-              c = Course.create!
-              c.root_account = root_account
-              c.account = account
-              c.lti_context_id = SecureRandom.hex 3
-              c.save
+          context "with course copies" do
+            before do
+              course.save!
+              @c1 = Course.create!
+              @c1.root_account = root_account
+              @c1.account = account
+              @c1.lti_context_id = "abc"
+              @c1.save
 
               course.content_migrations.create!(
                 workflow_state: "imported",
-                source_course: c
+                source_course: @c1
               )
-            end
 
-            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 10)
-            expect(recursive_course_lti_ids.split(",").length).to eq(11)
-            expect(recursive_course_lti_ids).to include "truncated"
-          end
-
-          it "courses with nil lti_context_ids shouldn't block 'truncated' from showing properly" do
-            [nil, "lti_context_id5"].each do |item|
-              c = Course.create!
-              c.root_account = root_account
-              c.account = account
-              c.lti_context_id = item
-              c.save
+              @c2 = Course.create!
+              @c2.root_account = root_account
+              @c2.account = account
+              @c2.lti_context_id = "def"
+              @c2.save!
 
               course.content_migrations.create!(
                 workflow_state: "imported",
-                source_course: c
+                source_course: @c2
+              )
+
+              @c3 = Course.create!
+              @c3.root_account = root_account
+              @c3.account = account
+              @c3.lti_context_id = "ghi"
+              @c3.save!
+
+              @c1.content_migrations.create!(
+                workflow_state: "imported",
+                source_course: @c3
               )
             end
 
-            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 3)
-            expect(recursive_course_lti_ids).to eq "lti_context_id5,ghi,def,truncated"
+            it "returns previous lti context_ids" do
+              expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc"
+            end
+
+            it "invalidates cache on last copied migration" do
+              enable_cache do
+                expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc"
+                @c4 = Course.create!(root_account:, account:, lti_context_id: "jkl")
+                @c1.content_migrations.create!(workflow_state: "imported", source_course: @c4)
+                expect(subject.recursively_fetch_previous_lti_context_ids).to eq "ghi,def,abc" # not copied into subject course yet
+
+                @c5 = Course.create!(root_account:, account:, lti_context_id: "mno")
+                course.content_migrations.create!(workflow_state: "imported", source_course: @c5) # direct copy
+                expect(subject.recursively_fetch_previous_lti_context_ids).to eq "mno,jkl,ghi,def,abc"
+              end
+            end
+
+            context "when there are multiple content migrations pointing to the same source course" do
+              before do
+                @c3.content_migrations.create!(
+                  workflow_state: "imported",
+                  source_course: @c2
+                )
+              end
+
+              it "does not return duplicates but still return in chronological order" do
+                expect(subject.recursively_fetch_previous_lti_context_ids).to eq "def,ghi,abc"
+              end
+            end
+
+            context "when there are more than (limit=1000) content migration courses in the history" do
+              it "truncates after the limit of ids" do
+                4.upto(11) do
+                  c = Course.create!
+                  c.root_account = root_account
+                  c.account = account
+                  c.lti_context_id = SecureRandom.hex 3
+                  c.save
+
+                  course.content_migrations.create!(
+                    workflow_state: "imported",
+                    source_course: c
+                  )
+                end
+
+                recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 10)
+                expect(recursive_course_lti_ids.split(",").length).to eq(11)
+                expect(recursive_course_lti_ids).to include "truncated"
+              end
+
+              it "courses with nil lti_context_ids shouldn't block 'truncated' from showing properly" do
+                [nil, "lti_context_id5"].each do |item|
+                  c = Course.create!
+                  c.root_account = root_account
+                  c.account = account
+                  c.lti_context_id = item
+                  c.save
+
+                  course.content_migrations.create!(
+                    workflow_state: "imported",
+                    source_course: c
+                  )
+                end
+
+                recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 3)
+                expect(recursive_course_lti_ids).to eq "lti_context_id5,ghi,def,truncated"
+              end
+            end
           end
-        end
-      end
 
-      describe "section substitutions" do
-        before do
-          course.save!
-          @sec1 = course.course_sections.create(name: "sec1")
-          @sec1.sis_source_id = "def"
-          @sec1.save!
-          @sec2 = course.course_sections.create!(name: "sec2")
-          @sec2.sis_source_id = "abc"
-          @sec2.save!
-          # course.reload
+          describe "section substitutions" do
+            before do
+              course.save!
+              @sec1 = course.course_sections.create(name: "sec1")
+              @sec1.sis_source_id = "def"
+              @sec1.save!
+              @sec2 = course.course_sections.create!(name: "sec2")
+              @sec2.sis_source_id = "abc"
+              @sec2.save!
+              # course.reload
 
-          user.save!
-          @e1 = multiple_student_enrollment(user, @sec1, course:)
-          @e2 = multiple_student_enrollment(user, @sec2, course:)
-        end
+              user.save!
+              @e1 = multiple_student_enrollment(user, @sec1, course:)
+              @e2 = multiple_student_enrollment(user, @sec2, course:)
+            end
 
-        it "returns all canvas section ids" do
-          expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(",")
-        end
+            it "returns all canvas section ids" do
+              expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(",")
+            end
 
-        it "returns section restricted if all enrollments are restricted" do
-          [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
-          expect(subject.section_restricted).to be true
-        end
+            it "returns section restricted if all enrollments are restricted" do
+              [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
+              expect(subject.section_restricted).to be true
+            end
 
-        it "does not return section restricted if only one is" do
-          @e1.update_attribute(:limit_privileges_to_course_section, true)
-          expect(subject.section_restricted).to be false
-        end
+            it "does not return section restricted if only one is" do
+              @e1.update_attribute(:limit_privileges_to_course_section, true)
+              expect(subject.section_restricted).to be false
+            end
 
-        it "returns all canvas section sis ids" do
-          expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(",")
+            it "returns all canvas section sis ids" do
+              expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(",")
+            end
+          end
         end
       end
     end

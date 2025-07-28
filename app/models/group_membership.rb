@@ -59,6 +59,9 @@ class GroupMembership < ActiveRecord::Base
           .merge(Assignment.active).where(assignments: { id: ids })
   }
 
+  scope :for_collaborative_groups, -> { joins(:group).merge(Group.collaborative) }
+  scope :for_non_collaborative_groups, -> { joins(:group).merge(Group.non_collaborative) }
+
   scope :for_students, ->(ids) { where(user_id: ids) }
 
   resolves_root_account through: :group
@@ -75,7 +78,7 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_context_group_membership
     p.to { user }
     p.whenever do |record|
-      record.just_created &&
+      record.previously_new_record? &&
         record.accepted? &&
         record.group &&
         record.group.context_available? &&
@@ -87,7 +90,7 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_context_group_membership_invitation
     p.to { user }
     p.whenever do |record|
-      record.just_created &&
+      record.previously_new_record? &&
         record.invited? &&
         record.group &&
         record.group.context_available? &&
@@ -110,7 +113,7 @@ class GroupMembership < ActiveRecord::Base
     p.to { group.context.participating_admins }
     p.whenever do |record|
       record.group.context.is_a?(Course) &&
-        record.just_created &&
+        record.previously_new_record? &&
         record.group.group_memberships.count == 1 &&
         record.group.student_organized?
     end
@@ -188,10 +191,15 @@ class GroupMembership < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id)
-                            .where(group_category_id: group.group_category_id).pluck(:id)
-    assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
-                                  .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+    assignments = []
+    if group.non_collaborative
+      assignments += AssignmentOverride.active.where(set_type: "Group", set_id: group.id).pluck(:assignment_id)
+    else
+      assignments += Assignment.where(context_type: group.context_type, context_id: group.context_id)
+                               .where(group_category_id: group.group_category_id).pluck(:id)
+      assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
+                                    .where.not(assignment_id: nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+    end
 
     SubmissionLifecycleManager.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
   end
@@ -237,61 +245,65 @@ class GroupMembership < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
-
-    given do |user, session|
-      !group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && group && !group.group_category.try(:communities?) &&
-        (
-          (user == self.user && group.grants_right?(user, session, :join)) ||
-            (
-              group.can_join?(self.user) && group.context &&
-                group.context.grants_right?(user, session, :manage_groups)
-            )
-        )
-    end
-    can :create
-
-    ##################### End legacy permission block ##########################
-
     # for non-communities, people can be placed into groups by users who can
     # manage groups at the context level, but not moderators (hence :manage_groups_manage)
     given do |user, session|
-      group.context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-        user && self.user && group && !group.group_category.try(:communities?) &&
+      user && self.user && group &&
+        !group.group_category.try(:communities?) &&
+        !group.non_collaborative? &&
         (
           (user == self.user && group.grants_right?(user, session, :join)) ||
-            (
-              group.can_join?(self.user) && group.context &&
-                group.context.grants_right?(user, session, :manage_groups_manage)
-            )
+          (
+            group.can_join?(self.user) && group.context &&
+            group.context.grants_right?(user, session, :manage_groups_manage)
+          )
         )
     end
     can :create
 
     # for communities, users must initiate in order to be added to a group
     given do |user, _session|
-      user && group && user == self.user && group.grants_right?(user, :join) &&
-        group.group_category.try(:communities?)
+      user && group &&
+        user == self.user &&
+        group.grants_right?(user, :join) &&
+        group.group_category.try(:communities?) &&
+        !group.non_collaborative?
     end
     can :create
 
     # user can read group membership if they can read its group's roster
-    given { |user, session| user && group && group.grants_right?(user, session, :read_roster) }
+    given { |user, session| user && group && !group.non_collaborative? && group.grants_right?(user, session, :read_roster) }
     can :read
 
-    given { |user, session| user && group && group.grants_right?(user, session, :manage) }
+    given { |user, session| user && group && !group.non_collaborative? && group.grants_right?(user, session, :manage) }
     can :update
 
     # allow moderators to kick people out
     # hence :manage instead of :manage_groups_delete on the context
     given do |user, session|
-      user && self.user && group &&
+      user && self.user && group && !group.non_collaborative? &&
         (
           (user == self.user && group.grants_right?(self.user, session, :leave)) ||
-            group.grants_right?(user, session, :manage)
+          group.grants_right?(user, session, :manage)
         )
     end
     can :delete
+
+    ##################### Non-Collaborative Group Permission Block ##########################
+    # Permissions for non-collaborative group memberships
+    given { |user| user && group&.non_collaborative? }
+    use_additional_policy do
+      given { |user, session| group.grants_right?(user, session, :create) }
+      can :create
+
+      given { |user, session| group.grants_right?(user, session, :read) }
+      can :read
+
+      given { |user, session| group.grants_right?(user, session, :update) }
+      can :update
+
+      given { |user, session| group.grants_right?(user, session, :delete) }
+      can :delete
+    end
   end
 end

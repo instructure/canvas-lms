@@ -311,7 +311,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #     -d 'course_ids_to_remove[]=2' \
   #
   def update_associations
-    if authorized_action(@course.account, @current_user, [:manage_courses, :manage_courses_admin])
+    if authorized_action(@course.account, @current_user, :manage_courses_admin)
       # NOTE: that I'm additionally requiring course management rights on the account
       # since (for now) we're only allowed to associate courses derived from it
       ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
@@ -359,12 +359,20 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @argument comment [Optional, String]
   #     An optional comment to be included in the sync history.
+  #
   # @argument send_notification [Optional, Boolean]
   #     Send a notification to the calling user when the sync completes.
   #
   # @argument copy_settings [Optional, Boolean]
   #     Whether course settings should be copied over to associated courses.
   #     Defaults to true for newly associated courses.
+  #
+  # @argument send_item_notifications [Optional, Boolean]
+  #     By default, new-item notifications are suppressed in blueprint syncs.
+  #     If this option is set, teachers and students may receive notifications
+  #     for items such as announcements and assignments that are created
+  #     in associated courses (subject to the usual notification settings).
+  #     This option requires the Blueprint Item Notifications feature to be enabled.
   #
   # @argument publish_after_initial_sync [Optional, Boolean]
   #     If set, newly associated courses will be automatically published after the sync completes
@@ -385,8 +393,12 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
-    [:copy_settings, :publish_after_initial_sync].each do |bool_key|
+    %i[copy_settings publish_after_initial_sync].each do |bool_key|
       options[bool_key] = value_to_boolean(params[bool_key]) if params.key?(bool_key)
+    end
+
+    if params.key?(:send_item_notifications) && @course.account.feature_enabled?(:blueprint_item_notifications)
+      options[:send_item_notifications] = value_to_boolean(params[:send_item_notifications])
     end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
@@ -422,7 +434,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def restrict_item
     content_type = params[:content_type]
     unless %w[assignment attachment course_pace discussion_topic external_tool lti-quiz quiz wiki_page].include?(content_type)
-      return render json: { message: "Must be a valid content type (assignment,attachment,course_pace,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, status: :bad_request
+      return render json: { message: "Must be a valid content type (assignment,attachment,course_pace,discussion_topic,external_tool,lti-quiz,quiz,wiki_page). Got #{content_type}" }, status: :bad_request
     end
     unless params.key?(:restricted)
       return render json: { message: "Must set 'restricted'" }, status: :bad_request
@@ -431,7 +443,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     scope =
       case content_type
       when "external_tool"
-        @course.context_external_tools.active
+        Lti::ContextToolFinder.only_for(@course).active
       when "attachment"
         @course.attachments.not_deleted
       when "lti-quiz"
@@ -447,19 +459,21 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     end
 
     mc_tag = @template.content_tag_for(item)
-    if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
-      mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
-      mc_tag.use_default_restrictions = !custom_restrictions
-    else
-      mc_tag.restrictions = {}
-      mc_tag.use_default_restrictions = false
+    update_tag(mc_tag, item)
+    all_created_tags_valid = mc_tag.valid?
+    tag_errors = mc_tag.errors.to_a
+    if item.is_a?(DiscussionTopic)
+      item.sub_assignments.each do |sub_assignment|
+        sub_tag = @template.content_tag_for(sub_assignment)
+        update_tag(sub_tag, sub_assignment)
+        all_created_tags_valid &&= sub_tag.valid?
+        tag_errors += sub_tag.errors.to_a
+      end
     end
-    mc_tag.save if mc_tag.changed?
-    if mc_tag.valid?
+    if all_created_tags_valid
       render json: { success: true }
     else
-      render json: mc_tag.errors, status: :bad_request
+      render json: tag_errors, status: :bad_request
     end
   end
 
@@ -478,8 +492,6 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     items = []
     GuardRail.activate(:secondary) do
       MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
-        next if klass == "MediaTrack" && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
-
         item_scope = case klass
                      when "Attachment"
                        @course.attachments
@@ -787,5 +799,17 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       end
     end
     classes.uniq
+  end
+
+  def update_tag(master_content_tag, item)
+    if value_to_boolean(params[:restricted])
+      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
+      master_content_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
+      master_content_tag.use_default_restrictions = !custom_restrictions
+    else
+      master_content_tag.restrictions = {}
+      master_content_tag.use_default_restrictions = false
+    end
+    master_content_tag.save if master_content_tag.changed?
   end
 end

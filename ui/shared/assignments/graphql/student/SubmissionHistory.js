@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {shape} from 'prop-types'
 import {
   SubmissionInterface,
@@ -31,7 +31,6 @@ export const SubmissionHistory = {
   `,
 
   shape: shape({
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     ...SubmissionInterface.shape.propTypes,
   }),
 }

@@ -146,31 +146,30 @@ describe AuthenticationProvider::Microsoft do
       expect(AuthenticationProvider::Microsoft.new(tenants: "common", login_attribute: "oid", account: Account.default)).not_to be_valid
       expect(AuthenticationProvider::Microsoft.new(tenants: "common", login_attribute: "sub", account: Account.default)).not_to be_valid
     end
+
+    it "allows deleting an auth provider with an otherwise invalid tenant" do
+      ap = AuthenticationProvider::Microsoft.new(tenants: "invalid", account: Account.default)
+      ap.save!(validate: false)
+      ap.destroy
+      expect(ap).not_to be_changed
+      expect(ap).to be_valid
+      expect(ap).to be_deleted
+    end
   end
 
   context "fetch unique_id" do
-    it "records used tenants" do
-      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common")
-      allow(ap).to receive(:claims).and_return("tid" => "1234")
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq ["1234"]
-      expect(ap).not_to receive(:save!)
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq ["1234"]
-    end
-
-    it "records used missing tenant" do
-      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common")
-      allow(ap).to receive(:claims).and_return({})
-      ap.unique_id("token")
-      expect(ap.settings["known_tenants"]).to eq [nil]
-    end
-
     it "calculates tid+oid when both are present" do
       ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenant: "common", login_attribute: "tid+oid")
       claims = { "tid" => "1234", "oid" => "5678" }
       allow(ap).to receive(:claims).and_return(claims)
       expect(ap.unique_id("token")).to eql claims.merge("tid+oid" => "1234#5678")
+    end
+
+    it "correctly chooses upn when chosen as login attribute" do
+      ap = AuthenticationProvider::Microsoft.new(account: Account.default, tenants: "microsoft", login_attribute: "upn")
+      claims = { "tid" => AuthenticationProvider::Microsoft::MICROSOFT_TENANT, "upn" => "john.doe@example.com" }
+      allow(ap).to receive(:claims).and_return(claims)
+      expect(ap.unique_id("token")).to eql claims
     end
 
     it "enforces the tenant" do

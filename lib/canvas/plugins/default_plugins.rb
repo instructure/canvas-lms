@@ -88,17 +88,6 @@ module Canvas::Plugins::DefaultPlugins
                               settings_partial: "plugins/diigo_settings",
                               validator: "DiigoValidator"
                             })
-    Canvas::Plugin.register("twitter",
-                            nil,
-                            name: "Twitter",
-                            description: -> { t :description, "Twitter notifications" },
-                            website: "http://www.twitter.com",
-                            author: "Instructure",
-                            author_website: "http://www.instructure.com",
-                            version: "1.0.0",
-                            settings_partial: "plugins/twitter_settings",
-                            validator: "TwitterValidator",
-                            encrypted_settings: [:consumer_secret])
     Canvas::Plugin.register("etherpad", :collaborations, {
                               name: -> { t :name, "EtherPad" },
                               description: -> { t :description, "EtherPad document sharing" },
@@ -356,6 +345,16 @@ module Canvas::Plugins::DefaultPlugins
                               },
                               validator: "AppCenterValidator"
                             })
+    Canvas::Plugin.register("learnplatform", nil, {
+                              name: -> { t :name, "LearnPlatform" },
+                              description: -> { t :description, "Enable access to the LearnPlatform API to pull product information" },
+                              author: "Instructure",
+                              settings_partial: "plugins/learn_platform_settings",
+                              settings: {
+                                base_url: "https://app.learnplatform.com",
+                              },
+                              encrypted_settings: %i[username password jwt_issuer jwt_secret]
+                            })
     Canvas::Plugin.register("pandapub", nil, {
                               name: -> { t :name, "PandaPub" },
                               description: -> { t :description, "Pub/Sub service" },
@@ -415,6 +414,39 @@ module Canvas::Plugins::DefaultPlugins
                                 max_log_ids: [0, 0, 0, 0, 0, 0, 0], # one for each day of week (table "partition")
                                 write_path: "update" # member of { update, log }
                               }
+                            })
+
+    Canvas::Plugin.register("graphql_tuning", nil, {
+                              name: -> { t :name, "GraphQL Tuning" },
+                              description: -> { t :description, "GraphQL performance tuning" },
+                              author: "Instructure",
+                              author_website: "http://www.instructure.com",
+                              version: "1.0.0",
+                              settings_partial: "plugins/graphql_tuning_settings",
+                              settings: {
+                                max_depth: 15,
+                                max_complexity: 375_000,
+                                default_page_size: 20,
+                                default_max_page_size: 100,
+                                validate_max_errors: 100,
+                                max_query_string_tokens: 5_000,
+                                max_query_aliases: 20,
+                                max_query_directives: 5,
+                                create_conversation_rate_limit: {
+                                  **GraphQLTuning.create_conversation_rate_limit_defaults
+                                },
+                              }
+                            })
+
+    Canvas::Plugin.register("conditional_release_tuning", nil, {
+                              name: -> { t :name, "Mastery Path Tuning" },
+                              description: -> { t :description, "Mastery Path tuning" },
+                              author: "Instructure",
+                              author_website: "http://www.instructure.com",
+                              version: "1.0.0",
+                              settings_partial: "plugins/conditional_release_tuning_settings",
+                              settings: { priority: "low" },
+                              validator: "ConditionalReleaseTuningValidator",
                             })
   end
 end

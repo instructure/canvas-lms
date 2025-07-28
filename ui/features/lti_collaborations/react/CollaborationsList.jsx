@@ -26,18 +26,19 @@ import store from './store'
 class CollaborationsList extends React.Component {
   loadMoreCollaborations = () => {
     ReactDOM.findDOMNode(
-      this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`]
+      this.refs[`collaboration-${this.props.collaborationsState.list.length - 1}`],
     ).focus()
     store.dispatch(this.props.getCollaborations(this.props.collaborationsState.nextPage))
   }
 
   render() {
     return (
-      <div className="CollaborationsList">
+      <div className="CollaborationsList" data-testid="collaborations-list">
         <LoadMore
-          isLoading={this.props.collaborationsState.listCollaborationsPending}
+          isLoading={Boolean(this.props.collaborationsState.listCollaborationsPending)}
           hasMore={!!this.props.collaborationsState.nextPage}
           loadMore={this.loadMoreCollaborations}
+          data-testid="load-more"
         >
           {this.props.collaborationsState.list.map((c, index) => (
             <Collaboration
@@ -45,6 +46,7 @@ class CollaborationsList extends React.Component {
               key={c.id}
               collaboration={c}
               deleteCollaboration={this.props.deleteCollaboration}
+              data-testid={`collaboration-${index}`}
             />
           ))}
         </LoadMore>
@@ -54,9 +56,9 @@ class CollaborationsList extends React.Component {
 }
 
 CollaborationsList.propTypes = {
-  collaborationsState: PropTypes.object.isRequired,
-  deleteCollaboration: PropTypes.func.isRequired,
-  getCollaborations: PropTypes.func.isRequired,
+  collaborationsState: PropTypes.object,
+  deleteCollaboration: PropTypes.func,
+  getCollaborations: PropTypes.func,
 }
 
 export default CollaborationsList

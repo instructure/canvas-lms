@@ -16,45 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {useContext, useEffect} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconCollapseLine, IconExpandLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {AllThreadsState, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 export const ExpandCollapseThreadsButton = props => {
-  const {setAllThreadsStatus, expandedThreads, setExpandedThreads} = useContext(SearchContext)
+  const {setAllThreadsStatus, setExpandedThreads} = useContext(SearchContext)
+  const buttonText =
+    props.expandedLocked || props.isExpanded ? I18n.t('Collapse Threads') : I18n.t('Expand Threads')
 
-  const isExpanded = expandedThreads.length > 0
-  const buttonText = isExpanded ? I18n.t('Collapse Threads') : I18n.t('Expand Threads')
-  return (
+  useEffect(() => {
+    if (props.isExpanded) {
+      setAllThreadsStatus(AllThreadsState.Expanded)
+    }
+    setTimeout(() => {
+      setAllThreadsStatus(AllThreadsState.None)
+    }, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleExpandCollapseClick = () => {
+    props.onCollapseRepliesToggle(!props.isExpanded)
+    setExpandedThreads([])
+    setAllThreadsStatus(props.isExpanded ? AllThreadsState.Collapsed : AllThreadsState.Expanded)
+    setTimeout(() => {
+      setAllThreadsStatus(AllThreadsState.None)
+    }, 0)
+  }
+
+  const button = (
+    <Button
+      display="block"
+      onClick={handleExpandCollapseClick}
+      renderIcon={
+        props.expandedLocked || props.isExpanded ? <IconCollapseLine /> : <IconExpandLine />
+      }
+      data-testid="ExpandCollapseThreads-button"
+      data-action-state={props.isExpanded ? 'collapseButton' : 'expandButton'}
+      disabled={props.disabled || false}
+    >
+      {props.showText ? buttonText : null}
+    </Button>
+  )
+
+  return props.tooltipEnabled ? (
     <Tooltip renderTip={buttonText} width="78px" data-testid="sortButtonTooltip">
-      <Button
-        onClick={() => {
-          if (isExpanded) {
-            setExpandedThreads([])
-            setAllThreadsStatus(AllThreadsState.Collapsed)
-          } else {
-            setAllThreadsStatus(AllThreadsState.Expanded)
-          }
-
-          setTimeout(() => {
-            setAllThreadsStatus(AllThreadsState.None)
-          }, 0)
-        }}
-        renderIcon={isExpanded ? <IconExpandLine /> : <IconCollapseLine />}
-        data-testid="ExpandCollapseThreads-button"
-      >
-        {props.showText ? buttonText : null}
-      </Button>
+      {button}
     </Tooltip>
+  ) : (
+    button
   )
 }
 
 ExpandCollapseThreadsButton.propTypes = {
   showText: PropTypes.bool,
+  isExpanded: PropTypes.bool,
+  onCollapseRepliesToggle: PropTypes.func,
+  tooltipEnabled: PropTypes.bool,
+  disabled: PropTypes.bool,
+  expandedLocked: PropTypes.bool,
 }

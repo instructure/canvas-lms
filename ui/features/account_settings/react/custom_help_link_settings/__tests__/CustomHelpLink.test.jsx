@@ -46,34 +46,19 @@ describe('<CustomHelpLink/>', () => {
     expect(getByText('Ask Your Instructor a Question')).toBeInTheDocument()
   })
 
-  it('does not render Featured for featured links', () => {
-    const {queryByText} = render(<CustomHelpLink {...makeProps({link: {is_featured: true}})} />)
+  it('does not render Featured or New for plain links', () => {
+    const {queryByText} = render(<CustomHelpLink {...makeProps()} />)
     expect(queryByText('Featured')).toBeNull()
+    expect(queryByText('New')).toBeNull()
   })
 
-  describe('with featured help links', () => {
-    beforeEach(() => {
-      window.ENV = {FEATURES: {featured_help_links: true}}
-    })
+  it('renders Featured for featured links', () => {
+    const {getByText} = render(<CustomHelpLink {...makeProps({link: {is_featured: true}})} />)
+    expect(getByText('Featured')).toBeInTheDocument()
+  })
 
-    afterEach(() => {
-      window.ENV = {}
-    })
-
-    it('does not render Featured or New for plain links', () => {
-      const {queryByText} = render(<CustomHelpLink {...makeProps()} />)
-      expect(queryByText('Featured')).toBeNull()
-      expect(queryByText('New')).toBeNull()
-    })
-
-    it('renders Featured for featured links', () => {
-      const {getByText} = render(<CustomHelpLink {...makeProps({link: {is_featured: true}})} />)
-      expect(getByText('Featured')).toBeInTheDocument()
-    })
-
-    it('renders New for new links', () => {
-      const {getByText} = render(<CustomHelpLink {...makeProps({link: {is_new: true}})} />)
-      expect(getByText('New')).toBeInTheDocument()
-    })
+  it('renders New for new links', () => {
+    const {getByText} = render(<CustomHelpLink {...makeProps({link: {is_new: true}})} />)
+    expect(getByText('New')).toBeInTheDocument()
   })
 })

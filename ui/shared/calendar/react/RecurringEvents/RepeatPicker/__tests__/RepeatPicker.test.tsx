@@ -61,19 +61,19 @@ describe('RepeatPicker', () => {
   describe('utilities', () => {
     it('getByMonthdateString returns the correct string', () => {
       expect(getByMonthdateString(moment('2023-07-03'), 'en', defaultTZ)).toEqual(
-        'on the first Monday'
+        'on the first Monday',
       )
       expect(getByMonthdateString(moment('2023-07-10'), 'en', defaultTZ)).toEqual(
-        'on the second Monday'
+        'on the second Monday',
       )
       expect(getByMonthdateString(moment('2023-07-17'), 'en', defaultTZ)).toEqual(
-        'on the third Monday'
+        'on the third Monday',
       )
       expect(getByMonthdateString(moment('2023-07-24'), 'en', defaultTZ)).toEqual(
-        'on the fourth Monday'
+        'on the fourth Monday',
       )
       expect(getByMonthdateString(moment('2023-07-31'), 'en', defaultTZ)).toEqual(
-        'on the fifth Monday'
+        'on the fifth Monday',
       )
     })
 
@@ -85,7 +85,7 @@ describe('RepeatPicker', () => {
   describe('component', () => {
     it('renders daily', () => {
       const {getByDisplayValue, getByTestId, getByText} = render(
-        <RepeatPicker {...defaultProps()} />
+        <RepeatPicker {...defaultProps()} />,
       )
       expect(getByText('Repeat every:')).toBeInTheDocument()
       expect(getByTestId('repeat-interval')).toBeInTheDocument()
@@ -108,7 +108,7 @@ describe('RepeatPicker', () => {
 
     it('renders plural weeks', () => {
       const {getByDisplayValue} = render(
-        <RepeatPicker {...defaultProps({interval: 2, freq: 'WEEKLY'})} />
+        <RepeatPicker {...defaultProps({interval: 2, freq: 'WEEKLY'})} />,
       )
       expect(getByDisplayValue('2')).toBeInTheDocument()
       expect(getByDisplayValue('Weeks')).toBeInTheDocument()
@@ -128,7 +128,7 @@ describe('RepeatPicker', () => {
       const pos = cardinalDayInMonth(today).cardinal
 
       const {getByDisplayValue} = render(
-        <RepeatPicker {...defaultProps({freq: 'MONTHLY', weekdays: today_day, pos})} />
+        <RepeatPicker {...defaultProps({freq: 'MONTHLY', weekdays: today_day, pos})} />,
       )
       expect(getByDisplayValue('1')).toBeInTheDocument()
       expect(getByDisplayValue('Month')).toBeInTheDocument()
@@ -140,7 +140,7 @@ describe('RepeatPicker', () => {
       const {getByDisplayValue} = render(
         <RepeatPicker
           {...defaultProps({dtstart: '2023-06-30', freq: 'MONTHLY', weekdays: ['FR'], pos: -1})}
-        />
+        />,
       )
       expect(getByDisplayValue('1')).toBeInTheDocument()
       expect(getByDisplayValue('Month')).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('RepeatPicker', () => {
 
     it('renders monthly correctly when the last day is in the 4th week', () => {
       const {getByTestId, getByRole} = render(
-        <RepeatPicker {...defaultProps({dtstart: '2023-07-25', freq: 'MONTHLY'})} />
+        <RepeatPicker {...defaultProps({dtstart: '2023-07-25', freq: 'MONTHLY'})} />,
       )
       fireEvent.click(getByTestId('repeat-month-mode'))
       expect(getByRole('option', {name: 'on day 25'})).toBeInTheDocument()
@@ -159,7 +159,7 @@ describe('RepeatPicker', () => {
 
     it('renders yearly by date', () => {
       const {getByDisplayValue, getByText} = render(
-        <RepeatPicker {...defaultProps({freq: 'YEARLY'})} />
+        <RepeatPicker {...defaultProps({freq: 'YEARLY'})} />,
       )
       expect(getByDisplayValue('1')).toBeInTheDocument()
       expect(getByDisplayValue('Year')).toBeInTheDocument()
@@ -201,7 +201,7 @@ describe('RepeatPicker', () => {
     it('calls onChange when weekdays changes', async () => {
       const onChange = jest.fn()
       const {getByDisplayValue} = render(
-        <RepeatPicker {...defaultProps({freq: 'WEEKLY', onChange})} />
+        <RepeatPicker {...defaultProps({freq: 'WEEKLY', onChange})} />,
       )
       // get 2 weekdays in the correct order
       const weekdays = weekdaysFromMoment(today)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,8 +19,8 @@
 import moment from 'moment-timezone'
 import {keyBy} from 'lodash'
 
-import {BlackoutDate, SyncState, Course} from '../shared/types'
-import {
+import {type BlackoutDate, SyncState, type Course} from '../shared/types'
+import type {
   Enrollment,
   Enrollments,
   Module,
@@ -34,11 +33,19 @@ import {
   PaceContextsApiResponse,
   StoreState,
   PaceContext,
+  BulkEditStudentsState,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
 window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 moment.tz.setDefault('America/Denver')
+
+export const ASSIGNMENT_WEIGHTING = {
+  assignment: 1,
+  discussion: 2,
+  quiz: 3,
+  page: 4,
+}
 
 export const COURSE: Course = {
   id: '30',
@@ -145,6 +152,19 @@ export const PACE_ITEM_3: CoursePaceItem = {
   published: true,
 }
 
+export const PACE_ITEM_4: CoursePaceItem = {
+  id: '53',
+  duration: 3,
+  assignment_title: 'Composite sociology',
+  assignment_link: `/courses/${COURSE.id}/modules/items/53`,
+  points_possible: 1,
+  position: 1,
+  module_item_id: '62',
+  module_item_type: 'Quiz',
+  published: true,
+  unreleased: true
+}
+
 export const PACE_MODULE_1: Module = {
   id: '40',
   name: 'How 2 B A H4CK32',
@@ -158,6 +178,17 @@ export const PACE_MODULE_2: Module = {
   position: 2,
   items: [PACE_ITEM_3],
 }
+
+export const PACE_MODULE_3: Module = {
+  id: '46',
+  name: 'Conditionally Released Items',
+  position: 3,
+  items: [PACE_ITEM_4],
+}
+
+export const EXCLUDE_WEEKENDS_WORK_WEEK_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri']
+
+export const NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
 export const PRIMARY_PACE: CoursePace = {
   id: '1',
@@ -173,6 +204,31 @@ export const PRIMARY_PACE: CoursePace = {
   end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
+  selected_days_to_skip: [],
+  modules: [PACE_MODULE_1, PACE_MODULE_2],
+  // @ts-expect-error
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
+  time_to_complete_calendar_days: 100,
+}
+
+export const PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED: CoursePace = {
+  id: '1',
+  name: 'Course 1',
+  course_id: COURSE.id,
+  course_section_id: undefined,
+  user_id: undefined,
+  context_type: 'Course',
+  context_id: COURSE.id,
+  start_date: '2021-09-01',
+  start_date_context: 'course',
+  end_date: '2021-12-15',
+  end_date_context: 'course',
+  workflow_state: 'active',
+  exclude_weekends: true,
+  selected_days_to_skip: ['sat', 'sun'],
   modules: [PACE_MODULE_1, PACE_MODULE_2],
   // @ts-expect-error
   course: undefined,
@@ -203,6 +259,7 @@ export const COURSE_PACE_CONTEXT: PaceContext = {
     duration: 6,
     last_modified: '2022-10-17T23:12:24Z',
   },
+  on_pace: true,
 }
 
 export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
@@ -219,6 +276,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'D-F',
@@ -232,6 +290,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'G-K',
@@ -245,6 +304,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 3,
@@ -264,6 +324,7 @@ export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 1,
@@ -283,6 +344,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Peter',
@@ -296,6 +358,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Mike',
@@ -309,6 +372,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Alex',
@@ -322,6 +386,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 4,
@@ -345,6 +410,7 @@ export const SECTION_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
 }
 
 export const STUDENT_PACE: CoursePace = {
@@ -365,6 +431,29 @@ export const STUDENT_PACE: CoursePace = {
   course: undefined,
   compressed_due_dates: undefined,
   updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
+  time_to_complete_calendar_days: 100,
+}
+
+export const STUDENT_PACE_UNRELEASED_ITEMS: CoursePace = {
+  id: '4',
+  course_id: COURSE.id,
+  course_section_id: undefined,
+  user_id: ENROLLMENT_1.user_id,
+  context_type: 'Enrollment',
+  context_id: ENROLLMENT_1.user_id,
+  start_date: '2021-10-01',
+  start_date_context: 'user',
+  end_date: '2021-12-15',
+  end_date_context: 'user',
+  workflow_state: 'active',
+  exclude_weekends: true,
+  modules: [PACE_MODULE_1, PACE_MODULE_2, PACE_MODULE_3],
+  // @ts-expect-error
+  course: undefined,
+  compressed_due_dates: undefined,
+  updated_at: '',
+  assignments_weighting: ASSIGNMENT_WEIGHTING,
 }
 
 export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
@@ -413,15 +502,64 @@ export const DEFAULT_UI_STATE: UIState = {
   showPaceModal: false,
   showProjections: true,
   syncing: 0,
+  outerResponsiveSize: 'large',
+  savingDraft: false,
+  showWeightedAssignmentsTray: false,
+  bulkEditModalOpen: false,
+  selectedBulkStudents: []
+}
+
+export const DEFAULT_BULK_EDIT_STUDENTS_STATE: BulkEditStudentsState = {
+    searchTerm: '',
+    filterSection: '',
+    filterPaceStatus: '',
+    sortBy: 'name',
+    orderType: 'asc',
+    page: 1,
+    pageCount: 2,
+    students: [
+      {
+        id: '1',
+        name: 'John',
+        enrollmentId: '1',
+        enrollmentDate: '2025-02-01',
+        paceStatus: "on-pace",
+        sections: [
+          { id: 'math', name: 'Math', course_id: "1" }
+        ]
+      },
+      {
+        id: '2',
+        name: 'Maria',
+        enrollmentId: '2',
+        enrollmentDate: '2025-02-02',
+        paceStatus: "on-pace",
+        sections: [
+          {
+            id: 'science',
+            name: 'Science',
+            course_id: "1"
+          }
+        ]
+      },
+    ],
+    sections: [
+      { id: 'all', name: 'All Sections', course_id: "1" },
+      { id: 'math', name: 'Math', course_id: "1" },
+      { id: 'science', name: 'Science', course_id: "1" },
+    ],
+    isLoading: false,
+    error: '',
 }
 
 export const DEFAULT_STORE_STATE: StoreState = {
   blackoutDates: DEFAULT_BLACKOUT_DATE_STATE,
   course: COURSE,
   enrollments: ENROLLMENTS,
-  coursePace: {...PRIMARY_PACE},
+  coursePace: { ...PRIMARY_PACE },
   sections: SECTIONS,
-  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES},
+  original: { coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES },
   paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
   ui: DEFAULT_UI_STATE,
+  bulkEditStudents: DEFAULT_BULK_EDIT_STUDENTS_STATE
 }

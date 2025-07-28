@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {TextInputChangeHandler} from './types'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export interface ConfigurationFormLti2Props {
   registrationUrl?: string
+  hasBeenSubmitted?: boolean
 }
 
 export interface ConfigurationFormLti2State {
@@ -46,22 +47,34 @@ export default class ConfigurationFormLti2 extends React.Component<
     errors: {},
   }
 
+  urlRef = React.createRef<TextInput>()
+
   handleChange: TextInputChangeHandler = (_, val) => {
     this.setState({
       registrationUrl: val,
     })
+    this.isValid()
   }
 
   isValid = () => {
-    if (!this.state.registrationUrl) {
+    if (
+      !this.state.registrationUrl ||
+      this.state.registrationUrl.trim() === '' ||
+      !URL.canParse(this.state.registrationUrl)
+    ) {
       this.setState({
         errors: {
-          registrationUrl: [{text: I18n.t('This field is required'), type: 'error'}],
+          registrationUrl: [
+            {text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'},
+          ],
         },
       })
-
+      this.urlRef.current?.focus()
       return false
     } else {
+      this.setState({
+        errors: {},
+      })
       return true
     }
   }
@@ -76,7 +89,6 @@ export default class ConfigurationFormLti2 extends React.Component<
         <TextInput
           id="registrationUrl"
           type="url"
-          // @ts-ignore
           // The LTI 2 registration form is the _only_ form that actually submits values
           // using form.submit as opposed to XHR/fetch, so this name is required for it to work
           // properly. InstUI will propagate this value down to the input element. This is largely
@@ -84,10 +96,11 @@ export default class ConfigurationFormLti2 extends React.Component<
           // to just let the form handle that, rather than replicate that functionality in JS.
           name="tool_consumer_url"
           value={this.state.registrationUrl}
+          ref={this.urlRef}
           onChange={this.handleChange}
           renderLabel={I18n.t('Registration URL')}
           placeholder={I18n.t('https://lti-tool-provider-example.herokuapp.com/register')}
-          messages={this.state.errors.registrationUrl}
+          messages={this.props.hasBeenSubmitted ? this.state.errors.registrationUrl : []}
           isRequired={true}
         />
       </div>

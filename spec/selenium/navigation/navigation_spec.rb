@@ -63,7 +63,7 @@ describe "Global Navigation" do
         driver.execute_script('$("#global_nav_courses_link").focus()')
         f("#global_nav_courses_link").send_keys(:enter)
         wait_for_ajaximations
-        links = ff('[aria-label="Courses tray"] li a')
+        links = ff('[aria-label="Courses tray"] a')
         expect(links.count).to be 2
       end
     end

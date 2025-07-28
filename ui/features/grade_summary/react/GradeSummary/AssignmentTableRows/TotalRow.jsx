@@ -19,21 +19,27 @@
 import React from 'react'
 import {ASSIGNMENT_NOT_APPLICABLE} from '../constants'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
 import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignments} from '../utils'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
-export const totalRow = (queryData, calculateOnlyGradedAssignments = false, courseLevelGrades) => {
-  const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
+export const totalRow = (
+  queryData,
+  assignmentsData,
+  calculateOnlyGradedAssignments = false,
+  courseLevelGrades,
+  overrideGrade,
+) => {
+  const applicableAssignments = filteredAssignments(assignmentsData, calculateOnlyGradedAssignments)
   let total = getTotal(
     applicableAssignments,
     queryData?.assignmentGroupsConnection?.nodes,
     queryData?.gradingPeriodsConnection?.nodes,
-    queryData?.applyGroupWeights
+    queryData?.applyGroupWeights,
   )
 
   const courseLevelScore = courseLevelGrades?.score || 0
@@ -52,16 +58,17 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false, cour
       : `${formatNumber(percentageFromCourseLevelGrades)}%`
 
   const letterGrade =
-    total === ASSIGNMENT_NOT_APPLICABLE
+    overrideGrade ||
+    (total === ASSIGNMENT_NOT_APPLICABLE
       ? total
-      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard)
+      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard))
 
   const earnedPoints = formatNumber(courseLevelScore) || '-'
   const totalPoints = formatNumber(courseLevelPossible) || '-'
   const hasWeightedGradingPeriods = queryData?.gradingPeriodsConnection?.nodes?.some(
     gradingPeriod => {
       return gradingPeriod.weight != null && gradingPeriod.weight > 0
-    }
+    },
   )
 
   return (
@@ -79,6 +86,7 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false, cour
             <Text weight="bold">{`${earnedPoints}/${totalPoints}`}</Text>
           </Table.Cell>
         )}
+      <Table.Cell textAlign="start">{/* Document processors */}</Table.Cell>
     </Table.Row>
   )
 }

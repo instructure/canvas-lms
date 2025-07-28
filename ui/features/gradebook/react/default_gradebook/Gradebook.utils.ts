@@ -22,7 +22,7 @@ import assignmentHelper from '../shared/helpers/assignmentHelper'
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import getTextWidth from '../shared/helpers/TextMeasure'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
@@ -62,7 +62,7 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const createDateTimeFormatter = (timeZone: string) => {
   return Intl.DateTimeFormat(I18n.currentLocale(), {
@@ -79,9 +79,12 @@ export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: 
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
 
-export function ensureAssignmentVisibility(assignment: Assignment, submission: Submission) {
+export function ensureAssignmentVisibility(
+  assignment: Pick<Assignment, 'visible_to_everyone' | 'assignment_visibility'>,
+  submission: Submission,
+) {
   if (
-    assignment?.only_visible_to_overrides &&
+    assignment?.visible_to_everyone === false &&
     !assignment.assignment_visibility.includes(submission.user_id)
   ) {
     return assignment.assignment_visibility.push(submission.user_id)
@@ -90,7 +93,7 @@ export function ensureAssignmentVisibility(assignment: Assignment, submission: S
 
 export function forEachSubmission(
   students: GradebookStudentMap,
-  fn: (submission: Submission) => void
+  fn: (submission: Submission) => void,
 ) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
@@ -160,7 +163,7 @@ export function onGridKeyDown(
     grid: {
       getColumns(): GridColumn[]
     }
-  }
+  },
 ) {
   if (obj.row == null || obj.cell == null) {
     return
@@ -182,7 +185,7 @@ export function onGridKeyDown(
 export function renderComponent(
   reactClass: any,
   mountPoint: Element | null,
-  props = {}
+  props = {},
 ): HTMLElement | undefined {
   if (mountPoint == null) {
     throw new Error('mountPoint is required')
@@ -202,7 +205,7 @@ export async function confirmViewUngradedAsZero({
   const showDialog = () =>
     showConfirmationDialog({
       body: I18n.t(
-        'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
+        'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.',
       ),
       confirmText: I18n.t('OK'),
       label: I18n.t('View Ungraded as Zero'),
@@ -217,7 +220,10 @@ export async function confirmViewUngradedAsZero({
   }
 }
 
-export function hiddenStudentIdsForAssignment(studentIds: string[], assignment: Assignment) {
+export function hiddenStudentIdsForAssignment(
+  studentIds: string[],
+  assignment: Pick<Assignment, 'assignment_visibility'>,
+) {
   return _.difference(studentIds, assignment.assignment_visibility)
 }
 
@@ -270,7 +276,7 @@ export function findFilterValuesOfType(type: FilterType, appliedFilters: Filter[
   return appliedFilters.reduce(
     (values: string[], filter: Filter) =>
       filter.type === type && filter.value ? values.concat(filter.value) : values,
-    []
+    [],
   )
 }
 
@@ -346,12 +352,15 @@ export const getLabelForFilter = (
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
   studentGroupCategories: StudentGroupCategoryMap,
-  customStatuses: GradeStatus[]
+  customStatuses: GradeStatus[],
 ) => {
-  const customStatusesMap = customStatuses.reduce((acc, status) => {
-    acc[mapCustomStatusToIdString(status)] = status.name
-    return acc
-  }, {} as Record<CustomStatusIdString, string>)
+  const customStatusesMap = customStatuses.reduce(
+    (acc, status) => {
+      acc[mapCustomStatusToIdString(status)] = status.name
+      return acc
+    },
+    {} as Record<CustomStatusIdString, string>,
+  )
   if (!filter.type) throw new Error('missing condition type')
 
   if (filter.type === 'section') {
@@ -421,7 +430,7 @@ export function doFiltersMatch(filters1: Filter[], filters2: Filter[]) {
     filtersWithValues1.length > 0 &&
     filtersWithValues1.length === filtersWithValues2.length &&
     filtersWithValues1.every(c1 =>
-      filtersWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value)
+      filtersWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value),
     )
   )
 }
@@ -443,7 +452,7 @@ export function assignmentSearchMatcher(
   option: {
     label: string
   },
-  searchTerm: string
+  searchTerm: string,
 ): boolean {
   const term = searchTerm?.toLowerCase() || ''
   const assignmentName = option.label?.toLowerCase() || ''
@@ -453,14 +462,14 @@ export function assignmentSearchMatcher(
 export function buildStudentColumn(
   columnId: string,
   gradebookColumnSizeSetting: string,
-  defaultWidth: number
+  defaultWidth: number,
 ): GridColumn {
   let studentColumnWidth = gradebookColumnSizeSetting
     ? parseInt(gradebookColumnSizeSetting, 10)
     : defaultWidth
   if (Number.isNaN(studentColumnWidth)) {
     studentColumnWidth = defaultWidth
-    // eslint-disable-next-line no-console
+
     console.warn('invalid student column width')
   }
   return {
@@ -504,7 +513,7 @@ export const buildAssignmentGroupColumnFn =
       width = testWidth(
         assignmentGroup.name,
         columnWidths.assignmentGroup.min,
-        columnWidths.assignmentGroup.default_max
+        columnWidths.assignmentGroup.default_max,
       )
     }
     return {
@@ -533,7 +542,7 @@ export function testWidth(text: string, minWidth: number, maxWidth: number) {
 export function otherGradingPeriodAssignmentIds(
   gradingPeriodAssignments: GradingPeriodAssignmentMap,
   selectedAssignmentIds: string[],
-  selectedPeriodId: string
+  selectedPeriodId: string,
 ) {
   const restIds = Object.values(gradingPeriodAssignments)
     .flat()
@@ -542,14 +551,14 @@ export function otherGradingPeriodAssignmentIds(
   return {
     otherAssignmentIds: [...new Set(restIds)],
     otherGradingPeriodIds: Object.keys(gradingPeriodAssignments).filter(
-      gpId => gpId !== selectedPeriodId
+      gpId => gpId !== selectedPeriodId,
     ),
   }
 }
 
 const createQueryString = ([key, val]: [
   string,
-  string | number | boolean | string[] | SubmissionType[]
+  string | number | boolean | string[] | SubmissionType[],
 ]): string => {
   if (Array.isArray(val)) {
     return val.map(v => createQueryString([`${key}[]`, String(v)])).join('&')
@@ -570,7 +579,7 @@ export function maxAssignmentCount(
     assignment_ids?: string
   },
   pathName: string,
-  requestCharacterLimit: number = DEFAULT_REQUEST_CHARACTER_LIMIT
+  requestCharacterLimit: number = DEFAULT_REQUEST_CHARACTER_LIMIT,
 ) {
   const queryString = Object.entries(params).map(createQueryString).join('&')
   const currentURI = `${window.location.hostname}${pathName}?${queryString}`
@@ -622,7 +631,7 @@ export const wasSubmitted = (s: Submission | MissingSubmission) =>
 export const categorizeFilters = (appliedFilters: Filter[], customStatuses: GradeStatus[]) => {
   const submissionFilters = findFilterValuesOfType(
     'submissions',
-    appliedFilters
+    appliedFilters,
   ) as SubmissionFilterValue[]
   const customStatusIds = getCustomStatusIdStrings(customStatuses)
 
@@ -647,12 +656,12 @@ export const categorizeFilters = (appliedFilters: Filter[], customStatuses: Grad
     possibleSomeFilters.push('has-no-submissions')
   } else {
     filtersNeedingEvery = submissionFilters.filter(filter =>
-      ['has-no-submissions'].includes(filter)
+      ['has-no-submissions'].includes(filter),
     )
   }
 
   const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
-    possibleSomeFilters.includes(filter)
+    possibleSomeFilters.includes(filter),
   )
 
   return {filtersNeedingSome, filtersNeedingEvery}
@@ -661,7 +670,7 @@ export const categorizeFilters = (appliedFilters: Filter[], customStatuses: Grad
 export function filterSubmission(
   filters: SubmissionFilterValue[],
   submission: Submission | MissingSubmission,
-  customStatuses: GradeStatus[]
+  customStatuses: GradeStatus[],
 ) {
   if (filters.length === 0) {
     return true
@@ -704,14 +713,14 @@ export function filterSubmissionsByCategorizedFilters(
   filtersNeedingSome: SubmissionFilterValue[],
   filtersNeedingEvery: SubmissionFilterValue[],
   submissions: (Submission | MissingSubmission)[],
-  customStatuses: GradeStatus[]
+  customStatuses: GradeStatus[],
 ) {
   const hasMatch =
     submissions.some(submission =>
-      filterSubmission(filtersNeedingSome, submission, customStatuses)
+      filterSubmission(filtersNeedingSome, submission, customStatuses),
     ) &&
     submissions.every(submission =>
-      filterSubmission(filtersNeedingEvery, submission, customStatuses)
+      filterSubmission(filtersNeedingEvery, submission, customStatuses),
     )
 
   return hasMatch
@@ -721,21 +730,21 @@ export const filterStudentBySubmissionFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,
   assignmentIds: string[],
-  customStatuses: GradeStatus[]
+  customStatuses: GradeStatus[],
 ) => {
   const submissionFilters = findFilterValuesOfType(
     'submissions',
-    appliedFilters
+    appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (student: Pick<Student, 'id'>) => {
     if (submissionFilters.length === 0) {
       return true
     }
 
     const submissions = submissionStateMap.getSubmissionsByStudentAndAssignmentIds(
       student.id,
-      assignmentIds
+      assignmentIds,
     )
 
     // when sorting rows, we only use .some to determine visiblity
@@ -756,14 +765,18 @@ const getIncludedEnrollmentStates = (enrollmentFilter: EnrollmentFilter) => {
 
 export const filterStudentBySectionFn = (
   appliedFilters: Filter[],
-  enrollmentFilter: EnrollmentFilter
+  enrollmentFilter: EnrollmentFilter,
 ) => {
   const sectionFilters = findFilterValuesOfType(
     'section',
-    appliedFilters
+    appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (
+    student: Pick<Student, 'sections'> & {
+      enrollments: Pick<Student['enrollments'][number], 'course_section_id' | 'enrollment_state'>[]
+    },
+  ) => {
     if (sectionFilters.length === 0) {
       return true
     }
@@ -786,14 +799,14 @@ export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,
   searchFilteredStudentIds: string[],
-  customStatuses: GradeStatus[]
+  customStatuses: GradeStatus[],
 ) => {
   const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(
     appliedFilters,
-    customStatuses
+    customStatuses,
   )
 
-  return (assignment: Assignment) => {
+  return (assignment: Pick<Assignment, 'id'>) => {
     if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
       return true
     }
@@ -802,7 +815,7 @@ export const filterAssignmentsBySubmissionsFn = (
 
     if (searchFilteredStudentIds.length > 0) {
       submissions = submissions.filter(submission =>
-        searchFilteredStudentIds.includes(submission.user_id)
+        searchFilteredStudentIds.includes(submission.user_id),
       )
     }
 
@@ -810,7 +823,7 @@ export const filterAssignmentsBySubmissionsFn = (
       filtersNeedingSome,
       filtersNeedingEvery,
       submissions,
-      customStatuses
+      customStatuses,
     )
     return result
   }
@@ -819,7 +832,7 @@ export function formatGradingPeriodTitleForDisplay(
   gradingPeriod:
     | Pick<CamelizedGradingPeriod, 'title' | 'startDate' | 'endDate' | 'closeDate'>
     | undefined
-    | null
+    | null,
 ) {
   if (!gradingPeriod) return null
 
@@ -842,4 +855,10 @@ export function formatGradingPeriodTitleForDisplay(
   }
 
   return title
+}
+
+export function postPolicyChangeable(
+  assignment: Pick<Assignment, 'anonymize_students'> | null | undefined,
+) {
+  return assignment != null && !assignment.anonymize_students
 }

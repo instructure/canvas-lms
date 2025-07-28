@@ -32,7 +32,7 @@ describe('canvas_quizzes/events/views/question_inspector/answers/multiple_answer
           ],
         }}
         answer={['1', '3']}
-      />
+      />,
     )
 
     expect(getByTestId('answer-1').checked).toBe(true)

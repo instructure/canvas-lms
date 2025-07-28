@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, find} from 'lodash'
 import {View} from '@canvas/backbone'
@@ -24,7 +24,7 @@ import template from '../../jst/section_to_show_menu.handlebars'
 import 'jquery-kyle-menu'
 import 'jquery-tinypubsub'
 
-const I18n = useI18nScope('gradebookSectionMenuView')
+const I18n = createI18nScope('gradebookSectionMenuView')
 
 const boundMethodCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {

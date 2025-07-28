@@ -25,7 +25,7 @@ module GlobalNavigationHelper
       render_icon_partial(base, icon)
     rescue ActionView::MissingTemplate => e
       logger.warn "Global nav icon does not exist: #{e}"
-      render_icon_partial("", icon) rescue nil # worst case we don't render anything
+      render_icon_partial("", icon)
     end
   end
 

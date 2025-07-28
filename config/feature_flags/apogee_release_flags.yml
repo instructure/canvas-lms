@@ -1,9 +1,4 @@
 ---
-datadog_rum_js:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Datadog RUM JS Agent
-  description: Include the Datadog RUM JS Agent in the document HEAD.
 missing_policy_applicator_emits_live_events:
   state: hidden
   applies_to: RootAccount
@@ -58,6 +53,9 @@ enhanced_gradebook_filters:
       this flag is enabled, early access to ongoing improvements will be displayed
       automatically with every release. For full details, please see the *Gradebook
       Filters User Group* in the Canvas Community.
+  environments:
+    development:
+      state: on # enable for local development
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin
@@ -68,7 +66,8 @@ apply_score_to_ungraded:
   state: hidden
   applies_to: Account
   display_name: Apply Score to Ungraded
-  description: Allows instructors to apply scores to ungraded submissions en masse from assignment
+  description:
+    Allows instructors to apply scores to ungraded submissions en masse from assignment
     group and Total column menus in the Gradebook.
   environments:
     development:
@@ -77,12 +76,14 @@ enhanced_grade_statistics:
   state: hidden
   applies_to: SiteAdmin
   display_name: Show quartiles for grades and use them for box and whiskers
-  description: Updates the student-facing assignment statistics to include quartiles and makes the
+  description:
+    Updates the student-facing assignment statistics to include quartiles and makes the
     box-and-whiskers plot a proper box and whiskers plot.
 submission_comment_emojis:
   state: hidden
   display_name: Emojis in Submission Comments
-  description: Adds an emoji picker that allows students and teachers to add emojis to
+  description:
+    Adds an emoji picker that allows students and teachers to add emojis to
     their submission comments.
   applies_to: Course
   root_opt_in: true
@@ -95,7 +96,8 @@ peer_reviews_for_a2:
   state: hidden
   applies_to: Course
   display_name: Peer Review Support in Assignment Enhancements
-  description: Students will be able to provide feedback on another student's assignment submission
+  description:
+    Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
 assignment_missing_shortcut:
   state: hidden
@@ -140,7 +142,8 @@ proxy_file_uploads:
   state: hidden
   applies_to: SiteAdmin
   display_name: Submit on Behalf of Student
-  description: Allows teachers with the proper permissions to submit file upload assignments
+  description:
+    Allows teachers with the proper permissions to submit file upload assignments
     on behalf of their students.
   environments:
     ci:
@@ -149,7 +152,8 @@ deprioritize_section_overrides_for_nonactive_enrollments:
   state: hidden
   applies_to: SiteAdmin
   display_name: Deprioritize Section Overrides for Nonactive Enrollments
-  description: If set, deprioritizes using due dates, lock dates, and unlock dates from
+  description:
+    If set, deprioritizes using due dates, lock dates, and unlock dates from
     section overrides on an assignment that are associated with a deactivated, concluded, or
     otherwise non-active enrollment for a student.
   environments:
@@ -176,7 +180,8 @@ new_quiz_deleted_workflow_restore_pending_review_state:
   state: hidden
   applies_to: SiteAdmin
   display_name: New Quiz deleted user restore pending review state on enroll
-  description: When set, determines if the workflow state of a new quiz should be
+  description:
+    When set, determines if the workflow state of a new quiz should be
     set as graded or pending_review if a user had a previous pending_review new quiz but
     had been re-enrolled in the course.
   environments:
@@ -186,22 +191,12 @@ new_quiz_deleted_workflow_restore_pending_review_state:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
-individual_gradebook_enhancements:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Individual Gradebook Enhancements
-  description: This feature introduces performance and maintenance enhancements
-    to Individual Gradebook
-  environments:
-    ci:
-      state: allowed_on # enable for automated testings builds and local testing
-    development:
-      state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin
   display_name: Hide zero point new quizzes from the student and teacher gradebooks
-  description: When set, an option to not display a new quiz with 0 points possible in the gradebook
+  description:
+    When set, an option to not display a new quiz with 0 points possible in the gradebook
     will be available in the form of a checkbox when creating or editing the quiz.
   environments:
     ci:
@@ -220,7 +215,8 @@ fix_missing_policy_applicator_gradebook_history:
   state: hidden
   applies_to: SiteAdmin
   display_name: Fix Missing Policy Applicator Gradebook History
-  description: Fixes the missing policy applicator to insert records into Gradebook History
+  description:
+    Fixes the missing policy applicator to insert records into Gradebook History
     for each submission marked as missing.
   environments:
     ci:
@@ -234,6 +230,9 @@ grading_scheme_updates:
   applies_to: SiteAdmin
   display_name: Improve Letter Grading Scheme Usability
   description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.
+  environments:
+    development:
+      state: allowed_on # enable by deault for local development
 custom_gradebook_statuses:
   state: hidden
   applies_to: SiteAdmin
@@ -248,7 +247,8 @@ submission_stickers:
   state: hidden
   applies_to: Course
   display_name: Submission Stickers
-  description: Allows teachers to attach stickers to student submissions.
+  description: Allows teachers to attach stickers to student submissions. Requires the "Assignment Enhancements - Student" feature flag to be enabled.
+  custom_transition_proc: assignment_enhancements_prereq_for_stickers_hook
   environments:
     ci:
       state: allowed_on # enable for automated testing builds and local testing
@@ -295,12 +295,23 @@ archived_grading_schemes:
     development:
       state: allowed_on
 enhanced_rubrics:
-  beta: true
   state: hidden
-  applies_to: RootAccount
+  beta: true
+  applies_to: Course
   root_opt_in: true
-  display_name: Rubric Enhancements
+  display_name: Enhanced Rubrics
   description: This feature provides visual and functional enhancements to rubrics across Canvas.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+enhanced_rubrics_copy_to:
+  state: hidden
+  applies_to: SiteAdmin
+  root_opt_in: true
+  display_name: Enhanced Rubrics Copy To
+  description: This functionality allows copying rubrics between courses from the enhanced rubrics UI and also assigning them directly to an assignment.
   environments:
     ci:
       state: allowed
@@ -328,9 +339,20 @@ customizable_default_due_time:
       state: allowed_on
 platform_service_speedgrader:
   state: hidden
+  applies_to: Course
+  display_name: Performance and Usability Upgrades for SpeedGrader
+  description: This feature provides a new SpeedGrader platform experience with a focus on improved performance for large courses.
+  after_state_change_proc: log_modernized_speedgrader_metrics
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+moderated_grading_modernized_speedgrader:
+  state: hidden
+  display_name: Performance and Usability Updates for Moderated Grading in SpeedGrader
+  description: This feature provides the new SpeedGrader platform experience with a focus on improved performance for large courses for Moderated Grading assignments
   applies_to: SiteAdmin
-  display_name: "SpeedGrader 2: Steel Thread"
-  description: This feature provides a new SpeedGrader platform experience.
   environments:
     ci:
       state: allowed
@@ -356,3 +378,122 @@ speedgrader_studio_media_capture:
       state: allowed
     development:
       state: allowed
+rubric_imports_exports:
+  state: hidden
+  applies_to: SiteAdmin
+  root_opt_in: true
+  display_name: Rubric Imports and Exports
+  description: This feature allows users to import and export rubrics from CSV and XML files from Enhanced Rubrics.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+rce_lite_enabled_speedgrader_comments:
+  state: hidden
+  applies_to: RootAccount
+  display_name: RCE lite in Speedgrader comments
+  description: Allows Speedgrader comments to be formatted using RCE lite.
+enhanced_rubrics_assignments:
+  state: hidden
+  beta: true
+  applies_to: SiteAdmin
+  root_opt_in: true
+  display_name: Enhanced Rubrics Assignments Page
+  description: This feature allows users to create and search for rubrics while using the Enhanced Rubrics design on the Assignments page.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+speedgrader_grade_by_student:
+  state: hidden
+  beta: true
+  applies_to: RootAccount
+  display_name: SpeedGrader Grade by Student
+  description: Allow instructors to view and traverse between students and assignments from within SpeedGrader
+rubric_assessment_imports_exports:
+  state: hidden
+  applies_to: SiteAdmin
+  root_opt_in: true
+  display_name: Rubric Assessments Imports and Exports
+  description: This feature allows users to import and export rubrics assessments from Gradebook in a CSV format. This feature is dependent on Enhanced Rubrics feature.
+  environments:
+    ci:
+      state: on
+    development:
+      state: on
+    test:
+      state: on
+rubric_self_assessment:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Rubric Self Assessments
+  description: This feature allows rubric self assessments to be enabled for an assignment. Students can assess their own submission using the assignment rubric.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+ai_rubrics:
+  state: hidden
+  applies_to: Course
+  root_opt_in: true
+  beta: true
+  display_name: AI Generated Rubrics
+  description: Give rubric creators the option to generate rubric criteria automatically based on an assignment description via a large language model (LLM).
+use_body_word_count:
+  state: allowed_on # this is intentional. we want to enable this upon deploy so we start populating word count.
+  applies_to: SiteAdmin
+  display_name: Use body_word_count for displaying submission word count
+  description: For text entry submisisons, the word count is currently calculated on-the-fly which can lead to load time issues. With this flag enabled, the value will be read from the new body_word_count column.
+graphql_honor_anonymous_grading:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: GraphQL API Honors Anonymous Grading
+  description: GraphQL API will return anonymous data for assignments and courses with anonymous grading enabled.
+  environments:
+    ci:
+      state: on
+    development:
+      state: on
+submission_comment_media_auto_captioning:
+  state: allowed_on
+  applies_to: Account
+  display_name: Auto Captioning of Media Submission Comments
+  description: This feature enables automatic captioning of media submission comments.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
+post_grades_enhanced_modal:
+  state: hidden
+  display_name: Post Grades Enhanced Modal
+  description: Accessible refactor of Sync Grades dialog
+  applies_to: Course
+  root_opt_in: true
+project_lhotse:
+  state: hidden
+  applies_to: Course
+  display_name: Grading Assistance
+  description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
+  hidden: true
+performance_improvements_for_gradebook:
+  state: hidden
+  applies_to: Course
+  display_name: Performance Improvements for Gradebook Data Loading
+  description: Reduce Gradebook load time by improving back end performance and reducing unnecessary background data
+  shadow: true
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
+grading_assistance_file_uploads:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Grading Assistance File Uploads
+  description: Enables support for uploading files as part of the AI-assisted grading tool in the Modernized Speedgrader.
+  shadow: true

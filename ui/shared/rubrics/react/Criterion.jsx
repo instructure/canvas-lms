@@ -27,7 +27,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Table} from '@instructure/ui-table'
 import {IconOutcomesLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import numberHelper from '@canvas/i18n/numberHelper'
 import {assessmentShape, criterionShape} from './types'
@@ -36,7 +36,7 @@ import Comments, {CommentText} from './Comments'
 import Points from './Points'
 import Ratings from './Ratings'
 
-const I18n = useI18nScope('edit_rubricCriterion')
+const I18n = createI18nScope('edit_rubricCriterion')
 
 const OutcomeIcon = () => (
   <span>
@@ -164,9 +164,11 @@ export default class Criterion extends React.Component {
     const pointsPossible = criterion.points
     const pointsElement = () =>
       !hidePoints &&
+      !ENV.restrict_quantitative_data &&
       !ignoreForScoring && (
         <Points
           key="points"
+          data-testid="points"
           allowExtraCredit={!isOutcome || allowExtraCredit}
           assessing={assessing}
           assessment={assessment}
@@ -255,7 +257,7 @@ export default class Criterion extends React.Component {
           {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
         </Table.RowHeader>
         <Table.Cell>{ratings}</Table.Cell>
-        {hasPointsColumn && (
+        {!ENV.restrict_quantitative_data && hasPointsColumn && (
           <Table.Cell data-testid="criterion-points">
             {pointsElement()}
             {assessing && !freeForm && !editingComments ? commentButton : null}

@@ -24,6 +24,7 @@ module LiveEvents
   class << self
     attr_accessor :logger, :cache, :statsd, :on_work_unit_end
     attr_reader :stream_client
+    attr_writer :retry_throttled_events
 
     # rubocop:disable Style/TrivialAccessors
     def settings=(settings)
@@ -49,6 +50,10 @@ module LiveEvents
     def max_queue_size
       @max_queue_size.call
     end
+
+    def retry_throttled_events
+      @retry_throttled_events&.call
+    end
     # rubocop:enable Style/TrivialAccessors
 
     require "live_events/client"
@@ -68,7 +73,7 @@ module LiveEvents
     end
 
     # Post an event for the current account.
-    def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil)
+    def post_event(event_name:, payload:, time: Time.zone.now, context: nil, partition_key: nil)
       if LiveEvents::Client.config
         context ||= materialized_context
         client.post_event(event_name, payload, time, context, partition_key)
@@ -85,7 +90,7 @@ module LiveEvents
           logger.warn "Starting new LiveEvents worker thread due to fork."
         end
 
-        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name)
+        @worker = LiveEvents::AsyncWorker.new(stream_client: client.stream_client, stream_name: client.stream_name, retry_throttled_events:)
         @launched_pid = Process.pid
       end
 
@@ -109,7 +114,7 @@ module LiveEvents
         context = Thread.current[:live_events_ctx] = context.call
       end
       if context.blank?
-        LiveEvents.statsd&.increment("live_events.missing_context")
+        LiveEvents.statsd&.distributed_increment("live_events.missing_context")
       end
       context
     end

@@ -27,11 +27,13 @@ class ErrorReport < ActiveRecord::Base
 
   before_save :guess_email
   before_save :truncate_enormous_fields
+  before_save :normalize_user_roles
 
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
 
   def send_to_external
+    truncate_fields_for_external
     run_callbacks(:on_send_to_external)
   end
 
@@ -72,14 +74,14 @@ class ErrorReport < ActiveRecord::Base
       category ||= exception.class.name
 
       @exception = exception
-      message = exception.to_s rescue exception.class.name
+      message = exception.to_s
       backtrace = Array(exception.backtrace)
       limit = 10
       while (exception = exception.cause)
         limit -= 1
         break if limit == 0
 
-        cause = exception.to_s rescue exception.class.name
+        cause = exception.to_s
         message += " caused by #{cause}"
         new_backtrace = Array(exception.backtrace)
         # remove the common lines of the backtrace, and separate it so you can see
@@ -185,22 +187,30 @@ class ErrorReport < ActiveRecord::Base
 
   def backtrace=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:backtrace, val)
+      super
     else
-      write_attribute(:backtrace, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
+    end
+  end
+
+  def subject=(val)
+    if !val || val.length < self.class.maximum_text_length
+      super
+    else
+      super(val[0, self.class.maximum_text_length])
     end
   end
 
   def comments=(val)
     if !val || val.length < self.class.maximum_text_length
-      write_attribute(:comments, val)
+      super
     else
-      write_attribute(:comments, val[0, self.class.maximum_text_length])
+      super(val[0, self.class.maximum_text_length])
     end
   end
 
   def url=(val)
-    write_attribute(:url, LoggingFilter.filter_uri(val))
+    val ? super(LoggingFilter.filter_uri(val)) : super
   end
 
   def safe_url?
@@ -212,7 +222,7 @@ class ErrorReport < ActiveRecord::Base
 
   def guess_email
     self.email = nil if email && email.empty?
-    self.email ||= user.email rescue nil
+    self.email ||= user&.email
     unless self.email
       domain = HostUrl.outgoing_email_domain.gsub(/[^a-zA-Z0-9]/, "-")
       # example.com definitely won't exist
@@ -229,5 +239,46 @@ class ErrorReport < ActiveRecord::Base
 
   def self.categories
     distinct_values("category")
+  end
+
+  private
+
+  def truncate_fields_for_external
+    # Truncate fields that are too long for external systems to handle
+    # 255 characters is still quite generous for a subject line
+    # If url is populated it will remain preserved in its entirety in the http_env as HTTP_REFERER
+    self.url = truncate_query_params_in_url(url) if url.present?
+    self.subject = subject.truncate(self.class.maximum_string_length) if subject.present?
+  end
+
+  def normalize_user_roles
+    return unless data.key?("user_roles")
+
+    data["user_roles"] = case data["user_roles"]
+                         when String
+                           # Deduplicate roles in case string already contains duplicates
+                           data["user_roles"].split(",").uniq.join(",")
+                         when Array
+                           data["user_roles"].uniq.join(",")
+                         when Hash
+                           data["user_roles"].values.flatten.uniq.join(",")
+                         else
+                           data["user_roles"].to_s
+                         end
+  end
+
+  def truncate_query_params_in_url(url, max_length = self.class.maximum_string_length)
+    return url if url.length <= max_length
+
+    uri = URI.parse(url)
+    base_url = "#{uri.scheme}://#{uri.host}#{uri.path}" # preserve the scheme, host, and path
+    remaining_length = max_length - base_url.length - 1 # 1 for the "?" character
+
+    if uri.query
+      truncated_query = uri.query[0, remaining_length]
+      "#{base_url}?#{truncated_query}"
+    else
+      base_url
+    end
   end
 end

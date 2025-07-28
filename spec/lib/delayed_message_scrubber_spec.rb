@@ -37,7 +37,7 @@ describe DelayedMessageScrubber do
 
   def new_messages(count = 2)
     (1..count).map do
-      delayed_message(Time.now)
+      delayed_message(Time.zone.now)
     end
   end
 

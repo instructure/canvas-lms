@@ -1,0 +1,378 @@
+---
+openapi: 3.0.3
+info:
+  title: app
+  version: 1.0.0
+servers: []
+paths:
+  "/api/lti/accounts/{account_id}/dr_iframe":
+    get:
+      summary: dr_iframe
+      tags:
+      - Lti::IMS::DynamicRegistration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6845
+      - name: url
+        in: query
+        required: false
+        schema:
+          type: string
+        example: http://testexample.com?registration_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNTE0OCwicm9vdF9hY2NvdW50X2dsb2JhbF9pZCI6MzEwMDAwMDAwMDA2ODQ1LCJleHAiOjE3MjA2NTgxODN9.-_a81YiTjDvvyNXuit244nvr5QIT2MqXwKdOdS2fN2s
+      responses:
+        '200':
+          description: TBD
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
+  "/api/lti/accounts/{account_id}/registration_token":
+    get:
+      summary: registration_token
+      tags:
+      - Lti::IMS::DynamicRegistration
+      parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 6887
+      - name: unified_tool_id
+        in: query
+        required: false
+        schema:
+          type: string
+        example: ''
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: string
+                  oidc_configuration_url:
+                    type: string
+                  token:
+                    type: string
+                required:
+                - uuid
+                - oidc_configuration_url
+                - token
+              example:
+                uuid: fb73bfab-f741-4b30-b245-60892acb81a1
+                oidc_configuration_url: http://localhost/api/lti/security/openid-configuration?registration_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZmI3M2JmYWItZjc0MS00YjMwLWIyNDUtNjA4OTJhY2I4MWExIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wNy0xMVQwMDozMTozMiswMDowMCIsInVzZXJfaWQiOjE1MTY5LCJ1bmlmaWVkX3Rvb2xfaWQiOm51bGwsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjMxMDAwMDAwMDAwNjg4NywiZXhwIjoxNzIwNjYxNDkyfQ.C8vJSQHkfBwp6r2SKwVBtGV5AFSGxQMa-f_1xG2pQvg
+                token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1dWlkIjoiZmI3M2JmYWItZjc0MS00YjMwLWIyNDUtNjA4OTJhY2I4MWExIiwiaW5pdGlhdGVkX2F0IjoiMjAyNC0wNy0xMVQwMDozMTozMiswMDowMCIsInVzZXJfaWQiOjE1MTY5LCJ1bmlmaWVkX3Rvb2xfaWQiOm51bGwsInJvb3RfYWNjb3VudF9nbG9iYWxfaWQiOjMxMDAwMDAwMDAwNjg4NywiZXhwIjoxNzIwNjYxNDkyfQ.C8vJSQHkfBwp6r2SKwVBtGV5AFSGxQMa-f_1xG2pQvg
+  "/api/lti/registrations":
+    post:
+      summary: create
+      tags:
+      - Lti::IMS::DynamicRegistration
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                application_type:
+                  type: string
+                client_name:
+                  type: string
+                grant_types:
+                  type: array
+                  items:
+                    type: string
+                https://purl.imsglobal.org/spec/lti-tool-configuration:
+                  type: object
+                  properties:
+                    claims:
+                      type: array
+                      items:
+                        type: string
+                    custom_parameters:
+                      type: object
+                      properties:
+                        global_foo:
+                          type: string
+                      required:
+                      - global_foo
+                    domain:
+                      type: string
+                    https://canvas.instructure.com/lti/privacy_level:
+                      type: string
+                    messages:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          label:
+                            type: string
+                          placements:
+                            type: array
+                            items:
+                              type: string
+                          target_link_uri:
+                            type: string
+                          custom_parameters:
+                            type: object
+                            properties:
+                              foo:
+                                type: string
+                            required:
+                            - foo
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          icon_uri:
+                            type: string
+                        required:
+                        - type
+                        - label
+                        - placements
+                        - target_link_uri
+                        - custom_parameters
+                        - roles
+                        - icon_uri
+                    target_link_uri:
+                      type: string
+                  required:
+                  - claims
+                  - custom_parameters
+                  - domain
+                  - https://canvas.instructure.com/lti/privacy_level
+                  - messages
+                  - target_link_uri
+                initiate_login_uri:
+                  type: string
+                jwks_uri:
+                  type: string
+                logo_uri:
+                  type: string
+                redirect_uris:
+                  type: array
+                  items:
+                    type: string
+                response_types:
+                  type: array
+                  items:
+                    type: string
+                scope:
+                  type: string
+                token_endpoint_auth_method:
+                  type: string
+              required:
+              - application_type
+              - client_name
+              - grant_types
+              - https://purl.imsglobal.org/spec/lti-tool-configuration
+              - initiate_login_uri
+              - jwks_uri
+              - logo_uri
+              - redirect_uris
+              - response_types
+              - scope
+              - token_endpoint_auth_method
+            example:
+              application_type: web
+              client_name: the client name
+              grant_types:
+              - client_credentials
+              - implicit
+              https://purl.imsglobal.org/spec/lti-tool-configuration:
+                claims:
+                - iss
+                - sub
+                custom_parameters:
+                  global_foo: global_bar
+                domain: example.com
+                https://canvas.instructure.com/lti/privacy_level: email_only
+                messages:
+                - type: LtiResourceLinkRequest
+                  label: deep link label
+                  placements:
+                  - course_navigation
+                  target_link_uri: https://example.com/launch
+                  custom_parameters:
+                    foo: bar
+                  roles:
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
+                  - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
+                  icon_uri: https://example.com/icon.jpg
+                target_link_uri: https://example.com/launch
+              initiate_login_uri: https://example.com/login
+              jwks_uri: https://example.com/api/jwks
+              logo_uri: https://example.com/logo.jpg
+              redirect_uris:
+              - https://example.com/launch
+              response_types:
+              - id_token
+              scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                https://purl.imsglobal.org/spec/lti-ags/scope/score
+                https://purl.imsglobal.org/spec/lti/scope/noticehandlers
+              token_endpoint_auth_method: private_key_jwt
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  client_id:
+                    type: string
+                  application_type:
+                    type: string
+                  grant_types:
+                    type: array
+                    items:
+                      type: string
+                  initiate_login_uri:
+                    type: string
+                  redirect_uris:
+                    type: array
+                    items:
+                      type: string
+                  response_types:
+                    type: array
+                    items:
+                      type: string
+                  client_name:
+                    type: string
+                  jwks_uri:
+                    type: string
+                  logo_uri:
+                    type: string
+                  token_endpoint_auth_method:
+                    type: string
+                  scope:
+                    type: string
+                  https://purl.imsglobal.org/spec/lti-tool-configuration:
+                    type: object
+                    properties:
+                      domain:
+                        type: string
+                      messages:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            target_link_uri:
+                              type: string
+                            label:
+                              type: string
+                            icon_uri:
+                              type: string
+                            custom_parameters:
+                              type: object
+                              properties:
+                                foo:
+                                  type: string
+                              required:
+                              - foo
+                            roles:
+                              type: array
+                              items:
+                                type: string
+                            placements:
+                              type: array
+                              items:
+                                type: string
+                          required:
+                          - type
+                          - target_link_uri
+                          - label
+                          - icon_uri
+                          - custom_parameters
+                          - roles
+                          - placements
+                      claims:
+                        type: array
+                        items:
+                          type: string
+                      target_link_uri:
+                        type: string
+                      custom_parameters:
+                        type: object
+                        properties:
+                          global_foo:
+                            type: string
+                        required:
+                        - global_foo
+                      https://canvas.instructure.com/lti/privacy_level:
+                        type: string
+                      https://canvas.instructure.com/lti/registration_config_url:
+                        type: string
+                    required:
+                    - domain
+                    - messages
+                    - claims
+                    - target_link_uri
+                    - custom_parameters
+                    - https://canvas.instructure.com/lti/privacy_level
+                    - https://canvas.instructure.com/lti/registration_config_url
+                required:
+                - client_id
+                - application_type
+                - grant_types
+                - initiate_login_uri
+                - redirect_uris
+                - response_types
+                - client_name
+                - jwks_uri
+                - logo_uri
+                - token_endpoint_auth_method
+                - scope
+                - https://purl.imsglobal.org/spec/lti-tool-configuration
+              example:
+                client_id: '310000000000354'
+                application_type: web
+                grant_types:
+                - client_credentials
+                - implicit
+                initiate_login_uri: https://example.com/login
+                redirect_uris:
+                - https://example.com/launch
+                response_types:
+                - id_token
+                client_name: the client name
+                jwks_uri: https://example.com/api/jwks
+                logo_uri: https://example.com/logo.jpg
+                token_endpoint_auth_method: private_key_jwt
+                scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+                  https://purl.imsglobal.org/spec/lti-ags/scope/score
+                  https://purl.imsglobal.org/spec/lti/scope/noticehandlers
+                https://purl.imsglobal.org/spec/lti-tool-configuration:
+                  domain: example.com
+                  messages:
+                  - type: LtiResourceLinkRequest
+                    target_link_uri: https://example.com/launch
+                    label: deep link label
+                    icon_uri: https://example.com/icon.jpg
+                    custom_parameters:
+                      foo: bar
+                    roles:
+                    - http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper
+                    - http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor
+                    placements:
+                    - course_navigation
+                  claims:
+                  - iss
+                  - sub
+                  target_link_uri: https://example.com/launch
+                  custom_parameters:
+                    global_foo: global_bar
+                  https://canvas.instructure.com/lti/privacy_level: email_only
+                  https://canvas.instructure.com/lti/registration_config_url: http://test.host/api/lti/registrations/310000000000114/view

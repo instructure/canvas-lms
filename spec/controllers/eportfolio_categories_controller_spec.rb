@@ -28,6 +28,12 @@ describe EportfolioCategoriesController do
     @category = @portfolio.eportfolio_categories.create(name: "some name")
   end
 
+  def eportfolio_entry(category = nil)
+    @entry = @portfolio.eportfolio_entries.new
+    @entry.eportfolio_category_id = category.id if category
+    @entry.save!
+  end
+
   describe "GET 'index'" do
     it "redirects" do
       get "index", params: { eportfolio_id: @portfolio.id }
@@ -202,6 +208,28 @@ describe EportfolioCategoriesController do
       user_session(@user)
       delete "destroy", params: { eportfolio_id: @portfolio.id, id: @category.id }
       expect(assigns[:category]).to be_frozen
+    end
+  end
+
+  describe "GET 'pages'" do
+    before(:once) do
+      eportfolio_category
+      eportfolio_entry(@category)
+    end
+
+    it "requires authorization" do
+      get "pages", params: { eportfolio_id: @portfolio.id, category_id: @category.id }
+      assert_unauthorized
+    end
+
+    it "assigns variables" do
+      user_session(@user)
+      get "pages", params: { eportfolio_id: @portfolio.id, category_id: @category.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.length).to be(1)
+      expect(json[0]["id"]).to eql(@entry.id)
     end
   end
 end

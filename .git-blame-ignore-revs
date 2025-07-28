@@ -124,3 +124,6 @@ b2b0bff902677f75180fc8e6139badb4a8ec62f4 # Style/TernaryParentheses, Style/Redun
 c6f2f9a81beddc714a0523e3780c7eec47b50ebf # Run prettier on app/jsx/ from blueprint_courses to bundles
 e0b90383b90f4ffdeae76e816aaaefd7fd54b847 # Upgrade and run prettier on ui/
 f980a6f3a7517a2d5024ab1abf198dd96a9237b2 # SpeedGrader linting
+33c5c980c58777578f6888639cd1a77d90f169ac # Biome & Eslint
+e216f64638bc47569d8f476eb1cbbdda02ecf0e6 # Biome & Eslint
+9c33ecc8dd5851fec2f7ed9cdb346c10b1ca0bca # Biome & Eslint

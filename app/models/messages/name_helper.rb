@@ -49,6 +49,8 @@ module Messages
       # for anonymous discussions, just return the author name, since that is already anonymized
       return asset.author_name if asset.is_a?(DiscussionEntry) && asset.discussion_topic.anonymous?
 
+      return asset.discussion_entry.author_name if asset.is_a?(Mention) && !anonymized_asset?
+
       return source_user&.short_name unless anonymized_asset?
 
       anonymous_name = I18n.t("Anonymous User")
@@ -97,6 +99,7 @@ module Messages
       "Assignment Submitted",
       "Assignment Resubmitted"
     ].freeze
+    private_constant :SOURCE_AUTHOR_NOTIFICATIONS, :SOURCE_USER_NOTIFICATIONS, :ANONYMIZED_NOTIFICATIONS
 
     def anonymized_asset?
       ANONYMIZED_NOTIFICATIONS.include?(notification_name) && (asset.respond_to?(:user) || asset.respond_to?(:recipient))

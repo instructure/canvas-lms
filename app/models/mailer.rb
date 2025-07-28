@@ -23,6 +23,9 @@ require "mail"
 class Mailer < ActionMailer::Base
   attr_reader :email
 
+  # Amazon SES has a weird interpretation of the RFCs and will reject messages if the from is too long
+  MAX_EMAIL_DISPLAY_NAME_BYTE = 320
+
   # define in rails3-style
   def create_message(m)
     # notifications have context, bounce replies don't.
@@ -50,9 +53,8 @@ class Mailer < ActionMailer::Base
   # if you can't go through Message.deliver, this is a fallback that respects
   # the notification service.
   def self.deliver(mail_obj)
-    InstStatsd::Statsd.increment("message.deliver",
-                                 short_stat: "message.deliver",
-                                 tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" })
+    InstStatsd::Statsd.distributed_increment("message.deliver",
+                                             tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" })
     if Account.site_admin.feature_enabled?(:notification_service)
       Services::NotificationService.process(
         "direct:#{SecureRandom.hex(10)}",
@@ -69,7 +71,9 @@ class Mailer < ActionMailer::Base
 
   def quoted_address(display_name, address)
     addr = Mail::Address.new(address)
-    addr.display_name = display_name
+    # display name is formated like this:"display_name" <address>
+    # which means 5 more characters are added
+    addr.display_name = CanvasTextHelper.truncate_text(display_name, max_byte: MAX_EMAIL_DISPLAY_NAME_BYTE - addr.address.bytesize - 5)
     addr.format
   end
 

@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
@@ -30,8 +30,9 @@ import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
+import {finalGradeOverrideUtils} from '../utils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type FinalGradeOverrideTextBoxProps = {
   finalGradeOverride?: FinalGradeOverride
@@ -41,6 +42,7 @@ export type FinalGradeOverrideTextBoxProps = {
   gradingPeriodId?: string | null
   disabled?: boolean
   showPercentageLabel?: boolean
+  restrictToTwoDigitsAfterSeparator?: boolean
 }
 export function FinalGradeOverrideTextBox({
   finalGradeOverride,
@@ -49,6 +51,7 @@ export function FinalGradeOverrideTextBox({
   width = '14rem',
   gradingPeriodId,
   disabled = false,
+  restrictToTwoDigitsAfterSeparator = false,
   showPercentageLabel = false,
 }: FinalGradeOverrideTextBoxProps) {
   const [inputValue, setInputValue] = useState<string>('')
@@ -62,13 +65,18 @@ export function FinalGradeOverrideTextBox({
       setFinalGradeOverridePercentage('')
       setInputValue('')
     } else if (gradingScheme && gradingScheme.data.length > 0) {
-      const grade = scoreToGrade(percentage, gradingScheme.data, gradingScheme.pointsBased)
+      const grade = scoreToGrade(
+        percentage,
+        gradingScheme.data,
+        gradingScheme.pointsBased,
+        gradingScheme.scalingFactor,
+      )
       const inputVal = GradeFormatHelper.replaceDashWithMinus(grade)
       setInputValue(inputVal || '')
       if (!gradingScheme.pointsBased) {
         // hide all percentages if this scheme is points based
         setFinalGradeOverridePercentage(
-          GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
+          GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'}),
         )
       }
     } else {
@@ -78,7 +86,11 @@ export function FinalGradeOverrideTextBox({
   }, [finalGradeOverride, gradingPeriodId, gradingScheme])
 
   const handleFinalGradeOverrideChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value)
+    let {value} = event.target
+    if (restrictToTwoDigitsAfterSeparator) {
+      value = finalGradeOverrideUtils.restrictToTwoDigitsAfterSeparator(value)
+    }
+    setInputValue(value)
   }
 
   const handleFinalGradeOverrideBlur = async () => {
@@ -101,7 +113,7 @@ export function FinalGradeOverrideTextBox({
         setInputValue(
           oldGrade.grade?.percentage
             ? GradeFormatHelper.formatGrade(oldGrade.grade.percentage, {gradingType: 'percent'})
-            : ''
+            : '',
         )
       }
       return

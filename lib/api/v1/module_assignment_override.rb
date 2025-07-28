@@ -42,6 +42,9 @@ module Api::V1::ModuleAssignmentOverride
         json[:students] = override.preloaded_student_ids.map { |user_id| { id: user_id, name: user_names[user_id] } }
       when "CourseSection"
         json[:course_section] = { id: override.set.id, name: override.set.name }
+      when "Group"
+        json[:group] = {  id: override.set_id,
+                          non_collaborative: override.group.non_collaborative }
       end
     end
   end

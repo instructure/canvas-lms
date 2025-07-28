@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import _, {map, find} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
 import autocompleteItemTemplate from '../../../jst/autocomplete_item.handlebars'
@@ -28,9 +28,9 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(CourseFindSelectView, Backbone.View)
 
@@ -90,7 +90,7 @@ CourseFindSelectView.prototype.render = function () {
             .value()
           return CourseFindSelectView.__super__.render.apply(_this, arguments)
         }
-      })(this)
+      })(this),
     )
   }
 }
@@ -151,17 +151,14 @@ CourseFindSelectView.prototype.toggleConcludedCourses = function () {
 // "term=typed in stuff" automagically so we don't have to worry about
 // refining the search term
 CourseFindSelectView.prototype.manageableCourseUrl = function () {
-  let params
+  const params = {
+    current_course_id: ENV.COURSE_ID
+  }
   if (this.includeConcludedCourses) {
-    params = encodeQueryString({
-      'include[]': 'concluded',
-    })
+    params['include[]'] = 'concluded'
   }
-  if (params) {
-    return '/users/' + this.current_user_id + '/manageable_courses?' + params
-  } else {
-    return '/users/' + this.current_user_id + '/manageable_courses'
-  }
+
+  return '/users/' + this.current_user_id + '/manageable_courses?' + encodeQueryString(params)
 }
 
 // Build a list of courses that our template and autocomplete can use
@@ -205,9 +202,9 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
       return function (course) {
         return course.id === value
       }
-    })(this)
+    })(this),
   )
-  // eslint-disable-next-line no-void
+
   return this.$courseSearchField.val(courseObj != null ? courseObj.value : void 0)
 }
 
@@ -216,7 +213,7 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
 // @api private
 CourseFindSelectView.prototype.setSourceCourseId = function (id) {
   let course, ref
-  // eslint-disable-next-line no-void
+
   if (id === ((ref = ENV.COURSE_ID) != null ? ref.toString() : void 0)) {
     this.$selectWarning.show()
   } else {
@@ -245,7 +242,7 @@ CourseFindSelectView.prototype.setSourceCourseId = function (id) {
 CourseFindSelectView.prototype.validations = function () {
   const errors = {}
   const settings = this.model.get('settings')
-  // eslint-disable-next-line no-void
+
   if (!(settings != null ? settings.source_course_id : void 0)) {
     errors.courseSearchField = [
       {

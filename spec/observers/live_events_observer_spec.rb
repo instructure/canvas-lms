@@ -301,6 +301,14 @@ describe LiveEventsObserver do
       s.excused = true
       s.save!
     end
+
+    it "posts submission_custom_grade_status event" do
+      expect(Canvas::LiveEvents).to receive(:submission_custom_grade_status).once
+      s = submission_model
+      custom_status = CustomGradeStatus.create!(name: "custom", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+      s.custom_grade_status = custom_status
+      s.save!
+    end
   end
 
   describe "user" do
@@ -349,6 +357,23 @@ describe LiveEventsObserver do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:user_account_association_created).once
       user_with_pseudonym(account: Account.default, username: "bobbo", active_all: true)
+    end
+  end
+
+  describe "account" do
+    before do
+      @account = Account.default
+    end
+
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:account_created).once
+      account_model
+    end
+
+    it "posts update events" do
+      account = account_model
+      expect(Canvas::LiveEvents).to receive(:account_updated).with(account)
+      account.update_attribute(:name, "New Account")
     end
   end
 

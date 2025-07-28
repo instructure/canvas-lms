@@ -34,7 +34,7 @@ import {
 } from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodSet from './GradingPeriodSet'
 import SearchGradingPeriodsField from './SearchGradingPeriodsField'
 import SearchHelpers from '@canvas/util/searchHelpers'
@@ -46,7 +46,7 @@ import SetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import TermsApi from './enrollmentTermsApi'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('GradingPeriodSetCollection')
+const I18n = createI18nScope('GradingPeriodSetCollection')
 
 const presentEnrollmentTerms = function (enrollmentTerms) {
   return map(enrollmentTerms, term => {
@@ -84,6 +84,13 @@ export default class GradingPeriodSetCollection extends React.Component {
     }).isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.addSetFormButtonRef = React.createRef()
+    this.newSetFormRef = React.createRef()
+    this.setRefs = {}
+  }
+
   state = {
     enrollmentTerms: [],
     sets: [],
@@ -100,7 +107,10 @@ export default class GradingPeriodSetCollection extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.editSet.id && prevState.editSet.id !== this.state.editSet.id) {
       const set = {id: prevState.editSet.id}
-      this.refs[this.getShowGradingPeriodSetRef(set)]._refs.editButton.focus()
+      const refKey = this.getShowGradingPeriodSetRef(set)
+      if (this.setRefs[refKey] && this.setRefs[refKey].current) {
+        this.setRefs[refKey].current._refs.editButton.focus()
+      }
     }
   }
 
@@ -113,8 +123,10 @@ export default class GradingPeriodSetCollection extends React.Component {
         showNewSetForm: false,
       },
       () => {
-        this.refs.addSetFormButton.focus()
-      }
+        if (this.addSetFormButtonRef.current) {
+          this.addSetFormButtonRef.current.focus()
+        }
+      },
     )
   }
 
@@ -165,7 +177,7 @@ export default class GradingPeriodSetCollection extends React.Component {
 
   onSetUpdated = updatedSet => {
     const sets = map(this.state.sets, set =>
-      set.id === updatedSet.id ? {...set, ...updatedSet} : set
+      set.id === updatedSet.id ? {...set, ...updatedSet} : set,
     )
 
     const terms = map(this.state.enrollmentTerms, term => {
@@ -229,7 +241,7 @@ export default class GradingPeriodSetCollection extends React.Component {
           other: '%{count} sets of grading periods found.',
           zero: 'No matching sets of grading periods found.',
         },
-        {count: numSets}
+        {count: numSets},
       )
     }
     const polite = true
@@ -239,7 +251,7 @@ export default class GradingPeriodSetCollection extends React.Component {
   getVisibleSets = () => {
     const setsFilteredBySearchText = this.filterSetsBySearchText(
       this.state.sets,
-      this.state.searchText
+      this.state.searchText,
     )
     const filterByTermArgs = [
       setsFilteredBySearchText,
@@ -266,18 +278,22 @@ export default class GradingPeriodSetCollection extends React.Component {
   nodeToFocusOnAfterSetDeletion = setID => {
     const index = this.state.sets.findIndex(set => set.id === setID)
     if (index < 1) {
-      return this.refs.addSetFormButton
+      return this.addSetFormButtonRef.current
     } else {
       const setRef = this.getShowGradingPeriodSetRef(this.state.sets[index - 1])
-      const setToFocus = this.refs[setRef]
-      return setToFocus._refs.editButton
+      const setToFocus = this.setRefs[setRef] && this.setRefs[setRef].current
+      return setToFocus && setToFocus._refs && setToFocus._refs.editButton
     }
   }
 
   removeGradingPeriodSet = setID => {
     const newSets = reject(this.state.sets, set => set.id === setID)
     const nodeToFocus = this.nodeToFocusOnAfterSetDeletion(setID)
-    this.setState({sets: newSets}, () => nodeToFocus.focus())
+    this.setState({sets: newSets}, () => {
+      if (nodeToFocus) {
+        nodeToFocus.focus()
+      }
+    })
   }
 
   updateSetPeriods = (setID, gradingPeriods) => {
@@ -298,7 +314,9 @@ export default class GradingPeriodSetCollection extends React.Component {
 
   closeNewSetForm = () => {
     this.setState({showNewSetForm: false}, () => {
-      this.refs.addSetFormButton.focus()
+      if (this.addSetFormButtonRef.current) {
+        this.addSetFormButtonRef.current.focus()
+      }
     })
   }
 
@@ -325,6 +343,14 @@ export default class GradingPeriodSetCollection extends React.Component {
   }
 
   getShowGradingPeriodSetRef = set => `show-grading-period-set-${set.id}`
+
+  getOrCreateSetRef = set => {
+    const refKey = this.getShowGradingPeriodSetRef(set)
+    if (!this.setRefs[refKey]) {
+      this.setRefs[refKey] = React.createRef()
+    }
+    return this.setRefs[refKey]
+  }
 
   renderEditGradingPeriodSetForm = set => {
     const cancelCallback = () => {
@@ -371,7 +397,7 @@ export default class GradingPeriodSetCollection extends React.Component {
         return (
           <GradingPeriodSet
             key={set.id}
-            ref={this.getShowGradingPeriodSetRef(set)}
+            ref={this.getOrCreateSetRef(set)}
             set={set}
             gradingPeriods={set.gradingPeriods}
             urls={urls}
@@ -396,7 +422,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     if (this.state.showNewSetForm) {
       return (
         <NewGradingPeriodSetForm
-          ref="newSetForm"
+          ref={this.newSetFormRef}
           closeForm={this.closeNewSetForm}
           urls={this.props.urls}
           enrollmentTerms={this.termsNotBelongingToActiveSets()}
@@ -411,7 +437,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     if (!this.props.readOnly) {
       return (
         <Button
-          ref="addSetFormButton"
+          ref={this.addSetFormButtonRef}
           color="primary"
           disabled={disable}
           onClick={this.openNewSetForm}

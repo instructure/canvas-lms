@@ -27,9 +27,9 @@ import {IconAdminToolsLine, IconRefreshLine, IconWarningSolid} from '@instructur
 import {Spinner} from '@instructure/ui-spinner'
 import {Pill} from '@instructure/ui-pill'
 import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function JobStatsTable({clusters, onRefresh, onUnblock, onShowStuckModal}) {
   const ShardIndicator = ({policy, shards}) => {

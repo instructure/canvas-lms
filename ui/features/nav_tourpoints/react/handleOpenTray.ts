@@ -21,7 +21,7 @@ import tourPubSub from '@canvas/tour-pubsub'
 export default async function handleOpenTray(trayType: string) {
   await new Promise<void>(resolve => {
     let resolved = false
-    let timeout: number
+    let timeout: NodeJS.Timeout
     const unsubscribe = tourPubSub.subscribe('navigation-tray-opened', type => {
       if (resolved) return
       if (type === trayType) {
@@ -49,6 +49,6 @@ export default async function handleOpenTray(trayType: string) {
       resolved = true
       unsubscribe()
       resolve()
-    }, 5000) as unknown as number
+    }, 5000)
   })
 }

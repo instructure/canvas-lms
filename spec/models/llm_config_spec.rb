@@ -22,48 +22,55 @@ describe LLMConfig do
   describe "#initialize" do
     context "with valid attributes" do
       it "initializes successfully" do
-        config = LLMConfig.new(name: "TestConfig", model_id: "model123")
+        config = LLMConfig.new(name: "TestConfig", model_id: "model123", template: "template")
         expect(config.name).to eq("TestConfig")
         expect(config.model_id).to eq("model123")
-        expect(config.template).to be_nil
+        expect(config.template).to eq("template")
         expect(config.options).to eq({})
       end
     end
 
     context "with invalid attributes" do
       it "raises an error if name is not a string" do
-        expect { LLMConfig.new(name: nil, model_id: "model123") }.to raise_error(ArgumentError, "Name must be a string")
+        expect { LLMConfig.new(name: nil, model_id: "model123", template: "template") }.to raise_error(ArgumentError, "Name must be a string")
       end
 
       it "raises an error if model_id is not a string" do
-        expect { LLMConfig.new(name: "TestConfig", model_id: nil) }.to raise_error(ArgumentError, "Model ID must be a string")
+        expect { LLMConfig.new(name: "TestConfig", model_id: nil, template: "template") }.to raise_error(ArgumentError, "Model ID must be a string")
       end
 
       it "raises an error if template is neither string nor nil" do
-        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", template: 123) }.to raise_error(ArgumentError, "Template must be a string or nil")
+        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", template: 123) }.to raise_error(ArgumentError, "Template must be a string")
       end
 
       it "raises an error if options is not a hash" do
-        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", options: "invalid") }.to raise_error(ArgumentError, "Options must be a hash")
+        expect { LLMConfig.new(name: "TestConfig", model_id: "model123", template: "template", options: "invalid") }.to raise_error(ArgumentError, "Options must be a hash")
       end
     end
   end
 
-  describe "#generate_prompt" do
-    let(:config) { LLMConfig.new(name: "TestConfig", model_id: "model123", template: "Hello <PLACEHOLDER>") }
+  describe "#generate_prompt_and_options" do
+    let(:config) { LLMConfig.new(name: "TestConfig", model_id: "model123", template: "Hello <TEMPLATE_PLACEHOLDER>", options: { max_tokens: 100, system: "Hello <OPTIONS_PLACEHOLDER>" }) }
 
-    context "when template is not nil" do
-      it "replaces the placeholder with dynamic content" do
-        expect(config.generate_prompt(dynamic_content: "World")).to eq("Hello World")
-      end
+    it "replaces the placeholders with content in both prompt and options" do
+      prompt, options = config.generate_prompt_and_options(substitutions: { TEMPLATE: "Template", OPTIONS: "Options" })
+      expect(prompt).to eq("Hello Template")
+      expect(options).to eq({ max_tokens: 100, system: "Hello Options" })
     end
 
-    context "when template is nil" do
-      let(:config) { LLMConfig.new(name: "TestConfig", model_id: "model123") }
+    it "raises an error if prompt still contains placeholders" do
+      expect { config.generate_prompt_and_options(substitutions: {}) }.to raise_error(ArgumentError, "Template still contains placeholder: <TEMPLATE_PLACEHOLDER>")
+    end
 
-      it "returns the dynamic content" do
-        expect(config.generate_prompt(dynamic_content: "Hello")).to eq("Hello")
-      end
+    it "raises an error if options still contain placeholders" do
+      expect { config.generate_prompt_and_options(substitutions: { TEMPLATE: "Template" }) }.to raise_error(ArgumentError, "Options still contain placeholder: <OPTIONS_PLACEHOLDER>")
+    end
+
+    it "returns the prompt and options when no placeholders are present" do
+      config = LLMConfig.new(name: "TestConfig", model_id: "model123", template: "Hello", options: { max_tokens: 100, system: "Hello" })
+      prompt, options = config.generate_prompt_and_options(substitutions: {})
+      expect(prompt).to eq("Hello")
+      expect(options).to eq({ max_tokens: 100, system: "Hello" })
     end
   end
 end

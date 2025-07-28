@@ -106,6 +106,10 @@ module Importers
          allow_rating
          only_graders_can_rate
          sort_by_rating
+         sort_order
+         sort_order_locked
+         expanded
+         expanded_locked
          anonymous_state
          is_anonymous_author].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
@@ -113,12 +117,12 @@ module Importers
         item.send(:"#{attr}=", options[attr])
       end
 
+      item.reply_to_entry_required_count = options[:reply_to_entry_required_count] || 0
+
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
       item.message = if options.message
                        migration.convert_html(options.message, type, options[:migration_id], :message)
-                     else
-                       I18n.t("#discussion_topic.empty_message", "No message")
                      end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
@@ -158,8 +162,12 @@ module Importers
       end
 
       if options[:has_group_category]
-        item.group_category ||= context.group_categories.active.where(name: options[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(name: I18n.t("Project Groups")).first_or_create
+        if migration.context.feature_enabled?(:migrate_assignment_group_categories)
+          item.group_category ||= context.group_categories.active.where(name: options[:group_category]).first_or_create
+        else
+          item.group_category ||= context.group_categories.active.where(name: options[:group_category]).first
+          item.group_category ||= context.group_categories.active.where(name: I18n.t("Project Groups")).first_or_create
+        end
       elsif migration.for_master_course_import? && !item.is_announcement
         if item.for_group_discussion? && !item.can_group?
           # when this is false you can't actually unset the category in the UI so we'll keep it consistent here
@@ -174,7 +182,11 @@ module Importers
         item.group_category = nil
       end
 
-      item.save_without_broadcasting!
+      if migration.send_item_notifications?
+        item.save!
+      else
+        item.save_without_broadcasting!
+      end
       import_migration_item
       item.saved_by = nil
       item
@@ -186,6 +198,10 @@ module Importers
       return nil unless context.respond_to?(:assignments)
 
       if options[:assignment]
+        assignment_hash = options[:assignment]
+        assignment_hash[:sub_assignments]&.each do |sub_assignment|
+          sub_assignment[:description] = item.message
+        end
         Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({

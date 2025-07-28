@@ -16,16 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as MoveItem from '@canvas/move-item-tray'
 import Cache from '../../cache'
 import DraggableCollectionView from './DraggableCollectionView'
 import AssignmentListItemView from './AssignmentListItemView'
-import CreateAssignmentView from './CreateAssignmentView'
 import CreateGroupView from './CreateGroupView'
 import DeleteGroupView from './DeleteGroupView'
 import preventDefault from '@canvas/util/preventDefault'
@@ -36,8 +33,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
+import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
+import {createRoot} from 'react-dom/client'
 
-const I18n = useI18nScope('AssignmentGroupListItemView')
+const I18n = createI18nScope('AssignmentGroupListItemView')
 
 extend(AssignmentGroupListItemView, DraggableCollectionView)
 
@@ -89,8 +88,6 @@ AssignmentGroupListItemView.prototype.itemView = AssignmentListItemView
 
 AssignmentGroupListItemView.prototype.template = template
 
-AssignmentGroupListItemView.child('createAssignmentView', '[data-view=createAssignment]')
-
 AssignmentGroupListItemView.child('editGroupView', '[data-view=editAssignmentGroup]')
 
 AssignmentGroupListItemView.child('deleteGroupView', '[data-view=deleteAssignmentGroup]')
@@ -111,6 +108,7 @@ AssignmentGroupListItemView.prototype.events = {
   'click .move_contents': 'onMoveContents',
   'click .move_group': 'onMoveGroup',
   'click .ag-header-controls .menu_tool_link': 'openExternalTool',
+  'click .add_assignment': 'addItem',
 }
 
 AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
@@ -119,7 +117,7 @@ AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
     toggleMessage() {
       return I18n.t('toggle_message', 'toggle assignment visibility')
     },
-  }
+  },
 )
 
 // call remove on children so that they can clean up old dialogs.
@@ -127,9 +125,6 @@ AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
 // we need to make sure that all children view are also children dom
 // elements first.
 AssignmentGroupListItemView.prototype.render = function () {
-  if (this.createAssignmentView) {
-    this.createAssignmentView.remove()
-  }
   if (this.editGroupView) {
     this.editGroupView.remove()
   }
@@ -144,10 +139,6 @@ AssignmentGroupListItemView.prototype.render = function () {
 }
 
 AssignmentGroupListItemView.prototype.afterRender = function () {
-  if (this.createAssignmentView) {
-    this.createAssignmentView.hide()
-    this.createAssignmentView.setTrigger(this.$addAssignmentButton)
-  }
   if (this.editGroupView) {
     this.editGroupView.hide()
     this.editGroupView.setTrigger(this.$editGroupButton)
@@ -165,15 +156,15 @@ AssignmentGroupListItemView.prototype.createItemView = function (model) {
   const options = {
     userIsAdmin: this.userIsAdmin,
   }
-  // eslint-disable-next-line new-cap
+
   return new this.itemView(
     $.extend(
       {},
       {
         model,
       },
-      options
-    )
+      options,
+    ),
   )
 }
 
@@ -215,21 +206,17 @@ AssignmentGroupListItemView.prototype.initializeCollection = function () {
       return function () {
         return _this.expand(false)
       }
-    })(this)
+    })(this),
   )
 }
 
 AssignmentGroupListItemView.prototype.initializeChildViews = function () {
   this.editGroupView = false
-  this.createAssignmentView = false
   this.deleteGroupView = false
   if (this.canAdd()) {
     this.editGroupView = new CreateGroupView({
       assignmentGroup: this.model,
       userIsAdmin: this.userIsAdmin,
-    })
-    this.createAssignmentView = new CreateAssignmentView({
-      assignmentGroup: this.model,
     })
   }
   if (this.canDelete()) {
@@ -293,7 +280,8 @@ AssignmentGroupListItemView.prototype.toJSON = function () {
     hasFrozenAssignments:
       this.model.hasFrozenAssignments != null && this.model.hasFrozenAssignments(),
     hasSisSourceId: this.model.hasSisSourceId != null && this.model.hasSisSourceId(),
-    syncedWithSisCategory: this.model.syncedWithSisCategory != null && this.model.syncedWithSisCategory(),
+    syncedWithSisCategory:
+      this.model.syncedWithSisCategory != null && this.model.syncedWithSisCategory(),
     postToSISName: ENV.SIS_NAME,
     assignmentGroupMenuPlacements: this.assignment_group_menu_tools,
     ENV,
@@ -313,8 +301,8 @@ AssignmentGroupListItemView.prototype.displayableRules = function () {
         },
         {
           count: rules.drop_lowest,
-        }
-      )
+        },
+      ),
     )
   }
   if (rules.drop_highest != null && rules.drop_highest > 0) {
@@ -327,8 +315,8 @@ AssignmentGroupListItemView.prototype.displayableRules = function () {
         },
         {
           count: rules.drop_highest,
-        }
-      )
+        },
+      ),
     )
   }
   if (rules.never_drop != null && rules.never_drop.length > 0) {
@@ -347,11 +335,11 @@ AssignmentGroupListItemView.prototype.displayableRules = function () {
             return results.push(
               I18n.t('never_drop_rule', 'Never drop %{assignment_name}', {
                 assignment_name: name,
-              })
+              }),
             )
           }
         }
-      })(this)
+      })(this),
     )
   }
   return results
@@ -368,7 +356,7 @@ AssignmentGroupListItemView.prototype.search = function (regex, gradingPeriod) {
         return count
       }
     })(this),
-    0
+    0,
   )
   const atleastone = assignmentCount > 0
   if (atleastone) {
@@ -391,7 +379,7 @@ AssignmentGroupListItemView.prototype.endSearch = function () {
       return function (as) {
         return as.endSearch()
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -544,7 +532,7 @@ AssignmentGroupListItemView.prototype.onMoveContents = function () {
       return function (col) {
         return col.get('assignments')
       }
-    })(this)
+    })(this),
   )
   groupItems[0].groupId = this.model.get('id')
   this.moveTrayProps = {
@@ -558,7 +546,7 @@ AssignmentGroupListItemView.prototype.onMoveContents = function () {
           return function (col) {
             return col.get('assignments')
           }
-        })(this)
+        })(this),
       ),
       excludeCurrent: true,
     },
@@ -572,7 +560,7 @@ AssignmentGroupListItemView.prototype.onMoveContents = function () {
           res.data.order,
           res.groupId,
           _this.model,
-          keys
+          keys,
         )
       }
     })(this),
@@ -643,8 +631,20 @@ AssignmentGroupListItemView.prototype.goToPrevItem = function () {
   }
 }
 
+AssignmentGroupListItemView.prototype.renderCreateEditAssignmentModal = function () {
+  const mountPoint = document.getElementById('create-edit-mount-point')
+  const root = createRoot(mountPoint)
+  const onClose = () => {
+    root.unmount()
+
+    // re-render the group view
+    this.render()
+  }
+  root.render(<CreateAssignmentViewAdapter assignmentGroup={this.model} closeHandler={onClose} />)
+}
+
 AssignmentGroupListItemView.prototype.addItem = function () {
-  return $('.add_assignment', '#assignment_group_' + this.model.id).click()
+  this.renderCreateEditAssignmentModal()
 }
 
 AssignmentGroupListItemView.prototype.editItem = function () {
@@ -719,13 +719,25 @@ AssignmentGroupListItemView.prototype.openExternalTool = function (ev) {
       return function (t) {
         return t.id === ev.target.dataset.toolId
       }
-    })(this)
+    })(this),
   )
   return this.setExternalToolTray(tool, this.$el.find('.al-trigger')[0])
 }
 
 AssignmentGroupListItemView.prototype.reloadPage = function () {
   return window.location.reload()
+}
+
+/**
+ * @type {null | import('react-dom/client').Root}
+ */
+let root = null
+const getRoot = () => {
+  if (root === null) {
+    const mountPoint = $('#external-tool-mount-point')[0]
+    root = createRoot(mountPoint)
+  }
+  return root
 }
 
 AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, returnFocusTo) {
@@ -755,9 +767,8 @@ AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, retu
     onDismiss: handleDismiss,
     open: tool !== null,
   }
-  const component = React.createElement(ContentTypeExternalToolTray, props)
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(component, $('#external-tool-mount-point')[0])
+  getRoot().render(React.createElement(ContentTypeExternalToolTray, props))
+  return root
 }
 
 export default AssignmentGroupListItemView

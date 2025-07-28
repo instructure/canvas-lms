@@ -21,7 +21,7 @@ describe Checkpoints::SectionOverrideCreatorService do
   describe ".call" do
     before(:once) do
       course = course_model
-      course.root_account.enable_feature!(:discussion_checkpoints)
+      course.account.enable_feature!(:discussion_checkpoints)
       topic = DiscussionTopic.create_graded_topic!(course:, title: "graded topic")
       topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
       @checkpoint = topic.reply_to_topic_checkpoint
@@ -54,7 +54,9 @@ describe Checkpoints::SectionOverrideCreatorService do
     end
 
     it "creates a parent section override without dates set (but still overridden), if one doesn't already exist" do
-      override = { set_id: @section.id, due_at: 2.days.from_now, unlock_at: 2.days.ago, lock_at: 4.days.from_now }
+      unlock_at_time = 2.days.ago
+      lock_at_time = 4.days.from_now
+      override = { set_id: @section.id, due_at: 2.days.from_now, unlock_at: unlock_at_time, lock_at: lock_at_time }
       service.call(checkpoint: @checkpoint, override:)
       parent_override = @checkpoint.parent_assignment.assignment_overrides.first
 
@@ -62,9 +64,9 @@ describe Checkpoints::SectionOverrideCreatorService do
         expect(parent_override.set).to eq @section
         expect(parent_override.due_at).to be_nil
         expect(parent_override.due_at_overridden).to be true
-        expect(parent_override.unlock_at).to be_nil
+        expect(parent_override.unlock_at.to_i).to be unlock_at_time.to_i
         expect(parent_override.unlock_at_overridden).to be true
-        expect(parent_override.lock_at).to be_nil
+        expect(parent_override.lock_at.to_i).to be lock_at_time.to_i
         expect(parent_override.lock_at_overridden).to be true
       end
     end

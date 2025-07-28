@@ -32,11 +32,23 @@
     "additional_considerations_f3801683": {
         "message": "Yderligere overvejelser"
     },
+    "address_applied_64269b0b": {
+        "message": "Adresse anvendt"
+    },
+    "address_removed_fcb496e0": {
+        "message": "Adresse fjernet"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Tilstødende links med samme URL skal være et enkelt link."
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
+    },
+    "ai_response_9624e8e8": {
+        "message": "AI-respons"
+    },
+    "ai_tools_fda01177": {
+        "message": "AI-værktøj"
     },
     "albanian_21ed929e": {
         "message": "Albansk"
@@ -76,6 +88,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Der opstod en fejl under oprettelse af en netværksanmodning"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "Der opstod en fejl under behandlingen af din anmodning"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Der opstod en fejl ved overførsel af mediet."
@@ -158,6 +173,9 @@
     "available_folders_694d0436": {
         "message": "Tilgængelige mapper"
     },
+    "background_1bc88842": {
+        "message": "Baggrund"
+    },
     "backslash_b2d5442d": {
         "message": "Omvendt skråstreg"
     },
@@ -190,6 +208,15 @@
     },
     "blue_daf8fea9": {
         "message": "Blå"
+    },
+    "bold_applied_42d547b7": {
+        "message": "Fed skrift anvendt"
+    },
+    "bold_removed_da474a5c": {
+        "message": "Fed skrift fjernet"
+    },
+    "border_5b08b06d": {
+        "message": "Kant"
     },
     "bottom_15a2a9be": {
         "message": "Bund"
@@ -332,11 +359,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Skjul { types }"
     },
+    "color_a363e1b0": {
+        "message": "Farve"
+    },
+    "color_contrast_4c418add": {
+        "message": "Farvekontrast"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Farvekontrastforhold"
+    },
     "color_picker_6b359edf": {
         "message": "Farvevælger"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Farvevælger ({ colorName } valgt)"
+    },
+    "color_popup_af39810f": {
+        "message": "Farve-popup"
     },
     "column_e1ae5c64": {
         "message": "Kolonne"
@@ -346,6 +385,9 @@
     },
     "complex_numbers_a543d004": {
         "message": "Komplekse tal"
+    },
+    "compose_44c904f4": {
+        "message": "Skab"
     },
     "computer_1d7dfa6f": {
         "message": "Computer"
@@ -373,6 +415,9 @@
     },
     "coproduct_e7838082": {
         "message": "Koprodukt"
+    },
+    "copy_9748f9f": {
+        "message": "Kopier"
     },
     "copyright_holder_66ee111": {
         "message": "Rettighedshaver:"
@@ -476,8 +521,14 @@
     "decrease_indent_d9cf469d": {
         "message": "Formindsk indrykning"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Reducer Rich Content-området"
+    },
     "deep_purple_bb3e2907": {
         "message": "Dyb lilla"
+    },
+    "default_9db103d": {
+        "message": "Standard"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "standard punktliste usorteret liste"
@@ -551,11 +602,20 @@
     "disjoint_union_e74351a8": {
         "message": "Usammenhængende forening"
     },
+    "dislike_14befc48": {
+        "message": "Synes ikke godt om"
+    },
     "display_options_315aba85": {
         "message": "Visningsindstillinger"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "Vis tekstlink (åbnes i en ny fane)"
+    },
+    "div_applied_49ad83fc": {
+        "message": "Div anvendt"
+    },
+    "div_removed_d13f8e17": {
+        "message": "Div fjernet"
     },
     "division_sign_72190870": {
         "message": "Divisionstegn"
@@ -629,8 +689,8 @@
     "edit_link_7f53bebb": {
         "message": "Rediger link"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "Editor-statusbar"
+    "editor_status_bar_653f44ee": {
+        "message": "Redaktørstatuslinje"
     },
     "element_starting_with_start_91bf4c3b": {
         "message": "Element begynder med { start }"
@@ -695,6 +755,9 @@
     "enter_search_text_26cb4459": {
         "message": "indtast søgetekst"
     },
+    "enter_text_8b35c65b": {
+        "message": "Indtast tekst"
+    },
     "epsilon_54bb8afa": {
         "message": "Epsilon"
     },
@@ -758,8 +821,14 @@
     "f_function_fe422d65": {
         "message": "F (funktion)"
     },
+    "fail_544e5dde": {
+        "message": "IKKE BESTÅET"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kunne ikke hente filindhold"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "Svaret kunne ikke kopieres"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kunne ikke hente indhold fra eksternt værktøj"
@@ -872,6 +941,9 @@
     "grades_a61eba0a": {
         "message": "Karakterer"
     },
+    "graphics_text_bc9568bc": {
+        "message": "Grafiktekst"
+    },
     "greater_than_e98af662": {
         "message": "Større end"
     },
@@ -941,6 +1013,12 @@
     "heading_4_b2e74be7": {
         "message": "Overskrift 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "Overskrift { h } anvendt"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "Overskrift { h } fjernet"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "Overskriftsniveauer bør ikke springes over."
     },
@@ -961,6 +1039,12 @@
     },
     "height_69b03e15": {
         "message": "Højde"
+    },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "Hej. Beskriv de ændringer, du gerne vil foretage i din sammensætning."
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "Hej. Beskriv de ændringer, du ønsker at foretage til dit valg."
     },
     "hexagon_d8468e0d": {
         "message": "Sekskant"
@@ -994,6 +1078,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Jeg er rettighedshaveren"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "Jeg beklager, men jeg kan ikke finde AI''ens svar"
     },
     "icelandic_9d6d35de": {
         "message": "Islandsk"
@@ -1070,6 +1157,9 @@
     "increase_indent_6af90f7c": {
         "message": "Øg indrykning"
     },
+    "increase_rich_content_area_340b775": {
+        "message": "Forøg Rich Content-området"
+    },
     "indefinite_integral_6623307e": {
         "message": "Ubestemt integral"
     },
@@ -1088,6 +1178,18 @@
     "infinity_7a10f206": {
         "message": "Uendelighed"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Indtastningsfelt for alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Indtastningsfelt for blå"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Indtastningsfelt for grøn"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Indtastningsfelt for rød"
+    },
     "insert_593145ef": {
         "message": "Indsæt"
     },
@@ -1102,6 +1204,9 @@
     },
     "intersection_cd4590e4": {
         "message": "Fællesmængde"
+    },
+    "invalid_description_991e23bb": {
+        "message": "Ugyldig beskrivelse"
     },
     "invalid_entry_f7d2a0f5": {
         "message": "Ugyldig indtastning."
@@ -1126,6 +1231,12 @@
     },
     "italian_bd3c792d": {
         "message": "Italiensk"
+    },
+    "italic_applied_8f59a684": {
+        "message": "Kursiv anvendt"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "Kursiv fjernet"
     },
     "japanese_b5721ca7": {
         "message": "Japansk"
@@ -1156,6 +1267,9 @@
     },
     "large_9c5e80e7": {
         "message": "Stor"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Stor tekst"
     },
     "latvian_2bbb6aab": {
         "message": "Lettisk"
@@ -1261,6 +1375,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Links til en ekstern webside."
+    },
+    "lists_cd1336fc": {
+        "message": "Lister"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "Lister skal have listeformat."
@@ -1382,6 +1499,9 @@
     "miscellaneous_e9818229": {
         "message": "Diverse"
     },
+    "modify_6b0b13e3": {
+        "message": "Modificer"
+    },
     "module_90d9fd32": {
         "message": "Modul"
     },
@@ -1402,12 +1522,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Musik-ikon"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Skal være mindst { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Skal være mindst { width } x { height } px"
     },
     "my_files_2f621040": {
         "message": "Mine filer"
@@ -1523,6 +1637,9 @@
     "none_selected_b93d56d2": {
         "message": "Ingen valgt"
     },
+    "normal_text_7b03da48": {
+        "message": "Normal tekst"
+    },
     "norwegian_53f391ec": {
         "message": "Norsk"
     },
@@ -1601,8 +1718,8 @@
     "outline_size_a6059a21": {
         "message": "Konturstørrelse"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } er ikke en gyldig protokol. Den skal være ftp, http, https, mailto, skype, tel eller kan udelades"
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } er ikke en gyldig protokol."
     },
     "page_50c4823d": {
         "message": "Side"
@@ -1613,6 +1730,12 @@
     "paragraph_5e5ad8eb": {
         "message": "Afsnit"
     },
+    "paragraph_applied_959b3fe5": {
+        "message": "Afsnit anvendt"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "Afsnit fjernet"
+    },
     "paragraph_starting_with_start_a59923f8": {
         "message": "Paragraf begynder med { start }"
     },
@@ -1621,6 +1744,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "Delvis (afledt)"
+    },
+    "pass_1c19a2b3": {
+        "message": "BESTÅET"
     },
     "paste_5963d1c1": {
         "message": "Sæt ind"
@@ -1639,6 +1765,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Procent skal være et tal"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Procent skal være mindst { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Scenekunst-ikon"
@@ -1664,11 +1793,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variant)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Vælg en farve"
+    },
     "pink_68ad45cb": {
         "message": "Lyserød"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pixels skal være mindst { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Afspil"
@@ -1681,6 +1816,18 @@
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "Lad Canvas få adgang til din mikrofon og webcam."
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "Vælg en fil"
+    },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "Beskriv, hvad du gerne vil komponere."
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "Venligst indtast et filnavn"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "Vælg en fil af en understøttet type"
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1732,6 +1879,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Forrige { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Tidligere valgte farver"
     },
     "prime_917ea60e": {
         "message": "Forbered"
@@ -1832,11 +1982,17 @@
     "resize_ec83d538": {
         "message": "Tilpas størrelse"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "Svar kopieret til udklipsholder"
+    },
     "restore_auto_save_deccd84b": {
         "message": "Gendan automatisk gemt indhold?"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "Resultat { index } af { max }."
+    },
+    "retry_ebd5f8ba": {
+        "message": "Prøv igen"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "Omvendt drejekors (giver ikke efter)"
@@ -1997,6 +2153,9 @@
     "shortcut_911d6255": {
         "message": "Genvej"
     },
+    "show_all_967a90f0": {
+        "message": "Vis alle"
+    },
     "show_audio_options_b489926b": {
         "message": "Vis lydindstillinger"
     },
@@ -2129,6 +2288,9 @@
     "submit_a3cc6859": {
         "message": "Aflever"
     },
+    "submitting_b90fac62": {
+        "message": "Afleverer ..."
+    },
     "subscript_59744f96": {
         "message": "Sænket skrift"
     },
@@ -2252,8 +2414,11 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Den første overskrift på en side skal være H2."
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "Følgende indhold er partnerleveret"
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Højden på Rich Content-området er blevet reduceret."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Højden på Rich Content-området er blevet øget."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialer er på det offentlige domæne"
@@ -2263,9 +2428,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materialet er underlagt en undtagelse - fx fair brug, retten til at citere eller andre i henhold til gældende copyright-love"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "Foregående indhold er partnerleveret"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Det pæne html-redigeringsværktøj er ikke tilgængeligt på tastaturet. Tryk på Shift-O for at åbne det rå html-redigeringsværktøj."
@@ -2362,6 +2524,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Kan ikke bestemme webadressen til ressourcevalg"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "Understregning anvendt"
+    },
+    "underline_removed_3693e17c": {
+        "message": "Understregning fjernet"
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2552,6 +2720,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Se antal ord og tegn"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "Venter på svar"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "Vi kunne ikke registrere en fungerende mikrofon tilsluttet til din enhed."
     },
@@ -2572,6 +2743,9 @@
     },
     "welsh_42ab94b1": {
         "message": "Walisisk"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "Hvad vil du gerne lave?"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "Når der anvendes fremhævelse, der visuelt formaterer elementer i listeform, men som ikke angiver listeforholdet, kan brugere have svært ved at navigere gennem oplysningerne."
@@ -2603,6 +2777,9 @@
     "wreath_product_200b38ef": {
         "message": "Krans-produkt"
     },
+    "writing_assistant_a30ac16a": {
+        "message": "Skriveassistent"
+    },
     "xi_149681d0": {
         "message": "Xi"
     },
@@ -2611,6 +2788,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Du er på en farvepalet. For at navigere på paletten op, til venstre, ned eller til højre skal du bruge henholdsvis ''W'', ''A'', ''S'' og ''D'' knapperne"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Du er på en farveskyder. For at navigere skyderen til venstre eller højre skal du bruge henholdsvis ''A'' og ''D'' knapperne"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Du er på en alfa-skyder. For at navigere skyderen til venstre eller højre skal du bruge henholdsvis ''A'' og ''D'' knapperne"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Du kan udskifte den ved at uploade en ny billedtekstfil."

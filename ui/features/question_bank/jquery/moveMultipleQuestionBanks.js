@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import moveQuestionTemplate from '../jst/move_question.handlebars'
 import htmlEscape from '@instructure/html-escape'
@@ -30,7 +30,7 @@ import '@canvas/jquery-keycodes' /* keycodes */
 import '@canvas/loading-image' /* loadingImage */
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('question_bank')
+const I18n = createI18nScope('question_bank')
 /* fillTemplateData, getTemplateData */
 
 const moveQuestions = {
@@ -86,7 +86,7 @@ const moveQuestions = {
       window.location.href + '/questions?page=' + this.page,
       'GET',
       {},
-      $.proxy(this.onData, this)
+      $.proxy(this.onData, this),
     )
   },
   onData(data) {

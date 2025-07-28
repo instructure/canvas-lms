@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/AssignmentGroupCreateDialog.handlebars'
@@ -27,7 +27,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('AssignmentGroupCreateDialog')
+const I18n = createI18nScope('AssignmentGroupCreateDialog')
 
 extend(AssignmentGroupCreateDialog, View)
 
@@ -64,7 +64,7 @@ AssignmentGroupCreateDialog.prototype.render = function () {
         return function () {
           return _this.cancel()
         }
-      })(this)
+      })(this),
     )
   return this
 }
@@ -84,7 +84,7 @@ AssignmentGroupCreateDialog.prototype.createAssignmentGroup = function (event) {
         _this.closeDialog()
         return _this.trigger('assignmentGroup:created', data.assignment_group)
       }
-    })(this)
+    })(this),
   )
 }
 

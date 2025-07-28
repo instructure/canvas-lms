@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::Delay do
   subject(:cop) { described_class.new }
 
   it "catches other forms of delay" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       class TestMigration < ActiveRecord::Migration
 
         def up
@@ -29,13 +29,13 @@ describe RuboCop::Cop::Migration::Delay do
         end
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_production/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_production/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "disallows delay in predeploys" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       class TestMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -44,8 +44,8 @@ describe RuboCop::Cop::Migration::Delay do
         end
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/predeploy/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/predeploy/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 end

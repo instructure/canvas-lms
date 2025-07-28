@@ -25,7 +25,8 @@ class MissingPolicyApplicator
   def apply_missing_deductions
     GuardRail.activate(:secondary) do
       recently_missing_submissions.find_in_batches do |submissions|
-        filtered_submissions = submissions.reject { |s| s.grading_period&.closed? }
+        filtered_submissions = submissions.reject { |s| s.grading_period&.closed? || s.assignment&.has_sub_assignments? }
+
         filtered_submissions.group_by(&:assignment).each { |k, v| apply_missing_deduction(k, v) }
       end
     end
@@ -39,7 +40,7 @@ class MissingPolicyApplicator
               .joins(assignment: { course: [:late_policy, :enrollments] })
               .where("enrollments.user_id = submissions.user_id")
               .preload(:grading_period, assignment: :post_policy, course: [:late_policy, :default_post_policy])
-              .merge(Assignment.published)
+              .merge(AbstractAssignment.published)
               .merge(Enrollment.all_active_or_pending)
               .missing
               .where(score: nil,
@@ -70,6 +71,15 @@ class MissingPolicyApplicator
         updated_at: now,
         workflow_state: "graded"
       )
+
+      # For items where we need to use the missing values right away to trigger a conditional release rule
+      if !assignment.post_manually? && assignment.queue_conditional_release_grade_change_handler?
+        submissions.each(&:queue_conditional_release_grade_change_handler)
+      end
+
+      if assignment.checkpoint?
+        submissions.each(&:aggregate_checkpoint_submissions)
+      end
 
       if assignment.course.root_account.feature_enabled?(:missing_policy_applicator_emits_live_events)
         Canvas::LiveEvents.delay_if_production.submissions_bulk_updated(submissions)

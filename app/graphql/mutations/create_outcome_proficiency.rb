@@ -24,8 +24,8 @@ class Mutations::CreateOutcomeProficiency < Mutations::OutcomeProficiencyBase
   graphql_name "CreateOutcomeProficiency"
 
   # input arguments
-  argument :context_type, String, required: true
   argument :context_id, ID, required: true
+  argument :context_type, String, required: true
   argument :proficiency_ratings, [Mutations::OutcomeProficiencyRatingCreate], required: true
 
   VALID_CONTEXTS = %w[Account Course].freeze

@@ -133,11 +133,11 @@
     .context_list_context .ContextList__DeleteBtn {
       visibility: hidden;
     }
-  
+
     .context_list_context:hover .ContextList__DeleteBtn {
       visibility: visible;
     }
-  
+
     .context_list_context:focus-within .ContextList__DeleteBtn {
       visibility: visible;
     }
@@ -147,7 +147,7 @@
 #other-calendars-section-header {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #C7CDD1;
+  border-bottom: 1px solid #E8EAEC;
   #manage-accounts-btn{
     padding-top: 0.66rem;
   }

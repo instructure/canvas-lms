@@ -24,8 +24,9 @@ import PropTypes from 'prop-types'
 import ReactModal from '@canvas/react-modal'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import {isRTL} from '@canvas/i18n/rtlHelper'
@@ -34,7 +35,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('calendar_color_picker')
+const I18n = createI18nScope('calendar_color_picker')
 
 export const PREDEFINED_COLORS = [
   {
@@ -137,7 +138,6 @@ function shouldApplySelectedStyle(color) {
   return this.state.currentColor === color.hexcode
 }
 
-// eslint-disable-next-line react/prefer-es6-class
 const ColorPicker = createReactClass({
   // ===============
   //     CONFIG
@@ -151,7 +151,7 @@ const ColorPicker = createReactClass({
       PropTypes.shape({
         hexcode: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
-      }).isRequired
+      }).isRequired,
     ),
     isOpen: PropTypes.bool,
     afterUpdateColor: PropTypes.func,
@@ -161,7 +161,7 @@ const ColorPicker = createReactClass({
         return new Error(
           `Invalid prop '${propName}' supplied to '${componentName}'. ` +
             `Prop '${propName}' must be present when 'parentComponent' ` +
-            "is 'DashboardCardMenu'. Vaidation failed."
+            "is 'DashboardCardMenu'. Vaidation failed.",
         )
       }
       return undefined
@@ -183,12 +183,19 @@ const ColorPicker = createReactClass({
   },
 
   hexInputRef: null,
+  courseNicknameEditRef: React.createRef(),
+  colorSwatchRefs: [],
+  pickerBodyRef: React.createRef(),
+  reactModalRef: React.createRef(),
 
   // ===============
   //    LIFECYCLE
   // ===============
 
   getInitialState() {
+    // Initialize colorSwatchRefs array with refs for each color
+    this.colorSwatchRefs = this.props.colors.map(() => React.createRef())
+
     return {
       isOpen: this.props.isOpen,
       currentColor: this.props.currentColor,
@@ -211,7 +218,7 @@ const ColorPicker = createReactClass({
         try {
           document.createEvent('TouchEvent')
           return false
-        } catch (e) {
+        } catch (_e) {
           return true
         }
       })(),
@@ -248,17 +255,17 @@ const ColorPicker = createReactClass({
         if (this.state.isOpen) {
           this.setFocus()
         }
-      }
+      },
     )
   },
 
   setFocus() {
     // focus course nickname input first if it's there, otherwise the first
     // color swatch
-    if (this.refs.courseNicknameEdit) {
-      this.refs.courseNicknameEdit.focus()
-    } else if (this.refs.colorSwatch0) {
-      ReactDOM.findDOMNode(this.refs.colorSwatch0).focus()
+    if (this.courseNicknameEditRef.current) {
+      this.courseNicknameEditRef.current.focus()
+    } else if (this.colorSwatchRefs[0] && this.colorSwatchRefs[0].current) {
+      this.colorSwatchRefs[0].current.focus()
     }
   },
 
@@ -326,7 +333,7 @@ const ColorPicker = createReactClass({
           "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.",
           {
             chosenColor: this.state.currentColor,
-          }
+          },
         ),
         type: 'warning',
         srOnly: true,
@@ -335,8 +342,8 @@ const ColorPicker = createReactClass({
   },
 
   setCourseNickname() {
-    if (this.refs.courseNicknameEdit) {
-      return this.refs.courseNicknameEdit.setCourseNickname()
+    if (this.courseNicknameEditRef.current) {
+      return this.courseNicknameEditRef.current.setCourseNickname()
     }
   },
 
@@ -417,11 +424,10 @@ const ColorPicker = createReactClass({
         }
       }
       if (shouldApplySelectedStyle.call(this, color)) {
-        colorSwatchStyle.borderColor = '#73818C'
+        colorSwatchStyle.borderColor = '#6A7883'
         colorSwatchStyle.borderWidth = '2px'
       }
       const title = color.name + ' (' + color.hexcode + ')'
-      const ref = 'colorSwatch' + idx
       const colorBlockStyles = classnames({
         ColorPicker__ColorBlock: true,
         'with-dark-check': this.props.withDarkCheck,
@@ -431,7 +437,7 @@ const ColorPicker = createReactClass({
         <button
           type="button"
           className={colorBlockStyles}
-          ref={ref}
+          ref={this.colorSwatchRefs[idx]}
           role="radio"
           aria-checked={this.state.currentColor === color.hexcode}
           style={colorSwatchStyle}
@@ -455,7 +461,7 @@ const ColorPicker = createReactClass({
     if (this.props.nicknameInfo) {
       return (
         <CourseNicknameEdit
-          ref="courseNicknameEdit"
+          ref={this.courseNicknameEditRef}
           nicknameInfo={this.props.nicknameInfo}
           onEnter={this.onApply.bind(null, this.state.currentColor)}
         />
@@ -473,39 +479,38 @@ const ColorPicker = createReactClass({
     }
   },
 
-  colorPreview() {
-    let previewColor = this.isValidHex(this.state.currentColor)
-      ? this.state.currentColor
-      : '#FFFFFF'
-
+  colorPreview(validHex) {
+    let previewColor = validHex ? this.state.currentColor : '#FFFFFF'
     if (previewColor.indexOf('#') < 0) {
       previewColor = '#' + previewColor
     }
 
-    const inputColorStyle = {
-      color: previewColor,
-      backgroundColor: previewColor,
-    }
-
     return (
-      <div
+      <View
+        as="div"
+        background="primary"
+        borderColor="primary"
         className="ic-Input-group__add-on ColorPicker__ColorPreview"
         title={this.state.currentColor}
-        style={inputColorStyle}
         role="presentation"
         aria-hidden="true"
         tabIndex="-1"
+        margin="xxx-small x-small 0 0"
+        themeOverride={{backgroundPrimary: previewColor, borderColorPrimary: previewColor}}
       >
-        {!this.isValidHex(this.state.currentColor) && (
+        {!validHex && (
           <Tooltip renderTip={I18n.t('Invalid hexcode')}>
-            <IconWarningSolid color="warning" id="ColorPicker__InvalidHex" />
+            <View as="div" height="1.75rem">
+              <IconWarningSolid id="ColorPicker__InvalidHex" color="error" height="0.9rem" />
+            </View>
           </Tooltip>
         )}
-      </div>
+      </View>
     )
   },
 
   pickerBody() {
+    const validHex = this.isValidHex(this.state.currentColor)
     const containerClasses = classnames({
       ColorPicker__Container: true,
       'with-animation': this.props.withAnimation,
@@ -517,7 +522,7 @@ const ColorPicker = createReactClass({
     const inputId = 'ColorPickerCustomInput-' + this.props.assetString
 
     return (
-      <div className={containerClasses} ref="pickerBody">
+      <div className={containerClasses} ref={this.pickerBodyRef}>
         {this.prompt()}
         {this.nicknameEdit()}
         <div
@@ -528,14 +533,12 @@ const ColorPicker = createReactClass({
           {this.renderColorRows()}
         </div>
 
-        <div className="ColorPicker__CustomInputContainer">
-          {this.colorPreview()}
+        <div className="ColorPicker__CustomInputContainer" style={{alignItems: 'flex-start'}}>
+          {this.colorPreview(validHex)}
           <TextInput
             renderLabel={
               <ScreenReaderContent>
-                {this.isValidHex(this.state.currentColor)
-                  ? I18n.t('Enter a hexcode here to use a custom color.')
-                  : I18n.t('Invalid hexcode. Enter a valid hexcode here to use a custom color.')}
+                {I18n.t('Enter a hexcode here to use a custom color.')}
               </ScreenReaderContent>
             }
             id={inputId}
@@ -548,6 +551,23 @@ const ColorPicker = createReactClass({
               this.hexInputRef = r
             }}
             data-testid="color-picker-input"
+            messages={
+              validHex
+                ? []
+                : [
+                    {
+                      type: 'error',
+                      text: (
+                        <View textAlign="center">
+                          <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                            <IconWarningSolid />
+                          </View>
+                          {I18n.t('Invalid format')}
+                        </View>
+                      ),
+                    },
+                  ]
+            }
           />
         </div>
 
@@ -560,7 +580,7 @@ const ColorPicker = createReactClass({
             id="ColorPicker__Apply"
             size="small"
             onClick={this.onApply.bind(null, this.state.currentColor)}
-            disabled={this.state.saveInProgress || !this.isValidHex(this.state.currentColor)}
+            disabled={this.state.saveInProgress || !validHex}
             margin="0 0 0 xxx-small"
           >
             {I18n.t('Apply')}
@@ -588,7 +608,7 @@ const ColorPicker = createReactClass({
 
     return (
       <ReactModal
-        ref="reactModal"
+        ref={this.reactModalRef}
         style={styleObj}
         isOpen={this.state.isOpen}
         onRequestClose={this.closeModal}
@@ -610,7 +630,7 @@ ColorPicker.getColorName = colorHex => {
   const colorWithoutHash = colorHex.replace('#', '')
 
   const definedColor = PREDEFINED_COLORS.find(
-    color => color.hexcode.replace('#', '') === colorWithoutHash
+    color => color.hexcode.replace('#', '') === colorWithoutHash,
   )
 
   if (definedColor) {

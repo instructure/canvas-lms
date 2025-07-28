@@ -53,16 +53,16 @@ module Lti
       lti_helper = Lti::SubstitutionsHelper.new(context, domain_root_account, user)
 
       params = {
-        context_id: Lti::Asset.opaque_identifier_for(context),
+        context_id: Lti::V1p1::Asset.opaque_identifier_for(context),
         tool_consumer_instance_guid: domain_root_account.lti_guid,
         roles: lti_helper.current_lis_roles,
-        launch_presentation_locale: I18n.locale.to_s || I18n.default_locale.to_s,
+        launch_presentation_locale: I18n.locale.to_s,
         launch_presentation_document_target: "iframe",
         ext_roles: lti_helper.all_roles,
         oauth_callback: "about:blank"
       }
 
-      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context:) if user
+      params[:user_id] = Lti::V1p1::Asset.opaque_identifier_for(user, context:) if user
       params
     end
 
@@ -144,6 +144,7 @@ module Lti
       quiz_index_menu
       wiki_index_menu
     ].freeze
+    private_constant :INDEX_MENU_TOOL_TYPES
 
     def placement_params(placement, assignment: nil)
       case placement

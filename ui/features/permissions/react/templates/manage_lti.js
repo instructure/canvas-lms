@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_28')
+const I18n = createI18nScope('permissions_templates_28')
 
 export const template = generateActionTemplates(
   [
@@ -29,7 +29,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to add external app icons to the Rich Content Editor toolbar.'
+        'Allows user to add external app icons to the Rich Content Editor toolbar.',
       ),
     },
     {
@@ -51,7 +51,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('External Apps'),
       description: I18n.t(
-        'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.'
+        'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.',
       ),
     },
   ],
@@ -73,8 +73,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('External Apps'),
       description: I18n.t(
-        'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.'
+        'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.',
       ),
     },
-  ]
+  ],
 )

@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, clone, indexOf, find, last} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -25,7 +25,7 @@ import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 import FindDirectoryView from './FindDirectoryView'
 
-const I18n = useI18nScope('outcomesSidebarView')
+const I18n = createI18nScope('outcomesSidebarView')
 
 let findDialog
 
@@ -258,7 +258,7 @@ export default class SidebarView extends Backbone.View {
         I18n.t('%{model} is already located in %{newGroup}', {
           model: model.get('title'),
           newGroup: newGroup.get('title'),
-        })
+        }),
       )
       return
     }
@@ -289,9 +289,9 @@ export default class SidebarView extends Backbone.View {
             I18n.t('Successfully moved %{model} to %{newGroup}', {
               model: model.get('title'),
               newGroup: newGroup.get('title'),
-            })
+            }),
           ),
-        1500
+        1500,
       )
     })
   }
@@ -303,7 +303,7 @@ export default class SidebarView extends Backbone.View {
       (this.entryHeight + 1) *
       indexOf(
         this.directories[dirIndex].views(),
-        find(this.directories[dirIndex].views(), v => v.model === model)
+        find(this.directories[dirIndex].views(), v => v.model === model),
       )
     return this.directories[dirIndex].$el.animate({scrollTop}, {duration: 200})
   }

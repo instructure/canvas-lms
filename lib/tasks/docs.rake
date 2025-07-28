@@ -5,7 +5,13 @@ begin
   require "yard-appendix"
   require_relative "../../config/initializers/json"
 
-  DOC_DIR     = File.join(%w[public doc api])
+  DOC_FORMAT = ENV["OUTPUT_FORMAT"] || "html"
+  DOC_DIR = if DOC_FORMAT == "markdown"
+              File.join(%w[public doc api_md])
+            else
+              File.join(%w[public doc api])
+            end
+
   API_DOC_DIR = Rails.root.join(DOC_DIR).expand_path
   DOC_OPTIONS = {
     # turning this on will show all the appendixes of all
@@ -43,6 +49,8 @@ begin
         doc/images:images
         --asset
         doc/examples:examples
+        --format
+        #{DOC_FORMAT}
       ]
 
       # t.options << '--verbose'
@@ -51,8 +59,12 @@ begin
 
     desc "generate API docs"
     task "api" do # rubocop:disable Rails/RakeEnvironment
-      puts "API Documentation successfully generated in #{DOC_DIR}\n" \
-           "See #{DOC_DIR}/index.html"
+      puts "API Documentation successfully generated in #{DOC_DIR}\n"
+      if DOC_FORMAT == "html"
+        puts "See #{DOC_DIR}/index.html"
+      elsif DOC_FORMAT == "markdown"
+        puts "See #{DOC_DIR}/Readme.md"
+      end
     end
   end
 rescue LoadError

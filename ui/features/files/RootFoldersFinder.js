@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Folder from '@canvas/files/backbone/models/Folder'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('rootFoldersFinder')
+const I18n = createI18nScope('rootFoldersFinder')
 
 function RootFoldersFinder(opts) {
   this.rootFoldersToShow = opts.rootFoldersToShow
@@ -52,7 +52,7 @@ RootFoldersFinder.prototype.find = function () {
             'custom_name',
             contextTypeAndId[0] === 'courses'
               ? I18n.t('course_files', 'Course files')
-              : I18n.t('group_files', 'Group files')
+              : I18n.t('group_files', 'Group files'),
           )
           contextFiles.url =
             '/api/v1/' + contextTypeAndId[0] + '/' + contextTypeAndId[1] + '/folders/root'

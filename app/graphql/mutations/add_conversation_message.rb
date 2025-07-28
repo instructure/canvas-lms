@@ -23,15 +23,14 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
 
   include ConversationsHelper
 
-  argument :conversation_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
-  argument :body, String, required: true
-  argument :recipients, [String], required: true
-  argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ConversationMessage")
   argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
+  argument :body, String, required: true
+  argument :context_code, String, required: false
+  argument :conversation_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
+  argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ConversationMessage")
   argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
-  argument :context_code, String, required: false
-  argument :user_note, Boolean, required: false
+  argument :recipients, [String], required: true
 
   field :conversation_message, Types::ConversationMessageType, null: true
 
@@ -50,17 +49,16 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       attachment_ids: input[:attachment_ids],
       domain_root_account_id: context[:domain_root_account].id,
       media_comment_id: input[:media_comment_id],
-      media_comment_type: input[:media_comment_type],
-      user_note: input[:user_note]
+      media_comment_type: input[:media_comment_type]
     )
-    InstStatsd::Statsd.increment("inbox.message.sent.isReply.react")
-    InstStatsd::Statsd.increment("inbox.message.sent.react")
+    InstStatsd::Statsd.distributed_increment("inbox.message.sent.isReply.react")
+    InstStatsd::Statsd.distributed_increment("inbox.message.sent.react")
     InstStatsd::Statsd.count("inbox.message.sent.recipients.react", message[:recipients_count])
     if input[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
-      InstStatsd::Statsd.increment("inbox.message.sent.media.react")
+      InstStatsd::Statsd.distributed_increment("inbox.message.sent.media.react")
     end
     if !message[:message].nil? && message[:message][:attachment_ids].present?
-      InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
+      InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.react")
     end
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound

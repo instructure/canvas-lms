@@ -51,7 +51,7 @@ describe('EmojiQuickPicker', () => {
     const {getByRole} = render(<EmojiQuickPicker insertEmoji={insertEmoji} />)
     await userEvent.click(getByRole('button', {name: /😘, kissing_heart/}))
     expect(insertEmoji).toHaveBeenCalledWith(
-      expect.objectContaining({id: 'kissing_heart', native: '😘'})
+      expect.objectContaining({id: 'kissing_heart', native: '😘'}),
     )
   })
 

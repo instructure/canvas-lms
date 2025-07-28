@@ -64,7 +64,7 @@ describe('validateScores', () => {
   it('allows scores within bounds', () => {
     const errors = validateScores(
       List(['1.0', '.9', '.8', '.2', '.111', '0.100', '0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -72,7 +72,7 @@ describe('validateScores', () => {
   it('allows scores with similar ranges', () => {
     const errors = validateScores(
       List(['1.0', '1.0', '1.0', '1.0', '1.0', '1.0', '1.0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -80,9 +80,17 @@ describe('validateScores', () => {
   it('allows scores with similar ranges and shows correct errors', () => {
     const errors = validateScores(
       List(['1.0', '1.0', '1.0', '1.0', '1.0', '2.0', '1.0']),
-      defaultScoringInfo()
+      defaultScoringInfo(),
     )
-    expect(errors.toJS()).toEqual([null, null, null, null, null, 'number is too large', null])
+    expect(errors.toJS()).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      'Please enter a smaller number',
+      null,
+    ])
   })
 
   it('allows scores with close bounds', () => {
@@ -93,7 +101,7 @@ describe('validateScores', () => {
   it('allows scores within bounds for letters', () => {
     const errors = validateScores(
       List(['1.0', '.9', '.8', '.2', '.111', '0.100', '0']),
-      defaultScoringInfoLetter()
+      defaultScoringInfoLetter(),
     )
     expect(errors.toJS()).toEqual([null, null, null, null, null, null, null])
   })
@@ -113,7 +121,7 @@ describe('validateScores', () => {
       const errors = validateScores(List(['1.00', val, '.20']))
       expect(errors.get(1)).toMatch(
         errorExpression,
-        'value ' + val + ' should have error matching ' + errorExpression
+        'value ' + val + ' should have error matching ' + errorExpression,
       )
     })
   }
@@ -123,7 +131,7 @@ describe('validateScores', () => {
       const errors = validateScores(List(['1.0', val, '.2']), defaultScoringInfoLetter())
       expect(errors.get(1)).toMatch(
         errorExpression,
-        'value ' + val + ' should have error matching ' + errorExpression
+        'value ' + val + ' should have error matching ' + errorExpression,
       )
     })
   }
@@ -141,13 +149,13 @@ describe('validateScores', () => {
   })
 
   it('requires the input to be within bounds', () => {
-    expectAllInvalid(/too/, '1.1', '1.105', '-1')
-    expectAllInvalidLetters(/too/, '1.1', '1.105', '-1')
+    expectAllInvalid(/Please enter a .* number/, '1.1', '1.105', '-1')
+    expectAllInvalidLetters(/Please enter a .* number/, '1.1', '1.105', '-1')
   })
 
   it('requires the input to not be blank', () => {
-    expectAllInvalid(/empty/, null, '')
-    expectAllInvalidLetters(/empty/, null, '')
+    expectAllInvalid(/Please enter a score/, null, '')
+    expectAllInvalidLetters(/Please enter a score/, null, '')
   })
 
   it('requires scores be in order', () => {

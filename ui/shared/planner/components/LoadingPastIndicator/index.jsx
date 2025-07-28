@@ -22,10 +22,10 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
 import ErrorAlert from '../ErrorAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TV from './TV'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default class LoadingPastIndicator extends Component {
   static propTypes = {

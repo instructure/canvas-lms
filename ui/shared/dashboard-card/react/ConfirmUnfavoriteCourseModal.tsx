@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -25,7 +25,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('dashcards')
+const I18n = createI18nScope('dashcards')
 
 export function showConfirmUnfavorite(props: Props) {
   const parent = document.createElement('div')
@@ -38,7 +38,7 @@ export function showConfirmUnfavorite(props: Props) {
 
   ReactDOM.render(
     <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
-    parent
+    parent,
   )
   return parent
 }
@@ -58,7 +58,7 @@ export function showNoFavoritesAlert() {
       your active courses. To add favorites, go to `)}{' '}
       <a href="/courses">{I18n.t('All Courses.')}</a>
     </Alert>,
-    parent
+    parent,
   )
   return parent
 }
@@ -129,7 +129,7 @@ export default class ConfirmUnfavoriteCourseModal extends React.Component<Props,
         <Modal.Body>
           {I18n.t(
             `You are about to remove this course from your dashboard. It will still be available
-              by navigating to Courses > All Courses from the main menu.`
+              by navigating to Courses > All Courses from the main menu.`,
           )}
         </Modal.Body>
 

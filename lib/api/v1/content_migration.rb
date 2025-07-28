@@ -48,7 +48,9 @@ module Api::V1::ContentMigration
     if attachment_preflight
       json[:pre_attachment] = attachment_preflight
     elsif migration.attachment && !migration.expired? && include_attachment
-      json[:attachment] = attachment_json(migration.attachment, current_user, {}, { can_view_hidden_files: true })
+      options = { can_view_hidden_files: true }
+      options[:omit_verifier_in_app] = true if Account.site_admin.feature_enabled?(:disable_verified_content_export_links)
+      json[:attachment] = attachment_json(migration.attachment, current_user, {}, options)
     end
 
     source = migration.source_course

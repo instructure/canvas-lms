@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-/* eslint-disable jest/valid-describe */
 // our own imported describe function confuses eslint
 
 import React from 'react'
@@ -47,7 +46,7 @@ import checkNode from '../node-checker'
 import formatMessage from '../../../../format-message'
 import {clearIndicators} from '../utils/indicate'
 import {getTrayHeight} from '../../shared/trayUtils'
-import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../util/fullscreenHelpers'
 
 // safari still doesn't support the standard api
 const FS_CHANGEEVENT = document.exitFullscreen ? 'fullscreenchange' : 'webkitfullscreenchange'
@@ -108,6 +107,7 @@ export default class Checker extends React.Component {
         errorIndex: 0,
       },
       () => {
+        window.webkit?.messageHandlers?.modalPresentation?.postMessage?.({open: true})
         if (typeof this.state.config.beforeCheck === 'function') {
           this.state.config.beforeCheck(this.props.editor, () => {
             this._check(() => {
@@ -125,7 +125,7 @@ export default class Checker extends React.Component {
         } else {
           this._check(done)
         }
-      }
+      },
     )
   }
 
@@ -310,7 +310,8 @@ export default class Checker extends React.Component {
     this.onLeaveError()
     clearIndicators(this.props.editor.dom.doc)
     this.setState({open: false}, () => {
-      this.props.onClose()
+      this.props?.onClose()
+      window.webkit?.messageHandlers?.modalPresentation?.postMessage?.({open: false})
     })
   }
 
@@ -497,7 +498,7 @@ export default class Checker extends React.Component {
       case !!f.options:
         return (
           <SimpleSelect
-            mountNode={instuiPopupMountNode}
+            mountNode={instuiPopupMountNodeFn()}
             disabled={disabled}
             onChange={(e, option) => {
               this.updateFormState({

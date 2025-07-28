@@ -19,10 +19,10 @@
 import React from 'react'
 import {bool, func, object, string} from 'prop-types'
 import DueDateCalendarPicker from './DueDateCalendarPicker'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import cx from 'classnames'
 
-const I18n = useI18nScope('DueDateCalendars')
+const I18n = createI18nScope('DueDateCalendars')
 
 class DueDateCalendars extends React.Component {
   static propTypes = {
@@ -78,7 +78,7 @@ class DueDateCalendars extends React.Component {
               'due_at',
               I18n.t('Due'),
               this.props.disabled,
-              this.props.dueDatesReadonly
+              this.props.dueDatesReadonly,
             )}
           </div>
         </div>
@@ -90,7 +90,7 @@ class DueDateCalendars extends React.Component {
                   'unlock_at',
                   I18n.t('Available from'),
                   this.props.disabled,
-                  this.props.availabilityDatesReadonly
+                  this.props.availabilityDatesReadonly,
                 )}
               </div>
               <div className="to">
@@ -98,7 +98,7 @@ class DueDateCalendars extends React.Component {
                   'lock_at',
                   I18n.t('Until'),
                   this.props.disabled,
-                  this.props.availabilityDatesReadonly
+                  this.props.availabilityDatesReadonly,
                 )}
               </div>
             </div>

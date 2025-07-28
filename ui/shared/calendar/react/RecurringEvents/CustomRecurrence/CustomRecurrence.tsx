@@ -82,14 +82,14 @@ export default function CustomRecurrence({
       }
       return new RRuleHelper({...currSpec, ...overrides}).spec
     },
-    [count, freq, interval, month, monthdate, pos, until, weekdays]
+    [count, freq, interval, month, monthdate, pos, until, weekdays],
   )
 
   const fireOnChange = useCallback(
     (spec: RRuleHelperSpec) => {
       onChange(spec)
     },
-    [onChange]
+    [onChange],
   )
 
   useEffect(() => {
@@ -140,7 +140,7 @@ export default function CustomRecurrence({
       setPos(newFreqSpec.pos)
       fireOnChange(stateToSpec(newFreqSpec))
     },
-    [fireOnChange, stateToSpec]
+    [fireOnChange, stateToSpec],
   )
 
   const handleEndChange = useCallback(
@@ -149,7 +149,7 @@ export default function CustomRecurrence({
       setUntil(endspec.until)
       fireOnChange(stateToSpec({count: endspec.count, until: endspec.until}))
     },
-    [fireOnChange, stateToSpec]
+    [fireOnChange, stateToSpec],
   )
 
   return (

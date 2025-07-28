@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {RubricRating} from './RubricRating'
 
 export const RubricCriterion = {

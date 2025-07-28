@@ -29,6 +29,12 @@ module Factories
       settings: {
         account_navigation: {
           canvas_icon_class: "icon-analytics"
+        }.with_indifferent_access,
+        course_navigation: {
+          canvas_icon_class: "icon-analytics"
+        }.with_indifferent_access,
+        student_context_card: {
+          canvas_icon_class: "icon-analytics"
         }.with_indifferent_access
       }
     )

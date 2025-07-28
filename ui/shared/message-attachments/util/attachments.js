@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {uploadFiles} from '@canvas/upload-file'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const addAttachmentsFn =
   (
@@ -27,7 +27,7 @@ export const addAttachmentsFn =
     setPendingUploads,
     messageAttachmentUploadFolderId,
     setOnFailure,
-    setOnSuccess
+    setOnSuccess,
   ) =>
   async e => {
     const fileUploadUrl = `/api/v1/folders/${messageAttachmentUploadFolderId}/files`
@@ -53,7 +53,7 @@ export const addAttachmentsFn =
     } finally {
       setPendingUploads(prev => {
         const attachmentsStillUploading = prev.filter(
-          file => !newAttachmentsToUpload.includes(file)
+          file => !newAttachmentsToUpload.includes(file),
         )
         return attachmentsStillUploading
       })

@@ -97,6 +97,11 @@ module CoursePacesCommonPageObject
     @course_pace
   end
 
+  def create_draft_course_pace
+    course_pace_model(course: @course, end_date: Time.zone.now.advance(days: 30), workflow_state: "unpublished")
+    @course_pace
+  end
+
   def create_course_pace_module_with_assignment(module_title, assignment_title)
     @course_pace_module = create_course_module(module_title)
     @course_pace_assignment = create_assignment(@course, assignment_title, assignment_title, 10, "published")
@@ -126,7 +131,6 @@ module CoursePacesCommonPageObject
 
   def feature_setup
     @account = Account.default
-    @account.enable_feature!(:course_paces)
   end
 
   def skip_weekends(date, duration = 1)
@@ -146,7 +150,7 @@ module CoursePacesCommonPageObject
 
   def date_of_next(day)
     date  = Date.parse(day)
-    delta = (date > Date.today) ? 0 : 7
+    delta = (date > Time.zone.today) ? 0 : 7
     date + delta
   end
 

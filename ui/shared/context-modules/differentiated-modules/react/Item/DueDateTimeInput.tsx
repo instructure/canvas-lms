@@ -17,12 +17,12 @@
  */
 
 import React, {useCallback, useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
 import type {CustomDateTimeInputProps} from './types'
 import {generateMessages} from './utils'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type DueDateTimeInputProps = CustomDateTimeInputProps & {
   dueDate: string | null
@@ -49,23 +49,24 @@ export function DueDateTimeInput({
   const key = 'due_at'
   const handleClear = useCallback(() => setDueDate(null), [setDueDate])
   const dateInputRef = useCallback(
+    // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const timeInputRef = useCallback(
+    // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const onBlur = useMemo(() => handleBlur(key), [handleBlur])
   const messages = useMemo(
     () => generateMessages(dueDate, validationErrors[key] ?? null, unparsedFieldKeys.has(key)),
-    [dueDate, validationErrors, unparsedFieldKeys]
+    [dueDate, validationErrors, unparsedFieldKeys],
   )
 
   const dueDateProps = {
-    key,
     id: key,
     disabled: Boolean(blueprintDateLocks?.includes('due_dates')) || disabledWithGradingPeriod,
     description: I18n.t('Choose a due date and time'),

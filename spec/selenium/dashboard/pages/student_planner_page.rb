@@ -242,6 +242,10 @@ module PlannerPageObject
     f("#course_home_content")
   end
 
+  def peer_review_link(course, assignment)
+    flnpt(assignment, peer_review_item(course))
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def mark_peer_review_as_complete(course)
@@ -249,7 +253,7 @@ module PlannerPageObject
   end
 
   def click_peer_review(course, assignment)
-    flnpt(assignment, peer_review_item(course)).click
+    peer_review_link(course, assignment).click
   end
 
   def click_opportunity(item_name)
@@ -349,6 +353,10 @@ module PlannerPageObject
 
   def validate_pill(pill_type)
     expect(fxpath("//*[contains(@class, 'PlannerApp')]//*[contains(text(),'#{pill_type}')]")).to be_displayed
+  end
+
+  def validate_feedback(feedback)
+    expect(fxpath("//*[contains(@class, 'PlannerApp')]//*[contains(text(),'#{feedback}')]")).to be_displayed
   end
 
   def go_to_list_view

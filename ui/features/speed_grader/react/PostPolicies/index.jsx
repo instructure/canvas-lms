@@ -48,12 +48,14 @@ export default class PostPolicies {
     const bindHideTray = ref => {
       this._hideAssignmentGradesTray = ref
     }
+
     ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     const $postContainer = document.getElementById('post-assignment-grades-tray')
     const bindPostTray = ref => {
       this._postAssignmentGradesTray = ref
     }
+
     ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
   }
 

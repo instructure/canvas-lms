@@ -53,7 +53,7 @@ describe CustomGradebookColumnsApiController, type: :request do
                    action: "index",
                    controller: "custom_gradebook_columns_api",
                    format: "json"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "returns the custom columns" do
@@ -103,7 +103,7 @@ describe CustomGradebookColumnsApiController, type: :request do
                      controller: "custom_gradebook_columns_api",
                      format: "json" },
                    "column[title]" => "Blah blah blah"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "creates a column" do
@@ -134,7 +134,7 @@ describe CustomGradebookColumnsApiController, type: :request do
                      controller: "custom_gradebook_columns_api",
                      format: "json" },
                    "column[title]" => "Bar"
-      assert_status(401)
+      assert_forbidden
       expect(@col.reload.title).to eq "Foo"
     end
 
@@ -169,7 +169,7 @@ describe CustomGradebookColumnsApiController, type: :request do
                    action: "destroy",
                    controller: "custom_gradebook_columns_api",
                    format: "json"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "works" do

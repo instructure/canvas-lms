@@ -20,7 +20,7 @@
   form_submission_delay = Setting.get("interop_8200_delay_form_submit_#{@domain_root_account.global_id}", nil)
   if form_submission_delay.present?
     js_env({
-      INTEROP_8200_DELAY_FORM_SUBMIT: form_submission_delay.to_i
+      LTI_FORM_SUBMIT_DELAY: form_submission_delay,
     })
   end
 %>
@@ -43,23 +43,35 @@
 <% end %>
 
 <%= render partial: "lti/launch_iframe" %>
-
-<% js_bundle :edit_rubric %>
-
-<% if @assignment.present? && !@assignment.quiz_lti? && can_do(@assignment, @current_user, :update) %>
-  <div class="content-box">
-    <a
-      href="<%= context_url(@context, :context_rubrics_url) %>"
-      class="add_rubric_link Button icon-plus"
-      style="<%= hidden if @assignment.active_rubric_association? %>"
-    >
-      <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
-      <span class="screenreader-only"><%= t('Add Rubric') %></span>
-    </a>
-  </div>
+<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+  <% js_bundle :edit_rubric %>
 <% end %>
 
-<%= render partial: "shared/rubrics_component" if @assignment.present? && !@assignment.quiz_lti? %>
+<% if @assignment.present? && !@assignment.quiz_lti? && can_do(@assignment, @current_user, :update) %>
+  <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+  <% else %>
+    <div class="content-box">
+      <a
+        href="<%= context_url(@context, :context_rubrics_url) %>"
+        class="add_rubric_link Button icon-plus"
+        style="<%= hidden if @assignment.active_rubric_association? %>"
+      >
+        <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
+        <span class="screenreader-only"><%= t('Add Rubric') %></span>
+      </a>
+    </div>
+    <% end %>
+<% end %>
+
+<!--Show partial rubrics ERB if enhanced_rubrics_assignments is not enabled or in Student View-->
+<% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) || !can_do(@context, @current_user, :read_as_admin)%>
+  <%= render :partial => "shared/rubrics_component", :locals => {:is_a2_student_view => @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) } if @assignment.present? && !@assignment.quiz_lti? %>
+
+  <% if Rubric.rubric_self_assessment_enabled?(@context) && can_do(@context, @current_user, :read_as_admin) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
+<% end %>
 
 <%= render @append_template if @append_template %>
 <div id="module_sequence_footer"></div>

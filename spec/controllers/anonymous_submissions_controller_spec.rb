@@ -67,7 +67,7 @@ RSpec.describe AnonymousSubmissionsController do
       user_session(@student)
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
-      expect(response).to have_http_status(:unauthorized)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it "mark read if reading one's own submission" do

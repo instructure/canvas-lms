@@ -40,7 +40,7 @@ SVGThumbnail.propTypes = {
     PropTypes.shape({
       source: PropTypes.func.isRequired,
       label: PropTypes.string.isRequired,
-    }).isRequired
+    }).isRequired,
   ).isRequired,
 }
 

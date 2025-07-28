@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {waitFor} from '@testing-library/react'
 
 import actions from '../actions'
 
 import {COURSE, ACCOUNT} from '@canvas/permissions/react/propTypes'
 import {PERMISSIONS, ROLES} from './examples'
-import {moxiosWait} from '@canvas/jest-moxios-utils'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 import '@canvas/rails-flash-notifications'
@@ -32,7 +33,7 @@ it('searchPermissions dispatches updatePermissionsSearch', done => {
   const dispatchMock = jest.fn()
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
     dispatchMock,
-    () => state
+    () => state,
   )
 
   const expectedDispatch = {
@@ -54,7 +55,7 @@ it('searchPermissions announces when search is complete', () => {
   const flashMock = jest.spyOn($, 'screenReaderFlashMessageExclusive')
   actions.searchPermissions({permissionSearchString: 'add', contextType: COURSE})(
     dispatchMock,
-    () => state
+    () => state,
   )
 
   expect(flashMock).toHaveBeenCalledTimes(1)
@@ -176,142 +177,147 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
 
-/* eslint-disable promise/catch-or-return */
 /* eslint-disable promise/no-callback-in-promise */
 describe('api actions', () => {
+  const server = setupServer()
+
+  beforeAll(() => server.listen())
   beforeEach(() => {
-    moxios.install()
     window.ENV = {}
     window.ENV.flashAlertTimeout = 5
   })
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    moxios.uninstall()
-  })
+  it('updateRoleName dispatches updateRole', async () => {
+    server.use(
+      http.put('/api/v1/accounts/1/roles/:id', () => {
+        return HttpResponse.json({
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active',
+        })
+      }),
+    )
 
-  it('updateRoleName dispatches updateRole', done => {
     const mockDispatch = jest.fn()
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.updateRoleName('1', 'steven', 'StudentRoll')(mockDispatch, getState)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
-          status: 200,
-          response: {
-            id: '9',
-            role: 'steven',
-            label: 'steven',
-            base_role_type: 'StudentEnrollment',
-            workflow_state: 'active',
-          },
-        })
-        .then(() => {
-          expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'UPDATE_ROLE',
-            payload: {
-              id: '9',
-              role: 'steven',
-              label: 'steven',
-              base_role_type: 'StudentEnrollment',
-              workflow_state: 'active',
-            },
-          })
-          done()
-        })
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'UPDATE_ROLE',
+        payload: {
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active',
+        },
+      })
     })
   })
 
-  it('createNewRole dispatches addNewRole', done => {
+  it('createNewRole dispatches addNewRole', async () => {
+    server.use(
+      http.post('/api/v1/accounts/1/roles', () => {
+        return HttpResponse.json({
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active',
+        })
+      }),
+    )
+
     const mockDispatch = jest.fn()
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
-          status: 200,
-          response: {
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_NEW_ROLE',
+        payload: {
+          id: '9',
+          role: 'steven',
+          label: 'steven',
+          base_role_type: 'StudentEnrollment',
+          workflow_state: 'active',
+        },
+      })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'DISPLAY_ROLE_TRAY',
+        payload: {
+          role: {
+            base_role_type: 'StudentEnrollment',
+            id: '9',
+            label: 'steven',
+            role: 'steven',
+            workflow_state: 'active',
+          },
+        },
+      })
+      const expectedStartDispatch = {
+        type: 'ADD_TRAY_SAVING_START',
+      }
+      const expectedDisplayAddSuccessDispatch = {
+        type: 'ADD_TRAY_SAVING_SUCCESS',
+      }
+
+      const expectedHideDispatch = {
+        type: 'HIDE_ALL_TRAYS',
+      }
+
+      expect(mockDispatch).toHaveBeenCalledTimes(6)
+      expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
+      expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
+      expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
+    })
+  })
+
+  it('createNewRole dispatches addTraySavingFail', async () => {
+    server.use(
+      http.post('/api/v1/accounts/1/roles', () => {
+        return HttpResponse.json(
+          {
             id: '9',
             role: 'steven',
             label: 'steven',
             base_role_type: 'StudentEnrollment',
             workflow_state: 'active',
           },
-        })
-        .then(() => {
-          expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'ADD_NEW_ROLE',
-            payload: {
-              id: '9',
-              role: 'steven',
-              label: 'steven',
-              base_role_type: 'StudentEnrollment',
-              workflow_state: 'active',
-            },
-          })
-          expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'DISPLAY_ROLE_TRAY',
-            payload: {
-              role: {
-                base_role_type: 'StudentEnrollment',
-                id: '9',
-                label: 'steven',
-                role: 'steven',
-                workflow_state: 'active',
-              },
-            },
-          })
-          const expectedStartDispatch = {
-            type: 'ADD_TRAY_SAVING_START',
-          }
-          const expectedDisplayAddSuccessDispatch = {
-            type: 'ADD_TRAY_SAVING_SUCCESS',
-          }
+          {status: 400},
+        )
+      }),
+    )
 
-          const expectedHideDispatch = {
-            type: 'HIDE_ALL_TRAYS',
-          }
-
-          expect(mockDispatch).toHaveBeenCalledTimes(6)
-          expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
-          expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
-          expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
-          done()
-        })
-    })
-  })
-
-  it('createNewRole dispatches addTraySavingFail', done => {
     const mockDispatch = jest.fn()
     const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
-          status: 400,
-          response: {
-            id: '9',
-            role: 'steven',
-            label: 'steven',
-            base_role_type: 'StudentEnrollment',
-            workflow_state: 'active',
-          },
-        })
-        .then(() => {
-          expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'ADD_TRAY_SAVING_FAIL',
-          })
-          done()
-        })
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_TRAY_SAVING_FAIL',
+      })
     })
   })
 
-  it('modifyPermissions dispatches updatePermissions', done => {
+  it('modifyPermissions dispatches updatePermissions', async () => {
+    server.use(
+      http.put('/api/v1/accounts/1/roles/:id', () => {
+        return HttpResponse.json({
+          id: '3',
+          permissions: {delete_course: {enabled: false, locked: true, explicit: true}},
+        })
+      }),
+    )
+
     const state = {
       contextId: 1,
       permissions: {},
@@ -365,66 +371,61 @@ describe('api actions', () => {
       explicit: true,
       inTray: false,
     })(dispatchMock, () => state)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
-          status: 200,
-          response: {
-            id: '3',
-            permissions: {delete_course: {enabled: false, locked: true, explicit: true}},
-          },
-        })
-        .then(() => {
-          expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
-          expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
-          expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
-          expect(dispatchMock).toHaveBeenCalledWith(expectedApiUnbusyDispatch)
-          expect(dispatchMock).toHaveBeenCalledTimes(4)
-          done()
-        })
+
+    await waitFor(() => {
+      expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
+      expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
+      expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
+      expect(dispatchMock).toHaveBeenCalledWith(expectedApiUnbusyDispatch)
+      expect(dispatchMock).toHaveBeenCalledTimes(4)
     })
   })
 
-  it('deleteRole action dispatches delete and calls success callback if good', done => {
+  it('deleteRole action dispatches delete and calls success callback if good', async () => {
+    server.use(
+      http.delete('/api/v1/accounts/1/roles/:id', () => {
+        return HttpResponse.json({data: 'who cares'})
+      }),
+    )
+
     const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
     const successCallbackMock = jest.fn()
     const failCallbackMock = jest.fn()
     const mockDispatch = jest.fn()
     actions.deleteRole(ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request.respondWith({status: 200, response: {data: 'who cares'}}).then(() => {
-        expect(successCallbackMock).toHaveBeenCalledTimes(1)
-        expect(failCallbackMock).toHaveBeenCalledTimes(0)
-        const expectedDeleteRoleDispatch = {
-          type: 'DELETE_ROLE_SUCCESS',
-          payload: ROLES[1],
-        }
-        expect(mockDispatch).toHaveBeenCalledTimes(2)
-        expect(mockDispatch).toHaveBeenCalledWith(expectedDeleteRoleDispatch)
-        done()
-      })
+
+    await waitFor(() => {
+      expect(successCallbackMock).toHaveBeenCalledTimes(1)
+      expect(failCallbackMock).toHaveBeenCalledTimes(0)
+      const expectedDeleteRoleDispatch = {
+        type: 'DELETE_ROLE_SUCCESS',
+        payload: ROLES[1],
+      }
+      expect(mockDispatch).toHaveBeenCalledTimes(2)
+      expect(mockDispatch).toHaveBeenCalledWith(expectedDeleteRoleDispatch)
     })
   })
 
-  it('deleteRole action doesnt dispatch and does fail callback on fail', done => {
+  it('deleteRole action doesnt dispatch and does fail callback on fail', async () => {
+    server.use(
+      http.delete('/api/v1/accounts/1/roles/:id', () => {
+        return HttpResponse.json({data: 'who cares'}, {status: 400})
+      }),
+    )
+
     const state = {contextId: 1, permissions: PERMISSIONS, roles: ROLES}
     const successCallbackMock = jest.fn()
     const failCallbackMock = jest.fn()
     const mockDispatch = jest.fn()
     actions.deleteRole(ROLES[1], successCallbackMock, failCallbackMock)(mockDispatch, () => state)
-    moxiosWait(() => {
-      const request = moxios.requests.mostRecent()
-      request.respondWith({status: 400, response: {data: 'who cares'}}).then(() => {
-        expect(successCallbackMock).toHaveBeenCalledTimes(0)
-        expect(failCallbackMock).toHaveBeenCalledTimes(1)
-        // Don't dispatch anything if api call fails
-        expect(mockDispatch).toHaveBeenCalledTimes(0)
-        done()
-      })
+
+    await waitFor(() => {
+      expect(successCallbackMock).toHaveBeenCalledTimes(0)
+      expect(failCallbackMock).toHaveBeenCalledTimes(1)
+      // Don't dispatch anything if api call fails
+      expect(mockDispatch).toHaveBeenCalledTimes(0)
     })
   })
 })
-/* eslint-enable promise/catch-or-return */
+
 /* eslint-enable promise/no-callback-in-promise */

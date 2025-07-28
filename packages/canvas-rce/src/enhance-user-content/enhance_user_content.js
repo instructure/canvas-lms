@@ -25,6 +25,7 @@ import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_externa
 import {MathJaxDirective, Mathml} from './mathml'
 import {makeExternalLinkIcon} from './external_links'
 import getTranslations from '../getTranslations'
+import {createOverlay} from './youtube_overlay'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -42,7 +43,7 @@ function makeDownloadButton(download_url, filename) {
   $icon.innerHTML = IconDownloadSVG
   $icon.firstChild.setAttribute(
     'style',
-    'width:1em; height:1em; vertical-align:middle; fill:currentColor'
+    'width:1em; height:1em; vertical-align:middle; fill:currentColor',
   )
   a.appendChild($icon)
 
@@ -138,11 +139,11 @@ const addResourceIdentifiersToStudioContent = content => {
     if (userContentContainer?.dataset?.resourceType && userContentContainer?.dataset?.resourceId) {
       url.searchParams.set(
         'com_instructure_course_canvas_resource_type',
-        userContentContainer.dataset.resourceType
+        userContentContainer.dataset.resourceType,
       )
       url.searchParams.set(
         'com_instructure_course_canvas_resource_id',
-        userContentContainer.dataset.resourceId
+        userContentContainer.dataset.resourceId,
       )
       iframe.src = url.href
     }
@@ -168,6 +169,12 @@ export function enhanceUserContent(container = document, opts = {}) {
      * When used inside of an LTI tool, this contains the canvas global id of the tool.
      */
     containingCanvasLtiToolId,
+
+    /**
+     * Contingency plan in case new instfs media links cause problems in rich content.
+     */
+    replaceInstFSLinksWithOldLinks,
+    showYoutubeAdOverlay,
   } = opts
 
   getTranslations(locale)
@@ -186,6 +193,17 @@ export function enhanceUserContent(container = document, opts = {}) {
     document
 
   const showFilePreviewEx = event => showFilePreview(event, {canvasOrigin, disableGooglePreviews})
+
+  if (showYoutubeAdOverlay) {
+    const youtubeIframes = content.querySelectorAll(
+      [
+        '.user_content:not(.enhanced) iframe[src*="youtube.com/embed/"]',
+        '.user_content:not(.enhanced) iframe[src*="youtube-nocookie.com/embed/"]',
+      ].join(', '),
+    )
+
+    createOverlay(youtubeIframes)
+  }
 
   content.querySelectorAll('.user_content:not(.enhanced)').forEach(elem => {
     elem.classList.add('unenhanced')
@@ -212,6 +230,30 @@ export function enhanceUserContent(container = document, opts = {}) {
       }
     })
     setData(unenhanced_elem, 'unenhanced_content_html', unenhanced_elem.innerHTML)
+
+    // If instfs links are causing content problems,
+    // use this to show users old links instead
+    if (replaceInstFSLinksWithOldLinks) {
+      const attributes = ['href', 'src']
+      const selector = '[href], [src]'
+      const oldLinkAttribute = 'data-old-link'
+
+      unenhanced_elem.querySelectorAll(selector).forEach(element => {
+        const oldLink = element.getAttribute(oldLinkAttribute)
+
+        if (!oldLink) {
+          return
+        }
+
+        for (const a of attributes) {
+          const newLink = element.getAttribute(a)
+
+          if (newLink && newLink != oldLink) {
+            element.setAttribute(a, oldLink)
+          }
+        }
+      })
+    }
 
     // guarantee relative links point to canvas
     if (canvasOrigin) {
@@ -263,7 +305,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       }
     })
 
-    unenhanced_elem.querySelectorAll('a:not(.not_external, .external)').forEach(childLink => {
+    unenhanced_elem.querySelectorAll('a:not(.not_external):not(.external)').forEach(childLink => {
       if (!isExternalLink(childLink, canvasOrigin)) return
       if (childLink.tagName === 'IMG' || childLink.querySelectorAll('img').length > 0) return
       childLink.classList.add('external')
@@ -290,7 +332,7 @@ export function enhanceUserContent(container = document, opts = {}) {
       if (!href) return
 
       const matchesCanvasFile = href.pathname.match(
-        /(?:\/(courses|groups|users)\/(\d+))?\/files\/(\d+)/
+        /(?:\/(courses|groups|users)\/\d+)?\/files\/([\d~]+)(?=[!*'();:@&=+$,/?#\[\]]|$)/,
       )
       if (!matchesCanvasFile) {
         // a bug in the new RCE added instructure_file_link class name to all links
@@ -306,7 +348,7 @@ export function enhanceUserContent(container = document, opts = {}) {
         const $span = document.createElement('span')
         $span.setAttribute(
           'class',
-          'instructure_file_holder link_holder instructure_file_link_holder'
+          'instructure_file_holder link_holder instructure_file_link_holder',
         )
 
         const qs = href.searchParams
@@ -314,7 +356,7 @@ export function enhanceUserContent(container = document, opts = {}) {
         qs.append('download_frd', '1')
         const download_url = `${href.origin}${href.pathname.replace(
           /(?:\/(download|preview))?$/,
-          '/download'
+          '/download',
         )}?${qs}`
         const $download_btn = makeDownloadButton(download_url, filename)
 
@@ -344,7 +386,7 @@ export function enhanceUserContent(container = document, opts = {}) {
   // added our own (above)
   content
     .querySelectorAll(
-      '.instructure_file_link_holder a.file_preview_link, .instructure_file_link_holder a.scribd_file_preview_link'
+      '.instructure_file_link_holder a.file_preview_link, .instructure_file_link_holder a.scribd_file_preview_link',
     )
     .forEach($link => {
       if ($link.classList.contains('previewable')) {
@@ -368,7 +410,7 @@ export function enhanceUserContent(container = document, opts = {}) {
     })
 
   const unenhanced_anchors = content.querySelectorAll(
-    '.user_content.unenhanced a, .user_content.unenhanced+div.answers a'
+    '.user_content.unenhanced a, .user_content.unenhanced+div.answers a',
   )
   unenhanced_anchors.forEach($anchor => {
     $anchor.querySelectorAll('img.media_comment_thumbnail').forEach($thumbnail => {

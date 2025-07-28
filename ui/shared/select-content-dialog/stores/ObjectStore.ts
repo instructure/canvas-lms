@@ -21,7 +21,7 @@ import {clone} from 'lodash'
 import createStore, {type CanvasStore} from '@canvas/backbone/createStore'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import '@canvas/rails-flash-notifications'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 
 const initialStoreState = {
   links: {},

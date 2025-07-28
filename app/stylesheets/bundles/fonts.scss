@@ -19,53 +19,53 @@
 @use "sass:list";
 
 $fonts: (
-  'Lato Extended': (
-    "faces": (
-        (normal 300): 'lato/extended/Lato-Light',
-        (normal 400): 'lato/extended/Lato-Regular',
-        (italic 400): 'lato/extended/Lato-Italic',
-        (normal 700): 'lato/extended/Lato-Bold',
-        (italic 700): 'lato/extended/Lato-BoldItalic',
-    )
-  ),
-  'Balsamiq Sans': (
-    // Balsamiq Sans has undesired glyphs for 2768-2775 (inclusive)
+  'Lato Extended': ("faces": ((normal 300): 'lato/extended/Lato-Light',
+      (normal 400): 'lato/extended/Lato-Regular',
+      (italic 400): 'lato/extended/Lato-Italic',
+      (normal 700): 'lato/extended/Lato-Bold',
+      (italic 700): 'lato/extended/Lato-BoldItalic',
+    )),
+  'Balsamiq Sans': ( // Balsamiq Sans has undesired glyphs for 2768-2775 (inclusive)
     // Therefore that range is excluded
     "ranges": (U+0021-2767, U+2776-FFFF),
-    "faces": (
-        (normal 400): 'balsamiq_sans/BalsamiqSans-Regular',
-        (italic 400): 'balsamiq_sans/BalsamiqSans-Italic',
-        (normal 700): 'balsamiq_sans/BalsamiqSans-Bold',
-        (italic 700): 'balsamiq_sans/BalsamiqSans-BoldItalic',
-    )
-  ),
-  'Architects Daughter': (
-    "faces": (
-        (normal 400): 'architects_daughter/ArchitectsDaughter-Regular',
-    )
-  )
+    "faces": ((normal 400): 'balsamiq_sans/BalsamiqSans-Regular',
+      (italic 400): 'balsamiq_sans/BalsamiqSans-Italic',
+      (normal 700): 'balsamiq_sans/BalsamiqSans-Bold',
+      (italic 700): 'balsamiq_sans/BalsamiqSans-BoldItalic',
+    )),
+  'Architects Daughter': ("faces": ((normal 400): 'architects_daughter/ArchitectsDaughter-Regular',
+    )),
+  'OpenDyslexic': ("faces": ((normal 400): 'open_dyslexic/OpenDyslexic-Regular',
+      (italic 400): 'open_dyslexic/OpenDyslexic-Italic',
+      (normal 700): 'open_dyslexic/OpenDyslexic-Bold',
+      (italic 700): 'open_dyslexic/OpenDyslexic-BoldItalic',
+    )),
+  'OpenDyslexicMono': ("faces": ((normal 400): 'open_dyslexic/OpenDyslexicMono-Regular',
+    ))
 );
 
 @each $family, $familyDef in $fonts {
-  $ranges: (null) !default;
-  $ranges: map-get($familyDef, "ranges");
-  $faces: map-get($familyDef, "faces");
+  $ranges: (
+    null) !default;
+  $ranges: map-get($familyDef, "ranges"
+  );
+$faces: map-get($familyDef, "faces");
 
-  @each $desc, $path in $faces {
-    @each $range in $ranges {
-      @font-face {
-        font-family: $family;
-        font-style: list.nth($desc, 1);
-        font-weight: list.nth($desc, 2);
-        src: url("/fonts/#{$path}.woff2");
-        font-display: swap;
+@each $desc, $path in $faces {
+  @each $range in $ranges {
+    @font-face {
+      font-family: $family;
+      font-style: list.nth($desc, 1);
+      font-weight: list.nth($desc, 2);
+      src: url("/fonts/#{$path}.woff2");
+      font-display: swap;
 
-        @if $range != null {
-          unicode-range: $range;
-        }
+      @if $range !=null {
+        unicode-range: $range;
       }
     }
   }
+}
 }
 
 /*

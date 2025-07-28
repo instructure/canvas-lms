@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Alert} from '@instructure/ui-alerts'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function TagThrottle({tag, jobs, onUpdate}) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -45,11 +45,11 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
   const [searchResult, setSearchResult] = useState({})
   const {searchTerm: debouncedTerm, setSearchTerm: setDebouncedTerm} = useDebouncedSearchTerm(
     term,
-    {timeout: 250}
+    {timeout: 250},
   )
   const {searchTerm: debouncedShardId, setSearchTerm: setDebouncedShardId} = useDebouncedSearchTerm(
     shardId,
-    {timeout: 250}
+    {timeout: 250},
   )
 
   const handleClose = () => setModalOpen(false)
@@ -72,7 +72,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
       err => {
         setSaving(false)
         setError(err)
-      }
+      },
     )
   }
 
@@ -89,7 +89,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
       success: setSearchResult,
       forceResult: modalOpen ? undefined : {},
     },
-    [modalOpen]
+    [modalOpen],
   )
 
   const enableSubmit = () => !loading && !saving && term.length > 1 && searchResult.matched_jobs > 1
@@ -166,6 +166,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
           </Flex.Item>
           <Flex.Item padding="xx-small">
             <NumberInput
+              allowStringValue={true}
               renderLabel={I18n.t('New Concurrency')}
               value={maxConcurrent}
               onChange={onChangeConcurrency}
@@ -181,7 +182,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
               <Flex.Item>
                 <Text>
                   {I18n.t(
-                    'After throttling the selected jobs, the newly created strand will be selected.'
+                    'After throttling the selected jobs, the newly created strand will be selected.',
                   )}
                 </Text>
               </Flex.Item>

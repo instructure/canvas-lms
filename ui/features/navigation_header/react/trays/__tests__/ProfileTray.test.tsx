@@ -20,10 +20,11 @@ import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import {getByText as domGetByText} from '@testing-library/dom'
 import ProfileTray from '../ProfileTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const imageUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
 
@@ -42,6 +43,12 @@ const profileTabs = [
     id: 'content_shares',
     label: 'Shared Content',
     html_url: '/shared',
+  },
+  {
+    id: 'external_tool',
+    label: 'External Tool',
+    html_url: '/accounts/1/external_tools/1?display=borderless',
+    type: 'external',
   },
 ]
 
@@ -66,6 +73,20 @@ describe('ProfileTray', () => {
     getByText('Sample Student')
   })
 
+  describe('when "open_tools_in_new_tab" FF is enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.open_tools_in_new_tab = true
+    })
+
+    it('renders external tool tabs with correct target attributes', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const toolLink = getByText('External Tool').closest('a')
+      expect(toolLink).toHaveAttribute('target', '_blank')
+    })
+  })
+
   it('renders the avatar', () => {
     window.ENV.current_user.avatar_is_fallback = false
     window.ENV.current_user.avatar_image_url = imageUrl
@@ -88,5 +109,37 @@ describe('ProfileTray', () => {
     // @ts-expect-error
     const elt = container.firstChild.querySelector('a[href="/shared"]')
     domGetByText(elt, '12 unread.')
+  })
+
+  it('renders the high contrast toggle', () => {
+    const {getByTestId} = render(<ProfileTray />)
+    const toggle = getByTestId('high-contrast-toggle')
+    expect(toggle).toBeInTheDocument()
+  })
+
+  describe('use dyslexic friendly font toggle', () => {
+    describe('when the use_dyslexic_font feature is shadowed', () => {
+      beforeEach(() => {
+        delete window.ENV.use_dyslexic_font
+      })
+
+      it('does not render the dyslexic font toggle', () => {
+        const {queryByTestId} = render(<ProfileTray />)
+        const toggle = queryByTestId('dyslexic-font-toggle')
+        expect(toggle).not.toBeInTheDocument()
+      })
+    })
+
+    describe('when the use_dyslexic_font feature is not shadowed', () => {
+      beforeEach(() => {
+        window.ENV.use_dyslexic_font = false
+      })
+
+      it('renders the dyslexic font toggle', () => {
+        const {getByTestId} = render(<ProfileTray />)
+        const toggle = getByTestId('dyslexic-font-toggle')
+        expect(toggle).toBeInTheDocument()
+      })
+    })
   })
 })

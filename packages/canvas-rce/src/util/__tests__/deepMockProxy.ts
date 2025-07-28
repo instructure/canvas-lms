@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -61,7 +62,7 @@ export function createDeepMockProxy<T>(
   deepOverrides: DeepPartialOptional<T> = {},
   shallowOverrides: Partial<T> = {},
   objectName = 'mock',
-  nameInParent?: string | symbol
+  nameInParent?: string | symbol,
 ): DeepMocked<T> {
   const mock = jest.fn().mockName(objectName)
   const cache = new Map<any, any>()
@@ -88,13 +89,13 @@ export function createDeepMockProxy<T>(
           ...Object.keys(mockPropRecord),
           ...Object.keys(shallowOverrides),
           ...Object.keys(deepOverrides),
-        ])
+        ]),
       )
     },
 
     getOwnPropertyDescriptor(
       target: jest.Mock,
-      name: string | symbol
+      name: string | symbol,
     ): PropertyDescriptor | undefined {
       if (name in mockPropRecord) return Object.getOwnPropertyDescriptor(mock, name)
       if (name in extraImpl) return Object.getOwnPropertyDescriptor(extraImpl, name)
@@ -149,7 +150,7 @@ export function createDeepMockProxy<T>(
       if (!cache.has(name)) {
         cache.set(
           name,
-          createDeepMockProxy(deepOverrides[name], {}, `${objectName}.${String(name)}`, name)
+          createDeepMockProxy(deepOverrides[name], {}, `${objectName}.${String(name)}`, name),
         )
       }
 
@@ -164,6 +165,6 @@ export type DeepMocked<T> = {
   [P in keyof T]: T[P] extends (...args: any[]) => any
     ? jest.MockInstance<ReturnType<T[P]>, jest.ArgsType<T[P]>>
     : T[P] extends object | null | undefined
-    ? DeepMocked<T[P]>
-    : T[P]
+      ? DeepMocked<T[P]>
+      : T[P]
 } & T & {mockClear(): void}

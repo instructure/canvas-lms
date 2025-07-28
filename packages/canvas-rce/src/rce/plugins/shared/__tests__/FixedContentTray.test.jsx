@@ -55,7 +55,7 @@ describe('RCE Plugins > FixedContentTray', () => {
         renderBody={() => 'R2D2'}
         renderFooter={() => 'C3PO'}
         shouldJoinBodyAndFooter={true}
-      />
+      />,
     )
     expect(screen.getByText('R2D2', {selector: 'form > div'})).toBeInTheDocument()
     expect(screen.getByText('C3PO', {selector: 'form > footer > div'})).toBeInTheDocument()

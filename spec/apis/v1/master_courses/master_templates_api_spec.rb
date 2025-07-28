@@ -40,23 +40,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "requires authorization" do
-      @account.disable_feature!(:granular_permissions_manage_courses)
-      @account.role_overrides.create!(
-        role: admin_role,
-        permission: "manage_courses",
-        enabled: false
-      )
-      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
-    end
-
-    it "requires authorization (granular permissions)" do
-      @account.enable_feature!(:granular_permissions_manage_courses)
       @account.role_overrides.create!(
         role: admin_role,
         permission: "manage_courses_admin",
         enabled: false
       )
-      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:get, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "lets teachers in the master course view details" do
@@ -132,12 +121,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "requires account-level authorization" do
       course_with_teacher(course: @course, active_all: true)
-      api_call(:put, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:put, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "requires account-level blueprint permissions" do
       Account.default.role_overrides.create!(role: admin_role, permission: "manage_master_courses", enabled: false)
-      api_call(:put, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:put, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "does not try to add other blueprint courses" do
@@ -243,6 +232,30 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       migration = @template.master_migrations.find(json["id"])
       expect(migration).to be_queued
       expect(migration.send_notification).to be true
+    end
+
+    describe "send_item_notifications option" do
+      context "with feature on" do
+        before :once do
+          Account.default.enable_feature!(:blueprint_item_notifications)
+        end
+
+        it "accepts the send_item_notifications option" do
+          json = api_call(:post, @url, @params.merge(send_item_notifications: true))
+          migration = @template.master_migrations.find(json["id"])
+          expect(migration).to be_queued
+          expect(migration.migration_settings[:send_item_notifications]).to be true
+        end
+      end
+
+      context "with feature off" do
+        it "ignores the send_item_notifications option" do
+          json = api_call(:post, @url, @params.merge(send_item_notifications: true))
+          migration = @template.master_migrations.find(json["id"])
+          expect(migration).to be_queued
+          expect(migration.migration_settings).not_to have_key(:send_item_notifications)
+        end
+      end
     end
   end
 
@@ -694,7 +707,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                          action: "import_details" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "syncs syllabus content unless changed downstream" do
@@ -715,6 +728,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @file = attachment_model(context: @master, display_name: "Some File")
         @folder = @master.folders.create!(name: "Blargh")
         @template.content_tag_for(@file).update_attribute(:restrictions, { content: true })
+        @assignment = @master.assignments.create(title: "some assignment", points_possible: "5")
+        @sub_assignment = @assignment.sub_assignments.create!(title: "sub assignment", context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       end
     end
 
@@ -742,6 +757,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @file.update_attribute(:display_name, "Renamed")
         @folder.update_attribute(:name, "Blergh")
         @new_page = @master.wiki_pages.create! title: "New News"
+        @sub_assignment.update_attribute(:points_possible, "7.3")
         @master.syllabus_body = "srslywat"
         @master.save!
 
@@ -753,38 +769,72 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                                 template_id: "default",
                                 course_id: @master.to_param,
                                 action: "unsynced_changes")
-        expect(json).to match_array([
-                                      { "asset_id" => @ann.id,
-                                        "asset_type" => "announcement",
-                                        "asset_name" => "Boring",
-                                        "change_type" => "deleted",
-                                        "html_url" => "http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}",
-                                        "locked" => false },
-                                      { "asset_id" => @file.id,
-                                        "asset_type" => "attachment",
-                                        "asset_name" => "Renamed",
-                                        "change_type" => "updated",
-                                        "html_url" => "http://www.example.com/courses/#{@master.id}/files/#{@file.id}",
-                                        "locked" => true },
-                                      { "asset_id" => @new_page.id,
-                                        "asset_type" => "wiki_page",
-                                        "asset_name" => "New News",
-                                        "change_type" => "created",
-                                        "html_url" => "http://www.example.com/courses/#{@master.id}/pages/new-news",
-                                        "locked" => false },
-                                      { "asset_id" => @folder.id,
-                                        "asset_type" => "folder",
-                                        "asset_name" => "Blergh",
-                                        "change_type" => "updated",
-                                        "html_url" => "http://www.example.com/courses/#{@master.id}/folders/#{@folder.id}",
-                                        "locked" => false },
-                                      { "asset_id" => @master.id,
-                                        "asset_type" => "syllabus",
-                                        "asset_name" => "Syllabus",
-                                        "change_type" => "updated",
-                                        "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/syllabus",
-                                        "locked" => false }
-                                    ])
+
+        expected_syncs = [
+          { "asset_id" => @ann.id,
+            "asset_type" => "announcement",
+            "asset_name" => "Boring",
+            "change_type" => "deleted",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/announcements/#{@ann.id}",
+            "locked" => false },
+
+          { "asset_id" => @assignment.id,
+            "asset_type" => "assignment",
+            "asset_name" => "some assignment",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/#{@assignment.id}",
+            "locked" => false },
+
+          { "asset_id" => @sub_assignment.id,
+            "asset_type" => "sub_assignment",
+            "asset_name" => "sub assignment",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/#{@assignment.id}",
+            "locked" => false },
+
+          { "asset_id" => @assignment.id,
+            "asset_type" => "assignment",
+            "asset_name" => "some assignment",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/#{@assignment.id}",
+            "locked" => false },
+
+          { "asset_id" => @assignment.assignment_group_id,
+            "asset_type" => "assignment_group",
+            "asset_name" => "Assignments",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/assignment_groups/#{@assignment.assignment_group_id}",
+            "locked" => false },
+
+          { "asset_id" => @file.id,
+            "asset_type" => "attachment",
+            "asset_name" => "Renamed",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/files/#{@file.id}",
+            "locked" => true },
+
+          { "asset_id" => @new_page.id,
+            "asset_type" => "wiki_page",
+            "asset_name" => "New News",
+            "change_type" => "created",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/pages/new-news",
+            "locked" => false },
+
+          { "asset_id" => @folder.id,
+            "asset_type" => "folder",
+            "asset_name" => "Blergh",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/folders/#{@folder.id}",
+            "locked" => false },
+
+          { "asset_id" => @master.id,
+            "asset_type" => "syllabus",
+            "asset_name" => "Syllabus",
+            "change_type" => "updated",
+            "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/syllabus",
+            "locked" => false }
+        ]
+        expect(json).to match_array(expected_syncs)
       end
 
       it "limits result size" do

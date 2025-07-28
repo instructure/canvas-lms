@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {lazy} from 'react'
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 
-const I18n = useI18nScope('direct_share_course_tray')
+const I18n = createI18nScope('direct_share_course_tray')
 
 const DirectShareCoursePanel = lazy(() => import('./DirectShareCoursePanel'))
 
 export default function DirectShareCourseTray({
   sourceCourseId,
   contentSelection,
+  showAssignments = false,
   onDismiss,
   ...trayProps
 }) {
@@ -42,6 +43,7 @@ export default function DirectShareCourseTray({
         sourceCourseId={sourceCourseId}
         contentSelection={contentSelection}
         onCancel={onDismiss}
+        showAssignments={showAssignments}
       />
     </CanvasLazyTray>
   )

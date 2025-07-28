@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import SearchBreadcrumb from './shared/SearchBreadcrumb'
@@ -39,11 +39,15 @@ import {
   IMPORT_PENDING,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const FindOutcomesView = ({
   outcomesGroup,
-  collection,
+  collection = {
+    id: '0',
+    name: '',
+    isRootGroup: false,
+  },
   loading,
   loadMore,
   searchString,
@@ -51,11 +55,11 @@ const FindOutcomesView = ({
   onChangeHandler,
   onClearHandler,
   onAddAllHandler,
-  mobileScrollContainer,
-  importGroupStatus,
+  mobileScrollContainer = null,
+  importGroupStatus = IMPORT_NOT_STARTED,
   importOutcomesStatus,
   importOutcomeHandler,
-  shouldFocusAddAllBtn,
+  shouldFocusAddAllBtn = false,
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -65,7 +69,7 @@ const FindOutcomesView = ({
   const notImportedOutcomesCount = outcomesGroup?.notImportedOutcomesCount || 0
   const importedOutcomesCount = Object.entries(importOutcomesStatus).filter(
     ([outId, importStatus]) =>
-      outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus)
+      outcomesIds.includes(outId) && [IMPORT_COMPLETED, IMPORT_PENDING].includes(importStatus),
   ).length
   const hasOutcomes = !!outcomesCount && outcomesCount > 0
   const searchEnabled =
@@ -97,10 +101,10 @@ const FindOutcomesView = ({
             isMobileView
               ? 'x-small 0'
               : isRootGroup
-              ? 'x-small 0'
-              : searchString.length === 0
-              ? 'x-small medium x-small 0'
-              : 'x-small 0'
+                ? 'x-small 0'
+                : searchString.length === 0
+                  ? 'x-small medium x-small 0'
+                  : 'x-small 0'
           }
         >
           <Text size="medium">
@@ -111,7 +115,7 @@ const FindOutcomesView = ({
               },
               {
                 count: outcomesCount || 0,
-              }
+              },
             )}
           </Text>
         </Flex.Item>
@@ -249,7 +253,7 @@ const FindOutcomesView = ({
                       isImported,
                     },
                   },
-                  index
+                  index,
                 ) => (
                   <FindOutcomeItem
                     key={linkId}
@@ -269,7 +273,7 @@ const FindOutcomesView = ({
                     sourceContextType={outcomesGroup.contextType}
                     importOutcomeHandler={importOutcomeHandler}
                   />
-                )
+                ),
               )}
             </View>
           </InfiniteScroll>
@@ -277,17 +281,6 @@ const FindOutcomesView = ({
       </div>
     </View>
   )
-}
-
-FindOutcomesView.defaultProps = {
-  collection: {
-    id: '0',
-    name: '',
-    isRootGroup: false,
-  },
-  importGroupStatus: IMPORT_NOT_STARTED,
-  mobileScrollContainer: null,
-  shouldFocusAddAllBtn: false,
 }
 
 FindOutcomesView.propTypes = {

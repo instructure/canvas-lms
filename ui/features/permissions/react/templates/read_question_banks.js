@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_58')
+const I18n = createI18nScope('permissions_templates_58')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Question Banks'),
       description: I18n.t(
-        'Allows user to view and link questions in a quiz to account-level question banks.'
+        'Allows user to view and link questions in a quiz to account-level question banks.',
       ),
     },
   ],
@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quizzes and Question Banks'),
       description: I18n.t(
-        'To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - manage / edit must also be enabled.'
+        'To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - manage / edit must also be enabled.',
       ),
     },
   ],
@@ -42,12 +42,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Question Banks'),
       description: I18n.t(
-        'Allows user to view and link questions in a quiz to course-level question banks.'
+        'Allows user to view and link questions in a quiz to course-level question banks.',
       ),
     },
     {
       description: I18n.t(
-        'Allows user to access the Manage Question Banks link on the Quizzes Index Page.'
+        'Allows user to access the Manage Question Banks link on the Quizzes Index Page.',
       ),
     },
   ],
@@ -55,8 +55,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Question Banks (Courses)'),
       description: I18n.t(
-        'To fully manage course-level question banks, Assignments and Quizzes - manage / edit permission must also be enabled.'
+        'To fully manage course-level question banks, Assignments and Quizzes - manage / edit permission must also be enabled.',
       ),
     },
-  ]
+  ],
 )

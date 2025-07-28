@@ -17,44 +17,49 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import type {CanvasId, CanvasProgress} from './types'
-import {
-  IconArrowOpenDownLine,
-  IconPublishSolid,
-  IconUnpublishedLine,
-  // @ts-ignore
-} from '@instructure/ui-icons'
+import type {CanvasId} from './types'
+import {IconArrowOpenDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 import {
   batchUpdateAllModulesApiCall,
-  cancelBatchUpdate,
   fetchAllItemPublishedStates,
-  monitorProgress,
   updateModulePendingPublishedStates,
 } from '../utils/publishAllModulesHelper'
+
+import {
+  monitorProgress,
+  cancelProgressAction,
+  type CanvasProgress,
+} from '@canvas/progress/ProgressHelpers'
 import {disableContextModulesPublishMenu} from '../utils/publishOneModuleHelper'
 import ContextModulesPublishModal from './ContextModulesPublishModal'
 
-const I18n = useI18nScope('context_modules_publish_menu')
+const I18n = createI18nScope('context_modules_publish_menu')
 
 interface Props {
   readonly courseId: CanvasId
   readonly runningProgressId: string | null
   readonly disabled: boolean
+  readonly onPublishComplete?: () => void
 }
 
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
 const {Item: MenuItem} = Menu as any
 
-const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Props) => {
+const ContextModulesPublishMenu = ({
+  courseId,
+  runningProgressId,
+  disabled,
+  onPublishComplete,
+}: Props) => {
   const [isPublishing, setIsPublishing] = useState<boolean>(!!runningProgressId)
   const [isCanceling, setIsCanceling] = useState<boolean>(false)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -118,18 +123,20 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
       .catch((error: Error) =>
         showFlashAlert({
           message: I18n.t(
-            'There was an error updating module and items publish status. Try refreshing the page.'
+            'There was an error updating module and items publish status. Try refreshing the page.',
           ),
           type: 'error',
           err: error,
-        })
+        }),
       )
       .finally(() => reset())
   }
 
-  const onPublishComplete = () => {
-    // eslint-disable-next-line promise/catch-or-return
-    refreshPublishStates(true).then(() => reset())
+  const handlePublishComplete = () => {
+    refreshPublishStates(true).then(() => {
+      reset()
+      onPublishComplete?.()
+    })
   }
 
   function updateCurrentProgress(progress: CanvasProgress) {
@@ -142,7 +149,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
         srOnly: true,
         politeness: 'polite',
       })
-      onPublishComplete()
+      handlePublishComplete()
     } else if (progress.workflow_state === 'failed') {
       if (progress.message === 'canceled') {
         showFlashAlert({
@@ -186,7 +193,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
   function onProgressFail(error: Error) {
     showFlashAlert({
       message: I18n.t(
-        "Something went wrong monitoring the work's progress. Try refreshing the page."
+        "Something went wrong monitoring the work's progress. Try refreshing the page.",
       ),
       err: error,
       type: 'error',
@@ -214,7 +221,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
   const handleCancel = () => {
     closeModal()
     if (currentProgress) {
-      cancelBatchUpdate(currentProgress, onCancelComplete)
+      cancelProgressAction(currentProgress, onCancelComplete)
     }
     setIsCanceling(true)
     setCurrentProgress(undefined)
@@ -222,7 +229,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
 
   const focusPublishAllButton = () => {
     const btn: HTMLButtonElement | null = document.querySelector(
-      '#context-modules-publish-menu button'
+      '#context-modules-publish-menu button',
     )
     if (document.activeElement !== btn) {
       btn?.focus()

@@ -28,48 +28,29 @@ describe "announcements" do
     stub_rcs_config
   end
 
-  context "should validate replies are not visible until after users post" do
-    before do
-      course_with_student_logged_in
-      topic_title = "new replies hidden until post topic"
-      @announcement = @course.announcements.create!(
-        title: topic_title, message: "blah", require_initial_post: true
-      )
-      student_2 = student_in_course.user
-      @reply = @announcement.discussion_entries.create!(user: student_2, message: "hello from student 2")
-    end
-
-    it "hides replies if user hasn't posted", priority: "1" do
-      get "/courses/#{@course.id}/announcements/#{@announcement.id}"
-      info_text = "Replies are only visible to those who have posted at least one reply."
-      expect(f("#discussion_subentries span").text).to eq info_text
-      ff(".discussion_entry").each { |entry| expect(entry).not_to include_text(@reply.message) }
-    end
-
-    it "shows replies if user has posted", priority: "1" do
-      get "/courses/#{@course.id}/announcements/#{@announcement.id}"
-      f(".discussion-reply-action").click
-      wait_for_ajaximations
-      type_in_tiny("textarea", "reply")
-      scroll_to_submit_button_and_click("#discussion_topic .discussion-reply-form")
-      wait_for_ajaximations
-      expect(ff(".discussion_entry .message")[1]).to include_text(@reply.message)
-    end
-  end
-
   context "announcements as a student" do
     before do
       course_with_student_logged_in
     end
 
     it "does not show an announcements section if there are no announcements", priority: "1" do
-      get "/courses/#{@course.id}"
-      expect(f("#content")).not_to contain_css(".announcements active")
+      get "/"
+      f("#DashboardOptionsMenu_Container button").click
+      fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+      expect(f("#content")).not_to contain_css('[data-category="Announcement"]')
+    end
+
+    it "does show an announcements section if there are announcements", priority: "1" do
+      @course.announcements.create!(title: "Hi there!", message: "Announcement time!")
+      get "/"
+      f("#DashboardOptionsMenu_Container button").click
+      fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+      expect(f("#content")).to contain_css('[data-category="Announcement"]')
     end
 
     it "validates that a student can not see an announcement with a delayed posting date", priority: "1" do
       announcement_title = "Hi there!"
-      announcement = @course.announcements.create!(title: announcement_title, message: "Announcement time!", delayed_post_at: Time.now + 1.day)
+      announcement = @course.announcements.create!(title: announcement_title, message: "Announcement time!", delayed_post_at: 1.day.from_now)
       get "/courses/#{@course.id}/announcements"
 
       expect(f("#content")).not_to contain_css(".ic-announcement-row")
@@ -85,8 +66,7 @@ describe "announcements" do
       get "/courses/#{@course.id}/announcements"
       wait_for_ajaximations
 
-      expect(f("#content")).not_to contain_css(".discussion_actions a.al-trigger")
-      expect(f("#content")).not_to contain_css(".discussion_actions ul.al-options")
+      expect(f("#content")).not_to contain_css(".ic-item-row__manage-menu")
     end
 
     it "has deleted announcement removed from student account", priority: "1" do
@@ -116,48 +96,34 @@ describe "announcements" do
       announcement = @course.announcements.create!(title: "stuff", message: "things", allow_rating: true)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
-      f(".discussion-reply-action").click
+      f('[data-testid="discussion-topic-reply"]').click
       wait_for_ajaximations
-      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
+      wait_for_rce
       type_in_tiny("textarea", "stuff and things")
-      submit_form(".discussion-reply-form")
+      f('[data-testid="DiscussionEdit-submit"]').click
       wait_for_ajaximations
 
-      expect(f(".discussion-rate-action")).to be_displayed
-      scroll_to(f(".discussion-rate-action"))
-      f(".discussion-rate-action").click
+      expect(f('[data-testid="like-button"]')).to be_displayed
+      expect(f("#content")).to contain_css('[data-action-state="likeButton"]')
+      scroll_to(f('[data-testid="like-button"]'))
+      f('[data-testid="like-button"]').click
       wait_for_ajaximations
 
-      expect(f(".discussion-rate-action--checked")).to be_displayed
+      expect(f("#content")).to contain_css('[data-action-state="unlikeButton"]')
     end
 
     it "doesn't allow rating when not enabled", priority: "1" do
       announcement = @course.announcements.create!(title: "stuff", message: "things", allow_rating: false)
       get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
 
-      f(".discussion-reply-action").click
+      f('[data-testid="discussion-topic-reply"]').click
       wait_for_ajaximations
-      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
+      wait_for_rce
       type_in_tiny("textarea", "stuff and things")
-      submit_form(".discussion-reply-form")
+      f('[data-testid="DiscussionEdit-submit"]').click
       wait_for_ajaximations
 
-      expect(f("#content")).not_to contain_css(".discussion-rate-action")
-    end
-
-    it "does not display the Subscribe button after replying" do
-      announcement = @course.announcements.create!(title: "Allow Replies", message: "Reply Here")
-      get "/courses/#{@course.id}/discussion_topics/#{announcement.id}"
-
-      f(".discussion-reply-action").click
-      wait_for_ajaximations
-      wait_for_tiny(f("#root_reply_message_for_#{announcement.id}"))
-      type_in_tiny("textarea", "this is my reply")
-      submit_form(".discussion-reply-form")
-      wait_for_ajaximations
-
-      expect(f(".topic-unsubscribe-button")).not_to be_displayed
-      expect(f(".topic-subscribe-button")).not_to be_displayed
+      expect(f("#content")).not_to contain_css('[data-testid="like-button"]')
     end
 
     context "section specific announcements" do
@@ -179,7 +145,7 @@ describe "announcements" do
       it "is visible to students in the specific section" do
         user_session(@student1)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
-        expect(f(".discussion-title")).to include_text(@announcement.title)
+        expect(f('[data-testid="message_title"]')).to include_text(@announcement.title)
       end
 
       it "is not visible to students not in the specific section" do

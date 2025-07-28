@@ -27,7 +27,7 @@ function renderComponent() {
         I am a button
       </ShowOnFocusButton>
       <input id="focusme" />
-    </div>
+    </div>,
   )
 }
 
@@ -50,8 +50,10 @@ describe('ShowOnFocusButton', () => {
     const {getByTestId} = renderComponent()
 
     const wrapper = getByTestId('ShowOnFocusButton__wrapper')
-    expect(wrapper.style.position).toEqual('absolute')
-    expect(wrapper.style.left).toEqual('-9999px')
+    expect(wrapper.style.opacity).toEqual('0')
+    expect(wrapper.style.width).toEqual('0px')
+    expect(wrapper.style.height).toEqual('0px')
+    expect(wrapper.style.overflow).toEqual('hidden')
   })
 
   it('renders visibly on screen when focused', () => {

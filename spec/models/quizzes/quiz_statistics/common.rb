@@ -25,7 +25,7 @@ shared_examples_for "Quizzes::QuizStatistics::Report" do
     @quiz = @course.quizzes.create!
     @quiz.quiz_questions.create!(question_data: { name: "test 1" })
     @quiz.generate_quiz_data
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.save!
   end
 

@@ -17,13 +17,42 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {MockedProvider} from '@apollo/client/testing'
+import {render, fireEvent, waitFor} from '@testing-library/react'
+import {gql} from '@apollo/client'
+import {setupServer} from 'msw/node'
+import {graphql, HttpResponse} from 'msw'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 import {TotalGradeOverrideTray, type TotalGradeOverrideTrayProps} from '../TotalGradeOverrideTray'
 import useStore from '../../stores'
-import * as FinalGradeOverrideHooks from '../../hooks/useFinalGradeOverrideCustomStatus'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+const SET_OVERRIDE_STATUS_MUTATION = gql`
+  mutation SetOverrideStatusMutation(
+    $customGradeStatusId: ID
+    $enrollmentId: ID!
+    $gradingPeriodId: ID
+  ) {
+    setOverrideStatus(
+      input: {
+        customGradeStatusId: $customGradeStatusId
+        enrollmentId: $enrollmentId
+        gradingPeriodId: $gradingPeriodId
+      }
+    ) {
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
 
 describe('TotalGradeOverrideTray Tests', () => {
   const navigateUp = jest.fn()
@@ -45,7 +74,11 @@ describe('TotalGradeOverrideTray Tests', () => {
       ...props,
     }
 
-    return render(<TotalGradeOverrideTray {...trayProps} />)
+    return render(
+      <MockedProvider>
+        <TotalGradeOverrideTray {...trayProps} />
+      </MockedProvider>,
+    )
   }
 
   beforeEach(() => {
@@ -144,8 +177,7 @@ describe('TotalGradeOverrideTray Tests', () => {
     })
   })
 
-  // EVAL-3907 - remove or rewrite to remove spies on imports
-  describe.skip('radio input tests', () => {
+  describe('radio input tests', () => {
     it('renders each radio input', () => {
       const {getByLabelText} = getComponent()
       const noneRadio = getByLabelText('None')
@@ -198,22 +230,27 @@ describe('TotalGradeOverrideTray Tests', () => {
     })
 
     it('calls setFinalGradeOverride when a radio input is clicked', async () => {
-      const saveFinalOverrideCustomStatusMock = jest.fn()
-      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
-        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
-        saveCallStatus: ApiCallStatus.COMPLETED,
-      })
+      server.use(
+        graphql.mutation('SetOverrideStatusMutation', () => {
+          return HttpResponse.json({
+            data: {
+              setOverrideStatus: {
+                errors: [],
+              },
+            },
+          })
+        }),
+      )
 
       const {getByLabelText} = getComponent()
       const radio = getByLabelText('Custom Status 3')
 
       fireEvent.click(radio)
 
-      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('3', '1111', null)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
-      expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
+      await waitFor(() => {
+        const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+        expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
+      })
     })
 
     it('calls setFinalGradeOverride when a radio input is clicked with null finalGradeOverride', async () => {
@@ -221,43 +258,53 @@ describe('TotalGradeOverrideTray Tests', () => {
         finalGradeOverrides: {},
       })
 
-      const saveFinalOverrideCustomStatusMock = jest.fn()
-      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
-        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
-        saveCallStatus: ApiCallStatus.COMPLETED,
-      })
+      server.use(
+        graphql.mutation('SetOverrideStatusMutation', () => {
+          return HttpResponse.json({
+            data: {
+              setOverrideStatus: {
+                errors: [],
+              },
+            },
+          })
+        }),
+      )
 
       const {getByLabelText} = getComponent()
       const radio = getByLabelText('Custom Status 3')
 
       fireEvent.click(radio)
 
-      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('3', '1111', null)
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
-      expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
+      await waitFor(() => {
+        const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+        expect(updatedFinalGradeOverrides['1'].courseGrade?.customGradeStatusId).toEqual('3')
+      })
     })
 
     it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId', async () => {
-      const saveFinalOverrideCustomStatusMock = jest.fn()
-      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
-        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
-        saveCallStatus: ApiCallStatus.COMPLETED,
-      })
+      server.use(
+        graphql.mutation('SetOverrideStatusMutation', () => {
+          return HttpResponse.json({
+            data: {
+              setOverrideStatus: {
+                errors: [],
+              },
+            },
+          })
+        }),
+      )
 
       const {getByLabelText} = getComponent({selectedGradingPeriodId: '2'})
       const radio = getByLabelText('Custom Status 1')
 
       fireEvent.click(radio)
 
-      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('1', '1111', '2')
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
-      expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
-      ).toEqual('1')
+      await waitFor(() => {
+        const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+        expect(
+          updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
+        ).toEqual('1')
+      })
     })
 
     it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId and null finalGradeOverride', async () => {
@@ -265,24 +312,29 @@ describe('TotalGradeOverrideTray Tests', () => {
         finalGradeOverrides: {},
       })
 
-      const saveFinalOverrideCustomStatusMock = jest.fn()
-      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
-        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
-        saveCallStatus: ApiCallStatus.COMPLETED,
-      })
+      server.use(
+        graphql.mutation('SetOverrideStatusMutation', () => {
+          return HttpResponse.json({
+            data: {
+              setOverrideStatus: {
+                errors: [],
+              },
+            },
+          })
+        }),
+      )
 
       const {getByLabelText} = getComponent({selectedGradingPeriodId: '2'})
       const radio = getByLabelText('Custom Status 1')
 
       fireEvent.click(radio)
 
-      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('1', '1111', '2')
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
-      expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
-      ).toEqual('1')
+      await waitFor(() => {
+        const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+        expect(
+          updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
+        ).toEqual('1')
+      })
     })
 
     it('calls setFinalGradeOverride when a radio input is clicked with selectedGradingPeriodId and null finalGradeOverride but valid course override', async () => {
@@ -297,24 +349,29 @@ describe('TotalGradeOverrideTray Tests', () => {
         },
       })
 
-      const saveFinalOverrideCustomStatusMock = jest.fn()
-      jest.spyOn(FinalGradeOverrideHooks, 'useFinalGradeOverrideCustomStatus').mockReturnValue({
-        saveFinalOverrideCustomStatus: saveFinalOverrideCustomStatusMock,
-        saveCallStatus: ApiCallStatus.COMPLETED,
-      })
+      server.use(
+        graphql.mutation('SetOverrideStatusMutation', () => {
+          return HttpResponse.json({
+            data: {
+              setOverrideStatus: {
+                errors: [],
+              },
+            },
+          })
+        }),
+      )
 
       const {getByLabelText} = getComponent({selectedGradingPeriodId: '2'})
       const radio = getByLabelText('Custom Status 1')
 
       fireEvent.click(radio)
 
-      expect(saveFinalOverrideCustomStatusMock).toHaveBeenCalledWith('1', '1111', '2')
-
-      await new Promise(resolve => setTimeout(resolve, 0))
-      const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
-      expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
-      ).toEqual('1')
+      await waitFor(() => {
+        const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
+        expect(
+          updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
+        ).toEqual('1')
+      })
     })
 
     it('calls handleDismiss with true when the button is clicked', () => {

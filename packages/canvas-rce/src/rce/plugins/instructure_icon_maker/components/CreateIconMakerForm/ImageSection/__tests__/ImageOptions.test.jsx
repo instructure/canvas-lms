@@ -26,7 +26,7 @@ jest.mock('../../../../../shared/ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn(() =>
     Promise.resolve({
       outerHTML: '<svg />',
-    })
+    }),
   ),
 }))
 
@@ -352,7 +352,7 @@ describe('ImageOptions', () => {
 
     it('sets the image preview', () => {
       expect(getByTestId('selected-image-preview')).toHaveStyle(
-        'backgroundImage: url(data:image/png;base64,EMBED_IMAGE)'
+        'backgroundImage: url(data:image/png;base64,EMBED_IMAGE)',
       )
     })
 
@@ -369,14 +369,14 @@ describe('ImageOptions', () => {
 
       it('is not rendered for single color images', () => {
         rerender(
-          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'SingleColor'}}} />
+          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'SingleColor'}}} />,
         )
         expect(queryByText(/crop image/i)).not.toBeInTheDocument()
       })
 
       it('is not rendered for multi color images', () => {
         rerender(
-          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'MultiColor'}}} />
+          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'MultiColor'}}} />,
         )
         expect(queryByText(/crop image/i)).not.toBeInTheDocument()
       })

@@ -28,7 +28,7 @@ const result = generateActionTemplates(
   accountDetails,
   accountConsiderations,
   courseDetails,
-  courseConsiderations
+  courseConsiderations,
 )
 
 describe('permissions::generateActionTemplates::', () => {
@@ -38,7 +38,7 @@ describe('permissions::generateActionTemplates::', () => {
       expect.objectContaining({
         [ACCOUNT]: expect.anything(),
         [COURSE]: expect.anything(),
-      })
+      }),
     )
   })
 

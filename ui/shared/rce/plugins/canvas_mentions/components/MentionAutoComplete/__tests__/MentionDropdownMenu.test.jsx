@@ -53,7 +53,7 @@ const setup = props => {
       mentionOptions={MentionMockUsers}
       coordiantes={mockCoordinates}
       {...props}
-    />
+    />,
   )
 }
 
@@ -74,13 +74,13 @@ describe('MentionDropdownMenu tests', () => {
   it('should render correct number of menu items', () => {
     const component = setup()
     const items = component.container.querySelectorAll('li')
-    expect(items.length).toBe(2)
+    expect(items).toHaveLength(2)
   })
 
   it('should call ARIA template for the Popup menu', () => {
     const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'ariaControlTemplate')
     setup()
     expect(spy).toHaveBeenCalled()
-    expect(spy.mock.calls.length).toBe(2)
+    expect(spy.mock.calls).toHaveLength(2)
   })
 })

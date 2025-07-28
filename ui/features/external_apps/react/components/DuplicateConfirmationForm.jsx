@@ -19,9 +19,9 @@
 import React from 'react'
 import {func, object, string, oneOfType, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default function DuplicateConfirmationForm(props) {
   const forceSaveTool =
@@ -33,11 +33,11 @@ export default function DuplicateConfirmationForm(props) {
     })
 
   return (
-    <div id="duplicate-confirmation-form">
+    <div id="duplicate-confirmation-form" data-testid="duplicate-confirmation-form">
       <div className="ReactModal__Body">
-        <p>
+        <p data-testid="confirmation-message">
           {I18n.t(
-            'This tool has already been installed in this context. Would you like to install it anyway?'
+            'This tool has already been installed in this context. Would you like to install it anyway?',
           )}
         </p>
       </div>
@@ -45,13 +45,18 @@ export default function DuplicateConfirmationForm(props) {
         <div className="ReactModal__Footer-Actions">
           <Button
             id="cancel-install"
+            data-testid="cancel-install-button"
             color="primary"
             margin="0 x-small 0 0"
             onClick={props.onCancel}
           >
             {I18n.t('No, Cancel Installation')}
           </Button>
-          <Button id="continue-install" onClick={forceSaveTool}>
+          <Button
+            id="continue-install"
+            data-testid="continue-install-button"
+            onClick={forceSaveTool}
+          >
             {I18n.t('Yes, Install Tool')}
           </Button>
         </div>

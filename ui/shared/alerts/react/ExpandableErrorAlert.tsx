@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {RefObject, useCallback, useEffect, useRef, useState} from 'react'
-import {Alert, AlertProps} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {type RefObject, useCallback, useEffect, useRef, useState} from 'react'
+import {Alert, type AlertProps} from '@instructure/ui-alerts'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
-const I18n = useI18nScope('app_shared_components_expandable_error_alert')
+const I18n = createI18nScope('app_shared_components_expandable_error_alert')
 
 export type ExpandableErrorAlertProps = Omit<
   AlertProps,

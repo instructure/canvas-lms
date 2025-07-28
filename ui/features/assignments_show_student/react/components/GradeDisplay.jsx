@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('assignments_2_student_points_display')
+const I18n = createI18nScope('assignments_2_student_points_display')
 
 export default function PointsDisplay(props) {
   const ungradedVisualString = () => {
@@ -45,7 +45,7 @@ export default function PointsDisplay(props) {
           count: props.pointsPossible,
           formattedPoints,
           wrappers: ['<span class="points-value">$1</span>'],
-        }
+        },
       )
     }
 
@@ -67,7 +67,7 @@ export default function PointsDisplay(props) {
         {
           count: props.pointsPossible,
           formattedPoints,
-        }
+        },
       )
     }
 
@@ -97,6 +97,7 @@ export default function PointsDisplay(props) {
       restrict_quantitative_data: ENV.restrict_quantitative_data,
       grading_scheme: ENV.grading_scheme,
       points_based_grading_scheme: ENV.points_based,
+      scaling_factor: ENV.scaling_factor,
     })
 
     if (
@@ -124,7 +125,7 @@ export default function PointsDisplay(props) {
             dangerouslySetInnerHTML={{__html: formatGrade()}}
             data-testid="grade-display"
             lineHeight="fit"
-            size={window.ENV.FEATURES.instui_nav ? 'medium' : 'x-large'}
+            size={window.ENV.FEATURES?.instui_nav ? 'medium' : 'x-large'}
             transform="capitalize"
           />
         </Flex.Item>

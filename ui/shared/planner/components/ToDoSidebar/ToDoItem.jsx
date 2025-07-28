@@ -35,9 +35,9 @@ import {
 
 import {func, shape, object, arrayOf, number, string, bool} from 'prop-types'
 import {dateTimeString} from '../../utilities/dateUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 const getAriaLabel = (itemType, itemTitle) => {
   switch (itemType) {
@@ -55,6 +55,8 @@ const getAriaLabel = (itemType, itemTitle) => {
       return I18n.t('Page, %{itemTitle}', {itemTitle})
     case 'Peer Review':
       return I18n.t('Peer Review, %{itemTitle}', {itemTitle})
+    case 'Discussion Checkpoint':
+      return I18n.t('Discussion Checkpoint, %{itemTitle}', {itemTitle})
     default:
       return I18n.t('To Do, %{itemTitle}', {itemTitle})
   }
@@ -68,6 +70,13 @@ const getIconComponent = itemType => {
       return <IconQuizLine label={I18n.t('Quiz')} className="ToDoSidebarItem__Icon" />
     case 'Discussion':
       return <IconDiscussionLine label={I18n.t('Discussion')} className="ToDoSidebarItem__Icon" />
+    case 'Discussion Checkpoint':
+      return (
+        <IconDiscussionLine
+          label={I18n.t('Discussion Checkpoint')}
+          className="ToDoSidebarItem__Icon"
+        />
+      )
     case 'Announcement':
       return (
         <IconAnnouncementLine label={I18n.t('Announcement')} className="ToDoSidebarItem__Icon" />
@@ -91,12 +100,19 @@ const getContextShortName = (courses, courseId) => {
 }
 
 export default class ToDoItem extends React.Component {
+  constructor(props) {
+    super(props)
+    this.dismissed = false
+  }
+
   focus() {
     const focusable = this.linkRef || this.buttonRef
     if (focusable) focusable.focus()
   }
 
   handleClick = () => {
+    if (this.dismissed) return
+    this.dismissed = true
     this.props.handleDismissClick(this.props.item)
   }
 
@@ -106,12 +122,12 @@ export default class ToDoItem extends React.Component {
       toDisplay.push(
         <InlineList.Item key="points">
           {I18n.t('%{numPoints} points', {numPoints: points})}
-        </InlineList.Item>
+        </InlineList.Item>,
       )
     }
 
     toDisplay.push(
-      <InlineList.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</InlineList.Item>
+      <InlineList.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</InlineList.Item>,
     )
     return toDisplay
   }
@@ -157,7 +173,7 @@ export default class ToDoItem extends React.Component {
             {this.getInformationRow(
               this.props.item.date,
               this.props.item.points,
-              this.props.item?.restrict_quantitative_data
+              this.props.item?.restrict_quantitative_data,
             )}
           </InlineList>
         </div>

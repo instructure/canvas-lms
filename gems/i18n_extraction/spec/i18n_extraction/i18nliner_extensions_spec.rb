@@ -74,6 +74,10 @@ describe I18nliner::Extractors::RubyExtractor do
       expect(extract("I18n.t 'foo', 'Foo'")).to eq({ "foo" => "Foo" })
     end
 
+    it "does not auto-scope keys when scope cannot be inferred correctly (e.g. in abstract models)" do
+      expect(extract("t 'foo', 'Foo'", I18nliner::Scope.new(""))).to eq({ "foo" => "Foo" })
+    end
+
     it "auto-scopes plugin registration" do
       expect(extract("Canvas::Plugin.register('dim_dim', :web_conferencing, {:name => lambda{ t :name, \"DimDim\" }})")).to eq(
         { "plugins.dim_dim.name" => "DimDim" }

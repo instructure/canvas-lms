@@ -40,6 +40,6 @@ class EtherpadCollaboration < Collaboration
   end
 
   def self.config
-    Canvas::Plugin.find(:etherpad).try(:settings) || (YAML.load_file(Rails.root.join("config/etherpad.yml"))[Rails.env] rescue nil)
+    Canvas::Plugin.find(:etherpad).settings || ConfigFile.load("etherpad.yml")
   end
 end

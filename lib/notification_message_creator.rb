@@ -137,7 +137,7 @@ class NotificationMessageCreator
       fallback_policy ||= channel.notification_policies.create!(frequency: "daily")
     end
 
-    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: "message.fall_back_used")
+    InstStatsd::Statsd.distributed_increment("message.fall_back_used")
     build_summary_for(user, fallback_policy)
   end
 
@@ -270,7 +270,7 @@ class NotificationMessageCreator
   end
 
   def user_channels(to_list)
-    to_user_channels = Hash.new([])
+    to_user_channels = Hash.new([].freeze)
     # if this method is given users we preload communication channels and they
     # are already loaded so we are using the select :active? to not do another
     # query to load them again.
@@ -386,7 +386,11 @@ class NotificationMessageCreator
             break_this_loop = true
             # else <no conditions; we're addressing the entire partition>
           end
-          scope.update_all(workflow_state: "cancelled") if Message.connection.table_exists?(start_partition)
+
+          if Message.connection.table_exists?(start_partition)
+            effected_record_count = scope.update_all(workflow_state: "cancelled")
+            InstStatsd::Statsd.count("cancelled_duplicated_messages", effected_record_count)
+          end
 
           break if break_this_loop
 
@@ -398,7 +402,7 @@ class NotificationMessageCreator
 
   def too_many_messages_for?(user)
     if @user_counts[user.id] >= user.max_messages_per_day
-      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: "message.too_many_messages_for_was_true")
+      InstStatsd::Statsd.distributed_increment("message.too_many_messages_for_was_true")
       true
     end
   end

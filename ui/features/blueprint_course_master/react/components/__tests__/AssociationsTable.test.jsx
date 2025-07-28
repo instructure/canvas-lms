@@ -19,11 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import AssociationsTable from '../AssociationsTable'
 import FocusManager from '../../focusManager'
 import getSampleData from './getSampleData'
-import sinon from 'sinon'
 
 describe('AssociationsTable component', () => {
   const focusManager = new FocusManager()
@@ -40,9 +38,9 @@ describe('AssociationsTable component', () => {
   })
 
   test('renders the AssociationsTable component', () => {
-    const tree = shallow(<AssociationsTable {...defaultProps()} />)
-    const node = tree.find('.bca-associations-table')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<AssociationsTable {...defaultProps()} />)
+    const node = container.querySelector('.bca-associations-table')
+    expect(node).toBeInTheDocument()
   })
 
   test('displays correct table data', () => {
@@ -50,25 +48,25 @@ describe('AssociationsTable component', () => {
     const tree = render(<AssociationsTable {...props} />)
     const rows = tree.container.querySelectorAll('tr[data-testid="associations-course-row"]')
 
-    expect(rows.length).toEqual(props.existingAssociations.length)
+    expect(rows).toHaveLength(props.existingAssociations.length)
     expect(rows[0].querySelectorAll('td')[0].textContent).toEqual(
-      props.existingAssociations[0].name
+      props.existingAssociations[0].name,
     )
     expect(rows[1].querySelectorAll('td')[0].textContent).toEqual(
-      props.existingAssociations[1].name
+      props.existingAssociations[1].name,
     )
   })
 
   test('calls onRemoveAssociations when association remove button is clicked', async () => {
     const props = defaultProps()
-    props.onRemoveAssociations = sinon.spy()
+    props.onRemoveAssociations = jest.fn()
     const tree = render(<AssociationsTable {...props} />)
     const button = tree.container.querySelectorAll(
-      'tr[data-testid="associations-course-row"] button'
+      'tr[data-testid="associations-course-row"] button',
     )
     await userEvent.click(button[0])
 
-    expect(props.onRemoveAssociations.callCount).toEqual(1)
-    expect(props.onRemoveAssociations.getCall(0).args[0]).toEqual(['1'])
+    expect(props.onRemoveAssociations).toHaveBeenCalledTimes(1)
+    expect(props.onRemoveAssociations).toHaveBeenCalledWith(['1'])
   })
 })

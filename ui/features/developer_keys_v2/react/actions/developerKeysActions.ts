@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -18,20 +17,20 @@
  */
 
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiScope} from 'features/developer_keys_v2/model/LtiScopes'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import {AnyAction, Dispatch} from 'redux'
-import {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
+import type {AnyAction, Dispatch} from 'redux'
+import type {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
 import type {LtiToolConfiguration} from 'features/developer_keys_v2/model/api/LtiToolConfiguration'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export type LtiDeveloperKeyApiResponse = {
   developer_key: DeveloperKey
   tool_configuration: LtiToolConfiguration
-  warning_message?: string
+  warning_message?: string | string[]
 }
 /**
  * Type function that takes a action type name in all caps and snake case
@@ -40,17 +39,18 @@ export type LtiDeveloperKeyApiResponse = {
  * type Foo = ToActionCreatorName<'FOO_BAR'>
  * Foo // 'fooBar'
  */
+// @ts-expect-error
 export type ToActionCreatorName<K> = ToActionCreatorNameInner<K, true>
 export type ToActionCreatorNameInner<
   ActionType extends string,
-  IsFirstSegment extends boolean = false
+  IsFirstSegment extends boolean = false,
 > = ActionType extends `${infer SegmentHead}_${infer SegmentTail}`
   ? `${IsFirstSegment extends true
       ? Lowercase<SegmentHead>
       : Capitalize<Lowercase<SegmentHead>>}${ToActionCreatorNameInner<SegmentTail, false>}`
   : IsFirstSegment extends true
-  ? Lowercase<ActionType>
-  : Capitalize<Lowercase<ActionType>>
+    ? Lowercase<ActionType>
+    : Capitalize<Lowercase<ActionType>>
 
 export type DeveloperKeyActionNames =
   | 'LIST_DEVELOPER_KEYS_START'
@@ -293,10 +293,12 @@ export const actions = {
 
   editDeveloperKey:
     (payload?: DeveloperKey): AnyAction =>
+    // @ts-expect-error
     dispatch => {
       if (payload) {
         dispatch(actions.listDeveloperKeyScopesSet(payload.scopes))
       }
+      // @ts-expect-error
       dispatch(actions.setEditingDeveloperKey(payload))
     },
 
@@ -316,6 +318,7 @@ export const actions = {
   setBindingWorkflowStateStart: () => ({type: actions.SET_BINDING_WORKFLOW_STATE_START}),
 
   SET_BINDING_WORKFLOW_STATE_SUCCESSFUL: 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL',
+  // @ts-expect-error
   setBindingWorkflowStateSuccessful: response => ({
     type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL,
     payload: response,
@@ -349,7 +352,7 @@ export const actions = {
         resource: string
         resource_name: string
       }
-    >
+    >,
   ) => ({
     type: actions.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL,
     payload,
@@ -377,6 +380,7 @@ export const actions = {
   },
 
   setBindingWorkflowState:
+    // @ts-expect-error
     (developerKey: DeveloperKey, accountId: string, workflowState: string) => dispatch => {
       dispatch(actions.setBindingWorkflowStateStart())
       const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKey.id}/developer_key_account_bindings`
@@ -386,8 +390,9 @@ export const actions = {
       dispatch(
         actions.listDeveloperKeysReplaceBindingState({
           developerKeyId: developerKey.id,
+          // @ts-expect-error
           newAccountBinding: {...previousAccountBinding, workflow_state: workflowState},
-        })
+        }),
       )
       axios
         .post(url, {
@@ -402,8 +407,9 @@ export const actions = {
           dispatch(
             actions.setBindingWorkflowStateFailed({
               developerKeyId: developerKey.id,
+              // @ts-expect-error
               previousAccountBinding,
-            })
+            }),
           )
           $.flashError(error.message)
         })
@@ -413,16 +419,17 @@ export const actions = {
     (formData: unknown, url: string, method: string) => (dispatch: Dispatch) => {
       dispatch(actions.createOrEditDeveloperKeyStart())
 
-      return axios({
+      return axios<DeveloperKey, DeveloperKey>({
         method,
         url,
         data: formData,
       })
         .then(response => {
+          const key = response.data
           if (method === 'post') {
-            dispatch(actions.listDeveloperKeysPrepend(response.data))
+            dispatch(actions.listDeveloperKeysPrepend(key))
           } else {
-            dispatch(actions.listDeveloperKeysReplace(response.data))
+            dispatch(actions.listDeveloperKeysReplace(key))
           }
           dispatch(actions.createOrEditDeveloperKeySuccessful())
         })
@@ -456,9 +463,10 @@ export const actions = {
     (
       url: string,
       developerKeysPassedIn: Array<DeveloperKey>,
-      callback: (developerKeys: Array<DeveloperKey>) => void
+      callback: (developerKeys: Array<DeveloperKey>) => void,
     ) =>
     (dispatch: Function) => {
+      // @ts-expect-error
       dispatch(actions.listDeveloperKeysStart())
 
       return retrieveRemainingDevKeys({
@@ -476,9 +484,10 @@ export const actions = {
     (
       url: string,
       developerKeysPassedIn: Array<DeveloperKey>,
-      callback: (developerKeys: Array<DeveloperKey>) => void
+      callback: (developerKeys: Array<DeveloperKey>) => void,
     ) =>
     (dispatch: Function) => {
+      // @ts-expect-error
       dispatch(actions.listInheritedDeveloperKeysStart())
 
       return retrieveRemainingDevKeys({
@@ -493,30 +502,34 @@ export const actions = {
     },
 
   deactivateDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.deactivateDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {event: 'deactivate'},
       })
       .then(response => {
         dispatch(actions.listDeveloperKeysReplace(response.data))
+        // @ts-expect-error
         dispatch(actions.deactivateDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.deactivateDeveloperKeyFailed(err)))
   },
 
   activateDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.activateDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {event: 'activate'},
       })
       .then(response => {
         dispatch(actions.listDeveloperKeysReplace(response.data))
+        // @ts-expect-error
         dispatch(actions.activateDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.activateDeveloperKeyFailed(err)))
@@ -527,7 +540,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {visible: false},
       })
       .then(response => {
@@ -542,7 +555,7 @@ export const actions = {
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
     axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {visible: true},
       })
       .then(response => {
@@ -553,6 +566,7 @@ export const actions = {
   },
 
   deleteDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.deleteDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
@@ -560,6 +574,7 @@ export const actions = {
       .delete(url)
       .then(response => {
         dispatch(actions.listDeveloperKeysDelete(response.data))
+        // @ts-expect-error
         dispatch(actions.deleteDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.deleteDeveloperKeyFailed(err)))
@@ -617,6 +632,7 @@ export const actions = {
               $.flashError(error.message)
             }
           }
+          // @ts-expect-error
           dispatch(actions.setEditingDeveloperKey(false))
           throw err
         })
@@ -627,11 +643,11 @@ export const actions = {
     disabled_placements: Array<string>,
     developerKeyId: string,
     toolConfiguration: unknown,
-    customFields: unknown
+    customFields: unknown,
   ) => {
     const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
     return axios
-      .put(url, {
+      .put<DeveloperKey>(url, {
         developer_key: {
           name: developerKey.name,
           notes: developerKey.notes,
@@ -646,7 +662,7 @@ export const actions = {
         },
       })
       .then(data => {
-        return data.data as LtiDeveloperKeyApiResponse
+        return data.data as unknown as LtiDeveloperKeyApiResponse
       })
       .catch(err => {
         const errors = err.response.data.errors
@@ -680,6 +696,7 @@ function retrieveDevKeys({
   axios
     .get(url)
     .then(response => {
+      // @ts-expect-error
       const {next} = parseLinkHeader(response.headers.link)
       const payload = {next, developerKeys: response.data}
       dispatch(success(payload))
@@ -706,6 +723,7 @@ function retrieveRemainingDevKeys({
   return axios
     .get(url)
     .then(response => {
+      // @ts-expect-error
       const {next} = parseLinkHeader(response.headers.link)
       const developerKeys = developerKeysPassedIn.concat(response.data)
       if (next) {

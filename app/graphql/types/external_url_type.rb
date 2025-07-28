@@ -26,6 +26,7 @@ module Types
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
 
+    field :new_tab, Boolean, null: true
     field :title, String, null: true
     field :url, String, null: true
 

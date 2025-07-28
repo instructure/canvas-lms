@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
@@ -34,11 +33,13 @@ import {Text} from '@instructure/ui-text'
 import type {CamelizedAssignment, PartialStudent} from '@canvas/grading/grading.d'
 import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import useStore from '../../stores'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
+// @ts-expect-error
 function labelForPostGradesAction(postGradesAction) {
   if (postGradesAction.hasGradesOrCommentsToPost) {
     return I18n.t('Post grades')
@@ -64,7 +65,7 @@ function labelForHideGradesAction(hideGradesAction: {
 
 function speedGraderUrl(assignment: {courseId: string; id: string}) {
   return encodeURI(
-    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`
+    `/courses/${assignment.courseId}/gradebook/speed_grader?assignment_id=${assignment.id}`,
   )
 }
 
@@ -95,6 +96,7 @@ export type AssignmentColumnHeaderProps = {
     onSelect: (onExited: any) => void
   }
   reuploadSubmissionsAction: any
+  rubricAssessmentImportsExportsEnabled: boolean
   setDefaultGradeAction: {
     disabled: boolean
     onSelect: (cb: any) => Promise<void>
@@ -144,10 +146,12 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     ...ColumnHeader.defaultProps,
   }
 
+  // @ts-expect-error
   bindAssignmentLink = ref => {
     this.assignmentLink = ref
   }
 
+  // @ts-expect-error
   bindEnterGradesAsMenuContent = ref => {
     this.enterGradesAsMenuContent = ref
   }
@@ -180,6 +184,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     this.invokeAndSkipFocus(this.props.showGradePostingPolicyAction)
   }
 
+  // @ts-expect-error
   invokeAndSkipFocus(action) {
     // this is because the onToggle handler in ColumnHeader.js is going to get
     // called synchronously, before the SetState takes effect, and it needs to
@@ -194,8 +199,10 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     this.assignmentLink?.focus()
   }
 
+  // @ts-expect-error
   handleKeyDown = (event: KeyboardEvent) => {
     if (event.which === 9) {
+      // @ts-expect-error
       if (this.assignmentLink.focused && !event.shiftKey) {
         event.preventDefault()
         this.optionsMenuTrigger.focus()
@@ -209,9 +216,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
       }
     }
 
+    // @ts-expect-error
     return ColumnHeader.prototype.handleKeyDown.call(this, event)
   }
 
+  // @ts-expect-error
   onEnterGradesAsSettingSelect = (_event, values) => {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
@@ -244,6 +253,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         onSend: this.handleSendMessageStudentsWho,
         messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
         userId: this.props.userId,
+        // @ts-expect-error
         pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       }
 
@@ -253,6 +263,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
       MessageStudentsWhoDialog.show(options, this.focusAtEnd)
     }
+  }
+
+  selectBulkRubricExport() {
+    const {toggleRubricAssessmentExportModal} = useStore.getState()
+    toggleRubricAssessmentExportModal(true, this.props.allStudents.length, this.props.assignment)
   }
 
   activeStudentDetails() {
@@ -278,11 +293,17 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     })
   }
 
+  rubricAssessmentImportExportDisplayed = () =>
+    this.props.assignment.hasRubric &&
+    !this.props.assignment.anonymizeStudents &&
+    this.props.rubricAssessmentImportsExportsEnabled
+
   renderAssignmentLink() {
     const assignment = this.props.assignment
 
     return (
       <InstUISettingsProvider
+        // @ts-expect-error
         theme={{smallPaddingHorizontal: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
       >
         <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl} isWithinText={false}>
@@ -401,6 +422,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
         {this.props.postGradesAction.enabledForUser && (
           <MenuItem
+            id="post-grades"
             disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
             onSelect={this.postGrades}
           >
@@ -456,8 +478,25 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         {this.props.postGradesAction.enabledForUser && <MenuSeparator />}
 
         {this.props.postGradesAction.enabledForUser && (
-          <MenuItem onSelect={this.showGradePostingPolicy}>
+          <MenuItem id="save-grade-posting-policy" onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
+          </MenuItem>
+        )}
+
+        {this.rubricAssessmentImportExportDisplayed() && (
+          <MenuItem onSelect={() => this.selectBulkRubricExport()}>
+            {I18n.t('Bulk Download Rubrics')}
+          </MenuItem>
+        )}
+
+        {this.rubricAssessmentImportExportDisplayed() && (
+          <MenuItem
+            onSelect={() => {
+              const {toggleRubricAssessmentImportTray} = useStore.getState()
+              toggleRubricAssessmentImportTray(true, this.props.assignment)
+            }}
+          >
+            {I18n.t('Import Rubrics')}
           </MenuItem>
         )}
       </Menu>

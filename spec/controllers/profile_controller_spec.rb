@@ -21,9 +21,17 @@
 require "timecop"
 
 describe ProfileController do
+  let(:mfa_settings) { :disabled }
+  let(:otp_via_sms) { false }
+
   before :once do
     course_with_teacher(active_all: true)
     user_with_pseudonym(active_user: true)
+  end
+
+  before do
+    allow_any_instance_of(ProfileHelper).to receive(:current_mfa_settings).and_return(mfa_settings)
+    allow_any_instance_of(Login::OtpHelper).to receive(:otp_via_sms_in_us_region?).and_return(otp_via_sms)
   end
 
   describe "show" do
@@ -71,6 +79,22 @@ describe ProfileController do
         expect(assigns(:user_data)[:common_contexts][1]["id"]).to eql(group.id)
         expect(assigns(:user_data)[:common_contexts][1]["roles"]).to eql(["Member"])
       end
+
+      it "does not include differentiation Tags in @user_data" do
+        user_session(@teacher)
+        student_in_course(user: @user, active_all: true)
+
+        @non_collaborative_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
+        @non_collaborative_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collaborative_group_category)
+        @non_collaborative_group.add_user(@user, "accepted")
+        @non_collaborative_group.add_user(@teacher, "accepted")
+
+        get "show", params: { user_id: @user.id }
+        # Expect that the non-collaborative group is not included in the common contexts
+        # The only common_context included is the course
+        expect(assigns(:user_data)[:common_contexts].size).to be(1)
+        expect(assigns(:user_data)[:common_contexts][0]["id"]).to eql(@course.id)
+      end
     end
   end
 
@@ -95,53 +119,6 @@ describe ProfileController do
         put "update", params: { user_id: @user.id, default_email_id: @cc2.id }, format: "json"
         expect(response).to be_successful
         expect(@user.email).to eq @cc2.path
-      end
-    end
-
-    describe "personal pronouns" do
-      before :once do
-        @user.account.settings = { can_add_pronouns: true }
-        @user.account.save!
-      end
-
-      it "allows changing pronouns" do
-        user_session(@user, @pseudonym)
-        expect(@user.pronouns).to be_nil
-        put "update", params: { user: { pronouns: "  He/Him " } }, format: "json"
-        expect(response).to be_successful
-        @user.reload
-        expect(@user.read_attribute(:pronouns)).to eq "he_him"
-        expect(@user.pronouns).to eq "He/Him"
-      end
-
-      it "allows unsetting pronouns" do
-        user_session(@user, @pseudonym)
-        @user.pronouns = " Dude/Guy  "
-        @user.save!
-        expect(@user.pronouns).to eq "Dude/Guy"
-        put "update", params: { user: { pronouns: "" } }, format: "json"
-        expect(response).to be_successful
-        @user.reload
-        expect(@user.pronouns).to be_nil
-      end
-
-      it "does not allow setting pronouns not on the approved list" do
-        user_session(@user, @pseudonym)
-        expect(@user.pronouns).to be_nil
-        put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
-        expect(response).to be_successful
-        @user.reload
-        expect(@user.pronouns).to be_nil
-      end
-
-      it "does not allow setting pronouns if the setting is disabled" do
-        @user.account.settings[:can_change_pronouns] = false
-        @user.account.save!
-        user_session(@user, @pseudonym)
-        put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
-        expect(response).to be_successful
-        @user.reload
-        expect(@user.pronouns).to be_nil
       end
     end
 
@@ -178,6 +155,74 @@ describe ProfileController do
     end
   end
 
+  describe "personal pronouns" do
+    before :once do
+      @user.account.settings = { can_add_pronouns: true }
+      @user.account.save!
+    end
+
+    describe "settings" do
+      specs_require_sharding
+
+      it "returns pronouns based on settings of the active account" do
+        @user.update!(pronouns: "he_him")
+        shard_one_account = @shard1.activate { Account.create!(name: "Shard1 Acc", settings: { can_add_pronouns: true }) }
+        # other tests for pronouns don't use this because pronouns falls back on user.account
+        allow(Account).to receive(:current_domain_root_account).and_return(shard_one_account)
+        @shard1.activate do
+          user_session(@user)
+          get "settings", params: { user_id: @user.id }, format: "json"
+
+          expect(response).to be_successful
+          json = json_parse(response.body)
+          expect(json["pronouns"]).to eq "He/Him"
+        end
+      end
+    end
+
+    describe "update" do
+      it "allows changing pronouns" do
+        user_session(@user, @pseudonym)
+        expect(@user.pronouns).to be_nil
+        put "update", params: { user: { pronouns: "  He/Him " } }, format: "json"
+        expect(response).to be_successful
+        @user.reload
+        expect(@user["pronouns"]).to eq "he_him"
+        expect(@user.pronouns).to eq "He/Him"
+      end
+
+      it "allows unsetting pronouns" do
+        user_session(@user, @pseudonym)
+        @user.pronouns = " Dude/Guy  "
+        @user.save!
+        expect(@user.pronouns).to eq "Dude/Guy"
+        put "update", params: { user: { pronouns: "" } }, format: "json"
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to be_nil
+      end
+
+      it "does not allow setting pronouns not on the approved list" do
+        user_session(@user, @pseudonym)
+        expect(@user.pronouns).to be_nil
+        put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to be_nil
+      end
+
+      it "does not allow setting pronouns if the setting is disabled" do
+        @user.account.settings[:can_change_pronouns] = false
+        @user.account.save!
+        user_session(@user, @pseudonym)
+        put "update", params: { user: { pronouns: "Pro/Noun" } }, format: "json"
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to be_nil
+      end
+    end
+  end
+
   describe "update_profile" do
     before :once do
       user_with_pseudonym
@@ -207,6 +252,12 @@ describe ProfileController do
     end
 
     it "alert is set to failed when user profile validation fails" do
+      Account.default.settings[:enable_name_pronunciation] = true
+      Account.default.settings[:allow_name_pronunciation_edit_for_students] = true
+      Account.default.save!
+      # requires base role of student to edit
+      student_in_course(active_all: true)
+      user_session(@student)
       pronunciation = "a" * 1000
       put "update_profile",
           params: { user: { short_name: "Monsturd", name: "Jenkins" },
@@ -267,17 +318,17 @@ describe ProfileController do
 
     it "lets you set visibility on user_services" do
       @user.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: true
-      @user.user_services.create! service: "twitter", service_user_name: "user", service_user_id: "user", visible: false
+      @user.user_services.create! service: "diigo", service_user_name: "user", service_user_id: "user", visible: false
 
       put "update_profile",
           params: { user_profile: { bio: "..." },
-                    user_services: { twitter: "1", skype: "false" } },
+                    user_services: { diigo: "1", skype: "false" } },
           format: "json"
       expect(response).to be_successful
 
       @user.reload
       expect(@user.user_services.where(service: "skype").first.visible?).to be_falsey
-      expect(@user.user_services.where(service: "twitter").first.visible?).to be_truthy
+      expect(@user.user_services.where(service: "diigo").first.visible?).to be_truthy
     end
 
     it "lets you set your profile links" do
@@ -297,11 +348,12 @@ describe ProfileController do
 
     it "lets you remove set pronouns" do
       @user.update(pronouns: "he_him")
-      expect do
-        put "update_profile", params: { pronouns: nil }, format: "json"
-      end.to change {
-        @user.reload.pronouns
-      }.from("He/Him").to(nil)
+      @user.account.settings[:can_add_pronouns] = true
+      @user.account.save!
+
+      expect(@user.pronouns).to eq("He/Him")
+      put "update_profile", params: { pronouns: nil }, format: "json"
+      expect(@user.reload.pronouns).to be_nil
       expect(response).to be_successful
     end
   end
@@ -403,15 +455,65 @@ describe ProfileController do
     end
 
     describe "js_env" do
-      it "sets discussions_reporting to falsey if react_discussions_post is off" do
-        Account.default.disable_feature! :react_discussions_post
+      context "register_cc_tabs" do
+        let(:mfa_settings) { :required }
+        let(:otp_via_sms) { true }
+
+        it "should include 'sms'" do
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:register_cc_tabs]).to include("sms")
+        end
+
+        it "should include 'slack'" do
+          @user.account.enable_feature! :slack_notifications
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:register_cc_tabs]).to include("slack")
+        end
+      end
+
+      context "is_default_account" do
+        it "should be 'true' if the domain root account is the default" do
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:is_default_account]).to be true
+        end
+      end
+
+      context "can_update_tokens" do
+        it "should be 'true' if the user has permission to update tokens" do
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:PERMISSIONS][:can_update_tokens]).to be true
+        end
+
+        it "should be 'false' if the user does not have permission to update tokens" do
+          @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
+          @user.account.enable_feature!(:admin_manage_access_tokens)
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:PERMISSIONS][:can_update_tokens]).to be false
+        end
+      end
+
+      it "sets discussions_reporting to falsey if discussions_reporting is off" do
+        Account.default.disable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_falsey
       end
 
-      it "sets discussions_reporting to truthy if react_discussions_post is on" do
-        Account.default.enable_feature! :react_discussions_post
+      it "sets discussions_reporting to truthy if discussions_reporting is on" do
+        Account.default.enable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_truthy

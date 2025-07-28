@@ -96,9 +96,9 @@ describe ScopesApiController, type: :request do
         user_with_pseudonym(account:)
       end
 
-      it "returns a 401" do
+      it "returns a 403" do
         api_call(:get, api_url, scope_params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end

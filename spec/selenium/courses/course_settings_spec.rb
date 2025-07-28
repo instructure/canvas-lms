@@ -96,9 +96,9 @@ describe "course settings" do
 
     it "hides most tabs if set" do
       get "/courses/#{@course.id}/settings"
-      expect(ff("#course_details_tabs > ul li").length).to eq 2
-      expect(f("#course_details_tab")).to be_displayed
-      expect(f("#sections_tab")).to be_displayed
+      expect(ff("[role='tab']").length).to eq 2
+      expect(f("#tab-details-selected")).to be_displayed
+      expect(f("#tab-sections")).to be_displayed
     end
 
     it "shows synced subjects" do
@@ -125,7 +125,7 @@ describe "course settings" do
 
       it "displays the course settings tab" do
         get "/courses/#{course.id}/settings"
-        expect(f("#integrations_tab")).to be_displayed
+        expect(f("#tab-integrations")).to be_displayed
       end
     end
   end
@@ -313,43 +313,6 @@ describe "course settings" do
       expect(home_page_announcement_limit).not_to be_disabled
     end
 
-    describe "course paces setting" do
-      describe "when the course paces feature flag is enabled" do
-        before do
-          @account.enable_feature!(:course_paces)
-        end
-
-        it "displays the course paces setting (and if checked, the caution text)" do
-          get "/courses/#{@course.id}/settings"
-
-          expect(element_exists?(".course-paces-row")).to be_truthy
-
-          caution_text = "Course Pacing is in active development."
-          course_paces_checkbox = f("#course_enable_course_paces")
-          course_paces_checkbox.location_once_scrolled_into_view
-          course_paces_checkbox.click
-          wait_for_ajaximations
-          expect(f(".course-paces-row")).to include_text caution_text
-
-          course_paces_checkbox.click
-          wait_for_ajaximations
-          expect(f(".course-paces-row")).not_to include_text caution_text
-        end
-      end
-
-      describe "when the course paces feature flag is disabled" do
-        before do
-          @account.disable_feature!(:course_paces)
-        end
-
-        it "does not display the course paces setting" do
-          get "/courses/#{@course.id}/settings"
-
-          expect(element_exists?(".course-paces-row")).to be_falsey
-        end
-      end
-    end
-
     it "shows participation by default" do
       get "/courses/#{@course.id}/settings"
 
@@ -383,7 +346,7 @@ describe "course settings" do
         expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
         expect(f("#course_hide_final_grades")).to be_present
         # Verify that other parts of the settings are not visilbe when they shouldn't be
-        expect(f("#tab-sections").css_value("display")).to eq "none"
+        expect(f("#sections").attribute("aria-hidden")).to eq "true"
       end
 
       it "is shown when only restrict_quantitative_data account locked setting and feature flags are ON" do
@@ -419,6 +382,15 @@ describe "course settings" do
     it "does not show cog menu for disabling or moving on home nav item" do
       get "/courses/#{@course.id}/settings#tab-navigation"
       expect(admin_cog("#nav_edit_tab_id_0")).to be_falsey
+    end
+
+    it "does not show Home tab when in a horizon course" do
+      @course.account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+      @course.save!
+      get "/courses/#{@course.id}/settings#tab-navigation"
+      # The Home tab always has this ID
+      expect(element_exists?("#nav_edit_tab_id_0")).to be_falsey
     end
 
     it "changes course details" do
@@ -485,6 +457,63 @@ describe "course settings" do
         cog_menu_button.click # open the menu
         ff(".disable_nav_item_link")[2].click # click "Disable"
         check_element_has_focus(cog_menu_button)
+      end
+    end
+
+    context "participation" do
+      it "allows setting both dates as empty" do
+        get "/courses/#{@course.id}/settings"
+
+        f("input[title='Term']").click
+        fj("li[class*='optionItem']:contains('Course')").click
+        fj("button:contains('Update Course Details')").click
+        expect(fj("span:contains('Course was successfully updated')")).to be_present
+      end
+
+      it "allows end date to be empty" do
+        get "/courses/#{@course.id}/settings"
+
+        f("input[title='Term']").click
+        fj("li[class*='optionItem']:contains('Course')").click
+        start_date = ff("input[id*='TextInput_']")[0]
+        start_date.send_keys(Time.zone.now.to_s)
+        start_date.send_keys(:tab)
+
+        fj("button:contains('Update Course Details')").click
+        expect(fj("span:contains('Course was successfully updated')")).to be_present
+      end
+
+      it "allows start date to be empty" do
+        get "/courses/#{@course.id}/settings"
+
+        f("input[title='Term']").click
+        fj("li[class*='optionItem']:contains('Course')").click
+        end_date = ff("input[id*='TextInput_']")[1]
+        end_date.send_keys(Time.zone.now.to_s)
+        end_date.send_keys(:tab)
+
+        fj("button:contains('Update Course Details')").click
+        expect(fj("span:contains('Course was successfully updated')")).to be_present
+      end
+
+      it "gives a validation when end is greater than start" do
+        current_date = Time.zone.now
+        yesterday = current_date - 1.day
+        get "/courses/#{@course.id}/settings"
+
+        f("input[title='Term']").click
+        fj("li[class*='optionItem']:contains('Course')").click
+        start_date = ff("input[id*='TextInput_']")[0]
+        start_date.send_keys(current_date.to_s)
+        end_date = ff("input[id*='TextInput_']")[1]
+        end_date.send_keys(yesterday.to_s)
+        end_date.send_keys(:tab)
+
+        fj("button:contains('Update Course Details')").click
+        # Adding expectation for the error shown after the end field
+        expect(fj("span:contains('The end date can not occur before the start date.')")).to be_present
+        # Adding expectation for the error shown in the Flash notification
+        expect(fj("span:contains('The course end date can not occur before the course start date.')")).to be_present
       end
     end
 
@@ -577,8 +606,7 @@ describe "course settings" do
     it "shows publish/unpublish buttons in sidebar and no status badge if user can change publish state" do
       course_with_teacher_logged_in(active_all: true)
       get "/courses/#{@course.id}/settings"
-      expect(f("#course_status_form")).to be_present
-      expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
+      expect(f("#course_publish_button")).to be_present
       expect(f("#content")).not_to contain_css("#course-status")
     end
 
@@ -586,7 +614,7 @@ describe "course settings" do
       course_with_ta_logged_in(active_all: true)
       get "/courses/#{@course.id}/settings"
       expect(f("#course-status")).to be_present
-      expect(f("#content")).not_to contain_css("#course_status_form")
+      expect(f("#content")).not_to contain_css("#course_publish_button")
     end
   end
 
@@ -605,14 +633,14 @@ describe "course settings" do
     user_session(@user)
     role = custom_account_role("role", account: @account)
     @account.role_overrides.create!(permission: "read_course_content", role:, enabled: true)
-    @account.role_overrides.create!(permission: "manage_content", role:, enabled: false)
+    @account.role_overrides.create!(permission: "manage_course_content_edit", role:, enabled: false)
     @course.account.account_users.create!(user: @user, role:)
 
     get "/courses/#{@course.id}/settings"
 
-    ffj("#tab-details input:visible").each do |input|
-      expect(input).to be_disabled
-    end
+    inputs = ffj("#tab-details-mount input:visible")
+    expect(inputs).to all(be_disabled)
+
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
 

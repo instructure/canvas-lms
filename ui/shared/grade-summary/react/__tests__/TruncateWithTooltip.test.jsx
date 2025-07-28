@@ -36,7 +36,7 @@ const renderTruncateWithTooltip = (text, props = {}) => {
   const wrapper = render(
     <TruncateWithTooltip {...defaultProps(props)} ref={ref}>
       {text}
-    </TruncateWithTooltip>
+    </TruncateWithTooltip>,
   )
 
   return {wrapper, ref}

@@ -1,0 +1,5 @@
+.field-group {
+  > h2 {
+    margin: 0;
+  }
+}

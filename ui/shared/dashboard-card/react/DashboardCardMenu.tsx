@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -25,7 +25,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import ColorPicker from '@canvas/color-picker'
 import DashboardCardMovementMenu from './DashboardCardMovementMenu'
 
-const I18n = useI18nScope('dashcards')
+const I18n = createI18nScope('dashcards')
 
 type Props = {
   afterUpdateColor: any
@@ -111,7 +111,7 @@ export default class DashboardCardMenu extends React.Component<Props, State> {
       index,
     }: {
       index: number
-    }
+    },
   ) => {
     this.setState({
       selectedIndex: index,

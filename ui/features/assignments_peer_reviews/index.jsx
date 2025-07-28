@@ -15,10 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -29,10 +30,42 @@ import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import FilterPeerReview from './react/FilterPeerReview'
+import ReviewsPerUserInput from './react/ReviewsPerUserInput'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments.peer_reviews')
+const I18n = createI18nScope('assignments.peer_reviews')
 
 $(document).ready(() => {
+  const ERROR_MESSAGE = I18n.t('Please select a student')
+
+  const peerReviewCountContainer = document.getElementById('reviews_per_user_container')
+  const redirectToEditContainer = document.getElementById('redirect_to_edit_button')
+  if (peerReviewCountContainer) {
+    const root = createRoot(peerReviewCountContainer)
+    const initialCount = peerReviewCountContainer.dataset.count ?? '0'
+    const setValue = value => {
+      const peerReviewCount = document.getElementById('peer_review_count')
+      peerReviewCount.value = value
+    }
+    root.render(
+      <View as="div" margin="medium 0 large 0">
+        <ReviewsPerUserInput initialCount={initialCount} onChange={setValue} />
+      </View>,
+    )
+  }
+
+  if (redirectToEditContainer) {
+    const courseId = redirectToEditContainer.dataset.courseid
+    const assignmentId = redirectToEditContainer.dataset.assignmentid
+    const root = createRoot(redirectToEditContainer)
+    const editLink = `/courses/${courseId}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`
+    root.render(<Button href={editLink}>{I18n.t('Edit Assignment')}</Button>)
+  }
+
   $('.peer_review').hover(
     function () {
       $('.peer_review.submission-hover').removeClass('submission-hover')
@@ -40,7 +73,7 @@ $(document).ready(() => {
     },
     function () {
       $(this).removeClass('submission-hover')
-    }
+    },
   )
 
   $('.peer_review').focusin(function () {
@@ -107,9 +140,68 @@ $(document).ready(() => {
     }
   })
 
+  $('#reviewee_id').change(function () {
+    const reviewee_id = $(this).val()
+    const form = $(this).closest('form')
+    const errorsContainer = form.find('#reviewee_errors')[0]
+
+    if (!reviewee_id) {
+      const container = $(this)
+      if (container) {
+        container.addClass('error-outline')
+        container.attr('aria-label', ERROR_MESSAGE)
+      }
+
+      const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+      errorRoots[form.attr('action')] = root
+      root.render(
+        <Flex as="div" alignItems="start" margin="0 0 0 0">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {ERROR_MESSAGE}
+          </Text>
+        </Flex>,
+      )
+      return false
+    } else {
+      const container = $(this)
+      if (container) {
+        container.removeClass('error-outline')
+        container.removeAttr('aria-label')
+      }
+      errorRoots[form.attr('action')]?.unmount()
+      errorRoots[form.attr('action')] = null
+    }
+  })
+
   $('#assign_peer_review_form').formSubmit({
     beforeSubmit(data) {
-      if (!data.reviewee_id) return false
+      if (!data.reviewee_id) {
+        const form = $(this)
+        const errorsContainer = form.find('#reviewee_errors')[0]
+        const container = form.find('#reviewee_id')
+        if (container) {
+          container.addClass('error-outline')
+          container.attr('aria-label', ERROR_MESSAGE)
+          container.focus()
+        }
+        const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+        errorRoots[form.attr('action')] = root
+
+        root.render(
+          <Flex as="div" alignItems="start" margin="0 0 0 0">
+            <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+              <IconWarningSolid color="error" />
+            </Flex.Item>
+            <Text size="small" color="danger">
+              {ERROR_MESSAGE}
+            </Text>
+          </Flex>,
+        )
+        return false
+      }
       $(this).loadingImage()
     },
     success(data) {
@@ -138,7 +230,7 @@ $(document).ready(() => {
         I18n.t('titles.reminder', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
           time,
-        })
+        }),
       )
       $(this).slideUp(function () {
         $(this).remove()
@@ -147,6 +239,26 @@ $(document).ready(() => {
     error(data) {
       $(this).loadingImage('remove')
       $(this).formErrors(data)
+    },
+  })
+
+  $('#assign_peer_reviews_form').formSubmit({
+    beforeSubmit(data) {
+      const textInput = document.getElementById('reviews_per_user_input')
+      if (!data.peer_review_count) {
+        textInput.focus()
+        return false
+      } else {
+        const input = Number(data.peer_review_count)
+        if (!Number.isInteger(input) || input <= 0) {
+          textInput.focus()
+          return false
+        }
+        return true
+      }
+    },
+    success(_data) {
+      location.reload()
     },
   })
 
@@ -163,7 +275,7 @@ $(document).ready(() => {
         I18n.t('titles.remind', 'Remind %{assessor} about Assessment, last notified %{time}', {
           assessor: assessor_name,
           time,
-        })
+        }),
       )
     })
   })
@@ -172,6 +284,8 @@ $(document).ready(() => {
     event.preventDefault()
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
+
+  const errorRoots = {}
 
   ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

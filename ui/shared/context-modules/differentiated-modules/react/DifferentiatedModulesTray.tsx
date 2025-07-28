@@ -27,14 +27,14 @@ import {Tabs} from '@instructure/ui-tabs'
 import {IconModuleSolid} from '@instructure/ui-icons'
 import {calculatePanelHeight} from '../utils/miscHelpers'
 import type {Module} from './types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {SettingsPanelState} from './settingsReducer'
 import {createModule, updateModule} from './SettingsPanel'
 import {type OptionValue, updateModuleAssignees} from './AssignToPanel'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
-import {AssigneeOption} from './Item/types'
+import type {AssigneeOption} from './Item/types'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 const SETTINGS_ID = 'settings'
 const ASSIGN_TO_ID = 'assign-to'
@@ -45,6 +45,7 @@ export type DifferentiatedModulesTrayProps = {
   onDismiss: () => void
   moduleElement: HTMLDivElement
   moduleId?: string
+  onComplete: () => void
   initialTab?: DifferentiatedModulesTrayTabId
   moduleName?: string
   unlockAt?: string
@@ -52,6 +53,7 @@ export type DifferentiatedModulesTrayProps = {
   moduleList?: Module[]
   courseId: string
   addModuleUI?: (data: Record<string, any>, element: HTMLDivElement) => void
+  onChangeAssignedTo?: () => void
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
@@ -66,7 +68,7 @@ function Header({
   moduleId?: string
   moduleElement: HTMLDivElement
   onDismiss: () => void
-  headerLabel: String
+  headerLabel: string
 }) {
   const customOnDismiss = useCallback(() => {
     if (!moduleId) {
@@ -110,9 +112,11 @@ function Body({
   onDismiss,
   moduleElement,
   moduleId,
+  onComplete,
   initialTab = ASSIGN_TO_ID,
   courseId,
   trayRef,
+  onChangeAssignedTo,
   ...settingsProps
 }: DifferentiatedModulesTrayProps & {trayRef: React.RefObject<HTMLElement>}) {
   const isPacedCourse = ENV.IN_PACED_COURSE
@@ -127,11 +131,11 @@ function Body({
   const footerHeight = '63'
   const panelHeight = useMemo(
     (): string => calculatePanelHeight(moduleId !== undefined),
-    [moduleId]
+    [moduleId],
   )
   const bodyHeight = useMemo(
     (): string => `calc(${panelHeight} - ${footerHeight}px)`,
-    [panelHeight]
+    [panelHeight],
   )
 
   const handleSubmitMissingTabs = () => {
@@ -141,7 +145,6 @@ function Body({
       assignToData.current &&
       moduleId
     ) {
-      // eslint-disable-next-line promise/catch-or-return
       updateModuleAssignees({
         courseId,
         moduleId,
@@ -154,7 +157,7 @@ function Body({
       settingsData.current
     ) {
       const performRequest = moduleId === undefined ? createModule : updateModule
-      // eslint-disable-next-line promise/catch-or-return
+
       performRequest({
         moduleId,
         moduleElement,
@@ -164,6 +167,13 @@ function Body({
     } else {
       onDismiss()
     }
+  }
+
+  const handleOnDidSubmitAssignedTo = () => {
+    if (onChangeAssignedTo) {
+      onChangeAssignedTo()
+    }
+    handleSubmitMissingTabs()
   }
 
   return (
@@ -178,6 +188,7 @@ function Body({
           mountNodeRef={trayRef}
           updateParentData={newSettingsData => (settingsData.current = newSettingsData)}
           onDidSubmit={onDismiss}
+          onComplete={onComplete}
           {...settingsProps}
           {...(settingsData.current ?? {})}
         />
@@ -200,9 +211,10 @@ function Body({
               mountNodeRef={trayRef}
               updateParentData={(newSettingsData, changed) => {
                 settingsData.current = newSettingsData
-                changed && changes.current.add(SETTINGS_ID)
+                if (changed) changes.current.add(SETTINGS_ID)
               }}
               onDidSubmit={handleSubmitMissingTabs}
+              onComplete={onComplete}
               {...settingsProps}
               {...(settingsData.current ?? {})}
             />
@@ -229,11 +241,11 @@ function Body({
                 onDismiss={onDismiss}
                 updateParentData={(newAssignToData, changed) => {
                   assignToData.current = newAssignToData
-                  changed && changes.current.add(ASSIGN_TO_ID)
+                  if (changed) changes.current.add(ASSIGN_TO_ID)
                 }}
                 defaultOption={assignToData.current?.selectedOption}
                 defaultAssignees={assignToData.current?.selectedAssignees}
-                onDidSubmit={handleSubmitMissingTabs}
+                onDidSubmit={handleOnDidSubmitAssignedTo}
               />
             )}
           </Tabs.Panel>
@@ -247,6 +259,9 @@ export default function DifferentiatedModulesTray(props: DifferentiatedModulesTr
   const {onDismiss, moduleElement, moduleId} = props
   const headerLabel = moduleId ? I18n.t('Edit Module Settings') : I18n.t('Add Module')
   const trayRef = useRef<HTMLElement | null>(null)
+  const themeOverride = window.ENV.FEATURES.modules_requirements_allow_percentage
+    ? {regularWidth: '32.375em'}
+    : undefined
 
   return (
     <Tray
@@ -255,6 +270,7 @@ export default function DifferentiatedModulesTray(props: DifferentiatedModulesTr
       placement="end"
       size="regular"
       contentRef={r => (trayRef.current = r)}
+      themeOverride={themeOverride}
     >
       <Header
         moduleId={moduleId}

@@ -62,7 +62,7 @@ export class ClosedCaptionPanel extends Component {
         locale: string.isRequired,
         inherited: bool,
         file: shape({name: string.isRequired}).isRequired,
-      })
+      }),
     ),
     updateSubtitles: func.isRequired,
     uploadMediaTranslations: shape({
@@ -143,7 +143,7 @@ export class ClosedCaptionPanel extends Component {
           newSelectedLanguage: null,
           announcement: formatMessage(
             this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
-            {lang: prevState.newSelectedLanguage.label}
+            {lang: prevState.newSelectedLanguage.label},
           ),
         }
       })
@@ -166,7 +166,7 @@ export class ClosedCaptionPanel extends Component {
           newSelectedLanguage: null,
           announcement: formatMessage(
             this.props.uploadMediaTranslations.UploadMediaStrings.ADDED_CAPTION,
-            {lang: lang.label}
+            {lang: lang.label},
           ),
         }
       })
@@ -186,7 +186,7 @@ export class ClosedCaptionPanel extends Component {
         addingNewClosedCaption: subtitles.length > 0 ? prevState.addingNewClosedCaption : true,
         announcement: formatMessage(
           this.props.uploadMediaTranslations.UploadMediaStrings.DELETED_CAPTION,
-          {lang: deletedLang?.label}
+          {lang: deletedLang?.label},
         ),
         lastDeletedCCIndex: deletedCCIndex,
       }
@@ -237,7 +237,7 @@ export class ClosedCaptionPanel extends Component {
               languages={this.closedCaptionLanguages.filter(candidate_lang => {
                 // remove already selected languages form the list
                 return !this.state.subtitles.find(
-                  st => !st.inherited && st.locale === candidate_lang.id
+                  st => !st.inherited && st.locale === candidate_lang.id,
                 )
               })}
               selectedLanguage={this.state.newSelectedLanguage}

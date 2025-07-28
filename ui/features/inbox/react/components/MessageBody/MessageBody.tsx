@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useEffect} from 'react'
+import React, {useEffect} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {ModalBodyContext, signatureSeparator} from '../../utils/constants'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {signatureSeparator} from '../../utils/constants'
+import {useTranslationContext} from '../../hooks/useTranslationContext'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 type Message = {
-  text: string
-  type: 'error' | 'hint' | 'success' | 'screenreader-only'
+  text: React.ReactNode
+  type: 'newError' | 'error' | 'hint' | 'success' | 'screenreader-only'
 }
 
 type Props = {
@@ -41,7 +42,7 @@ export const MessageBody = (props: Props) => {
     (props.inboxSignatureBlock && props.signature && `${signatureSeparator}${props.signature}`) ||
     ''
 
-  const {body, setBody, translating} = useContext(ModalBodyContext)
+  const {body, setBody, translating, textTooLongErrors} = useTranslationContext()
 
   useEffect(() => {
     if (signature) setBody((body: string) => body + signature)
@@ -55,7 +56,7 @@ export const MessageBody = (props: Props) => {
   return (
     <TextArea
       label={<ScreenReaderContent>{I18n.t('Message Body')}</ScreenReaderContent>}
-      messages={props.messages}
+      messages={textTooLongErrors ? props.messages?.concat(textTooLongErrors) : props.messages}
       autoGrow={false}
       height="200px"
       maxHeight="200px"

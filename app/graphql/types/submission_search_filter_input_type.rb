@@ -28,6 +28,10 @@ module Types
       When true, this filter takes precedence over the include_concluded and include_deactivated filters.
     MD
 
+    argument :apply_gradebook_group_filter, Boolean, <<~MD, required: false
+      Filters submissions for users in a specific group applied in the Gradebook.
+    MD
+
     argument :include_unsubmitted, Boolean, required: false
 
     argument :representatives_only, Boolean, <<~MD, required: false
@@ -36,8 +40,8 @@ module Types
       are being graded individually.
     MD
 
-    argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
     argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
+    argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
 
     argument :enrollment_types, [EnrollmentTypeType], required: false
     argument :include_concluded, Boolean, <<~MD, required: false
@@ -60,9 +64,19 @@ module Types
       There is no character restriction on this field
     MD
 
+    argument :user_representative_id, ID, <<~MD, required: false
+      Return only submissions related to group representative for the user_id
+      There is no character restriction on this field
+    MD
+
+    argument :anonymous_id, ID, <<~MD, required: false
+      Return only submissions related to the given anonymous_id
+      There is no character restriction on this field
+    MD
+
+    argument :late, Boolean, "Limit results to submissions that are late", required: false
     argument :scored_less_than, Float, "Limit results to submissions that scored below the specified value", required: false
     argument :scored_more_than, Float, "Limit results to submissions that scored above the specified value", required: false
-    argument :late, Boolean, "Limit results to submissions that are late", required: false
 
     argument :grading_status, SubmissionGradingStatusType, "Limit results by grading status", required: false
   end

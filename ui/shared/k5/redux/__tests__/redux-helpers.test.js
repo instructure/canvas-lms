@@ -96,20 +96,20 @@ describe('K-5 Dashboard redux-helpers', () => {
         expect(mapStateToProps(state([['2021-02-06', []]])).assignmentsDueToday).toEqual({})
         expect(
           mapStateToProps(state([['2021-02-06', [{foo: 'bar'}], [{foo: 'baz'}]]]))
-            .assignmentsDueToday
+            .assignmentsDueToday,
         ).toEqual({})
       })
 
       it('groups the number of assignment items by course_id', () => {
         const {assignmentsDueToday} = mapStateToProps(state())
-        expect(Object.keys(assignmentsDueToday).length).toBe(2)
+        expect(Object.keys(assignmentsDueToday)).toHaveLength(2)
         expect(assignmentsDueToday.science).toBe(2)
         expect(assignmentsDueToday.math).toBe(1)
       })
 
       it('filters out assignments in submitted status', () => {
         const {assignmentsDueToday, assignmentsCompletedForToday} = mapStateToProps(state())
-        expect(Object.keys(assignmentsDueToday).length).toBe(2)
+        expect(Object.keys(assignmentsDueToday)).toHaveLength(2)
         expect(assignmentsDueToday.science).toBe(2)
         expect(assignmentsCompletedForToday.science).toBe(1)
       })
@@ -118,14 +118,14 @@ describe('K-5 Dashboard redux-helpers', () => {
     describe('assignmentsMissing', () => {
       it('groups the number of missing assignments by course_id', () => {
         const {assignmentsMissing} = mapStateToProps(state())
-        expect(Object.keys(assignmentsMissing).length).toBe(2)
+        expect(Object.keys(assignmentsMissing)).toHaveLength(2)
         expect(assignmentsMissing.science).toBe(1)
         expect(assignmentsMissing.math).toBe(1)
       })
 
       it('filters out assignments that have been dismissed already', () => {
         const {assignmentsMissing} = mapStateToProps(state())
-        expect(Object.keys(assignmentsMissing).length).toBe(2)
+        expect(Object.keys(assignmentsMissing)).toHaveLength(2)
         expect(assignmentsMissing.science).toBe(1)
       })
     })

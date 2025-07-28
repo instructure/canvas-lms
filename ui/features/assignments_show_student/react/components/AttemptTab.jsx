@@ -21,7 +21,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
 import LazyLoad, {lazy} from '@canvas/lazy-load'
 
-import {bool, func, string} from 'prop-types'
+import {bool, func, string, object} from 'prop-types'
 import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
 import ExternalToolOptions from './ExternalToolOptions'
@@ -34,7 +34,7 @@ import {
   IconUploadLine,
   IconTextLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component} from 'react'
@@ -43,61 +43,68 @@ import SubmissionTypeButton from './SubmissionTypeButton'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
 import {uploadFile} from '@canvas/upload-file'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
 import {isOriginalityReportVisible} from '@canvas/grading/originalityReportHelper'
 
-const I18n = useI18nScope('assignments_2_attempt_tab')
+const I18n = createI18nScope('assignments_2_attempt_tab')
 
-const ExternalToolSubmission = lazy(() =>
-  import(
-    /* webpackChunkName: "ExternalToolSubmission" */
-    /* webpackPrefetch: true */
-    './AttemptType/ExternalToolSubmission'
-  )
+const ExternalToolSubmission = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ExternalToolSubmission" */
+      /* webpackPrefetch: true */
+      './AttemptType/ExternalToolSubmission'
+    ),
 )
-const FilePreview = lazy(() =>
-  import(
-    /* webpackChunkName: "FilePreview" */
-    /* webpackPrefetch: true */
-    './AttemptType/FilePreview'
-  )
+const FilePreview = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "FilePreview" */
+      /* webpackPrefetch: true */
+      './AttemptType/FilePreview'
+    ),
 )
-const FileUpload = lazy(() =>
-  import(
-    /* webpackChunkName: "FileUpload" */
-    /* webpackPrefetch: true */
-    './AttemptType/FileUpload'
-  )
+const FileUpload = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "FileUpload" */
+      /* webpackPrefetch: true */
+      './AttemptType/FileUpload'
+    ),
 )
-const MediaAttempt = lazy(() =>
-  import(
-    /* webpackChunkName: "MediaAttempt" */
-    /* webpackPrefetch: true */
-    './AttemptType/MediaAttempt'
-  )
+const MediaAttempt = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "MediaAttempt" */
+      /* webpackPrefetch: true */
+      './AttemptType/MediaAttempt'
+    ),
 )
-const TextEntry = lazy(() =>
-  import(
-    /* webpackChunkName: "TextEntry" */
-    /* webpackPrefetch: true */
-    './AttemptType/TextEntry'
-  )
+const TextEntry = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "TextEntry" */
+      /* webpackPrefetch: true */
+      './AttemptType/TextEntry'
+    ),
 )
-const UrlEntry = lazy(() =>
-  import(
-    /* webpackChunkName: "UrlEntry" */
-    /* webpackPrefetch: true */
-    './AttemptType/UrlEntry'
-  )
+const UrlEntry = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "UrlEntry" */
+      /* webpackPrefetch: true */
+      './AttemptType/UrlEntry'
+    ),
 )
-const StudentAnnotationAttempt = lazy(() =>
-  import(
-    /* webpackChunkName: "StudentAnnotationAttempt" */
-    /* webpackPrefetch: true */
-    './AttemptType/StudentAnnotationAttempt'
-  )
+const StudentAnnotationAttempt = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "StudentAnnotationAttempt" */
+      /* webpackPrefetch: true */
+      './AttemptType/StudentAnnotationAttempt'
+    ),
 )
 
 const iconsByType = {
@@ -196,6 +203,8 @@ export default class AttemptTab extends Component {
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool,
+    submitButtonRef: object,
+    newAttemptButtonRef: object,
   }
 
   state = {
@@ -214,6 +223,7 @@ export default class AttemptTab extends Component {
           submission={this.props.submission}
           onCanvasFileRequested={this.onCanvasFileRequested}
           onUploadRequested={this.onUploadRequested}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -243,7 +253,7 @@ export default class AttemptTab extends Component {
           return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
         }),
       },
-      onSuccess
+      onSuccess,
     )
     this.updateUploadingFiles(async () => {
       try {
@@ -307,7 +317,7 @@ export default class AttemptTab extends Component {
           },
           null,
           axios,
-          onProgress
+          onProgress,
         )
       } else {
         promise = uploadFile(
@@ -319,7 +329,7 @@ export default class AttemptTab extends Component {
           },
           file,
           axios,
-          onProgress
+          onProgress,
         )
       }
       uploadPromises.push(promise)
@@ -345,7 +355,7 @@ export default class AttemptTab extends Component {
             isOriginalityReportVisible(
               this.props.assignment.originalityReportVisibility,
               this.props.assignment.dueAt,
-              this.props.submission.gradingStatus
+              this.props.submission.gradingStatus,
             ) && this.props.originalityReportsForA2
           }
         />
@@ -368,6 +378,7 @@ export default class AttemptTab extends Component {
           readOnly={readOnly}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -382,6 +393,8 @@ export default class AttemptTab extends Component {
           focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
           updateEditingDraft={this.props.updateEditingDraft}
+          submitButtonRef={this.props.submitButtonRef}
+          newAttemptButtonRef={this.props.newAttemptButtonRef}
         />
       </LazyLoad>
     )
@@ -400,6 +413,7 @@ export default class AttemptTab extends Component {
           uploadingFiles={this.props.uploadingFiles}
           iframeURL={this.state.mediaRecordingIframURL}
           setIframeURL={this.setMediaRecordingIframeURL}
+          submitButtonRef={this.props.submitButtonRef}
         />
       </LazyLoad>
     )
@@ -437,6 +451,7 @@ export default class AttemptTab extends Component {
         }}
         submission={this.props.submission}
         tool={externalTool}
+        submitButtonRef={this.props.submitButtonRef}
       />
     </LazyLoad>
   )
@@ -515,8 +530,8 @@ export default class AttemptTab extends Component {
             {selectedType != null && (
               <div
                 style={{
-                  backgroundColor: theme.variables.colors.backgroundLight,
-                  borderTop: `2px solid ${theme.variables.colors.borderMedium}`,
+                  backgroundColor: theme.colors.contrasts.grey1111,
+                  borderTop: `2px solid ${theme.colors.contrasts.grey1214}`,
                 }}
               >
                 {this.renderByType(selectedType, context, this.props.selectedExternalTool)}

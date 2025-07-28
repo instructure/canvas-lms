@@ -59,7 +59,6 @@ class BreadcrumbCollapsedContainer extends React.Component {
 
     return (
       <li
-        href="#"
         onMouseEnter={this.open}
         onMouseLeave={this.close}
         onFocus={this.open}
@@ -81,7 +80,6 @@ class BreadcrumbCollapsedContainer extends React.Component {
                         ? `${filesEnv.baseUrl}/folder/${folder.urlPath()}`
                         : filesEnv.baseUrl
                     }
-                    activeClassName="active"
                     className="ellipsis"
                   >
                     <i className="ef-big-icon icon-folder" />

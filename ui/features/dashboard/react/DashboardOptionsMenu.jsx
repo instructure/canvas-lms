@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('dashboard')
+const I18n = createI18nScope('dashboard')
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {
@@ -91,6 +91,7 @@ export default class DashboardOptionsMenu extends React.Component {
               elementRef={this.props.menuButtonRef}
               screenReaderLabel={I18n.t('Dashboard Options')}
               display="block"
+              data-testid="dashboard-options-button"
             >
               More <IconArrowOpenDownLine size="x-small" />
             </Button>
@@ -101,6 +102,7 @@ export default class DashboardOptionsMenu extends React.Component {
               withBorder={ENV.FEATURES?.instui_header}
               elementRef={this.props.menuButtonRef}
               screenReaderLabel={I18n.t('Dashboard Options')}
+              data-testid="dashboard-options-button"
             />
           )
         }
@@ -110,14 +112,23 @@ export default class DashboardOptionsMenu extends React.Component {
           label={I18n.t('Dashboard View')}
           onSelect={this.handleViewOptionSelect}
           selected={[this.props.view]}
+          data-testid="dashboard-view-group"
         >
-          <Menu.Item value="cards">{I18n.t('Card View')}</Menu.Item>
+          <Menu.Item value="cards" data-testid="card-view-menu-item">
+            {I18n.t('Card View')}
+          </Menu.Item>
           {this.props.planner_enabled && (
-            <Menu.Item value="planner">{I18n.t('List View')}</Menu.Item>
+            <Menu.Item value="planner" data-testid="list-view-menu-item">
+              {I18n.t('List View')}
+            </Menu.Item>
           )}
-          <Menu.Item value="activity">{I18n.t('Recent Activity')}</Menu.Item>
+          <Menu.Item value="activity" data-testid="recent-activity-menu-item">
+            {I18n.t('Recent Activity')}
+          </Menu.Item>
           {this.props.canEnableElementaryDashboard && (
-            <Menu.Item value="elementary">{I18n.t('Homeroom View')}</Menu.Item>
+            <Menu.Item value="elementary" data-testid="homeroom-view-menu-item">
+              {I18n.t('Homeroom View')}
+            </Menu.Item>
           )}
         </Menu.Group>
         {cardView && <Menu.Separator />}
@@ -128,10 +139,12 @@ export default class DashboardOptionsMenu extends React.Component {
                 {I18n.t('Toggle course card color overlays')}
               </ScreenReaderContent>
             }
+            data-testid="color-overlay-group"
           >
             <Menu.Item
               onSelect={(_e, _, isSelected) => this.handleColorOverlayOptionSelect(isSelected)}
               selected={this.state.showColorOverlays}
+              data-testid="color-overlay-menu-item"
             >
               {I18n.t('Color Overlay')}
             </Menu.Item>

@@ -92,14 +92,49 @@ describe UsersController, type: :request do
     get("/api/v1/users/self/todo")
     assert_status(401)
 
-    @course = factory_with_protected_attributes(Course, course_valid_attributes)
+    @course = Course.create!(course_valid_attributes)
     raw_api_call(:get,
                  "/api/v1/courses/#{@course.id}/todo",
                  controller: "courses",
                  action: "todo_items",
                  format: "json",
                  course_id: @course.to_param)
-    assert_status(401)
+    assert_forbidden
+  end
+
+  context "with suppress_assignments setting on" do
+    before(:once) do
+      root_account = @course.root_account
+      root_account.settings[:suppress_assignment] = true
+      root_account.save
+    end
+
+    it "does not return todo items for suppressed assignments" do
+      @course.assignments.create(title: "suppressed", due_at: "2012-01-08", suppress_assignment: true)
+      json = api_call(:get, "/api/v1/planner/items?start_date=2012-01-07&end_date=2012-01-16&context_codes[]=course_#{@course.id}&context_codes[]=user_#{@student_course.id}", {
+                        controller: "planner",
+                        action: "index",
+                        format: "json",
+                        context_codes: ["course_#{@course.id}", "user_#{@student_course.id}"],
+                        start_date: "2012-01-07",
+                        end_date: "2012-01-16"
+                      })
+      expect(json.count).to eq(0)
+    end
+
+    it "returns todo items for unsuppressed assignments" do
+      new_assignment = @course.assignments.create(title: "unsuppressed", due_at: "2012-01-08", suppress_assignment: false)
+      json = api_call(:get, "/api/v1/planner/items?start_date=2012-01-07&end_date=2012-01-16&context_codes[]=course_#{@course.id}&context_codes[]=user_#{@student_course.id}", {
+                        controller: "planner",
+                        action: "index",
+                        format: "json",
+                        context_codes: ["course_#{@course.id}", "user_#{@student_course.id}"],
+                        start_date: "2012-01-07",
+                        end_date: "2012-01-16"
+                      })
+      expect(json.count).to eq(1)
+      expect(json.first["plannable_id"]).to eq(new_assignment.id)
+    end
   end
 
   it "returns a global user todo list" do
@@ -241,6 +276,25 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.first)).to eq strip_secure_params(@a2_json)
   end
 
+  it "supports ignore for sub assignments" do
+    @teacher_course.account.enable_feature!(:discussion_checkpoints)
+    rtt, _ = graded_discussion_topic_with_checkpoints(context: @teacher_course)
+    student = @teacher_course.students.first
+    rtt.submit_homework(student, body: "checkpoint submission for #{student.name}")
+    api_call(:delete,
+             "/api/v1/users/self/todo/sub_assignment_#{rtt.id}/grading",
+             controller: "users",
+             action: "ignore_item",
+             format: "json",
+             purpose: "grading",
+             asset_string: "sub_assignment_#{rtt.id}",
+             permanent: "0")
+
+    expect(response).to be_successful
+    ignored_asset = Ignore.last.asset
+    expect(ignored_asset).to eq rtt
+  end
+
   it "ignores excused assignments for students" do
     @student_course.enroll_teacher(@teacher)
     @a1.grade_student(@me, excuse: true, grader: @teacher)
@@ -293,6 +347,38 @@ describe UsersController, type: :request do
 
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
     expect(json.length).to eq 0
+  end
+
+  it "does not include items assigned to a concluded section enrollment while also having an active enrollment in the course" do
+    mixed_course = course_factory(active_course: true, course_name: "Mixed Course")
+    active_section = mixed_course.course_sections.create!(name: "active section")
+    concluded_section = mixed_course.course_sections.create!(name: "concluded section")
+    concluded_assignment = Assignment.create!(context: mixed_course, title: "concluded assignment", submission_types: "online_text_entry", points_possible: 15, workflow_state: "published")
+    concluded_assignment.submissions.create!(user: @user)
+
+    StudentEnrollment.create!(user: @user, course: mixed_course, course_section: active_section, workflow_state: "active")
+    concluded_enrollment = StudentEnrollment.create!(user: @user, course: mixed_course, course_section: concluded_section, workflow_state: "active")
+    ao = AssignmentOverride.new(
+      assignment: concluded_assignment,
+      title: "Lorem",
+      workflow_state: "active",
+      set: concluded_section,
+      due_at: 1.day.from_now,
+      unassign_item: false,
+      unlock_at_overridden: true,
+      lock_at_overridden: true
+    )
+    ao.save!
+    concluded_assignment.update(only_visible_to_overrides: true)
+    concluded_assignment.submissions.update(cached_due_date: 1.day.from_now)
+    expect(concluded_assignment.submissions.last.cached_due_date).not_to be_nil
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map { |e| e["assignment"]["id"] }).to include concluded_assignment.id
+
+    concluded_enrollment.conclude
+
+    json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
+    expect(json.map { |e| e["assignment"]["id"] }).not_to include concluded_assignment.id
   end
 
   it "does not include items from courses concluded by terms dates if the user is also an admin" do

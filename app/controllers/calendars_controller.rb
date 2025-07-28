@@ -21,12 +21,19 @@
 class CalendarsController < ApplicationController
   include Api::V1::Conferences
   include CalendarConferencesHelper
+  include HorizonMode
 
   before_action :require_user
+  before_action :check_limited_access_for_students, only: %i[show]
+  before_action :load_canvas_career, only: %i[show]
 
   def show
     get_context
     @show_account_calendars = @current_user.all_account_calendars.any?
+    if params[:include_contexts]
+      # We had some bad links in ics calendar feeds that tried to link to a course section calendar
+      params[:include_contexts] = params[:include_contexts].split(",").reject { |c| c.starts_with?("course_section_") }.join(",").presence
+    end
     get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)
@@ -57,7 +64,7 @@ class CalendarsController < ApplicationController
     end
     @contexts_json = @contexts.map do |context|
       ag_permission = false
-      if context.respond_to?(:appointment_groups) && context.grants_right?(@current_user, session, :manage_calendar)
+      if context.respond_to?(:appointment_groups) && context.grants_right?(@current_user, session, :manage_calendar) && !context&.horizon_course?
         ag = AppointmentGroup.new(contexts: [context])
         ag.update_contexts_and_sub_contexts
         if ag.grants_right? @current_user, session, :create
@@ -88,13 +95,13 @@ class CalendarsController < ApplicationController
         assignment_groups: context.respond_to?(:assignments) ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id:, name: } } : [],
         can_create_appointment_groups: ag_permission,
         user_is_student: context.grants_right?(@current_user, :participate_as_student),
-        can_update_todo_date: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
+        can_update_todo_date: context.grants_right?(@current_user, session, :manage_course_content_edit),
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: context.is_a?(Course) ? context.concluded? : false,
         k5_course: context.is_a?(Course) && context.elementary_enabled?,
         k5_account: context.is_a?(Account) && context.enable_as_k5_account?,
-        course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
+        course_pacing_enabled: context.is_a?(Course) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read),
@@ -146,6 +153,6 @@ class CalendarsController < ApplicationController
     add_conference_types_to_js_env(calendar_contexts)
 
     enrollment_types_tags = @current_user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }
-    InstStatsd::Statsd.increment("calendar.visit", tags: enrollment_types_tags)
+    InstStatsd::Statsd.distributed_increment("calendar.visit", tags: enrollment_types_tags)
   end
 end

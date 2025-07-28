@@ -40,7 +40,7 @@ describe Mutations::CreateSubmissionComment do
     stringify ? "\"#{value}\"" : value
   end
 
-  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil, reviewer_submission_id: nil, group_comment: false)
+  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil, reviewer_submission_id: nil, group_comment: false, draft_comment: false)
     <<~GQL
       mutation {
         createSubmissionComment(input: {
@@ -52,11 +52,13 @@ describe Mutations::CreateSubmissionComment do
           mediaObjectType: #{value_or_null(media_object_type)}
           submissionId: #{value_or_null(submission_id || @submission.id)}
           reviewerSubmissionId: #{value_or_null(reviewer_submission_id)}
+          draftComment: #{draft_comment}
         }) {
           submissionComment {
             _id
             attempt
             comment
+            draft
             attachments {
               _id
             }
@@ -102,6 +104,15 @@ describe Mutations::CreateSubmissionComment do
     expect(result[:errors][0][:message]).to eq "not found"
   end
 
+  it "forbids commenting on submission by students in limited access account" do
+    @account.root_account.enable_feature!(:allow_limited_access_for_students)
+    @account.settings[:enable_limited_access_for_students] = true
+    @account.save!
+    result = run_mutation({}, @student)
+    expect(result[:errors].length).to eq 1
+    expect(result[:errors][0][:message]).to eq "not found"
+  end
+
   describe "submission_id argument" do
     it "is gracefully handled when the submission is not found" do
       result = run_mutation(submission_id: 12_345)
@@ -116,6 +127,22 @@ describe Mutations::CreateSubmissionComment do
       expect(
         result.dig(:data, :createSubmissionComment, :submissionComment, :comment)
       ).to eq "dogs and cats"
+    end
+
+    context "draft comment" do
+      it "is saved as a draft comment" do
+        result = run_mutation(draft_comment: true)
+        expect(
+          result.dig(:data, :createSubmissionComment, :submissionComment, :draft)
+        ).to be true
+      end
+
+      it "is not saved as a draft comment" do
+        result = run_mutation(draft_comment: false)
+        expect(
+          result.dig(:data, :createSubmissionComment, :submissionComment, :draft)
+        ).to be false
+      end
     end
   end
 

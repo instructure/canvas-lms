@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {ReactNodeLike} from 'prop-types'
+import React, {useEffect} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Modal} from '@instructure/ui-modal'
-import formatMessage from 'format-message'
+import formatMessage from '../../../../../format-message'
 import {ModalProps} from '@instructure/ui-modal/types'
 
 export function ExternalToolDialogModal(
   props: Pick<ModalProps, 'label' | 'open' | 'onOpen' | 'onClose' | 'mountNode'> & {
     onCloseButton: () => void
     name: string
-    children: ReactNodeLike
-  }
+    children: React.ReactNode
+  },
 ) {
   return (
     <Modal
@@ -42,6 +40,7 @@ export function ExternalToolDialogModal(
       onOpen={props.onOpen}
       onClose={props.onClose}
       mountNode={props.mountNode}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
         <Heading>{props.name}</Heading>

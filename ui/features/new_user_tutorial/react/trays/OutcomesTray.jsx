@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TutorialTrayContent from './TutorialTrayContent'
 
-const I18n = useI18nScope('new_user_tutorial')
+const I18n = createI18nScope('new_user_tutorial')
 
 const HomeTray = () => (
   <TutorialTrayContent
@@ -51,7 +51,7 @@ const HomeTray = () => (
       },
       {
         label: I18n.t(
-          'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?'
+          'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?',
         ),
         href: I18n.t('#community.instructor_use_mastery_gradebook'),
       },
@@ -61,7 +61,7 @@ const HomeTray = () => (
       `Set up outcomes in your course as measured by pedagogical goals or desired objectives.
       Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
       Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
-      Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.`
+      Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.`,
     )}
   </TutorialTrayContent>
 )

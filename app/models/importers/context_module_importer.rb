@@ -250,7 +250,7 @@ module Importers
                                          assignment: ass,
                                          position: context_module.migration_position)
         end
-      elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
+      elsif /folder|heading|contextmodulesubheader/i.match?(hash[:linked_resource_type] || hash[:type])
         # just a snippet of text
         item = context_module.add_item({
                                          title: hash[:title] || hash[:linked_resource_title],
@@ -262,7 +262,8 @@ module Importers
       elsif /url/i.match?(hash[:linked_resource_type])
         # external url
         if (url = hash[:url])
-          if (CanvasHttp.validate_url(hash[:url]) rescue nil)
+          begin
+            CanvasHttp.validate_url(hash[:url])
             url = migration.process_domain_substitutions(url)
 
             item = context_module.add_item({
@@ -273,7 +274,7 @@ module Importers
                                            },
                                            existing_item,
                                            position: context_module.migration_position)
-          else
+          rescue URI::InvalidURIError, ArgumentError, CanvasHttp::RelativeUriError, CanvasHttp::InsecureUriError
             migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL")
           end
         end
@@ -290,7 +291,7 @@ module Importers
           if custom_fields.present?
             external_tool_url = add_custom_fields_to_url(hash[:url], custom_fields) || hash[:url]
           end
-        elsif hash[:linked_resource_id] && (et = context_module.context.context_external_tools.active.where(migration_id: hash[:linked_resource_id]).first)
+        elsif hash[:linked_resource_id] && (et = Lti::ContextToolFinder.only_for(context_module.context).active.where(migration_id: hash[:linked_resource_id]).first)
           external_tool_id = et.id
         end
 

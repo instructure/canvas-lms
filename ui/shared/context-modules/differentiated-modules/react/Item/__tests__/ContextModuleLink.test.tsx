@@ -23,10 +23,26 @@ import ContextModuleLink from '../ContextModuleLink'
 describe('ContextModuleLink', () => {
   it('renders', async () => {
     render(
-      <ContextModuleLink courseId="1" contextModuleId="2" contextModuleName="My fabulous module" />
+      <ContextModuleLink courseId="1" contextModuleId="2" contextModuleName="My fabulous module" />,
     )
     expect(await screen.findByTestId('context-module-text')).toBeInTheDocument()
     const link = screen.getByRole('link', {name: 'My fabulous module'})
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link).toHaveAttribute('href', '/courses/1/modules#2')
+  })
+
+  it('renders with special characters or html', async () => {
+    render(
+      <ContextModuleLink
+        courseId="1"
+        contextModuleId="2"
+        contextModuleName="My fabulous student & course <b>module's</b> name<script>alert('hi')</script>"
+      />,
+    )
+    expect(await screen.findByTestId('context-module-text')).toBeInTheDocument()
+    const link = screen.getByRole('link', {
+      name: "My fabulous student & course <b>module's</b> name<script>alert('hi')</script>",
+    })
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('href', '/courses/1/modules#2')
   })

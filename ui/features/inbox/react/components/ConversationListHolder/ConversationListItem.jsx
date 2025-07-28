@@ -34,12 +34,13 @@ import React, {useContext, useState, useMemo} from 'react'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Heading} from '@instructure/ui-heading'
+import {stripHtmlTags} from '@canvas/util/TextHelper'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
@@ -107,6 +108,7 @@ export const ConversationListItem = ({...props}) => {
             data-testid="conversation"
             as="div"
             borderWidth="none none small none"
+            borderColor="secondary"
             padding="small medium small x-small"
           >
             <Grid
@@ -159,7 +161,7 @@ export const ConversationListItem = ({...props}) => {
                     countUntil={99}
                     standalone={true}
                     themeOverride={{
-                      colorPrimary: colors.backgroundDarkest,
+                      colorPrimary: colors.contrasts.grey125125,
                       borderRadius: '0.25rem',
                       fontSize: '0.8125rem',
                       fontWeight: '700',
@@ -171,7 +173,7 @@ export const ConversationListItem = ({...props}) => {
                             one: '1 message',
                             other: '%{count} messages',
                           },
-                          {count: props.conversation.count}
+                          {count: props.conversation.count},
                         )}
                       >
                         {formattedCount}
@@ -262,7 +264,7 @@ export const ConversationListItem = ({...props}) => {
                   )}
                 </Grid.Col>
               </Grid.Row>
-              <Grid.Row>
+              <Grid.Row role='button'>
                 <Grid.Col>
                   <Focusable>
                     {({focused}) => {

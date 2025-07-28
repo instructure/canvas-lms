@@ -27,12 +27,21 @@ module GroupCategories
       @raw_params = args
     end
 
+    def non_collaborative
+      value_to_boolean raw_params[:non_collaborative]
+    end
+
     def self_signup
       return _self_signup if _self_signup
       return nil unless enable_self_signup
       return "restricted" if restrict_self_signup
 
       "enabled"
+    end
+
+    def self_signup_end_at
+      end_date = raw_params[:self_signup_end_at]
+      (end_date && self_signup == "enabled") ? Time.parse(end_date).utc : nil
     end
 
     def auto_leader

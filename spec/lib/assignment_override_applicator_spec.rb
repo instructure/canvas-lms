@@ -74,10 +74,10 @@ describe AssignmentOverrideApplicator do
     @module_override
   end
 
-  def create_assignment(*args)
+  def create_assignment(*)
     # need to make sure it doesn't invalidate the cache right away
     Timecop.freeze(5.seconds.ago) do
-      assignment_model(*args)
+      assignment_model(*)
     end
   end
 
@@ -246,7 +246,6 @@ describe AssignmentOverrideApplicator do
       end
 
       it "does not apply overrides if adhoc override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @adhoc_override.unassign_item = true
         @adhoc_override.save!
 
@@ -254,17 +253,7 @@ describe AssignmentOverrideApplicator do
         expect(due_at).to eq @assignment.due_at
       end
 
-      it "applies unassigned overrides if flag is off" do
-        Account.site_admin.disable_feature!(:differentiated_modules)
-        @adhoc_override.unassign_item = true
-        @adhoc_override.save!
-
-        due_at = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student).due_at
-        expect(due_at).to eq @adhoc_override.due_at
-      end
-
       it "applies adhoc override even if section override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @section_override.unassign_item = true
         @section_override.save!
 
@@ -374,6 +363,20 @@ describe AssignmentOverrideApplicator do
         expect(@teachers_assignment.due_at.to_i).to eq section_due_at.to_i
         expect(@students_assignment.due_at.to_i).to eq section_due_at.to_i
       end
+
+      it "uses course override if there is no assignment.due_at" do
+        course_override_due_at = 5.days.from_now
+
+        @course_override = assignment_override_model(assignment: @assignment, due_at: course_override_due_at)
+        @course_override.set = @course
+        @course_override.save!
+
+        @assignment.update_attribute(:due_at, nil)
+        @teachers_assignment = AssignmentOverrideApplicator
+                               .assignment_overridden_for(@assignment, @teacher)
+
+        expect(@teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
     end
   end
 
@@ -407,7 +410,7 @@ describe AssignmentOverrideApplicator do
       end
 
       it "distinguishes cache by assignment version" do
-        Timecop.travel Time.now + 1.hour do
+        Timecop.travel 1.hour.from_now do
           @assignment.due_at = 7.days.from_now
           @assignment.save!
           expect(@assignment.versions.count).to eq 2
@@ -472,7 +475,6 @@ describe AssignmentOverrideApplicator do
       end
 
       it "orders section override before course overrides" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @section_override = assignment_override_model(assignment: @assignment)
         @section_override.set = @course.default_section
         @section_override.save!
@@ -488,6 +490,58 @@ describe AssignmentOverrideApplicator do
       end
 
       it "should order section overrides by position" # see TODO in implementation
+
+      context "differentiation tag overrides" do
+        before do
+          account = @course.account
+          account.enable_feature!(:assign_to_differentiation_tags)
+          account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            a.save!
+          end
+
+          @diff_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+          @diff_tag = @course.groups.create!(name: "Diff Tag 1", group_category: @diff_tag_category, non_collaborative: true)
+          @diff_tag.add_user(@student)
+        end
+
+        it "includes differentiation tag overrides if available" do
+          @section_override = assignment_override_model(assignment: @assignment)
+          @section_override.set = @course.default_section
+          @section_override.save!
+
+          @diff_tag_override = assignment_override_model(assignment: @assignment)
+          @diff_tag_override.set_type = "Group"
+          @diff_tag_override.set_id = @diff_tag.id
+          @diff_tag_override.save!
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides.size).to eq 2
+          expect(overrides.first).to eq @diff_tag_override
+          expect(overrides.last).to eq @section_override
+        end
+
+        it "does not include differentiation tag overrides if account setting is disabled" do
+          @section_override = assignment_override_model(assignment: @assignment)
+          @section_override.set = @course.default_section
+          @section_override.save!
+
+          @diff_tag_override = assignment_override_model(assignment: @assignment)
+          @diff_tag_override.set_type = "Group"
+          @diff_tag_override.set_id = @diff_tag.id
+          @diff_tag_override.save!
+
+          # disable account setting for differentiation tags
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = false
+            a.save!
+          end
+
+          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          expect(overrides.size).to eq 1
+          expect(overrides.first).to eq @section_override
+        end
+      end
 
       context "sharding" do
         specs_require_sharding
@@ -541,7 +595,6 @@ describe AssignmentOverrideApplicator do
 
         it "includes context module overrides" do
           @override.destroy!
-          Account.site_admin.enable_feature!(:differentiated_modules)
           create_context_module_and_override_adhoc
 
           result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
@@ -565,7 +618,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           create_context_module_and_override_adhoc
 
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
@@ -583,7 +635,6 @@ describe AssignmentOverrideApplicator do
 
         it "includes context module overrides" do
           @override.destroy!
-          Account.site_admin.enable_feature!(:differentiated_modules)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           create_context_module_and_override_adhoc
@@ -600,7 +651,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           account_admin_user
           create_context_module_and_override_adhoc
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
@@ -859,7 +909,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           create_section_context_module_override(@course.default_section)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to include(@module_override)
@@ -874,7 +923,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           teacher_in_course
           create_section_context_module_override(@course.default_section)
           result = AssignmentOverrideApplicator.section_overrides(@assignment, @teacher)
@@ -891,7 +939,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student2.id })
 
@@ -910,7 +957,6 @@ describe AssignmentOverrideApplicator do
         end
 
         it "includes context module overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           account_admin_user
           create_section_context_module_override(@section2)
           result = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
@@ -983,19 +1029,11 @@ describe AssignmentOverrideApplicator do
 
       describe "for students" do
         it "returns course overrides" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
           expect(result.length).to eq 1
         end
 
-        it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          result = AssignmentOverrideApplicator.course_overrides(@assignment, @student)
-          expect(result).to be_nil
-        end
-
         it "doesn't include course overrides for student not in course" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           course2 = course_factory
           student2 = student_in_course(course: course2)
           result = AssignmentOverrideApplicator.course_overrides(@assignment, student2.user)
@@ -1005,57 +1043,31 @@ describe AssignmentOverrideApplicator do
 
       describe "for teachers" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           teacher_in_course
           result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
           expect(result).to include(@override)
-        end
-
-        it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          teacher_in_course
-          result = AssignmentOverrideApplicator.course_overrides(@assignment, @teacher)
-          expect(result).to be_nil
         end
       end
 
       describe "for observers" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           course_with_observer({ course: @course, active_all: true })
           @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
           expect(overrides).to eq [@override]
-        end
-
-        it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          course_with_observer({ course: @course, active_all: true })
-          @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
-          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @observer)
-          expect(overrides).to eq []
         end
       end
 
       describe "for admins" do
         it "works" do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           account_admin_user
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
           expect(overrides).to eq [@override]
-        end
-
-        it "doesn't include course overrides if flag is off" do
-          Account.site_admin.disable_feature!(:differentiated_modules)
-          account_admin_user
-          overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @admin)
-          expect(overrides).to eq []
         end
       end
 
       describe "for other types of learning objects" do
         before do
-          Account.site_admin.enable_feature!(:differentiated_modules)
           teacher_in_course(active_all: true)
           account_admin_user
           course_with_observer({ course: @course, active_all: true })
@@ -1110,7 +1122,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#observer_overrides" do
+    describe "#observer_overrides" do
       it "returns all dates visible to observer" do
         @override = assignment_override_model(assignment: @assignment)
         @override_student = @override.assignment_override_students.build
@@ -1134,7 +1146,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    context "#has_invalid_args?" do
+    describe "#has_invalid_args?" do
       it "returns true with nil user" do
         result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, nil)
         expect(result).to be_truthy
@@ -1156,7 +1168,6 @@ describe AssignmentOverrideApplicator do
       end
 
       it "returns false if the assignment has context module overrides" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @module = @course.context_modules.create!(name: "Module 1")
         @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
 
@@ -1246,7 +1257,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.first).not_to be_deleted
       end
 
-      it "includes now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses permission)" do
+      it "includes now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses_admin permission)" do
         account_admin_user
 
         @override = assignment_override_model(assignment: @assignment)
@@ -1457,7 +1468,7 @@ describe AssignmentOverrideApplicator do
 
     it "distinguishes cache by assignment updated_at" do
       @assignment = create_assignment
-      Timecop.travel Time.now + 1.hour do
+      Timecop.travel 1.hour.from_now do
         @assignment.due_at = 5.days.from_now
         @assignment.save!
         expect(@assignment.versions.count).to eq 2
@@ -1575,13 +1586,11 @@ describe AssignmentOverrideApplicator do
       end
 
       it "uses no override if the override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @adhoc_override.unassign_item = true
         expect(due_at).to eq @assignment.due_at
       end
 
       it "uses adhoc override even if section override is unassigned" do
-        Account.site_admin.enable_feature!(:differentiated_modules)
         @section_override.unassign_item = true
         expect(due_at).to eq @adhoc_override.due_at
       end
@@ -1635,7 +1644,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override with no adhoc override due_at and section override unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       @section_override = assignment_override_model(assignment: @assignment, set: @course.default_section)
       @section_override.override_due_at(7.days.from_now)
       @section_override.unassign_item = true
@@ -1655,7 +1663,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override if the override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       @override.override_unlock_at(7.days.from_now)
       @override.unassign_item = true
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
@@ -1663,7 +1670,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses adhoc override even if section override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       @adhoc_override = @override
       @adhoc_override.override_unlock_at(7.days.from_now)
 
@@ -1769,7 +1775,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses no override if the override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       @override.override_lock_at(7.days.from_now)
       @override.unassign_item = true
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
@@ -1777,7 +1782,6 @@ describe AssignmentOverrideApplicator do
     end
 
     it "uses adhoc override even if section override is unassigned" do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       @adhoc_override = @override
       @adhoc_override.override_lock_at(7.days.from_now)
 

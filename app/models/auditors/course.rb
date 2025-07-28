@@ -111,20 +111,13 @@ class Auditors::Course
 
   Stream = Auditors.stream do
     course_ar_type = Auditors::ActiveRecord::CourseRecord
-    active_record_type course_ar_type
-    record_type Auditors::Course::Record
+    record_type course_ar_type
 
     add_index :course do
-      table :courses_by_course
-      entry_proc ->(record) { record.course }
-      key_proc ->(course) { course.global_id }
       ar_scope_proc ->(course) { course_ar_type.where(course_id: course.id) }
     end
 
     add_index :account do
-      table :courses_by_account
-      entry_proc ->(record) { record.account }
-      key_proc ->(account) { account.global_id }
       ar_scope_proc ->(account) { course_ar_type.where(account_id: account.id) }
     end
   end

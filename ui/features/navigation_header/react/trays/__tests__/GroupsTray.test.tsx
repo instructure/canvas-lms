@@ -19,21 +19,26 @@
 import React from 'react'
 import {render as testingLibraryRender} from '@testing-library/react'
 import GroupsTray from '../GroupsTray'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 const render = (children: unknown) =>
-  testingLibraryRender(<QueryProvider>{children}</QueryProvider>)
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('GroupsTray', () => {
   const groups = [
     {
       id: '1',
       name: 'Group1',
+      context_name: 'Course1',
+      context_type: 'Course',
       can_access: true,
     },
     {
       id: '2',
       name: 'Group2',
+      context_name: 'Account1',
+      context_type: 'Account',
       can_access: true,
     },
   ]
@@ -55,6 +60,16 @@ describe('GroupsTray', () => {
     const {getByText} = render(<GroupsTray />)
     getByText('Group1')
     getByText('Group2')
+  })
+
+  it('renders a group context name', () => {
+    const {getByText} = render(<GroupsTray />)
+    getByText('Course1')
+  })
+
+  it('does not render an account context name', () => {
+    const {queryByText} = render(<GroupsTray />)
+    expect(queryByText('Account1')).toBeNull()
   })
 
   it('renders all groups link', () => {

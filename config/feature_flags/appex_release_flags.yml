@@ -15,3 +15,27 @@ verify_ldap_certs:
   display_name: Verify LDAP TLS certificates
   description: Verify TLS certificates presented by LDAP authentication providers.
   applies_to: Account
+admin_manage_access_tokens:
+  state: hidden
+  display_name: Admin Manage Access Tokens
+  description: Limit the ability to manage access tokens to admins only.
+  applies_to: RootAccount
+login_registration_ui_identity:
+  state: hidden
+  applies_to: RootAccount
+  display_name: New Login/Registration UI for Identity
+  description: Rework the Login/Registration UI to support Identity changes, ensuring a uniform login experience and transparent auth migration.
+  environments:
+    development:
+      state: allowed
+    beta:
+      state: hidden
+    production:
+      state: hidden
+force_login_after_logout:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Force Login After Delegated Logout
+  description:
+    After logging out of Canvas, instruct identity providers to re-authenticate the user on their next login attempt.
+    This can prevent unexpected login loops.

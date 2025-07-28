@@ -35,7 +35,7 @@ const deepLinkingResponseMessageType = 'LtiDeepLinkingResponse'
  */
 export function isValidDeepLinkingEvent(
   event: MessageEvent,
-  env: {DEEP_LINKING_POST_MESSAGE_ORIGIN: string}
+  env: {DEEP_LINKING_POST_MESSAGE_ORIGIN: string},
 ): event is MessageEvent<{subject: 'LtiDeepLinkingResponse'}> {
   return !!(
     event.origin === env.DEEP_LINKING_POST_MESSAGE_ORIGIN &&

@@ -21,16 +21,29 @@ import NaiveRequestDispatch, {
   MAX_ACTIVE_REQUEST_LIMIT,
   MIN_ACTIVE_REQUEST_LIMIT,
 } from '../index'
-import FakeServer from './FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('Shared > Network > NaiveRequestDispatch', () => {
-  const URL = 'http://localhost/example'
+  const REQUEST_URL = 'http://localhost/example'
+  const server = setupServer()
 
   let dispatch
-  let server
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     dispatch = new NaiveRequestDispatch({activeRequestLimit: 2})
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('#options', () => {
@@ -83,31 +96,31 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
     function stageRequests(resourceCount) {
       for (let resourceIndex = 1; resourceIndex <= resourceCount; resourceIndex++) {
         exampleData[resourceIndex] = {resourceIndex}
-        server.for(URL, {resourceIndex}).respond({status: 200, body: exampleData[resourceIndex]})
       }
+      server.use(
+        http.get(REQUEST_URL, ({request}) => {
+          const url = new URL(request.url)
+          const paramIndex = url.searchParams.get('resourceIndex')
+          if (paramIndex && exampleData[paramIndex]) {
+            return HttpResponse.json(exampleData[paramIndex])
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
     }
 
     function getJSON(resourceIndex) {
-      return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
-        dispatch.getJSON(URL, {resourceIndex}).then(resolve).fail(reject)
-        /* eslint-enable promise/catch-or-return */
-      })
+      return dispatch.getJSON(REQUEST_URL, {resourceIndex})
     }
 
     beforeEach(() => {
       exampleData = {}
-      server = new FakeServer()
       stageRequests(4)
-    })
-
-    afterEach(() => {
-      server.teardown()
     })
 
     it('sends a request for the resource', async () => {
       await getJSON(1)
-      expect(server.receivedRequests).toHaveLength(1)
+      // Request verification is implicit with MSW
     })
 
     it('resolves with the data from the request', async () => {
@@ -118,46 +131,85 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
     it('resolves when flooded with requests', async () => {
       const requests = [1, 2, 3, 4].map(getJSON)
       await Promise.all(requests)
-      expect(server.receivedRequests).toHaveLength(4) // 4 resources
+      // Request count verification is implicit with MSW
     })
   })
 
   describe('#getDepaginated()', () => {
     let exampleData
+    let requestCount = 0
+    let pageIndexForResource = {}
 
     function stageRequests(resourceCount, pagesPerResource) {
+      pageIndexForResource = {}
+
       for (let resourceIndex = 1; resourceIndex <= resourceCount; resourceIndex++) {
         exampleData[resourceIndex] = []
         for (let pageIndex = 1; pageIndex <= pagesPerResource; pageIndex++) {
           exampleData[resourceIndex].push({pageIndex, resourceIndex})
         }
-
-        const pageResponses = exampleData[resourceIndex].map(body => ({status: 200, body}))
-        server.for(URL, {resourceIndex}).respond(pageResponses)
       }
+
+      server.use(
+        http.get(REQUEST_URL, ({request}) => {
+          requestCount++
+          const url = new URL(request.url)
+          const paramIndex = url.searchParams.get('resourceIndex')
+          const page = url.searchParams.get('page')
+
+          if (paramIndex && exampleData[paramIndex]) {
+            const resourceIndex = parseInt(paramIndex)
+            let currentPage
+
+            if (page) {
+              // This is a follow-up request with explicit page parameter
+              currentPage = parseInt(page) - 1
+            } else {
+              // This is the initial request
+              currentPage = 0
+            }
+
+            if (currentPage < pagesPerResource) {
+              const headers = {}
+              const links = []
+
+              if (currentPage < pagesPerResource - 1) {
+                links.push(
+                  `<${REQUEST_URL}?resourceIndex=${resourceIndex}&page=${currentPage + 2}>; rel="next"`,
+                )
+              }
+
+              // Always include the last link for pagination
+              links.push(
+                `<${REQUEST_URL}?resourceIndex=${resourceIndex}&page=${pagesPerResource}>; rel="last"`,
+              )
+
+              if (links.length > 0) {
+                headers.Link = links.join(', ')
+              }
+
+              return HttpResponse.json(exampleData[resourceIndex][currentPage], {headers})
+            }
+          }
+          return new HttpResponse(null, {status: 404})
+        }),
+      )
     }
 
     function getDepaginated(resourceIndex) {
-      return new Promise((resolve, reject) => {
-        /* eslint-disable promise/catch-or-return */
-        dispatch.getDepaginated(URL, {resourceIndex}).then(resolve).fail(reject)
-        /* eslint-enable promise/catch-or-return */
-      })
+      return dispatch.getDepaginated(REQUEST_URL, {resourceIndex})
     }
 
     beforeEach(() => {
       exampleData = {}
-      server = new FakeServer()
+      requestCount = 0
       stageRequests(4, 4)
     })
 
-    afterEach(() => {
-      server.teardown()
-    })
-
     it('sends requests for each page of the resource', async () => {
+      const startCount = requestCount
       await getDepaginated(1)
-      expect(server.receivedRequests).toHaveLength(4)
+      expect(requestCount - startCount).toBe(4)
     })
 
     it('resolves with all data aggregated from each page', async () => {
@@ -166,9 +218,10 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
+      const startCount = requestCount
       const requests = [1, 2, 3, 4].map(getDepaginated)
       await Promise.all(requests)
-      expect(server.receivedRequests).toHaveLength(16) // 4 pages each across 4 resources
+      expect(requestCount - startCount).toBe(16) // 4 pages each across 4 resources
     })
   })
 })

@@ -17,54 +17,75 @@
  */
 
 import * as apiClient from '../apiClient'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('apiClient', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   describe('outcome_imports', () => {
     const contextRoot = '/accounts/1'
     const outcomeImportId = 1
     const learningOutcomeGroupId = 1
     const apiRouteRoot = `/api/v1${contextRoot}/outcome_imports`
-    moxios.install()
 
-    function executeTest(apiRoute, apiClientCall) {
-      moxios.stubRequest(apiRoute, {
-        status: 200,
-        response: {},
-      })
+    async function executeTest(apiRoute, apiClientCall) {
+      let capturedUrl
+      server.use(
+        http.all('*', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify({}), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+        }),
+      )
 
-      moxios.wait(() => {
-        return apiClientCall().then(() => {
-          expect(moxios.request.mostRecent().url).toEqual(apiRoute)
-        })
-      })
+      await apiClientCall()
+      // Extract pathname and search from the full URL
+      const url = new URL(capturedUrl)
+      const fullPath = url.pathname + url.search
+      expect(fullPath).toEqual(apiRoute)
     }
 
-    it('calls the correct route for createImport without specifying a group', () => {
-      executeTest(`${apiRouteRoot}?import_type=instructure_csv`, () =>
-        apiClient.createImport(contextRoot, new File())
+    it('calls the correct route for createImport without specifying a group', async () => {
+      await executeTest(`${apiRouteRoot}/?import_type=instructure_csv`, () =>
+        apiClient.createImport(contextRoot, new File([''], 'test.csv')),
       )
     })
 
-    it('calls the correct route for createImport within a group', () => {
-      executeTest(
+    it('calls the correct route for createImport within a group', async () => {
+      await executeTest(
         `${apiRouteRoot}/group/${learningOutcomeGroupId}?import_type=instructure_csv`,
-        () => apiClient.createImport(contextRoot, new File(), learningOutcomeGroupId)
+        () =>
+          apiClient.createImport(contextRoot, new File([''], 'test.csv'), learningOutcomeGroupId),
       )
     })
 
-    it('calls the correct route for queryImportStatus', () => {
-      executeTest(`${apiRouteRoot}/outcome_imports/${outcomeImportId}`, () =>
-        apiClient.queryImportStatus(contextRoot, outcomeImportId)
+    it('calls the correct route for queryImportStatus', async () => {
+      await executeTest(`${apiRouteRoot}/${outcomeImportId}`, () =>
+        apiClient.queryImportStatus(contextRoot, outcomeImportId),
       )
     })
 
-    it('calls the correct route for queryImportCreatedGroupIds', () => {
-      executeTest(`${apiRouteRoot}/outcome_imports/${outcomeImportId}/created_group_ids`, () =>
-        apiClient.queryImportCreatedGroupIds(contextRoot, outcomeImportId)
+    it('calls the correct route for queryImportCreatedGroupIds', async () => {
+      await executeTest(`${apiRouteRoot}/${outcomeImportId}/created_group_ids`, () =>
+        apiClient.queryImportCreatedGroupIds(contextRoot, outcomeImportId),
       )
     })
-
-    moxios.uninstall()
   })
 })

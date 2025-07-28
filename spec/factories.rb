@@ -25,22 +25,6 @@
 #
 
 module Factories
-  def factory_with_protected_attributes(ar_klass, attrs, do_save = true)
-    obj = ar_klass.respond_to?(:new) ? ar_klass.new : ar_klass.build
-    attrs.each { |k, v| obj.send(:"#{k}=", v) }
-    obj.save! if do_save
-    obj
-  end
-
-  def update_with_protected_attributes!(ar_instance, attrs)
-    attrs.each { |k, v| ar_instance.send(:"#{k}=", v) }
-    ar_instance.save!
-  end
-
-  def update_with_protected_attributes(ar_instance, attrs)
-    update_with_protected_attributes!(ar_instance, attrs) rescue false
-  end
-
   # a fast way to create a record, especially if you don't need the actual
   # ruby object. since it just does a straight up insert, you need to
   # provide any non-null attributes or things that would normally be

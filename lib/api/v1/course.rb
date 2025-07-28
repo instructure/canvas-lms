@@ -161,17 +161,21 @@ module Api::V1::Course
       hash["banner_image_download_url"] = course.banner_image if includes.include?("banner_image")
       hash["concluded"] = course.concluded? if includes.include?("concluded")
       apply_master_course_settings(hash, course, user)
-      if course.root_account.feature_enabled?(:course_templates)
-        hash["template"] = course.template?
-        if course.template? && includes.include?("templated_accounts")
-          hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
-        end
+      hash["template"] = course.template?
+      if course.template? && includes.include?("templated_accounts")
+        hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
       end
 
-      hash["grading_scheme"] = course.grading_standard_or_default.data if includes.include?("grading_scheme")
-      hash["points_based_grading_scheme"] = course.grading_standard_or_default.points_based? if includes.include?("grading_scheme")
+      if includes.include?("grading_scheme")
+        grading_standard = course.grading_standard_or_default
+        hash["grading_scheme"] = grading_standard.data
+        hash["points_based_grading_scheme"] = grading_standard.points_based?
+        hash["scaling_factor"] = grading_standard.scaling_factor
+      end
       hash["restrict_quantitative_data"] = course.restrict_quantitative_data?(user) if includes.include?("restrict_quantitative_data")
-
+      if includes.include?("post_manually")
+        hash["post_manually"] = course.post_manually?
+      end
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash
     end
@@ -195,7 +199,7 @@ module Api::V1::Course
   def add_helper_dependant_entries(hash, course, builder)
     request = respond_to?(:request) ? self.request : nil
     hash["calendar"] = { "ics" => "#{feeds_calendar_url(course.feed_code)}.ics" }
-    hash["syllabus_body"] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
+    hash["syllabus_body"] = api_user_content(course.syllabus_body, course, location: "course_syllabus_#{course.id}") if builder.include_syllabus
     hash["html_url"] = course_url(course, host: HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
     hash["time_zone"] = course.time_zone&.tzinfo&.name
     hash

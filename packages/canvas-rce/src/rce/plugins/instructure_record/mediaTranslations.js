@@ -41,7 +41,7 @@ const uploadMediaTranslations = {
     UPLOADING_ERROR: formatMessage('An error occurred uploading your media.'),
     UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
     MEDIA_RECORD_NOT_AVAILABLE: formatMessage(
-      'Audio and video recording not supported; please use a different browser.'
+      'Audio and video recording not supported; please use a different browser.',
     ),
     SUPPORTED_FILE_TYPES: formatMessage('Supported file types: SRT or WebVTT'),
     NO_FILE_CHOSEN: formatMessage('No file chosen'),
@@ -50,6 +50,9 @@ const uploadMediaTranslations = {
     ADDED_CAPTION: 'Captions for {lang} added',
     DELETED_CAPTION: 'Deleted captions for {lang}',
     PROGRESS_LABEL: formatMessage('Uploading'),
+    SELECT_SUPPORTED_FILE_TYPE: formatMessage('Please select a file of a supported type'),
+    CHOOSE_FILE_TO_UPLOAD: formatMessage('Please choose a file'),
+    ENTER_FILE_NAME: formatMessage('Please enter a file name'),
   },
 
   SelectStrings: {
@@ -88,14 +91,14 @@ const uploadMediaTranslations = {
     MIC_BLOCKED: formatMessage('Your microphone is blocked in the browser settings.'),
     WEBCAM_BLOCKED: formatMessage('Your webcam is blocked in the browser settings.'),
     MIC_AND_WEBCAM_BLOCKED: formatMessage(
-      'Your webcam and microphone are blocked in the browser settings.'
+      'Your webcam and microphone are blocked in the browser settings.',
     ),
     NO_MIC_EXIST: formatMessage(
-      'We couldn’t detect a working microphone connected to your device.'
+      'We couldn’t detect a working microphone connected to your device.',
     ),
     NO_WEBCAM_EXIST: formatMessage('We couldn’t detect a working webcam connected to your device.'),
     NO_MIC_AND_WEBCAM_EXIST: formatMessage(
-      'We couldn’t detect a working webcam or microphone connected to your device.'
+      'We couldn’t detect a working webcam or microphone connected to your device.',
     ),
     WEBCAM_DISABLED: formatMessage('Webcam Disabled'),
     MICROPHONE_DISABLED: formatMessage('Microphone Disabled'),

@@ -34,7 +34,7 @@
 
         <% if @can_grade %>
           <a href="#" class="upload_submissions_link icon-upload" style="<%= hidden unless @assignment.submissions_downloaded? %>"><%= t 'links.reupload_submissions', "Re-Upload Submissions" %></a>
-          <%= form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; display: none;"} do %>
+          <%= form_tag context_url(@context, :submissions_upload_context_gradebook_url, @assignment.id), {:id => "re_upload_submissions_form", :multipart => true, :style => "margin-top: 10px; margin-bottom: 0px; display: none;"} do %>
             <div style="font-size: 0.8em;">
               <%= mt <<-EOT
   If you made changes to the student submission files you downloaded
@@ -46,10 +46,12 @@
               %>
             </div>
             <div>
-              <input type="file" name="submissions_zip"/>
+              <button id="choose_file_button" class="btn"><%= t 'buttons.choose_file', "Choose File" %></button>
+              <div id="uploaded_file_tag"></div>
               <div class="button-container">
-                <button type="submit" class="btn"><%= t 'buttons.upload_files', "Upload Files" %></button>
+                <button id="reuploaded_submissions_button" type="submit" class="btn btn-primary" style="display: none;"><%= t 'buttons.upload_files', "Re-Upload Files" %></button>
               </div>
+              <input type="file" name="submissions_zip" style="height:0;width:0;overflow:hidden;"/>
             </div>
           <% end %>
         <% end %>

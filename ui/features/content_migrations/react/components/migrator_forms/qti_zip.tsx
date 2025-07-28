@@ -16,71 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
-import CommonMigratorControls from './common_migrator_controls'
+import React, {useState, useRef} from 'react'
+import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
-import QuestionBankSelector, {type QuestionBankSettings} from './question_bank_selector'
+import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
-
-const I18n = useI18nScope('content_migrations_redesign')
+import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
+import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
+import {ImportClearLabel} from './import_clear_label'
 
 type QTIZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
   onCancel: () => void
   fileUploadProgress: number | null
+  isSubmitting: boolean
 }
 
-const QTIZipImporter = ({onSubmit, onCancel, fileUploadProgress}: QTIZipImporterProps) => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<boolean>(false)
-  const [questionBankSettings, setQuestionBankSettings] = useState<QuestionBankSettings | null>()
-  const [questionBankError, setQuestionBankError] = useState<boolean>(false)
+const QTIZipImporter = ({
+  onSubmit,
+  onCancel,
+  fileUploadProgress,
+  isSubmitting,
+}: QTIZipImporterProps) => {
+  const [isQuestionBankDisabled, setIsQuestionBankDisabled] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleSubmit = useCallback(
-    formData => {
-      if (!file) {
-        setFileError(true)
-      }
-      if (questionBankSettings) {
-        setQuestionBankError(questionBankSettings.question_bank_name === '')
-        if (questionBankSettings.question_bank_name === '') {
-          return
-        }
-        formData.settings = {...formData.settings, ...questionBankSettings}
-      }
-      if (file) {
-        setFileError(false)
-        formData.pre_attachment = {
-          name: file.name,
-          size: file.size,
-          no_redirect: true,
-        }
-        onSubmit(formData, file)
-      }
-    },
-    [onSubmit, file, questionBankSettings]
-  )
+  const {setFile, fileError, questionBankSettings, setQuestionBankSettings, handleSubmit} =
+    useSubmitHandlerWithQuestionBank(onSubmit, fileInputRef)
 
   return (
     <>
-      <MigrationFileInput fileUploadProgress={fileUploadProgress} onChange={setFile} />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
+      <MigrationFileInput
+        fileUploadProgress={fileUploadProgress}
+        onChange={setFile}
+        isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
+        inputRef={ref => (fileInputRef.current = ref)}
+      />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
-        questionBankError={questionBankError}
+        disable={isSubmitting || isQuestionBankDisabled}
+        notCompatible={isQuestionBankDisabled}
+        questionBankSettings={questionBankSettings}
       />
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
+        isSubmitting={isSubmitting}
         canImportAsNewQuizzes={ENV.NEW_QUIZZES_IMPORT}
         canOverwriteAssessmentContent={true}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        setIsQuestionBankDisabled={setIsQuestionBankDisabled}
+        SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
+        CancelLabel={ImportClearLabel}
       />
     </>
   )

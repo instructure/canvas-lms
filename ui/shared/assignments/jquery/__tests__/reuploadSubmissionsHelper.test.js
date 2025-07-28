@@ -18,38 +18,42 @@
  */
 
 import $ from 'jquery'
-import sinon from 'sinon'
 import {setupSubmitHandler} from '../reuploadSubmissionsHelper'
 
 describe('setupSubmitHandler', () => {
   const formId = 're_upload_submissions_form'
   let formSubmit
   let fixture
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    sandbox.stub($.fn, 'formSubmit')
+    jest.spyOn($.fn, 'formSubmit').mockImplementation()
     fixture = document.createElement('div')
     document.body.appendChild(fixture)
-    fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data"><input type="file" name="submissions_zip"><button type="submit">Upload Files</button></form>`
+    fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data">
+    <button id="choose_file_button" class="btn"><%= t 'buttons.choose_file', "Choose File" %></button>
+    <div id="uploaded_file_tag"></div>
+    <div class="button-container">
+      <button id="reuploaded_submissions_button" type="submit" class="btn btn-primary" style="display: none;"><%= t 'buttons.upload_files', "Re-Upload Files" %></button>
+    </div>
+    <input type="file" name="submissions_zip" style="height:0;width:0;overflow:hidden;"/>
+    </form>`
 
     const dummySubmit = event => {
       event.preventDefault()
       event.stopPropagation()
     }
-    formSubmit = sandbox.stub()
-    document.getElementById(formId).addEventListener('submit', formSubmit.callsFake(dummySubmit))
+    formSubmit = jest.fn(dummySubmit)
+    document.getElementById(formId).addEventListener('submit', formSubmit)
   })
 
   afterEach(() => {
     fixture.remove()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   it('sets up the handler by calling $.fn.formSubmit', () => {
     setupSubmitHandler(formId, 'user_1')
-    expect($.fn.formSubmit.callCount).toEqual(1)
+    expect($.fn.formSubmit).toHaveBeenCalledTimes(1)
   })
 
   describe('beforeSubmit', () => {
@@ -132,10 +136,13 @@ describe('setupSubmitHandler', () => {
   describe('success', () => {
     let attachment
     let success
+    let formElement
 
     beforeEach(() => {
       attachment = {id: '729'}
       success = setupSubmitHandler(formId, 'user_1').success
+      formElement = document.getElementById(formId)
+      formElement.submit = jest.fn()
     })
 
     it('adds the attachment ID to the form', () => {
@@ -146,13 +153,13 @@ describe('setupSubmitHandler', () => {
 
     it('submits the form', () => {
       success(attachment)
-      expect(formSubmit.callCount).toEqual(1)
+      expect(formElement.submit).toHaveBeenCalledTimes(1)
     })
 
     it('removes the file input', () => {
       success(attachment)
       const input = document.querySelectorAll('input[name="submissions_zip"]')
-      expect(input.length).toEqual(0)
+      expect(input).toHaveLength(0)
     })
 
     it('removes the multipart enctype', () => {

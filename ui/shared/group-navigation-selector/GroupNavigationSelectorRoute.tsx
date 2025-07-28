@@ -22,7 +22,7 @@ import GroupNavigationSelector from './GroupNavigationSelector'
 
 export function Component() {
   const groupSwitchMountPoint: HTMLElement | null = document.querySelector(
-    '#group-switch-mount-point'
+    '#group-switch-mount-point',
   )
   if (!groupSwitchMountPoint) {
     return null

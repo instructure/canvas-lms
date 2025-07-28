@@ -18,14 +18,14 @@
 
 import i18nLinerHandlebars from '../webpack/i18nLinerHandlebars'
 
-const fileRegex = /\.(handlebars|hbs)$/
+const fileRegex = /\.(handlebars)$/
 
 export default function handlebarsPlugin() {
   return [
     {
       name: 'handlebars',
 
-      formats: ['hbs', 'handlebars'],
+      formats: ['handlebars'],
 
       transform(text: string, id: string) {
         if (fileRegex.test(id)) {

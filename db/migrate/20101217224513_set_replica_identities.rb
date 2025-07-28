@@ -28,6 +28,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :accounts
     set_replica_identity :asset_user_accesses
     set_replica_identity :blackout_dates
+    set_replica_identity :block_editors
     set_replica_identity :comment_bank_items
     set_replica_identity :content_tags
     set_replica_identity :context_external_tools
@@ -44,6 +45,8 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :discussion_entry_participants
     set_replica_identity :discussion_topic_participants
     set_replica_identity :discussion_topics
+    set_replica_identity :discussion_topic_summaries
+    set_replica_identity :discussion_topic_summary_feedback
     set_replica_identity :enrollment_dates_overrides
     set_replica_identity :enrollment_states
     set_replica_identity :enrollment_terms
@@ -53,8 +56,17 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :group_categories
     set_replica_identity :group_memberships
     set_replica_identity :groups
+    set_replica_identity :inbox_settings
+    set_replica_identity :lti_assets
+    set_replica_identity :lti_asset_processors
+    set_replica_identity :lti_asset_reports
     set_replica_identity :lti_ims_registrations
     set_replica_identity :lti_line_items
+    set_replica_identity :lti_notice_handlers
+    set_replica_identity :lti_overlays
+    set_replica_identity :lti_overlay_versions
+    set_replica_identity :lti_registrations
+    set_replica_identity :lti_registration_account_bindings
     set_replica_identity :lti_resource_links
     set_replica_identity :lti_results
     set_replica_identity :mentions
@@ -65,12 +77,13 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :pseudonyms
     set_replica_identity :role_overrides
     set_replica_identity :roles
+    set_replica_identity :rubric_assessment_imports
     set_replica_identity :rubric_criteria
+    set_replica_identity :rubric_imports
     set_replica_identity :standard_grade_statuses
     set_replica_identity :temporary_enrollment_pairings
     set_replica_identity :user_account_associations
     set_replica_identity :user_lmgb_outcome_orderings
-    set_replica_identity :user_notes
     set_replica_identity :users
     set_replica_identity :web_conference_participants
     set_replica_identity :web_conferences

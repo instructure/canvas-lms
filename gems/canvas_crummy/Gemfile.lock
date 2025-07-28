@@ -6,13 +6,13 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    docile (1.4.0)
+    docile (1.4.1)
     rake (13.2.1)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
-    simplecov-html (0.12.3)
+    simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
 
 PLATFORMS
@@ -23,13 +23,12 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (~> 2.2)
   canvas_crummy!
   rake
   simplecov (~> 0.22)
 
 RUBY VERSION
-   ruby 3.1.2p20
+   ruby 3.4.1p0
 
 BUNDLED WITH
-   2.5.10
+   2.6.7

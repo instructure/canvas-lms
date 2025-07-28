@@ -68,6 +68,30 @@ describe ContentMigration do
       expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
     end
 
+    describe "with InstFS enabled" do
+      before do
+        require "webmock/rspec"
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "https://instfs.not_real")
+      end
+
+      it "uses InstFS to store the import files" do
+        export_file = File.open("spec/fixtures/migration/cc_empty_link.zip")
+        exported_data = File.open("spec/fixtures/migration/exported_data_cm.zip")
+        expect(InstFS).to receive(:direct_upload).and_return("export_file", "overview", "exported_data")
+        export_file_url = "https://instfs.not_real/files/export_file/from-course-export.imscc"
+        exported_data_url = "https://instfs.not_real/files/exported_data/exported_data_cm."
+        expect(CanvasHttp).to receive(:validate_url).with(/#{export_file_url}.*/, check_host: true, host: nil, scheme: nil).and_return(["", URI.parse(export_file_url)])
+        expect(CanvasHttp).to receive(:validate_url).with(/#{exported_data_url}.*/, check_host: true, host: nil, scheme: nil).and_return(["", URI.parse(exported_data_url)])
+        stub_request(:get, export_file_url).to_return(body: export_file)
+        stub_request(:get, exported_data_url).to_return(body: exported_data)
+        run_course_copy
+
+        expect(@cm.attachment.instfs_uuid).to eq "export_file"
+        expect(@cm.exported_attachment.instfs_uuid).to eq "exported_data"
+        expect(@cm.overview_attachment.instfs_uuid).to eq "overview"
+      end
+    end
+
     it "migrates course home links in rich content on copy" do
       course_model
 
@@ -530,7 +554,35 @@ describe ContentMigration do
       @copy_from.allow_student_discussion_reporting = true
       @copy_from.allow_student_anonymous_discussion_topics = true
 
-      tool = external_tool_1_3_model(context: @copy_from)
+      # Course level tool
+      registration = lti_developer_key_model(account: @copy_from.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+      end.lti_registration
+      tool = registration.new_external_tool(@copy_from)
+
+      # Account level tool with course level context control
+      registration2 = lti_developer_key_model(account: @copy_from.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k,
+                                     lti_registration: k.lti_registration,
+                                     domain: "example.com",
+                                     target_link_uri: "https://example.com/other-tool")
+      end.lti_registration
+      account_tool = registration2.new_external_tool(@copy_from.root_account)
+      Lti::ContextControl.create!(
+        deployment: account_tool,
+        course: @copy_from,
+        registration: registration2,
+        available: false
+      )
+
+      # Cross-account tool so the account level tool with course control can be copied over.
+      duplicate_cross_account_registration = lti_developer_key_model(account: @copy_to.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k,
+                                     lti_registration: k.lti_registration,
+                                     domain: "example.com",
+                                     target_link_uri: "https://example.com/other-tool")
+      end.lti_registration
+      duplicate_cross_account_registration.new_external_tool(@copy_from.root_account)
 
       @copy_from.lti_resource_links.create!(
         context_external_tool: tool,
@@ -573,6 +625,7 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
 
       expect(@copy_to.lti_resource_links.size).to eq 2
+      expect(Lti::ContextControl.where(course: @copy_to).size).to eq 2
       rla = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7a" }
       expect(rla.url).to eq "http://example.com/resource-link-url"
 
@@ -796,7 +849,6 @@ describe ContentMigration do
 
     context "media objects" do
       before do
-        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
         kaltura_double = double("kaltura")
         allow(kaltura_double).to receive(:startSession)
         # rubocop:disable RSpec/ReceiveMessages
@@ -810,8 +862,24 @@ describe ContentMigration do
                                                                                 }
                                                                               ])
         allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
+        allow(kaltura_double).to receive(:media_sources).and_return([{
+                                                                      isOriginal: "0",
+                                                                      fileExt: "mp4",
+                                                                      url: "http://example.com/media_path",
+                                                                      content_type: "video/mp4"
+                                                                    }])
         # rubocop:enable RSpec/ReceiveMessages
         allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
+      end
+
+      it "updates media comment even if original attachment is deleted" do
+        og_att = attachment_model(display_name: "test.mp4", context: @copy_from, media_entry_id: "0_l4l5n0wt")
+        MediaObject.create! media_id: "0_l4l5n0wt", attachment: og_att
+        @copy_from.syllabus_body = "<a id=\"media_comment_0_l4l5n0wt\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/0_l4l5n0wt\"></a>"
+        og_att.destroy
+        run_course_copy
+        expect(Attachment.find_by(migration_id: mig_id(og_att)).file_state).to eq("hidden")
+        expect(@copy_to.syllabus_body).to include("src=\"/media_attachments_iframe/#{@copy_to.attachments.find_by(media_entry_id: "0_l4l5n0wt").id}?embedded=true&amp;type=video\"")
       end
 
       it "updates media comment links to be media attachment links" do
@@ -844,10 +912,9 @@ describe ContentMigration do
         expect(@copy_to.syllabus_body).to eq translated_body
       end
 
-      it "updates media comment links to be media attachment links when the media object has an attachment in a different course" do
-        course_with_teacher(course_name: "from course", active_all: true)
-        media_object_model(title: "test.mp4", context: @course, media_id: "m-index0")
-        media_object_model(title: "test.mp4", context: @course, media_id: "m-index1")
+      it "updates media comment links to be media attachment links when the media object has an attachment in the current course" do
+        media_object_model(title: "test0.mp4", context: @copy_from, media_id: "m-index0")
+        media_object_model(title: "test1.mp4", context: @copy_from, media_id: "m-index1")
 
         @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
           with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
@@ -856,11 +923,100 @@ describe ContentMigration do
 
         run_course_copy
 
-        file0, file1 = @copy_to.attachments.order(:id)
+        file0 = @copy_to.attachments.find_by(media_entry_id: "m-index0")
+        file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
+      end
+
+      it "updates media comment links to be media attachment links when the media object has an attachment in a different course" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        media_object_model(title: "test0.mp4", context: @course, media_id: "m-index0")
+        media_object_model(title: "test1.mp4", context: @course, media_id: "m-index1")
+
+        @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        run_course_copy
+
+        file0 = @copy_to.attachments.find_by(media_entry_id: "m-index0")
+        file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
+
+        translated_body = <<~HTML.strip
+          with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
+      end
+
+      it "updates media comment links to be media attachment links when the media object has an attachment in a different course that doesn't look like a media attachment" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        mo = media_object_model(title: "test0", context: @course, media_id: "m-index0")
+        mo.attachment.update(media_entry_id: nil, content_type: "unknown/unknown", workflow_state: "pending_upload")
+
+        @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        run_course_copy
+
+        file = @copy_to.attachments.take
+        expect(file.media_entry_id).to eq mo.media_id
+
+        translated_body = <<~HTML.strip
+          with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
+      end
+
+      it "updates media comment links to be media attachment links when the attachment has a media_entry_id of 'maybe'" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        mo = media_object_model(title: "test0", context: @course, media_id: "m-index0")
+        mo.attachment.update(media_entry_id: "maybe", content_type: "unknown/unknown", workflow_state: "pending_upload")
+
+        @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        run_course_copy
+
+        file = @copy_to.attachments.take
+        expect(file.media_entry_id).to eq mo.media_id
+
+        translated_body = <<~HTML.strip
+          with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file.id}?embedded=true&amp;type=video"></iframe>
+        HTML
+        expect(@copy_to.wiki_pages.take.body).to eq translated_body
+      end
+
+      it "updates media comment links to be media attachment links when the data-media-id is broken" do
+        course_with_teacher(course_name: "from course", active_all: true)
+        media_object_model(title: "test0.mp4", context: @course, media_id: "m-index0")
+        media_object_model(title: "test1.mp4", context: @course, media_id: "m-index1")
+
+        @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
+          undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="undefined" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index0?type=video&amp;embedded=true"></iframe>
+          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_objects_iframe/m-index1?type=video&amp;embedded=true"></iframe>
+        HTML
+
+        run_course_copy
+
+        file0 = @copy_to.attachments.find_by(media_entry_id: "m-index0")
+        file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
+
+        translated_body = <<~HTML.strip
+          undefined data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
+          no data-media-id: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video" data-media-id="m-index1"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -879,11 +1035,12 @@ describe ContentMigration do
 
         run_course_copy
 
-        file0, file1 = @copy_to.attachments.order(:id)
+        file0 = @copy_to.attachments.find_by(media_entry_id: "m-index0")
+        file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.syllabus_body).to eq translated_body
       end
@@ -895,7 +1052,8 @@ describe ContentMigration do
         @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?embedded=true&amp;type=video"></iframe></p>)
         run_course_copy
         new_att = @copy_to.attachments.find_by(migration_id: mig_id(att))
-        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{att.id}", "/media_attachments_iframe/#{new_att.id}")
+        expect(@copy_to.syllabus_body).to include("/media_attachments_iframe/#{new_att.id}")
+        expect(@copy_to.syllabus_body).not_to include("/media_attachments_iframe/#{att.id}")
       end
 
       it "does not update media attachment links from a different course" do
@@ -903,7 +1061,7 @@ describe ContentMigration do
         course_with_teacher(course_name: "from course", active_all: true)
         @course.media_objects.create!(media_id:)
         att = @course.attachments.find_by(media_entry_id: media_id)
-        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video&"></iframe></p>)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{att.id}?type=video&"></iframe></p>)
         run_course_copy
         expect(@copy_to.attachments.count).to eq 0
         expect(@copy_to.media_objects.count).to eq 0
@@ -913,7 +1071,7 @@ describe ContentMigration do
       it "does not update media attachment links from user media" do
         media_id = "0_deadbeef"
         att = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
-        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true"></iframe></p>)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{att.id}?type=video&amp;embedded=true"></iframe></p>)
         run_course_copy
         expect(@copy_to.attachments.count).to eq 0
         expect(@copy_to.media_objects.count).to eq 0
@@ -944,6 +1102,7 @@ describe ContentMigration do
         course_with_teacher(course_name: "from course", active_all: true)
         media_object_model(title: "test.mp4", context: @course, media_id: "m-index0")
         media_object_model(title: "test.mp4", context: @course, media_id: "m-index1")
+        @course.attachments.update_all(workflow_state: "processed")
 
         wiki = @copy_from.wiki_pages.create!(title: "page", body: <<~HTML.strip)
           with media comment: <a id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" href="/media_objects/m-index0" data-media_comment_type="video" data-alt="">this is a media comment</a>
@@ -961,12 +1120,13 @@ describe ContentMigration do
 
         run_course_copy
 
-        file0, file1 = @copy_to.attachments.order(:id)
+        file0 = @copy_to.attachments.find_by(media_entry_id: "m-index0")
+        file1 = @copy_to.attachments.find_by(media_entry_id: "m-index1")
 
         translated_body = <<~HTML.strip
           with media comment: <iframe id="media_comment_m-index0" class="instructure_inline_media_comment video_comment" data-media_comment_type="video" data-alt="" style="width: 320px; height: 240px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-index0"></iframe>
-          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
-          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url 0: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index0" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file0.id}?embedded=true&amp;type=video"></iframe>
+          with media objects iframe url 1: <iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="m-index1" allowfullscreen="allowfullscreen" allow="fullscreen" loading="lazy" src="/media_attachments_iframe/#{file1.id}?embedded=true&amp;type=video"></iframe>
         HTML
         expect(@copy_to.wiki_pages.take.body).to eq translated_body
       end
@@ -1245,6 +1405,7 @@ describe ContentMigration do
         # the wiki and root folder need to exist or the export will update the course
         @copy_from.wiki_pages.create! title: "one"
         Folder.root_folders(@copy_from)
+        @cm.update! user: nil, initiated_source: :course_template # only course template copies are reused
       end
 
       it "reuses the ContentExport if it's newer than the course" do
@@ -1252,6 +1413,18 @@ describe ContentMigration do
         @copy_to.wiki_pages.where(title: "one").delete_all
         Timecop.travel(1.minute.from_now) do
           expect { run_course_copy }.not_to change(ContentExport, :count)
+          expect { JSON.parse(@cm.reload.exported_attachment.open) }.not_to raise_error
+
+          expect(@copy_to.wiki_pages.where(title: "one")).to exist
+        end
+      end
+
+      it "does not reuse a ContentExport created by a user" do
+        run_course_copy
+        @copy_to.wiki_pages.where(title: "one").delete_all
+        @cm.content_export.update! user_id: @user.id
+        Timecop.travel(1.minute.from_now) do
+          expect { run_course_copy }.to change(ContentExport, :count).by(1)
           expect(@copy_to.wiki_pages.where(title: "one")).to exist
         end
       end
@@ -1263,6 +1436,13 @@ describe ContentMigration do
           expect { run_course_copy }.to change(ContentExport, :count).by(1)
           expect(@copy_to.wiki_pages.where(title: "two")).to exist
         end
+      end
+
+      it "finds the ContentMigration's ContentExport via source course and attachment id" do
+        run_course_copy
+        export = @cm.content_export
+        export.update! content_migration_id: nil
+        expect(ContentMigration.find(@cm.id).content_export).to eq export
       end
     end
 
@@ -1288,6 +1468,59 @@ describe ContentMigration do
         run_course_copy
 
         expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
+      end
+    end
+
+    describe "Course Page Copy with Home Link" do
+      include_context "course copy"
+      let(:course1) { Course.create!(name: "Course 1") }
+      let(:course2) { Course.create!(name: "Course 2") }
+      let(:course3) { Course.create!(name: "Course 3") }
+      let(:home_page) do
+        course1.wiki_pages.create(
+          title: "Javascript",
+          body: "<a title='Home' href=\"/courses/#{course1.id}\" data-course-type='navigation'>Home</a><iframe src='https://www.google.com//' width='800' height='600' title='Google'></iframe>"
+        )
+      end
+
+      before do
+        home_page
+      end
+
+      def run_course_copy(copy_from, copy_to)
+        @cm = ContentMigration.new(
+          context: copy_to,
+          source_course: copy_from,
+          migration_type: "course_copy_importer",
+          copy_options: { everything: "1" }
+        )
+        @cm.migration_settings[:import_immediately] = true
+        @cm.set_default_settings
+        @cm.save!
+        worker = Canvas::Migration::Worker::CourseCopyWorker.new
+        worker.perform(@cm)
+      end
+
+      it "updates home link when copying the page between courses" do
+        run_course_copy(course1, course2)
+        copied_page1 = course2.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page1).not_to be_nil
+        expect(copied_page1.body).to include("/courses/#{course2.id}")
+        run_course_copy(course2, course3)
+        copied_page2 = course3.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page2).not_to be_nil
+        expect(copied_page2.body).to include("/courses/#{course3.id}")
+      end
+
+      it "does not update iframe links when copying the page between courses" do
+        run_course_copy(course1, course2)
+        copied_page1 = course2.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page1).not_to be_nil
+        expect(copied_page1.body).to include("https://www.google.com//")
+        run_course_copy(course2, course3)
+        copied_page2 = course3.wiki_pages.find_by(title: "Javascript")
+        expect(copied_page2).not_to be_nil
+        expect(copied_page2.body).to include("https://www.google.com//")
       end
     end
   end

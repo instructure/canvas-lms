@@ -32,11 +32,23 @@
     "additional_considerations_f3801683": {
         "message": "其他考慮因素"
     },
+    "address_applied_64269b0b": {
+        "message": "已套用位址"
+    },
+    "address_removed_fcb496e0": {
+        "message": "已移除位址"
+    },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "URL 相同的相鄰連結應為單一連結。"
     },
     "afrikaans_da0fe6ee": {
         "message": "南非荷蘭語"
+    },
+    "ai_response_9624e8e8": {
+        "message": "人工智慧反應"
+    },
+    "ai_tools_fda01177": {
+        "message": "人工智慧工具"
     },
     "albanian_21ed929e": {
         "message": "阿爾巴尼亞語"
@@ -76,6 +88,9 @@
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "發出連線請求時發生錯誤"
+    },
+    "an_error_occurred_processing_your_request_a3a38d84": {
+        "message": "處理您的申請時發生錯誤"
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "上載媒體時發生錯誤。"
@@ -158,6 +173,9 @@
     "available_folders_694d0436": {
         "message": "可用資料夾"
     },
+    "background_1bc88842": {
+        "message": "背景"
+    },
     "backslash_b2d5442d": {
         "message": "反斜线"
     },
@@ -190,6 +208,15 @@
     },
     "blue_daf8fea9": {
         "message": "藍色"
+    },
+    "bold_applied_42d547b7": {
+        "message": "已套用粗體"
+    },
+    "bold_removed_da474a5c": {
+        "message": "已移除粗體"
+    },
+    "border_5b08b06d": {
+        "message": "邊框"
     },
     "bottom_15a2a9be": {
         "message": "底部"
@@ -332,11 +359,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "收起以隱藏 { types }"
     },
+    "color_a363e1b0": {
+        "message": "顏色"
+    },
+    "color_contrast_4c418add": {
+        "message": "顏色對比度"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "顏色對比度比率"
+    },
     "color_picker_6b359edf": {
         "message": "顏色選擇器"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "顏色選擇器（已選擇 { colorName } 色）"
+    },
+    "color_popup_af39810f": {
+        "message": "顏色彈出視窗"
     },
     "column_e1ae5c64": {
         "message": "欄"
@@ -346,6 +385,9 @@
     },
     "complex_numbers_a543d004": {
         "message": "複數"
+    },
+    "compose_44c904f4": {
+        "message": "撰寫"
     },
     "computer_1d7dfa6f": {
         "message": "電腦"
@@ -373,6 +415,9 @@
     },
     "coproduct_e7838082": {
         "message": "副產品"
+    },
+    "copy_9748f9f": {
+        "message": "複製"
     },
     "copyright_holder_66ee111": {
         "message": "版權持有人："
@@ -476,8 +521,14 @@
     "decrease_indent_d9cf469d": {
         "message": "減少縮排"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "減少多種格式的內容區域"
+    },
     "deep_purple_bb3e2907": {
         "message": "深紫色"
+    },
+    "default_9db103d": {
+        "message": "預設"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "預設符號無序清單"
@@ -551,11 +602,20 @@
     "disjoint_union_e74351a8": {
         "message": "互斥聯集"
     },
+    "dislike_14befc48": {
+        "message": "取消按讚"
+    },
     "display_options_315aba85": {
         "message": "顯示選項"
     },
     "display_text_link_opens_in_a_new_tab_75e9afc9": {
         "message": "顯示文字連結（在新標籤中開啟）"
+    },
+    "div_applied_49ad83fc": {
+        "message": "已套用 Div"
+    },
+    "div_removed_d13f8e17": {
+        "message": "已移除 Div"
     },
     "division_sign_72190870": {
         "message": "除號"
@@ -629,8 +689,8 @@
     "edit_link_7f53bebb": {
         "message": "編輯連結"
     },
-    "editor_statusbar_26ac81fc": {
-        "message": "編輯器狀態欄"
+    "editor_status_bar_653f44ee": {
+        "message": "編輯器狀態列"
     },
     "element_starting_with_start_91bf4c3b": {
         "message": "以 { start } 開始的元素"
@@ -695,6 +755,9 @@
     "enter_search_text_26cb4459": {
         "message": "輸入搜尋文字"
     },
+    "enter_text_8b35c65b": {
+        "message": "輸入文字"
+    },
     "epsilon_54bb8afa": {
         "message": "ɛ"
     },
@@ -758,8 +821,14 @@
     "f_function_fe422d65": {
         "message": "F（函數）"
     },
+    "fail_544e5dde": {
+        "message": "失敗"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "無法取得檔案內容"
+    },
+    "failed_to_copy_response_d3def551": {
+        "message": "無法複製反應"
     },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "無法從外部工具擷取內容"
@@ -872,6 +941,9 @@
     "grades_a61eba0a": {
         "message": "成績"
     },
+    "graphics_text_bc9568bc": {
+        "message": "圖形文字"
+    },
     "greater_than_e98af662": {
         "message": ">"
     },
@@ -941,6 +1013,12 @@
     "heading_4_b2e74be7": {
         "message": "標題 4"
     },
+    "heading_h_applied_eccd294d": {
+        "message": "已套用標題 { h }"
+    },
+    "heading_h_removed_745f24a6": {
+        "message": "已移除標題 { h }"
+    },
     "heading_levels_should_not_be_skipped_3947c0e0": {
         "message": "不應跳過標題層。"
     },
@@ -961,6 +1039,12 @@
     },
     "height_69b03e15": {
         "message": "高度"
+    },
+    "hello_please_describe_the_modifications_you_would__49b19837": {
+        "message": "您好，請描述您想要對您的作文所做的修改。"
+    },
+    "hello_please_describe_the_modifications_you_would__600dbbf0": {
+        "message": "您好，請描述您想要對您的選擇進行的修改。"
     },
     "hexagon_d8468e0d": {
         "message": "六邊形"
@@ -994,6 +1078,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "我持有該版權"
+    },
+    "i_m_sorry_but_i_cannot_find_the_ai_s_answer_67569d19": {
+        "message": "抱歉，我找不到人工智慧的答案"
     },
     "icelandic_9d6d35de": {
         "message": "冰島語"
@@ -1070,6 +1157,9 @@
     "increase_indent_6af90f7c": {
         "message": "增加縮進"
     },
+    "increase_rich_content_area_340b775": {
+        "message": "增加多種格式的內容區域"
+    },
     "indefinite_integral_6623307e": {
         "message": "無限積分"
     },
@@ -1088,6 +1178,18 @@
     "infinity_7a10f206": {
         "message": "無限"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "α 系數的輸入欄位"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "藍色的輸入欄位"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "綠色的輸入欄位"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "紅色的輸入欄位"
+    },
     "insert_593145ef": {
         "message": "插入"
     },
@@ -1102,6 +1204,9 @@
     },
     "intersection_cd4590e4": {
         "message": "交集"
+    },
+    "invalid_description_991e23bb": {
+        "message": "無效的描述"
     },
     "invalid_entry_f7d2a0f5": {
         "message": "無效的輸入項目。"
@@ -1126,6 +1231,12 @@
     },
     "italian_bd3c792d": {
         "message": "義大利語"
+    },
+    "italic_applied_8f59a684": {
+        "message": "已套用斜體"
+    },
+    "italic_removed_17cbab6f": {
+        "message": "已移除斜體 "
     },
     "japanese_b5721ca7": {
         "message": "日語"
@@ -1156,6 +1267,9 @@
     },
     "large_9c5e80e7": {
         "message": "大"
+    },
+    "large_text_e7ba08cd": {
+        "message": "大文字"
     },
     "latvian_2bbb6aab": {
         "message": "拉脫維亞語"
@@ -1261,6 +1375,9 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "連結到外部網站。"
+    },
+    "lists_cd1336fc": {
+        "message": "清單"
     },
     "lists_should_be_formatted_as_lists_f862de8d": {
         "message": "列表應使用清單格式。"
@@ -1382,6 +1499,9 @@
     "miscellaneous_e9818229": {
         "message": "雜項"
     },
+    "modify_6b0b13e3": {
+        "message": "修改"
+    },
     "module_90d9fd32": {
         "message": "單元"
     },
@@ -1402,12 +1522,6 @@
     },
     "music_icon_4db5c972": {
         "message": "音樂圖示"
-    },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "必須至少 { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "必須至少為 { width } x { height } px"
     },
     "my_files_2f621040": {
         "message": "我的檔案"
@@ -1523,6 +1637,9 @@
     "none_selected_b93d56d2": {
         "message": "未選擇任何項目"
     },
+    "normal_text_7b03da48": {
+        "message": "一般文字"
+    },
     "norwegian_53f391ec": {
         "message": "挪威語"
     },
@@ -1601,8 +1718,8 @@
     "outline_size_a6059a21": {
         "message": "輪廓大小"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p }並非有效協議，必須使用 ftp、http、https、mailto、skype、tel 或忽略此項"
+    "p_is_not_a_valid_protocol_b1c4efaa": {
+        "message": "{ p } 不是有效的通訊協定。"
     },
     "page_50c4823d": {
         "message": "頁面"
@@ -1613,6 +1730,12 @@
     "paragraph_5e5ad8eb": {
         "message": "段落"
     },
+    "paragraph_applied_959b3fe5": {
+        "message": "已套用段落"
+    },
+    "paragraph_removed_d09320e": {
+        "message": "已移除段落"
+    },
     "paragraph_starting_with_start_a59923f8": {
         "message": "以 { start } 開始的段落"
     },
@@ -1621,6 +1744,9 @@
     },
     "partial_derivative_4a9159df": {
         "message": "部份（導數）"
+    },
+    "pass_1c19a2b3": {
+        "message": "合格"
     },
     "paste_5963d1c1": {
         "message": "貼上"
@@ -1639,6 +1765,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "百分比必須是數字"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "百分比必須至少為 { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "表演藝術圖示"
@@ -1664,11 +1793,17 @@
     "pi_variant_10f5f520": {
         "message": "π（變量）"
     },
+    "pick_a_color_557abfb0": {
+        "message": "選擇一種顏色"
+    },
     "pink_68ad45cb": {
         "message": "粉紅色"
     },
     "pixels_52ece7d1": {
         "message": "像素"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "像素必須至少為 { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "播放"
@@ -1681,6 +1816,18 @@
     },
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "請允許 Canvas 存取您的麥克風和網路攝影機。"
+    },
+    "please_choose_a_file_c2449cc": {
+        "message": "請選擇一個檔案"
+    },
+    "please_decribe_what_you_would_like_to_compose_27a51be5": {
+        "message": "請描述您想創作什麼。"
+    },
+    "please_enter_a_file_name_f159edc1": {
+        "message": "請輸入一個檔案名稱"
+    },
+    "please_select_a_file_of_a_supported_type_1fc578f2": {
+        "message": "請選取支援類型的檔案"
     },
     "plus_d43cd4ec": {
         "message": "+"
@@ -1732,6 +1879,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "上一個 { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "之前選擇的顏色"
     },
     "prime_917ea60e": {
         "message": "質數"
@@ -1832,11 +1982,17 @@
     "resize_ec83d538": {
         "message": "調校大小"
     },
+    "response_copied_to_clipboard_130d66cd": {
+        "message": "回應已複製到剪貼簿"
+    },
     "restore_auto_save_deccd84b": {
         "message": "還原自動儲存？"
     },
     "result_index_of_max_7db5ad8b": {
         "message": "{ max } 的結果 { index }。"
+    },
+    "retry_ebd5f8ba": {
+        "message": "重試"
     },
     "reverse_turnstile_does_not_yield_7558be06": {
         "message": "反向 T 形符號（不產生）"
@@ -1997,6 +2153,9 @@
     "shortcut_911d6255": {
         "message": "快速鍵"
     },
+    "show_all_967a90f0": {
+        "message": "全部顯示"
+    },
     "show_audio_options_b489926b": {
         "message": "顯示音訊選項"
     },
@@ -2129,6 +2288,9 @@
     "submit_a3cc6859": {
         "message": "提交"
     },
+    "submitting_b90fac62": {
+        "message": "正在提交..."
+    },
     "subscript_59744f96": {
         "message": "下標"
     },
@@ -2252,8 +2414,11 @@
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "頁面的第一個標題應該是 H2。"
     },
-    "the_following_content_is_partner_provided_ed1da756": {
-        "message": "以下內容由合作夥伴提供"
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "多種格式的內容區域的高度已減少。"
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "多種格式的內容區域的高度已增加。"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "該材料位於公用網域中。"
@@ -2263,9 +2428,6 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "可能有適用於此資料的例外情況 - 如：合理使用、引用權，或適用版權法下的其他情況"
-    },
-    "the_preceding_content_is_partner_provided_d753928c": {
-        "message": "上述內容由合作夥伴提供"
     },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "美觀 HTML 編輯器無法用鍵盤存取。按 ShiftO 開啟原始 HTML 編輯器。"
@@ -2362,6 +2524,12 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "無法決定資源選擇網址"
+    },
+    "underline_applied_ae01ec97": {
+        "message": "已套用底線"
+    },
+    "underline_removed_3693e17c": {
+        "message": "已移除底線"
     },
     "union_e6b57a53": {
         "message": "聯集"
@@ -2552,6 +2720,9 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "檢視文字和字元計數"
     },
+    "waiting_for_response_1efd0c50": {
+        "message": "等待回應"
+    },
     "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
         "message": "我們偵測不到與您的裝置連線的工作中麥克風。"
     },
@@ -2572,6 +2743,9 @@
     },
     "welsh_42ab94b1": {
         "message": "威爾斯語"
+    },
+    "what_would_you_like_to_do_6dc0d541": {
+        "message": "您想做什麼？"
     },
     "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
         "message": "如果使用標記使項目看起來像清單，但並未標示其清單關係，使用者瀏覽資訊時或會有困難。"
@@ -2603,6 +2777,9 @@
     "wreath_product_200b38ef": {
         "message": "花環產品"
     },
+    "writing_assistant_a30ac16a": {
+        "message": "寫作助理"
+    },
     "xi_149681d0": {
         "message": "ξ"
     },
@@ -2611,6 +2788,15 @@
     },
     "yiddish_f96986df": {
         "message": "意第緒語"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "您正在調色盤上。若要在調色盤上向上、向左、向下或向右導覽，請分別使用 ''W’、''A’、''S’ 和 ''D’ 按鈕"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "您正在顏色滑鈕上。若要使用滑鈕向左或向右導覽，請分別使用 ''A’ 和 ''D’ 按鈕"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "您正在 α 滑鈕上。若要使用滑鈕向左或向右導覽，請分別使用 ''A’ 和 ''D’ 按鈕"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "您可以透過上傳新的字幕檔來取代。"

@@ -2,10 +2,13 @@
 
 namespace :db do
   task nuke: :environment do
-    # dont kill db:nuke if it dies with destoying all the attachments.
-    # it probably is just because it tries to delete an attachment who's
-    # file on disk or s3 is no longer there.
-    Attachment.destroy_all rescue nil
+    begin
+      Attachment.destroy_all
+    rescue
+      # dont kill db:nuke if it dies with destoying all the attachments.
+      # it probably is just because it tries to delete an attachment who's
+      # file on disk or s3 is no longer there.
+    end
     abcs = ActiveRecord::Base.configurations
     ["development"].each do |db|
       case abcs[db]["adapter"]

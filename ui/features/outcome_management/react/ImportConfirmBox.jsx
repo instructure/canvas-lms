@@ -19,14 +19,14 @@
 import React, {useState, useEffect, useRef} from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 
-const I18n = useI18nScope('ImportConfirmBox')
+const I18n = createI18nScope('ImportConfirmBox')
 
 const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
   const containerRef = useRef()
@@ -79,12 +79,12 @@ const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
             },
             {
               count,
-            }
+            },
           )}
         </Text>
         <Text as="div">
           {I18n.t(
-            'To make outcome alignment easier, only add outcomes that are pertinent to this course.'
+            'To make outcome alignment easier, only add outcomes that are pertinent to this course.',
           )}
         </Text>
         <View as="div" padding="small 0 0">
@@ -130,7 +130,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
       boxContainer.id = messageHolderId
       boxContainer.setAttribute(
         'style',
-        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
       )
       document.body.appendChild(boxContainer)
     }
@@ -141,6 +141,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
   parent.setAttribute('style', 'max-width:45em;margin:1rem auto;')
   parent.setAttribute('class', 'flashalert-message')
   getBoxContainer().appendChild(parent)
+
   ReactDOM.render(
     <ImportConfirmBox
       count={count}
@@ -151,6 +152,6 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
         parent.remove()
       }}
     />,
-    parent
+    parent,
   )
 }

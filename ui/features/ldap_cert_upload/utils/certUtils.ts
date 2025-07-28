@@ -43,7 +43,7 @@ export const parseCertificate = async (file: File): Promise<X509Certificate> => 
 export const isCa = (certificate: X509Certificate) =>
   certificate.extensions.some(
     extension =>
-      extension.critical && extension instanceof BasicConstraintsExtension && extension.ca
+      extension.critical && extension instanceof BasicConstraintsExtension && extension.ca,
   )
 
 export const withinValidityPeriod = (certificate: X509Certificate) => {

@@ -28,10 +28,10 @@ describe Quizzes::QuizQuestionsController do
 
   def quiz_question
     @question = @quiz.quiz_questions.build
-    @question.write_attribute(:question_data, { answers: [
-                                { id: 123_456, answer_text: "asdf", weight: 100 },
-                                { id: 654_321, answer_text: "jkl;", weight: 0 }
-                              ] })
+    @question["question_data"] = { answers: [
+      { id: 123_456, answer_text: "asdf", weight: 100 },
+      { id: 654_321, answer_text: "jkl;", weight: 0 }
+    ] }
     @question.save!
     @question
   end

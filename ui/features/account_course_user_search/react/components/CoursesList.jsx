@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {string, shape, arrayOf, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CoursesListRow from './CoursesListRow'
 import CoursesListHeader from './CoursesListHeader'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default function CoursesList(props) {
   // The 'sis_course_id' field is only included in the api response if the user has
@@ -35,8 +35,14 @@ export default function CoursesList(props) {
     <Table margin="small 0" caption={I18n.t('Courses')}>
       <Table.Head>
         <Table.Row>
-          <Table.ColHeader id="header-published" width="1">
-            {I18n.t('Published')}
+          <Table.ColHeader id="header-course-status">
+            <CoursesListHeader
+              {...props}
+              id="course_status"
+              label={I18n.t('Status')}
+              tipDesc={I18n.t('Click to sort by status ascending')}
+              tipAsc={I18n.t('Click to sort by status descending')}
+            />
           </Table.ColHeader>
           <Table.ColHeader id="header-course-name">
             <CoursesListHeader

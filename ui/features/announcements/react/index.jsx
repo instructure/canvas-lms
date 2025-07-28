@@ -36,7 +36,7 @@ export default function createAnnouncementsIndex(root, data = {}) {
       <Provider store={store}>
         <ConnectedAnnouncementsIndex />
       </Provider>,
-      root
+      root,
     )
   }
 

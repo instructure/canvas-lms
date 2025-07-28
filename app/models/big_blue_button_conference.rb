@@ -199,28 +199,26 @@ class BigBlueButtonConference < WebConference
       req_params[:bbbCanvasCourseCode] = context.course_code
     end
 
-    if Account.site_admin.feature_enabled? :bbb_modal_update
-      req_params.merge!({
-                          lockSettingsDisableCam: settings[:share_webcam] ? false : true,
-                          lockSettingsDisableMic: settings[:share_microphone] ? false : true,
-                          lockSettingsDisablePublicChat: settings[:send_public_chat] ? false : true,
-                          lockSettingsDisablePrivateChat: settings[:send_private_chat] ? false : true,
-                          guestPolicy: settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
-                          webcamsOnlyForModerator: settings[:share_other_webcams] ? false : true,
-                        })
-    end
+    req_params.merge!({
+                        lockSettingsDisableCam: settings[:share_webcam] ? false : true,
+                        lockSettingsDisableMic: settings[:share_microphone] ? false : true,
+                        lockSettingsDisablePublicChat: settings[:send_public_chat] ? false : true,
+                        lockSettingsDisablePrivateChat: settings[:send_private_chat] ? false : true,
+                        guestPolicy: settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
+                        webcamsOnlyForModerator: settings[:share_other_webcams] ? false : true,
+                      })
     response = send_request(:create, req_params) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?
     save
-    InstStatsd::Statsd.increment("bigbluebutton.started")
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.record") if req_params[:record] == true
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_webcam") if req_params[:lockSettingsDisableCam] == false
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_microphone") if req_params[:lockSettingsDisableMic] == false
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.send_public_chat") if req_params[:lockSettingsDisablePublicChat] == false
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.send_private_chat") if req_params[:lockSettingsDisablePrivateChat] == false
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.enable_waiting_room") if req_params[:guestPolicy] == "ASK_MODERATOR"
-    InstStatsd::Statsd.increment("bigbluebutton.start.setting.share_other_webcams") if req_params[:webcamsOnlyForModerator] == false
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.started")
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.record") if req_params[:record] == true
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.share_webcam") if req_params[:lockSettingsDisableCam] == false
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.share_microphone") if req_params[:lockSettingsDisableMic] == false
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.send_public_chat") if req_params[:lockSettingsDisablePublicChat] == false
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.send_private_chat") if req_params[:lockSettingsDisablePrivateChat] == false
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.enable_waiting_room") if req_params[:guestPolicy] == "ASK_MODERATOR"
+    InstStatsd::Statsd.distributed_increment("bigbluebutton.start.setting.share_other_webcams") if req_params[:webcamsOnlyForModerator] == false
     conference_key
   end
 
@@ -254,9 +252,9 @@ class BigBlueButtonConference < WebConference
   end
 
   def recordings
-    fetch_recordings.map do |recording|
-      recording_formats(recording)
-    end
+    fetch_recordings
+      .reject { |recording| recording[:state] == "deleted" }
+      .map { |recording| recording_formats(recording) }
   end
 
   def recording(recording_id = nil)
@@ -348,8 +346,7 @@ class BigBlueButtonConference < WebConference
 
   def use_fallback_config?
     # use the fallback config (if possible) if it wasn't created with the current config
-    self.class.config[:use_fallback] &&
-      settings[:domain] != self.class.config[:domain]
+    !!(self.class.config&.[](:use_fallback) && settings[:domain] != self.class.config[:domain])
   end
 
   private
@@ -409,8 +406,8 @@ class BigBlueButtonConference < WebConference
                            end
   end
 
-  def generate_request(*args)
-    self.class.generate_request(*args)
+  def generate_request(*)
+    self.class.generate_request(*)
   end
 
   def send_request(action, options)

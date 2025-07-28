@@ -47,7 +47,7 @@ describe('default proficiency', () => {
   it('renders five ratings', () => {
     const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps()} />)
     const inputs = getAllByLabelText(/Change description/)
-    expect(inputs.length).toEqual(5)
+    expect(inputs).toHaveLength(5)
   })
 
   it('clicking button adds rating', () => {
@@ -55,7 +55,7 @@ describe('default proficiency', () => {
     const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
     const inputs = getAllByLabelText(/Change description/)
-    expect(inputs.length).toEqual(6)
+    expect(inputs).toHaveLength(6)
   })
 
   it('clicking add rating button flashes SR message', () => {
@@ -86,7 +86,7 @@ describe('default proficiency', () => {
     fireEvent.change(masteryField, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
     const error = await within(masteryField.closest('.description')).findByText(
-      'Missing required description'
+      'Missing required description',
     )
     expect(error).not.toBeNull()
     expect(document.activeElement).toEqual(masteryField.closest('input'))
@@ -145,7 +145,7 @@ describe('default proficiency', () => {
   it('renders confirmation modal, calls update on save, and flashes a message to the user', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps({contextType: 'course'})} update={updateSpy} />
+      <ProficiencyTable {...defaultProps({contextType: 'course'})} update={updateSpy} />,
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
@@ -163,7 +163,7 @@ describe('default proficiency', () => {
   it('does not call save when canceling on the confirmation modal', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
@@ -175,7 +175,7 @@ describe('default proficiency', () => {
   it('empty rating description does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
@@ -186,7 +186,7 @@ describe('default proficiency', () => {
   it('empty rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: ''}})
@@ -197,7 +197,7 @@ describe('default proficiency', () => {
   it('invalid rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
@@ -208,7 +208,7 @@ describe('default proficiency', () => {
   it('increasing rating points does call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})
@@ -220,7 +220,7 @@ describe('default proficiency', () => {
   it('negative rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />,
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-10'}})
@@ -253,7 +253,7 @@ describe('default proficiency', () => {
         {...defaultProps()}
         onNotifyPendingChanges={onNotifyPendingChangesSpy}
         update={update}
-      />
+      />,
     )
 
     const pointsInput = getByDisplayValue('3')
@@ -262,7 +262,7 @@ describe('default proficiency', () => {
     fireEvent.click(getByText('Save'))
 
     await waitFor(() => {
-      expect(onNotifyPendingChangesSpy.mock.calls.length).toBe(2)
+      expect(onNotifyPendingChangesSpy.mock.calls).toHaveLength(2)
       // first call first argument
       expect(onNotifyPendingChangesSpy.mock.calls[0][0]).toBe(true)
       // second call first argument
@@ -296,7 +296,7 @@ describe('custom proficiency', () => {
     }
     const {getAllByText} = render(<ProficiencyTable {...customProficiencyProps} />)
     const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
-    expect(deleteButtons.length).toEqual(2)
+    expect(deleteButtons).toHaveLength(2)
     expect(deleteButtons.some(btn => btn.disabled)).toEqual(false)
   })
 
@@ -332,7 +332,7 @@ describe('custom proficiency', () => {
 
     it('by point value when a new rating is added', () => {
       const {getAllByLabelText, getByText, getByDisplayValue} = render(
-        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />,
       )
       const button = getByText(/Add Mastery Level/)
       fireEvent.click(button)
@@ -369,7 +369,7 @@ describe('custom proficiency', () => {
 
     it('masteryIndex is incremented when sorting causes a rating to be put above the current mastery', () => {
       const {getAllByLabelText, getByText, getByDisplayValue} = render(
-        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />,
       )
 
       const pointsInput = getByDisplayValue('3')
@@ -392,7 +392,7 @@ describe('custom proficiency', () => {
 
     it('masteryIndex is not incremented when adding a new rating that is less than the current mastery', () => {
       const {getAllByLabelText, getByText} = render(
-        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />,
       )
       const button = getByText(/Add Mastery Level/)
       fireEvent.click(button)
@@ -421,7 +421,7 @@ describe('custom proficiency', () => {
 
     it('masteryIndex remains at the correct index when sorting and deleting in a single update', () => {
       const {getByText, getAllByText, getByDisplayValue} = render(
-        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />,
       )
 
       const pointsInput = getByDisplayValue('3')
@@ -462,7 +462,7 @@ describe('custom proficiency', () => {
     }
     const {getAllByText} = render(<ProficiencyTable {...props} />)
     const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
-    expect(deleteButtons.length).toEqual(1)
+    expect(deleteButtons).toHaveLength(1)
     expect(deleteButtons[0].disabled).toEqual(true)
   })
 
@@ -514,7 +514,7 @@ describe('confirmation modal', () => {
 
   it('renders correct text for the Course context', () => {
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps()} contextType="Course" />
+      <ProficiencyTable {...defaultProps()} contextType="Course" />,
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})

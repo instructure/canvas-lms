@@ -20,7 +20,7 @@
 
 class AuthenticationProvider::SamlIdpDiscovery < AuthenticationProvider::Delegated
   class << self
-    def enabled?(_account = nil)
+    def enabled?(_account = nil, _user = nil)
       AuthenticationProvider::SAML.enabled?
     end
 

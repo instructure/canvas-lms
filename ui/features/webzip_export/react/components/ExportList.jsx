@@ -18,10 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ExportListItem from './ExportListItem'
 
-const I18n = useI18nScope('webzip_exports')
+const I18n = createI18nScope('webzip_exports')
 
 class ExportList extends React.Component {
   static propTypes = {
@@ -31,14 +31,13 @@ class ExportList extends React.Component {
         link: PropTypes.string,
         workflowState: PropTypes.string.isRequired,
         newExport: PropTypes.bool.isRequired,
-      })
+      }),
     ).isRequired,
   }
 
   renderExportListItems() {
     return this.props.exports.map((webzip, key) => (
       <ExportListItem
-        // eslint-disable-next-line react/no-array-index-key
         key={key}
         link={webzip.link}
         date={webzip.date}

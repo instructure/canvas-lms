@@ -88,7 +88,8 @@ class Submission::ShowPresenter
   end
 
   def comment_attachment_download_url(submission_comment:, attachment:)
-    submission_data_url(comment_id: submission_comment.id, download: attachment.id)
+    location = submission_comment.asset_string if @context.root_account.feature_enabled?(:file_association_access)
+    submission_data_url(comment_id: submission_comment.id, download: attachment.id, location:)
   end
 
   def comment_attachment_template_url
@@ -101,6 +102,8 @@ class Submission::ShowPresenter
 
   # this is superficial and should be fine, since this is only showing data, not saving data
   def entered_grade
+    return "-" if @submission.score.nil?
+
     if @assignment.restrict_quantitative_data?(@current_user)
       if @assignment.grading_type == "pass_fail"
         return @submission.entered_grade

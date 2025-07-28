@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useMemo, useEffect, useCallback, useContext} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
@@ -26,7 +26,7 @@ import {IconCheckSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {DiscussionDueDatesContext} from '../../util/constants'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
 
 export const AssignedTo = ({
@@ -37,7 +37,7 @@ export const AssignedTo = ({
   onOptionDismiss,
 }) => {
   const [selectedOptionAssetCode, setSelectedOptionAssetCode] = useState(
-    initialAssignedToInformation
+    initialAssignedToInformation,
   )
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionAssetCode, setHighlightedOptionAssetCode] = useState(null)
@@ -53,7 +53,7 @@ export const AssignedTo = ({
   const [activeOptions, setActiveOptions] = useState(
     Object.values(availableAssignToOptions)
       .flat()
-      .find(option => initialAssignedToInformation.includes(option.assetCode)) || []
+      .find(option => initialAssignedToInformation.includes(option.assetCode)) || [],
   )
 
   const {groupCategoryId, groups, gradedDiscussionRefMap, setGradedDiscussionRefMap} =
@@ -76,7 +76,7 @@ export const AssignedTo = ({
       return activeOptions.find(o => o?.assetCode === assetCode) || {}
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [availableAssignToOptions]
+    [availableAssignToOptions],
   )
 
   // filterOptions only occur based on user input.
@@ -88,7 +88,7 @@ export const AssignedTo = ({
         .filter(
           option =>
             !currentFilterInput ||
-            option.label.toLowerCase().includes(currentFilterInput.toLowerCase())
+            option.label.toLowerCase().includes(currentFilterInput.toLowerCase()),
         )
         .map(option => addIconToOption(option, selectedOptionAssetCode.includes(option.assetCode)))
 
@@ -101,7 +101,7 @@ export const AssignedTo = ({
     setAnnouncement(
       `${currentFilterInput}. ${I18n.t('%{optionCount} options available.', {
         optionCount: filteredOptions.length,
-      })}`
+      })}`,
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filteredOptions])
@@ -243,7 +243,7 @@ export const AssignedTo = ({
     setHighlightedOptionAssetCode(null)
     onOptionDismiss(tagAssetCode) // Notify parent
     setAnnouncement(
-      I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label})
+      I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label}),
     )
     inputRef.current.focus()
   }
@@ -264,7 +264,7 @@ export const AssignedTo = ({
       setSelectedOptionAssetCode(prevSelectedOptionId => prevSelectedOptionId.slice(0, -1))
       onOptionDismiss(lastSelectedTagAssetCode)
       setAnnouncement(
-        I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label})
+        I18n.t('%{optionName} selection has been removed', {optionName: optionBeingRemoved.label}),
       )
     }
   }
@@ -310,7 +310,7 @@ export const AssignedTo = ({
       <Select
         renderLabel={I18n.t('Assign To')}
         assistiveText={I18n.t(
-          'Type or use arrow keys to navigate options. Multiple selections allowed.'
+          'Type or use arrow keys to navigate options. Multiple selections allowed.',
         )}
         inputValue={inputValue}
         isShowingOptions={isShowingOptions}
@@ -349,8 +349,8 @@ AssignedTo.propTypes = {
       PropTypes.shape({
         assetCode: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
-      })
-    )
+      }),
+    ),
   ).isRequired,
   onOptionDismiss: PropTypes.func,
 }

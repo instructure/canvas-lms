@@ -29,7 +29,7 @@
   <div class="Sidebar__TodoListContainer"></div>
 <% end %>
 <% if render_teacher_to_do %>
-  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true, :additional_title_context => @user.has_student_enrollment?} %>
+  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true, :additional_title_context => @user.has_student_enrollment? } %>
   <% locals = {
       :title => t('coming_up', "Coming Up"),
       :period => :one_week,
@@ -48,7 +48,7 @@
   <% if show_user_create_course_button(@current_user) || (@current_user.alternate_account_for_course_creation && @domain_root_account.feature_enabled?(:create_course_subaccount_picker)) %>
     <button type="button"
             id="start_new_course"
-            class="element_toggler btn button-sidebar-wide"
+            class="element_toggler element_toggler_inst_focus_ring btn button-sidebar-wide"
             aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
     <% if @domain_root_account.feature_enabled?(:create_course_subaccount_picker) %>
       <div id="create_course_modal_container"></div>
@@ -57,7 +57,7 @@
     <% end %>
   <% end %>
 
-  <a href="<%= grades_path %>" class="Button button-sidebar-wide">
+  <a href="<%= grades_path %>" class="Button button-sidebar-wide element_toggler_inst_focus_ring">
   <%= t('View Grades') %>
   </a>
 </div>

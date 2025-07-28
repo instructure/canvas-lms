@@ -338,7 +338,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   margin-#{direction(left)}: 5px;
 }
 
-.ef-links-col, 
+.ef-links-col,
 .ef-select-col {
   display: flex;
   flex: 2 0 63px;
@@ -380,10 +380,41 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   padding-#{direction(right)}: 5px;
 }
 
-.current_uploads {
+.current_uploads, .current_downloads {
   border-radius: 10px;
   border: dashed $ic-color-neutral 2px;
   padding: 10px;
+}
+
+.FileDrag {
+  padding: 30px
+}
+
+.FileDragOverlayContainer {
+  position: relative;
+}
+
+.FileDragOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 2*36px);
+  height: calc(100% - 2*36px);
+  padding: 36px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.FileDragOverlay [data-filedropcontent] {
+  background-color: white;
+}
+
+.modified-by-link {
+  a {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+  }
 }
 
 .ef-breadcrumb-popover {
@@ -458,4 +489,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
       color: var(--ic-brand-primary);
     }
   }
+}
+
+#files-table {
+  user-select: none;
 }

@@ -20,6 +20,8 @@
 require "zip"
 
 class ContentZipper
+  MAX_FILENAME_LENGTH = 255
+
   def initialize(options = {})
     @check_user = options.key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
@@ -67,8 +69,8 @@ class ContentZipper
     @assignment = assignment
     @context    = assignment.context
 
-    filename    = assignment_zip_filename(assignment)
-    user        = zip_attachment.user
+    filename = assignment_zip_filename(assignment)
+    @user = user = zip_attachment.user
 
     # It is possible to get this far if an assignment allows the
     # downloadable submissions below as well as those that can't be
@@ -85,6 +87,8 @@ class ContentZipper
                                                  submission_type: downloadable_submissions)
     end
 
+    @tempfiles = []
+
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
@@ -96,6 +100,11 @@ class ContentZipper
           add_submission(submission, students, zipfile)
           update_progress(zip_attachment, index, count)
         end
+      end
+
+      @tempfiles.each do |tempfile|
+        tempfile.close
+        tempfile.unlink
       end
 
       @logger.debug("added #{submissions.size} submissions")
@@ -160,14 +169,14 @@ class ContentZipper
 
     all_attachments = rich_text_attachments + static_attachments
 
-    filename = portfolio.name
-    make_zip_tmpdir(filename) do |zip_name|
+    make_zip_tmpdir(portfolio.name) do |zip_name|
       index = 0
       count = all_attachments.length + 2
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
         update_progress(zip_attachment, index, count)
         portfolio_entries.each do |entry|
-          filename = "#{entry.full_slug}.html"
+          # if filename > 180 characters (allows 75 character buffer for the unique slug)
+          filename = Attachment.shorten_filename(entry.full_slug.concat(".html"))
           content = render_eportfolio_page_content(entry, portfolio, all_attachments, submissions_hash)
           zipfile.get_output_stream(filename) { |f| f.puts content }
         end
@@ -195,8 +204,8 @@ class ContentZipper
     )
   end
 
-  def self.zip_base_folder(*args)
-    ContentZipper.new.zip_base_folder(*args)
+  def self.zip_base_folder(*)
+    ContentZipper.new.zip_base_folder(*)
   end
 
   def zip_base_folder(zip_attachment, folder)
@@ -314,16 +323,31 @@ class ContentZipper
   def add_attachment_to_zip(attachment, zipfile, filename = nil)
     filename ||= attachment.filename
 
+    @files_in_zip ||= Set.new
+    # if filename > 180 characters (allows 75 character buffer for the unique filename)
+    filename = Attachment.shorten_filename(filename)
     # we allow duplicate filenames in the same folder. it's a bit silly, but we
     # have to handle it here or people might not get all their files zipped up.
-    @files_in_zip ||= Set.new
     filename = Attachment.make_unique_filename(filename, @files_in_zip)
     @files_in_zip << filename
 
     handle = nil
     begin
       handle = attachment.open
-      zipfile.get_output_stream(filename) { |zos| Zip::IOExtras.copy_stream(zos, handle) }
+      handle.rewind if handle.respond_to?(:rewind)
+
+      tempfile = Tempfile.new([File.basename(filename), File.extname(filename)])
+      tempfile.binmode
+      IO.copy_stream(handle, tempfile)
+      tempfile.flush
+      tempfile.rewind
+
+      entry = Zip::Entry.new(zipfile.name, filename)
+      Time.use_zone(@user&.time_zone || Time.zone) do
+        entry.time = Zip::DOSTime.from_time(Time.now.utc)
+      end
+      zipfile.add(entry, tempfile.path)
+      mark_successful!
     rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
       Canvas::Errors.capture_exception(:content_export, e, :warn)
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
@@ -403,8 +427,22 @@ class ContentZipper
     content = ERB.new(content).result(binding)
 
     if content
-      zipfile.get_output_stream(filename) { |f| f.puts content }
-      mark_successful!
+      tempfile = Tempfile.new([File.basename(filename, ".html"), ".html"])
+      begin
+        tempfile.write(content)
+        tempfile.flush
+        tempfile.rewind
+
+        entry = Zip::Entry.new(zipfile.name, filename)
+        Time.use_zone(@user&.time_zone || Time.zone) do
+          entry.time = Zip::DOSTime.from_time(Time.now.utc)
+        end
+
+        zipfile.add(entry, tempfile.path)
+        @tempfiles << tempfile
+
+        mark_successful!
+      end
     end
   end
 

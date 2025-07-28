@@ -134,6 +134,10 @@ module CustomSeleniumActions
     reloadable_collection { (scope || driver).find_elements(:xpath, xpath) }
   end
 
+  def find_by_test_id(test_id, scope = nil)
+    f("[data-testid='#{test_id}']", scope)
+  end
+
   def find_with_jquery(selector, scope = nil)
     driver.execute_script(
       "return $(arguments[0], arguments[1] && $(arguments[1]))[0];",
@@ -230,6 +234,10 @@ module CustomSeleniumActions
   # usage example: find_table ("Grade Changes")
   def find_table(caption = "", scope = nil)
     fj("table:contains('#{caption}')", scope)
+  end
+
+  def find_table_rows(caption = "", scope = nil)
+    ffxpath("//table[caption='#{caption}']/tbody/tr", scope)
   end
 
   def fxpath_table_cell(caption, row_index, col_index)
@@ -442,6 +450,12 @@ module CustomSeleniumActions
     end
   end
 
+  def search_for_option(select_css, option_text, option_value, match_by = :value)
+    element = canvas_select(select_css)
+    input_canvas_select(element, option_text)
+    click_INSTUI_Select_option(element, option_value, match_by)
+  end
+
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
     if element.tag_name == "input"
@@ -452,15 +466,20 @@ module CustomSeleniumActions
     end
   end
 
-  def INSTUI_select(elem_or_css)
+  def element_or_css(elem_or_css)
     elem_or_css.is_a?(String) ? fj(elem_or_css) : elem_or_css
   end
 
-  # implementation of click_option for use with INSTU's Select
-  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
-  # untested with a raw instui Select)
-  def click_INSTUI_Select_option(select, option_text, select_by = :text)
-    cselect = INSTUI_select(select)
+  def canvas_select(elem_or_css)
+    element_or_css(elem_or_css)
+  end
+
+  def instui_select(elem_or_css)
+    element_or_css(elem_or_css)
+  end
+
+  def instui_select_option(select, option_text, select_by: text)
+    cselect = instui_select(select)
     option_list_id = cselect.attribute("aria-controls")
     if option_list_id.blank?
       cselect.click
@@ -468,21 +487,53 @@ module CustomSeleniumActions
     end
 
     if select_by == :text
-      fj("##{option_list_id} [role='option']:contains(#{option_text})").click
+      fj("##{option_list_id} [role='option']:contains(#{option_text})")
     else
-      f("##{option_list_id} [role='option'][#{select_by}='#{option_text}']").click
+      f("##{option_list_id} [role='option'][#{select_by}='#{option_text}']")
     end
   end
 
+  def clear_canvas_select(select)
+    cselect = canvas_select(select)
+    # clear the input field
+    cselect.send_keys [:control, "a"], :backspace
+  end
+
+  def input_canvas_select(select, text, option_exists: true)
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+    cselect = canvas_select(select)
+    clear_canvas_select(select)
+
+    # if the option doesn't exist, we need to type the first word of the option
+    # otherwise all space characters will be ignored
+    unless option_exists
+      cselect.send_keys(text.split.first)
+      wait.until { cselect.attribute("aria-expanded") == "false" }
+      return
+    end
+
+    text.split.flat_map { |w| [w, :space] }[0...-1].each do |word|
+      cselect.send_keys(word)
+      wait.until { cselect.attribute("aria-expanded") == "true" }
+    end
+  end
+
+  # implementation of click_option for use with INSTU's Select
+  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
+  # untested with a raw instui Select)
+  def click_INSTUI_Select_option(select, option_text, select_by = :text)
+    instui_select_option(select, option_text, select_by:).click
+  end
+
   def INSTUI_Select_options(select)
-    cselect = INSTUI_select(select)
+    cselect = instui_select(select)
     cselect.click # open the options list
     option_list_id = cselect.attribute("aria-controls")
     ff("##{option_list_id} [role='option']")
   end
 
   def INSTUI_Menu_options(menu)
-    menu = INSTUI_select(menu)
+    menu = instui_select(menu)
     menu.click # option the options list
     ff("[aria-labelledby='#{menu.attribute("id")}'] [role='menuitemradio']")
   end
@@ -618,11 +669,17 @@ module CustomSeleniumActions
   end
 
   ##
+  ## drags the source element by dx to the right and dy down
+  def drag_and_drop_element_by(source, dx, dy)
+    driver.action.drag_and_drop_by(source, dx, dy).perform
+  end
+
+  ##
   # returns true if a form validation error message is visible, false otherwise
-  def error_displayed?
+  def error_displayed?(class_name = "error_text")
     # after it fades out, it's still visible, just off the screen
     driver.execute_script(
-      "return $('.error_text:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0"
+      "return $('.#{class_name}:visible').filter(function(){ return $(this).offset().left >= 0 }).length > 0"
     )
   end
 
@@ -642,6 +699,11 @@ module CustomSeleniumActions
   def move_to_click(selector)
     el = driver.find_element :css, selector
     driver.action.move_to(el).click.perform
+  end
+
+  def scroll_to_click_element(element)
+    scroll_into_view(element)
+    element.click
   end
 
   def move_to_click_element(element)
@@ -725,5 +787,14 @@ module CustomSeleniumActions
     element.click
   rescue
     click_repeat(element)
+  end
+
+  # If you want to simulate a user's internet connection turning offline, use these methods.
+  def turn_off_network
+    driver.network_conditions = { offline: true, latency: 0, throughput: 0 }
+  end
+
+  def turn_on_network
+    driver.network_conditions = { offline: false, latency: 0, throughput: -1 }
   end
 end

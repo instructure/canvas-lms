@@ -19,15 +19,17 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {map, filter, sortBy} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('EnrollmentTermsDropdown')
+const I18n = createI18nScope('EnrollmentTermsDropdown')
 
 class EnrollmentTermsDropdown extends React.Component {
   static propTypes = {
     terms: PropTypes.array.isRequired,
     changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
   }
+
+  termsDropdown = React.createRef()
 
   sortedTerms = terms => {
     const dated = filter(terms, term => term.startAt)
@@ -61,7 +63,7 @@ class EnrollmentTermsDropdown extends React.Component {
         name="enrollment_term"
         data-view="termSelect"
         aria-label="Enrollment Term"
-        ref="termsDropdown"
+        ref={this.termsDropdown}
         onChange={this.props.changeSelectedEnrollmentTerm}
       >
         {this.termOptions(this.props.terms)}

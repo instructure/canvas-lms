@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_4')
+const I18n = createI18nScope('permissions_templates_4')
 
 export const template = generateActionTemplates(
   [
@@ -35,17 +35,17 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conferences'),
       description: I18n.t(
-        'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.'
+        'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To end a long-running conference, the Course Content permission must be enabled.'
+        'To end a long-running conference, the Course Content permission must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.'
+        'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.',
       ),
     },
   ],
@@ -62,18 +62,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conferences'),
       description: I18n.t(
-        'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.'
+        'To allow full management of conferences created by the user or others, the Course Content permission must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To end a long-running conference, the Course Content permission must be enabled.'
+        'To end a long-running conference, the Course Content permission must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.'
+        'If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences.',
       ),
     },
-  ]
+  ],
 )

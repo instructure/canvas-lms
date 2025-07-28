@@ -17,11 +17,8 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
-
-const I18n = useI18nScope('collaborations')
 
 let main
 
@@ -30,9 +27,6 @@ class CollaborationsToolLaunch extends React.Component {
     super(props)
     this.state = {
       height: 500,
-      beforeExternalContentAlertClass: 'screenreader-only',
-      afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {},
     }
 
     main = document.querySelector('#main')
@@ -57,71 +51,15 @@ class CollaborationsToolLaunch extends React.Component {
     })
   }
 
-  handleAlertFocus = event => {
-    const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = ''
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = ''
-    }
-    this.setState(newState)
-  }
-
-  handleAlertBlur = event => {
-    const newState = {
-      iframeStyle: {border: 'none', width: '100%'},
-    }
-    if (event.target.className.search('before') > -1) {
-      newState.beforeExternalContentAlertClass = 'screenreader-only'
-    } else if (event.target.className.search('after') > -1) {
-      newState.afterExternalContentAlertClass = 'screenreader-only'
-    }
-    this.setState(newState)
-  }
-
   render() {
-    const beforeAlertStyles = `before_external_content_info_alert ${this.state.beforeExternalContentAlertClass}`
-    const afterAlertStyles = `after_external_content_info_alert ${this.state.afterExternalContentAlertClass}`
-
     return (
       <div className="CollaborationsToolLaunch" style={{height: this.state.height}}>
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={beforeAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info">
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The following content is partner provided')}
-          </div>
-        </div>
         <ToolLaunchIframe
           src={this.props.launchUrl}
-          style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
         />
-        <div
-          onFocus={this.handleAlertFocus}
-          onBlur={this.handleAlertBlur}
-          className={afterAlertStyles}
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex="0"
-        >
-          <div className="ic-flash-info">
-            <div className="ic-flash__icon" aria-hidden="true">
-              <i className="icon-info" />
-            </div>
-            {I18n.t('The preceding content is partner provided')}
-          </div>
-        </div>
       </div>
     )
   }

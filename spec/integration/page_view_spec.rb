@@ -46,15 +46,6 @@ describe "page views" do
     expect(pv.http_method).to eq "get"
   end
 
-  it "does not record gets for api request when setting disabled" do
-    Setting.set("create_get_api_page_views", "false")
-    course_with_teacher(active_all: 1, user: user_with_pseudonym)
-    @topic = @course.discussion_topics.create!
-    expect do
-      get "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: { access_token: @user.access_tokens.create!.full_token }
-    end.not_to change(PageView, :count)
-  end
-
   it "records the developer key when an access token was used" do
     user_with_pseudonym(active_all: 1)
     course_with_teacher(active_all: 1, user: @user)

@@ -88,7 +88,7 @@ class Trend {
   d() {
     return Math.pow(
       sumBy(this.rawData, p => p.x),
-      2
+      2,
     )
   }
 

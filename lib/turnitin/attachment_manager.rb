@@ -23,7 +23,7 @@ module Turnitin
       assignment = submission.assignment
       user = submission.user
       tool = assignment.external_tool_tag.content
-      tool ||= ContextExternalTool.from_assignment(assignment)
+      tool ||= Lti::ToolFinder.from_assignment(assignment)
       tii_client = TiiClient.new(
         user,
         assignment,

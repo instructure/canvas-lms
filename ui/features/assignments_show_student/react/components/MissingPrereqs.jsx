@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string} from 'prop-types'
 
@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 
 import locked1SVG from '../../images/Locked1.svg'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 function modulesPage(moduleUrl) {
   const encodedUrl = encodeURI(moduleUrl)
@@ -46,7 +46,7 @@ export default function MissingPrereqs(props) {
           <Flex.Item>
             <Text weight="normal" data-testid="assignments-2-pre-req-title" margin="small">
               {I18n.t(
-                'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.'
+                'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.',
               )}
             </Text>
           </Flex.Item>

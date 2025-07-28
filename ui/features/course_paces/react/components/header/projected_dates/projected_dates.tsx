@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -20,14 +19,14 @@
 import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {coursePaceActions as actions} from '../../../actions/course_paces'
-import {StoreState, CoursePace, OptionalDate, PaceDuration} from '../../../types'
+import type {StoreState, CoursePace, OptionalDate, PaceDuration} from '../../../types'
 import {
   getCoursePace,
   getCoursePaceItems,
@@ -37,7 +36,7 @@ import {
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone, coursePaceDateFormatter} from '../../../shared/api/backend_serializer'
 
-const I18n = useI18nScope('course_paces_projected_dates')
+const I18n = createI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
 const NBSP = String.fromCharCode(0x00a0)
@@ -62,7 +61,7 @@ const END_DATE_CAPTIONS = {
   hypothetical: I18n.t('Determined by course pace'),
 }
 
-type StoreProps = {
+export type StoreProps = {
   readonly coursePace: CoursePace
   readonly assignments: number
   readonly paceDuration: PaceDuration
@@ -83,18 +82,10 @@ export const ProjectedDates = ({
 }: StoreProps) => {
   const [dateFormatter] = useState(coursePaceDateFormatter)
 
-  const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
-  let endDateValue, endHelpText
-  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
-    endDateValue = plannedEndDate
-    endHelpText = END_DATE_CAPTIONS.user
-  } else {
-    endDateValue =
-      coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
-    endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
-  }
+  const endDateValue = coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
+  const endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
 
   useEffect(() => {
     if (compression > 0) {
@@ -106,6 +97,7 @@ export const ProjectedDates = ({
 
   const hasAtLeastOneDate = () => !!(startDateValue || endDateValue)
 
+  // @ts-expect-error
   const renderDate = (label, dateValue, helpText, testid) => {
     return (
       <div data-testid={testid} style={{display: 'inline-block', lineHeight: '1.125rem'}}>
@@ -141,7 +133,7 @@ export const ProjectedDates = ({
                   one: '1 assignment',
                   other: '%{count} assignments',
                 },
-                {count: assignments}
+                {count: assignments},
               )}
             </Text>
           </View>
@@ -155,7 +147,7 @@ export const ProjectedDates = ({
                   one: '1 week',
                   other: '%{count} weeks',
                 },
-                {count: paceDuration.weeks}
+                {count: paceDuration.weeks},
               )}
               {NBSP}
               {I18n.t(
@@ -163,7 +155,7 @@ export const ProjectedDates = ({
                   one: '1 day',
                   other: '%{count} days',
                 },
-                {count: paceDuration.days}
+                {count: paceDuration.days},
               )}{' '}
             </Text>
           </View>
@@ -187,7 +179,7 @@ export const ProjectedDates = ({
                 I18n.t('Start Date'),
                 startDateValue,
                 startHelpText,
-                'coursepace-start-date'
+                'coursepace-start-date',
               )}
             </Flex.Item>
             <Flex.Item margin="0 medium medium 0" shouldGrow={true}>

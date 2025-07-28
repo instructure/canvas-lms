@@ -17,18 +17,22 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ConfigureExternalToolButton from '../ConfigureExternalToolButton'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 let tool
 let event
+let ref
+let returnFocus
 
 beforeEach(() => {
   ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   ENV.CONTEXT_BASE_URL = 'https://advantage.tool.com'
   tool = {
     name: 'test tool',
+    app_id: '1',
     tool_configuration: {
       url: 'https://advantage.tool.com',
     },
@@ -36,105 +40,60 @@ beforeEach(() => {
   event = {
     preventDefault() {},
   }
+  ref = React.createRef()
+  returnFocus = jest.fn()
   userEvent.setup()
 })
 
-test('uses the tool configuration "url" when present', () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
-  expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com'
-  )
-})
+function renderComponent(modalIsOpen = false) {
+  return render(<ConfigureExternalToolButton {...{tool, modalIsOpen, returnFocus, ref}} />)
+}
 
-test('uses the tool configuration "target_link_uri" when "url" is not present', () => {
-  tool.tool_configuration = {
-    target_link_uri: 'https://advantage.tool.com',
-  }
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+function renderComponentOpen() {
+  renderComponent(true)
+}
+
+test('uses the tool id to launch', () => {
+  renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'url=https%3A%2F%2Fadvantage.tool.com'
+    '/external_tools/1',
   )
 })
 
 test('includes the tool_configuration placement', () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   expect(screen.getByTitle(/Tool Configuration/i).getAttribute('src')).toContain(
-    'placement=tool_configuration'
+    'placement=tool_configuration',
   )
 })
 
-test('shows beginning info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
-  )
-  ref.current.handleAlertFocus({target: {className: 'before'}})
-  expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-  // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
-  // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-})
-
-test('shows ending info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
-  )
-
-  ref.current.handleAlertFocus({target: {className: 'after'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-  // Note: The width here is normally 300px, but because these are older JS files, the CSS isn't included,
-  // so the offsetWidth is 0.
-  expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-})
-
-test('hides beginning info alert and adds styles to iframe', async () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
-  ref.current.openModal(event)
-  ref.current.handleAlertBlur({target: {className: 'before'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-})
-
-test('hides ending info alert and adds styles to iframe', () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
-  ref.current.openModal(event)
-
-  ref.current.handleAlertBlur({target: {className: 'after'}})
-  expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-  expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-})
-
-test("doesn't show alerts or add border to iframe by default", () => {
-  const ref = React.createRef()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={jest.fn()} ref={ref} />)
-  ref.current.openModal(event)
-  const iframe = screen.getByTitle(/Tool Configuration/i)
-  expect(iframe).toHaveClass('tool_launch')
-  expect(iframe).not.toHaveStyle('border: 2px solid #0374B5;')
+test('adds iframe width/height when it is in the tool configuration', () => {
+  tool.tool_configuration.selection_width = 500
+  tool.tool_configuration.selection_height = 600
+  renderComponentOpen()
+  expect(ref.current.iframeStyle()).toEqual({
+    border: 'none',
+    padding: '2px',
+    width: 500,
+    height: 600,
+    minHeight: 600,
+  })
 })
 
 test('sets the iframe allowances', () => {
-  const ref = React.createRef()
-  render(
-    <ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} ref={ref} />
-  )
-  ref.current.handleAlertFocus({target: {className: 'before'}})
+  renderComponentOpen()
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveAttribute('allow', 'midi; media')
 })
 
 test("sets the 'data-lti-launch' attribute on the iframe", () => {
-  render(<ConfigureExternalToolButton tool={tool} modalIsOpen={true} returnFocus={jest.fn()} />)
+  renderComponentOpen()
   const iframe = screen.getByTitle(/Tool Configuration/i)
   expect(iframe).toHaveAttribute('data-lti-launch', 'true')
 })
 
 test('opens and closes the modal', async () => {
-  const returnFocus = jest.fn()
-  render(<ConfigureExternalToolButton tool={tool} returnFocus={returnFocus} />)
+  renderComponent()
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 
   await userEvent.click(screen.getByText(/configure/i))
@@ -143,6 +102,27 @@ test('opens and closes the modal', async () => {
 
   await userEvent.click(screen.getByTestId('close-modal-button'))
 
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
   expect(returnFocus).toHaveBeenCalled()
+})
+
+test('closes the modal when tool sends lti.close message', async () => {
+  renderComponentOpen()
+  monitorLtiMessages()
+
+  const iframe = screen.getByTitle(/Tool Configuration/i)
+  fireEvent(
+    window,
+    new MessageEvent('message', {
+      data: {subject: 'lti.close'},
+      origin: 'https://advantage.tool.com',
+      source: iframe.contentWindow,
+    }),
+  )
+
+  await waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
 })

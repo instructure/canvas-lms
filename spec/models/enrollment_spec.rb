@@ -1564,7 +1564,6 @@ describe Enrollment do
     end
 
     it "does not send out notifications for enrollment acceptance to admins who are section restricted and in other sections" do
-      # even though section restrictions are still basically meaningless at this point
       teacher = user_with_pseudonym(active_all: true)
       n = Notification.create!(name: "Enrollment Accepted")
       NotificationPolicy.create!(notification: n, communication_channel: @user.communication_channel, frequency: "immediately")
@@ -1573,10 +1572,56 @@ describe Enrollment do
       other_section = @course.course_sections.create!
       e1 = @course.enroll_student(user_factory, section: other_section)
       e1.accept!
-      expect(teacher.messages).to_not be_exists
+      expect(teacher.messages).not_to exist
       e2 = @course.enroll_student(user_factory, section: @course.default_section)
       e2.accept!
-      expect(teacher.messages).to be_exists
+      expect(teacher.reload.messages).to exist
+    end
+
+    context "for course admin temporary enrollments" do
+      before(:once) do
+        Account.default.enable_feature!(:temporary_enrollments)
+        provider = user_factory(active_all: true)
+        @recipient = user_with_pseudonym(active_all: true)
+        @course = course_with_teacher(active_all: true, user: provider).course
+        pairing = TemporaryEnrollmentPairing.create!(root_account: Account.default, created_by: account_admin_user)
+        @temp_enrollment = @course.enroll_user(@recipient,
+                                               "TeacherEnrollment",
+                                               {
+                                                 role: teacher_role,
+                                                 temporary_enrollment_source_user_id: provider.id,
+                                                 temporary_enrollment_pairing_id: pairing.id,
+                                               })
+      end
+
+      it "does not send out notifications for enrollment acceptance with inactive / future enrollments" do
+        @temp_enrollment.update!(start_at: 1.day.from_now, end_at: 1.week.from_now)
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).not_to exist
+      end
+
+      it "sends out notifications for enrollment acceptance with active temp enrollments" do
+        @temp_enrollment.update!(start_at: 1.day.ago, end_at: 1.day.from_now)
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).to exist
+        expect(@recipient.messages.take.notification).to eq(n)
+      end
+
+      it "sends out notifications for enrollment acceptance with non-temporary enrollments" do
+        @course.enroll_user(@recipient, "TeacherEnrollment", { role: teacher_role })
+        n = Notification.create!(name: "Enrollment Accepted")
+        NotificationPolicy.create!(notification: n, communication_channel: @recipient.communication_channel, frequency: "immediately")
+        e = @course.enroll_student(user_factory, section: @course.default_section)
+        e.accept!
+        expect(@recipient.reload.messages).to exist
+        expect(@recipient.messages.take.notification).to eq(n)
+      end
     end
   end
 
@@ -1613,13 +1658,7 @@ describe Enrollment do
       expect(Enrollment).to receive(:delay_if_production)
         .with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"))
         .and_call_original
-      # The delegation works correctly in both cases, just the introspection of the method
-      # kwargs by rspec is different between ruby versions
-      if RUBY_VERSION >= "2.7.0"
-        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id)
-      else
-        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
-      end
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id)
 
       Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
     end
@@ -2704,6 +2743,94 @@ describe Enrollment do
     end
   end
 
+  context "audit_groups_for_deleted_enrollments with differentiation tags" do
+    before do
+      Account.default.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      Account.default.save!
+      Account.default.reload
+      course_with_teacher(active_all: true)
+    end
+
+    it "removes the user from the differentiation tag when the enrollment is deleted" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      # Set up non-collaborative group (differentiation tag)
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student)
+      expect(diff_tag.users).to include(student)
+
+      # Delete enrollment to trigger audit removal
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      enrollment.destroy
+      diff_tag.reload
+
+      expect(diff_tag.users).not_to include(student)
+    end
+
+    it "removes the differentiation tag membership when the enrollment is rejected" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      gm = non_collab_category.groups.create!(context: @course).add_user(student)
+
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      enrollment.reject!
+
+      expect(gm.reload).to be_deleted
+    end
+
+    it "does not remove the differentiation tag when a user's section is updated" do
+      # Set up course with two users in one section
+      student1 = user_model
+      student2 = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student1, "StudentEnrollment")
+      section1.enroll_user(student2, "StudentEnrollment")
+
+      # Set up a non-collaborative group category with restricted self sign-up
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student1)
+      diff_tag.add_user(student2)
+      # Move student2 to a new section
+      section2 = @course.course_sections.create!(name: "Section 2")
+      enrollment = student2.enrollments.where(course_section_id: section1.id).first
+      enrollment.course_section = section2
+      enrollment.save!
+      diff_tag.reload
+      non_collab_category.reload
+
+      expect(diff_tag.users.size).to eq 2
+      expect(diff_tag.users).to include(student2)
+    end
+
+    it "ignores previously deleted differentiation tag memberships" do
+      student = user_model
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section1.enroll_user(student, "StudentEnrollment")
+
+      non_collab_category = @course.group_categories.create!(name: "Non-Collaborative Category", non_collaborative: true)
+      diff_tag = non_collab_category.groups.create!(context: @course)
+      diff_tag.add_user(student)
+
+      # Mark the differentiation tag membership as deleted
+      membership = diff_tag.group_memberships.where(user_id: student.id).first
+      membership.update!(workflow_state: "deleted")
+
+      enrollment = student.enrollments.where(course_section_id: section1.id).first
+      expect { enrollment.destroy }.not_to raise_error
+      diff_tag.reload
+
+      expect(diff_tag.users).not_to include(student)
+    end
+  end
+
   describe "for_email" do
     before :once do
       course_factory(active_all: true)
@@ -2895,7 +3022,7 @@ describe Enrollment do
     end
 
     it "follows chain of fallbacks in correct order if no enrollment_dates" do
-      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, Time.now]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, Time.zone.now]])
 
       # start peeling away things from most preferred to least preferred to
       # test fallback chain
@@ -3165,13 +3292,12 @@ describe Enrollment do
   end
 
   describe "#can_be_deleted_by" do
-    describe "on a student enrollment with granular_permissions_manage_users" do
+    describe "on a student enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_student
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
@@ -3202,13 +3328,12 @@ describe Enrollment do
       end
     end
 
-    describe "on an observer enrollment with granular_permission_manage_users" do
+    describe "on an observer enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_observer
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
@@ -3230,13 +3355,12 @@ describe Enrollment do
       end
     end
 
-    describe "on a teacher enrollment with granular_permission_manage_users" do
+    describe "on a teacher enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_teacher
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
@@ -3699,6 +3823,40 @@ describe Enrollment do
             expect { enroll_user }.to not_change { Delayed::Job.where(tag: "MicrosoftSync::StateMachineJob#run_later").count }
           end
         end
+      end
+    end
+  end
+
+  describe ".all_student" do
+    before(:once) do
+      @student = @user
+      @enrollment = @course.enroll_student(@student, enrollment_state: :active)
+    end
+
+    context "course workflow_state" do
+      it "available" do
+        @course.update_attribute(:workflow_state, "available")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "completed" do
+        @course.update_attribute(:workflow_state, "completed")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "created" do
+        @course.update_attribute(:workflow_state, "created")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "claimed" do
+        @course.update_attribute(:workflow_state, "claimed")
+        expect(Enrollment.all_student).to include(@enrollment)
+      end
+
+      it "deleted" do
+        @course.update_attribute(:workflow_state, "deleted")
+        expect(Enrollment.all_student).not_to include(@enrollment)
       end
     end
   end

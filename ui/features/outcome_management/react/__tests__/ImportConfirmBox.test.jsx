@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, act, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ImportConfirmBox, {showImportConfirmBox} from '../ImportConfirmBox'
 
 jest.useFakeTimers()
@@ -33,7 +34,21 @@ describe('ImportConfirmBox', () => {
     ...props,
   })
 
-  beforeEach(async () => {
+  // Custom render function to help with testing
+  const renderImportConfirmBox = props => {
+    // Clear any previous renders
+    if (document.body.querySelector('[data-testid="import-confirm-box"]')) {
+      document.body.innerHTML = ''
+    }
+
+    return render(<ImportConfirmBox {...defaultProps(props)} />)
+  }
+
+  beforeEach(() => {
+    // Reset the DOM between tests
+    document.body.innerHTML = ''
+
+    // Create the alert div fresh for each test
     alertDiv = document.createElement('div')
     alertDiv.id = 'flashalert_message_holder'
     alertDiv.setAttribute('role', 'alert')
@@ -44,32 +59,82 @@ describe('ImportConfirmBox', () => {
   })
 
   afterEach(() => {
+    // Clean up after each test
     jest.clearAllMocks()
-    alertDiv?.parentNode?.removeChild(alertDiv)
+    document.body.innerHTML = ''
     alertDiv = null
   })
 
   describe('ImportConfirmBox', () => {
     it('shows message with number of outcomes to be imported', () => {
-      const {getByText} = render(<ImportConfirmBox {...defaultProps()} />)
-      expect(getByText(/You are about to add 100 outcomes to this course./)).toBeInTheDocument()
+      // Update the component to add data-testid
+      const ImportConfirmBoxWithTestId = props => (
+        <div data-testid="import-confirm-box">
+          <ImportConfirmBox {...props} />
+        </div>
+      )
+
+      render(<ImportConfirmBoxWithTestId {...defaultProps()} />)
+
+      // Use a more specific query with container
+      const container = screen.getByTestId('import-confirm-box')
+      const message = container.querySelector('div[class*="text"]')
+      expect(message.textContent).toBe('You are about to add 100 outcomes to this course.')
     })
 
     it('pluralizes message depending on number of outcomes to be imported', () => {
-      const {getByText} = render(<ImportConfirmBox {...defaultProps({count: 1})} />)
-      expect(getByText(/You are about to add 1 outcome to this course./)).toBeInTheDocument()
+      // Update the component to add data-testid
+      const ImportConfirmBoxWithTestId = props => (
+        <div data-testid="import-confirm-box">
+          <ImportConfirmBox {...props} />
+        </div>
+      )
+
+      render(<ImportConfirmBoxWithTestId {...defaultProps({count: 1})} />)
+
+      // Use a more specific query with container
+      const container = screen.getByTestId('import-confirm-box')
+      const message = container.querySelector('div[class*="text"]')
+      expect(message.textContent).toBe('You are about to add 1 outcome to this course.')
     })
 
     it('calls onCloseHandler when cancel button is clicked', async () => {
-      const {getByText} = render(<ImportConfirmBox {...defaultProps()} />)
-      fireEvent.click(getByText('Cancel'))
+      // Update the component to add data-testid
+      const ImportConfirmBoxWithTestId = props => (
+        <div data-testid="import-confirm-box">
+          <ImportConfirmBox {...props} />
+        </div>
+      )
+
+      render(<ImportConfirmBoxWithTestId {...defaultProps()} />)
+
+      // Use a more specific query with container and role
+      const container = screen.getByTestId('import-confirm-box')
+      const cancelButton = container.querySelector('button span span').closest('button')
+      fireEvent.click(cancelButton)
+
       await act(async () => jest.runAllTimers())
       expect(onCloseHandlerMock).toHaveBeenCalled()
     })
 
     it('calls onImportHandler and onCloseHandler when Import Anyway button is clicked', async () => {
-      const {getByText} = render(<ImportConfirmBox {...defaultProps()} />)
-      fireEvent.click(getByText('Import Anyway'))
+      // Update the component to add data-testid
+      const ImportConfirmBoxWithTestId = props => (
+        <div data-testid="import-confirm-box">
+          <ImportConfirmBox {...props} />
+        </div>
+      )
+
+      render(<ImportConfirmBoxWithTestId {...defaultProps()} />)
+
+      // Find the button by its text content within the container
+      const container = screen.getByTestId('import-confirm-box')
+      const buttons = container.querySelectorAll('button')
+      const importButton = Array.from(buttons).find(button =>
+        button.textContent.includes('Import Anyway'),
+      )
+
+      fireEvent.click(importButton)
       await act(async () => jest.runAllTimers())
       expect(onImportHandlerMock).toHaveBeenCalled()
       expect(onCloseHandlerMock).toHaveBeenCalled()
@@ -80,7 +145,7 @@ describe('ImportConfirmBox', () => {
     it('renders ImportConfirmBox when showImportConfirmBox is called', async () => {
       showImportConfirmBox({...defaultProps()})
       expect(
-        screen.getByText(/You are about to add 100 outcomes to this course./)
+        screen.getByText(/You are about to add 100 outcomes to this course./),
       ).toBeInTheDocument()
     })
 

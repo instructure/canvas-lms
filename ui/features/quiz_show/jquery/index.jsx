@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import MessageStudentsDialog from '@canvas/message-students-dialog'
 import QuizArrowApplicator from '@canvas/quizzes/jquery/quiz_arrows'
 import inputMethods from '@canvas/quizzes/jquery/quiz_inputs'
@@ -37,9 +37,76 @@ import '@canvas/message-students-dialog/jquery/message_students' /* messageStude
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {
+  RubricAssignmentContainer,
+  RubricSelfAssessmentSettingsWrapper,
+} from '@canvas/rubrics/react/RubricAssignment'
+import {
+  mapRubricUnderscoredKeysToCamelCase,
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+} from '@canvas/rubrics/react/utils'
 
-const I18n = useI18nScope('quizzes.show')
+const I18n = createI18nScope('quizzes.show')
+
+const roots = new Map()
+
+function createOrUpdateRoot(elementId, component) {
+  const container = document.getElementById(elementId)
+  if (!container) return
+
+  let root = roots.get(elementId)
+  if (!root) {
+    root = createRoot(container)
+    roots.set(elementId, root)
+  }
+  root.render(component)
+}
+
+function unmountRoot(elementId) {
+  const root = roots.get(elementId)
+  if (root) {
+    root.unmount()
+    roots.delete(elementId)
+  }
+}
+
+function renderRubric() {
+  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit-mount-point')
+
+  if ($mountPoint) {
+    const envRubric = ENV.assigned_rubric
+    const envRubricAssociation = ENV.rubric_association
+    const assignmentRubric = envRubric
+      ? {
+          ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
+          can_update: ENV.assigned_rubric?.can_update,
+          association_count: ENV.assigned_rubric?.association_count,
+        }
+      : undefined
+    const assignmentRubricAssociation = envRubricAssociation
+      ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
+      : undefined
+
+    createOrUpdateRoot(
+      'enhanced-rubric-assignment-edit-mount-point',
+      <RubricAssignmentContainer
+        assignmentId={ENV.ASSIGNMENT_ID}
+        assignmentRubric={assignmentRubric}
+        assignmentRubricAssociation={assignmentRubricAssociation}
+        canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+        courseId={ENV.COURSE_ID}
+        rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
+        aiRubricsEnabled={ENV.ai_rubrics_enabled}
+      />,
+    )
+  }
+
+  createOrUpdateRoot(
+    'enhanced-rubric-self-assessment-edit',
+    <RubricSelfAssessmentSettingsWrapper assignmentId={ENV.ASSIGNMENT_ID} />,
+  )
+}
 
 $(document).ready(function () {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
@@ -90,7 +157,7 @@ $(document).ready(function () {
     event.preventDefault()
     let deleteConfirmMessage = I18n.t(
       'confirms.delete_quiz',
-      'Are you sure you want to delete this quiz?'
+      'Are you sure you want to delete this quiz?',
     )
     const submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'), 10)
     if (submittedCount > 0) {
@@ -103,7 +170,7 @@ $(document).ready(function () {
             other:
               'Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
           },
-          {count: submittedCount}
+          {count: submittedCount},
         )
     }
     $('nothing').confirmDelete({
@@ -125,24 +192,24 @@ $(document).ready(function () {
         if (hasOpenedQuizDetails) {
           if (ENV.IS_SURVEY) {
             $quizResultsText.text(
-              I18n.t('links.show_student_survey_results', 'Show Student Survey Results')
+              I18n.t('links.show_student_survey_results', 'Show Student Survey Results'),
             )
           } else {
             $quizResultsText.text(
-              I18n.t('links.show_student_quiz_results', 'Show Student Quiz Results')
+              I18n.t('links.show_student_quiz_results', 'Show Student Quiz Results'),
             )
           }
         } else if (ENV.IS_SURVEY) {
           $quizResultsText.text(
-            I18n.t('links.hide_student_survey_results', 'Hide Student Survey Results')
+            I18n.t('links.hide_student_survey_results', 'Hide Student Survey Results'),
           )
         } else {
           $quizResultsText.text(
-            I18n.t('links.hide_student_quiz_results', 'Hide Student Quiz Results')
+            I18n.t('links.hide_student_quiz_results', 'Hide Student Quiz Results'),
           )
         }
         hasOpenedQuizDetails = !hasOpenedQuizDetails
-      })
+      }),
     )
   })
 
@@ -150,15 +217,21 @@ $(document).ready(function () {
     event.preventDefault()
     ensureStudentsLoaded(() => {
       const submissionList = ENV.QUIZ_SUBMISSION_LIST
-      const unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS
-      const submittedStudents = submissionList.SUBMITTED_STUDENTS
+      const unsubmittedStudents = submissionList.UNSUBMITTED_STUDENTS.map(p => ({
+        ...p,
+        id: p.id.toString(),
+      }))
+      const submittedStudents = submissionList.SUBMITTED_STUDENTS.map(p => ({
+        ...p,
+        id: p.id.toString(),
+      }))
       const haveTakenQuiz = I18n.t(
         'students_who_have_taken_the_quiz',
-        'Students who have taken the quiz'
+        'Students who have taken the quiz',
       )
       const haveNotTakenQuiz = I18n.t(
         'students_who_have_not_taken_the_quiz',
-        'Students who have NOT taken the quiz'
+        'Students who have NOT taken the quiz',
       )
       const dialog = new MessageStudentsDialog({
         context: ENV.QUIZ.title,
@@ -173,17 +246,20 @@ $(document).ready(function () {
 
   function openSendTo(event, open = true) {
     if (event) event.preventDefault()
-    ReactDOM.render(
+
+    const container = document.getElementById('direct-share-mount-point')
+    const root = createRoot(container)
+    root.render(
       <DirectShareUserModal
         open={open}
         sourceCourseId={ENV.COURSE_ID}
         contentShare={{content_type: 'quiz', content_id: ENV.QUIZ.id}}
         onDismiss={() => {
+          root.unmount()
           openSendTo(null, false)
           $('.al-trigger').focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
     )
   }
 
@@ -191,17 +267,20 @@ $(document).ready(function () {
 
   function openCopyTo(event, open = true) {
     if (event) event.preventDefault()
-    ReactDOM.render(
+
+    const container = document.getElementById('direct-share-mount-point')
+    const root = createRoot(container)
+    root.render(
       <DirectShareCourseTray
         open={open}
         sourceCourseId={ENV.COURSE_ID}
         contentSelection={{quizzes: [ENV.QUIZ.id]}}
         onDismiss={() => {
+          root.unmount()
           openCopyTo(null, false)
           $('.al-trigger').focus()
         }}
       />,
-      document.getElementById('direct-share-mount-point')
     )
   }
 
@@ -264,11 +343,12 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    ReactDOM.render(
-      <ItemAssignToTray
+    createOrUpdateRoot(
+      'assign-to-mount-point',
+      <ItemAssignToManager
         open={open}
         onClose={() => {
-          ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+          unmountRoot('assign-to-mount-point')
         }}
         onDismiss={() => {
           renderItemAssignToTray(false, returnFocusTo, itemProps)
@@ -280,7 +360,6 @@ $(document).ready(function () {
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}
       />,
-      document.getElementById('assign-to-mount-point')
     )
   }
 
@@ -321,7 +400,9 @@ $(document).ready(function () {
       $('#assignment_external_tools')[0],
       'assignment_view',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.QUIZ.assignment_id, 10)
+      parseInt(ENV.QUIZ.assignment_id, 10),
     )
   }
+
+  renderRubric()
 })

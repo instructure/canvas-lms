@@ -27,12 +27,13 @@ shared_context "discussions_page_shared_context" do
   let(:discussions_topic_detail_page) { "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}" }
   let(:permissions_page) { "/account/#{@account.id}/permissions" }
   let(:discussion_link) { ".discussions" }
-  let(:discussion_message) { '.message.user_content.enhanced:contains("Discussion 1 message")' }
-  let(:discussion_edit_button) { ".btn.edit-btn" }
+  let(:discussion_message) { '[data-resource-type="discussion_topic.body"]:contains("Discussion 1 message")' }
+  let(:discussion_edit_button) { '[data-testid="discussion-thread-menuitem-edit"]' }
   let(:course_navigation_items) { "#section-tabs" }
   let(:discussions_link) { "Discussions" }
-  let(:discussion_container) { "#discussion_container" }
-  let(:discussion_reply_button) { ".discussion-reply-action.discussion-reply-box" }
+  let(:discussion_container) { '[data-testid="discussion-topic-container"]' }
+  let(:discussion_menu) { '[data-position-content="discussion-post-menu"]' }
+  let(:discussion_reply_button) { '[data-testid="discussion-topic-reply"]' }
 end
 
 module DiscussionHelpers

@@ -192,7 +192,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
 
   // if there's no edit link, don't need to (and shouldn't) do the rest of
   // this. the edit link is included on the page if and only if the user has
-  // :manage_content permission on the course (see assignments'
+  // :manage_course_content_edit permission on the course (see assignments'
   // syllabus_right_side view)
   if (!$edit_syllabus_link.length) return
 

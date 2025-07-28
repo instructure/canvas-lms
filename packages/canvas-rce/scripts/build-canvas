@@ -11,7 +11,8 @@ mkdir -p es
 # delete everything in them.
 rm -rf lib/*
 rm -rf es/*
+rm -f tsconfig.tsbuildinfo
 
-yarn build:types
 yarn installTranslations
 yarn build:es
+yarn build:types

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CoursePacing::PaceContextsApiController < ApplicationController
-  before_action :require_feature_flag
   before_action :require_context
   before_action :ensure_pacing_enabled
   before_action :authorize_action
@@ -54,24 +53,24 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   def index
     contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type, params: filter_params)
     paginated_contexts = Api.paginate(contexts, self, api_v1_pace_contexts_url, total_entries: contexts.count)
+
+    @course_pace_pacing_status_labels_enabled = @context.root_account.feature_enabled?(:course_pace_pacing_status_labels)
+    overdue_items_by_user = (@course_pace_pacing_status_labels_enabled && @type == "student_enrollment") ? CoursePacing::CoursePaceService.off_pace_counts_by_user(contexts) : {}
+
     render json: {
-      pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c) },
+      pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c, overdue_items_by_user) },
       total_entries: contexts.count
     }
   end
 
   private
 
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
-  end
-
   def ensure_pacing_enabled
     not_found unless @context.enable_course_paces
   end
 
   def authorize_action
-    authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
   end
 
   def load_type

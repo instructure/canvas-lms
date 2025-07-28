@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -28,7 +28,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import axios from '@canvas/axios'
 import {string} from 'prop-types'
 
-const I18n = useI18nScope('generate_pairing_code')
+const I18n = createI18nScope('generate_pairing_code')
 
 export default class GeneratePairingCode extends Component {
   state = {
@@ -87,14 +87,14 @@ export default class GeneratePairingCode extends Component {
       `Share the following pairing code with an observer to allow
     them to connect with %{name}. This code will expire in seven days,
     or after one use.`,
-      {name: this.props.name}
+      {name: this.props.name},
     )
     const messageWithoutName = I18n.t(`Share the following pairing code with an observer to allow
     them to connect with you. This code will expire in seven days,
     or after one use.`)
     return (
       <div>
-        <Button onClick={this.openModal} display="block" textAlign="start">
+        <Button onClick={this.openModal} display="block" textAlign="start" margin="x-small 0">
           <IconGroupLine />
           {I18n.t('Pair with Observer')}
         </Button>

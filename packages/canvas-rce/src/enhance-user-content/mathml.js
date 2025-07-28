@@ -73,7 +73,7 @@ class Mathml {
         script.async = true
         script.src = `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=${configFile}&locale=${locale}`
       })
-      // eslint-disable-next-line promise/catch-or-return
+       
       scriptPromise.then(() => {
         window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function () {
           // get the mathjax context menu above the rce's equation editor
@@ -121,7 +121,7 @@ class Mathml {
           window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
             const elm = Array.isArray(message[1]) ? message[1][0] : message[1]
             const elements = elm.querySelectorAll(
-              '.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]'
+              '.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]',
             )
             elements.forEach(function (element) {
               element.remove()

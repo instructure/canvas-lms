@@ -25,7 +25,5 @@ module Canvas::Migration
     Rails.logger
   end
 
-  def logger
-    Rails.logger
-  end
+  delegate :logger, to: :Rails
 end

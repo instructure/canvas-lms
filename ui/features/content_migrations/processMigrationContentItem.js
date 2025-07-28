@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 import '@canvas/rails-flash-notifications'
 import {
@@ -26,7 +26,7 @@ import {
 } from '@canvas/external-tools/messages'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 export default function processMigrationContentItem(event) {
   if (
@@ -38,6 +38,13 @@ export default function processMigrationContentItem(event) {
 
   try {
     const result = processSingleContentItem(event)
+    if (result === undefined || result === null) {
+      if (!event.data.msg && !event.data.errormsg) {
+        $.flashWarning(I18n.t('No content was selected'))
+      }
+      postMessageExternalContentCancel(window)
+      return
+    }
     if (result.type !== 'file') {
       throw new Error(`Expected type "file" but received "${result.type}"`)
     }
@@ -47,7 +54,7 @@ export default function processMigrationContentItem(event) {
   } catch (error) {
     $.flashError(I18n.t('Error retrieving content'))
     postMessageExternalContentCancel(window)
-    // eslint-disable-next-line no-console
+
     console.error(error)
     captureException(error)
   }

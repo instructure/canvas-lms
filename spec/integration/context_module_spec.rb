@@ -27,24 +27,8 @@ describe ContextModule do
   end
 
   describe "index" do
-    it "requires manage_content permission before showing add controls" do
+    it "requires manage_course_content_edit permission before showing add controls" do
       course_with_teacher_logged_in active_all: true
-      @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
-      get "/courses/#{@course.id}/modules"
-      doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css(".add_module_link")).not_to be_nil
-
-      @course.account.role_overrides.create! role: ta_role, permission: "manage_content", enabled: false
-      course_with_ta course: @course
-      user_session(@ta)
-      get "/courses/#{@course.id}/modules"
-      doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css(".add_module_link")).to be_nil
-    end
-
-    it "requires manage_course_content_edit permission before showing add controls (granular permissions)" do
-      course_with_teacher_logged_in active_all: true
-      @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css(".add_module_link")).not_to be_nil
@@ -199,6 +183,8 @@ describe ContextModule do
           expect(html.at_css("#file_content")["src"]).to match(/#{@test_url.split("?").first}/)
         elsif @is_wiki_page
           expect(html.css("#wiki_page_show").length).to eq 1
+        elsif @test_url.match?("discussion_topics")
+          expect(html.css("#test_content").length).to eq 0
         else
           expect(html.css("#test_content").length).to eq 1
         end

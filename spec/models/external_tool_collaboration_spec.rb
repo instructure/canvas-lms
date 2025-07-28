@@ -51,7 +51,7 @@ describe ExternalToolCollaboration do
     let(:url) { "http://www.example.com/launch" }
     let(:account) { account_model }
     let(:course) { course_model(account:) }
-    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:developer_key) { lti_developer_key_model(account:) }
     let(:tool_1p1) { external_tool_model(context: course, opts: { url:, domain: }) }
     let(:tool_1p3) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
 
@@ -59,6 +59,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: course,
         title: "Indirect Collaboration",
+        root_account_id: course.root_account_id,
         url:
       )
     end
@@ -73,6 +74,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: course,
         title: "Indirect Collaboration",
+        root_account_id: course.root_account_id,
         url: "http://tool2.other.com"
       )
     end
@@ -81,6 +83,7 @@ describe ExternalToolCollaboration do
       external_tool_collaboration_model(
         context: other_course,
         title: "Other Course - Indirect Collaboration",
+        root_account_id: other_course.root_account_id,
         url:
       )
     end

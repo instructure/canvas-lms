@@ -20,6 +20,10 @@ import {screen, waitFor, fireEvent} from '@testing-library/dom'
 import TrayController from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 
+jest.mock('../../../shared/DimensionsInput', () => ({
+  useDimensionsState: () => ({ isValid: true }),
+}));
+
 describe('RCE "Images" Plugin > ImageOptionsTray > TrayController for Icon Maker Icons', () => {
   const isIconMaker = true
 

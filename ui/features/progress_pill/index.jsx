@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconUploadLine, IconWarningLine} from '@instructure/ui-icons'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('progress_pill')
+const I18n = createI18nScope('progress_pill')
 
 ready(() => {
   const presenter = document.querySelectorAll('.assignment_presenter_for_submission')
@@ -39,10 +39,13 @@ ready(() => {
   }
 
   const progressElements = document.querySelectorAll('.react_pill_container')
+  const roots = []
   for (let i = 0; i < progressElements.length; i++) {
     const icon = progressIcon(presenter[i])
     if (icon !== null) {
-      ReactDOM.render(<Tooltip renderTip={icon[1]}>{icon[0]}</Tooltip>, progressElements[i])
+      const root = createRoot(progressElements[i])
+      root.render(<Tooltip renderTip={icon[1]}>{icon[0]}</Tooltip>)
+      roots.push(root)
     }
   }
 })

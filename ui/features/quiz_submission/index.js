@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import '@canvas/quizzes/jquery/behaviors/quiz_selectmenu'
 
-const I18n = useI18nScope('quizzes.quiz_submission')
+const I18n = createI18nScope('quizzes.quiz_submission')
 
 $(document).ready(() => {
   $('#questions.assessment_results .question').hover(
@@ -29,7 +29,7 @@ $(document).ready(() => {
     },
     function () {
       $(this).removeClass('hover')
-    }
+    },
   )
 
   $('.quiz_response_text img').each(function () {
@@ -44,8 +44,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_image',
-          'This is an image, not text, and could have changed since the student submitted'
-        )
+          'This is an image, not text, and could have changed since the student submitted',
+        ),
       )
   })
 
@@ -61,8 +61,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_external_frame',
-          'This is an external frame, not text, and could have changed since the student submitted'
-        )
+          'This is an external frame, not text, and could have changed since the student submitted',
+        ),
       )
   })
 
@@ -88,8 +88,8 @@ $(document).ready(() => {
         'title',
         I18n.t(
           'titles.this_is_an_external_element',
-          'This is an external element, not text, and could have changed since the student submitted'
-        )
+          'This is an external element, not text, and could have changed since the student submitted',
+        ),
       )
   })
 })

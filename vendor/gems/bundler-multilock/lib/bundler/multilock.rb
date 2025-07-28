@@ -75,11 +75,11 @@ module Bundler
 
         lockfile_definitions[lockfile] = (lockfile_def = {
           gemfile: (gemfile && Bundler.root.join(gemfile).expand_path) || Bundler.default_gemfile,
-          lockfile: lockfile,
-          active: active,
+          lockfile:,
+          active:,
           prepare: block,
-          parent: parent,
-          enforce_pinned_additional_dependencies: enforce_pinned_additional_dependencies
+          parent:,
+          enforce_pinned_additional_dependencies:
         })
 
         # If they're using BUNDLE_LOCKFILE, then they really do want to
@@ -179,7 +179,7 @@ module Bundler
             Bundler.settings.temporary(frozen: true) do
               Bundler.ui.silence do
                 up_to_date = checker.base_check(lockfile_definition, check_missing_deps: true) &&
-                             checker.deep_check(lockfile_definition, conflicts: conflicts)
+                             checker.deep_check(lockfile_definition, conflicts:)
               end
             end
             if up_to_date
@@ -198,7 +198,7 @@ module Bundler
               end
 
               Bundler.ui.info("Installing gems for #{relative_lockfile}...")
-              write_lockfile(lockfile_definition, lockfile_name, cache, install: install)
+              write_lockfile(lockfile_definition, lockfile_name, cache, install:)
             else
               Bundler.ui.info("Syncing to #{relative_lockfile}...") if attempts == 1
               synced_any = true
@@ -248,7 +248,7 @@ module Bundler
                   next :self if parent_spec.nil?
                   next spec_precedences[spec.name] if spec_precedences.key?(spec.name)
 
-                  precedence = if !(cache.reverse_dependencies(lockfile_name)[spec.name] & conflicts).empty?
+                  precedence = if !(cache.reverse_dependencies(lockfile_name)[spec.name] & conflicts).empty? # rubocop:disable Style/ArrayIntersect -- not an array
                                  :parent
                                elsif cache.conflicting_requirements?(lockfile_name,
                                                                      parent_lockfile_name,
@@ -260,6 +260,9 @@ module Bundler
                   spec_precedences[spec.name] = precedence || :parent
                 end
 
+                lockfile.sources.map! do |source|
+                  parent_lockfile.sources.find { |s| s == source } || source
+                end
                 # replace any duplicate specs with what's in the parent lockfile
                 lockfile.specs.map! do |spec|
                   parent_spec = cache.find_matching_spec(parent_specs, spec)
@@ -268,9 +271,11 @@ module Bundler
 
                   dependency_changes ||= spec != parent_spec
 
-                  new_spec = parent_spec.dup
-                  new_spec.source = spec.source
-                  new_spec
+                  if spec.source != parent_spec.source
+                    parent_spec = parent_spec.dup
+                    parent_spec.source = spec.source
+                  end
+                  parent_spec
                 end
 
                 lockfile.platforms.replace(parent_lockfile.platforms).uniq!
@@ -302,9 +307,9 @@ module Bundler
                 had_changes ||= write_lockfile(lockfile_definition,
                                                temp_lockfile.path,
                                                cache,
-                                               install: install,
-                                               dependency_changes: dependency_changes,
-                                               unlocking_bundler: unlocking_bundler)
+                                               install:,
+                                               dependency_changes:,
+                                               unlocking_bundler:)
               end
               cache.invalidate_lockfile(lockfile_name) if had_changes
 
@@ -483,6 +488,13 @@ module Bundler
         # from someone else
         if current_lockfile.exist? && install
           Bundler.settings.temporary(frozen: true) do
+            # it keeps the same sources as the builder, which now shares with
+            # `definition` above; give it its own copy to avoid stomping on it
+            builder.instance_variable_set(
+              :@sources,
+              builder.instance_variable_get(:@sources).dup
+            )
+
             current_definition = builder.to_definition(current_lockfile, {})
             # if something has changed, we skip this step; it's unlocking anyway
             next unless current_definition.no_resolve_needed?
@@ -504,6 +516,14 @@ module Bundler
           previous_ui_level = Bundler.ui.level
           Bundler.ui.level = "warn"
           begin
+            # force a remote resolution if intermediate gems are missing
+            if definition.instance_variable_get(:@locked_spec_with_missing_deps) ||
+               definition.instance_variable_get(:@locked_spec_with_invalid_deps) ||
+               definition.instance_variable_get(:@missing_lockfile_dep) ||
+               definition.instance_variable_get(:@invalid_lockfile_dep)
+              raise SolveFailure
+            end
+
             # this is a horrible hack, to fix what I consider to be a Bundler bug.
             # basically, if you have multiple platform specific gems in your
             # lockfile, and that gem gets unlocked, Bundler will only search

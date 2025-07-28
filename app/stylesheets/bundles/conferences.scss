@@ -92,3 +92,16 @@
   margin: 0;
   border-radius: 3px;
 }
+
+.page_header {
+  @include page_header;
+}
+
+.page_header_container {
+  @include page_header_container;
+}
+
+.actions_buttons-container {
+  @include action_buttons_container;
+}
+

@@ -29,11 +29,14 @@ jest.mock('@canvas/do-fetch-api-effect')
 
 describe('Grading Schemes Management Tests', () => {
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
   })
 
   afterEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
 
@@ -43,9 +46,10 @@ describe('Grading Schemes Management Tests', () => {
         contextId="1"
         contextType="Course"
         archivedGradingSchemesEnabled={false}
+        defaultAccountGradingSchemeEnabled={false}
         onGradingSchemesChanged={() => {}}
         {...props}
-      />
+      />,
     )
   }
 
@@ -100,7 +104,7 @@ describe('Grading Schemes Management Tests', () => {
 
   describe('archived grading schemes', () => {
     const renderArchivedGradingSchemesManagement = (
-      props: Partial<GradingSchemesManagementProps> = {}
+      props: Partial<GradingSchemesManagementProps> = {},
     ) => {
       return renderGradingSchemesManagement({archivedGradingSchemesEnabled: true, ...props})
     }
@@ -151,6 +155,23 @@ describe('Grading Schemes Management Tests', () => {
         fireEvent.change(input, {target: {value: 'Carrot Potato Scheme'}})
         expect(getByTestId('grading-scheme-row-')).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('default account grading scheme FF enabled', () => {
+    it('shows the default account grading scheme selector if the context is an account', () => {
+      const {getByText} = renderGradingSchemesManagement({
+        defaultAccountGradingSchemeEnabled: true,
+        contextType: 'Account',
+      })
+      expect(getByText('Account default grading scheme')).toBeInTheDocument()
+    })
+
+    it('does not show the default account grading scheme selector if the context is a course', () => {
+      const {queryByText} = renderGradingSchemesManagement({
+        defaultAccountGradingSchemeEnabled: true,
+      })
+      expect(queryByText('Account default grading scheme')).not.toBeInTheDocument()
     })
   })
 })

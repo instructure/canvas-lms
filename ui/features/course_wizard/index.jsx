@@ -31,7 +31,7 @@ function renderWizard(showWizard) {
     <Suspense fallback={<div />}>
       {showWizard && <CourseWizard onHideWizard={() => renderWizard(false)} />}
     </Suspense>,
-    document.getElementById('wizard_box')
+    document.getElementById('wizard_box'),
   )
 }
 

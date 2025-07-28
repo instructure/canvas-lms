@@ -17,15 +17,16 @@
  */
 
 import React from 'react'
-import {type Outcome} from '../../../types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {GradebookCourseOutcomeProficiency, type Outcome} from '../../../types'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import LoadingIndicator from '@canvas/loading-indicator'
 import type {OutcomeScore, ParsedOutcomeRollup} from '../LearningMasteryTabsView'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type OutcomeResultProps = {
+  courseOutcomeProficiency?: GradebookCourseOutcomeProficiency | null
   outcome?: Outcome | null
   outcomeScore?: OutcomeScore | null
   selectedStudentId?: string | null
@@ -34,6 +35,7 @@ type OutcomeResultProps = {
 }
 
 function OutcomeResult({
+  courseOutcomeProficiency,
   outcome,
   outcomeScore,
   selectedStudentId,
@@ -68,8 +70,10 @@ function OutcomeResult({
       return (
         <View as="div" data-testid="student-outcome-rollup-results">
           <View as="p" className="student_outcome_selection">
-            {I18n.t('Current Mastery Score')}:{selectedOutcomeRollup.score}
-            {I18n.t('out of')} {outcome.masteryPoints}
+            {I18n.t('Current Mastery Score')}: {selectedOutcomeRollup.score} {I18n.t('out of')}{' '}
+            {window.ENV?.FEATURES?.account_level_mastery_scales
+              ? courseOutcomeProficiency?.masteryPoints
+              : outcome.masteryPoints}
           </View>
           <table className="ic-Table">
             <thead>

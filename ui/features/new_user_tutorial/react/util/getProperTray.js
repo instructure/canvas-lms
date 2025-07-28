@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import HomeTray from '../trays/HomeTray'
 import ModulesTray from '../trays/ModulesTray'
 import PagesTray from '../trays/PagesTray'
@@ -37,7 +37,7 @@ import RubricsTray from '../trays/RubricsTray'
 import ZoomTray from '../trays/ZoomTray'
 import NewAnalyticsTray from '../trays/NewAnalyticsTray'
 
-const I18n = useI18nScope('new_user_tutorials')
+const I18n = createI18nScope('new_user_tutorials')
 
 const generateObject = (component, label, pageName) => ({
   component,
@@ -73,7 +73,7 @@ const getProperTray = (path = window.location.pathname) => {
     return generateObject(
       CollaborationsTray,
       I18n.t('Collaborations Tutorial Tray'),
-      'collaborations'
+      'collaborations',
     )
   } else if (path.includes('content_migrations')) {
     return generateObject(ImportTray, I18n.t('Import Tutorial Tray'), 'collaborations')
@@ -94,7 +94,7 @@ const getProperTray = (path = window.location.pathname) => {
       return generateObject(
         NewAnalyticsTray,
         I18n.t('New Analytics Tutorial Tray'),
-        'new-analytics'
+        'new-analytics',
       )
     }
     // Return null if we don't have a tutorial tray

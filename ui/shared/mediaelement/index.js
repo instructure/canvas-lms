@@ -45,7 +45,7 @@ window.MediaElementPlayer.prototype.buildsourcechooser = function (
   player,
   _controls,
   _layers,
-  _media
+  _media,
 ) {
   if (!player.isVideo) return
   return orginalBuildsourcechooser.apply(this, arguments)

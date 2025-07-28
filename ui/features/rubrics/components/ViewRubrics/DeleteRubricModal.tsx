@@ -17,19 +17,20 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {useMutation, queryClient} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import {deleteRubric} from '../../queries/ViewRubricQueries'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {Text} from '@instructure/ui-text'
+import {useMutation} from '@tanstack/react-query'
 
-const I18n = useI18nScope('rubrics-duplicate-modal')
+const I18n = createI18nScope('rubrics-duplicate-modal')
 
 export type DeleteRubricModalProps = {
   id?: string
@@ -50,7 +51,7 @@ export const DeleteRubricModal = ({
   setPopoverIsOpen,
 }: DeleteRubricModalProps) => {
   const {
-    isLoading: deleteLoading,
+    isPending: deleteLoading,
     isError: deleteError,
     mutate,
   } = useMutation({
@@ -59,8 +60,18 @@ export const DeleteRubricModal = ({
     onSuccess: async () => {
       showFlashSuccess(I18n.t('Rubric deleted successfully'))()
       const queryKey = accountId ? `accountRubrics-${accountId}` : `courseRubrics-${courseId}`
-      await queryClient.invalidateQueries([`fetch-rubric-${id}`], {}, {cancelRefetch: true})
-      await queryClient.invalidateQueries([queryKey], undefined, {cancelRefetch: true})
+      await queryClient.invalidateQueries(
+        {
+          queryKey: [`fetch-rubric-${id}`],
+        },
+        {cancelRefetch: true},
+      )
+      await queryClient.invalidateQueries(
+        {
+          queryKey: [queryKey],
+        },
+        {cancelRefetch: true},
+      )
       onDismiss()
       setPopoverIsOpen(false)
     },
@@ -111,7 +122,7 @@ export const DeleteRubricModal = ({
             onClick={() => mutate()}
             color="danger"
             type="submit"
-            data-testid="delete-rubric-button"
+            data-testid="delete-rubric-modal-button"
           >
             {I18n.t('Delete')}
           </Button>

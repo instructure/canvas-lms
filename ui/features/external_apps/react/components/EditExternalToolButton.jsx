@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -26,13 +26,12 @@ import store from '../lib/ExternalAppsStore'
 import ConfigurationForm from './configuration_forms/ConfigurationForm'
 import Lti2Edit from './Lti2Edit'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     canEdit: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
     returnFocus: PropTypes.func.isRequired,
   }
 
@@ -42,6 +41,8 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   editButton = React.createRef()
+  configurationForm = React.createRef()
+  lti2Edit = React.createRef()
 
   setContextExternalToolState = data => {
     const tool = Object.assign(data, this.props.tool)
@@ -102,7 +103,7 @@ export default class EditExternalToolButton extends React.Component {
       () => {
         this.closeModal()
         $.flashError(I18n.t('We were unable to activate the app.'))
-      }
+      },
     )
   }
 
@@ -116,7 +117,7 @@ export default class EditExternalToolButton extends React.Component {
       () => {
         this.closeModal()
         $.flashError(I18n.t('We were unable to deactivate the app.'))
-      }
+      },
     )
   }
 
@@ -124,7 +125,7 @@ export default class EditExternalToolButton extends React.Component {
     if (this.state.tool.app_type === 'ContextExternalTool') {
       return (
         <ConfigurationForm
-          ref="configurationForm"
+          ref={this.configurationForm}
           tool={this.state.tool}
           configurationType="manual"
           handleSubmit={this.saveChanges}
@@ -140,7 +141,7 @@ export default class EditExternalToolButton extends React.Component {
       // Lti::ToolProxy
       return (
         <Lti2Edit
-          ref="lti2Edit"
+          ref={this.lti2Edit}
           tool={this.state.tool}
           handleActivateLti2={this.handleActivateLti2}
           handleDeactivateLti2={this.handleDeactivateLti2}
@@ -151,7 +152,7 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canEdit || this.props.canAddEdit) {
+    if (this.props.canEdit) {
       const editAriaLabel = I18n.t('Edit %{toolName} App', {toolName: this.state.tool.name})
 
       return (

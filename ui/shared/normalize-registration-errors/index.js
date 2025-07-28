@@ -33,6 +33,6 @@ export default function (errors, passwordPolicy) {
       observee: Pseudonym.prototype.normalizeErrors(errors.observee, passwordPolicy),
       pairing_code: ObserverPairingCode.prototype.normalizeErrors(errors.pairing_code),
     },
-    {arrays: false}
+    {arrays: false},
   )
 }

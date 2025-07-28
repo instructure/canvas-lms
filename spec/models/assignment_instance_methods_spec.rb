@@ -27,6 +27,40 @@ describe Assignment do
     end
   end
 
+  describe "cross-shard" do
+    specs_require_sharding
+    before(:once) do
+      @shard1.activate do
+        @cross_shard_student = User.create!
+      end
+
+      @shard2.activate do
+        account = @account = Account.create!
+        @course2 = Course.create!(account:, workflow_state: "available")
+        @teacher = course_with_teacher(active_all: true, course: @course2).user
+        @student1 = student_in_course(active_all: true).user
+        @student2 = student_in_course(active_all: true).user
+        @student3 = student_in_course(active_all: true).user
+        @course2.enroll_student(@cross_shard_student, enrollment_state: "active")
+
+        @assignment = @course2.assignments.create(points_possible: 100)
+        @assignment.submit_homework @student1, body: "EHLO"
+        @assignment.submit_homework @student2, body: "EHLO"
+        @assignment.submit_homework @cross_shard_student, body: "EHLO_cross"
+        @assignment.grade_student @student1, score: 99, grader: @teacher
+        @assignment.grade_student(@cross_shard_student, grade: 9, grader: @teacher)
+      end
+    end
+
+    it "returns all representatives with assignment overrides" do
+      # we could spec some examples, but this way it works for any overrides.
+      allow_any_instance_of(AbstractAssignment).to receive(:differentiated_assignments_applies?).and_return(true)
+      @shard1.activate do
+        expect(Assignment.find(@assignment.global_id).representatives(user: @teacher).map(&:id).sort).to match([@cross_shard_student.id, @student1.global_id, @student2.global_id, @student3.global_id].sort)
+      end
+    end
+  end
+
   describe "serialization" do
     before do
       course = Course.create!
@@ -47,6 +81,199 @@ describe Assignment do
       assignment = Assignment.new(sub_assignment_tag: "my_tag")
       assignment.validate
       expect(assignment.errors.full_messages).to include "Sub assignment tag must be blank"
+    end
+  end
+
+  describe "unsupported_in_speedgrader_2?" do
+    before do
+      @course = Course.create!
+      course_with_student(course: @course, active_all: true)
+    end
+
+    context "based on submission types" do
+      it "allows dynamically dropping support for particular assignment types" do
+        a = @course.assignments.create!(submission_types: "online_upload")
+
+        expect { Setting.set("submission_types_unsupported_in_sg2", "online_upload") }.to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false).to(true)
+      end
+
+      it "for assignments with multiple types, does not support that assignment if any of its types are unsupported" do
+        a = @course.assignments.create!(submission_types: "online_text_entry,online_upload")
+
+        expect { Setting.set("submission_types_unsupported_in_sg2", "online_upload") }.to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false).to(true)
+      end
+
+      it "continues to support assignment types not specified in the Setting" do
+        a = @course.assignments.create!(submission_types: "online_upload")
+
+        expect { Setting.set("submission_types_unsupported_in_sg2", "online_text_entry") }.not_to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false)
+      end
+
+      it "ignores leading/trailing spaces in the Setting value" do
+        a = @course.assignments.create!(submission_types: "online_upload")
+
+        expect { Setting.set("submission_types_unsupported_in_sg2", " online_upload  ") }.to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false).to(true)
+      end
+    end
+
+    context "based on grading type" do
+      it "allows dynamically dropping support for particular grading types" do
+        a = @course.assignments.create!(submission_types: "online_text_entry", grading_type: "letter_grade")
+
+        expect { Setting.set("grading_types_unsupported_in_sg2", "letter_grade") }.to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false).to(true)
+      end
+
+      it "continues to support grading types not specified in the Setting" do
+        a = @course.assignments.create!(submission_types: "online_text_entry", grading_type: "points")
+
+        expect { Setting.set("grading_types_unsupported_in_sg2", "letter_grade") }.not_to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false)
+      end
+
+      it "ignores leading/trailing spaces in the Setting value" do
+        a = @course.assignments.create!(submission_types: "online_text_entry", grading_type: "letter_grade")
+
+        expect { Setting.set("grading_types_unsupported_in_sg2", " letter_grade ") }.to change {
+          a.unsupported_in_speedgrader_2?
+        }.from(false).to(true)
+      end
+    end
+
+    context "based on features" do
+      it "returns true by default for moderated assignments" do
+        a = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+        expect(a).to be_unsupported_in_speedgrader_2
+      end
+
+      it "returns false if feature flag is enabled" do
+        Account.site_admin.enable_feature!(:moderated_grading_modernized_speedgrader)
+        a = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+        expect(a).not_to be_unsupported_in_speedgrader_2
+      end
+
+      it "conditionally allows moderated assignments" do
+        a = @course.assignments.create!(moderated_grading: true, grader_count: 1)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(true).to(false)
+      end
+
+      it "allows dynamically dropping support for peer review assignments" do
+        a = @course.assignments.create!(peer_reviews: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "peer")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(false).to(true)
+      end
+
+      it "allows dynamically dropping support for group assignments" do
+        group_category = @course.group_categories.create!(name: "My Group Category")
+        a = @course.assignments.create!(group_category:)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "group")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(false).to(true)
+      end
+
+      it "allows dynamically dropping support for group assignments graded as group" do
+        group_category = @course.group_categories.create!(name: "My Group Category")
+        group_grade = @course.assignments.create!(group_category:, grade_group_students_individually: false)
+        individual_grade = @course.assignments.create!(group_category:, grade_group_students_individually: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "group_graded_group")
+        end.to change { [group_grade.unsupported_in_speedgrader_2?, individual_grade.unsupported_in_speedgrader_2?] }.from([false, false]).to([true, false])
+      end
+
+      it "allows dynamically dropping support for group assignments graded individually" do
+        group_category = @course.group_categories.create!(name: "My Group Category")
+        group_grade = @course.assignments.create!(group_category:, grade_group_students_individually: false)
+        individual_grade = @course.assignments.create!(group_category:, grade_group_students_individually: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "group_graded_ind")
+        end.to change { [group_grade.unsupported_in_speedgrader_2?, individual_grade.unsupported_in_speedgrader_2?] }.from([false, false]).to([false, true])
+      end
+
+      it "allows dynamically dropping support for anonymous assignments" do
+        anonymous = @course.assignments.create!(anonymous_grading: true)
+        anonymous.post_submissions
+        anonymized = @course.assignments.create!(anonymous_grading: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "anonymous")
+        end.to change { [anonymous.unsupported_in_speedgrader_2?, anonymized.unsupported_in_speedgrader_2?] }.from([false, false]).to([true, true])
+      end
+
+      it "allows dynamically dropping support for actively anonymized assignments (anon assignments that haven't been posted to students yet)" do
+        anonymous = @course.assignments.create!(anonymous_grading: true)
+        anonymous.post_submissions
+        anonymized = @course.assignments.create!(anonymous_grading: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "anonymized")
+        end.to change { [anonymous.unsupported_in_speedgrader_2?, anonymized.unsupported_in_speedgrader_2?] }.from([false, false]).to([false, true])
+      end
+
+      it "allows dynamically dropping support for new quizzes" do
+        a = @course.assignments.build(submission_types: "external_tool")
+        tool = @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+        a.external_tool_tag_attributes = { content: tool }
+        a.save!
+
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "new_quiz")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(false).to(true)
+      end
+
+      it "allows dynamically dropping support for assignments with rubrics attached" do
+        rubric = rubric_model({
+                                context: @course,
+                                title: "Test Rubric",
+                                data: [{
+                                  description: "Some criterion",
+                                  points: 10,
+                                  id: "crit1",
+                                  ignore_for_scoring: true,
+                                  ratings: [
+                                    { description: "Good", points: 10, id: "rat1", criterion_id: "crit1" }
+                                  ]
+                                }]
+                              })
+        a = @course.assignments.create!(submission_types: "online_text_entry")
+        rubric.associate_with(a, @course, purpose: "grading")
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "rubric")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(false).to(true)
+      end
+
+      it "supports multiple features" do
+        group_category = @course.group_categories.create!(name: "My Group Category")
+        group = @course.assignments.create!(group_category:)
+        anonymous = @course.assignments.create!(anonymous_grading: true)
+        peer = @course.assignments.create!(peer_reviews: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "group,peer")
+        end.to change { [group.unsupported_in_speedgrader_2?, anonymous.unsupported_in_speedgrader_2?, peer.unsupported_in_speedgrader_2?] }.from([false, false, false]).to([true, false, true])
+      end
+
+      it "ignores bogus values stored in the setting" do
+        a = @course.assignments.create!(peer_reviews: true)
+        expect do
+          Setting.set("assignment_features_unsupported_in_sg2", "hackerman,peer,sql_injection_evil, ")
+        end.to change { a.unsupported_in_speedgrader_2? }.from(false).to(true)
+      end
     end
   end
 
@@ -268,7 +495,7 @@ describe Assignment do
     let(:url) { "http://www.example.com" }
     let(:account) { account_model }
     let(:course) { course_model(account:) }
-    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:developer_key) { lti_developer_key_model(account:) }
     let(:old_tool) { external_tool_model(context: course, opts: { url: }) }
     let(:new_tool) { external_tool_1_3_model(context: course, developer_key:, opts: { url:, name: "1.3 tool" }) }
     let(:direct_assignment) do

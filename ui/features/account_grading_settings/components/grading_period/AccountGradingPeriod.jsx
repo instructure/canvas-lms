@@ -22,12 +22,13 @@ import $ from 'jquery'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
+import {windowConfirm} from '@canvas/util/globalUtils'
 
-const I18n = useI18nScope('AccountGradingPeriod')
+const I18n = createI18nScope('AccountGradingPeriod')
 
 export default class AccountGradingPeriod extends React.Component {
   static propTypes = {
@@ -55,13 +56,19 @@ export default class AccountGradingPeriod extends React.Component {
 
   constructor(props) {
     super(props)
-    this._refs = {}
+    this.editButtonRef = React.createRef()
+    this.deleteButtonRef = React.createRef()
+    this.weightRef = React.createRef()
+    this.titleRef = React.createRef()
+    this.startDateRef = React.createRef()
+    this.endDateRef = React.createRef()
+    this.closeDateRef = React.createRef()
   }
 
   promptDeleteGradingPeriod = event => {
     event.stopPropagation()
     const confirmMessage = I18n.t('Are you sure you want to delete this grading period?')
-    if (!window.confirm(confirmMessage)) return null
+    if (!windowConfirm(confirmMessage)) return null
     const url = replaceTags(this.props.deleteGradingPeriodURL, 'id', this.props.period.id)
 
     axios
@@ -84,9 +91,7 @@ export default class AccountGradingPeriod extends React.Component {
     if (this.props.permissions.update && !this.props.readOnly) {
       return (
         <IconButton
-          elementRef={ref => {
-            this._refs.editButton = ref
-          }}
+          elementRef={el => (this.editButtonRef.current = el)}
           disabled={this.props.actionsDisabled}
           onClick={this.onEdit}
           withBackground={false}
@@ -104,9 +109,7 @@ export default class AccountGradingPeriod extends React.Component {
     if (this.props.permissions.delete && !this.props.readOnly) {
       return (
         <IconButton
-          elementRef={ref => {
-            this._refs.deleteButton = ref
-          }}
+          elementRef={el => (this.deleteButtonRef.current = el)}
           disabled={this.props.actionsDisabled}
           onClick={this.promptDeleteGradingPeriod}
           withBackground={false}
@@ -124,11 +127,7 @@ export default class AccountGradingPeriod extends React.Component {
     if (this.props.weighted) {
       return (
         <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-          <span
-            ref={ref => {
-              this._refs.weight = ref
-            }}
-          >
+          <span ref={this.weightRef}>
             {I18n.t('Weight:')} {I18n.n(this.props.period.weight, {percentage: true})}
           </span>
         </div>
@@ -141,38 +140,20 @@ export default class AccountGradingPeriod extends React.Component {
       <div className="GradingPeriodList__period">
         <div className="GradingPeriodList__period__attributes grid-row">
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-4">
-            <span
-              ref={ref => {
-                this._refs.title = ref
-              }}
-            >
-              {this.props.period.title}
-            </span>
+            <span ref={this.titleRef}>{this.props.period.title}</span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span
-              ref={ref => {
-                this._refs.startDate = ref
-              }}
-            >
+            <span ref={this.startDateRef}>
               {I18n.t('Starts:')} {DateHelper.formatDateForDisplay(this.props.period.startDate)}
             </span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span
-              ref={ref => {
-                this._refs.endDate = ref
-              }}
-            >
+            <span ref={this.endDateRef}>
               {I18n.t('Ends:')} {DateHelper.formatDateForDisplay(this.props.period.endDate)}
             </span>
           </div>
           <div className="GradingPeriodList__period__attribute col-xs-12 col-md-8 col-lg-2">
-            <span
-              ref={ref => {
-                this._refs.closeDate = ref
-              }}
-            >
+            <span ref={this.closeDateRef}>
               {I18n.t('Closes:')} {DateHelper.formatDateForDisplay(this.props.period.closeDate)}
             </span>
           </div>

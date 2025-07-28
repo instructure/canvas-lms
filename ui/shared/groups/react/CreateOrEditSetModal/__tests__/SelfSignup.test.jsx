@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import {GroupContext} from '../context'
 import {SelfSignup} from '../SelfSignup'
 
@@ -38,9 +38,16 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       const v = checked ? 'checked' : 'unchecked'
       it(`tracks ${v} Self Signup`, () => {
         const state = {selfSignup: checked, bySection: false}
-        const {getByTestId} = render(<Wrapper state={state} props={defaultProps} />)
+        const {getByTestId, queryByTestId} = render(
+          <Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />,
+        )
         expect(getByTestId('checkbox-allow-self-signup').checked).toBe(checked)
         expect(getByTestId('checkbox-same-section').disabled).toBe(!checked)
+        if (checked) {
+          expect(getByTestId('self-signup-end-date')).toBeInTheDocument()
+        } else {
+          expect(queryByTestId('self-signup-end-date')).not.toBeInTheDocument()
+        }
       })
     })
 
@@ -77,6 +84,44 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       fireEvent.click(getByTestId('checkbox-same-section'))
       expect(onChange).toHaveBeenCalledTimes(1)
       expect(onChange).toHaveBeenCalledWith({selfSignup: true, bySection: true})
+    })
+  })
+
+  it('renders self sign up end date helper text when FF is enabled', () => {
+    const state = {selfSignup: true, bySection: false}
+    const {queryByText} = render(
+      <Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />,
+    )
+    expect(
+      queryByText(
+        'With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      queryByText(
+        'Note that as long as this option is enabled, students can move themselves from one group to another.',
+      ),
+    ).not.toBeInTheDocument()
+  })
+
+  describe('info box', () => {
+    it('renders info box when self sign up is enabled', () => {
+      const state = {selfSignup: true, bySection: true}
+      render(<Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />)
+      expect(
+        screen.getByText(
+          'Students who are enrolled in multiple sections will be put in a group by themselves.',
+        ),
+      ).toBeInTheDocument()
+    })
+    it('does not render info box when self sign up is disabled', () => {
+      const state = {selfSignup: false, bySection: false}
+      render(<Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />)
+      expect(
+        screen.queryByText(
+          'Students who are enrolled in multiple sections will be put in a group by themselves.',
+        ),
+      ).not.toBeInTheDocument()
     })
   })
 })

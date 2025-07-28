@@ -1,0 +1,41 @@
+<table class="grade-values">
+  <tbody>
+  <% if @assignment.checkpoints_parent? %>
+    <div id="checkpoints-grade-inputs-mount-point"></div>
+  <% else %>
+    <tr role="text">
+      <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
+      <td class="bold">
+        <span class="entered_grade">
+          <% if @submission.excused? %>
+            <%= t "Excused" %>
+          <% else %>
+            <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
+          <% end %>
+        </span>
+        <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
+          <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
+        <% end %>
+      </td>
+    </tr>
+  <% end %>
+  <% points_deducted = I18n.n(-@submission.points_deducted) if @submission.points_deducted&.> 0
+     points_possible = I18n.n(round_if_whole(@assignment.points_possible))
+     grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
+  %>
+    <tr role="text" class="error late-penalty-display" style="<%= grade_breakdown_style %>">
+      <th><%= I18n.t('Late penalty:') %></th>
+      <td class="late_penalty bold"><%= points_deducted %></td>
+    </tr>
+    <tr role="text" class="late-penalty-display" style="<%= grade_breakdown_style %>">
+      <th><%= I18n.t('Final grade:') %></th>
+      <td class="bold">
+        <span class="grade"><%= i18n_grade(round_if_whole(@submission.published_grade), @submission.grading_type) %></span>
+
+        <% if @assignment.grading_type == 'points' %>
+          / <%= points_possible %>
+        <% end %>
+      </td>
+    </tr>
+  </tbody>
+</table>

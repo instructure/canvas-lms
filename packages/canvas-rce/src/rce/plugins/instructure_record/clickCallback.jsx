@@ -22,7 +22,7 @@ import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
 import {headerFor, originFromHost} from '../../../rcs/api'
-import {instuiPopupMountNode} from '../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../util/fullscreenHelpers'
 import RCEGlobals from '../../RCEGlobals'
 
 export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
@@ -31,7 +31,7 @@ export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark
   if (error?.name === 'FileSizeError') {
     err_msg = formatMessage(
       'Size of caption file is greater than the maximum {max} kb allowed file size.',
-      {max: error.maxBytes / 1000}
+      {max: error.maxBytes / 1000},
     )
   }
 
@@ -91,7 +91,7 @@ export default function (ed, document) {
               headers: headerFor(contentProps.jwt),
             }}
             userLocale={Bridge.userLocale}
-            mountNode={instuiPopupMountNode}
+            mountNode={instuiPopupMountNodeFn}
             open={true}
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}
@@ -102,10 +102,11 @@ export default function (ed, document) {
             tabs={{record: true, upload: true}}
             uploadMediaTranslations={Bridge.uploadMediaTranslations}
             media_links_use_attachment_id={RCEGlobals.getFeatures().media_links_use_attachment_id}
+            useStudioPlayer={RCEGlobals.getFeatures()?.consolidated_media_player}
           />
         )}
       </StoreProvider>,
-      container
+      container,
     )
   })
 }

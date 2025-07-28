@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,16 +19,15 @@
 import React, {useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import {MomentInput} from 'moment-timezone'
-import type {Moment} from 'moment-timezone'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
+import type {MomentInput} from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
 import {View} from '@instructure/ui-view'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isoDateFromInput} from '../../../util/DateUtils'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const formatDate = (date: Date) => tz.format(date, 'date.formats.medium')
 
@@ -97,18 +95,18 @@ export default function FilterNavDateModal({
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="0 0 medium 0">
-          <CanvasDateInput
+          <CanvasDateInput2
             dataTestid="start-date-input"
-            dateIsDisabled={(date: Moment) =>
-              Boolean(endDateValue && date.toISOString() > endDateValue)
-            }
-            display="block"
+            disabledDates={(isoDate: string) => Boolean(endDateValue && isoDate > endDateValue)}
+            isInline={false}
+            // @ts-expect-error
             formatDate={formatDate}
             interaction="enabled"
             messages={startDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const startDate_ = isoDateFromInput('start-date', inputObj)
+                const startDate_ = isoDateFromInput('start-date', inputObj, ENV?.TIMEZONE)
+                // @ts-expect-error
                 if (endDateValue && startDate_ > endDateValue) {
                   setStartDateMessages([
                     {
@@ -118,6 +116,7 @@ export default function FilterNavDateModal({
                   ])
                 } else {
                   setStartDateMessages([])
+                  // @ts-expect-error
                   setStartDateValue(startDate_)
                 }
               } else {
@@ -131,18 +130,18 @@ export default function FilterNavDateModal({
         </View>
 
         <View as="div">
-          <CanvasDateInput
+          <CanvasDateInput2
             dataTestid="end-date-input"
-            dateIsDisabled={(date: Moment) =>
-              Boolean(startDateValue && date.toISOString() < startDateValue)
-            }
-            display="block"
+            disabledDates={(isoDate: string) => Boolean(startDateValue && isoDate < startDateValue)}
+            isInline={false}
+            // @ts-expect-error
             formatDate={formatDate}
             interaction="enabled"
             messages={endDateMessages}
             onSelectedDateChange={(inputObj: MomentInput) => {
               if (inputObj instanceof Date) {
-                const endDate_ = isoDateFromInput('end-date', inputObj)
+                const endDate_ = isoDateFromInput('end-date', inputObj, ENV?.TIMEZONE)
+                // @ts-expect-error
                 if (startDateValue && endDate_ < startDateValue) {
                   setEndDateMessages([
                     {
@@ -152,6 +151,7 @@ export default function FilterNavDateModal({
                   ])
                 } else {
                   setEndDateMessages([])
+                  // @ts-expect-error
                   setEndDateValue(endDate_)
                 }
               } else {
@@ -168,7 +168,12 @@ export default function FilterNavDateModal({
         <Button onClick={onCloseDateModal} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" data-testid="apply-date-filter">
+        <Button
+          id="apply-date-filter" // EVAL-4235
+          color="primary"
+          type="submit"
+          data-testid="apply-date-filter"
+        >
           {I18n.t('Apply')}
         </Button>
       </Modal.Footer>

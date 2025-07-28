@@ -98,11 +98,11 @@ EOF
             }
 
             stage('Start Canvas Container') {
-              sh 'docker-compose up -d'
+              sh 'docker compose up -d'
             }
 
             stage('Test') {
-              sh 'docker-compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
+              sh 'docker compose exec -T web bundle exec rspec spec/controllers/oauth2_provider_controller_spec.rb -fd'
             }
           } //protectedNode
         } //script

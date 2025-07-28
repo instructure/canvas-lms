@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -68,6 +67,7 @@ const AsyncComponents = {
   loadPostAssignmentGradesTray,
   loadSetDefaultGradeDialog,
 
+  // @ts-expect-error
   async renderGradeDetailTray(props, $container) {
     const GradeDetailTray = await loadGradeDetailTray()
     render(<GradeDetailTray {...props} />, $container)

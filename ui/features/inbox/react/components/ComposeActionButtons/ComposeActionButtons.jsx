@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -23,7 +23,8 @@ import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ConversationContext} from '../../../util/constants'
-const I18n = useI18nScope('conversations_2')
+
+const I18n = createI18nScope('conversations_2')
 export const ComposeActionButtons = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   return (
@@ -40,6 +41,7 @@ const renderUploadButtons = props => {
     <>
       <Tooltip renderTip={I18n.t('Add an attachment')} placement="top">
         <IconButton
+          id="upload-attachment-button"
           screenReaderLabel={I18n.t('Add an attachment')}
           onClick={handleAttachmentClick}
           margin="xx-small"
@@ -63,6 +65,7 @@ const renderUploadButtons = props => {
       {props.onMediaUpload && (
         <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
           <IconButton
+            id="media-upload-button"
             screenReaderLabel={I18n.t('Record an audio or video comment')}
             onClick={props.onMediaUpload}
             margin="xx-small"
@@ -88,6 +91,7 @@ const renderMessageButtons = props => {
         {I18n.t('Cancel')}
       </Button>
       <Button
+        id="send-message-button"
         color={props.isSending ? 'secondary' : 'primary'}
         margin="xx-small"
         onClick={props.onSend}

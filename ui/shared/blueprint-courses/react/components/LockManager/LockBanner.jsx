@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -26,7 +26,7 @@ import '@canvas/rails-flash-notifications'
 import {formatLockObject} from '../../LockItemFormat'
 import propTypes from '../../propTypes'
 
-const I18n = useI18nScope('blueprint_coursesLockBanner')
+const I18n = createI18nScope('blueprint_coursesLockBanner')
 
 export default class LockBanner extends Component {
   static propTypes = {
@@ -55,7 +55,7 @@ export default class LockBanner extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.isLocked && !prevProps.isLocked) {
       $.screenReaderFlashMessage(
-        I18n.t('%{attributes} locked', {attributes: formatLockObject(this.props.itemLocks)})
+        I18n.t('%{attributes} locked', {attributes: formatLockObject(this.props.itemLocks)}),
       )
     }
   }

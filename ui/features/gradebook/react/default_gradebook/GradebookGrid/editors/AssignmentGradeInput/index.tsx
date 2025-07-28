@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -19,13 +18,13 @@
 
 import React, {Component} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'
 import GradingSchemeGradeInput from './GradingSchemeGradeInput'
 import TextGradeInput from './TextGradeInput'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
@@ -47,6 +46,7 @@ type Props = {
     grade: string
     valid: boolean
   }
+  scalingFactor: number
   submission: {
     enteredGrade: string
     enteredScore: number
@@ -60,10 +60,13 @@ export default class AssignmentGradeInput extends Component<Props> {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
+    // @ts-expect-error
     this.bindGradeInput = ref => {
+      // @ts-expect-error
       this.gradeInput = ref
     }
 
@@ -71,18 +74,23 @@ export default class AssignmentGradeInput extends Component<Props> {
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.gradeInput.gradeInfo
   }
 
   focus() {
+    // @ts-expect-error
     this.gradeInput.focus()
   }
 
+  // @ts-expect-error
   handleKeyDown(event) {
+    // @ts-expect-error
     return this.gradeInput.handleKeyDown(event)
   }
 
   hasGradeChanged() {
+    // @ts-expect-error
     return this.gradeInput.hasGradeChanged()
   }
 
@@ -101,22 +109,27 @@ export default class AssignmentGradeInput extends Component<Props> {
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}
         {this.props.enterGradesAs === 'passFail' && (
           <CompleteIncompleteGradeInput
             {...this.props}
+            // @ts-expect-error
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}
         {!['gradingScheme', 'passFail'].includes(this.props.enterGradesAs) && (
+          // @ts-expect-error
           <TextGradeInput
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}

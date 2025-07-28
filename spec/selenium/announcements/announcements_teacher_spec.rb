@@ -18,12 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "../helpers/notifications_common"
 require_relative "../helpers/announcements_common"
 require_relative "pages/announcement_new_edit_page"
 
 describe "announcements" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
+  include NotificationsCommon
+
+  def verify_email_address(email)
+    cc = CommunicationChannel.find_by(path: email)
+    cc.workflow_state = "active"
+    cc.save!
+  end
 
   context "announcements as a teacher" do
     before :once do
@@ -44,10 +52,149 @@ describe "announcements" do
     end
 
     # ignore RCE error since it has nothing to do with the test
-    it "shows the no notifications on edit info alert when editing an announcement", :ignore_js_errors do
+    it "shows the no notifications on edit info alert when editing an announcement" do
       @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
+    end
+
+    context "when :discussion_create feature flag is ON", :ignore_js_errors do
+      before do
+        Account.site_admin.enable_feature!(:discussion_create)
+
+        site_admin_logged_in
+
+        @user = user_with_pseudonym(active_user: true, username: "someone")
+        @course.enroll_user(@user, "StudentEnrollment", enrollment_state: :active)
+
+        verify_email_address("someone#{@user.id}@example.com")
+        setup_notification(@user, name: "New Announcement", category: "Announcement", sms: true)
+
+        @announcement = @course.announcements.create!(title: "something", message: "hello my favorite section!")
+      end
+
+      it "should send notification when user decides to notify users when editing an announcement" do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        AnnouncementNewEdit.save_button.click
+
+        # Expect Modal to appear with proper header
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        # Choose sending Notification along with our change
+        AnnouncementNewEdit.notification_modal_send.click
+
+        expect(Message.last.body).to include "Hi, this is my EDITED message"
+      end
+
+      it "should not send notification when user decides not to notify users when editing an announcement" do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        AnnouncementNewEdit.save_button.click
+
+        # Expect Modal to appear with proper header
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        # Choose not to send Notification along with our change
+        AnnouncementNewEdit.notification_modal_dont_send.click
+
+        # Verify back if user got the message
+        expect(Message.last.body).not_to include "Hi, this is my EDITED message"
+      end
+
+      it "for delayed posting don't send notifications" do
+        @announcement.delayed_post_at = 1.day.from_now
+        @announcement.save!
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
+
+        AnnouncementNewEdit.save_button.click
+
+        expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+        AnnouncementNewEdit.notification_modal_dont_send.click
+
+        expect(Message.last.body).not_to include "Hi, this is my EDITED message"
+      end
+
+      it "should not send notifications at all if we hit Cancel" do
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        AnnouncementNewEdit.save_button.click
+        AnnouncementNewEdit.notification_modal_cancel.click
+
+        expect(AnnouncementNewEdit.save_button).to be_displayed
+      end
+
+      it "removes delayed_post_at when Available from field is cleared" do
+        @announcement.delayed_post_at = 10.days.from_now
+        @announcement.save!
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+        AnnouncementNewEdit.available_from_reset_button.click
+        expect_new_page_load do
+          AnnouncementNewEdit.submit_button.click
+          AnnouncementNewEdit.notification_modal_send.click
+        end
+
+        @announcement.reload
+        expect(@announcement.delayed_post_at).to be_nil
+      end
+
+      it "removes lock_at when Available until field is cleared" do
+        @announcement.lock_at = 10.days.from_now
+        @announcement.save!
+
+        get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+        AnnouncementNewEdit.available_until_reset_button.click
+        expect_new_page_load do
+          AnnouncementNewEdit.submit_button.click
+          AnnouncementNewEdit.notification_modal_send.click
+        end
+
+        @announcement.reload
+        expect(@announcement.lock_at).to be_nil
+      end
+
+      context "selective release assignment embedded in discussions edit page" do
+        it "allows create" do
+          title = "Announcement"
+          message = "this is an announcement"
+          get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
+          AnnouncementNewEdit.title_field.send_keys title
+          type_in_tiny(AnnouncementNewEdit.message_body_selector, message)
+          AnnouncementNewEdit.submit
+          wait_for_ajaximations
+          expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/new")
+        end
+
+        it "allows edit" do
+          title = "Announcement"
+          message = "this is an announcement"
+          get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
+
+          AnnouncementNewEdit.title_field.clear
+          AnnouncementNewEdit.title_field.send_keys title
+          clear_tiny(AnnouncementNewEdit.message_body, "discussion-topic-message-body_ifr")
+          type_in_tiny(AnnouncementNewEdit.message_body_selector, message)
+          AnnouncementNewEdit.submit
+          wait_for_ajaximations
+
+          # Expect Modal to appear with proper header
+          expect(AnnouncementNewEdit.notification_modal).to be_displayed
+
+          # Choose sending Notification along with our change
+          AnnouncementNewEdit.notification_modal_send.click
+
+          wait_for_new_page_load
+          expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit")
+        end
+      end
     end
 
     it "allows saving of section announcement", priority: "1" do
@@ -103,14 +250,13 @@ describe "announcements" do
       it "is visible to teacher in course" do
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
-        expect(f(".discussion-title")).to include_text(@announcement.title)
+        expect(f('[data-testid="message_title"]')).to include_text(@announcement.title)
       end
     end
 
     describe "shared main page topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements" }
       let(:new_url) { "/courses/#{@course.id}/discussion_topics/new?is_announcement=true" }
-      let(:what_to_create) { Announcement }
 
       before :once do
         @topic_title = "new discussion"
@@ -131,7 +277,7 @@ describe "announcements" do
 
         replace_content(f("input[name=title]"), topic_title)
         add_attachment_and_validate
-        expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
+        expect(Announcement.where(title: topic_title).first.attachment_id).to be_present
       end
 
       it "performs front-end validation for message", priority: "1" do
@@ -141,28 +287,15 @@ describe "announcements" do
         wait_for_tiny(f("#discussion-edit-view textarea[name=message]"))
         replace_content(f("input[name=title]"), topic_title)
         submit_form(".form-actions")
-        wait_for_ajaximations
 
-        expect(ff(".error_box").any? { |box| box.text.include?("A message is required") }).to be_truthy
-      end
-
-      it "adds an attachment to a graded topic", priority: "1" do
-        (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: "graded attachment topic", user: @user) : announcement_model(title: "graded attachment topic", user: @user)
-        if what_to_create == DiscussionTopic
-          what_to_create.last.update(assignment: @course.assignments.create!(name: "graded topic assignment"))
-        end
-        get url
-        expect_new_page_load { f(".ic-announcement-row h3").click }
-        expect_new_page_load { f(".edit-btn").click }
-
-        add_attachment_and_validate
+        expect(ff(".error_box").any? { |box| box.attribute("innerHTML").include?("A message is required") }).to be_truthy
       end
 
       it "edits a topic", priority: "1" do
         edit_name = "edited discussion name"
-        topic = (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
+        topic = announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
-        expect_new_page_load { f(".edit-btn").click }
+        click_edit_btn
 
         edit_announcement(edit_name, "edit message")
       end
@@ -170,10 +303,9 @@ describe "announcements" do
 
     it "creates a delayed announcement with an attachment", priority: "1" do
       AnnouncementNewEdit.visit_new(@course)
-      f("input[type=checkbox][name=delay_posting]").click
       replace_content(f("input[name=title]"), "First Announcement")
       type_in_tiny("textarea[name=message]", "Hi, this is my first announcement")
-      f(".ui-datepicker-trigger").click
+      f("input#delayed_post_at ~ button.ui-datepicker-trigger").click
       datepicker_next
       f(".ui-datepicker-time .ui-datepicker-ok").click
       _, path = get_file("testfile1.txt")
@@ -192,13 +324,11 @@ describe "announcements" do
                                         message: "foobers",
                                         delayed_post_at: 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
-      expect(f(".discussion-fyi")).to include_text(
-        "The content of this announcement will not be visible to users until"
-      )
+      expect(f('[data-testid="delayed-until"]')).to include_text("This announcement will not be visible until")
     end
 
     it "allows delay post date edit with disabled comments", priority: "2" do
-      time_new = format_time_for_view(Time.zone.today + 1.day)
+      time_new = format_time_for_view(Time.zone.today + 1.day).gsub(" at ", " ")
       disable_comments_on_announcements
       announcement = @course.announcements.create!(
         title: "Hello there!", message: "Hi!", delayed_post_at: time_new
@@ -206,43 +336,44 @@ describe "announcements" do
       get [@course, announcement]
       click_edit_btn
       submit_form(f(".form-horizontal"))
-      expect(f(".discussion-fyi")).to include_text(time_new)
+      expect(f('[data-testid="delayed-until"]')).to include_text(time_new)
     end
 
-    it "removes delayed_post_at when unchecking delay_posting", priority: "1" do
+    it "removes delayed_post_at when delayed_post_at field is cleared", priority: "1" do
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
-      expect_new_page_load { f(".edit-btn").click }
+      click_edit_btn
 
-      f('input[type=checkbox][name="delay_posting"]').click
+      f("input#delayed_post_at").clear
       expect_new_page_load { f(".form-actions button[type=submit]").click }
 
       topic.reload
       expect(topic.delayed_post_at).to be_nil
     end
 
-    it "changes the save button to publish when delayed_post_at is removed", :ignore_js_errors, priority: "1" do
+    it "changes the save button to publish when delayed_post_at is cleared", :ignore_js_errors, priority: "1" do
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
 
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
       expect(f(".submit_button").text).to eq("Save")
 
-      f('input[type=checkbox][name="delay_posting"]').click
+      f("input#delayed_post_at").clear
+
       expect(f(".submit_button").text).to eq("Publish")
     end
 
-    it "lets a teacher add a new entry to its own announcement", priority: "1" do
+    it "lets a teacher add a new entry to its own announcement", :ignore_js_errors, priority: "1" do
       create_announcement
       get [@course, @announcement]
-      f(".discussion-reply-action").click
+      f('[data-testid="discussion-topic-reply"').click
       entry_text = "new entry text"
       type_in_tiny("textarea", entry_text)
-      f("button[type=submit]").click
-      wait_for_ajax_requests
+      f('[data-testid="DiscussionEdit-submit"]').click
+      wait_for_ajaximations
       expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
-    it "shows announcements to student view student", priority: "1" do
+    it "shows announcements to student view student", :ignore_js_errors, priority: "1" do
       create_announcement
       enter_student_view
       get "/courses/#{@course.id}/announcements"
@@ -272,8 +403,8 @@ describe "announcements" do
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f("input[name=title]"), "title")
       type_in_tiny("textarea[name=message]", "hi")
-      f("#allow_user_comments").click
-      f("#require_initial_post").click
+      f("label[for='allow_user_comments']").click
+      f("label[for='require_initial_post']").click
       expect_new_page_load { submit_form(".form-actions") }
       announcement = Announcement.where(title: "title").first
       expect(announcement.require_initial_post).to be(true)
@@ -287,11 +418,12 @@ describe "announcements" do
       end
 
       it "removes the Reply section" do
+        skip "Should be fixed by VICE-5399"
         create_announcement
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
 
         expect(f("#discussion_topic")).to contain_css(".entry-content.no-reply")
-        expect(f("body")).not_to contain_css(".discussion-entry-reply-area")
+        expect(f("body")).not_to contain_css('[data-testid="discussion-root-entry-container"]')
       end
     end
   end

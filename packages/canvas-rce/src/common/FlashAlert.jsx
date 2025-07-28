@@ -204,7 +204,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
       alertContainer.id = messageHolderId
       alertContainer.setAttribute(
         'style',
-        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
       )
       document.body.appendChild(alertContainer)
     }
@@ -223,7 +223,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
         liveRegion={getLiveRegion}
         screenReaderOnly={srOnly}
       />,
-      parent
+      parent,
     )
   }
 
@@ -243,7 +243,7 @@ export function destroyContainer() {
 }
 
 export function showFlashError(
-  message = formatMessage('An error occurred making a network request')
+  message = formatMessage('An error occurred making a network request'),
 ) {
   return err => showFlashAlert({message, err, type: 'error'})
 }

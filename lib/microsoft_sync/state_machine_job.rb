@@ -311,7 +311,7 @@ module MicrosoftSync
 
     def statsd_increment(bucket, step, error = nil)
       tags = { category: error&.class&.name&.tr(":", "_"), microsoft_sync_step: step.to_s }.compact
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags:)
+      InstStatsd::Statsd.distributed_increment("#{STATSD_PREFIX}.#{bucket}", tags:)
     end
 
     def log(&)
@@ -340,8 +340,10 @@ module MicrosoftSync
       error_report_id = capture && capture_exception(capture)[:error_report]
       error_msg = MicrosoftSync::Errors.serialize(error, step:)
       job_state_record&.update_unless_deleted(
-        workflow_state: :errored, job_state: nil,
-        last_error: error_msg, last_error_report_id: error_report_id
+        workflow_state: :errored,
+        job_state: nil,
+        last_error: error_msg,
+        last_error_report_id: error_report_id
       )
       steps_object.after_failure
     end

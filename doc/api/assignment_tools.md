@@ -7,12 +7,12 @@ LTI services to return submissions and/or scores back to the Canvas gradebook.
 The specifics for how grading is achieved depend on the LTI version being used:
 
 - [LTI Advantage: Assignment and Grading Services](#lti_advantage)
-- [LTI 1.1 Grade Passback Tools](#outcomes_service)
+- [LTI 1.1 Grade Passback Tools (deprecated)](#outcomes_service)
 
 Tools become associated with Canvas assignments either through the UI during
 <a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-assignment-using-an-external-app/ta-p/656"
 target="_blank">assignment creation</a>, or by the tool using the
-<a href="/doc/api/line_items.html" target="_blank">Line Items Service</a> to
+<a href="line_items.html" target="_blank">Line Items Service</a> to
 create assignments.
 
 If configured in via the Canvas UI, Course Designers (Admins/Instructors) will
@@ -26,9 +26,8 @@ specific resource to be associated to the assignment. When students view
 the assignment, instead of seeing a standard Canvas assignment they'll see
 the tool loaded in an iframe on the page.
 
-<a name="lti_advantage"></a>
-LTI Advantage: Assignment and Grading Services
-====================
+# LTI Advantage: Assignment and Grading Services <a name="lti_advantage"></a>
+
 LTI 1.3 tools can be configured to have access to the
 <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">
 Assignment and Grading Services</a> (AGS). Assignment and Grading Services
@@ -51,7 +50,8 @@ the <a
 href="https://www.imsglobal.org/spec/lti/v1p3/impl#lti-advantage-use-cases"
 target="_blank">IMS LTI Advantage Implementation Guide</a>.
 
-##Configuring
+## Configuring
+
 To configure an LTI 1.3 tool that has access to AGS, an
 <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140"
 target="_blank">LTI Developer Key must be created</a> with the desired scopes
@@ -64,60 +64,62 @@ For example, the following JSON would create an LTI 1.3 tool that has access to
 read and write scores, check for existing scores, and manage line items (ex.
 assignments) that are associated with the tool:
 
-```
+```json
 {
-   "title":"Cool AGS Tool ",
-   "scopes":[
-      "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
-      "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
-      "https://purl.imsglobal.org/spec/lti-ags/scope/score"
-      ],
-   "extensions":[
-      {
-         "domain":"agsexample.com",
-         "tool_id":"ags-tool-123",
-         "platform":"canvas.instructure.com",
-         "settings":{
-            "text":"Cool AGS Text",
-            "icon_url":"https://some.icon.url",
-            "placements":[
-               {
-                  "text":"Embed Tool Content as a Canvas Assignment",
-                  "enabled":true,
-                  "icon_url":"https://some.icon.url",
-                  "placement":"assignment_selection",
-                  "message_type":"LtiDeepLinkingRequest",
-                  "target_link_uri":"https://your.target_link_uri/deeplinkexample"
-               }
-            ]
-         }
+  "title": "Cool AGS Tool ",
+  "scopes": [
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
+    "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+  ],
+  "extensions": [
+    {
+      "domain": "agsexample.com",
+      "tool_id": "ags-tool-123",
+      "platform": "canvas.instructure.com",
+      "settings": {
+        "text": "Cool AGS Text",
+        "icon_url": "https://some.icon.url",
+        "placements": [
+          {
+            "text": "Embed Tool Content as a Canvas Assignment",
+            "enabled": true,
+            "icon_url": "https://some.icon.url",
+            "placement": "assignment_selection",
+            "message_type": "LtiDeepLinkingRequest",
+            "target_link_uri": "https://your.target_link_uri/deeplinkexample"
+          }
+        ]
       }
-   ],
-   "public_jwk":{
-      "kty":"RSA",
-      "alg":"RS256",
-      "e":"AQAB",
-      "kid":"8f796169-0ac4-48a3-a202-fa4f3d814fcd",
-      "n":"nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
-      "use":"sig"
-   },
-   "description":"1.3 Test Tool",
-   "target_link_uri":"https://your.target_link_uri",
-   "oidc_initiation_url":"https://your.oidc_initiation_url"
+    }
+  ],
+  "public_jwk": {
+    "kty": "RSA",
+    "alg": "RS256",
+    "e": "AQAB",
+    "kid": "8f796169-0ac4-48a3-a202-fa4f3d814fcd",
+    "n": "nZD7QWmIwj-3N_RZ1qJjX6CdibU87y2l02yMay4KunambalP9g0fU9yZLwLX9WYJINcXZDUf6QeZ-SSbblET-h8Q4OvfSQ7iuu0WqcvBGy8M0qoZ7I-NiChw8dyybMJHgpiP_AyxpCQnp3bQ6829kb3fopbb4cAkOilwVRBYPhRLboXma0cwcllJHPLvMp1oGa7Ad8osmmJhXhM9qdFFASg_OCQdPnYVzp8gOFeOGwlXfSFEgt5vgeU25E-ycUOREcnP7BnMUk7wpwYqlE537LWGOV5z_1Dqcqc9LmN-z4HmNV7b23QZW4_mzKIOY4IqjmnUGgLU9ycFj5YGDCts7Q",
+    "use": "sig"
+  },
+  "description": "1.3 Test Tool",
+  "target_link_uri": "https://your.target_link_uri",
+  "oidc_initiation_url": "https://your.oidc_initiation_url"
 }
 ```
 
 NOTE: Using AGS does not require configuration of any specific placements, so
 the placement(s) here could be any placement(s).
 
-##Available Services
+## Available Services
+
 Canvas supports the following AGS services:
 
-- <a href="/doc/api/line_items.html" target="_blank">Line Items</a>
-- <a href="/doc/api/score.html" target="_blank">Score</a>
-- <a href="/doc/api/result.html" target="_blank">Result</a>
+- <a href="line_items.html" target="_blank">Line Items</a>
+- <a href="score.html" target="_blank">Score</a>
+- <a href="result.html" target="_blank">Result</a>
 
-##Accessing AGS
+## Accessing AGS
+
 Before a tool can run AGS requests, it must be available in the course that it
 wishes to interact with, and also complete the
 <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">
@@ -125,9 +127,10 @@ OAuth2 Client Credentials</a> grant to obtain an access token. This covered in
 depth in the <a href="https://www.imsglobal.org/spec/security/v1p0/#securing_web_services" target="_blank">
 IMS LTI Security Framework, SEC 4</a>.
 
-##Request Throttling
+## Request Throttling
+
 Like all requests made to the Canvas API, AGS requests are throttled (see the
-<a href="/doc/api/file.throttling.html" target="_blank">Throttling docs</a> for details)
+<a href="file.throttling.html" target="_blank">Throttling docs</a> for details)
 to ensure that Canvas stays up and running. Unlike normal API requests which are made with
 a token specific to a user, AGS tokens are specific to a tool installation for a Course or
 an Account, and so there is the possibility of many more requests in a short amount of time.
@@ -135,36 +138,39 @@ As long as you as a tool provider keep requests more-or-less sequential, and pay
 to the request throttling headers as detailed in the above doc, even this elevated level
 of requests per token should not be limited.
 
-##Common Error Codes
+## Common Error Codes
+
 Below are some common error codes that you might encounter while using the Assignment
 and Grade Services API. Each code also comes with some advice for fixing your issue.
 
-| Code | Associated Message | Resolution | Notes |
-| ---- | ------------------ | ---------- | ----- |
-| 400 | \<parameter\> is missing | Ensure you're passing all required parameters |
-| 400 | Provided timestamp of \<timestamp\> not a valid timestamp | Ensure you're passing a correctly formatted, valid timestamp |
-| 400 | Provided timestamp of \<timestamp\> before last updated timestamp of \<timestamp\> | Ensure the timestamp you're passing isn't before when the result was last updated |
-| 400 | Provided submitted_at timestamp of \<timestamp\> in the future | Ensure the provided timestamp isn't too far in the future |
-| 401 | Invalid Developer Key | Ensure your credentials point to the correct developer key and that the key is on |
-| 401 | Access Token not linked to a Tool associated with this Context | Ensure that your tool is installed and available in the specified context |
-| 404 | The specified resource does not exist. | Verify that the course, resource link, line item, or any other such resource that you're specifying exists |
-| 404 | Context not found | Ensure that the context you're specifying actually exists. |
-| 412 | Tool does not have permission to view line_item | Ensure the specified line item is associated with your tool |
-| 412 | The specified LTI link ID is not associated with the line item | Ensure the resourceLinkId you're passing is associated with this line item |
-| 422 | This course has concluded. AGS requests will no longer be accepted for this course. | Reopen the specified course or stop sending requests for this course | Only returned if the ags_improved_course_concluded_response_codes feature flag is enabled |
-| 422 | User not found in course or is not a student | Ensure the user you're specifying exists or is a student |
-| 422 | ScoreMaximum must be greater than or equal to 0 | Ensure you're passing a valid value for ScoreMaximum |
-| 422 | ScoreMaximum not supplied when ScoreGiven present | Ensure you're providing a ScoreMaximum in any request with a ScoreGiven |
-| 422 | Content items must be provided with submission type 'online_upload' | Ensure you specify the correct submission type when providing submission files |
-| 422 | The maximum number of allowed attempts has been reached for this submission | Add additional attempts or stop sending submission requests for the specified student |
+| Code | Associated Message  | Resolution |
+| ---- | --------------------| -----------|
+| 400  | \<parameter\> is missing                                                            | Ensure you're passing all required parameters                                                              |
+| 400  | Provided timestamp of \<timestamp\> not a valid timestamp                           | Ensure you're passing a correctly formatted, valid timestamp                                               |
+| 400  | Provided timestamp of \<timestamp\> before last updated timestamp of \<timestamp\>  | Ensure the timestamp you're passing isn't before when the result was last updated                          |
+| 400  | Provided submitted_at timestamp of \<timestamp\> in the future                      | Ensure the provided timestamp isn't too far in the future                                                  |
+| 401  | Invalid Developer Key                                                               | Ensure your credentials point to the correct developer key and that the key is on                          |
+| 401  | Access Token not linked to a Tool associated with this Context                      | Ensure that your tool is installed and available in the specified context                                  |
+| 404  | The specified resource does not exist.                                              | Verify that the course, resource link, line item, or any other such resource that you're specifying exists |
+| 404  | Context not found                                                                   | Ensure that the context you're specifying actually exists.                                                 |
+| 412  | Tool does not have permission to view line_item                                     | Ensure the specified line item is associated with your tool                                                |
+| 412  | The specified LTI link ID is not associated with the line item                      | Ensure the resourceLinkId you're passing is associated with this line item                                 |
+| 422  | This course has concluded. AGS requests will no longer be accepted for this course. | Reopen the specified course or stop sending requests for this course                                       |
+| 422  | User not found in course or is not a student                                        | Ensure the user you're specifying exists or is a student                                                   |
+| 422  | ScoreMaximum must be greater than or equal to 0                                     | Ensure you're passing a valid value for ScoreMaximum                                                       |
+| 422  | ScoreMaximum not supplied when ScoreGiven present                                   | Ensure you're providing a ScoreMaximum in any request with a ScoreGiven                                    |
+| 422  | Content items must be provided with submission type 'online_upload'                 | Ensure you specify the correct submission type when providing submission files                             |
+| 422  | The maximum number of allowed attempts has been reached for this submission         | Add additional attempts or stop sending submission requests for the specified student                      |
 
-##Extensions
+## Extensions
+
 Canvas has extended several AGS endpoints to support deeper grading
 integrations. Here, we will focus on these extensions and describe how tools can
 be configured to leverage AGS in Canvas.
 
-###Line Item Extension: Creating deep linked assignments
-The <a href="/doc/api/line_items.html" target="_blank">Line Item service</a> has been extended
+### Line Item Extension: Creating deep linked assignments
+
+The <a href="line_items.html" target="_blank">Line Item service</a> has been extended
 to allow an external tool to not only create gradebook columns (i.e. assignments)
 in Canvas, but also connect the column/assignment to a specific LTI resource on
 the external tool. This means that when the student accesses the assignment from
@@ -176,16 +182,19 @@ This also allows tools to introduce new workflows, such as allowing instructors
 to launch from a Course Navigation Placement, select multiple resources, and
 import them into their course.
 
-###Score Extension: Creating submission data
-The <a href="/doc/api/score.html" target="_blank">Score service</a> has been extended to allow
+### Score Extension: Creating submission data
+
+The <a href="score.html" target="_blank">Score service</a> has been extended to allow
 an external tool to submission data back to the Canvas Gradebook. This data is
 then exposed in the Submission Details and SpeedGrader Views so that both
 students and teachers can see what was submitted to the external tool without
 leaving Canvas. Support for basic urls, text, and LTI links are supported.
 
-<a name="outcomes_service"></a>
-LTI 1.1 Grade Passback Tools
-====================
+# LTI 1.1 Grade Passback Tools (deprecated) <a name="outcomes_service"></a>
+
+NOTE: LTI 1.1 (including Grade Passback) is an old version of the LTI standard.
+New tools should be written for the LTI 1.3 spec (and
+[Assignment and Grading Services](#lti_advantage))
 
 Tools can know that they have been launched in a graded context because
 additional parameters are sent across when a student accesses the external
@@ -222,7 +231,7 @@ Only one type of resultData should be sent, if multiple types are sent the tool
 consumer behavior is undefined and is implementation-specific. Canvas will take
 the text value and ignore the url value if both are sent.
 
-####Text
+#### Text
 
 Add a `resultData` node with a `text` node of plain text in the same encoding as
 the rest of the document within it like this:
@@ -258,7 +267,7 @@ the rest of the document within it like this:
 </imsx_POXEnvelopeRequest>
 ```
 
-####URL
+#### URL
 
 Add a `resultData` node with a `url` node within it like this:
 

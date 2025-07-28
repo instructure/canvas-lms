@@ -20,10 +20,12 @@ import actions from '../developerKeysActions'
 import axios from '@canvas/axios'
 import $ from 'jquery'
 
-const dispatch = jest.fn()
-
 describe('saveLtiToolConfiguration', () => {
-  beforeAll(() => {
+  let dispatch
+
+  beforeEach(() => {
+    dispatch = jest.fn()
+    jest.clearAllMocks()
     axios.post = jest.fn().mockResolvedValue({
       data: {
         tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'},
@@ -32,7 +34,7 @@ describe('saveLtiToolConfiguration', () => {
     })
   })
 
-  afterAll(() => {
+  afterEach(() => {
     axios.post.mockRestore()
   })
 
@@ -51,13 +53,16 @@ describe('saveLtiToolConfiguration', () => {
   })
 
   describe('on successful response', () => {
-    it('prepends the developer key to the list', () => {
+    it('prepends the developer key to the list', async () => {
+      // We need to call save() first to trigger the dispatch
+      await save()
+
       expect(dispatch).toHaveBeenCalledWith(
         actions.listDeveloperKeysPrepend({
           id: 100000000087,
           name: 'test key',
           tool_configuration: {test: 'config'},
-        })
+        }),
       )
     })
   })
@@ -78,13 +83,15 @@ describe('saveLtiToolConfiguration', () => {
       },
     }
 
-    beforeAll(() => {
+    beforeEach(() => {
+      jest.clearAllMocks()
       axios.post = jest.fn().mockRejectedValue(error)
       $.flashError = jest.fn()
     })
 
-    afterAll(() => {
+    afterEach(() => {
       axios.post.mockRestore()
+      $.flashError.mockRestore()
     })
 
     it('calls flashError for each message', () => {
@@ -92,18 +99,19 @@ describe('saveLtiToolConfiguration', () => {
         save().finally(() => {
           expect($.flashError).toHaveBeenCalledTimes(2)
           expect(dispatch).toHaveBeenCalledWith(actions.setEditingDeveloperKey(false))
-        })
+        }),
       ).rejects.toEqual(error)
     })
   })
 })
 
 describe('updateLtiKey', () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    jest.clearAllMocks()
     axios.put = jest.fn().mockResolvedValue({})
   })
 
-  afterAll(() => {
+  afterEach(() => {
     axios.put.mockRestore()
   })
 
@@ -122,13 +130,14 @@ describe('updateLtiKey', () => {
     access_token_count: 1,
   }
 
-  const update = () => {
-    actions.updateLtiKey(
+  const update = (callback = jest.fn()) => {
+    return actions.updateLtiKey(
       developerKey,
       disabledPlacements,
       developerKeyId,
       toolConfiguration,
-      customFields
+      customFields,
+      callback,
     )
   }
 
@@ -150,7 +159,7 @@ describe('updateLtiKey', () => {
           settings: toolConfiguration,
           custom_fields: customFields,
         },
-      }
+      },
     )
   })
 })

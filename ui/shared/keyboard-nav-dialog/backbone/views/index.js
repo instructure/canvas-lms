@@ -17,12 +17,12 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('KeyboardNavDialog')
+const I18n = createI18nScope('KeyboardNavDialog')
 
 extend(KeyboardNavDialog, View)
 
@@ -54,7 +54,14 @@ KeyboardNavDialog.prototype.bindOpenKeys = function () {
     (function (_this) {
       return function (e) {
         const isQuestionMark = e.keyCode === 191 && e.shiftKey
-        if (isQuestionMark && !$(e.target).is(':input') && !ENV.disable_keyboard_shortcuts) {
+        if (
+          isQuestionMark &&
+          !(
+            $(e.target).is(':input') ||
+            (e.target.getAttribute && e.target.getAttribute('contenteditable') === 'true')
+          ) &&
+          !ENV.disable_keyboard_shortcuts
+        ) {
           e.preventDefault()
           if (_this.$el.is(':visible')) {
             _this.$el.dialog('close')
@@ -79,7 +86,7 @@ KeyboardNavDialog.prototype.bindOpenKeys = function () {
           }
         }
       }
-    })(this)
+    })(this),
   )
 }
 

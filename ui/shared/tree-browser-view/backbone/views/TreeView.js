@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
@@ -131,7 +131,7 @@ TreeView.prototype.renderSelf = function () {
         const $label = $(
           '<a\n  class="treeLabel"\n  role="presentation"\n  tabindex="-1"\n>\n  <i class="icon-mini-arrow-right"></i>\n  <i class="' +
             htmlEscape(icon_class) +
-            '"></i>\n</a>'
+            '"></i>\n</a>',
         )
           .append(_this.$labelInner)
           .prependTo(_this.$el)
@@ -152,7 +152,7 @@ TreeView.prototype.renderSelf = function () {
               return _this.dndOptions.onItemDrop(
                 event.originalEvent,
                 _this.model,
-                toggleActive(false)
+                toggleActive(false),
               )
             },
           })
@@ -169,7 +169,7 @@ TreeView.prototype.renderSelf = function () {
     return this.$label.toggleClass(
       this.selectedStyleClass,
       window.location.pathname ===
-        (typeof this.href === 'function' ? this.href(this.model) : void 0)
+        (typeof this.href === 'function' ? this.href(this.model) : void 0),
     )
   }
 }

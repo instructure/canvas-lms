@@ -18,34 +18,38 @@
 
 import {debounce} from 'lodash'
 import React from 'react'
-import {ExtensionsSearchBar} from './ExtensionsSearchBar'
+import {AppsSearchBar} from './AppsSearchBar'
 
-import GenericErrorPage from '@canvas/generic-error-page/react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {Flex} from '@instructure/ui-flex'
-import {Pagination} from '@instructure/ui-pagination'
-import {Spinner} from '@instructure/ui-spinner'
-import {
-  fetchRegistrations as apiFetchRegistrations,
-  deleteRegistration as apiDeleteRegistration,
-} from '../../api/registrations'
-import {ExtensionsTable} from './ExtensionsTable'
-import {MANAGE_EXTENSIONS_PAGE_LIMIT, mkUseManagePageState} from './ManagePageLoadingState'
-import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
-import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
-import type {LtiRegistration} from '../../model/LtiRegistration'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
+import {isSuccessful} from '../../../common/lib/apiResult/ApiResult'
+import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/ParamsParseResult'
+import {
+  deleteRegistration as apiDeleteRegistration,
+  fetchRegistrations as apiFetchRegistrations,
+  unbindGlobalLtiRegistration as apiUnbindGlobalRegistration,
+} from '../../api/registrations'
+import {type AccountId, ZAccountId} from '../../model/AccountId'
+import type {LtiRegistration} from '../../model/LtiRegistration'
+import {AppsTable} from './AppsTable'
+import {mkUseManagePageState} from './ManagePageLoadingState'
+import {type ManageSearchParams, useManageSearchParams} from './ManageSearchParams'
 
 const SEARCH_DEBOUNCE_MS = 250
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const ManagePage = () => {
+  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
   const [searchParams] = useManageSearchParams()
+
   return searchParams.success ? (
-    <ManagePageInner searchParams={searchParams.value} />
+    <ManagePageInner searchParams={searchParams.value} accountId={accountId} />
   ) : (
     <GenericErrorPage
       imageUrl={errorShipUrl}
@@ -57,6 +61,7 @@ export const ManagePage = () => {
 }
 
 type ManagePageInnerProps = {
+  accountId: AccountId
   searchParams: ManageSearchParams
 }
 
@@ -66,18 +71,25 @@ const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
     confirmButtonLabel: I18n.t('Delete'),
     heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
     message: I18n.t(
-      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.'
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
     ),
   })
 
-const useManagePageState = mkUseManagePageState(apiFetchRegistrations, apiDeleteRegistration)
+const useManagePageState = mkUseManagePageState(
+  apiFetchRegistrations,
+  apiDeleteRegistration,
+  apiUnbindGlobalRegistration,
+)
 
 export const ManagePageInner = (props: ManagePageInnerProps) => {
   const {sort, dir, page} = props.searchParams
 
   const [, setManageSearchParams] = useManageSearchParams()
 
-  const [extensions, {setStale, deleteRegistration}] = useManagePageState(props.searchParams)
+  const [apps, {setStale, deleteRegistration}] = useManagePageState({
+    ...props.searchParams,
+    accountId: props.accountId,
+  })
 
   /**
    * Holds the state of the search input field
@@ -93,23 +105,24 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
       setStale()
       setManageSearchParams(params)
     },
-    [setStale, setManageSearchParams]
+    [setStale, setManageSearchParams],
   )
 
   const deleteApp = React.useCallback(
     async (app: LtiRegistration) => {
       if (await confirmDeletion(app)) {
-        const deleteResult = await deleteRegistration(app)
+        const deleteResult = await deleteRegistration(app, props.accountId)
+        const type = isSuccessful(deleteResult) ? 'success' : 'error'
         showFlashAlert({
-          type: deleteResult._type,
+          type,
           message:
-            deleteResult._type === 'error'
-              ? deleteResult.message
+            deleteResult._type !== 'Success'
+              ? I18n.t('There was an error deleting “%{appName}”', {appName: app.name})
               : I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
         })
       }
     },
-    [deleteRegistration]
+    [deleteRegistration, props.accountId],
   )
 
   /**
@@ -119,7 +132,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
     debounce((q: string) => {
       updateSearchParams({q: q === '' ? undefined : q, page: undefined})
     }, SEARCH_DEBOUNCE_MS),
-    [updateSearchParams]
+    [updateSearchParams],
   )
 
   const handleChange = React.useCallback(
@@ -129,7 +142,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
       setQuery(value)
       updateQueryParamDebounced(value)
     },
-    [setStale, updateQueryParamDebounced]
+    [setStale, updateQueryParamDebounced],
   )
 
   const handleClear = React.useCallback(() => {
@@ -140,49 +153,28 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
 
   return (
     <div>
-      <ExtensionsSearchBar value={query} handleChange={handleChange} handleClear={handleClear} />
+      <AppsSearchBar value={query} handleChange={handleChange} handleClear={handleClear} />
       {(() => {
-        if (extensions._type === 'error') {
+        if (apps._type === 'error') {
           return (
             <GenericErrorPage
               imageUrl={errorShipUrl}
               errorSubject={I18n.t('LTI Registrations listing error')}
-              error={extensions.message}
+              errorMessage={apps.message}
             />
           )
-        } else if ('items' in extensions && typeof extensions.items !== 'undefined') {
+        } else if ('items' in apps && typeof apps.items !== 'undefined') {
           return (
             <>
-              <ExtensionsTable
-                stale={extensions._type === 'reloading' || extensions._type === 'stale'}
-                extensions={extensions.items}
+              <AppsTable
+                stale={apps._type === 'reloading' || apps._type === 'stale'}
+                apps={apps.items}
                 sort={sort}
                 dir={dir}
                 updateSearchParams={updateSearchParams}
                 deleteApp={deleteApp}
+                page={page}
               />
-              <Pagination
-                as="nav"
-                margin="small"
-                variant="compact"
-                labelNext={I18n.t('Next Page')}
-                labelPrev={I18n.t('Previous Page')}
-              >
-                {Array.from(
-                  Array(Math.ceil(extensions.items.total / MANAGE_EXTENSIONS_PAGE_LIMIT))
-                ).map((_, i) => (
-                  <Pagination.Page
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={i}
-                    current={i === page - 1}
-                    onClick={() => {
-                      setManageSearchParams({page: (i + 1).toString()})
-                    }}
-                  >
-                    {i + 1}
-                  </Pagination.Page>
-                ))}
-              </Pagination>
             </>
           )
         } else {

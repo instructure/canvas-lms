@@ -21,6 +21,7 @@
 describe UserContent::FilesHandler do
   let(:is_public) { false }
   let(:in_app) { false }
+  let(:no_verifiers) { false }
   let(:course) { course_factory(active_all: true) }
   let(:attachment) do
     attachment_with_context(course, { filename: "test.mp4", content_type: "video" })
@@ -31,14 +32,12 @@ describe UserContent::FilesHandler do
   let(:match_part) { "download?wrap=1" }
   let(:uri_match) do
     UserContent::FilesHandler::UriMatch.new(
-      OpenStruct.new(
-        {
-          url: match_url,
-          type: "files",
-          obj_class: Attachment,
-          obj_id: attachment.id,
-          rest: "/#{match_part}"
-        }
+      UserContent::HtmlRewriter::UriMatch.new(
+        match_url,
+        "files",
+        Attachment,
+        attachment.id,
+        "/#{match_part}"
       )
     )
   end
@@ -46,7 +45,7 @@ describe UserContent::FilesHandler do
   describe UserContent::FilesHandler::ProcessedUrl do
     subject(:processed_url) do
       UserContent::FilesHandler::ProcessedUrl.new(
-        match: uri_match, attachment:, is_public:, in_app:
+        match: uri_match, attachment:, is_public:, in_app:, no_verifiers:
       ).url
     end
 
@@ -61,8 +60,18 @@ describe UserContent::FilesHandler do
       end
 
       it "includes verifier query param" do
+        attachment.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
         query_string = processed_url.split("?")[1]
         expect(Rack::Utils.parse_nested_query(query_string)).to have_key("verifier")
+      end
+
+      it "excludes verifiers in returned URL when disable_adding_uuid_verifier_in_api is enabled" do
+        processed_url_with_no_verifiers = UserContent::FilesHandler::ProcessedUrl.new(
+          match: uri_match, attachment:, is_public:, in_app:
+        ).url
+
+        query_string = processed_url_with_no_verifiers.split("?")[1]
+        expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
       end
 
       context "is in_app" do
@@ -110,6 +119,15 @@ describe UserContent::FilesHandler do
           expect(processed_url).not_to match(/#{attachment.context_type.tableize}/)
         end
       end
+
+      context "when no_verifiers is true" do
+        let(:no_verifiers) { true }
+
+        it "does not include verifier" do
+          query_string = processed_url.split("?")[1]
+          expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key("verifier")
+        end
+      end
     end
   end
 
@@ -121,7 +139,8 @@ describe UserContent::FilesHandler do
         user: current_user,
         preloaded_attachments:,
         is_public:,
-        in_app:
+        in_app:,
+        no_verifiers:
       ).processed_url
     end
 
@@ -191,7 +210,7 @@ describe UserContent::FilesHandler do
         it "when replaced the replacement attachment url will be returned" do
           current_user = user_factory
           replacement_attachment = attachment_with_context(course, { filename: "hello" })
-          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: DateTime.now)
+          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: Time.zone.now)
           preloaded_attachments = {}
           preloaded_attachments[attachment.id] = attachment
 

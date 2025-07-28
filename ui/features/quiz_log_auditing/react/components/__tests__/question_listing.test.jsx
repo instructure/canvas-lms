@@ -27,7 +27,7 @@ describe('canvas_quizzes/events/views/question_listing', () => {
     render(
       <MemoryRouter>
         <QuestionListing questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]} />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

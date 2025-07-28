@@ -110,7 +110,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def answer_ids
-      @answer_ids ||= question_data[:answers].map { |a| (a[:id]).to_s }
+      @answer_ids ||= question_data[:answers].map { |a| a[:id].to_s }
     end
 
     def answer_key(id)
@@ -127,9 +127,9 @@ module CanvasQuizStatistics::Analyzers
       end
     end
 
-    def calculate_responses(responses, answers, *args)
+    def calculate_responses(responses, answers, *)
       responses.each do |response|
-        choices = extract_chosen_choices(response, answers, *args)
+        choices = extract_chosen_choices(response, answers, *)
 
         if choices.empty?
           choices = [generate_missing_answer(answers)]

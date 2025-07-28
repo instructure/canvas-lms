@@ -16,17 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid, IconCheckSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import Focus from '@canvas/outcomes/react/Focus'
 
-const I18n = useI18nScope('AddGroup')
+const I18n = createI18nScope('AddGroup')
+
+const validateTitle = title => {
+  const MAX_TITLE_LENGTH = 255
+  if (!title || title.trim().length <= 0)
+    return [{type: 'newError', text: I18n.t('Cannot be blank')}]
+  if (title.trim().length > MAX_TITLE_LENGTH)
+    return [{type: 'newError', text: I18n.t('Must be 255 characters or less')}]
+  return []
+}
 
 const AddContentItem = ({
   labelInstructions,
@@ -35,13 +45,20 @@ const AddContentItem = ({
   onHideHandler,
 }) => {
   const [title, setTitle] = useState('')
+  const titleRef = useRef(null)
+  const [errorMessages, setErrorMessages] = useState([])
 
-  const titleChangeHandler = (e, value) => {
+  const titleChangeHandler = (event, value) => {
     setTitle(value)
-    e.stopPropagation()
+    setErrorMessages(validateTitle(value))
+    event?.stopPropagation()
   }
 
   const save = () => {
+    if (errorMessages.length > 0) {
+      titleRef.current?.focus()
+      return
+    }
     onSaveHandler(title)
   }
 
@@ -50,34 +67,38 @@ const AddContentItem = ({
   }
 
   return (
-    <View as="div" padding="xx-small">
-      <Focus>
-        <TextInput
-          renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
-          placeholder={textInputInstructions}
+    <View as="div" padding="xx-small" onFocus={e => e.stopPropagation()}>
+      <Flex alignItems="start">
+        <Focus>
+          <TextInput
+            elementRef={ref => (titleRef.current = ref)}
+            renderLabel={<ScreenReaderContent>{textInputInstructions}</ScreenReaderContent>}
+            placeholder={textInputInstructions}
+            display="inline-block"
+            width="14rem"
+            onChange={titleChangeHandler}
+            onBlur={event => titleChangeHandler(event, title)}
+            messages={errorMessages}
+          />
+        </Focus>
+        <IconButton
+          screenReaderLabel={I18n.t('Cancel')}
           display="inline-block"
-          width="12rem"
-          onChange={titleChangeHandler}
-        />
-      </Focus>
-      <IconButton
-        screenReaderLabel={I18n.t('Cancel')}
-        display="inline-block"
-        margin="0 0 0 small"
-        onClick={hide}
-      >
-        <IconXSolid />
-      </IconButton>
-      <IconButton
-        screenReaderLabel={labelInstructions}
-        interaction={title.trim().length > 0 ? 'enabled' : 'disabled'}
-        margin="0 0 0 small"
-        display="inline-block"
-        onClick={save}
-        data-testid="outcomes-management-add-content-item"
-      >
-        <IconCheckSolid />
-      </IconButton>
+          margin="0 0 0 small"
+          onClick={hide}
+        >
+          <IconXSolid />
+        </IconButton>
+        <IconButton
+          screenReaderLabel={labelInstructions}
+          margin="0 0 0 small"
+          display="inline-block"
+          onClick={save}
+          data-testid="outcomes-management-add-content-item"
+        >
+          <IconCheckSolid />
+        </IconButton>
+      </Flex>
     </View>
   )
 }

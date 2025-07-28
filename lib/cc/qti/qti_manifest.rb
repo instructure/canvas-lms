@@ -39,13 +39,9 @@ module CC
                                                            disable_content_rewriting: @exporter.disable_content_rewriting)
       end
 
-      def export_dir
-        @exporter.export_dir
-      end
+      delegate :export_dir, to: :@exporter
 
-      def zip_file
-        @exporter.zip_file
-      end
+      delegate :zip_file, to: :@exporter
 
       def close
         @file&.close
@@ -96,12 +92,6 @@ module CC
               ) do |res|
                 res.file(href: path)
               end
-            end
-
-            begin
-              Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
-            rescue
-              add_error(I18n.t("course_exports.errors.resources", "Failed to link some resources."), $!)
             end
           end
         end # manifest

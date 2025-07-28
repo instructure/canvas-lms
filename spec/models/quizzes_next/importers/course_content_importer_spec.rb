@@ -156,15 +156,15 @@ describe QuizzesNext::Importers::CourseContentImporter do
         expect(migration.workflow_state).to eq("imported")
         expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set])
           .to eq([[assignment01.global_id, quiz01.global_id]])
-        expect(quiz01.workflow_state).to eq("deleted")
         expect(quiz01.assignment.ready_to_migrate_to_quiz_next?).to be(false)
+        expect(quiz01.reload.workflow_state).to eq("deleted")
       end
     end
   end
 
   context "migration context is not a Course" do
     let(:context) { double }
-    let(:migration) { instance_double("ContextMigration") }
+    let(:migration) { instance_double(ContentMigration) }
     let(:data) { double }
 
     before do

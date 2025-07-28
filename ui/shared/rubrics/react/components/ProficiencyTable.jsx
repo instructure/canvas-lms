@@ -27,19 +27,19 @@ import PropTypes from 'prop-types'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
-import ProficiencyRating from './ProficiencyRating'
 import {v1 as uuid} from 'uuid'
 import {memoize} from 'lodash'
 import {fromJS, List} from 'immutable'
 import {fetchProficiency, saveProficiency} from '../api'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import SVGWrapper from '@canvas/svg-wrapper'
+import {Flex} from '@instructure/ui-flex'
+import ProficiencyRating from '@canvas/rubrics/react/components/ProficiencyRating'
 
-const I18n = useI18nScope('ProficiencyTable')
+const I18n = createI18nScope('ProficiencyTable')
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -66,11 +66,11 @@ export default class ProficiencyTable extends React.Component {
       loading: true,
       masteryIndex: 1,
       rows: List([
-        this.createRating('Exceeds Mastery', 4, '127A1B'),
-        this.createRating('Mastery', 3, '0B874B'),
+        this.createRating('Exceeds Mastery', 4, '02672D'),
+        this.createRating('Mastery', 3, '03893D'),
         this.createRating('Near Mastery', 2, 'FAB901'),
         this.createRating('Below Mastery', 1, 'FD5D10'),
-        this.createRating('Well Below Mastery', 0, 'E0061F'),
+        this.createRating('Well Below Mastery', 0, 'E62429'),
       ]),
     }
   }
@@ -104,7 +104,7 @@ export default class ProficiencyTable extends React.Component {
           $.flashError(
             I18n.t('An error occurred while loading account proficiency ratings: %{m}', {
               m: e.response.statusText,
-            })
+            }),
           )
         }
         this.setState({billboard: true, loading: false})
@@ -113,7 +113,9 @@ export default class ProficiencyTable extends React.Component {
 
   configToState = data => {
     const rows = List(
-      data.ratings.map(rating => this.createRating(rating.description, rating.points, rating.color))
+      data.ratings.map(rating =>
+        this.createRating(rating.description, rating.points, rating.color),
+      ),
     )
     const masteryIndex = data.ratings.findIndex(rating => rating.mastery)
     this.setState({
@@ -147,6 +149,23 @@ export default class ProficiencyTable extends React.Component {
 
   handleMasteryChange = memoize(index => () => {
     this.setState({masteryIndex: index})
+  })
+
+  handleBlurChange = memoize(index => (value, fieldName) => {
+    this.setState(oldState => {
+      let rows = oldState.rows
+      if(fieldName === 'description') {
+        if (this.invalidDescription(value)) {
+          rows = rows.setIn([index, 'descriptionError'], I18n.t('Please include a rating title'))
+        }
+      } else if (fieldName === 'points') {
+        const parsed = NumberHelper.parse(value)
+        if (this.invalidPoints(parsed) || parsed < 0) {
+          rows = rows.setIn([index, 'pointsError'], I18n.t('Invalid format'))
+        }
+      }
+      return {rows}
+    })
   })
 
   handleDescriptionChange = memoize(index => value => {
@@ -201,7 +220,7 @@ export default class ProficiencyTable extends React.Component {
       row =>
         this.invalidPoints(row.get('points')) ||
         row.get('points') < 0 ||
-        this.invalidDescription(row.get('description'))
+        this.invalidDescription(row.get('description')),
     )
 
   stateToConfig = () => ({
@@ -217,7 +236,6 @@ export default class ProficiencyTable extends React.Component {
 
   handleSubmit = () => {
     if (!this.checkForErrors()) {
-      // eslint-disable-next-line promise/catch-or-return
       saveProficiency(this.props.accountId, this.stateToConfig()).then(response => {
         if (response.status === 200) {
           $.flashMessage(I18n.t('Account proficiency ratings saved'))
@@ -234,7 +252,7 @@ export default class ProficiencyTable extends React.Component {
     const rows = this.state.rows.map(row => {
       let r = row
       if (this.invalidDescription(row.get('description'))) {
-        r = r.set('descriptionError', I18n.t('Missing required description'))
+        r = r.set('descriptionError', I18n.t('Please include a rating title'))
         if (firstError) {
           r = r.set('focusField', 'description')
           firstError = false
@@ -242,7 +260,7 @@ export default class ProficiencyTable extends React.Component {
       }
       if (this.invalidPoints(row.get('points'))) {
         previousPoints = null
-        r = r.set('pointsError', I18n.t('Invalid points'))
+        r = r.set('pointsError', I18n.t('Invalid format'))
         if (firstError) {
           r = r.set('focusField', 'points')
           firstError = false
@@ -316,7 +334,7 @@ export default class ProficiencyTable extends React.Component {
             `
             Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.
             Adjust number of ratings, mastery level, points, and colors.
-          `
+          `,
           ).trim()}
         />
         <Button color="primary" onClick={this.removeBillboard}>
@@ -330,58 +348,83 @@ export default class ProficiencyTable extends React.Component {
     const masteryIndex = this.state.masteryIndex
     return (
       <div>
-        <Table caption={I18n.t('Proficiency ratings')}>
-          <Table.Head>
-            <Table.Row>
-              <Table.ColHeader id="mastery-column" width="1%">
+        <Flex direction="column" gap="medium">
+          <Flex direction="column" gap="medium">
+            <Flex gap="medium">
+              <Flex.Item
+                id="mastery-column"
+                as="th"
+                size="80px"
+                textAlign="center"
+              >
                 {I18n.t('Mastery')}
-              </Table.ColHeader>
-              <Table.ColHeader id="rating-column">{I18n.t('Proficiency Rating')}</Table.ColHeader>
-              <Table.ColHeader id="points-column" width="1%">
+              </Flex.Item>
+              <Flex.Item
+                id="rating-column"
+                as="th"
+                shouldGrow={true}
+                shouldShrink={true}
+                size="auto"
+                textAlign="start"
+              >
+                {I18n.t('Proficiency Rating')}
+              </Flex.Item>
+              <Flex.Item
+                id="points-column"
+                as="th"
+                size="80px"
+                textAlign="start"
+              >
                 {I18n.t('Points')}
-              </Table.ColHeader>
-              <Table.ColHeader id="color-column" width="1%">
+              </Flex.Item>
+              <Flex.Item
+                id="color-column"
+                as="th"
+                size="170px"
+                textAlign="start"
+              >
                 {I18n.t('Color')}
-              </Table.ColHeader>
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {this.state.rows.map((rating, index) => (
-              <ProficiencyRating
-                key={rating.get('key')}
-                color={rating.get('color')}
-                description={rating.get('description')}
-                descriptionError={rating.get('descriptionError')}
-                disableDelete={this.state.rows.size === 1}
-                focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
-                points={rating.get('points').toString()}
-                pointsError={rating.get('pointsError')}
-                mastery={index === masteryIndex}
-                onColorChange={this.handleColorChange(index)}
-                onDelete={this.handleDelete(index)}
-                onDescriptionChange={this.handleDescriptionChange(index)}
-                onMasteryChange={this.handleMasteryChange(index)}
-                onPointsChange={this.handlePointsChange(index)}
-              />
-            ))}
-            <Table.Row>
-              <Table.Cell colSpan="4" textAlign="center">
-                <IconButton
-                  onClick={this.addRow}
-                  renderIcon={<IconPlusLine />}
-                  color="primary"
-                  shape="circle"
-                  screenReaderLabel={I18n.t('Add proficiency rating')}
+              </Flex.Item>
+            </Flex>
+            <Flex direction="column" gap="medium">
+              {this.state.rows.map((rating, index) => (
+                <ProficiencyRating
+                  key={rating.get('key')}
+                  color={rating.get('color')}
+                  description={rating.get('description')}
+                  descriptionError={rating.get('descriptionError')}
+                  disableDelete={this.state.rows.size === 1}
+                  focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
+                  points={rating.get('points').toString()}
+                  pointsError={rating.get('pointsError')}
+                  mastery={index === masteryIndex}
+                  onColorChange={this.handleColorChange(index)}
+                  onDelete={this.handleDelete(index)}
+                  onDescriptionChange={this.handleDescriptionChange(index)}
+                  onMasteryChange={this.handleMasteryChange(index)}
+                  onPointsChange={this.handlePointsChange(index)}
+                  onBlurChange={this.handleBlurChange(index)}
                 />
-              </Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table>
-        <div className="save">
-          <Button color="primary" onClick={this.handleSubmit}>
-            {I18n.t('Save Learning Mastery')}
-          </Button>
-        </div>
+              ))}
+            </Flex>
+            <Flex justifyItems="center">
+              <IconButton
+                onClick={this.addRow}
+                renderIcon={<IconPlusLine />}
+                color="primary"
+                shape="circle"
+                screenReaderLabel={I18n.t('Add proficiency rating')}
+              />
+            </Flex>
+          </Flex>
+          <Flex justifyItems="end">
+            <div className="save">
+              <Button color="primary" onClick={this.handleSubmit}>
+                {I18n.t('Save Learning Mastery')}
+              </Button>
+            </div>
+          </Flex>
+        </Flex>
       </div>
     )
   }

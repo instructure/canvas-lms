@@ -112,16 +112,18 @@ describe('MoveItemTray', () => {
         groupId: '5',
         itemId: undefined,
         itemIds: ['2'],
-      })
+      }),
     )
   })
 
   it('calls onFocus on the result of focusOnExit on close', () => {
+    const mockFocusElement = {focus: jest.fn()}
+    stubs.focusOnExit.mockReturnValue(mockFocusElement)
     const {ref} = renderMoveItemTray()
 
     ref.current.onExited()
     jest.runOnlyPendingTimers()
 
-    expect(stubs.focusOnExit).toHaveBeenCalledTimes(1)
+    expect(mockFocusElement.focus).toHaveBeenCalled()
   })
 })

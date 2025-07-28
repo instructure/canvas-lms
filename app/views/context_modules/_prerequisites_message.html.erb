@@ -27,6 +27,12 @@
     hide_footer = context_module && context_module.active_prerequisites && !context_module.active_prerequisites.empty?
     prerequisites = (context_module.active_prerequisites || []) if context_module
   end
+
+  if @is_student
+    prerequisites = prerequisites.select { |prerequisite| @viewable_module_ids.include?(prerequisite[:id]) }
+    hide_footer = context_module && prerequisites && !prerequisites.empty?
+  end
+
   prereq_list = prerequisite_list(prerequisites)
 %>
 

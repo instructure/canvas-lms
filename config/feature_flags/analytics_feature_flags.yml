@@ -3,15 +3,22 @@
 analytics_2:
   state: hidden
   applies_to: Course
-  display_name: New Course and User Analytics
+  display_name: Course and User Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
-    new_analytics_description: Show new analytics for course and user data. Data
-      may take 24 hours to appear in New Analytics after setting this feature flag
-      to ON. For full details, please see the *New Analytics user group* in the Canvas
-      Community.
+    course_analytics_description: Show analytics for course and user data. Data
+      may take 24 hours to appear in Course Analytics after setting this feature flag
+      to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
+hide_legacy_course_analytics:
+  state: hidden
+  applies_to: Course
+  display_name: Hide Legacy Course Analytics
+  description:
+    hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 
 # Admin Analytics - Provided through K20 LTI App
 admin_analytics_view_permission:
@@ -27,49 +34,48 @@ admin_analytics:
   applies_to: Account
   display_name: Admin Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
     admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
       details on Canvas usage, Canvas course success, and student engagement.
-      Learn more in the *Admin Analytics Hub* in the Canvas community.
+      Learn more in the Admin Analytics Hub in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: false
-admin_analytics_dap_model:
-  state: hidden
-  applies_to: Account
-  display_name: Admin Analytics DAP
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
-    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  root_opt_in: true
-  beta: true
-  shadow: true
-course_analytics_dap_model:
-  state: hidden
-  applies_to: Account
-  display_name: New/Course Analytics DAP
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
-    admin_analytics_dap_model_description: Enables the use of DAP for Analytics at the account-level.
-  root_opt_in: true
-  beta: true
-  shadow: true
+
 
 # Intelligent Insights - Provided through K20 LTI App
-k20_course_readiness_alpha_testing:
-  state: hidden
-  applies_to: Account
-  display_name: K20 - Course Readiness Alpha Testing
-  description:
-    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Intelligent Insights Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
-  root_opt_in: true
-  beta: true
 k20_course_readiness:
   state: hidden
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness
   description:
-    k20_course_readiness: Enables the Course Readiness for closed beta customers.
+    k20_course_readiness: Enables the Intelligent Insights - Course Readiness feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_due_date_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Due Date Criteria
+  description:
+    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_gradebook_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Gradebook Criteria
+  description:
+    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature and accompanying permission.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_broken_links_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Broken Links Criteria
+  description:
+    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
@@ -78,28 +84,19 @@ k20_students_in_need_of_attention:
   applies_to: Account
   display_name: Intelligent Insights - Students in Need of Attention
   description:
-    k20_students_in_need_of_attention: Enables the Students in Need of Attention dashboards for closed beta customers.
+    k20_students_in_need_of_attention: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
-k20_lti_usage:
+title_iv_financial_aid_report:
   state: hidden
   applies_to: Account
-  display_name: Intelligent Insights - LTI Usage
+  display_name: Intelligent Insights - Financial Aid Compliance
   description:
-    k20_lti_usage: Enables the LTI Usage dashboards for closed beta customers.
+    title-iv-financial-aid-report: Enables the Intelligent Insights - Financial Aid Compliance feature and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
-k20_beta:
-  state: hidden
-  applies_to: Account
-  display_name: Advanced Analytics - Course Readiness and Students in Need of Attention
-  description:
-    k20_beta_description: Enables the Course Readiness and Students in Need of Attention dashboards for closed beta customers. Will be deprecated in favor of Intelligent Insights Feature Flags.
-  root_opt_in: true
-  beta: true
-
 
 # Intelligent Insights - Provided through Ask Your Data LTI App
 advanced_analytics_ask_questions:
@@ -126,3 +123,13 @@ analytics_hub:
       state: allowed_on
     development:
       state: allowed_on
+
+# Admin Analytics - Contextual Messaging
+intelligent_insights_contextual_messaging:
+  state: hidden
+  applies_to: Account
+  display_name: "Intelligent Insights - Contextual Messaging"
+  description: Show Intelligent Insights new contextual messaging feature.
+  root_opt_in: true
+  beta: true
+  shadow: true

@@ -42,7 +42,7 @@ describe('test', () => {
     expect(
       rule.test(elem, {
         disableContrastCheck: true,
-      })
+      }),
     ).toBe(true)
   })
 

@@ -44,5 +44,5 @@ export default handleActions(
       return defaultState
     },
   },
-  defaultState
+  defaultState,
 )

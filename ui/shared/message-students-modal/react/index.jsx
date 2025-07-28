@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import {Button} from '@instructure/ui-buttons'
 import {TextArea} from '@instructure/ui-text-area'
@@ -27,7 +27,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FormField} from '@instructure/ui-form-field'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('shared_message_students')
+const I18n = createI18nScope('shared_message_students')
 
 class MessageStudents extends React.Component {
   static propTypes = {
@@ -165,7 +165,7 @@ class MessageStudents extends React.Component {
       },
       () => {
         this.props.onRequestClose()
-      }
+      },
     )
   }
 
@@ -267,17 +267,17 @@ class MessageStudents extends React.Component {
             {this.renderAlert(
               I18n.t('Your message was sent!'),
               'success',
-              () => this.state.success
+              () => this.state.success,
             )}
             {this.renderAlert(
               I18n.t("We're sending your message..."),
               'info',
-              () => this.state.sending
+              () => this.state.sending,
             )}
             {this.renderAlert(
               I18n.t('There was a problem sending your message.'),
               'error',
-              () => Object.keys(this.state.errors).length > 0
+              () => Object.keys(this.state.errors).length > 0,
             )}
             <form onSubmit={this.handleSubmit} className="MessageStudents__Form">
               <div className="MessageStudents__FormField">
@@ -308,14 +308,19 @@ class MessageStudents extends React.Component {
             </form>
           </Modal.Body>
           <Modal.Footer>
-            <Button disabled={this.state.sending || this.state.success} onClick={this.handleClose}>
+            <Button
+              data-testid="message-students-cancel"
+              disabled={this.state.sending || this.state.success}
+              onClick={this.handleClose}
+            >
               {I18n.t('Close')}
             </Button>
             &nbsp;
             <Button
-              disabled={this.state.sending || this.state.success}
-              onClick={this.handleSubmit}
+              data-testid="message-students-submit"
               color="primary"
+              onClick={this.handleSubmit}
+              disabled={this.state.sending || this.state.success}
             >
               {I18n.t('Send Message')}
             </Button>

@@ -77,7 +77,7 @@ if (update_url) {
             navigator.sendBeacon(update_url, formData)
           }
         },
-        false
+        false,
       )
 
       let eventInTime = false

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import _, {clone, keys} from 'lodash'
@@ -107,10 +107,12 @@ File.prototype.toJSON = function () {
   if (!this.get('file')) {
     return File.__super__.toJSON.apply(this, arguments)
   }
-  // eslint-disable-next-line prefer-spread
+   
   return _.pick.apply(
     _,
-    [this.attributes, 'file'].concat(slice.call(keys((ref = this.uploadParams) != null ? ref : {})))
+    [this.attributes, 'file'].concat(
+      slice.call(keys((ref = this.uploadParams) != null ? ref : {})),
+    ),
   )
 }
 

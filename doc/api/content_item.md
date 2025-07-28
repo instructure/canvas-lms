@@ -143,26 +143,16 @@ as either module items or assignments, based on the presence or absence of the `
 property.
 
 #### Assignment Selection Deep Linking
-
-When a tool is launched from the `assignment_selection` placement, properties
-from the deep linking response will overwrite existing settings on the
-assignment create/edit page. However, the following properties in the deep
-linking response behave uniquely:
-
-* `lineItem.label` or `title` (corresponding to the assignment name)
-* `lineItem.scoreMaximum` (corresponding to the assignment's "points possible")
-* `text` (corresponding to the assignment description body)
-
-Existing values for these corresponding assignment settings will *not* be
-overwritten in the following cases:
-
-* The deep linking response omits one of the properties. Leaving out a property
-  will not erase an existing value.
-* The feature flag "LTI Deep Linking Line Items on Assignment create/edit page"
-  (`lti_assignment_page_line_items`) is disabled. This flag, enabled by
-  default since August 2023, can be disabled by institution admins. (Note that,
-  if the corresponding assignment settings are empty, the values from the
-  deep linking response are used regardless of the feature flag.)
+When a tool is launched from the `assignment_selection` placement, any previous
+LTI parameters (URL, iframe width, etc.) are overwritten with the information
+in the Deep Linking Response. In addition, if the following properties are
+present and non-empty in the content item in the Deep Linking Response, they
+will set the following fields, potentially overwriting user-inputted values:
+- `text` sets/overwrites the assignment description
+- `lineItem.scoreMaximum` sets/overwrites the maximum score for the assignment
+- `lineItem.label` or `title` sets the assignment name, and overwrites unless 
+  `"https://canvas.instructure.com/lti/preserveExistingAssignmentName": true`
+  is given in the content item.
 
 ### HTML fragment
 Full support for required properties.
@@ -191,7 +181,7 @@ For example, the following JSON would allow an LTI Advantage tool to be
 installed that uses deep linking return items back to Canvas as an assignment or
 within the canvas Rich Content Editor:
 
-```
+```json
 {
    "title":"Cool Deep Linking Tool ",
    "scopes":[],
@@ -284,7 +274,7 @@ below:
 
 ### ContentItemSelection: Tool Consumer <- Tool Provider
 
-```
+```json
 
     lti_message_type: ContentItemSelection
     lti_version: LTI-1p0
@@ -328,7 +318,7 @@ content-item.
 
 Below is an example of a bare-bones tool provider LTI configuration that
 _does not_ use content-item:
-```
+```xml
     <?xml version="1.0" encoding="UTF-8"?><cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
       <blti:title>Example Tool Provider</blti:title>
       <blti:description>This is a Sample Tool Provider.</blti:description>
@@ -342,7 +332,7 @@ _does not_ use content-item:
 ```
 
 **Note:** for more on the basics of LTI tool configuration see
-[external tools documentation](https://canvas.instructure.com/doc/api/file.tools_xml.html).
+[external tools documentation](file.tools_xml.html).
 
 To begin using content-item we need to specify at least one valid placement for
 Canvas to use. Placements are used to help the tool consumer (Canvas in this
@@ -352,7 +342,7 @@ XML would tell Canvas to add a link in the course navigation to the LTI tool:
 
 
 
-```
+```xml
     <lticm:options name="course_navigation">
       <lticm:property name="url">http://localhost:4040/messages/blti</lticm:property>
     </lticm:options>
@@ -365,7 +355,7 @@ To enable content-item with the **assignment_selection** placement, we add lines
 
 
 
-```
+```xml
      1 <?xml version="1.0" encoding="UTF-8"?><cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0" xmlns:blti="http://www.imsglobal.org/xsd/imsbasiclti_v1p0" xmlns:lticm="http://www.imsglobal.org/xsd/imslticm_v1p0" xmlns:lticp="http://www.imsglobal.org/xsd/imslticp_v1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsglobal.org/xsd/imslticc_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticc_v1p0.xsd http://www.imsglobal.org/xsd/imsbasiclti_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imsbasiclti_v1p0p1.xsd http://www.imsglobal.org/xsd/imslticm_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticm_v1p0.xsd http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd">
      2   <blti:title>Example Tool Provider</blti:title>
      3   <blti:description>This is a Sample Tool Provider.</blti:description>

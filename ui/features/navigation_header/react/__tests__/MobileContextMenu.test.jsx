@@ -17,7 +17,8 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import MobileContextMenu from '../MobileContextMenu'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const tabsFromApi = [
   {
@@ -59,6 +60,8 @@ const spinner = 'Spinner'
 const contextType = 'Course'
 const contextId = '1'
 
+const server = setupServer()
+
 const props = {
   spinner,
   contextType,
@@ -66,13 +69,13 @@ const props = {
 }
 
 describe('MobileContextMenu', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     window.ENV = {context_asset_string: 'courses_1'}
-    fetchMock.mock('*', JSON.stringify(tabsFromApi))
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
+    server.use(http.get('*', () => HttpResponse.json(tabsFromApi)))
   })
 
   it('renders spinner while loading', () => {
@@ -98,7 +101,7 @@ describe('MobileContextMenu', () => {
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Discussions')).toBeVisible()
     expect(getByText('- Disabled. Not visible to students.')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[0]).toBeVisible()
   })
 
@@ -107,7 +110,7 @@ describe('MobileContextMenu', () => {
     await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('Grades')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[1]).toBeVisible()
   })
 
@@ -116,7 +119,7 @@ describe('MobileContextMenu', () => {
     await waitFor(() => getAllByRole('link'))
     const iconOff = container.querySelectorAll("svg[name='IconOff']")
     expect(getByText('DIG')).toBeVisible()
-    expect(iconOff.length).toEqual(3)
+    expect(iconOff).toHaveLength(3)
     expect(iconOff[2]).toBeVisible()
   })
 })

@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import type {ProgressData} from '@canvas/grading/grading.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ApiCallStatus} from '../../../types'
 import {Link} from '@instructure/ui-link'
@@ -28,7 +28,7 @@ import DateHelper from '@canvas/datetime/dateHelper'
 import {useExportGradebook} from '../../hooks/useExportGradebook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   lastGeneratedCsvAttachmentUrl: string | null | undefined
@@ -43,7 +43,7 @@ export default function GradebookScoreExport({
   exportGradebookCsvUrl,
 }: Props) {
   const [lastGeneratedCsvLink, setLastGeneratedCsvLink] = useState<string | null | undefined>(
-    lastGeneratedCsvAttachmentUrl
+    lastGeneratedCsvAttachmentUrl,
   )
   const [lastGeneratedCsvLinkText, setLastGeneratedCsvLinkText] = useState<
     string | null | undefined
@@ -82,6 +82,7 @@ export default function GradebookScoreExport({
       <Button
         data-testid="gradebook-export-button"
         color="secondary"
+        // @ts-expect-error
         renderIcon={IconDownloadLine}
         id="gradebook-export"
         interaction={attachmentStatus === ApiCallStatus.PENDING ? 'disabled' : 'enabled'}

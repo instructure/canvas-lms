@@ -110,3 +110,20 @@
     }
   }
 }
+
+#wikipage-title-input:required:invalid {
+  // reset global style, let instui handle it
+  box-shadow: initial;
+}
+
+// app/stylesheets/components/_ic-typography.scss:268 causes an issue with instui 10
+#edit_wikipage_title_container > div > label {
+  display: grid;
+}
+
+.wiki-legend {
+  border: 0;
+  border-bottom: none;
+  @include fontSize($baseFontSize * 0.7);
+  line-height: $baseLineHeight;
+}

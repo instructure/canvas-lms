@@ -28,8 +28,8 @@ describe CanvasImportedHtmlConverter do
   end
 
   describe ".convert" do
-    def convert_exported_html(*args)
-      @converter.convert_exported_html(*args)[0]
+    def convert_exported_html(*)
+      @converter.convert_exported_html(*)[0]
     end
 
     it "converts a wiki reference" do

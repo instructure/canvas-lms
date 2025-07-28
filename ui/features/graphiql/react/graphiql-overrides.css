@@ -1,0 +1,8 @@
+.graphiql-container {
+  overflow: auto;
+}
+
+.graphiql-container .historyPaneWrap {
+  overflow: auto !important;
+  max-height: 100%;
+}

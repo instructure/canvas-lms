@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useCallback, useState} from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -28,8 +28,11 @@ import type {ContentItem} from '@canvas/deep-linking/models/ContentItem'
 import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
-const I18n = useI18nScope('external_content.success')
+declare const ENV: GlobalEnv
+
+const I18n = createI18nScope('external_content.success')
 
 const {
   Head: TableHead,
@@ -49,6 +52,17 @@ type ContentItemError = {
   message: string
 }
 
+const noContentBlurb = () => (
+  <View
+    display="inline-block"
+    padding="none small"
+    borderWidth="none none none large"
+    borderColor="danger"
+  >
+    <View display="block">{I18n.t('The external app returned with no content.')}</View>
+  </View>
+)
+
 const header = () => (
   <View
     display="inline-block"
@@ -59,7 +73,7 @@ const header = () => (
     <View display="block">
       {I18n.t(
         'One or more content items sent by this external app failed to process correctly. ' +
-          'These have not been saved by Canvas, and the reasons for failure are listed below.'
+          'These have not been saved by Canvas, and the reasons for failure are listed below.',
       )}
     </View>
     <View display="block" margin="small 0 0 0">
@@ -95,7 +109,7 @@ const buildContentItems = (items: ContentItem[]) =>
           ({
             title: item.title,
             error: {field, message},
-          } as ContentItemDisplay)
+          }) as ContentItemDisplay,
       )
       return [...acc, ...errorItems]
     }
@@ -109,20 +123,15 @@ const buildContentItems = (items: ContentItem[]) =>
   }, [])
 
 type RetrievingContentProps = {
-  environment: Environment
+  environment: GlobalEnv
   parentWindow: Window
-}
-
-type Environment = {
-  deep_link_response: DeepLinkResponse
-  DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  deep_linking_use_window_parent: boolean
 }
 
 export const RetrievingContent = ({environment, parentWindow}: RetrievingContentProps) => {
   const subject = 'LtiDeepLinkingResponse'
-  const deepLinkResponse = environment.deep_link_response
+  const deepLinkResponse = environment.deep_link_response as DeepLinkResponse
   const [hasErrors, setHasErrors] = useState(false)
+  const [noContent, setNoContent] = useState(false)
   const [contentItems, setContentItems] = useState<ContentItemDisplay[]>([])
 
   const sendMessage = useCallback(() => {
@@ -131,13 +140,16 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
         subject,
         ...deepLinkResponse,
       },
-      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
+      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     )
   }, [deepLinkResponse, environment.DEEP_LINKING_POST_MESSAGE_ORIGIN, parentWindow])
 
   useEffect(() => {
+    if (deepLinkResponse.content_items?.length == 0) {
+      setNoContent(true)
+    }
     const anyItemHasError = deepLinkResponse.content_items.some(
-      item => Object.keys(item.errors || {}).length > 0
+      item => Object.keys(item.errors || {}).length > 0,
     )
     setHasErrors(anyItemHasError)
 
@@ -149,6 +161,10 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
     const items = buildContentItems(deepLinkResponse.content_items)
     setContentItems(items)
   }, [deepLinkResponse.content_items, sendMessage])
+
+  if (noContent) {
+    return noContentBlurb()
+  }
 
   if (hasErrors) {
     return (
@@ -210,16 +226,16 @@ export default class DeepLinkingResponse {
     // tools within tools to send content items to the tool,
     // not to Canvas. This assumes that tools are always only
     // "one level deep" in the frame hierarchy.
-    const environment: Environment = window.ENV as Environment
-    const shouldUseParent = environment.deep_linking_use_window_parent
-    return window.opener || (shouldUseParent && window.parent) || window.top
+    return window.opener || window.parent
   }
 
   static mount() {
     const parentWindow = this.targetWindow(window)
-    ReactDOM.render(
-      <RetrievingContent environment={window.ENV as Environment} parentWindow={parentWindow} />,
-      document.getElementById('deepLinkingContent')
-    )
+    const node = document.getElementById('deepLinkingContent')
+    if (!node) {
+      throw new Error('Could not find node with id deepLinkingContent')
+    }
+    const root = ReactDOM.createRoot(node)
+    root.render(<RetrievingContent environment={ENV} parentWindow={parentWindow} />)
   }
 }

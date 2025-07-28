@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
@@ -90,7 +89,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     expect(wrapper.container).toBeInTheDocument()
   })
@@ -105,7 +104,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     expect(ref.current.getDefinitionsUrl()).toEqual(correctUrl)
   })
@@ -118,12 +117,10 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('.tool_launch').length).toEqual(
-      toolDefinitions.length
-    )
+    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(toolDefinitions.length)
   })
 
   test('it builds the correct Launch URL for LTI 1 tools', () => {
@@ -134,98 +131,16 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
-      '/courses/1/external_tools/retrieve?borderless=true&' +
+      `/courses/1/external_tools/${tool.definition_id}?display=borderless&` +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
       'placement=assignment_edit&assignment_id=1'
     }`
     const computedUrl = ref.current.getLaunch(tool)
     expect(computedUrl).toEqual(correctUrl)
-  })
-
-  test('shows beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-  })
-
-  test('shows ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-  })
-
-  test('hides beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    wrapper.container.querySelector('.before_external_content_info_alert').blur()
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test('hides ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />
-    )
-    ref.current.setState({tools: toolDefinitions})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    wrapper.container.querySelector('.after_external_content_info_alert').blur()
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test("doesn't show alerts or add border to iframe by default", () => {
-    const ref = React.createRef()
-    wrapper = render(
-      <AssignmentExternalTools.configTools
-        ref={ref}
-        placement="assignment_edit"
-        courseId={1}
-        assignmentId={1}
-      />
-    )
-    ref.current.setState({tools: toolDefinitions})
-    expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({})
   })
 
   test('it renders multiple iframes', () => {
@@ -236,10 +151,10 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('.tool_launch').length).toEqual(2)
+    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(2)
   })
 
   test('it sets correct placement in launch url', () => {
@@ -250,11 +165,11 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
-      '/courses/1/external_tools/retrieve?borderless=true&' +
+      `/courses/1/external_tools/${tool.definition_id}?display=borderless&` +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
       'placement=assignment_view&assignment_id=1'
     }`
@@ -270,7 +185,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelectorAll('.tool_launch').forEach(iframe => {

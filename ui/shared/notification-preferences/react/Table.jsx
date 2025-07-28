@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import NotificationPreferencesSetting from './Setting'
 import {NotificationPreferencesShape} from './Shape'
 import React, {useEffect, useState} from 'react'
@@ -26,11 +26,10 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('notification_preferences')
+const I18n = createI18nScope('notification_preferences')
 
 const formattedCategoryNames = {
   courseActivities: () => I18n.t('Course Activities'),
@@ -109,7 +108,7 @@ const renderNotificationCategory = (
   updatePreferenceCallback,
   renderChannelHeader,
   sendScoresInEmails,
-  setSendScoresInEmails
+  setSendScoresInEmails,
 ) => (
   <React.Fragment key={notificationCategory}>
     {!(notificationCategory === 'conversations' && ENV.current_user_disabled_inbox) && (
@@ -166,58 +165,33 @@ const renderNotificationCategory = (
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {Object.keys(notificationPreferences.channels[0].categories[notificationCategory])
-            .filter(
-              category =>
-                notificationPreferences.channels[0].categories[notificationCategory][category]
-                  .notification
-            )
-            .map(category => (
+          {Object.entries(notificationPreferences.channels[0].categories[notificationCategory])
+            .filter(([_, categoryValue]) => categoryValue.notification)
+            .map(([category, categoryValue]) => (
               <Table.Row key={category} data-testid={formatCategoryKey(category)}>
                 <Table.RowHeader>
-                  <Tooltip
-                    renderTip={
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            notificationPreferences.channels[0].categories[notificationCategory][
-                              category
-                            ].notification.categoryDescription,
-                        }}
-                        data-testid={`${formatCategoryKey(category)}_description`}
-                      />
-                    }
-                    placement="end"
+                  <Text
+                    tabIndex="0"
+                    variant="contentImportant"
+                    data-testid={`${formatCategoryKey(category)}_header`}
                   >
-                    <span
-                      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                      tabIndex="0"
-                      style={{padding: theme.variables.spacing.xxSmall}}
-                      data-testid={`${formatCategoryKey(category)}_header`}
-                    >
-                      {
-                        notificationPreferences.channels[0].categories[notificationCategory][
-                          category
-                        ].notification.categoryDisplayName
-                      }
-                    </span>
-                  </Tooltip>
-                  <ScreenReaderContent>
-                    <div
+                    {categoryValue.notification.categoryDisplayName}
+                  </Text>
+                  <View as="div" data-testid={`${formatCategoryKey(category)}_description`}>
+                    <Text
+                      variant="legend"
                       dangerouslySetInnerHTML={{
-                        __html:
-                          notificationPreferences.channels[0].categories[notificationCategory][
-                            category
-                          ].notification.categoryDescription,
+                        __html: categoryValue.notification.categoryDescription
+                          .replace(/<p>/g, '<span style="display: block;">')
+                          .replace(/<\/p>/g, '</span>'),
                       }}
-                      data-testid={`${formatCategoryKey(category)}_screenReader`}
                     />
-                  </ScreenReaderContent>
+                  </View>
                   {category === 'Grading' &&
                     renderSendScoresInEmailsToggle(
                       sendScoresInEmails,
                       setSendScoresInEmails,
-                      updatePreferenceCallback
+                      updatePreferenceCallback,
                     )}
                 </Table.RowHeader>
                 {notificationPreferences.channels.map(channel => (
@@ -250,7 +224,7 @@ const renderNotificationCategory = (
 const renderSendScoresInEmailsToggle = (
   sendScoresInEmails,
   setSendScoresInEmails,
-  updatePreferenceCallback
+  updatePreferenceCallback,
 ) => {
   if (ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text !== null) {
     return (
@@ -273,16 +247,23 @@ const renderSendScoresInEmailsToggle = (
 }
 
 const formatPreferencesData = preferences => {
-  preferences.channels.forEach((channel, i) => {
+  const formattedPreferences = JSON.parse(JSON.stringify(preferences))
+
+  formattedPreferences.channels.forEach((channel, i) => {
     // copying the notificationCategories object defined above and setting it on each comms channel
     // so that we can update and mutate the object for each channel without it effecting the others.
     // We are also using the structure defined above because we care about the order that the
     // preferences are displayed in.
-    preferences.channels[i].categories = JSON.parse(JSON.stringify(notificationCategories))
-    setNotificationPolicy(channel.notificationPolicies, preferences.channels[i].categories)
-    setNotificationPolicy(channel.notificationPolicyOverrides, preferences.channels[i].categories)
-    dropEmptyCategories(preferences.channels[i].categories)
+    formattedPreferences.channels[i].categories = JSON.parse(JSON.stringify(notificationCategories))
+    setNotificationPolicy(channel.notificationPolicies, formattedPreferences.channels[i].categories)
+    setNotificationPolicy(
+      channel.notificationPolicyOverrides,
+      formattedPreferences.channels[i].categories,
+    )
+    dropEmptyCategories(formattedPreferences.channels[i].categories)
   })
+
+  return formattedPreferences
 }
 
 const setNotificationPolicy = (policies, categories) => {
@@ -312,7 +293,7 @@ const dropEmptyCategories = categories => {
 const NotificationPreferencesTable = props => {
   const {sendScoresInEmails} = props.preferences
   const [stageSendScoresInEmails, setStageSendScoresInEmails] = useState(
-    props.preferences.sendScoresInEmails
+    props.preferences.sendScoresInEmails,
   )
 
   useEffect(() => {
@@ -324,18 +305,18 @@ const NotificationPreferencesTable = props => {
   }
 
   if (props.preferences.channels?.length > 0) {
-    formatPreferencesData(props.preferences)
+    const formattedPreferences = formatPreferencesData(props.preferences)
     return (
       <>
-        {Object.keys(props.preferences.channels[0].categories).map((notificationCategory, i) =>
+        {Object.keys(formattedPreferences.channels[0].categories).map((notificationCategory, i) =>
           renderNotificationCategory(
-            props.preferences,
+            formattedPreferences,
             notificationCategory,
             props.updatePreference,
             i === 0,
             stageSendScoresInEmails,
-            setStageSendScoresInEmails
-          )
+            setStageSendScoresInEmails,
+          ),
         )}
       </>
     )

@@ -41,6 +41,7 @@ ready(() => {
         </Alert>
       )
     })
+
     ReactDOM.render(alerts, container)
   }
 })

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-
+import fakeENV from '@canvas/test-utils/fakeENV'
 import AssignmentTable from '../AssignmentTable'
 
 import {Assignment} from '../../../graphql/Assignment'
@@ -29,9 +29,15 @@ const defaultProps = {
   queryData: {
     name: 'Course Name',
     _id: '1',
-    assignmentsConnection: {nodes: [Assignment.mock()]},
     assignmentGroupsConnection: {nodes: [AssignmentGroup.mock()]},
     gradingStandard: GradingStandard.mock(),
+  },
+  assignmentsData: {
+    assignments: [Assignment.mock()],
+    pageInfo: {
+      hasNextPage: false,
+      endCursor: null,
+    },
   },
   layout: 'fixed',
   setShowTray: () => {},
@@ -39,6 +45,14 @@ const defaultProps = {
 }
 
 describe('AssignmentTable', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.SETTINGS = {suppress_assignments: false}
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
   it('renders', () => {
     const {getByText} = render(<AssignmentTable {...defaultProps} />)
     expect(getByText(Assignment.mock().name)).toBeInTheDocument()

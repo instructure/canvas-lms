@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,15 +18,15 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import {actions} from '../../actions/ui'
-import {CoursePace, StoreState} from '../../types'
+import type {CoursePace, StoreState} from '../../types'
 import {getCoursePace} from '../../reducers/course_paces'
 
-const I18n = useI18nScope('course_paces_blueprint_lock')
+const I18n = createI18nScope('course_paces_blueprint_lock')
 
 interface PassedProps {
   readonly newPace: boolean
@@ -45,27 +44,27 @@ interface StoreProps {
 export class BlueprintLock extends React.Component<PassedProps & StoreProps & DispatchProps> {
   private lockManager
 
+  // @ts-expect-error
   private isLocked
 
+  // @ts-expect-error
   private isChild
 
   private tooltipMessage
 
+  // @ts-expect-error
   private isCourseLevelPace
-
-  private useRedesign
 
   constructor(props: PassedProps & StoreProps & DispatchProps) {
     super(props)
     this.lockManager = new LockManager()
     this.tooltipMessage = I18n.t('Blueprint locking is only available for published paces')
-    this.useRedesign = window.ENV.FEATURES.course_paces_redesign
   }
 
   componentDidMount() {
     this.isCourseLevelPace = this.props.coursePace.context_type === 'Course'
 
-    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace && this.useRedesign)) {
+    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace)) {
       this.props.setBlueprintLocked(false)
       return null
     }
@@ -74,16 +73,18 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
       itemType: 'course_pace',
       page: 'show',
       bannerSelector: this.props.bannerSelector,
+      // @ts-expect-error
       lockCallback: locked => {
         this.props.setBlueprintLocked(
-          locked && this.isCourseLevelPace && this.lockManager.state.isChildContent
+          locked && this.isCourseLevelPace && this.lockManager.state.isChildContent,
         )
+        // @ts-expect-error
         window.ENV.MASTER_COURSE_DATA.restricted_by_master_course = locked
       },
     })
 
     this.props.setBlueprintLocked(
-      this.lockManager.state.isChildContent && this.lockManager.state.isLocked
+      this.lockManager.state.isChildContent && this.lockManager.state.isLocked,
     )
     this.isLocked = this.lockManager.state.isChildContent && this.lockManager.state.isLocked
     this.isChild = this.lockManager.state.isChildContent
@@ -98,7 +99,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
   }
 
   render() {
-    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace && this.useRedesign)) return null
+    if (!this.lockManager.shouldInit() || (!this.isCourseLevelPace)) return null
 
     const disabledLock = (this.props.newPace || this.isCourseLevelPace === false) && !this.isChild
     const disabledStyle = {pointerEvents: 'none', opacity: '0.5'}
@@ -111,6 +112,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
           renderTip={this.tooltipMessage}
           on={!disabledLock || this.isChild ? [] : ['hover', 'focus']}
         >
+          {/* @ts-expect-error */}
           <div className="blueprint-label" style={disabledLock ? disabledStyle : {}} />
           <ScreenReaderContent>{this.tooltipMessage}</ScreenReaderContent>
         </Tooltip>

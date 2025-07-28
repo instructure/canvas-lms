@@ -85,10 +85,10 @@ MemberListView.prototype.render = function () {
             id: c.get('id'),
             name: c.get('sortable_name') || c.get('name'),
             selected: true,
-          })
+          }),
         )
       }
-    })(this)
+    })(this),
   )
   collaboratorsHtml = collaboratorsHtml.join('')
   this.$list.html(collaboratorsHtml)
@@ -170,7 +170,7 @@ MemberListView.prototype.typecastMember = function (model) {
     return new User(
       extend(props, {
         sortable_name: props.name,
-      })
+      }),
     )
   } else {
     return new Group(props)

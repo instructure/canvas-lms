@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# These methods are mixed into the classes that can be considered a "context".
+# These methods are mixed into the classes that can be considered a "context"
+# EXCEPT for CourseSection.
 # See Context::CONTEXT_TYPES below.
 module Context
   CONTEXT_TYPES = %i[Account Course CourseSection User Group].freeze
@@ -84,7 +85,7 @@ module Context
   end
 
   def self.sorted_rubrics(context)
-    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(rubric: :context)
+    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).joins(:rubric).where(rubrics: { workflow_state: "active" }).preload(rubric: :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
   end
 
@@ -101,7 +102,7 @@ module Context
           context_codes << context.asset_string if context
         end
       end
-      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
+      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).joins(:rubric).where(rubrics: { workflow_state: "active" }).preload(rubric: :context).to_a
     end
 
     associations = associations.select(&:rubric).uniq { |a| [a.rubric_id, a.context.asset_string] }
@@ -153,7 +154,7 @@ module Context
 
     # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
     if only_check.present? && (cache_with_everything = Rails.cache.read([base_cache_key, "everything", self].cache_key))
-      return @active_record_types[only_check] = cache_with_everything.select { |k, _v| only_check.include?(k) }
+      return @active_record_types[only_check] = cache_with_everything.slice(*only_check)
     end
 
     # otherwise compute it and store it in the cache
@@ -172,6 +173,8 @@ module Context
   def find_asset(asset_string, allowed_types = nil)
     return nil unless asset_string
 
+    asset_string = Context.normalize_asset_string(asset_string)
+
     res = Context.find_asset_by_asset_string(asset_string, self, allowed_types)
     res = nil if res.respond_to?(:deleted?) && res.deleted?
     res
@@ -179,7 +182,7 @@ module Context
 
   # [[context_type, context_id], ...] -> {[context_type, context_id] => name, ...}
   def self.names_by_context_types_and_ids(context_types_and_ids)
-    ids_by_type = Hash.new([])
+    ids_by_type = Hash.new([].freeze)
     context_types_and_ids.each do |type, id|
       next unless type && CONTEXT_TYPES.include?(type.to_sym)
 
@@ -194,13 +197,26 @@ module Context
     result
   end
 
-  def self.context_code_for(record)
+  def self.context_code_for(record, fieldname = nil)
     raise ArgumentError unless record.respond_to?(:context_type) && record.respond_to?(:context_id)
 
-    "#{record.context_type.underscore}_#{record.context_id}"
+    if record.is_a?(Course) && fieldname == "syllabus_body"
+      "course_syllabus_#{record.context_id}"
+    else
+      "#{record.context_type.underscore}_#{record.context_id}"
+    end
+  end
+
+  def self.normalize_asset_string(asset_string)
+    if asset_string.start_with?("course_syllabus_")
+      return asset_string.gsub("course_syllabus", "course")
+    end
+
+    asset_string
   end
 
   def self.find_by_asset_string(string)
+    string = normalize_asset_string(string)
     ActiveRecord::Base.find_by_asset_string(string, CONTEXT_TYPES.map(&:to_s))
   end
 
@@ -220,7 +236,7 @@ module Context
 
     res = nil
     if context && klass == ContextExternalTool
-      res = klass.find_external_tool_by_id(id, context)
+      res = Lti::ToolFinder.from_id(id, context)
     elsif context && (klass.column_names & ["context_id", "context_type"]).length == 2
       res = klass.where(context:, id:).first
     else
@@ -276,7 +292,7 @@ module Context
         tool_url = query_params["url"]&.first
         resource_link_lookup_uuid = query_params["resource_link_lookup_uuid"]&.first
         object = if tool_url
-                   ContextExternalTool.find_external_tool(tool_url, context)
+                   Lti::ToolFinder.from_url(tool_url, context)
                  elsif resource_link_lookup_uuid
                    Lti::ResourceLink.where(
                      lookup_uuid: resource_link_lookup_uuid,
@@ -284,7 +300,7 @@ module Context
                    ).active.take&.current_external_tool(context)
                  end
       elsif params[:id]
-        object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
+        object = Lti::ToolFinder.from_id(params[:id], context)
       end
     when "context_modules"
       object = if %w[item_redirect item_redirect_mastery_paths choose_mastery_path].include?(params[:action])
@@ -429,7 +445,7 @@ module Context
 
     final_scope = scopes.first if scopes.length == 1
     final_scope ||= scopes.first.union(*scopes[1..], from: true)
-    final_scope.order(updated_at: :desc).limit(1).pluck(:updated_at)&.first
+    final_scope.order(updated_at: :desc).limit(1).pick(:updated_at)
   end
 
   def resolved_root_account_id

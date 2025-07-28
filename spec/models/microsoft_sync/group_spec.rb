@@ -22,9 +22,6 @@ describe MicrosoftSync::Group do
 
   it { is_expected.to be_a(described_class) }
   it { is_expected.to be_valid }
-  it { is_expected.to belong_to(:course).required }
-  it { is_expected.to belong_to(:last_error_report).class_name("ErrorReport") }
-  it { is_expected.to validate_presence_of(:course) }
 
   it "defaults to workflow_state=pending" do
     expect(subject.workflow_state).to eq("pending")

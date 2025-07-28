@@ -23,7 +23,7 @@
 @import "components/emoji";
 
 body.is-inside-submission-frame {
-  background-color: #f5f5f5;
+  background-color: #F2F4F4;
 }
 
 .ic-Layout-wrapper {
@@ -152,13 +152,31 @@ body.is-inside-submission-frame {
   }
 }
 
-.file-upload-submission {
-  display: flex;
-  align-items: center;
+.file-upload-submission-table {
+  width: 100%;
   background: $ic-color-light;
-  padding: $ic-sp $ic-sp*0.5;
-  border-bottom: 1px solid $ic-border-light;
-  &:last-of-type { border-bottom: none; }
+  border-collapse: collapse;
+
+  thead {
+    th {
+      padding: $ic-sp*0.5;
+      text-align: direction(left);
+      font-weight: bold;
+    }
+  }
+
+  tbody tr {
+    &.file-upload-submission {
+      background: $ic-color-light;
+      padding: 0;
+      display: table-row;
+    }
+  }
+
+  td {
+    padding: $ic-sp*0.5;
+    vertical-align: middle;
+  }
 }
 
 .file-upload-submission-info {
@@ -170,9 +188,9 @@ body.is-inside-submission-frame {
     margin-#{direction(right)}: $ic-sp*0.5;
     font-weight: bold;
   }
-  flex: 1;
   text-overflow: ellipsis;
   overflow: hidden;
+  max-width: 200px;
 }
 
 .file-upload-submission-info__filesize {
@@ -182,15 +200,15 @@ body.is-inside-submission-frame {
 
 .file-upload-submission-attachment {
   @include fontSize(13px);
-  flex: 0 0 auto;
   text-align: direction(right);
   box-sizing: border-box;
   padding-#{direction(left)}: $ic-sp;
+  white-space: nowrap;
 }
 
 .file-upload-submission-turnitin {
   @include fontSize(13px);
-  flex: 0 0 20%;
+  text-align: direction(center);
 }
 
 .omit-from-final-warning {
@@ -223,6 +241,28 @@ body.is-inside-submission-frame {
 
   .turnitin_similarity_score, .turnitin_similarity_score:hover {
     color: $ic-color-dark;
+  }
+}
+
+.submission_description {
+  width: 600px;
+  margin: 10px auto;
+  p {
+    button {
+      background: none;
+      color: var(--ic-link-color);
+      border: none;
+      padding: 0;
+      font: inherit;
+      text-decoration: none;
+      &:hover {
+        color: var(--ic-link-color);
+        text-decoration: underline;
+      }
+    }
+  }
+  .discussion_entry {
+    background-clip: content-box;
   }
 }
 

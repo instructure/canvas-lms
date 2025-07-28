@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,10 +18,10 @@
 
 import React, {useEffect} from 'react'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
-import {StoreState} from '../types'
+import type {StoreState} from '../types'
 import {connect} from 'react-redux'
 import {getCategoryError, getSyncing} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,7 +29,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('unpublished_changes_button_props')
+const I18n = createI18nScope('unpublished_changes_button_props')
 
 type StateProps = {
   readonly changeCount: number
@@ -52,17 +51,15 @@ export type UnpublishedChangesIndicatorProps = StateProps & PassedProps
 const text = (changeCount: number) => {
   if (changeCount < 0) throw Error(`changeCount cannot be negative (${changeCount})`)
   if (changeCount === 0) {
-    return window.ENV.FEATURES.course_paces_redesign
-      ? I18n.t('No pending changes to apply')
-      : I18n.t('All changes published')
+    return I18n.t('No pending changes')
   }
 
   return I18n.t(
     {
-      one: '1 unpublished change',
-      other: '%{count} unpublished changes',
+      one: '1 unsaved change',
+      other: '%{count} unsaved changes',
     },
-    {count: changeCount}
+    {count: changeCount},
   )
 }
 
@@ -113,20 +110,9 @@ export const UnpublishedChangesIndicator = ({
   if (isSyncing) {
     return (
       <View>
-        {window.ENV.FEATURES.course_paces_redesign ? (
+        {
           <Text>{publishingMessage}</Text>
-        ) : (
-          <>
-            <Spinner
-              size="x-small"
-              margin="0 x-small 0"
-              renderTitle={I18n.t('Publishing pace...')}
-            />
-            <PresentationContent>
-              <Text>{publishingMessage}</Text>
-            </PresentationContent>
-          </>
-        )}
+        }
       </View>
     )
   }

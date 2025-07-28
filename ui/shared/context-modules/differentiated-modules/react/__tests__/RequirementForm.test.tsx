@@ -38,6 +38,8 @@ describe('RequirementForm', () => {
     onAddRequirement: jest.fn(),
     onDropRequirement: () => {},
     onUpdateRequirement: () => {},
+    validatePointsInput: () => {},
+    pointsInputMessages: [],
   }
 
   const renderComponent = (overrides = {}) => render(<RequirementForm {...props} {...overrides} />)
@@ -79,6 +81,17 @@ describe('RequirementForm', () => {
   it('does not render the add button when all available module items have requirements', () => {
     const {queryByText} = renderComponent({
       requirements: props.moduleItems.map(moduleItem => ({...moduleItem, type: 'view'})),
+    })
+    expect(queryByText('Requirement')).not.toBeInTheDocument()
+    expect(queryByText('Add Requirement')).not.toBeInTheDocument()
+  })
+
+  it('ignores invalid items', () => {
+    const requirements = props.moduleItems.map(moduleItem => ({...moduleItem, type: 'view'}))
+    const moduleItems = [...props.moduleItems, {id: '4', name: '', resource: undefined}]
+    const {queryByText} = renderComponent({
+      requirements,
+      moduleItems,
     })
     expect(queryByText('Requirement')).not.toBeInTheDocument()
     expect(queryByText('Add Requirement')).not.toBeInTheDocument()

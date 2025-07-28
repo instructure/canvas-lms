@@ -1,6 +1,3 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import signatureBuilder from './signature_builder'
-import urlParams from './url_params'
-import mBus from './message_bus'
-import objectMerge from './object_merge'
-import k5Options from './k5_options'
+import signatureBuilder from './signature_builder.js'
+import urlParams from './url_params.js'
+import mBus from './message_bus.js'
+import objectMerge from './object_merge.js'
+import k5Options from './k5_options.js'
 
 function EntryService() {}
 
@@ -45,14 +42,15 @@ EntryService.prototype.createEntryRequest = function () {
 
 EntryService.prototype.parseRequest = function (xml) {
   const parser = new DOMParser()
-  const parsedXml = parser.parseFromString(xml, "application/xml")
-  const ent = parsedXml.querySelector("result > entries > entry1_")
+  const parsedXml = parser.parseFromString(xml, 'application/xml')
+  const ent = parsedXml.querySelector('result > entries > entry1_')
   if (ent) {
     var entry = {
       id: ent.querySelector('id') && ent.querySelector('id').textContent,
       type: ent.querySelector('type') && ent.querySelector('type').textContent,
       title: ent.querySelector('name') && ent.querySelector('name').textContent,
-      context_code: ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
+      context_code:
+        ent.querySelector('partnerData') && ent.querySelector('partnerData').textContent,
       mediaType: ent.querySelector('mediatype') && ent.querySelector('mediatype').textContent,
       entryId: ent.querySelector('id') && ent.querySelector('id').textContent,
       userTitle: undefined,

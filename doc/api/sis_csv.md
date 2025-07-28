@@ -132,6 +132,11 @@ over 10% different, the entire import file will be applied instead of diffing
 against a previous batch and this batch will not be used for diffing any future
 batches. The change_threshold can be set to any integer between 1 and 100.
 
+If five consecutive SIS batches with the same diffing data set identifier 
+exceed the change threshold, future imports will fail. You will be required
+to perform a remaster using the `diffing_remaster_data_set=true` option
+to resume imports with that data set identifier.
+
 change_threshold also impacts batch mode.
 
 Stickiness
@@ -276,7 +281,7 @@ recommended to omit this field over using fake email addresses for testing.</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
+<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user. This column will be ignored unless the "Enable Personal Pronouns" account setting is enabled.</td>
 </tr>
 <tr>
 <td>declared_user_type</td>
@@ -605,7 +610,7 @@ To remove the Blueprint Course link you can pass 'dissociate' in place of the id
 <p>If the start_date is set, it will override the term start date. If the end_date is set, it will
 override the term end date.</p>
 <p>To view the current status of a course that has already been imported into Canvas, please fetch the course data using the
-<a href="/doc/api/courses.html#method.courses.show" target="_blank">get a single course</a> API endpoint and refer to the workflow_state value returned in the <a href="/doc/api/courses.html#Course" target="_blank">Course</a> object.</p>
+<a href="courses.html#method.courses.show" target="_blank">get a single course</a> API endpoint and refer to the workflow_state value returned in the <a href="courses.html#Course" target="_blank">Course</a> object.</p>
 
 Sample:
 
@@ -798,6 +803,15 @@ Ignored for any role other than observer</td>
 <td></td>
 <td>If true, a notification will be sent to the enrolled user. Notifications are
  not sent by default. </td>
+</tr>
+<tr>
+<td>temporary_enrollment_source_user_id</td>
+<td>text</td>
+<td></td>
+<td></td>
+<td>The User identifier from users.csv of a provider in a temporary enrollment.
+ If included, the created enrollment is a temporary enrollment.
+ <em>Requires Temporary Enrollments feature option.</em></td>
 </tr>
 </table>
 
@@ -1121,7 +1135,7 @@ admins.csv
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>The account identifier from accounts.csv. Uses the root_account if left blank. The collumn is required even when importing for the root_account and the value is blank.</td>
+<td>The account identifier from accounts.csv. Uses the root_account if left blank. The column is required even when importing for the root_account and the value is blank.</td>
 </tr>
 <tr>
 <td>role_id</td>

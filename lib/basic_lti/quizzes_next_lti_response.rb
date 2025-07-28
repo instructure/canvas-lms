@@ -116,15 +116,11 @@ module BasicLTI
     end
 
     def raw_score
-      Float(result_total_score)
-    rescue
-      nil
+      Float(result_total_score, exception: false)
     end
 
     def percentage_score
-      Float(result_score)
-    rescue
-      nil
+      Float(result_score, exception: false)
     end
 
     def valid_request?(assignment)

@@ -24,7 +24,7 @@ class Checkpoints::AggregatorService < ApplicationService
     assignment.present? &&
       assignment.active? &&
       assignment.has_sub_assignments? &&
-      !!assignment.root_account&.feature_enabled?(:discussion_checkpoints)
+      !!assignment.context.discussion_checkpoints_enabled?
   end
 
   def sum(objects, field_name)

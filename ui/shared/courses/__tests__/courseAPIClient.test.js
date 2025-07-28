@@ -16,89 +16,178 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {forceReload} from '@canvas/util/globalUtils'
 import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import * as apiClient from '../courseAPIClient'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  forceReload: jest.fn(),
+}))
+
+const server = setupServer()
 
 describe('apiClient', () => {
   const {location: savedLocation} = window
 
   beforeAll(() => {
+    server.listen()
     $.flashWarning = jest.fn()
     $.flashError = jest.fn()
   })
 
-  beforeEach(() => {
-    delete window.location
-    window.location = {search: ''}
-    moxios.install()
-  })
-
   afterEach(() => {
-    window.location = savedLocation
-    moxios.uninstall()
+    server.resetHandlers()
     $.flashWarning.mockClear()
     $.flashError.mockClear()
+    forceReload.mockClear()
   })
 
   afterAll(() => {
+    server.close()
     $.flashWarning.mockRestore()
     $.flashError.mockRestore()
   })
 
   describe('publishCourse', () => {
-    it('reloads the window after upload with the proper param', done => {
-      moxios.stubRequest('/api/v1/courses/1', {
-        status: 200,
-        response: {},
+    it('reloads the window after upload with the proper param', async () => {
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
       })
-      apiClient.publishCourse({courseId: 1})
-      moxios.wait(() => {
-        expect(window.location.search).toBe('for_reload=1')
-        done()
-      })
+
+      server.use(
+        http.put('/api/v1/courses/1', async ({request}) => {
+          const body = await request.json()
+          expect(body).toEqual({course: {event: 'offer'}})
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({})
+        }),
+      )
+
+      apiClient.publishCourse({courseId: '1'})
+      await promise
+      expect(forceReload).toHaveBeenCalled()
     })
 
-    it('calls onSuccess function on success if provided', done => {
-      moxios.stubRequest('/api/v1/courses/1', {
-        status: 200,
-        response: {},
-      })
+    it('calls onSuccess function on success if provided', async () => {
       const onSuccess = jest.fn()
-      apiClient.publishCourse({courseId: 1, onSuccess})
-      moxios.wait(() => {
-        expect(onSuccess).toHaveBeenCalled()
-        done()
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
       })
+
+      server.use(
+        http.put('/api/v1/courses/1', () => {
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({})
+        }),
+      )
+
+      apiClient.publishCourse({courseId: '1', onSuccess})
+      await promise
+      expect(onSuccess).toHaveBeenCalled()
     })
 
-    it('flashes registration message on 401', done => {
-      moxios.stubRequest('/api/v1/courses/1', {
-        status: 401,
-        response: {
-          status: 'unverified',
-        },
+    it('flashes registration message on 401', async () => {
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
       })
-      apiClient.publishCourse({courseId: 1})
-      moxios.wait(() => {
-        expect(window.location.search).toBe('')
-        expect($.flashWarning).toHaveBeenCalledWith(
-          'Complete registration by clicking the “finish the registration process” link sent to your email.'
-        )
-        done()
-      })
+
+      server.use(
+        http.put('/api/v1/courses/1', () => {
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({status: 'unverified'}, {status: 401})
+        }),
+      )
+
+      apiClient.publishCourse({courseId: '1'})
+      await promise
+      expect(window.location.search).toBe('')
+      expect($.flashWarning).toHaveBeenCalledWith(
+        expect.stringContaining('Complete registration by clicking the'),
+      )
     })
 
-    it('flashes an error on failure', done => {
-      moxios.stubRequest('/api/v1/courses/1', {
-        status: 404,
+    it('flashes an error on failure', async () => {
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
       })
-      apiClient.publishCourse({courseId: 1})
-      moxios.wait(() => {
-        expect(window.location.search).toBe('')
-        expect($.flashError).toHaveBeenCalledWith('An error ocurred while publishing course')
-        done()
+
+      server.use(
+        http.put('/api/v1/courses/1', () => {
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({}, {status: 404})
+        }),
+      )
+
+      apiClient.publishCourse({courseId: '1'})
+      await promise
+      expect(window.location.search).toBe('')
+      expect($.flashError).toHaveBeenCalledWith('An error ocurred while publishing course')
+    })
+  })
+
+  describe('unpublishCourse', () => {
+    it('reloads the window after upload with the proper param', async () => {
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
       })
+
+      server.use(
+        http.put('/api/v1/courses/1', async ({request}) => {
+          const body = await request.json()
+          expect(body).toEqual({course: {event: 'claim'}})
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({})
+        }),
+      )
+
+      apiClient.unpublishCourse({courseId: '1'})
+      await promise
+      expect(forceReload).toHaveBeenCalled()
+    })
+
+    it('calls onSuccess function on success if provided', async () => {
+      const onSuccess = jest.fn()
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
+      })
+
+      server.use(
+        http.put('/api/v1/courses/1', () => {
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({})
+        }),
+      )
+
+      apiClient.unpublishCourse({courseId: '1', onSuccess})
+      await promise
+      expect(onSuccess).toHaveBeenCalled()
+    })
+
+    it('flashes an error on failure', async () => {
+      let resolvePromise
+      const promise = new Promise(resolve => {
+        resolvePromise = resolve
+      })
+
+      server.use(
+        http.put('/api/v1/courses/1', () => {
+          setTimeout(() => resolvePromise(), 0)
+          return HttpResponse.json({}, {status: 404})
+        }),
+      )
+
+      apiClient.unpublishCourse({courseId: '1'})
+      await promise
+      expect(window.location.search).toBe('')
+      expect($.flashError).toHaveBeenCalledWith('An error occurred while unpublishing course')
     })
   })
 })

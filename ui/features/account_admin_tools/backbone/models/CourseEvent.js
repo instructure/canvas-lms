@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_logging')
+const I18n = createI18nScope('course_logging')
 
 const last = obj => obj.at(-1)
 const notEmpty = obj => Object.keys(obj).length > 0
@@ -158,7 +158,7 @@ export default class CourseEvent extends Backbone.Model {
       case 'allow_student_forum_attachments':
         return I18n.t(
           'field_label.allow_student_forum_attachments',
-          'Allow Student Forum Attachments'
+          'Allow Student Forum Attachments',
         )
       case 'default_wiki_editing_roles':
         return I18n.t('field_label.default_wiki_editing_roles', 'Default Wiki Editing Roles')
@@ -167,7 +167,7 @@ export default class CourseEvent extends Backbone.Model {
       case 'allow_student_organized_groups':
         return I18n.t(
           'field_label.allow_student_organized_groups',
-          'Allow Student Organized Groups'
+          'Allow Student Organized Groups',
         )
       case 'course_code':
         return I18n.t('field_label.course_code', 'Course Code')
@@ -202,7 +202,7 @@ export default class CourseEvent extends Backbone.Model {
       case 'restrict_enrollments_to_course_dates':
         return I18n.t(
           'field_label.restrict_enrollments_to_course_dates',
-          'Restrict Enrollments To Course Dates'
+          'Restrict Enrollments To Course Dates',
         )
       case 'template_course_id':
         return I18n.t('field_label.template_course_id', 'Template Course Id')
@@ -225,12 +225,12 @@ export default class CourseEvent extends Backbone.Model {
       case 'allow_student_discussion_topics':
         return I18n.t(
           'field_label.allow_student_discussion_topics',
-          'Allow Student Discussion Topics'
+          'Allow Student Discussion Topics',
         )
       case 'allow_student_discussion_editing':
         return I18n.t(
           'field_label.allow_student_discussion_editing',
-          'Allow Student Discussion Editing'
+          'Allow Student Discussion Editing',
         )
       case 'lock_all_announcements':
         return I18n.t('field_label.lock_all_announcements', 'Lock All Announcements')

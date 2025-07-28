@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -17,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 import type Gradebook from '../Gradebook'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export default class FinalGradeOverrides {
   _gradebook: Gradebook
@@ -35,6 +34,7 @@ export default class FinalGradeOverrides {
     this._datastore = new FinalGradeOverrideDatastore()
   }
 
+  // @ts-expect-error
   getGradeForUser(userId) {
     let gradingPeriodId: null | string = null
     if (this._gradebook.isFilteringColumnsByGradingPeriod()) {
@@ -53,6 +53,7 @@ export default class FinalGradeOverrides {
     return this._datastore.getPendingGradeInfo(userId, gradingPeriodId)
   }
 
+  // @ts-expect-error
   setGrades(gradeOverrides) {
     this._datastore.setGrades(gradeOverrides)
     const studentIds = Object.keys(gradeOverrides)
@@ -61,6 +62,7 @@ export default class FinalGradeOverrides {
     })
   }
 
+  // @ts-expect-error
   updateGrade(userId: string, gradeOverrideInfo) {
     const [enrollment] = this._gradebook.student(userId).enrollments
 
@@ -73,7 +75,9 @@ export default class FinalGradeOverrides {
     this._gradebook.gradebookGrid?.updateRowCell(userId, 'total_grade_override')
 
     if (gradeOverrideInfo.valid) {
+      // @ts-expect-error
       updateFinalGradeOverride(enrollment.id, gradingPeriodId, gradeOverrideInfo.grade)
+        // @ts-expect-error
         .then(grade => {
           this._datastore.removePendingGradeInfo(userId, gradingPeriodId)
           this._datastore.updateGrade(userId, gradingPeriodId, grade)
@@ -95,7 +99,7 @@ export default class FinalGradeOverrides {
     } else {
       showFlashAlert({
         message: I18n.t(
-          'You have entered an invalid grade for this student. Check the value and the grading type and try again.'
+          'You have entered an invalid grade for this student. Check the value and the grading type and try again.',
         ),
         type: 'error',
         err: null,

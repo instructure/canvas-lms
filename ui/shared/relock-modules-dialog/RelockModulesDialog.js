@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogBaseView from '@canvas/dialog-base-view'
 import template from './RelockModulesDialog.handlebars'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 export default class RelockModulesDialog extends DialogBaseView {
   renderIfNeeded(data) {
@@ -59,7 +59,7 @@ export default class RelockModulesDialog extends DialogBaseView {
   }
 
   relock() {
-    const url = `/api/v1/courses/${ENV.COURSE_ID}/modules/${this.module_id}/relock`
+    const url = `/api/v1/courses/${ENV.COURSE_ID || ENV.course_id}/modules/${this.module_id}/relock`
     return this.dialog.disableWhileLoading($.ajaxJSON(url, 'PUT', {}, () => this.close()))
   }
 }

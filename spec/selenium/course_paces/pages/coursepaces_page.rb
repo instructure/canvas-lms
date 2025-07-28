@@ -206,6 +206,10 @@ module CoursePacesPageObject
     "//span[@data-testid = 'skip-weekends-toggle']"
   end
 
+  def skip_selected_days_xpath_selector
+    "[data-testid= 'skip-selected-days']"
+  end
+
   def skip_weekends_checkbox_selector
     "[data-testid='skip-weekends-toggle']"
   end
@@ -301,6 +305,26 @@ module CoursePacesPageObject
     "[data-testid='pace-info']"
   end
 
+  def pace_course_stats_info_selector
+    "[data-testid='course-stats-info']"
+  end
+
+  def pace_start_date_input_selector
+    "[data-testid='start-date-input']"
+  end
+
+  def pace_end_date_input_selector
+    "[data-testid='end-date-input']"
+  end
+
+  def pace_weeks_number_input_selector
+    "[data-testid='weeks-number-input']"
+  end
+
+  def pace_days_number_input_selector
+    "[data-testid='days-number-input']"
+  end
+
   def remove_pace_button_selector
     "[data-testid='remove-pace-button']"
   end
@@ -340,6 +364,18 @@ module CoursePacesPageObject
 
   def reset_all_x_button_selector
     "[data-testid='reset-changes-modal'] [data-testid='instui-modal-close'] button"
+  end
+
+  def save_draft_button_selector
+    "[data-testid='save-pace-draft-button']"
+  end
+
+  def draft_pace_status_pill_selector
+    "[data-testid='draft-pace-status-pill']"
+  end
+
+  def direct_publish_draft_button_selector
+    "[data-testid='direct-publish-draft-pace-button']"
   end
 
   #------------------------- Elements --------------------------------
@@ -540,6 +576,10 @@ module CoursePacesPageObject
     fxpath(skip_weekends_checkbox_xpath_selector)
   end
 
+  def show_skip_selected_days
+    f(skip_selected_days_xpath_selector)
+  end
+
   def student_course_pace(student_name)
     fj(student_course_pace_selector(student_name))
   end
@@ -604,6 +644,26 @@ module CoursePacesPageObject
 
   def pace_info
     f(pace_info_selector)
+  end
+
+  def pace_course_stats_info
+    f(pace_course_stats_info_selector)
+  end
+
+  def pace_start_date_input
+    f(pace_start_date_input_selector)
+  end
+
+  def pace_end_date_input
+    f(pace_end_date_input_selector)
+  end
+
+  def pace_weeks_number_input
+    f(pace_weeks_number_input_selector)
+  end
+
+  def pace_days_number_input
+    f(pace_days_number_input_selector)
   end
 
   def remove_pace_button
@@ -744,6 +804,10 @@ module CoursePacesPageObject
     skip_weekends_checkbox.click
   end
 
+  def click_show_skip_selected_days
+    show_skip_selected_days.click
+  end
+
   #------------------------- Redesign Elements -----------------------
   def click_apply_or_create_pace_button
     apply_or_create_pace_button.click
@@ -818,7 +882,7 @@ module CoursePacesPageObject
   delegate :text, to: :assignment_due_date, prefix: true
 
   def calculate_saturday_date
-    current_date = Date.today
+    current_date = Time.zone.today
     current_date + ((6 - current_date.wday) % 7)
   end
 

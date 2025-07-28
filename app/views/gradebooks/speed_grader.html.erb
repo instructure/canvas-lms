@@ -24,7 +24,8 @@
       :assessor_id => @current_user.id.to_s,
       :assessment_type => can_do(@assignment, @current_user, :grade) ? "grading" : "peer_review"
     },
-    studio_media_capture_enabled: Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture)
+    studio_media_capture_enabled: Account.site_admin.feature_enabled?(:speedgrader_studio_media_capture),
+    ENTRY_ID: @entry_id
   })
   @show_left_side = false
   @show_embedded_chat = false
@@ -35,7 +36,7 @@
 
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
-<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;">
+<div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;" id="classic_speedgrader_container">
   <figure id="speed_grader_timeout_alert"></figure>
   <figure id="speed_grader_loading"></figure>
   <h1 class="screenreader-only"><%= t('page_header_title', "SpeedGrader") %></h1>
@@ -53,7 +54,7 @@
           <span id="speed_grader_settings_mount_point"></span>
         </div>
         <div class="assignmentDetails">
-          <a id="assignment_url" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
+          <a id="assignment_url" role="button" href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>">
             <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
           </a>
           <p class="assignmentDetails__Info">
@@ -202,9 +203,13 @@
               <% end %>
               <div class="turnitin_info_container"></div>
             </div>
+            <div id="speed_grader_lti_asset_reports_mount_point"></div>
           </div>
 
           <div class="content_box">
+            <% if @assignment.context.discussion_checkpoints_enabled? && @assignment.submission_types == 'discussion_topic' %>
+              <div id="speed_grader_discussions_navigation_mount_point"></div>
+            <% end %>
             <% if @assignment.active_rubric_association? %>
             <div id="rubric_full" style="display: none;">
                 <h2><%= t("Grading") %></h2>
@@ -227,37 +232,58 @@
             </div>
             <% end %>
 
-            <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+            <% if @assignment.active_rubric_association? || @assignment.can_view_audit_trail?(@current_user) || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
             <div id="grades-loading-spinner"></div>
-            <div id="grading">
-              <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
-              <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
-                <div id="grade_container">
-                  <%= render partial: "grading_box_extended", locals: {assignment: @assignment} %>
-                  <span class="turnitin_score_container"></span>
-                  <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
-                  <div class="turnitin_info_container"></div>
+
+            <div style="display: flex;">
+              <div id="grading" style="flex: 1;">
+                <div style="display: flex;">
+                  <div style="flex: 1">
+                    <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
+                    <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+                    <div id="grade_container">
+                      <%= render partial: "grading_box_extended", locals: {assignment: @assignment} %>
+                      <span class="turnitin_score_container"></span>
+                      <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
+                      <div class="turnitin_info_container"></div>
+                    </div>
+                  </div>
+
+                  <% if @assignment.stickers_enabled?(@current_user) %>
+                  <div id="submission_sticker_mount_point"></div>
+                  <% end %>
                 </div>
 
                 <div id="grading_details_mount_point"></div>
-              <% end %>
-
-              <% if @assignment.active_rubric_association? %>
-                <div id="rubric_summary_holder">
-                  <div id="rubric_assessments_list_and_edit_button_holder">
-                    <span id="rubric_assessments_list">
-                      <h2><%= t("Select Rubric") %></h2>
-                      <select id="rubric_assessments_select"></select>
-                    </span>
-                  </div>
-                  <div id="rubric_summary_container">
-                    <%= render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => {:assessing => true } if @assignment.try_rescue(:rubric_association).try_rescue(:rubric) %>
+                <% else %>
                   </div>
                 </div>
-              <% end %>
+                <% end %>
 
-              <div id="speed_grader_assessment_audit_button_mount_point"></div>
-            </div><!-- end #grading -->
+                <% if @assignment.active_rubric_association? %>
+                  <div id="rubric_summary_holder">
+                    <div id="rubric_assessments_list_and_edit_button_holder">
+                      <span id="rubric_assessments_list">
+                        <h2><%= t("Select Rubric") %></h2>
+                        <select id="rubric_assessments_select"></select>
+                      </span>
+                    </div>
+                    <div id="rubric_summary_container">
+                      <%=
+                        locals = {
+                          assessing: true,
+                          checkpointed: @assignment.checkpoints_parent?,
+                        }
+                        render :partial => "shared/rubric_summary", :object => @assignment.try_rescue(:rubric_association).try_rescue(:rubric), :locals => locals if @assignment.try_rescue(:rubric_association).try_rescue(:rubric)
+                      %>
+                    </div>
+                  </div>
+                <% end %>
+
+                <div id="speed_grader_assessment_audit_button_mount_point"></div>
+              </div><!-- end #grading -->
+              <div id="enhanced-rubric-assessment-container"></div>
+            </div>
             <% end %>
           </div>
 
@@ -274,8 +300,11 @@
                 <div class="comment" id="comment_blank" style="display: none;">
                   <div class="comment_flex">
                     <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar" alt="" style="display: none;"/>
-                    <span class="draft-marker" aria-label="<%= t('Draft comment') %>">*</span>
+                    <span class="draft-marker" aria-label="<%= t('Draft comment') %>"><%=t('DRAFT')%></span>
                     <span class="comment"></span>
+                    <a href="javascript:void 0;" class="edit_comment_link icon-edit">
+                      <span class="screenreader-only"><%= t('Edit Draft comment') %></span>
+                    </a>
                     <button class="submit_comment_button">
                       <span><%= t('Submit') %></span>
                     </button>
@@ -474,6 +503,30 @@
       <%= label_tag :enable_speedgrader_grade_by_question,
         t("Grade by question") %>
     </p>
+
+    <% if @context.feature_enabled?(:platform_service_speedgrader) %>
+      <p>
+        <button class="btn btn-primary submit_button" id="show_new_sg_ui" name="show_new_sg_ui">
+          <%= t('buttons.show_new_sg_ui', "Use new SpeedGrader UI") %>
+        </button>
+      </p>
+    <% end %>
+
+    <% if @context.discussion_checkpoints_enabled? %>
+      <fieldset class="ic-Fieldset ic-Fieldset--radio-checkbox">
+        <legend class="ic-Legend"><%= t("Default Discussion View Options") %></legend>
+          <div class="ic-Form-control ic-Form-control--radio">
+          <div class="ic-Radio">
+            <input type="radio" id="discussion_view_no_context" name="default_discussion_view" value="discussion_view_no_context">
+            <label class="ic-Label" for="discussion_view_no_context"><%= t('buttons.discussion_view_no_context', "Show replies without discussion context") %></label>
+          </div>
+          <div class="ic-Radio">
+            <input type="radio" id="discussion_view_with_context" name="default_discussion_view" value="discussion_view_with_context">
+            <label class="ic-Label" for="discussion_view_with_context"><%= t('buttons.discussion_view_with_context', "Show replies in context") %></label>
+          </div>
+        </div>
+      </fieldset>
+    <% end %>
 
     <div class="button-container">
       <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>

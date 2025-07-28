@@ -64,6 +64,8 @@ module Api::V1::MasterCourses
             show_media_attachment_tracks_url(attachment_id: asset.attachment, id: asset.id)
           when "Quizzes::Quiz"
             course_quiz_url(course_id: asset.context.id, id: asset.id)
+          when "SubAssignment"
+            course_assignment_url(course_id: asset.context.id, id: asset.parent_assignment_id)
           else
             polymorphic_url([asset.context, asset])
           end

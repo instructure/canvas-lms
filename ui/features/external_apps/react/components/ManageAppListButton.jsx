@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -25,7 +25,7 @@ import ConfigOptionField from './ConfigOptionField'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class ManageAppListButton extends React.Component {
   static propTypes = {
@@ -81,7 +81,7 @@ export default class ManageAppListButton extends React.Component {
           ENV.CONTEXT_BASE_URL,
           this.state.accessToken,
           this.successHandler,
-          this.errorHandler
+          this.errorHandler,
         )
       }
     })
@@ -119,7 +119,7 @@ export default class ManageAppListButton extends React.Component {
                       '<a href="https://www.eduappcenter.com">$1</a>',
                       '<a href="' + allowListLink + '">$1</a>',
                     ],
-                  }
+                  },
                 ),
               }}
             />

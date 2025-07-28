@@ -93,26 +93,26 @@ module Canvas
 
     # Load manifests at most once per instance
     class Registry::ProcessCache
-      def gulp(*args, **kwargs)
-        @gulp ||= Registry::Gulp.new(*args, **kwargs)
+      def gulp(*, **)
+        @gulp ||= Registry::Gulp.new(*, **)
       end
 
-      def webpack(*args, **kwargs)
-        @webpack ||= Registry::Webpack.new(*args, **kwargs)
+      def webpack(*, **)
+        @webpack ||= Registry::Webpack.new(*, **)
       end
     end
 
     # (Re)load manifests on every request
     class Registry::RequestCache
-      def gulp(*args, **kwargs)
+      def gulp(*, **)
         ::RequestCache.cache(["registry", "gulp"]) do
-          Registry::Gulp.new(*args, **kwargs)
+          Registry::Gulp.new(*, **)
         end
       end
 
-      def webpack(*args, **kwargs)
+      def webpack(*, **)
         ::RequestCache.cache(["registry", "webpack"]) do
-          Registry::Webpack.new(*args, **kwargs)
+          Registry::Webpack.new(*, **)
         end
       end
     end
@@ -124,17 +124,19 @@ module Canvas
         @webpack_manifest = webpack
       end
 
-      def gulp(*args, **kwargs)
+      def gulp(*, **)
         @gulp ||= Registry::Gulp.new(
-          *args,
-          **kwargs.merge(manifest: @gulp_manifest)
+          *,
+          **,
+          manifest: @gulp_manifest
         )
       end
 
-      def webpack(*args, **kwargs)
+      def webpack(*, **)
         @webpack ||= Registry::Webpack.new(
-          *args,
-          **kwargs.merge(manifest: @webpack_manifest)
+          *,
+          **,
+          manifest: @webpack_manifest
         )
       end
     end

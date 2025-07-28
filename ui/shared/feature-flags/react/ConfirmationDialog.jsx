@@ -18,11 +18,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 
-const I18n = useI18nScope('ConfirmationDialog')
+const I18n = createI18nScope('ConfirmationDialog')
 
 const dialogHolderId = 'confirmation_dialog_holder'
 
@@ -44,10 +44,11 @@ export default function ConfirmationDialog({
       size={size}
       footer={
         <>
-          <Button data-testid="cancel-button" onClick={onReject}>
+          <Button key="cancel" data-testid="cancel-button" onClick={onReject}>
             {I18n.t('Cancel')}
           </Button>
           <Button
+            key="confirm"
             data-testid="confirm-button"
             margin="0 0 0 small"
             color={confirmColor || 'primary'}
@@ -108,7 +109,7 @@ export async function showConfirmationDialog({
       >
         {body}
       </ConfirmationDialog>,
-      parent
+      parent,
     )
   }
   renderDialog(getDialogContainer())

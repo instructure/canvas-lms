@@ -28,6 +28,7 @@ require_relative "../helpers/files_common"
 require_relative "../helpers/conferences_common"
 require_relative "../helpers/course_common"
 require_relative "../helpers/groups_shared_examples"
+require_relative "../files_v2/pages/files_page"
 
 describe "groups" do
   include_context "in-process server selenium tests"
@@ -38,7 +39,7 @@ describe "groups" do
   include FilesCommon
   include GroupsCommon
   include WikiAndTinyCommon
-
+  include FilesPage
   setup_group_page_urls
 
   context "as a teacher" do
@@ -110,7 +111,7 @@ describe "groups" do
         expect(f(".announcements-v2__wrapper")).not_to contain_css(".ic-announcement-row")
       end
 
-      it "lets teachers see announcement details" do
+      it "lets teachers see announcement details", :ignore_js_errors do
         announcement = @testgroup.first.announcements.create!(
           title: "Test Announcement",
           message: "test message",
@@ -118,8 +119,8 @@ describe "groups" do
         )
         get announcements_page
         expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement.title) }
-        expect(f(".discussion-title").text).to eq "Test Announcement"
-        expect(f(".message").text).to eq "test message"
+        expect(f('[data-testid="message_title"]')).to include_text("Test Announcement")
+        expect(f('[data-resource-type="announcement.body"]').text).to eq "test message"
       end
 
       it "edit button from announcement details works on teachers announcement" do
@@ -133,7 +134,8 @@ describe "groups" do
           announcement
         )
         get url_base
-        expect_new_page_load { f(".edit-btn").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.current_url).to include "#{url_base}/edit"
         expect(f("#content-wrapper")).not_to contain_css("#sections_autocomplete_root input")
       end
@@ -166,7 +168,8 @@ describe "groups" do
           announcement
         )
         get url_base
-        expect_new_page_load { f(".edit-btn").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.current_url).to include "#{url_base}/edit"
         expect(f("#content-wrapper")).not_to contain_css("#sections_autocomplete_root input")
       end
@@ -225,12 +228,12 @@ describe "groups" do
       it "has three options when creating a discussion", priority: "1" do
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
-        expect(f("#threaded")).to be_displayed
-        expect(f("#allow_rating")).to be_displayed
-        expect(f("#podcast_enabled")).to be_displayed
+        expect(f('[name="allow_rating"]')).to be_present
+        expect(f('[name="allow_todo_date"]')).to be_present
+        expect(f('[name="podcast_enabled"]')).to be_present
       end
 
-      it "allows teachers to access a discussion", priority: "1" do
+      it "allows teachers to access a discussion", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: "Discussion Topic",
@@ -238,7 +241,7 @@ describe "groups" do
         get discussions_page
         # Verifies teacher can access the group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
-        expect(f(".message.user_content")).to include_text(dt.message)
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text(dt.message)
       end
 
       it "allows teachers to delete their group discussions", :ignore_js_errors, priority: "1" do
@@ -300,58 +303,31 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
-    describe "Files page" do
-      it_behaves_like "files_page", :teacher
-
-      it "allows teacher to add a new folder", priority: "2" do
-        get files_page
-        add_folder
-        expect(ff(".ef-name-col__text").first.text).to eq "new folder"
+    describe "Files page on old UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows teacher to delete a folder", priority: "2" do
-        skip_if_safari(:alert)
-        get files_page
-        add_folder
-        delete_file(0, :toolbar_menu)
-        expect(f("body")).not_to contain_css(".ef-item-row")
+      before do
+        @teacher.set_preference(:files_ui_version, "v1")
       end
 
-      it "allows a teacher to delete a file", priority: "2" do
-        skip_if_safari(:alert)
-        add_test_files
-        get files_page
-        delete_file(0, :toolbar_menu)
-        wait_for_ajaximations
-        expect(f("body")).not_to contain_css(".ef-item-row")
+      it_behaves_like "files_page_old_ui", :teacher
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "Files page on files rewrite UI" do
+      before(:once) do
+        Account.site_admin.enable_feature! :files_a11y_rewrite
+        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
       end
 
-      it "allows teachers to move a file", priority: "2" do
-        add_test_files
-        get files_page
-        add_folder("destination_folder")
-        move_file_to_folder("example.pdf", "destination_folder")
+      before do
+        @teacher.set_preference(:files_ui_version, "v2")
       end
 
-      it "allows teachers to move a folder", priority: "2" do
-        get files_page
-        create_folder_structure
-        move_folder(@inner_folder)
-      end
-
-      it "hides the publish cloud", priority: "1" do
-        add_test_files
-        get files_page
-        expect(f("#content")).not_to contain_css(".btn-link.published-status")
-      end
-
-      it "does not allow teachers to restrict access to a file", priority: "1" do
-        add_test_files
-        get files_page
-        f(".ef-item-row .ef-date-created-col").click
-        expect(f(".ef-header")).to contain_css(".ef-header__secondary")
-        expect(f(".ef-header__secondary")).not_to contain_css(".btn-restrict")
-      end
+      it_behaves_like "files_page_files_rewrite_ui", :teacher
     end
 
     #-------------------------------------------------------------------------------------------------------------------

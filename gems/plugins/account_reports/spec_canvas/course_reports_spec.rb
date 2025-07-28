@@ -192,6 +192,8 @@ describe "Course Account Reports" do
 
       @assignment = @course1.assignments.create(title: "some assignment",
                                                 points_possible: "5")
+
+      @assignment.sub_assignments.create!(title: "sub assignment", context: @assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @discussion = @course2.discussion_topics.create!(message: "hi")
       @attachment = attachment_model(context: @course3)
       @module = @course4.context_modules.create!(name: "some module")
@@ -285,19 +287,19 @@ describe "Course Account Reports" do
     before(:once) do
       @report = "course_storage_csv"
       a = attachment_obj_with_context(@course1)
-      a.update_attribute(:size, 1.226.megabyte)
+      a.update_attribute(:size, 1.226.decimal_megabytes)
       a = attachment_obj_with_context(@course2)
-      a.update_attribute(:size, 3.megabyte)
+      a.update_attribute(:size, 3.decimal_megabytes)
       a = attachment_obj_with_context(@course5)
-      a.update_attribute(:size, 11.megabyte)
+      a.update_attribute(:size, 11.decimal_megabytes)
       a = attachment_obj_with_context(@course5)
-      a.update_attribute(:size, 1.megabyte)
+      a.update_attribute(:size, 1.decimal_megabytes)
       a = attachment_obj_with_context(@course4)
-      a.update_attribute(:size, 4.6521.megabyte)
+      a.update_attribute(:size, 4.6521.decimal_megabytes)
       a = attachment_obj_with_context(@course5)
-      a.update_attribute(:size, 80.megabyte)
+      a.update_attribute(:size, 80.decimal_megabytes)
       child = attachment_obj_with_context(@course1)
-      child.update_attribute(:size, 80.megabyte)
+      child.update_attribute(:size, 80.decimal_megabytes)
       child.root_attachment_id = a.id
       child.save!
     end

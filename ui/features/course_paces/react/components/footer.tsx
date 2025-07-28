@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -27,18 +26,19 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-
-import {ResponsiveSizes, StoreState} from '../types'
+import type {ResponsiveSizes, StoreState} from '../types'
 import {
   getAnyActiveRequests,
   getAutoSaving,
   getShowLoadingOverlay,
   getSyncing,
   getBlueprintLocked,
+  getSavingDraft,
 } from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {
   getIsUnpublishedNewPace,
+  getIsDraftPace,
   getPacePublishing,
   getUnpublishedChangeCount,
   isNewPace,
@@ -49,14 +49,16 @@ import {
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import UnpublishedChangesIndicator from './unpublished_changes_indicator'
 import {RemovePaceWarningModal} from './remove_pace_warning_modal'
+import { isBulkEnrollment } from '../reducers/pace_contexts'
 
-const I18n = useI18nScope('course_paces_footer')
+const I18n = createI18nScope('course_paces_footer')
 
 interface StoreProps {
   readonly autoSaving: boolean
   readonly pacePublishing: boolean
   readonly blackoutDatesSyncing: boolean
   readonly isSyncing: boolean
+  readonly isSavingDraft: boolean
   readonly blackoutDatesUnsynced: boolean
   readonly showLoadingOverlay: boolean
   readonly sectionPace: boolean
@@ -65,8 +67,10 @@ interface StoreProps {
   readonly unpublishedChanges: boolean
   readonly anyActiveRequests: boolean
   readonly isUnpublishedNewPace: boolean
+  readonly isDraftPace: boolean
   readonly paceName: string
   readonly blueprintLocked: boolean | undefined
+  readonly isBulkEnrollment: boolean
 }
 
 interface DispatchProps {
@@ -82,13 +86,14 @@ interface PassedProps {
   readonly focusOnClose?: () => void
 }
 
-type ComponentProps = StoreProps & DispatchProps & PassedProps
+export type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 export const Footer = ({
   autoSaving,
   pacePublishing,
   blackoutDatesSyncing,
   isSyncing,
+  isSavingDraft,
   syncUnpublishedChanges,
   handleCancel,
   onResetPace,
@@ -103,53 +108,53 @@ export const Footer = ({
   anyActiveRequests,
   focusOnClose,
   isUnpublishedNewPace,
+  isDraftPace,
   paceName,
   blueprintLocked,
+  isBulkEnrollment
 }: ComponentProps) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
-  const useRedesign = window.ENV.FEATURES.course_paces_redesign
+  const isCoursePace = !sectionPace && !studentPace
   const userIsMasquerading = window.ENV.IS_MASQUERADING
-  const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
+  const allowDraftPaces = window?.ENV?.FEATURES?.course_pace_draft_state && isCoursePace
 
-  const handlePublish = useCallback(() => {
-    syncUnpublishedChanges()
-  }, [syncUnpublishedChanges])
-
-  if (studentPace && !allowStudentPaces) return null
+  const handlePublish = useCallback(
+    (saveAsDraft: boolean) => {
+      syncUnpublishedChanges(saveAsDraft)
+    },
+    [syncUnpublishedChanges],
+  )
 
   const handlePublishClicked = () => {
-    handlePublish()
-    if (useRedesign && focusOnClose) {
+    handlePublish(false)
+    if (focusOnClose) {
       focusOnClose()
     }
   }
 
-  const isCoursePace = !sectionPace && !studentPace
-  const cancelDisabled = useRedesign
-    ? anyActiveRequests
-    : autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
-  const pubDisabled = useRedesign
-    ? !newPace &&
-      (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
-    : !newPace && (cancelDisabled || blueprintLocked)
+  const handleSaveDraftClicked = () => {
+    handlePublish(true)
+  }
+
+  const cancelDisabled = anyActiveRequests
+  let pubDisabled = !newPace &&
+  (!unpublishedChanges || autoSaving || isSyncing || showLoadingOverlay || blueprintLocked)
   const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
+  const saveDraftEnabled = (isDraftPace || isUnpublishedNewPace) && unpublishedChanges
+  // always override publishing to be enabled when a pace is a draft, even if there are no unsaved changes
+  if (allowDraftPaces && isDraftPace) pubDisabled = false
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
-  if (useRedesign) {
-    if (newPace) {
-      publishLabel = I18n.t('Create Pace')
-    } else {
-      publishLabel = I18n.t('Apply Changes')
-    }
+  if (newPace) {
+    publishLabel = I18n.t('Create Pace')
+  } else {
+    publishLabel =
+      allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
   }
 
   const handleCancelClick = () => {
-    if (useRedesign) {
-      handleCancel()
-    } else {
-      cancelDisabled || onResetPace()
-    }
+    handleCancel()
   }
 
   const handleRemovePaceClicked = () => {
@@ -161,6 +166,43 @@ export const Footer = ({
   const handleRemovePaceConfirmed = () => {
     setRemovePaceModalOpen(false)
     removePace()
+  }
+
+  const getSaveDraftButton = () => {
+    if (allowDraftPaces && !isBulkEnrollment) {
+      let saveDraftLabel = I18n.t('Save as Draft')
+      let draftTip = I18n.t('Save this pace as a draft without publishing.')
+      if (!saveDraftEnabled && !isDraftPace) {
+        return null
+      } else if (!saveDraftEnabled && !unpublishedChanges) {
+        draftTip = I18n.t('Make changes to the pace to save as a draft.')
+      }
+
+      if (isSavingDraft) {
+        saveDraftLabel = (
+          <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+            <Spinner size="x-small" renderTitle={I18n.t('Saving...')} />
+          </div>
+        )
+      }
+
+      return (
+        <>
+          <Tooltip renderTip={draftTip} on={['hover', 'focus']}>
+            <Button
+              data-testid="save-pace-draft-button"
+              color="secondary"
+              margin="0 small 0 0"
+              onClick={() => saveDraftEnabled && handleSaveDraftClicked()}
+              interaction={saveDraftEnabled ? 'enabled' : 'disabled'}
+            >
+              {saveDraftLabel}
+            </Button>
+          </Tooltip>
+        </>
+      )
+    }
+    return null
   }
 
   if (pacePublishing || isSyncing) {
@@ -197,21 +239,18 @@ export const Footer = ({
   }
 
   const removePaceLabel = I18n.t('Remove Pace')
-  const showRemovePaceButton = useRedesign && !isCoursePace && !newPace && !isUnpublishedNewPace
-  const showCondensedView = useRedesign && responsiveSize === 'small'
+  const showRemovePaceButton = !isCoursePace && !newPace && !isUnpublishedNewPace
+  const showCondensedView = responsiveSize === 'small'
   const removePaceButtonProps = {
     onClick: handleRemovePaceClicked,
-    interaction: useRedesign && removeDisabled ? ('disabled' as const) : ('enabled' as const),
+    interaction: removeDisabled ? ('disabled' as const) : ('enabled' as const),
   }
 
   const renderChangesIndicator = () => {
-    if (useRedesign && (!studentPace || (studentPace && allowStudentPaces))) {
-      return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
-    }
+    return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
   }
-
   return (
-    <View as="div" width="100%" margin={useRedesign && userIsMasquerading ? '0 0 x-large' : '0'}>
+    <View as="div" width="100%" margin={userIsMasquerading ? '0 0 x-large' : '0'}>
       {showCondensedView && (
         <View as="div" textAlign="center" borderWidth="0 0 small 0" padding="xx-small">
           {renderChangesIndicator()}
@@ -229,7 +268,7 @@ export const Footer = ({
           {showRemovePaceButton && (
             <Tooltip
               renderTip={removeDisabled ? removeTip : ''}
-              on={removeDisabled && !useRedesign ? ['hover', 'focus'] : []}
+              on={[]}
             >
               {showCondensedView ? (
                 <IconButton
@@ -253,26 +292,27 @@ export const Footer = ({
           {!showCondensedView && renderChangesIndicator()}
           <Tooltip
             renderTip={cancelDisabled ? cancelTip : ''}
-            on={cancelDisabled && !useRedesign ? ['hover', 'focus'] : []}
+            on={[]}
           >
             <Button
               color="secondary"
               margin="0 small 0"
               onClick={handleCancelClick}
-              interaction={useRedesign && cancelDisabled ? 'disabled' : 'enabled'}
+              interaction={cancelDisabled ? 'disabled' : 'enabled'}
             >
-              {useRedesign ? I18n.t('Close') : I18n.t('Cancel')}
+              {I18n.t('Close')}
             </Button>
           </Tooltip>
+          {getSaveDraftButton()}
           <Tooltip
             renderTip={pubDisabled ? pubTip : ''}
-            on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}
+            on={[]}
           >
             <Button
               data-testid="apply-or-create-pace-button"
               color="primary"
               onClick={() => pubDisabled || handlePublishClicked()}
-              interaction={(useRedesign && pubDisabled) || blueprintLocked ? 'disabled' : 'enabled'}
+              interaction={pubDisabled || blueprintLocked ? 'disabled' : 'enabled'}
             >
               {publishLabel}
             </Button>
@@ -289,6 +329,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     pacePublishing: getPacePublishing(state),
     blackoutDatesSyncing: getBlackoutDatesSyncing(state),
     isSyncing: getSyncing(state),
+    isSavingDraft: getSavingDraft(state),
     blackoutDatesUnsynced: getBlackoutDatesUnsynced(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     studentPace: isStudentPace(state),
@@ -297,8 +338,10 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0,
     anyActiveRequests: getAnyActiveRequests(state),
     isUnpublishedNewPace: getIsUnpublishedNewPace(state),
+    isDraftPace: getIsDraftPace(state),
     paceName: getPaceName(state),
     blueprintLocked: getBlueprintLocked(state),
+    isBulkEnrollment: isBulkEnrollment(state),
   }
 }
 

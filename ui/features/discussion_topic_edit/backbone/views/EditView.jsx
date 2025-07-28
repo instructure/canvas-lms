@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
@@ -38,7 +36,6 @@ import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialo
 import ConditionalRelease from '@canvas/conditional-release-editor'
 import deparam from 'deparam'
 import numberHelper from '@canvas/i18n/numberHelper'
-import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
@@ -48,8 +45,9 @@ import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import 'jqueryui/tabs'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {DiscussionFormOptions} from '../../react/DiscussionFormOptions'
 
-const I18n = useI18nScope('discussion_topics')
+const I18n = createI18nScope('discussion_topics')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -65,8 +63,7 @@ function EditView() {
   this.submit = this.submit.bind(this)
   this.saveFormData = this.saveFormData.bind(this)
   this.updateAssignment = this.updateAssignment.bind(this)
-  this.handleStudentTodoUpdate = this.handleStudentTodoUpdate.bind(this)
-  this.renderStudentTodoAtDate = this.renderStudentTodoAtDate.bind(this)
+  this.renderFormOptions = this.renderFormOptions.bind(this)
   this.loadConditionalRelease = this.loadConditionalRelease.bind(this)
   this.renderTabs = this.renderTabs.bind(this)
   this.renderPostToSisOptions = this.renderPostToSisOptions.bind(this)
@@ -88,6 +85,9 @@ function EditView() {
   this.locationAfterSave = this.locationAfterSave.bind(this)
   this.setRenderSectionsAutocomplete = this.setRenderSectionsAutocomplete.bind(this)
   this.handleMessageEvent = this.handleMessageEvent.bind(this)
+  this.toggleGradingDependentOptions = this.toggleGradingDependentOptions.bind(this)
+  this.toggleAvailabilityOptions = this.toggleAvailabilityOptions.bind(this)
+  this.toggleConditionalReleaseTab = this.toggleConditionalReleaseTab.bind(this)
   window.addEventListener('message', this.handleMessageEvent.bind(this))
   return EditView.__super__.constructor.apply(this, arguments)
 }
@@ -102,31 +102,25 @@ EditView.prototype.dontRenableAfterSaveSuccess = true
 
 EditView.prototype.els = {
   '#availability_options': '$availabilityOptions',
-  '#use_for_grading': '$useForGrading',
   '#discussion_topic_assignment_points_possible': '$assignmentPointsPossible',
   '#discussion_point_change_warning': '$discussionPointPossibleWarning',
   '#discussion-edit-view': '$discussionEditView',
   '#discussion-details-tab': '$discussionDetailsTab',
   '#conditional-release-target': '$conditionalReleaseTarget',
-  '#todo_options': '$todoOptions',
-  '#todo_date_input': '$todoDateInput',
-  '#allow_todo_date': '$allowTodoDate',
-  '#allow_user_comments': '$allowUserComments',
-  '#require_initial_post': '$requireInitialPost',
   '#assignment_external_tools': '$AssignmentExternalTools',
+  '#assignment_suppress_from_gradebook': '$suppressAssignment',
+  '#discussion_form_options': '$discussionFormOptions',
 }
 
 EditView.prototype.events = lodashExtend(EditView.prototype.events, {
   'click .removeAttachment': 'removeAttachment',
   'click .save_and_publish': 'saveAndPublish',
   'click .cancel_button': 'handleCancel',
-  'change #use_for_grading': 'toggleGradingDependentOptions',
   'change .delay_post_at_date': 'hanldeDelayedPostAtChange',
   'change #discussion_topic_assignment_points_possible': 'handlePointsChange',
   change: 'onChange',
   'tabsbeforeactivate #discussion-edit-view': 'onTabChange',
-  'change #allow_todo_date': 'toggleTodoDateInput',
-  'change #allow_user_comments': 'updateAllowComments',
+  'change #assignment_suppress_from_gradebook': 'handleSuppressFromGradebookChange',
 })
 
 EditView.prototype.messages = {
@@ -134,7 +128,7 @@ EditView.prototype.messages = {
   group_category_field_label: I18n.t('this_is_a_group_discussion', 'This is a Group Discussion'),
   group_locked_message: I18n.t(
     'group_discussion_locked',
-    'Students have already submitted to this discussion, so group settings cannot be changed.'
+    'Students have already submitted to this discussion, so group settings cannot be changed.',
   ),
 }
 
@@ -184,7 +178,7 @@ EditView.prototype.initialize = function (options) {
                 return {}
               },
               contextId,
-              contextType + 's'
+              contextType + 's',
             ).always(function () {
               _this.unwatchUnload()
               return _this.redirectAfterSave()
@@ -198,7 +192,7 @@ EditView.prototype.initialize = function (options) {
           return _this.redirectAfterSave()
         }
       }
-    })(this)
+    })(this),
   )
   this.attachment_model = new FilesystemObject()
   EditView.__super__.initialize.apply(this, arguments)
@@ -281,6 +275,12 @@ EditView.prototype.toJSON = function () {
   const data = EditView.__super__.toJSON.apply(this, arguments)
   const json = lodashExtend(data, this.options, {
     showAssignment: !!this.assignmentGroupCollection,
+    coursePaceWithMasteryPath:
+      (typeof ENV !== 'undefined' && ENV !== null
+        ? ENV.IN_PACED_COURSE &&
+          ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+          ENV.FEATURES.course_pace_pacing_with_mastery_paths
+        : void 0) || false,
     useForGrading: this.model.get('assignment') != null,
     isTopic: this.isTopic(),
     isAnnouncement: this.isAnnouncement(),
@@ -298,6 +298,7 @@ EditView.prototype.toJSON = function () {
     allow_todo_date: data.todo_date != null,
     unlocked: data.locked === void 0 ? !this.isAnnouncement() : !data.locked,
     announcementsLocked: this.announcementsLocked,
+    isCreate: !this.options.isEditing,
   })
   json.assignment = json.assignment.toView()
   return json
@@ -317,7 +318,7 @@ EditView.prototype.handlePointsChange = function (ev) {
   this.assignment.pointsPossible(this.$assignmentPointsPossible.val())
   if (this.assignment.hasSubmittedSubmissions()) {
     return this.$discussionPointPossibleWarning.toggleAccessibly(
-      this.assignment.pointsPossible() !== this.initialPointsPossible
+      this.assignment.pointsPossible() !== this.initialPointsPossible,
     )
   }
 }
@@ -369,7 +370,7 @@ EditView.prototype.render = function () {
         return function () {
           return _this.loadNewEditor(_this.$textarea)
         }
-      })(this)
+      })(this),
     )
   }
   if (this.assignmentGroupCollection) {
@@ -394,25 +395,16 @@ EditView.prototype.render = function () {
     defer(this.loadConditionalRelease)
   }
   renderDatetimeField(this.$('.datetime_field'))
-  if (!this.model.get('locked')) {
-    this.updateAllowComments()
-  }
+
+  this.renderFormOptions()
   return this
 }
 
 EditView.prototype.shouldRenderUsageRights = function () {
-  return (
-    ENV.FEATURES.usage_rights_discussion_topics &&
-    ENV.USAGE_RIGHTS_REQUIRED &&
-    ENV.PERMISSIONS.manage_files &&
-    this.permissions.CAN_ATTACH
-  )
+  return ENV.USAGE_RIGHTS_REQUIRED && ENV.PERMISSIONS.manage_files && this.permissions.CAN_ATTACH
 }
 
 EditView.prototype.afterRender = function () {
-  if (this.$todoDateInput.length) {
-    this.renderStudentTodoAtDate()
-  }
   const ref = ENV.context_asset_string.split('_')
   const context = ref[0]
   const context_id = ref[1]
@@ -421,7 +413,7 @@ EditView.prototype.afterRender = function () {
       this.$AssignmentExternalTools.get(0),
       'assignment_edit',
       parseInt(context_id, 10),
-      parseInt(this.assignment.id, 10)
+      parseInt(this.assignment.id, 10),
     )
   }
   if (this.shouldRenderUsageRights()) {
@@ -546,34 +538,30 @@ EditView.prototype.loadConditionalRelease = function () {
   return (this.conditionalReleaseEditor = ConditionalRelease.attach(
     this.$conditionalReleaseTarget.get(0),
     I18n.t('discussion topic'),
-    ENV.CONDITIONAL_RELEASE_ENV
+    ENV.CONDITIONAL_RELEASE_ENV,
   ))
 }
 
-EditView.prototype.renderStudentTodoAtDate = function () {
-  this.toggleTodoDateInput()
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(
-    React.createElement(DueDateCalendarPicker, {
-      dateType: 'todo_date',
-      name: 'todo_date',
-      handleUpdate: this.handleStudentTodoUpdate,
-      rowKey: 'student_todo_at_date',
-      labelledBy: 'student_todo_at_date_label',
-      inputClasses: '',
-      disabled: false,
-      isFancyMidnight: true,
-      dateValue: this.studentTodoAtDateValue,
-      labelText: I18n.t('Discussion Topic will show on student to-do list for date'),
-      labelClasses: 'screenreader-only',
-    }),
-    this.$todoDateInput[0]
-  )
-}
+EditView.prototype.renderFormOptions = function () {
+  const target = this.$discussionFormOptions
+  if (target.length > 0) {
+    const component = React.createElement(DiscussionFormOptions, {
+      options: {
+        studentTodoAtDateValue: this.studentTodoAtDateValue,
+        studentPlannerEnabled: ENV.STUDENT_PLANNER_ENABLED,
+        createAnnouncementsUnlocked: ENV.CREATE_ANNOUNCEMENTS_UNLOCKED,
+        ...this.toJSON(),
+      },
+      onGradedChange: this.toggleGradingDependentOptions,
+      handleStudentTodoUpdate: date => {
+        this.studentTodoAtDateValue = date
+      },
+    })
 
-EditView.prototype.handleStudentTodoUpdate = function (newDate) {
-  this.studentTodoAtDateValue = newDate
-  return this.renderStudentTodoAtDate()
+    ReactDOM.render(component, target[0], () => {
+      this.$useForGrading = this.$('#use_for_grading')
+    })
+  }
 }
 
 EditView.prototype.getFormData = function () {
@@ -637,8 +625,8 @@ EditView.prototype.getFormData = function () {
       set_assignment: this.permissions.CAN_CREATE_ASSIGNMENT
         ? '0'
         : this.permissions.CAN_UPDATE_ASSIGNMENT
-        ? '1'
-        : '0',
+          ? '1'
+          : '0',
     })
   }
   // these options get passed to Backbone.sync in ValidatedFormView
@@ -688,10 +676,10 @@ EditView.prototype.saveFormData = function () {
             },
             function (err) {
               return new $.Deferred().reject(xhr, err).promise()
-            }
+            },
           )
         }
-      })(this)
+      })(this),
     )
   } else {
     return EditView.__super__.saveFormData.apply(this, arguments)
@@ -737,7 +725,7 @@ EditView.prototype.fieldSelectors = lodashExtend(
     usage_rights_control: '#usage_rights_control button',
   },
   AssignmentGroupSelector.prototype.fieldSelectors,
-  GroupCategorySelector.prototype.fieldSelectors
+  GroupCategorySelector.prototype.fieldSelectors,
 )
 
 EditView.prototype.saveAndPublish = function (event) {
@@ -808,7 +796,7 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
       'assignment',
       this.model.createAssignment({
         set_assignment: false,
-      })
+      }),
     )
   }
   if (
@@ -925,10 +913,12 @@ EditView.prototype.showErrors = function (errors) {
   return EditView.__super__.showErrors.call(this, errors)
 }
 
-EditView.prototype.toggleGradingDependentOptions = function () {
+EditView.prototype.toggleGradingDependentOptions = function (isGraded) {
   this.toggleAvailabilityOptions()
   this.toggleConditionalReleaseTab()
-  this.toggleTodoDateBox()
+
+  this.$('#assignment_options').toggle(isGraded)
+
   if (this.renderSectionsAutocomplete != null) {
     return this.renderSectionsAutocomplete()
   }
@@ -944,17 +934,19 @@ EditView.prototype.hanldeDelayedPostAtChange = function () {
 }
 
 EditView.prototype.gradedChecked = function () {
-  return this.$useForGrading.is(':checked')
+  return this.$useForGrading?.is(':checked') || false
 }
 
 // Graded discussions and section specific discussions are mutually exclusive
 EditView.prototype.disableGradedCheckBox = function () {
-  return this.$useForGrading.prop('disabled', true)
+  return document.dispatchEvent(new CustomEvent('toggleGradedCheckBox', {detail: {disabled: true}}))
 }
 
 // Graded discussions and section specific discussions are mutually exclusive
 EditView.prototype.enableGradedCheckBox = function () {
-  return this.$useForGrading.prop('disabled', false)
+  return document.dispatchEvent(
+    new CustomEvent('toggleGradedCheckBox', {detail: {disabled: false}}),
+  )
 }
 
 EditView.prototype.toggleAvailabilityOptions = function () {
@@ -980,27 +972,8 @@ EditView.prototype.toggleConditionalReleaseTab = function () {
   }
 }
 
-EditView.prototype.toggleTodoDateBox = function () {
-  if (this.gradedChecked()) {
-    return this.$todoOptions.hide()
-  } else {
-    return this.$todoOptions.show()
-  }
-}
-
-EditView.prototype.toggleTodoDateInput = function () {
-  if (this.$allowTodoDate.is(':checked')) {
-    return this.$todoDateInput.show()
-  } else {
-    return this.$todoDateInput.hide()
-  }
-}
-
-EditView.prototype.updateAllowComments = function () {
-  const allowsComments =
-    this.$allowUserComments.is(':checked') || !this.model.get('is_announcement')
-  this.$requireInitialPost.prop('disabled', !allowsComments)
-  return this.model.set('locked', !allowsComments)
+EditView.prototype.handleSuppressFromGradebookChange = function () {
+  return this.assignment.suppressAssignment(this.$suppressAssignment.prop('checked'))
 }
 
 EditView.prototype.onChange = function () {

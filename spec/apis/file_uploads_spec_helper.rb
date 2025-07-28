@@ -43,9 +43,8 @@ shared_examples_for "file uploads api" do
   def attachment_json(attachment, options = {})
     json = {
       "id" => attachment.id,
-      "uuid" => attachment.uuid,
       "folder_id" => attachment.folder_id,
-      "url" => file_download_url(attachment, verifier: attachment.uuid, download: "1", download_frd: "1"),
+      "url" => file_download_url(attachment, verifier: attachment.root_account.feature_enabled?(:disable_adding_uuid_verifier_in_api) ? nil : attachment.uuid, download: "1", download_frd: "1"),
       "content-type" => attachment.content_type,
       "display_name" => attachment.display_name,
       "filename" => attachment.filename,
@@ -82,110 +81,127 @@ shared_examples_for "file uploads api" do
     json
   end
 
-  it "uploads (local files)" do
-    filename = "my_essay.doc"
-    content = "this is a test doc"
+  context "double testing with disable_adding_uuid_verifier_in_api ff" do
+    before do
+      # we need to access attachments in the double_testing_with_disable_adding_uuid_verifier_in_api_ff block,
+      # so we need to make sure it's defined here before the block is called
+      @filename = "my_essay.doc"
+      @content = "this is a test doc"
 
-    local_storage!
-    # step 1, preflight
-    json = preflight({ name: filename })
-    attachment = Attachment.order(:id).last
-    exemption_string = has_query_exemption? ? ("?quota_exemption=" + attachment.quota_exemption_key) : ""
-    expect(json["upload_url"]).to eq "http://www.example.com/files_api#{exemption_string}"
-
-    # step 2, upload
-    tmpfile = Tempfile.new(["test", File.extname(filename)])
-    tmpfile.write(content)
-    tmpfile.rewind
-    post_params = json["upload_params"].merge({ "file" => tmpfile })
-    send_multipart(json["upload_url"], post_params)
-
-    attachment = Attachment.order(:id).last
-    expect(attachment).to be_deleted
-    exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
-    expect(response).to redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
-
-    # step 3, confirmation
-    post response["Location"], headers: { "Authorization" => "Bearer #{access_token_for_user @user}" }
-    expect(response).to be_successful
-    attachment.reload
-    json = json_parse(response.body)
-    expected_json = {
-      "id" => attachment.id,
-      "uuid" => attachment.uuid,
-      "folder_id" => attachment.folder_id,
-      "url" => file_download_url(attachment, verifier: attachment.uuid, download: "1", download_frd: "1"),
-      "content-type" => attachment.content_type,
-      "display_name" => attachment.display_name,
-      "filename" => attachment.filename,
-      "size" => tmpfile.size,
-      "unlock_at" => nil,
-      "locked" => false,
-      "hidden" => false,
-      "lock_at" => nil,
-      "locked_for_user" => false,
-      "hidden_for_user" => false,
-      "created_at" => attachment.created_at.as_json,
-      "updated_at" => attachment.updated_at.as_json,
-      "upload_status" => "success",
-      "thumbnail_url" => attachment.has_thumbnail? ? thumbnail_image_url(attachment, attachment.uuid, host: "www.example.com") : nil,
-      "modified_at" => attachment.modified_at.as_json,
-      "mime_class" => attachment.mime_class,
-      "media_entry_id" => attachment.media_entry_id,
-      "canvadoc_session_url" => nil,
-      "crocodoc_session_url" => nil,
-      "category" => "uncategorized"
-    }
-
-    if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
-      expected_json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
+      local_storage!
+      # step 1, preflight
+      @json = preflight({ name: @filename })
+      @attachment = Attachment.all
     end
 
-    if attachment.supports_visibility?
-      expected_json["visibility_level"] = attachment.visibility_level
+    double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+      it "uploads (local files)" do
+        attachment = Attachment.order(:id).last
+        exemption_string = has_query_exemption? ? ("?quota_exemption=" + attachment.quota_exemption_key) : ""
+        expect(@json["upload_url"]).to eq "http://www.example.com/files_api#{exemption_string}"
+
+        # step 2, upload
+        tmpfile = Tempfile.new(["test", File.extname(@filename)])
+        tmpfile.write(@content)
+        tmpfile.rewind
+        post_params = @json["upload_params"].merge({ "file" => tmpfile })
+        send_multipart(@json["upload_url"], post_params)
+
+        attachment = Attachment.order(:id).last
+        expect(attachment).to be_deleted
+        exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
+        expect(response).to redirect_to("http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}")
+
+        # step 3, confirmation
+        post response["Location"], headers: { "Authorization" => "Bearer #{access_token_for_user @user}" }
+        expect(response).to be_successful
+        attachment.reload
+        json = json_parse(response.body)
+        expected_json = {
+          "id" => attachment.id,
+          "folder_id" => attachment.folder_id,
+          "url" => file_download_url(attachment, verifier: (attachment.uuid unless disable_adding_uuid_verifier_in_api), download: "1", download_frd: "1"),
+          "content-type" => attachment.content_type,
+          "display_name" => attachment.display_name,
+          "filename" => attachment.filename,
+          "size" => tmpfile.size,
+          "unlock_at" => nil,
+          "locked" => false,
+          "hidden" => false,
+          "lock_at" => nil,
+          "locked_for_user" => false,
+          "hidden_for_user" => false,
+          "created_at" => attachment.created_at.as_json,
+          "updated_at" => attachment.updated_at.as_json,
+          "upload_status" => "success",
+          "thumbnail_url" => attachment.has_thumbnail? ? thumbnail_image_url(attachment, attachment.uuid, host: "www.example.com") : nil,
+          "modified_at" => attachment.modified_at.as_json,
+          "mime_class" => attachment.mime_class,
+          "media_entry_id" => attachment.media_entry_id,
+          "canvadoc_session_url" => nil,
+          "crocodoc_session_url" => nil,
+          "category" => "uncategorized"
+        }
+
+        if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
+          expected_json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0)
+        end
+
+        if attachment.supports_visibility?
+          expected_json["visibility_level"] = attachment.visibility_level
+        end
+
+        expect(json).to eq(expected_json)
+        expect(attachment.file_state).to eq "available"
+        expect(attachment.content_type).to eq "application/msword"
+        expect(attachment.open.read).to eq @content
+        expect(attachment.display_name).to eq @filename
+        expect(attachment.user.id).to eq @user.id
+        attachment
+      end
     end
 
-    expect(json).to eq(expected_json)
-    expect(attachment.file_state).to eq "available"
-    expect(attachment.content_type).to eq "application/msword"
-    expect(attachment.open.read).to eq content
-    expect(attachment.display_name).to eq filename
-    expect(attachment.user.id).to eq @user.id
-    attachment
-  end
+    context "while testing verifiers usage with disable_adding_uuid_verifier_in_api ff" do
+      before do
+        @filename = "my_essay.doc"
 
-  it "uploads (s3 files)" do
-    filename = "my_essay.doc"
+        s3_storage!
+        # step 1, preflight
+        @json = preflight({ name: @filename })
+        @attachment = Attachment.all
+      end
 
-    s3_storage!
-    # step 1, preflight
-    json = preflight({ name: filename })
-    expect(json["upload_url"]).to eq "https://no-bucket.s3.amazonaws.com"
-    attachment = Attachment.order(:id).last
-    redir = json["upload_params"]["success_action_redirect"]
-    exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
-    expect(redir).to eq "http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}"
-    expect(attachment).to be_deleted
+      double_testing_with_disable_adding_uuid_verifier_in_api_ff do
+        it "uploads (s3 files)" do
+          expect(@json["upload_url"]).to eq "https://no-bucket.s3.amazonaws.com"
+          attachment = Attachment.order(:id).last
+          redir = @json["upload_params"]["success_action_redirect"]
+          exemption_string = has_query_exemption? ? ("quota_exemption=" + attachment.quota_exemption_key + "&") : ""
+          expect(redir).to eq "http://www.example.com/api/v1/files/#{attachment.id}/create_success?#{exemption_string}uuid=#{attachment.uuid}"
+          expect(attachment).to be_deleted
 
-    # step 2, upload
-    # we skip the actual call and double this out, since we can't hit s3 during specs
-    expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
-                                                                           content_type: "application/msword",
-                                                                           content_length: 1234,
-                                                                         })
+          # step 2, upload
+          # we skip the actual call and double this out, since we can't hit s3 during specs
+          expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
+                                                                                 content_type: "application/msword",
+                                                                                 content_length: 1234,
+                                                                               })
 
-    # step 3, confirmation
-    post redir, headers: { "Authorization" => "Bearer #{access_token_for_user @user}" }
-    expect(response).to be_successful
-    attachment.reload
-    json = json_parse(response.body)
-    expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
+          # step 3, confirmation
+          post redir, headers: { "Authorization" => "Bearer #{access_token_for_user @user}" }
+          expect(response).to be_successful
+          attachment.reload
+          json = json_parse(response.body)
+          expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
 
-    expect(attachment.file_state).to eq "available"
-    expect(attachment.content_type).to eq "application/msword"
-    expect(attachment.display_name).to eq filename
-    expect(attachment.user.id).to eq @user.id
-    attachment
+          expect(attachment.file_state).to eq "available"
+          expect(attachment.content_type).to eq "application/msword"
+          expect(attachment.display_name).to eq @filename
+          expect(attachment.user.id).to eq @user.id
+          attachment
+        end
+      end
+    end
   end
 
   it "allows uploading files from a url" do
@@ -477,7 +493,7 @@ shared_examples_for "file uploads api with quotas" do
   end
 
   it "returns successful preflight for files within quota limits" do
-    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context["storage_quota"] = 5.megabytes
     @context.save!
     preflight({ name: "test.txt", size: 3.megabytes })
     attachment = Attachment.order(:id).last
@@ -486,14 +502,14 @@ shared_examples_for "file uploads api with quotas" do
   end
 
   it "returns unsuccessful preflight for files exceeding quota limits" do
-    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context["storage_quota"] = 5.megabytes
     @context.save!
     json = preflight({ name: "test.txt", size: 10.megabytes }, expected_status: 400)
     expect(json["message"]).to eq "file size exceeds quota"
   end
 
   it "returns unsuccessful preflight for files exceeding quota limits (URL uploads)" do
-    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context["storage_quota"] = 5.megabytes
     @context.save!
     json = preflight({ name: "test.txt", size: 10.megabytes, url: "http://www.example.com/test" },
                      expected_status: 400)
@@ -501,7 +517,7 @@ shared_examples_for "file uploads api with quotas" do
   end
 
   it "returns successful create_success for files within quota" do
-    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context["storage_quota"] = 5.megabytes
     @context.save!
     attachment = @context.attachments.new
     attachment.filename = "smaller_file.txt"
@@ -517,7 +533,7 @@ shared_examples_for "file uploads api with quotas" do
   end
 
   it "returns unsuccessful create_success for files exceeding quota limits" do
-    @context.write_attribute(:storage_quota, 5.megabytes)
+    @context["storage_quota"] = 5.megabytes
     @context.save!
     attachment = @context.attachments.new
     attachment.filename = "bigger_file.txt"
@@ -538,13 +554,13 @@ shared_examples_for "file uploads api with quotas" do
   end
 
   it "fails URL uploads for files exceeding quota limits" do
-    @context.write_attribute(:storage_quota, 1.megabyte)
+    @context["storage_quota"] = 1.megabyte
     @context.save!
     json = preflight({ name: "test.txt", url: "http://www.example.com/test" })
     progress_url = json["progress"]["url"]
     progress_id = json["progress"]["id"]
     attachment = Attachment.order(:id).last
-    expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, (" " * 2.megabytes)))
+    expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, " " * 2.megabytes))
     run_jobs
 
     json = api_call(:get, progress_url, { id: progress_id, controller: "progress", action: "show", format: "json" })
@@ -558,7 +574,7 @@ shared_examples_for "file uploads api without quotas" do
   it "ignores context-related quotas in preflight" do
     local_storage!
 
-    @context.write_attribute(:storage_quota, 0)
+    @context["storage_quota"] = 0
     @context.save!
     json = preflight({ name: "test.txt", size: 1.megabyte })
     attachment = Attachment.order(:id).last
@@ -567,7 +583,7 @@ shared_examples_for "file uploads api without quotas" do
 
   it "ignores context-related quotas in preflight" do
     s3_storage!
-    @context.write_attribute(:storage_quota, 0)
+    @context["storage_quota"] = 0
     @context.save!
     json = preflight({ name: "test.txt", size: 1.megabyte })
     attachment = Attachment.order(:id).last

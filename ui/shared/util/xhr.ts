@@ -84,7 +84,7 @@ export function clearPrefetchedXHRs() {
  */
 export function asAxios<T>(
   fetchRequest: Promise<Response>,
-  type: 'json' | 'text' = 'json'
+  type: 'json' | 'text' = 'json',
 ):
   | Promise<{
       data: T
@@ -104,7 +104,7 @@ export function asAxios<T>(
           data,
           headers: {link: res.headers.get('Link')},
         }
-      })
+      }),
   )
 }
 
@@ -140,18 +140,34 @@ export function checkStatus(response: Response) {
 
 const csrfToken = getCookie('_csrf_token')
 
-// these are duplicated in application_helper.rb#prefetch_xhr
-// because we don't have a good pattern for sharing them yet.
-// If you change these defaults, you should probably cascade that change
-// to that ruby location
-export const defaultFetchOptions = (): {
+type DefaultFetchOptionsOptions = {
+  headers?: Record<string, string>
+}
+
+/**
+ * Provides default options for fetch requests iin Canvas,
+ * include these in any fetch request to ensure that it is
+ * properly authenticated and has the correct headers.
+ *
+ * @param options optionally provide additional headers to include
+ * @returns
+ */
+export const defaultFetchOptions = (
+  options: DefaultFetchOptionsOptions = {},
+): {
   credentials: 'include' | 'omit' | 'same-origin'
   headers: Record<string, string>
-} => ({
-  credentials: 'same-origin',
-  headers: {
-    Accept: 'application/json+canvas-string-ids, application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-Token': csrfToken,
-  },
-})
+} =>
+  // these are duplicated in application_helper.rb#prefetch_xhr
+  // because we don't have a good pattern for sharing them yet.
+  // If you change these defaults, you should probably cascade that change
+  // to that ruby location
+  ({
+    credentials: 'same-origin',
+    headers: {
+      Accept: 'application/json+canvas-string-ids, application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-CSRF-Token': csrfToken,
+      ...options.headers,
+    },
+  })

@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {useQuery, useMutation, useLazyQuery} from 'react-apollo'
+import {useQuery, useMutation, useLazyQuery} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -32,10 +32,10 @@ import {
 } from './graphql/Mutations'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {COMMENTS_QUERY} from './graphql/Queries'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Library from './Library'
 
-const I18n = useI18nScope('CommentLibrary')
+const I18n = createI18nScope('CommentLibrary')
 
 function persistCheckbox(state) {
   doFetchApi({
@@ -45,13 +45,13 @@ function persistCheckbox(state) {
   })
     .then(
       ({json}) =>
-        (ENV.comment_library_suggestions_enabled = json.comment_library_suggestions_enabled)
+        (ENV.comment_library_suggestions_enabled = json.comment_library_suggestions_enabled),
     )
     .catch(() =>
       showFlashAlert({
         message: I18n.t('Error saving suggestion preference'),
         type: 'error',
-      })
+      }),
     )
 }
 
@@ -73,9 +73,35 @@ const LibraryManager = ({
   // new request to find suggestions isn't made
   const [changeSearchTerm, setChangeSearchTerm] = useState(true)
 
-  const {loading, error, data} = useQuery(COMMENTS_QUERY, {
+  const {loading, error, data, fetchMore} = useQuery(COMMENTS_QUERY, {
     variables: {userId},
+    notifyOnNetworkStatusChange: true,
   })
+
+  useEffect(() => {
+    const pageInfo = data?.legacyNode?.commentBankItemsConnection?.pageInfo
+    if (pageInfo?.hasNextPage && pageInfo?.endCursor && !loading) {
+      fetchMore({
+        variables: {userId, after: pageInfo.endCursor},
+        updateQuery: (prev, {fetchMoreResult}) => {
+          const prevNodes = prev?.legacyNode?.commentBankItemsConnection?.nodes || []
+          const newNodes = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.nodes || []
+          const newPageInfo = fetchMoreResult?.legacyNode?.commentBankItemsConnection?.pageInfo
+
+          return {
+            legacyNode: {
+              ...prev.legacyNode,
+              commentBankItemsConnection: {
+                ...prev.legacyNode.commentBankItemsConnection,
+                nodes: [...prevNodes, ...newNodes],
+                pageInfo: newPageInfo,
+              },
+            },
+          }
+        },
+      })
+    }
+  }, [data, fetchMore, loading, userId])
 
   useEffect(() => {
     if (error) {
@@ -119,7 +145,7 @@ const LibraryManager = ({
       setComment(comment)
       setFocusToTextArea()
     },
-    [setComment, setFocusToTextArea]
+    [setComment, setFocusToTextArea],
   )
 
   const [deleteComment, {loading: isDeletingComment}] = useMutation(DELETE_COMMENT_MUTATION, {

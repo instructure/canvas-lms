@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
@@ -37,9 +36,9 @@ import {View} from '@instructure/ui-view'
 
 import AssignmentRow from './assignment_row'
 import BlackoutDateRow from './blackout_date_row'
-import {ModuleWithDueDates, ResponsiveSizes} from '../../types'
+import type {ModuleWithDueDates, ResponsiveSizes} from '../../types'
 
-const I18n = useI18nScope('course_paces_module')
+const I18n = createI18nScope('course_paces_module')
 
 const componentOverrides = {
   Button: {
@@ -97,7 +96,7 @@ export const Module = (props: ComponentProps) => {
   }
 
   const compressionTipText = I18n.t(
-    'Due Dates are being compressed based on your start and end dates'
+    'Due Dates are being compressed based on your start and end dates',
   )
   const timezoneTipText = I18n.t('Dates shown in Course Time Zone')
   const daysTipText = I18n.t('Changing course pacing days may modify due dates')
@@ -119,6 +118,7 @@ export const Module = (props: ComponentProps) => {
           padding={headerPadding}
         >
           {props.compression > 0 && (
+            // @ts-expect-error
             <Tooltip renderTip={compressionTipText} placement="top" on={tipEvents}>
               <IconButton
                 withBorder={false}
@@ -133,6 +133,7 @@ export const Module = (props: ComponentProps) => {
           <View id="due-date-column-title" as="span">
             {I18n.t('Due Date')}
           </View>
+          {/* @ts-expect-error */}
           <Tooltip renderTip={timezoneTipText} placement="top" on={tipEvents}>
             <IconButton
               withBorder={false}
@@ -148,12 +149,14 @@ export const Module = (props: ComponentProps) => {
     )
   }
 
+  // @ts-expect-error
   const renderAssignmentRow = item => {
     // Scoping the key this way keeps a single reference on the table, regardless of whether the pace exists or not
     const key = `assignment-row-${item.module_item_id}`
     return (
       <AssignmentRow
         key={key}
+        // @ts-expect-error
         actuallyExpanded={actuallyExpanded}
         datesVisible={datesVisible}
         coursePaceItem={item}
@@ -163,6 +166,7 @@ export const Module = (props: ComponentProps) => {
     )
   }
 
+  // @ts-expect-error
   const renderBlackoutDateRow = item => {
     const key = `blackoutdate-${props.module.moduleKey}-${item.id || item.temp_id}`
     return <BlackoutDateRow key={key} blackoutDate={item} isStacked={isTableStacked} />
@@ -223,6 +227,7 @@ export const Module = (props: ComponentProps) => {
                       <View id="days-column-title" as="span">
                         {I18n.t('Days')}
                       </View>
+                      {/* @ts-expect-error */}
                       <Tooltip renderTip={daysTipText} placement="top" on={tipEvents}>
                         <IconButton
                           withBorder={false}
@@ -235,7 +240,7 @@ export const Module = (props: ComponentProps) => {
                       </Tooltip>
                     </Flex>
                   </Table.ColHeader>
-                  {renderDateColHeader()}
+                  {renderDateColHeader() as any}
                   <Table.ColHeader
                     data-testid="pp-status-columnheader"
                     id={`module-${props.module.id}-status`}

@@ -38,7 +38,7 @@ module Lti
       )
     end
     let(:substitution_helper) { double.as_null_object }
-    let(:right_now) { DateTime.now }
+    let(:right_now) { Time.zone.now }
     let(:tool) do
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })

@@ -40,7 +40,7 @@ describe "login logout test" do
   it "logins successfully with correct username and password", :xbrowser, priority: "2" do
     user_with_pseudonym({ active_user: true })
     login_as
-    expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
+    expect(f('[aria-label="Profile tray"] h2').text).to eq @user.pseudonyms.first.unique_id
   end
 
   it "shows error message if wrong credentials are used", priority: "2" do
@@ -80,10 +80,10 @@ describe "login logout test" do
   it "validates forgot my password functionality for email account", priority: "1" do
     user_with_pseudonym({ active_user: true })
     go_to_forgot_password
-    f("#pseudonym_session_unique_id_forgot").send_keys(@user.primary_pseudonym.unique_id)
+    f("#pseudonym_session_unique_id_forgot").send_keys(@user.pseudonyms.first.unique_id)
     submit_form("#forgot_password_form")
     wait_for_ajaximations
-    assert_flash_notice_message "Your password recovery instructions will be sent to #{@user.primary_pseudonym.unique_id}"
+    assert_flash_notice_message "Your password recovery instructions will be sent to #{@user.pseudonyms.first.unique_id}"
   end
 
   it "validates back button works in forgot password page", priority: "2" do
@@ -109,7 +109,7 @@ describe "login logout test" do
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
     driver.execute_script "$('[name=authenticity_token]').remove()"
     fill_in_login_form("nobody@example.com", "asdfasdf")
-    expect(displayed_username).to eq @user.primary_pseudonym.unique_id
+    expect(displayed_username).to eq @user.pseudonyms.first.unique_id
   end
 
   it "doesn't display external link icons", priority: "2" do

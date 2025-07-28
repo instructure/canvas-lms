@@ -17,15 +17,26 @@
  */
 
 import moment from 'moment-timezone'
-import type {CoursePace} from '../../types'
+import type {CoursePace, Module} from '../../types'
 import type {BlackoutDate} from '../../shared/types'
 import {
   getBlackoutDateChanges,
+  getModuleItems,
   getPaceName,
   isNewPace,
   mergeAssignmentsAndBlackoutDates,
 } from '../course_paces'
-import {DEFAULT_STORE_STATE, SECTION_PACE, STUDENT_PACE} from '../../__tests__/fixtures'
+import {
+  DEFAULT_STORE_STATE,
+  PACE_ITEM_1,
+  PACE_ITEM_2,
+  PACE_ITEM_3,
+  PACE_ITEM_4,
+  PACE_MODULE_1,
+  PACE_MODULE_2,
+  SECTION_PACE,
+  STUDENT_PACE
+} from '../../__tests__/fixtures'
 
 const newbod1: BlackoutDate = {
   temp_id: 'tmp1',
@@ -51,14 +62,14 @@ describe('course_paces reducer', () => {
     it('finds the first blackout date', () => {
       // because this was the source of a hard to find bug
       const changes = getBlackoutDateChanges([], [newbod1])
-      expect(changes.length).toEqual(1)
+      expect(changes).toHaveLength(1)
       expect(changes[0].oldValue).toBeNull()
       expect(changes[0].newValue).toBe(newbod1)
     })
 
     it('finds newly added and deleted dates', () => {
       const changes = getBlackoutDateChanges([oldbod1, oldbod2], [oldbod1, newbod1])
-      expect(changes.length).toEqual(2)
+      expect(changes).toHaveLength(2)
       // added
       expect(changes[0].oldValue).toBeNull()
       expect(changes[0].newValue).toBe(newbod1)
@@ -79,29 +90,11 @@ describe('course_paces reducer', () => {
       expect(isNewPace({coursePace: {id: '1'}})).toBe(false)
     })
 
-    it('is not new if it is a student pace', () => {
-      // because we don't have student paces in the db yet
-      // the api always returns an unsaved pace with no id
-      // but we need it for the start_date to show the user's
-      // assignment due dates in their pace
+    it('is new if it is a student pace', () => {
       expect(
         // @ts-expect-error
-        isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
-      ).toBe(false)
-    })
-
-    describe('with course paces for students', () => {
-      beforeAll(() => {
-        window.ENV.FEATURES ||= {}
-        window.ENV.FEATURES.course_paces_for_students = true
-      })
-
-      it('is new if it is a student pace', () => {
-        expect(
-          // @ts-expect-error
-          isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
-        ).toBe(true)
-      })
+        isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}}),
+      ).toBe(true)
     })
   })
 
@@ -121,7 +114,7 @@ describe('course_paces reducer', () => {
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
-      expect(result[0].itemsWithDates.length).toBe(1)
+      expect(result[0].itemsWithDates).toHaveLength(1)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
     })
@@ -143,7 +136,7 @@ describe('course_paces reducer', () => {
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
 
-      expect(result[0].itemsWithDates.length).toBe(1)
+      expect(result[0].itemsWithDates).toHaveLength(1)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
     })
@@ -169,7 +162,7 @@ describe('course_paces reducer', () => {
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
 
-      expect(result[0].itemsWithDates.length).toBe(2)
+      expect(result[0].itemsWithDates).toHaveLength(2)
       expect(result[0].itemsWithDates[0].type).toEqual('blackout_date')
       expect(result[0].itemsWithDates[0].id).toEqual('100')
       expect(result[0].itemsWithDates[1].type).toEqual('assignment')
@@ -193,7 +186,7 @@ describe('course_paces reducer', () => {
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
 
-      expect(result[0].itemsWithDates.length).toBe(3)
+      expect(result[0].itemsWithDates).toHaveLength(3)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
       expect(result[0].itemsWithDates[1].type).toEqual('blackout_date')
@@ -227,12 +220,12 @@ describe('course_paces reducer', () => {
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
 
-      expect(result[0].itemsWithDates.length).toBe(2)
+      expect(result[0].itemsWithDates).toHaveLength(2)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
       expect(result[0].itemsWithDates[1].type).toEqual('assignment')
       expect(result[0].itemsWithDates[1].module_item_id).toEqual('2')
-      expect(result[1].itemsWithDates.length).toBe(3)
+      expect(result[1].itemsWithDates).toHaveLength(3)
       expect(result[1].itemsWithDates[0].type).toEqual('blackout_date')
       expect(result[1].itemsWithDates[0].id).toEqual('100')
       expect(result[1].itemsWithDates[1].type).toEqual('assignment')
@@ -266,12 +259,12 @@ describe('course_paces reducer', () => {
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
 
-      expect(result[0].itemsWithDates.length).toBe(2)
+      expect(result[0].itemsWithDates).toHaveLength(2)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
       expect(result[0].itemsWithDates[1].type).toEqual('assignment')
       expect(result[0].itemsWithDates[1].module_item_id).toEqual('2')
-      expect(result[1].itemsWithDates.length).toBe(3)
+      expect(result[1].itemsWithDates).toHaveLength(3)
       expect(result[1].itemsWithDates[0].type).toEqual('assignment')
       expect(result[1].itemsWithDates[0].module_item_id).toEqual('3')
       expect(result[1].itemsWithDates[1].type).toEqual('assignment')
@@ -308,7 +301,7 @@ describe('course_paces reducer', () => {
 
       // first render, the blackout date is at the
       // top of the second module
-      expect(result[0].itemsWithDates.length).toBe(3)
+      expect(result[0].itemsWithDates).toHaveLength(3)
       expect(result[0].itemsWithDates[0].type).toEqual('assignment')
       expect(result[0].itemsWithDates[0].module_item_id).toEqual('1')
       expect(result[0].itemsWithDates[1].type).toEqual('blackout_date')
@@ -316,7 +309,7 @@ describe('course_paces reducer', () => {
       expect(result[0].itemsWithDates[2].type).toEqual('assignment')
       expect(result[0].itemsWithDates[2].module_item_id).toEqual('2')
 
-      expect(result[1].itemsWithDates.length).toBe(2)
+      expect(result[1].itemsWithDates).toHaveLength(2)
     })
   })
 
@@ -331,8 +324,54 @@ describe('course_paces reducer', () => {
 
     it('gets pace name for student pace', () => {
       expect(getPaceName({...DEFAULT_STORE_STATE, coursePace: STUDENT_PACE})).toBe(
-        'Henry Dorsett Case'
+        'Henry Dorsett Case',
       )
+    })
+  })
+
+  describe('getModuleItems', () => {
+
+    const modules: Module[] = [
+      {
+        ...PACE_MODULE_1,
+        items : [
+          {
+            ...PACE_ITEM_1,
+            id: '3',
+            position: 3,
+          },
+          {
+            ...PACE_ITEM_2,
+            id: '1',
+            position: 1,
+          },
+          {
+            ...PACE_ITEM_3,
+            id: '2',
+            position: 2,
+          }
+        ]
+      },
+      {
+        ...PACE_MODULE_2,
+        items : [
+          {
+            ...PACE_ITEM_4,
+            id: '5',
+            position: 2,
+          },
+          {
+            ...PACE_ITEM_1,
+            id: '4',
+            position: 1,
+          }
+        ]
+      },
+    ]
+
+    it('return module items ordered by position',() => {
+      const result = getModuleItems(modules)
+      expect(result.map(item => item.id)).toEqual(['1', '2', '3', '4', '5'])
     })
   })
 })

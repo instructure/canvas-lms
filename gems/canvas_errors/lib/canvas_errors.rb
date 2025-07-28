@@ -72,14 +72,22 @@ module CanvasErrors
   # Registered callbacks can decide what to do about different levels.
   ERROR_LEVELS = %i[info warn error].freeze
   def self.capture(exception, data = {}, level = :error)
-    unless ERROR_LEVELS.include?(level)
-      Rails.logger.warn("[ERRORS] error level #{level} is not supported, defaulting to :error")
-      level = :error
+    return if Thread.current[:in_canvas_errors_capture]
+
+    begin
+      Thread.current[:in_canvas_errors_capture] = true
+
+      unless ERROR_LEVELS.include?(level)
+        Rails.logger.warn("[ERRORS] error level #{level} is not supported, defaulting to :error")
+        level = :error
+      end
+      job_info = check_for_job_context
+      request_info = check_for_request_context
+      error_info = team_context(exception).deep_merge(job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data)))
+      run_callbacks(exception, error_info, level)
+    ensure
+      Thread.current[:in_canvas_errors_capture] = nil
     end
-    job_info = check_for_job_context
-    request_info = check_for_request_context
-    error_info = team_context(exception).deep_merge(job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data)))
-    run_callbacks(exception, error_info, level)
   end
 
   # convenience method, use this if you want to apply the 'type' tag without

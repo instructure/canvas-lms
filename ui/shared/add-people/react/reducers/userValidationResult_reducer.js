@@ -38,7 +38,10 @@ function transformDupeApiResult(apiResult) {
           selectedUserId: -1,
           skip: false,
           createNew: false,
-          newUserInfo: undefined,
+          newUserInfo: {
+            name: '',
+            email: '',
+          },
           userList: d,
         }
       }
@@ -145,5 +148,5 @@ export default handleActions(
         : state
     },
   },
-  defaultState.userValidationResult
+  defaultState.userValidationResult,
 )

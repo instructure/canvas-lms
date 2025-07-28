@@ -103,6 +103,59 @@ describe "gradebooks/grade_summary" do
     expect(response.body).to match(/Test Student scores are not included in grade statistics./)
   end
 
+  describe "comments thread" do
+    before do
+      stub_kaltura
+      course_with_teacher
+      student_in_course(active_all: true)
+      view_context
+      a = @course.assignments.create!(title: "some assignment", submission_types: ["online_text_entry"])
+      @sub = a.submit_homework(@student, submission_type: "online_text_entry", body: "o hai")
+      assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+      @cell_selector = "table#grades_summary > tbody > tr[id^=comments_thread] > td > table.score_details_table > tbody > tr > td"
+    end
+
+    it "shows pure text comments correctly" do
+      @sub.add_comment(author: @teacher, comment: "Pure text comment")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;">Pure text comment</span>')
+    end
+
+    it "shows RCE comments correctly" do
+      @sub.add_comment(author: @teacher, comment: "<p>RCE comment</p>")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><p>RCE comment</p></span>')
+    end
+
+    it "sanitization prohibits XSS attacks" do
+      @sub.add_comment(author: @teacher, comment: '<p>Doing an XSS attack</p><script>alert("Hello! This is an alert message.");</script>')
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><p>Doing an XSS attack</p></span>')
+    end
+
+    it "sanitization corrects invalid HTML syntax" do
+      @sub.add_comment(author: @teacher, comment: "<h3>Doing an XSS attack</p>")
+      render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment response.body
+
+      cell = doc.at_css(@cell_selector)
+      expect(cell).not_to be_nil
+      expect(cell.inner_html).to include('<span style="white-space: pre-wrap;"><h3>Doing an XSS attack<p></p></h3></span>')
+    end
+  end
+
   describe "submission details link" do
     before do
       course_with_teacher
@@ -811,6 +864,32 @@ describe "gradebooks/grade_summary" do
       expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
       expect(response).to have_tag("span.points_possible")
     end
+
+    it "does not render context subtext in case of groups" do
+      assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment1.grade_student(student, grade: "90%", grader: teacher)
+
+      group = course.assignment_groups.create!(name: "a group")
+      group_assignment = Assignment::HardCoded.new(id: "group-#{group.id}",
+                                                   rules: group.rules,
+                                                   title: group.name,
+                                                   points_possible: 10,
+                                                   special_class: "group_total",
+                                                   assignment_group_id: group.id,
+                                                   group_weight: group.group_weight,
+                                                   asset_string: "group_total_#{group.id}")
+      presenter.groups_assignments = [group_assignment]
+
+      assignment2 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+      assignment2.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+      assignment2.grade_student(student, grade: "90%", grader: teacher)
+
+      render "gradebooks/grade_summary"
+      expect(response).to have_tag(".student_assignment .title .context")
+      expect(response).to have_tag(".group_total .title")
+      expect(response).not_to have_tag(".group_total .title .context")
+    end
   end
 
   describe "visibility feedback student grades page" do
@@ -909,6 +988,15 @@ describe "gradebooks/grade_summary" do
       expect(response).to have_tag("#submission_#{@a2.id} td .grade_dot")
     end
 
+    it "shows the comment button if post policy is set to manual" do
+      @course.apply_post_policy!(post_manually: true)
+      @a1.submissions.first.add_comment(author: @student, comment: "Test!")
+
+      render "gradebooks/grade_summary"
+
+      expect(response).to have_tag("#assignment_comment_#{@a1.id}")
+    end
+
     context "when the feature flag is disabled" do
       before(:once) do
         course_with_student({ active_all: true })
@@ -920,6 +1008,206 @@ describe "gradebooks/grade_summary" do
       it "does not have the visibility_feedback_ff class" do
         expect(response).not_to have_tag("#grades_summary .visibility_feedback_ff")
       end
+    end
+  end
+
+  context "discussion checkpoints" do
+    before do
+      course_with_student(active_all: true)
+      @course.account.enable_feature!(:discussion_checkpoints)
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+    end
+
+    it "sub assignments are shown" do
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      render "gradebooks/grade_summary"
+
+      expect(response).to have_tag("tr.has_sub_assignments")
+      expect(response).to have_tag("button#parent_assignment_id_#{@reply_to_topic.parent_assignment.id}")
+      expect(response).to have_tag("tr.parent_assignment_id_#{@reply_to_topic.parent_assignment.id}")
+      expect(response).to have_tag("tr#sub_assignment_#{@reply_to_topic.id}")
+      expect(response).to have_tag("tr#sub_assignment_#{@reply_to_entry.id}")
+    end
+
+    it "renders correct due dates after adding an ADHOC override" do
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+
+      everyone_reply_to_topic_due_at = "2022-01-25T20:10:00Z"
+      points_possible_reply_to_topic = 5
+
+      everyone_reply_to_entry_due_at = "2022-01-26T21:10:00Z"
+      points_possible_reply_to_entry = 10
+      replies_required = 2
+
+      # Adding an everyone card
+      reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_topic_due_at,
+          },
+        ],
+        points_possible: points_possible_reply_to_topic
+      )
+
+      reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_entry_due_at,
+          },
+        ],
+        points_possible: points_possible_reply_to_entry,
+        replies_required:
+      )
+
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+      rendered_html = render "gradebooks/grade_summary"
+
+      doc = Nokogiri::HTML5.fragment rendered_html
+      topic_due_date = doc.at_css("tr#sub_assignment_#{reply_to_topic.id} .due").text.strip
+      entry_due_date = doc.at_css("tr#sub_assignment_#{reply_to_entry.id} .due").text.strip
+
+      expect(topic_due_date).to eq("Jan 25, 2022 by 8:10pm")
+      expect(entry_due_date).to eq("Jan 26, 2022 by 9:10pm")
+
+      adhoc_reply_to_topic_due_at = "2021-02-25T3:30:00Z"
+      adhoc_reply_to_entry_due_at = "2021-02-26T4:30:00Z"
+
+      # Adding an ADHOC card
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_topic_due_at,
+          },
+          {
+            type: "override",
+            set_type: "ADHOC",
+            due_at: adhoc_reply_to_topic_due_at,
+            student_ids: [@student.id]
+          },
+        ],
+        points_possible: points_possible_reply_to_topic
+      )
+
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_entry_due_at,
+          },
+          {
+            type: "override",
+            set_type: "ADHOC",
+            due_at: adhoc_reply_to_entry_due_at,
+            student_ids: [@student.id.to_s]
+          },
+        ],
+        points_possible: points_possible_reply_to_entry,
+        replies_required:
+      )
+
+      # re-rendering gradebooks/grade_summary
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+      rendered_html = render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment rendered_html
+
+      topic_due_date_updated = doc.at_css("tr#sub_assignment_#{reply_to_topic.id} .due").text.strip
+      entry_due_date_updated = doc.at_css("tr#sub_assignment_#{reply_to_entry.id} .due").text.strip
+
+      expect(topic_due_date_updated).to eq("Feb 25, 2021 by 3:30am")
+      expect(entry_due_date_updated).to eq("Feb 26, 2021 by 4:30am")
+    end
+
+    it "renders Reply To Topic first" do
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      rendered_html = render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment rendered_html
+
+      rows_in_tbody = doc.css("tbody tr")
+      topic_row = doc.at_css("tr#sub_assignment_#{@reply_to_topic.id}")
+      entry_row = doc.at_css("tr#sub_assignment_#{@reply_to_entry.id}")
+
+      expect(topic_row).not_to be_nil
+      expect(entry_row).not_to be_nil
+
+      topic_index = rows_in_tbody.index(topic_row)
+      entry_index = rows_in_tbody.index(entry_row)
+
+      expect(topic_index).not_to be_nil
+      expect(entry_index).not_to be_nil
+
+      expect(topic_index).to be < entry_index
+    end
+  end
+
+  describe "suppress assignment feature" do
+    before do
+      course_with_student(active_all: true)
+      @course.assignments.create!(title: "Hidden Assignment")
+      view_context(@course, @student)
+    end
+
+    context "with feature on" do
+      before do
+        root_account = @course.root_account
+        root_account.settings[:suppress_assignments] = true
+        root_account.save
+
+        @assignment = @course.assignments.create!(title: "Hidden Assignment", suppress_assignment: true)
+        @assignment2 = @course.assignments.create!(title: "Not Hidden Assignment", suppress_assignment: false)
+      end
+
+      it "renders suppress message" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+        render "gradebooks/grade_summary"
+
+        expect(response.body).to include('data-testid="suppressed-assignment-notification"')
+      end
+
+      it "does not render suppressed assignment" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+        render "gradebooks/grade_summary"
+        expect(response.body).not_to include("submission_#{@assignment.id}")
+      end
+
+      it "does render non-suppressed assignment" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+        render "gradebooks/grade_summary"
+        expect(response.body).to include("submission_#{@assignment2.id}")
+      end
+    end
+
+    context "with feature off" do
+      it "does not render suppress message" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+        render "gradebooks/grade_summary"
+        expect(response.body).not_to include("Some items are hidden from grades view")
+      end
+    end
+
+    it "does render assignment if feature is disabled" do
+      assignment = @course.assignments.create!(title: "Fallback Visible Assignment", suppress_assignment: true)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      render "gradebooks/grade_summary"
+      expect(response.body).to include("submission_#{assignment.id}")
     end
   end
 end

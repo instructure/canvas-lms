@@ -55,7 +55,7 @@ describe('DiscussionsSettings', () => {
         toggleModalOpen() {},
         applicationElement: () => document.getElementById('fixtures'),
       },
-      props
+      props,
     )
 
   const oldEnv = window.ENV
@@ -75,6 +75,13 @@ describe('DiscussionsSettings', () => {
     }).not.toThrow()
   })
 
+  it('should render discussion settings with buttonText', () => {
+    render(<DiscussionSettings {...makeProps()} />)
+
+    const settingsButton = screen.getByTestId('discussion-setting-button')
+    expect(settingsButton).toHaveTextContent('Settings')
+  })
+
   it('should find 0 checked boxes', () => {
     render(
       <DiscussionSettings
@@ -88,7 +95,7 @@ describe('DiscussionsSettings', () => {
             allow_student_anonymous_discussion_topics: false,
           },
         })}
-      />
+      />,
     )
 
     const checkboxes = screen.getAllByRole('checkbox')
@@ -108,7 +115,7 @@ describe('DiscussionsSettings', () => {
     render(
       <DiscussionSettings
         {...makeProps({isSettingsModalOpen: true, permissions: {change_settings: true}})}
-      />
+      />,
     )
     const checkboxes = screen.getAllByRole('checkbox')
     expect(checkboxes).toHaveLength(6)
@@ -146,12 +153,11 @@ describe('DiscussionsSettings', () => {
           isSavingSettings: false,
           permissions: {change_settings: true},
         })}
-      />
+      />,
     )
 
     const checkboxes = screen.getAllByRole('checkbox')
     for (const checkbox of checkboxes) {
-      // eslint-disable-next-line no-await-in-loop
       await user.click(checkbox)
     }
 
@@ -159,7 +165,7 @@ describe('DiscussionsSettings', () => {
     await user.click(button)
     expect(saveMock).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining(expectedCourseSettings)
+      expect.objectContaining(expectedCourseSettings),
     )
   })
 
@@ -195,12 +201,11 @@ describe('DiscussionsSettings', () => {
           isSavingSettings: false,
           permissions: {change_settings: true},
         })}
-      />
+      />,
     )
 
     const checkboxes = screen.getAllByRole('checkbox')
     for (const checkbox of checkboxes) {
-      // eslint-disable-next-line no-await-in-loop
       await user.click(checkbox)
     }
 
@@ -208,7 +213,7 @@ describe('DiscussionsSettings', () => {
     await user.click(button)
     expect(saveMock).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining(expectedCourseSettings)
+      expect.objectContaining(expectedCourseSettings),
     )
   })
 
@@ -220,7 +225,7 @@ describe('DiscussionsSettings', () => {
           isSettingsModalOpen: true,
           permissions: {change_settings: true},
         })}
-      />
+      />,
     )
 
     expect(screen.getByTestId('discussion-settings-spinner-container')).toBeInTheDocument()

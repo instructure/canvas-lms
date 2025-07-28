@@ -29,7 +29,7 @@ describe('parseUrlParams', () => {
       {
         a: 'baz',
         b: 'bar',
-      }
+      },
     )
 
     if (result.success) {
@@ -48,7 +48,7 @@ describe('parseUrlParams', () => {
       },
       {
         a: 'baz',
-      }
+      },
     )
 
     expect(result.success).toEqual(false)

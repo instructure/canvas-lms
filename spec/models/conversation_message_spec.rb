@@ -131,56 +131,6 @@ describe ConversationMessage do
     end
   end
 
-  context "generate_user_note" do
-    context "when the deprecate_faculty_journal flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "adds a user note under nominal circumstances" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student.user_notes.size).to be(1)
-        note = student.user_notes.first
-        expect(note.creator).to eql(@teacher)
-        expect(note.title).to eql("Private message")
-        expect(note.note).to eql("reprimanded!")
-      end
-
-      it "allows user notes on more than one recipient" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student1 = student_in_course(active_all: true).user
-        student2 = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student1, student2])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student1.user_notes.size).to be(1)
-        expect(student2.user_notes.size).to be(1)
-      end
-    end
-
-    context "when the deprecate_faculty_journal flag is enabled" do
-      it "does not add a user note under nominal circumstances" do
-        Account.default.update_attribute :enable_user_notes, true
-        course_with_teacher(active_all: true)
-        student = student_in_course(active_all: true).user
-        conversation = @teacher.initiate_conversation([student])
-        conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-        expect(student.user_notes.size).to be(0)
-      end
-    end
-
-    it "fails if notes are disabled on the account" do
-      Account.default.update_attribute :enable_user_notes, false
-      course_with_teacher(active_all: true)
-      student = student_in_course(active_all: true).user
-      conversation = @teacher.initiate_conversation([student])
-      conversation.add_message("reprimanded!", generate_user_note: true, root_account_id: Account.default.id)
-      expect(student.user_notes.size).to be(0)
-    end
-  end
-
   context "stream_items" do
     before :once do
       course_with_teacher
@@ -256,37 +206,6 @@ describe ConversationMessage do
       end
     end
 
-    context "when the deprecate_faculty_journal flag is disabled" do
-      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
-
-      it "user_note uses the recipients shard" do
-        conversation = nil
-        acc = nil
-        @shard1.activate do
-          acc = Account.default
-          acc.enable_user_notes = true
-          acc.save!
-          course_with_teacher(active_all: true)
-        end
-        a = @teacher.shard.activate do
-          attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
-        end
-        m = nil
-        @shard2.activate do
-          student_in_course(active_all: true)
-          m = @teacher.initiate_conversation([@student]).add_message("test", attachment_ids: [a.id])
-          conversation = m.conversation
-        end
-        @shard1.activate do
-          allow(Account).to receive(:default) { acc }
-          conversation_participant = conversation.conversation_participants.where(user_id: @teacher.id).first
-          conversation_participant.add_message("reprimanded!", generate_user_note: true, root_account_id: acc)
-          conversation_participant.reload
-          expect(@student.user_notes.last.root_account_id).to eq(Shard.relative_id_for(acc.id, acc.shard, @student.shard))
-        end
-      end
-    end
-
     context "sharding" do
       specs_require_sharding
 
@@ -351,7 +270,7 @@ describe ConversationMessage do
     it "sets has_attachments if there are attachments" do
       a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
       m = @teacher.initiate_conversation([@student]).add_message("ohai", attachment_ids: [a.id])
-      expect(m.read_attribute(:has_attachments)).to be_truthy
+      expect(m.has_attachments).to be_truthy
       expect(m.conversation.reload.has_attachments).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
@@ -360,7 +279,7 @@ describe ConversationMessage do
       a = attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
       m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", attachment_ids: [a.id])
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
-      expect(m2.read_attribute(:has_attachments)).to be_truthy
+      expect(m2.has_attachments).to be_truthy
       expect(m2.conversation.reload.has_attachments).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_attachments?)).to be_truthy
     end
@@ -372,7 +291,7 @@ describe ConversationMessage do
       mc.context = mc.user = @teacher
       mc.save
       m = @teacher.initiate_conversation([@student]).add_message("ohai", media_comment: mc)
-      expect(m.read_attribute(:has_media_objects)).to be_truthy
+      expect(m.has_media_objects).to be_truthy
       expect(m.conversation.reload.has_media_objects).to be_truthy
       expect(m.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end
@@ -385,55 +304,273 @@ describe ConversationMessage do
       mc.save
       m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", media_comment: mc)
       m2 = @teacher.initiate_conversation([@student]).add_message("lulz", forwarded_message_ids: [m1.id])
-      expect(m2.read_attribute(:has_media_objects)).to be_truthy
+      expect(m2.has_media_objects).to be_truthy
       expect(m2.conversation.reload.has_media_objects).to be_truthy
       expect(m2.conversation.conversation_participants.all?(&:has_media_objects?)).to be_truthy
     end
   end
 
   context "log_conversation_message_metrics" do
-    it "logs inbox.message.created.react when react_inbox is ON in root account" do
-      Account.default.enable_feature! :react_inbox
-      allow(InstStatsd::Statsd).to receive(:increment)
+    it "logs inbox.message.created.react" do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
 
       course_with_teacher(active_all: true)
       student1 = student_in_course(active_all: true).user
       conversation = @teacher.initiate_conversation([student1])
-      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.react").at_least(:once)
+      conversation.add_message("hello", root_account_id: Account.default.id)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("inbox.message.created.react").at_least(:once)
+    end
+  end
+
+  context "check_for_out_of_office_recipients" do
+    before do
+      allow(ConversationMessage).to receive(:delay_if_production)
+      course_with_teacher
+      @student1 = student_in_course.user
+      @student1_inbox_settings = Inbox::InboxService.inbox_settings_for_user(user_id: @student1.id, root_account_id: Account.default.id)
+      @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+        user_id: @teacher.id,
+        root_account_id: Account.default.id,
+        use_signature: true,
+        signature: "",
+        use_out_of_office: true,
+        out_of_office_first_date: Time.zone.today,
+        out_of_office_last_date: Time.zone.tomorrow,
+        out_of_office_subject: "OOO",
+        out_of_office_message: "Out of Office"
+      )
+      @conversation = @student1.initiate_conversation([@student1, @teacher])
     end
 
-    it "logs inbox.message.created.legacy when react_inbox is OFF in root account" do
-      Account.default.disable_feature! :react_inbox
-      allow(InstStatsd::Statsd).to receive(:increment)
-
-      course_with_teacher(active_all: true)
-      student1 = student_in_course(active_all: true).user
-      conversation = @teacher.initiate_conversation([student1])
-      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.legacy").at_least(:once)
+    it "does not trigger an OOO auto response if inbox_settings FF is disabled" do
+      expect(ConversationMessage.count).to eq(0)
+      @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+      expect(ConversationMessage.count).to eq(1)
     end
 
-    it "logs inbox.message.created.react when react_inbox is ON in site admin" do
-      Account.site_admin.enable_feature! :react_inbox
-      allow(InstStatsd::Statsd).to receive(:increment)
-
-      course_with_teacher(active_all: true)
-      student1 = student_in_course(active_all: true).user
-      conversation = @teacher.initiate_conversation([student1])
-      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.react").at_least(:once)
+    it "does not trigger an OOO auto response if enable_inbox_auto_response setting is disabled" do
+      Account.site_admin.enable_feature! :inbox_settings
+      expect(ConversationMessage.count).to eq(0)
+      @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+      expect(ConversationMessage.count).to eq(1)
     end
 
-    it "logs inbox.message.created.legacy when react_inbox is OFF in site admin" do
-      Account.site_admin.disable_feature! :react_inbox
-      allow(InstStatsd::Statsd).to receive(:increment)
+    context "with inbox_settings FF and enable_inbox_auto_response setting is enabled" do
+      before do
+        Account.site_admin.enable_feature! :inbox_settings
+        Account.default.settings[:enable_inbox_auto_response] = true
+        Account.default.save!
+      end
 
+      it "triggers an OOO auto response in a new conversation" do
+        expect(Conversation.count).to eq(1)
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        expect(Conversation.count).to eq(2)
+        expect(ConversationMessage.last.body).to eq("Out of Office")
+      end
+
+      it "does not send message to sender if sender and recipient are both out of office" do
+        Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @student1.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+
+        expect(Conversation.count).to eq(1)
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("Messaging you even though we are both OOO", root_account_id: Account.default.id, recipients: [@teacher])
+
+        # If it creates a loop, then there would be 3 conversations with 3 total conversations
+        # Let's make sure that there are only 2 conversations with 2 total messages
+        expect(ConversationMessage.count).to eq(2)
+        expect(Conversation.count).to eq(2)
+      end
+
+      it "does not trigger an OOO auto response if use_out_of_office inbox setting is false" do
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: false,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(1)
+        expect(ConversationMessage.last.body).to eq("hi!")
+      end
+
+      it "does not trigger an OOO auto response if not in OOO range" do
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+
+        # Move out of date range
+        Timecop.travel(3.days) do
+          expect(ConversationMessage.count).to eq(0)
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+
+          # If auto-response message was sent, then the count of messages in conversation would be 2
+          expect(ConversationMessage.count).to eq(1)
+          expect(ConversationMessage.last.body).to eq("hi!")
+        end
+      end
+
+      it "does not trigger a second OOO auto response" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(3)
+        expect(ConversationMessage.last.body).to eq("hi again!")
+      end
+
+      it "does not trigger a second OOO auto response if the inbox settings were updated but not the OOO settings" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: true,
+          signature: "New signature!",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO",
+          out_of_office_message: "Out of Office"
+        )
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(3)
+        expect(ConversationMessage.last.body).to eq("hi again!")
+      end
+
+      it "triggers a second OOO auto response if there was an update to the OOO settings" do
+        expect(ConversationMessage.count).to eq(0)
+        @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(2)
+        expect(ConversationMessage.last.body).to eq("Out of Office")
+        @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: @teacher.id,
+          root_account_id: Account.default.id,
+          use_signature: true,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO - For Real",
+          out_of_office_message: "Out of Office - updated"
+        )
+        @conversation.add_message("hi again!", root_account_id: Account.default.id, recipients: [@teacher])
+        expect(ConversationMessage.count).to eq(4)
+        expect(ConversationMessage.last.body).to eq("Out of Office - updated")
+      end
+
+      it "triggers multiple OOO auto responses if multiple participants are OOO" do
+        student2 = student_in_course.user
+        Inbox::InboxService.inbox_settings_for_user(user_id: student2.id, root_account_id: Account.default.id)
+        Inbox::InboxService.update_inbox_settings_for_user(
+          user_id: student2.id,
+          root_account_id: Account.default.id,
+          use_signature: false,
+          signature: "",
+          use_out_of_office: true,
+          out_of_office_first_date: Time.zone.today,
+          out_of_office_last_date: Time.zone.tomorrow,
+          out_of_office_subject: "OOO too!",
+          out_of_office_message: "Out of Office too!"
+        )
+        conversation = @student1.initiate_conversation([@teacher, @student1, student2])
+        expect(Conversation.count).to eq(2)
+        expect(ConversationMessage.count).to eq(0)
+        conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher, student2])
+
+        # Should spawn two new conversations to send the OOO auto responses to
+        expect(Conversation.count).to eq(4)
+        expect(ConversationMessage.count).to eq(3)
+
+        # Make sure that the correct messages go through
+        messages = ConversationMessage.all.map(&:body)
+        expect(messages.include?("Out of Office")).to be_truthy
+        expect(messages.include?("Out of Office too!")).to be_truthy
+      end
+
+      context "with inbox signature enabled" do
+        before do
+          Account.default.settings[:enable_inbox_signature_block] = true
+          Account.default.save!
+        end
+
+        it "appends Inbox Signature to message body if 'use_signature' is true" do
+          @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+            user_id: @teacher.id,
+            root_account_id: Account.default.id,
+            use_signature: true,
+            signature: "Teacher\n\nUniversity",
+            use_out_of_office: true,
+            out_of_office_first_date: Time.zone.today,
+            out_of_office_last_date: Time.zone.tomorrow,
+            out_of_office_subject: "OOO",
+            out_of_office_message: "Out of Office"
+          )
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+          expect(ConversationMessage.last.body).to eq("Out of Office\n\n---\nTeacher\n\nUniversity")
+        end
+
+        it "does not append Inbox Signature to message body if 'use_signature' is false" do
+          @teacher_inbox_settings = Inbox::InboxService.update_inbox_settings_for_user(
+            user_id: @teacher.id,
+            root_account_id: Account.default.id,
+            use_signature: false,
+            signature: "Teacher\n\nUniversity",
+            use_out_of_office: true,
+            out_of_office_first_date: Time.zone.today,
+            out_of_office_last_date: Time.zone.tomorrow,
+            out_of_office_subject: "OOO",
+            out_of_office_message: "Out of Office"
+          )
+          @conversation.add_message("hi!", root_account_id: Account.default.id, recipients: [@teacher])
+          expect(ConversationMessage.last.body).to eq("Out of Office")
+        end
+      end
+    end
+  end
+
+  describe "set_policy" do
+    before do
       course_with_teacher(active_all: true)
-      student1 = student_in_course(active_all: true).user
-      conversation = @teacher.initiate_conversation([student1])
-      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.legacy").at_least(:once)
+      @student_with_access = student_in_course(active_all: true).user
+      @student_without_access = student_in_course(active_all: true).user
+      @conversation = @teacher.initiate_conversation([@student_with_access])
+      @attachment = attachment_model(context: @teacher)
+      @conversation.add_message("test", attachment_ids: [@attachment.id])
+    end
+
+    it "allow read access if the user can view the attachment when user participant is available for the convo" do
+      conversation_message = @conversation.conversation.conversation_messages.last
+      expect(conversation_message.grants_right?(@student_with_access, :read)).to be_truthy
+      expect(conversation_message.grants_right?(@teacher, :read)).to be_truthy
+      expect(conversation_message.grants_right?(@student_without_access, :read)).to be_falsey
     end
   end
 

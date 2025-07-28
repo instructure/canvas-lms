@@ -17,14 +17,14 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('copy_to_clipboard')
+const I18n = createI18nScope('copy_to_clipboard')
 
 const CopyToClipboard = props => {
   const copyToClipboardProps = ['buttonText']
@@ -32,7 +32,7 @@ const CopyToClipboard = props => {
 
   // Object containing props intended for the TextInput component
   const textInputProps = Object.fromEntries(
-    Object.entries(props).filter(([k]) => !copyToClipboardProps.includes(k))
+    Object.entries(props).filter(([k]) => !copyToClipboardProps.includes(k)),
   )
 
   const copyToClipboard = () => {

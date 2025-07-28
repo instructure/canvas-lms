@@ -1,7 +1,21 @@
+<%
+  tag = ''
+  if asset.assignment.is_a?(SubAssignment)
+    tag = case asset.assignment.sub_assignment_tag
+            when CheckpointLabels::REPLY_TO_TOPIC
+              t('Reply To Topic')
+            when CheckpointLabels::REPLY_TO_ENTRY
+              t('Reply To Entry')
+            else
+              ''
+          end
+  end
+  assignment_title = "#{asset.assignment.title} #{tag}".strip
+%>
 <% if send_student_names(asset, user) %>
-<%= t "%{assignment} has been graded for %{name}.", :assignment => asset.assignment.title, name: asset.user.name %>
+<%= t "%{assignment} has been graded for %{name}.", :assignment => assignment_title, name: asset.user.name %>
 <% else %>
-<%= t :sms_body, "%{assignment} has been graded.", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+<%= t :sms_body, "%{assignment} has been graded.", :assignment => assignment_title, :context => asset.assignment.context.name %>
 <% end %>
 <% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context) %>
   <% if asset.assignment.restrict_quantitative_data?(user)%>

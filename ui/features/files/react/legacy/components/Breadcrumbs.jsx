@@ -77,7 +77,7 @@ export default {
         availableWidth: newAvailableWidth,
         maxCrumbWidth: MAX_CRUMB_WIDTH,
       },
-      this.checkIfCrumbsFit
+      this.checkIfCrumbsFit,
     )
   },
 

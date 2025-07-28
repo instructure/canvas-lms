@@ -23,6 +23,7 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
   let(:feature_name) { "root_account_feature" }
 
   before do
+    allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
     allow(RequestContextGenerator).to receive_messages(request_id:)
     allow(Feature).to receive(:definitions).and_return({
                                                          feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount")

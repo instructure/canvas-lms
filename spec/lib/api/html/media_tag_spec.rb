@@ -37,13 +37,9 @@ module Api
                        @attrs = {}
                      end
 
-                     def []=(key, val)
-                       @attrs[key] = val
-                     end
+                     delegate :[]=, to: :@attrs
 
-                     def [](key)
-                       @attrs[key]
-                     end
+                     delegate :[], to: :@attrs
                    end)
       end
 

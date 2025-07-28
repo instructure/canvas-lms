@@ -27,7 +27,7 @@ export function parseUrlOrNull(url: string | null | undefined, base?: string | U
 
   try {
     return new URL(url, base)
-  } catch (e) {
+  } catch (_e) {
     return null
   }
 }
@@ -39,6 +39,10 @@ export function relativizeUrl(url: string): string {
   delete parsed.host
   delete parsed.port
   return URI.serialize(parsed)
+}
+
+export function parseUrlPath(url: string) {
+  return URI.parse(url).path
 }
 
 /**
@@ -57,7 +61,7 @@ export function relativizeUrl(url: string): string {
  */
 export function relativeHttpUrlForHostname<TInput extends string | null | undefined>(
   inputUrlStr: TInput,
-  origin: string
+  origin: string,
 ): TInput {
   if (inputUrlStr == null || inputUrlStr === '') {
     return inputUrlStr
@@ -118,7 +122,7 @@ export function relativeHttpUrlForHostname<TInput extends string | null | undefi
  */
 export function addQueryParamsToUrl(
   inputUrlStr: string | null | undefined,
-  queryParams: Record<string, string | null | undefined>
+  queryParams: Record<string, string | null | undefined>,
 ): string | null {
   if (inputUrlStr == null) {
     return null

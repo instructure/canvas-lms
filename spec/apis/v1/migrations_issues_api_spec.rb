@@ -50,9 +50,9 @@ describe MigrationIssuesController, type: :request do
       expect(json.first["id"]).to eq issue.id
     end
 
-    it "401s" do
+    it "403s" do
       course_with_student_logged_in(course: @course, active_all: true)
-      api_call(:get, @issue_url, @params, {}, {}, expected_status: 401)
+      api_call(:get, @issue_url, @params, {}, {}, expected_status: 403)
     end
   end
 
@@ -88,9 +88,9 @@ describe MigrationIssuesController, type: :request do
       api_call(:get, @issue_url + "000", @params.merge({ id: @issue.id.to_param + "000" }), {}, {}, expected_status: 404)
     end
 
-    it "401s" do
+    it "403s" do
       course_with_student_logged_in(course: @course, active_all: true)
-      api_call(:get, @issue_url, @params, {}, {}, expected_status: 401)
+      api_call(:get, @issue_url, @params, {}, {}, expected_status: 403)
     end
   end
 
@@ -119,9 +119,9 @@ describe MigrationIssuesController, type: :request do
       api_call(:put, @issue_url + "000", @params.merge({ id: @issue.id.to_param + "000" }), @body_params, {}, expected_status: 404)
     end
 
-    it "401s" do
+    it "403s" do
       course_with_student_logged_in(course: @course, active_all: true)
-      api_call(:put, @issue_url, @params, @body_params, {}, expected_status: 401)
+      api_call(:put, @issue_url, @params, @body_params, {}, expected_status: 403)
       @issue.reload
       expect(@issue.workflow_state).to eq "active"
     end

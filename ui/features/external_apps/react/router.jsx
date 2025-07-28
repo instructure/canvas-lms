@@ -43,7 +43,7 @@ const renderAppList = _ctx => {
       <Root>
         <AppList baseUrl={baseUrl} />
       </Root>,
-      targetNodeToRenderIn
+      targetNodeToRenderIn,
     )
   }
 }
@@ -53,7 +53,7 @@ const renderAppDetails = ctx => {
     <Root>
       <AppDetails shortName={ctx.params.shortName} baseUrl={baseUrl} store={AppCenterStore} />
     </Root>,
-    targetNodeToRenderIn
+    targetNodeToRenderIn,
   )
 }
 
@@ -65,7 +65,7 @@ const renderConfigurations = _ctx => {
       <Root>
         <Configurations pathname={baseUrl} env={window.ENV} />
       </Root>,
-      targetNodeToRenderIn
+      targetNodeToRenderIn,
     )
   }
 }

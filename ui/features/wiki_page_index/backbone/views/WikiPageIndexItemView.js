@@ -17,16 +17,16 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import WikiPageIndexEditDialog from './WikiPageIndexEditDialog'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
+import renderWikiPageIndexEditModal from '../../react/WikiPageIndexEditModal'
 import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
 import template from '../../jst/WikiPageIndexItem.handlebars'
 import '../../jquery/redirectClickTo'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 export default class WikiPageIndexItemView extends Backbone.View {
   static initClass() {
@@ -59,6 +59,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     this.optionProperty('contextName')
     this.optionProperty('selectedPages')
     this.optionProperty('collectionHasTodoDate')
+    this.optionProperty('editModalRoot')
   }
 
   initialize() {
@@ -92,8 +93,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
       json.cannot_edit_by_master_course = json.master_course_restrictions.content
     }
 
-    json.differentiated_modules =
-      !!ENV.FEATURES?.differentiated_modules && this.contextName === 'courses'
+    json.show_assign_to = this.contextName === 'courses'
     json.wiki_page_menu_tools = ENV.wiki_page_menu_tools || []
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)
@@ -101,6 +101,13 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
+    json.block_editor =
+      ENV.EDITOR_FEATURE === 'block_editor' || ENV.EDITOR_FEATURE === 'block_content_editor'
+    json.page_is_block =
+      this.model.get('editor') === 'block_editor' ||
+      this.model.get('editor') === 'block_content_editor'
+    json.page_type_label = json.page_is_block ? I18n.t('block page') : I18n.t('classic page')
+    json.is_horizon_course = ENV?.horizon_course
     return json
   }
 
@@ -127,6 +134,10 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
     this.publishIconView.$el.appendTo(this.$publishCell)
     this.publishIconView.render()
+
+    if (ENV.horizon_course) {
+      this.publishIconView.$el.addClass('disabled')
+    }
 
     if (!this.lockIconView) {
       this.lockIconView = new LockIconView({
@@ -156,23 +167,25 @@ export default class WikiPageIndexItemView extends Backbone.View {
   editPage(ev = {}) {
     ev.preventDefault()
 
-    const $curCog = $(ev.target).parents('td').children().find('.al-trigger')
-
-    const editDialog = new WikiPageIndexEditDialog({
+    renderWikiPageIndexEditModal(this.editModalRoot, {
       model: this.model,
-      returnFocusTo: $curCog,
+      modalOpen: true,
+      closeModal: this.closeEditModal.bind(this),
     })
-    editDialog.open()
+  }
+
+  closeEditModal = focusEl => {
+    renderWikiPageIndexEditModal(this.editModalRoot, {
+      model: this.model,
+      modalOpen: false,
+      closeModal: this.closeEditModal.bind(this),
+    })
 
     const {indexView} = this
-    const {collection} = this
-    return editDialog.on('success', function () {
-      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}-menu.al-trigger`
-      indexView.currentSortField = null
-      indexView.renderSortHeaders()
-
-      return collection.fetch({page: 'current'})
-    })
+    indexView.focusAfterRenderSelector = focusEl
+    indexView.currentSortField = null
+    indexView.renderSortHeaders()
+    return this.collection.fetch({page: 'current'})
   }
 
   deletePage(ev = {}) {

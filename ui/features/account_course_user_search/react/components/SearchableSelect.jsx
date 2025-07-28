@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import {bool, func, node, oneOfType, string} from 'prop-types'
 import {Select} from '@instructure/ui-select'
@@ -24,7 +24,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {uid} from '@instructure/uid'
 
-const I18n = useI18nScope('managed_course_selector')
+const I18n = createI18nScope('managed_course_selector')
 
 const NO_OPTIONS_OPTION_ID = '___noOptionsOption__'
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
@@ -33,11 +33,11 @@ const liveRegion = () => document.getElementById('flash_screenreader_holder')
 const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = str => str.replace(reEscapeMatcher, '\\$1')
 
-/* eslint-disable react/no-unused-prop-types */
 const SearchableSelectOption = () => <div />
 SearchableSelectOption.propTypes = {
   id: string.isRequired,
   value: string.isRequired,
+  children: node.isRequired,
 }
 SearchableSelectOption.displayName = 'Option'
 
@@ -46,7 +46,6 @@ SearchableSelectGroup.propTypes = {
   label: string.isRequired,
 }
 SearchableSelectGroup.displayName = 'Group'
-/* eslint-enable react/no-unused-prop-types */
 
 function flattenOptions(nodes) {
   const options = []
@@ -87,7 +86,7 @@ function SearchableSelect(props) {
 
   function setSearchResultMessage(matches) {
     if (!matches) {
-      setMessages([{type: 'error', text: noSearchMatchLabel}])
+      setMessages([{type: 'newError', text: noSearchMatchLabel}])
       return
     }
     if (noResults) {
@@ -100,7 +99,6 @@ function SearchableSelect(props) {
   useEffect(() => {
     setMatcher(new RegExp(''))
     setSelectedOptionId(null)
-    setIsShowingOptions(false)
     setSearchResultMessage(true)
     if (!value || inputValue) return
     const initialValue = options.find(i => i.value === value)

@@ -48,6 +48,13 @@ describe QuizzesNext::QuizzesApiController, type: :request do
       )
     end
 
+    let(:quiz_data_mock) do
+      [
+        { "id" => new_quizzes.first.id.to_i, "question_count" => 5 },
+        { "id" => new_quizzes.second.id.to_i, "question_count" => 10 }
+      ]
+    end
+
     before(:once) { teacher_in_course(active_all: true) }
 
     before do
@@ -67,6 +74,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           format: "json",
           course_id: @course.id.to_s
         )
+      end
+
+      before do
+        allow_any_instance_of(ListNewQuizzesWithQuestionCountService)
+          .to receive(:question_count)
+          .and_return(quiz_data_mock)
       end
 
       it "returns list of old quizzes" do
@@ -183,7 +196,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           enable_cache do
             subject
             link_header = response.headers["Link"]
-            cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/quizzes\.next/).first.dup.split(":", 2).last
+            cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/page/).first.dup.split(":", 2).last
             cached_content = Rails.cache.read(cache_key)
             expect(cached_content[:link]).to eq(link_header)
           end
@@ -193,6 +206,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
     context "as a student" do
       before(:once) { student_in_course(active_all: true) }
+
+      before do
+        allow_any_instance_of(ListNewQuizzesWithQuestionCountService)
+          .to receive(:question_count)
+          .and_return(quiz_data_mock)
+      end
 
       context "quiz tab is disabled" do
         before do

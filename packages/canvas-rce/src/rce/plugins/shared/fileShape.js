@@ -90,7 +90,7 @@ function createContentTrayDocumentShape(isRequired) {
       if (isRequired) {
         if (!p) {
           return new Error(
-            `Required prop \`${propName}\` not supplied to \`${componentName}\`. Validation failed.`
+            `Required prop \`${propName}\` not supplied to \`${componentName}\`. Validation failed.`,
           )
         }
       }
@@ -99,13 +99,13 @@ function createContentTrayDocumentShape(isRequired) {
       const files = p.user || p.course || p.group || p.User || p.Course || p.Group
       if (!files) {
         return new Error(
-          `Invalid prop \`${propName}\` supplied to \`${componentName}\`. Missing "user"|"course"|"group" key.`
+          `Invalid prop \`${propName}\` supplied to \`${componentName}\`. Missing "user"|"course"|"group" key.`,
         )
       }
       if ('searchString' in p) {
         if (!(typeof p.searchString === 'string')) {
           return new Error(
-            `Invalid prop \`${propName}\` supplied to \`${componentName}\`. "searchString" must be a string.`
+            `Invalid prop \`${propName}\` supplied to \`${componentName}\`. "searchString" must be a string.`,
           )
         }
       }
@@ -114,21 +114,21 @@ function createContentTrayDocumentShape(isRequired) {
           {docs: shape(documentQueryReturnShape)},
           {docs: files},
           componentName,
-          componentName
+          componentName,
         )
       } else if (propName === 'images') {
         checkPropTypes(
           {images: shape(imageQueryReturnShape)},
           {images: files},
           componentName,
-          componentName
+          componentName,
         )
       } else if (propName === 'media') {
         checkPropTypes(
           {media: shape(mediaQueryReturnShape)},
           {media: files},
           componentName,
-          componentName
+          componentName,
         )
       }
     }

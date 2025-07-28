@@ -65,6 +65,11 @@
 #           "example": "2013-12-02T00:03:21-06:00",
 #           "type": "datetime"
 #         },
+#         "run_time": {
+#           "description": "The time (in seconds) the report has been waiting to run, has been running so far, or took to run to completion, depending on its current state.",
+#           "example": 33.3,
+#           "type": "number"
+#         },
 #         "parameters": {
 #           "description": "The report parameters",
 #           "example": {"course_id": 2, "start_at": "2012-07-13T10:55:20-06:00", "end_at": "2012-07-13T10:55:20-06:00"},
@@ -194,12 +199,24 @@ class AccountReportsController < ApplicationController
   include Api::V1::Account
   include Api::V1::AccountReport
 
+  # allows `render_to_string` to find partials there
+  def self.local_prefixes
+    super + ["accounts"]
+  end
+
   # @API List Available Reports
   #
   # Returns a paginated list of reports for the current context.
   #
+  # @argument include[] [String, "description_html"|"params_html"]
+  #   Array of additional information to include.
+  #
+  #   "description_html":: an HTML description of the report, with example output
+  #   "parameters_html":: an HTML form for the report parameters
+  #
   # @response_field name The name of the report.
   # @response_field parameters The parameters will vary for each report
+  # @response_field last_run [Report] The last run of the report. This will be null if the report has never been run.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -211,7 +228,15 @@ class AccountReportsController < ApplicationController
   #    {
   #      "report":"student_assignment_outcome_map_csv",
   #      "title":"Student Competency",
-  #      "parameters":null
+  #      "parameters":null,
+  #      "last_run": {
+  #        "id": 1,
+  #        "report": "student_assignment_outcome_map_csv",
+  #        "file_url": "https://example.com/some/path",
+  #        "status": "complete",
+  #        "created_at": "2013-12-01T23:59:00-06:00",
+  #        "started_at": "2013-12-02T00:03:21-06:00",
+  #        "ended_at": "2013-12-02T00:03:21-06:00"
   #    },
   #    {
   #      "report":"grade_export_csv",
@@ -221,19 +246,23 @@ class AccountReportsController < ApplicationController
   #          "description":"The canvas id of the term to get grades from",
   #          "required":true
   #        }
-  #      }
+  #      },
+  #      "last_run": null
   #    }
   #  ]
   #
   def available_reports
     if authorized_action(@account, @current_user, :read_reports)
+      @root_account = @account.root_account # used in partials
       available_reports = AccountReport.available_reports
+      includes = Array(params[:include])
 
       results = []
+      last_runs = AccountReport.last_reports(account: @account)
 
       available_reports.each do |key, value|
-        last_run = @account.account_reports.active.where(report_type: key).most_recent.take
-        last_run = account_report_json(last_run, @current_user) if last_run
+        last_run = account_report_json(last_runs[key], @current_user) if last_runs.key?(key)
+
         report = {
           title: value.title,
           parameters: nil,
@@ -250,9 +279,12 @@ class AccountReportsController < ApplicationController
         end
 
         report[:parameters] = parameters unless parameters.empty?
+
+        add_description_partials(report, key, value, includes)
+
         results << report
       end
-      render json: results
+      render json: results.sort_by { |r| r[:title] }
 
     end
   end
@@ -264,7 +296,7 @@ class AccountReportsController < ApplicationController
   # not those parameters are required), see
   # {api:AccountReportsController#available_reports List Available Reports}.
   #
-  # @argument parameters The parameters will vary for each report. To fetch a list
+  # @argument parameters[] [Hash] The parameters will vary for each report. To fetch a list
   #   of available parameters for each report, see {api:AccountReportsController#available_reports List Available Reports}.
   #   A few example parameters have been provided below. Note that the example
   #   parameters provided below may not be valid for every report.
@@ -297,6 +329,11 @@ class AccountReportsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
 
       parameters = params[:parameters]&.to_unsafe_h
+      enrollment_term_id = parameters&.dig("enrollment_term_id") || parameters&.dig("enrollment_term")
+      if enrollment_term_id.present? && !valid_enrollment_term_id?(enrollment_term_id)
+        return render json: { error: "invalid enrollment_term_id '#{enrollment_term_id}'" }, status: :bad_request
+      end
+
       report = @account.account_reports.build(user: @current_user, report_type: params[:report], parameters:)
       report.workflow_state = :created
       report.progress = 0
@@ -304,6 +341,10 @@ class AccountReportsController < ApplicationController
       report.run_report
       render json: account_report_json(report, @current_user)
     end
+  end
+
+  def valid_enrollment_term_id?(enrollment_term_id)
+    enrollment_term_id == "active_terms" || api_find_all(@account.root_account.enrollment_terms, enrollment_term_id.to_s.split(",")).exists?
   end
 
   def type_scope
@@ -364,5 +405,66 @@ class AccountReportsController < ApplicationController
         render json: report.errors, status: :bad_request
       end
     end
+  end
+
+  # @API Abort a Report
+  #
+  # Abort a report in progress
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #          -X PUT \
+  #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<id>/abort
+  #
+  # @returns Report
+  #
+  def abort
+    if authorized_action(@context, @current_user, :read_reports)
+      report = type_scope.created_or_running.find(params[:id])
+
+      if report.update(workflow_state: "aborted")
+        render json: account_report_json(report, @current_user)
+      else
+        render json: report.errors, status: :bad_request
+      end
+    end
+  end
+
+  private
+
+  def add_description_partials(json, report, report_details, includes)
+    if includes.include?("description_html") && report_details.respond_to?(:description_partial)
+      description_partial = report_details.description_partial
+      if description_partial.present?
+        description_partial = report + "_description" if description_partial == true
+        json[:description_html] = render_to_string(
+          partial: description_partial,
+          layout: false,
+          locals: { report:, report_details: },
+          formats: [:html]
+        )
+      end
+    end
+
+    if includes.include?("parameters_html") && report_details.respond_to?(:parameters_partial)
+      parameters_partial = report_details.parameters_partial
+      if parameters_partial.present?
+        parameters_partial = report + "_parameters" if parameters_partial == true
+        json[:parameters_html] = <<~HTML
+          <form id="#{report}_form" class="run_report_form" action="#{api_v1_account_create_report_path(@account, report)}">
+          #{
+            render_to_string(
+              partial: parameters_partial,
+              layout: false,
+              locals: { report:, report_details: },
+              formats: [:html]
+            )
+          }
+          </form>
+        HTML
+      end
+    end
+
+    json
   end
 end

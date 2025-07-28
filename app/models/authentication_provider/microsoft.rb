@@ -23,7 +23,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   self.plugin = :microsoft
   plugin_settings :application_id, application_secret: :application_secret_dec
 
-  SENSITIVE_PARAMS = [:application_secret].freeze
   # Tenant IDs are always GUIDs, but we will translate the GUID for
   # the Microsoft personal account tenant to "microsoft" for ease
   # of identification. "guests" and "common" are special cases that
@@ -42,9 +41,9 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   alias_method :application_secret=, :client_secret=
   alias_method :login_attribute_for_pseudonyms, :login_attribute
 
-  validates :tenants, presence: true
-  validate :tenants, :validate_tenants
-  validate :login_attribute, :validate_secure_login_attribute
+  validates :tenants, presence: true, if: :active?
+  validate :tenants, :validate_tenants, if: :active?
+  validate :login_attribute, :validate_secure_login_attribute, if: :active?
 
   def client_id
     application_id
@@ -60,8 +59,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     super - open_id_connect_params + %i[tenant login_attribute jit_provisioning tenants].freeze
   end
 
+  def self.sensitive_params
+    [*super, :application_secret].freeze
+  end
+
   def self.login_attributes
-    %w[tid+oid sub email oid preferred_username].freeze
+    %w[tid+oid sub email oid preferred_username upn].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -72,7 +75,16 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
       preferred_username
       oid
       sub
+      upn
     ].freeze
+  end
+
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
+  def self.validate_issuer?
+    false
   end
 
   def login_attribute
@@ -81,8 +93,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def unique_id(token)
     id_token = claims(token)
-    settings["known_tenants"] ||= []
-    (settings["known_tenants"] << id_token["tid"]).uniq!
     allowed_tenants = mapped_allowed_tenants
     if allowed_tenants.empty? || allowed_tenants.include?("common") || settings["skip_tenant_verification"]
       # allow anyone
@@ -94,11 +104,6 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     elsif !allowed_tenants.include?(id_token["tid"])
       raise OAuthValidationError, t("User is from unacceptable tenant %{tenant}.", tenant: id_token["tid"].inspect)
     end
-
-    settings["known_idps"] ||= []
-    idp = id_token["idp"] || id_token["iss"]
-    (settings["known_idps"] << idp).uniq!
-    save! if changed?
 
     ids = id_token.as_json
     ids["tid+oid"] = "#{ids["tid"]}##{ids["oid"]}" if ids["tid"] && ids["oid"]
@@ -123,6 +128,12 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
     [tenant.presence].compact + (settings["allowed_tenants"] || [])
   end
 
+  def validate_signature(_token)
+    # The token is retrieved over TLS, so trust that, rather than the
+    # signature in the token, which might be signed by a various keys
+    # due to claims mapping
+  end
+
   protected
 
   def authorize_url
@@ -136,7 +147,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid])
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username tid+oid upn])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end

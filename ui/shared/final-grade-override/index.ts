@@ -17,3 +17,4 @@
  */
 
 export {FinalGradeOverrideTextBox} from './react'
+export {finalGradeOverrideUtils} from './utils'

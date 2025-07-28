@@ -14,7 +14,7 @@ migrate_to_new_quizzes_by_default:
 require_migration_to_new_quizzes:
   state: allowed
   display_name: New Quizzes migration required
-  description:  Disable New Quiz importing and migration checkboxes, defaulting them to enabled
+  description: Disable New Quiz importing and migration checkboxes, defaulting them to enabled
   applies_to: RootAccount
   beta: true
 new_quizzes_assignment_build_button:
@@ -24,7 +24,7 @@ new_quizzes_assignment_build_button:
   state: hidden
 new_quizzes_bank_migrations:
   display_name: New Quizzes Banks Migrations
-  description: Enable migrating item banks to New Quizzes during course import/copy
+  description: Enable migrating question banks to New Quizzes during course import/copy
   applies_to: SiteAdmin
   state: hidden
   beta: true
@@ -80,3 +80,41 @@ common_cartridge_qti_new_quizzes_import:
   display_name: Common Cartridge QTI New Quizzes Import
   description: If enabled, users will be able to import a Common Cartridge with New Quizzes in QTI format, users will be able to select the option to import existing quizzes as New Quizzes or import as the current quiz type.
   applies_to: SiteAdmin
+impact_integration:
+  state: hidden
+  display_name: Impact integration for New Quizzes
+  description: Allow Impact services to reach New Quizzes
+  applies_to: SiteAdmin
+  shadow: true
+new_quizzes_enable_quiz_visibility_after_course_conclusion:
+  state: hidden
+  display_name: Enable quiz visibility after course conclusion
+  description: Enable quiz visibility after course conclusion
+  applies_to: RootAccount
+  shadow: true
+new_quizzes_unattached_bank_migrations:
+  display_name: New Quizzes Unattached Bank Migrations
+  description: Enable migrating all question banks to New Quizzes during course import/copy
+  applies_to: SiteAdmin
+  state: hidden
+new_quizzes_report_failed_duplicates:
+  state: hidden
+  display_name: Report failed duplicates to Sentry when importing New Quizzes
+  description: If enabled, Canvas will report failed duplicates to Sentry
+  applies_to: SiteAdmin
+new_quizzes_navigation_updates:
+  display_name: New Quizzes Navigation Updates
+  description: If enabled, New Quizzes will launch in a display type that includes breadcrumbs and left-side menu
+  state: hidden
+  applies_to: SiteAdmin
+new_quizzes_separators:
+  display_name: New Quizzes Separators
+  description: If enabled, users can set decimal and thousands separators for New Quizzes
+  state: allowed
+  applies_to: SiteAdmin
+new_quizzes_ai_quiz_generation:
+  display_name: AI Quiz Generation
+  description: If enabled, the "Generate With AI" button will appear, allowing AI-based quiz creation for institutions in the Early Adopter Program
+  state: hidden
+  shadow: true
+  applies_to: Course

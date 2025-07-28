@@ -37,9 +37,7 @@ class ModeratedGrading::NullProvisionalGrade
     }
   end
 
-  def submission_comments
-    @submission.submission_comments
-  end
+  delegate :submission_comments, to: :@submission
 
   def scorer
     return nil if @scorer_id.nil?

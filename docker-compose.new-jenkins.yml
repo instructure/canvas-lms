@@ -5,7 +5,6 @@ services:
     image: $PATCHSET_TAG
     depends_on:
       - postgres
-      - cassandra
       - redis
       - dynamodb
     environment:
@@ -47,12 +46,6 @@ services:
     environment:
       PGDATA: /data
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    init: true
-
-  cassandra:
-    image: $CASSANDRA_IMAGE_TAG
-    environment:
-      CASSANDRA_START_RPC: 'true'
     init: true
 
   dynamodb:

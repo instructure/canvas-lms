@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import _ from 'lodash'
 import $ from 'jquery'
@@ -40,7 +40,7 @@ import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import natcompare from '@canvas/util/natcompare'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 class FileBrowser extends React.Component {
   static propTypes = {
@@ -158,11 +158,9 @@ class FileBrowser extends React.Component {
         }
       })
       .catch(error => {
-        /* eslint-disable no-console */
         console.error('Error fetching data from API')
         console.error(error)
         captureException(error)
-        /* eslint-enable no-console */
       })
   }
 
@@ -182,7 +180,7 @@ class FileBrowser extends React.Component {
           collectionCollections.push(collection.id)
           newCollections[parent_id].collections = this.orderedIdsFromList(
             newCollections,
-            collectionCollections
+            collectionCollections,
           )
         }
       })
@@ -245,7 +243,7 @@ class FileBrowser extends React.Component {
       existingCollections && {
         collections: existingCollections.collections,
         items: existingCollections.items,
-      }
+      },
     )
     return folder
   }
@@ -272,7 +270,6 @@ class FileBrowser extends React.Component {
       const sortedIds = ids.sort((a, b) => natcompare.strings(list[a].name, list[b].name))
       return sortedIds
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error(error)
       captureException(error)
       return ids
@@ -348,7 +345,9 @@ class FileBrowser extends React.Component {
 
   clearUploadInfo() {
     this.setState({uploading: false})
-    this.uploadInput.value = ''
+    if (this.uploadInput) {
+      this.uploadInput.value = ''
+    }
   }
 
   setSuccessMessage = message => {

@@ -40,6 +40,7 @@ export interface EnvAssignmentsA2StudentView {
   restrict_quantitative_data: boolean
   grading_scheme: any
   points_based: boolean
+  scaling_factor: number
 
   // Peer review data
   peer_review_available: boolean
@@ -48,9 +49,13 @@ export interface EnvAssignmentsA2StudentView {
   REVIEWER_SUBMISSION_ID?: string | number
 
   belongs_to_unpublished_module: boolean
-
+  LTI_TOOL?: string
+  LTI_TOOL_ID?: string
+  LTI_TOOL_SELECTION_WIDTH?: string
+  LTI_TOOL_SELECTION_HEIGHT?: string
   ASSIGNMENT_ID: string | number
   CONFETTI_ENABLED: boolean
+  CURRENT_USER_CAN_GRADE_SUBMISSION: boolean
   EMOJIS_ENABLED: boolean
   EMOJI_DENY_LIST: any[]
   COURSE_ID: string | number

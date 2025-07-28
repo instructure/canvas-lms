@@ -109,6 +109,7 @@ describe('events', () => {
           return false
         })
         subject()
+         
         expect(ReactDOM.render).toHaveBeenCalled()
       })
     })
@@ -132,7 +133,7 @@ describe('events', () => {
             <span id="mentions-marker" contenteditable="true">wes</span>
             <span id="mention-menu"></span>
           </span>
-        </div>`
+        </div>`,
       )
 
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
@@ -159,7 +160,7 @@ describe('events', () => {
               <span id="mentions-marker" contenteditable="true" aria-activedescendant="test"->wes</span>
               <span id="mention-menu"></span>
             </span>
-          </div>`
+          </div>`,
         )
       })
 
@@ -181,7 +182,7 @@ describe('events', () => {
               <span id="mentions-marker" contenteditable="true" aria-activedescendant="test"->wes</span>
               <span id="mention-menu"></span>
             </span>
-          </div>`
+          </div>`,
         )
       })
 
@@ -262,7 +263,7 @@ describe('events', () => {
               subject: expectedMessageType,
               value: expectedValue,
             },
-            'https://canvas.instructure.com'
+            'https://canvas.instructure.com',
           )
         })
       }
@@ -311,7 +312,7 @@ describe('events', () => {
               name: 'Test User',
               _id: '12345',
             },
-            editor
+            editor,
           )
         })
 
@@ -342,7 +343,7 @@ describe('events', () => {
               name: 'Test User',
               _id: '12345',
             },
-            editor
+            editor,
           )
         })
 
@@ -405,7 +406,7 @@ describe('events', () => {
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
-        </div>`
+        </div>`,
       )
 
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
@@ -420,7 +421,7 @@ describe('events', () => {
           subject: 'mentions.InputChangeEvent',
           value: 'wes',
         },
-        'https://canvas.instructure.com'
+        'https://canvas.instructure.com',
       )
     })
 
@@ -474,7 +475,7 @@ describe('events', () => {
             <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
           <span id="mention-menu"></span>
-        </div>`
+        </div>`,
       )
     })
 
@@ -516,7 +517,7 @@ describe('events', () => {
           <span id="test"> @
             <span id="mentions-marker" contenteditable="true">wes</span>
           </span>
-        </div>`
+        </div>`,
       )
 
       editor.selection.select(editor.dom.select('#mentions-marker')[0])
@@ -525,7 +526,7 @@ describe('events', () => {
     it('sets the active descendant attribute', () => {
       subject()
       expect(
-        editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+        editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant'),
       ).toEqual('#foo')
     })
 
@@ -537,7 +538,7 @@ describe('events', () => {
     it('sets the data-displayName attribute', () => {
       subject()
       expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
-        'Test User'
+        'Test User',
       )
     })
 
@@ -547,14 +548,14 @@ describe('events', () => {
       it('sets the active descendant attribute to an empty string', () => {
         subject()
         expect(
-          editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant')
+          editor.dom.select('#mentions-marker')[0].getAttribute('aria-activedescendant'),
         ).toEqual('')
       })
 
       it('sets the data-displayname attribute to an empty string', () => {
         subject()
         expect(editor.dom.select('#mentions-marker')[0].getAttribute('data-displayName')).toEqual(
-          ''
+          '',
         )
       })
 

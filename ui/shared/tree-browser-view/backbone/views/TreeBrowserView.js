@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import $ from 'jquery'
 import {uniqueId} from 'lodash'
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/TreeBrowser.handlebars'
 import TreeView from './TreeView'
 
-const I18n = useI18nScope('treeBrowser')
+const I18n = createI18nScope('treeBrowser')
 
 extend(TreeBrowserView, Backbone.View)
 
@@ -284,7 +282,7 @@ TreeBrowserView.prototype.activateCurrent = function ($current) {
   return $.screenReaderFlashMessage(
     I18n.t('Selected %{subtree}', {
       subtree: $current.attr('aria-label'),
-    })
+    }),
   )
 }
 

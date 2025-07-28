@@ -85,7 +85,13 @@ export default class TrayController {
   }
 
   _applyAudioOptions(audioOptions) {
-    if (!audioOptions.media_object_id || audioOptions.media_object_id === 'undefined') {
+    const hasAttachmentId =
+      audioOptions.attachment_id
+
+    if (
+      !hasAttachmentId &&
+      (!audioOptions.media_object_id || audioOptions.media_object_id === 'undefined')
+    ) {
       return
     }
     const container = this._audioContainer
@@ -93,10 +99,11 @@ export default class TrayController {
       .updateMediaObject({
         media_object_id: audioOptions.media_object_id,
         subtitles: audioOptions.subtitles,
+        attachment_id: audioOptions.attachment_id,
       })
       .then(() => container?.contentWindow.location.reload())
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed updating audio captions', ex)
       })
   }
@@ -106,15 +113,19 @@ export default class TrayController {
 
     this._subtitleListener = new AbortController()
 
-    window.addEventListener('message', (event) => {
-      if (event?.data?.subject === "media_tracks_response") {
-        cb(event?.data?.payload)
-      }
-    }, {signal: this._subtitleListener.signal})
+    window.addEventListener(
+      'message',
+      event => {
+        if (event?.data?.subject === 'media_tracks_response') {
+          cb(event?.data?.payload)
+        }
+      },
+      {signal: this._subtitleListener.signal},
+    )
 
     this._audioContainer?.contentWindow?.postMessage(
       {subject: 'media_tracks_request'},
-      bridge.canvasOrigin
+      bridge.canvasOrigin,
     )
   }
 
@@ -139,7 +150,7 @@ export default class TrayController {
         onDismiss={() => this._dismissTray()}
         open={this._shouldOpen}
         trayProps={trayProps}
-        requestSubtitlesFromIframe={(cb) => this.requestSubtitlesFromIframe(cb)}
+        requestSubtitlesFromIframe={cb => this.requestSubtitlesFromIframe(cb)}
       />
     )
     ReactDOM.render(element, this.container)

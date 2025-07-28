@@ -60,7 +60,7 @@ describe('ExportProgressBar', () => {
           filename: 'test-download-complete',
           completion: 100,
         }}
-      />
+      />,
     )
     expect(getByText('Exporting test-download-complete')).toBeInTheDocument()
     expect(getByText('100%')).toBeInTheDocument()

@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import Modal from '@canvas/react-modal'
 
 import ConnectedAssignmentPicker from './assignment-picker'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {transformScore} from '../score-helpers'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const {object, bool, func} = PropTypes
 
@@ -63,12 +63,12 @@ class AssignmentPickerModal extends React.Component {
       const lowerBound = transformScore(
         target.get('lower_bound'),
         this.props.triggerAssignment,
-        false
+        false,
       )
       const upperBound = transformScore(
         target.get('upper_bound'),
         this.props.triggerAssignment,
-        true
+        true,
       )
       range = I18n.t('%{upper} to %{lower}', {
         upper: upperBound,

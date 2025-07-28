@@ -32,7 +32,7 @@ import {ARIA_ID_TEMPLATES, MARKER_SELECTOR, MARKER_ID} from './constants'
 
 export const name = 'canvas_mentions'
 
-function onInputChange(_e, ed = false) {
+export function onInputChange(_e, ed = false) {
   // editor objects are explicitly passed in unit tests
   const editor = ed || tinymce.activeEditor
   const tinySelection = editor.selection
@@ -44,29 +44,26 @@ function onInputChange(_e, ed = false) {
       'mceInsertContent',
       false,
       `<span role="textbox" id="${MARKER_ID}" aria-label="Mentions Textbox" data-testid="${MARKER_ID}" aria-autocomplete="list" aria-controls="${ARIA_ID_TEMPLATES.ariaControlTemplate(
-        editor.id
-      )}" aria-activedescendant=""></span>`
+        editor.id,
+      )}" aria-activedescendant=""></span>`,
     )
 
     makeMarkerEditable(editor, MARKER_SELECTOR) // Make the mentions marker editable for A11y
   }
 }
 
-export const pluginDefinition = {
-  init(editor) {
-    editor.on('input', onInputChange)
-    editor.on('SetContent', onSetContent)
-    editor.on('KeyDown', onKeyDown)
-    editor.on('KeyUp', onKeyUp)
-    editor.on('MouseDown', onMouseDown)
-    editor.on('Remove', e => {
-      onMentionsExit(e.target)
-      window.removeEventListener('mousedown', onWindowMouseDown)
-    })
-    editor.on('ViewChange', e => onMentionsExit(e.target))
-    window.addEventListener('mousedown', onWindowMouseDown)
-  },
+export const CanvasMentionsPlugin = editor => {
+  editor.on('input', onInputChange)
+  editor.on('SetContent', onSetContent)
+  editor.on('KeyDown', onKeyDown)
+  editor.on('KeyUp', onKeyUp)
+  editor.on('MouseDown', onMouseDown)
+  editor.on('Remove', e => {
+    onMentionsExit(e.target)
+    window.removeEventListener('mousedown', onWindowMouseDown)
+  })
+  editor.on('ViewChange', e => onMentionsExit(e.target))
+  window.addEventListener('mousedown', onWindowMouseDown)
 }
 
-tinymce.create('tinymce.plugins.CanvasMentionsPlugin', pluginDefinition)
-tinymce.PluginManager.add(name, tinymce.plugins.CanvasMentionsPlugin)
+tinymce.PluginManager.add(name, CanvasMentionsPlugin)

@@ -35,7 +35,7 @@ module Lti::IMS
 
     def serialize_context
       {
-        id: Lti::Asset.opaque_identifier_for(unwrap(page[:context])),
+        id: Lti::V1p1::Asset.opaque_identifier_for(unwrap(page[:context])),
         label: page[:context].context_label,
         title: page[:context].context_title,
       }.compact
@@ -119,7 +119,7 @@ module Lti::IMS
         email: (user.email if page[:tool].include_email?),
         lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
         user_id: user.past_lti_ids.first&.user_lti_id || user.lti_id,
-        lti11_legacy_user_id: Lti::Asset.opaque_identifier_for(user),
+        lti11_legacy_user_id: Lti::V1p1::Asset.opaque_identifier_for(user),
         roles: enrollment.lti_roles
       }.compact
     end
@@ -144,7 +144,7 @@ module Lti::IMS
             return_url: nil,
             opts: {
               # See #variable_expander for additional constraints on custom param expansion
-              claim_group_whitelist: %i[public i18n custom_params],
+              claim_group_whitelist: %i[public i18n custom_params lti11_legacy_user_id],
               extension_whitelist: [:canvas_user_id, :canvas_user_login_id],
               resource_link: page[:opts][:rlid].present? ? Lti::ResourceLink.find_by(resource_link_uuid: page[:opts][:rlid]) : nil
             }

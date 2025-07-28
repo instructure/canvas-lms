@@ -19,24 +19,25 @@
 
 import React, {useState, useRef, Suspense} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
-const CanvasRce = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    '@canvas/rce/react/CanvasRce'
-  )
+const CanvasRce = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      '@canvas/rce/react/CanvasRce'
+    ),
 )
 
-const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
+const OutcomesRceField = ({onChangeHandler, defaultContent = ''}) => {
   const [isLoadingRce, setIsLoadingRce] = useState(true)
   const rceRef = useRef(null)
   const spinner = (
-    <View display="block" textAlign="center">
+    <View display="block" textAlign="center" data-testid="rce-loading-spinner">
       <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('Loading...')} />
     </View>
   )
@@ -71,10 +72,6 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
 OutcomesRceField.propTypes = {
   defaultContent: PropTypes.string,
   onChangeHandler: PropTypes.func.isRequired,
-}
-
-OutcomesRceField.defaultProps = {
-  defaultContent: '',
 }
 
 export default OutcomesRceField

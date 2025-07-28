@@ -21,11 +21,13 @@ require_relative "../common"
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
+  include ItemsAssignToTray
 
   context "Navigation" do
     def edit_page(edit_text)
@@ -92,9 +94,42 @@ describe "Wiki Pages" do
       keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
 
-    it "alerts a teacher when accessing a non-existant page", priority: "1" do
+    it "alerts a teacher when accessing a non-existent page", priority: "1" do
       get "/courses/#{@course.id}/pages/fake"
       expect_flash_message :info
+    end
+
+    it "displays error if no title on submit", :ignore_js_errors, priority: "1" do
+      @course.wiki_pages.create!(title: "Page1")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      wiki_page_title_input.clear
+      f("form.edit-form button.submit").click
+      wait_for_ajaximations
+      expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
+    end
+
+    it "displays error if no title on save and publish", :ignore_js_errors, priority: "1" do
+      @course.wiki_pages.create!(title: "Page1", workflow_state: "unpublished")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      wiki_page_title_input.clear
+      f(".save_and_publish").click
+      wait_for_ajaximations
+      expect(f('[id*="TextInput-messages"]')).to include_text "Title must contain at least one letter or number"
+    end
+
+    it "changes Save button state based on publish_at state" do
+      Account.site_admin.enable_feature!(:scheduled_page_publication)
+      @course.wiki_pages.create!(title: "Page1", workflow_state: "unpublished")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      publish_at_input.send_keys("invalid date")
+      # blurs the input
+      wiki_page_title_input.click
+      expect(submit_button).to be_disabled
+
+      publish_at_input.clear
+      publish_at_input.send_keys(Time.zone.now)
+      wiki_page_title_input.click
+      expect(submit_button).not_to be_disabled
     end
 
     it "updates with changes made in other window", custom_timeout: 40.seconds, priority: "1" do
@@ -137,14 +172,78 @@ describe "Wiki Pages" do
       course_with_teacher_logged_in
     end
 
+    context "infinite scrolling" do
+      before do
+        90.times do |i|
+          @course.wiki_pages.create!(title: "Page#{i}")
+        end
+      end
+
+      def wait_for_index_page_load
+        wait_for(method: nil, timeout: 5) { f(".paginatedLoadingIndicator").attribute("style").include?("display: none") }
+        wait_for_animations
+      end
+
+      context "top_navigation_placement feature flag is enabled" do
+        before do
+          Account.default.enable_feature!(:top_navigation_placement)
+        end
+
+        it "can scroll down to bottom of page to load more pages" do
+          get "/courses/#{@course.id}/pages"
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 60
+
+          scroll_page_to_bottom
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 90
+        end
+
+        it "can scroll and more pages after refreshing the page" do
+          get "/courses/#{@course.id}/pages"
+          refresh_page
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 60
+          scroll_page_to_bottom
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 90
+        end
+      end
+
+      context "top_navigation_placement feature flag is disabled" do
+        before do
+          Account.default.disable_feature!(:top_navigation_placement)
+        end
+
+        it "can scroll down to bottom of page to load more pages" do
+          get "/courses/#{@course.id}/pages"
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 60
+          scroll_page_to_bottom
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 90
+        end
+
+        it "can scroll and more pages after refreshing the page" do
+          get "/courses/#{@course.id}/pages"
+          refresh_page
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 60
+          scroll_page_to_bottom
+          wait_for_index_page_load
+          expect(ff(".wiki-page-link").length).to eq 90
+        end
+      end
+    end
+
     it "edits page title from pages index", priority: "1" do
       @course.wiki_pages.create!(title: "B-Team")
       get "/courses/#{@course.id}/pages"
       f("tbody .al-trigger").click
       f(".edit-menu-item").click
-      expect(f(".edit-control-text").attribute(:value)).to include("B-Team")
-      f(".edit-control-text").clear
-      f(".edit-control-text").send_keys("A-Team")
+      expect(f('[data-testid="wikiTitleEditModal"] input').attribute(:value)).to include("B-Team")
+      f('[data-testid="wikiTitleEditModal"] input').clear
+      f('[data-testid="wikiTitleEditModal"] input').send_keys("A-Team")
       fj('button:contains("Save")').click
       expect(f(".collectionViewItems")).to include_text("A-Team")
     end
@@ -182,6 +281,37 @@ describe "Wiki Pages" do
 
       driver.action.move_by(10, 10).perform
       expect(element_exists?(element_selector)).to be_truthy
+    end
+
+    context "Assign To differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+      end
+
+      it "can assign wiki-pages to differentiation tags" do
+        @course.wiki_pages.create!(title: "B-Team")
+        get "/courses/#{@course.id}/pages"
+        f("tbody .al-trigger").click
+        fj("[role=menuitem]:contains('Assign To...')").click
+        f(add_assign_to_card_selector).click
+        assignee_selector = ff("[data-testid='assignee_selector']")[1]
+        assignee_selector.send_keys("Differentiation Tag 1")
+        assignee_selector.send_keys(:enter)
+        save_button.click
+
+        # Reopen tray and verify that it saved
+        f("tbody .al-trigger").click
+        fj("[role=menuitem]:contains('Assign To...')").click
+        expect(assign_to_in_tray("Remove #{@diff_tag1.name}")[0]).to be_displayed
+      end
     end
   end
 
@@ -221,7 +351,7 @@ describe "Wiki Pages" do
       wait_for_ajaximations
       # validation
       lock_explanation = f(".lock_explanation").text
-      expect(lock_explanation).to include "This page is locked until"
+      expect(lock_explanation).to include "This page is part of the module #{mod2.name} and hasn't been unlocked yet."
       expect(lock_explanation).to include "The following requirements need to be completed before this page will be unlocked:"
     end
 
@@ -250,6 +380,25 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages/foo"
 
       expect(f("#content")).not_to contain_css(".view_all_pages")
+    end
+
+    it "displays To-Do Date in user's time zone" do
+      @user.time_zone = "Alaska"
+      @user.save!
+      Time.use_zone("UTC") do
+        # Use a fixed time to avoid boundary issues (middle of the day, middle of the month)
+        # Use a time with minutes to avoid formatting ambiguity (6:30pm vs 6pm)
+        todo_date = Time.zone.parse("2024-07-15 18:30:00")
+        @course.wiki_pages.create!(title: "todo", todo_date:)
+        get "/courses/#{@course.id}/pages/todo"
+        Time.use_zone("Alaska") do
+          # The UI uses the date_at_time format which is "%b %-d at %l:%M%P"
+          # Convert UTC time to Alaska time before formatting
+          expected_date = todo_date.in_time_zone("Alaska").strftime("%b %-d at %l:%M%P").strip
+          elm = find_by_test_id("friendly-date-time")
+          expect(elm).to include_text "To-Do Date: #{expected_date}"
+        end
+      end
     end
   end
 

@@ -27,7 +27,7 @@
 #       "description": "",
 #       "properties": {
 #         "type": {
-#           "description": "one of 'must_view', 'must_submit', 'must_contribute', 'min_score', 'must_mark_done'",
+#           "description": "one of 'must_view', 'must_submit', 'must_contribute', 'min_score', 'min_percentage', 'must_mark_done'",
 #           "example": "min_score",
 #           "type": "string",
 #           "allowableValues": {
@@ -36,6 +36,7 @@
 #               "must_submit",
 #               "must_contribute",
 #               "min_score",
+#               "min_percentage",
 #               "must_mark_done"
 #             ]
 #           }
@@ -43,6 +44,11 @@
 #         "min_score": {
 #           "description": "minimum score required to complete (only present when type == 'min_score')",
 #           "example": 10,
+#           "type": "integer"
+#         },
+#         "min_percentage": {
+#           "description": "minimum percentage required to complete (only present when type == 'min_percentage')",
+#           "example": 70,
 #           "type": "integer"
 #         },
 #         "completed": {
@@ -271,7 +277,10 @@ class ContextModuleItemsApiController < ApplicationController
       route = polymorphic_url([:api_v1, @context, mod, :items])
       scope = mod.content_tags_visible_to(@student || @current_user)
       scope = ContentTag.search_by_attribute(scope, :title, params[:search_term])
-      items = Api.paginate(scope, self, route)
+      # with modules_perf flag enabled we call the api with the only[]=title (and maybe others) param
+      # in this case we want all the items because we're using the api to get a list of all
+      # the items in the module
+      items = params[:only] ? scope.to_a : Api.paginate(scope, self, route)
       prog = @student ? mod.evaluate_for(@student) : nil
       includes = Array(params[:include])
       opts = {}
@@ -281,7 +290,8 @@ class ContextModuleItemsApiController < ApplicationController
       if includes.include?("mastery_paths")
         opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
-      opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
+      opts[:can_view_published] = @context.grants_right?(@student || @current_user, session, :read_as_admin)
+      opts[:can_have_estimated_time] = @context.horizon_course?
       render json: items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
@@ -307,8 +317,12 @@ class ContextModuleItemsApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       get_module_item
+      opts = { can_view_published: @context.grants_right?(@student || @current_user, session, :read_as_admin) }
+      if @context.horizon_course?
+        opts[:can_have_estimated_time] = true
+        @item.context_module_action(@current_user, :read) if @current_user
+      end
       prog = @student ? @module.evaluate_for(@student) : nil
-      opts = { can_view_published: @context.grants_right?((@student || @current_user), session, :read_as_admin) }
       render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]), opts)
     end
   end
@@ -559,7 +573,7 @@ class ContextModuleItemsApiController < ApplicationController
   #
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
-    return unless @student == @current_user || authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
+    return unless @student == @current_user || authorized_action(@context, @current_user, :manage_assignments_edit)
     return render json: { message: "mastery paths not enabled" }, status: :bad_request unless cyoe_enabled?(@context)
     return render json: { message: "assignment_set_id required" }, status: :bad_request unless params[:assignment_set_id]
 
@@ -741,7 +755,9 @@ class ContextModuleItemsApiController < ApplicationController
           graded: new_tag.graded?,
           content_details: content_details(new_tag, @current_user),
           assignment_id: new_tag.assignment.try(:id),
-          is_duplicate_able: new_tag.duplicate_able?
+          is_checkpointed: new_tag.assignment.try(:has_sub_assignments),
+          is_duplicate_able: new_tag.duplicate_able?,
+          can_manage_assign_to: new_tag.content&.grants_right?(@current_user, session, :manage_assign_to)
         )
         render json:
       else
@@ -788,7 +804,7 @@ class ContextModuleItemsApiController < ApplicationController
 
     if params[:module_item][:completion_requirement].blank?
       reqs[@tag.id] = {}
-    elsif %w[must_view must_submit must_contribute min_score must_mark_done].include?(params[:module_item][:completion_requirement][:type])
+    elsif %w[must_view must_submit must_contribute min_score min_percentage must_mark_done].include?(params[:module_item][:completion_requirement][:type])
       reqs[@tag.id] = params[:module_item][:completion_requirement].to_unsafe_h
     else
       @tag.errors.add(:completion_requirement, t(:invalid_requirement_type, "Invalid completion requirement type"))

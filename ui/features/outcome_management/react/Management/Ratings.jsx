@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -31,7 +31,7 @@ import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyRating from '../MasteryScale/ProficiencyRating'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const ratingsShape = PropTypes.shape({
   key: PropTypes.string,
@@ -119,13 +119,13 @@ const Ratings = ({
         currentIndex === 0 && ratingsCopy.length > 1
           ? (ratingsCopy[currentIndex].focusField = 'trash')
           : ratingsCopy.length === 1
-          ? (ratingsCopy[0].focusField = 'points')
-          : (ratingsCopy[currentIndex - 1].focusField = 'trash')
+            ? (ratingsCopy[0].focusField = 'points')
+            : (ratingsCopy[currentIndex - 1].focusField = 'trash')
 
         return ratingsCopy
       })
     },
-    [onChangeRatings]
+    [onChangeRatings],
   )
 
   const handleMasteryPointsChange = e => onChangeMasteryPoints(e.target.value)
@@ -140,7 +140,7 @@ const Ratings = ({
         >
           <TextInput
             type="text"
-            messages={masteryPoints.error ? [{text: masteryPoints.error, type: 'error'}] : null}
+            messages={masteryPoints.error ? [{text: masteryPoints.error, type: 'newError'}] : null}
             renderLabel={
               <ScreenReaderContent>{I18n.t('Change mastery points')}</ScreenReaderContent>
             }
@@ -329,7 +329,7 @@ const Ratings = ({
                 canManage={canManage}
                 individualOutcome={true}
               />
-            )
+            ),
           )}
           {renderEditMasteryPoints()}
         </>

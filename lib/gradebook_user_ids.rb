@@ -222,9 +222,19 @@ class GradebookUserIds
   end
 
   def students_in_groups(students, group_id_or_group_ids)
-    students.joins(group_memberships: :group)
-            .where(group_memberships: { group: group_id_or_group_ids, workflow_state: :accepted })
-            .merge(Group.active)
+    # this will now return students who belong to regular groups or differentiation tags (aka non_collaborative groups)
+    # that match group_id_or_group_ids
+    # if a consumer supplies an id of a non_collaborative group, we can assume that they have access to that group
+    # in the UI, we already only show non_collaborative groups to users who have access to them
+    group_scope = students.joins(group_memberships: :group)
+                          .where(group_memberships: { group: group_id_or_group_ids, workflow_state: :accepted })
+                          .merge(Group.active)
+    differentiation_tag_scope = students.joins(differentiation_tag_memberships: :group)
+                                        .where(differentiation_tag_memberships: { group: group_id_or_group_ids, workflow_state: :accepted })
+                                        .merge(Group.active)
+    group_ids = group_scope.select(:id)
+    tag_ids   = differentiation_tag_scope.select(:id)
+    students.where(id: group_ids).or(students.where(id: tag_ids))
   end
 
   def sort_by_scores(type = :total_grade, id = nil)

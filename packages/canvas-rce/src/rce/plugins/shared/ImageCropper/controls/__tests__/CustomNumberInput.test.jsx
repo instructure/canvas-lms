@@ -37,7 +37,7 @@ describe('CustomNumberInput', () => {
         processValueCallback={v => (v > 10 ? 10 : v)}
         formatValueCallback={v => `${v}%`}
         {...otherSettings}
-      />
+      />,
     )
 
   it('increment using up arrow', () => {
@@ -85,16 +85,16 @@ describe('CustomNumberInput', () => {
       const input = container.querySelector('label input[type="text"]')
       fireEvent.change(input, {target: {value: '15'}})
       fireEvent.blur(input)
-      const messageContainer = container.querySelector('label > span > span:last-child')
+      const messageContainer = container.querySelector('label > span:last-child')
       expect(messageContainer.textContent).toEqual('')
     })
 
-    it('shows error messages after parsing', async () => {
+    it('shows error messages after parsing', () => {
       const {container} = subject({parseValueCallback: () => null})
       const input = container.querySelector('label input[type="text"]')
       fireEvent.change(input, {target: {value: 'x'}})
       fireEvent.blur(input)
-      const messageContainer = container.querySelector('label > span > span:last-child')
+      const messageContainer = container.querySelector('label div span span span')
       expect(messageContainer.textContent).toEqual('Invalid entry.')
     })
   })
@@ -109,7 +109,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(callback).toHaveBeenCalledWith('10')
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -121,7 +121,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(input.value).toEqual('10%')
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -133,7 +133,7 @@ describe('CustomNumberInput', () => {
         () => {
           expect(onChangeFn).toHaveBeenCalledWith(10)
         },
-        {timeout}
+        {timeout},
       )
     })
 
@@ -153,10 +153,10 @@ describe('CustomNumberInput', () => {
       fireEvent.change(input, {target: {value: 'x'}})
       await waitFor(
         () => {
-          const messageContainer = container.querySelector('label > span > span:last-child')
+          const messageContainer = container.querySelector('label div span span span')
           expect(messageContainer.textContent).toEqual('Invalid entry.')
         },
-        {timeout}
+        {timeout},
       )
     })
   })

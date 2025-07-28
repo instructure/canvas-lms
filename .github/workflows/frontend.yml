@@ -1,0 +1,125 @@
+name: Frontend
+
+on:
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - '.github/workflows/*'
+      - 'package.json'
+      - 'yarn.lock'
+      - 'ui/**'
+      - 'packages/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  depcruise:
+    name: Check Circular Deps
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+      - name: Check Circular Dependencies
+        run: yarn depcruise ./ --include-only "^(ui|packages)"
+
+  eslint:
+    name: Check ESLint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+      - name: Run ESLint Check
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn lint --quiet
+
+  typescript:
+    name: Check TypeScript
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+      - name: Run TypeScript Check
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn tsc --noemit -p tsconfig.json
+
+  ui-tests:
+    name: UI Tests (Shard ${{ matrix.shard }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+      - name: Run Tests (Shard ${{ matrix.shard }})
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn test --shard=${{ matrix.shard }}/16
+
+  package-tests:
+    name: Package Tests
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Packages
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn build:packages
+      - name: Run TypeScript Check
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+        run: yarn wsrun --report -m -l -s -c test

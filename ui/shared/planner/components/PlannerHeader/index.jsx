@@ -47,13 +47,13 @@ import {
   scrollToNewActivity,
   setGradesTrayState,
 } from '../../actions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
 import {observedUserId} from '../../utilities/apiUtils'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class PlannerHeader extends Component {
   static propTypes = {
@@ -82,8 +82,8 @@ export class PlannerHeader extends Component {
         PropTypes.oneOfType([
           /* date */ PropTypes.string,
           PropTypes.arrayOf(/* items */ PropTypes.object),
-        ])
-      )
+        ]),
+      ),
     ),
     ui: PropTypes.shape({
       naiAboveScreen: PropTypes.bool,
@@ -126,7 +126,7 @@ export class PlannerHeader extends Component {
     super(props)
 
     const [newOpportunities, dismissedOpportunities] = this.segregateOpportunities(
-      props.opportunities
+      props.opportunities,
     )
 
     this.state = {
@@ -151,7 +151,7 @@ export class PlannerHeader extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const [newOpportunities, dismissedOpportunities] = this.segregateOpportunities(
-      nextProps.opportunities
+      nextProps.opportunities,
     )
 
     this.loadNextOpportunitiesIfNeeded(nextProps)
@@ -284,7 +284,7 @@ export class PlannerHeader extends Component {
       },
       {
         count: this.state.newOpportunities.length,
-      }
+      },
     )
   }
 

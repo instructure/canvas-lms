@@ -34,7 +34,7 @@ describe "i18n js" do
       skip("FOO-4268")
       # everything except %N %6N %9N %U %V %W %Z
       format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
-      date = Time.now
+      date = Time.zone.now
       expect(driver.execute_script(<<~JS).upcase).to eq date.strftime(format).upcase
         var date = new Date(#{date.strftime("%s")} * 1000 + #{date.strftime("%L").gsub(/^0+/, "")});
         return I18n.strftime(date, '#{format}');

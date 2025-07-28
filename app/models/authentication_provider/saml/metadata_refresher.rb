@@ -20,49 +20,27 @@
 
 require "saml2"
 
-class AuthenticationProvider::SAML::MetadataRefresher
+class AuthenticationProvider::SAML::MetadataRefresher < AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
-      federations = AuthenticationProvider::SAML::Federation.descendants.map { |federation| federation::URN }
+      federations = AuthenticationProvider::SAML::Federation.descendants
+                                                            .reject { |federation| federation::MDQ }
+                                                            .map { |federation| federation::URN }
       providers ||= AuthenticationProvider::SAML.active
                                                 .where.not(metadata_uri: [nil, ""] + federations)
                                                 .shard(shard_scope)
-
-      providers.each do |provider|
-        new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
-        next unless new_data
-
-        provider.populate_from_metadata_xml(new_data)
-        provider.save! if provider.changed?
-      rescue => e
-        level = (e.is_a?(Net::HTTPClientException) && e.response.code.to_i == 404) ? :warn : :error
-        ::Canvas::Errors.capture(e, { tags: { type: "saml_metadata_refresh", auth_provider: provider.global_id } }, level)
-      end
+      super
     end
 
-    protected
+    private
 
-    # returns the new data if it changed, or false if it has not
-    def refresh_if_necessary(provider_key, endpoint, force_fetch: false)
-      if !force_fetch && Canvas.redis_enabled?
-        etag = Canvas.redis.get("saml_#{provider_key}_etag")
-      end
+    def uri_for(provider)
+      effective_metadata_uri = AuthenticationProvider::SAML::Federation
+                               .descendants
+                               .find { |federation| federation::MDQ && provider.metadata_uri == federation::URN }
+                               &.metadata_uri(provider.idp_entity_id)
 
-      headers = {}
-      headers["If-None-Match"] = etag if etag
-      CanvasHttp.get(endpoint, headers) do |response|
-        if response.is_a?(Net::HTTPNotModified)
-          return false
-        end
-
-        # raise on non-success
-        response.value
-        # store new data
-        if Canvas.redis_enabled? && response["ETag"]
-          Canvas.redis.set("saml_#{provider_key}_etag", response["ETag"])
-        end
-        return response.body
-      end
+      effective_metadata_uri || super
     end
   end
 end

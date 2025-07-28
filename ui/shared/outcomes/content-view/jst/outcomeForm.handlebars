@@ -1,19 +1,21 @@
-<form action="{{url}}" class="learning_outcome" method="post">
+<form action="{{url}}" class="learning_outcome" method="post" novalidate>
 
-  <label class="span3" for="title">{{#t "title"}}Name this outcome{{/t}}:</label>
-  <input class="outcome_title span3" name="title" id=title size="50" type="text" value="{{title}}" placeholder="{{#t}}New Outcome{{/t}}">
 
-  <label class="span3" for="display_name">{{#t "display_name"}}Friendly name (optional){{/t}}:</label>
-  <input class="outcome_display_name span3" name="display_name" id=display_name size="50" type="text" value="{{display_name}}">
+  <div class="span6 learning_outcome__margin-left-0">
+    <label class="span3" for="title">{{#t "title"}}Name this outcome{{/t}} *</label>
+    <div id="title_container" class="span3 learning_outcome__margin-left-0" data-initial-value="{{title}}"></div>
+    <label class="span3" for="display_name">{{#t "display_name"}}Friendly name{{/t}} </label>
+    <div id="display_name_container" class="outcome_display_name span3 learning_outcome__margin-left-0" data-initial-value="{{display_name}}"></div>
+  </div>
 
-  <label for="description">{{#t "description"}}Describe this outcome{{/t}}:</label>
+  <label for="description">{{#t "description"}}Describe this outcome{{/t}}</label>
 
   <textarea cols="40" name="description" id=description rows="20" style="display: none; width: 100%; height: 150px;">{{description}}</textarea>
 
   {{#unless hideMasteryScale}}
     <label>
       <div style="display: flex">
-        <div id='criterion_rating_label' style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}:</div>
+        <div id='criterion_rating_label' style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}</div>
         <div id="react-info-link"></div>
       </div>
     </label>
@@ -41,12 +43,12 @@
         </tr>
       </tbody>
     </table>
-    <div>
-      <label for="mastery_points" style="display: inline">{{#t "mastery"}}Mastery at{{/t}}:</label>
-      <input type="text" name="mastery_points" style="width: 20px;" class="mastery_points" id="mastery_points" value="{{n mastery_points precision=2 strip_insignificant_zeros=true}}">
+    <div class="learning_outcome__mastery_points_wrap">
+      <label for="mastery_points" class="learning_outcome__mastery_points__label">{{#t "mastery"}}Mastery at{{/t}}* </label>
+      <span id="mastery_point_container" data-initial-value="{{n mastery_points precision=2 strip_insignificant_zeros=true}}"></span>
     </div>
     <div>
-      <label for="calculation_method" style="display: inline">{{#t "calculation_method"}}Calculation Method{{/t}}:</label>
+      <label for="calculation_method" style="display: inline">{{#t "calculation_method"}}Calculation Method{{/t}}</label>
       <select name="calculation_method" class="calculation_method" id="calculation_method" data-calculation-method="{{calculation_method}}" value="{{calculation_method}}">
         {{#each calculationMethods}}
           <option value="{{@key}}" {{ selectedIf @key ../calculation_method }}>

@@ -21,6 +21,7 @@ import {showFlashAlert} from '../common/FlashAlert'
 import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
 import {parseUrlOrNull} from '../util/url-util'
+import psl from 'psl'
 
 const youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
 export function youTubeID(path) {
@@ -33,9 +34,13 @@ export function youTubeID(path) {
 
 export function getTld(hostname) {
   hostname = (hostname || '').split(':')[0]
-  const parts = hostname.split('.'),
-    length = parts.length
-  return (length > 1 ? [parts[length - 2], parts[length - 1]] : parts).join('.')
+  if (hostname.includes('inseng.test')) {
+    const parts = hostname.split('.')
+    return parts.slice(-3).join('.')
+  }
+
+  const parsed = psl.parse(hostname)
+  return parsed.domain || hostname
 }
 
 export function isExternalLink(element, canvasOrigin = window.location.origin) {
@@ -98,12 +103,25 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
     event.preventDefault()
     const url = new URL(target.href)
     const verifier = url?.searchParams.get('verifier')
+    const access_token = url?.searchParams.get('access_token')
+    const instfs_id = url?.searchParams.get('instfs_id')
+    const location = url?.searchParams.get('location')
     const file_id = matches[1]
+
+    const params = {subject: 'preview_file', file_id}
+    if (verifier) params.verifier = verifier
+    if (access_token && instfs_id) {
+      params.access_token = access_token
+      params.instfs_id = instfs_id
+    }
+    if (location) {
+      params.location = location
+    }
     // TODO:
-    // 1. what window should be be using
+    // 1. what window should we be using
     // 2. is that the right origin?
     // 3. this is temporary until we can decouple the file previewer from canvas
-    window.top.postMessage({subject: 'preview_file', file_id, verifier}, canvasOrigin)
+    window.top.postMessage(params, canvasOrigin)
   }
 }
 
@@ -131,7 +149,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
       method: 'GET',
       headers: {Accept: 'application/json'},
       credentials: 'include',
-    }
+    },
   )
     .then(response => {
       if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -187,7 +205,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         message: formatMessage('Failed getting file contents'),
         type: 'error',
       })
-      // eslint-disable-next-line no-console
+
       console.error(ex)
       resetInlinePreview($link)
 

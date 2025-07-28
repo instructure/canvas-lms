@@ -63,7 +63,7 @@ it('sets loading states on GETTING_WEEK_ITEMS', () => {
 it('leaves loadingError in place on GETTING_WEEK_ITEMS', () => {
   const newState = loadingReducer(
     initialState({loadingError: 'whoops!'}),
-    Actions.gettingWeekItems()
+    Actions.gettingWeekItems(),
   )
   expect(newState).toMatchObject({loadingError: 'whoops!'})
 })
@@ -76,7 +76,7 @@ it('sets loading states on GETTING_INIT_WEEK_ITEMS', () => {
 it('leaves loadingError in place on GETTING_INIT_WEEK_ITEMS', () => {
   const newState = loadingReducer(
     initialState({loadingError: 'whoops!'}),
-    Actions.gettingInitWeekItems()
+    Actions.gettingInitWeekItems(),
   )
   expect(newState).toMatchObject({loadingError: 'whoops!'})
 })
@@ -163,7 +163,7 @@ it('purges complete days from partial days on GOT_DAYS_SUCCESS', () => {
     Actions.gotDaysSuccess([
       ['2017-12-18', []],
       ['2017-12-17', []],
-    ])
+    ]),
   )
   expect(newState).toMatchObject({
     partialFutureDays: [['2017-12-20', [{id: 1}]]],
@@ -178,7 +178,7 @@ it('sets only futureNextUrl from response on GOT_PARTIAL_FUTURE_DAYS when loadin
     state,
     Actions.gotPartialFutureDays([], {
       ...linkHeader('someurl'),
-    })
+    }),
   )
   expect(newState).toMatchObject({
     futureNextUrl: 'someurl',
@@ -197,7 +197,7 @@ it('sets only futureNextUrl from response on initial GOT_PARTIAL_FUTURE_DAYS', (
     state,
     Actions.gotPartialFutureDays([], {
       ...linkHeader('futureNextUrl'),
-    })
+    }),
   )
   expect(newState).toMatchObject({
     futureNextUrl: 'futureNextUrl',
@@ -212,7 +212,7 @@ it('sets pastNextUrl from response on GOT_PARTIAL_PAST_DAYS', () => {
     state,
     Actions.gotPartialPastDays([], {
       ...linkHeader('someurl'),
-    })
+    }),
   )
   expect(newState).toMatchObject({
     futureNextUrl: 'original',
@@ -325,7 +325,7 @@ it('sets nextWeekUrl from response on GOT_PARTIAL_WEEK_DAYS', () => {
     state,
     Actions.gotPartialWeekDays([], {
       ...linkHeader('someurl'),
-    })
+    }),
   )
   expect(newState).toMatchObject({
     weekNextUrl: 'someurl',
@@ -372,7 +372,7 @@ it('resets loading state on CLEAR_LOADING', () => {
       partialFutureDays: [],
       partialWeekDays: [{}],
     }),
-    Actions.clearLoading()
+    Actions.clearLoading(),
   )
   expect(newState).toMatchObject({
     futureNextUrl: null,

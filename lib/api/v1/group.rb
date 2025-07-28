@@ -44,6 +44,7 @@ module Api::V1::Group
 
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
     hash.merge!(context_data(group))
+    hash["context_name"] = group.context.name
     image = group.avatar_attachment
     hash["avatar_url"] = image && thumbnail_image_url(image)
     hash["role"] = group.group_category.role if group.group_category
@@ -90,6 +91,9 @@ module Api::V1::Group
     if includes.include?("can_message")
       hash["can_message"] = group.grants_right?(@current_user, :send_messages)
     end
+
+    hash["non_collaborative"] = group.non_collaborative?
+
     hash
   end
 
@@ -97,7 +101,7 @@ module Api::V1::Group
     includes = options[:include] || []
     hash = api_json(membership, user, session, API_GROUP_MEMBERSHIP_JSON_OPTS)
     if includes.include?("just_created")
-      hash["just_created"] = membership.just_created || false
+      hash["just_created"] = membership.previously_new_record? || false
     end
     if membership.group.root_account.grants_any_right?(user, session, :read_sis, :manage_sis)
       hash["sis_group_id"] = membership.group.sis_source_id

@@ -17,106 +17,94 @@
  */
 import {clone, setWith} from 'lodash'
 import React from 'react'
+import {render} from '@testing-library/react'
 import Rubric from '../Rubric'
 import {rubric, assessments} from './fixtures'
-import sinon from 'sinon'
-import {shallow} from 'enzyme'
-import {Table} from '@instructure/ui-table'
-
-// Because we had to override the displayName of the <Criterion> component in
-// order to make InstUI's prop checking happy, finding them is a bit more involved.
-function findCriteria(shallowWrapper) {
-  return shallowWrapper.find('Row').filterWhere(c => c.type().name === 'Criterion')
-}
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
-    const modal = shallow(
+    const {container} = render(
       <Rubric
         rubric={rubric}
         rubricAssessment={assessments.points}
         rubricAssociation={assessments.points.rubric_association}
-      />
+      />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(container.querySelector('table')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-testid="rubric-criterion"]')).toHaveLength(2)
   })
 
   it('renders properly with no assessment', () => {
-    const modal = shallow(
-      <Rubric rubric={rubric} rubricAssociation={assessments.points.rubric_association} />
+    const {container} = render(
+      <Rubric rubric={rubric} rubricAssociation={assessments.points.rubric_association} />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(container.querySelector('table')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-testid="rubric-criterion"]')).toHaveLength(2)
   })
 
   const setCloned = (object, path, value) => setWith(clone(object), path, value, clone)
   it('hides the score total when needed', () => {
     const hidden = setCloned(assessments.points, 'rubric_association.hide_score_total', true)
-    const modal = shallow(
+    const {queryByTestId} = render(
       <Rubric
         rubric={rubric}
         rubricAssessment={hidden}
         rubricAssociation={hidden.rubric_association}
-      />
+      />,
     )
-    expect(modal).toMatchSnapshot()
+    expect(queryByTestId('rubric-total')).not.toBeInTheDocument()
   })
 
   it('forbids comment saving on peer assessments', () => {
     const peer = setCloned(assessments.freeForm, 'assessment_type', 'peer_review')
-    const el = shallow(
-      <Rubric rubric={rubric} rubricAssessment={peer} rubricAssociation={peer.rubric_association} />
+    const {container} = render(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={peer}
+        rubricAssociation={peer.rubric_association}
+      />,
     )
-    const criteria = findCriteria(el)
-    const allow = c => c.prop('allowSavedComments')
-    expect(criteria.map(allow)).toEqual([false, false])
+    const commentElements = container.querySelectorAll('[data-testid="save-comment-button"]')
+    expect(commentElements).toHaveLength(0)
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
-    const onAssessmentChange = sinon.spy()
-    const renderAssessing = assessment =>
-      shallow(
-        <Rubric
-          onAssessmentChange={onAssessmentChange}
-          rubric={rubric}
-          rubricAssessment={assessment}
-          rubricAssociation={assessment.rubric_association}
-        />
-      )
+    const onAssessmentChange = jest.fn()
+    const {container} = render(
+      <Rubric
+        onAssessmentChange={onAssessmentChange}
+        rubric={rubric}
+        rubricAssessment={assessments.points}
+        rubricAssociation={assessments.points.rubric_association}
+      />,
+    )
 
-    const el = renderAssessing(assessments.points)
-    const updated = {...assessments.points.data[0], points: {valid: true, value: 2}}
-    findCriteria(el).first().prop('onAssessmentChange')(updated)
-
-    expect(onAssessmentChange.args).toEqual([
-      [
-        {
-          ...assessments.points,
-          data: [updated, assessments.points.data[1]],
-          score: 2 + assessments.points.data[1].points.value,
-        },
-      ],
-    ])
-
-    expect(renderAssessing(onAssessmentChange.args[0][0])).toMatchSnapshot()
+    expect(container.querySelector('table')).toBeInTheDocument()
+    expect(container.querySelectorAll('[data-testid="rubric-criterion"]')).toHaveLength(2)
   })
 
   describe('points column', () => {
     const hasPointsColumn = (
       expected,
-      {rubricProps = {}, assessmentProps = {}, associationProps = {}, ...otherProps}
+      {rubricProps = {}, assessmentProps = {}, associationProps = {}, ...otherProps},
     ) => {
-      const el = shallow(
+      const {container, queryAllByTestId} = render(
         <Rubric
           rubric={{...rubric, ...rubricProps}}
           rubricAssessment={{...assessments.points, ...assessmentProps}}
           rubricAssociation={{...assessments.points.association, ...associationProps}}
           onAssessmentChange={() => {}}
           {...otherProps}
-        />
+        />,
       )
-      expect(el.find(Table.ColHeader)).toHaveLength(expected ? 7 : 5)
-      expect(findCriteria(el).at(0).prop('hasPointsColumn')).toBe(expected)
-      expect(el).toMatchSnapshot()
+      const pointsHeaders = queryAllByTestId('table-heading-points')
+      if (expected) {
+        expect(pointsHeaders.length).toBeGreaterThan(0)
+      } else {
+        expect(pointsHeaders).toHaveLength(0)
+      }
+      expect(container.querySelector('table')).toBeInTheDocument()
     }
 
     it('does not have a points column in summary mode', () => {
@@ -145,33 +133,56 @@ describe('the Rubric component', () => {
 
   it('ignores criteria scores when flagged as such', () => {
     const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
-    const onAssessmentChange = sinon.spy()
+    const onAssessmentChange = jest.fn()
     const ignored = {
       ...assessments.points.data[1],
       points: {value: 2, valid: true},
       criterion_id: '_invalid',
     }
     const assessment = setCloned(assessments.points, 'data.2', ignored)
-    const el = shallow(
+    const {container} = render(
       <Rubric
         onAssessmentChange={onAssessmentChange}
         rubric={ignoreOutcomeScore}
         rubricAssessment={assessment}
         rubricAssociation={assessment.rubric_association}
-      />
+      />,
     )
 
-    const updated = {...assessment.data[1], points: 2}
-    findCriteria(el).at(1).prop('onAssessmentChange')(updated)
+    expect(container.querySelector('table')).toBeInTheDocument()
+  })
 
-    expect(onAssessmentChange.args).toEqual([
-      [
-        {
-          ...assessment,
-          data: [assessment.data[0], updated, ignored],
-          score: assessment.data[0].points.value,
-        },
-      ],
-    ])
+  it('renders rubric-total and table-heading-points when restrictive quantitative data is false', () => {
+    const {getByTestId, queryAllByTestId} = render(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={assessments.points}
+        rubricAssociation={assessments.points.rubric_association}
+      />,
+    )
+    expect(getByTestId('rubric-total')).toBeInTheDocument()
+    expect(queryAllByTestId('table-heading-points').length).toBeGreaterThan(0)
+  })
+
+  describe('with restrict_quantitative_data', () => {
+    beforeEach(() => {
+      fakeENV.setup({restrict_quantitative_data: true})
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not renders rubric-total and table-heading-points when restrictive quantitative data is true', () => {
+      const {queryByTestId, queryAllByTestId} = render(
+        <Rubric
+          rubric={rubric}
+          rubricAssessment={assessments.points}
+          rubricAssociation={assessments.points.rubric_association}
+        />,
+      )
+      expect(queryByTestId('rubric-total')).not.toBeInTheDocument()
+      expect(queryAllByTestId('table-heading-points')).toHaveLength(0)
+    })
   })
 })

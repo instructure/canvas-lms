@@ -19,7 +19,7 @@
 import {screen as _screen} from '@testing-library/dom'
 
 export const getAutomaticallyApplyGradeForMissingSubmissionsCheckbox = (
-  screen: typeof _screen
+  screen: typeof _screen,
 ): HTMLInputElement => {
   return screen.getByRole('checkbox', {
     name: 'Automatically apply grade for missing submissions',
@@ -28,7 +28,7 @@ export const getAutomaticallyApplyGradeForMissingSubmissionsCheckbox = (
 }
 
 export const getAutomaticallyApplyDeductionToLateSubmissionsCheckbox = (
-  screen: typeof _screen
+  screen: typeof _screen,
 ): HTMLInputElement => {
   return screen.getByRole('checkbox', {
     name: 'Automatically apply deduction to late submissions',
@@ -37,25 +37,25 @@ export const getAutomaticallyApplyDeductionToLateSubmissionsCheckbox = (
 }
 
 export const getGradePercentageForMissingSubmissionsInput = (
-  screen: typeof _screen
+  screen: typeof _screen,
 ): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Grade for missing submissions', hidden: true})
+  return screen.getByTestId('missing-submission-grade')
 }
 
 export const getLateSubmissionDeductionPercentInput = (
-  screen: typeof _screen
+  screen: typeof _screen,
 ): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Late submission deduction', hidden: true})
+  return screen.getByTestId('late-submission-deduction')
 }
 
 export const getLateSubmissionDeductionIntervalInput = (
-  screen: typeof _screen
+  screen: typeof _screen,
 ): HTMLInputElement => {
   return screen.getByRole('combobox', {name: 'Deduction interval', hidden: true})
 }
 
 export const getLowestPossibleGradePercentInput = (screen: typeof _screen): HTMLInputElement => {
-  return screen.getByRole('textbox', {name: 'Lowest possible grade', hidden: true})
+  return screen.getByTestId('late-submission-minimum-percent')
 }
 
 export const getLatePoliciesTabPanelProps = () => {
@@ -136,6 +136,6 @@ export const getActionMenuProps = () => {
 
 export function findOption(document: Document, label: string) {
   return [...document.querySelectorAll('[role=option]')].find(
-    $el => $el.textContent?.trim() === label
+    $el => $el.textContent?.trim() === label,
   )
 }

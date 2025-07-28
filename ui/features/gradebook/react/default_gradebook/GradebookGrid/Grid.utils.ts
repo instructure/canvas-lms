@@ -24,7 +24,7 @@ export const DEFAULT_COLUMN_SORT_TYPE = 'assignment_group'
 
 export function hideAggregateColumns(
   gradingPeriodSet: CamelizedGradingPeriodSet | null,
-  gradingPeriodId: string
+  gradingPeriodId: string,
 ) {
   if (gradingPeriodSet == null) {
     return false
@@ -41,7 +41,7 @@ export function isFilteringColumnsByGradingPeriod(gradingPeriodId: string) {
 
 export function isInvalidSort(
   modules: Module[],
-  gradebookColumnOrderSettings: ColumnOrderSettings | undefined
+  gradebookColumnOrderSettings: ColumnOrderSettings | undefined,
 ) {
   const sortSettings = gradebookColumnOrderSettings
   if (
@@ -63,7 +63,7 @@ export function isInvalidSort(
 
 export function getColumnOrder(
   modules: Module[],
-  gradebookColumnOrderSettings: ColumnOrderSettings | undefined
+  gradebookColumnOrderSettings: ColumnOrderSettings | undefined,
 ): ColumnOrderSettings {
   if (isInvalidSort(modules, gradebookColumnOrderSettings) || !gradebookColumnOrderSettings) {
     return {
@@ -78,7 +78,7 @@ export function getColumnOrder(
 
 export function listRowIndicesForStudentIds(
   rows: GradebookStudent,
-  studentIds: string[]
+  studentIds: string[],
 ): number[] {
   const rowIndicesByStudentId = rows.reduce(
     (
@@ -86,12 +86,12 @@ export function listRowIndicesForStudentIds(
         [studentId: string]: number
       },
       row: GradebookStudent,
-      index: number
+      index: number,
     ) => {
       map[row.id] = index
       return map
     },
-    {}
+    {},
   )
   return studentIds.map(studentId => rowIndicesByStudentId[studentId])
 }

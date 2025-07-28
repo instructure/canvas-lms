@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_5')
+const I18n = createI18nScope('permissions_templates_5')
 
 export const template = generateActionTemplates(
   [
@@ -39,7 +39,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.',
       ),
     },
     {
@@ -63,11 +63,11 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.',
       ),
     },
     {
       description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
     },
-  ]
+  ],
 )

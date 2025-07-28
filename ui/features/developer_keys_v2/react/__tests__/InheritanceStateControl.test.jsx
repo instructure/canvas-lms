@@ -17,11 +17,21 @@
  */
 
 import React from 'react'
-import moxios from 'moxios'
-import {screen, render, fireEvent} from '@testing-library/react'
+import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import $ from 'jquery'
+
+jest.mock('@canvas/instui-bindings/react/Confirm')
+
+// Mock jQuery flash notification functions
+beforeEach(() => {
+  $.flashError = jest.fn()
+  $.flashMessage = jest.fn()
+  $.flashWarning = jest.fn()
+})
 
 const sampleDeveloperKey = (defaults = {}) => {
   return {
@@ -55,23 +65,15 @@ const renderInheritanceStateControl = (developerKey, store = false, contextId = 
   render(<InheritanceStateControl {...defaultProps(developerKey, store, contextId)} />)
 
 describe('InheritanceStateControl', () => {
-  let oldConfirmation = window.confirm
   let oldFeatures = {}
 
   beforeEach(() => {
-    oldConfirmation = window.confirm
-    window.confirm = jest.fn(() => true)
     window.ENV.FEATURES ||= {}
     oldFeatures = window.ENV.FEATURES
-
-    moxios.install()
   })
 
   afterEach(() => {
-    window.confirm = oldConfirmation
     window.ENV.FEATURES = oldFeatures
-
-    moxios.uninstall()
   })
 
   it('uses the "off" state from the store for a siteadmin key', () => {
@@ -138,7 +140,8 @@ describe('InheritanceStateControl', () => {
     expect(checkedBtn.checked).toBe(false)
   })
 
-  it('updates the state when the RadioInput is clicked', () => {
+  it('updates the state when the RadioInput is clicked', async () => {
+    confirm.mockImplementation(() => Promise.resolve(true))
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -158,12 +161,14 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+    await waitFor(() => {
+      const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
-    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+      expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+    })
   })
 
-  it('updates the state when the Checkbox is clicked', () => {
+  function createStoreAndDevKey() {
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -176,6 +181,29 @@ describe('InheritanceStateControl', () => {
         list: [key],
       },
     })
+    return {store, key}
+  }
+
+  it('updates the state when the Checkbox is clicked', async () => {
+    confirm.mockImplementation(() => Promise.resolve(true))
+    const {key, store} = createStoreAndDevKey()
+
+    renderInheritanceStateControl(key, store)
+
+    const item = screen.getByRole('checkbox')
+    expect(item.checked).toBe(true)
+
+    fireEvent.click(item)
+
+    await waitFor(() => {
+      const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+      expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+    })
+  })
+
+  it('does nothing if cancel is clicked in the confirmation modal', async () => {
+    confirm.mockImplementation(() => Promise.resolve(false))
+    const {key, store} = createStoreAndDevKey()
 
     renderInheritanceStateControl(key, store)
 
@@ -183,33 +211,13 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
+    // It's hard to test "wait for nothing to happen", so just
+    // wait a bit and make sure nothing's changed. This seems to be
+    // enough time such that if the confirm() Promise resolves to true,
+    // this test fails.
+    await new Promise(resolve => setTimeout(resolve, 1))
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
-
-    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
-  })
-
-  it('does nothing if cancel is clicked in the confirmation modal', () => {
-    const key = sampleDeveloperKey({
-      developer_key_account_binding: {
-        developer_key_id: '1',
-        workflow_state: 'on',
-        account_owns_binding: true,
-      },
-    })
-    const store = storeCreator({
-      listDeveloperKeys: {
-        list: [key],
-      },
-    })
-
-    const {getByRole} = renderInheritanceStateControl(key, store)
-    const item = getByRole('checkbox')
-
-    fireEvent.change(item, {target: {checked: true}})
-
-    const devKeyFromStore = store.getState().listDeveloperKeys.list[0]
-
-    expect(devKeyFromStore.developer_key_account_binding.workflow_state).toBe('on')
+    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('on')
   })
 
   const rootAccountCTX = {
@@ -242,7 +250,7 @@ describe('InheritanceStateControl', () => {
         ctx={context}
         store={{dispatch: () => {}}}
         actions={{setBindingWorkflowState: () => {}}}
-      />
+      />,
     )
     return container
   }
@@ -255,7 +263,7 @@ describe('InheritanceStateControl', () => {
 
   it('disabled the checkbox if the account does not own the binding and it is not set and the account is a child account', () => {
     const checkbox = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
-      'input[type="checkbox"]'
+      'input[type="checkbox"]',
     )
 
     expect(checkbox.disabled).toBe(true)
@@ -263,7 +271,7 @@ describe('InheritanceStateControl', () => {
 
   it('enables the radio group if the account does not own the binding and it is not set and the account is not a child account', () => {
     const radioGroup = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
-      'input[type="radio"]'
+      'input[type="radio"]',
     )
 
     expect(radioGroup.disabled).toBeFalsy()
@@ -277,7 +285,7 @@ describe('InheritanceStateControl', () => {
 
   it('the correct state for the developer key for siteadmin', () => {
     const offRadioInput = componentNode(mockDevKey(), siteAdminCTX).querySelector(
-      'input[value="off"]'
+      'input[value="off"]',
     )
 
     expect(offRadioInput.checked).toBe(true)
@@ -299,7 +307,7 @@ describe('InheritanceStateControl', () => {
     const modifiedKey = mockDevKey()
     modifiedKey.developer_key_account_binding = undefined
     const allowRadioInput = componentNode(modifiedKey, siteAdminCTX).querySelector(
-      'input[value="allow"]'
+      'input[value="allow"]',
     )
 
     expect(allowRadioInput.checked).toBe(true)
@@ -311,7 +319,7 @@ describe('InheritanceStateControl', () => {
 
   it('renders an "off" option for siteadmin keys', () => {
     expect(
-      componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="off"]')
+      componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="off"]'),
     ).toBeTruthy()
   })
 
@@ -321,19 +329,19 @@ describe('InheritanceStateControl', () => {
 
   it('renders an "allow" option only for site_admin', () => {
     expect(
-      componentNode(mockDevKey(), siteAdminCTX).querySelector('input[value="allow"]')
+      componentNode(mockDevKey(), siteAdminCTX).querySelector('input[value="allow"]'),
     ).toBeTruthy()
   })
 
   it('do not render an "allow" option only for root-account', () => {
     expect(
-      componentNode(mockDevKey(), rootAccountCTX).querySelector('input[value="allow"]')
+      componentNode(mockDevKey(), rootAccountCTX).querySelector('input[value="allow"]'),
     ).toBeFalsy()
   })
 
   it('renders "allow" if "allow" is set as the workflow state for site admin', () => {
     const allowRadioInput = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
-      'input[value="allow"]'
+      'input[value="allow"]',
     )
 
     expect(allowRadioInput.checked).toBe(true)

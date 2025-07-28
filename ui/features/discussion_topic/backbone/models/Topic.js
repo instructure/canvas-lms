@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend as extend1} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, extend} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -31,7 +29,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 
 const indexOf = [].indexOf
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 const UNKNOWN_AUTHOR = {
   avatar_image_url: null,
@@ -103,11 +101,11 @@ MaterializedDiscussionTopic.prototype.fetch = function (options) {
             baseInterval: 2000,
             maxAttempts: 12,
             backoffFactor: 1.6,
-          }
+          },
         )
         return loader.start()
       }
-    })(this)
+    })(this),
   )
 }
 

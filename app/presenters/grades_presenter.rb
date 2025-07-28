@@ -63,7 +63,7 @@ class GradesPresenter
       # The erb that uses this expects a value for all course ids in the hash. Since they aren't interesting enough to
       # store, we'll make them the empty case default value for the hash. Since its only used in a read only capacity
       # they can be all the exact same object.
-      summaries.each_with_object(Hash.new({ score: nil, students: 0 })) do |(key, value), memo|
+      summaries.each_with_object(Hash.new({ score: nil, students: 0 }.freeze)) do |(key, value), memo|
         memo[key] = value.grades_presenter_hash
       end
     end

@@ -210,7 +210,7 @@ module Turnitin
     def generateReport(submission, asset_string)
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      object_id = submission.turnitin_data.dig(asset_string, :object_id)
       res = nil
       res = sendRequest(:generate_report, 2, oid: object_id, utp: "2", user: course, course:, assignment:) if object_id
       data = {}
@@ -226,7 +226,7 @@ module Turnitin
     def submissionReportUrl(submission, asset_string)
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      object_id = submission.turnitin_data.dig(asset_string, :object_id)
       sendRequest(:generate_report, 1, oid: object_id, utp: "2", user: course, course:, assignment:)
     end
 
@@ -234,7 +234,7 @@ module Turnitin
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      object_id = submission.turnitin_data.dig(asset_string, :object_id)
       sendRequest(:generate_report, 1, oid: object_id, utp: "1", user:, course:, assignment:, tem: email(course))
     end
 
@@ -242,7 +242,7 @@ module Turnitin
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      object_id = submission.turnitin_data.dig(asset_string, :object_id)
       sendRequest(:show_paper, 1, oid: object_id, utp: "1", user:, course:, assignment:, tem: email(course))
     end
 
@@ -250,7 +250,7 @@ module Turnitin
       user = submission.user
       assignment = submission.assignment
       course = assignment.context
-      object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
+      object_id = submission.turnitin_data.dig(asset_string, :object_id)
       sendRequest(:show_paper, 1, oid: object_id, utp: "1", user:, course:, assignment:, tem: email(course))
     end
 

@@ -17,8 +17,8 @@
  */
 
 import React, {useContext, useState, useEffect} from 'react'
-import {useQuery, useMutation} from 'react-apollo'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useQuery as useApolloQuery, useMutation} from '@apollo/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
@@ -30,7 +30,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {ASSIGNMENTS} from '../../graphql/queries'
+import {GRADE_SUMMARY} from '../../graphql/GradeSummary'
 import {
   UPDATE_SUBMISSIONS_READ_STATE,
   UPDATE_RUBRIC_ASSESSMENT_READ_STATE,
@@ -39,8 +39,9 @@ import {
 import AssignmentTable from './AssignmentTable'
 import {getGradingPeriodID} from './utils'
 import {GradeSummaryContext} from './context'
+import {useAssignments} from '../../graphql/Assignments'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const GradeSummaryContainer = () => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -48,25 +49,34 @@ const GradeSummaryContainer = () => {
   const [submissionIdsForRubricUpdate, setSubmissionIdsForRubricUpdate] = useState([])
   const [submissionAssignmentId, setSubmissionAssignmentId] = useState('')
 
+  if (!ENV?.student_id) {
+    throw new Error('No student_id found')
+  }
+
   const gradingPeriod = ENV?.grading_period?.id || getGradingPeriodID()
   const viewingUserId = ENV?.student_id
   const hideTotalRow = ENV?.hide_final_grades
 
-  const variables = {
+  const gradeSummaryVariables = {
     courseID: ENV.course_id,
+    studentId: viewingUserId,
+  }
+
+  const gradeSummaryQuery = useApolloQuery(GRADE_SUMMARY, {
+    variables: gradeSummaryVariables,
+  })
+
+  const assignmentsVariables = {
+    courseID: ENV.course_id,
+    studentId: viewingUserId,
   }
 
   if (gradingPeriod !== undefined) {
-    variables.gradingPeriodID = gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null
+    assignmentsVariables.gradingPeriodId =
+      gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null
   }
 
-  if (viewingUserId !== undefined) {
-    variables.studentId = viewingUserId
-  }
-
-  const assignmentQuery = useQuery(ASSIGNMENTS, {
-    variables,
-  })
+  const assignmentsResult = useAssignments(assignmentsVariables)
 
   const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {
     onCompleted(data) {
@@ -79,8 +89,8 @@ const GradeSummaryContainer = () => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
         setSubmissionIdsForUpdate([])
       }
@@ -101,8 +111,8 @@ const GradeSummaryContainer = () => {
               one: 'Rubric read state Changed!',
               other: 'Rubric read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
         setSubmissionIdsForRubricUpdate([])
       }
@@ -141,7 +151,7 @@ const GradeSummaryContainer = () => {
     return () => clearInterval(interval)
   }, [submissionIdsForRubricUpdate, readStateChangeRubric])
 
-  if (assignmentQuery.loading) {
+  if (gradeSummaryQuery.loading || assignmentsResult.isLoading) {
     return (
       <Flex alignItems="center" justifyItems="center" width="100%">
         <Flex.Item>
@@ -151,12 +161,39 @@ const GradeSummaryContainer = () => {
     )
   }
 
-  if (assignmentQuery.error || !assignmentQuery?.data?.legacyNode) {
+  if (gradeSummaryQuery.error || !gradeSummaryQuery?.data?.legacyNode) {
     return (
       <GenericErrorPage
         imageUrl={errorShipUrl}
         errorSubject={I18n.t('Grade Summary initial query error')}
         errorCategory={I18n.t('Grade Summary Error Page')}
+      />
+    )
+  }
+
+  if (assignmentsResult.isError) {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('Failed to load assignments data')}
+        errorCategory={I18n.t('Grade Summary Error Page')}
+        errorMessage={
+          assignmentsResult.error?.message ||
+          I18n.t('An error occurred while fetching assignments. Please try refreshing the page.')
+        }
+      />
+    )
+  }
+
+  if (!assignmentsResult?.data?.assignments) {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('Assignments data is missing or invalid')}
+        errorCategory={I18n.t('Grade Summary Error Page')}
+        errorMessage={I18n.t(
+          'The assignments data structure is invalid. This could be due to a server-side issue.',
+        )}
       />
     )
   }
@@ -170,8 +207,8 @@ const GradeSummaryContainer = () => {
     const arr = [...submissionIdsForUpdate, submissionID]
     setSubmissionIdsForUpdate(
       arr.filter(
-        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
-      )
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index,
+      ),
     )
   }
 
@@ -180,8 +217,8 @@ const GradeSummaryContainer = () => {
     const arr = [...submissionIdsForRubricUpdate, submissionID]
     setSubmissionIdsForRubricUpdate(
       arr.filter(
-        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index
-      )
+        (item, index) => item !== null && item !== undefined && arr.indexOf(item) === index,
+      ),
     )
   }
 
@@ -200,7 +237,8 @@ const GradeSummaryContainer = () => {
         <GradeSummaryContext.Provider value={gradeSummaryContext}>
           <View as="div" padding="medium">
             <AssignmentTable
-              queryData={assignmentQuery?.data?.legacyNode}
+              queryData={gradeSummaryQuery?.data?.legacyNode}
+              assignmentsData={assignmentsResult?.data}
               layout={layout}
               handleReadStateChange={handleReadStateChange}
               handleRubricReadStateChange={handleRubricReadStateChange}

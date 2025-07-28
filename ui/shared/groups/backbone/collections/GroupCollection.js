@@ -80,13 +80,13 @@ GroupCollection.prototype.fetchAllDriver = function (options) {
   if (options == null) {
     options = {}
   }
-  // eslint-disable-next-line prefer-object-spread
+   
   options.data = Object.assign(
     {
       per_page: 20,
       include: 'can_message',
     },
-    options.data || {}
+    options.data || {},
   )
   return this.fetch(options)
 }

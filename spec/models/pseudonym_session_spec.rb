@@ -70,7 +70,7 @@ describe PseudonymSession do
 
       it "adds a warning message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("Please verify your username or password and try again. After 2 more attempt(s), your account will be locked.")
+        expect(session.errors[:password]).to include("Please verify your username or password and try again. After 2 more attempt(s), your account will be locked.")
       end
     end
 
@@ -79,7 +79,7 @@ describe PseudonymSession do
 
       it "adds a warning message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("Please verify your username or password and try again. After 1 more attempt(s), your account will be locked.")
+        expect(session.errors[:password]).to include("Please verify your username or password and try again. After 1 more attempt(s), your account will be locked.")
       end
     end
 
@@ -88,7 +88,7 @@ describe PseudonymSession do
 
       it "adds a lock message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("We've received several incorrect username or password entries. To protect your account, it has been locked. Please contact your system administrator.")
+        expect(session.errors[:password]).to include("We've received several incorrect username or password entries. To protect your account, it has been locked. Please contact your system administrator.")
       end
     end
 
@@ -97,7 +97,7 @@ describe PseudonymSession do
 
       it "adds a max attempts message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("Too many failed login attempts. Please try again later or contact your system administrator.")
+        expect(session.errors[:password]).to include("Too many failed login attempts. Please try again later or contact your system administrator.")
       end
     end
 
@@ -106,7 +106,7 @@ describe PseudonymSession do
 
       it "adds a rapid attempts message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("You have recently logged in multiple times too quickly. Please wait a few seconds and try again.")
+        expect(session.errors[:password]).to include("You have recently logged in multiple times too quickly. Please wait a few seconds and try again.")
       end
     end
 
@@ -115,7 +115,7 @@ describe PseudonymSession do
 
       it "adds a generic error message to errors" do
         session.validate_by_password
-        expect(session.errors.messages[:password]).to include("Login has been denied for security reasons. Please try again later or contact your system administrator.")
+        expect(session.errors[:password]).to include("Login has been denied for security reasons. Please try again later or contact your system administrator.")
       end
     end
   end

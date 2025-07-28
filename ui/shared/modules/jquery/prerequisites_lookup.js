@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import Spinner from 'spin.js'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('prerequisites_lookup')
+const I18n = createI18nScope('prerequisites_lookup')
 
 let lookupStarted = false
 
@@ -101,18 +101,18 @@ INST.lookupPrerequisites = function () {
       const sentence = I18n.beforeLabel(
         I18n.t(
           'labels.requirements_must_be_completed',
-          'The following requirements need to be completed before this page will be unlocked'
-        )
+          'The following requirements need to be completed before this page will be unlocked',
+        ),
       )
       $link.after(
-        "<br/><h2 style='margin-top: 15px;'>" + htmlEscape(header) + '</h2>' + htmlEscape(sentence)
+        "<br/><h2 style='margin-top: 15px;'>" + htmlEscape(header) + '</h2>' + htmlEscape(sentence),
       )
       $link.prev('a').hide()
     },
     _data => {
       spinner.stop()
       $('.module_prerequisites_fallback').show()
-    }
+    },
   )
 }
 $(document).ready(INST.lookupPrerequisites)

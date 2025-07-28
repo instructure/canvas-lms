@@ -49,6 +49,7 @@ development:
         internal_tool_domain_allowlist:
           - 'docker'
           - 'localhost'
+        canvas_apps_lti_usage_url: "https://example.com" # Change this to your own URL if need be
       math-man:
         base_url: 'http://mathman.docker'
         use_for_svg: 'false'
@@ -56,6 +57,9 @@ development:
       pandata/events:
         enabled_for_canvas: false
         url: 'https://cbbsk4vb5k.execute-api.us-east-1.amazonaws.com/prod/pandata-event' # dev PandataEvents environment
+      learn_platform_global_api:
+        enabled_for_canvas: false
+        url: 'http://127.0.0.1:9292/'
       rich-content-service:
         # if you're running canvas-rce-api on its own
         app-host: "rce.canvas.docker"
@@ -63,6 +67,8 @@ development:
         app-host: "http://rce.canvas.docker:3000"
       common_cartridge_viewer:
         base_url: "http://localhost:3300"
+      csp-logging:
+        # host: "https://<csp-violation-report-endpoint>/submit/csp"
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key
@@ -82,6 +88,14 @@ development:
         aws_access_key_id: key
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
+      # bedrock configuration for smart search and discussion summaries
+      bedrock.yml: |-
+        bedrock_region: us-west-2
+        vault_credential_path: sts/testaccount/sts/bedrock-dev
+      # AWS translation configuration for translations
+      translation.yml: |
+        translation_region: us-west-2
+        vault_credential_path: sts/testaccount/sts/translation-dev
       # datadog_apm.yml: |
       #   sample_rate: 0.0
       #   host_sample_rate: 0.0
@@ -120,9 +134,6 @@ development:
       # clone_url_strand.yml: |
       #   lti1.instructure.com: lti1
       #   lti2.instructure.com: lti2
-      # csp_logging.yml: |
-      #   host: https://csplogging.inscloudgate.net/
-      #   shared_secret: s00p3r_s3cr3t
       # To work with the release notes UI, uncomment this and ensure you have vault_contents.yml
       # with the example contents.  Also see docker-compose/dynamodb.override.yml
       # release_notes.yml: |
@@ -134,6 +145,34 @@ development:
       #   sampling_rate: '0.0'
       #   queue_url: ''
       #   region: 'us-west-2'
+      # ams.yml: |
+      #   launch_url: http://ams-ux.inseng.test:5173/src/remote-adapter.js
+      # canvas_career.yml: |
+      #   public_app_config:
+      #     hosts:
+      #       api_proxy: "https://dev.cd.canvashorizon.com"
+      #       cedar: "https://cedar-api-dev.domain-svcs.nonprod.inseng.io"
+      #       common_cartridge_viewer: "https://common-cartridge-viewer.netlify.app"
+      #       ignite: "https://career-agent-dev.journey.nonprod.inseng.io"
+      #       journey: "https://journey-server-dev.journey.nonprod.inseng.io"
+      #       pine: "https://pine-api-dev.domain-svcs.nonprod.inseng.io"
+      #       rcs: "https://rich-content-pdx-cd.inseng.net"
+      #       redwood: "https://redwood-api-dev.domain-svcs.nonprod.inseng.io"
+      #       upload: "https://instructure-uploads-pdx-cd.s3.us-west-2.amazonaws.com"
+      #     hotglue:
+      #       api_key: "gFd34vgi2D5OY8RrNInl55wDY1ixqSvxZsSHf965"
+      #       env_id: "demo.hg.instructure.com"
+      #       flow_id: "NsN76D10s"
+      #     pendo:
+      #       api_key: "f5faad90-a2af-4bf9-6f7b-862e00100be4"
+      #     sentry:
+      #       learner_dsn: "https://4c2589d43fafee7da8e0896a8667cfcb@relay-pdx.sentry.insops.net/486"
+      #       learning_provider_dsn: "https://feb64e6e836b324f39dd9c499a9d3a47@relay-pdx.sentry.insops.net/530"
+      #       replays_sample_rate: 1.0
+      #       traces_sample_rate: 0.1
+      #     environment: "dev"
+      #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
+
   store:
     canvas:
       lti-keys:
@@ -144,6 +183,10 @@ development:
         jwk-past.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-06-04T21:16:54Z","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
         jwk-present.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-07-04T21:16:54Z","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
         jwk-future.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-08-04T21:16:54Z","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
+      services-jwt:
+        jwk-past.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-06-04T21:16:54Z_a","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
+        jwk-present.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-07-04T21:16:54Z_b","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
+        jwk-future.json: '{"kty":"RSA","e":"AQAB","n":"uX8P5oiiQtksQO3LT4vdvobJa72bXNtxgVQAvvPBfp5M_vhJN17WQJdNrhefUVsnLkVWxnyn3JgXWACnICUDYjr6KNN2grdq6zV1cCyZz-O6NNLcwyzfcwP4-_DuMMd2ioBnbz2Z3ApTyM78HLpioWs-K7Uips3I8RgCNy_-CkXxEN4OrGc7QZ7ni8yaQ8wla-whI7VcPqxnPPMetFQGrO5lrbeMU9D6CwRMkHZvY_qpD6GLlVYG1_al2r_8Pvw02mr_qXncDyFD3J4AF3zMm-a6VqKiaeAD18T-tNEvXhZ4_kFlalshJDXKf60U4LLevo25mGY6VFiq8nIp90speQ","kid":"2024-08-04T21:16:54Z_c","alg":"RS256","use":"sig","d":"gBk5F9C_jT6Aiw4sWvCR32Mhcd_sjIGWruMd6MBYnWIgdetsVGqPtudF47W4dexm8FM-C7BGE9aMOF-rCk3FOm7UFqGBs9-KXIf8Y8zJI4F2M8hyX-57GOhjZ0kIlHMKb7cgtvdpa0VOetxFymkEd8ihlHlwRpTR8XzM-uOPofNhED2kJOsDrgsxoll3jeNTsgDJMH5awW73RRIt4l3n4EHxpW5RAu16SIx0_QantDBai3uj5PigQzZPhkIpj9tzOdJ4QRcl9xHU7CGxPWtiNNMTnvZmKlpQKU6P-yBCa3vDWsESlJnkCGhwBkJ13USA130DLdVY5uOvnWL50kpRIQ","p":"67v5UvVR_pVBD_aDXDof5PCI8rj9mRUv2Z6tfu5z5jIcQLtw7zpKdkX51MuDrQlQJrIij_wVFxTvlx8nsisnOsJ9SfehvKrsn4kMzmiYBXz3gAYv-qwmrcrIx4mLV3kmtlYq6c5qX4etuJrgd5SPHz8YnPo20c9eQclZoB6MZ00","q":"yXF0YevfsIjCh2ZXs2bRhNxtSc88VNQQdEy7SMvQ4xKETPmbWEx_qd8XIS7lULjylGYgcbxpSGNcv6zG19EgEOG9zJJotQDm6TA43cqm68A6D2patfIlM68pwQeuV-PcXYQk7uajESDVW3gRbiKqFpt94CJfp1mcyEA3U0zH7N0","dp":"DIKfSq3GOjKFj2lPs1dKVgYF3ou-uZ8MOQpYvsG82NyT70ODTM7VIM254ncid85kuIj_mJCSNfVgea6nlqb_n_iuWXyQ0shnYlgNm-6lErV9FQg_B5iXPOXkHeLIyE2fplGQWXQg5Qz4RTHC89WoesoIblxBCIVuxSMAZKT6Yok","dq":"j146-ZI5ctfysxEIq_sqdQe4lIZ0pt8DEvKlfGrqsSG1nV8sy4wudAT93jUVKf1nUGza_Hee6tEk6poaLvF8g-dWAOnWsbQBo8cZQekAIdt-twf3pXTAO2eYLPS9hXn7lWb-LjVhq0gV8XKj3SG4sjxaOxHbyCxEJFVnytZjl9U","qi":"mp15h3KyOLM1_yFXG42dV5hMjXCXo5x3xwCkBeI3Yw2a96ItVn0Rpib3NzjOzxxn84KHfJ_iyBuZHr6vDPh_djRPRJN_Dhi2rt3C-VdudZLPknZnEsx_kv3-H-B-C3xOtBIff3VSwMU2DyCffnonWzkWk9aE5YV4uOfLRwzu1zU"}'
 test:
   config:
     canvas:

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, string} from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
@@ -37,7 +37,7 @@ import permissionPropTypes, {COURSE} from '@canvas/permissions/react/propTypes'
 import DetailsToggle from './DetailsToggle'
 import {PERMISSION_DETAIL_SECTIONS} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_role_tray')
+const I18n = createI18nScope('permissions_role_tray')
 
 function PermissionDetailToggles({tab, permissionName}) {
   const [permData, setPermData] = useState(null)
@@ -176,7 +176,7 @@ function mapStateToProps(state, ownProps) {
   function findPermission(name) {
     // First try the primary permissions (might be a group)
     const perm = state.permissions.find(
-      p => p.permission_name === name && p.contextType === ownProps.tab
+      p => p.permission_name === name && p.contextType === ownProps.tab,
     )
     if (perm) return perm
 
@@ -185,7 +185,7 @@ function mapStateToProps(state, ownProps) {
       state.permissions
         .filter(p => p.contextType === ownProps.tab)
         .map(p => p.granular_permissions)
-        .filter(p => typeof p !== 'undefined')
+        .filter(p => typeof p !== 'undefined'),
     )
     return groupPerms.find(p => p.permission_name === name)
   }

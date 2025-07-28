@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import BBTreeBrowserView from '../modules/BBTreeBrowserView'
@@ -27,7 +27,7 @@ import filesEnv from '@canvas/files/react/modules/filesEnv'
 import page from 'page'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('folder_tree')
+const I18n = createI18nScope('folder_tree')
 
 export default {
   displayName: 'FolderTree',
@@ -56,8 +56,8 @@ export default {
       },
       {
         render: true,
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
-      }
+        element: ReactDOM.findDOMNode(this.folderTreeHolderRef.current),
+      },
     ).index
 
     this.expandTillCurrentFolder(this.props)
@@ -73,10 +73,10 @@ export default {
 
   onClick(event, folder) {
     event.preventDefault()
-    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+    $(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
       .find(`.${this.focusStyleClass}`)
       .each((key, value) => $(value).removeClass(this.focusStyleClass))
-    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+    $(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
       .find(`.${this.selectedStyleClass}`)
       .each((key, value) => $(value).removeClass(this.selectedStyleClass))
     if (folder.get('locked_for_user')) {

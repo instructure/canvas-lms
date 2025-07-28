@@ -44,7 +44,7 @@ export function shimGetterShorthand(hostObject, getters) {
       get: getters[key],
       enumerable: true,
       configurable: true,
-    })
+    }),
   )
   return hostObject
 }

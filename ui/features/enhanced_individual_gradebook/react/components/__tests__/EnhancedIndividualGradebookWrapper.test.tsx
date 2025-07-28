@@ -18,10 +18,9 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {MockedProvider} from '@apollo/react-testing'
 import {render} from '@testing-library/react'
-import {QueryProvider} from '@canvas/query'
-import {setGradebookOptions, setupGraphqlMocks} from './fixtures'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
+import {setGradebookOptions, setupCanvasQueries} from './fixtures'
 import EnhancedIndividualGradebookWrapper from '../EnhancedIndividualGradebookWrapper'
 import axios from 'axios'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
@@ -34,6 +33,16 @@ jest.mock('@canvas/do-fetch-api-effect/apiRequest', () => ({
 }))
 
 const mockedAxios = axios as jest.Mocked<typeof axios>
+
+const mockSearchParams = (defaultSearchParams = {}) => {
+  const setSearchParamsMock = jest.fn()
+  const searchParamsMock = new URLSearchParams(defaultSearchParams)
+  jest
+    .spyOn(ReactRouterDom, 'useSearchParams')
+    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  return {searchParamsMock, setSearchParamsMock}
+}
+
 describe('Enhanced Individual Wrapper Gradebook', () => {
   beforeEach(() => {
     ;(window.ENV as any) = setGradebookOptions()
@@ -42,28 +51,28 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       data: [],
     })
     $.subscribe = jest.fn()
+
+    setupCanvasQueries()
+    mockSearchParams()
   })
   afterEach(() => {
-    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
-    jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   const renderEnhancedIndividualGradebookWrapper = (mockOverrides = []) => {
     return render(
-      <QueryProvider>
-        <BrowserRouter basename="">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <MockedProvider mocks={setupGraphqlMocks(mockOverrides)} addTypename={false}>
-                  <EnhancedIndividualGradebookWrapper />
-                </MockedProvider>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </QueryProvider>
+      <BrowserRouter basename="">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <MockedQueryProvider>
+                <EnhancedIndividualGradebookWrapper />
+              </MockedQueryProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>,
     )
   }
 

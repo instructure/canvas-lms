@@ -169,6 +169,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     scope = DifferentiableAssignment.scope_filter(scope, @current_user, @course)
 
     quizzes = Api.paginate(scope, self, api_route)
+    DatesOverridable.preload_override_data_for_objects(quizzes)
 
     render({
              json: {
@@ -185,7 +186,7 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
       quiz_overrides[:due_dates] = quiz.dates_hash_visible_to(user)
 
       if include_all_dates
-        quiz_overrides[:all_dates] = quiz.formatted_dates_hash(quiz.all_due_dates)
+        quiz_overrides[:all_dates] = Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting) ? quiz.dates_hash_visible_to_v2(user, include_all_dates: true) : quiz.formatted_dates_hash(quiz.all_due_dates)
       end
     end
   end

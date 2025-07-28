@@ -26,11 +26,11 @@ module Types
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
-    field :context_type, String, null: true
+    field :can_reply, Boolean, null: true
     field :context_id, ID, null: true
+    field :context_type, String, null: true
     field :subject, String, null: true
     field :updated_at, Types::DateTimeType, null: true
-    field :can_reply, Boolean, null: true
     def can_reply
       other_users = object.participants.reject { |u| u.id == current_user.id }
       audience = other_users.map(&:id)
@@ -42,8 +42,8 @@ module Types
     end
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
-      argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
       argument :created_before, DateTimeType, required: false
+      argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
     end
     def conversation_messages_connection(participants: nil, created_before: nil)
       load_association(:conversation_messages).then do |messages|

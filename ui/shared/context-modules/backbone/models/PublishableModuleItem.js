@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {Model} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('publishableModuleItem')
+const I18n = createI18nScope('publishableModuleItem')
 
 // A slightly terrible class that branches the urls and json data for the
 // different module types
@@ -40,7 +40,7 @@ export default class PublishableModuleItem extends Model {
     this.prototype.urls = {
       generic() {
         return `${this.baseUrl()}/modules/${this.get('module_id')}/items/${this.get(
-          'module_item_id'
+          'module_item_id',
         )}`
       },
       module() {

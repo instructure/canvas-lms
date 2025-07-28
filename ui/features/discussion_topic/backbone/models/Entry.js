@@ -19,13 +19,13 @@
 // TODO: consolidate this into DiscussionEntry
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {isArray, pick, some} from 'lodash'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 const stripTags = function (str) {
   const div = document.createElement('div')
@@ -162,7 +162,7 @@ Entry.prototype.toJSON = function () {
     'deleted',
     'attachment',
     'replies',
-    'author'
+    'author',
   )
 }
 
@@ -202,7 +202,7 @@ Entry.prototype.ratingString = function () {
     },
     {
       count: sum,
-    }
+    },
   )
 }
 
@@ -341,7 +341,7 @@ Entry.prototype._hasActiveReplies = function (replies) {
         return function (reply) {
           return _this._hasActiveReplies(reply.replies)
         }
-      })(this)
+      })(this),
     )
   ) {
     return true

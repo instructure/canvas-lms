@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web:
+    environment:
+      INST_STATSD_HOST: statsd
+      INST_STATSD_PORT: 8125
+
+  statsd:
+    image: alpine
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache socat
+        socat -d -d -u UDP-RECV:8125 - 2>&1 | awk '/received packet/ {getline; print strftime("[%Y-%m-%d %H:%M:%S]"), $0}'
+    ports:
+      - "8125:8125/udp"
+    restart: unless-stopped

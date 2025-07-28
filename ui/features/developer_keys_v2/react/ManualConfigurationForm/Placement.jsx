@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {createRef} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -26,23 +26,39 @@ import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {NumberInput} from '@instructure/ui-number-input'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
+
+const validationMessage = {
+  url: [{text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'}],
+}
 
 export default class Placement extends React.Component {
   constructor(props) {
     super(props)
     let placement
+    const {placement: propsPlacement = {}} = props
     if (this.alwaysDeeplinking.includes(props.placementName)) {
-      placement = {...props.placement, message_type: 'LtiDeepLinkingRequest'}
-    } else if (!props.placement.message_type) {
-      placement = {...props.placement, message_type: 'LtiResourceLinkRequest'}
+      placement = {...propsPlacement, message_type: 'LtiDeepLinkingRequest'}
+    } else if (!propsPlacement.message_type) {
+      placement = {...propsPlacement, message_type: 'LtiResourceLinkRequest'}
     } else {
-      placement = props.placement
+      placement = propsPlacement
     }
 
-    this.state = {placement}
+    this.state = {
+      placement,
+      width: '',
+      height: '',
+      isTargetLinkUriValid: true,
+      isIconUrlValid: true,
+      showMessages: false,
+    }
   }
+
+  targetLinkUriRef = createRef()
+  iconUrlRef = createRef()
 
   alwaysDeeplinking = [
     'editor_button',
@@ -50,6 +66,7 @@ export default class Placement extends React.Component {
     'homework_submission',
     'conference_selection',
     'submission_type_selection',
+    'ActivityAssetProcessor',
   ]
 
   canBeEither = [
@@ -74,12 +91,6 @@ export default class Placement extends React.Component {
 
   messageTypeSelectable(placementName) {
     if (
-      ['course_assignments_menu', 'module_menu_modal'].includes(placementName) &&
-      !ENV.FEATURES.lti_multiple_assignment_deep_linking
-    ) {
-      return false
-    }
-    if (
       placementName === 'module_index_menu_modal' &&
       !ENV.FEATURES.lti_deep_linking_module_index_menu_modal
     ) {
@@ -100,8 +111,27 @@ export default class Placement extends React.Component {
     return this.state.placement
   }
 
+  validateUrlField = (fieldValue, fieldStateKey, fieldRef) => {
+    if (fieldValue && !URL.canParse(fieldValue)) {
+      this.setState({[fieldStateKey]: false})
+      if (this.isValid) {
+        fieldRef.current.focus()
+        this.isValid = false
+        this.setState({showMessages: true})
+      }
+    } else {
+      this.setState({[fieldStateKey]: true})
+    }
+  }
+
   valid = () => {
-    return true
+    const {icon_url, target_link_uri} = this.state.placement
+    this.isValid = true
+
+    this.validateUrlField(target_link_uri, 'isTargetLinkUriValid', this.targetLinkUriRef)
+    this.validateUrlField(icon_url, 'isIconUrlValid', this.iconUrlRef)
+
+    return this.isValid
   }
 
   setOrDeletePlacementField = (key, value) => {
@@ -117,6 +147,7 @@ export default class Placement extends React.Component {
   handleTargetLinkUriChange = e => {
     const value = e.target.value
     this.setOrDeletePlacementField('target_link_uri', value)
+    this.validateUrlField(value, 'isTargetLinkUriValid', this.targetLinkUriRef)
   }
 
   handleMessageTypeChange = (_, value) =>
@@ -125,6 +156,7 @@ export default class Placement extends React.Component {
   handleIconUrlChange = e => {
     const value = e.target.value
     this.setOrDeletePlacementField('icon_url', value)
+    this.validateUrlField(value, 'isIconUrlValid', this.iconUrlRef)
   }
 
   iconUrlText = placementName => {
@@ -142,20 +174,20 @@ export default class Placement extends React.Component {
 
   handleHeightChange = e => {
     const value = e.target.value
-    const numVal = parseInt(value, 10)
+    const numVal = Number.parseInt(value, 10)
     const fieldName = e.target.name.includes('launch') ? 'launch_height' : 'selection_height'
     this.setOrDeletePlacementField(fieldName, !Number.isNaN(numVal) ? numVal : '')
   }
 
   handleWidthChange = e => {
     const value = e.target.value
-    const numVal = parseInt(value, 10)
+    const numVal = Number.parseInt(value, 10)
     const fieldName = e.target.name.includes('launch') ? 'launch_width' : 'selection_width'
     this.setOrDeletePlacementField(fieldName, !Number.isNaN(numVal) ? numVal : '')
   }
 
   render() {
-    const {placement} = this.state
+    const {placement, showMessages} = this.state
     const {placementName, displayName} = this.props
 
     return (
@@ -168,7 +200,7 @@ export default class Placement extends React.Component {
               {this.isSpecialType(placementName) ? (
                 <Alert variant="warning" margin="small">
                   {I18n.t(
-                    'This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality'
+                    'This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality',
                   )}
                 </Alert>
               ) : null}
@@ -180,7 +212,13 @@ export default class Placement extends React.Component {
                   name={`${placementName}_target_link_uri`}
                   value={placement.target_link_uri}
                   renderLabel={I18n.t('Target Link URI')}
+                  inputRef={ref => {
+                    this.targetLinkUriRef.current = ref
+                  }}
                   onChange={this.handleTargetLinkUriChange}
+                  messages={
+                    showMessages && !this.state.isTargetLinkUriValid ? validationMessage.url : []
+                  }
                 />
                 <RadioInputGroup
                   name={`${placementName}_message_type`}
@@ -202,8 +240,12 @@ export default class Placement extends React.Component {
                   name={`${placementName}_icon_url`}
                   value={placement.icon_url}
                   renderLabel={this.iconUrlText(placementName)}
+                  inputRef={ref => {
+                    this.iconUrlRef.current = ref
+                  }}
                   onChange={this.handleIconUrlChange}
                   isRequired={placementName === 'editor_button'}
+                  messages={showMessages && !this.state.isIconUrlValid ? validationMessage.url : []}
                 />
                 <TextInput
                   name={`${placementName}_text`}
@@ -217,33 +259,37 @@ export default class Placement extends React.Component {
                 layout="columns"
               >
                 {this.isLaunchPlacementType(placementName) ? (
-                  <TextInput
+                  <NumberInput
                     name={`${placementName}_launch_height`}
                     value={placement.launch_height && placement.launch_height.toString()}
                     renderLabel={I18n.t('Launch Height')}
                     onChange={this.handleHeightChange}
+                    showArrows={false}
                   />
                 ) : (
-                  <TextInput
+                  <NumberInput
                     name={`${placementName}_selection_height`}
                     value={placement.selection_height && placement.selection_height.toString()}
                     renderLabel={I18n.t('Selection Height')}
                     onChange={this.handleHeightChange}
+                    showArrows={false}
                   />
                 )}
                 {this.isLaunchPlacementType(placementName) ? (
-                  <TextInput
+                  <NumberInput
                     name={`${placementName}_launch_width`}
                     value={placement.launch_width && placement.launch_width.toString()}
                     renderLabel={I18n.t('Launch Width')}
                     onChange={this.handleWidthChange}
+                    showArrows={false}
                   />
                 ) : (
-                  <TextInput
+                  <NumberInput
                     name={`${placementName}_selection_width`}
                     value={placement.selection_width && placement.selection_width.toString()}
                     renderLabel={I18n.t('Selection Width')}
                     onChange={this.handleWidthChange}
+                    showArrows={false}
                   />
                 )}
               </FormFieldGroup>
@@ -259,8 +305,4 @@ Placement.propTypes = {
   displayName: PropTypes.string.isRequired,
   placement: PropTypes.object,
   placementName: PropTypes.string.isRequired,
-}
-
-Placement.defaultProps = {
-  placement: {},
 }

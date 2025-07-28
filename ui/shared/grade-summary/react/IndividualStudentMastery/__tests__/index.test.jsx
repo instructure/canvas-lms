@@ -25,7 +25,9 @@ import fetchOutcomes from '../fetchOutcomes'
 jest.mock('../fetchOutcomes')
 
 beforeEach(() => {
-  fetchOutcomes.mockImplementation(() => Promise.resolve(null))
+  fetchOutcomes.mockImplementation(() => {
+    return Promise.resolve({outcomeGroups: [], outcomes: []})
+  })
 })
 
 const props = {
@@ -43,7 +45,6 @@ it('attempts to load when mounted', () => {
   render(<IndividualStudentMastery {...props} />)
   expect(fetchOutcomes).toHaveBeenCalled()
 })
-
 it('renders error when error occurs during fetch', async () => {
   fetchOutcomes.mockImplementation(() => Promise.reject(new Error('foo')))
   const {findByText} = render(<IndividualStudentMastery {...props} />)
@@ -61,7 +62,7 @@ it('renders outcome groups if they are returned', async () => {
     Promise.resolve({
       outcomeGroups: [{id: 1, title: 'Group'}],
       outcomes: [],
-    })
+    }),
   )
   const {findByText} = render(<IndividualStudentMastery {...props} />)
   expect(await findByText('Group')).not.toBeNull()
@@ -87,7 +88,7 @@ describe('expand and contract', () => {
             ratings: [],
           },
         ],
-      })
+      }),
     )
   })
 
@@ -101,7 +102,7 @@ describe('expand and contract', () => {
           {id: 4, title: 'abba Albums'},
         ],
         outcomes: [],
-      })
+      }),
     )
     const {findAllByRole} = render(<IndividualStudentMastery {...props} />)
     const groups = await findAllByRole('listitem')

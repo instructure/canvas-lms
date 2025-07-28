@@ -39,6 +39,11 @@ module Api::V1::LearningObjectDates
       hash[field] = overridable.send(field) if overridable.respond_to?(field)
     end
     hash[:graded] = graded?(learning_object)
+    if hash[:group_category_id].nil?
+      group_category_id = group_category_id(learning_object)
+      hash[:group_category_id] = group_category_id if group_category_id
+    end
+    add_checkpoint_info(hash, learning_object, overridable)
     hash
   end
 
@@ -52,5 +57,17 @@ module Api::V1::LearningObjectDates
     return learning_object.assignment_id.present? if learning_object.is_a?(DiscussionTopic)
 
     GRADED_MODELS.include?(learning_object.class)
+  end
+
+  def group_category_id(learning_object)
+    learning_object.group_category_id if learning_object.is_a?(DiscussionTopic)
+  end
+
+  private
+
+  def add_checkpoint_info(hash, learning_object, overridable)
+    if learning_object.context.discussion_checkpoints_enabled? && overridable.respond_to?(:has_sub_assignments?) && overridable.has_sub_assignments?
+      hash["checkpoints"] = overridable.sub_assignments.map { |sub_assignment| Checkpoint.new(sub_assignment, @current_user).as_json.except("name", "points_possible") }
+    end
   end
 end

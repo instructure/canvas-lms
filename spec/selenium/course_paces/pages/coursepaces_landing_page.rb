@@ -49,6 +49,14 @@ module CoursePacesLandingPageObject
     "[data-testid='course-pace-row']"
   end
 
+  def download_selected_paces_button_selector
+    "[data-testid='download-selected-button']"
+  end
+
+  def select_all_paces_checkbox_selector
+    "[data-testid='select-all-paces-checkbox']"
+  end
+
   def course_paces_navigation_selector
     ".course_paces"
   end
@@ -97,6 +105,14 @@ module CoursePacesLandingPageObject
     "[data-testid='sortable-column-name']"
   end
 
+  def download_pace_selector
+    "[data-testid='download-pace']"
+  end
+
+  def draft_pace_confused_panda_div_selector
+    "[data-testid='draft-pace-confused-panda-div']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def community_info_text
@@ -121,6 +137,14 @@ module CoursePacesLandingPageObject
 
   def course_pace_table_rows
     ff(course_pace_table_rows_selector)
+  end
+
+  def download_selected_paces_button
+    f(download_selected_paces_button_selector)
+  end
+
+  def select_all_paces_checkbox
+    f(select_all_paces_checkbox_selector)
   end
 
   def context_row(context_name)
@@ -173,6 +197,14 @@ module CoursePacesLandingPageObject
 
   def table_column_name
     f(table_column_name_selector)
+  end
+
+  def download_pace
+    f(download_pace_selector)
+  end
+
+  def more_options_button
+    driver.execute_script("return document.querySelector('[data-testid=\"course-pace-context-table\"] svg[name=\"IconMore\"]').closest('button')") # rubocop:disable Specs/NoExecuteScript
   end
 
   #----------------------- Actions & Methods -------------------------

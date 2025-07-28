@@ -144,7 +144,7 @@ module QuizzesHelper
 
     show_at = quiz.show_correct_answers_at
     hide_at = quiz.hide_correct_answers_at
-    now = Time.now
+    now = Time.zone.now
 
     # Some labels will be used in more than one case, so we'll pre-define them.
     labels = {}
@@ -542,6 +542,7 @@ module QuizzesHelper
     opts["class"] = class_array.compact.join(" ")
     opts["aria-controls"] = "js-sequential-warning-dialogue" if @quiz.cant_go_back?
     opts["data-method"] = "post" unless @quiz.cant_go_back?
+    opts["role"] = "button" if class_array.include?("btn")
     link_to(link_body, (opts["preview"] == 1) ? preview_quiz_url : take_quiz_url, opts)
   end
 
@@ -655,7 +656,7 @@ module QuizzesHelper
     titles = []
 
     if selected_answer || correct_answer || show_correct_answers
-      titles << ("#{answer}.")
+      titles << "#{answer}."
     end
 
     if selected_answer

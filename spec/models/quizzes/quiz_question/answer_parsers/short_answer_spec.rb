@@ -21,7 +21,7 @@
 require_relative "answer_parser_spec_helper"
 
 describe Quizzes::QuizQuestion::AnswerParsers::ShortAnswer do
-  context "#parse" do
+  describe "#parse" do
     let(:raw_answers) do
       [
         {

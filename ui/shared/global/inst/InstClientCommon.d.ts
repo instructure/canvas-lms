@@ -71,18 +71,6 @@ export type InstClientCommon = Partial<{
   youTubeRegEx: RegExp
 
   /**
-   * From ui/shared/content-locks/jquery/lock_reason.js
-   */
-  lockExplanation(
-    data: {
-      lock_at?: string | null
-      unlock_at?: string | null
-      context_module?: {name?: string}
-    },
-    type: 'quiz' | 'assignment' | 'topic' | 'file' | 'page'
-  ): string
-
-  /**
    * From ui/shared/modules/jquery/prerequisites_lookup.js
    */
   lookupPrerequisites()

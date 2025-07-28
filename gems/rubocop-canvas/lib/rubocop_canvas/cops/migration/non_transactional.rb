@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class NonTransactional < Cop
+      class NonTransactional < Base
         def on_send(node)
           _receiver, method_name, *args = *node
 
@@ -53,7 +53,7 @@ module RuboCop
 
           block_arg = node.parent.arguments.first
           node.parent.body.each_child_node do |child|
-            next unless child.send_type? && child.receiver.children.first == block_arg.name
+            next unless child.send_type? && child.receiver && child.receiver.children.first == block_arg.name
 
             case child.method_name
             when :references

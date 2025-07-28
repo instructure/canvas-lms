@@ -30,7 +30,7 @@ describe GradebookUpload do
       # actual attachment integration covered in gradebook_uploads_controller_spec;
       # that means in the spec the dummy hash will be enqueued instead of a real attachment
       # object
-      allow_any_instance_of(GradebookUpload).to receive_messages(attachments: double(create!: attachment_data))
+      allow_any_instance_of(GradebookUpload).to receive_messages(attachments: double(create!: attachment_data)) unless RSpec.current_example.metadata[:skip_before]
     end
 
     it "builds a progress object to track the import" do
@@ -56,6 +56,13 @@ describe GradebookUpload do
       GradebookUpload.queue_from(gradebook_course, teacher, attachment_data)
       upload = GradebookUpload.last
       expect(upload.course).to eq(gradebook_course)
+    end
+
+    it "catches error and sets progress to failed if attachment_data is empty", :skip_before do
+      expect { GradebookUpload.queue_from(gradebook_course, teacher, {}) }.not_to raise_error
+      progress = Progress.last
+      expect(progress.workflow_state).to eq("failed")
+      expect(progress.message).to eq("Invalid attachment")
     end
   end
 end

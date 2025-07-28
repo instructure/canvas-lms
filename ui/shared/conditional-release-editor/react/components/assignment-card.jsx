@@ -22,9 +22,9 @@ import classNames from 'classnames'
 import {DragSource} from 'react-dnd'
 
 import AssignmentMenu from './assignment-card-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const {object, bool, func} = PropTypes
 
@@ -109,7 +109,7 @@ class AssignmentCard extends React.Component {
         <div className="cr-assignment-card__content" ref={this.contentRef} aria-label={label}>
           <i
             className={`cr-assignment-card__icon icon-${this.itemClass(
-              this.props.assignment.get('category')
+              this.props.assignment.get('category'),
             )}`}
           />
           <p className="cr-assignment-card__points">{points}</p>
@@ -138,9 +138,9 @@ class AssignmentCard extends React.Component {
           {this.renderContent()}
           {this.renderMenu()}
         </div>,
-        {dropEffect: 'move'}
+        {dropEffect: 'move'},
       ),
-      {captureDraggingState: true}
+      {captureDraggingState: true},
     )
   }
 }

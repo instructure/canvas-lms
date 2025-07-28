@@ -50,7 +50,7 @@ describe('AccountNavigation', () => {
 
     it('renders one page button when pageCount is 1', () => {
       const {getByText, queryByText} = render(
-        <AccountNavigation {...props} currentPage={1} pageCount={1} />
+        <AccountNavigation {...props} currentPage={1} pageCount={1} />,
       )
       expect(getByText(1)).toBeInTheDocument()
       expect(queryByText(2)).not.toBeInTheDocument()
@@ -59,7 +59,7 @@ describe('AccountNavigation', () => {
 
     it('renders page buttons 1-3 when page count is 3', () => {
       const {getByText, queryByText} = render(
-        <AccountNavigation {...props} currentPage={1} pageCount={3} />
+        <AccountNavigation {...props} currentPage={1} pageCount={3} />,
       )
       expect(getByText(1)).toBeInTheDocument()
       expect(getByText(2)).toBeInTheDocument()

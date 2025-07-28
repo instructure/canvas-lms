@@ -19,9 +19,9 @@
 import React from 'react'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('NewTabIndicator')
+const I18n = createI18nScope('NewTabIndicator')
 
 type Props = {
   tabName: string

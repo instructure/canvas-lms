@@ -119,10 +119,37 @@ describe UserContent do
       expect(rewriter.user_can_view_content?(att2)).to be_falsey
     end
 
+    it "adds lazy loading to Canvas iframes and images" do
+      course = course_factory
+      att = attachment_model(context: @course)
+
+      html = <<~HTML
+        <iframe src="/media_attachments_iframe/#{att.id}"></iframe>
+        <iframe src="/media_objects_iframe/m-hi"></iframe>
+        <img src="/courses/#{course.id}/files/#{att.id}/preview">
+      HTML
+
+      expected = <<~HTML
+        <iframe src="/media_attachments_iframe/#{att.id}" loading="lazy"></iframe>
+        <iframe src="/media_objects_iframe/m-hi" loading="lazy"></iframe>
+        <img src="/courses/#{course.id}/files/#{att.id}/preview" loading="lazy">
+      HTML
+      expect(rewriter.translate_content(html)).to eq(expected)
+    end
+
     describe "precise_translate_content" do
+      before do
+        Account.site_admin.enable_feature!(:precise_link_replacements)
+      end
+
       it "deals properly with non-href anchors and nodes too deep" do
-        expect { rewriter.precise_translate_content("<a title='/courses/#{rewriter.context.id}/assignments/5'>non-href link</a>") }.not_to raise_error
-        expect { rewriter.precise_translate_content("<!DOCTYPE html>" + ("<div>" * 1000)) }.not_to raise_error
+        course_with_teacher
+        rewriter = UserContent::HtmlRewriter.new(@course, @teacher)
+        html = "<a title='/courses/#{rewriter.context.id}/assignments/5'>non-href link</a>"
+        parsed_html = Nokogiri::HTML5.fragment(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        expect { rewriter.precise_translate_content(parsed_html) }.not_to raise_error
+        rewriter.translate_content("<!DOCTYPE html>" + ("<div>" * 1000))
+        expect { rewriter.precise_translate_content(parsed_html) }.not_to raise_error
       end
     end
 

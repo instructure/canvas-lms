@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
@@ -56,7 +56,7 @@ Group.prototype.users = function () {
       return function () {
         return _this.set('members_count', _this._users.length)
       }
-    })(this)
+    })(this),
   )
   this.users = function () {
     return this._users

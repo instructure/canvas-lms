@@ -24,12 +24,21 @@ require_relative "../pages/gradebook_page"
 require_relative "../pages/grading_curve_page"
 require_relative "../setup/gradebook_setup"
 
-describe "Gradebook editing grades" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook editing grades" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
   include GradebookSetup
 
   before(:once) do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
     gradebook_data_setup
     show_sections_filter(@teacher)
   end
@@ -44,7 +53,10 @@ describe "Gradebook editing grades" do
 
   it "updates a graded quiz and have the points carry over to the quiz attempts page", priority: "1" do
     points = 50
-    q = factory_with_protected_attributes(@course.quizzes, title: "new quiz", points_possible: points, quiz_type: "assignment", workflow_state: "available")
+    q = @course.quizzes.create!(title: "new quiz",
+                                points_possible: points,
+                                quiz_type: "assignment",
+                                workflow_state: "available")
     q.save!
     qs = q.generate_submission(@student_1)
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -250,6 +262,71 @@ describe "Gradebook editing grades" do
     end
   end
 
+  context "checkpoints", :ignore_js_errors do
+    before do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+
+      @due_at = 2.days.from_now
+      @replies_required = 2
+      @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "everyone", due_at: @due_at }],
+        points_possible: 6
+      )
+      Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: @checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "everyone", due_at: @due_at }],
+        points_possible: 7,
+        replies_required: @replies_required
+      )
+    end
+
+    it "sets a default grade as expected for type points" do
+      Gradebook.visit(@course)
+      Gradebook.click_assignment_header_menu(@checkpointed_discussion.assignment.id)
+      set_checkpoints_default_grade("1", "3")
+
+      reply_to_topic_checkpoint = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      reply_to_entry_checkpoint = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      reply_to_topic_checkpoint.submissions.each do |submission|
+        expect(submission.grade).to eq "1"
+      end
+
+      reply_to_entry_checkpoint.submissions.each do |submission|
+        expect(submission.grade).to eq "3"
+      end
+    end
+
+    it "sets a default grade as expected for type pass_fail" do
+      @checkpointed_discussion.assignment.update!(grading_type: "pass_fail")
+      @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).update!(grading_type: "pass_fail")
+      @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).update!(grading_type: "pass_fail")
+
+      Gradebook.visit(@course)
+      Gradebook.click_assignment_header_menu(@checkpointed_discussion.assignment.id)
+      set_checkpoints_default_grade_for_pass_fail("Complete", "Incomplete")
+
+      reply_to_topic_checkpoint = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      reply_to_entry_checkpoint = @checkpointed_discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      reply_to_topic_checkpoint.submissions.each do |submission|
+        expect(submission.grade).to eq "complete"
+      end
+
+      reply_to_entry_checkpoint.submissions.each do |submission|
+        expect(submission.grade).to eq "incomplete"
+      end
+
+      @checkpointed_discussion.assignment.submissions.each do |submission|
+        expect(submission.grade).to eq "incomplete"
+      end
+    end
+  end
+
   context "with an invalid grade" do
     before :once do
       init_course_with_students 1
@@ -375,4 +452,9 @@ describe "Gradebook editing grades" do
       end
     end
   end
+end
+
+describe "Gradebook editing grades" do
+  it_behaves_like "Gradebook editing grades", true
+  it_behaves_like "Gradebook editing grades", false
 end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {uniqueId} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
@@ -38,14 +38,14 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
-import 'date-js'
+import '@instructure/date-js'
 import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
 
-const I18n = useI18nScope('instructure_js')
+const I18n = createI18nScope('instructure_js')
 
 export function formatTimeAgoTitle(date) {
   const fudgedDate = fudgeDateForProfileTimezone(date)
@@ -66,7 +66,7 @@ export function formatTimeAgoDate(date) {
         return I18n.t(
           '#time.count_minutes_ago',
           {one: '1 minute ago', other: '%{count} minutes ago'},
-          {count: minutes}
+          {count: minutes},
         )
       }
     } else {
@@ -74,7 +74,7 @@ export function formatTimeAgoDate(date) {
       return I18n.t(
         '#time.count_hours_ago',
         {one: '1 hour ago', other: '%{count} hours ago'},
-        {count: hours}
+        {count: hours},
       )
     }
   } else {
@@ -100,7 +100,7 @@ function enhanceUserJQueryWidgetContent() {
         'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements) // eslint-disable-line no-console
+      console.error(msg, $elements)
       captureException(new Error(msg))
     })
     .end()
@@ -182,37 +182,37 @@ function warnAboutRolesBeingSwitched() {
       case 'TeacherEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.teacher',
-          'You have switched roles temporarily for this course, and are now viewing the course as a teacher.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a teacher.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'StudentEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.student',
-          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'TaEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.ta',
-          'You have switched roles temporarily for this course, and are now viewing the course as a TA.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a TA.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'ObserverEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.observer',
-          'You have switched roles temporarily for this course, and are now viewing the course as an observer.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as an observer.  You can restore your role and permissions from the course home page.',
         )
         break
       case 'DesignerEnrollment':
         switched_roles_message = I18n.t(
           'switched_roles_message.designer',
-          'You have switched roles temporarily for this course, and are now viewing the course as a designer.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a designer.  You can restore your role and permissions from the course home page.',
         )
         break
       default:
         switched_roles_message = I18n.t(
           'switched_roles_message.student',
-          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.'
+          'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.',
         )
     }
     $img.attr('src', '/images/warning.png').attr('title', switched_roles_message).css({
@@ -247,16 +247,16 @@ function previewEquellaContentWhenClicked() {
       $dialog.html(
         "<h2/><iframe style='background: url(/images/ajax-loader-medium-444.gif) no-repeat left top; width: 800px; height: 350px; border: 0;' src='about:blank' borderstyle='0'/><div style='text-align: right;'><a href='#' class='original_link external external_link' target='_blank'>" +
           htmlEscape(
-            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window')
+            I18n.t('links.view_equella_content_in_new_window', 'view the content in a new window'),
           ) +
-          '</a>'
+          '</a>',
       )
       $dialog
         .find('h2')
         .text(
           $(this).attr('title') ||
             $(this).text() ||
-            I18n.t('titles.equella_content_preview', 'Equella Content Preview')
+            I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
         )
       const $iframe = $dialog.find('iframe')
       setTimeout(() => {
@@ -308,8 +308,8 @@ function openDialogsWhenClicked() {
               modal: true,
               zIndex: 1000,
             },
-            $(link).data('dialogOpts')
-          )
+            $(link).data('dialogOpts'),
+          ),
         )
         $dialog.fixDialogButtons()
       }
@@ -335,8 +335,9 @@ function enhanceUserContentWhenAsked() {
         new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
         explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
         locale: ENV?.LOCALE ?? 'en',
+        showYoutubeAdOverlay: ENV?.FEATURES?.youtube_migration,
       }),
-    50
+    50,
   )
 }
 
@@ -426,7 +427,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         let submission = null
         for (const idx in data) {
           const s = data[idx].submission
-          // eslint-disable-next-line eqeqeq
+
           if (s.user_id == user_id) {
             submission = s
           }
@@ -534,10 +535,13 @@ function doThingsToModuleSequenceFooter() {
           courseID: el.attr('data-course-id'),
           assetType: el.attr('data-asset-type'),
           assetID: el.attr('data-asset-id'),
+          onFetchSuccess: () => {
+            $('.module-sequence-footer-right').prepend($('#mark-as-done-container'))
+            $('#mark-as-done-container').css({'margin-right': '4px'})
+          },
         })
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
         console.error(ex)
         captureException(ex)
       })
@@ -599,17 +603,17 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
 // this it'll be too time consuming to decouple it from canvas in our
 // timeframe. Solve it for now by using postMessage from enhanced-user-content2
 // (which we hope to decouple from canvas) to ask canvas to render the preview
-function showFilePreviewInOverlayHandler({file_id, verifier}) {
+function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instfs_id, location}) {
   import('../react/showFilePreview')
     .then(module => {
-      module.showFilePreview(file_id, verifier)
+      module.showFilePreview(file_id, verifier, access_token, instfs_id, location)
     })
     .catch(err => {
       showFlashAlert({
         message: I18n.t('Something went wrong loading the file previewer.'),
         type: 'error',
       })
-      // eslint-disable-next-line no-console
+
       console.log(err)
     })
 }

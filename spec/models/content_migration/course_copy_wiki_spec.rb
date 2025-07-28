@@ -28,15 +28,132 @@ describe ContentMigration do
                                            body: "<address><ul></ul></address>",
                                            editing_roles: "teachers",
                                            todo_date: Time.zone.now,
-                                           publish_at: 1.week.from_now.beginning_of_day)
+                                           publish_at: 1.week.from_now.beginning_of_day,
+                                           unlock_at: 1.week.from_now.beginning_of_day,
+                                           lock_at: 2.weeks.from_now.beginning_of_day)
 
       run_course_copy
 
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
 
-      attrs = %i[title body editing_roles todo_date publish_at]
+      attrs = %i[title body editing_roles todo_date publish_at unlock_at lock_at]
       expect(page.attributes.slice(*attrs)).to eq page_to.attributes.slice(*attrs)
       expect(page_to.body.strip).to eq "<address><ul></ul></address>"
+    end
+
+    context "block editor copying" do
+      it "copies a linked block editor (Course Copy)" do
+        block_editor_page_with_media
+        run_course_copy
+
+        # general data
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+        expect(destination_page.body).to eq("<iframe class=\"block_editor_view\" src=\"/block_editors/#{destination_page.block_editor.id}\"></iframe>")
+        expect(destination_page.block_editor).to be_a(BlockEditor)
+        expect(destination_page.block_editor.editor_version).to eq("0.2")
+
+        # media block
+        destination_media_attachment = @copy_to.attachments.where(migration_id: mig_id(@block_editor_media_attachment_1)).first
+        expect(destination_page.block_editor.blocks.dig("wlatZhI-P8", "props", "src")).to eq("/media_attachments_iframe/#{destination_media_attachment.try(:id)}?embedded=true")
+        expect(destination_page.block_editor.blocks.dig("wlatZhI-P8", "props", "attachmentId")).to eq(destination_media_attachment.id.to_s)
+
+        # image block
+        destination_image = @copy_to.attachments.where(migration_id: mig_id(@block_editor_image_1)).first
+        expect(destination_page.block_editor.blocks.dig("rq_jYNdueq", "props", "src")).to eq("/courses/#{@copy_to.id}/files/#{destination_image.id}/preview")
+
+        # rce block
+        rce_html = Nokogiri::HTML5.fragment(destination_page.block_editor.blocks.dig("_8byC2eDxh", "props", "text"))
+
+        # rce block media
+        media_iframe_src = rce_html.at_css("iframe")[:src]
+        second_destination_media_attachment = @copy_to.attachments.where(migration_id: mig_id(@block_editor_media_attachment_2)).first
+        expect(media_iframe_src).to eq("/media_attachments_iframe/#{second_destination_media_attachment.try(:id)}?type=video&embedded=true")
+
+        # rce block image
+        img_src = rce_html.at_css("img")[:src]
+        second_destination_image = @copy_to.attachments.where(migration_id: mig_id(@block_editor_image_2)).first
+        expect(img_src).to eq("/courses/#{@copy_to.id}/files/#{second_destination_image.id}/preview")
+      end
+
+      it "copies a linked block editor (Export and Import)" do
+        block_editor_page_with_media
+        run_export_and_import
+
+        # general data
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+
+        expect(destination_page.body).to eq("<iframe class=\"block_editor_view\" src=\"/block_editors/#{destination_page.block_editor.id}\"></iframe>")
+        expect(destination_page.block_editor).to be_a(BlockEditor)
+        expect(destination_page.block_editor.editor_version).to eq("0.2")
+
+        # media block
+        destination_media_attachment = @copy_to.attachments.where(migration_id: mig_id(@block_editor_media_attachment_1)).first
+        expect(destination_page.block_editor.blocks.dig("wlatZhI-P8", "props", "src")).to eq("/media_attachments_iframe/#{destination_media_attachment.try(:id)}?embedded=true")
+        expect(destination_page.block_editor.blocks.dig("wlatZhI-P8", "props", "attachmentId")).to eq(destination_media_attachment.id.to_s)
+
+        # image block
+        destination_image = @copy_to.attachments.where(migration_id: mig_id(@block_editor_image_1)).first
+        expect(destination_page.block_editor.blocks.dig("rq_jYNdueq", "props", "src")).to eq("/courses/#{@copy_to.id}/files/#{destination_image.id}/preview")
+
+        # rce block
+        rce_html = Nokogiri::HTML5.fragment(destination_page.block_editor.blocks.dig("_8byC2eDxh", "props", "text"))
+
+        # rce block media
+        media_iframe_src = rce_html.at_css("iframe")[:src]
+        second_destination_media_attachment = @copy_to.attachments.where(migration_id: mig_id(@block_editor_media_attachment_2)).first
+        expect(media_iframe_src).to eq("/media_attachments_iframe/#{second_destination_media_attachment.try(:id)}?embedded=true&type=video")
+
+        # rce block image
+        img_src = rce_html.at_css("img")[:src]
+        second_destination_image = @copy_to.attachments.where(migration_id: mig_id(@block_editor_image_2)).first
+        expect(img_src).to eq("/courses/#{@copy_to.id}/files/#{second_destination_image.id}/preview")
+      end
+
+      it "ignores template assets (Course Copy)" do
+        block_editor_page_with_global_images
+        run_course_copy
+
+        # general data
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+
+        expect(destination_page.body).to eq("<iframe class=\"block_editor_view\" src=\"/block_editors/#{destination_page.block_editor.id}\"></iframe>")
+        expect(destination_page.block_editor).to be_a(BlockEditor)
+        expect(destination_page.block_editor.editor_version).to eq("0.2")
+
+        # global images
+        expect(destination_page.block_editor.blocks.dig("2dG8NCQo6D", "props", "src")).to eq("/images/block_editor/templates/teacherNote.svg")
+        expect(destination_page.block_editor.blocks.dig("tUF84HE2cn", "props", "src")).to eq("/images/block_editor/templates/global-1.svg")
+      end
+
+      it "ignores template assets (Export and Import)" do
+        block_editor_page_with_global_images
+        run_export_and_import
+
+        # general data
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+
+        expect(destination_page.body).to eq("<iframe class=\"block_editor_view\" src=\"/block_editors/#{destination_page.block_editor.id}\"></iframe>")
+        expect(destination_page.block_editor).to be_a(BlockEditor)
+        expect(destination_page.block_editor.editor_version).to eq("0.2")
+
+        # global images
+        expect(destination_page.block_editor.blocks.dig("2dG8NCQo6D", "props", "src")).to eq("/images/block_editor/templates/teacherNote.svg")
+        expect(destination_page.block_editor.blocks.dig("tUF84HE2cn", "props", "src")).to eq("/images/block_editor/templates/global-1.svg")
+      end
+
+      it "ignores empty src in blocks (Course Copy)" do
+        block_editor_page_with_empty_images
+        run_course_copy
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+        expect(destination_page.block_editor.blocks.dig("FUN8kk-ph7", "props", "src")).to eq("")
+      end
+
+      it "ignores empty src in blocks (Export and Import)" do
+        block_editor_page_with_empty_images
+        run_export_and_import
+        destination_page = @copy_to.wiki_pages.where(migration_id: mig_id(@block_editor_page)).first
+        expect(destination_page.block_editor.blocks.dig("FUN8kk-ph7", "props", "src")).to eq("")
+      end
     end
 
     it "resets user on re-import" do
@@ -87,8 +204,8 @@ describe ContentMigration do
     end
 
     it "keeps assignment relationship" do
-      @copy_to.conditional_release = true
-      @copy_to.save!
+      @copy_from.conditional_release = true
+      @copy_from.save!
       vanilla_page_from = @copy_from.wiki_pages.create!(title: "Everyone Sees This Page")
       title = "conditional page"
       wiki_page_assignment_model(course: @copy_from, title:)

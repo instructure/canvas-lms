@@ -26,7 +26,7 @@ bbb_avatar:
   applies_to: RootAccount
 
 react_discussions_post:
-  state: hidden
+  state: 'on'
   beta: true
   display_name: Discussions/Announcements Redesign
   description:
@@ -37,6 +37,15 @@ react_discussions_post:
       For full details, please see the *Discussions/Announcements Redesign user group*
       in the Canvas Community
   applies_to: Course
+
+discussions_reporting:
+  state: hidden
+  beta: true
+  display_name: Discussions Redesign - Reporting
+  description: |-
+    This feature flag enables Discussions Reporting inside the new
+    Discussions Redesign work.
+  applies_to: RootAccount
 
 draft_discussions:
   state: hidden
@@ -69,28 +78,6 @@ discussion_create:
     This feature flag enables the use of the updated
     discussion create/edit page
   applies_to: RootAccount
-
-bbb_modal_update:
-  state: hidden
-  display_name: BBB Modal Update
-  description: |-
-    This update offers enhanced feature functionality for
-    Big Blue Button Conferences. Users will now be able to enable
-    the Waiting Room in their conference settings, they'll be able
-    to add a scheduled conference to their calendar from within a conference,
-    and they'll be able to update/sync conference attendees as new attendees are
-    added or removed.
-  applies_to: SiteAdmin
-
-react_inbox:
-  state: hidden
-  display_name: Update Inbox page to use react/instui
-  description: |-
-    This refactor will make this page more maintainable
-  applies_to: RootAccount
-  environments:
-    development:
-      state: on # enable for local development
 
 react_inbox_labels:
   state: hidden
@@ -136,17 +123,76 @@ react_people_page:
   applies_to: RootAccount
 
 discussion_checkpoints:
-  state: hidden
+  state: allowed
   display_name: Discussion Checkpoints
   description: |-
     Enables checkpoints for graded discussions. Checkpoints allow teachers to
     create separate due dates for the initial response and replies. The initial
     response and replies are then graded separately, and those grades are
     combined to form a final discussion grade.
-  applies_to: RootAccount
+  applies_to: Account
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
 
 inbox_settings:
   state: hidden
   applies_to: SiteAdmin
   display_name: Inbox Settings - QW Updates
   description: Gives users access to new optional features like setting a default signature that will be added at the end of outgoing messages and setting an autoresponder.
+
+disallow_threaded_replies_fix_alert:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Disallow Threaded Replies Fix Alert
+  description: |-
+    This feature flag controls the visibility of the alert that allows teachers to fix threaded replies on the Discussions Index page.
+
+discussion_permalink:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Discussion permalink
+  description: |-
+    This feature flag enables the Copy Link option in the discussions redesign
+
+discussion_insights:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Insights
+  description: |-
+    Allow access to discussion insights
+
+discussion_ai_survey_link:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Discussion AI survey link
+  description: |-
+    Displays a survey link for Discussion Translate and Discussion Insights
+
+disallow_threaded_replies_manage:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Manage Disallow Threaded Replies in Discussions
+  description: |-
+    This feature flag controls the visibility of the alert that allows teachers to manage threaded replies for each discussion topic on the Discussions Index page, this will override the Dissalow Threaded Replies Fix Alert.
+
+
+discussion_pin_post:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Pin Post
+  description: |-
+    This feature flag controls the ability to pin posts on the Discussions page.
+  shadow: true
+
+create_conversation_graphql_rate_limit:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Rate Limit for Create Conversation GraphQL Mutation
+  description: |-
+    This feature flag enables a rate limit for the Create Conversation GraphQL mutation.
+    Assigns different scores for different user groups like students, teachers, etc.
+    Once the score reaches a certain threshold, the user will be rate limited for a period of time.
+

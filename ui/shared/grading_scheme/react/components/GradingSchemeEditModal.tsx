@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
@@ -29,7 +29,7 @@ import {
 } from './form/GradingSchemeInput'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('GradingSchemeViewModal')
+const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeEditModalProps = {
   open: boolean
@@ -38,7 +38,7 @@ export type GradingSchemeEditModalProps = {
   openDeleteModal: (gradingScheme: GradingScheme) => void
   handleUpdateScheme: (
     gradingSchemeFormInput: GradingSchemeEditableData,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => void
   defaultGradingSchemeTemplate: GradingScheme
   defaultPointsGradingScheme: GradingSchemeTemplate
@@ -94,15 +94,15 @@ const GradingSchemeEditModal = ({
           >
             {!viewingFromAccountManagementPage && gradingScheme.context_type === 'Account'
               ? I18n.t(
-                  "Percentages and points can't be edited because it is an account level grading scheme."
+                  "Percentages and points can't be edited because it is an account level grading scheme.",
                 )
               : isCourseDefault
-              ? I18n.t(
-                  "Percentages and points can't be edited because it is being used as the default grading scheme."
-                )
-              : I18n.t(
-                  "Percentages and points can't be edited because it is currently being used."
-                )}
+                ? I18n.t(
+                    "Percentages and points can't be edited because it is being used as the default grading scheme.",
+                  )
+                : I18n.t(
+                    "Percentages and points can't be edited because it is currently being used.",
+                  )}
           </Alert>
         )}
         <GradingSchemeInput

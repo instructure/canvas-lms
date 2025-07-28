@@ -79,7 +79,7 @@ module Canvas
       end
     end
 
-    describe ".read" do
+    describe ".read / .cached?" do
       before do
         allow(described_class).to receive(:config).and_return(static_config)
         @stub = stub_request(:get, "#{addr}/v1/test/path")
@@ -93,6 +93,15 @@ module Canvas
                            headers: { "content-type": "application/json" })
         stub_request(:get, "#{addr}/v1/bad/test/path")
           .to_return(status: 404, headers: { "content-type": "application/json" })
+      end
+
+      it "checks if the read is cached" do
+        expect(described_class.cached?("test/path")).to be_falsey
+        described_class.read("test/path")
+        expect(described_class.cached?("test/path")).to be_truthy
+        Timecop.travel(3600.seconds.from_now) do
+          expect(described_class.cached?("test/path")).to be_truthy
+        end
       end
 
       it "Caches the read" do

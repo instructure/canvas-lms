@@ -189,8 +189,9 @@ class ConferencesController < ApplicationController
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
 
+    page_has_instui_topnav
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = if @context.grants_any_right?(@current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+    conferences = if @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active
                   else
                     @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
@@ -334,7 +335,6 @@ class ConferencesController < ApplicationController
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
       can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
       render_alternatives: @render_alternatives,
-      bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update),
       bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,
       context_name: @context&.name || nil
     )

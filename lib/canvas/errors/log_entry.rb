@@ -44,8 +44,7 @@ module Canvas
 
       def message
         msg = +""
-        deprecators = ($canvas_rails == "7.0") ? ActiveSupport::Deprecation : Rails.application.deprecators
-        deprecators.silence do
+        Rails.application.deprecators.silence do
           msg << "\n\n[CANVAS_ERRORS] EXCEPTION LOG"
           if @ex.is_a?(String) || @ex.is_a?(Symbol)
             msg << "\n#{@ex}\n"

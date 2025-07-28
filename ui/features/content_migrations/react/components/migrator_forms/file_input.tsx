@@ -16,95 +16,138 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {useCallback, useEffect, useState} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Button} from '@instructure/ui-buttons'
-import {IconUploadLine} from '@instructure/ui-icons'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {IconUploadSolid} from '@instructure/ui-icons'
 import {humanReadableSize} from '../utils'
 import {ProgressBar} from '@instructure/ui-progress'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {FileDrop} from '@instructure/ui-file-drop'
+import {Flex} from '@instructure/ui-flex'
+import {FormLabel, RequiredFormLabel} from '@canvas/content-migrations'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type MigrationFileInputProps = {
   onChange: (file: File | null) => void
   accepts?: string | undefined
   fileUploadProgress: number | null
+  isSubmitting?: boolean
+  externalFormMessage?: FormMessage
+  isRequired?: boolean
+  inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
-const MigrationFileInput = ({onChange, accepts, fileUploadProgress}: MigrationFileInputProps) => {
-  const fileInput = createRef<HTMLInputElement>()
-  const [file, setFile] = useState<File | null>(null)
+const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
+const getErrorMessage = (text: string): FormMessage => ({text, type: 'newError'})
 
-  const handleSelectFile = useCallback(() => {
-    const files = fileInput.current?.files
-    if (!files) {
-      return
-    }
-    const selectedFile = files[0]
+const formLabelText = I18n.t('Source')
 
-    if (selectedFile && ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
-      setFile(null)
-      onChange(null)
-      showFlashError(
-        I18n.t('Your migration can not exceed %{file_size}', {
-          file_size: humanReadableSize(ENV.UPLOAD_LIMIT),
-        })
-      )()
-    } else if (selectedFile) {
-      setFile(selectedFile)
+const MigrationFileInput = ({
+  onChange,
+  accepts,
+  fileUploadProgress,
+  isSubmitting,
+  externalFormMessage,
+  isRequired,
+  inputRef,
+}: MigrationFileInputProps) => {
+  const [formMessage, setFormMessage] = useState<FormMessage>(
+    externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'},
+  )
+
+  useEffect(() => {
+    externalFormMessage && setFormMessage(externalFormMessage)
+  }, [externalFormMessage])
+
+  const handleDropAccepted = useCallback(
+    (files: ArrayLike<DataTransferItem | File>) => {
+      if (!Array.isArray(files) || !files.every(singleFile => singleFile instanceof File)) {
+        return onChange(null)
+      }
+      const selectedFile = files[0]
+
+      if (!selectedFile) {
+        return onChange(null)
+      }
+      if (ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
+        onChange(null)
+        return setFormMessage(
+          getErrorMessage(
+            I18n.t('Your migration can not exceed %{upload_limit}', {
+              upload_limit: humanReadableSize(ENV.UPLOAD_LIMIT),
+            }),
+          ),
+        )
+      }
+      if (selectedFile.name) {
+        setFormMessage(getHintMessage(selectedFile.name))
+      }
       onChange(selectedFile)
-    } else {
-      setFile(null)
-      onChange(null)
-    }
-  }, [onChange, fileInput])
+    },
+    [onChange, setFormMessage],
+  )
+
+  const handleDropRejected = useCallback(() => {
+    onChange(null)
+    setFormMessage(getErrorMessage(I18n.t('Invalid file type')))
+  }, [onChange, setFormMessage])
 
   return (
     <>
       <View margin="none none x-small none" style={{display: 'block'}}>
-        <label htmlFor="migrationFileUpload">
-          <Text weight="bold">{I18n.t('Source')}</Text>
-        </label>
+        {isRequired ? (
+          <RequiredFormLabel
+            showErrorState={formMessage && formMessage.type === 'newError'}
+            htmlFor="migrationFileUpload"
+          >
+            {formLabelText}
+          </RequiredFormLabel>
+        ) : (
+          <FormLabel htmlFor="migrationFileUpload">
+            {formLabelText}
+          </FormLabel>
+        )}
       </View>
-      <input
+      <FileDrop
         id="migrationFileUpload"
-        data-testid="migrationFileUpload"
-        type="file"
-        ref={fileInput}
         accept={accepts || '.zip,.imscc,.mbz,.xml'}
-        onChange={handleSelectFile}
-        style={{display: 'none'}}
+        onDropAccepted={handleDropAccepted}
+        interaction={isSubmitting ? 'disabled' : 'enabled'}
+        data-testid="migrationFileUpload"
+        onDropRejected={handleDropRejected}
+        inputRef={inputRef}
+        messages={[formMessage]}
+        renderLabel={
+          <View as="div" textAlign="center" padding="x-large large">
+            <IconUploadSolid />
+            <Text as="div" weight="bold">
+              {I18n.t('Choose File')}
+            </Text>
+            <Text>
+              {I18n.t('Drag and drop or')} <Text color="brand">{I18n.t('browse your files')}</Text>
+            </Text>
+          </View>
+        }
+        maxWidth="46.5rem"
       />
-      <Button
-        color="secondary"
-        disabled={!!(fileUploadProgress && fileUploadProgress < 100)}
-        onClick={() => fileInput.current?.click()}
-      >
-        <IconUploadLine />
-        &nbsp;
-        {I18n.t('Choose File')}
-      </Button>
-      <View margin="none none none medium">
-        <Text>{file ? file.name : I18n.t('No file chosen')}</Text>
-      </View>
-      {fileUploadProgress && fileUploadProgress < 100 && (
-        <View as="div" margin="small 0 0" style={{position: 'relative'}}>
+      {isSubmitting && (
+        <View as="div" margin="small 0 0" maxWidth="22.5rem">
           {I18n.t('Uploading File')}
-          <ProgressBar
-            size="small"
-            meterColor="info"
-            screenReaderLabel={I18n.t('Loading completion')}
-            valueNow={fileUploadProgress || 0}
-            valueMax={100}
-            // @ts-ignore
-            shouldAnimate={true}
-          />
-          <span style={{top: '25px', right: '-45px', position: 'absolute'}}>
-            {fileUploadProgress}%
-          </span>
+          <Flex gap="x-small">
+            <ProgressBar
+              width="100%"
+              size="small"
+              meterColor="info"
+              screenReaderLabel={I18n.t('Loading completion')}
+              valueNow={fileUploadProgress || 0}
+              valueMax={100}
+              shouldAnimate={true}
+            />
+            <span>{fileUploadProgress}%</span>
+          </Flex>
         </View>
       )}
     </>

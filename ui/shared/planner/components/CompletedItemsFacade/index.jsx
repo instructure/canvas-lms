@@ -26,9 +26,9 @@ import buildStyle from './style'
 import {NotificationBadge, MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import {badgeShape, sizeShape} from '../plannerPropTypes'
 import {animatable} from '../../dynamic-ui'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class CompletedItemsFacade extends Component {
   constructor(props) {
@@ -52,7 +52,7 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
-    // eslint-disable-next-line react/no-unused-prop-types
+
     date: momentObj, // the scroll-to-today animation requires a date on each component in the planner
     responsiveSize: sizeShape,
     simplifiedControls: bool,
@@ -71,7 +71,7 @@ export class CompletedItemsFacade extends Component {
       'item',
       this,
       this.props.animatableIndex,
-      this.props.animatableItemIds
+      this.props.animatableItemIds,
     )
   }
 
@@ -81,7 +81,7 @@ export class CompletedItemsFacade extends Component {
       'item',
       this,
       newProps.animatableIndex,
-      newProps.animatableItemIds
+      newProps.animatableItemIds,
     )
   }
 
@@ -102,7 +102,7 @@ export class CompletedItemsFacade extends Component {
       return (
         <BadgeList>
           {this.props.badges.map(b => (
-            <Pill key={b.id} color={b.variant}>
+            <Pill key={b.id} color={b.variant} data-testid="badgepill">
               {b.text}
             </Pill>
           ))}
@@ -123,7 +123,7 @@ export class CompletedItemsFacade extends Component {
         one: '1 completed item',
         other: '%{count} completed items',
       },
-      {count: this.props.itemCount}
+      {count: this.props.itemCount},
     )
     return (
       <NotificationBadge responsiveSize={this.props.responsiveSize}>
@@ -147,7 +147,7 @@ export class CompletedItemsFacade extends Component {
           this.style.classNames.root,
           this.style.classNames[this.props.responsiveSize],
           'planner-completed-items',
-          this.props.simplifiedControls ? this.style.classNames.k5Layout : ''
+          this.props.simplifiedControls ? this.style.classNames.k5Layout : '',
         )}
         ref={elt => (this.rootDiv = elt)}
       >
@@ -162,7 +162,7 @@ export class CompletedItemsFacade extends Component {
                 one: 'Show 1 completed item',
                 other: 'Show %{count} completed items',
               },
-              {count: this.props.itemCount}
+              {count: this.props.itemCount},
             )}
             themeOverride={this.conditionalTheme}
           >

@@ -45,7 +45,7 @@ function studentEnrollments(student) {
   return filter(
     student.enrollments,
     enrollment =>
-      enrollment.type === 'StudentEnrollment' || enrollment.type === 'StudentViewEnrollment'
+      enrollment.type === 'StudentEnrollment' || enrollment.type === 'StudentViewEnrollment',
   )
 }
 
@@ -72,7 +72,7 @@ OverrideStudentStore.fetchStudentsByID = function (givenIds) {
       enrollment_type: 'student',
       include: ['enrollments', 'group_ids'],
     },
-    this._fetchStudentsByIDSuccessHandler.bind(this, {})
+    this._fetchStudentsByIDSuccessHandler.bind(this, {}),
   )
 }
 
@@ -111,7 +111,7 @@ OverrideStudentStore.fetchStudentsByName = function (nameString) {
       include: ['enrollments', 'group_ids'],
     },
     this._fetchStudentsByNameSuccessHandler.bind(this, {nameString}),
-    this._fetchStudentsByNameErrorHandler.bind(this, {nameString})
+    this._fetchStudentsByNameErrorHandler.bind(this, {nameString}),
   )
 }
 
@@ -150,7 +150,7 @@ OverrideStudentStore.fetchStudentsForCourse = function () {
       include_inactive: false,
       include: ['enrollments', 'group_ids'],
     },
-    this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1})
+    this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1}),
   )
 }
 
@@ -158,7 +158,7 @@ OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function (
   {pageNumber},
   items,
   status,
-  xhr
+  xhr,
 ) {
   this.addStudents(items)
 
@@ -168,7 +168,7 @@ OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function (
       $.getJSON(
         links.next,
         {},
-        this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: pageNumber + 1})
+        this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: pageNumber + 1}),
       )
     }
   } else {

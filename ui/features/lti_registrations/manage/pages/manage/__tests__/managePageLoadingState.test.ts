@@ -17,11 +17,13 @@
  */
 
 import {act, waitFor} from '@testing-library/react'
-import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
-import type {FetchRegistrations} from 'features/lti_registrations/manage/api/registrations'
 import {renderHook, type RenderResult} from '@testing-library/react-hooks/dom'
-import {mockRegistration, mockPageOfRegistrations} from './helpers'
-import type {ApiResult} from 'features/lti_registrations/manage/api/ApiResult'
+import type {ApiResult} from '../../../../common/lib/apiResult/ApiResult'
+import type {FetchRegistrations} from '../../../api/registrations'
+import {mkUseManagePageState, type ManagePageLoadingState} from '../ManagePageLoadingState'
+import {mockPageOfRegistrations, mockRegistration} from './helpers'
+import {ZAccountId} from '../../../model/AccountId'
+import $ from 'jquery'
 
 // #region helpers
 const mockFetchRegistrations = (
@@ -39,7 +41,7 @@ const mockFetchRegistrations = (
 }
 
 const mockPromise = <T>(
-  apiResultData: T
+  apiResultData: T,
 ): {
   resolve: () => void
   reject: () => void
@@ -57,7 +59,7 @@ const mockPromise = <T>(
     resolve: () => {
       resolve &&
         resolve({
-          _type: 'success',
+          _type: 'Success',
           data: apiResultData,
         })
     },
@@ -76,17 +78,19 @@ const awaitState = async <K extends ManagePageLoadingState['_type']>(
       ManagePageLoadingState,
       {
         readonly setStale: () => void
-      }
+      },
     ]
   >,
   type: K,
-  f: (s: Extract<ManagePageLoadingState, {_type: K}>) => void
+  f: (s: Extract<ManagePageLoadingState, {_type: K}>) => void,
 ) => {
   await waitFor(() => {
     expect(state.current[0]._type).toEqual(type)
   })
   f(state.current[0] as Extract<ManagePageLoadingState, {_type: K}>)
 }
+
+const accountId = ZAccountId.parse('foo')
 
 /**
  * Creates a few mock promises and renders the hook.
@@ -99,7 +103,8 @@ const setup = () => {
 
   const useManagePageState = mkUseManagePageState(
     mockFetchRegistrations(req1.promise, req2.promise),
-    () => deleteReq.promise
+    () => deleteReq.promise,
+    jest.fn(),
   )
 
   const {result, rerender} = renderHook<
@@ -111,6 +116,7 @@ const setup = () => {
       page: 1,
       q: '',
       sort: 'name',
+      accountId,
     },
   })
   return {result, rerender, req1, req2, deleteReq}
@@ -137,7 +143,7 @@ test('it should load results', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(3)
+    expect(state.items.data).toHaveLength(3)
   })
 })
 
@@ -176,6 +182,21 @@ test('it should handle race conditions when an in-flight request is made stale',
     page: 1,
     q: 'Ba',
     sort: 'name',
+    accountId,
+  })
+
+  await awaitState(result, 'reloading', state => {
+    expect(state.items).toBeUndefined()
+  })
+  // #endregion
+
+  // #region UPDATE SEARCH
+  rerender({
+    dir: 'asc',
+    page: 1,
+    q: 'Ba',
+    sort: 'name',
+    accountId,
   })
 
   await awaitState(result, 'reloading', state => {
@@ -200,7 +221,7 @@ test('it should handle race conditions when an in-flight request is made stale',
 
   // The second request should be the one that populates the items
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 })
@@ -234,6 +255,7 @@ test('it should handle race conditions when a later request is resolved quicker'
     page: 1,
     q: 'Ba',
     sort: 'name',
+    accountId,
   })
 
   await awaitState(result, 'reloading', state => {
@@ -246,7 +268,7 @@ test('it should handle race conditions when a later request is resolved quicker'
     req2.resolve()
   })
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 
@@ -257,7 +279,7 @@ test('it should handle race conditions when a later request is resolved quicker'
 
   await awaitState(result, 'loaded', state => {
     // the initial request should be ignored
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
   // #endregion
 })
@@ -274,7 +296,7 @@ test('it should reload results when the query is changed', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(3)
+    expect(state.items.data).toHaveLength(3)
   })
 
   act(() => {
@@ -290,6 +312,7 @@ test('it should reload results when the query is changed', async () => {
     page: 1,
     q: 'Ba',
     sort: 'name',
+    accountId,
   })
 
   await awaitState(result, 'reloading', state => {
@@ -301,7 +324,7 @@ test('it should reload results when the query is changed', async () => {
   })
 
   await awaitState(result, 'loaded', state => {
-    expect(state.items.data.length).toBe(2)
+    expect(state.items.data).toHaveLength(2)
   })
 })
 // TOOD flatten if you can to adhere to paul's style
@@ -313,10 +336,13 @@ describe('deleteRegistration', () => {
     req1.resolve()
 
     await awaitState(result, 'loaded', state => {
-      expect(state.items.data.length).toBe(3)
+      expect(state.items.data).toHaveLength(3)
     })
 
-    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+    const deletionPromise = result.current[1].deleteRegistration(
+      mockRegistration('Foo', 0),
+      ZAccountId.parse('0'),
+    )
     deleteReq.resolve()
 
     await awaitState(result, 'reloading', state => {
@@ -325,7 +351,7 @@ describe('deleteRegistration', () => {
 
     req2.resolve()
     expect(await deletionPromise).toEqual({
-      _type: 'success',
+      _type: 'Success',
     })
   })
 
@@ -338,10 +364,13 @@ describe('deleteRegistration', () => {
     })
 
     await awaitState(result, 'loaded', state => {
-      expect(state.items.data.length).toBe(3)
+      expect(state.items.data).toHaveLength(3)
     })
 
-    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+    const deletionPromise = result.current[1].deleteRegistration(
+      mockRegistration('Foo', 0),
+      ZAccountId.parse('0'),
+    )
 
     deleteReq.reject()
 
@@ -351,7 +380,7 @@ describe('deleteRegistration', () => {
 
     req2.resolve()
     expect(await deletionPromise).toEqual({
-      _type: 'error',
+      _type: 'GenericError',
       message: 'Error deleting app “Foo”',
     })
   })

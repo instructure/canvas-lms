@@ -17,243 +17,152 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, screen} from '@testing-library/react'
 import SubmissionProgressBars from '../SubmissionProgressBars'
-import {shallow} from 'enzyme'
-import {render} from '@testing-library/react'
-import sinon from 'sinon'
 
 const user = {_id: '1'}
 
-describe('StudentContextTray/Progress', () => {
-  let grade, score, spy, subject, submission, tag
-
-  afterEach(() => {
-    if (subject) {
-      const componentNode = ReactDOM.findDOMNode(subject)
-      if (componentNode) {
-        ReactDOM.unmountComponentAtNode(componentNode.parentNode)
-      }
-    }
-    grade = null
-    score = null
-    spy = null
-    submission = null
-    subject = null
-    tag = null
-  })
-
+describe('SubmissionProgressBars', () => {
   describe('displayGrade', () => {
-    beforeEach(() => {
-      subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={[]} />)
+    it('returns EX when submission is excused', () => {
+      const submission = {id: '1', excused: true, assignment: {points_possible: 25}}
+      expect(SubmissionProgressBars.displayGrade(submission)).toBe('EX')
     })
 
-    describe('when submission is excused', () => {
-      test('it returns `EX`', () => {
-        submission = {id: '1', excused: true, assignment: {points_possible: 25}}
-        grade = SubmissionProgressBars.displayGrade(submission)
-        expect(grade).toEqual('EX')
-      })
+    it('returns the grade when it is a percentage', () => {
+      const percentage = '80%'
+      const submission = {
+        id: '1',
+        excused: false,
+        grade: percentage,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayGrade(submission)).toBe(percentage)
     })
 
-    describe('when grade is a percentage', () => {
-      test('it returns the grade', () => {
-        const percentage = '80%'
-        submission = {
-          id: '1',
-          excused: false,
-          grade: percentage,
-          assignment: {points_possible: 25},
-        }
-        grade = SubmissionProgressBars.displayGrade(submission)
-        expect(grade).toEqual(percentage)
-      })
+    it('calls renderIcon when grade is complete or incomplete', () => {
+      const submission = {
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+      const spy = jest.spyOn(SubmissionProgressBars, 'renderIcon')
+
+      SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
+      expect(spy).toHaveBeenCalledTimes(1)
+      spy.mockClear()
+
+      SubmissionProgressBars.displayGrade({...submission, grade: 'incomplete'})
+      expect(spy).toHaveBeenCalledTimes(1)
+      spy.mockRestore()
     })
 
-    describe('when grade is complete or incomplete', () => {
-      test('it calls `renderIcon`', () => {
-        submission = {
-          id: '1',
-          excused: false,
-          assignment: {points_possible: 25},
-        }
-        spy = sinon.spy(SubmissionProgressBars, 'renderIcon')
-
-        SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
-        expect(spy.calledOnce).toBeTruthy()
-        spy.resetHistory()
-
-        SubmissionProgressBars.displayGrade({...submission, grade: 'incomplete'})
-        expect(spy.calledOnce).toBeTruthy()
-        SubmissionProgressBars.renderIcon.restore()
-      })
+    it('renders score/points_possible when grade is a random string', () => {
+      const submission = {
+        grade: 'A+',
+        score: '15',
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayGrade(submission)).toBe('15/25')
     })
 
-    describe('when grade is a random string', () => {
-      test('it renders `score/points_possible`', () => {
-        const pointsPossible = 25
-        score = '15'
-        grade = 'A+'
-        submission = {
-          grade,
-          score,
-          id: '1',
-          excused: false,
-          assignment: {points_possible: pointsPossible},
-        }
-        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
-        )
-      })
-    })
-
-    describe('by default', () => {
-      test('it renders `score/points_possible`', () => {
-        const pointsPossible = 25
-        grade = '15'
-        score = '15'
-        submission = {
-          grade,
-          score,
-          id: '1',
-          excused: false,
-          assignment: {points_possible: pointsPossible},
-        }
-        expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
-        )
-      })
+    it('renders score/points_possible by default', () => {
+      const submission = {
+        grade: '15',
+        score: '15',
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayGrade(submission)).toBe('15/25')
     })
   })
 
   describe('displayScreenreaderGrade', () => {
-    beforeEach(() => {
-      subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={[]} />)
+    it('returns excused when submission is excused', () => {
+      const submission = {id: '1', excused: true, assignment: {points_possible: 25}}
+      expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toBe('excused')
     })
 
-    describe('when submission is excused (2)', () => {
-      test('it returns `excused`', () => {
-        submission = {id: '1', excused: true, assignment: {points_possible: 25}}
-        grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
-        expect(grade).toEqual('excused')
-      })
+    it('returns the grade when it is a percentage', () => {
+      const percentage = '80%'
+      const submission = {
+        id: '1',
+        excused: false,
+        grade: percentage,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toBe(percentage)
     })
 
-    describe('when grade is a percentage (2)', () => {
-      test('it returns the grade', () => {
-        const percentage = '80%'
-        submission = {
-          id: '1',
-          excused: false,
-          grade: percentage,
-          assignment: {points_possible: 25},
-        }
-        grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
-        expect(grade).toEqual(percentage)
-      })
+    it('returns complete or incomplete when grade is complete/incomplete', () => {
+      const submission = {
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+
+      expect(
+        SubmissionProgressBars.displayScreenreaderGrade({...submission, grade: 'complete'}),
+      ).toBe('complete')
+      expect(
+        SubmissionProgressBars.displayScreenreaderGrade({...submission, grade: 'incomplete'}),
+      ).toBe('incomplete')
     })
 
-    describe('when grade is complete or incomplete (2)', () => {
-      test('renders `complete` or `incomplete`', () => {
-        submission = {
-          id: '1',
-          excused: false,
-          assignment: {points_possible: 25},
-        }
-
-        grade = SubmissionProgressBars.displayScreenreaderGrade({...submission, grade: 'complete'})
-        expect(grade).toEqual('complete')
-
-        grade = SubmissionProgressBars.displayScreenreaderGrade({
-          ...submission,
-          grade: 'incomplete',
-        })
-        expect(grade).toEqual('incomplete')
-      })
+    it('renders score/points_possible when grade is a random string', () => {
+      const submission = {
+        grade: 'A+',
+        score: '15',
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toBe('15/25')
     })
 
-    describe('when grade is a random string (2)', () => {
-      test('it renders `score/points_possible`', () => {
-        const pointsPossible = 25
-        score = '15'
-        grade = 'A+'
-        submission = {
-          grade,
-          score,
-          id: '1',
-          excused: false,
-          assignment: {points_possible: pointsPossible},
-        }
-        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
-        )
-      })
-    })
-
-    describe('by default (2)', () => {
-      test('it renders `score/points_possible`', () => {
-        const pointsPossible = 25
-        grade = '15'
-        score = '15.56789'
-        submission = {
-          grade,
-          score,
-          id: '1',
-          excused: false,
-          assignment: {points_possible: pointsPossible},
-        }
-        expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
-          `15.57/${pointsPossible}`
-        )
-      })
+    it('renders score/points_possible by default with proper rounding', () => {
+      const submission = {
+        grade: '15',
+        score: '15.56789',
+        id: '1',
+        excused: false,
+        assignment: {points_possible: 25},
+      }
+      expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toBe('15.57/25')
     })
   })
 
   describe('renderIcon', () => {
-    describe('when grade is `complete`', () => {
-      test('renders icon with `icon-check` class', () => {
-        subject = TestUtils.renderIntoDocument(
-          <SubmissionProgressBars
-            submissions={[
-              {
-                id: '1',
-                grade: 'complete',
-                score: 25,
-                assignment: {name: 'test', points_possible: 25, html_url: '/test'},
-                user,
-              },
-            ]}
-          />
-        )
-        tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
-        expect(tag.className).toEqual('icon-check')
-      })
+    it('renders icon with icon-check class when grade is complete', () => {
+      const submission = {
+        id: '1',
+        grade: 'complete',
+        score: 25,
+        assignment: {name: 'test', points_possible: 25, html_url: '/test'},
+        user,
+      }
+      render(<SubmissionProgressBars submissions={[submission]} />)
+      expect(screen.getByTestId('submission-grade-icon-complete')).toHaveClass('icon-check')
     })
 
-    describe('when grade is `complete` (2)', () => {
-      test('renders icon with `icon-check` class', () => {
-        subject = TestUtils.renderIntoDocument(
-          <SubmissionProgressBars
-            submissions={[
-              {
-                id: '1',
-                grade: 'incomplete',
-                score: 0,
-                assignment: {name: 'test', points_possible: 25, html_url: '/test'},
-                user,
-              },
-            ]}
-          />
-        )
-        tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
-        expect(tag.className).toEqual('icon-x')
-      })
+    it('renders icon with icon-x class when grade is incomplete', () => {
+      const submission = {
+        id: '1',
+        grade: 'incomplete',
+        score: 0,
+        assignment: {name: 'test', points_possible: 25, html_url: '/test'},
+        user,
+      }
+      render(<SubmissionProgressBars submissions={[submission]} />)
+      expect(screen.getByTestId('submission-grade-icon-incomplete')).toHaveClass('icon-x')
     })
   })
 
   describe('render', () => {
-    test('renders one ProgressBar component per submission', () => {
+    it('renders one progress bar per submission', () => {
       const submissions = [
         {
           id: '1',
@@ -277,15 +186,11 @@ describe('StudentContextTray/Progress', () => {
           assignment: {name: 'test', points_possible: 25, html_url: '/test'},
         },
       ]
-      const wrapper = render(<SubmissionProgressBars submissions={submissions} />)
-
-      const ProgressBarBars = wrapper.container.querySelectorAll(
-        '.StudentContextTray-Progress__Bar'
-      ) // Assuming ProgressBar is the name of the component
-      expect(ProgressBarBars.length).toEqual(submissions.length)
+      render(<SubmissionProgressBars submissions={submissions} />)
+      expect(screen.getAllByTestId('submission-progress-bar')).toHaveLength(submissions.length)
     })
 
-    test('ignores submissions with null grades', () => {
+    it('ignores submissions with null grades', () => {
       const submissions = [
         {
           id: '1',
@@ -303,11 +208,11 @@ describe('StudentContextTray/Progress', () => {
         },
       ]
 
-      const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      expect(tray.find('ProgressBar').length).toEqual(1)
+      render(<SubmissionProgressBars submissions={submissions} />)
+      expect(screen.getAllByTestId('submission-progress-bar')).toHaveLength(1)
     })
 
-    test('links to submission urls', () => {
+    it('links to submission urls', () => {
       const submissions = [
         {
           id: '1',
@@ -318,13 +223,8 @@ describe('StudentContextTray/Progress', () => {
         },
       ]
 
-      const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      expect(
-        tray
-          .find('Link')
-          .getElement()
-          .props.href.match(/submissions\/99/)
-      ).toBeTruthy()
+      render(<SubmissionProgressBars submissions={submissions} />)
+      expect(screen.getByTestId('submission-link')).toHaveAttribute('href', 'grades/submissions/99')
     })
   })
 })

@@ -18,15 +18,16 @@
 
 // Ignored rules can be removed incrementally
 // Resolving all these up-front is untenable and unlikely
-/* eslint-disable eqeqeq,@typescript-eslint/no-redeclare,@typescript-eslint/no-shadow */
-/* eslint-disable block-scoped-var,no-var,prefer-const,no-restricted-globals,vars-on-top */
-/* eslint-disable promise/catch-or-return,@typescript-eslint/no-unused-vars,no-empty */
-/* eslint-disable no-loop-func,no-constant-condition,no-alert */
+
+/* eslint-disable prefer-const */
+/* eslint-disable no-empty */
+/* eslint-disable no-redeclare */
+/* eslint-disable no-constant-condition */
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {find, forEach, keys, difference} from 'lodash'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
@@ -70,10 +71,20 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
+import MasteryPathToggleView from '@canvas/mastery-path-toggle/backbone/views/MasteryPathToggle'
+import {renderError, restoreOriginalMessage} from '@canvas/quizzes/jquery/quiz_form_utils'
 
-const I18n = useI18nScope('quizzes_public')
+const I18n = createI18nScope('quizzes_public')
+const QUESTIONS_NUMBER = 'questions_number'
+const QUESTION_POINTS = 'question_points'
 
-let dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation
+let dueDateList,
+  overrideView,
+  masteryPathToggle,
+  quizModel,
+  sectionList,
+  correctAnswerVisibility,
+  scoreValidation
 
 RichContentEditor.preloadRemoteModule()
 
@@ -124,6 +135,7 @@ const renderDueDates = lockedItems => {
     sectionList = new SectionList(ENV.SECTION_LIST)
 
     dueDateList = new DueDateList(quizModel.get('assignment_overrides'), sectionList, quizModel)
+    quizModel.set('post_to_sis', $('#quiz_post_to_sis').prop('checked'))
 
     overrideView = window.overrideView = new DueDateOverrideView({
       el: '.js-assignment-overrides',
@@ -136,30 +148,36 @@ const renderDueDates = lockedItems => {
       courseId: ENV.COURSE_ID,
     })
 
-    if (ENV.FEATURES?.differentiated_modules) {
-      overrideView.bind('tray:open', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', true)
-        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', true)
-      })
-
-      overrideView.bind('tray:close', () => {
-        $('#quiz_edit_wrapper .btn.save_quiz_button').prop('disabled', false)
-        $('#quiz_edit_wrapper .btn.save_and_publish').prop('disabled', false)
-      })
-    }
+    $('#quiz_post_to_sis').on('change', e => {
+      const postToSISChecked = e.target.checked
+      quizModel.set('post_to_sis', postToSISChecked)
+    })
 
     overrideView.render()
+
+    if (
+      ENV.IN_PACED_COURSE &&
+      ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+      ENV.FEATURES.course_pace_pacing_with_mastery_paths
+    ) {
+      masteryPathToggle = window.masteryPathToggle = new MasteryPathToggleView({
+        el: '.js-assignment-overrides-mastery-paths',
+        model: dueDateList,
+      })
+
+      masteryPathToggle.render()
+    }
   }
 }
 
 const clickSetCorrect = I18n.t(
     'titles.click_to_set_as_correct',
-    'Click to set this answer as correct'
+    'Click to set this answer as correct',
   ),
   isSetCorrect = I18n.t('titles.set_as_correct', 'This answer is set as correct'),
   clickUnsetCorrect = I18n.t(
     'titles.click_to_unset_as_correct',
-    'Click to unset this answer as correct'
+    'Click to unset this answer as correct',
   ),
   correctAnswerLabel = I18n.t('labels.correct_answer', 'Correct Answer'),
   possibleAnswerLabel = I18n.t('labels.possible_answer', 'Possible Answer')
@@ -252,7 +270,7 @@ function getChangeMultiFunc($questionContent, questionType, $select) {
       $select.append(
         "<option class='shown_when_no_other_options_available' value='0'>" +
           htmlEscape(I18n.t('enter_answer_variable_above', '[ Enter Answer Variables Above ]')) +
-          '</option>'
+          '</option>',
       )
     }
     $select.find('option.to_be_removed').remove()
@@ -281,7 +299,7 @@ export const quiz = (window.quiz = {
   // Determines whether or not to show the "show question details" link.
   checkShowDetails() {
     const hasQuestions = this.$questions.find(
-      'div.display_question:not(.essay_question, .file_upload_question, .text_only_question)'
+      'div.display_question:not(.essay_question, .file_upload_question, .text_only_question)',
     ).length
     this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200)
   },
@@ -374,10 +392,10 @@ export const quiz = (window.quiz = {
       match_id: answer.match_id,
     }
     templateData.comments_header = I18n.beforeLabel(
-      I18n.t('labels.comments_on_answer', 'Comments, if the user chooses this answer')
+      I18n.t('labels.comments_on_answer', 'Comments, if the user chooses this answer'),
     )
     templateData.short_answer_header = I18n.beforeLabel(
-      I18n.t('labels.possible_answer', 'Possible Answer')
+      I18n.t('labels.possible_answer', 'Possible Answer'),
     )
 
     $answer
@@ -386,18 +404,18 @@ export const quiz = (window.quiz = {
         'title',
         I18n.t(
           'titles.click_to_enter_comments_on_answer',
-          'Click to enter comments for the student if they choose this answer'
-        )
+          'Click to enter comments for the student if they choose this answer',
+        ),
       )
 
     if (question_type === 'essay_question' || question_type === 'file_upload_question') {
       templateData.comments_header = I18n.beforeLabel(
-        I18n.t('labels.comments_on_question', 'Comments for this question')
+        I18n.t('labels.comments_on_question', 'Comments for this question'),
       )
     } else if (question_type === 'matching_question') {
       templateData.answer_match_left_html = answer.answer_match_left_html
       templateData.comments_header = I18n.beforeLabel(
-        I18n.t('labels.comments_on_wrong_match', 'Comments if the user gets this match wrong')
+        I18n.t('labels.comments_on_wrong_match', 'Comments if the user gets this match wrong'),
       )
       $answer
         .find('.comment_focus')
@@ -405,19 +423,19 @@ export const quiz = (window.quiz = {
           'title',
           I18n.t(
             'titles.click_to_enter_comments_on_wrong_match',
-            'Click to enter comments for the student if they miss this match'
-          )
+            'Click to enter comments for the student if they miss this match',
+          ),
         )
     } else if (question_type === 'missing_word_question') {
       templateData.short_answer_header = I18n.beforeLabel(
-        I18n.t('labels.answer_text', 'Answer text')
+        I18n.t('labels.answer_text', 'Answer text'),
       )
     } else if (question_type === 'multiple_choice_question') {
       templateData.answer_html = answer.answer_html
     } else if (question_type === 'multiple_answers_question') {
       templateData.answer_html = answer.answer_html
       templateData.short_answer_header = I18n.beforeLabel(
-        I18n.t('labels.answer_text', 'Answer text')
+        I18n.t('labels.answer_text', 'Answer text'),
       )
     } else if (question_type === 'fill_in_multiple_blanks_question') {
       templateData.blank_id = answer.blank_id
@@ -510,13 +528,21 @@ export const quiz = (window.quiz = {
           tinyOptions: {
             aria_label: I18n.t(
               'label.question.instructions',
-              'Question instructions, rich text area'
+              'Question instructions, rich text area',
             ),
           },
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
-        }
+          $form
+            .find('.question-text')
+            .find('iframe')
+            .contents()
+            .find('body')
+            .on('input', () => {
+              restoreOriginalMessage($form.find('.question-text'))
+            })
+        },
       )
       $form
         .find('.text_after_answers')
@@ -766,7 +792,7 @@ export const quiz = (window.quiz = {
       $text.html("<span class='text_before_answers'>" + raw(question.question_text) + '</span> ')
       $text.append($select)
       $text.append(
-        " <span class='text_after_answers'>" + raw(question.text_after_answers) + '</span>'
+        " <span class='text_after_answers'>" + raw(question.text_after_answers) + '</span>',
       )
     } else if (
       question.question_type === 'multiple_dropdowns_question' ||
@@ -817,12 +843,12 @@ export const quiz = (window.quiz = {
         $text.append(
           htmlEscape(
             I18n.beforeLabel(
-              I18n.t('labels.other_incorrect_matches', 'Other Incorrect Match Options')
-            )
+              I18n.t('labels.other_incorrect_matches', 'Other Incorrect Match Options'),
+            ),
           ) +
             "<ul class='matching_answer_incorrect_matches_list'>" +
             codeHtml +
-            '</ul>'
+            '</ul>',
         )
       }
     }
@@ -839,7 +865,7 @@ export const quiz = (window.quiz = {
         quiz.defaultQuestionData.question_type = question_type
         quiz.defaultQuestionData.answer_count = Math.min(
           $question.find('.answers .answer').length,
-          4
+          4,
         )
       }
     }
@@ -849,7 +875,7 @@ export const quiz = (window.quiz = {
       .showIf(
         !$question.closest('.question_holder').hasClass('group') &&
           !$('#questions').hasClass('survey_quiz') &&
-          question.question_type !== 'text_only_question'
+          question.question_type !== 'text_only_question',
       )
     $question.find('.unsupported_question_type_message').remove()
     quiz.updateDisplayComments()
@@ -940,7 +966,7 @@ export const quiz = (window.quiz = {
       .showIf(
         !$formQuestion.closest('.question_holder').hasClass('group') &&
           !$('#questions').hasClass('survey_quiz') &&
-          question_type !== 'text_only_question'
+          question_type !== 'text_only_question',
       )
 
     const options = {
@@ -1049,6 +1075,7 @@ export const quiz = (window.quiz = {
       result.htmlValues = []
     }
     $formQuestion.find('.answer.hidden').remove()
+    hideAlertBox($form.find('.answers_warning'))
     $form.find("input[name='answer_selection_type']").val(result.answer_selection_type).change()
     $form.find('.add_answer_link').showIf(options.addable)
     var $answers = $formQuestion.find('.form_answers .answer')
@@ -1277,24 +1304,33 @@ scoreValidation = {
   },
 
   initValidators() {
+    const $inputField = $('.points-possible')
     $('input#quiz_points_possible')
-      .on('invalid:not_a_number', function (e) {
-        $(this).errorBox(
+      .on('invalid:not_a_number', function () {
+        renderError(
+          $inputField,
           I18n.t(
             'errors.quiz_score_not_a_number',
-            'Score must be a number between 0 and 2,000,000,000.'
-          )
+            'Score must be a number between 0 and 2,000,000,000.',
+          ),
         )
       })
-      .on('invalid:greater_than', function (e) {
-        $(this).errorBox(I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'))
-      })
-      .on('invalid:less_than', function (e) {
-        $(this).errorBox(
-          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.')
+      .on('invalid:greater_than', function () {
+        renderError(
+          $inputField,
+          I18n.t('errors.quiz_score_too_short', 'Score must be greater than 0.'),
         )
       })
-    $('input#quiz_points_possible').change(this.validatePoints)
+      .on('invalid:less_than', function () {
+        renderError(
+          $inputField,
+          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'),
+        )
+      })
+      .on('valid', function () {
+        restoreOriginalMessage($inputField)
+      })
+      .on('change', () => this.validatePoints())
   },
 
   validatePoints() {
@@ -1303,13 +1339,12 @@ scoreValidation = {
 
     if (value && Number.isNaN(Number(numVal))) {
       $('input#quiz_points_possible').trigger('invalid:not_a_number')
-      // valid = false;
     } else if (numVal > 2000000000) {
       $('input#quiz_points_possible').trigger('invalid:less_than')
-      // valid = false;
     } else if (numVal < 0) {
       $('input#quiz_points_possible').trigger('invalid:greater_than')
-      // valid = false;
+    } else {
+      $('input#quiz_points_possible').trigger('valid')
     }
   },
 
@@ -1332,7 +1367,7 @@ const ipFilterValidation = {
 
   initValidators() {
     $('#quiz_ip_filter').on('invalid:ip_filter', function (e) {
-      $(this).errorBox(I18n.t('IP filter is not valid.'))
+      renderError($('.ip-filter'), I18n.t('IP filter is not valid.'))
     })
   },
 
@@ -1343,6 +1378,31 @@ const ipFilterValidation = {
 
       // Prevent $.fn.formErrors from giving error box with cryptic message.
       delete resp.invalid_ip_filter
+    }
+  },
+}
+
+const timeLimitValidation = {
+  init() {
+    this.initValidators.apply(this)
+    $('#quiz_options_form').on('xhrError', this.onFormError)
+  },
+
+  initValidators() {
+    $('#quiz_time_limit').on('invalid:time_limit', function (e) {
+      const $inputField = $('.time-limit')
+
+      renderError($inputField, I18n.t('errors.invalid_time_limit', 'Time limit is not valid.'))
+    })
+  },
+
+  onFormError(e, resp) {
+    if (resp && resp.invalid_time_limit) {
+      const event = 'invalid:time_limit'
+      $('#quiz_time_limit').triggerHandler(event)
+
+      // Prevent $.fn.formErrors from giving error box with cryptic message.
+      delete resp.invalid_time_limit
     }
   },
 }
@@ -1390,11 +1450,19 @@ correctAnswerVisibility = {
     const that = correctAnswerVisibility
 
     that.$toggler.on('invalid:bad_range', () => {
-      $('#quiz_hide_correct_answers_at').errorBox(
-        I18n.t('errors.invalid_show_correct_answers_range', 'Hide date cannot be before show date.')
+      renderError(
+        $('.hide-correct-answers'),
+        I18n.t(
+          'errors.invalid_show_correct_answers_range',
+          'Hide date cannot be before show date.',
+        ),
       )
 
       return true
+    })
+
+    that.$toggler.on('valid', () => {
+      restoreOriginalMessage($('.hide-correct-answers'))
     })
 
     that.$pickers.on('change', that.validateRange)
@@ -1413,18 +1481,13 @@ correctAnswerVisibility = {
     const $hide_at = that.$options.find('#quiz_hide_correct_answers_at')
     const $show_at = that.$options.find('#quiz_show_correct_answers_at')
 
-    // Clear any existing error boxes
-    that.$pickers.each(function () {
-      const $errorBox = $(this).data('associated_error_box')
-
-      if ($errorBox) {
-        $errorBox.remove()
-      }
-    })
+    restoreOriginalMessage($('#quiz_show_correct_answers_options'))
 
     if ($show_at.val().length && $hide_at.val().length) {
       if ($show_at.data().date >= $hide_at.data().date) {
         that.$toggler.triggerHandler('invalid:bad_range')
+      } else {
+        that.$toggler.triggerHandler('valid')
       }
     }
   },
@@ -1534,12 +1597,11 @@ correctAnswerVisibility = {
 }
 
 function makeQuestion(data) {
-  const idx = $('.question_holder:visible').length + 1
   const question = $.extend(
     {},
     quiz.defaultQuestionData,
     {question_name: I18n.t('default_quesiton_name', 'Question')},
-    data
+    data,
   )
   const $question = $('#question_template').clone(true)
   $question.attr('id', '').find('.question').attr('id', 'question_new')
@@ -1863,8 +1925,8 @@ function questionLimitReached(inclusiveLimit) {
         I18n.t(
           'question_limit_reached',
           'You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\n\nAs a workaround, consider spreading the material across multiple quizzes.',
-          {count: numQuestions, limit: QUESTION_LIMIT}
-        )
+          {count: numQuestions, limit: QUESTION_LIMIT},
+        ),
       )
     })
     return true
@@ -1911,6 +1973,142 @@ function formatFloatOrPercentage(val) {
     return I18n.n(valstr)
   }
 }
+function renderAlertBox(inputField, message, focusedElement) {
+  const $inputField = $(inputField)
+  $inputField.removeClass('hidden')
+  $inputField.find('.answers_warning_message').text(message)
+
+  if (focusedElement) {
+    $(focusedElement).attr('aria-describedby', 'answers_warning_alert_box')
+    $(focusedElement).focus(150).trigger('select')
+  }
+}
+
+function hideAlertBox(inputField) {
+  const $inputField = $(inputField)
+  $inputField.addClass('hidden')
+
+  $inputField.find('.answers_warning_message').text('')
+  $(`[aria-describedby="answers_warning_alert_box"]`).removeAttr('aria-describedby')
+}
+
+function getActiveInnerForms() {
+  return {
+    question: $('.question_form').not('#question_form_template'),
+    group: $('.group_top.editing').find('.quiz_group_form'),
+  }
+}
+
+function submitOpenFormsAndCheckValidity() {
+  // Submit open questions and question groups
+  const $forms = $('.question_form:visible,.group_top.editing .quiz_group_form:visible')
+
+  let isValid = true
+
+  $forms.each(function () {
+    const $form = $(this)
+    $form.trigger('submit', {disableInputFocus: !isValid})
+
+    if (!isValid) {
+      return
+    }
+
+    const $invalidInputControls = $form.find('.form-control.invalid')
+
+    if ($invalidInputControls.length) {
+      const $inputs = $invalidInputControls.find('input')
+
+      if ($inputs.length > 0) {
+        isValid = false
+      }
+
+      const $iframes = $invalidInputControls.find('iframe')
+
+      if ($iframes.length > 0) {
+        isValid = false
+        const $firstIframe = $iframes.first()
+        const $drawerLayoutContent = $('#drawer-layout-content')
+        $drawerLayoutContent.scrollTo({
+          top:
+            $drawerLayoutContent.scrollTop() + $firstIframe.get(0).getBoundingClientRect().y - 20,
+          left: 0,
+        })
+      }
+    }
+
+    const $alerts = $form.find('.answers_warning').not('.hidden')
+
+    if ($alerts.length > 0) {
+      isValid = false
+      const $firstAlert = $alerts.first()
+      const $drawerLayoutContent = $('#drawer-layout-content')
+      $drawerLayoutContent.scrollTo({
+        top: $drawerLayoutContent.scrollTop() + $firstAlert.get(0).getBoundingClientRect().y - 20,
+        left: 0,
+      })
+    }
+  })
+
+  return isValid
+}
+
+function renderQuestionGroupError(inputName, message, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
+  inputContainer.addClass('invalid')
+  inputMessageContainer.addClass('error').removeClass('hidden')
+  inputField.attr('aria-invalid', 'true')
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+  inputMessageText
+    .attr({
+      'aria-live': 'polite',
+      'aria-atomic': 'true',
+    })
+    .text(message)
+  inputMessageText.addClass('error_text')
+}
+
+function clearQuestionGroupError(inputName, form) {
+  const inputField = form.find(`.${inputName}`)
+  const inputContainer = form.find(`.${inputName}_container`)
+  const inputMessageContainer = form.find(`.${inputName}_message_container`)
+  const inputMessageText = inputMessageContainer.find('.input-message__text')
+
+  inputContainer.removeClass('invalid')
+  inputField.removeAttr('aria-invalid')
+  inputMessageContainer.removeClass('error')
+  inputMessageText.removeAttr('aria-live').removeAttr('aria-atomic').removeClass('error_text')
+
+  inputMessageContainer.addClass('hidden')
+}
+
+function focusOnFirstError() {
+  const errorsOnOptionsTab = $('#options_tab .form-control.invalid input')
+  const errorsOnQuestionsTab = $('#questions_tab .form-control.invalid input')
+
+  if (errorsOnOptionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 0)
+    errorsOnOptionsTab?.first()?.focus()
+  } else if (errorsOnQuestionsTab.length > 0) {
+    $('#quiz_tabs').tabs('option', 'active', 1)
+    errorsOnQuestionsTab?.first()?.focus()
+  }
+}
+
+function restoreSavingButtons() {
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_quiz_button')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save', 'Save'))
+
+  $('#quiz_edit_wrapper')
+    .find('.btn.save_and_publish')
+    .prop('disabled', false)
+    .removeClass('saving')
+    .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
+}
 
 function toggleConditionalReleaseTab(quizType) {
   if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
@@ -1932,6 +2130,7 @@ ready(function () {
   correctAnswerVisibility.init()
   scoreValidation.init()
   ipFilterValidation.init()
+  timeLimitValidation.init()
   renderDueDates(lockedItems)
 
   if ($('#assignment_external_tools').length) {
@@ -1939,7 +2138,7 @@ ready(function () {
       $('#assignment_external_tools')[0],
       'assignment_edit',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.ASSIGNMENT_ID, 10)
+      parseInt(ENV.ASSIGNMENT_ID, 10),
     )
   }
 
@@ -1960,6 +2159,10 @@ ready(function () {
   $('#questions').on('mouseover', '.answer', function (event) {
     $('#questions .answer.hover').removeClass('hover')
     $(this).addClass('hover')
+  })
+
+  $('#quiz_title').on('input', function () {
+    restoreOriginalMessage($('#quiz-title-container'))
   })
 
   $quiz_options_form
@@ -2014,6 +2217,7 @@ ready(function () {
       } else {
         $item.data('saved_value', $(this).val())
         $item.val('--')
+        restoreOriginalMessage($('#multiple_attempts_suboptions'))
       }
     })
     .triggerHandler('change', [true])
@@ -2056,8 +2260,9 @@ ready(function () {
     if ($('#enable_quiz_ip_filter').is(':checked')) {
       if (!data['quiz[ip_filter]']) {
         erratic = true
-        $('#quiz_ip_filter').errorBox(
-          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+        renderError(
+          $('.ip-filter'),
+          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address'),
         )
       }
     }
@@ -2065,8 +2270,9 @@ ready(function () {
     if ($('#enable_quiz_access_code').is(':checked')) {
       if (!data['quiz[access_code]']) {
         erratic = true
-        $('#quiz_access_code').errorBox(
-          I18n.t('errors.missing_access_code', 'You must enter an access code')
+        renderError(
+          $('.access-code'),
+          I18n.t('errors.missing_access_code', 'You must enter an access code'),
         )
       }
     }
@@ -2076,9 +2282,61 @@ ready(function () {
     }
   })
 
+  $('#quiz_points_possible').on('input', function () {
+    restoreOriginalMessage($('#quiz_points_possible'))
+  })
+
+  $('#time_limit_option').on('change', function () {
+    restoreOriginalMessage($('.time-limit'))
+  })
+
+  $('#quiz_time_limit').on('input', function () {
+    restoreOriginalMessage($('.time-limit'))
+  })
+
+  $('#enable_quiz_access_code').on('change', function () {
+    restoreOriginalMessage($('.access-code'))
+  })
+
+  $('#enable_quiz_ip_filter').on('change', function () {
+    restoreOriginalMessage($('.ip-filter'))
+  })
+
+  $('#quiz_access_code').on('input', function () {
+    restoreOriginalMessage($('.access-code'))
+  })
+
+  $('#quiz_ip_filter').on('input', function () {
+    restoreOriginalMessage($('.ip-filter'))
+  })
+
+  $('#question_points').on('input', function () {
+    restoreOriginalMessage($(this).closest('.form-control').first())
+  })
+
+  $('#found_question_group_name').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+  })
+
+  $('#found_question_group_pick').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+  })
+
+  $('#found_question_group_points').on('input', function () {
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+  })
+
   $('#quiz_require_lockdown_browser').change(function () {
     $('#lockdown_browser_suboptions').showIf($(this).prop('checked'))
     $('#quiz_require_lockdown_browser_for_results').prop('checked', true).change()
+  })
+
+  $('.questions_number').on('input', function () {
+    clearQuestionGroupError(QUESTIONS_NUMBER, $(this).closest('.group_edit'))
+  })
+
+  $('.question_points').on('input', function () {
+    clearQuestionGroupError(QUESTION_POINTS, $(this).closest('.group_edit'))
   })
 
   $('#lockdown_browser_suboptions').showIf($('#quiz_require_lockdown_browser').prop('checked'))
@@ -2130,7 +2388,7 @@ ready(function () {
           $dialog
             .find('.searching_message')
             .text(I18n.t('errors.retrieving_filters_failed', 'Retrieving Filters Failed'))
-        }
+        },
       )
     }
   })
@@ -2152,8 +2410,8 @@ ready(function () {
       alert(
         I18n.t(
           'quiz_short_answer_length_error',
-          'Answers for fill in the blank questions must be under 80 characters long'
-        )
+          'Answers for fill in the blank questions must be under 80 characters long',
+        ),
       )
       $(this).val(answerValue.substring(0, 80))
     }
@@ -2161,6 +2419,7 @@ ready(function () {
 
   $('#multiple_attempts_option,#limit_attempts_option,#quiz_allowed_attempts')
     .change(() => {
+      const $inputField = $('#multiple_attempts_suboptions')
       const checked =
         $('#multiple_attempts_option').prop('checked') &&
         $('#limit_attempts_option').prop('checked')
@@ -2169,16 +2428,22 @@ ready(function () {
         const $attempts = $('#quiz_allowed_attempts')
         const $attemptsVal = $attempts.val()
         if (isNaN($attemptsVal)) {
-          alert(I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'))
-          $attempts.val('')
-        } else if ($attemptsVal.length > 3) {
-          alert(
-            I18n.t(
-              'quiz_attempts_length_error',
-              'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left'
-            )
+          renderError(
+            $inputField,
+            I18n.t('quiz_attempts_nan_error', 'Quiz attempts can only be specified in numbers'),
           )
           $attempts.val('')
+        } else if ($attemptsVal.length > 3) {
+          renderError(
+            $inputField,
+            I18n.t(
+              'quiz_attempts_length_error',
+              'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left',
+            ),
+          )
+          $attempts.val('')
+        } else {
+          restoreOriginalMessage($inputField)
         }
       } else {
         $('#hide_results_only_after_last').prop('checked', false)
@@ -2191,8 +2456,32 @@ ready(function () {
 
   $quiz_options_form.formSubmit({
     object_name: 'quiz',
+    disableErrorBox: true,
 
     processData(data) {
+      const activeInnerForms = getActiveInnerForms()
+
+      if (activeInnerForms.group?.length || activeInnerForms.question?.length) {
+        alert(
+          I18n.t(
+            'errors.save_inner_forms',
+            'Save or cancel the open question/group before saving the quiz.',
+          ),
+        )
+
+        if (activeInnerForms.group.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.group.find('.submit_button').first().focus(150)
+        }
+
+        if (activeInnerForms.question.length) {
+          $('#quiz_tabs').tabs('option', 'active', 1)
+          activeInnerForms.question.find('.submit_button').first().focus(150)
+        }
+
+        return false
+      }
+
       RichContentEditor.closeRCE($('#quiz_description'))
       $(this).attr('method', 'PUT')
       const quiz_title = $("input[name='quiz[title]']").val()
@@ -2205,7 +2494,6 @@ ready(function () {
         maxNameLength = ENV.MAX_NAME_LENGTH
       }
 
-      let valid = true
       const validationData = {
         assignment_overrides: overrideView.getAllDates(),
         postToSIS: data['quiz[post_to_sis]'] === '1',
@@ -2221,35 +2509,29 @@ ready(function () {
       })
 
       if (keys(overrideErrs).length > 0) {
-        valid = false
         forEach(overrideErrs, err => {
           err.showError(err.element, err.message)
         })
+        return false
       }
+
       if (validationHelper.nameTooLong()) {
-        valid = false
-        const headerOffset = $('#quiz_title')
-          .errorBox(
-            I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})
-          )
-          .offset()
-        $('html,body').scrollTo({top: headerOffset.top, left: 0})
-      }
-      if (!valid) {
+        renderError(
+          $('.title'),
+          I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1}),
+        )
         return false
       }
 
       if (quiz_title.length === 0) {
-        const offset = $('#quiz_title')
-          .errorBox(I18n.t('errors.field_is_required', 'This field is required'))
-          .offset()
-        $('html,body').scrollTo({top: offset.top, left: 0})
+        renderError($('.title'), I18n.t('errors.field_is_required', 'This field is required'))
         return false
       }
+
       data['quiz[title]'] = quiz_title
 
       data['quiz[points_possible'] = numberHelper.parse(
-        $("input[name='quiz[points_possible]']").val()
+        $("input[name='quiz[points_possible]']").val(),
       )
 
       if (!lockedItems.content) {
@@ -2267,17 +2549,15 @@ ready(function () {
       }
       data.allowed_attempts = attempts
       data['quiz[allowed_attempts]'] = attempts
+      const sectionViewRef = document.getElementById(
+        'manage-assign-to-container',
+      )?.reactComponentInstance
+      sectionViewRef?.focusErrors()
+      if (sectionViewRef?.mustConvertTags()) return false
       let overrides = overrideView.getOverrides()
       data['quiz[only_visible_to_overrides]'] = overrideView.setOnlyVisibleToOverrides()
       if (overrideView.containsSectionsWithoutOverrides() && !hasCheckedOverrides) {
-        const sections = overrideView.sectionsWithoutOverrides()
         var missingDateView = new MissingDateDialog({
-          validationFn() {
-            return sections
-          },
-          labelFn(section) {
-            return section.get('name')
-          },
           success() {
             missingDateView.$dialog.dialog('close').remove()
             missingDateView.remove()
@@ -2334,9 +2614,12 @@ ready(function () {
       $quiz_edit_wrapper.find('.btn.save_and_publish').prop('disabled', true)
     },
 
-    onSubmit(promise, data) {
-      const form = this
+    onClientSideValidationError() {
+      restoreSavingButtons()
+      focusOnFirstError()
+    },
 
+    onSubmit(promise) {
       if (ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED) {
         promise = promise.pipe(promisedData => {
           if (promisedData && promisedData.quiz) {
@@ -2390,20 +2673,10 @@ ready(function () {
       }
 
       function error(data) {
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_quiz_button')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save', 'Save'))
-        $('#quiz_edit_wrapper')
-          .find('.btn.save_and_publish')
-          .prop('disabled', false)
-          .removeClass('saving')
-          .text(I18n.t('buttons.save_and_publish', 'Save & Publish'))
-        $('#quiz_edit_wrapper').find('input[name="publish"]').remove()
-
         $(this).trigger('xhrError', data)
         $(this).formErrors(data)
+        restoreSavingButtons()
+        focusOnFirstError()
       }
     },
   })
@@ -2452,7 +2725,7 @@ ready(function () {
   $('.start_over_link').click(event => {
     event.preventDefault()
     const result = confirm(
-      I18n.t('confirms.scrap_and_restart', 'Scrap this quiz and start from scratch?')
+      I18n.t('confirms.scrap_and_restart', 'Scrap this quiz and start from scratch?'),
     )
     if (result) {
       location.href += '?fresh=1'
@@ -2481,25 +2754,25 @@ ready(function () {
         event.target.value === 'assignment' || event.target.value === 'graded_survey'
       $('#post_to_sis_option').showIf(gradedQuiz)
       $('#quiz_options_form .quiz_survey_setting').showIf(
-        assignment_id && assignment_id.match(/survey/)
+        assignment_id && assignment_id.match(/survey/),
       )
       $('#quiz_points_possible').showIf(assignment_id === 'graded_survey')
       $('#survey_instructions').showIf(
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       $('#quiz_assignment_group_id')
         .closest('.control-group')
         .showIf(assignment_id === 'assignment' || assignment_id === 'graded_survey')
       $('#questions').toggleClass(
         'survey_quiz',
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       $('#quiz_display_points_possible').showIf(
-        assignment_id !== 'survey' && assignment_id !== 'graded_survey'
+        assignment_id !== 'survey' && assignment_id !== 'graded_survey',
       )
       $('#quiz_options_holder').toggleClass(
         'survey_quiz',
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       const url = $('#quiz_urls .update_quiz_url').attr('href')
       $('#quiz_title_input').val(quiz_title)
@@ -2533,7 +2806,7 @@ ready(function () {
               'class',
               $(this)
                 .attr('class')
-                .replace(/answer_for_[A-Za-z0-9]+/g, '')
+                .replace(/answer_for_[A-Za-z0-9]+/g, ''),
             )
             $(this).addClass('answer_for_' + variable)
           })
@@ -2561,7 +2834,7 @@ ready(function () {
         url: $(this).parents('.question_holder').find('.update_question_url').attr('href'),
         message: I18n.t(
           'confirms.delete_question',
-          'Are you sure you want to delete this question?'
+          'Are you sure you want to delete this question?',
         ),
         success(data) {
           $(this).remove()
@@ -2572,6 +2845,7 @@ ready(function () {
 
   $(document).on('click', '.edit_question_link', function (event) {
     event.preventDefault()
+
     var $question = $(this).parents('.question')
     setQuestionID($question)
     var questionID = $question.data('questionID')
@@ -2673,7 +2947,7 @@ ready(function () {
           $td.text(I18n.n(question.answers[idx].variables[jdx].value))
           $td.attr(
             'aria-labelledby',
-            'possible_solution_' + question.answers[idx].variables[jdx].name
+            'possible_solution_' + question.answers[idx].variables[jdx].name,
           )
           $tr.append($td)
         }
@@ -2736,14 +3010,14 @@ ready(function () {
 
     if (REGRADE_OPTIONS[questionID]) {
       const regradeOption = $(QuizRegradeView.prototype.template()).find(
-        'input[value=' + REGRADE_OPTIONS[questionID] + ']'
+        'input[value=' + REGRADE_OPTIONS[questionID] + ']',
       )
       const newAnswer = $form.find('.correct_answer')
       toggleAnswer($question, {regradeOption, newAnswer})
     }
     toggleSelectAnswerAltText(
       $('.form_answers .answer'),
-      quiz.answerSelectionType(question.question_type)
+      quiz.answerSelectionType(question.question_type),
     )
     togglePossibleCorrectAnswerLabel($('.form_answers .answer'))
   })
@@ -2762,13 +3036,17 @@ ready(function () {
   })
 
   $('#question_form_template .cancel_link').click(function (event) {
-    const $displayQuestion = $(this).parents('form').prev()
+    const $form = $(this).parents('form')
+    const $displayQuestion = $form.prev()
     const isNew = $displayQuestion.attr('id') === 'question_new'
+
+    restoreOriginalMessage($form.find('.question_points_holder'))
+    restoreOriginalMessage($form.find('.question-text'))
 
     event.preventDefault()
 
     if (!isNew) {
-      $(this).parents('form').remove()
+      $form.remove()
     }
     $displayQuestion.show()
     $('html,body').scrollTo({top: $displayQuestion.offset().top - 10, left: 0})
@@ -2852,6 +3130,7 @@ ready(function () {
     event.preventDefault()
 
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     if (!$question.hasClass('selectable')) {
       return
     }
@@ -3025,7 +3304,7 @@ ready(function () {
       const msg = I18n.t(
         'confirms.delete_answer',
         'Are you sure? Deleting answers from a question with submissions ' +
-          'disables the option to regrade this question.'
+          'disables the option to regrade this question.',
       )
       if (!confirm(msg)) {
         return
@@ -3038,19 +3317,22 @@ ready(function () {
 
     const $ans = $(this).parents('.answer')
     const $ansHeader = $ans.closest('.question').find('.answers_header')
-    $('.errorBox').not('#error_box_template').remove()
+    hideAlertBox(holder.find('.answers_warning'))
     $ans.remove()
     $ansHeader.focus()
   })
 
   $('.add_question_group_link').click(function (event) {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     if (questionLimitReached()) return
-    $('.question_form .submit_button:visible,.quiz_group_form .submit_button:visible').each(
-      function () {
-        $(this).parents('form').trigger('submit')
-      }
-    )
+
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
     const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
     $('#questions').append($group_top.show()).append($group_bottom.show())
@@ -3064,8 +3346,15 @@ ready(function () {
 
   $('.add_question_link').click(function (event) {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     if (questionLimitReached()) return
-    $('.question_form:visible,.group_top.editing .quiz_group_form:visible').trigger('submit')
+
     const $question = makeQuestion()
     if ($(this).parents('.group_top').length > 0) {
       const groupID = $(this).parents('.group_top')[0].id.replace('group_top_', '')
@@ -3139,10 +3428,10 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_banks_failed',
-                'Question Banks failed to load, please try again'
-              )
+                'Question Banks failed to load, please try again',
+              ),
             )
-        }
+        },
       )
     }
     $dialog.find('.bank.selected').removeClass('selected')
@@ -3187,6 +3476,13 @@ ready(function () {
 
   $('.find_question_link').click(event => {
     event.preventDefault()
+
+    const areAllOpenFormsSaved = submitOpenFormsAndCheckValidity()
+
+    if (!areAllOpenFormsSaved) {
+      return
+    }
+
     const $dialog = $findQuestionDialog
     if (!$dialog.hasClass('loaded')) {
       $dialog.data('banks', {})
@@ -3221,10 +3517,10 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_banks_failed',
-                'Question Banks failed to load, please try again'
-              )
+                'Question Banks failed to load, please try again',
+              ),
             )
-        }
+        },
       )
     }
     $dialog.data('add_source', '')
@@ -3287,6 +3583,29 @@ ready(function () {
   })
 
   $('#add_question_group_dialog .submit_button').click(event => {
+    const restoreDialogButton = dialog => {
+      dialog
+        .find('button')
+        .prop('disabled', false)
+        .filter('.submit_button')
+        .text(I18n.t('buttons.create_group', 'Create Group'))
+    }
+
+    const renderNameError = message => {
+      renderError($('#add_question_group_dialog .name'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPickError = message => {
+      renderError($('#add_question_group_dialog .pick'), message)
+      restoreDialogButton($dialog)
+    }
+
+    const renderPointsError = message => {
+      renderError($('#add_question_group_dialog .points'), message)
+      restoreDialogButton($dialog)
+    }
+
     const $dialog = $('#add_question_group_dialog')
     $dialog
       .find('button')
@@ -3295,11 +3614,68 @@ ready(function () {
       .text(I18n.t('buttons.creating_group', 'Creating Group...'))
 
     const params = $dialog.getFormData()
+
+    let hasValidationErrors = false
+
+    const groupName = params['quiz_group[name]']
+    const groupPicks = params['quiz_group[pick_count]']
+    const groupPoints = params['quiz_group[question_points]']
+
+    // Name validation
+    if (!groupName) {
+      renderNameError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    // Picks validation
+    const parsedPickCount = Number.parseInt(groupPicks, 10)
+
+    if (Number.isNaN(parsedPickCount)) {
+      renderPickError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPicks == null || groupPicks === '') {
+      renderPickError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPickCount < 0) {
+      renderPickError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    // Points validation
+    const parsedPoints = Number.parseInt(groupPoints, 10)
+
+    if (Number.isNaN(parsedPoints)) {
+      renderPointsError(I18n.t('errors.must_be_number', 'Must be a number'))
+      hasValidationErrors = true
+    }
+
+    if (groupPoints == null || groupPoints === '') {
+      renderPointsError(I18n.t('errors.field_is_required', 'This field is required'))
+      hasValidationErrors = true
+    }
+
+    if (parsedPoints < 0) {
+      renderPointsError(I18n.t('question.positive_points', 'Must be zero or greater'))
+      hasValidationErrors = true
+    }
+
+    if (hasValidationErrors) {
+      $('#add_question_group_dialog .form-control.invalid input').first().focus(150)
+      return false
+    }
+
     const quizGroupQuestionPoints = numberHelper.parse(params['quiz_group[question_points]'])
+
     if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-      $(this)
-        .find("input[name='quiz_group[question_points]']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $('#add_question_group_dialog .points'),
+        I18n.t('question.positive_points', 'Must be zero or greater'),
+      )
+      restoreDialogButton($dialog)
       return false
     } else {
       params['quiz_group[question_points]'] = quizGroupQuestionPoints
@@ -3316,11 +3692,7 @@ ready(function () {
       'POST',
       newParams,
       data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('buttons.create_group', 'Create Group'))
+        restoreDialogButton($dialog)
 
         const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
         const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
@@ -3339,18 +3711,19 @@ ready(function () {
 
         updateFindQuestionDialogQuizGroups(group.id)
         $dialog.dialog('close')
+        $dialog.find('input[type="text"]').val('')
       },
-      data => {
-        $dialog
-          .find('button')
-          .prop('disabled', false)
-          .filter('.submit_button')
-          .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
-      }
+      () => {
+        restoreDialogButton($dialog)
+      },
     )
   })
 
   $('#add_question_group_dialog .cancel_button').click(event => {
+    restoreOriginalMessage($('#add_question_group_dialog .name'))
+    restoreOriginalMessage($('#add_question_group_dialog .pick'))
+    restoreOriginalMessage($('#add_question_group_dialog .points'))
+    $('#add_question_group_dialog').find('input[type="text"]').val('')
     $('#add_question_group_dialog').dialog('close')
     $('#quiz_group_select').val('none')
   })
@@ -3466,13 +3839,13 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_questions_failed',
-                'Questions failed to load, please try again'
-              )
+                'Questions failed to load, please try again',
+              ),
             )
           $findQuestionDialog
             .find('.page_link')
             .text(I18n.t('errors.loading_more_questions_failed', 'loading more questions failed'))
-        }
+        },
       )
     })
     .on('click', '.select_all_link', event => {
@@ -3555,15 +3928,16 @@ ready(function () {
             .prop('disabled', false)
             .filter('.submit_button')
             .text(
-              I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again')
+              I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again'),
             )
-        }
+        },
       )
     })
 
   $('.add_answer_link').bind('click', function (event, skipFocus) {
     event.preventDefault()
     const $question = $(this).parents('.question')
+    hideAlertBox($question.find('.answers_warning'))
     var answers = []
     let answer_type = null,
       question_type = null,
@@ -3573,7 +3947,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3586,7 +3960,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3598,7 +3972,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_response_to_essay',
-            'Response to show student after they submit an answer'
+            'Response to show student after they submit an answer',
           ),
         },
       ]
@@ -3609,7 +3983,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_response_to_file_upload',
-            'Response to show student after they submit an answer'
+            'Response to show student after they submit an answer',
           ),
         },
       ]
@@ -3620,7 +3994,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_comments_on_wrong_match',
-            'Response if the user misses this match'
+            'Response if the user misses this match',
           ),
         },
       ]
@@ -3632,7 +4006,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3647,7 +4021,7 @@ ready(function () {
           answer_precision: '10',
           comments: I18n.t(
             'default_answer_comments_on_match',
-            'Response if the student matches this answer'
+            'Response if the student matches this answer',
           ),
         },
       ]
@@ -3659,7 +4033,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3671,7 +4045,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3682,7 +4056,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3717,12 +4091,13 @@ ready(function () {
     $(this).find('.answer_comment').slideToggle()
   })
 
-  $('#question_form_template').submit(function (event) {
+  $('#question_form_template').submit(function (event, data) {
     event.preventDefault()
     event.stopPropagation()
     const $displayQuestion = $(this).prev()
     const $form = $(this)
     $('.errorBox').not('#error_box_template').remove()
+    hideAlertBox($form.find('.answers_warning'))
     var $answers = $form.find('.answer')
     const $question = $(this).find('.question')
     const answers = []
@@ -3733,28 +4108,66 @@ ready(function () {
 
     questionData.question_points = numberHelper.parse(questionData.question_points)
     if (questionData.question_points && questionData.question_points < 0) {
-      $form
-        .find("input[name='question_points']")
-        .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      renderError(
+        $form.find('.question_points_holder'),
+        I18n.t('question.positive_points', 'Must be zero or greater'),
+      )
+
+      if (!data?.disableInputFocus) {
+        // Focus on the question points input
+        $form.find('.question_points_holder.invalid').find('input').first().focus(150)
+      }
+
       return
+    } else {
+      restoreOriginalMessage($form.find('.question_points_holder'))
+    }
+
+    // This is not ideal, but our only way to ensure the validation error gets displayed before
+    // closing the panel. Additionally, this will take HTML tags into account in the length check,
+    // but that's also the case when validated on the backend.
+    const MAX_QUESTION_TEXT_LENGTH = 16_384
+
+    if (questionData.question_text.length > MAX_QUESTION_TEXT_LENGTH) {
+      renderError(
+        $form.find('.question-text'),
+        I18n.t(
+          'question.question_text_too_long',
+          'Question text is too long, max length is 16384 characters',
+        ),
+      )
+
+      if (!data?.disableInputFocus) {
+        $form.find('.question-text').find('iframe').get(0).contentDocument.body.focus()
+      }
+      return
+    } else {
+      restoreOriginalMessage($form.find('.question-text'))
     }
 
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
     let error_text = null
+    let focused_element = null
     if (questionData.question_type === 'calculated_question') {
       if ($form.find('.combinations_holder .combinations tbody tr').length === 0) {
+        focused_element = $form.find('input[name="min"].float_value.min.variable_setting:visible')
+        // if no element is visible set the focus on the RCE
+        if (focused_element.length === 0 && $form.find('iframe').length > 0) {
+          focused_element = $form.find('iframe').get(0).contentDocument.body
+        }
         error_text = I18n.t(
           'errors.no_possible_solution',
-          'Please generate at least one possible solution'
+          'Please generate at least one possible solution',
         )
       }
     } else if ($answers.length === 0 || $answers.filter('.correct_answer').length === 0) {
       if (
         $answers.length === 0 &&
         !['essay_question', 'file_upload_question', 'text_only_question'].includes(
-          questionData.question_type
+          questionData.question_type,
         )
       ) {
+        focused_element = $form.find('.add_answer_link:first')
         error_text = I18n.t('errors.no_answer', 'Please add at least one answer')
       } else if (
         $answers.filter('.correct_answer').length === 0 &&
@@ -3762,6 +4175,7 @@ ready(function () {
           questionData.question_type === 'true_false_question' ||
           questionData.question_tyep === 'missing_word_question')
       ) {
+        focused_element = $form.find('.select_answer_link')
         error_text = I18n.t('errors.no_correct_answer', 'Please choose a correct answer')
       }
     } else if (
@@ -3773,8 +4187,9 @@ ready(function () {
       }
       if (questionData.question_type === 'fill_in_multiple_blanks_question') {
         const $variables = $form.find('.blank_id_select > option')
-        $variables.each((i, answer_blank) => {
+        $variables.each(i => {
           let blankCount = 0
+
           $answers.filter('.answer_idx_' + i).each((i, element) => {
             const $validInputs = $(element)
               .find($("input[name='answer_text']"))
@@ -3784,17 +4199,19 @@ ready(function () {
             }
           })
           if (blankCount == 0) {
+            focused_element = $form.find('.blank_id_select')
             error_text = I18n.t('Please add at least one non-blank answer for each variable.')
           }
         })
       } else {
         const $validAnswers = $answers.filter(
-          "div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer"
+          "div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer",
         )
         const $validInputs = $validAnswers
           .find($("input[name='answer_text']"))
           .not('.disabled_answer')
         if (checkForNotBlanks($validInputs) == 0) {
+          focused_element = $validInputs.first()
           error_text = I18n.t('Please add at least one non-blank answer.')
         }
       }
@@ -3806,7 +4223,11 @@ ready(function () {
         .val()
         .match(/survey/i)
     if (isNotSurvey && error_text) {
-      $form.find('.answers_header').errorBox(error_text, true)
+      renderAlertBox(
+        $form.find('.answers_warning'),
+        error_text,
+        !data?.disableInputFocus ? focused_element : null,
+      )
       return
     }
     const question = $.extend({}, questionData)
@@ -3883,7 +4304,7 @@ ready(function () {
       question.formula_decimal_places =
         numberHelper.parse($question.find('.decimal_places .round').val()) || 0
       question.answer_tolerance = parseFloatOrPercentage(
-        $question.find('.combination_answer_tolerance').val()
+        $question.find('.combination_answer_tolerance').val(),
       )
       question.answerDecimalPoints =
         numberHelper.parse($question.find('.combination_error_margin').val()) || 0
@@ -3941,7 +4362,7 @@ ready(function () {
     }
     if ($('#assessment_question_bank_id').length > 0) {
       questionData['assessment_question[assessment_question_bank_id]'] = $(
-        '#assessment_question_bank_id'
+        '#assessment_question_bank_id',
       ).text()
     }
     $displayQuestion.loadingImage()
@@ -3981,7 +4402,7 @@ ready(function () {
       },
       data => {
         $displayQuestion.formErrors(data)
-      }
+      },
     )
   })
 
@@ -4051,7 +4472,7 @@ ready(function () {
             $teaser
               .find('.teaser.question_text')
               .text(I18n.t('errors.loading_question_failed', 'Loading Question Failed...'))
-          }
+          },
         )
       } else {
         showQuestion(question_data)
@@ -4103,7 +4524,6 @@ ready(function () {
 
   $('.quiz_group_form').formSubmit({
     object_name: 'quiz_group',
-
     formatApiData(data) {
       const newData = {}
       forEach(data, (val, key) => {
@@ -4112,16 +4532,41 @@ ready(function () {
       return newData
     },
     // rewrite the data so that it fits the jsonapi format
-    processData(data) {
+    processData(data, extraData) {
+      const quizGroupQuestionsNumber = numberHelper.parse(data['quiz_group[pick_count]'])
       const quizGroupQuestionPoints = numberHelper.parse(data['quiz_group[question_points]'])
-      if (quizGroupQuestionPoints && quizGroupQuestionPoints < 0) {
-        $(this)
-          .find("input[name='quiz_group[question_points]']")
-          .errorBox(I18n.t('question.positive_points', 'Must be zero or greater'))
+      const validationErrors = validateQuestionGroupData(
+        quizGroupQuestionsNumber,
+        quizGroupQuestionPoints,
+      )
+      const $form = $(this)
+      if (
+        validationErrors.QUESTIONS_NUMBER.length > 0 ||
+        validationErrors.QUESTION_POINTS.length > 0
+      ) {
+        if (validationErrors.QUESTIONS_NUMBER.length > 0) {
+          renderQuestionGroupError(
+            QUESTIONS_NUMBER,
+            validationErrors.QUESTIONS_NUMBER.join(', '),
+            $form,
+          )
+        }
+        if (validationErrors.QUESTION_POINTS.length > 0) {
+          renderQuestionGroupError(
+            QUESTION_POINTS,
+            validationErrors.QUESTION_POINTS.join(', '),
+            $form,
+          )
+        }
+        if (!extraData?.disableInputFocus) {
+          $form.find('.invalid input').first().focus(150)
+        }
         return false
-      } else {
-        data['quiz_group[question_points]'] = quizGroupQuestionPoints
       }
+      clearQuestionGroupError(QUESTION_POINTS, $form)
+      data['quiz_group[question_points]'] = quizGroupQuestionPoints
+      clearQuestionGroupError(QUESTIONS_NUMBER, $form)
+      data['quiz_group[pick_count]'] = quizGroupQuestionsNumber
       return data
     },
     beforeSubmit(formData) {
@@ -4195,6 +4640,40 @@ ready(function () {
       $form.formErrors(data)
     },
   })
+
+  function validateQuestionGroupData(questionsNumber, questionPoints) {
+    const errors = {
+      QUESTIONS_NUMBER: [],
+      QUESTION_POINTS: [],
+    }
+    if (Number.isNaN(questionsNumber) || typeof questionsNumber === 'undefined') {
+      errors.QUESTIONS_NUMBER.push(
+        I18n.t('question_group.questions_number.defined', 'Questions number must be a number'),
+      )
+    }
+    if (Number.isNaN(questionPoints) || typeof questionPoints === 'undefined') {
+      errors.QUESTION_POINTS.push(
+        I18n.t('question_group.question_points.defined', 'Question points must be a number'),
+      )
+    }
+    if (questionsNumber < 0) {
+      errors.QUESTIONS_NUMBER.push(
+        I18n.t(
+          'question_group.questions_number.positive_points',
+          'The amount of questions must be zero or greater',
+        ),
+      )
+    }
+    if (questionPoints < 0) {
+      errors.QUESTION_POINTS.push(
+        I18n.t(
+          'question_group.question_points.positive_points',
+          'The amount of points must be zero or greater',
+        ),
+      )
+    }
+    return errors
+  }
 
   // accessible sortables
   const accessibleSortables = {
@@ -4278,10 +4757,10 @@ ready(function () {
       if (this.intoGroups.length > 0) {
         options = $.map(
           this.intoGroups,
-          g => '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>'
+          g => '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>',
         )
         options.unshift(
-          '<option value="top">' + htmlEscape(I18n.t('top_level', '-- Top level --')) + '</option>'
+          '<option value="top">' + htmlEscape(I18n.t('top_level', '-- Top level --')) + '</option>',
         )
 
         moveWrapper.show()
@@ -4312,12 +4791,12 @@ ready(function () {
           item.id +
           '">' +
           htmlEscape(I18n.t('before_quiz_item', 'before %{name}', {name: item.name})) +
-          '</option>'
+          '</option>',
       )
       options.push(
         '<option value="last">' +
           htmlEscape(I18n.t('at_the_bottom', '-- at the bottom --')) +
-          '</option>'
+          '</option>',
       )
       this.$form.find('#move_select_question').html(raw(options.join('')))
     },
@@ -4325,7 +4804,7 @@ ready(function () {
     itemsInGroup(group) {
       return $.grep(
         this.items,
-        item => item.id != this.selected.id && (group === 'top' ? item.top : item.group == group)
+        item => item.id != this.selected.id && (group === 'top' ? item.top : item.group == group),
       )
     },
 
@@ -4457,7 +4936,7 @@ ready(function () {
           this.$questions.loadingImage('remove')
         },
         {},
-        {contentType: 'application/json'}
+        {contentType: 'application/json'},
       )
     },
 
@@ -4525,7 +5004,7 @@ ready(function () {
         ui.placeholder.append(
           "<div class='question_placeholder' style='height: " +
             raw(ui.helper.height() - 10) +
-            "px;'>&nbsp;</div>"
+            "px;'>&nbsp;</div>",
         )
       }
     },
@@ -4582,7 +5061,7 @@ ready(function () {
       }
 
       let url = $('#quiz_urls .reorder_questions_url, #bank_urls .reorder_questions_url').attr(
-        'href'
+        'href',
       )
       var data = {}
       let $container = $('#questions')
@@ -4626,7 +5105,7 @@ ready(function () {
           $container.loadingImage('remove')
         },
         {},
-        {contentType: 'application/json'}
+        {contentType: 'application/json'},
       )
     },
   })
@@ -4637,6 +5116,7 @@ ready(function () {
         return
       }
       event.preventDefault()
+
       const $top = $(this).parents('.group_top')
       const data = $top.getTemplateData({textValues: ['name', 'pick_count', 'question_points']})
       $top.fillFormData(data, {object_name: 'quiz_group'})
@@ -4675,9 +5155,14 @@ ready(function () {
       })
     })
     .on('click', '.group_edit.cancel_button', function (event) {
-      if ($(this).closest('.group_top').length === 0) {
+      const $groupContainer = $(this).closest('.group_top')
+
+      if ($groupContainer.length === 0) {
         return
       }
+
+      clearQuestionGroupError(QUESTION_POINTS, $groupContainer)
+      clearQuestionGroupError(QUESTIONS_NUMBER, $groupContainer)
       const $top = $(this).parents('.group_top')
       $top.removeClass('editing')
       if ($top.attr('id') === 'group_top_new') {
@@ -4776,7 +5261,7 @@ ready(function () {
     conditionalRelease.editor = ConditionalRelease.attach(
       $('#conditional_release_target').get(0),
       I18n.t('quiz'),
-      ENV.CONDITIONAL_RELEASE_ENV
+      ENV.CONDITIONAL_RELEASE_ENV,
     )
 
     $('#questions').on('change DOMNodeRemoved DOMNodeInserted', () => {
@@ -4839,7 +5324,7 @@ $.fn.multipleAnswerSetsQuestion = function () {
               'class',
               $(this)
                 .attr('class')
-                .replace(/answer_idx_\d+/g, '')
+                .replace(/answer_idx_\d+/g, ''),
             )
           })
           .addClass('answer_idx_' + i)
@@ -4958,13 +5443,13 @@ $.fn.formulaQuestion = function () {
     const mod = 0
     const finished = function () {
       $question.find('.supercalc').superCalc('clear_cached_finds')
-      $button.text('Generate').prop('disabled', false)
+      $button.text(I18n.t('buttons.generate', 'Generate')).prop('disabled', false)
       if (succeeded == 0) {
         alert(
           I18n.t(
             'alerts.no_valid_combinations',
-            'The system could not generate any valid combinations for the parameters given'
-          )
+            'The system could not generate any valid combinations for the parameters given',
+          ),
         )
       } else if (succeeded < cnt) {
         alert(
@@ -4975,8 +5460,8 @@ $.fn.formulaQuestion = function () {
               other:
                 'The system could only generate %{count} valid combinations for the parameters given',
             },
-            {count: succeeded}
-          )
+            {count: succeeded},
+          ),
         )
       }
       $question.triggerHandler('settings_change', false)
@@ -4988,14 +5473,14 @@ $.fn.formulaQuestion = function () {
       $tbody = $table.find('tbody')
     $question.find('.supercalc').superCalc('cache_finds')
     const answer_tolerance = parseFloatOrPercentage(
-      $question.find('.combination_answer_tolerance').val()
+      $question.find('.combination_answer_tolerance').val(),
     )
     var next = function () {
       $button.text(
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
           total: cnt,
-        })
+        }),
       )
       const fragment = document.createDocumentFragment()
       for (let idx = 0; idx < 5 && succeeded < cnt && failedCount < 25; idx++) {
@@ -5044,7 +5529,7 @@ $.fn.formulaQuestion = function () {
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
           total: cnt,
-        })
+        }),
       )
       if (combinationIndex >= cnt || succeeded >= cnt || failedCount >= 25) {
         finished()
@@ -5175,7 +5660,7 @@ $.fn.formulaQuestion = function () {
                     "<td><div style='width: 70%;'><select aria-labelledby='" +
                     label_id +
                     " equation_var_precision' name='round' class='float_value round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></div></td>" +
-                    "<td aria-labelledby='equation_var_example' class='value'></td></tr>"
+                    "<td aria-labelledby='equation_var_example' class='value'></td></tr>",
                 )
 
                 $question.find('.variables tbody').append($variable)

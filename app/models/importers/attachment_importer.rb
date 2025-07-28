@@ -64,7 +64,7 @@ module Importers
         return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
 
         item ||= Attachment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
-        item ||= Attachment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first # if hash[:migration_id]
+        item ||= Attachment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
         item ||= Attachment.find_from_path(hash[:path_name], context)
         if item
           item.mark_as_importing!(migration)
@@ -74,7 +74,7 @@ module Importers
           item.locked = true if hash[:locked]
           item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if hash[:lock_at]
           item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at]) if hash[:unlock_at]
-          item.file_state = "hidden" if hash[:hidden]
+          item.file_state = hash[:hidden] ? "hidden" : "available"
           item.display_name = hash[:display_name] if hash[:display_name]
           item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]
           item.set_publish_state_for_usage_rights unless hash[:locked]

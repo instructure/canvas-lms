@@ -50,6 +50,7 @@ export default function loadFullCalendarLocaleData(locale) {
     'lt',
     'lv',
     'nb',
+    'nn',
     'nl',
     'pl',
     'pt',
@@ -87,7 +88,7 @@ export default function loadFullCalendarLocaleData(locale) {
       return import('../../../ext/custom_moment_locales/ca').then(
         ({default: reconfigureMomentCALocale}) => {
           reconfigureMomentCALocale()
-        }
+        },
       )
     }
   })

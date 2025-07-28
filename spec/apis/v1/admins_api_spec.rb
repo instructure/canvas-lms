@@ -176,8 +176,8 @@ describe "Admins API", type: :request do
         @user = user_factory account: @account
       end
 
-      it "401s" do
-        api_call(:delete, @path, @path_opts, {}, {}, expected_status: 401)
+      it "403s" do
+        api_call(:delete, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 
@@ -283,8 +283,8 @@ describe "Admins API", type: :request do
         @user = user_factory account: @account
       end
 
-      it "401s" do
-        api_call(:get, @path, @path_opts, {}, {}, expected_status: 401)
+      it "403s" do
+        api_call(:get, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 
@@ -413,6 +413,71 @@ describe "Admins API", type: :request do
         ]
       end
     end
+
+    context "search_term filtering" do
+      before :once do
+        @search_user = user_factory(name: "Searchable Admin", account: @account)
+        @search_role = custom_account_role("SearchRole", account: @account)
+        @account.account_users.create!(user: @search_user, role: @search_role)
+      end
+
+      it "returns admins matching a partial name (min 3 chars)" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(search_term: "Sea"))
+        expect(json.map { |au| au["user"]["id"] }).to include(@search_user.id)
+      end
+
+      it "does not return admins for non-matching search_term" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(search_term: "ZZZ"))
+        expect(json.map { |au| au["user"]["id"] }).not_to include(@search_user.id)
+      end
+
+      it "returns 400 bad request for search_term shorter than 2 chars" do
+        @user = @admin
+        expect do
+          api_call(:get, @path, @path_opts.merge(search_term: "S"), {}, {}, expected_status: 400)
+        end.not_to raise_error
+      end
+    end
+
+    context "include_deleted parameter" do
+      before :once do
+        @deleted_user = user_factory(name: "Deleted Admin", account: @account)
+        @deleted_role = custom_account_role("DeletedRole", account: @account)
+        @deleted_au = @account.account_users.create!(user: @deleted_user, role: @deleted_role)
+        @deleted_au.update!(workflow_state: "deleted")
+      end
+
+      it "does not include deleted admins by default" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts)
+        expect(json.map { |au| au["user"]["id"] }).not_to include(@deleted_user.id)
+      end
+
+      it "includes deleted admins when include_deleted is true" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(include_deleted: true))
+        returned_aus = json.select { |au| au["id"] == @deleted_au.id }
+        expect(returned_aus).not_to be_empty
+        expect(returned_aus.first["user"]["id"]).to eq(@deleted_user.id)
+        expect(returned_aus.first["workflow_state"]).to eq("deleted")
+      end
+    end
+
+    context "include parameter" do
+      it "does not include admin uuid by default" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts)
+        expect(json.map { |au| au["user"]["uuid"] }).to eq([nil])
+      end
+
+      it "include admin uuid when include uuid is present" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(include: "uuid"))
+        expect(json.map { |au| au["user"]["uuid"] }).to eq([@admin.uuid])
+      end
+    end
   end
 
   describe "self_roles" do
@@ -427,8 +492,8 @@ describe "Admins API", type: :request do
         @user = user_factory(account: @account)
       end
 
-      it "returns unauthorized" do
-        api_call(:get, @path, @path_opts, {}, {}, expected_status: 401)
+      it "returns forbidden" do
+        api_call(:get, @path, @path_opts, {}, {}, expected_status: 403)
       end
     end
 

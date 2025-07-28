@@ -119,7 +119,7 @@ describe('AssignmentConfigurationsTools', () => {
 
   test('it renders', () => {
     const {container} = render(
-      <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
+      <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />,
     )
     expect(container).toBeInTheDocument()
   })
@@ -133,7 +133,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={courseId}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     expect(ref.current.getDefinitionsUrl()).toBe(correctUrl)
   })
@@ -145,7 +145,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
 
@@ -159,7 +159,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     const toolType = wrapper.container.querySelector('#configuration-tool-type')
@@ -173,11 +173,11 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('#similarity_detection_tool option').length).toBe(
-      toolDefinitions.length + 1
+    expect(wrapper.container.querySelectorAll('#similarity_detection_tool option')).toHaveLength(
+      toolDefinitions.length + 1,
     )
   })
 
@@ -188,7 +188,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
@@ -206,7 +206,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     const tool = toolDefinitions[3]
     const correctUrl = `/courses/1/lti/basic_lti_launch_request/5?display=borderless&secure_params=${secureParams}`
@@ -221,7 +221,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const toolSelect = wrapper.container.querySelector('#similarity_detection_tool')
@@ -239,7 +239,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const toolSelect = wrapper.container.querySelector('#similarity_detection_tool')
@@ -258,87 +258,11 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const selectBox = wrapper.container.querySelector('#similarity_detection_tool')
     expect(selectBox.value).toBe('ContextExternalTool_5')
-  })
-
-  test('shows beginning info alert and adds styles to iframe', async () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-  })
-
-  test('shows ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    expect(ref.current.state.afterExternalContentAlertClass).toBe('')
-    expect(ref.current.state.iframeStyle).toEqual({border: '2px solid #0374B5', width: '-4px'})
-  })
-
-  test('hides beginning info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.before_external_content_info_alert').focus()
-    wrapper.container.querySelector('.before_external_content_info_alert').blur()
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test('hides ending info alert and adds styles to iframe', () => {
-    const ref = React.createRef()
-    const wrapper = render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    wrapper.container.querySelector('.after_external_content_info_alert').focus()
-    wrapper.container.querySelector('.after_external_content_info_alert').blur()
-    expect(ref.current.state.afterExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({border: 'none', width: '100%'})
-  })
-
-  test("doesn't show alerts or add border to iframe by default", () => {
-    const ref = React.createRef()
-    render(
-      <AssignmentConfigurationTools.configTools
-        courseId={1}
-        secureParams={secureParams}
-        ref={ref}
-      />
-    )
-    ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
-    expect(ref.current.state.beforeExternalContentAlertClass).toBe('screenreader-only')
-    expect(ref.current.state.iframeStyle).toEqual({})
   })
 
   test('renders visibility options', () => {
@@ -350,7 +274,7 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     expect(wrapper.container.querySelector('#report_visibility_picker')).toBeInTheDocument()
@@ -365,24 +289,23 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     expect(wrapper.container.querySelector('#report_visibility_picker')).toBeVisible()
   })
 
   test('sets the iframe allowances', () => {
-    const ref = React.createRef()
     const wrapper = render(
       <AssignmentConfigurationTools.configTools
         courseId={1}
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('allow')).toBe(
-      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '),
     )
   })
 
@@ -393,10 +316,10 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('data-lti-launch')).toBe(
-      'true'
+      'true',
     )
   })
 })

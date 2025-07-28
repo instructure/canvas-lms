@@ -23,7 +23,7 @@ describe RuboCop::Cop::Specs::NoSeleniumWebDriverWait do
   let(:msg_regex) { /Avoid using Selenium::WebDriver::Wait/ }
 
   it "disallows Selenium::WebDriver::Wait" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       describe "breaks all the things" do
         wait = Selenium::WebDriver::Wait.new(timeout: 5)
         wait.until do
@@ -35,8 +35,8 @@ describe RuboCop::Cop::Specs::NoSeleniumWebDriverWait do
         expect(f('.self_enrollment_message')).not_to include_text('self_enrollment_code')
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(msg_regex)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(msg_regex)
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 end

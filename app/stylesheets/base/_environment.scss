@@ -26,6 +26,8 @@
 // Mixins
 //==================
 
+@import "base/shared.scss";
+
 // provides RTL support: see https://www.npmjs.com/package/sass-direction for docs
 @import "../../../node_modules/sass-direction/_direction.scss";
 

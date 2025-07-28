@@ -19,11 +19,13 @@
 <%
   context_module_next ||= nil
   context_module ||= context_module_next
-  module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
+  module_data = context_module ? process_module_data(context_module, @current_user, @session, student: @is_student) : { published_status: 'unpublished' }
+  had_data = module_data[:items].present? && module_data[:items].length > 0
   can_direct_share = can_do(@context, @current_user, :direct_share)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
   js_bundle :context_modules_publish_icon
+  css_bundle :context_modules
 %>
 
 <% cache_if_module(context_module, @can_view, @can_add, @can_edit, @can_delete, @is_student, @can_view_unpublished, @current_user, @context) do %>
@@ -61,6 +63,10 @@
     >
       <i class="icon-mini-arrow-down"></i>
       <span class="name"><%= context_module.try_rescue(:name) || nbsp %></span>
+      <% if @context.horizon_course? %>
+        <span class="estimated_duration_header_title"></span>
+        <span class="estimated_duration_header_minutes"></span>
+      <%end%>
     </span>
     <span
       role="button"
@@ -74,6 +80,10 @@
     >
       <i class="icon-mini-arrow-right"></i>
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
+      <% if @context.horizon_course? %>
+        <span class="estimated_duration_header_title"></span>
+        <span class="estimated_duration_header_minutes"></span>
+      <%end%>
     </span>
     <%= render :partial => "context_modules/prerequisites_message", :locals => {:viewable => @can_view, :context_module => context_module} %>
     <div class="module_header_items">
@@ -146,11 +156,12 @@
                   class="icon-edit edit_module_link"
                   title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
               </li>
-              <li role="presentation">
+              <li role="presentation" class="move-contents-container" style="<%= had_data ? '' : 'display:none;' %>">
                 <a
                   href="#<%= context_module ? context_module.id : "{{ id }}" %>"
                   class="move_module_contents_link icon-move-down"
-                  title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
+                  title="<%= t('Move module contents') %>"><%= t('Move Contents...') %>
+                </a>
               </li>
               <li role="presentation">
                 <a
@@ -158,15 +169,13 @@
                   class="move_module_link icon-updown"
                   title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
               </li>
-              <% if Account.site_admin.feature_enabled?(:differentiated_modules) %>
-                <li role="presentation">
-                    <a
-                      href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-                      class="assign_module_link icon-permissions"
-                      title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
-                    </a>
-                </li>
-              <% end %>
+              <li role="presentation">
+                  <a
+                    href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                    class="assign_module_link icon-permissions"
+                    title="<%= t('Assign this module') %>"><%= t('Assign To...') %>
+                  </a>
+              </li>
             <% end %>
             <% if @can_delete %>
               <li role="presentation">
@@ -206,9 +215,28 @@
               </li>
             <% end %>
             <% if @can_view %>
-              <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
-              <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
-              <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
+             <% if Account.site_admin.feature_enabled?(:create_external_apps_side_tray_overrides) %>
+                <% json_data = external_tools_menu_items_grouped_json(
+                  @menu_tools.slice(:module_menu, :module_group_menu, :module_menu_modal),
+                  module_menu: { modules: [context_module&.id || "{{ id }}" ] }
+                ) %>
+                <% if json_data.present? %>
+                  <li role="presentation">
+                    <%= tag.a href: "#",
+                              class: "module_external_apps icon-integrations",
+                              aria: { label: t("View external apps...") },
+                              title: t("View external apps..."),
+                              data: { external_tools: json_data },
+                              role: "presentation" do %>
+                      <%= t("External Apps...") %>
+                    <% end %>
+                  </li>
+                <% end %>
+              <% else %>
+                <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
+                <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+                <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
+              <% end %>
             <% end %>
           </ul>
         <% end %>
@@ -219,9 +247,9 @@
           <span class="require_sequential_progress"><%= context_module.try_rescue(:require_sequential_progress) || "" %></span>
         </span>
       </div>
-      <% if @can_edit && Account.site_admin.feature_enabled?(:differentiated_modules) %>
+      <% if @can_edit %>
         <div class="view_assign">
-          <% if context_module && @module_ids_with_overrides.include?(context_module.id) %>
+          <% if context_module && @module_ids_with_overrides&.include?(context_module.id) %>
             <i aria-hidden="true" class="icon-group"></i>
             <button
               class="btn view_assign_link"
@@ -235,24 +263,28 @@
   </div>
 
   <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
-    <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
-      <% if context_module && module_data[:items] %>
-        <% module_data[:items].each do |item| %>
-          <%
-            item_data = module_data[:items_data][item.id]
-            locals = {
-              :completion_criteria => context_module.completion_requirements,
-              :item_data => item_data,
-              :viewable => @can_view,
-            }
-          %>
-          <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
-          <% if item_data[:show_cyoe_placeholder] %>
-            <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+    <%# This part of code is copied to items_html.html.erb as a temporary solution %>
+    <% unless module_performance_improvement_is_enabled?(@context, @current_user) %>
+      <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
+        <% if context_module && module_data[:items] %>
+          <% module_data[:items].each do |item| %>
+            <%
+              item_data = module_data[:items_data][item.id]
+              locals = {
+                item_restrictions: module_data.dig(:items_restrictions, item.id),
+                completion_criteria: context_module.completion_requirements,
+                item_data: item_data,
+                viewable: @can_view,
+              }
+            %>
+            <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
+            <% if item_data[:show_cyoe_placeholder] %>
+              <%= render :partial => 'context_modules/module_item_conditional_next', :object => item, :as => :module_item, :locals => locals %>
+            <% end %>
           <% end %>
         <% end %>
-      <% end %>
-    </ul>
+      </ul>
+    <% end %>
     <% if !context_module || @can_view && module_data[:items]&.empty? %>
       <div class='module_dnd' data-context-module-id="<%= context_module&.id %>"></div>
     <% end %>

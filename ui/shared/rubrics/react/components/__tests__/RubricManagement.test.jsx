@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import axios from '@canvas/axios'
 import RubricManagement from '../RubricManagement'
 
@@ -36,12 +36,14 @@ describe('RubricManagement', () => {
   })
 
   it('renders the RubricManagement component', () => {
-    const wrapper = shallow(<RubricManagement {...defaultProps()} />)
-    expect(wrapper).toMatchSnapshot()
+    const wrapper = render(<RubricManagement {...defaultProps()} />)
+    expect(wrapper.getByText('Account Rubrics')).toBeInTheDocument()
+    expect(wrapper.getByText('Learning Mastery')).toBeInTheDocument()
   })
 
-  it('passes accountId to the ProficiencyTable component', () => {
-    const wrapper = shallow(<RubricManagement {...defaultProps()} />)
-    expect(wrapper.find('ProficiencyTable').prop('accountId')).toBe('1')
+  it('renders both Account Rubrics and Learning Mastery tabs', () => {
+    const wrapper = render(<RubricManagement {...defaultProps()} />)
+    expect(wrapper.getByRole('tab', {name: 'Account Rubrics'})).toBeInTheDocument()
+    expect(wrapper.getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
   })
 })

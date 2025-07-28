@@ -39,7 +39,7 @@ module GraphQLPostgresTimeout
           end
           raise GraphQLPostgresTimeout::Error, "operation timed out"
         end
-        raise GraphQL::ExecutionError, "Invalid SQL: #{e.message}"
+        raise
       end
     end
   end

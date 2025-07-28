@@ -26,6 +26,7 @@ class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
   before_action :require_user, unless: :public_access?
+  before_action :check_limited_access_for_students, only: %i[index]
   before_action :set_user
   before_action :set_date_range
   before_action :set_params, only: [:index]
@@ -143,8 +144,9 @@ class PlannerController < ApplicationController
         items_response = Rails.cache.fetch(composite_cache_key, expires_in: 1.week) do
           items = collection_for_filter(params[:filter])
           items = Api.paginate(items, self, params.key?(:user_id) ? api_v1_user_planner_items_url : api_v1_planner_items_url)
+          use_html_comment = params[:use_html_comment] || false
           {
-            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date }),
+            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date, use_html_comment: }),
             link: response.headers["Link"].to_s,
           }
         end
@@ -206,12 +208,15 @@ class PlannerController < ApplicationController
                    ungraded_discussion_collection,
                    calendar_events_collection,
                    peer_reviews_collection]
+    collections << sub_assignment_collection if sub_assignment_collection.present?
+
     BookmarkedCollection.merge(*collections)
   end
 
   def unread_items
     collections = [unread_discussion_topic_collection,
                    unread_assignment_collection]
+    collections << unread_sub_assignment_collection if unread_sub_assignment_collection.present?
 
     BookmarkedCollection.merge(*collections)
   end
@@ -261,6 +266,14 @@ class PlannerController < ApplicationController
     collections
   end
 
+  def sub_assignment_collection
+    item_collection("sub_assignment_viewing",
+                    @user.assignments_for_student("viewing", is_sub_assignment: true, **default_opts).preload(:discussion_topic),
+                    SubAssignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
+  end
+
   def ungraded_quiz_collection
     item_collection("ungraded_quizzes",
                     @user.ungraded_quizzes(**default_opts),
@@ -289,9 +302,27 @@ class PlannerController < ApplicationController
                         .where(content_participations: { user_id: @user, workflow_state: "unread" }).union(
                           assign_scope.where(id: disc_assign_ids)
                         ).due_between_for_user(start_date, end_date, @user)
+
     item_collection("unread_assignment_submissions",
                     scope,
                     Assignment,
+                    %i[user_due_date due_at created_at],
+                    :id)
+  end
+
+  def unread_sub_assignment_collection
+    assign_scope = SubAssignment.active.where(context_type: "Course", context_id: @local_course_ids)
+    disc_sub_assign_ids = DiscussionTopic.active.published.where(context_type: "Course", context_id: @local_course_ids)
+                                         .where.not(assignment_id: nil).unread_for(@user).select(:assignment_id)
+    scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted")
+                        .joins(submissions: :content_participations)
+                        .where(content_participations: { user_id: @user, workflow_state: "unread" }).union(
+                          assign_scope.where(parent_assignment_id: disc_sub_assign_ids)
+                        ).due_between_for_user(start_date, end_date, @user)
+
+    item_collection("unread_sub_assignment_submissions",
+                    scope,
+                    SubAssignment,
                     %i[user_due_date due_at created_at],
                     :id)
   end
@@ -508,10 +539,10 @@ class PlannerController < ApplicationController
   def discussion_topic_todo_scopes
     scopes = []
     Shard.partition_by_shard(@pub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).published
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts, assignment_id: nil).published_or_post_delayed
     end
     Shard.partition_by_shard(@unpub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).active
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts, assignment_id: nil).active
     end
     scopes
   end

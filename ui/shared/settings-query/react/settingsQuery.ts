@@ -18,7 +18,6 @@
 
 import type {QueryKey} from '@tanstack/react-query'
 import type {Setting} from '@canvas/global/env/EnvCommon'
-import {defaultFetchOptions} from '@canvas/util/xhr'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const settings = [
@@ -29,6 +28,7 @@ const settings = [
   'hide_dashcard_color_overlays',
   'comment_library_suggestions_enabled',
   'elementary_dashboard_disabled',
+  'suppress_assignments',
 ] as const
 
 export function getSetting({queryKey}: {queryKey: QueryKey}) {
@@ -44,7 +44,7 @@ export async function getSettingAsync({queryKey}: {queryKey: QueryKey}) {
   if (!settings.includes(setting)) {
     throw new Error('Invalid setting')
   }
-  const {json} = await doFetchApi({
+  const {json} = await doFetchApi<any>({
     method: 'GET',
     path: '/api/v1/users/self/settings',
   })

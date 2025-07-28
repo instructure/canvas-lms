@@ -20,12 +20,11 @@
 require "active_support"
 require "active_record"
 require "bookmarked_collection"
-require "canvas_cassandra"
 require "inst_statsd"
 
 module EventStream
   require "event_stream/attr_config"
-  require "event_stream/backend"
+  require "event_stream/backend/active_record"
   require "event_stream/record"
   require "event_stream/failure"
   require "event_stream/logger"

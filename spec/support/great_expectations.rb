@@ -183,8 +183,10 @@ module GreatExpectations
     end
 
     def generate_error(action, message, location = nil)
-      if action == :raise
+      case action
+      when :raise
         raise Error.for(message, location)
+      when :ignore; # do nothing
       else
         warn "\e[31mWarning: #{message}"
         warn "See: " + (location || CallStackUtils.best_line_for(caller).join("\n")) + "\e[0m"

@@ -24,7 +24,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Layout from './Layout'
 import {
@@ -35,7 +35,7 @@ import {
 import {isHideable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 function initialShowState() {
   return {
@@ -43,6 +43,7 @@ function initialShowState() {
     hidingGrades: false,
     open: true,
     selectedSectionIds: [],
+    showSectionValidation: false,
   }
 }
 
@@ -63,6 +64,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       open: false,
       selectedSectionIds: [],
       submissions: [],
+      showSectionValidation: false,
     }
   }
 
@@ -78,7 +80,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
   }
 
   hideBySectionsChanged(hideBySections) {
-    this.setState({hideBySections, selectedSectionIds: []})
+    this.setState({hideBySections, selectedSectionIds: [], showSectionValidation: false})
   }
 
   async onHideClick() {
@@ -88,18 +90,15 @@ export default class HideAssignmentGradesTray extends PureComponent {
 
     if (this.state.hideBySections) {
       if (selectedSectionIds.length === 0) {
-        showFlashAlert({
-          message: I18n.t('At least one section must be selected to hide grades by section.'),
-          type: 'error',
-        })
-
-        return
+        return this.setState({showSectionValidation: true})
       }
+
+      this.setState({showSectionValidation: false})
 
       hideRequest = hideAssignmentGradesForSections(assignment.id, selectedSectionIds)
       successMessage = I18n.t(
         'Success! Grades have been hidden for the selected sections of %{assignmentName}.',
-        {assignmentName: assignment.name}
+        {assignmentName: assignment.name},
       )
     } else {
       hideRequest = hideAssignmentGrades(assignment.id)
@@ -139,7 +138,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
     } else {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
-          selectedSection => selectedSection !== sectionId
+          selectedSection => selectedSection !== sectionId,
         ),
       })
     }
@@ -150,7 +149,8 @@ export default class HideAssignmentGradesTray extends PureComponent {
       return null
     }
 
-    const {assignment, containerName, onExited, sections, submissions} = this.state
+    const {assignment, containerName, onExited, sections, submissions, showSectionValidation} =
+      this.state
 
     const unhiddenCount = submissions.filter(submission => isHideable(submission)).length
 
@@ -188,6 +188,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
           sectionSelectionChanged={this.sectionSelectionChanged}
           selectedSectionIds={this.state.selectedSectionIds}
           unhiddenCount={unhiddenCount}
+          showSectionValidation={showSectionValidation}
         />
       </Tray>
     )

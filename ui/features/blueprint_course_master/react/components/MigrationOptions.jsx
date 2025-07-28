@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import select from '@canvas/obj-select'
@@ -35,7 +35,7 @@ import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
-const I18n = useI18nScope('blueprint_settingsMigrationOptions')
+const I18n = createI18nScope('blueprint_settingsMigrationOptions')
 
 const MAX_NOTIFICATION_MESSAGE_LENGTH = 140
 const WARNING_MESSAGE_LENGTH = 126
@@ -46,11 +46,14 @@ export default class MigrationOptions extends React.Component {
     willSendNotification: PropTypes.bool.isRequired,
     willIncludeCustomNotificationMessage: PropTypes.bool.isRequired,
     willIncludeCourseSettings: PropTypes.bool.isRequired,
+    willSendItemNotifications: PropTypes.bool.isRequired,
     notificationMessage: PropTypes.string.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     includeCustomNotificationMessage: PropTypes.func.isRequired,
     includeCourseSettings: PropTypes.func.isRequired,
+    enableItemNotifications: PropTypes.func.isRequired,
     setNotificationMessage: PropTypes.func.isRequired,
+    itemNotificationFeatureEnabled: PropTypes.bool.isRequired,
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
@@ -62,7 +65,7 @@ export default class MigrationOptions extends React.Component {
         I18n.t('%{count} of %{max} maximum characters', {
           count: newProps.notificationMessage.length,
           max: MAX_NOTIFICATION_MESSAGE_LENGTH,
-        })
+        }),
       )
     }
   }
@@ -79,13 +82,17 @@ export default class MigrationOptions extends React.Component {
     this.props.includeCustomNotificationMessage(event.target.checked)
   }
 
+  handleItemNotificationChange = event => {
+    this.props.enableItemNotifications(event.target.checked)
+  }
+
   handleChangeMessage = event => {
     if (event.target.value.length > MAX_NOTIFICATION_MESSAGE_LENGTH) {
       setTimeout(() => {
         $.screenReaderFlashMessage(
           I18n.t('You have reached the limit of %{len} characters in the notification message', {
             len: MAX_NOTIFICATION_MESSAGE_LENGTH,
-          })
+          }),
         )
       }, 600)
     }
@@ -116,6 +123,15 @@ export default class MigrationOptions extends React.Component {
           size="small"
           disabled={isDisabled}
         />
+        {this.props.itemNotificationFeatureEnabled ? (
+          <Checkbox
+            label={I18n.t('Enable New Item Notifications')}
+            checked={this.props.willSendItemNotifications}
+            onChange={this.handleItemNotificationChange}
+            size="small"
+            disabled={isDisabled}
+          />
+        ) : null}
         {this.props.willSendNotification ? (
           <div className="bcs__history-notification__add-message">
             <Checkbox
@@ -173,6 +189,8 @@ const connectState = state =>
     'willIncludeCustomNotificationMessage',
     'notificationMessage',
     'willIncludeCourseSettings',
+    'willSendItemNotifications',
+    'itemNotificationFeatureEnabled',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)

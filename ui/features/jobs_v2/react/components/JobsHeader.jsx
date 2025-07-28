@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import DateOptionsModal from './DateOptionsModal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -35,7 +35,7 @@ import {
   IconAnalyticsSolid,
 } from '@instructure/ui-icons'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function JobsHeader({
   jobBucket,
@@ -73,7 +73,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 medium">
+      <Flex.Item margin="0 small">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item>
@@ -93,7 +93,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 medium">
+      <Flex.Item margin="0 small">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item align="end" margin="0 x-small x-small 0">
@@ -101,7 +101,7 @@ export default function JobsHeader({
           <strong>{I18n.t('Scope:')}</strong>
         </PresentationContent>
       </Flex.Item>
-      <Flex.Item align="end" shouldGrow={true}>
+      <Flex.Item align="end" shouldGrow={true} shouldShrink={true}>
         <SimpleSelect
           renderLabel={<ScreenReaderContent>{I18n.t('Scope')}</ScreenReaderContent>}
           onChange={onChangeScope}

@@ -16,9 +16,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency "canvas_errors"
   spec.add_dependency "dynamic_settings"
   spec.add_dependency "json-jwt"
-
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "debug"
-  spec.add_development_dependency "rspec"
-  spec.add_development_dependency "timecop"
 end

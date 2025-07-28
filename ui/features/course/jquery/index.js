@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
-const I18n = useI18nScope('courses')
+const I18n = createI18nScope('courses')
 
 $(document).ready(() => {
   $('.reject_button').click(event => {
     const result = window.confirm(
       I18n.t(
         'confirm_reject_invitation',
-        'Are you sure you want to reject the invitation to participate in this course?'
-      )
+        'Are you sure you want to reject the invitation to participate in this course?',
+      ),
     )
     if (!result) {
       event.preventDefault()

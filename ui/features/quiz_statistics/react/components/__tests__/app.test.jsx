@@ -30,7 +30,7 @@ describe('canvas_quizzes/statistics/views/app', () => {
         isLoadingStatistics={quizStatistics.isLoading()}
         canBeLoaded={quizStatistics.canBeLoaded()}
         quizReports={quizReports.getAll()}
-      />
+      />,
     )
   })
 })

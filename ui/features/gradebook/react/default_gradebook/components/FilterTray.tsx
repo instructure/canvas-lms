@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View, ContextView} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -31,7 +31,7 @@ import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type FilterTrayProps = {
   isTrayOpen: boolean
@@ -121,7 +121,7 @@ export default function FilterTray({
                 shadow="resting"
               >
                 {I18n.t(
-                  'Did you know you can now create filter presets and save them for future use?'
+                  'Did you know you can now create filter presets and save them for future use?',
                 )}
               </ContextView>
             </Flex.Item>
@@ -177,7 +177,7 @@ export default function FilterTray({
                 onDelete={() => deleteFilterPreset(filterPreset)}
                 onToggle={() =>
                   setExpandedFilterPresetId(
-                    expandedFilterPresetId === filterPreset.id ? null : filterPreset.id
+                    expandedFilterPresetId === filterPreset.id ? null : filterPreset.id,
                   )
                 }
                 onUpdate={updatedFilterPreset => {

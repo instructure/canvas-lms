@@ -22,7 +22,7 @@ describe RubricsController do
   describe "GET 'index'" do
     it "requires authorization" do
       course_with_teacher(active_all: true)
-      @course.root_account.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:enhanced_rubrics)
       get "index", params: { course_id: @course.id }
       assert_unauthorized
     end
@@ -61,7 +61,7 @@ describe RubricsController do
       before do
         course_with_teacher_logged_in(active_all: true)
         @course.complete!
-        @course.root_account.disable_feature!(:enhanced_rubrics)
+        @course.disable_feature!(:enhanced_rubrics)
       end
 
       it "can access rubrics" do
@@ -76,7 +76,7 @@ describe RubricsController do
       end
 
       it "sets correct permissions with enhanced_rubrics enabled" do
-        @course.root_account.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:enhanced_rubrics)
         get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
       end
@@ -85,7 +85,7 @@ describe RubricsController do
     describe "with enhanced_rubrics enabled" do
       before do
         course_with_teacher_logged_in(active_all: true)
-        @course.root_account.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:enhanced_rubrics)
       end
 
       it "can access rubrics" do
@@ -101,13 +101,22 @@ describe RubricsController do
       end
 
       it "sets correct breadcrumbs" do
-        @course.root_account.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:enhanced_rubrics)
         get "index", params: { course_id: @course.id }
         expected_breadcrumbs = [
           { name: "Unnamed", url: "/courses/#{@course.id}" },
           { name: "Rubrics", url: "/courses/#{@course.id}/rubrics" },
         ]
         expect(assigns[:js_env][:breadcrumbs]).to eq(expected_breadcrumbs)
+      end
+
+      it "sets correct env variables" do
+        @course.enable_feature!(:enhanced_rubrics)
+        Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
+        get "index", params: { course_id: @course.id }
+
+        expect(assigns[:js_env][:enhanced_rubrics_enabled]).to be true
+        expect(assigns[:js_env][:enhanced_rubric_assignments_enabled]).to be true
       end
     end
   end
@@ -225,7 +234,7 @@ describe RubricsController do
 
     it "generates criterion record if enhanced_rubrics is turned on" do
       course_with_teacher_logged_in(active_all: true)
-      @course.root_account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       assignment = @course.assignments.create!(assignment_valid_attributes)
       create_params = {
         "course_id" => @course.id,
@@ -477,7 +486,7 @@ describe RubricsController do
 
     it "updates the criteria records if changed and enhanced_rubrics is turned on" do
       course_with_teacher_logged_in(active_all: true)
-      @course.root_account.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:enhanced_rubrics)
       assignment = @course.assignments.create!(assignment_valid_attributes)
       create_params = {
         "course_id" => @course.id,
@@ -1059,7 +1068,7 @@ describe RubricsController do
         end
 
         it "sets correct permissions with enhanced_rubrics enabled" do
-          @course.root_account.enable_feature!(:enhanced_rubrics)
+          @course.enable_feature!(:enhanced_rubrics)
           get "show", params: { id: @r.id, course_id: @course.id }
           expect(assigns[:js_env][:PERMISSIONS][:manage_rubrics]).to be false
         end
@@ -1068,7 +1077,7 @@ describe RubricsController do
 
     describe "with enhanced_rubrics enabled" do
       before do
-        @course.root_account.enable_feature!(:enhanced_rubrics)
+        @course.enable_feature!(:enhanced_rubrics)
         course_with_teacher_logged_in(active_all: true)
       end
 
@@ -1077,6 +1086,243 @@ describe RubricsController do
 
         expect(response).to render_template("layouts/application")
       end
+    end
+
+    describe "track metrics" do
+      before do
+        course_with_teacher_logged_in(active_all: true)
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+      end
+
+      let(:create_params) do
+        {
+          "course_id" => @course.id,
+          "points_possible" => "5",
+          "rubric" => {
+            "criteria" => {
+              "0" => {
+                "description" => "hi",
+                "id" => "",
+                "long_description" => "",
+                "mastery_points" => "3",
+                "points" => "5",
+                "ratings" => {
+                  "0" => {
+                    "description" => "Exceeds Expectations",
+                    "id" => "blank",
+                    "points" => "5"
+                  },
+                  "1" => {
+                    "description" => "Meets Expectations",
+                    "id" => "blank",
+                    "points" => "3"
+                  },
+                  "2" => {
+                    "description" => "Does Not Meet Expectations",
+                    "id" => "blank_2",
+                    "points" => "0"
+                  }
+                }
+              }
+            },
+            "free_form_criterion_comments" => "0",
+            "points_possible" => "5",
+            "title" => "Some Rubric"
+          },
+          "rubric_association" => {
+            "association_id" => @assignment.id,
+            "association_type" => "Assignment",
+            "hide_score_total" => "0",
+            "id" => "",
+            "purpose" => "grading",
+            "use_for_grading" => "1"
+          },
+          "rubric_association_id" => "",
+          "rubric_id" => "new",
+          "skip_updating_points_possible" => "false",
+          "title" => "Some Rubric"
+        }
+      end
+
+      context "enhanced version disabled" do
+        before do
+          @course.disable_feature!(:enhanced_rubrics)
+        end
+
+        it "track rubric created with old version" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_old").at_least(:once)
+
+          post "create", params: create_params
+        end
+
+        it "track creationfrom assignments ui" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_from_assignment").at_least(:once)
+
+          post "create", params: create_params
+        end
+
+        it "track rubric updated with old version" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.updated_old").at_least(:once)
+
+          rubric_association_model(user: @user, context: @course)
+          put "update", params: { course_id: @course.id, id: @rubric.id, rubric: { title: "new title" } }
+        end
+      end
+
+      context "enhanced version enabled" do
+        before do
+          @course.enable_feature!(:enhanced_rubrics)
+        end
+
+        it "track rubric created with enhanced version" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.created_enhanced").at_least(:once)
+
+          post "create", params: create_params
+        end
+
+        it "track rubric duplicate" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.duplicated_enhanced").at_least(:once)
+          create_params["rubric"]["is_duplicate"] = true
+          post "create", params: create_params
+        end
+
+        it "track rubric updated with enhanced version" do
+          expect(InstStatsd::Statsd).to receive(:distributed_increment).with("course.rubrics.updated_enhanced").at_least(:once)
+
+          rubric_association_model(user: @user, context: @course)
+          put "update", params: { course_id: @course.id, id: @rubric.id, rubric: { title: "new title" } }
+        end
+
+        it "track rubric aligned with outcome" do
+          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
+          expect(InstStatsd::Statsd).to receive(:distributed_increment)
+            .with("rubrics_management.rubric_criterion.aligned_with_outcome_used_for_scoring")
+            .at_least(:once)
+          outcome_group = @course.root_outcome_group
+          outcome = @course.created_learning_outcomes.create!(
+            description: "hi",
+            short_description: "hi"
+          )
+          outcome_group.add_outcome(outcome)
+          outcome_group.save!
+
+          create_params["rubric"]["criteria"]["0"]["learning_outcome_id"] = outcome.id
+
+          post "create", params: create_params
+        end
+      end
+    end
+  end
+
+  describe "POST 'llm_criteria'" do
+    before do
+      course_with_teacher_logged_in(active_all: true)
+      @assignment = @course.assignments.create!(assignment_valid_attributes)
+
+      @course.enable_feature!(:enhanced_rubrics)
+      @course.enable_feature!(:ai_rubrics)
+
+      @inst_llm = double("InstLLM::Client")
+      allow(InstLLMHelper).to receive(:client).and_return(@inst_llm)
+    end
+
+    it "queues job for generation of criteria via LLM when features are enabled" do
+      llm_response = {
+        criteria: [
+          {
+            name: "Critical Analysis",
+            description: "Demonstrates thorough understanding and analysis",
+            ratings: [
+              { title: "Excellent", description: "Thoroughly demonstrated understanding" },
+              { title: "Good", description: "Partially demonstrated understanding" },
+              { title: "Needs Improvement", description: "Failed to demonstrate understanding" }
+            ]
+          },
+          {
+            name: "Detailed Diagrams",
+            description: "Demonstrates diagramming ability ",
+            ratings: [
+              { title: "Excellent", description: "Thoroughly demonstrated diagramming" },
+              { title: "Good", description: "Partially demonstrated diagramming" },
+              { title: "Needs Improvement", description: "Failed to demonstrate diagramming" }
+            ]
+          }
+        ]
+      }
+
+      expect(@inst_llm).to receive(:chat).and_return(
+        InstLLM::Response::ChatResponse.new(
+          model: "model",
+          message: { role: :assistant, content: llm_response.to_json },
+          stop_reason: "stop_reason",
+          usage: {
+            input_tokens: 10,
+            output_tokens: 20,
+          }
+        )
+      )
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5, use_range: true, additional_prompt_info: "Focus on content", grade_level: "second" }
+           },
+           format: :json
+
+      expect(response).to be_successful
+      json = response.parsed_body
+      expect(json).to be_present
+      expect(json["workflow_state"]).to eq "queued"
+
+      run_jobs
+
+      progress = Progress.find(json["id"])
+      expect(progress.results).to be_present
+      expect(progress.results[:criteria].length).to eq 2
+      expect(progress.results[:criteria][0][:criterion_use_range]).to be_truthy
+    end
+
+    it "returns error when features are disabled" do
+      @course.disable_feature!(:enhanced_rubrics)
+      @course.disable_feature!(:ai_rubrics)
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when user lacks permissions" do
+      course_with_student_logged_in(active_all: true, course: @course)
+
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 2, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_forbidden
+    end
+
+    it "returns error when user specifies out-of-bounds parameters" do
+      post "llm_criteria",
+           params: {
+             course_id: @course.id,
+             rubric_association: { association_type: "Assignment", association_id: @assignment.id },
+             generate_options: { criteria_count: 1, rating_count: 3, points_per_criterion: 5 }
+           },
+           format: :json
+
+      expect(response).to be_bad_request
     end
   end
 end

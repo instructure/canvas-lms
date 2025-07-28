@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Favorite < ActiveRecord::Base
-  belongs_to :context, polymorphic: [:course, :group]
+  belongs_to :context, polymorphic: [:course, :group], inverse_of: :favorites
   belongs_to :user
   belongs_to :root_account, class_name: "Account", inverse_of: :favorites
   validates :context_type, inclusion: { allow_nil: true, in: ["Course", "Group"].freeze }
@@ -33,5 +33,9 @@ class Favorite < ActiveRecord::Base
 
   def populate_root_account_id
     self.root_account = context.root_account
+  end
+
+  def self.create_or_find_by(user:, context:)
+    new(user:, context:).insert(on_conflict: -> { user.favorites.find_by(context:) })
   end
 end

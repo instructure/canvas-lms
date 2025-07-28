@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {render as realRender, fireEvent, act} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from '@canvas/apollo'
+import {MockedProvider} from '@apollo/client/testing'
+import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -52,14 +52,14 @@ describe('GroupEditModal', () => {
       contextType = 'Account',
       contextId = '1',
       mocks = [updateOutcomeGroupMock({description: group.description})],
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -126,8 +126,16 @@ describe('GroupEditModal', () => {
     const {getByDisplayValue, rerender} = render(<GroupEditModal {...defaultProps()} />)
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
-    rerender(<GroupEditModal {...defaultProps({isOpen: false})} />)
-    rerender(<GroupEditModal {...defaultProps({isOpen: true})} />)
+    rerender(
+      <MockedProvider>
+        <GroupEditModal {...defaultProps({isOpen: false})} />
+      </MockedProvider>,
+    )
+    rerender(
+      <MockedProvider>
+        <GroupEditModal {...defaultProps({isOpen: true})} />
+      </MockedProvider>,
+    )
     expect(getByDisplayValue('Group title')).toBeInTheDocument()
   })
 

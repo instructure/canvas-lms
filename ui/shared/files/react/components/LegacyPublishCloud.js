@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import customPropTypes from '../modules/customPropTypes'
 import '@canvas/rails-flash-notifications'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('broccoli_cloud')
+const I18n = createI18nScope('broccoli_cloud')
 
 export default {
   displayName: 'PublishCloud',
@@ -57,9 +57,9 @@ export default {
   },
 
   updatePublishClassElements() {
-    return this.props.togglePublishClassOn.classList[this.state.published ? 'add' : 'remove'](
-      'ig-published'
-    )
+    const el = this.props.togglePublishClassOn
+    if (!el || !el.classList) return
+    return el.classList[this.state.published ? 'add' : 'remove']('ig-published')
   },
 
   getRestrictedText() {

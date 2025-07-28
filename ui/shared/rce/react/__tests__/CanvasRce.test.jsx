@@ -18,6 +18,7 @@
 
 import React, {createRef} from 'react'
 import {render, waitFor} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import CanvasRce from '../CanvasRce'
 
 describe('CanvasRce', () => {
@@ -33,6 +34,7 @@ describe('CanvasRce', () => {
   })
   afterEach(() => {
     document.body.removeChild(document.getElementById('fixture'))
+    fakeENV.teardown()
   })
 
   it('supports getCode() and setCode() on its ref', async () => {
@@ -56,13 +58,12 @@ describe('CanvasRce', () => {
   })
 
   it('populates externalToolsConfig without context_external_tool_resource_selection_url', async () => {
-    const rceRef = createRef(null)
-
-    window.ENV = {
+    fakeENV.setup({
       LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
       a2_student_view: true,
       MAX_MRU_LTI_TOOLS: 892,
-    }
+    })
+    const rceRef = createRef(null)
 
     render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
 
@@ -77,13 +78,12 @@ describe('CanvasRce', () => {
   })
 
   it('populates externalToolsConfig with context_external_tool_resource_selection_url', async () => {
-    const rceRef = createRef(null)
-
-    window.ENV = {
+    fakeENV.setup({
       LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
       a2_student_view: true,
       MAX_MRU_LTI_TOOLS: 892,
-    }
+    })
+    const rceRef = createRef(null)
 
     const a = document.createElement('a')
     try {
@@ -106,6 +106,26 @@ describe('CanvasRce', () => {
     }
   })
 
+  it('sets maxAge for autosave to 60 minutes by default', async () => {
+    fakeENV.setup({
+      rce_auto_save_max_age_ms: undefined,
+    })
+    const rceRef = createRef(null)
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+    expect(rceRef.current.props.autosave.maxAge).toEqual(60 * 60 * 1000) // 60 minutes in milliseconds
+  })
+
+  it('sets maxAge for autosave to the environment variable value', async () => {
+    fakeENV.setup({
+      rce_auto_save_max_age_ms: 30 * 60 * 1000, // 30 minutes in milliseconds
+    })
+    const rceRef = createRef(null)
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={{enabled: false}} />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+    expect(rceRef.current.props.autosave.maxAge).toEqual(30 * 60 * 1000) // 30 minutes in milliseconds
+  })
+
   describe('merging UI elements', () => {
     // the only way I can think of to test these functions
     // is to look at the props passed to the mock Editor component
@@ -121,13 +141,13 @@ describe('CanvasRce', () => {
             plugins: ['foo', 'bar'],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
 
       expect(rceRef.current.mceInstance().props.init.plugins).toEqual(
-        expect.arrayContaining(['foo', 'bar'])
+        expect.arrayContaining(['foo', 'bar']),
       )
     })
 
@@ -147,7 +167,7 @@ describe('CanvasRce', () => {
             },
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -158,7 +178,7 @@ describe('CanvasRce', () => {
             title: 'Format',
             items: expect.stringMatching(/\| item1 item2$/),
           }),
-        })
+        }),
       )
     })
 
@@ -178,7 +198,7 @@ describe('CanvasRce', () => {
             },
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -191,7 +211,7 @@ describe('CanvasRce', () => {
             title: 'A new menu',
             items: 'item1 item2',
           }),
-        })
+        }),
       )
     })
 
@@ -211,7 +231,7 @@ describe('CanvasRce', () => {
             ],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -222,7 +242,7 @@ describe('CanvasRce', () => {
             name: 'Styles',
             items: expect.arrayContaining(['button1', 'button2']),
           },
-        ])
+        ]),
       )
     })
 
@@ -242,7 +262,7 @@ describe('CanvasRce', () => {
             ],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -254,14 +274,14 @@ describe('CanvasRce', () => {
             name: 'New Toolbar',
             items: expect.arrayContaining(['button1', 'button2']),
           },
-        ])
+        ]),
       )
     })
   })
 
   describe('body theme', () => {
     const setupRCEWithENV = async env => {
-      window.ENV = env
+      fakeENV.setup(env)
       const rceRef = createRef(null)
       render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -331,6 +351,42 @@ describe('CanvasRce', () => {
           USE_CLASSIC_FONT: false,
         })
         expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+      })
+    })
+  })
+
+  describe('features prop forwarding', () => {
+    it('forwards features prop to underlying RCE component', async () => {
+      const rceRef = createRef(null)
+      const testFeatures = {
+        rce_a11y_resize: true,
+        new_math_equation_handling: true,
+        rce_find_replace: false,
+      }
+
+      render(<CanvasRce ref={rceRef} textareaId="textarea3" features={testFeatures} />, target)
+
+      await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+      expect(rceRef.current.props.features).toEqual(testFeatures)
+    })
+
+    it('uses ENV.FEATURES as default when features prop not provided', async () => {
+      fakeENV.setup({
+        FEATURES: {
+          rce_a11y_resize: true,
+          explicit_latex_typesetting: false,
+        },
+      })
+      const rceRef = createRef(null)
+
+      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+
+      await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+      expect(rceRef.current.props.features).toEqual({
+        rce_a11y_resize: true,
+        explicit_latex_typesetting: false,
       })
     })
   })

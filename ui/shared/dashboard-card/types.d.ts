@@ -23,17 +23,35 @@ export type Card = {
   id: string
   href: string
   links: any
-  term: string
+  term: string | null
   assetString: string
   color: string
   image: string
   isFavorited: boolean
   enrollmentType: string
-  observee: boolean
+  enrollmentState: string
+  observee: string | null
   position: number
   published: boolean
   canChangeCoursePublishState: boolean
   defaultView: string
   pagesUrl: string
   frontPageTitle: string
+  isK5Subject: boolean
+  isHomeroom: boolean
+  canReadAnnouncements: boolean
+  canManage: boolean
+  longName: string
+}
+
+export type ActivityStreamSummary = {
+  id: string
+  summary: StreamSummaryItem[]
+}
+
+export type StreamSummaryItem = {
+  count: number
+  notification_category: string | null
+  type: string
+  unread_count: number
 }

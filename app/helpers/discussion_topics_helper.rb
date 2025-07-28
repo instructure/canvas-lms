@@ -31,4 +31,21 @@ module DiscussionTopicsHelper
       t("#title.edit_topic", "Edit Discussion Topic")
     end
   end
+
+  def validate_possible_points_with_checkpoints(input)
+    total_points_possible = 0
+    input[:checkpoints].each { |checkpoint| total_points_possible += checkpoint[:points_possible].to_i }
+    I18n.t("The value of possible points for this assignment cannot exceed 999999999.") unless total_points_possible < 1_000_000_000
+  end
+
+  def any_course_with_checkpoints_enabled?(contexts)
+    return false unless contexts.is_a?(Array)
+
+    courses = contexts.select { |context| context.is_a?(Course) }
+    return false if courses.empty?
+
+    # Ensure we check each account once since discussion_checkpoints FF is at the account level
+    sample_courses = courses.group_by(&:account_id).map { |_account_id, courses_group| courses_group.first }
+    sample_courses.any?(&:discussion_checkpoints_enabled?)
+  end
 end

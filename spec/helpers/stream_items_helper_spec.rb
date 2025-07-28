@@ -34,8 +34,22 @@ describe StreamItemsHelper do
     entry.save!
     @announcement = announcement_model
     @assignment = assignment_model(course: @course, peer_reviews: true)
-    @assignment.assign_peer_review(@teacher, @student)
-    @assignment.assign_peer_review(@reviewer_student, @reviewee_student)
+    assessor_submission1 = @assignment.submit_homework(@reviewer_student, body: "submission text")
+    assessor_submission2 = @assignment.submit_homework(@teacher, body: "submission text")
+    submission1 = submission_model(assignment: @assignment, user: @reviewee_student)
+    submission2 = submission_model(assignment: @assignment, user: @student)
+    AssessmentRequest.create!(
+      assessor: @reviewer_student,
+      assessor_asset: assessor_submission1,
+      asset: submission1,
+      user: @reviewee_student
+    )
+    AssessmentRequest.create!(
+      assessor: @teacher,
+      assessor_asset: assessor_submission2,
+      asset: submission2,
+      user: @student
+    )
     # this conversation will not be shown, since the teacher is the last author
     conversation(@another_user, @teacher).conversation.add_message(@teacher, "zomg")
     # whereas this one will be shown
@@ -158,6 +172,13 @@ describe StreamItemsHelper do
       expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}?entry_id=#{DiscussionEntry.last.id}")
       expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
+
+    it "provides correct link for AssessmentRequest when assignments_2_student feature flag is enabled" do
+      @course.enable_feature!(:assignments_2_student)
+      @items = @teacher.recent_stream_items
+      @categorized = helper.categorize_stream_items(@items, @teacher)
+      expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}?reviewee_id=#{@student.id}")
+    end
   end
 
   context "extract_context" do
@@ -223,7 +244,7 @@ describe StreamItemsHelper do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])
-      assessor_submission = submission_model(assignment: @assignment, user: @other_user)
+      assessor_submission = @assignment.submit_homework(@other_user, body: "submission text")
       assessment_request = AssessmentRequest.create!(
         assessor: @other_user,
         asset: @submission,

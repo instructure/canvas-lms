@@ -41,6 +41,8 @@ describe Types::GroupType do
     expect(group_type.resolve("membersConnection { edges { node { _id } } }"))
       .to eq @group.group_memberships.map(&:to_param)
     expect(group_type.resolve("membersCount")).to eq @group.members_count
+    expect(group_type.resolve("nonCollaborative")).to eq @group.non_collaborative
+    expect(group_type.resolve("state")).to eq @group.workflow_state
   end
 
   it "requires read permission" do
@@ -122,6 +124,22 @@ describe Types::GroupType do
     it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
       tester = GraphQLTypeTester.new(@group, current_user: @student_in_group)
       expect(tester.resolve("sisId")).to be_nil
+    end
+  end
+
+  context "ActivityStream" do
+    it "returns the activity stream summary" do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @group = @course.groups.create!(name: "Group 1")
+      @group.users << @user
+      @context = @group
+      @topic1 = discussion_topic_model
+
+      cur_resolver = GraphQLTypeTester.new(@group, current_user: @user)
+      expect(cur_resolver.resolve("activityStream { summary { type } }")).to match_array %w[DiscussionTopic]
+      expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [1]
+      expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil]
     end
   end
 end

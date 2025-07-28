@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {personReadyToEnrollShape} from './shapes'
@@ -24,7 +24,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('PeopleReadyList')
+const I18n = createI18nScope('PeopleReadyList')
 
 class PeopleReadyList extends React.Component {
   static propTypes = {
@@ -84,7 +84,7 @@ class PeopleReadyList extends React.Component {
 
   render() {
     return (
-      <div className="addpeople__peoplereadylist">
+      <div className="addpeople__peoplereadylist" data-testid="people_ready_list">
         <div className="peoplereadylist__pad-box">{this.renderNotice()}</div>
         {this.renderUserTable()}
       </div>

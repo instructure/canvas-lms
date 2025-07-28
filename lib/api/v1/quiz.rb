@@ -59,8 +59,9 @@ module Api::V1::Quiz
   def quizzes_json(quizzes, context, user, session, options = {})
     # bulk preload all description attachments to prevent N+1 query
     preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
+    DatesOverridable.preload_override_data_for_objects(quizzes)
     options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
-    if context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)
+    if context.grants_right?(user, session, :manage_assignments_edit)
       options[:master_course_status] = setup_master_course_restrictions(quizzes, context)
     end
 
@@ -70,7 +71,7 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session, options = {}, serializer = nil)
-    options[:description_formatter] = description_formatter(context, user) unless options[:description_formatter]
+    options[:description_formatter] = description_formatter(context, user, {}, quiz) unless options[:description_formatter]
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
                                      scope: user,
@@ -89,11 +90,11 @@ module Api::V1::Quiz
     end
   end
 
-  def description_formatter(context, user, preloaded_attachments = {})
+  def description_formatter(context, user, preloaded_attachments = {}, quiz = nil)
     # adds verifiers - lambda here (as opposed to
     # inside the serializer) to capture context
     lambda do |description|
-      api_user_content(description, context, user, preloaded_attachments)
+      api_user_content(description, context, user, preloaded_attachments, location: quiz&.asset_string)
     end
   end
 
@@ -117,7 +118,7 @@ module Api::V1::Quiz
   def add_meta_permissions!(meta)
     meta[:permissions] ||= {}
     meta[:permissions][:quizzes] = {
-      create: context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_add)
+      create: context.grants_right?(@current_user, session, :manage_assignments_add)
     }
   end
 

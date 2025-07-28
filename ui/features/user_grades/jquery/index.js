@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@instructure/grading-utils'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('user_grades')
+const I18n = createI18nScope('user_grades')
 
 $(document).ready(function () {
   $('.grading_periods_selector').each(function () {
@@ -50,14 +50,19 @@ $(document).ready(function () {
           gradeToShow = '--'
         } else if (totals.grade || totals.grade === 0) {
           gradeToShow = totals.restrict_quantitative_data
-            ? scoreToGrade(totals.grade, totals.grading_scheme, totals.points_based_grading_scheme)
+            ? scoreToGrade(
+                totals.grade,
+                totals.grading_scheme,
+                totals.points_based_grading_scheme,
+                totals.scaling_factor,
+              )
             : totals.grade + '%'
         } else {
           gradeToShow = I18n.t('no grade')
         }
 
         $percentDisplay.text(gradeToShow)
-      }
+      },
     )
   })
 })

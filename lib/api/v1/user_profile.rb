@@ -44,9 +44,13 @@ module Api::V1::UserProfile
     json[:bio] = profile.bio
     json[:pronunciation] = profile.pronunciation
     json[:primary_email] = user.email if user.grants_right?(current_user, :read_email_addresses)
-    json[:login_id] ||= user.primary_pseudonym.try(:unique_id)
-    json[:sis_user_id] ||= user.primary_pseudonym.try(:sis_user_id) if user.grants_right?(current_user, :read_sis)
-    json[:integration_id] ||= user.primary_pseudonym.try(:integration_id)
+    pseudo = SisPseudonym.for(user,
+                              context.respond_to?(:root_account) ? context : nil,
+                              type: :implicit,
+                              require_sis: false)
+    json[:login_id] ||= pseudo&.unique_id
+    json[:sis_user_id] ||= pseudo&.sis_user_id if user.grants_right?(current_user, :read_sis)
+    json[:integration_id] ||= pseudo&.integration_id
     zone = user.time_zone || @domain_root_account.try(:default_time_zone) || Time.zone
     json[:time_zone] = zone.tzinfo.name
     json[:locale] = user.locale

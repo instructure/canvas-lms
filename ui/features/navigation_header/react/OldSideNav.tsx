@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React, {useEffect, useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -27,13 +27,13 @@ import tourPubSub from '@canvas/tour-pubsub'
 import {getTrayLabel, getTrayPortal} from './utils'
 import useHoverIntent from './hooks/useHoverIntent'
 import coursesQuery from './queries/coursesQuery'
-import accountsQuery from './queries/accountsQuery'
 import groupsQuery from './queries/groupsQuery'
 import NavigationBadges from './NavigationBadges'
-import {prefetchQuery} from '@canvas/query'
 import profileQuery from './queries/profileQuery'
+import getAccounts from '@canvas/api/accounts/getAccounts'
+import {queryClient} from '@canvas/query'
 
-const I18n = useI18nScope('Navigation')
+const I18n = createI18nScope('Navigation')
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
@@ -50,9 +50,8 @@ const profileNavLink = document.querySelector(`#global_nav_profile_link`)
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =
-  /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history|(passport$)/
+  /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 // learning_passport is a temporary flag for a prototpye
-const LEARNER_PASSPORT_REGEX = ENV.FEATURES.learner_passport ? /\/users\/\d+\/passport/ : null
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 type ActiveItem =
@@ -63,7 +62,6 @@ type ActiveItem =
   | 'profile'
   | 'history'
   | 'help'
-  | 'passport'
   | null
 
 const itemsWithResources = ['courses', 'groups', 'accounts', 'profile', 'history', 'help'] as const
@@ -86,33 +84,40 @@ const Navigation = () => {
   useEffect(() => {
     if (!isTrayOpen) {
       // when tray is closed, set active item based on current path
-      const path = window.location.pathname
-      if (LEARNER_PASSPORT_REGEX && path.match(LEARNER_PASSPORT_REGEX)) {
-        setActiveItem('passport')
-      } else {
-        setActiveItem(handleActiveItem())
-      }
+      setActiveItem(handleActiveItem())
     }
   }, [isTrayOpen])
 
   useHoverIntent(profileNavLink, () => {
     import('./trays/ProfileTray')
-    prefetchQuery(['profile'], profileQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['profile'],
+      queryFn: profileQuery,
+    })
   })
 
   useHoverIntent(coursesNavLink, () => {
     import('./trays/CoursesTray')
-    prefetchQuery(['courses'], coursesQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['courses'],
+      queryFn: coursesQuery,
+    })
   })
 
   useHoverIntent(accountsNavLink, () => {
     import('./trays/AccountsTray')
-    prefetchQuery(['accounts'], accountsQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['accounts', {pageIndex: 1}],
+      queryFn: getAccounts,
+    })
   })
 
   useHoverIntent(groupsNavLink, () => {
     import('./trays/GroupsTray')
-    prefetchQuery(['groups'], groupsQuery)
+    queryClient.prefetchQuery({
+      queryKey: ['groups'],
+      queryFn: groupsQuery,
+    })
   })
 
   useEffect(() => {
@@ -146,7 +151,7 @@ const Navigation = () => {
         openTray(type_)
       }
     },
-    [activeItem, closeTray, isTrayOpen, openTray]
+    [activeItem, closeTray, isTrayOpen, openTray],
   )
 
   useEffect(() => {
@@ -182,7 +187,7 @@ const Navigation = () => {
 
     const overrideDismissUnsubscribe = tourPubSub.subscribe(
       'navigation-tray-override-dismiss',
-      tf => setOverrideDismiss(Boolean(tf))
+      tf => setOverrideDismiss(Boolean(tf)),
     )
 
     return () => {

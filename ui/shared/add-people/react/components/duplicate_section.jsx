@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {duplicateSetShape} from './shapes'
@@ -27,7 +27,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('add_people_duplicate_section')
+const I18n = createI18nScope('add_people_duplicate_section')
 
 const CREATE_NEW = '__CREATE_NEW__'
 const SKIP = '__SKIP'
@@ -45,6 +45,7 @@ class DuplicateSection extends React.Component {
     onNewForDuplicate: PropTypes.func.isRequired,
     onSkipDuplicate: PropTypes.func.isRequired,
     inviteUsersURL: PropTypes.string,
+    fieldsRefAndError: PropTypes.object,
   }
 
   static defaultProps = {
@@ -99,7 +100,7 @@ class DuplicateSection extends React.Component {
     for (let i = 0; i < this.props.duplicates.userList.length; ++i) {
       const user = this.props.duplicates.userList[i]
       // match as string or number
-      // eslint-disable-next-line eqeqeq
+
       if (user.user_id == userId) {
         retval = user
         break
@@ -120,7 +121,7 @@ class DuplicateSection extends React.Component {
       const checked = duplicateSet.selectedUserId === dupe.user_id
       return (
         <Table.Row key={k}>
-          <Table.RowHeader>
+          <Table.Cell>
             <RadioInput
               value={dupe.user_id}
               name={duplicateSet.address}
@@ -132,7 +133,7 @@ class DuplicateSection extends React.Component {
                 </ScreenReaderContent>
               }
             />
-          </Table.RowHeader>
+          </Table.Cell>
           <Table.Cell>{dupe.user_name}</Table.Cell>
           <Table.Cell>{dupe.email}</Table.Cell>
           <Table.Cell>{dupe.login_id}</Table.Cell>
@@ -145,9 +146,11 @@ class DuplicateSection extends React.Component {
       // next, add a row for creating a new user for this login id
       if (duplicateSet.createNew) {
         // render the row as an editor
+        const emailError = this.props.fieldsRefAndError?.[duplicateSet.address]?.errorMessage
+
         rows.push(
           <Table.Row key={duplicateSet.address + CREATE_NEW} data-testid="create-new">
-            <Table.RowHeader>
+            <Table.Cell>
               <RadioInput
                 value={CREATE_NEW}
                 name={duplicateSet.address}
@@ -161,7 +164,7 @@ class DuplicateSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </Table.RowHeader>
+            </Table.Cell>
             <Table.Cell>
               <TextInput
                 isRequired={true}
@@ -175,6 +178,9 @@ class DuplicateSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
+                ref={ref => {
+                  this.props.fieldsRefAndError[duplicateSet.address] = {ref}
+                }}
                 isRequired={true}
                 name="email"
                 type="email"
@@ -182,16 +188,17 @@ class DuplicateSection extends React.Component {
                 renderLabel={<ScreenReaderContent>{emailLabel}</ScreenReaderContent>}
                 value={duplicateSet.newUserInfo.email}
                 onChange={this.onNewForDuplicateChange}
+                messages={emailError ? [{text: emailError, type: 'newError'}] : []}
               />
             </Table.Cell>
             <Table.Cell colSpan="3" />
-          </Table.Row>
+          </Table.Row>,
         )
       } else {
         // render the row as a hint to the user
         rows.push(
           <Table.Row key={duplicateSet.address + CREATE_NEW} data-testid="create-new">
-            <Table.RowHeader>
+            <Table.Cell>
               <RadioInput
                 value={CREATE_NEW}
                 name={duplicateSet.address}
@@ -205,7 +212,7 @@ class DuplicateSection extends React.Component {
                   </ScreenReaderContent>
                 }
               />
-            </Table.RowHeader>
+            </Table.Cell>
             <Table.Cell colSpan="5">
               <Link
                 isWithinText={false}
@@ -218,14 +225,14 @@ class DuplicateSection extends React.Component {
                 </Text>
               </Link>
             </Table.Cell>
-          </Table.Row>
+          </Table.Row>,
         )
       }
     }
     // finally, the skip this user row
     rows.push(
       <Table.Row key={duplicateSet.address + SKIP} data-testid="skip-addr">
-        <Table.RowHeader>
+        <Table.Cell>
           <RadioInput
             value={SKIP}
             name={duplicateSet.address}
@@ -237,7 +244,7 @@ class DuplicateSection extends React.Component {
               </ScreenReaderContent>
             }
           />
-        </Table.RowHeader>
+        </Table.Cell>
         <Table.Cell colSpan="5">
           <Link
             isWithinText={false}
@@ -248,7 +255,7 @@ class DuplicateSection extends React.Component {
             <Text>{I18n.t('Don’t add this user for now.')}</Text>
           </Link>
         </Table.Cell>
-      </Table.Row>
+      </Table.Row>,
     )
     return rows
   }
@@ -261,7 +268,7 @@ class DuplicateSection extends React.Component {
             <Text>
               {I18n.t(
                 'Possible matches for "%{address}". Select the correct one below or create a new user.',
-                {address: this.props.duplicates.address}
+                {address: this.props.duplicates.address},
               )}
             </Text>
           }

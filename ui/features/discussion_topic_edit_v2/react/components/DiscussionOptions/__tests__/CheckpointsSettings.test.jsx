@@ -43,7 +43,7 @@ const setup = ({
       }}
     >
       <CheckpointsSettings />
-    </DiscussionDueDatesContext.Provider>
+    </DiscussionDueDatesContext.Provider>,
   )
 }
 
@@ -70,6 +70,14 @@ describe('CheckpointsSettings', () => {
         pointsPossibleReplyToTopic: 9,
       })
       expect(getByText('Total Points Possible: 17')).toBeInTheDocument()
+    })
+
+    it('adds decimal points', () => {
+      const {getByText} = setup({
+        pointsPossibleReplyToEntry: 2.5,
+        pointsPossibleReplyToTopic: 3.25,
+      })
+      expect(getByText('Total Points Possible: 5.75')).toBeInTheDocument()
     })
   })
   describe('Additional Replies Required', () => {

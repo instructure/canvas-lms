@@ -64,7 +64,7 @@ describe('ToolConfigurationForm', () => {
       mountForm()
 
       expect(
-        screen.getByText(new RegExp(defaultProps().toolConfiguration.url, 'i'))
+        screen.getByText(new RegExp(defaultProps().toolConfiguration.url, 'i')),
       ).toBeInTheDocument()
     })
 
@@ -106,6 +106,26 @@ describe('ToolConfigurationForm', () => {
       expect(elem1).not.toBeVisible()
       expect(elem2).not.toBeVisible()
     })
+
+    it('validates the JSON syntax', async () => {
+      const {ref} = mountForm({invalidJson: '{invalid json text}'})
+      expect(ref.current.valid()).toBeFalsy()
+    })
+
+    it('is valid when valid', async () => {
+      const {ref} = mountForm()
+      expect(ref.current.valid()).toBeTruthy()
+    })
+
+    it('is invalid with invalid json', () => {
+      const {ref} = mountForm({invalidJson: 'invalid json'})
+      expect(ref.current.valid()).toBeFalsy()
+    })
+
+    it('is invalid with empty json', () => {
+      const {ref} = mountForm({jsonString: '{}'})
+      expect(ref.current.valid()).toBeFalsy()
+    })
   })
 
   describe('when configuration method is by URL', () => {
@@ -116,12 +136,37 @@ describe('ToolConfigurationForm', () => {
     })
 
     it('transitions to configuring by JSON when the json option is selected', () => {
-      const {ref} = renderToolConfigurationForm({configurationMethod: 'url'})
+      const {ref} = renderToolConfigurationForm({
+        configurationMethod: 'url',
+        updatePastedJson: jest.fn(),
+      })
 
       fireEvent.click(screen.getByRole('combobox', {name: /method/i}))
       fireEvent.click(document.querySelector('[value="json"]'))
 
       expect(ref.current.props.updateConfigurationMethod).toHaveBeenCalled()
+      expect(ref.current.props.updatePastedJson).toHaveBeenCalled()
+    })
+
+    it('is valid when valid', async () => {
+      const {ref} = renderToolConfigurationForm({configurationMethod: 'url'})
+      expect(ref.current.valid()).toBeTruthy()
+    })
+
+    it('is invalid with an invalid url', () => {
+      const {ref} = renderToolConfigurationForm({
+        configurationMethod: 'url',
+        toolConfigurationUrl: 'invalid url',
+      })
+      expect(ref.current.valid()).toBeFalsy()
+    })
+
+    it('is invalid with empty url', () => {
+      const {ref} = renderToolConfigurationForm({
+        configurationMethod: 'url',
+        toolConfigurationUrl: '',
+      })
+      expect(ref.current.valid()).toBeFalsy()
     })
   })
 
@@ -135,8 +180,8 @@ describe('ToolConfigurationForm', () => {
     it('renders a visible manual configuration', () => {
       renderToolConfigurationForm({configurationMethod: 'manual'})
 
-      const elem1 = screen.queryByText('* Target Link URI')
-      const elem2 = screen.queryByText('* OpenID Connect Initiation Url')
+      const elem1 = screen.queryByText('Target Link URI')
+      const elem2 = screen.queryByText('OpenID Connect Initiation Url')
 
       expect(elem1).toBeVisible()
       expect(elem2).toBeVisible()

@@ -23,16 +23,17 @@ require_relative "messages_helper"
 describe "discussion_mention" do
   before :once do
     discussion_topic_model
-    @entry = @topic.discussion_entries.create!(user: user_model)
-    @object = @entry.mentions.create!(user: @user, root_account: @entry.root_account)
+    @author = user_model(name: "Author Name")
+    @entry = @topic.discussion_entries.create!(user: @author)
+    @object = @entry.mentions.create!(user: @user, root_account: @entry.root_account, discussion_entry: @entry)
   end
 
   let(:asset) { @object }
-  let(:notification_name) { :discussion_mention }
+  let(:notification_name) { "Discussion Mention" }
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
     let(:long_comment_instruction_html) do
       "Comment by replying to this message, or join the conversation using the link below. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
@@ -41,9 +42,15 @@ describe "discussion_mention" do
       "Comment by replying to this message, or join the conversation using this link:"
     end
 
-    it "renders emal" do
+    it "renders email" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
+    end
+
+    it "emails render author name" do
+      msg = generate_message(notification_name, path_type, asset)
+      msg.save!
+      expect(msg.from_name).to eq "Author Name"
     end
 
     it "renders correct footer if replies are enabled" do
@@ -70,16 +77,6 @@ describe "discussion_mention" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
       expect(msg.subject).to include "You have been mentioned in #{@entry.title}: #{@course.name}"
-    end
-  end
-
-  context "twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders twitter" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
-      expect(msg.body).to include "Canvas Alert - Mention: #{@entry.title}, #{@course.name}."
     end
   end
 end

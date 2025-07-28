@@ -20,6 +20,7 @@ import {filter} from 'lodash'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/QuizItemGroupView.handlebars'
 import QuizItemView from './QuizItemView'
+import 'jqueryui/tooltip'
 
 export default class ItemGroupView extends CollectionView {
   static initClass() {

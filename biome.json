@@ -1,0 +1,50 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "master"
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "Jenkinsfile.js",
+      "**/coverage/**",
+      "**/dist/**",
+      "**/es/**",
+      "**/locales/**",
+      "**/public/**",
+      "packages/bootstrap*",
+      "packages/bundles",
+      "packages/jquery*",
+      "packages/react-dnd-test-backend/index.js",
+      "packages/slickgrid",
+      "ui/shared/apollo-v3/possibleTypes.json",
+      "ui/shared/graphql/fragment-masking.ts",
+      "ui/shared/graphql/gql.ts",
+      "ui/shared/graphql/graphql.ts",
+      "schema.graphql"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "indentStyle": "space"
+  },
+  "organizeImports": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": false
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "lineWidth": 100,
+      "quoteStyle": "single",
+      "bracketSpacing": false,
+      "arrowParentheses": "asNeeded"
+    }
+  }
+}

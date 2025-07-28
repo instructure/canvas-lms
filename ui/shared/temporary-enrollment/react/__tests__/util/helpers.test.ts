@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
+  generateDateTimeMessage,
   getDayBoundaries,
   getFromLocalStorage,
   removeStringAffix,
@@ -124,6 +126,106 @@ describe('helpers.ts', () => {
 
         expect(start).toEqual(new Date(2023, 8, 13, 0, 1, 0, 0))
         expect(end).toEqual(new Date(2023, 8, 13, 23, 59, 59, 999))
+      })
+    })
+
+    describe('generateDateTimeMessage', () => {
+      const date = '2023-08-30T19:30:00.000Z' // July 30th, 2023 at 6:30 pm
+
+      afterAll(() => {
+        fakeENV.teardown()
+      })
+
+      it('returns only local time if the context timezone is null', () => {
+        fakeENV.setup({
+          CONTEXT_TIMEZONE: null,
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        })
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns only local time if the context isnt account', () => {
+        fakeENV.setup({
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'users_1',
+          TIMEZONE: 'America/Denver',
+        })
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns only local time if the context timezone is the same as the system timezone', () => {
+        fakeENV.setup({
+          CONTEXT_TIMEZONE: 'America/Denver',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        })
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Wed, Aug 30, 2023, 1:30 PM')
+      })
+
+      it('returns local and account times', () => {
+        fakeENV.setup({
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        })
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('Local: Wed, Aug 30, 2023, 1:30 PM')
+        expect(messageText).toContain('Account: Thu, Aug 31, 2023, 3:30 AM')
+      })
+
+      it('returns error message if isInvalid', () => {
+        fakeENV.setup({
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        })
+        const dateTime = {value: date, isInvalid: true, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('The chosen date and time is invalid.')
+      })
+
+      it('returns error message if wrongOrder', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const dateTime = {value: date, isInvalid: false, wrongOrder: true}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('The start date must be before the end date')
       })
     })
   })

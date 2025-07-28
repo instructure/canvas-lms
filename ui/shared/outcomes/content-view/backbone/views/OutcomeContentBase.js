@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {extend, isEmpty} from 'lodash'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
@@ -24,7 +24,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('OutcomeContentBase')
+const I18n = createI18nScope('OutcomeContentBase')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -42,7 +42,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         'click .move_button': 'move',
         'keyup input.outcome_title': 'updateTitle',
       },
-      ValidatedFormView.prototype.events
+      ValidatedFormView.prototype.events,
     )
 
     // A validation key is the field name to validate.
@@ -91,7 +91,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
             this.state = opts.state
             return this.render()
           },
-        })
+        }),
       )
     }
     return super.initialize(...arguments)
@@ -131,7 +131,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   fail() {
     return $.flashError(
-      I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+      I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.'),
     )
   }
 
@@ -153,7 +153,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
           default:
             return 'edit'
         }
-      })()
+      })(),
     )
   }
 
@@ -201,7 +201,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   delete(e) {
     e.preventDefault()
-    // eslint-disable-next-line no-alert
+
     if (!window.confirm(I18n.t('confirm.delete', 'Are you sure you want to delete?'))) return
     this.state = 'delete'
     this.setModelUrl()
@@ -216,25 +216,25 @@ export default class OutcomeContentBase extends ValidatedFormView {
         error: (_model, response) => {
           if (
             response.responseText.match(
-              /Outcome.*cannot be deleted because it is aligned to content/
+              /Outcome.*cannot be deleted because it is aligned to content/,
             )
           ) {
             $.flashError(
               I18n.t(
                 'flash.userDeleteError',
-                'Outcome Group contains one or more Outcomes that are currently aligned to content.'
-              )
+                'Outcome Group contains one or more Outcomes that are currently aligned to content.',
+              ),
             )
           } else {
             $.flashError(
               I18n.t(
                 'flash.unexpectedDeleteError',
-                'Something went wrong. Unable to delete at this time.'
-              )
+                'Something went wrong. Unable to delete at this time.',
+              ),
             )
           }
         },
-      })
+      }),
     )
   }
 
@@ -272,7 +272,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
     const localElExists = this.$el.find('[name="description"]').length > 0
     const editorElExists = RichContentEditor.callOnRCE(
       this.$el.find('[name="description"]'),
-      'exists?'
+      'exists?',
     )
     return localElExists && editorElExists
   }

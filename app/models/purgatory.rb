@@ -23,7 +23,7 @@ class Purgatory < ActiveRecord::Base
 
   scope :active, -> { where(workflow_state: "active") }
 
-  TIME_TO_EXPIRE = 30.days
+  TIME_TO_EXPIRE = 180.days
 
   def self.expire_old_purgatories
     Purgatory.active.where(updated_at: ...TIME_TO_EXPIRE.ago).find_in_batches do |batch|

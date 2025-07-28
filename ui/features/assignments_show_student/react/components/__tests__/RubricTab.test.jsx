@@ -65,7 +65,7 @@ function gradedResolvers() {
 
 function ungradedResolvers() {
   return {
-    Submission: {rubricAssessmentsConnection: () => null},
+    Submission: {rubricAssessmentsConnection: () => []},
     Course: {
       account: {
         outcomeProficiency: {
@@ -92,6 +92,7 @@ async function makeProps(opts = {}) {
       Rubric: {
         criteria: [{}],
       },
+      HtmlEncodedString: () => 'Mocked HTML encoded string',
     },
   ]
 
@@ -99,8 +100,6 @@ async function makeProps(opts = {}) {
   const assessments = result.data.submission.rubricAssessmentsConnection?.nodes
   return {
     assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)) || [],
-    proficiencyRatings:
-      result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
     rubric: transformRubricData(result.data.assignment.rubric),
   }
 }
@@ -156,11 +155,11 @@ describe('RubricTab', () => {
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('contains "View Rubric" when peer review mode is OFF', async () => {
@@ -218,8 +217,8 @@ describe('RubricTab', () => {
 
       expect(
         await findByText(
-          'Fill out the rubric below after reviewing the student submission to complete this review.'
-        )
+          'Fill out the rubric below after reviewing the student submission to complete this review.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -233,18 +232,18 @@ describe('RubricTab', () => {
 
       expect(
         await queryByText(
-          'Fill out the rubric below after reviewing the student submission to complete this review.'
-        )
+          'Fill out the rubric below after reviewing the student submission to complete this review.',
+        ),
       ).not.toBeInTheDocument()
     })
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('opens rubric assessment tray by default', async () => {
@@ -366,11 +365,11 @@ describe('RubricTab', () => {
 
     describe('enhanced rubrics', () => {
       beforeAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = true
+        window.ENV.enhanced_rubrics_enabled = true
       })
 
       afterAll(() => {
-        window.ENV.FEATURES.enhanced_rubrics = false
+        window.ENV.enhanced_rubrics_enabled = false
       })
 
       it('displays the name of the assessor if present', async () => {

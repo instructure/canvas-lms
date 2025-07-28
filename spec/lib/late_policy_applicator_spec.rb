@@ -26,7 +26,7 @@ describe LatePolicyApplicator do
     end
 
     it "instantiates an applicator for the course" do
-      expect(LatePolicyApplicator).to receive(:new).with(@course).and_call_original
+      expect(LatePolicyApplicator).to receive(:new).with(@course, []).and_call_original
 
       LatePolicyApplicator.for_course(@course)
     end
@@ -47,11 +47,11 @@ describe LatePolicyApplicator do
 
     it "kicks off a singleton-by-course + n_strand-by-root-account background job" do
       queueing_args = {
-        singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}",
+        singleton: "late_policy_applicator:calculator:Course:#{@course.global_id}:AssignmentsHash:N/A",
         n_strand: ["LatePolicyApplicator", @course.root_account.global_id]
       }
 
-      applicator_double = instance_double("LatePolicyApplicator")
+      applicator_double = instance_double(LatePolicyApplicator)
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
       expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)
@@ -115,7 +115,7 @@ describe LatePolicyApplicator do
         n_strand: ["LatePolicyApplicator", @published_assignment.root_account.global_id]
       }
 
-      applicator_double = instance_double("LatePolicyApplicator")
+      applicator_double = instance_double(LatePolicyApplicator)
       allow(LatePolicyApplicator).to receive(:new).and_return(applicator_double)
 
       expect(applicator_double).to receive(:delay_if_production).with(**queueing_args).and_return(applicator_double)

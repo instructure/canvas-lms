@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -20,13 +19,14 @@
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {SimilarityScore} from '../../../../../../api.d' // !!! FIXME
 
 import SimilarityIcon from '../../components/SimilarityIcon'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
+// @ts-expect-error
 function tooltipText({similarityScore, status}) {
   if (status === 'error') {
     return I18n.t('Error submitting to plagiarism service')

@@ -53,6 +53,14 @@ body.student-annotation-container .ic-Layout-contentMain {
   display: flex;
 }
 
+.ef-file-studio-player-container {
+  display: flex;
+  flex: 1 1 auto;
+  margin: 2% 0;
+  place-items: center;
+  justify-content: center;
+}
+
 /// Second container: Image/Info Area
 
 .ef-file-preview-information-container {

@@ -29,7 +29,7 @@ function renderComponent(props) {
       selectedAccordionIndex=""
       onLinkClick={() => {}}
       {...props}
-    />
+    />,
   )
 }
 

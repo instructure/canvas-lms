@@ -65,11 +65,15 @@ module AttachmentFu # :nodoc:
       end
 
       def authenticated_s3_url(*args)
-        if args[0].is_a?(Hash) && !args[0][:secure].nil?
-          protocol = args[0][:secure] ? "https://" : "http://"
+        if args[0].is_a?(Hash)
+          unless args[0][:secure].nil?
+            protocol = args[0][:secure] ? "https://" : "http://"
+          end
+          user = args[0][:user] if args[0][:user]
+          ttl = args[0][:ttl] if args[0][:ttl]
         end
         protocol ||= "#{HostUrl.protocol}://"
-        "#{protocol}#{local_storage_path}"
+        "#{protocol}#{local_storage_path(user:, ttl:)}"
       end
 
       def filename=(value)
@@ -77,15 +81,15 @@ module AttachmentFu # :nodoc:
         if !new_record? && !(filename.nil? || @old_filename)
           @old_filename = full_filename
         end
-        write_attribute :filename, value
+        self["filename"] = value
       end
 
       def sanitize_filename(filename)
-        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
+        if respond_to?(:root_attachment) && root_attachment&.filename
           filename = root_attachment.filename
         else
           filename = Attachment.truncate_filename(filename, 255)
-          filename.gsub!(%r{/| }, "_")
+          filename&.gsub!(%r{/| }, "_")
         end
         filename
       end

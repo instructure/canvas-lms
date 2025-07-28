@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,9 +17,9 @@
  */
 
 import moment from 'moment-timezone'
-import {BlackoutDate} from '../shared/types'
+import type {BlackoutDate} from '../shared/types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
-import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {initialCalendarEventBlackoutDates} from '../reducers/original'
 
 /* API methods */
@@ -46,14 +45,14 @@ export const sync = (course_id: string | number) => {
     })
     .then(result => {
       return ((result.json || []) as Array<ApiFormattedBlackoutDate>).map(bd =>
-        transformBlackoutDateFromApi(bd)
+        transformBlackoutDateFromApi(bd),
       )
     })
 }
 
 export const calendarEventsSync = (
   blackoutDates: BlackoutDate[],
-  course_id: string
+  course_id: string,
 ): BlackoutDate[] => {
   if (!course_id) return []
 
@@ -117,7 +116,7 @@ const addCalendarEvent = (event: BlackoutDate, course_id: string) => {
 }
 
 const toBlackoutDate = (
-  result: DoFetchApiResults<ApiFormattedCalendarEventBlackoutDate>
+  result: DoFetchApiResults<ApiFormattedCalendarEventBlackoutDate>,
 ): BlackoutDate => {
   const event_title = result.json?.title || ''
   const start_date = moment(result.json?.start_at)
@@ -167,10 +166,10 @@ function transformBlackoutDateForApi(blackoutDate: BlackoutDate): ApiFormattedBl
 }
 
 export function transformBlackoutDatesForApi(
-  blackoutDates: BlackoutDate[]
+  blackoutDates: BlackoutDate[],
 ): ApiFormattedBlackoutDate[] {
   return blackoutDates.map(
-    (bd: BlackoutDate): ApiFormattedBlackoutDate => transformBlackoutDateForApi(bd)
+    (bd: BlackoutDate): ApiFormattedBlackoutDate => transformBlackoutDateForApi(bd),
   )
 }
 

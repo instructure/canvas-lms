@@ -20,12 +20,12 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('file_not_found')
+const I18n = createI18nScope('file_not_found')
 
 const LABEL_TEXT = I18n.t(
-  'Please let them know which page you were viewing and the link you clicked on.'
+  'Please let them know which page you were viewing and the link you clicked on.',
 )
 
 class FileNotFound extends React.Component {
@@ -34,6 +34,8 @@ class FileNotFound extends React.Component {
     this.state = {
       status: 'composing',
     }
+    this.formRef = React.createRef()
+    this.messageRef = React.createRef()
   }
 
   submitMessage = e => {
@@ -42,15 +44,15 @@ class FileNotFound extends React.Component {
       subject: I18n.t('Broken file link found in your course'),
       recipients: this.props.contextCode + '_teachers',
       body: `${I18n.t(
-        'This most likely happened because you imported course content without its associated files.'
+        'This most likely happened because you imported course content without its associated files.',
       )}
 
-        ${I18n.t('This student wrote:')} ${ReactDOM.findDOMNode(this.refs.message).value}`,
+        ${I18n.t('This student wrote:')} ${this.messageRef.current.value}`,
       context_code: this.props.contextCode,
     }
 
     const dfd = $.post('/api/v1/conversations', conversationData)
-    $(ReactDOM.findDOMNode(this.refs.form)).disableWhileLoading(dfd)
+    $(ReactDOM.findDOMNode(this.formRef.current)).disableWhileLoading(dfd)
 
     dfd.done(() => this.setState({status: 'sent'}))
   }
@@ -60,7 +62,7 @@ class FileNotFound extends React.Component {
       return (
         <div>
           <p>{I18n.t('Be a hero and ask your instructor to fix this link.')}</p>
-          <form style={{marginBottom: 0}} ref="form" onSubmit={this.submitMessage}>
+          <form style={{marginBottom: 0}} ref={this.formRef} onSubmit={this.submitMessage}>
             <div className="form-group pad-box">
               <label htmlFor="fnfMessage" className="screenreader-only">
                 {LABEL_TEXT}
@@ -69,7 +71,7 @@ class FileNotFound extends React.Component {
                 className="input-block-level"
                 id="fnfMessage"
                 placeholder={LABEL_TEXT}
-                ref="message"
+                ref={this.messageRef}
               />
             </div>
             <div className="form-actions" style={{marginBottom: 0}}>

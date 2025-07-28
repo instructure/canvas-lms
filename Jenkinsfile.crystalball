@@ -55,6 +55,11 @@ def getResultsHTMLUrl() {
   return "${env.BUILD_URL}/artifact/crystalball_map.yml"
 }
 
+def sendCrystalballSlack(status) {
+  def message = ":alert: <$env.BUILD_URL|Crystalball Map Build> ${status}! :alert:\nResolve this issue to prevent further build failures!"
+  slackSend channel: '#crystalball-noisy,#devx-alerts', color: 'danger', message: message
+}
+
 def postFn() {
   copyArtifacts(
     filter: 'tmp/*/crystalball/**',
@@ -64,7 +69,7 @@ def postFn() {
   )
 
   sh """
-    docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
+    docker compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
     -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
     --name crystalball-parser \
     canvas bash -c 'ruby build/new-jenkins/crystalball_merge_coverage.rb "/tmp/*/crystalball/"'
@@ -76,7 +81,7 @@ def postFn() {
   def message = "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>\n"
   try {
     def mapSpecInfo = sh(script: """
-      docker-compose run --rm \
+      docker compose run --rm \
         -v \$(pwd)/\$LOCAL_WORKDIR/crystalball_map.yml/:/usr/src/app/crystalball_map.yml \
         -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
         -v \$(pwd)/\$LOCAL_WORKDIR/gems/plugins/:/usr/src/app/gems/plugins \
@@ -87,7 +92,10 @@ def postFn() {
     message = message + "\n" + mapSpecInfo
     // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
     if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
-      sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
+      withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
+        def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
+        sh "$awsCreds aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/"
+      }
     }
   } catch(e) {
     message = message + "\nMap Invalid!"
@@ -108,6 +116,7 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'crystalball-map'
+    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
     RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
@@ -121,7 +130,6 @@ pipeline {
     PATCHSET_TAG = getPatchsetTag()
 
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
-    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
@@ -133,7 +141,6 @@ pipeline {
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
 
-    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     POSTGRES_CLIENT = configuration.postgresClient()
@@ -154,6 +161,9 @@ pipeline {
               }
 
               buildSummaryReport.addFailureRun('Main Build', currentBuild)
+              if (stageConfig.status() != 'SUCCESS') {
+                sendCrystalballSlack(stageConfig.status())
+              }
             },
             onNodeReleasing: {
               postFn()
@@ -205,7 +215,7 @@ pipeline {
                   if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
                     /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
                     sh '''#!/bin/bash
-                      ids=($(docker ps -aq --filter "name=canvas_"))
+                      ids=($(docker ps -aq --filter "name=canvas-"))
                       for i in "${ids[@]}"
                         do
                           docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"

@@ -62,7 +62,7 @@ describe "quiz restrictions as a teacher" do
 
       # now try and save it and validate the validation text
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
-      expect(ffj(".error_text")[1]).to include_text("You must enter an access code")
+      expect(ff(".error_text")[0]).to include_text("You must enter an access code")
     end
 
     it "accepts a valid password when creating a quiz", priority: "1" do
@@ -114,7 +114,7 @@ describe "quiz restrictions as a teacher" do
 
       # now try and save it and validate the validation text
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
-      expect(ffj(".error_text")[1]).to include_text("You must enter a valid IP Address")
+      expect(ff(".error_text")[0]).to include_text("You must enter a valid IP Address")
     end
 
     it "accepts a valid ipv4 address when creating a quiz", priority: "1" do
@@ -164,7 +164,7 @@ describe "quiz restrictions as a teacher" do
       f("#quiz_ip_filter").send_keys("7")
 
       wait_for_new_page_load { f("button.save_quiz_button.btn.btn-primary").click }
-      expect(ff(".error_text")[-1]).to include_text("IP filter is not valid")
+      expect(ff(".error_text")[0]).to include_text("IP filter is not valid")
     end
 
     it "has a working link to help with ip address filtering", priority: "1" do
@@ -201,7 +201,7 @@ describe "quiz restrictions as a teacher" do
     quiz.generate_quiz_data
     quiz.save!
 
-    @course.account.role_overrides.create!(permission: :manage_assignments, role: teacher_role, enabled: false)
+    @course.account.role_overrides.create!(permission: :manage_assignments_add, role: teacher_role, enabled: false)
 
     expect(@quiz.grants_right?(@user, :manage)).to be_falsey
     expect(@course.grants_right?(@user, :read_as_admin)).to be_truthy

@@ -26,6 +26,48 @@ describe "assignments" do
   include GoogleDriveCommon
   include AssignmentsCommon
 
+  def checkpointed_discussion(name, course, student, options = {})
+    defaults = {
+      reply_to_topic_due_at: nil,
+      required_replies_due_at: nil,
+      available_from: nil,
+      available_until: nil
+    }
+    options = defaults.merge(options)
+
+    checkpointed_discussion = DiscussionTopic.create_graded_topic!(course:, title: name)
+
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: checkpointed_discussion,
+      checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+      dates: [{
+        type: "override",
+        set_type: "ADHOC",
+        student_ids: [student.id],
+        due_at: options[:reply_to_topic_due_at],
+        unlock_at: options[:available_from],
+        lock_at: options[:available_until],
+      }],
+      points_possible: 3
+    )
+    Checkpoints::DiscussionCheckpointCreatorService.call(
+      discussion_topic: checkpointed_discussion,
+      checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+      dates: [{
+        type: "override",
+        set_type: "ADHOC",
+        student_ids: [student.id],
+        due_at: options[:required_replies_due_at],
+        unlock_at: options[:available_from],
+        lock_at: options[:available_until],
+      }],
+      points_possible: 3,
+      replies_required: 2
+    )
+
+    checkpointed_discussion
+  end
+
   context "as a student" do
     before do
       course_with_student_logged_in
@@ -136,7 +178,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
       expect(f("#content")).to include_text(format_date_for_view(unlock_time))
-      locked_assignment.update(unlock_at: Time.now)
+      locked_assignment.update(unlock_at: Time.zone.now)
       refresh_page # to show the updated assignment
       expect(f("#content")).not_to include_text("This assignment is locked until")
     end
@@ -227,23 +269,37 @@ describe "assignments" do
       end
 
       it "validates file upload restrictions" do
-        _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
         _filename_zip, fullpath_zip, _data_zip, _tempfile_zip = get_file("testfile5.zip")
         @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f(".submit_assignment_link").click
-
-        submit_file_button = f("#submit_file_button")
         submission_input = f(".submission_attachment input")
-        ext_error = f(".bad_ext_msg")
-
-        submission_input.send_keys(fullpath_txt)
-        expect(ext_error).not_to be_displayed
-        expect(submit_file_button["disabled"]).to be_nil
         submission_input.send_keys(fullpath_zip)
-        expect(ext_error).to be_displayed
-        expect(submit_file_button).to be_disabled
+        expect(f(".submission_attachment")).to include_text("This file type is not allowed.")
       end
+
+      it "accepts valid file upload extensions" do
+        _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
+        @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        f(".submit_assignment_link").click
+        submission_input = f(".submission_attachment input")
+        submission_input.send_keys(fullpath_txt)
+        expect(f(".submission_attachment")).not_to include_text("This file type is not allowed.")
+      end
+    end
+
+    it "allows student to submit valid file upload" do
+      _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
+      @assignment.update(submission_types: "online_upload", allowed_extensions: ".txt")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f(".submit_assignment_link").click
+      submission_input = f(".submission_attachment input")
+      submission_input.send_keys(fullpath_txt)
+      assignment_form = f("#submit_online_upload_form")
+      submit_form(assignment_form)
+      wait_for_ajax_requests
+      expect(f("#right-side-wrapper")).to include_text("Submitted!")
     end
 
     # EVAL-3711 Remove this test when instui_nav feature flag is removed
@@ -535,6 +591,124 @@ describe "assignments" do
         f('[data-view="showBy"] [type="button"]').click
         f('[data-testid="show_by_type"]').click
         expect(ff('[data-view="assignmentGroups"] .assignment_group').length).to eq(count_to_expect)
+      end
+    end
+
+    context "checkpointed" do
+      before do
+        @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
+        Account.site_admin.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
+
+        @date_in_past = 2.days.ago
+        @date_in_future = 2.days.from_now
+
+        # Checkpointed assignments in undated assignment group
+        @both_undated = checkpointed_discussion("Both Undated", @course, @student)
+
+        # Checkpointed assignments in upcoming assignment group
+        @both_future = checkpointed_discussion(
+          "Both Future",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_future,
+          required_replies_due_at: @date_in_future
+        )
+
+        @undated_future = checkpointed_discussion(
+          "Undated and Future",
+          @course,
+          @student,
+          required_replies_due_at: @date_in_future
+        )
+
+        @future_past = checkpointed_discussion(
+          "Future and Past",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_past + 1.day,
+          required_replies_due_at: @date_in_future
+        )
+        @future_past.assignment.sub_assignments.first.grade_student(@student, grader: @teacher, score: 1)
+
+        # Checkpointed assignments in overdue assignment group
+        @both_overdue = checkpointed_discussion(
+          "Both Overdue",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_past,
+          required_replies_due_at: @date_in_past
+        )
+
+        @undated_overdue = checkpointed_discussion(
+          "Undated and Overdue",
+          @course,
+          @student,
+          required_replies_due_at: @date_in_past
+        )
+
+        @overdue_future = checkpointed_discussion(
+          "Overdue and Future",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_past,
+          required_replies_due_at: @date_in_future
+        )
+
+        @overdue_past = checkpointed_discussion(
+          "Overdue and Past",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_past,
+          required_replies_due_at: @date_in_past
+        )
+        @overdue_past.assignment.sub_assignments.first.grade_student(@student, grader: @teacher, score: 1)
+
+        # Checkpointed assignments in past assignment group
+        @both_past = checkpointed_discussion(
+          "Both Past",
+          @course,
+          @student,
+          reply_to_topic_due_at: @date_in_past - 1.day,
+          required_replies_due_at: @date_in_past - 1.day
+        )
+        @both_past.assignment.sub_assignments.first.grade_student(@student, grader: @teacher, score: 1)
+        @both_past.assignment.sub_assignments.second.grade_student(@student, grader: @teacher, score: 1)
+
+        @undated_past = checkpointed_discussion(
+          "Undated and Past",
+          @course,
+          @student,
+          required_replies_due_at: @date_in_past - 1.day
+        )
+        @undated_past.assignment.sub_assignments.second.grade_student(@student, grader: @teacher, score: 1)
+      end
+
+      it "categorizes checkpointed discussions by date correctly" do
+        undated = [@both_undated]
+        upcoming = [@both_future, @undated_future, @future_past]
+        overdue = [@both_overdue, @undated_overdue, @overdue_future, @overdue_past]
+        past = [@both_past, @undated_past]
+
+        get "/courses/#{@course.id}/assignments"
+        wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
+        wait_for_ajaximations
+
+        undated.each do |d|
+          expect(f("#assignment_group_undated #assignment_#{d.assignment.id}")).not_to be_nil
+        end
+
+        upcoming.each do |d|
+          expect(f("#assignment_group_upcoming #assignment_#{d.assignment.id}")).not_to be_nil
+        end
+
+        overdue.each do |d|
+          expect(f("#assignment_group_overdue_assignments #assignment_#{d.assignment.id}")).not_to be_nil
+        end
+
+        past.each do |d|
+          expect(f("#assignment_group_past_assignments #assignment_#{d.assignment.id}")).not_to be_nil
+        end
       end
     end
   end

@@ -16,44 +16,61 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {getCourseRootFolder, getFolderFiles} from '../apiClient'
 
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
 beforeEach(() => {
-  moxios.install()
+  // Reset handlers for each test
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   jest.clearAllMocks()
 })
 
-it('fetches course root folder', done => {
-  moxios.stubRequest('/api/v1/courses/1/folders/root', {
-    response: {files: []},
-  })
-  getCourseRootFolder('1')
-    .then(rootFolder => {
-      expect(rootFolder).toEqual({files: []})
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+afterAll(() => {
+  server.close()
 })
 
-it('fetches folder files across pages', done => {
-  moxios.stubRequest('/api/v1/folders/1/files?only[]=names', {
-    response: [{display_name: 'a.txt'}],
-    headers: {
-      link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"',
-    },
-  })
-  moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2', {
-    response: [{display_name: 'b.txt'}],
-  })
-  getFolderFiles('1')
-    .then(files => {
-      expect(files.map(f => f.get('display_name'))).toEqual(['a.txt', 'b.txt'])
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+it('fetches course root folder', async () => {
+  server.use(
+    http.get('*/api/v1/courses/1/folders/root', () => {
+      return new HttpResponse(JSON.stringify({files: []}), {
+        status: 200,
+        headers: {'Content-Type': 'application/json'},
+      })
+    }),
+  )
+  const rootFolder = await getCourseRootFolder('1')
+  expect(rootFolder).toEqual({files: []})
+})
+
+it('fetches folder files across pages', async () => {
+  server.use(
+    http.get('*/api/v1/folders/1/files', ({request}) => {
+      const url = new URL(request.url)
+      if (url.searchParams.get('page') === '2') {
+        return new HttpResponse(JSON.stringify([{display_name: 'b.txt'}]), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }
+      return new HttpResponse(JSON.stringify([{display_name: 'a.txt'}]), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"',
+        },
+      })
+    }),
+  )
+  const files = await getFolderFiles('1')
+  expect(files.map(f => f.get('display_name'))).toEqual(['a.txt', 'b.txt'])
 })

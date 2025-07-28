@@ -17,12 +17,12 @@
  */
 
 import React, {useCallback, useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
 import type {CustomDateTimeInputProps} from './types'
 import {generateMessages} from './utils'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type AvailableToDateTimeInputProps = CustomDateTimeInputProps & {
   availableToDate: string | null
@@ -49,24 +49,25 @@ export function AvailableToDateTimeInput({
   const key = 'lock_at'
   const handleClear = useCallback(() => setAvailableToDate(null), [setAvailableToDate])
   const dateInputRef = useCallback(
+    // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const timeInputRef = useCallback(
+    // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const onBlur = useMemo(() => handleBlur(key), [handleBlur])
   const messages = useMemo(
     () =>
       generateMessages(availableToDate, validationErrors[key] ?? null, unparsedFieldKeys.has(key)),
-    [availableToDate, validationErrors, unparsedFieldKeys]
+    [availableToDate, validationErrors, unparsedFieldKeys],
   )
 
   const availableToDateProps = {
-    key,
     id: key,
     disabled:
       Boolean(blueprintDateLocks?.includes('availability_dates')) || disabledWithGradingPeriod,

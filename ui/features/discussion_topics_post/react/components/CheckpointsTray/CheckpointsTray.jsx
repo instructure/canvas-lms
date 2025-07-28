@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
@@ -24,11 +24,18 @@ import {IconDiscussionCheckLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Checkpoint} from '../../../graphql/Checkpoint'
 import {Submission} from '../../../graphql/Submission'
-import {REPLY_TO_TOPIC, REPLY_TO_ENTRY, SUBMITTED, MISSING, LATE} from '../../utils/constants'
+import {
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
+  SUBMITTED,
+  RESUMBITTED,
+  MISSING,
+  LATE,
+} from '../../utils/constants'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function CheckpointsTray({...props}) {
   const getCheckpointDueString = checkpointData => {
@@ -39,14 +46,14 @@ export function CheckpointsTray({...props}) {
       : I18n.t('Due: No Due Date')
   }
   const replyToTopicCheckpoint = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === REPLY_TO_TOPIC
+    checkpoint => checkpoint.tag === REPLY_TO_TOPIC,
   )
   const replyToEntryCheckpoint = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === REPLY_TO_ENTRY
+    checkpoint => checkpoint.tag === REPLY_TO_ENTRY,
   )
 
   const renderSubmissionStatus = (submission = {}) => {
-    if (submission.submissionStatus === SUBMITTED) {
+    if (submission.submissionStatus === SUBMITTED || submission.submissionStatus === RESUMBITTED) {
       return (
         <Flex.Item align="start">
           <Text size="small" color="success" weight="bold">

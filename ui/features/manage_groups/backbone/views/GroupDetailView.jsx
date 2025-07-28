@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import GroupModal from '@canvas/group-modal'
@@ -27,7 +27,7 @@ import groupHasSubmissions from '../../groupHasSubmissions'
 import '@canvas/rails-flash-notifications'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-const I18n = useI18nScope('GroupDetailView')
+const I18n = createI18nScope('GroupDetailView')
 
 export default class GroupDetailView extends View {
   static initClass() {
@@ -74,6 +74,7 @@ export default class GroupDetailView extends View {
 
   editGroup(e, open = true) {
     if (e) e.preventDefault()
+
     ReactDOM.render(
       <GroupModal
         group={{
@@ -94,13 +95,13 @@ export default class GroupDetailView extends View {
           this.$editGroupLink.focus()
         }}
       />,
-      document.getElementById('group-mount-point')
+      document.getElementById('group-mount-point'),
     )
   }
 
   deleteGroup(e) {
     e.preventDefault()
-    // eslint-disable-next-line no-restricted-globals
+
     if (confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group?'))) {
       if (groupHasSubmissions(this.model)) {
         this.cloneCategoryView = new GroupCategoryCloneView({
@@ -132,7 +133,7 @@ export default class GroupDetailView extends View {
       },
       error() {
         return $.flashError(
-          I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
+          I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.'),
         )
       },
     })
@@ -152,6 +153,7 @@ export default class GroupDetailView extends View {
     json.canAssignUsers = ENV.IS_LARGE_ROSTER && !this.model.isLocked()
     json.canManage = ENV.permissions.can_manage_groups && !this.model.isLocked()
     json.canDelete = ENV.permissions.can_delete_groups && !this.model.isLocked()
+    json.isNonCollaborative = this.model.get('non_collaborative')
     json.summary = this.summary()
     return json
   }

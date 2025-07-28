@@ -20,24 +20,22 @@ import formatMessage from '../../src/format-message'
 import clickCallback from './clickCallback'
 import {IconAdminToolsLine} from '@instructure/ui-icons/es/svg'
 
-tinymce.create('tinymce.plugins.RceDemoTest', {
-  init(ed) {
-    ed.addCommand('RceDemoTest', clickCallback.bind(this, ed, document))
-    ed.ui.registry.addIcon('rce-demo-test', IconAdminToolsLine.src)
+const RceDemoTest = (ed) => {
+  ed.addCommand('RceDemoTest', clickCallback.bind(this, ed, document))
+  ed.ui.registry.addIcon('rce-demo-test', IconAdminToolsLine.src)
 
-    ed.ui.registry.addButton('rce_demo_test', {
-      tooltip: formatMessage('Demo test plugin'),
-      onAction: _ => ed.execCommand('RceDemoTest'),
-      icon: 'rce-demo-test'
-    })
+  ed.ui.registry.addButton('rce_demo_test', {
+    tooltip: formatMessage('Demo test plugin'),
+    onAction: _ => ed.execCommand('RceDemoTest'),
+    icon: 'rce-demo-test'
+  })
 
-    ed.ui.registry.addMenuItem('rce_demo_test', {
-      text: formatMessage('Demo test plugin'),
-      icon: 'rce-demo-test',
-      onAction: () => ed.execCommand('RceDemoTest')
-    })
-  }
-})
+  ed.ui.registry.addMenuItem('rce_demo_test', {
+    text: formatMessage('Demo test plugin'),
+    icon: 'rce-demo-test',
+    onAction: () => ed.execCommand('RceDemoTest')
+  })
+}
 
 // Register plugin
-tinymce.PluginManager.add('rce_demo_test', tinymce.plugins.RceDemoTest)
+tinymce.PluginManager.add('rce_demo_test', RceDemoTest)

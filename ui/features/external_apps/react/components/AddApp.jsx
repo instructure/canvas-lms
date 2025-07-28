@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, each, isEmpty, compact} from 'lodash'
 import $ from 'jquery'
 import React from 'react'
@@ -29,9 +29,8 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
-// eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
   displayName: 'AddApp',
 
@@ -45,10 +44,17 @@ export default createReactClass({
       modalIsOpen: false,
       errorMessage: null,
       fields: {},
+      _isMounted: false,
     }
   },
 
+  componentWillMount() {
+    this.addToolRef = React.createRef()
+    this.addButtonRef = React.createRef()
+  },
+
   componentDidMount() {
+    this.setState({_isMounted: true})
     const fields = {}
 
     fields.name = {
@@ -82,11 +88,16 @@ export default createReactClass({
       }
     })
 
-    // eslint-disable-next-line react/no-is-mounted
-    if (this.isMounted()) {
+    try {
       this.setState({fields}, this.validateConfig)
-      this.refs.addTool.focus()
+      this.addToolRef.current?.focus()
+    } catch (err) {
+      console.error(err)
     }
+  },
+
+  componentWillUnmount() {
+    this.setState({_isMounted: false})
   },
 
   handleChange(e) {
@@ -109,15 +120,14 @@ export default createReactClass({
         if (v.required && isEmpty(v.value)) {
           return k
         }
-      })
+      }),
     )
     this.setState({invalidFields})
   },
 
   openModal(e) {
     e.preventDefault()
-    // eslint-disable-next-line react/no-is-mounted
-    if (this.isMounted()) {
+    if (this.state._isMounted) {
       this.setState({modalIsOpen: true})
     }
   },
@@ -172,19 +182,20 @@ export default createReactClass({
     newTool.set('config_settings', this.configSettings())
 
     $(e.target).prop('disabled', true)
+    this.addButtonRef = e.target
 
     newTool.save()
   },
 
   onSaveSuccess(tool) {
-    $(this.addButtonRef).removeAttr('disabled')
+    $(this.addButtonRef.current).removeAttr('disabled')
     tool.off('sync', this.onSaveSuccess)
     this.setState({errorMessage: null})
     this.closeModal(this.props.handleToolInstalled)
   },
 
   onSaveFail(_tool) {
-    $(this.addButtonRef).removeAttr('disabled')
+    $(this.addButtonRef.current).removeAttr('disabled')
     this.setState({
       errorMessage: I18n.t('There was an error in processing your request'),
     })
@@ -220,7 +231,7 @@ export default createReactClass({
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
-          ref="addTool"
+          ref={this.addToolRef}
           className="btn btn-primary btn-block add_app icon-add"
           onClick={this.openModal}
         >

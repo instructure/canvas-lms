@@ -42,7 +42,7 @@ export const Footer = ({
         <View as="div" padding="medium">
           <Checkbox
             label={formatMessage(
-              'Apply changes to all instances of this Icon Maker Icon in the Course'
+              'Apply changes to all instances of this Icon Maker Icon in the Course',
             )}
             data-testid="cb-replace-all"
             checked={replaceAll}
@@ -82,6 +82,7 @@ export const Footer = ({
               </ConditionalTooltip>
             ) : (
               <Button
+                id="create-icon-button"
                 disabled={disabled}
                 margin="0 0 0 x-small"
                 color="primary"

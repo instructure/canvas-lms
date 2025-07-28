@@ -31,7 +31,7 @@ describe "Exportable" do
     end
   end
 
-  context "#convert_to_epub" do
+  describe "#convert_to_epub" do
     it "creates proper zip and an epub files" do
       @epub_export = klass.new.convert_to_epub
       expect(File.exist?(@epub_export.first) && File.exist?(@epub_export.last)).to be true

@@ -269,10 +269,10 @@ describe Quizzes::QuizQuestionBuilder do
 
         expect(questions.count).to eq(4)
         expect(@quiz.quiz_questions.generated.count).to eq(2)
-        expect([
-                 ["bank question 1", "bank question 1", "bank question 2", "group question"],
-                 ["bank question 1", "bank question 2", "group question", "group question"],
-               ]).to include(questions.pluck(:question_text).sort)
+        expect(questions.pluck(:question_text).sort).to be_in [
+          ["bank question 1", "bank question 1", "bank question 2", "group question"],
+          ["bank question 1", "bank question 2", "group question", "group question"],
+        ]
       end
     end
   end

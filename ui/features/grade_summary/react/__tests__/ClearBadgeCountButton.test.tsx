@@ -55,7 +55,7 @@ describe('ClearBadgeCountsButton', () => {
     expect(button).toBeInTheDocument()
     expect(button).toHaveAttribute('disabled')
     expect(axios.put).toHaveBeenCalledWith(
-      `/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`
+      `/api/v1/courses/${props.courseId}/submissions/${props.userId}/clear_unread`,
     )
   })
 

@@ -39,7 +39,6 @@ describe('ToolLaunchResizer', () => {
 
     describe('when the wrapperId contains non-UUID chars', () => {
       beforeEach(() => {
-        /* eslint-disable-next-line no-template-curly-in-string */
         wrapperId = '<img src="x" onerror="alert(`${document.domain}_-`);" />'
       })
 

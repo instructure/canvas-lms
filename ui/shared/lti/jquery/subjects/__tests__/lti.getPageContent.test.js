@@ -29,10 +29,15 @@ describe('lti.getPageContent handler', () => {
       sendError: jest.fn(),
     }
     originalDocument = window.document
+    // Create a clean document for each test
+    const testdiv = document.createElement('div')
+    document.body.innerHTML = ''
+    document.body.appendChild(testdiv)
   })
 
   afterEach(() => {
     window.document = originalDocument
+    document.body.innerHTML = ''
   })
 
   function expectContent(expectedContent) {
@@ -50,8 +55,7 @@ describe('lti.getPageContent handler', () => {
 
   describe('when mixed data-lti-page-content elements are present', () => {
     beforeEach(() => {
-      const testdiv = document.createElement('div')
-      testdiv.innerHTML = `<div>
+      document.body.innerHTML = `<div>
           <div data-lti-page-content="true">page content1</div>
           <div data-lti-page-content="true">
             <div>page content2a</div>
@@ -65,7 +69,6 @@ describe('lti.getPageContent handler', () => {
           </div>
           <div>page content3-UNEXPECTED</div>
         </div>`
-      window.document.body.appendChild(testdiv)
     })
 
     it('responds with a message containing the combined outerHTML of expected elements only', () => {
@@ -77,7 +80,7 @@ describe('lti.getPageContent handler', () => {
             <div>
               page content2c
             </div>
-          </div>`
+          </div>`,
       )
     })
   })

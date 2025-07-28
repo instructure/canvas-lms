@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -24,6 +23,7 @@ import EditableCell from './EditableCell'
 import ReadOnlyCell from './ReadOnlyCell'
 
 export default class TotalGradeOverrideCellEditor extends ReactCellEditor {
+  // @ts-expect-error
   createElement(props) {
     if (props.studentIsGradeable) {
       return <EditableCell {...props} />

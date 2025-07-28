@@ -247,6 +247,34 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
+    it "uses the ams service logic when the ams_service is enabled" do
+      @course.root_account.enable_feature!(:ams_service)
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(controller.remote_env[:ams]).to_not be_nil
+
+      expect(controller.js_env[:QUIZZES]).to be_nil
+    end
+
+    context "assign to differentiation tags" do
+      before :once do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+    end
+
     context "DIRECT_SHARE_ENABLED" do
       before :once do
         course_quiz
@@ -506,6 +534,24 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    context "assign to differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        course_quiz
+        user_session(@teacher)
+        get "edit", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+    end
+
     context "conditional release" do
       before do
         allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "charliemccarthy" })
@@ -616,6 +662,56 @@ describe Quizzes::QuizzesController do
       attach = assigns[:js_env][:ATTACHMENTS][attachment.id]
       expect(attach[:id]).to eq attachment.id
       expect(attach[:display_name]).to eq attachment.display_name
+    end
+
+    context "when the ams_service is enabled" do
+      before do
+        @course.root_account.enable_feature!(:ams_service)
+        user_session(@teacher)
+        course_quiz(true)
+      end
+
+      it "uses the ams service logic with a quiz id" do
+        get "show", params: { course_id: @course.id, id: @quiz.id }
+        expect(response).to be_successful
+        expect(controller.remote_env[:ams]).to_not be_nil
+
+        expect(controller.js_env[:QUIZZES]).to be_nil
+      end
+
+      it "uses the ams service logic without a valid quiz id" do
+        get "show", params: { course_id: @course.id, id: "some_id" }
+        expect(response).to be_successful
+        expect(controller.remote_env[:ams]).to_not be_nil
+
+        expect(controller.js_env[:QUIZZES]).to be_nil
+      end
+    end
+
+    context "assign to differentiation tags" do
+      before do
+        @course.account.enable_feature! :assign_to_differentiation_tags
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+      end
+
+      it "differentiation tags information is true if account setting is on and user can manage tags" do
+        course_quiz
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
+      end
+
+      it "differentiation tags information is not available if user can not manage tags" do
+        course_quiz
+        user_session(@student)
+        get "show", params: { course_id: @course.id, id: @quiz.id }
+        expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be_nil
+        expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be_nil
+      end
     end
 
     describe "js_env SUBMISSION_VERSIONS_URL" do
@@ -744,6 +840,59 @@ describe Quizzes::QuizzesController do
         user_session(@teacher)
         get "show", params: { course_id: @course.id, id: @quiz.id, take: "1", preview: "1" }
         expect(response).to be_successful
+      end
+    end
+
+    describe "enhanced rubrics js_env" do
+      context "assigned_rubric and rubric_association" do
+        before do
+          Account.site_admin.enable_feature!(:enhanced_rubrics_assignments)
+          @course.enable_feature!(:enhanced_rubrics)
+          rubric = @course.rubrics.create! { |r| r.user = @teacher }
+          course_quiz(true)
+          rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                     hide_score_total: "0",
+                                                                                     purpose: "grading",
+                                                                                     skip_updating_points_possible: false,
+                                                                                     update_if_existing: true,
+                                                                                     use_for_grading: "1",
+                                                                                     association_object: @quiz.assignment
+                                                                                   })
+          rubric_assoc = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+          @quiz.assignment.rubric_association = rubric_assoc
+          @quiz.assignment.save!
+        end
+
+        it "sets assigned_rubric and rubric_association in the ENV when FF is ON" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @quiz.id }
+          quiz_assignment = @quiz.assignment
+          expect(assigns[:js_env][:assigned_rubric][:id]).to eq quiz_assignment.rubric_association.rubric_id
+          expect(assigns[:js_env][:assigned_rubric][:title]).to eq "Unnamed Course Rubric"
+          expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
+          expect(assigns[:js_env][:assigned_rubric][:association_count]).to eq 1
+          expect(assigns[:js_env][:rubric_association][:id]).to eq quiz_assignment.rubric_association.id
+          expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
+        end
+
+        it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
+          user_session(@teacher)
+          Account.site_admin.disable_feature!(:enhanced_rubrics_assignments)
+          get "show", params: { course_id: @course.id, id: @quiz.id }
+          expect(assigns[:js_env][:assigned_rubric]).to be_nil
+          expect(assigns[:js_env][:rubric_association]).to be_nil
+        end
+
+        it "does not set assigned_rubric when quiz is not associated with an assignment" do
+          @quiz.quiz_type = "survey"
+          @quiz.assignment = nil
+          @quiz.save!
+
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @quiz.id }
+          expect(assigns[:js_env][:assigned_rubric]).to be_nil
+          expect(assigns[:js_env][:rubric_association]).to be_nil
+        end
       end
     end
   end
@@ -1141,12 +1290,12 @@ describe Quizzes::QuizzesController do
     it "lets them take the quiz if it's locked but unlocked by an override" do
       user_session(@student)
       course_quiz(true)
-      @quiz.lock_at = Time.now
+      @quiz.lock_at = Time.zone.now
       @quiz.save!
       override = AssignmentOverride.new
       override.title = "ADHOC quiz override"
       override.quiz = @quiz
-      override.lock_at = Time.now + 1.day
+      override.lock_at = 1.day.from_now
       override.lock_at_overridden = true
       override.save!
       override_student = override.assignment_override_students.build
@@ -1794,6 +1943,22 @@ describe Quizzes::QuizzesController do
       expect(@quiz.reload.published).to be(false)
     end
 
+    context "when the account has suppress_assignments setting on" do
+      before do
+        account = @course.root_account
+        account.settings[:suppress_assignments] = true
+        account.save
+      end
+
+      it "quiz suppress_assignment false then true" do
+        user_session(@teacher)
+        course_quiz
+        expect(@quiz.assignment.suppress_assignment).to be(false) # default
+        put "update", params: { course_id: @course.id, id: @quiz.id, quiz: { title: "some quiz" }, suppress_assignment: "1" }
+        expect(assigns[:quiz].assignment.suppress_assignment).to be(true)
+      end
+    end
+
     context "post_to_sis" do
       before { @course.enable_feature!(:post_grades) }
 
@@ -2190,7 +2355,7 @@ describe Quizzes::QuizzesController do
         course_quiz
         @quiz.generate_quiz_data
         @quiz.workflow_state = "available"
-        @quiz.published_at = Time.now
+        @quiz.published_at = Time.zone.now
         @quiz.save!
 
         @quiz.update_attribute(:created_at, 1.day.ago)

@@ -79,7 +79,7 @@ DashboardCardBackgroundStore.getUsedDefaults = function () {
 // @ts-expect-error
 DashboardCardBackgroundStore.setColorForCourse = function (
   courseAssetString: string,
-  colorCode: string
+  colorCode: string,
 ) {
   const originalColors = this.getCourseColors()
   const newColors = {...originalColors, [courseAssetString]: colorCode}
@@ -110,11 +110,11 @@ DashboardCardBackgroundStore.leastUsedDefaults = function () {
 
   const usedColorsByFrequency = groupBy(
     usedDefaults,
-    (x: string) => filter(usedDefaults, (y: string) => x === y).length
+    (x: string) => filter(usedDefaults, (y: string) => x === y).length,
   )
 
   const mostCommonColors = uniq(
-    usedColorsByFrequency[chain(usedColorsByFrequency).keys().max().value()]
+    usedColorsByFrequency[chain(usedColorsByFrequency).keys().max().value()],
   )
 
   return difference(DEFAULT_COLOR_OPTIONS, mostCommonColors).length === 0
@@ -133,7 +133,7 @@ DashboardCardBackgroundStore.markColorUsed = function (usedColor: string) {
 
 DashboardCardBackgroundStore.persistNewColor = function (
   courseAssetString: string,
-  colorForCourse: string
+  colorForCourse: string,
 ) {
   const tmp: Record<string, string> = {}
   tmp[courseAssetString] = colorForCourse

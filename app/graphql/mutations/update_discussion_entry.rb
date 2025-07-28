@@ -22,10 +22,10 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
   graphql_name "UpdateDiscussionEntry"
 
   argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
-  argument :message, String, required: false
-  argument :remove_attachment, Boolean, required: false
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
+  argument :message, String, required: false
   argument :quoted_entry_id, ID, required: false
+  argument :remove_attachment, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)

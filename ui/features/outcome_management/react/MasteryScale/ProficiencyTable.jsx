@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import {v1 as uuid} from 'uuid'
@@ -32,7 +32,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
-const I18n = useI18nScope('ProficiencyTable')
+const I18n = createI18nScope('ProficiencyTable')
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -54,8 +54,8 @@ const createRating = (description, points, color, mastery = false, focusField = 
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
-      fromJS(createRating(rating.description, rating.points, rating.color, rating.mastery))
-    )
+      fromJS(createRating(rating.description, rating.points, rating.color, rating.mastery)),
+    ),
   )
   return {
     rows,
@@ -78,11 +78,11 @@ class ProficiencyTable extends React.Component {
     proficiency: {
       proficiencyRatingsConnection: {
         nodes: [
-          createRating(I18n.t('Exceeds Mastery'), 4, '127A1B'),
-          createRating(I18n.t('Mastery'), 3, '0B874B', true),
+          createRating(I18n.t('Exceeds Mastery'), 4, '02672D'),
+          createRating(I18n.t('Mastery'), 3, '03893D', true),
           createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
           createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
-          createRating(I18n.t('Well Below Mastery'), 0, 'E0061F'),
+          createRating(I18n.t('Well Below Mastery'), 0, 'E62429'),
         ],
       },
     },
@@ -100,7 +100,7 @@ class ProficiencyTable extends React.Component {
     if (this.fieldWithFocus()) {
       this.setState(
         ({rows}) => ({rows: rows.map(row => row.delete('focusField'))}),
-        this.notifyPendingChanges
+        this.notifyPendingChanges,
       )
     }
   }
@@ -142,7 +142,7 @@ class ProficiencyTable extends React.Component {
           type: 'success',
           srOnly: true,
         })
-      }
+      },
     )
   }
 
@@ -172,7 +172,7 @@ class ProficiencyTable extends React.Component {
             showFlashAlert({
               message: I18n.t('Mastery scale saved'),
               type: 'success',
-            })
+            }),
           )
           .catch(e => {
             showFlashAlert({
@@ -183,7 +183,7 @@ class ProficiencyTable extends React.Component {
             })
             this.setState({savedRows: oldRows}, this.notifyPendingChanges)
           })
-      }
+      },
     )
   }
 
@@ -223,7 +223,7 @@ class ProficiencyTable extends React.Component {
       ({rows}) => ({
         rows: rows.update(index, row => row.set('color', unformatColor(value))),
       }),
-      this.notifyPendingChanges
+      this.notifyPendingChanges,
     )
   })
 
@@ -249,7 +249,7 @@ class ProficiencyTable extends React.Component {
         {
           rows: rows.setIn([index - 1, 'focusField'], 'trash'),
         },
-        this.notifyPendingChanges
+        this.notifyPendingChanges,
       )
     }
     showFlashAlert({
@@ -264,7 +264,7 @@ class ProficiencyTable extends React.Component {
       row =>
         this.invalidPoints(row.get('points')) ||
         row.get('points') < 0 ||
-        this.invalidDescription(row.get('description'))
+        this.invalidDescription(row.get('description')),
     )
 
   stateToConfig = () => ({
@@ -349,11 +349,11 @@ class ProficiencyTable extends React.Component {
     const {contextType} = this.props
     if (contextType === 'Course') {
       return I18n.t(
-        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.'
+        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.',
       )
     }
     return I18n.t(
-      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.'
+      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.',
     )
   }
 

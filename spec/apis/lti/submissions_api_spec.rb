@@ -66,7 +66,7 @@ module Lti
     let(:other_tp_guid) { SecureRandom.uuid }
 
     before do
-      mock_sub_helper = instance_double("Lti::PlagiarismSubscriptionsHelper",
+      mock_sub_helper = instance_double(Lti::PlagiarismSubscriptionsHelper,
                                         create_subscription: "123",
                                         destroy_subscription: nil)
       allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(mock_sub_helper)
@@ -132,12 +132,12 @@ module Lti
                  "url" => nil,
                  "submitted_at" => now.iso8601,
                  "assignment_id" => assignment.id,
-                 "user_id" => Lti::Asset.opaque_identifier_for(student),
+                 "user_id" => Lti::V1p1::Asset.opaque_identifier_for(student),
                  "submission_type" => "online_upload",
                  "workflow_state" => "submitted",
                  "attempt" => 1,
                  "course_id" => assignment.context.global_id,
-                 "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+                 "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
                  "attachments" =>
                    [
                      {
@@ -189,12 +189,12 @@ module Lti
                 "url" => nil,
                 "submitted_at" => now.iso8601,
                 "assignment_id" => assignment.id,
-                "user_id" => Lti::Asset.opaque_identifier_for(student),
+                "user_id" => Lti::V1p1::Asset.opaque_identifier_for(student),
                 "submission_type" => "online_upload",
                 "workflow_state" => "submitted",
                 "attempt" => 1,
                 "course_id" => assignment.context.global_id,
-                "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+                "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
                 "attachments" =>
                    [
                      {

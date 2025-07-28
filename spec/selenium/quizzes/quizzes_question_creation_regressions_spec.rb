@@ -166,7 +166,7 @@ describe "quizzes question creation" do
       edit_first_question
       delete_first_multiple_choice_answer
       save_question
-      expect(error_displayed?).to be_truthy
+      expect(error_displayed?("answers_warning_message")).to be_truthy
     end
 
     it "does not show errors for surveys", priority: "1" do

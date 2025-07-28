@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 
 import {View} from '@instructure/ui-view'
@@ -38,7 +38,7 @@ import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
 import _ from 'lodash'
 
-const I18n = useI18nScope('important_dates')
+const I18n = createI18nScope('important_dates')
 
 const ImportantDates = ({
   contexts,
@@ -74,7 +74,7 @@ const ImportantDates = ({
       // Make sure that we only include K-5 subject courses from `contexts` in the
       // `selectedContextCodes` we pass to the FilterCalendarsModal
       const savedSelected = initialSelectedContextCodes?.filter(code =>
-        contexts.some(c => c.assetString === code)
+        contexts.some(c => c.assetString === code),
       )
       const contextCodes = savedSelected?.length ? savedSelected : defaultSelected
       setSelectedContextCodes(contextCodes)
@@ -118,7 +118,7 @@ const ImportantDates = ({
     success: setAssignments,
     error: useCallback(
       showFlashError(I18n.t('Failed to load assignments in important dates.')),
-      []
+      [],
     ),
     loading: setLoadingAssignments,
     params: {
@@ -142,8 +142,8 @@ const ImportantDates = ({
 
   const closeCalendarsModal = () => setCalendarsModalOpen(false)
 
-  const datesSkeleton = props => (
-    <div {...props}>
+  const datesSkeleton = ({key, ...otherProps}) => (
+    <div key={key} {...otherProps}>
       <LoadingSkeleton
         id="skeleton-date"
         screenReaderLabel={I18n.t('Loading Important Date')}
@@ -162,8 +162,13 @@ const ImportantDates = ({
   )
 
   const dates = useMemo(
-    () => groupImportantDates(assignments, events, timeZone),
-    [assignments, events, timeZone]
+    () =>
+      groupImportantDates(
+        assignments,
+        events?.filter(e => e.child_events_count === 0),
+        timeZone,
+      ),
+    [assignments, events, timeZone],
   )
 
   return (

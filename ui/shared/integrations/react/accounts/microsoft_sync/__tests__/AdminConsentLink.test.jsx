@@ -38,7 +38,7 @@ describe('AdminConsentLink', () => {
   it('renders a valid Microsoft admin consent link', () => {
     const anchorTag = subject().getByText(/Grant tenant access/)
     expect(anchorTag.href).toEqual(
-      'https://www.microsoft.com/canvas.onmicrosoft.com/adminconsent?client_id=2345-2345-23452-qefqewr&redirect_uri=https%3A%2F%2Fwww.instructure.com%2F'
+      'https://www.microsoft.com/canvas.onmicrosoft.com/adminconsent?client_id=2345-2345-23452-qefqewr&redirect_uri=https%3A%2F%2Fwww.instructure.com%2F',
     )
   })
 
@@ -47,7 +47,7 @@ describe('AdminConsentLink', () => {
 
     it('does not render a message and link', () => {
       expect(
-        subject(overrides).queryByText(/After completing the above configuration/)
+        subject(overrides).queryByText(/After completing the above configuration/),
       ).not.toBeInTheDocument()
     })
   })

@@ -67,6 +67,14 @@ class ConditionalReleaseObjects
       ff(".cr-scoring-range")
     end
 
+    def scoring_input_error
+      ff(scoring_input_error_selector)
+    end
+
+    def scoring_input_error_selector
+      "[data-testid='cr-score-input-error']"
+    end
+
     def top_scoring_boundary
       f("[title='Top Bound']")
     end
@@ -75,28 +83,10 @@ class ConditionalReleaseObjects
       f("[title='Lower Bound']")
     end
 
-    def division_cutoff1
-      f("[title='Division cutoff 1']")
-    end
+    def division_cutoff(index)
+      return unless (0..1).cover?(index)
 
-    def division_cutoff2
-      f("[title='Division cutoff 2']")
-    end
-
-    def must_not_be_empty_exists?
-      element_exists?("//*[contains(@id,'error') and contains(text(),'must not be empty')]", true)
-    end
-
-    def these_scores_are_out_of_order_exists?
-      element_exists?("//*[contains(@id,'error') and contains(text(),'these scores are out of order')]", true)
-    end
-
-    def must_be_a_number_exists?
-      element_exists?("//*[contains(@id,'error') and contains(text(),'must be a number')]", true)
-    end
-
-    def number_is_too_small_exists?
-      element_exists?("//*[contains(@id,'error') and contains(text(),'number is too small')]", true)
+      ff(".cr-scoring-range")[index].find("input[title='Cutoff Points']")
     end
 
     # Common Selectors

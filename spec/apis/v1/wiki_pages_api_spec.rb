@@ -57,7 +57,7 @@ describe WikiPagesApiController, type: :request do
         api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: })
       end
 
-      context "with a title containing charaters from the Katakana script" do
+      context "with a title containing characters from the Katakana script" do
         let(:created_page) do
           create_wiki_page(
             @teacher,
@@ -105,6 +105,58 @@ describe WikiPagesApiController, type: :request do
           end
         end
 
+        context "when the page is in a horizon course" do
+          before :once do
+            @course.update! horizon_course: true
+            account = @course.account
+            account.enable_feature!(:horizon_course_setting)
+            account.horizon_account = true
+            account.save!
+          end
+
+          it "allows setting estimated duration" do
+            estimated_duration_attributes = { minutes: 5 }
+            create_wiki_page(@teacher, { title: "New Page", estimated_duration_attributes: })
+            expect(WikiPage.last.estimated_duration.duration).to eq 5.minutes
+          end
+        end
+
+        context "when sending block content editor attributes" do
+          context "when block content editor feature flag is on" do
+            before do
+              Account.default.enable_feature!(:block_content_editor)
+            end
+
+            it "creates block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).to be_present
+            end
+          end
+
+          context "when block content editor feature flag is off" do
+            before do
+              Account.default.disable_feature!(:block_content_editor)
+            end
+
+            it "does not create block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).not_to be_present
+            end
+          end
+        end
+
         context "when the user does not have manage_wiki_update permission" do
           before :once do
             teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
@@ -121,7 +173,7 @@ describe WikiPagesApiController, type: :request do
             expect(WikiPage.last.workflow_state).to eq "active"
           end
 
-          it "cannot be explictly unpublished when created" do
+          it "cannot be explicitly unpublished when created" do
             create_wiki_page(@teacher, { title: "New Page", published: false }, 401)
             expect(WikiPage.last).to be_nil
           end
@@ -132,7 +184,7 @@ describe WikiPagesApiController, type: :request do
           end
 
           context "with the block editor" do
-            context "with the block editor feature flag on" do
+            context "with the block editor feature flag on", skip: "defer until we have a stable block editor json schema" do
               before do
                 Account.default.enable_feature!(:block_editor)
               end
@@ -140,13 +192,13 @@ describe WikiPagesApiController, type: :request do
               it "succeeds" do
                 block_editor_attributes = {
                   time: Time.now.to_i,
-                  blocks: [{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }],
-                  version: "1.0"
+                  blocks: { "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" },
+                  version: "0.2"
                 }
                 create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
                 expect(WikiPage.last.title).to eq "New Page"
                 expect(WikiPage.last.block_editor).to be_present
-                expect(WikiPage.last.block_editor.blocks).to eq([{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }])
+                expect(WikiPage.last.block_editor.blocks).to eq({ "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" })
               end
             end
 
@@ -158,7 +210,7 @@ describe WikiPagesApiController, type: :request do
               it "ignores the block_editor_attributes" do
                 block_editor_attributes = {
                   time: Time.now.to_i,
-                  blocks: [{ "data" => { "text" => "test" }, "id" => "R0iGYLKhw2", "type" => "paragraph" }],
+                  blocks: { "text" => "test", "id" => "R0iGYLKhw2", "type" => "paragraph" },
                   version: "1.0"
                 }
                 create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
@@ -171,7 +223,7 @@ describe WikiPagesApiController, type: :request do
 
         context "with the user not having manage_wiki_create permission" do
           it "fails if the course does not grant create wiki page permission" do
-            create_wiki_page(@student, { title: "New Page" }, 401)
+            create_wiki_page(@student, { title: "New Page" }, 403)
             expect(WikiPage.last).to be_nil
           end
 
@@ -236,7 +288,7 @@ describe WikiPagesApiController, type: :request do
         role: teacher_role,
         account: @course.root_account
       )
-      delete_wiki_page(@teacher, 401)
+      delete_wiki_page(@teacher, 403)
       expect(@page.reload.workflow_state).to eq "active"
     end
   end
@@ -272,14 +324,25 @@ describe WikiPagesApiController, type: :request do
 
     it "fails for a student if the wiki page is unpublished" do
       @page.update!(workflow_state: "unpublished")
-      json = get_wiki_page(@student, 401)
+      json = get_wiki_page(@student, 403)
       expect(json["url"]).to be_nil
     end
 
     it "fails if you do not have read permissions" do
       user = User.create!
-      json = get_wiki_page(user, 401)
+      json = get_wiki_page(user, 403)
       expect(json["url"]).to be_nil
+    end
+
+    it "with file_association_access ff it will add location to file tags" do
+      attachment = attachment_model(context: @course)
+      @course.root_account.enable_feature!(:file_association_access)
+      wiki_body = <<~HTML
+        <img src="/courses/#{@course.id}/files/#{attachment.id}/preview">
+      HTML
+      @page.update(body: wiki_body)
+      json = get_wiki_page(@student)
+      expect(json["body"]).to include("location=#{@page.asset_string}")
     end
   end
 
@@ -301,7 +364,7 @@ describe WikiPagesApiController, type: :request do
                          url_or_id: @page.url },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "can duplicate wiki non-assignment if teacher" do
@@ -366,7 +429,7 @@ describe WikiPagesApiController, type: :request do
         Account.site_admin.enable_feature!(:permanent_page_links)
       end
 
-      it "401s for unauthorized users" do
+      it "403s for unauthorized users" do
         new_user = User.create!
         api_call_as_user(new_user,
                          :get,
@@ -377,7 +440,7 @@ describe WikiPagesApiController, type: :request do
                            course_id: @course.id.to_s },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "400s if missing title field in request body" do
@@ -403,6 +466,34 @@ describe WikiPagesApiController, type: :request do
                                   format: "json",
                                   course_id: @course.id.to_s },
                                 { title: @page.title },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be true
+      end
+
+      it "is not a conflict when is the same id" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title, current_page_id: @page.id },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be false
+      end
+
+      it "is a conflict when is another id" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title, current_page_id: @page.id + 10 },
                                 {},
                                 { expected_status: 200 })
         expect(json["conflict"]).to be true

@@ -17,16 +17,15 @@
  */
 
 import React, {useEffect} from 'react'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {FinalGradeOverrideTextBox} from '@canvas/final-grade-override'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
 import {CloseButton} from '@instructure/ui-buttons'
 import Carousel from './Carousel'
-import {InstUISettingsProvider} from '@instructure/emotion'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -39,14 +38,7 @@ import {useFinalGradeOverrideCustomStatus} from '../hooks/useFinalGradeOverrideC
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 
-const I18n = useI18nScope('gradebook')
-
-const componentOverrides = {
-  Link: {
-    mediumPaddingHorizontal: 0,
-    mediumHeight: 'normal',
-  },
-}
+const I18n = createI18nScope('gradebook')
 
 export type TotalGradeOverrideTrayProps = {
   customGradeStatuses: GradeStatusUnderscore[]
@@ -100,11 +92,11 @@ export function TotalGradeOverrideTray({
   const selectedCustomStatusId = gradeOverrideCustomStatus(
     finalGradeOverrides,
     studentId,
-    selectedGradingPeriodId
+    selectedGradingPeriodId,
   )
 
   const selectedCustomStatus = customGradeStatuses.find(
-    status => status.id === selectedCustomStatusId
+    status => status.id === selectedCustomStatusId,
   )
 
   const {name, avatarUrl, gradesUrl, enrollmentId} = studentInfo
@@ -189,11 +181,9 @@ export function TotalGradeOverrideTray({
             onRightArrowClick={() => navigateDown()}
             rightArrowDescription={I18n.t('Next student')}
           >
-            <InstUISettingsProvider theme={{componentOverrides}}>
-              <Link href={gradesUrl} isWithinText={false}>
-                {name}
-              </Link>
-            </InstUISettingsProvider>
+            <Link href={gradesUrl} isWithinText={false}>
+              {name}
+            </Link>
           </Carousel>
 
           <View as="div" margin="small 0" className="hr" />
@@ -212,6 +202,7 @@ export function TotalGradeOverrideTray({
               finalGradeOverride={studentFinalGradeOverrides}
               gradingPeriodId={gradingPeriodId}
               gradingScheme={gradeEntry?.gradingScheme}
+              restrictToTwoDigitsAfterSeparator={!!gradeEntry?.restrictToTwoDigitsAfterSeparator}
               showPercentageLabel={false}
               width="4rem"
               disabled={selectedCustomStatus?.allow_final_grade_value === false}

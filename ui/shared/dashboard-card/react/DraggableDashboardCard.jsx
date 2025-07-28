@@ -68,5 +68,5 @@ export default compose(
   DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
     isDragging: monitor.isDragging(),
-  }))
+  })),
 )(({cardComponent: Card, ...rest}) => <Card {...rest} />)

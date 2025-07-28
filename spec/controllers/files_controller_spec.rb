@@ -19,6 +19,7 @@
 #
 
 require_relative "../helpers/k5_common"
+require "webmock/rspec"
 
 def new_valid_tool(course)
   tool = course.context_external_tools.new(
@@ -50,19 +51,19 @@ describe FilesController do
   end
 
   def course_file
-    @file = factory_with_protected_attributes(@course.attachments, uploaded_data: io)
+    @file = @course.attachments.create!(uploaded_data: io)
   end
 
   def user_file
-    @file = factory_with_protected_attributes(@user.attachments, uploaded_data: io)
+    @file = @user.attachments.create!(uploaded_data: io)
   end
 
   def user_html_file
-    @file = factory_with_protected_attributes(@user.attachments, uploaded_data: fixture_file_upload("test.html", "text/html", false))
+    @file = @user.attachments.create!(uploaded_data: fixture_file_upload("test.html", "text/html", false))
   end
 
   def account_js_file
-    @file = factory_with_protected_attributes(@account.attachments, uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
+    @file = @account.attachments.create!(uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
   end
 
   def folder_file
@@ -141,6 +142,12 @@ describe FilesController do
   end
 
   describe "GET 'index'" do
+    def enable_limited_access_for_students
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     it "requires authorization" do
       get "index", params: { course_id: @course.id }
       assert_unauthorized
@@ -188,6 +195,33 @@ describe FilesController do
       @file.context = @group
       get "index", params: { group_id: @group.id }
       expect(assigns[:js_env][:FILES_CONTEXTS][0][:file_menu_tools]).to eq []
+    end
+
+    it "redirects to course homepage if context is course in limited access for students account" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "index", params: { course_id: @course.id }
+      expect(response).to redirect_to(course_path(@course))
+    end
+
+    it "renders unauthorized if context is a User enrolled as student in a limited access for students account" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "index", params: { user_id: @student.id }
+      expect(response.code.to_i).to be 401
+    end
+
+    it "renders unauthorized if context is a Group and user is student in a limited access for students account" do
+      enable_limited_access_for_students
+
+      category = group_category
+      @group = category.groups.create(context: @course)
+
+      user_session(@student)
+      get "index", params: { group_id: @group.id }
+      expect(response.code.to_i).to be 401
     end
 
     context "file menu tool visibility" do
@@ -242,6 +276,12 @@ describe FilesController do
   end
 
   describe "GET 'show'" do
+    def enable_limited_access_for_students
+      @course.account.root_account.enable_feature!(:allow_limited_access_for_students)
+      @course.account.settings[:enable_limited_access_for_students] = true
+      @course.account.save!
+    end
+
     before :once do
       course_file
     end
@@ -271,6 +311,14 @@ describe FilesController do
 
       get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
       expect(response).not_to be_ok
+    end
+
+    it "renders files with limited access flag" do
+      enable_limited_access_for_students
+
+      user_session(@student)
+      get "show", params: { course_id: @course.id, id: @file.id }
+      expect(response).to be_successful
     end
 
     describe "with verifiers" do
@@ -303,6 +351,367 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"
         expect(Canvas::LiveEvents).to receive(:asset_access).with(@file, "files", nil, nil)
         get "show", params: { course_id: @course.id, id: @file.id, verifier: @file.uuid, download: 1 }, format: "json"
+      end
+    end
+
+    describe "with an OAuth access token" do
+      before do
+        user_with_pseudonym
+        pseudonym(@teacher)
+        @access_token = AccessToken.create!(user: @teacher)
+        @invalid_token = AccessToken.create!(user: @teacher, permanent_expires_at: 1.day.ago)
+        @unauthorized_token = AccessToken.create!(user: @user)
+      end
+
+      context "with enable_file_access_with_api_tokens disabled" do
+        before do
+          Account.site_admin.disable_feature!(:enable_file_access_with_api_tokens)
+        end
+
+        it "does not allow access with a valid token" do
+          request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+          get "show", params: { course_id: @course.id, id: @file.id }
+          expect(response).not_to be_successful
+        end
+      end
+
+      it "allows access with a valid token" do
+        request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }, format: "json"
+        expect(response).to be_successful
+      end
+
+      it "allows download with a valid token" do
+        request.headers["Authorization"] = "Bearer #{@access_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id, download: "1" }
+        expect(response).to be_redirect
+        expect(response.location).to include "/courses/#{@course.id}/files/#{@file.id}/course%20files"
+      end
+
+      it "denies access with an invalid token" do
+        request.headers["Authorization"] = "Bearer #{@invalid_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response.status.to_i).to be > 399
+      end
+
+      it "denies access with a valid token for a user who does not have access" do
+        request.headers["Authorization"] = "Bearer #{@unauthorized_token.full_token}"
+        get "show", params: { course_id: @course.id, id: @file.id }
+        expect(response.status.to_i).to be > 399
+      end
+    end
+
+    describe "with JWT access token" do
+      include_context "InstAccess setup"
+
+      before do
+        @file.update!(file_state: "hidden")
+        user_with_pseudonym
+        jwt_payload = {
+          resource: "/courses/#{@course.id}/files/#{@file.id}?instfs_id=stuff",
+          aud: [@course.root_account.uuid],
+          sub: @user.uuid,
+          tenant_auth: { location: "location" },
+          iss: "instructure:inst_access",
+          exp: 1.hour.from_now.to_i,
+          iat: Time.now.to_i
+        }
+        @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+      end
+
+      it "allows access" do
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "allows access to files in deleted contexts" do
+        @course.delete
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "allows access to deleted files" do
+        @file.destroy
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
+        expect(json_parse["attachment"]["canvadoc_session_url"]).to match %r{/api/v1/canvadoc_session.+?access_token=#{@token_string}}
+      end
+
+      it "does not allow access if the resource in the token does not match the resource being accessed" do
+        file2 = user_file
+
+        get "show", params: { course_id: @course.id, id: file2.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_not_found
+      end
+
+      it "does not allow access if InstFS doesn't return metadata for the tenant auth" do
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
+
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_forbidden
+      end
+
+      it "allows download" do
+        get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff", download: "1" }
+        expect(response).to be_redirect
+        expect(response.location).to include "/courses/#{@course.id}/files/#{@file.id}/course%20files"
+        expect(response.location).to include "sf_verifier"
+
+        sf_verifier = Addressable::URI.parse(response.location).query_values["sf_verifier"]
+        claims = Canvas::Security.decode_jwt(sf_verifier)
+        expect(claims["attachment_id"]).to eq @file.global_id.to_s
+        expect(claims["permission"]).to eq "download"
+      end
+    end
+
+    describe "access via location parameter" do
+      def valid_download_response(response)
+        expect(response.status).to equal(302)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      def valid_denied_access_response(response)
+        expect(response).to have_http_status(:forbidden).or have_http_status(:unauthorized)
+      end
+
+      context "for a deleted file" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          course_file
+          html = <<~HTML
+            <p><a href="/courses/#{@course.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
+          @course.associate_attachments_to_rce_object(html, @teacher, context_concern: "syllabus_body")
+
+          @file.destroy
+        end
+
+        let(:params_with_location) { { course_id: @course.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "denies access even with location" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+
+      context "for a private user file attached to a public course syllabus" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          user_session(@student)
+          user_file
+
+          html = <<~HTML
+            <p><a href="/users/#{@student.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          @course.associate_attachments_to_rce_object(html, @student, context_concern: "syllabus_body")
+        end
+
+        let(:params_with_location) { { user_id: @student.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+        end
+
+        context "with disable_file_verifiers_in_public_syllabus disabled" do
+          before do
+            @course.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "denies access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+
+      context "for a course file attached to a public course syllabus" do
+        before do
+          @course.is_public = false
+          @course.public_syllabus = true
+          @course.save!
+
+          course_file
+          html = <<~HTML
+            <p><a href="/courses/#{@course.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
+
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          @course.associate_attachments_to_rce_object(html, @teacher, context_concern: "syllabus_body")
+        end
+
+        let(:params_with_location) { { course_id: @course.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
+
+        context "with disable_file_verifiers_in_public_syllabus enabled" do
+          before do
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          context "with sharding" do
+            specs_require_sharding
+
+            before do
+              @shard1.activate do
+                user_factory(active_all: true)
+                @course.enroll_teacher(@user)
+                attachment_model(context: @user, filename: "shard1.txt")
+                html = <<~HTML
+                  <p><a href="/courses/#{@course.id}/files/#{@attachment.id}/download">file 1</a>
+                HTML
+                @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+                @course.associate_attachments_to_rce_object(html, @user, context_concern: "syllabus_body")
+              end
+            end
+
+            it "allows access to the file" do
+              user_session(@student)
+              get "show", params: { user_id: @user.global_id, id: @attachment.global_id, download: 1, location: "course_syllabus_#{@course.id}" }, format: "json"
+              expect(response.headers["location"]).to include("download_frd")
+
+              @shard1.activate do
+                get "show", params: { user_id: @user.id, id: @attachment.id, download: 1, location: "course_syllabus_#{@course.global_id}" }, format: "json"
+                expect(response.headers["location"]).to include("download_frd")
+              end
+            end
+          end
+        end
+
+        context "with disable_file_verifiers_in_public_syllabus disabled" do
+          before do
+            @course.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+          end
+
+          it "allows access for student/file owner" do
+            user_session(@student)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "allows access for teacher/course owner" do
+            user_session(@teacher)
+            get "show", params: params_with_location, format: "json"
+            valid_download_response(response)
+          end
+
+          it "denies access for unassociated user" do
+            user_session(@other_user)
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+
+          it "denies access for anonymous user" do
+            remove_user_session
+            get "show", params: params_with_location, format: "json"
+            valid_denied_access_response(response)
+          end
+        end
+      end
+    end
+
+    describe "sets the X-Robots-Tag" do
+      it "sets the X-Robots-Tag header to noindex, nofollow" do
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
+        expect(response).to be_successful
+        expect(response.headers["X-Robots-Tag"]).to eq("noindex, nofollow")
+      end
+
+      it "does not set the X-Robots-Tag header if the account allows indexing" do
+        @course.root_account.settings[:enable_search_indexing] = true
+        @course.root_account.save!
+        verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
+        expect(response).to be_successful
+        expect(response.headers["X-Robots-Tag"]).to be_nil
       end
     end
 
@@ -374,7 +783,7 @@ describe FilesController do
       get "show", params: verifier.merge(id: file.id)
       expect(response).to be_redirect
 
-      expect(response.headers["Location"]).to eq "http://test.host/files/#{file.id}"
+      expect(response.headers["Location"]).not_to include "sf_verifier=#{verifier}"
     end
 
     it "ignores invalid sf_verifiers" do
@@ -777,7 +1186,7 @@ describe FilesController do
       it "is included in newly uploaded files" do
         user_session(@teacher)
 
-        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "doc.doc")
+        attachment = Attachment.create!(context: @course, file_state: "deleted", filename: "doc.doc")
         attachment.uploaded_data = io
         attachment.save!
 
@@ -1007,6 +1416,43 @@ describe FilesController do
         assert_unauthorized
       end
     end
+
+    describe "with the sf_verifier" do
+      before do
+        @file.update!(file_state: "hidden", instfs_uuid: "stuff")
+        user_with_pseudonym
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow_any_instance_of(FilesController).to receive(:safer_domain_available?).and_return(false)
+      end
+
+      it "does not allow access if the user can't see the file" do
+        sf_verifier = Users::AccessVerifier.generate(
+          user: @user,
+          real_user: @user,
+          root_account: Account.last,
+          return_url: nil,
+          fallback_url: "http://test.host/fallback"
+        )
+
+        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+        expect(response).to be_unauthorized
+      end
+
+      it "allows access if the sf_verifier includes the file authorization information" do
+        sf_verifier = Users::AccessVerifier.generate(
+          authorization: { attachment: @file, permission: "download" },
+          user: @user,
+          real_user: @user,
+          root_account: Account.last,
+          return_url: nil,
+          fallback_url: "http://test.host/fallback"
+        )
+
+        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+        expect(response).to be_redirect
+        expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -1051,13 +1497,13 @@ describe FilesController do
       it "does not move a file into a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @file.id, attachment: { folder_id: @sub_folder.id } }, format: "json"
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not move a file out of a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @sub_file.id, attachment: { folder_id: @root_folder.id } }, format: "json"
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -1430,7 +1876,11 @@ describe FilesController do
       # this endpoint does not need a logged-in user or api token auth, it's
       # based completely on the policy signature
       pseudonym(@teacher)
-      @attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", workflow_state: "unattached", filename: "test.txt", content_type: "text")
+      @attachment = Attachment.create!(context: @course,
+                                       file_state: "deleted",
+                                       workflow_state: "unattached",
+                                       filename: "test.txt",
+                                       content_type: "text")
     end
 
     before do
@@ -1467,6 +1917,13 @@ describe FilesController do
       assert_status(400)
     end
 
+    it "rejects an empty file" do
+      empty_file = Rack::Test::UploadedFile.new(file_fixture("empty_file.txt"), "")
+      params = @attachment.ajax_upload_params("", "")
+      post "api_create", params: params[:upload_params].merge(file: empty_file)
+      assert_status(400)
+    end
+
     it "rejects an expired policy" do
       params = @attachment.ajax_upload_params("", "", expiration: -60.seconds)
       post "api_create", params: params[:upload_params].merge({ file: @content })
@@ -1497,16 +1954,13 @@ describe FilesController do
     end
 
     it "adds 'include=avatar' to the api_create_success redirect for profile pictures" do
-      profile_pic = factory_with_protected_attributes(
-        Attachment,
-        user: @teacher,
-        context: @teacher,
-        folder: @teacher.profile_pics_folder,
-        file_state: "deleted",
-        workflow_state: "unattached",
-        filename: "profile.png",
-        content_type: "image/png"
-      )
+      profile_pic = Attachment.create!(user: @teacher,
+                                       context: @teacher,
+                                       folder: @teacher.profile_pics_folder,
+                                       file_state: "deleted",
+                                       workflow_state: "unattached",
+                                       filename: "profile.png",
+                                       content_type: "image/png")
 
       local_storage!
       params = profile_pic.ajax_upload_params("", "")
@@ -1531,7 +1985,7 @@ describe FilesController do
     it "rejects if JWT is excluded or improperly formed" do
       wrong_token = Canvas::Security.create_jwt({}, nil, "the wrong key")
       post "api_capture", params: { id: 1, token: wrong_token }
-      assert_status(403)
+      assert_forbidden
     end
 
     it "rejects if required params aren't included" do
@@ -1749,7 +2203,10 @@ describe FilesController do
           folder.attachments.create!(
             context: course,
             user:,
-            file_state: "deleted"
+            file_state: "deleted",
+            workflow_state: "unattached",
+            filename: "test.txt",
+            content_type: "text"
           )
         end
 
@@ -1799,6 +2256,26 @@ describe FilesController do
         attachment = assigns[:attachment]
         expect(attachment).not_to be_nil
         expect(attachment.shard).to eq @shard1
+      end
+
+      it "stores the correct root_account_id on the attachment for a cross-shard account when the context is on the birth shard" do
+        account = @shard1.activate { Account.create! }
+        user = User.create!(name: "me")
+        Attachment.current_root_account = account
+        post "api_capture", params: {
+          user_id: user.global_id,
+          context_type: "User",
+          context_id: user.global_id,
+          token: @token,
+          name: "test.txt",
+          size: 42,
+          content_type: "text/plain",
+          instfs_uuid: 1,
+          folder_id: user.profile_pics_folder.global_id,
+        }
+        assert_status(201)
+        attachment = assigns[:attachment]
+        expect(attachment.root_account_id).to eq account.global_id
       end
     end
   end
@@ -1859,7 +2336,7 @@ describe FilesController do
   end
 
   describe "GET 'image_thumbnail'" do
-    let(:image) { factory_with_protected_attributes(@teacher.attachments, uploaded_data: stub_png_data, instfs_uuid: "1234") }
+    let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
 
     it "returns default 'no_pic' thumbnail if attachment not found" do
       user_session @teacher
@@ -1885,6 +2362,136 @@ describe FilesController do
         end
         expect(locations[0]).not_to eq(locations[1])
       end
+    end
+  end
+
+  describe "GET 'image_thumbnail_plain'" do
+    before :once do
+      @course.root_account.enable_feature!(:file_association_access)
+    end
+
+    context "without InstFS" do
+      let(:image) do
+        local_storage!
+        @teacher.attachments.create!(uploaded_data: stub_png_data)
+      end
+
+      it "returns a non-token url for local storage" do
+        local_storage!
+        user_session @teacher
+        location = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
+        expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
+      end
+    end
+
+    context "with InstFS enabled" do
+      let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
+
+      it "returns default 'no_pic' thumbnail if attachment not found" do
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id + 1 }
+        expect(response).to redirect_to("/images/no_pic.gif")
+      end
+
+      it "returns the same jwt if requested twice" do
+        enable_cache do
+          user_session @teacher
+          locations = Array.new(2) do
+            get("image_thumbnail_plain", params: { id: image.id }).location
+          end
+          expect(locations[0]).to eq(locations[1])
+        end
+      end
+
+      it "returns a proper jwt token" do
+        user_session @teacher
+        token = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
+        expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
+      end
+
+      it "returns the different jwts if no_cache is passed" do
+        enable_cache do
+          user_session @teacher
+          locations = Array.new(2) do
+            get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
+          end.map! { |l| l.split("?token=") }
+          # This confirms that the two base URLS are the same, but the tokens handed are different
+          expect([locations[0][0] == locations[1][0], locations[0][1] != locations[1][1]]).to all(be true)
+        end
+      end
+
+      it "redirects to default no_pic thumbnail if access_allowed returns false" do
+        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id }
+        expect(response).to redirect_to("/images/no_pic.gif")
+      end
+
+      it "returns a 302 if access_allowed returns true" do
+        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id }
+        expect(response).to be_redirect
+      end
+    end
+  end
+
+  describe "process_content_type_from_instfs" do
+    it "fixes doc files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.doc")).to eq "application/msword"
+    end
+
+    it "fixes xls files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.xls")).to eq "application/vnd.ms-excel"
+    end
+
+    it "fixes ppt files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.ppt")).to eq "application/vnd.ms-powerpoint"
+    end
+
+    it "ignores case" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.DOC")).to eq "application/msword"
+    end
+
+    it "leaves other CFB types alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.msi")).to eq "application/x-cfb"
+    end
+
+    it "fixes kml files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/xml", "file.kml")).to eq "application/vnd.google-earth.kml+xml"
+    end
+
+    it "leaves other XML files alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/xml", "file.xml")).to eq "application/xml"
+    end
+
+    it "leaves other content types alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/pdf", "file.pdf")).to eq "application/pdf"
+    end
+  end
+
+  describe "GET 'show_thumbnail'" do
+    let(:user) { user_factory }
+    let(:course) { course_factory }
+    let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
+    let(:thumbnail) do
+      Thumbnail.create!(filename: "tmp/test_thumb.png", content_type: "image/png", attachment: image, size: "200x50")
+    end
+
+    it "sends the thumbnail file if authorized" do
+      local_storage!
+      user_session(@teacher)
+      expect_any_instance_of(FilesController).to receive(:safe_send_file)
+        .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
+      get :show_thumbnail, params: { id: thumbnail.id }
+    end
+
+    it "returns unauthorized if not authorized" do
+      local_storage!
+      allow_any_instance_of(FilesController).to receive(:authorized_action).and_return(false)
+      user_session(user)
+      get :show_thumbnail, params: { id: thumbnail.id }
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

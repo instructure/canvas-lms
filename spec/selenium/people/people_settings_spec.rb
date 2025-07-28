@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
+require_relative "pages/course_people_modal"
 
 describe "course people" do
   include_context "in-process server selenium tests"
@@ -26,7 +27,6 @@ describe "course people" do
     course_with_teacher_logged_in limit_privileges_to_course_section: false, active_all: true
     @account = @course.account # for custom roles
     @custom_student_role = custom_student_role("custom stu")
-    Account.default.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
   def add_user(email, type, section_name = nil)
@@ -47,20 +47,10 @@ describe "course people" do
   end
 
   describe "course users" do
-    def select_from_auto_complete(text, input_id)
-      fj(".token_input input:visible").send_keys(text)
-      wait_for_ajaximations
-
-      keep_trying_until { driver.execute_script("return $('##{input_id}').data('token_input').selector.list.query.search") == text }
-      wait_for_ajaximations
-      elements = ffj(".autocomplete_menu:visible .list:last ul:last li").map do |e|
-        [e, (e.find_element(:tag_name, :b).text rescue e.text)]
-      end
-      wait_for_ajaximations
-      element = elements.detect { |e| e.last == text }
-      expect(element).not_to be_nil
-      element.first.click
-      wait_for_ajaximations
+    def select_from_auto_complete(text)
+      select = f("[aria-label='Observee select']")
+      select.send_keys(text)
+      click_option(select, text)
     end
 
     def go_to_people_page
@@ -123,7 +113,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, "section_input")
+        CoursePeople.select_from_section_autocomplete(section_name)
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)
@@ -161,7 +151,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, "section_input")
+        CoursePeople.select_from_section_autocomplete(section_name)
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)
@@ -220,7 +210,7 @@ describe "course people" do
       f('a[data-event="linkToStudents"]', cog).click
       wait_for_ajaximations
       yield
-      f(".ui-dialog-buttonpane .btn-primary").click
+      f("[aria-label='Update']").click
       wait_for_ajaximations
     end
 
@@ -253,13 +243,13 @@ describe "course people" do
       expect(observer_row).to include students[1].name
       # remove an observer
       use_link_dialog(obs) do
-        fj("#link_students input:visible").send_keys(:backspace)
+        f("[aria-label='Observee select']").send_keys(:backspace)
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 1
       # add an observer
       use_link_dialog(obs) do
-        select_from_auto_complete(students[2].name, "student_input")
+        select_from_auto_complete(students[2].name)
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 2
@@ -294,9 +284,8 @@ describe "course people" do
 
       # dialog loads too
       use_link_dialog(obs) do
-        input = f("#link_students")
-        expect(input.text).to include "Student 1"
-        expect(input.text).not_to include "Student 2"
+        expect(f("[type=button][title$='Student 1']")).to be_truthy
+        expect { f("[type=button][title$='Student 2']") }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
       end
     end
 
@@ -323,30 +312,6 @@ describe "course people" do
       expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
     end
 
-    context "with granular permissions enabled" do
-      before do
-        @account.root_account.enable_feature!(:granular_permissions_manage_users)
-      end
-
-      it "removes a user from the course" do
-        username = "user@example.com"
-        student_in_course(name: username, role: @custom_student_role)
-        add_section("Section1")
-        @enrollment.course_section = @course_section
-        @enrollment.save!
-
-        go_to_people_page
-        expect(f(".roster")).to include_text(username)
-
-        remove_user(@student)
-        expect(f(".roster")).not_to include_text(username)
-      end
-
-      it "adds a user without custom role to another section" do
-        add_user_to_second_section
-      end
-    end
-
     context "multiple enrollments" do
       it "links an observer enrollment when other enrollment types exist" do
         course_with_student course: @course, active_all: true, name: "teh student"
@@ -355,7 +320,7 @@ describe "course people" do
 
         go_to_people_page
         use_link_dialog(@observer, "ObserverEnrollment") do
-          select_from_auto_complete(@student.name, "student_input")
+          select_from_auto_complete(@student.name)
         end
 
         expect(@observer.enrollments.where(associated_user_id: @student)).to be_exists
@@ -372,7 +337,7 @@ describe "course people" do
         go_to_people_page
 
         use_link_dialog(@observer) do
-          select_from_auto_complete(@student.name, "student_input")
+          select_from_auto_complete(@student.name)
         end
 
         @observer.reload
@@ -397,21 +362,6 @@ describe "course people" do
           send :"custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
-        end
-      end
-
-      context "with granular permissions enabled" do
-        before do
-          @account.root_account.enable_feature!(:granular_permissions_manage_users)
-        end
-
-        %w[student teacher ta designer observer].each do |base_type|
-          it "allows adding custom #{base_type} enrollments" do
-            user = user_with_pseudonym(active_all: true, username: "#{base_type}@example.com", name: "#{base_type}@example.com")
-            send :"custom_#{base_type}_role", "custom"
-            add_user(user.name, "custom")
-            expect(f("#user_#{user.id} .admin-links")).not_to be_nil
-          end
         end
       end
     end

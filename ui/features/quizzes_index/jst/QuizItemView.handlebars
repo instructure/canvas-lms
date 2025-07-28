@@ -123,12 +123,12 @@
               <span data-view="publish-icon" class="publish-icon"></span>
           {{/if}}
           <div class="inline-block">
-            <button class="al-trigger al-trigger-gray Button--icon-action" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" role="button">
+            <button class="al-trigger al-trigger-gray Button--icon-action" id="btn-id-{{id}}-1" data-popup-collision="fit flipfit">
               <i class="icon-more" aria-hidden="true"></i>
               <span class="screenreader-only">{{#t}}Options for {{title_label}}{{/t}}</span>
             </button>
 
-            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
               {{#if can_update}}
                 <li role="presentation">
                   <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
@@ -155,7 +155,6 @@
               </li>
               {{/if}}
               {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -163,14 +162,13 @@
                       href="{{id}}%>"
                       data-quiz-name="{{name}}"
                       data-quiz-context-id="{{courseId}}"
-                      data-quiz-id="{{assignment_id}}"
+                      data-quiz-id="{{id}}"
                       data-is-lti-quiz="{{isQuizzesNext}}"
                       title="<%= {{#t}}Assign this Quiz{{/t}} %>"
                       aria-label="{{#t}}Assign To...{{/t}}"
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
               {{/if}}
               {{#unless is_locked}}
                 <li role="presentation">
@@ -220,12 +218,12 @@
               <span data-view="publish-icon" class="publish-icon"></span>
           {{/if}}
           <div class="inline-block">
-            <button class="al-trigger al-trigger-gray Button--icon-action" aria-haspopup="true" aria-owns="ui-id-{{id}}-1" role="button">
+            <button class="al-trigger al-trigger-gray Button--icon-action" id="btn-id-{{id}}-1">
               <i class="icon-more" aria-hidden="true"></i>
               <span class="screenreader-only">{{#t}}Options for {{title_label}}{{/t}}</span>
             </button>
 
-            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
+            <ul id="ui-id-{{id}}-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="ui-id-{{id}}-2">
               {{#if can_update}}
                 <li role="presentation">
                   <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
@@ -247,7 +245,6 @@
               </li>
               {{/if}}
               {{#if canManageAssignTo}}
-                {{#if differentiatedModulesFlag}}
                   <li>
                     <a
                       class="assign-to-link icon-permissions"
@@ -255,14 +252,13 @@
                       href="{{id}}%>"
                       data-quiz-name="{{name}}"
                       data-quiz-context-id="{{courseId}}"
-                      data-quiz-id="{{assignment_id}}"
+                      data-quiz-id="{{id}}"
                       data-is-lti-quiz="{{isQuizzesNext}}"
                       title="<%= {{#t}}Assign this Quiz{{/t}} %>"
                       aria-label="{{#t}}Assign To...{{/t}}"
                       data-focus-returns-to="assign_{{id}}_manage_link"
                     >{{#t}}Assign To...{{/t}}</a>
                   </li>
-                {{/if}}
               {{/if}}
               {{#ifAll can_update cyoe.isCyoeAble}}
               <li role="presentation">

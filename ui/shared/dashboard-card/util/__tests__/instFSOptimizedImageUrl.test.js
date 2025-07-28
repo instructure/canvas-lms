@@ -21,16 +21,16 @@ import instFSOptimizedImageUrl from '../instFSOptimizedImageUrl'
 describe('instFSOptimizedImageUrl', () => {
   it('only adds query string params to things that look like inst-fs urls', () => {
     expect(
-      instFSOptimizedImageUrl('https://instructure-uploads.s3.amazonaws.com/foo', {x: 100, y: 50})
+      instFSOptimizedImageUrl('https://instructure-uploads.s3.amazonaws.com/foo', {x: 100, y: 50}),
     ).toEqual('https://instructure-uploads.s3.amazonaws.com/foo')
 
     expect(
       instFSOptimizedImageUrl(
         'https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz',
-        {x: 100, y: 50}
-      )
+        {x: 100, y: 50},
+      ),
     ).toEqual(
-      'https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=100x50'
+      'https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=100x50',
     )
   })
 })

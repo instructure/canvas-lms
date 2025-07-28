@@ -1,0 +1,10 @@
+<% if @resource %>
+# <%= @resource %> API
+<% else %>
+# All API Resources
+<% end %>
+
+<% if @beta %>
+<%= hint("warning", "BETA: This API resource is not finalized, and there could be breaking changes before its final release.") %>
+<% end %>
+<%= yieldall %>

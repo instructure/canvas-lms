@@ -26,7 +26,7 @@ describe('RCE Plugins > ExternalToolSelectionItem', () => {
     return render(
       <div style={{width: '10rem'}}>
         <ExpandoText text={text} title={title} />)
-      </div>
+      </div>,
     )
   }
 

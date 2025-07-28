@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import Slick from 'slickgrid'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('jobs')
+const I18n = createI18nScope('jobs')
 /*
 xsslint safeString.identifier klass d out_of runtime_string
 */
@@ -111,7 +111,7 @@ class FlavorGrid {
           this.updated()
         }
         return this.$element.dequeue()
-      })
+      }),
     )
   }
 
@@ -204,11 +204,11 @@ class Jobs extends FlavorGrid {
           this.data.splice(
             row,
             row + data[this.type_name].length - row,
-            ...[].concat(data[this.type_name])
+            ...[].concat(data[this.type_name]),
           )
           this.grid.invalidate()
           return this.$element.dequeue()
-        }
+        },
       )
     })
   }
@@ -296,7 +296,6 @@ class Jobs extends FlavorGrid {
     }
 
     if (this.grid.getSelectedRows().length < 1) {
-      // eslint-disable-next-line no-alert
       window.alert('No jobs are selected')
       return
     }
@@ -311,21 +310,21 @@ class Jobs extends FlavorGrid {
           case 'hold':
             return I18n.t(
               'confirm.hold_all',
-              'Are you sure you want to hold *all* jobs of this type and matching this query?'
+              'Are you sure you want to hold *all* jobs of this type and matching this query?',
             )
           case 'unhold':
             return I18n.t(
               'confirm.unhold_all',
-              'Are you sure you want to unhold *all* jobs of this type and matching this query?'
+              'Are you sure you want to unhold *all* jobs of this type and matching this query?',
             )
           case 'destroy':
             return I18n.t(
               'confirm.destroy_all',
-              'Are you sure you want to destroy *all* jobs of this type and matching this query?'
+              'Are you sure you want to destroy *all* jobs of this type and matching this query?',
             )
         }
       })()
-      // eslint-disable-next-line no-alert
+
       if (!window.confirm(message)) return
     }
 
@@ -361,7 +360,7 @@ class Jobs extends FlavorGrid {
           selected_job.last_error = data.last_error
           fillin_job_data(selected_job)
           return cb()
-        }
+        },
       )
     }
   }
@@ -533,7 +532,7 @@ $(document).ready(() => {
           height: 700,
           modal: true,
           zIndex: 1000,
-        })
+        }),
     )
     return false
   })
@@ -548,7 +547,7 @@ $(document).ready(() => {
           height: 700,
           modal: true,
           zIndex: 1000,
-        })
+        }),
     )
     return false
   })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
@@ -28,13 +28,15 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import LogoutButton from '../LogoutButton'
 import HighContrastModeToggle from './HighContrastModeToggle'
+import DyslexicFontToggle from './UseDyslexicFontToggle'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {useQuery} from '@canvas/query'
 import profileQuery from '../queries/profileQuery'
 import {getUnreadCount} from '../queries/unreadCountQuery'
 import type {ProfileTab, TabCountsObj} from '../../../../api.d'
+import {useQuery} from '@tanstack/react-query'
+import {sessionStoragePersister} from '@canvas/query'
 
-const I18n = useI18nScope('ProfileTray')
+const I18n = createI18nScope('ProfileTray')
 
 // Trying to keep this as generalized as possible, but it's still a bit
 // gross matching on the id of the tray tabs given to us by Rails
@@ -60,9 +62,13 @@ function CountBadge({counts, id}: {counts: TabCountsObj; id: string}) {
 }
 
 function ProfileTabLink({id, html_url, label, counts}: ProfileTab) {
+  const target =
+    window.ENV.FEATURES?.open_tools_in_new_tab && html_url.includes('display=borderless')
+      ? '_blank'
+      : undefined
   return (
     <View className={`profile-tab-${id}`} as="div" margin="small 0">
-      <Link isWithinText={false} href={html_url}>
+      <Link isWithinText={false} href={html_url} target={target}>
         {label}
         <CountBadge counts={counts} id={id} />
       </Link>
@@ -78,11 +84,11 @@ export default function ProfileTray() {
   } = useQuery<ProfileTab[], Error>({
     queryKey: ['profile'],
     queryFn: profileQuery,
-    fetchAtLeastOnce: true,
+    persister: sessionStoragePersister,
   })
 
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: unreadContentSharesCount} = useQuery({
@@ -90,7 +96,7 @@ export default function ProfileTray() {
     queryFn: getUnreadCount,
     staleTime: 60 * 60 * 1000, // 1 hour
     enabled: countsEnabled && ENV.CAN_VIEW_CONTENT_SHARES,
-    fetchAtLeastOnce: true,
+    persister: sessionStoragePersister,
   })
 
   const counts: TabCountsObj = {
@@ -145,6 +151,7 @@ export default function ProfileTray() {
       </List>
       <hr role="presentation" />
       <HighContrastModeToggle />
+      {'use_dyslexic_font' in window.ENV && <DyslexicFontToggle />}
     </View>
   )
 }

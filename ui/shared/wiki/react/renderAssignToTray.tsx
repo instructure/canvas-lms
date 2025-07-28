@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import {Link} from '@instructure/ui-link'
-import {Pill} from '@instructure/ui-pill'
+import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
-import {IconEditLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import ReactDOM from 'react-dom'
-import {
+import {useScope as createI18nScope} from '@canvas/i18n'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {createRoot} from 'react-dom/client'
+import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
 } from '@canvas/context-modules/differentiated-modules/react/Item/types'
@@ -33,7 +30,7 @@ import {
   generateDefaultCard,
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
-const I18n = useI18nScope('pages_edit')
+const I18n = createI18nScope('pages_edit')
 
 interface Props {
   pageName?: string
@@ -42,81 +39,75 @@ interface Props {
 }
 
 const AssignToOption = (props: Props) => {
-  const [open, setOpen] = useState(false)
   const [checkPoint, setCheckPoint] = useState<ItemAssignToCardSpec[] | undefined>(undefined)
   const [disabledOptionIds, setDisabledOptionIds] = useState<string[]>([])
-  const [showPendingChangesPill, setShowPendingChangesPill] = useState(false)
-  const linkRef = useRef<Link | null>(null)
   const itemName =
     (document.getElementById('wikipage-title-input') as HTMLInputElement)?.value ?? props.pageName
-
-  const handleOpen = () => setOpen(true)
-
-  const handleClose = () => setOpen(false)
-
-  const handleDismiss = () => {
-    handleClose()
-  }
 
   useEffect(() => {
     if (props.pageId === undefined) {
       const defaultCard = generateDefaultCard()
+      // @ts-expect-error
       setCheckPoint([defaultCard])
       setDisabledOptionIds(defaultCard.selectedAssigneeIds)
     }
   }, [props.pageId])
 
-  const handleSave = (
+  const onChange = (
     assignToCards: ItemAssignToCardSpec[],
     hasModuleOverrides: boolean,
-    deletedModuleAssignees: string[]
+    deletedModuleAssignees: string[],
+    newDisabledOptionIds: string[],
+    moduleOverrides: ItemAssignToCardSpec[],
   ) => {
-    const hasChanges =
-      assignToCards.some(({highlightCard}) => highlightCard) ||
-      (checkPoint !== undefined && assignToCards.length < Object.entries(checkPoint).length)
-    setShowPendingChangesPill(hasChanges)
     const filteredCards = assignToCards.filter(
       card =>
         [null, undefined, ''].includes(card.contextModuleId) ||
-        (card.contextModuleId !== null && card.isEdited)
+        (card.contextModuleId !== null && card.isEdited),
     )
+    if (hasModuleOverrides) {
+      assignToCards.forEach(card => {
+        const hasUnlockOrLock = card.unlock_at != null || card.lock_at != null
+
+        if (
+          card.contextModuleId &&
+          card.isEdited &&
+          (hasUnlockOrLock || !card.hasInitialOverride)
+        ) {
+          card.contextModuleId = null
+          card.contextModuleName = null
+          return
+        } else if (hasUnlockOrLock) {
+          return
+        }
+
+        const moduleCard = moduleOverrides.find(moduleOverride => moduleOverride.key === card.key)
+        if (
+          moduleCard &&
+          !hasUnlockOrLock &&
+          (card.hasInitialOverride === undefined || card.hasInitialOverride)
+        ) {
+          card.contextModuleId = moduleCard.contextModuleId
+          card.contextModuleName = moduleCard.contextModuleName
+        }
+      })
+    }
+
     const overrides = generateDateDetailsPayload(
       filteredCards,
       hasModuleOverrides,
-      deletedModuleAssignees
+      deletedModuleAssignees,
     )
     props.onSync(overrides)
-    setCheckPoint(assignToCards)
-    handleClose()
+    setDisabledOptionIds(newDisabledOptionIds)
+    return assignToCards
   }
 
   return (
-    <>
-      <View display="flex">
-        <View as="div" margin="none none" width="25px">
-          <IconEditLine size="x-small" color="primary" />
-        </View>
-        <Link
-          margin="none none"
-          data-testid="manage-assign-to"
-          isWithinText={false}
-          ref={ref => (linkRef.current = ref)}
-          onClick={() => (open ? handleClose() : handleOpen())}
-        >
-          <View as="div">
-            {I18n.t('Manage Assign To')}
-            {showPendingChangesPill && (
-              <Pill data-testid="pending_changes_pill" color="info" margin="auto small">
-                {I18n.t('Pending Changes')}
-              </Pill>
-            )}
-          </View>
-        </Link>
-      </View>
-      <ItemAssignToTray
-        open={open}
-        onClose={handleClose}
-        onDismiss={handleDismiss}
+    <View as="div" maxWidth="478px">
+      <ItemAssignToManager
+        data-testid="manage-assign-to"
+        // @ts-expect-error
         courseId={ENV.COURSE_ID}
         itemName={itemName}
         itemType="page"
@@ -126,18 +117,21 @@ const AssignToOption = (props: Props) => {
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={true}
-        onSave={handleSave}
         defaultCards={checkPoint}
         defaultDisabledOptionIds={disabledOptionIds}
         onInitialStateSet={setCheckPoint}
+        isTray={false}
+        // @ts-expect-error
+        onChange={onChange}
       />
-    </>
+    </View>
   )
 }
 
 export const renderAssignToTray = (el: HTMLElement, props: Props) => {
   if (el) {
-    ReactDOM.render(<AssignToOption {...props} />, el)
+    const root = createRoot(el)
+    root.render(<AssignToOption {...props} />)
   }
   return <AssignToOption {...props} />
 }

@@ -17,7 +17,7 @@
  */
 import axios from '@canvas/axios'
 
-import type {LtiRegistration} from 'features/developer_keys_v2/model/LtiRegistration'
+import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {RegistrationOverlay} from '../RegistrationSettings/RegistrationOverlayState'
 
 export type RegistrationToken = {
@@ -26,9 +26,9 @@ export type RegistrationToken = {
   uuid: string
 }
 
-export const getRegistrationToken = (accountId: string) =>
+export const getRegistrationToken = (accountId: string, registrationUrl: string) =>
   axios
-    .get(`/api/lti/accounts/${accountId}/registration_token`)
+    .get(`/api/lti/accounts/${accountId}/registration_token?registration_url=${registrationUrl}`)
     .then(resp => resp.data as unknown as RegistrationToken)
 
 export const getRegistrationByUUID = (accountId: string, registrationUuid: string) =>
@@ -39,7 +39,7 @@ export const getRegistrationByUUID = (accountId: string, registrationUuid: strin
 export const updateRegistrationOverlay = (
   accountId: string,
   registrationId: number | string,
-  overlay: RegistrationOverlay
+  overlay: RegistrationOverlay,
 ) =>
   axios
     .put(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, overlay)

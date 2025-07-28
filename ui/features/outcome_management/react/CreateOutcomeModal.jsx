@@ -20,7 +20,7 @@
 import React, {useRef, useState, useEffect} from 'react'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
@@ -40,7 +40,7 @@ import {
 } from '@canvas/outcomes/graphql/Management'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation,
@@ -53,7 +53,7 @@ import useOutcomeFormValidate from '@canvas/outcomes/react/hooks/useOutcomeFormV
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Management/Ratings'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const componentOverrides = {
   Mask: {
@@ -103,7 +103,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
   const [proficiencyCalculation, setProficiencyCalculation] = useState(
-    defaultProficiencyCalculation
+    defaultProficiencyCalculation,
   )
   const [proficiencyCalculationError, setProficiencyCalculationError] = useState(false)
 
@@ -140,7 +140,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   if (friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error',
+      type: 'newError',
     })
   }
 
@@ -154,7 +154,10 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       titleError: invalidTitle,
     }) && selectedGroup
       ? onCreateOutcomeHandler()
-      : focusOnError()
+      : (() => {
+        focusOnError()
+        invalidTitle && setShowTitleError(true)
+      })()
 
   const updateProficiencyCalculation = (calculationMethodKey, calculationInt) =>
     setProficiencyCalculation({calculationMethod: calculationMethodKey, calculationInt})
@@ -227,7 +230,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       size="medium"
       value={title}
       placeholder={I18n.t('Enter name or code')}
-      messages={invalidTitle && showTitleError ? [{text: invalidTitle, type: 'error'}] : []}
+      messages={invalidTitle && showTitleError ? [{text: invalidTitle, type: 'newError'}] : []}
       renderLabel={I18n.t('Name')}
       onChange={changeTitle}
       inputRef={setTitleRef}
@@ -240,7 +243,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       size="medium"
       value={displayName}
       placeholder={I18n.t('Create a friendly display name')}
-      messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'error'}] : []}
+      messages={invalidDisplayName ? [{text: invalidDisplayName, type: 'newError'}] : []}
       renderLabel={I18n.t('Friendly Name')}
       onChange={displayNameChangeHandler}
       inputRef={setDisplayNameRef}

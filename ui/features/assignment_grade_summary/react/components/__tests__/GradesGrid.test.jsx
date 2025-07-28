@@ -128,7 +128,7 @@ describe('GradeSummary GradesGrid', () => {
 
   it('includes a row for each student', () => {
     mountComponent()
-    expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(4)
+    expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow')).toHaveLength(4)
   })
 
   it('sends disabledCustomGrade to the Grid', () => {
@@ -140,13 +140,13 @@ describe('GradeSummary GradesGrid', () => {
       screen.getByRole('combobox', {
         name: /grade for Adam Jones/i,
       }),
-      {target: {value: '10'}}
+      {target: {value: '10'}},
     )
 
     expect(
       screen.queryByRole('option', {
         name: /10 \(custom\)/i,
-      })
+      }),
     ).not.toBeInTheDocument()
   })
 
@@ -157,13 +157,13 @@ describe('GradeSummary GradesGrid', () => {
       screen.getByRole('combobox', {
         name: /grade for Adam Jones/i,
       }),
-      {target: {value: '55'}}
+      {target: {value: '55'}},
     )
 
     expect(
       screen.queryByRole('option', {
         name: /55 \(custom\)/i,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -182,12 +182,12 @@ describe('GradeSummary GradesGrid', () => {
       screen.getByRole('combobox', {
         name: /grade for Adam Jones/i,
       }),
-      {target: {value: '10'}}
+      {target: {value: '10'}},
     )
     fireEvent.click(
       screen.getByRole('option', {
         name: /10 \(custom\)/i,
-      })
+      }),
     )
 
     expect(props.onGradeSelect).toHaveBeenCalledWith({
@@ -208,7 +208,7 @@ describe('GradeSummary GradesGrid', () => {
     expect(
       screen.getByRole('combobox', {
         name: /grade for Adam Jones/i,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -218,7 +218,7 @@ describe('GradeSummary GradesGrid', () => {
     mountComponent()
     props.students = students
     wrapper.rerender(<GradesGrid {...props} />)
-    expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(4)
+    expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow')).toHaveLength(4)
   })
 
   it('displays the student names in the row headers', () => {
@@ -296,7 +296,7 @@ describe('GradeSummary GradesGrid', () => {
 
     it('displays only 20 rows on a page', () => {
       mountComponent()
-      expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow').length).toBe(20)
+      expect(wrapper.container.querySelectorAll('tr.GradesGrid__BodyRow')).toHaveLength(20)
     })
 
     it('displays the first 20 students on the first page', () => {

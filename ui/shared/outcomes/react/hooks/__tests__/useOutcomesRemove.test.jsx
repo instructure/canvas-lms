@@ -24,11 +24,11 @@ import useOutcomesRemove, {
   REMOVE_NOT_STARTED,
   REMOVE_PENDING,
 } from '../useOutcomesRemove'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 
 jest.useFakeTimers()
 
@@ -49,7 +49,7 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
         parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`,
       },
     }),
-    {}
+    {},
   )
 
 describe('useOutcomesRemove', () => {

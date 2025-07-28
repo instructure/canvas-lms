@@ -33,7 +33,7 @@ describe "content_export_finished" do
   context "content export" do
     let(:asset) { @ce }
 
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "renders the content export link" do
@@ -42,7 +42,7 @@ describe "content_export_finished" do
       end
     end
 
-    context ".email.html" do
+    describe ".email.html" do
       let(:path_type) { :summary }
 
       it "renders the content export link" do
@@ -59,7 +59,7 @@ describe "content_export_finished" do
 
     let(:asset) { @epub }
 
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "renders the epub export link" do
@@ -68,7 +68,7 @@ describe "content_export_finished" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
 
       it "renders the epub export link" do
@@ -85,7 +85,7 @@ describe "content_export_finished" do
 
     let(:asset) { @webzip }
 
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "renders the web zip export link" do
@@ -94,7 +94,7 @@ describe "content_export_finished" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
 
       it "renders the web zip export link" do

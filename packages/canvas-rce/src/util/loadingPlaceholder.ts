@@ -19,7 +19,7 @@
 import {isAudio, isImage, isVideo} from '../rce/plugins/shared/fileTypeUtils'
 import {
   AUDIO_PLAYER_SIZE,
-  VIDEO_SIZE_DEFAULT,
+  videoDefaultSize,
 } from '../rce/plugins/instructure_record/VideoOptionsTray/TrayController'
 import formatMessage from '../format-message'
 import {trimmedOrNull} from './string-util'
@@ -31,7 +31,7 @@ import {isTextNode} from './elem-util'
  * Determines what type of placeholder is appropriate for a given file information.
  */
 export async function placeholderInfoFor(
-  fileMetaProps: PlaceHoldableThingInfo
+  fileMetaProps: PlaceHoldableThingInfo,
 ): Promise<PlaceholderInfo> {
   const fileName = fileMetaProps.title ?? fileMetaProps.name
   const visibleLabel = trimmedOrNull(fileName) ?? formatMessage('Loading...')
@@ -39,7 +39,12 @@ export async function placeholderInfoFor(
     fileName: fileName ?? 'unknown filename',
   })
 
-  if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
+  const type = fileMetaProps.contentType || fileMetaProps.type
+  if (typeof type !== 'string') {
+    throw new Error('Invalid type: ' + type)
+  }
+
+  if (isImage(type) && fileMetaProps.displayAs !== 'link') {
     const imageUrl =
       trimmedOrNull((fileMetaProps.domObject as {preview: string}).preview) ??
       URL.createObjectURL(fileMetaProps.domObject as File | Blob)
@@ -59,16 +64,17 @@ export async function placeholderInfoFor(
       image.onerror = () => reject(new Error('Failed to load image: ' + imageUrl))
       image.src = imageUrl
     })
-  } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
+  } else if (isVideo(type)) {
+    const videoSize = videoDefaultSize()
     return {
       type: 'block',
       visibleLabel,
       ariaLabel,
-      width: VIDEO_SIZE_DEFAULT.width,
-      height: VIDEO_SIZE_DEFAULT.height,
+      width: videoSize.width,
+      height: videoSize.height,
       vAlign: 'bottom',
     }
-  } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
+  } else if (isAudio(type)) {
     return {
       type: 'block',
       visibleLabel,
@@ -84,7 +90,7 @@ export async function placeholderInfoFor(
 
 export function removePlaceholder(editor: Editor, unencodedName: string) {
   const placeholderElem = editor.dom.doc.querySelector(
-    `[data-placeholder-for="${encodeURIComponent(unencodedName)}"]`
+    `[data-placeholder-for="${encodeURIComponent(unencodedName)}"]`,
   ) as HTMLDivElement
 
   // Fail gracefully
@@ -96,7 +102,7 @@ export function removePlaceholder(editor: Editor, unencodedName: string) {
     // Cleanup data URIs
     placeholderElem.querySelectorAll('img').forEach(
       // Revoking non-object URLs is safe
-      img => URL.revokeObjectURL(img.src)
+      img => URL.revokeObjectURL(img.src),
     )
   })
 }
@@ -107,8 +113,8 @@ export function removePlaceholder(editor: Editor, unencodedName: string) {
  */
 export async function insertPlaceholder(
   editor: Editor,
-  unencodedName: string,
-  placeholderInfoPromise: Promise<PlaceholderInfo>
+  unencodedName: string | undefined,
+  placeholderInfoPromise: Promise<PlaceholderInfo>,
 ): Promise<HTMLElement> {
   const placeholderId = `placeholder-${placeholderIdCounter++}`
 
@@ -119,13 +125,13 @@ export async function insertPlaceholder(
       false,
       `<span
             aria-label="${formatMessage('Loading')}"
-            data-placeholder-for="${encodeURIComponent(unencodedName)}"
+            data-placeholder-for="${encodeURIComponent(unencodedName || '')}"
             id="${placeholderId}"
             class="mceNonEditable"
             style="user-select: none; pointer-events: none; user-focus: none; display: inline-flex;"
-          ></span>&nbsp;`
+          ></span>&nbsp;`,
       // Without the trailing &nbsp;, tinymce will place the cursor inside the placeholder, which we don't want.
-    )
+    ),
   )
 
   const placeholderElem = editor.dom.doc.querySelector(`#${placeholderId}`) as HTMLDivElement
@@ -168,7 +174,7 @@ export async function insertPlaceholder(
     // Create the spinner
     placeholderElem.innerHTML = spinnerSvg(
       placeholderInfo.type === 'inline' ? 'x-small' : 'medium',
-      placeholderId + '-label'
+      placeholderId + '-label',
     )
 
     const spinnerElem = placeholderElem.firstElementChild as SVGElement
@@ -181,7 +187,7 @@ export async function insertPlaceholder(
     placeholderElem.appendChild(labelElem)
 
     Object.assign(labelElem.style, {
-      color: '#2D3B45',
+      color: '#273540',
       zIndex: '1000',
 
       /* Restrict text to one line */
@@ -202,7 +208,7 @@ export async function insertPlaceholder(
           padding: '5px',
           verticalAlign: 'baseline',
           gap: '8px',
-          backgroundColor: '#F5F5F5',
+          backgroundColor: '#F2F4F4',
         } as CSSStyleDeclaration)
         break
 
@@ -352,8 +358,8 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					position: relative;
 					box-sizing: border-box;
 					overflow: hidden;
-					--Spinner-trackColor: #F5F5F5;
-					--Spinner-color: #0374B5;
+					--Spinner-trackColor: #F2F4F4;
+					--Spinner-color: #2B7ABC;
 					--Spinner-xSmallSize: 1.5em;
 					--Spinner-xSmallBorderWidth: 0.25em;
 					--Spinner-smallSize: 3em;
@@ -362,7 +368,7 @@ function spinnerSvg(size: 'x-small' | 'small' | 'medium' | 'large', labelId: str
 					--Spinner-mediumBorderWidth: 0.5em;
 					--Spinner-largeSize: 7em;
 					--Spinner-largeBorderWidth: 0.75em;
-					--Spinner-inverseColor: #0374B5;
+					--Spinner-inverseColor: #2B7ABC;
 				}
 
 				.Spinner-circleTrack {

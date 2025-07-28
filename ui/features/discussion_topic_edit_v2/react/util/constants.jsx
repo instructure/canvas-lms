@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export const defaultEveryoneOption = {
   assetCode: 'everyone',
@@ -67,6 +67,11 @@ export const maximumReplyToEntryRequiredCount = 10
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 
+export const DEFAULT_SORT_ORDER = 'asc'
+export const DEFAULT_SORT_ORDER_LOCKED = false
+export const DEFAULT_EXPANDED_STATE = true
+export const DEFAULT_EXPANDED_LOCKED = false
+
 export const useShouldShowContent = (
   isGraded,
   isAnnouncement,
@@ -75,7 +80,9 @@ export const useShouldShowContent = (
   discussionAnonymousState,
   isEditing,
   isStudent,
-  published
+  published,
+  isCheckpoints,
+  isAlreadyAGroupDiscussion,
 ) => {
   const shouldShowTodoSettings =
     !isGraded &&
@@ -84,10 +91,7 @@ export const useShouldShowContent = (
     ENV.STUDENT_PLANNER_ENABLED
 
   const shouldShowPostToSectionOption =
-    !isGraded &&
-    !isGroupDiscussion &&
-    !isGroupContext &&
-    !(ENV.FEATURES.differentiated_modules && !isAnnouncement)
+    !isGraded && !isGroupDiscussion && !isGroupContext && isAnnouncement
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
@@ -95,32 +99,23 @@ export const useShouldShowContent = (
     (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
       ENV.allow_student_anonymous_discussion_topics)
 
-  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
+  const shouldShowViewSettings = ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !isAnnouncement
 
   const shouldShowGroupOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
+    !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
 
   const shouldShowGradedDiscussionOptions =
-    discussionAnonymousState === 'off' &&
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
+    !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
 
   const shouldShowUsageRightsOption =
-    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-    ENV?.FEATURES?.usage_rights_discussion_topics &&
-    ENV?.USAGE_RIGHTS_REQUIRED &&
-    ENV?.PERMISSIONS?.manage_files
+    ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH && ENV?.USAGE_RIGHTS_REQUIRED
 
   const shouldShowLikingOption = !ENV.K5_HOMEROOM_COURSE
 
   const shouldShowPartialAnonymousSelector =
     !isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent
 
-  const shouldShowAvailabilityOptions = !isAnnouncement && !isGroupContext
+  const shouldShowAvailabilityOptions = !isGroupContext
 
   /* discussion moderators viewing a new or still unpublished discussion */
   const shouldShowSaveAndPublishButton =
@@ -129,24 +124,24 @@ export const useShouldShowContent = (
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
-  const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED
-
-  const canCreateGradedDiscussion =
-    !isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_CREATE_ASSIGNMENT
-  const canEditDiscussionAssignment =
-    isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_UPDATE_ASSIGNMENT
+  const shouldShowCheckpointsOptions =
+    isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && !ENV.RESTRICT_QUANTITATIVE_DATA
 
   const shouldShowAssignToForUngradedDiscussions =
-    !isAnnouncement &&
-    !isGraded &&
-    ENV.FEATURES?.differentiated_modules &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
+    !isAnnouncement && !isGraded && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
+
+  const shouldShowAllowParticipantsToCommentOption =
+    !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && isAnnouncement
+
+  const groupContextType = ENV?.GROUP_CONTEXT_TYPE
+
+  const shouldShowSuppressAssignmentOption = isGraded && ENV.SETTINGS.suppress_assignments
 
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
     shouldShowAnonymousOptions,
-    shouldShowAnnouncementOnlyOptions,
+    shouldShowViewSettings,
     shouldShowGroupOptions,
     shouldShowGradedDiscussionOptions,
     shouldShowUsageRightsOption,
@@ -157,5 +152,8 @@ export const useShouldShowContent = (
     shouldShowPodcastFeedOption,
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
+    shouldShowAllowParticipantsToCommentOption,
+    shouldShowSuppressAssignmentOption,
+    groupContextType,
   }
 }

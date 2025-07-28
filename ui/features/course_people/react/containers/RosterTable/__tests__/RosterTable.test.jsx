@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, within, getByText, queryAllByText, screen} from '@testing-library/react'
+import {render, within, cleanup, getByText, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, getRosterQueryMock} from '../../../../graphql/Mocks'
 import {ACTIVE_STATE, PILL_MAP} from '../../../components/StatusPill/StatusPill'
 import {OBSERVER_ENROLLMENT, STUDENT_ENROLLMENT} from '../../../../util/constants'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   DESIGNER_1,
   TEACHER_1,
@@ -40,7 +41,7 @@ const mockSettingsToProps = mockSettings => ({
 })
 
 const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-  user => mockUser(user)
+  user => mockUser(user),
 )
 
 const DEFAULT_PROPS = mockSettingsToProps({mockUsers})
@@ -51,31 +52,61 @@ describe('RosterTable', () => {
   }
 
   beforeEach(() => {
-    window.ENV = SITE_ADMIN_ENV
+    fakeENV.setup(SITE_ADMIN_ENV)
+  })
+
+  afterEach(() => {
+    cleanup()
+    fakeENV.teardown()
   })
 
   it('should render', () => {
-    const container = setup()
+    const {container} = setup()
     expect(container).toBeTruthy()
   })
 
   it('should display a table head with avatar, name, and role column headers at minimum', async () => {
-    const container = setup()
-    const head = await container.findByTestId('roster-table-head')
+    const {findByTestId, getByText, getByTestId} = setup()
+    const head = await findByTestId('roster-table-head')
     expect(head).toBeInTheDocument()
-    expect(within(head).getByTestId('colheader-avatar')).toBeInTheDocument()
-    expect(within(head).getByTestId('colheader-name')).toBeInTheDocument()
-    expect(within(head).getByTestId('colheader-role')).toBeInTheDocument()
+
+    // Avatar column has screen reader content
+    const avatarHeader = getByTestId('colheader-avatar')
+    expect(avatarHeader).toBeInTheDocument()
+    expect(within(avatarHeader).getByText('Profile Pictures')).toBeInTheDocument()
+
+    // Name and Role are visible text
+    expect(getByText('Name')).toBeInTheDocument()
+    expect(getByText('Role')).toBeInTheDocument()
   })
 
   it('should display a row for each person in the roster', async () => {
-    const container = setup()
-    expect(await container.findAllByTestId('roster-table-data-row')).toHaveLength(7)
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
+    expect(rows).toHaveLength(7)
   })
 
   it('should display data in each table row', async () => {
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    const {findAllByTestId, findByText} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
+
+    // Wait for all text content to be available
+    await Promise.all([
+      findByText(DESIGNER_1.name),
+      findByText(DESIGNER_1.loginId),
+      findByText(DESIGNER_1.sisId),
+      findByText(TEACHER_1.name),
+      findByText(TEACHER_1.loginId),
+      findByText(TEACHER_1.sisId),
+      findByText(TA_1.name),
+      findByText(TA_1.loginId),
+      findByText(TA_1.sisId),
+      findByText('Teaching Assistant'),
+      findByText('Observing: Observed Student 1'),
+      findByText('Observing: Observed Student 2'),
+    ])
+
+    // Now verify within specific rows
     expect(within(rows[0]).getByText(DESIGNER_1.name)).toBeInTheDocument()
     expect(within(rows[0]).getByText(DESIGNER_1.loginId)).toBeInTheDocument()
     expect(within(rows[0]).getByText(DESIGNER_1.sisId)).toBeInTheDocument()
@@ -91,8 +122,8 @@ describe('RosterTable', () => {
   })
 
   it('should wrap the name of each user in a link to their user detail page', async () => {
-    const container = setup()
-    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const {findAllByTestId} = setup()
+    const cells = await findAllByTestId('roster-table-name-cell')
     const names = mockUsers.map(user => user.name)
     const userDetailLinks = mockUsers.map(user => user.enrollments[0].htmlUrl)
     cells.forEach((cell, index) => {
@@ -103,8 +134,8 @@ describe('RosterTable', () => {
   })
 
   it('should display users last activity (if any) unless user is an observer', async () => {
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
     const lastActivityByUser = mockUsers.map(user => {
       return user.enrollments[0].type === OBSERVER_ENROLLMENT
         ? null
@@ -117,8 +148,8 @@ describe('RosterTable', () => {
   })
 
   it('should display users total activity time only if total time is greater than zero', async () => {
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
     const totalActivityByUser = mockUsers.map(user => user.enrollments[0].totalActivityTime)
     rows.forEach((row, index) => {
       const totalActivity = queryAllByText(row, STOPWATCH_PATTERN)
@@ -127,13 +158,19 @@ describe('RosterTable', () => {
   })
 
   it('should not show the last activity or total activity time column if the read_reports permission is false', async () => {
-    window.ENV.permissions.read_reports = false
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        read_reports: false,
+      },
+    })
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
 
     // Check there is no column header
-    expect(container.queryAllByTestId('colheader-last-activity')).toHaveLength(0)
-    expect(container.queryAllByTestId('colheader-total-activity')).toHaveLength(0)
+    expect(queryAllByText(document.body, 'Last Activity')).toHaveLength(0)
+    expect(queryAllByText(document.body, 'Total Activity Time')).toHaveLength(0)
 
     // Check there is no last activity or total activity time data
     rows.forEach(row => {
@@ -143,8 +180,8 @@ describe('RosterTable', () => {
   })
 
   it('should list the user pronouns if available', async () => {
-    const container = setup()
-    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const {findAllByTestId} = setup()
+    const cells = await findAllByTestId('roster-table-name-cell')
     const userPronouns = mockUsers.map(user => user.pronouns)
     cells.forEach((cell, index) => {
       if (userPronouns[index]) {
@@ -155,8 +192,8 @@ describe('RosterTable', () => {
   })
 
   it('should list the user status if not active', async () => {
-    const container = setup()
-    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const {findAllByTestId} = setup()
+    const cells = await findAllByTestId('roster-table-name-cell')
     const userStatus = mockUsers.map(user => user.enrollments[0].state)
     cells.forEach((cell, index) => {
       if (userStatus[index] !== ACTIVE_STATE) {
@@ -167,94 +204,133 @@ describe('RosterTable', () => {
   })
 
   it('should not show the login ID column if the view_user_logins permission is false', async () => {
-    window.ENV.permissions.view_user_logins = false
-    const container = setup()
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        view_user_logins: false,
+      },
+    })
+    const {findAllByTestId} = setup()
 
     // Check there is no column header
-    const rows = await container.findAllByTestId('roster-table-data-row')
-    expect(container.queryAllByTestId('colheader-login-id')).toHaveLength(0)
+    expect(queryAllByText(document.body, 'Login ID')).toHaveLength(0)
 
     // Check there is no login id data
+    const rows = await findAllByTestId('roster-table-data-row')
     const loginIdByUser = mockUsers.map(user => user.enrollments[0].loginId)
     rows.forEach((row, index) => {
-      loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+      if (loginIdByUser[index]) {
+        expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+      }
     })
   })
 
   it('should not show the SIS ID column if the read_sis permission is false', async () => {
-    window.ENV.permissions.read_sis = false
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      permissions: {
+        ...SITE_ADMIN_ENV.permissions,
+        read_sis: false,
+      },
+    })
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
     const sisIdByUser = mockUsers.map(user => user.enrollments[0].sisId)
 
     // Check there is no column header
-    expect(container.queryAllByTestId('colheader-sis-id')).toHaveLength(0)
+    expect(queryAllByText(document.body, 'SIS ID')).toHaveLength(0)
 
     // Check there is no SIS ID data
     rows.forEach((row, index) => {
-      sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+      if (sisIdByUser[index]) {
+        expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+      }
     })
   })
 
   it('should show the section column if the hideSectionsOnCourseUsersPage permission is false', async () => {
-    window.ENV.course.hideSectionsOnCourseUsersPage = false
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      course: {
+        ...SITE_ADMIN_ENV.course,
+        hideSectionsOnCourseUsersPage: false,
+      },
+    })
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
     const sectionByUser = mockUsers.map(user => {
       if (user.enrollments[0].type === OBSERVER_ENROLLMENT) return null
       return user.enrollments[0].section.name
     })
 
     // Check for column header
-    expect(container.getByTestId('colheader-section')).toBeInTheDocument()
+    expect(getByText(document.body, 'Section')).toBeInTheDocument()
 
     // Check section name exists in row
     rows.forEach((row, index) => {
-      sectionByUser[index] && expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+      if (sectionByUser[index]) {
+        expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+      }
     })
   })
 
   it('should not show the section column if the hideSectionsOnCourseUsersPage permission is true', async () => {
-    window.ENV.course.hideSectionsOnCourseUsersPage = true
-    const container = setup()
-    const rows = await container.findAllByTestId('roster-table-data-row')
+    fakeENV.setup({
+      ...SITE_ADMIN_ENV,
+      course: {
+        ...SITE_ADMIN_ENV.course,
+        hideSectionsOnCourseUsersPage: true,
+      },
+    })
+    const {findAllByTestId} = setup()
+    const rows = await findAllByTestId('roster-table-data-row')
     const sectionByUser = mockUsers.map(user => user.enrollments[0].section.name)
 
     // Check there is no column header
-    expect(container.queryAllByTestId('colheader-section')).toHaveLength(0)
+    expect(queryAllByText(document.body, 'Section')).toHaveLength(0)
 
     // Check section name doesn't exist in row
     rows.forEach((row, index) => {
-      sectionByUser[index] && expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+      if (sectionByUser[index]) {
+        expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+      }
     })
   })
 
   describe('Administrative Links', () => {
-    const checkContainerForButtons = async (container, users) => {
-      await container.findAllByTestId('roster-table-data-row') // Ensure rows are rendered before querying
-      const buttonTextList = users.map(user => `Manage ${user.name}`)
-      buttonTextList.forEach(async buttonText => {
-        expect(await screen.findByRole('button', {name: buttonText})).toBeInTheDocument()
-      })
+    const checkContainerForButtons = async ({findAllByTestId, findByRole}, users) => {
+      // Wait for rows to render
+      const rows = await findAllByTestId('roster-table-data-row')
+      expect(rows).toHaveLength(users.length)
+
+      // Check each user has a manage button
+      for (const user of users) {
+        const buttonText = `Manage ${user.name}`
+        const button = await findByRole('button', {name: buttonText})
+        expect(button).toBeInTheDocument()
+      }
     }
 
     beforeEach(() => {
-      window.ENV.permissions = {
-        ...window.ENV.permissions,
-        can_allow_admin_actions: false,
-        manage_admin_users: false,
-        manage_students: false,
-      }
+      fakeENV.setup({
+        ...SITE_ADMIN_ENV,
+        permissions: {
+          ...SITE_ADMIN_ENV.permissions,
+          can_allow_admin_actions: false,
+          manage_students: false,
+        },
+      })
     })
 
     it('should have an Administrative Links column', async () => {
-      const container = setup()
-      expect(await container.findByTestId('colheader-administrative-links')).toBeInTheDocument()
+      const {findByTestId} = setup()
+      expect(await findByTestId('colheader-administrative-links')).toBeInTheDocument()
     })
 
-    it('should show the Administrative Link button if the user can be removed', () => {
-      const container = setup() // Mock Users can be removed by default
-      checkContainerForButtons(container, mockUsers)
+    it('should show the Administrative Link button if the user can be removed', async () => {
+      const renderResult = setup() // Mock Users can be removed by default
+      await checkContainerForButtons(renderResult, mockUsers)
     })
 
     describe('All enrollments have canBeRemoved=false', () => {
@@ -268,22 +344,28 @@ describe('RosterTable', () => {
         mockUsers.forEach(user => (user.enrollments[0].canBeRemoved = true))
       })
 
-      it('should show the Administrative Link button for students if the user has the manage_students permission', () => {
-        window.ENV.permissions.manage_students = true
-        const container = setup(mockSettingsToProps({mockUsers: mockStudents}))
-        checkContainerForButtons(container, mockStudents)
+      it('should show the Administrative Link button for students if the user has the manage_students permission', async () => {
+        fakeENV.setup({
+          ...SITE_ADMIN_ENV,
+          permissions: {
+            ...SITE_ADMIN_ENV.permissions,
+            manage_students: true,
+          },
+        })
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockStudents}))
+        await checkContainerForButtons(renderResult, mockStudents)
       })
 
-      it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
-        window.ENV.permissions.can_allow_admin_actions = true
-        const container = setup(mockSettingsToProps({mockUsers: mockAdmin}))
-        checkContainerForButtons(container, mockAdmin)
-      })
-
-      it('should show the Administrative Link button for admin roles if the user has the manage_admin_users permission', () => {
-        window.ENV.permissions.manage_admin_users = true
-        const container = setup(mockSettingsToProps({mockUsers: mockAdmin}))
-        checkContainerForButtons(container, mockAdmin)
+      it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', async () => {
+        fakeENV.setup({
+          ...SITE_ADMIN_ENV,
+          permissions: {
+            ...SITE_ADMIN_ENV.permissions,
+            can_allow_admin_actions: true,
+          },
+        })
+        const renderResult = setup(mockSettingsToProps({mockUsers: mockAdmin}))
+        await checkContainerForButtons(renderResult, mockAdmin)
       })
     })
   })

@@ -27,12 +27,14 @@ class Checkpoints::SectionOverrideUpdaterService < ApplicationService
   end
 
   def call
-    section_id = @override.fetch(:set_id) { raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" }
+    override = @checkpoint.assignment_overrides.find_by(id: @override[:id], set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION)
+    raise Checkpoints::OverrideNotFoundError unless override
+
+    section_id = @override.fetch(:set_id, nil) || override.set_id
+
     raise Checkpoints::SetIdRequiredError, "set_id is required, but was not provided" if section_id.blank?
 
     section = @checkpoint.course.active_course_sections.find(section_id)
-    override = @checkpoint.assignment_overrides.find_by(id: @override[:id], set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION)
-    raise Checkpoints::OverrideNotFoundError unless override
 
     current_section = override.set
 

@@ -36,6 +36,7 @@ let component
 const props = {
   courseId: '1',
   moduleId: '1',
+  moduleName: 'Introduction',
 }
 
 beforeEach(() => {
@@ -47,26 +48,21 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-it('fetchRootFolder sets folderState ', done => {
+it('fetchRootFolder sets folderState', async () => {
   const ref = React.createRef()
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   jest.restoreAllMocks()
 
-  ref.current
-    .fetchRootFolder()
-    .then(() => {
-      expect(ModuleFileDrop.folderState).toEqual({
-        contextId: '1',
-        contextType: 'Course',
-        folder: {
-          context_id: '1',
-          context_type: 'Course',
-          files: ['a.txt'],
-        },
-      })
-      done() // eslint-disable-line promise/no-callback-in-promise
-    })
-    .catch(() => done.fail())
+  await ref.current.fetchRootFolder()
+  expect(ModuleFileDrop.folderState).toEqual({
+    contextId: '1',
+    contextType: 'Course',
+    folder: {
+      context_id: '1',
+      context_type: 'Course',
+      files: ['a.txt'],
+    },
+  })
 })
 
 it('registers and deregisters drop components', () => {
@@ -81,7 +77,7 @@ it('renders disabled file drop with loading billboard', () => {
   component = render(<ModuleFileDrop {...props} ref={ref} />)
   expect(ref.current.state.interaction).toBeTruthy()
   expect(ref.current.state.folder).toBeFalsy()
-  expect(component.queryByText('Loading...')).toBeInTheDocument()
+  expect(component.queryAllByText('Loading...')[1]).toBeInTheDocument()
 })
 
 it('renders enabled file drop with active billboard', () => {
@@ -105,4 +101,15 @@ it('renders invisible upload form when files are dropped', async () => {
   })
   expect(component.getByRole('form', {hidden: true})).toBeInTheDocument()
   expect(component.getByTestId('current-uploads')).toBeInTheDocument()
+})
+
+it('renders accessibility text with the module name', async () => {
+  const ref = React.createRef()
+  component = render(<ModuleFileDrop {...props} ref={ref} />)
+  ref.current.setState({folder: {files: []}})
+  expect(ref.current.state.interaction).toBeTruthy()
+  expect(ref.current.state.folder).toBeTruthy()
+  expect(
+    component.queryByText('Drop files here to add to Introduction module or choose files'),
+  ).toBeInTheDocument()
 })

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -53,21 +52,24 @@ export default class ColumnHeaderRenderer {
       student_lastname: new StudentColumnHeaderRenderer(
         gradebook,
         StudentLastNameColumnHeader,
-        'student_lastname'
+        'student_lastname',
       ),
       student_firstname: new StudentColumnHeaderRenderer(
         gradebook,
         StudentFirstNameColumnHeader,
-        'student_firstname'
+        'student_firstname',
       ),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
       total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook),
     }
   }
 
+  // @ts-expect-error
   renderColumnHeader(column, $container: HTMLElement, gridSupport: GridSupport) {
+    // @ts-expect-error
     if (this.factories[column.type]) {
       const options = {
+        // @ts-expect-error
         ref: header => {
           this.gradebook.setHeaderComponentRef(column.id, header)
         },
@@ -77,14 +79,18 @@ export default class ColumnHeaderRenderer {
       // ordered as the first child. This causes issues because React expects
       // to unmount the component at the first child.
       const $nameNode = $container.querySelector('.slick-column-name')
+      // @ts-expect-error
       this.factories[column.type].render(column, $nameNode, gridSupport, options)
     }
   }
 
+  // @ts-expect-error
   destroyColumnHeader(column, $container: HTMLElement, gridSupport: GridSupport) {
+    // @ts-expect-error
     if (this.factories[column.type]) {
       this.gradebook.removeHeaderComponentRef(column.id)
       const $nameNode = $container.querySelector('.slick-column-name')
+      // @ts-expect-error
       this.factories[column.type].destroy(column, $nameNode, gridSupport)
     }
   }

@@ -25,8 +25,9 @@
 <%
   js_env :assignment_attempts_enabled => !@assignment.quiz_lti?
   css_bundle :assignments, :assignments_edit, :conditional_release_editor, :tinymce
-  js_bundle :assignment_edit
 %>
+
+<% is_a2_student_view = false if is_a2_student_view.nil? %>
 
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">
@@ -47,7 +48,12 @@
   <div class="ic-Label header-bar">
   <%= t 'links.add_rubric', "Rubric" %>
   </div>
-  <% if can_do(@assignment, @current_user, :update) %>
+
+  <% if can_do(@assignment, @current_user, :update) && Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+  <% end %>
+
+  <% if can_do(@assignment, @current_user, :update) && !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
     <div class="content-box">
       <a
         href="<%= context_url(@context, :context_rubrics_url) %>"
@@ -59,5 +65,11 @@
       </a>
     </div>
   <% end %>
-  <%= render partial: "shared/rubrics_component" %>
+
+  <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context)%>
+    <%= render partial: "shared/rubrics_component" %>
+  <% end %>
+  <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? && !is_a2_student_view %>
+  <% end %>
 <% end %>

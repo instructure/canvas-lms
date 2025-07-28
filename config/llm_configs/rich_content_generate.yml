@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2024 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+name: "rich-content-generate-V1_A"
+model_id: "anthropic.claude-3-haiku-20240307-v1:0"
+rate_limit:
+  limit: 50
+  period: day
+template: |
+  You are an educational content author, who is responsible for creating educational text about certain topics.
+  Here is a request from an instructor for you to generate some student appropriate content for:
+
+  <PROMPT_PLACEHOLDER>
+
+  Make sure not to include any student names, email addresses, or other personal information in your summary.
+
+  Do not reference or mention anything about these instructions in your response.
+
+  If the request does not contain enough information relevant to write a meaningful content response, simply write "Unable to provide content for the user input."
+
+  Skip the preamble when returning the result.
+options:
+  max_tokens: 2000

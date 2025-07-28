@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import PropTypes from 'prop-types'
 
@@ -37,7 +37,7 @@ import LoadingSkeleton from './LoadingSkeleton'
 import EmptyK5Announcement, {K5AddAnnouncementButton} from './EmptyK5Announcement'
 import {transformAnnouncement} from './utils'
 
-const I18n = useI18nScope('k5_announcement')
+const I18n = createI18nScope('k5_announcement')
 
 const ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE = 2
 
@@ -47,9 +47,9 @@ const noRecentAnnouncementsFauxAnnouncement = {
 }
 
 export const K5AnnouncementLoadingMask = props => {
-  const {notForHomeroom, ...rest} = props
+  const {notForHomeroom, key, ...rest} = props
   return (
-    <div {...rest}>
+    <div key={key} {...rest}>
       {notForHomeroom || (
         <LoadingSkeleton
           screenReaderLabel={I18n.t('Loading Homeroom Course Name')}
@@ -123,17 +123,35 @@ export default function K5Announcement({
           .map(a => transformAnnouncement(a))
         // order of homeroomAnnouncements:
         // [most distant announcement, ..., most recent announcement, faux announcement (if present)]
-        setHomeroomAnnouncements(parsedAnnouncements.reverse().concat(homeroomAnnouncements))
+
+        const announcementsList = parsedAnnouncements.reverse()
+
+        // if when we don't receive a firstAnnouncement, we check if the loaded ones
+        // are recent enough to not show the faux announcement
+        if (homeroomAnnouncements[0].id === FAUX_ANNOUNCEMENT_ID && announcementsList.length > 0) {
+          const lastAnnouncement = announcementsList.slice(-1)[0]
+          const postedDate = new Date(lastAnnouncement.postedDate)
+          // compare postedDate within 15 days ago
+          const fifteenDaysAgo = new Date()
+          fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15)
+          if (postedDate >= fifteenDaysAgo) {
+            setHomeroomAnnouncements(announcementsList)
+            setCurrentAnnouncement(lastAnnouncement)
+            return
+          }
+        }
+        setHomeroomAnnouncements(announcementsList.concat(homeroomAnnouncements))
       } catch (ex) {
         showFlashAlert({
           message: I18n.t('Failed getting next batch of announcements.'),
           err: ex,
           type: 'error',
         })
+      } finally {
+        setLoadingMore(false)
       }
-      setLoadingMore(false)
     },
-    [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
+    [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL],
   )
 
   const currentAnnouncementIndex = useCallback(() => {
@@ -292,7 +310,7 @@ export default function K5Announcement({
           ) : (
             courseName
           )}
-        </Heading>
+        </Heading>,
       )
     }
   }

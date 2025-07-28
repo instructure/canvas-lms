@@ -20,9 +20,9 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 export default function Description() {
   return (
@@ -30,7 +30,7 @@ export default function Description() {
       <View as="p" margin="0 0 small">
         <Text>
           {I18n.t(
-            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
+            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:',
           )}
         </Text>
       </View>

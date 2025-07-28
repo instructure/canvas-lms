@@ -67,7 +67,7 @@
 }
 .alert-info {
   background-color: $ic-bg-light-primary;
-  color: $ic-bg-light-primary-text;
+  color: $ic-bg-light-neutral-text;
 
   @if $use_high_contrast {
     border: 1px solid $ic-bg-light-primary-text;

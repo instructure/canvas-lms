@@ -95,7 +95,7 @@ describe('Files UploadForm', () => {
           autoUpload: false,
           ...folderWithFiles,
         })}
-      />
+      />,
     )
     setFile(getByTestId)
     rerender(<UploadForm {...formProps()} />)
@@ -117,7 +117,7 @@ describe('Files UploadForm', () => {
             },
           },
         })}
-      />
+      />,
     )
     Modal.setAppElement('body')
 

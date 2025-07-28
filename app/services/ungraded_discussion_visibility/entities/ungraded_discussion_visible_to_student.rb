@@ -20,39 +20,6 @@
 module UngradedDiscussionVisibility
   module Entities
     # When a discussion topic is visible to a (student) user
-    class UngradedDiscussionVisibleToStudent
-      attr_reader :course_id,
-                  :user_id,
-                  :discussion_topic_id
-
-      def initialize(course_id:,
-                     user_id:,
-                     discussion_topic_id:)
-        raise ArgumentError, "course_id cannot be nil" if course_id.nil?
-        raise ArgumentError, "user_id cannot be nil" if user_id.nil?
-        raise ArgumentError, "discussion_topic_id cannot be nil" if discussion_topic_id.nil?
-
-        @course_id = course_id
-        @user_id = user_id
-        @discussion_topic_id = discussion_topic_id
-      end
-
-      # two UngradedDiscussionVisibleToStudent DTOs are equal if all of their attributes are equal
-      def ==(other)
-        return false unless other.is_a?(UngradedDiscussionVisibleToStudent)
-
-        course_id == other.course_id &&
-          user_id == other.user_id &&
-          discussion_topic_id == other.discussion_topic_id
-      end
-
-      def eql?(other)
-        self == other
-      end
-
-      def hash
-        [course_id, user_id, discussion_topic_id].hash
-      end
-    end
+    UngradedDiscussionVisibleToStudent = Struct.new(:course_id, :user_id, :discussion_topic_id, keyword_init: true)
   end
 end

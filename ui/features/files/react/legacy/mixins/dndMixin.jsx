@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DragFeedback from '../../components/DragFeedback'
+import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import moveStuff from '../util/moveStuff'
 import $ from 'jquery'
 import {isArray} from 'lodash'
@@ -32,9 +32,10 @@ export default {
       this.dragHolder = $('<div>').appendTo(document.body)
     }
     // This should be in JSX, but /o\
+
     ReactDOM.render(
       <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={this.itemsToDrag()} />,
-      this.dragHolder[0]
+      this.dragHolder[0],
     )
   },
 
@@ -55,7 +56,7 @@ export default {
       if (itemsToDrag.length && isArray(itemsToDrag)) {
         event.dataTransfer.setData(
           'text/uri-list',
-          itemsToDrag.map(item => item.get('url')).join('\n')
+          itemsToDrag.map(item => item.get('url')).join('\n'),
         )
       }
 
@@ -110,7 +111,7 @@ export default {
           if (callback) {
             return callback({success: false, event})
           }
-        }
+        },
       )
       .done(this.clearSelectedItems)
   },

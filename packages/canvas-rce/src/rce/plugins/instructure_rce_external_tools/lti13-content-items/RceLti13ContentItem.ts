@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -33,7 +34,7 @@ export abstract class RceLti13ContentItem<TJson extends object> {
   constructor(
     public readonly type: Lti13ContentItemJson['type'],
     public readonly json: TJson,
-    public readonly context: RceLti13ContentItemContext
+    public readonly context: RceLti13ContentItemContext,
   ) {}
 
   abstract buildTitle(): string | null | undefined
@@ -66,7 +67,7 @@ export abstract class RceLti13ContentItem<TJson extends object> {
 
       iframeTag.setAttribute(
         'src',
-        addParentFrameContextToUrl(iframeInfo.src, this.context.containingCanvasLtiToolId) ?? ''
+        addParentFrameContextToUrl(iframeInfo.src, this.context.containingCanvasLtiToolId) ?? '',
       )
       iframeTag.setAttribute('title', this.buildTitle() || '')
       iframeTag.setAttribute('allowfullscreen', 'true')

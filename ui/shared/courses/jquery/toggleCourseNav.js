@@ -73,7 +73,7 @@ const initialize = () => {
       : () => {
           toggleCourseNav()
           saveCourseNavCollapseState()
-        }
+        },
   )
 }
 
@@ -92,4 +92,16 @@ const toggleCourseNav = () => {
   resetMenuItemTabIndexes()
 }
 
-export {initialize, toggleCourseNav}
+const showCourseNav = () => {
+  if (!$('body').hasClass('course-menu-expanded')) {
+    toggleCourseNav()
+  }
+}
+
+const hideCourseNav = () => {
+  if ($('body').hasClass('course-menu-expanded')) {
+    toggleCourseNav()
+  }
+}
+
+export {initialize, toggleCourseNav, showCourseNav, hideCourseNav}

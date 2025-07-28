@@ -16,30 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 
 import {Menu} from '@instructure/ui-menu'
 import {
   IconMoreLine,
-  IconNextUnreadLine,
   IconDiscussionLine,
   IconEditLine,
   IconTrashLine,
   IconSpeedGraderLine,
-  IconMarkAsReadSolid,
-  IconMarkAsReadLine,
   IconWarningBorderlessSolid,
   IconReplyAll2Line,
   IconCommentLine,
+  IconLinkLine
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import ReadIcon from '@canvas/read-icon'
+import UnreadIcon from '@canvas/unread-icon'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 // Reason: <Menu> in v6 of InstUI requires a ref to bind too or errors
 // are produced by the menu causing the page to scroll all over the place
@@ -51,6 +51,7 @@ export const ThreadActions = props => {
       isUnread: props.isUnread,
       onToggleUnread: props.onToggleUnread,
       goToTopic: props.goToTopic,
+      permalinkId: props.permalinkId,
       goToParent: props.goToParent,
       goToQuotedReply: props.goToQuotedReply,
       onEdit: props.onEdit,
@@ -63,32 +64,30 @@ export const ThreadActions = props => {
     }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
+  if (props.isSearch) {
+    return null
+  }
+
   return (
-    <Flex justifyItems="end">
-      <Flex.Item>
-        {!props.isSearch && (
-          <Menu
-            placement="bottom"
-            key={`threadActionMenu-${props.id}`}
-            trigger={
-              <IconButton
-                size="medium"
-                screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
-                  author: props.authorName,
-                })}
-                renderIcon={IconMoreLine}
-                withBackground={false}
-                withBorder={false}
-                data-testid="thread-actions-menu"
-              />
-            }
-            ref={props.moreOptionsButtonRef}
-          >
-            {menuItems}
-          </Menu>
-        )}
-      </Flex.Item>
-    </Flex>
+    <Menu
+      placement="bottom"
+      key={`threadActionMenu-${props.id}`}
+      trigger={
+        <IconButton
+          size="medium"
+          screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
+            author: props.authorName,
+          })}
+          renderIcon={IconMoreLine}
+          withBackground={false}
+          withBorder={false}
+          data-testid="thread-actions-menu"
+        />
+      }
+      ref={props.moreOptionsButtonRef}
+    >
+      {menuItems}
+    </Menu>
   )
 }
 
@@ -97,7 +96,7 @@ const getMenuConfigs = props => {
   if (props.onMarkAllAsRead) {
     options.push({
       key: 'markAllAsRead',
-      icon: <IconNextUnreadLine />,
+      icon: <ReadIcon />,
       label: I18n.t('Mark All as Read'),
       selectionCallback: props.onMarkAllAsRead,
     })
@@ -105,7 +104,7 @@ const getMenuConfigs = props => {
   if (props.onMarkAllAsUnread) {
     options.push({
       key: 'markAllAsUnRead',
-      icon: <IconNextUnreadLine />,
+      icon: <UnreadIcon />,
       label: I18n.t('Mark All as Unread'),
       selectionCallback: props.onMarkAllAsUnread,
     })
@@ -113,14 +112,14 @@ const getMenuConfigs = props => {
   if (props.isUnread) {
     options.push({
       key: 'markAsRead',
-      icon: <IconNextUnreadLine />,
+      icon: <ReadIcon />,
       label: I18n.t('Mark as Read'),
       selectionCallback: props.onToggleUnread,
     })
   } else {
     options.push({
       key: 'markAsUnread',
-      icon: <IconNextUnreadLine />,
+      icon: <UnreadIcon />,
       label: I18n.t('Mark as Unread'),
       selectionCallback: props.onToggleUnread,
     })
@@ -128,7 +127,7 @@ const getMenuConfigs = props => {
   if (props.onMarkThreadAsRead) {
     options.push({
       key: 'markThreadAsRead',
-      icon: <IconMarkAsReadLine />,
+      icon: <ReadIcon />,
       label: I18n.t('Mark Thread as Read'),
       selectionCallback: () => {
         props.onMarkThreadAsRead(true)
@@ -138,7 +137,7 @@ const getMenuConfigs = props => {
   if (props.onMarkThreadAsRead) {
     options.push({
       key: 'markThreadAsUnRead',
-      icon: <IconMarkAsReadSolid />,
+      icon: <UnreadIcon />,
       label: I18n.t('Mark Thread as Unread'),
       selectionCallback: () => {
         props.onMarkThreadAsRead(false)
@@ -159,6 +158,17 @@ const getMenuConfigs = props => {
       icon: <IconDiscussionLine />,
       label: I18n.t('Go To Parent'),
       selectionCallback: props.goToParent,
+    })
+  }
+  if (props.permalinkId && ENV?.FEATURES?.discussion_permalink) {
+    options.push({
+      key: 'copyLink',
+      icon: <IconLinkLine />,
+      label: I18n.t('Copy Link'),
+      selectionCallback: async function() {
+        const url = `${window.location.origin}/courses/${ENV.course_id}/discussion_topics/${ENV.discussion_topic_id}?entry_id=${props.permalinkId}`
+        await navigator.clipboard.writeText(url)
+      }
     })
   }
   if (props.goToQuotedReply) {
@@ -219,7 +229,7 @@ const getMenuConfigs = props => {
 
 const renderMenuItem = (
   {selectionCallback, icon, label, key, separator = false, disabled = false, color},
-  id
+  id,
 ) => {
   return separator ? (
     <Menu.Separator key={key} />
@@ -255,6 +265,7 @@ ThreadActions.propTypes = {
   onToggleUnread: PropTypes.func.isRequired,
   isUnread: PropTypes.bool,
   goToTopic: PropTypes.func,
+  permalinkId: PropTypes.string,
   goToParent: PropTypes.func,
   goToQuotedReply: PropTypes.func,
   onEdit: PropTypes.func,

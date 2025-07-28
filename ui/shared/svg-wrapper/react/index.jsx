@@ -52,7 +52,7 @@ class SVGWrapper extends React.Component {
 
         if (this.svg.nodeType !== ELEMENT_NODE && this.svg.nodeName !== 'SVG') {
           throw new Error(
-            `SVGWrapper: SVG Element must be returned by request to ${this.props.url}`
+            `SVGWrapper: SVG Element must be returned by request to ${this.props.url}`,
           )
         }
 
@@ -61,6 +61,7 @@ class SVGWrapper extends React.Component {
         }
 
         this.svg.setAttribute('focusable', false)
+        this.rootSpan.innerHTML = ''
         this.rootSpan.appendChild(this.svg)
       },
     })

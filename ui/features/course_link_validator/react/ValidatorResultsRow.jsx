@@ -37,9 +37,9 @@ import {
 } from '@instructure/ui-icons'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('link_validator')
+const I18n = createI18nScope('link_validator')
 
 const TYPE_INFO = {
   course_card_image: {icon: IconSettingsLine, label: I18n.t('Course Settings')},
@@ -56,7 +56,7 @@ const TYPE_INFO = {
 
 const REASON_DESCRIPTION = {
   course_mismatch: I18n.t(
-    'Links to other courses in this resource may not be accessible by the students in this course:'
+    'Links to other courses in this resource may not be accessible by the students in this course:',
   ),
   unpublished_item: I18n.t('Unpublished content referenced in this resource:'),
   missing_item: I18n.t('Non-existent content referenced in this resource:'),
@@ -117,7 +117,7 @@ export default function ValidatorResultsRow(props) {
         <List isUnstyled={true} margin="none x-small small small">
           {links}
         </List>
-      </List.Item>
+      </List.Item>,
     )
   })
 

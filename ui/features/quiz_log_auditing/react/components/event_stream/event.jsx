@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import K from '../../../constants'
 import React from 'react'
 import secondsToTime from '@canvas/quiz-legacy-client-apps/util/seconds_to_time'
@@ -24,7 +24,7 @@ import SightedUserContent from '@canvas/quiz-legacy-client-apps/react/components
 import {Link} from 'react-router-dom'
 import {IconTroubleLine, IconCompleteLine, IconEmptyLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('quiz_log_auditing.event_stream')
+const I18n = createI18nScope('quiz_log_auditing.event_stream')
 
 class Event extends React.Component {
   static defaultProps = {
@@ -89,7 +89,7 @@ class Event extends React.Component {
                 one: 'Answered question:',
                 other: 'Answered the following questions:',
               },
-              {count: valid_answers.length}
+              {count: valid_answers.length},
             )}
 
             <div className="ic-QuestionAnchors">
@@ -108,7 +108,7 @@ class Event extends React.Component {
                 one: 'Viewed (and possibly read) question',
                 other: 'Viewed (and possibly read) the following questions:',
               },
-              {count: event.data.length}
+              {count: event.data.length},
             )}
 
             <div className="ic-QuestionAnchors">

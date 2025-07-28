@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class Predeploy < Cop
+      class Predeploy < Base
         include RuboCop::Canvas::MigrationTags
         include RuboCop::Canvas::CurrentDef
 

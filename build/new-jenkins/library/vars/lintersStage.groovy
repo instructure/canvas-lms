@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['bundle', 'code', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'Biome', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -40,23 +40,68 @@ def nodeRequirementsTemplate() {
 
 def tearDownNode() {
   { ->
-    container('code') {
+    container('gergichLinters') {
       sh './build/new-jenkins/linters/run-gergich-publish.sh'
     }
   }
 }
 
-def codeStage(stages) {
+def gergichLintersStage(stages) {
   { ->
     def codeEnvVars = [
       "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
+    ]
+
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'gergichLinters',
+      envVars: codeEnvVars,
+      command: './build/new-jenkins/linters/run-gergich-linters.sh'
+    )
+  }
+}
+
+def miscJsChecksStage(stages) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'miscJsChecks',
+      command: './build/new-jenkins/linters/run-misc-js-checks.sh'
+    )
+  }
+}
+
+def typescriptStage(stages) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'TypeScript',
+      command: './build/new-jenkins/linters/run-ts-type-check.sh'
+    )
+  }
+}
+
+def eslintStage(stages) {
+  { ->
+    def codeEnvVars = [
       "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
     ]
 
     callableWithDelegate(queueTestStage())(stages,
-      name: 'code',
+      name: 'ESLint',
       envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-gergich-linters.sh'
+      command: './build/new-jenkins/linters/run-eslint.sh'
+    )
+  }
+}
+
+def biomeStage(stages, buildConfig) {
+  { ->
+    def codeEnvVars = [
+      "SKIP_BIOME=${commitMessageFlag('skip-biome') as Boolean}",
+    ]
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'Biome',
+      envVars: codeEnvVars,
+      command: './build/new-jenkins/linters/run-gergich-biome.sh',
+      required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasJsFiles(buildConfig),
     )
   }
 }

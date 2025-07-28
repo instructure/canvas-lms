@@ -19,27 +19,25 @@
 
 module SectionTabHelper
   # This should contain all the permissions that are checked in Course#uncached_tabs_available
-  PERMISSIONS_TO_PRECALCULATE = %i[
-    create_conferences
-    create_forum
-    manage_admin_users
-    manage_assignments
-    manage_assignments_add
-    manage_assignments_edit
-    manage_assignments_delete
-    manage_content
-    manage_files_add
-    manage_files_edit
-    manage_files_delete
-    manage_grades
-    manage_students
-    moderate_forum
-    post_to_forum
-    read_announcements
-    read_course_content
-    read_forum
-    read_roster
-    view_all_grades
+  PERMISSIONS_TO_PRECALCULATE = [
+    :create_conferences,
+    :create_forum,
+    :manage_assignments_add,
+    :manage_assignments_edit,
+    :manage_assignments_delete,
+    :manage_files_add,
+    :manage_files_edit,
+    :manage_files_delete,
+    :manage_grades,
+    :manage_students,
+    :moderate_forum,
+    :post_to_forum,
+    :read_announcements,
+    :read_course_content,
+    :read_forum,
+    :read_roster,
+    :view_all_grades,
+    *RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
   ].freeze
 
   def available_section_tabs
@@ -121,6 +119,8 @@ module SectionTabHelper
           elsif tab_is?(tab, "TAB_PEOPLE")
             # can't manage people in template courses
             context.is_a?(Course) && context.template?
+          elsif tab_is?(tab, "TAB_FILES")
+            context.is_a?(Course) && context&.account&.limited_access_for_user?(current_user)
           end
         end
       end
@@ -194,13 +194,16 @@ module SectionTabHelper
     def a_attributes
       {
         href: @tab.path,
-        title: a_title,
+        id: "#{@tab.label.downcase.tr(" ", "-")}-link",
         "aria-label": a_aria_label,
         "aria-current": a_aria_current_page,
         class: a_classes
       }.tap do |h|
         h[:target] = @tab.target if @tab.target?
-        h["data-tooltip"] = "" if @tab.hide? || @tab.unused?
+        if @tab.hide? || @tab.unused?
+          h["data-tooltip"] = ""
+          h["data-html-tooltip-title"] = a_title
+        end
       end
     end
 
@@ -224,7 +227,7 @@ module SectionTabHelper
 
     # include the css_class of tabs here to show a "new" pill in the nav
     # hide the "new" pill by adding the css_class to the :visited_tabs user preference
-    NEW_TABS = %w[account_calendars].freeze
+    NEW_TABS = %w[account_calendars account_reports].freeze
 
     def indicate_new
       return unless NEW_TABS.include? @tab.css_class

@@ -19,7 +19,6 @@
 #
 
 require_relative "../../spec_helper"
-require_relative "../../lti_1_3_spec_helper"
 
 class ApiRouteSetSpecController < ActionController::Base # rubocop:disable Rails/ApplicationController
   def action_with_foobar_id

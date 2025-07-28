@@ -31,7 +31,7 @@ const defaultProps = () => ({
 it('calls toggleInactiveEnrollments to enable displaying inactive enrollments', () => {
   const toggleInactiveEnrollments = jest.fn()
   const {getByText, getByRole} = render(
-    <OutcomeFilterView {...defaultProps()} toggleInactiveEnrollments={toggleInactiveEnrollments} />
+    <OutcomeFilterView {...defaultProps()} toggleInactiveEnrollments={toggleInactiveEnrollments} />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Inactive enrollments'))
@@ -45,7 +45,7 @@ it('calls toggleInactiveEnrollments to disable displaying inactive enrollments',
       {...defaultProps()}
       toggleInactiveEnrollments={toggleInactiveEnrollments}
       showInactiveEnrollments={true}
-    />
+    />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Inactive enrollments'))
@@ -58,7 +58,7 @@ it('calls toggleConcludedEnrollments to enable displaying Concluded enrollments'
     <OutcomeFilterView
       {...defaultProps()}
       toggleConcludedEnrollments={toggleConcludedEnrollments}
-    />
+    />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Concluded enrollments'))
@@ -72,7 +72,7 @@ it('calls toggleConcludedEnrollments to disable displaying Concluded enrollments
       {...defaultProps()}
       toggleConcludedEnrollments={toggleConcludedEnrollments}
       showConcludedEnrollments={true}
-    />
+    />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Concluded enrollments'))
@@ -82,7 +82,7 @@ it('calls toggleConcludedEnrollments to disable displaying Concluded enrollments
 it('calls toggleUnassessedStudents to enable displaying Unassessed students', () => {
   const toggleUnassessedStudents = jest.fn()
   const {getByText, getByRole} = render(
-    <OutcomeFilterView {...defaultProps()} toggleUnassessedStudents={toggleUnassessedStudents} />
+    <OutcomeFilterView {...defaultProps()} toggleUnassessedStudents={toggleUnassessedStudents} />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Unassessed students'))
@@ -96,7 +96,7 @@ it('calls toggleUnassessedStudents to disable displaying Unassessed students', (
       {...defaultProps()}
       toggleUnassessedStudents={toggleUnassessedStudents}
       showUnassessedStudents={true}
-    />
+    />,
   )
   fireEvent.click(getByRole('button'))
   fireEvent.click(getByText('Unassessed students'))

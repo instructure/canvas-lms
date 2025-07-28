@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {createRef} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -26,9 +26,8 @@ import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
 import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n: I18nType = useI18nScope('external_tools')
+const I18n: I18nType = createI18nScope('external_tools')
 
 const PRIVACY_OPTIONS = {
   anonymous: I18n.t('Anonymous'),
@@ -48,12 +47,13 @@ export interface ConfigurationFormManualProps {
   description?: string
   allowMembershipServiceAccess?: boolean
   membershipServiceFeatureFlagEnabled: boolean
+  hasBeenSubmitted?: boolean
 }
 
 interface ConfigurationFormManualErrors {
-  name?: FormMessage[]
-  url?: FormMessage[]
-  domain?: FormMessage[]
+  missing?: FormMessage[]
+  urlOrDomain?: FormMessage[]
+  invalidUrl?: FormMessage[]
 }
 
 export interface ConfigurationFormManualState {
@@ -66,11 +66,23 @@ export interface ConfigurationFormManualState {
   customFields: string
   description: string
   allowMembershipServiceAccess: boolean
-  errors: ConfigurationFormManualErrors
+  showMessages: boolean
+  isNameValid: boolean
+  isUrlValid: boolean
+  isDomainValid: boolean
+  isUrlRequired: boolean
 }
 
 export interface ConfigurationFormManualFormData
-  extends Omit<ConfigurationFormManualState, 'allowMembershipServiceAccess' | 'errors'> {
+  extends Omit<
+    ConfigurationFormManualState,
+    | 'allowMembershipServiceAccess'
+    | 'isNameValid'
+    | 'isUrlValid'
+    | 'isDomainValid'
+    | 'showMessages'
+    | 'isUrlRequired'
+  > {
   allow_membership_service_access?: boolean
   verifyUniqueness: 'true'
 }
@@ -89,41 +101,78 @@ export default class ConfigurationFormManual extends React.Component<
     customFields: ConfigurationFormManual.customFieldsToMultiLine(this.props.customFields) ?? '',
     description: this.props.description ?? '',
     allowMembershipServiceAccess: this.props.allowMembershipServiceAccess ?? false,
-    errors: {},
+    showMessages: false,
+    isNameValid: true,
+    isUrlValid: true,
+    isDomainValid: true,
+    isUrlRequired: true,
+  }
+
+  nameRef = createRef<TextInput>()
+  urlRef = createRef<TextInput>()
+  domainRef = createRef<TextInput>()
+
+  valid = true
+
+  errors: ConfigurationFormManualErrors = {
+    missing: [{text: I18n.t('This field is required'), type: 'error'}],
+    urlOrDomain: [
+      {text: I18n.t('One or both of Launch URL and Domain should be entered.'), type: 'error'},
+    ],
+    invalidUrl: [
+      {text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'},
+    ],
+  }
+
+  validateField = (
+    fieldValue: string,
+    fieldStateKey: 'isNameValid' | 'isUrlValid' | 'isDomainValid',
+    fieldRef: React.RefObject<TextInput>,
+    isUrl: boolean,
+  ) => {
+    if (fieldStateKey === 'isDomainValid' && this.state.isUrlValid) {
+      this.setState(prevState => ({...prevState, [fieldStateKey]: true}))
+      return
+    }
+    if (!fieldValue || (isUrl && !URL.canParse(fieldValue))) {
+      this.invalidate(fieldStateKey, fieldRef)
+      return
+    }
+
+    this.setState(prevState => ({...prevState, [fieldStateKey]: true}))
+  }
+
+  invalidate = (
+    fieldStateKey: 'isNameValid' | 'isUrlValid' | 'isDomainValid',
+    fieldRef: React.RefObject<TextInput>,
+  ) => {
+    this.setState(prevState => ({...prevState, [fieldStateKey]: false}))
+    if (this.valid) {
+      fieldRef.current?.focus()
+      this.valid = false
+      this.setState({showMessages: true})
+    }
   }
 
   isValid = () => {
-    const errors: ConfigurationFormManualErrors = {},
-      formErrors = [],
-      name = this.state.name,
-      url = this.state.url,
-      domain = this.state.domain
+    this.valid = true
 
-    if (name.length === 0) {
-      errors.name = [{text: I18n.t('This field is required'), type: 'error'}]
-      formErrors.push(I18n.t('This field "name" is required.'))
+    const {name, url, domain} = this.state
+
+    this.validateField(name, 'isNameValid', this.nameRef, false)
+    if (this.state.isUrlRequired || url.length > 0) {
+      this.validateField(url, 'isUrlValid', this.urlRef, true)
+    }
+    if (!url) {
+      this.validateField(domain, 'isDomainValid', this.domainRef, false)
     }
 
     if (url.length === 0 && domain.length === 0) {
-      errors.url = [{text: I18n.t('Either the url or domain should be set.'), type: 'error'}]
-      errors.domain = [{text: I18n.t('Either the url or domain should be set.'), type: 'error'}]
-      formErrors.push(I18n.t('Either the url or domain should be set.'))
+      this.valid = false
+      this.setState({showMessages: true})
     }
 
-    this.setState({errors})
-
-    let isValid = true
-    if (formErrors.length > 0) {
-      isValid = false
-      showFlashAlert({
-        message: I18n.t('There were errors with the form: %{errors}', {
-          errors: formErrors.join(' '),
-        }),
-        type: 'error',
-        politeness: 'assertive',
-      })
-    }
-    return isValid
+    return this.valid
   }
 
   getFormData = (): ConfigurationFormManualFormData => {
@@ -157,16 +206,31 @@ export default class ConfigurationFormManual extends React.Component<
   }
 
   handleFieldChange: (
-    field: Exclude<keyof ConfigurationFormManualState, 'description' | 'customFields'>
+    field: Exclude<keyof ConfigurationFormManualState, 'description' | 'customFields'>,
   ) => TextInputChangeHandler = field => {
-    return (_, value) => {
+    return (e, value) => {
+      const fieldId = e.target.id
+
       this.setState(prevState => ({...prevState, [field]: value}))
+
+      switch (fieldId) {
+        case 'name':
+          this.validateField(value, 'isNameValid', this.nameRef, false)
+          break
+        case 'url':
+          this.validateField(value, 'isUrlValid', this.urlRef, true)
+          break
+        case 'domain':
+          if (value !== '') this.setState({isUrlRequired: false})
+          this.validateField(value, 'isDomainValid', this.domainRef, false)
+          break
+      }
     }
   }
 
   handlePrivacyChange: (
     event: React.SyntheticEvent,
-    data: {value?: string | number; id?: string}
+    data: {value?: string | number; id?: string},
   ) => void = (_, data) => {
     this.setState({privacyLevel: data.value as keyof typeof PRIVACY_OPTIONS})
   }
@@ -179,7 +243,38 @@ export default class ConfigurationFormManual extends React.Component<
     this.setState({description: e.target.value})
   }
 
+  showUrlValidationError = (domain: string) => {
+    if (domain && !this.state.url) {
+      return []
+    }
+    if (!this.state.isUrlValid) {
+      return this.errors.invalidUrl
+    }
+    if (!this.state.domain && !this.state.url) {
+      return this.errors.urlOrDomain
+    }
+    return []
+  }
+
+  showDomainValidationError = (url: string, domain: string) => {
+    return !url && !domain ? this.errors.urlOrDomain : []
+  }
+
   render() {
+    const {
+      name,
+      consumerKey,
+      sharedSecret,
+      url,
+      domain,
+      privacyLevel,
+      customFields,
+      description,
+      showMessages,
+      isUrlRequired,
+      isNameValid,
+    } = this.state
+
     return (
       <div className="ConfigurationFormManual">
         <Grid hAlign="space-between" colSpacing="none" rowSpacing="small">
@@ -187,11 +282,16 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextInput
                 id="name"
-                value={this.state.name}
+                value={name}
                 onChange={this.handleFieldChange('name')}
                 renderLabel={I18n.t('Name')}
-                isRequired={true}
-                messages={this.state.errors.name}
+                ref={this.nameRef}
+                isRequired
+                messages={
+                  this.props.hasBeenSubmitted && showMessages && !isNameValid
+                    ? this.errors.missing
+                    : []
+                }
               />
             </Grid.Col>
           </Grid.Row>
@@ -199,7 +299,7 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextInput
                 id="consumerKey"
-                value={this.state.consumerKey}
+                value={consumerKey}
                 onChange={this.handleFieldChange('consumerKey')}
                 renderLabel={I18n.t('Consumer Key')}
               />
@@ -208,7 +308,7 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextInput
                 id="sharedSecret"
-                value={this.state.sharedSecret}
+                value={sharedSecret}
                 onChange={this.handleFieldChange('sharedSecret')}
                 placeholder={this.props.consumerKey ? I18n.t('[Unchanged]') : undefined} // Assume that if we have a consumer key, we have a secret
                 renderLabel={I18n.t('Shared Secret')}
@@ -235,10 +335,15 @@ export default class ConfigurationFormManual extends React.Component<
               <TextInput
                 id="url"
                 onChange={this.handleFieldChange('url')}
-                value={this.state.url}
+                value={url}
                 renderLabel={I18n.t('Launch URL')}
-                isRequired={true}
-                messages={this.state.errors.url}
+                ref={this.urlRef}
+                isRequired={isUrlRequired}
+                messages={
+                  this.props.hasBeenSubmitted && showMessages
+                    ? this.showUrlValidationError(domain)
+                    : []
+                }
               />
             </Grid.Col>
           </Grid.Row>
@@ -247,17 +352,22 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextInput
                 id="domain"
-                value={this.state.domain}
+                value={domain}
                 onChange={this.handleFieldChange('domain')}
                 renderLabel={I18n.t('Domain')}
-                messages={this.state.errors.domain}
+                ref={this.domainRef}
+                messages={
+                  this.props.hasBeenSubmitted && showMessages
+                    ? this.showDomainValidationError(url, domain)
+                    : []
+                }
               />
             </Grid.Col>
 
             <Grid.Col>
               <SimpleSelect
                 id="privacyLevel"
-                value={this.state.privacyLevel}
+                value={privacyLevel}
                 onChange={this.handlePrivacyChange}
                 renderLabel={I18n.t('Privacy Level')}
               >
@@ -266,7 +376,7 @@ export default class ConfigurationFormManual extends React.Component<
                     key={value}
                     id={value}
                     value={value}
-                    selected={value === this.state.privacyLevel}
+                    selected={value === privacyLevel}
                   >
                     {translated}
                   </SimpleSelect.Option>
@@ -279,7 +389,7 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextArea
                 id="customFields"
-                value={this.state.customFields}
+                value={customFields}
                 onChange={this.handleCustomFieldsChange}
                 label={I18n.t('Custom Fields')}
                 placeholder={I18n.t('One per line. Format: name=value')}
@@ -292,7 +402,7 @@ export default class ConfigurationFormManual extends React.Component<
             <Grid.Col>
               <TextArea
                 id="description"
-                value={this.state.description}
+                value={description}
                 onChange={this.handleDescriptionChange}
                 label={I18n.t('Description')}
                 height="6rem"

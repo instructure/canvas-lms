@@ -20,7 +20,7 @@
 module Lti::IMS
   # @API Score
   #
-  # Score API for IMS Assignment and Grade Services
+  # Score API for 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
   #
   # @model Score
   #     {
@@ -76,6 +76,7 @@ module Lti::IMS
       :verify_line_item_in_context,
       :verify_user_in_context,
       :verify_required_params,
+      :verify_assignment_published,
       :verify_valid_timestamp,
       :verify_valid_score_maximum,
       :verify_valid_score_given,
@@ -236,13 +237,9 @@ module Lti::IMS
     #   }
     def create
       report_grade_progress_metric
-      ags_scores_multiple_files = @domain_root_account.feature_enabled?(:ags_scores_multiple_files)
-      return old_create unless ags_scores_multiple_files
 
       json = {}
-      preflights_and_attachments = compute_preflights_and_attachments(
-        ags_scores_multiple_files:
-      )
+      preflights_and_attachments = compute_preflights_and_attachments
       attachments = preflights_and_attachments.pluck(:attachment)
       json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
 
@@ -261,7 +258,7 @@ module Lti::IMS
         # 5xx and other unexpected errors
         return render_error(err_message, :internal_server_error)
       end
-      submit_homework(attachments) if new_submission? && activity_started?
+      submit_homework(attachments) if new_submission? && trigger_submission?
       update_or_create_result
       json[:resultUrl] = result_url
 
@@ -269,31 +266,6 @@ module Lti::IMS
     end
 
     private
-
-    def old_create
-      submit_homework if new_submission? && !has_content_items? && activity_started?
-      update_or_create_result
-      json = { resultUrl: result_url }
-
-      preflights_and_attachments = compute_preflights_and_attachments
-      json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
-
-      if has_content_items?
-        begin
-          upload_submission_files(preflights_and_attachments.pluck(:preflight_json))
-        rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
-          return render_error("failed to communicate with file service", :gateway_timeout)
-        rescue CanvasHttp::InvalidResponseCodeError => e
-          err_message = "uploading to file service failed with #{e.code}: #{e.body}"
-          return render_error(err_message, :bad_request) if e.code == 400
-
-          # 5xx and other unexpected errors
-          return render_error(err_message, :internal_server_error)
-        end
-      end
-
-      render json:, content_type: MIME_TYPE
-    end
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = [:scoreGiven, :scoreMaximum, :comment, :submittedAt, submission: %i[submittedAt]].freeze
@@ -308,6 +280,11 @@ module Lti::IMS
     ].freeze
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
     DEFAULT_SUBMISSION_TYPE = "external_tool"
+    private_constant :REQUIRED_PARAMS,
+                     :OPTIONAL_PARAMS,
+                     :EXTENSION_PARAMS,
+                     :SCORE_SUBMISSION_TYPES,
+                     :DEFAULT_SUBMISSION_TYPE
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -347,7 +324,7 @@ module Lti::IMS
     end
 
     def verify_valid_submitted_at
-      submitted_at = params.dig(:submission, :submittedAt) || top_level_submitted_at || params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params.dig(:submission, :submittedAt) || params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       submitted_at_date = parse_timestamp(submitted_at)
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -403,6 +380,12 @@ module Lti::IMS
       return if submission.attempts_left.nil? || submission.attempts_left > 0
 
       render_error("The maximum number of allowed attempts has been reached for this submission", :unprocessable_entity)
+    end
+
+    def verify_assignment_published
+      return if line_item.assignment.published?
+
+      render_error("This assignment is still unpublished", :unprocessable_entity)
     end
 
     def prioritize_non_tool_grade?
@@ -468,7 +451,10 @@ module Lti::IMS
             scores_params.merge(created_at: timestamp, updated_at: timestamp, user:, submission:)
           )
         else
-          result.update!(scores_params.merge(updated_at: timestamp))
+          result.with_lock do
+            # with_lock reloads the record with fresh make sure we update all the changes
+            result.update!(scores_params.merge(updated_at: timestamp))
+          end
         end
         # An update to a result might require updating a submission's workflow_state.
         # The submission will infer that for us.
@@ -476,12 +462,10 @@ module Lti::IMS
       end
     end
 
-    def compute_preflights_and_attachments(ags_scores_multiple_files: false)
+    def compute_preflights_and_attachments
       # We defer submitting the assignment if the file error improvements flag is not on
       #   When this feature flag is turned on, we will never submit the assignment,
       #   and always precreate the attachment here
-      precreate_attachment = ags_scores_multiple_files
-      submit_assignment = !ags_scores_multiple_files
       file_content_items.map do |item|
         # Pt 1 of the file upload process, which for non-InstFS (ie local or open source) is all that's needed.
         # This upload will always be URL-only, so unless InstFS is enabled a job will be created to pull the
@@ -492,8 +476,8 @@ module Lti::IMS
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment:,
-          precreate_attachment:,
+          submit_assignment: false,
+          precreate_attachment: true,
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,
@@ -504,10 +488,10 @@ module Lti::IMS
           }
         )
         # if we precreate the attachment, it gets returned with the json
-        preflight_json = precreate_attachment ? preflight[:json] : preflight
-        attachment = precreate_attachment ? preflight[:attachment] : nil
+        preflight_json = preflight[:json]
+        attachment = preflight[:attachment]
 
-        if submitted_at && ags_scores_multiple_files
+        if submitted_at
           # the file upload process uses the Progress#created_at for the homework submission time
           Progress.find(preflight_json[:progress][:id]).update!(created_at: submitted_at)
         end
@@ -598,14 +582,8 @@ module Lti::IMS
     end
 
     def submitted_at
-      submitted_at = params.dig(:submission, :submittedAt) || top_level_submitted_at || scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at = params.dig(:submission, :submittedAt) || scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
       parse_timestamp(submitted_at)
-    end
-
-    def top_level_submitted_at
-      return nil if @domain_root_account.feature_enabled?(:lti_ags_remove_top_submitted_at)
-
-      params[:submittedAt]
     end
 
     def file_content_items
@@ -619,13 +597,21 @@ module Lti::IMS
     def parse_timestamp(t)
       return nil unless t.present?
 
-      parsed = Time.zone.iso8601(t) rescue nil
-      parsed ||= (Time.zone.parse(t) rescue nil) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
+      begin
+        parsed = Time.zone.iso8601(t)
+      rescue ArgumentError
+        # ignore
+      end
+      parsed ||= Time.zone.parse(t) if Setting.get("enforce_iso8601_for_lti_scores", "false") == "false"
       parsed
     end
 
-    def activity_started?
-      params[:activityProgress] != "Initialized"
+    def trigger_submission?
+      if context.root_account.feature_enabled?(:ags_score_trigger_needs_grading_after_submitted)
+        Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
+      else
+        params[:activityProgress] != "Initialized"
+      end
     end
   end
 end

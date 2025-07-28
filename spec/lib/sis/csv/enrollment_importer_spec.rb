@@ -141,8 +141,8 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.users.where(enrollments: { type: "DesignerEnrollment" }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
-    expect(siete.start_at).to eq DateTime.new(1985, 8, 24)
-    expect(siete.end_at).to eq DateTime.new(2011, 8, 29)
+    expect(siete.start_at).to eq Time.zone.local(1985, 8, 24)
+    expect(siete.end_at).to eq Time.zone.local(2011, 8, 29)
   end
 
   it "enrolls users by integration id" do
@@ -184,10 +184,10 @@ describe SIS::CSV::EnrollmentImporter do
     )
     course = @account.courses.where(sis_source_id: "test_1").first
     course.teacher_enrollments.first.tap do |e|
-      expect(e.start_at).to eq DateTime.parse("1985-08-24")
-      expect(e.end_at).to eq DateTime.parse("2011-08-29")
-      e.start_at = DateTime.parse("1985-05-24")
-      e.end_at = DateTime.parse("2011-05-29")
+      expect(e.start_at).to eq Time.zone.parse("1985-08-24")
+      expect(e.end_at).to eq Time.zone.parse("2011-08-29")
+      e.start_at = Time.zone.parse("1985-05-24")
+      e.end_at = Time.zone.parse("2011-05-29")
       e.save!
     end
     process_csv_data_cleanly(
@@ -196,8 +196,8 @@ describe SIS::CSV::EnrollmentImporter do
     )
     course.reload
     course.teacher_enrollments.first.tap do |e|
-      expect(e.start_at).to eq DateTime.parse("1985-05-24")
-      expect(e.end_at).to eq DateTime.parse("2011-05-29")
+      expect(e.start_at).to eq Time.zone.parse("1985-05-24")
+      expect(e.end_at).to eq Time.zone.parse("2011-05-29")
     end
   end
 
@@ -417,7 +417,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,status",
       "C001,U001,student,active"
     )
-    enrollment = Enrollment.where(course_id: course.id, user_id: user.id).take
+    enrollment = Enrollment.find_by(course_id: course.id, user_id: user.id)
     expect(enrollment.sis_batch_id).to eq importer.batch.id
     importer = process_csv_data_cleanly(
       "course_id,user_id,role,status",
@@ -987,9 +987,9 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,observer_user,observer,,active,student_user",
       batch: batch1
     )
-    course = @account.all_courses.where(sis_source_id: "test_1").take
+    course = @account.all_courses.find_by(sis_source_id: "test_1")
     g = course.groups.create!(name: "group")
-    g.group_memberships.create!(user: Pseudonym.where(sis_user_id: "student_user").take.user)
+    g.group_memberships.create!(user: Pseudonym.find_by(sis_user_id: "student_user").user)
     batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id",
@@ -1321,32 +1321,69 @@ describe SIS::CSV::EnrollmentImporter do
         @course.root_account.enable_feature!(:temporary_enrollments)
         process_csv_data_cleanly(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
-          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
-          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,"
         )
       end
 
-      it "creates a new temporary enrollment association" do
+      it "creates a new temporary enrollment and pairing" do
+        process_csv_data_cleanly(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
+        )
         expect(@course.enrollments.count).to eq 2
         expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
         expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to eq @provider.id
+
+        enrollment_pairing_id = @recipient.enrollments.take.temporary_enrollment_pairing_id
+        expect(Enrollment.where(temporary_enrollment_pairing_id: enrollment_pairing_id)).to exist
+      end
+
+      it "does not create enrollment if end date is before start" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2023-08-25T23:08:51Z,provider"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["A temporary enrollment end date is before the start date (start_date: 2023-09-10 23:08:51 UTC, end_date: 2023-08-25 23:08:51 UTC)"]
+      end
+
+      it "does not create enrollment if source and user are the same" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,provider"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["A temporary enrollment provider and recipient are the same (temporary_source_user_id: provider, user: provider)"]
+      end
+
+      it "does not create enrollment if source is not enrolled in the course" do
+        importer = process_csv_data(
+          "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
+          "test_1,provider,student,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,recipient"
+        )
+        errors = importer.errors.map(&:last)
+        expect(@course.enrollments.count).to eq 1
+        expect(errors).to eq ["The temporary enrollment provider is not enrolled in the course (course: test_1, temporary_source_user_id: recipient)"]
       end
     end
 
     context "when feature flag is disabled" do
       before(:once) do
         @course.root_account.disable_feature!(:temporary_enrollments)
-        process_csv_data_cleanly(
+      end
+
+      it "does not create a new temporary enrollment or pairing" do
+        importer = process_csv_data(
           "course_id,user_id,role,status,start_date,end_date,temporary_enrollment_source_user_id",
           "test_1,provider,teacher,active,2023-09-10T23:08:51Z,2023-09-30T23:08:51Z,,",
           "test_1,recipient,teacher,active,2023-09-10T23:08:51Z,2043-09-30T23:08:51Z,provider"
         )
-      end
-
-      it "does not create a new temporary enrollment association" do
-        expect(@course.enrollments.count).to eq 2
-        expect(@recipient.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
-        expect(@recipient.enrollments.take.temporary_enrollment_source_user_id).to be_nil
+        expect(@course.enrollments.count).to eq 1
+        expect(@provider.enrollments.map(&:type)).to eq ["TeacherEnrollment"]
+        errors = importer.errors.map(&:last)
+        expect(errors).to eq ["Temporary enrollments are not enabled"]
       end
     end
   end

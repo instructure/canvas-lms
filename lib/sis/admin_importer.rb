@@ -115,12 +115,12 @@ module SIS
 
       def get_account(account_id)
         @account = nil unless @account&.sis_source_id == account_id
-        @account ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take if account_id.present?
+        @account ||= @root_account.all_accounts.active.find_by(sis_source_id: account_id) if account_id.present?
         @account ||= @root_account if account_id.blank?
       end
 
       def get_user(user_id, root_account)
-        pseudonym = root_account.pseudonyms.active.where(sis_user_id: user_id).take
+        pseudonym = root_account.pseudonyms.active.find_by(sis_user_id: user_id)
         user = pseudonym.user if pseudonym
         user
       end

@@ -35,7 +35,7 @@ const enableScrollEvents: LtiMessageHandler = ({responseMessages}) => {
         })
       })
     },
-    false
+    false,
   )
   return true
 }

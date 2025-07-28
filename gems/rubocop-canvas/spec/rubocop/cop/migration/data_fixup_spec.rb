@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::DataFixup do
   subject(:cop) { described_class.new }
 
   it "flags calls to datafixes in predeploy migrations" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :predeploy
         def up
@@ -29,13 +29,13 @@ describe RuboCop::Cop::Migration::DataFixup do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to eq "Migration/DataFixup: Data fixups should be done in postdeploy migrations"
-    expect(cop.offenses.first.severity.name).to eq(:convention)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to eq "Migration/DataFixup: Data fixups should be done in postdeploy migrations"
+    expect(offenses.first.severity.name).to eq(:convention)
   end
 
   it "does not flag calls to datafixes in postdeploy migrations" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :postdeploy
         def up
@@ -43,6 +43,6 @@ describe RuboCop::Cop::Migration::DataFixup do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

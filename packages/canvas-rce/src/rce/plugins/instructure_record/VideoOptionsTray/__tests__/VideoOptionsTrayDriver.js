@@ -65,7 +65,7 @@ export default class VideoOptionsTrayDriver {
 
   get $doneButton() {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
-      $button => $button.textContent.trim() === 'Done'
+      $button => $button.textContent.trim() === 'Done',
     )
   }
 
@@ -107,5 +107,10 @@ export default class VideoOptionsTrayDriver {
     await waitFor(() => getSizeOptions(this.$sizeSelect))
     const $options = getSizeOptions(this.$sizeSelect)
     $options.find($option => $option.textContent.trim().includes(sizeText)).click()
+  }
+
+  messageText() {
+    const message = queryByTestId(this.$element, 'message')
+    return message.textContent
   }
 }

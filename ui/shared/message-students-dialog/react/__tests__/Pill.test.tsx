@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Pill from '../Pill'
+import type {MakeOptional} from '@canvas/types/MakeOptional'
+import Pill, {type PillProps} from '../Pill'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
 
-function makeProps(overrides) {
+function makeProps(overrides: MakeOptional<PillProps, 'onClick'>): PillProps {
   const props = {
     ...overrides,
     onClick: jest.fn().mockResolvedValue({}),
@@ -30,8 +30,9 @@ function makeProps(overrides) {
 }
 
 describe('Pill', () => {
-  const studentId = 1
-  const observerId = 2
+  const studentId = '1'
+  const observerId = '2'
+
   it('renders the user name', () => {
     const props = makeProps({studentId, text: 'Betty Ford'})
     const {findByRole} = render(<Pill {...props} />)
@@ -82,7 +83,7 @@ describe('Pill', () => {
     fireEvent.click(button)
 
     await waitFor(() => {
-      expect(props.onClick).toHaveBeenCalledWith(studentId, null)
+      expect(props.onClick).toHaveBeenCalledWith(studentId)
     })
   })
 

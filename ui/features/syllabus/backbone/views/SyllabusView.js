@@ -72,18 +72,18 @@ export default class SyllabusView extends Backbone.View {
   //    "related_id": "assignment_1",
   //
   //    // Assignment or other type of event
-  //    "type": "assignment|event",
+  //    "type": "assignment|sub_assignment|event",
   //
   //    // Title of the event
   //    "title": "Event title",
   //
-  //    // URL for the user to access details on the assignment/event
+  //    // URL for the user to access details on the assignment/sub_assignment/event
   //    "html_url": "http://...",
   //
-  //    // Date the event begins (this is the due_at date for assignments)
+  //    // Date the event begins (this is the due_at date for assignments and sub_assignments)
   //    "start_at": "2012-01-01T23:59:00-07:00",
   //
-  //    // Date the event ends (this is the due_at date for assignments)
+  //    // Date the event ends (this is the due_at date for assignments and sub_assignments)
   //    "end_at": "2012-01-01T23:59:00-07:00",
   //
   //    // Date the event is due (null for non-assignment events)
@@ -122,7 +122,7 @@ export default class SyllabusView extends Backbone.View {
       if (related_id == null) {
         related_id = json.id
       }
-      if (json.type === 'assignment') {
+      if (json.type === 'assignment' || json.type === 'sub_assignment') {
         if (html_url_for_assignment) {
           html_url = json.html_url
         }
@@ -131,20 +131,28 @@ export default class SyllabusView extends Backbone.View {
       }
 
       const title = json.title
+
       if (json.start_at) {
         start_at = fudgeDateForProfileTimezone(json.start_at)
       }
       if (json.end_at) {
         end_at = fudgeDateForProfileTimezone(json.end_at)
       }
-      if (json.type === 'assignment') {
+      if (json.type === 'assignment' || json.type === 'sub_assignment') {
         due_at = start_at
       } else if (json.type === 'wiki_page' || json.type === 'discussion_topic') {
         todo_at = fudgeDateForProfileTimezone(json.todo_at)
       }
 
       let override = null
-      each(json.assignment_overrides != null ? json.assignment_overrides : [], ov => {
+      let overrides = null
+      if (json.type === 'assignment') {
+        overrides = json.assignment_overrides
+      } else if (json.type === 'sub_assignment') {
+        overrides = json.sub_assignment_overrides
+      }
+
+      each(overrides != null ? overrides : [], ov => {
         if (override == null) {
           override = {}
         }
@@ -231,7 +239,6 @@ export default class SyllabusView extends Backbone.View {
         events[0].override = null
       } else {
         for (const event of Array.from(events)) {
-          // eslint-disable-next-line no-bitwise
           overrides_present |= event.override !== null
         }
       }

@@ -92,7 +92,7 @@ describe('InfiniteScroll', () => {
       mockContainer(scrollContainer2, 'scrollTop', 0)
 
       const {rerender} = render(
-        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />
+        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />,
       )
       rerender(<InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer2} />)
 
@@ -115,13 +115,23 @@ describe('InfiniteScroll', () => {
       const windowSpy = jest.spyOn(window, 'addEventListener')
 
       const {rerender} = render(
-        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />
+        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />,
       )
       expect(windowSpy.mock.calls.map(c => c[0])).not.toContain('scroll')
 
       rerender(<InfiniteScroll {...defaultProps()} />)
 
       expect(windowSpy.mock.calls.map(c => c[0])).toContain('scroll')
+    })
+
+    it('uses top nav drawer as container if present', () => {
+      const scrollContainer = document.createElement('div')
+      scrollContainer.id = 'drawer-layout-content'
+      document.body.append(scrollContainer)
+
+      const windowSpy = jest.spyOn(window, 'addEventListener')
+      render(<InfiniteScroll {...defaultProps()} />)
+      expect(windowSpy.mock.calls.map(c => c[0])).not.toContain('scroll')
     })
   })
 })

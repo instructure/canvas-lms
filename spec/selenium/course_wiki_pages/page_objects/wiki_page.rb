@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module CourseWikiPage
   #------------------------------ Selectors -----------------------------
+  def assign_to_card_selector
+    "[data-testid='item-assign-to-card']"
+  end
+
   def publish_btn_selector
     ".btn-publish"
   end
@@ -62,6 +66,10 @@ module CourseWikiPage
   end
 
   #------------------------------ Elements ------------------------------
+  def assign_to_card
+    f(assign_to_card_selector)
+  end
+
   def publish_btn
     f(publish_btn_selector)
   end
@@ -148,6 +156,10 @@ module CourseWikiPage
 
   def editing_roles_input
     f(editing_roles_input_selector)
+  end
+
+  def mastery_path_toggle
+    f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
   end
 
   #------------------------------ Actions -------------------------------

@@ -20,6 +20,7 @@
 
 module StreamItemsHelper
   include TextHelper
+  include AssignmentsHelper
 
   class StreamItemPresenter
     attr_accessor :stream_item_id, :updated_at, :unread, :path, :context, :state, :summary
@@ -117,11 +118,7 @@ module StreamItemsHelper
                        id: Shard.short_id_for(item.data.context_id))
     when "AssessmentRequest"
       submission = item.data.asset
-      Submission::ShowPresenter.new(
-        submission:,
-        current_user: user,
-        assessment_request: item.data
-      ).submission_data_url
+      student_peer_review_url(submission.context, submission.assignment, item.data, user)
     end
   end
 

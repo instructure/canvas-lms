@@ -21,15 +21,6 @@
 describe LearningOutcome do
   let(:calc_method_no_int) { %w[highest latest average] }
 
-  describe "associations" do
-    it { is_expected.to belong_to(:copied_from).inverse_of(:cloned_outcomes) }
-
-    it do
-      expect(subject).to have_many(:cloned_outcomes).with_foreign_key("copied_from_outcome_id")
-                                                    .inverse_of(:copied_from)
-    end
-  end
-
   def outcome_errors(prop)
     @outcome.errors[prop].map(&:to_s)
   end
@@ -76,29 +67,6 @@ describe LearningOutcome do
     end
 
     outcome.rubric_criterion = criterion
-  end
-
-  context "validations" do
-    describe "lengths" do
-      it { is_expected.to validate_length_of(:description).is_at_most(described_class.maximum_text_length) }
-      it { is_expected.to validate_length_of(:short_description).is_at_most(described_class.maximum_string_length) }
-      it { is_expected.to validate_length_of(:vendor_guid).is_at_most(described_class.maximum_string_length) }
-      it { is_expected.to validate_length_of(:display_name).is_at_most(described_class.maximum_string_length) }
-    end
-
-    describe "nullable" do
-      it { is_expected.to allow_value(nil).for(:description) }
-      it { is_expected.not_to allow_value(nil).for(:short_description) }
-      it { is_expected.to allow_value(nil).for(:vendor_guid) }
-      it { is_expected.to allow_value(nil).for(:display_name) }
-    end
-
-    describe "blankable" do
-      it { is_expected.to allow_value("").for(:description) }
-      it { is_expected.not_to allow_value("").for(:short_description) }
-      it { is_expected.to allow_value("").for(:vendor_guid) }
-      it { is_expected.to allow_value("").for(:display_name) }
-    end
   end
 
   context "outcomes" do
@@ -167,7 +135,7 @@ describe LearningOutcome do
     end
 
     it "adding outcomes to a rubric should increment datadog counter" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       @rubric = Rubric.new(context: @course)
       @rubric.data = [
         {
@@ -192,16 +160,16 @@ describe LearningOutcome do
         }
       ]
       @rubric.save!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome.align", tags: { type: @rubric.class.name })
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("learning_outcome.align", tags: { type: @rubric.class.name })
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "adding outcomes to an AssessmentQuestionBank should increment datadog counter" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       @question_bank = AssessmentQuestionBank.create(context: @course)
       @outcome.align(@question_bank, @course, mastery_score: 0.5)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome.align", tags: { type: @question_bank.class.name })
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("learning_outcome.align", tags: { type: @question_bank.class.name })
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "allows learning outcome rows in the rubric" do
@@ -1137,7 +1105,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true]
-          expect(ratings.pluck(:color)).to eq %w[0B874B]
+          expect(ratings.pluck(:color)).to eq %w[03893D]
         end
 
         it "2 ratings" do
@@ -1145,7 +1113,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D 555555]
         end
 
         it "3 ratings" do
@@ -1153,7 +1121,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D FAB901 555555]
         end
 
         it "4 ratings" do
@@ -1161,7 +1129,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [true, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[03893D FAB901 E62429 555555]
         end
 
         it "5 ratings" do
@@ -1169,7 +1137,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 E62429 555555]
         end
 
         it "6 ratings" do
@@ -1177,7 +1145,7 @@ describe LearningOutcome do
           @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
           ratings = @outcome.rubric_criterion[:ratings]
           expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false, false]
-          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 D97900 E0061F 555555]
+          expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 D97900 E62429 555555]
         end
 
         context "mastery points do not exactly match ratings" do
@@ -1187,7 +1155,7 @@ describe LearningOutcome do
             @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
             ratings = @outcome.rubric_criterion[:ratings]
             expect(ratings.pluck(:mastery)).to eq [true, false, false]
-            expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+            expect(ratings.pluck(:color)).to eq %w[03893D FAB901 555555]
           end
 
           it "5 ratings" do
@@ -1196,7 +1164,7 @@ describe LearningOutcome do
             @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
             ratings = @outcome.rubric_criterion[:ratings]
             expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
-            expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+            expect(ratings.pluck(:color)).to eq %w[2B7ABC 03893D FAB901 E62429 555555]
           end
         end
 
@@ -1660,6 +1628,19 @@ describe LearningOutcome do
       o4.update(copied_from_outcome_id: o3.id)
       o3.update(copied_from_outcome_id: o1.id)
       expect(o3.fetch_outcome_copies.length).to eq 4
+    end
+
+    it "it avoids creating a loop if one of the copies is already on the list" do
+      o1 = LearningOutcome.create!(title: "outcome1")
+      o2 = LearningOutcome.create!(title: "outcome2")
+      o3 = LearningOutcome.create!(title: "outcome3")
+      o4 = LearningOutcome.create!(title: "outcome4")
+      # manually adding a loop making o1 a child of o4
+      o1.update(copied_from_outcome_id: o4.id)
+      o2.update(copied_from_outcome_id: o1.id)
+      o3.update(copied_from_outcome_id: o2.id)
+      o4.update(copied_from_outcome_id: o3.id)
+      expect(o4.fetch_outcome_copies.count).to eq 4
     end
   end
 end

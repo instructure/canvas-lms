@@ -21,7 +21,7 @@ import {useMemo, createRef} from 'react'
 const useInputFocus = inputEls => {
   const inputElRefs = useMemo(
     () => inputEls.reduce((acc, el) => acc.set(el, createRef()), new Map()),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
+    [], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   const setInputElRef = (el, key) => {

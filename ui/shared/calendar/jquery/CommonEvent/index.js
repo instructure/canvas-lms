@@ -18,7 +18,9 @@
 
 import CommonEvent from './CommonEvent'
 import Assignment from './Assignment'
+import SubAssignment from './SubAssignment'
 import AssignmentOverride from './AssignmentOverride'
+import SubAssignmentOverride from './SubAssignmentOverride'
 import CalendarEvent from './CalendarEvent'
 import PlannerNote from './PlannerNote'
 import ToDoItem from './ToDoItem'
@@ -36,19 +38,31 @@ export default function commonEventFactory(data, contexts) {
   let actualContextCode = data.context_code
   let contextCode = data.effective_context_code || actualContextCode
 
-  const type = data.assignment_overrides
-    ? 'assignment_override'
-    : data.assignment || data.assignment_group_id
-    ? 'assignment'
-    : data.type === 'planner_note'
-    ? 'planner_note'
-    : data.plannable
-    ? 'todo_item'
-    : 'calendar_event'
+  const assignmentOverrides = data.assignment_overrides?.length ? data.assignment_overrides : null
 
-  data = data.assignment_overrides
-    ? {assignment: data.assignment, assignment_override: data.assignment_overrides[0]}
-    : data.assignment || data.calendar_event || data
+  const type = assignmentOverrides
+    ? 'assignment_override'
+    : data.sub_assignment_overrides
+      ? 'sub_assignment_override'
+      : data.type === 'sub_assignment'
+        ? 'sub_assignment'
+        : data.assignment || data.assignment_group_id
+          ? 'assignment'
+          : data.type === 'planner_note'
+            ? 'planner_note'
+            : data.plannable
+              ? 'todo_item'
+              : 'calendar_event'
+
+  data = assignmentOverrides
+    ? {assignment: data.assignment, assignment_override: assignmentOverrides[0]}
+    : data.sub_assignment_overrides
+      ? {
+          sub_assignment: data.sub_assignment,
+          sub_assignment_override: data.sub_assignment_overrides[0],
+        }
+      : data.sub_assignment || data.assignment || data.calendar_event || data
+
   if (data.hidden) {
     return null
   } // e.g. parent event of section-level events
@@ -81,6 +95,10 @@ export default function commonEventFactory(data, contexts) {
     obj = new Assignment(data, contextInfo)
   } else if (type === 'assignment_override') {
     obj = new AssignmentOverride(data, contextInfo)
+  } else if (type === 'sub_assignment') {
+    obj = new SubAssignment(data, contextInfo)
+  } else if (type === 'sub_assignment_override') {
+    obj = new SubAssignmentOverride(data, contextInfo)
   } else if (type === 'planner_note') {
     obj = new PlannerNote(data, contextInfo, actualContextInfo)
   } else if (type === 'todo_item') {
@@ -157,6 +175,5 @@ export default function commonEventFactory(data, contexts) {
 
   // disable fullcalendar.js dragging unless the user has permissions
   if (!obj.can_edit) obj.editable = false
-
   return obj
 }

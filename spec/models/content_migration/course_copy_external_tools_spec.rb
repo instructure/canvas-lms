@@ -186,7 +186,7 @@ describe ContentMigration do
     it "does not double-escape retrieval urls" do
       url = "http://www.example.com?url=http%3A%2F%2Fwww.anotherurl.com"
 
-      @copy_from.syllabus_body = "<p><iframe src=\"/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape(url)}\" width=\"320\" height=\"240\" style=\"width: 553px; height: 335px;\"></iframe></p>"
+      @copy_from.syllabus_body = %(<p><iframe src="/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape(url)}" width="320" height="240" style="width: 553px; height: 335px;" loading="lazy"></iframe></p>)
 
       run_course_copy
 

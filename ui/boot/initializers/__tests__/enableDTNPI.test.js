@@ -18,17 +18,29 @@
 
 import {up as enableDTNPI, down as disableDTNPI} from '../enableDTNPI'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import $ from 'jquery'
+
+const server = setupServer()
 
 describe('enableDTNPI', () => {
   let consoleLog
 
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     consoleLog = jest.spyOn(console, 'log').mockImplementation(() => {})
+    // Mock jQuery's flashError function
+    $.flashError = jest.fn()
   })
 
   afterEach(async () => {
     consoleLog.mockReset()
+    // Clean up the jQuery mock
+    $.flashError.mockReset()
+    server.resetHandlers()
 
     await disableDTNPI()
   })
@@ -38,7 +50,7 @@ describe('enableDTNPI', () => {
     log({id: 'foo'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(1)
+    expect(events).toHaveLength(1)
     expect(events[0]).toMatchObject({id: 'foo'})
   })
 
@@ -47,7 +59,7 @@ describe('enableDTNPI', () => {
     log({value: Array(65).join('*')})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(1)
+    expect(events).toHaveLength(1)
     expect(events[0].value).toEqual(Array(33).join('*'))
   })
 
@@ -59,12 +71,14 @@ describe('enableDTNPI', () => {
     log({id: '4'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
-    expect(events.length).toEqual(3)
+    expect(events).toHaveLength(3)
     expect(events.map(x => x.id)).toEqual(['2', '3', '4'])
   })
 
   it('submits tracked events to the backend', async () => {
     const endpoint = 'https://blahblah/submit'
+    let requestMade = false
+    let capturedPayload = null
 
     localStorage.setItem(
       'dtnpi',
@@ -76,21 +90,24 @@ describe('enableDTNPI', () => {
           parsed: '2021-08-18T06:00:00.000Z',
           value: 'wed aug 18',
         },
-      ])
+      ]),
     )
 
-    fetchMock.put(endpoint, 200)
+    server.use(
+      http.put(endpoint, async ({request}) => {
+        requestMade = true
+        capturedPayload = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
 
-    expect(fetchMock.called()).toBeFalsy()
+    expect(requestMade).toBeFalsy()
 
     await enableDTNPI({endpoint})
 
-    expect(fetchMock.called()).toBeTruthy()
-    expect(fetchMock.lastCall()[0]).toEqual(endpoint)
+    expect(requestMade).toBeTruthy()
 
-    const payload = JSON.parse(fetchMock.lastCall()[1].body)
-
-    expect(payload.length).toEqual(1)
-    expect(payload.map(x => x.id)).toEqual(['a'])
+    expect(capturedPayload).toHaveLength(1)
+    expect(capturedPayload.map(x => x.id)).toEqual(['a'])
   })
 })

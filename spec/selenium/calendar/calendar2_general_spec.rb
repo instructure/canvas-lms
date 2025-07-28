@@ -43,7 +43,7 @@ describe "calendar2" do
     end
 
     it "lets me go to the Edit Appointment group page from the appointment group slot dialog" do
-      date = Date.today.to_s
+      date = Time.zone.today.to_s
       create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
@@ -59,7 +59,7 @@ describe "calendar2" do
     end
 
     it "lets me message students who have signed up for an appointment" do
-      date = Date.today.to_s
+      date = Time.zone.today.to_s
       create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
@@ -166,7 +166,6 @@ describe "calendar2" do
 
       it "course pacing calendars' assignments should not appear on teachers' calendars" do
         Account.site_admin.enable_feature! :account_level_blackout_dates
-        Account.site_admin.enable_feature! :course_paces
         @course.enable_course_paces = true
         @course.save!
         @course.active_assignments.create!(name: "cp assignment", due_at: Time.zone.now)
@@ -197,7 +196,7 @@ describe "calendar2" do
       end
 
       it "allows moving events between calendars" do
-        event = @user.calendar_events.create! title: "blah", start_at: Date.today
+        event = @user.calendar_events.create! title: "blah", start_at: Time.zone.today
         get "/calendar2"
         open_edit_event_dialog
         click_option(edit_calendar_event_form_context, @course.name)
@@ -205,6 +204,24 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(event.reload.context).to eq @course
         expect(f(".fc-event")).to have_class "group_course_#{@course.id}"
+      end
+
+      it "does not allow saving events without participants" do
+        skip("VICE-5309 - flaky")
+        create_appointment_group
+        ag = AppointmentGroup.first
+        student_in_course(course: @course, active_all: true)
+        ag.appointments.first.reserve_for(@user, @user)
+
+        get "/calendar2"
+
+        open_edit_event_dialog
+        f("[type=checkbox][name=max_participants_option]").click
+        replace_content f("[name=max_participants]"), 0
+        fj(".ui-button:contains(Update)").click
+        wait_for_ajaximations
+
+        expect(f(".error-message").text).to include "Please enter a value greater or equal to 1"
       end
     end
 
@@ -288,7 +305,7 @@ describe "calendar2" do
 
     it "tests the today button" do
       get "/calendar2"
-      current_month_num = Time.now.month
+      current_month_num = Time.zone.now.month
       current_month = Date::MONTHNAMES[current_month_num]
 
       change_calendar
@@ -302,7 +319,7 @@ describe "calendar2" do
       unrelated_course = Course.create!(account: Account.default, name: "unrelated course")
       # make the user an admin so they can view the course's calendar without an enrollment
       Account.default.account_users.create!(user: @user)
-      CalendarEvent.create!(title: "from unrelated one", start_at: Time.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
+      CalendarEvent.create!(title: "from unrelated one", start_at: Time.zone.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
       keep_trying_until { expect(CalendarEvent.last.title).to eq "from unrelated one" }
       get "/courses/#{unrelated_course.id}/settings"
       expect(f("#course_calendar_link")["href"]).to match(/course_#{Course.last.id}/)
@@ -343,6 +360,7 @@ describe "calendar2" do
     end
 
     it "assignment appears on all calendars", priority: "1" do
+      skip("LS-3626 -- flaky about 20% of the time -- probably related to the others above")
       title = "Zak McKracken"
       due_time = 5.minutes.from_now
       @assignment = @course.assignments.create!(name: title, due_at: due_time)

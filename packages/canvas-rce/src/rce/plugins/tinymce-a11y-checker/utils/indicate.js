@@ -20,7 +20,7 @@
 // These rules will be assigned to the selector we build below
 // that locates the violating element in the DOM
 export const INDICATOR_STYLE = `
-outline:2px solid #2D3B45;
+outline:2px solid #273540;
 outline-offset:2px;
 `
 

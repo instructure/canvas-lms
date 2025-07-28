@@ -19,9 +19,9 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussions.participant')
+const I18n = createI18nScope('discussions.participant')
 
 extend(Participant, Backbone.Model)
 

@@ -31,15 +31,15 @@ unless defined? BASE_FIXTURE_DIR
   HTML_SANITIZATION_FIXTURE_DIR = BASE_FIXTURE_DIR + "html_sanitization/"
 end
 
-def get_question_hash(dir, name, delete_answer_ids: true, **opts)
-  hash = get_quiz_data(dir, name, **opts).first.first
+def get_question_hash(dir, name, delete_answer_ids: true, **)
+  hash = get_quiz_data(dir, name, **).first.first
   hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end
 
-def get_quiz_data(dir, name, **opts)
+def get_quiz_data(dir, name, **)
   File.open(File.join(dir, "%s.xml" % name), "r") do |file|
-    Qti.convert_xml(file.read, **opts)
+    Qti.convert_xml(file.read, **)
   end
 end
 

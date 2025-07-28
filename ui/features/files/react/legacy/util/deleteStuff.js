@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 export default function deleteStuff(filesAndFolders, args) {
   const isDeletingAnUnemptyFolder = filesAndFolders.some(
-    item => item.get('folders_count') || item.get('files_count')
+    item => item.get('folders_count') || item.get('files_count'),
   )
   const message = isDeletingAnUnemptyFolder
     ? I18n.t(
@@ -35,7 +35,7 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
+        },
       )
     : I18n.t(
         {
@@ -45,7 +45,7 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
+        },
       )
   if (!window.confirm(message)) return
 
@@ -71,15 +71,16 @@ export default function deleteStuff(filesAndFolders, args) {
           I18n.t('Error deleting %{name}: %{reason}', {
             name: item.displayName(),
             reason,
-          })
+          }),
         )
       },
-    })
+    }),
   )
 
   return $.when(...Array.from(promises || [])).then(() => {
     $.flashMessage(
       I18n.t(
+        'files_legacy_delete',
         {
           one: '%{name} deleted successfully.',
           other: '%{count} items deleted successfully.',
@@ -87,8 +88,8 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
-      )
+        },
+      ),
     )
     if (args && args.returnFocusTo) {
       args.returnFocusTo.focus()

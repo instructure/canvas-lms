@@ -36,6 +36,7 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseLearningOutcomeMutation
       outcome_input.delete(:rubric_criterion)
     end
 
+    record.saving_user = current_user
     if record.update(outcome_input)
       { learning_outcome: record }
     else

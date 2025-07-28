@@ -19,6 +19,35 @@
 // Several components use aphrodite, which tries to manipulate the dom
 // on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
+// eslint-disable-next-line import/no-nodejs-modules
+import {TextDecoder, TextEncoder} from 'util'
+
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// Add fetch polyfills for msw
+require('isomorphic-fetch')
+
+// Add BroadcastChannel polyfill for msw
+if (!globalThis.BroadcastChannel) {
+  globalThis.BroadcastChannel = class BroadcastChannel {
+    constructor() {}
+    postMessage() {}
+    close() {}
+    addEventListener() {}
+    removeEventListener() {}
+  }
+}
+
+// Add TransformStream polyfill for msw
+if (!globalThis.TransformStream) {
+  globalThis.TransformStream = class TransformStream {
+    constructor() {
+      this.readable = {}
+      this.writable = {}
+    }
+  }
+}
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -44,6 +73,17 @@ const ignoredErrors = [
   /failed updating video captions/,
   /You seem to have overlapping act\(\) calls/,
   /A theme registry has already been initialized/,
+  /Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of \["primary","primary-inverse"\]./,
+  /ReactDOM.render is no longer supported in React 18/,
+  /Warning: Failed %s type: %s%s/,
+  /Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s/,
+  /Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom\/test-utils`. See https:\/\/react.dev\/warnings\/react-dom-test-utils for more info./,
+  /Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom\/test-utils`./,
+  /Warning: unmountComponentAtNode is deprecated and will be removed in the next major release. Switch to the createRoot API. Learn more: https:\/\/reactjs.org\/link\/switch-to-createroot/,
+  /Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https:\/\/reactjs.org\/link\/strict-mode-find-node/,
+  /Warning: %s uses the legacy childContextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) instead/,
+  /Warning: %s uses the legacy contextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) with static contextType instead./,
+  /Warning: Unknown event handler property `%s`. It will be ignored.%s/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
@@ -63,7 +103,7 @@ global.console = {
     }
     globalError(error)
     throw new Error(
-      `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`
+      `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`,
     )
   },
   warn: warning => {
@@ -72,7 +112,7 @@ global.console = {
     }
     globalWarn(warning)
     throw new Error(
-      `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`
+      `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`,
     )
   },
   info: console.info,

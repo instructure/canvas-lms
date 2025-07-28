@@ -198,13 +198,14 @@ module Lti
     # with the value of the 'EndKey' header in the response.
     #
     # Note that this will return all active subscription and the last 90 days of deleted subscriptions.
+    # It does not include subscriptions with an owner type of 'external_tool' or 'internal_service'.
     #
     # Example use of a 'StartKey' header object:
     #   { "Id":"71d6dfba-0547-477d-b41d-db8cb528c6d1","OwnerId":"domain.instructure.com" }
     #
     # @returns DataServiceSubscription
     def index
-      response = Services::LiveEventsSubscriptionService.index(jwt_body, query: { limit_deleted: 90 })
+      response = Services::LiveEventsSubscriptionService.index(jwt_body, query: { limit_deleted: 90, exclude_services: true })
       forward_service_response(response)
     end
 

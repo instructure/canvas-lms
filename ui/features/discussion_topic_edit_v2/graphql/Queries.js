@@ -19,7 +19,7 @@
 import {Course} from './Course'
 import {Group} from './Group'
 import {DiscussionTopic} from './DiscussionTopic'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const DISCUSSION_TOPIC_QUERY = gql`
   query GetDiscussionTopic($discussionTopicId: ID!) {

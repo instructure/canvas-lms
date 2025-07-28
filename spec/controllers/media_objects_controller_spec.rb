@@ -80,6 +80,7 @@ describe MediaObjectsController do
       get "show", params: { media_object_id: deleted_media_id }
       expect(json_parse(response.body)).to eq(
         {
+          "auto_caption_status" => nil,
           "can_add_captions" => false,
           "created_at" => media_object.created_at.as_json,
           "media_id" => deleted_media_id,
@@ -99,14 +100,12 @@ describe MediaObjectsController do
       )
     end
 
-    context "with media_links_use_attachment_id ON" do
-      it "uses the correct json helper" do
-        course_with_teacher_logged_in
-        mo = MediaObject.create! media_id: "_media_id", course: @course
-        expect(controller).to receive(:media_attachment_api_json).with(mo.attachment, mo, @teacher, anything).and_call_original
-        get "show", params: { attachment_id: mo.attachment.id, media_object_id: mo.id }
-        assert_status(200)
-      end
+    it "uses the correct json helper" do
+      course_with_teacher_logged_in
+      mo = MediaObject.create! media_id: "_media_id", course: @course
+      expect(controller).to receive(:media_attachment_api_json).with(mo.attachment, mo, @teacher, anything).and_call_original
+      get "show", params: { attachment_id: mo.attachment.id, media_object_id: mo.id }
+      assert_status(200)
     end
 
     context "adheres to attachment permissions" do
@@ -296,6 +295,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -313,6 +313,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test2"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -330,6 +331,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test3"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -372,6 +374,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo.created_at.as_json,
             "media_id" => "test",
@@ -394,6 +397,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo.created_at.as_json,
             "media_id" => "test",
@@ -431,6 +435,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -439,6 +444,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "another_test",
@@ -479,6 +485,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -496,6 +503,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test3"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -519,6 +527,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -569,6 +578,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "media_id" => "in_course_with_att",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -577,6 +587,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/in_course_with_att"
           },
           {
+            "auto_caption_status" => nil,
             "media_id" => "in_course_with_deleted_att",
             "media_type" => nil,
             "created_at" => mo2.created_at.as_json,
@@ -620,6 +631,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo3.created_at.as_json,
             "media_id" => "test3",
@@ -637,6 +649,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test3"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -663,6 +676,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -708,6 +722,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to eq(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "not_in_course",
@@ -737,6 +752,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "media_id" => "in_group",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -846,6 +862,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo2.created_at.as_json,
             "media_id" => "test2",
@@ -863,6 +880,7 @@ describe MediaObjectsController do
             "embedded_iframe_url" => "http://test.host/media_objects_iframe/test2"
           },
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -896,6 +914,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -922,6 +941,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "can_add_captions" => true,
             "created_at" => mo1.created_at.as_json,
             "media_id" => "test",
@@ -949,6 +969,7 @@ describe MediaObjectsController do
       expect(json_parse(response.body)).to match_array(
         [
           {
+            "auto_caption_status" => nil,
             "media_id" => "in_group",
             "media_type" => nil,
             "created_at" => mo1.created_at.as_json,
@@ -1079,23 +1100,57 @@ describe MediaObjectsController do
       assert_status(200)
     end
 
-    context "with the media_links_use_attachment_id feature flag disabled" do
+    describe "with JWT access token" do
+      include_context "InstAccess setup"
+
       before do
-        Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+        @media_object.attachment.update!(file_state: "hidden")
+        user_with_pseudonym
+        jwt_payload = {
+          resource: "/media_attachments_iframe/#{@media_object.attachment_id}?instfs_id=stuff",
+          aud: [@course.root_account.uuid],
+          sub: @user.uuid,
+          tenant_auth: { location: "location" },
+          iss: "instructure:inst_access",
+          exp: 1.hour.from_now.to_i,
+          iat: Time.now.to_i
+        }
+        @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
       end
 
-      it "redirects to media_objects_iframe" do
-        user_session(@student)
-        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
-        expect(response).to be_redirect
-        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef"
+      it "allows access" do
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_successful
       end
 
-      it "redirects to media_objects_iframe with query params" do
-        user_session(@student)
-        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, embed: true, foo: "bar" }
-        expect(response).to be_redirect
-        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef?embed=true&foo=bar"
+      it "allows access to files in deleted contexts" do
+        @media_object.attachment.context.delete
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }
+        expect(response).to be_successful
+      end
+
+      it "allows access to deleted files" do
+        @media_object.attachment.destroy
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }
+        expect(response).to be_successful
+      end
+
+      it "does not allow access if the resource in the token does not match the resource being accessed" do
+        media_object2 = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+
+        get "iframe_media_player", params: { attachment_id: media_object2.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_forbidden
+      end
+
+      it "does not allow access if InstFS doesn't return metadata for the tenant auth" do
+        stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
+
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+        expect(response).to be_forbidden
       end
     end
   end
@@ -1143,7 +1198,7 @@ describe MediaObjectsController do
       it "returns true as long as user can update attachment" do
         teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
         RoleOverride.create!(
-          permission: "manage_content",
+          permission: "manage_course_content_edit",
           enabled: false,
           role: teacher_role,
           account: @course.root_account
@@ -1272,42 +1327,17 @@ describe MediaObjectsController do
     end
 
     it "returns the embedded_iframe_url" do
-      Account.site_admin.disable_feature!(:media_links_use_attachment_id)
-
-      post :create_media_object,
-           params: {
-             context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
-           }
+      post :create_media_object, params: { context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title" }
       @media_object = @user.reload.media_objects.last
-      expect(response.parsed_body["embedded_iframe_url"]).to eq media_object_iframe_url(
-        @media_object.media_id
+      expect(response.parsed_body["embedded_iframe_url"]).to eq media_attachment_iframe_url(
+        @media_object.attachment_id
       )
     end
 
-    context "with media_links_use_attachment_id feature flag enabled" do
-      before do
-        Account.site_admin.enable_feature!(:media_links_use_attachment_id)
-      end
-
-      it "returns the embedded_iframe_url" do
-        post :create_media_object,
-             params: {
-               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
-             }
-        @media_object = @user.reload.media_objects.last
-        expect(response.parsed_body["embedded_iframe_url"]).to eq media_attachment_iframe_url(
-          @media_object.attachment_id
-        )
-      end
-
-      it "returns the uuid" do
-        post :create_media_object,
-             params: {
-               context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title"
-             }
-        @media_object = @user.reload.media_objects.last
-        expect(response.parsed_body["media_object"]["uuid"]).to eq @media_object.attachment.uuid
-      end
+    it "returns the uuid" do
+      post :create_media_object, params: { context_code: "user_#{@user.id}", id: "new_object", type: "audio", title: "title" }
+      @media_object = @user.reload.media_objects.last
+      expect(response.parsed_body["media_object"]["uuid"]).to eq @media_object.attachment.uuid
     end
   end
 
@@ -1316,7 +1346,7 @@ describe MediaObjectsController do
       @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
       @attachment = @course.attachments.create! media_entry_id: "0_deadbeef", filename: "blah.flv", uploaded_data: StringIO.new("data")
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
-        [{ url: "whatever man", bitrate: 12_345 }]
+        [{ url: "http://instfs.test/redirect_to_media", bitrate: 12_345 }]
       )
     end
 
@@ -1326,8 +1356,8 @@ describe MediaObjectsController do
           {
             bitrate: 12_345,
             label: "12 kbps",
-            src: "whatever man",
-            url: "whatever man"
+            src: "http://instfs.test/redirect_to_media",
+            url: "http://instfs.test/redirect_to_media"
           }
         ]
       )
@@ -1375,6 +1405,61 @@ describe MediaObjectsController do
             }
           ]
         )
+      end
+
+      it "returns the media_attachment redirect url as the source when attachment is present and attached location if passed" do
+        expect(controller.media_sources_json(@media_object, attachment: @attachment, location: "blah")).to eq(
+          [
+            {
+              bitrate: 12_345,
+              label: "12 kbps",
+              src: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&location=blah",
+              url: "http://test.host/media_attachments/#{@attachment.id}/redirect?bitrate=12345&location=blah"
+            }
+          ]
+        )
+      end
+
+      describe "with JWT access token" do
+        include_context "InstAccess setup"
+
+        before do
+          @media_object.attachment.update!(file_state: "hidden")
+          user_with_pseudonym
+          jwt_payload = {
+            resource: "/media_attachments_iframe/#{@media_object.attachment_id}?instfs_id=stuff",
+            aud: [@course.root_account.uuid],
+            sub: @user.uuid,
+            tenant_auth: { location: "location" },
+            iss: "instructure:inst_access",
+            exp: 1.hour.from_now.to_i,
+            iat: Time.now.to_i
+          }
+          @token_string = InstAccess::Token.send(:new, jwt_payload).to_unencrypted_token_string
+          allow(InstFS).to receive_messages(enabled?: true, app_host: "http://instfs.test")
+          stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 200, body: { url: "http://instfs.test/stuff" }.to_json)
+          stub_request(:get, "http://instfs.test/redirect_to_media").to_return(status: 200)
+        end
+
+        it "allows access" do
+          expect(InstFS).to receive(:get_file_metadata).with(@media_object.attachment).and_return({ url: "http://instfs.test/stuff" })
+          get "media_object_redirect", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
+
+          expect(response).to be_redirect
+        end
+
+        it "returns the media_attachment redirect url as the source when attachment is present and attached verifier if passed" do
+          expect(controller.media_sources_json(@media_object, attachment: @attachment, access_token: @token_string, instfs_id: "stuff")).to eq(
+            [
+              {
+                bitrate: 12_345,
+                label: "12 kbps",
+                src: "http://test.host/media_attachments/#{@attachment.id}/redirect?access_token=#{@token_string}&bitrate=12345&instfs_id=stuff",
+                url: "http://test.host/media_attachments/#{@attachment.id}/redirect?access_token=#{@token_string}&bitrate=12345&instfs_id=stuff"
+              }
+            ]
+          )
+        end
       end
     end
   end
@@ -1487,74 +1572,6 @@ describe MediaObjectsController do
         stub_request(:get, "http://test.host/media").to_return(status: 400)
         get :media_object_redirect, params: { attachment_id: @media_object.attachment_id }
         assert_status(400)
-      end
-
-      context "with media_links_use_attachment_id feature flag disabled" do
-        before do
-          Account.site_admin.disable_feature!(:media_links_use_attachment_id)
-        end
-
-        it "returns the redirected URL" do
-          stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
-          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
-          assert_status(302)
-          expect(response.location).to eq "http://s3link.example.com/"
-        end
-
-        it "returns the URL if the response is not a redirect" do
-          stub_request(:get, "http://test.host/media").to_return(status: 200)
-          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
-          assert_status(302)
-          expect(response.location).to eq "http://test.host/media"
-        end
-
-        context "with public files" do
-          context "users with access" do
-            it "returns the redirected URL if it is a public file and the user does not have access" do
-              user_session(user_factory)
-              @attachment.update(visibility_level: "public")
-              stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-              stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
-              get :media_object_redirect, params: { media_object_id: @media_object.media_id }
-              assert_status(302)
-              expect(response.location).to eq "http://s3link.example.com/"
-            end
-
-            it "returns the redirected URL if it is a public file and there is no user session" do
-              remove_user_session
-              @attachment.update(visibility_level: "public")
-              stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-              stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
-              get :media_object_redirect, params: { media_object_id: @media_object.media_id }
-              assert_status(302)
-              expect(response.location).to eq "http://s3link.example.com/"
-            end
-          end
-        end
-
-        it "returns the redirected URL by bitrate" do
-          stub_request(:head, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-          stub_request(:get, "http://test.host/media_2").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
-          get :media_object_redirect, params: { media_object_id: @media_object.media_id, bitrate: 2 }
-          assert_status(302)
-          expect(response.location).to eq "http://s3link.example.com/"
-        end
-
-        it "returns the lowest bitrate file redirected URL if the bitrate is invalid" do
-          stub_request(:get, "http://test.host/media").to_return(status: 302, headers: { location: "http://s3link.example.com/" })
-          stub_request(:get, "http://s3link.example.com/").to_return(status: 200)
-          get :media_object_redirect, params: { media_object_id: @media_object.media_id, bitrate: "not real" }
-          assert_status(302)
-          expect(response.location).to eq "http://s3link.example.com/"
-        end
-
-        it "renders an error if there was a problem fetching the file redirect URL" do
-          stub_request(:get, "http://test.host/media").to_return(status: 400)
-          get :media_object_redirect, params: { media_object_id: @media_object.media_id }
-          assert_status(400)
-        end
       end
     end
   end

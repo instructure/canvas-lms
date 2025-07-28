@@ -59,6 +59,7 @@ describe Mutations::CreateAssignment do
             omitFromFinalGrade
             postToSis
             anonymousGrading
+            suppressAssignment
             assignmentOverrides {
               nodes {
                 id
@@ -119,7 +120,7 @@ describe Mutations::CreateAssignment do
   end
 
   it "creates an assignment with attributes" do
-    query = +"courseId: #{@course.to_param}\n"
+    query = "courseId: #{@course.to_param}\n"
     test_attrs.each do |graphql_name, _assignment_name, _initial_value, update_value, _graphql_result, _assignment_result|
       query << "#{graphql_name}: #{update_value}\n"
     end
@@ -455,5 +456,16 @@ describe Mutations::CreateAssignment do
     errors = result["errors"]
 
     expect(errors).to be_nil
+  end
+
+  it "sets suppressAssignment field" do
+    result = execute_with_input <<~GQL
+      name: "suppressed assignment"
+      courseId: "#{@course.to_param}"
+      suppressAssignment: true
+    GQL
+
+    assignment = Assignment.find(result.dig("data", "createAssignment", "assignment", "_id"))
+    expect(assignment.suppress_assignment).to be true
   end
 end

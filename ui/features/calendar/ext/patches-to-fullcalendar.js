@@ -30,8 +30,8 @@ fullCalendar.Grid.prototype.headCellHtml = function (cell) {
     const date = cell.start
     return `
   			<th class="fc-day-header ${htmlEscape(this.view.widgetHeaderClass)} fc-${htmlEscape(
-      dayIDs[date.day()]
-    )}">
+          dayIDs[date.day()],
+        )}">
         	<div class="fc-day-header__week-number">${htmlEscape(date.format('D'))}</div>
         	<div class="fc-day-header__week-day">${htmlEscape(date.format('ddd'))}</div>
         </th>`

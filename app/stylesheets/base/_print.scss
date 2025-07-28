@@ -131,9 +131,9 @@
       }
     }
     .exceedsMasteryShader {
-      border-bottom: 0.3em solid #127A1B;
+      border-bottom: 0.3em solid #02672D;
       .triangle {
-        color: #127A1B;
+        color: #02672D;
       }
     }
     .meetsMasteryShader {
@@ -149,10 +149,14 @@
       }
     }
     .wellBelowMasteryShader {
-      border-bottom: 0.3em solid #E0061F;
+      border-bottom: 0.3em solid #E62429;
       .triangle {
-        color: #E0061F;
+        color: #E62429;
       }
     }
+  }
+
+  #drawer-layout-content {
+    overflow: visible;
   }
 }

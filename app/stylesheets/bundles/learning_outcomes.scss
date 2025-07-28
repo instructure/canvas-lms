@@ -83,6 +83,20 @@
       label.span3 {
         margin-#{direction(left)}: 0px;
       }
+      .learning_outcome__margin-left-0 {
+        margin-left: 0;
+      }
+      .learning_outcome__mastery_points_wrap {
+        display: flex;
+        align-items: start;
+        span[class$="__message"] {
+          white-space: nowrap;
+        }
+      }
+      .learning_outcome__mastery_points__label {
+        margin-top: 0.5rem;
+        margin-right: 0.5rem;
+      }
     }
     .wrapper {
       padding: 15px;

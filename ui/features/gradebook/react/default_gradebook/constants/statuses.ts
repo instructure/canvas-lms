@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
-export const statuses = ['late', 'missing', 'resubmitted', 'dropped', 'excused']
-if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) statuses.push('extended')
+export const getStatuses = () => {
+  const statuses = ['late', 'missing', 'resubmitted', 'dropped', 'excused']
+  if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) statuses.push('extended')
+  return statuses
+}
 
 export const statusesTitleMap: {
   late: string

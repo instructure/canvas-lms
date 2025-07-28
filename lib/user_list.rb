@@ -183,9 +183,12 @@ class UserList
       Shard.partition_by_shard(all_account_ids) do |account_ids|
         next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
 
+        unique_ids = Pseudonym.by_unique_id(@addresses.pluck(:address))
+                              .or(Pseudonym.where(sis_user_id: @addresses.pluck(:address)))
         Pseudonym.active
                  .select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id")
-                 .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.pluck(:address), account_ids)
+                 .where(account_id: account_ids)
+                 .merge(unique_ids)
                  .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
           addresses = @addresses.select do |a|
             a[:address].casecmp?(login[:address]) ||

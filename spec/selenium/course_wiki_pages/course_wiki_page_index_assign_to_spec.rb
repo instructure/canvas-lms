@@ -29,8 +29,6 @@ describe "wiki pages show page assign to" do
   include CourseWikiIndexPage
 
   before :once do
-    differentiated_modules_on
-
     course_with_teacher(active_all: true)
     @page = @course.wiki_pages.create!(title: "wikiwiki")
     @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user

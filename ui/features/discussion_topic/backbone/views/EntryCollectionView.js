@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import walk from '../../array-walk'
 import {View} from '@canvas/backbone'
@@ -29,7 +27,7 @@ import entryStatsTemplate from '../../jst/entryStats.handlebars'
 import EntryView from './EntryView'
 import 'jquery-scroll-into-view'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 extend(EntryCollectionView, View)
 
@@ -137,7 +135,7 @@ EntryCollectionView.prototype.addNewView = function (view) {
           return view.$el.fadeIn()
         }
       })(this),
-      500
+      500,
     )
   }
 }
@@ -171,7 +169,7 @@ EntryCollectionView.prototype.renderNextLink = function () {
       },
       {
         count: stats.total + this.collection.options.perPage,
-      }
+      },
     )
   }
   this.nextLink.html(
@@ -179,7 +177,7 @@ EntryCollectionView.prototype.renderNextLink = function () {
       stats,
       moreText,
       showMore: true,
-    })
+    }),
   )
   this.nextLink.addClass('showMore loadNext')
   if (this.options.threaded) {

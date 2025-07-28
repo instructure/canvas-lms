@@ -18,26 +18,32 @@
 
 import React, {useState} from 'react'
 import {bool, string, func, shape, arrayOf} from 'prop-types'
-import {IconGroupLine, IconMoreLine, IconPlusLine, IconStudentViewLine} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {
+  IconGroupLine,
+  IconMoreLine,
+  IconPlusLine,
+  IconSearchLine,
+  IconStudentViewLine,
+  IconTroubleLine,
+} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default function UsersToolbar(props) {
   const [recipientsFilterChecked, setRecipientFilterChecked] = useState(false)
   const [providersFilterChecked, setProvidersFilterChecked] = useState(false)
-  const [includeDeletedUsers, setIncludeDeletedUsers] = useState(false)
 
-  function handleRoleSelect(event, value) {
+  function handleRoleSelect(_event, value) {
     props.onUpdateFilters({role_filter_id: value})
   }
 
@@ -60,7 +66,22 @@ export default function UsersToolbar(props) {
     }
   }
 
+  const renderClearButton = () =>
+    props.search_term.length ? (
+      <IconButton
+        type="button"
+        size="small"
+        data-testid="clear-search"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Clear search"
+        onClick={() => props.onUpdateFilters({search_term: ''})}
+      >
+        <IconTroubleLine />
+      </IconButton>
+    ) : undefined
   const placeholder = I18n.t('Search people...')
+
   return (
     <form onSubmit={preventDefault(props.onApplyFilters)}>
       <Grid vAlign="top" startAt="medium">
@@ -91,6 +112,10 @@ export default function UsersToolbar(props) {
                   <TextInput
                     type="search"
                     value={props.search_term}
+                    renderBeforeInput={
+                      <IconSearchLine inline={false} data-testid="icon-search-line" />
+                    }
+                    renderAfterInput={renderClearButton()}
                     renderLabel={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
                     placeholder={placeholder}
                     onChange={e => props.onUpdateFilters({search_term: e.target.value})}
@@ -153,8 +178,7 @@ export default function UsersToolbar(props) {
                       size="small"
                       checked={props.include_deleted_users}
                       onChange={e =>
-                        // eslint-disable-next-line no-restricted-globals
-                        props.onUpdateFilters({include_deleted_users: event.target.checked})
+                        props.onUpdateFilters({include_deleted_users: e.target.checked})
                       }
                       label={I18n.t('Include deleted users in search results')}
                     />
@@ -170,11 +194,8 @@ export default function UsersToolbar(props) {
 }
 
 function renderKabobMenu(accountId) {
-  const newCourseAdminGranulars = ENV.FEATURES.granular_permissions_manage_users
   // see accounts_controller#avatars for the showAvatarItem logic
-  const showAvatarItem = newCourseAdminGranulars
-    ? ENV.PERMISSIONS.can_allow_course_admin_actions
-    : ENV.PERMISSIONS.can_manage_admin_users
+  const showAvatarItem = ENV.PERMISSIONS.can_allow_course_admin_actions
   const showGroupsItem = ENV.PERMISSIONS.can_manage_groups // see groups_controller#context_index
   if (showAvatarItem || showGroupsItem) {
     return (
@@ -214,7 +235,7 @@ UsersToolbar.propTypes = {
     shape({
       id: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ).isRequired,
 }
 

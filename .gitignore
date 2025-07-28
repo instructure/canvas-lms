@@ -24,6 +24,7 @@
 !/config/code_ownership.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
+!/config/graphql_persisted_queries.yml
 /config/environments/*-local.rb
 /config/locales/generated/
 /config/saml/*
@@ -43,9 +44,9 @@ node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
+/public/doc/api_md/
 /public/javascripts/translations/*
 !/public/javascripts/translations/en.json
-/storybook-static/
 /tmp/*
 !/tmp/.keep
 /vendor
@@ -53,6 +54,7 @@ yarn-error.log
 dump.rdb
 .eslintcache
 tsconfig.tsbuildinfo
+.sentryclirc
 
 # canvas-gems
 /gems/*/coverage
@@ -89,13 +91,17 @@ docker-compose/api-gateway.override.yml
 # generated scopes markdown
 /doc/api/api_token_scopes.md
 
+# generated live events docs
+/doc/api/data_services/md/dynamic/*.md
+
 # js coverage stuff
 .nyc_output
 coverage-jest
 coverage-karma
 
-# generated graphql schema
-schema.graphql
-
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Allows devs to create their own devcontainer files
+/.devcontainer/*
+/!.devcontainer/.keep

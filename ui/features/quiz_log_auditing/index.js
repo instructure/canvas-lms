@@ -32,6 +32,6 @@ ready(() => {
   })
 
   mount(document.body.querySelector('#content')).then(() =>
-    console.log('Yeah, a canvas quiz app has been loaded!!!')
+    console.log('Yeah, a canvas quiz app has been loaded!!!'),
   )
 })

@@ -24,8 +24,6 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
   self.plugin = :facebook
   plugin_settings :app_id, app_secret: :app_secret_dec
 
-  SENSITIVE_PARAMS = [:app_secret].freeze
-
   alias_attribute :app_id, :entity_id
   alias_method :app_secret, :client_secret
   alias_method :app_secret=, :client_secret=
@@ -50,6 +48,10 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
     super + [:login_attribute, :jit_provisioning].freeze
   end
 
+  def self.sensitive_params
+    [*super, :app_secret].freeze
+  end
+
   def self.login_attributes
     ["id", "email"].freeze
   end
@@ -64,6 +66,10 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
       locale
       name
     ].freeze
+  end
+
+  def self.supports_autoconfirmed_email?
+    false
   end
 
   def login_attribute

@@ -63,7 +63,7 @@ describe('GroupRemoveModal', () => {
     return rawRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -100,8 +100,8 @@ describe('GroupRemoveModal', () => {
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     expect(
       getByText(
-        'Are you sure that you want to remove this group and all of its content from your account?'
-      )
+        'Are you sure that you want to remove this group and all of its content from your account?',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -111,14 +111,14 @@ describe('GroupRemoveModal', () => {
     })
     expect(
       getByText(
-        'Are you sure that you want to remove this group and all of its content from your course?'
-      )
+        'Are you sure that you want to remove this group and all of its content from your course?',
+      ),
     ).toBeInTheDocument()
   })
 
   it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds', async () => {
     removeOutcomeGroup.mockReturnValue(
-      Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
+      Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}}),
     )
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))
@@ -147,7 +147,7 @@ describe('GroupRemoveModal', () => {
 
   it('displays proper flash error message if delete request fails due to aligned outcome', async () => {
     removeOutcomeGroup.mockReturnValue(
-      Promise.reject(new CustomError('cannot be deleted because it is aligned to contents'))
+      Promise.reject(new CustomError('cannot be deleted because it is aligned to contents')),
     )
     const {getByText} = render(<GroupRemoveModal {...defaultProps()} />)
     fireEvent.click(getByText('Remove Group'))

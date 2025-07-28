@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import Big from 'big.js'
 // rounds a number to 'n' digits
 export default function round(n: number | string | null, digits = 0) {
   try {
+    // @ts-expect-error
     return parseFloat(Big(n).round(digits))
   } catch (error) {
     return NaN

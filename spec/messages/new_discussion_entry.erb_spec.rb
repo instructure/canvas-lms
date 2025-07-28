@@ -31,7 +31,7 @@ describe "new_discussion_entry" do
 
   include_examples "a message"
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do

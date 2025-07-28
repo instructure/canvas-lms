@@ -25,34 +25,19 @@ class SubAccountsController < ApplicationController
 
   # these actions assume that if we're authorized to act on @account , we're
   # authorized to act on all its sub-accounts too.
-
-  def sub_accounts_of(account, current_depth = 0)
-    account_data = @accounts[account.id] = { account:, course_count: 0 }
-    sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key("name")).limit(101) unless current_depth == 2
-    sub_account_ids = (sub_accounts || []).map(&:id)
-    if current_depth == 2 || sub_accounts.length > 100
-      account_data[:sub_account_ids] = []
-      account_data[:sub_account_count] = 0
-      @accounts[:accounts_to_get_sub_account_count] << account.id
-      return
-    else
-      account_data[:sub_account_ids] = sub_account_ids
-      account_data[:sub_account_count] = sub_accounts.length
-    end
-    @accounts[:all_account_ids].concat sub_account_ids
-    sub_accounts.each do |sub_account|
-      sub_accounts_of(sub_account, current_depth + 1)
-    end
-  end
-
   before_action :require_context
   before_action :require_account_management, except: [:index]
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   def index
+    add_crumb t("titles.sub_accounts", "Sub-Accounts")
+
     page_has_instui_topnav
     if !api_request? && params[:term]
-      # accept :manage_courses or :manage_courses_admin so course settings page can query subaccounts
-      require_account_management(permissions: [:manage_courses, :manage_courses_admin])
+      # accept :manage_courses_admin so course settings page can query subaccounts
+      require_account_management(permissions: [:manage_courses_admin])
     else
       require_account_management
     end
@@ -76,29 +61,6 @@ class SubAccountsController < ApplicationController
           return
         end
       end
-    end
-
-    @accounts = {}
-    @accounts[:all_account_ids] = [@context.id]
-    @accounts[:accounts_to_get_sub_account_count] = []
-    sub_accounts_of(@context)
-    unless @accounts[:accounts_to_get_sub_account_count].empty?
-      counts = Account.active
-                      .where(parent_account_id: @accounts[:accounts_to_get_sub_account_count])
-                      .group(:parent_account_id).count
-      counts.each do |account_id, count|
-        @accounts[account_id][:sub_account_count] = count
-      end
-    end
-    counts = Course
-             .joins(:course_account_associations)
-             .group("course_account_associations.account_id")
-             .where("course_account_associations.account_id IN (?) AND course_account_associations.course_section_id IS NULL AND
-                 course_account_associations.depth=0 AND courses.workflow_state<>'deleted'",
-                    @accounts[:all_account_ids])
-             .distinct.count(:id)
-    counts.each do |account_id, count|
-      @accounts[account_id][:course_count] = count
     end
   end
 
@@ -135,7 +97,7 @@ class SubAccountsController < ApplicationController
     parent_id = if params[:account][:parent_account_id]
                   params[:account].delete(:parent_account_id)
                 else
-                  params[:account_id]
+                  api_find(Account.active, params[:account_id]).id
                 end
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)

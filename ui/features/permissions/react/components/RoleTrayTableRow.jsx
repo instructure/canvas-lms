@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {bool, func, node, oneOfType, string} from 'prop-types'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import PropTypes, {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {ConnectedGranularCheckbox} from './GranularCheckbox'
-import {ConnectedPermissionButton} from './PermissionButton'
+import GranularCheckbox from './GranularCheckbox'
+import PermissionButton from './PermissionButton'
 import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
-const I18n = useI18nScope('permissions_role_tray_table_row')
+const I18n = createI18nScope('permissions_role_tray_table_row')
 
 // TODO Pass in props needed to actually generate the button sara is working on
 // TODO add expandable-ness to this. Will probably need to make this not a
@@ -55,6 +55,8 @@ export default function RoleTrayTableRow({
         permissionLabel={permissionLabel}
         roleId={role.id}
         roleLabel={role.label}
+        inTray={true}
+        handleScroll={() => {}}
       />
     )
   } else {
@@ -124,13 +126,13 @@ RoleTrayTableRow.propTypes = {
   permissionLabel: string.isRequired,
   role: permissionPropTypes.role.isRequired,
   title: string.isRequired,
-  permButton: oneOfType([node, func]), // used for tests only
-  permCheckbox: oneOfType([node, func]), // used for tests only
+  permButton: oneOfType([node, func, PropTypes.elementType]), // used for tests only
+  permCheckbox: oneOfType([node, func, PropTypes.elementType]), // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
-  permButton: ConnectedPermissionButton,
-  permCheckbox: ConnectedGranularCheckbox,
+  permButton: PermissionButton,
+  permCheckbox: GranularCheckbox,
 }

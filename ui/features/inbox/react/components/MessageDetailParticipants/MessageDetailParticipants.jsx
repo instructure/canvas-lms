@@ -17,22 +17,23 @@
  */
 
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {decodeHTMLAuthor} from '../../../util/utils'
 
 import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../util/constants'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const MessageDetailParticipants = ({...props}) => {
   const [participantsExpanded, setParticipantsExpanded] = useState(false)
 
   const uniqueMessageRecipients = props.conversationMessage?.recipients?.filter(
-    p => p.shortName !== props.conversationMessage?.author?.shortName
+    p => p.shortName !== props.conversationMessage?.author?.shortName,
   )
 
   const participantsToShow = participantsExpanded
@@ -40,7 +41,7 @@ export const MessageDetailParticipants = ({...props}) => {
     : uniqueMessageRecipients.slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
 
   const participantStr = `, ${participantsToShow
-    .map(participant => participant.shortName)
+    .map(participant => decodeHTMLAuthor(participant).shortName)
     .join(', ')}`
 
   const participantCount = uniqueMessageRecipients.length - PARTICIPANT_EXPANSION_THRESHOLD

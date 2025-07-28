@@ -37,7 +37,7 @@ module BroadcastPolicies
                                      published?: true,
                                      wiki:,
                                      context: course,
-                                     just_created: false)
+                                     previously_new_record?: false)
       end
     end
     let(:policy) { WikiPagePolicy.new(wiki_page) }

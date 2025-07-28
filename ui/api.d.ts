@@ -43,6 +43,8 @@ export type Enrollment = Readonly<{
   updated_at: string
   user_id: string
   grades: {
+    // *_grades are represented as strings in the backend, but for some reason they are defined as
+    // number here
     html_url: string
     current_grade: null | number
     current_score: null | number
@@ -180,6 +182,8 @@ export type Assignment = Readonly<{
   automatic_peer_reviews: boolean
   can_duplicate: boolean
   course_id: string
+  checkpoints: Checkpoint[]
+  discussion_topic: DiscussionTopic
   due_date_required: boolean
   final_grader_id: null | string
   grade_group_students_individually: boolean
@@ -202,6 +206,7 @@ export type Assignment = Readonly<{
   intra_group_peer_reviews: boolean
   is_quiz_assignment: boolean
   lock_at: null | string
+  has_rubric: null | boolean
   locked_for_user: boolean
   lti_context_id: string
   max_name_length: number
@@ -226,10 +231,12 @@ export type Assignment = Readonly<{
   secure_params: string
   sis_assignment_id: null | string
   submission_types: string[]
+  suppress_assignment: boolean
   submissions_download_url: string
   unlock_at: null | string
   unpublishable: boolean
   updated_at: string
+  visible_to_everyone: boolean
   workflow_state: WorkflowState
 }> & {
   anonymize_students: boolean
@@ -290,6 +297,7 @@ export type AttachmentData = Readonly<{
 }>
 
 export type Attachment = {
+  _id: string
   canvadoc_url?: string
   comment_id?: string
   content_type: string
@@ -343,6 +351,7 @@ export type SectionMap = {
 }
 
 export type GradingType =
+  | 'no_submission'
   | 'points'
   | 'percent'
   | 'letter_grade'
@@ -352,6 +361,8 @@ export type GradingType =
 
 export type SubmissionType =
   | null
+  | ''
+  | 'none'
   | 'basic_lti_launch'
   | 'discussion_topic'
   | 'external_tool'
@@ -390,6 +401,18 @@ export type TurnitinAsset = {
   public_error_message?: string
 }
 
+export type SubAssignmentSubmission = {
+  grade: string | null
+  score: number | null
+  published_grade: string | null
+  published_score: string | null
+  grade_matches_current_submission: boolean
+  sub_assignment_tag: string
+  entered_grade: string | null
+  entered_score: number | null
+  excused: boolean
+}
+
 export type Submission = Readonly<{
   anonymous_id?: string
   assignment_id: string
@@ -415,6 +438,7 @@ export type Submission = Readonly<{
   redo_request: boolean
   score: null | number
   seconds_late: number
+  sticker: string | null
   similarityInfo: null | SimilarityScore
   submission_type: SubmissionType
   url?: null | string
@@ -422,6 +446,7 @@ export type Submission = Readonly<{
   versioned_attachments?: any
   word_count: null | number
   workflow_state: WorkflowState
+  sub_assignment_submissions?: SubAssignmentSubmission[]
 }> & {
   assignedAssessments?: AssignedAssessments[]
   attempt?: number
@@ -437,6 +462,7 @@ export type Submission = Readonly<{
   rawGrade: string | null
   submission_comments: SubmissionComment[]
   submitted_at: null | Date
+  // this type is possibly wrong, it should be Record<string, TurnitinAsset>...
   turnitin_data?: TurnitinAsset & {
     // TODO: refactor to separate out the dynamic object
     [key: string]: any
@@ -592,10 +618,16 @@ export type Account = Readonly<{
   name: string
 }>
 
-// '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
+// '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
+// '/api/v1/courses/:id',
 export type Course = Readonly<{
   id: string
   name: string
+  course_code?: string
+  start_at?: string
+  end_at?: string
+  time_zone: string
+  blueprint: boolean
   workflow_state: string
   enrollment_term_id: number
   term: {
@@ -603,6 +635,30 @@ export type Course = Readonly<{
   }
   homeroom_course: boolean
   sis_course_id: string | null
+  sections: [
+    {
+      id: string
+      name: string
+    },
+  ]
+  restrict_enrollments_to_course_dates: boolean
+  horizon_course: boolean
+}>
+
+export type ContentMigration = Readonly<{
+  id: string
+  migration_type: string
+}>
+
+export type Term = Readonly<{
+  id: string
+  name: string
+  start_at: string
+  end_at: string
+}>
+
+export type EnrollmentTerms = Readonly<{
+  enrollment_terms: Term[]
 }>
 
 // '/api/v1/users/self/tabs',
@@ -646,3 +702,96 @@ export type ReleaseNote = {
   date: string
   new: boolean
 }
+
+export type DiscussionTopic = {
+  reply_to_entry_required_count: number
+}
+
+export type Checkpoint = {
+  due_at: string | null
+  name: string
+  only_visible_to_overrides: boolean
+  overrides: CheckpointOverride[]
+  points_possible: number
+  tag: string
+  unlock_at: string | null
+  lock_at: string | null
+}
+
+export type CheckpointOverride = {
+  all_day: boolean
+  all_day_date: string
+  assignment_id: string
+  due_at: string
+  id: string
+  student_ids: string[]
+  title: string
+  unassign_item: boolean
+  unlock_at: string | null
+  lock_at: string | null
+}
+
+export type SisImport = {
+  id: string
+  created_at: string
+  started_at: string | null
+  ended_at: string | null
+  updated_at: string
+  progress: number
+  workflow_state: string
+  data: {
+    import_type: string
+  }
+  batch_mode: boolean
+  batch_mode_term_id: string
+  multi_term_batch_mode: boolean
+  override_sis_stickiness: boolean
+  add_sis_stickiness: boolean
+  update_sis_id_if_login_claimed: boolean
+  clear_sis_stickiness: boolean
+  diffing_data_set_identifier: string
+  diffing_remaster: boolean
+  diffed_against_import_id: string
+  diffing_drop_status: string
+  diffing_user_remove_status: string
+  skip_deletes: boolean
+  change_threshold: number
+  diff_row_count_threshold: number
+  user: User
+}
+
+export type ExperienceSummary = {
+  current_app: string
+  available_apps: string[]
+}
+
+export type SwitchExperienceResponse = {
+  experience: string
+}
+
+export type YoutubeEmbed = Readonly<{
+  path: string
+  src: string
+  resource_type: string
+  field: string
+  id: number
+  resource_group_key: string
+}>
+
+export type YoutubeScanResource = Readonly<{
+  name: string
+  type: string
+  content_url: string
+  count: number
+  failed?: boolean
+  embeds: Array<YoutubeEmbed>
+}>
+
+export type YoutubeScanWorkflowState = 'completed' | 'failed' | 'queued' | 'running'
+
+export type YoutubeScanResultReport = Readonly<{
+  workflow_state: YoutubeScanWorkflowState | null
+  resources: Array<YoutubeScanResource>
+  total_count: number | null
+  id: number
+}>

@@ -45,7 +45,7 @@ describe('MigrationFileInput', () => {
   it('renders button input', () => {
     renderComponent()
 
-    expect(screen.getByRole('button', {name: 'Choose File'})).toBeInTheDocument()
+    expect(screen.getByText('Choose File')).toBeInTheDocument()
   })
 
   it('renders text if no file is chosen', () => {
@@ -64,7 +64,7 @@ describe('MigrationFileInput', () => {
     expect(screen.getByText('my_file.zip')).toBeInTheDocument()
   })
 
-  it('does not render file name when large file is chosen', async () => {
+  it('renders file size validation error when large file is chosen', async () => {
     renderComponent()
 
     const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
@@ -72,18 +72,7 @@ describe('MigrationFileInput', () => {
     const input = screen.getByTestId('migrationFileUpload')
     await userEvent.upload(input, file)
 
-    expect(screen.getByText('No file chosen')).toBeInTheDocument()
-  })
-
-  it('renders alert when large file is chosen', async () => {
-    renderComponent()
-
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    Object.defineProperty(file, 'size', {value: 1024 + 1})
-    const input = screen.getByTestId('migrationFileUpload')
-    await userEvent.upload(input, file)
-
-    expect(showFlashError).toHaveBeenCalledWith('Your migration can not exceed 1.0 KB')
+    expect(screen.getByText('Your migration can not exceed 1.0 KB')).toBeInTheDocument()
   })
 
   it('calls onChange with file', async () => {
@@ -96,20 +85,46 @@ describe('MigrationFileInput', () => {
     expect(onChange).toHaveBeenCalledWith(expect.any(File))
   })
 
-  it('calls onChange with null', async () => {
+  it('calls onChange with null and displays proper error message when wrong file type provided', async () => {
     renderComponent()
 
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
+    const wrongFile = new File(['blah, blah, blah'], 'my_file.jpg', {type: 'image/jpeg'})
     const input = screen.getByTestId('migrationFileUpload')
-    await userEvent.upload(input, file)
-    // This is needed to clear input
-    fireEvent.change(input, {target: {files: []}})
-
+    fireEvent.change(input, {
+      target: {
+        files: [wrongFile],
+      },
+    })
     expect(onChange).toHaveBeenCalledWith(null)
+    expect(screen.getByText('Invalid file type')).toBeInTheDocument()
   })
 
   it('renders the progressbar with the passed progress', async () => {
-    renderComponent({fileUploadProgress: 29})
+    renderComponent({isSubmitting: true, fileUploadProgress: 29})
     expect(screen.getByText('29%')).toBeInTheDocument()
+  })
+
+  it('disable input while uploading', async () => {
+    renderComponent({isSubmitting: true})
+    expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
+  })
+
+  describe('externalFormMessage', () => {
+    describe('when externalFormMessage is provided', () => {
+      const text = 'External Form Message'
+      const externalFormMessage = {text, type: 'hint'}
+
+      it('renders the externalFormMessage', () => {
+        renderComponent({externalFormMessage})
+        expect(screen.getByText(text)).toBeInTheDocument()
+      })
+    })
+
+    describe('when externalFormMessage is not provided', () => {
+      it('renders the default message', () => {
+        renderComponent()
+        expect(screen.getByText('No file chosen')).toBeInTheDocument()
+      })
+    })
   })
 })

@@ -28,7 +28,7 @@ const setup = props => {
       isMessageSending={true}
       pendingUploads={['fake upload']}
       {...props}
-    />
+    />,
   )
 }
 
@@ -47,5 +47,40 @@ describe('AttachmentUploadSpinner', () => {
 
     expect(await findByText(message)).toBeInTheDocument()
     expect(await findByTitle(label)).toBeInTheDocument()
+  })
+
+  describe('default parameters', () => {
+    it('renders with default label when label prop is not provided', async () => {
+      const propsWithoutLabel = {
+        sendMessage: Function.prototype,
+        isMessageSending: true,
+        pendingUploads: ['fake upload'],
+        message: 'Custom message',
+      }
+      const {findByTitle} = render(<AttachmentUploadSpinner {...propsWithoutLabel} />)
+      expect(await findByTitle('Uploading Files')).toBeInTheDocument()
+    })
+
+    it('renders with default message when message prop is not provided', async () => {
+      const propsWithoutMessage = {
+        sendMessage: Function.prototype,
+        isMessageSending: true,
+        pendingUploads: ['fake upload'],
+        label: 'Custom Label',
+      }
+      const {findByText} = render(<AttachmentUploadSpinner {...propsWithoutMessage} />)
+      expect(await findByText('Please wait while we upload attachments.')).toBeInTheDocument()
+    })
+
+    it('renders with both default label and message when neither prop is provided', async () => {
+      const minimalProps = {
+        sendMessage: Function.prototype,
+        isMessageSending: true,
+        pendingUploads: ['fake upload'],
+      }
+      const {findByText, findByTitle} = render(<AttachmentUploadSpinner {...minimalProps} />)
+      expect(await findByText('Please wait while we upload attachments.')).toBeInTheDocument()
+      expect(await findByTitle('Uploading Files')).toBeInTheDocument()
+    })
   })
 })

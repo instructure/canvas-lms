@@ -28,8 +28,8 @@ describe "Account Reports API", type: :request do
     @report.account = @admin.account
     @report.user = @admin
     @report.progress = rand(100)
-    @report.start_at = DateTime.now
-    @report.end_at = (Time.now + rand(60 * 60 * 4)).to_datetime
+    @report.start_at = Time.zone.now
+    @report.end_at = Time.zone.now + rand(60 * 60 * 4)
     @report.report_type = "student_assignment_outcome_map_csv"
     @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 
@@ -54,6 +54,27 @@ describe "Account Reports API", type: :request do
           expect(parameter).to have_key("description")
         end
       end
+
+      report_csv = json.find { |r| r["report"] == @report.report_type }
+      expect(report_csv["last_run"]["id"]).to eq @report.id
+      expect(report_csv["last_run"]["status"]).to eq @report.workflow_state
+      expect(report_csv["last_run"]["progress"]).to eq @report.progress
+    end
+
+    it "includes HTML descriptions and forms if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@admin.account.id}/reports?include[]=description_html&include[]=parameters_html",
+                      { controller: "account_reports",
+                        action: "available_reports",
+                        format: "json",
+                        account_id: @admin.account.id.to_s,
+                        include: ["description_html", "parameters_html"] })
+
+      report_with_description = json.find { |r| r["description_html"].present? }
+      expect(report_with_description["description_html"]).to include("<p>")
+
+      report_with_parameters = json.find { |r| r["parameters_html"].present? }
+      expect(report_with_parameters["parameters_html"]).to include("<form")
     end
   end
 
@@ -72,6 +93,7 @@ describe "Account Reports API", type: :request do
     end
 
     it "works with parameters" do
+      @admin.account.enrollment_terms.create! sis_source_id: "a_term"
       report = api_call(:post,
                         "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { report: @report.report_type,
@@ -79,7 +101,7 @@ describe "Account Reports API", type: :request do
                           action: "create",
                           format: "json",
                           account_id: @admin.account.id.to_s,
-                          parameters: { "some_param" => 1 } })
+                          parameters: { "enrollment_term_id" => "sis_term_id:a_term" } })
       expect(report).to have_key("id")
     end
 
@@ -88,6 +110,58 @@ describe "Account Reports API", type: :request do
                    "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
                    { report: "bad_report_csv", controller: "account_reports", action: "create", format: "json", account_id: @admin.account.id.to_s })
       assert_status(404)
+    end
+
+    it "400s for invalid enrollment_term_id" do
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                   { report: @report.report_type,
+                     controller: "account_reports",
+                     action: "create",
+                     format: "json",
+                     account_id: @admin.account.id.to_s,
+                     parameters: { "enrollment_term_id" => "sis_term_id:invalid" } })
+      assert_status(400)
+    end
+
+    it "accepts a numeric enrollment term id in the request body" do
+      term_id = Account.default.enrollment_terms.pick(:id)
+      report = api_call(:post,
+                        "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                        { controller: "account_reports",
+                          action: "create",
+                          format: "json",
+                          account_id: @admin.account.id.to_s,
+                          report: @report.report_type },
+                        { parameters: { "enrollment_term_id" => term_id } },
+                        {},
+                        as: :json)
+      expect(report["parameters"]).to eq({ "enrollment_term_id" => term_id })
+    end
+
+    it "accepts comma-separated enrollment_term_id param" do
+      Account.default.enrollment_terms.create!
+      report = api_call(:post,
+                        "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                        { report: @report.report_type,
+                          controller: "account_reports",
+                          action: "create",
+                          format: "json",
+                          account_id: @admin.account.id.to_s,
+                          parameters: { "enrollment_term_id" => Account.default.enrollment_terms.pluck(:id).join(",") } })
+      expect(report).to have_key("id")
+    end
+
+    it "ignores empty enrollment_term_id param" do
+      report = api_call(:post,
+                        "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
+                        { report: @report.report_type,
+                          controller: "account_reports",
+                          action: "create",
+                          format: "json",
+                          account_id: @admin.account.id.to_s,
+                          parameters: { "enrollment_term_id" => "" } })
+      expect(report).to have_key("id")
     end
   end
 
@@ -162,6 +236,34 @@ describe "Account Reports API", type: :request do
         expect(json["parameters"][key]).to eq value
       end
     end
+
+    describe "run_time" do
+      before :once do
+        @path = "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}"
+        @params = { report: @report.report_type, controller: "account_reports", action: "show", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s }
+      end
+
+      it "returns wait time" do
+        @report.update!(start_at: nil, end_at: nil)
+        Timecop.freeze(@report.created_at + 7.seconds) do
+          json = api_call(:get, @path, @params)
+          expect(json["run_time"].round).to eq 7
+        end
+      end
+
+      it "returns in-progress report run time" do
+        @report.update!(end_at: nil)
+        Timecop.freeze(@report.start_at + 31.seconds) do
+          json = api_call(:get, @path, @params)
+          expect(json["run_time"].round).to eq 31
+        end
+      end
+
+      it "returns completed report run time" do
+        json = api_call(:get, @path, @params)
+        expect(json["run_time"].round).to eq (@report.end_at - @report.start_at).round
+      end
+    end
   end
 
   describe "destroy" do
@@ -178,6 +280,44 @@ describe "Account Reports API", type: :request do
         expect(json["parameters"][key]).to eq value
       end
       expect(AccountReport.active.exists?(@report.id)).not_to be_truthy
+    end
+  end
+
+  describe "abort" do
+    it "aborts a running report" do
+      @report.update!(workflow_state: "running")
+
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}/abort",
+                      { report: @report.report_type, controller: "account_reports", action: "abort", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s })
+
+      expect(json["id"]).to eq @report.id
+      expect(json["status"]).to eq "aborted"
+      expect(AccountReport.created_or_running.exists?(@report.id)).to be_falsey
+    end
+
+    it "aborts a report that hasn't started yet" do
+      @report.update!(workflow_state: "created")
+
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}/abort",
+                      { report: @report.report_type, controller: "account_reports", action: "abort", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s })
+
+      expect(json["id"]).to eq @report.id
+      expect(json["status"]).to eq "aborted"
+      expect(@report.reload).to be_aborted
+    end
+
+    it "returns error on a report that has already finished" do
+      @report.update!(workflow_state: "complete")
+
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}/abort",
+                      { report: @report.report_type, controller: "account_reports", action: "abort", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s })
+
+      expect(json["id"]).to be_nil
+      expect(json["errors"]).to eq([{ "message" => "The specified resource does not exist." }])
+      expect(AccountReport.find(@report.id).workflow_state).to eq("complete")
     end
   end
 end

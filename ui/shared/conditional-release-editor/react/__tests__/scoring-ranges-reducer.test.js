@@ -78,56 +78,56 @@ describe('scoringRangeReducer', () => {
         {lower_bound: '0.05', upper_bound: '0.10'},
         {lower_bound: '0.25', upper_bound: '0.30'},
         {lower_bound: '0.15', upper_bound: '0.20'},
-      ])
+      ]),
     )
     expect(newState).toEqual(
       Immutable.fromJS([
         {lower_bound: '0.25', upper_bound: '0.30'},
         {lower_bound: '0.15', upper_bound: '0.20'},
         {lower_bound: '0.05', upper_bound: '0.10'},
-      ])
+      ]),
     )
   })
 
   it('sets lower and upper bounds when boundary changes', () => {
     let newState = reduce(initialState(), actions.SET_SCORE_AT_INDEX, {index: 0, score: '0.60'})
     newState = newState.map(range =>
-      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')})
+      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')}),
     )
     expect(newState).toEqual(
       Immutable.fromJS([
         {lower_bound: '0.60', upper_bound: '1.00'},
         {lower_bound: '0.4242', upper_bound: '0.60'},
         {lower_bound: '0', upper_bound: '0.4242'},
-      ])
+      ]),
     )
   })
 
   it('ignores setting boundaries on the last range', () => {
     let newState = reduce(initialState(), actions.SET_SCORE_AT_INDEX, {index: 2, score: '0.60'})
     newState = newState.map(range =>
-      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')})
+      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')}),
     )
     expect(newState).toEqual(
       Immutable.fromJS([
         {lower_bound: '0.8484', upper_bound: '1.00'},
         {lower_bound: '0.4242', upper_bound: '0.8484'},
         {lower_bound: '0', upper_bound: '0.4242'},
-      ])
+      ]),
     )
   })
 
   it('allows setting bound to 0 on the middle range', () => {
     let newState = reduce(initialState(), actions.SET_SCORE_AT_INDEX, {index: 1, score: '0'})
     newState = newState.map(range =>
-      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')})
+      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')}),
     )
     expect(newState).toEqual(
       Immutable.fromJS([
         {lower_bound: '0.8484', upper_bound: '1.00'},
         {lower_bound: '0', upper_bound: '0.8484'},
         {lower_bound: '0', upper_bound: '0'},
-      ])
+      ]),
     )
   })
 
@@ -146,10 +146,10 @@ describe('scoringRangeReducer', () => {
       assignment_set_associations: [{assignment_id: 1}, {assignment_id: 2}],
     })
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id']),
     ).toBe(1)
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id']),
     ).toBe(2)
   })
 
@@ -247,7 +247,7 @@ describe('scoringRangeReducer', () => {
     const newState = reduce(state, actions.REMOVE_ASSIGNMENT, {path: new Path(0, 0, 0)})
     expect(newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations']).size).toBe(1)
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id']),
     ).toBe('2')
   })
 
@@ -264,13 +264,13 @@ describe('scoringRangeReducer', () => {
 
     expect(newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations']).size).toBe(3)
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id']),
     ).toBe('1')
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id']),
     ).toBe('3')
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 2, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 2, 'assignment_id']),
     ).toBe('2')
   })
 
@@ -286,13 +286,13 @@ describe('scoringRangeReducer', () => {
 
     expect(newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations']).size).toBe(3)
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 0, 'assignment_id']),
     ).toBe('1')
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 1, 'assignment_id']),
     ).toBe('3')
     expect(
-      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 2, 'assignment_id'])
+      newState.getIn([0, 'assignment_sets', 0, 'assignment_set_associations', 2, 'assignment_id']),
     ).toBe('2')
   })
 })

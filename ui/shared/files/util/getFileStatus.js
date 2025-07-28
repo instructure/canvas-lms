@@ -17,10 +17,10 @@
  */
 
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('file_status')
+const I18n = createI18nScope('file_status')
 
 // Handles getting the status for a file.
 //

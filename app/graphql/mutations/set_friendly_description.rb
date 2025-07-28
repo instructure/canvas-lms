@@ -21,13 +21,13 @@
 class Mutations::SetFriendlyDescription < Mutations::BaseMutation
   graphql_name "SetFriendlyDescription"
 
+  argument :context_id, ID, required: true
+  argument :context_type, String, required: true
   argument :description, String, required: true
   argument :outcome_id,
            ID,
            required: true,
            prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
-  argument :context_id, ID, required: true
-  argument :context_type, String, required: true
 
   field :outcome_friendly_description, Types::OutcomeFriendlyDescriptionType, null: true
 

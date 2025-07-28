@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class ScopeIncludes < Cop
+      class ScopeIncludes < Base
         MSG = "Never `include` a module at the top-level. Otherwise its " \
               "methods will be added to `Object` (and thus everything), " \
               "causing all sorts of mayhem. Move this inside a `describe`, " \
@@ -33,6 +33,7 @@ module RuboCop
           shared_context
           shared_examples
           shared_examples_for
+          skip
           new
         ].freeze
 

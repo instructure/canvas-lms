@@ -96,7 +96,7 @@ const setup = (props = {}) => {
       trayComponent={<DueDateTray assignmentOverrides={mockOverrides} isAdmin={true} />}
       isTrayOpen={true}
       {...props}
-    />
+    />,
   )
 }
 
@@ -110,7 +110,7 @@ describe('TrayDisplayer', () => {
 
     it('renders correct data in the dueDateTray', () => {
       const container = setup()
-      expect(container.getAllByTestId('assignment-override-row').length).toBe(mockOverrides.length)
+      expect(container.getAllByTestId('assignment-override-row')).toHaveLength(mockOverrides.length)
       expect(container.getByText('assignment override 1')).toBeInTheDocument()
       expect(container.getByText('assignment override 2')).toBeInTheDocument()
       expect(container.getByText('assignment override 2')).toBeInTheDocument()
@@ -145,7 +145,7 @@ describe('TrayDisplayer', () => {
           />
         ),
       })
-      expect(container.getAllByTestId('availabilities-row').length).toBe(mockAvailabities.length)
+      expect(container.getAllByTestId('availabilities-row')).toHaveLength(mockAvailabities.length)
       expect(container.getByText('section 1')).toBeInTheDocument()
       expect(container.getByText('section 2')).toBeInTheDocument()
       expect(container.getByText('99')).toBeInTheDocument()

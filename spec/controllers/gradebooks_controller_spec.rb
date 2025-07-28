@@ -44,7 +44,7 @@ describe GradebooksController do
       before do
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Example Assignment")
-        @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
+        @media_object = MediaObject.create!(media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
         @mock_kaltura = double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
         @media_sources = [{
@@ -93,7 +93,10 @@ describe GradebooksController do
         attachment = attachment_model(context: @assignment)
         attachment2 = attachment_model(context: @assignment)
         other_student = @course.enroll_user(User.create!(name: "some other user")).user
-        deleted_media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid2", media_type: "video", title: "Example Media Object 2", context: @course)
+        deleted_media_object = MediaObject.create!(media_id: "m-someid2",
+                                                   media_type: "video",
+                                                   title: "Example Media Object 2",
+                                                   context: @course)
         submission_to_comment = @assignment.grade_student(@student, grade: 10, grader: @teacher).first
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])
@@ -187,6 +190,24 @@ describe GradebooksController do
 
                                                     }
                                                   })
+        end
+      end
+
+      describe "asset processor functionality" do
+        it "includes asset_processors in submission data" do
+          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:asset_processors)
+          expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
+        end
+
+        it "includes asset_reports in submission data" do
+          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:asset_reports)
+          expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
         end
       end
     end
@@ -986,19 +1007,6 @@ describe GradebooksController do
         expect(response).to render_template("gradebooks/gradebook")
       end
 
-      it "renders screenreader gradebook when preferred with 'individual'" do
-        @admin.set_preference(:gradebook_version, "individual")
-        get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/individual")
-      end
-
-      it "renders screenreader gradebook when preferred with 'srgb'" do
-        # most a11y users will have this set from before New Gradebook existed
-        @admin.set_preference(:gradebook_version, "srgb")
-        get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/individual")
-      end
-
       it "renders default gradebook when user has no preference" do
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradebook")
@@ -1008,20 +1016,6 @@ describe GradebooksController do
         allow(Rails.env).to receive(:development?).and_return(false)
         @admin.set_preference(:gradebook_version, "default")
         get "show", params: { course_id: @course.id, version: "individual" }
-        expect(response).to render_template("gradebooks/gradebook")
-      end
-
-      it "renders enhanced individual gradebook when individual_enhanced & individual_gradebook_enhancements is enabled" do
-        @course.root_account.enable_feature!(:individual_gradebook_enhancements)
-        @admin.set_preference(:gradebook_version, "individual_enhanced")
-        get "show", params: { course_id: @course.id }
-        expect(response).to render_template("layouts/application")
-      end
-
-      it "renders traditional gradebook when individual_gradebook_enhancements is disabled" do
-        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
-        @admin.set_preference(:gradebook_version, "individual_enhanced")
-        get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebooks/gradebook")
       end
 
@@ -1099,20 +1093,6 @@ describe GradebooksController do
       it "renders default gradebook" do
         get "show", params: { course_id: @course.id, version: "default" }
         expect(response).to render_template("gradebooks/gradebook")
-      end
-    end
-
-    context "in development and requested version is 'individual'" do
-      before do
-        account_admin_user(account: @course.root_account)
-        user_session(@admin)
-        @admin.set_preference(:gradebook_version, "default")
-        allow(Rails.env).to receive(:development?).and_return(true)
-      end
-
-      it "renders screenreader gradebook" do
-        get "show", params: { course_id: @course.id, version: "individual" }
-        expect(response).to render_template("gradebooks/individual")
       end
     end
 
@@ -1249,31 +1229,6 @@ describe GradebooksController do
         it "sets allow_separate_first_last_names in the ENV to false if the feature is not enabled" do
           get :show, params: { course_id: @course.id }
           expect(gradebook_options.fetch(:allow_separate_first_last_names)).to be false
-        end
-      end
-
-      describe "show_message_students_with_observers_dialog" do
-        shared_examples_for "environment variable" do
-          it "is true when the feature is enabled" do
-            Account.site_admin.enable_feature!(:message_observers_of_students_who)
-            get :show, params: { course_id: @course.id }
-            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be true
-          end
-
-          it "is false when the feature is not enabled" do
-            get :show, params: { course_id: @course.id }
-            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be false
-          end
-        end
-
-        context "when individual gradebook is enabled" do
-          before { @teacher.set_preference(:gradebook_version, "srgb") }
-
-          include_examples "environment variable"
-        end
-
-        context "when default gradebook is enabled" do
-          include_examples "environment variable"
         end
       end
 
@@ -1481,6 +1436,33 @@ describe GradebooksController do
           groupless_json = group_categories_json.find { |cat| cat["id"] == @groupless_category.id }
           expect(groupless_json["groups"]).to be_empty
         end
+
+        context ":differentiation_tags" do
+          before :once do
+            @course.account.enable_feature! :assign_to_differentiation_tags
+            @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+            @course.account.save!
+            @course.account.reload
+          end
+
+          before do
+            @ncgc = @course.group_categories.create!(name: "ncgc", non_collaborative: true)
+            @ncgc.create_groups(2)
+          end
+
+          it "includes differentiation tag categories when user has a manage tags permission" do
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id, @ncgc.id)
+          end
+
+          it "excludes differentiation tag categories when user does not have a manage tags permission" do
+            ta_in_course
+            user_session(@ta)
+
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id)
+          end
+        end
       end
 
       context "publish_to_sis_enabled" do
@@ -1672,12 +1654,6 @@ describe GradebooksController do
         get "show", params: { course_id: @course.id }
         expect(response).to render_template("gradebook")
       end
-
-      it "redirects to Individual View with a friendly URL" do
-        @teacher.set_preference(:gradebook_version, "srgb")
-        get "show", params: { course_id: @course.id }
-        expect(response).to render_template("gradebooks/individual")
-      end
     end
 
     it "renders the unauthorized page without gradebook authorization" do
@@ -1701,7 +1677,7 @@ describe GradebooksController do
 
       it "includes the gradebook_import_url key in ENV" do
         actual_value = @gradebook_env[:gradebook_import_url]
-        expected_value = new_course_gradebook_upload_path(@course)
+        expected_value = course_gradebook_uploads_path(@course)
 
         expect(actual_value).to eq(expected_value)
       end
@@ -1810,12 +1786,6 @@ describe GradebooksController do
           expect(response).to render_template("gradebooks/gradebook")
         end
 
-        it "renders 'individual' when the user uses individual view" do
-          update_preferred_gradebook_version!("individual")
-          get "show", params: { course_id: @course.id }
-          expect(response).to render_template("gradebooks/individual")
-        end
-
         it "updates the user's preference when the requested view is 'gradebook'" do
           get "show", params: { course_id: @course.id, view: "gradebook" }
           @teacher.reload
@@ -1842,10 +1812,10 @@ describe GradebooksController do
           # The initial show view will redirect to show without the view query param the first time,
           #  and because RSpec doesn't follow redirects well, we stub out a few things to simulate
           #  the redirects
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
           allow_any_instance_of(GradebooksController).to receive(:preferred_gradebook_view).and_return("learning_mastery")
           get "show", params: { course_id: @course.id, view: "" }
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
             "outcomes_page_views",
             tags: { type: "teacher_lmgb" }
           )
@@ -1866,12 +1836,6 @@ describe GradebooksController do
           update_preferred_gradebook_version!("2")
           get "show", params: { course_id: @course.id }
           expect(response).to render_template("gradebooks/gradebook")
-        end
-
-        it "renders 'individual' when the user uses individual view" do
-          update_preferred_gradebook_version!("individual")
-          get "show", params: { course_id: @course.id }
-          expect(response).to render_template("gradebooks/individual")
         end
 
         it "redirects to the gradebook when requesting the preferred view" do
@@ -1905,12 +1869,6 @@ describe GradebooksController do
           update_preferred_gradebook_version!("2")
           get "show", params: { course_id: @course.id }
           expect(response).to render_template("gradebooks/learning_mastery")
-        end
-
-        it "renders 'individual' when the user uses individual view" do
-          update_preferred_gradebook_version!("individual")
-          get "show", params: { course_id: @course.id }
-          expect(response).to render_template("gradebooks/individual")
         end
 
         it "redirects to the gradebook when requesting the preferred view" do
@@ -2068,7 +2026,7 @@ describe GradebooksController do
     it "returns unauthorized when the user is not authorized to manage grades" do
       user_session(@student)
       get :final_grade_overrides, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -2106,7 +2064,7 @@ describe GradebooksController do
     it "returns unauthorized if the user is not authorized to manage grades" do
       user_session(@student)
       get :user_ids, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -2158,7 +2116,7 @@ describe GradebooksController do
     it "returns unauthorized if the user is not authorized to manage grades" do
       user_session(@student)
       get :grading_period_assignments, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -2736,8 +2694,7 @@ describe GradebooksController do
 
     context "moderated grading" do
       before :once do
-        @assignment = @course.assignments.create!(title: "some assignment", moderated_grading: true, grader_count: 1)
-        @student = @course.enroll_student(User.create!(name: "some user"), enrollment_state: :active).user
+        @assignment = @course.assignments.create!(title: "yet another assignment", moderated_grading: true, grader_count: 1)
       end
 
       before do
@@ -2871,10 +2828,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true } },
              format: :json
         expect(response).to_not be_successful
@@ -2888,10 +2845,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true } },
              format: :json
         expect(response).to be_successful
@@ -2905,10 +2862,10 @@ describe GradebooksController do
 
         post "update_submission",
              params: { course_id: @course.id,
-                       submission: { score: 100,
+                       submission: { score: 100.to_s,
                                      comment: "provisional!",
-                                     assignment_id: @assignment.id,
-                                     user_id: @student.id,
+                                     assignment_id: @assignment.id.to_s,
+                                     user_id: @student.id.to_s,
                                      provisional: true,
                                      final: true } },
              format: :json
@@ -2942,8 +2899,8 @@ describe GradebooksController do
         post_params = {
           course_id: @course.id,
           submission: {
-            score: 100.to_s,
-            comment: "provisional comment",
+            score: 66.to_s,
+            comment: "not the end",
             assignment_id: @assignment.id.to_s,
             user_id: @student.id.to_s,
             provisional: true,
@@ -3009,7 +2966,7 @@ describe GradebooksController do
 
     describe "checkpointed discussions" do
       before do
-        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @course.account.enable_feature!(:discussion_checkpoints)
         assignment = @course.assignments.create!(has_sub_assignments: true)
         assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, due_at: 2.days.from_now)
         assignment.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, due_at: 3.days.from_now)
@@ -3054,7 +3011,7 @@ describe GradebooksController do
       end
 
       it "ignores checkpoints when the feature flag is disabled" do
-        @course.root_account.disable_feature!(:discussion_checkpoints)
+        @course.account.disable_feature!(:discussion_checkpoints)
         user_session(@teacher)
         post(
           "update_submission",
@@ -3079,10 +3036,13 @@ describe GradebooksController do
       user_session(@teacher)
     end
 
+    let(:classic_sg_template) { :speed_grader }
+    let(:platform_sg_template) { :bare }
+
     it "renders speed_grader template with locals" do
       @assignment.publish
       get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-      expect(response).to render_template(:speed_grader, locals: { anonymous_grading: false })
+      expect(response).to render_template(classic_sg_template, locals: { anonymous_grading: false })
     end
 
     it "redirects the user if course's large_roster? setting is true" do
@@ -3108,11 +3068,54 @@ describe GradebooksController do
       expect(response).not_to be_redirect
     end
 
-    it "loads the platform speedgreader when the feature flag is on and the platform_sg flag is passed" do
-      @assignment.publish
-      Account.site_admin.enable_feature!(:platform_service_speedgrader)
-      get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
-      expect(response).to render_template(:bare, locals: { anonymous_grading: false })
+    context "when the platform speedgrader launch URL is configured" do
+      before do
+        allow(Services::PlatformServiceSpeedgrader).to receive(:launch_url).and_return("http://example.com")
+      end
+
+      it "loads the platform speedgrader when the feature flag is on and the platform_sg flag is passed" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
+
+      it "loads the platform speedgrader when the account allows it and the course enables it" do
+        @assignment.publish
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
+
+      it "does not load the platform speedgrader when the assignment is moderated" do
+        @assignment.publish
+        @assignment.moderated_grading = true
+        @assignment.final_grader_id = @teacher
+        @assignment.grader_count = 1
+        @assignment.save!
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).to render_template(classic_sg_template)
+      end
+
+      it "does not load the platform speedgrader when the account allows it and the course disables it" do
+        @assignment.publish
+        Account.site_admin.allow_feature!(:platform_service_speedgrader)
+        @course.disable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
+      end
+    end
+
+    it "falls back to classic speedgrader when the platform speedgrader launch URL is not configured" do
+      expect(Services::PlatformServiceSpeedgrader).to receive(:launch_url).at_least(:once).and_return(nil)
+      Account.site_admin.allow_feature!(:platform_service_speedgrader)
+      @course.enable_feature!(:platform_service_speedgrader)
+      get "speed_grader", params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(response).to render_template(classic_sg_template)
     end
 
     describe "js_env" do
@@ -3209,6 +3212,12 @@ describe GradebooksController do
         expect(js_env.fetch(:media_comment_asset_string)).to eq @teacher.asset_string
       end
 
+      it "sets rce_js_env" do
+        @course.root_account.enable_feature!(:rce_lite_enabled_speedgrader_comments)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env).to have_key :RICH_CONTENT_APP_HOST
+      end
+
       describe "student group filtering" do
         before do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
@@ -3235,7 +3244,7 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               @teacher.reload
 
-              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")&.last
               expect(saved_group_id).to eq group1.id.to_s
             end
 
@@ -3248,11 +3257,25 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               expect(js_env[:student_group_reason_for_change]).to eq :no_group_selected
             end
+
+            it "clears all other group filters when there are multiple groups selected" do
+              new_student = @course.enroll_student(User.create!, enrollment_state: :active).user
+              group2 = group_category.groups.last
+              group_category.create_groups(1)
+              new_group = group_category.groups.last
+              new_group.add_user(new_student)
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: new_student }
+              @teacher.reload
+              saved_group_ids = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")
+              expect(saved_group_ids).to eq [new_group.id.to_s]
+            end
           end
 
           context "when the selected group stays the same" do
             before do
-              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id] } })
             end
 
             it "sets selected_student_group to the selected group's JSON representation" do
@@ -3264,21 +3287,41 @@ describe GradebooksController do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: @student }
               expect(js_env).not_to include(:student_group_reason_for_change)
             end
+
+            it "sets the selected_student_group to the most recently selected group when there are multiple groups selected" do
+              group2 = group_category.groups.last
+              second_student = @course.enroll_student(User.create!, enrollment_state: :active).user
+              group2.add_user(second_student)
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: second_student }
+              expect(js_env.dig(:selected_student_group, "id")).to eq group2.id
+            end
           end
 
           context "when the selected group is cleared due to loading a student not in any group" do
             let(:groupless_student) { @course.enroll_student(User.create!, enrollment_state: :active).user }
 
             before do
-              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id] } })
             end
 
             it "clears the selected group from the viewing user's preferences for the course" do
               get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: groupless_student }
               @teacher.reload
 
-              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_id")
+              saved_group_id = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")&.last
               expect(saved_group_id).to be_nil
+            end
+
+            it "clears all selected groups if multiple groups were selected" do
+              group2 = group_category.groups.last
+              @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_ids" => [group1.id, group2.id] } })
+
+              get :speed_grader, params: { course_id: @course, assignment_id: @assignment, student_id: groupless_student }
+              @teacher.reload
+              saved_group_ids = @teacher.get_preference(:gradebook_settings, @course.global_id).dig("filter_rows_by", "student_group_ids")
+              expect(saved_group_ids).to be_empty
             end
 
             it "does not set selected_student_group" do
@@ -3298,6 +3341,55 @@ describe GradebooksController do
             get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
             expect(js_env).not_to include(:filter_speed_grader_by_student_group)
           end
+        end
+      end
+
+      describe "rubric_outcome_data" do
+        before do
+          @course.enable_feature!(:enhanced_rubrics)
+        end
+
+        it "does not include rubric_outcome_data when the assignment does not have a rubric" do
+          rubric = Rubric.create!(context: @course, title: "testing")
+          RubricAssociation.create!(context: @course, rubric:, purpose: :grading, association_object: @assignment)
+
+          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+          expect(js_env[:rubric_outcome_data]).to eq []
+        end
+
+        it "includes rubric_outcome_data" do
+          outcome_with_rubric({ mastery_points: 3 })
+          @outcome.display_name = "Outcome 1"
+          @outcome.save!
+          RubricAssociation.create!(context: @course, rubric: @rubric, purpose: :grading, association_object: @assignment)
+
+          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+          expect(js_env[:rubric_outcome_data].length).to eq 1
+          expect(js_env[:rubric_outcome_data].first[:display_name]).to eq "Outcome 1"
+        end
+
+        it "does not include rubric_outcome_data when the enhanced_rubric feature is disabled" do
+          @course.disable_feature!(:enhanced_rubrics)
+          rubric = Rubric.create!(context: @course, title: "testing")
+          RubricAssociation.create!(context: @course, rubric:, purpose: :grading, association_object: @assignment)
+
+          get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+          expect(js_env[:rubric_outcome_data]).to eq []
+        end
+      end
+
+      describe "rubric_assessment_imports_exports" do
+        it "sets rubric_assessment_imports_exports_enabled feature flag value" do
+          Account.site_admin.enable_feature!(:enhanced_rubrics)
+          Account.site_admin.enable_feature!(:rubric_assessment_imports_exports)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:rubric_assessment_imports_exports_enabled]).to be(true)
+        end
+
+        it "sets rubric_assessment_imports_exports_enabled to false when enhanced_rubrics not set" do
+          Account.site_admin.enable_feature!(:rubric_assessment_imports_exports)
+          get :show, params: { course_id: @course.id }
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:rubric_assessment_imports_exports_enabled]).to be(false)
         end
       end
     end
@@ -3465,6 +3557,76 @@ describe GradebooksController do
         end
       end
     end
+
+    describe "selected_section_ids preference" do
+      let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "adds selected section IDs to the user's preference if they are not already present" do
+        section1 = @course.course_sections.first.id
+        section2 = (@course.course_sections.second || @course.course_sections.create!).id
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [section1, section2]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to match_array [section1.to_s, section2.to_s]
+        expect(course_settings["selected_view_options_filters"]).to include("sections")
+      end
+
+      it "removes already-selected section IDs from the user's preference (toggle behavior)" do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  "filter_rows_by" => { "section_ids" => [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [section1.to_s]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
+      end
+
+      it 'clears the selected sections if passed the value "all"' do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: "all"
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_nil
+      end
+
+      it "ignores invalid or non-active section IDs" do
+        invalid_id = "9999999"
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [invalid_id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(invalid_id)
+      end
+
+      it "ignores section IDs that don't belong to the course" do
+        other_course_section = Course.create!.course_sections.create!
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [other_course_section.id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(other_course_section.id.to_s)
+      end
+    end
   end
 
   describe "POST 'save_assignment_order'" do
@@ -3619,6 +3781,22 @@ describe GradebooksController do
     end
   end
 
+  describe "#post_grades_enhanced_modal?" do
+    it "returns false when :post_grades_enhanced modal feature disabled for context" do
+      context = object_double(@course, feature_enabled?: false)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_enhanced_modal?).to be(false)
+    end
+
+    it "returns true when :post_grades_enhanced modal feature enabled for context" do
+      context = object_double(@course, feature_enabled?: true)
+      @controller.instance_variable_set(:@context, context)
+
+      expect(@controller.post_grades_enhanced_modal?).to be(true)
+    end
+  end
+
   describe "#grading_rubrics" do
     context "sharding" do
       specs_require_sharding
@@ -3696,7 +3874,7 @@ describe GradebooksController do
     it "returns unauthorized when the user is not authorized to manage grades" do
       user_session(@student)
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "returns unauthorized when the course does not allow final grade override" do
@@ -3704,7 +3882,7 @@ describe GradebooksController do
       @course.save!
 
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -3715,7 +3893,7 @@ describe GradebooksController do
     it "returns unauthorized when the course is concluded" do
       @course.complete!
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "returns an error when the override_scores param is not supplied" do
@@ -3782,13 +3960,13 @@ describe GradebooksController do
       it "rejects requests if the caller does not have the manage_grades permission" do
         user_session(@student)
         make_request(percent: 50.0)
-        assert_unauthorized
+        assert_forbidden
       end
 
       it "rejects requests if the account does not have the apply_score_to_ungraded feature enabled" do
         @course.account.disable_feature!(:apply_score_to_ungraded)
         make_request(percent: 50.0)
-        assert_unauthorized
+        assert_forbidden
       end
     end
 

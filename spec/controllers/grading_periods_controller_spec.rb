@@ -459,7 +459,7 @@ describe GradingPeriodsController do
             expect do
               patch :batch_update, params: { course_id: course.id, grading_periods: [period_1_params] }
             end.not_to change { course.grading_periods.count }
-            expect(response.status).to eql(Rack::Utils.status_code(:unauthorized))
+            expect(response.status).to eql(Rack::Utils.status_code(:forbidden))
           end
 
           it "cannot create multiple grading periods" do
@@ -511,7 +511,7 @@ describe GradingPeriodsController do
             expect do
               patch :batch_update, params: { course_id: course.id, grading_periods: [period_1_params] }
             end.not_to change { course.grading_periods.count }
-            expect(response.status).to eql(Rack::Utils.status_code(:unauthorized))
+            expect(response.status).to eql(Rack::Utils.status_code(:forbidden))
           end
 
           it "cannot create multiple grading periods" do

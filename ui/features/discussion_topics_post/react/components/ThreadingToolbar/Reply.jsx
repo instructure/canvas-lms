@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
@@ -26,8 +26,9 @@ import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {IconDiscussionReply2Line} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function Reply({...props}) {
   let replyButtonText = I18n.t('Reply')
@@ -38,12 +39,14 @@ export function Reply({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small',
-          itemSpacing: 'none small 0 none',
+          textSize: 'medium',
+          itemSpacing: 'none xx-small 0 none',
+          isMobile: true,
         },
         desktop: {
           textSize: undefined,
           itemSpacing: undefined,
+          isMobile: false,
         },
       }}
       render={responsiveProps => (
@@ -55,6 +58,9 @@ export function Reply({...props}) {
             data-testid="threading-toolbar-reply"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
             ref={props.replyButtonRef}
+            renderIcon={
+              !responsiveProps.isMobile && !props.isSplitScreenView && <IconDiscussionReply2Line />
+            }
           >
             <AccessibleContent
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
@@ -102,4 +108,5 @@ Reply.propTypes = {
    */
   isSplitView: PropTypes.bool,
   replyButtonRef: PropTypes.any,
+  isSplitScreenView: PropTypes.bool,
 }

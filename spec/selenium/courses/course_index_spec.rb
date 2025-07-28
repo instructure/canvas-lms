@@ -329,7 +329,7 @@ describe "course index" do
       sorted_courses = table_rows(current_enrollments_selector)
       # remove header row
       sorted_courses.shift
-      expect(sorted_courses.first).to eq row_with_text(unpublished_course.name)
+      expect(sorted_courses.last).to eq row_with_text(unpublished_course.name)
     end
 
     it "is independent across tables" do
@@ -368,7 +368,7 @@ describe "course index" do
       sorted_past_courses.shift
       sorted_future_courses.shift
 
-      expect(sorted_current_courses.first).to eq row_with_text(unpublished_course.name)
+      expect(sorted_current_courses.last).to eq row_with_text(unpublished_course.name)
       expect(sorted_past_courses.last).to eq row_with_text(course_as_ta.name)
       expect(sorted_future_courses.first).to eq row_with_text(favorite_course.name)
     end

@@ -20,8 +20,14 @@ import {isNaN, isEmpty, extend} from 'lodash'
 
 import Backbone from '@canvas/backbone'
 import template from '../../jst/outcomeCalculationMethodForm.handlebars'
+import exampleTemplate from '../../../jst/_calculationMethodExample.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
+import {createRoot} from 'react-dom/client'
+import {createElement} from 'react';
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {TextInput} from '@instructure/ui-text-input'
 
 export default class CalculationMethodFormView extends Backbone.View {
   static initClass() {
@@ -38,14 +44,6 @@ export default class CalculationMethodFormView extends Backbone.View {
     }
   }
 
-  afterRender() {
-    if (this.hadFocus) {
-      this.$calculation_int.focus().val(this.$calculation_int.val())
-      this.$calculation_int[0].selectionStart = this.selectionStart
-    }
-    return (this.hadFocus = undefined)
-  }
-
   attach() {
     return this.model.on('change:calculation_method', this.render, this)
   }
@@ -60,10 +58,13 @@ export default class CalculationMethodFormView extends Backbone.View {
   change(e) {
     const val = parseInt(numberHelper.parse($(e.target).val()), 10)
     if (isNaN(val)) return
+    const data = this.model.present()
+    if (data.calculation_method === 'decaying_average' && (val < 1 || val > 99)) return
+    if (data.calculation_method === 'n_mastery' && (val < 1 || val > 10)) return
     this.model.set({
       calculation_int: val,
     })
-    return this.render()
+    return this.renderExample()
   }
 
   keyup(e) {
@@ -82,14 +83,55 @@ export default class CalculationMethodFormView extends Backbone.View {
   // 3 - delegateEvents again after render so that we are hooked up
   //     to handle the next round of events.
   render() {
-    this.hadFocus =
-      !isEmpty(this.$calculation_int) && document.activeElement === this.$calculation_int[0]
-    if (this.hadFocus) {
-      this.selectionStart = document.activeElement.selectionStart
-    }
     this.undelegateEvents()
     super.render(...arguments)
+    this.createInstUIInput()
+    this.calculationIntInstUIInput.render()
+    this.renderExample()
+    this.trigger('instUIInputCreated', this.calculationIntInstUIInput)
     return this.delegateEvents()
+  }
+
+  renderExample() {
+    this.$('#calculation_int_example_container').html(exampleTemplate(this.model.present()))
+  }
+
+  createInstUIInput() {
+    this.calculationIntInstUIInput = {
+      root: (() => {
+        const el = this.$('#calculation_int_container')[0]
+        if(!el) return null
+        return {
+          rootElement: createRoot(el),
+          initialValue: el.dataset.initialValue,
+          label: el.dataset.label.replace(/: ?$/g, ''),
+          calculationIntDescription: el.dataset.calculationIntDescription,
+        }
+      })(),
+      render: (errorMessages) => {
+        this.calculationIntInstUIInput.root?.rootElement.render(
+          createElement(View, {as: 'div', margin: 'none none small none'},
+            createElement(TextInput, {
+              name: 'calculation_int',
+              id: 'calculation_int',
+              defaultValue: this.calculationIntInstUIInput.root?.initialValue,
+              as: 'span',
+              display: 'inline-block',
+              htmlSize: 2,
+              renderLabel: ()=> createElement(Text, { weight: 'normal', size: 'small' },
+                this.calculationIntInstUIInput.root?.label),
+              messages: [
+                { text: this.calculationIntInstUIInput.root?.calculationIntDescription, type: 'hint' },
+                ...(errorMessages
+                    ? errorMessages.map((m) => ({ text: m.message, type: 'newError' }))
+                    : [])
+              ],
+            })
+          )
+        )
+      },
+      inputElement: () => this.$('#calculation_int')[0],
+    }
   }
 
   toJSON() {

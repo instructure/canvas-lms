@@ -20,11 +20,11 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {COURSES_QUERY} from '../../graphql/Queries'
 import CourseSelect, {ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/MailboxSelectionDropdown'
 import {MessageActionButtons} from '../components/MessageActionButtons/MessageActionButtons'
 import PropTypes from 'prop-types'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/client'
 import React, {useContext, useEffect} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
@@ -32,7 +32,7 @@ import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../util/utils'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const MessageListActionContainer = props => {
   const LIMIT_TAG_COUNT = 1
@@ -41,7 +41,7 @@ const MessageListActionContainer = props => {
 
   const selectedReadStates = () => {
     const selectedStates = props.selectedConversations.map(
-      conversation => conversation?.workflowState
+      conversation => conversation?.workflowState,
     )
     return selectedStates
   }
@@ -55,12 +55,15 @@ const MessageListActionContainer = props => {
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
   const {loading, error, data} = useQuery(COURSES_QUERY, {
-    variables: {userID},
+    variables: {
+      userID,
+      horizonCourses: false,
+    },
   })
 
   const uniqueCourses = reduceDuplicateCourses(
     data?.legacyNode?.enrollments,
-    data?.legacyNode?.favoriteCoursesConnection?.nodes
+    data?.legacyNode?.favoriteCoursesConnection?.nodes,
   )
 
   const moreCourses = []
@@ -82,8 +85,8 @@ const MessageListActionContainer = props => {
       },
     ],
     favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
-    moreCourses,
-    concludedCourses,
+    moreCourses: moreCourses,
+    concludedCourses: concludedCourses,
     groups: data?.legacyNode?.favoriteGroupsConnection?.nodes,
   }
 
@@ -96,13 +99,13 @@ const MessageListActionContainer = props => {
   useEffect(() => {
     if (
       !loading &&
-      !doesCourseFilterOptionExist(props.activeCourseFilter, courseSelectorOptions) &&
-      props.activeCourseFilter !== undefined
+      !doesCourseFilterOptionExist(props.activeCourseFilterID, courseSelectorOptions) &&
+      props.activeCourseFilterID !== undefined
     ) {
       props.onCourseFilterSelect(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.activeCourseFilter])
+  }, [props.activeCourseFilterID])
 
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
@@ -167,12 +170,13 @@ const MessageListActionContainer = props => {
       render={(responsiveProps, matches) => (
         <View
           as="div"
-          borderWidth="0 0 small 0"
+          borderWidth="small 0 small 0"
           display="inline-block"
           width="100%"
           margin="none"
           padding="small"
           background="secondary"
+          borderColor="secondary"
           data-testid="tool-bar"
         >
           <Flex wrap="wrap">
@@ -184,7 +188,7 @@ const MessageListActionContainer = props => {
               <CourseSelect
                 mainPage={true}
                 options={courseSelectorOptions}
-                activeCourseFilterID={props.activeCourseFilter}
+                activeCourseFilterID={props.activeCourseFilterID}
                 onCourseFilterSelect={contextObject => {
                   props.onCourseFilterSelect(contextObject.contextID)
                 }}
@@ -211,6 +215,7 @@ const MessageListActionContainer = props => {
                 width={responsiveProps.addressBookContainer.width}
                 limitTagCount={LIMIT_TAG_COUNT}
                 addressBookLabel="Search"
+                renderingContext="message-list-actions"
               />
             </Flex.Item>
             <Flex.Item padding={responsiveProps.messageActionButtons.padding}>
@@ -266,7 +271,7 @@ MessageListActionContainer.propTypes = {
   onStar: PropTypes.func,
   onDelete: PropTypes.func,
   onReadStateChange: PropTypes.func,
-  activeCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   canReply: PropTypes.bool,
   showComposeButton: PropTypes.bool,
 }

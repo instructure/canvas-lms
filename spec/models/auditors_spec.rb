@@ -21,12 +21,8 @@ describe Auditors do
   describe ".stream" do
     it "constructs an event stream object with config on board" do
       ar_klass = Class.new
-      record_klass = Class.new
       stream_obj = Auditors.stream do
-        backend_strategy -> { :active_record }
-        active_record_type ar_klass
-        record_type record_klass
-        table :test_stream_items
+        record_type ar_klass
       end
       expect(stream_obj).to be_a(EventStream::Stream)
     end

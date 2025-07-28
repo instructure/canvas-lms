@@ -66,4 +66,58 @@ describe "quizzes/quizzes/_quiz_edit" do
     render partial: "quizzes/quizzes/quiz_edit"
     expect(response.body).not_to match(/student_submissions_warning/)
   end
+
+  context "with suppress_assignment feature" do
+    context "on" do
+      before do
+        root_account = @course.root_account
+        root_account.settings[:suppress_assignments] = true
+        root_account.save
+      end
+
+      it "shows grading visibility option" do
+        render partial: "quizzes/quizzes/quiz_edit_details"
+        expect(response.body).to include("Grading Visibility")
+        expect(response.body).to include("Hide from gradebook view and student grades view")
+      end
+
+      it "renders grading visibility checkbox as checked when suppress_assignment is true" do
+        quiz = @course.quizzes.create!
+        assignment = @course.assignments.create!(title: "Test Assignment", suppress_assignment: true)
+        quiz.update!(assignment_id: assignment.id)
+        assign(:quiz, quiz)
+        render partial: "quizzes/quizzes/quiz_edit_details"
+        doc = Nokogiri::HTML.fragment(response.body)
+        checkbox = doc.at_css("input[type='checkbox'][name='quiz[suppress_assignment]']")
+        expect(checkbox).not_to be_nil
+        expect(checkbox["checked"]).to eq("checked")
+      end
+
+      it "renders checkbox as unchecked when suppress_assignment is false" do
+        quiz = @course.quizzes.create!
+        assignment = @course.assignments.create!(title: "Test Assignment", suppress_assignment: false)
+        quiz.update!(assignment_id: assignment.id)
+        assign(:quiz, quiz)
+        render partial: "quizzes/quizzes/quiz_edit_details"
+        doc = Nokogiri::HTML.fragment(response.body)
+        checkbox = doc.at_css("input[type='checkbox'][name='quiz[suppress_assignment]']")
+        expect(checkbox).not_to be_nil
+        expect(checkbox["checked"]).to be_nil
+      end
+    end
+
+    context "off" do
+      before do
+        root_account = @course.root_account
+        root_account.settings[:suppress_assignment] = false
+        root_account.save
+      end
+
+      it "does not show grading visibility option" do
+        render partial: "quizzes/quizzes/quiz_edit_details"
+        expect(response.body).not_to include("Grading Visibility")
+        expect(response.body).not_to include("Hide from gradebook view and student grades view")
+      end
+    end
+  end
 end

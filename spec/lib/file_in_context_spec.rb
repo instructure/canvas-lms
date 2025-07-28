@@ -27,14 +27,14 @@ describe FileInContext do
     @course.reload
   end
 
-  context "#attach" do
+  describe "#attach" do
     it "creates files with the supplied filename escaped for s3" do
       s3_storage!
 
       filename = File.expand_path(File.join(__dir__, "../fixtures/files/escaping_test[0].txt"))
       attachment = FileInContext.attach(@course, filename, folder: @folder)
       allow(attachment).to receive(:filename=) do |new_name|
-        write_attribute(:filename, sanitize_filename(new_name))
+        self["filename"] = sanitize_filename(new_name)
       end
       expect(attachment.filename).to eq "escaping_test%5B0%5D.txt"
       expect(attachment).to be_published
@@ -58,7 +58,7 @@ describe FileInContext do
         attachment.update(md5: @md5)
 
         # Making sure no additions to before blocks mess this up
-        expect(@course.attachments.where(md5: @sha512).take).to be_falsey
+        expect(@course.attachments.find_by(md5: @sha512)).to be_falsey
 
         FileInContext.attach(@course, @filename, folder: @folder, md5: @sha512)
         expect(@course.attachments.count).to eq 1
@@ -69,7 +69,7 @@ describe FileInContext do
         attachment.update(md5: @sha512)
 
         # Making sure no additions to before blocks mess this up
-        expect(@course.attachments.where(md5: @md5).take).to be_falsey
+        expect(@course.attachments.find_by(md5: @md5)).to be_falsey
 
         FileInContext.attach(@course, @filename, folder: @folder, md5: @md5)
         expect(@course.attachments.count).to eq 1

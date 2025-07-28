@@ -17,16 +17,23 @@
  */
 
 import React from 'react'
-import sinon from 'sinon'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import SpeedGraderProvisionalGradeSelector from '../SpeedGraderProvisionalGradeSelector'
 import {render, waitFor} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('SpeedGraderProvisionalGradeSelector', () => {
-  let $container
   let props
 
   beforeEach(() => {
+    fakeENV.setup({
+      instructor_selectable_states: {
+        1: false,
+        2: true,
+        3: true,
+      },
+    })
+
     props = {
       detailsInitiallyVisible: true,
       finalGraderId: '2',
@@ -65,8 +72,12 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     }
 
     document.documentElement.setAttribute('dir', 'ltr')
-    $container = document.createElement('div')
+    const $container = document.createElement('div')
     document.body.appendChild($container)
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
   test('has "Show Details" text if detailsVisible is false', () => {
@@ -84,13 +95,6 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
   test('has "Hide Details" text if detailsVisible is true', async () => {
     const ref = React.createRef()
     const wrapper = render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
-    window.ENV = {
-      instructor_selectable_states: {
-        1: false,
-        2: true,
-        3: true,
-      },
-    }
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
       expect(wrapper.getByText('Hide Details')).toBeInTheDocument()
@@ -108,7 +112,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     const ref = React.createRef()
     const wrapper = render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
     ref.current.setState({detailsVisible: true})
-    expect(wrapper.container.querySelectorAll('input[type="radio"]').length).toBe(3)
+    expect(wrapper.container.querySelectorAll('input[type="radio"]')).toHaveLength(3)
   })
 
   test('positions the "Custom" radio button first', () => {
@@ -170,7 +174,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
       expect(wrapper.getAllByText('Custom')[1].closest('div').querySelector('input').value).toBe(
-        '3'
+        '3',
       )
     })
   })
@@ -192,7 +196,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
       expect(
-        wrapper.getAllByText('out of 123')[0].closest('div').querySelector('input').value
+        wrapper.getAllByText('out of 123')[0].closest('div').querySelector('input').value,
       ).toBe('1')
     })
   })
@@ -214,7 +218,7 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
       expect(wrapper.getAllByText('Custom')[0].closest('div').querySelector('input').disabled).toBe(
-        false
+        false,
       )
     })
   })
@@ -240,19 +244,18 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ]
     props.provisionalGrades = provisionalGrades
 
-    const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
+    const formatSpy = jest.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
     const ref = React.createRef()
     render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
     ref.current.setState({detailsVisible: true})
     await waitFor(() => {
-      expect(formatSpy.called).toBe(true)
-      const [gradeToFormat] = formatSpy.firstCall.args
+      expect(formatSpy).toHaveBeenCalled()
+      const [gradeToFormat] = formatSpy.mock.calls[0]
       expect(gradeToFormat).toBe(provisionalGrades[0])
     })
-    formatSpy.restore()
   })
 
-  test('calls formatSubmissionGrade with the passed-in grading type', () => {
+  test('calls formatSubmissionGrade with the passed-in grading type', async () => {
     const provisionalGrades = [
       {
         grade: '123456.78',
@@ -264,12 +267,14 @@ describe('SpeedGraderProvisionalGradeSelector', () => {
     ]
     props.provisionalGrades = provisionalGrades
 
-    const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
+    const formatSpy = jest.spyOn(GradeFormatHelper, 'formatSubmissionGrade')
     const ref = React.createRef()
     render(<SpeedGraderProvisionalGradeSelector {...props} ref={ref} />)
     ref.current.setState({detailsVisible: true})
-    expect(formatSpy.firstCall.args[1].formatType).toBe('points')
-
-    formatSpy.restore()
+    await waitFor(() => {
+      expect(formatSpy).toHaveBeenCalled()
+      expect(formatSpy.mock.calls[0][1].formatType).toBe('points')
+    })
+    formatSpy.mockRestore()
   })
 })

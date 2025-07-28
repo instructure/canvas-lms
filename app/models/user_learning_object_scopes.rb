@@ -38,16 +38,12 @@ module UserLearningObjectScopes
   end
 
   def ignore_item!(asset, purpose, permanent = false)
-    begin
-      # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(user: self, purpose:, permanent:)
-    rescue ActiveRecord::RecordNotUnique
-      asset.shard.activate do
-        ignore = asset.ignores.where(user_id: self, purpose:).first
-        ignore.permanent = permanent
-        ignore.save!
-      end
-    end
+    asset.ignores.upsert(
+      { user_id: id, purpose:, permanent: },
+      unique_by: %i[asset_id asset_type user_id purpose],
+      update_only: :permanent
+    )
+
     touch
   end
 
@@ -124,14 +120,12 @@ module UserLearningObjectScopes
                                              contexts:,
                                              include_concluded:)
       group_ids = group_ids_for_todo_lists(group_ids:, contexts:)
-      ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
+      ids_by_shard = Hash.new({ course_ids: [].freeze, group_ids: [].freeze }.freeze)
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
       end
       Shard.partition_by_shard(group_ids) do |shard_group_ids|
-        shard_hash = ids_by_shard[Shard.current]
-        shard_hash[:group_ids] = shard_group_ids
-        ids_by_shard[Shard.current] = shard_hash
+        ids_by_shard[Shard.current] = ids_by_shard[Shard.current].merge(group_ids: shard_group_ids)
       end
 
       if scope_only
@@ -192,9 +186,24 @@ module UserLearningObjectScopes
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
     scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
-    if object_type == "Assignment"
+
+    course_ids_by_account_id = Course.where(id: shard_course_ids).group(:account_id).pluck(Arel.sql("account_id, ARRAY_AGG(id)")).to_h
+    accounts_with_checkpoints, accounts_without_checkpoints = Account.where(id: course_ids_by_account_id.keys).partition(&:discussion_checkpoints_enabled?)
+    course_ids_with_checkpoints_enabled = accounts_with_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+    course_ids_with_checkpoints_disabled = accounts_without_checkpoints.flat_map { |account| course_ids_by_account_id[account.id] }
+
+    scope = scope.for_course(course_ids_with_checkpoints_enabled) if object_type == "SubAssignment"
+
+    if ["Assignment", "SubAssignment"].include?(object_type)
       scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
+
+      if object_type == "Assignment"
+        # if checkopoints is enabled for a course, only include non-checkpointed assignments
+        # if checkpoints is disabled, include all assignments
+        scope = scope.for_course(course_ids_with_checkpoints_enabled).where(has_sub_assignments: false)
+                     .or(scope.for_course(course_ids_with_checkpoints_disabled))
+      end
     end
     [scope, shard_course_ids, shard_group_ids]
   end
@@ -206,10 +215,12 @@ module UserLearningObjectScopes
     due_before: 2.weeks.from_now,
     cache_timeout: 120.minutes,
     include_locked: false,
+    is_sub_assignment: false,
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing("Assignment",
+    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    objects_needing(object_type,
                     purpose,
                     :student,
                     params,
@@ -221,11 +232,12 @@ module UserLearningObjectScopes
       if opts[:course_ids].present?
         active_enrollment_course_ids = Enrollment.where(Enrollment.active_student_conditions)
                                                  .where(user_id: id, course_id: opts[:course_ids]).pluck(:course_id)
-        assignments = assignments.visible_to_students_in_course_with_da(id, active_enrollment_course_ids)
+        assignments = assignments.visible_to_students_in_course_with_da([id], active_enrollment_course_ids, nil, opts[:include_concluded])
       end
 
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
+      assignments = assignments.without_suppressed_assignments
       if purpose == "submitting"
         assignments = assignments.submittable.or(assignments.where("assignments.user_due_date > ?", Time.zone.now))
       end
@@ -239,6 +251,7 @@ module UserLearningObjectScopes
     due_before: 1.week.from_now,
     scope_only: false,
     include_concluded: false,
+    is_sub_assignment: false,
     **opts # forward args to assignments_for_student
   )
     opts[:cache_timeout] = 15.minutes
@@ -332,12 +345,12 @@ module UserLearningObjectScopes
   end
 
   # opts forwaded to course_ids_for_todo_lists
-  def submissions_needing_grading_count(**opts)
+  def submissions_needing_grading_count(**)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return 0
     end
 
-    course_ids = course_ids_for_todo_lists(:manage_grades, **opts)
+    course_ids = course_ids_for_todo_lists(:manage_grades, **)
     Submission.active
               .needs_grading
               .joins("INNER JOIN #{Enrollment.quoted_table_name} AS grader_enrollments ON assignments.context_id = grader_enrollments.course_id")
@@ -355,14 +368,17 @@ module UserLearningObjectScopes
               ).count
   end
 
-  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
+  def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, is_sub_assignment: false, **opts)
     if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
-      return scope_only ? Assignment.none : []
+      scope = is_sub_assignment ? SubAssignment.none : Assignment.none
+      return scope_only ? scope : []
     end
 
     params = _params_hash(binding)
+    params.delete(:is_sub_assignment)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing("Assignment", "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
+    object_type = is_sub_assignment ? "SubAssignment" : "Assignment"
+    objects_needing(object_type, "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
       if Setting.get("assignments_needing_grading_new_style", "true") == "true"
         submissions_needing_grading = Submission.select(:assignment_id, :user_id)
                                                 .joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id")
@@ -428,6 +444,7 @@ module UserLearningObjectScopes
     end
   end
 
+  # rubocop:disable Style/ArgumentsForwarding -- _params_hash needs the binding
   def discussion_topics_needing_viewing(
     due_after:,
     due_before:,
@@ -441,6 +458,8 @@ module UserLearningObjectScopes
         .for_courses_and_groups(shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
         .visible_to_ungraded_discussion_student_visibilities(self)
+        # announcements are not shown if lock_at is in the past
+        .where.not("discussion_topics.type IS NOT NULL AND discussion_topics.type = 'Announcement' AND discussion_topics.lock_at IS NOT NULL AND discussion_topics.lock_at < ?", Time.zone.now)
     end
   end
 
@@ -453,9 +472,9 @@ module UserLearningObjectScopes
     objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
       wiki_pages_context
         .available_to_planner
-        .visible_to_user(self)
-        .for_courses_and_groups(shard_course_ids, shard_group_ids)
+        .visible_to_user_in_courses_and_groups(self, shard_course_ids, shard_group_ids)
         .todo_date_between(due_after, due_before)
     end
   end
+  # rubocop:enable Style/ArgumentsForwarding
 end

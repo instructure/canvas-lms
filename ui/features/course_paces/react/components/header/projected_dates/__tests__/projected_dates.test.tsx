@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -22,19 +21,17 @@ import {within} from '@testing-library/dom'
 import {renderConnected} from '../../../../__tests__/utils'
 import {PRIMARY_PACE, STUDENT_PACE} from '../../../../__tests__/fixtures'
 
-import {ProjectedDates} from '../projected_dates'
+import {ProjectedDates, type StoreProps} from '../projected_dates'
+import type {CoursePace} from '../../../../types'
 
-const defaultProps = {
+const defaultProps: StoreProps = {
   coursePace: PRIMARY_PACE, // 2021-09-01 -> 2021-12-15
   assignments: 5,
   paceDuration: {weeks: 2, days: 3},
-  projectedEndDate: '2021-12-01',
-  blackoutDates: [],
-  weekendsDisabled: false,
   compression: 0,
-  setStartDate: () => {},
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
+  plannedEndDate: '2021-12-01',
 }
 
 afterEach(() => {
@@ -55,7 +52,11 @@ describe('ProjectedDates', () => {
   })
 
   it('shows term start and end date when given', () => {
-    const cpace = {...defaultProps.coursePace, start_date_context: 'term', end_date_context: 'term'}
+    const cpace: CoursePace = {
+      ...defaultProps.coursePace,
+      start_date_context: 'term',
+      end_date_context: 'term',
+    }
     const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={cpace} />)
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -69,7 +70,7 @@ describe('ProjectedDates', () => {
 
   it('shows student enrollment dates when given', () => {
     const {getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={STUDENT_PACE} />
+      <ProjectedDates {...defaultProps} coursePace={STUDENT_PACE} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -83,7 +84,11 @@ describe('ProjectedDates', () => {
 
   // this can't happen any more
   it('shows no dates for a course with no start and end dates', () => {
-    const cpace = {...defaultProps.coursePace, start_date: null, end_date: null}
+    const cpace: CoursePace = {
+      ...defaultProps.coursePace,
+      start_date: undefined,
+      end_date: undefined,
+    }
     const {queryByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={cpace} />)
 
     expect(queryByText('Start Date')).not.toBeInTheDocument()
@@ -97,7 +102,7 @@ describe('ProjectedDates', () => {
     const cpace = {...defaultProps.coursePace, end_date: null}
 
     const {getByTestId, getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={cpace} />
+      <ProjectedDates {...defaultProps} coursePace={cpace} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -110,10 +115,10 @@ describe('ProjectedDates', () => {
   })
 
   it('captions the end date to match the start', () => {
-    const cpace = {...defaultProps.coursePace, end_date: null, end_date_context: 'term'}
+    const cpace: CoursePace = {...defaultProps.coursePace, end_date: null, end_date_context: 'term'}
 
     const {getByTestId, getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={cpace} />
+      <ProjectedDates {...defaultProps} coursePace={cpace} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -128,7 +133,7 @@ describe('ProjectedDates', () => {
 
   it('compresses dates if projectedEndDate is after pace end_date', () => {
     renderConnected(
-      <ProjectedDates {...defaultProps} projectedEndDate="2021-12-17" compression={1000} />
+      <ProjectedDates {...defaultProps} plannedEndDate={'2021-12-17'} compression={1000} />,
     )
     expect(defaultProps.compressDates).toHaveBeenCalled()
     expect(defaultProps.uncompressDates).not.toHaveBeenCalled()

@@ -34,3 +34,29 @@ li.used_otp {
     display: none;
   }
 }
+
+.otp-login__grid-row-divider {
+  background-image: linear-gradient($ic-border-light, $ic-border-light);
+  background-size: 1px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+
+  @media (max-width: 767px) {
+    background: none;
+  }
+}
+
+.otp-login__text-align--xs-center {
+  text-align: center;
+
+  @media (min-width: 768px) {
+    text-align: left;
+  }
+}
+
+.otp-login__secret-key {
+  font-family: $ic-font-family-monospace;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}

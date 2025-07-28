@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TutorialTrayContent from './TutorialTrayContent'
 
-const I18n = useI18nScope('new_user_tutorial')
+const I18n = createI18nScope('new_user_tutorial')
 
 const HomeTray = () => (
   <TutorialTrayContent
@@ -39,7 +39,7 @@ const HomeTray = () => (
       },
       {
         label: I18n.t(
-          'What layout options are available in the Course Home Page as an instructor?'
+          'What layout options are available in the Course Home Page as an instructor?',
         ),
         href: I18n.t('#community.instructor_homepage_layout_options'),
       },

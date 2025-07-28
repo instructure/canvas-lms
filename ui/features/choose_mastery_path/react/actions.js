@@ -37,7 +37,7 @@ actions.selectOption = option => {
       err => {
         dispatch({type: actions.SELECT_OPTION, payload: null})
         dispatch(actions.setError(err))
-      }
+      },
     )
   }
 }

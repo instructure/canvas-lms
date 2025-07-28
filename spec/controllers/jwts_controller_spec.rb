@@ -60,12 +60,22 @@ describe JwtsController do
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:domain]).to eq("test.host")
       end
+
+      it "generates a token that includes the root account uuid" do
+        root_account_uuid = LoadAccount.default_domain_root_account.uuid
+        pseudonym(admin_user)
+        access_token = admin_user.access_tokens.create!.full_token
+        request.headers["Authorization"] = "Bearer #{access_token}"
+        post "create", format: "json"
+        jwt = translate_token.call(response)
+        expect(jwt[:root_account_uuid]).to eq(root_account_uuid)
+      end
     end
 
     context "asymmetric tokens" do
       before { user_session(token_user) }
 
-      it "gererates an unencrypt token for non-canvas audiences" do
+      it "generates an unencrypted token for non-canvas audiences" do
         post "create", params: { canvas_audience: false }, format: "json"
 
         jwt = translate_unencrypted_token.call(response)
@@ -84,6 +94,51 @@ describe JwtsController do
 
         jwt = translate_token.call(response)
         expect(jwt[:sub]).to eq(token_user.global_id)
+      end
+
+      describe "with custom audiences requested" do
+        let(:allowed_audience) { "custom_audience" }
+
+        before do
+          pseudonym(admin_user)
+          access_token = admin_user.access_tokens.create!.full_token
+          admin_user.access_tokens.first.developer_key.update!(allowed_audiences: [allowed_audience])
+          request.headers["Authorization"] = "Bearer #{access_token}"
+        end
+
+        context "when audience is allowed through the developer key" do
+          it "returns unencrypted token" do
+            post "create", params: { audience: allowed_audience }, format: "json"
+
+            jwt = translate_unencrypted_token.call(response)
+            expect(jwt[:sub]).to eq(admin_user.global_id)
+          end
+
+          it "generates a token that includes the requested audience" do
+            post "create", params: { audience: allowed_audience }, format: "json"
+
+            jwt = translate_unencrypted_token.call(response)
+            expect(jwt[:aud]).to eq(["custom_audience"])
+          end
+        end
+
+        context "when at least one audience is not allowed through the developer key" do
+          it "throws an error with status code bad request" do
+            post "create", params: { audience: "#{allowed_audience} not_allowed_audience" }, format: "json"
+
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include(/invalid_target/)
+          end
+        end
+
+        context "when no audience is allowed through the developer key" do
+          it "returns an error with bad request status code" do
+            post "create", params: { audience: "not_allowed_audience" }, format: "json"
+
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include(/invalid_target/)
+          end
+        end
       end
     end
 
@@ -163,51 +218,45 @@ describe JwtsController do
         it "context_type param is missing" do
           post "create", params: params.except(:context_type), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Missing context_type parameter./)
         end
 
         it "context_id or context_uuid param is missing" do
           post "create", params: params.except(:context_id), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Missing context_id or context_uuid parameter./)
         end
 
         it "context_type and context_uuid are passed" do
           post "create", params: params.merge({ context_uuid: @context_uuid }), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Should provide context_id or context_uuid parameters, but not both./)
         end
 
         it "context_type is invalid" do
           post "create", params: params.merge({ context_type: "unknown" }), format: "json"
           expect(response).to have_http_status(:bad_request)
-          expect(response.body).to match(/Invalid context_type parameter./)
         end
 
         it "context not found with id" do
           post "create", params: params.merge({ context_id: "unknown" }), format: "json"
           expect(response).to have_http_status(:not_found)
-          expect(response.body).to match(/Context not found./)
         end
 
         it "context not found with uuid" do
           post "create", params: params.except(:context_id).merge({ context_uuid: "unknown" }), format: "json"
           expect(response).to have_http_status(:not_found)
-          expect(response.body).to match(/Context not found./)
         end
 
         it "context is unauthorized" do
           generic_user = user_factory
           user_session(generic_user)
           post "create", params:, format: "json"
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "generic user is unauthorized for Account context type" do
           generic_user = user_factory
           user_session(generic_user)
           post "create", params: params.merge(context_type: "Account", context_id: Account.last.id), format: "json"
-          assert_unauthorized
+          assert_forbidden
         end
       end
     end

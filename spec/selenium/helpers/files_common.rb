@@ -116,9 +116,11 @@ module FilesCommon
       fln("15").click
       ff(".ui-datepicker-trigger.btn")[0].send_keys(:enter) # close the calendar
       wait_for_ajaximations
+      driver.find_element(id: "timeSelectInput").send_keys("6:00 AM")
       ff(".ui-datepicker-trigger.btn")[1].click
       fln("25").click
       ff(".ui-datepicker-trigger.btn")[1].send_keys(:enter) # close the calendar
+      driver.find_element(id: "lockDateTime").send_keys("11:59 PM")
     end
     ff(".btn.btn-primary")[1].click
     wait_for_ajaximations

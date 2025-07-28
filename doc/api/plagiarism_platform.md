@@ -38,7 +38,7 @@ Canvas requires that the TP use the following restricted capabilities/services:
 * `vnd.Canvas.submission` service
 * `Canvas.placements.similarityDetection` capability
 
-To retrieve a TCP with these restricted services/capabilities first retrieve a JWT access token as described in <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. These tokens are associated with a single developer key which, in turn, are associated with a single custom TCP. Include this token in the authorization header of the request to retrieve the TCP:
+To retrieve a TCP with these restricted services/capabilities first retrieve a JWT access token as described in <a href="file.jwt_access_tokens.html">JWT access tokens</a> section 1.0. These tokens are associated with a single developer key which, in turn, are associated with a single custom TCP. Include this token in the authorization header of the request to retrieve the TCP:
 
 ```
 Authorization Bearer <JWT access token>
@@ -123,9 +123,9 @@ The following excerpt regarding the split secret capability is from the LTI 2.1 
 #### 1.5 The Tool Proxy Create Request & Webhooks
 The next-to-last step in the standard LTI2 registration flow is creating a Tool Proxy in the Tool Consumer (see [LTI2 implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-101)).
 
-To register a Tool Proxy that uses restricted capabilities/services (like the originality report service) from a custom TCP the Tool Proxy creation `POST` request should include a JWT access token in the `Authorization` header. For information on retrieving a JWT access token for this purpose see <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. This may be the same token used to retrieve the tool consumer profile.
+To register a Tool Proxy that uses restricted capabilities/services (like the originality report service) from a custom TCP the Tool Proxy creation `POST` request should include a JWT access token in the `Authorization` header. For information on retrieving a JWT access token for this purpose see <a href="file.jwt_access_tokens.html">JWT access tokens</a> section 1.0. This may be the same token used to retrieve the tool consumer profile.
 
-Standard LTI2 registration requires requests to be signed with a temporary `reg_key` and `reg_password` (see [LTI@ implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-60)). When using a JWT access token in the authorization header this is not necessary (see <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0).
+Standard LTI2 registration requires requests to be signed with a temporary `reg_key` and `reg_password` (see [LTI@ implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-60)). When using a JWT access token in the authorization header this is not necessary (see <a href="file.jwt_access_tokens.html">JWT access tokens</a> section 1.0).
 
 Once a Tool Proxy is created Canvas will automatically create a subscription to notify the tool when submissions are created by students(see section 2.2).
 
@@ -180,7 +180,7 @@ HTTPS Webhooks will be transmitted over HTTPS via a POST request with a content 
 
 SQS Webhooks will contain the same JSON body as the body of the SQS Message.
 
-For additional field definitions and example JSON payloads, see the documentation for assignment_updated, submission_created, and submission_updated event types in the Canvas Data Services LTI Tool, or on S3 here: <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/assignment_updated.json">assignment_updated</a>, <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/submission_created.json">submission_created</a>, <a href="https://d1raj86qipxohr.cloudfront.net/production/canvas/event-types/submission_updated.json">submission_updated</a>
+For additional field definitions and example JSON payloads, refer to the documentation for the `assignment_updated`, `submission_created`, and `submission_updated` event types in Canvas Data Services, specifically under <a href="file.data_service_canvas_assignment.html" target="_blank">Assignment</a> and <a href="file.data_service_canvas_submission.html" target="_blank">Submission</a> Event Format.
 
 ### 3. Originality Reports
 Once the TP has been notified of a new submission (see section 2.2), it may access the submission through the <a href="plagiarism_detection_submissions.html">Canvas LTI Submissions API</a> for processing. The payload from this request will contain URLs for retrieving the submission’s attachment.
@@ -189,7 +189,7 @@ After processing the submission, an Originality Report may be created for the su
 
 For more details on creating originality reports see the <a href="originality_reports.html"> Canvas Originality Report API documentation</a>.
 
-Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="jwt_access_tokens.html">JWT access tokens</a>.
+Using the Originality Report and Submissions APIs requires a JWT access token be sent in the authorization header. For more information on using JWT tokens in Canvas see <a href="file.jwt_access_tokens.html">JWT access tokens</a>.
 
 ### 4. Other Features and Considerations
 The following are optional features the tool provider may wish to implement.
@@ -246,7 +246,8 @@ PUT
 ```
 
 Example Request:
-```
+
+```bash
 curl -X PUT \
   http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
   -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUiLCJleHAiOjE1MTI3NTYwOTMsImF1ZCI6WyJjYW52YXMuZG9ja2VyIiwiY2FudmFzLmRvY2tlciJdLCJpYXQiOjE1MTI3NTI0OTMsIm5iZiI6MTUxMjc1MjQ2MywianRpIjoiZTY3MmM5OGItYmM4NS00NjliLWE5YjYtNjEyMDE2MWFhZjk0Iiwic2hhcmRfaWQiOjEsInJlZ19rZXkiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUifQ.InMhzWYLhcAWRJHJsy9pRojEcQ5KRUtRGp50mQmFrnA' \
@@ -270,7 +271,8 @@ GET
 
 ```
 Example Request:
-```
+
+```bash
 curl -X GET \
   http://canvas.docker/api/lti/tool_proxy/0ce4dbf1-b8c5-407d-85ac-618d7615a5a5/courses/24/resource_link_id/b2d9b916-5128-42ad-ad17-b54091a52be2/tool_setting \
   -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJDYW52YXMiLCJzdWIiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUiLCJleHAiOjE1MTI3NTYwOTMsImF1ZCI6WyJjYW52YXMuZG9ja2VyIiwiY2FudmFzLmRvY2tlciJdLCJpYXQiOjE1MTI3NTI0OTMsIm5iZiI6MTUxMjc1MjQ2MywianRpIjoiZTY3MmM5OGItYmM4NS00NjliLWE5YjYtNjEyMDE2MWFhZjk0Iiwic2hhcmRfaWQiOjEsInJlZ19rZXkiOiIwY2U0ZGJmMS1iOGM1LTQwN2QtODVhYy02MThkNzYxNWE1YTUifQ.InMhzWYLhcAWRJHJsy9pRojEcQ5KRUtRGp50mQmFrnA' \
@@ -279,7 +281,7 @@ curl -X GET \
 ```
 
 Response:
-```
+```json
 {"tp_custom_setting": "some value"}
 ```
 #### Group Assignments

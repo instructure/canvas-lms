@@ -67,7 +67,14 @@ module FeatureFlags
     end
 
     def self.docviewer_enable_iwork_visible_on_hook(context)
-      DocviewerIworkPredicate.new(context, Shard.current.database_server.config[:region]).call
+      @docviewer_enable_iwork_visible_on_hook_cache ||= {}
+
+      allowed = @docviewer_enable_iwork_visible_on_hook_cache[context.global_asset_string]
+      if allowed.nil?
+        allowed = DocviewerIworkPredicate.new(context, Shard.current.database_server.config[:region]).call
+        @docviewer_enable_iwork_visible_on_hook_cache[context.global_asset_string] = allowed
+      end
+      allowed
     end
 
     def self.usage_metrics_allowed_hook(context)
@@ -108,13 +115,6 @@ module FeatureFlags
       end
     end
 
-    def self.differentiated_modules_setting_hook(_user, _context, _old_state, new_state)
-      # this is a temporary hook to allow us to check the flag's state when booting
-      # canvas. The setting will be checked in app/models/quiz_student_visibility and
-      # app/models/assignment_student_visibility.rb
-      Setting.set("differentiated_modules_setting", (new_state == "on") ? "true" : "false")
-    end
-
     def self.archive_outcomes_after_change_hook(_user, context, _old_state, new_state)
       # Get all root accounts that isn't the site admin account
       root_accounts = Account.active.excluding(context).where(parent_account_id: nil)
@@ -139,6 +139,24 @@ module FeatureFlags
         transitions["on"] ||= {}
         transitions["on"]["message"] = I18n.t("The LTI Extensions Discover page won't be accessible unless the LTI Registrations page is enabled")
       end
+    end
+
+    def self.assignment_enhancements_prereq_for_stickers_hook(_user, context, _old_state, new_state)
+      return if context.feature_allowed?(:assignments_2_student)
+
+      new_state["on"] ||= {}
+      new_state["on"]["locked"] = true
+      new_state["on"]["warning"] = I18n.t("'Assignment Enhancements - Student' must first be enabled in order to enable 'Submission Stickers'")
+    end
+
+    def self.log_modernized_speedgrader_metrics(_user, context, _old_state, new_state)
+      state = if ["allowed_on", "on"].include? new_state
+                "enabled"
+              else
+                "disabled"
+              end
+      cxt = context.is_a?(Course) ? "course" : "account"
+      InstStatsd::Statsd.distributed_increment("speedgrader.modernized.flag.#{state}.#{cxt}")
     end
   end
 end

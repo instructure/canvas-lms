@@ -19,16 +19,19 @@
 
 describe Lti::LogService do
   let(:service) do
-    Lti::LogService.new(tool:, context:, user:, session_id:, placement:, launch_type:)
+    Lti::LogService.new(tool:, context:, user:, session_id:, placement:, launch_type:, launch_url:, lti2:)
   end
 
+  let(:lti2) { false }
+
   let_once(:session_id) { SecureRandom.hex }
-  let_once(:tool) { external_tool_model }
+  let_once(:tool) { external_tool_model(opts: { unified_tool_id: "unified_tool_id" }) }
   let_once(:user) { user_model }
   let_once(:account) { account_model }
   let_once(:context) { course_model(root_account: account) }
   let_once(:placement) { :course_navigation }
   let_once(:launch_type) { :direct_link }
+  let_once(:launch_url) { "https://example.com/basic_lti_tool/" }
 
   describe ".new" do
     context "when context is not valid type" do
@@ -58,9 +61,9 @@ describe Lti::LogService do
       allow(service).to receive(:log_data).and_return(data)
     end
 
-    context "when account-level flag is disabled" do
+    context "when log_lti_launches setting is disabled" do
       before do
-        account.disable_feature!(:lti_log_launches)
+        allow(Setting).to receive(:get).with("log_lti_launches", "true").and_return("false")
       end
 
       it "does not send an event to PandataEvents" do
@@ -69,9 +72,33 @@ describe Lti::LogService do
       end
     end
 
-    context "when site-admin-level flag is disabled" do
+    it "sends an event to PandataEvents" do
+      subject
+      expect(PandataEvents).to have_received(:send_event).with(:lti_launch, data, for_user_id: user.global_id)
+    end
+
+    context "without user" do
+      let(:user) { nil }
+
+      it "sends event without sub" do
+        subject
+        expect(PandataEvents).to have_received(:send_event).with(:lti_launch, data, for_user_id: nil)
+      end
+    end
+  end
+
+  describe "#call with lti2" do
+    subject { service.call }
+
+    let(:lti2) { true }
+
+    before do
+      allow(PandataEvents).to receive(:send_event)
+    end
+
+    context "when log_lti_launches setting is disabled" do
       before do
-        Account.site_admin.disable_feature!(:lti_log_launches_site_admin)
+        allow(Setting).to receive(:get).with("log_lti_launches", "true").and_return("false")
       end
 
       it "does not send an event to PandataEvents" do
@@ -80,30 +107,61 @@ describe Lti::LogService do
       end
     end
 
-    context "when both flags are enabled" do
+    context "when lti_v2_turnitin_usage_log feature flag is disabled" do
       before do
-        account.enable_feature!(:lti_log_launches)
-        Account.site_admin.enable_feature!(:lti_log_launches_site_admin)
+        context.root_account.disable_feature!(:lti_v2_turnitin_usage_log)
+      end
+
+      it "does not send an event to PandataEvents" do
+        subject
+        expect(PandataEvents).not_to have_received(:send_event)
+      end
+    end
+
+    context "when launch URL is not turnitin" do
+      let(:launch_url) { "https://example.com/launch" }
+
+      it "does not send an event to PandataEvents" do
+        subject
+        expect(PandataEvents).not_to have_received(:send_event)
+      end
+    end
+
+    context "when launch URL is turnitin" do
+      let(:launch_url) { "https://api.turnitin.com/api/lti/1p0/assignment" }
+      let(:unified_tool_id) { "777" }
+
+      before do
+        Setting.set("lti_v2_turnitin_utid", unified_tool_id)
       end
 
       it "sends an event to PandataEvents" do
+        expect(PandataEvents).to receive(:send_event).with(
+          :lti_launch,
+          hash_including(
+            unified_tool_id:,
+            tool_name: "Turnitin",
+            tool_version: "2.0",
+            account_id: account.id.to_s,
+            message_type: "basic-lti_launch-request",
+            root_account_uuid: account.uuid,
+            launch_type:,
+            launch_url:,
+            context_id: context.id.to_s,
+            context_type: context.class.name,
+            user_id: user.id.to_s,
+            session_id:,
+            shard_id: Shard.current.id.to_s
+          ),
+          for_user_id: user.global_id
+        )
         subject
-        expect(PandataEvents).to have_received(:send_event).with(:lti_launch, data, for_user_id: user.global_id)
-      end
-
-      context "without user" do
-        let(:user) { nil }
-
-        it "sends event without sub" do
-          subject
-          expect(PandataEvents).to have_received(:send_event).with(:lti_launch, data, for_user_id: nil)
-        end
       end
     end
   end
 
   describe "#log_data" do
-    subject { service.log_data }
+    subject { service.send(:log_data) }
 
     let_once(:user_relationship) { ["StudentEnrollment"] }
 
@@ -113,7 +171,7 @@ describe Lti::LogService do
 
     it "includes the correct data" do
       expect(subject).to eq({
-                              unified_tool_id: nil,
+                              unified_tool_id: tool.unified_tool_id,
                               tool_id: tool.id.to_s,
                               tool_provided_id: tool.tool_id,
                               tool_domain: tool.domain,
@@ -124,7 +182,8 @@ describe Lti::LogService do
                               account_id: account.id.to_s,
                               root_account_uuid: account.uuid,
                               launch_type:,
-                              message_type: service.message_type,
+                              launch_url:,
+                              message_type: service.send(:message_type),
                               placement:,
                               context_id: context.id.to_s,
                               context_type: context.class.name,
@@ -174,7 +233,7 @@ describe Lti::LogService do
   end
 
   describe "#user_relationship" do
-    subject { service.user_relationship }
+    subject { service.send(:user_relationship) }
 
     let(:account_admin_role) { Role.get_built_in_role("AccountAdmin", root_account_id: account.id) }
     let(:account) { account_model }
@@ -259,7 +318,7 @@ describe Lti::LogService do
   end
 
   describe "#message_type" do
-    subject { service.message_type }
+    subject { service.send(:message_type) }
 
     context "when placement is not nil" do
       it "returns the tool's message type for the placement" do

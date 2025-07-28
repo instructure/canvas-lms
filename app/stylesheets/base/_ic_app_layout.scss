@@ -24,17 +24,23 @@
 @mixin shared-main-content {
   display: flex;
 }
+
 @mixin shared-primary {
   flex: 1;
   // Fix Firefox and IE Edge issues with contents breaking out of flex container
   min-width: 1px;
 }
+
 @mixin shared-secondary {
   width: $ic-right-side-width;
   padding-#{direction(left)}: $ic-sp * 2;
 }
 
 $ic-left-side-width: $ic-sp * 16;
+
+@if $use_dyslexic_font {
+  $ic-left-side-width: $ic-sp * 18.2;
+}
 
 body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   box-sizing: border-box;
@@ -54,7 +60,9 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
     outline-offset: -2px;
     outline-style: solid;
   }
+
   padding: $ic-sp * 3 $ic-sp * 4 $ic-sp * 4 $ic-sp * 4;
+
   @include mobile-only {
     & {
       padding-#{direction(left)}: $ic-sp;
@@ -97,6 +105,7 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   box-sizing: border-box;
   min-width: 1px;
   padding: $ic-sp * 2;
+
   @include mobile-only {
     & {
       padding-#{direction(left)}: $ic-sp;
@@ -116,11 +125,13 @@ body.course-menu-expanded {
       @include shared-main-content;
     }
   }
+
   &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop--nav-open) {
       @include shared-primary;
     }
   }
+
   .ic-app-main-content__secondary {
     @include breakpoint(desktop--nav-open) {
       @include shared-secondary;
@@ -135,11 +146,13 @@ body:not(.course-menu-expanded) {
       @include shared-main-content;
     }
   }
+
   &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop) {
       @include shared-primary;
     }
   }
+
   .ic-app-main-content__secondary {
     @include breakpoint(desktop) {
       @include shared-secondary;
@@ -151,45 +164,60 @@ body:not(.course-menu-expanded) {
   .terms-of-service__link {
     a {
       @include ic-focus-base;
+
       &:focus {
         @include ic-focus-variant;
       }
     }
+
     margin-top: -2px !important;
     color: var(--ic-brand-font-color-dark-lightened-15) !important;
   }
+
   box-sizing: border-box;
   padding: $ic-sp 0;
   margin: 0 $ic-sp * 2;
   border-top: 1px solid $ic-border-light;
+
   @include breakpoint(desktop) {
     display: flex;
     align-items: center;
   }
+
   body.modal & {
     margin: 0;
     padding: $ic-sp $ic-sp * 2;
   }
 }
+
 .ic-app-footer__links {
   flex: 1;
   display: flex;
+
   a {
     color: $ic-font-color--subdued;
     margin-#{direction(right)}: $ic-sp;
     @include fontSize($ic-font-size--xsmall);
+
+    &:focus {
+      @include ic-focus-variant-inst;
+    }
+
     @include mobile-only {
       display: inline-block;
       width: 100%;
     }
   }
+
   @include breakpoint(desktop) {
     justify-content: flex-end;
+
     a {
       margin-#{direction(right)}: 0;
       margin-#{direction(left)}: $ic-sp;
     }
   }
+
   @include mobile-only {
     display: block;
   }
@@ -204,7 +232,7 @@ body:not(.course-menu-expanded) {
   box-sizing: border-box;
   min-height: 100vh;
 
-  body:not(.full-width):not(.outcomes):not(.body--login-confirmation) & {
+  body:not(.full-width):not(.outcomes):not(.body--login-confirmation):not(.content-only) & {
     // We want to add a max size to most pages in canvas
     // unless it's a full-width app
     max-width: 1366px;
@@ -216,11 +244,11 @@ body:not(.course-menu-expanded) {
   }
 
   @include desktop-only {
-    body:not(.no-headers) & {
+    body:not(.no-headers):not(.content-only) & {
       margin-#{direction(left)}: $ic-header-primary-width - 30;
     }
 
-    body:not(.no-headers).primary-nav-expanded & {
+    body:not(.no-headers):not(.content-only).primary-nav-expanded & {
       margin-#{direction(left)}: $ic-header-primary-width;
     }
   }
@@ -242,8 +270,7 @@ body:not(.course-menu-expanded) {
   }
 
   @include desktop-only {
-    body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame)
-      & {
+    body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame):not(.content-only) & {
       margin-#{direction(left)}: $ic-left-side-width;
 
       .ic-Layout-watermark {
@@ -293,14 +320,17 @@ body:not(.course-menu-expanded) {
   width: $ic-left-side-width;
   padding: direction-sides($ic-sp * 2 $ic-sp $ic-sp $ic-sp * 2);
   opacity: 0;
+
   body.course-menu-expanded & {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
+
   &.ic-sticky-on {
     bottom: 0;
     padding: 0;
   }
+
   // account for the course term showing in the left-hand sub-nav
   #section-tabs-header-subtitle {
     padding: direction-sides(0 0 $ic-sp $ic-sp);
@@ -319,6 +349,7 @@ body:not(.course-menu-expanded) {
 
 .ic-sticky-frame.has-scrollbar {
   padding: direction-sides($ic-sp * 2 $ic-sp * 0.2 $ic-breadcrumbs-height $ic-sp * 2);
+
   & .nav-icon {
     padding: 0 3px;
   }
@@ -344,12 +375,24 @@ body:not(.course-menu-expanded) {
 
   .right-of-crumbs {
     display: flex;
-    flex: 1;
     flex-direction: row-reverse;
+    align-items: center;
   }
 
-  .right-of-crumbs > * {
+  .right-of-crumbs>* {
     margin-left: 12px;
+  }
+}
+
+/* Push Top Navigation buttons out from under blueprint sync button on full-width pages */
+body.full-width .right-of-crumbs.bp-sync-button-exists {
+  margin-right: 3rem;
+}
+
+/* Top Navigation buttons still need margin at smaller sizes on pages that are not full-width */
+@media (max-width: 1495px) {
+  .right-of-crumbs.bp-sync-button-exists {
+    margin-right: 3rem;
   }
 }
 
@@ -359,6 +402,7 @@ body:not(.course-menu-expanded) {
   width: $ic-sp * 3;
   height: ($ic-sp * 3) - ($ic-sp * 0.5);
   @include overwrite-default-icon-size(1.5rem);
+
   i[class*='icon-'],
   i[class^='icon-'] {
     margin-#{direction(right)}: 0;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Formatter from './Formatter'
+import type Formatter from './Formatter'
 import spacing from './formatters/spacing'
 
 enum MimeTypes {
@@ -88,6 +87,7 @@ class ContentChunker {
     const chunks: Array<Chunk> = []
     const body = this.bodyFor(content)
     const mathElement = body.querySelector(this.selector)
+    // @ts-expect-error
     const [preMath, postMath] = body.innerHTML.split(mathElement?.outerHTML)
 
     // Add pre-math content

@@ -38,7 +38,9 @@
           </span>
         </div>
       <% end %>
-      <%= t(:course_count, "Course", :count => @course_counts_by_term[term&.id] || 0) %><br/>
+      <a id="filter_link_<%= term&.id || "new" %>" class="filter_link" target="_blank" href="<%= context_url(@context, :account_url, enrollment_term_id: term&.id) %>">
+        <%= t(:course_count, "Course", :count => @course_counts_by_term[term&.id] || 0) %>
+      </a><br/>
     </div>
     <%= form_for (term || EnrollmentTerm.new), :url => (term ? context_url(@context, :context_term_url, term.id) : context_url(@context, :context_terms_url)), :html => {:class => "enrollment_term_form", :method => (term ? :put : :post)} do |f| %>
         <div class="control-group edit_term">
@@ -113,7 +115,7 @@
       <td class="edit_term edit_term_buttons">
         <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
         <button class="btn btn-primary submit_button" type="button"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
-        <% if term && term.root_account.feature_enabled?(:course_paces) %>
+        <% if term %>
           <div><%= t("Changing the course participation will republish all course pacing with any new dates using term participation.") %></div>
         <% end %>
       </td>

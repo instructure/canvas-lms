@@ -47,7 +47,7 @@ export default function register(editor: Editor) {
           icon: button.name,
           text: button.text,
           onAction: () => editor.execCommand(button.cmd),
-        }))
+        })),
       ),
   })
 }

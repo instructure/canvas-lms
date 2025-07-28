@@ -23,7 +23,7 @@
 #   script/rails runner spec/fixtures/data_generation/generate_data.rb [options]
 #
 # In docker environment, run:
-#   docker-compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
+#   docker compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
 
 require_relative "../../factories/course_factory"
 require_relative "../../factories/user_factory"
@@ -280,49 +280,82 @@ end
 def generate_mastery_path_course
   puts "Generate Course with Mastery Path"
   course_with_enrollments
+
   @course.conditional_release = true
   @course.save!
 
-  @trigger_assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
-  @set1_assmt1 = create_assignment(@course, "Set 1 Assessment 1", 10)
-  @set2_assmt1 = create_assignment(@course, "Set 2 Assessment 1", 10)
-  @set2_assmt2 = create_assignment(@course, "Set 2 Assessment 2", 10)
-  @set3a_assmt = create_assignment(@course, "Set 3a Assessment", 10)
-  @set3b_assmt = create_assignment(@course, "Set 3b Assessment", 10)
+  @trigger_assignment = @course.assignments.create!(
+    title: "Trigger Assignment",
+    grading_type: "points",
+    points_possible: 100,
+    # due_at: 1.day.ago(now),
+    submission_types: "online_text_entry"
+  )
 
-  graded_discussion = create_discussion(@course, @teacher)
+  @set1_assignment = @course.assignments.create!(
+    title: "Set 1 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set1_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
+  @set2_assignment = @course.assignments.create!(
+    title: "Set 2 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set2_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
+  @set3_assignment = @course.assignments.create!(
+    title: "Set 3 Assignment",
+    points_possible: 10,
+    only_visible_to_overrides: true
+  )
+  @set3_assignment.assignment_overrides.create!(
+    set_type: "Noop",
+    set_id: 1,
+    all_day: false,
+    title: "Mastery Paths",
+    unlock_at_overridden: true,
+    lock_at_overridden: true,
+    due_at_overridden: true
+  )
 
   course_module = @course.context_modules.create!(name: "Mastery Path Module")
   course_module.add_item(id: @trigger_assignment.id, type: "assignment")
-  course_module.add_item(id: @set1_assmt1.id, type: "assignment")
-  course_module.add_item(id: graded_discussion.id, type: "discussion_topic")
-  course_module.add_item(id: @set2_assmt1.id, type: "assignment")
-  course_module.add_item(id: @set2_assmt2.id, type: "assignment")
-  course_module.add_item(id: @set3a_assmt.id, type: "assignment")
-  course_module.add_item(id: @set3b_assmt.id, type: "assignment")
+  course_module.add_item(id: @set1_assignment.id, type: "assignment")
+  course_module.add_item(id: @set2_assignment.id, type: "assignment")
+  course_module.add_item(id: @set3_assignment.id, type: "assignment")
 
   ranges = [
     ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assignment.id)
                                                                                  ])
                                          ]),
     ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assignment.id)
                                                                                  ])
                                          ]),
     ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(
                                              assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
-                                               assignment_id: @set3a_assmt.id
-                                             )]
-                                           ),
-                                           ConditionalRelease::AssignmentSet.new(
-                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
-                                               assignment_id: @set3b_assmt.id
+                                               assignment_id: @set3_assignment.id
                                              )]
                                            )
                                          ])
@@ -401,7 +434,6 @@ def generate_course_pace_course
   course_with_teacher_enrolled
   course_with_students_enrolled
 
-  @root_account.enable_feature!(:course_paces)
   @course.update(enable_course_paces: true)
 
   module1 = create_module(@course)
@@ -419,6 +451,71 @@ def generate_course_pace_course
   puts "Assignment 2 ID is #{assignment2.id}"
   puts "Discussion ID is #{discussion1.id}"
   puts "Module ID is #{module1.id}"
+end
+
+def generate_mega_course
+  puts "Generate Mega Course with #{@mega_course} learning objects"
+  course_with_teacher_enrolled
+  course_with_students_enrolled
+
+  items_per_course_module = 20
+  course_modules = []
+
+  number_of_course_modules = @mega_course / items_per_course_module
+  last_module_number_of_items = @mega_course % items_per_course_module
+  if last_module_number_of_items >> 0
+    number_of_course_modules += 1
+  end
+
+  number_of_course_modules.times do
+    course_modules << create_module(@course)
+  end
+
+  course_modules.each_with_index do |course_module, module_number|
+    items_per_course_module = if module_number == number_of_course_modules - 1 && last_module_number_of_items > 0
+                                last_module_number_of_items
+                              else
+                                20
+                              end
+
+    item_types = %w[assignment discussion_topic quiz wiki_page]
+
+    item_types.cycle.take(items_per_course_module).each do |item_type|
+      learning_object = case item_type
+                        when "assignment"
+                          create_assignment(@course, "Mega Assignment")
+                        when "discussion_topic"
+                          create_discussion(@course, @teacher)
+                        when "quiz"
+                          create_quiz(@course)
+                        when "wiki_page"
+                          create_wiki_page(@course)
+                        end
+
+      course_module.add_item(id: learning_object.id, type: item_type)
+    end
+  end
+
+  assignment_list = @course.assignments
+  wiki_page_list = @course.wiki_pages
+
+  assignment_list.each do |assignment|
+    Assignment.suspend_due_date_caching do
+      @student_list.each do |student|
+        ao = assignment.assignment_overrides.create!
+        ao.assignment_override_students.create!(user: student)
+      end
+    end
+  end
+
+  wiki_page_list.each do |wiki_page|
+    @student_list.each do |student|
+      ao = wiki_page.assignment_overrides.create!
+      ao.assignment_override_students.create!(user: student)
+    end
+  end
+
+  print_standard_course_info
 end
 
 def create_all_the_available_data
@@ -445,6 +542,8 @@ def create_all_the_available_data
   generate_course_assignment_groups
   @course_name = save_course_name + " (course pace course)"
   generate_course_pace_course
+  @course_name = save_course_name + " (mega course)"
+  generate_mega_course
 end
 # rubocop:enable Specs/ScopeHelperModules
 
@@ -467,6 +566,7 @@ option_parser = OptionParser.new do |opts|
   opts.on("-r", "--rubric", "Course with Outcome Rubric Assignment")
   opts.on("-s", "--submissions", "Course and Assignments and Submissions")
   opts.on("-t", "--sections", "Course with Students in Sections")
+  opts.on("-o", "--mega_course=MEGACOURSE", Integer, "Mega Course with Learning Objects and Overrides (default: 200)")
   opts.on_tail("-h", "--help", "Help") do
     puts opts
     exit
@@ -483,12 +583,15 @@ end
 @course_name = options.key?(:course_name) ? options[:course_name] : "Play Course"
 @number_of_students = options.key?(:num_students) ? options[:num_students] : 3
 root_account_id = options.key?(:account_id) ? options[:account_id] : 2
-
+puts "Root Account Id is #{root_account_id}"
 if (@root_account = Account.find_by(id: root_account_id)).nil?
   puts "Invalid Root Account Id: #{root_account_id}"
   puts option_parser.help
   exit 1
 end
+
+# mega course takes the number of learning objects to create
+@mega_course = options.key?(:mega_course) ? options[:mega_course] : 200
 
 options.except!(:course_name, :num_students, :account_id)
 
@@ -525,6 +628,8 @@ options.each_key do |key|
     generate_sections
   when :course_pace
     generate_course_pace_course
+  when :mega_course
+    generate_mega_course
   else raise "should never get here -- BIG FAIL"
   end
 end

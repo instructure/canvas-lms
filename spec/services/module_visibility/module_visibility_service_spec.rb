@@ -31,7 +31,7 @@ describe "ModuleVisibility" do
   end
 
   def module_ids_visible_to_user(user)
-    ModuleVisibility::ModuleVisibilityService.modules_visible_to_student(course_id: @course.id, user_id: user.id).map(&:context_module_id)
+    ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(course_ids: @course.id, user_ids: user.id).map(&:context_module_id)
   end
 
   context "module visibility" do
@@ -62,6 +62,66 @@ describe "ModuleVisibility" do
       @module1.assignment_overrides.create!(set: @section2, workflow_state: "deleted")
       expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
       expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
+    end
+
+    context "with a group override" do
+      before :once do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
+
+        @module3 = @course.context_modules.create!(name: "Module 3 for Non-Collaborative Group")
+
+        @student3 = student_in_course(active_all: true).user
+
+        @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+        @group_category.create_groups(2)
+        @group = @group_category.groups.first
+        @group.add_user(@student3, "accepted")
+
+        @module3.assignment_overrides.create!(set: @group)
+      end
+
+      it "does not consider differentiation tags when the feature is disabled" do
+        @course.account.disable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+        @course.account.reload
+
+        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id)
+      end
+
+      it "does not include modules unless the user is in the group" do
+        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+      end
+
+      it "ignore group overrides when they are deleted" do
+        @group_category.destroy
+        @group_category.groups.each(&:destroy)
+
+        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id)
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id)
+      end
+
+      it "ignore assignment overrides when they are deleted" do
+        @module3.assignment_overrides.destroy_all
+
+        expect(module_ids_visible_to_user(@student1)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+        expect(module_ids_visible_to_user(@student2)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id, @module3.id)
+      end
+
+      it "does not show module when to student after he is removed from group" do
+        @group.group_memberships.where(user: @student3).destroy_all
+
+        expect(module_ids_visible_to_user(@student3)).to contain_exactly(@module1.id, @module2.id)
+      end
     end
   end
 end

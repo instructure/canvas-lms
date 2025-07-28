@@ -29,14 +29,20 @@ describe "eportfolios" do
     stub_rcs_config
   end
 
-  it "creates an eportfolio", priority: "1" do
-    create_eportfolio
-    validate_eportfolio
-  end
+  it "validates creation and visibility of eportfolio" do
+    get "/dashboard/eportfolios"
+    f("#add_eportfolio_button").click
 
-  it "creates an eportfolio that is public", priority: "2" do
-    create_eportfolio
-    validate_eportfolio(true)
+    # fill out form
+    replace_content f("#eportfolio_name"), "student content"
+    f('label[for="eportfolio_public"]').click
+    expect_new_page_load { f("#eportfolio_submit").click }
+
+    # validate eportfolio
+    eportfolio = Eportfolio.find_by_name("student content")
+    expect(eportfolio).to be_valid
+    expect(eportfolio.public).to be_truthy
+    expect(f("#content h2")).to include_text(I18n.t("headers.welcome", "Welcome to Your ePortfolio"))
   end
 
   context "eportfolio created with user" do
@@ -67,32 +73,33 @@ describe "eportfolios" do
       expect(f("#wizard_box")).not_to be_displayed
     end
 
-    it "adds a new page", priority: "1" do
-      page_title = "I made this page."
+    it "adds a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
-      add_eportfolio_page(page_title)
-      expect(f("#page_list")).to include_text(page_title)
-      get "/eportfolios/#{@eportfolio.id}/category/I_made_this_page"
-      wait_for_ajaximations
-      expect(pages.last).to include_text(page_title)
-      expect(f("#content h2")).to include_text(page_title)
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+      add_eportfolio_page("test page name")
+      wait_for_ajax_requests
+      expect(pages.last).to include_text("test page name")
     end
 
     it "deletes a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
-      # add a few pages
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+
+      # add a page
       add_eportfolio_page("page #1")
 
-      # delete page using the settings menu
+      # delete section using the settings menu
       page = pages.last
       delete_eportfolio_page(page)
+      wait_for_ajax_requests
 
-      # The last remaining page should not include the "Delete" action.
-      organize_pages
+      # The last remaining section should not include the "Delete" action.
       expect(pages.length).to eq 1
       last_page = pages.last
-      last_page.find_element(:css, ".page_settings_menu").click
-      expect(last_page).not_to contain_jqcss(".remove_page_link:visible")
+      last_page.find("button").click
+      expect(f("div[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a page", :ignore_js_errors, priority: "1" do
@@ -113,12 +120,17 @@ describe "eportfolios" do
 
     it "adds a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
       add_eportfolio_section("test section name")
+      wait_for_ajax_requests
       expect(sections.last).to include_text("test section name")
     end
 
     it "deletes a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
 
       # add a section
       add_eportfolio_section("section #1")
@@ -126,13 +138,13 @@ describe "eportfolios" do
       # delete section using the settings menu
       section = sections.last
       delete_eportfolio_section(section)
+      wait_for_ajax_requests
 
       # The last remaining section should not include the "Delete" action.
-      organize_sections
       expect(sections.length).to eq 1
       last_section = sections.last
-      last_section.find_element(:css, ".section_settings_menu").click
-      expect(last_section).not_to contain_jqcss(".remove_section_link:visible")
+      last_section.find("button").click
+      expect(f("div[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a section", :ignore_js_errors, priority: "1" do
@@ -153,11 +165,11 @@ describe "eportfolios" do
 
     it "edits ePortfolio settings", priority: "2" do
       get "/eportfolios/#{@eportfolio.id}"
-      f("#section_list_manage .portfolio_settings_link").click
-      replace_content f("#edit_eportfolio_form #eportfolio_name"), "new ePortfolio name1"
-      f("#edit_eportfolio_form #eportfolio_public").click
-      submit_dialog_form("#edit_eportfolio_form")
       wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+      f("button[data-testid='portfolio-settings']").click
+      replace_content f("[data-testid='portfolio-name-field']"), "new ePortfolio name1"
+      fj("button:contains('Save')").click
       @eportfolio.reload
       expect(@eportfolio.name).to include("new ePortfolio name1")
     end
@@ -177,18 +189,25 @@ describe "eportfolios" do
       expect(f("form.FindFlickrImageView")).to be_displayed
     end
 
-    it "does not have new section option when adding submission" do
-      @assignment = @course.assignments.create!(
-        title: "hardest assignment ever",
-        submission_types: "online_url,online_upload"
-      )
-      @submission = @assignment.submit_homework(@student)
-      @submission.submission_type = "online_url"
-      @submission.save!
-      get "/eportfolios/#{@eportfolio.id}"
-      f(".submission").click
-      expect(f("#add_submission_form")).to be_displayed
-      expect(ff("#category_select option").map(&:text)).not_to include("New Section")
+    context "with submissions" do
+      before do
+        @assignment = @course.assignments.create!(
+          title: "hardest assignment ever",
+          submission_types: "online_url,online_upload"
+        )
+        @submission = @assignment.submit_homework(@student)
+        @submission.submission_type = "online_url"
+        @submission.save!
+        get "/eportfolios/#{@eportfolio.id}"
+      end
+
+      it "create a page with a submission" do
+        f("[data-testid='submission-modal-#{@submission.id}']").click
+        expect(f("[data-testid='create-page-modal']")).to be_displayed
+        f("[data-testid='create-page-button']").click
+        expect(f("#content h2")).to include_text @assignment.name
+        expect(f("#content form")).to include_text "This is my hardest assignment ever submission for Unnamed Course"
+      end
     end
 
     it "deletes the ePortfolio", priority: "2" do
@@ -200,7 +219,7 @@ describe "eportfolios" do
       submit_form("#delete_eportfolio_form")
       f("#wrapper .eportfolios").click
       expect(f("#content")).not_to contain_css("#portfolio_#{@eportfolio.id}")
-      expect(f("#whats_an_eportfolio .add_eportfolio_link")).to be_displayed
+      expect(f("#add_eportfolio_button")).to be_displayed
       expect(Eportfolio.first.workflow_state).to eq "deleted"
     end
 
@@ -254,7 +273,7 @@ describe "eportfolios file upload" do
     fj(".file_upload:visible").send_keys(fullpath)
     wait_for_ajaximations
     f(".upload_file_button").click
-    submit_form(".form_content")
+    f("[data-testid='save-page']").click
   end
 
   def verify_file_upload

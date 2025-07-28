@@ -7,3 +7,7 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rake"
+gem "redcarpet"
+gem "rspec", "~> 3.0"

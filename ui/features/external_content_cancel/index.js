@@ -16,17 +16,20 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {postMessageExternalContentCancel} from '@canvas/external-tools/messages'
+import ready from '@instructure/ready'
 
-const I18n = useI18nScope('external_content.cancel')
+const I18n = createI18nScope('external_content.cancel')
 
-const parentWindow = window.opener || window.parent
-postMessageExternalContentCancel(parentWindow)
-setTimeout(
-  () =>
-    $('#dialog_message').text(
-      I18n.t('popup_success', 'Canceled. This popup should close on its own...')
-    ),
-  1000
-)
+ready(() => {
+  const parentWindow = window.opener || window.parent
+  postMessageExternalContentCancel(parentWindow)
+  setTimeout(
+    () =>
+      $('#dialog_message').text(
+        I18n.t('popup_success', 'Canceled. This popup should close on its own...'),
+      ),
+    1000,
+  )
+})

@@ -31,7 +31,7 @@ const setup = ({
       initialAssignedInformation={initialAssignedInformation}
       assignedListOptions={assignedListOptions}
       onAssignedInfoChange={onAssignedInfoChange}
-    />
+    />,
   )
 }
 
@@ -87,7 +87,7 @@ describe('AssignmentDueDate', () => {
         initialAssignedInformation.dueDate,
         locale,
         timeZone,
-        'LL'
+        'LL',
       )
       // Get the input based on that formatted string
       const dueDateInput = getByDisplayValue(datestr)

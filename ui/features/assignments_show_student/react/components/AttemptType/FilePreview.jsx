@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,75 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import LoadingIndicator from '@canvas/loading-indicator'
-import previewUnavailable from '../../../images/PreviewUnavailable.svg'
-import React, {useState, useEffect, useRef, useMemo} from 'react'
-import {bool} from 'prop-types'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
+import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
+import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
+import {
+  filterReports,
+  shouldRenderAssetProcessorData,
+} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
+import {colors, spacing} from '@instructure/canvas-theme'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {IconCompleteSolid, IconDownloadLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Table} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
+import {bool} from 'prop-types'
+import {useEffect, useState} from 'react'
+import previewUnavailable from '../../../images/PreviewUnavailable.svg'
 import elideString from '../../helpers/elideString'
 import OriginalityReport from '../OriginalityReport'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-flex'
-import {IconDownloadLine, IconCompleteSolid} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
-import theme from '@instructure/canvas-theme'
-import {Table} from '@instructure/ui-table'
-import {Link} from '@instructure/ui-link'
-import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
-
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function FilePreview({submission, isOriginalityReportVisible}) {
   const [selectedFileIndex, setSelectedFileIndex] = useState(0)
+  const [apModalAttachmentId, setApModalAttachmentId] = useState(null)
 
   useEffect(() => {
     setSelectedFileIndex(0)
   }, [submission.attempt])
 
-  const translateMimeClass = mimeClass => {
-    switch (mimeClass) {
-      case 'audio':
-        return I18n.t('audio')
-      case 'code':
-        return I18n.t('code')
-      case 'doc':
-        return I18n.t('doc')
-      case 'flash':
-        return I18n.t('flash')
-      case 'html':
-        return I18n.t('html')
-      case 'image':
-        return I18n.t('image')
-      case 'pdf':
-        return I18n.t('pdf')
-      case 'ppt':
-        return I18n.t('ppt')
-      case 'text':
-        return I18n.t('text')
-      case 'video':
-        return I18n.t('video')
-      case 'xls':
-        return I18n.t('xls')
-      case 'zip':
-        return I18n.t('zip')
-      default:
-        return I18n.t('file')
-    }
-  }
-
-  const capitalize = s => {
-    if (typeof s !== 'string') return ''
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
   const selectFile = index => {
     if (index >= 0 || index < submission.attachments.length) {
       setSelectedFileIndex(index)
     }
+  }
+
+  const handleOpenModal = attachmentId => {
+    setApModalAttachmentId(attachmentId)
   }
 
   const shouldDisplayThumbnail = file => {
@@ -121,58 +94,85 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
     )
   }
 
-  const renderFileIcons = () => {
-    const cellTheme = {background: theme.variables.colors.backgroundLight}
+  const renderFileDetailsTable = () => {
+    const cellTheme = {background: colors.contrasts.grey1111}
+    const showDocumentProcessorsColumn = shouldRenderAssetProcessorData()
+
     return (
-      <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
-        <Table.Head>
-          <Table.Row>
-            <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
-            <Table.ColHeader id="filename" themeOverride={cellTheme}>
-              {I18n.t('File Name')}
-            </Table.ColHeader>
-            <Table.ColHeader id="size" themeOverride={cellTheme}>
-              {I18n.t('Size')}
-            </Table.ColHeader>
-            <Table.ColHeader id="originality_report" themeOverride={cellTheme} />
-            <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
-          </Table.Row>
-        </Table.Head>
-        <Table.Body>
-          {submission.attachments.map((file, index) => (
-            <Table.Row key={file._id}>
-              <Table.Cell themeOverride={cellTheme}>
-                {shouldDisplayThumbnail(file)
-                  ? renderThumbnail(file, index)
-                  : renderIcon(file, index)}
-              </Table.Cell>
-              <Table.Cell themeOverride={cellTheme}>
-                <>
+      <>
+        {showDocumentProcessorsColumn && (
+          <StudentAssetReportModal
+            assetProcessors={ENV.ASSET_PROCESSORS}
+            assignmentName={ENV.ASSIGNMENT_NAME}
+            open={apModalAttachmentId !== null}
+            reports={filterReports(ENV.ASSET_REPORTS, apModalAttachmentId)}
+            onClose={() => setApModalAttachmentId(null)}
+            submissionType={submission.submissionType}
+          />
+        )}
+        <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="thumbnail" width="1rem" themeOverride={cellTheme} />
+              <Table.ColHeader id="filename" themeOverride={cellTheme}>
+                {I18n.t('File Name')}
+              </Table.ColHeader>
+              <Table.ColHeader id="size" themeOverride={cellTheme}>
+                {I18n.t('Size')}
+              </Table.ColHeader>
+              <Table.ColHeader id="originality_report" themeOverride={cellTheme} />
+              {showDocumentProcessorsColumn && (
+                <Table.ColHeader id="document_processors" themeOverride={cellTheme}>
+                  {I18n.t('Document Processors')}
+                </Table.ColHeader>
+              )}
+              <Table.ColHeader id="upload-success" width="1rem" themeOverride={cellTheme} />
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            {submission.attachments.map((file, index) => (
+              <Table.Row key={file._id}>
+                <Table.Cell themeOverride={cellTheme}>
+                  {shouldDisplayThumbnail(file)
+                    ? renderThumbnail(file, index)
+                    : renderIcon(file, index)}
+                </Table.Cell>
+                <Table.Cell themeOverride={cellTheme}>
                   <Link onClick={() => selectFile(index)}>
                     {elideString(file.displayName || file.name)}
                   </Link>
                   <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
-                </>
-              </Table.Cell>
-              <Table.Cell themeOverride={cellTheme} data-testid="file-size">
-                {file.size}
-              </Table.Cell>
-              <Table.Cell themeOverride={cellTheme}>
-                {submission.originalityData &&
-                  isOriginalityReportVisible &&
-                  getOriginalityData(submission, index) && (
-                    <Flex.Item>
-                      <OriginalityReport originalityData={getOriginalityData(submission, index)} />
-                    </Flex.Item>
-                  )}
-              </Table.Cell>
-              <Table.Cell themeOverride={cellTheme}>
-                <IconCompleteSolid color="success" />
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+                </Table.Cell>
+                <Table.Cell themeOverride={cellTheme} data-testid="file-size">
+                  {file.size}
+                </Table.Cell>
+                <Table.Cell themeOverride={cellTheme}>
+                  {submission.originalityData &&
+                    isOriginalityReportVisible &&
+                    getOriginalityData(submission, index) && (
+                      <Flex.Item>
+                        <OriginalityReport
+                          originalityData={getOriginalityData(submission, index)}
+                        />
+                      </Flex.Item>
+                    )}
+                </Table.Cell>
+                {showDocumentProcessorsColumn && (
+                  <Table.Cell themeOverride={cellTheme}>
+                    <AssetReportStatus
+                      reports={filterReports(ENV.ASSET_REPORTS, file._id)}
+                      openModal={() => handleOpenModal(file._id)}
+                    />
+                  </Table.Cell>
+                )}
+                <Table.Cell themeOverride={cellTheme}>
+                  <IconCompleteSolid color="success" />
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </>
     )
   }
 
@@ -184,10 +184,10 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
           style={{
             display: 'block',
             padding: `
-              ${theme.variables.spacing.large}
-              ${theme.variables.spacing.medium}
+              ${spacing.large}
+              ${spacing.medium}
               0
-              ${theme.variables.spacing.medium}
+              ${spacing.medium}
             `,
           }}
         >
@@ -210,7 +210,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
       width: '100%',
       height: '100%',
       position: 'absolute',
-      borderLeft: `1px solid ${theme.variables.colors.borderMedium}`,
+      borderLeft: `1px solid ${colors.contrasts.grey1214}`,
     }
     const selectedFile = submission.attachments[selectedFileIndex]
     if (selectedFile && !selectedFile.submissionPreviewUrl) {
@@ -218,8 +218,8 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
         <div
           style={{
             textAlign: 'center',
-            padding: `${theme.variables.spacing.medium} 0 0 0`,
-            borderLeft: `1px solid ${theme.variables.colors.borderMedium}`,
+            padding: `${spacing.medium} 0 0 0`,
+            borderLeft: `1px solid ${colors.contrasts.grey1214}`,
           }}
         >
           <div style={{display: 'block'}}>
@@ -258,7 +258,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
       return (
         <Flex data-testid="file-preview" direction="column" width="100%" alignItems="stretch">
           {submission.attachments.length > 1 && (
-            <Flex.Item padding="0 x-large x-large">{renderFileIcons()}</Flex.Item>
+            <Flex.Item padding="0 x-large x-large">{renderFileDetailsTable()}</Flex.Item>
           )}
           <Flex.Item>{renderFilePreview()}</Flex.Item>
         </Flex>

@@ -27,6 +27,7 @@ describe ExternalToolsController, type: :request do
     before(:once) do
       course_with_teacher(active_all: true, user: user_with_pseudonym)
       @group = group_model(context: @course)
+      @tool_context = @course
     end
 
     it "shows an external tool" do
@@ -129,11 +130,11 @@ describe ExternalToolsController, type: :request do
           expect(doc.at_css("form")["action"]).to eq tool.url
         end
 
-        it "returns 401 if the user is not authorized for the course" do
+        it "returns 403 if the user is not authorized for the course" do
           user_with_pseudonym
           params = { id: tool.id.to_s }
           code = get_raw_sessionless_launch_url(@course, params)
-          expect(code).to eq 401
+          expect(code).to eq 403
         end
 
         it "returns a service unavailable if redis isn't available" do
@@ -167,7 +168,7 @@ describe ExternalToolsController, type: :request do
             expect(json["errors"].first["message"]).to eq "The specified resource does not exist."
           end
 
-          it "returns an unauthorized response if the user can't read the assignment" do
+          it "returns an forbidden response if the user can't read the assignment" do
             assignment_model(course: @course, name: "tool assignment", submission_types: "external_tool", points_possible: 20, grading_type: "points")
             tag = @assignment.build_external_tool_tag(url: tool.url)
             tag.content_type = "ContextExternalTool"
@@ -176,7 +177,7 @@ describe ExternalToolsController, type: :request do
             student_in_course(course: @course)
             params = { id: tool.id.to_s, launch_type: "assessment", assignment_id: @assignment.id }
             code = get_raw_sessionless_launch_url(@course, params)
-            expect(code).to eq 401
+            expect(code).to eq 403
           end
 
           it "returns a bad request if the assignment doesn't have an external_tool_tag" do
@@ -266,6 +267,7 @@ describe ExternalToolsController, type: :request do
       account_admin_user(active_all: true, user: user_with_pseudonym)
       @account = @user.account
       @group = group_model(context: @account)
+      @tool_context = @account
     end
 
     it "shows an external tool" do
@@ -452,6 +454,7 @@ describe ExternalToolsController, type: :request do
       ContextExternalTool.create!(
         context: account,
         consumer_key: "key",
+        developer_key: lti_developer_key_model,
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
@@ -459,7 +462,7 @@ describe ExternalToolsController, type: :request do
       )
     end
 
-    describe "#add_rce_favorite" do
+    describe "#mark_rce_favorite" do
       before :once do
         @root_tool = create_editor_tool(Account.default)
         @sub_account = Account.default.sub_accounts.create!
@@ -467,11 +470,11 @@ describe ExternalToolsController, type: :request do
         account_admin_user(active_all: true)
       end
 
-      def add_favorite_tool(account, tool)
+      def mark_favorite_tool(account, tool)
         json = api_call(:post,
                         "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
                         { controller: "external_tools",
-                          action: "add_rce_favorite",
+                          action: "mark_rce_favorite",
                           format: "json",
                           account_id: account.id.to_s,
                           id: tool.id.to_s },
@@ -488,20 +491,20 @@ describe ExternalToolsController, type: :request do
         api_call(:post,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                  { controller: "external_tools",
-                   action: "add_rce_favorite",
+                   action: "mark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @root_tool.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires a tool in the context" do
         api_call(:post,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
                  { controller: "external_tools",
-                   action: "add_rce_favorite",
+                   action: "mark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @sub_tool.id.to_s },
@@ -521,7 +524,7 @@ describe ExternalToolsController, type: :request do
         json = api_call(:post,
                         "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                         { controller: "external_tools",
-                          action: "add_rce_favorite",
+                          action: "mark_rce_favorite",
                           format: "json",
                           account_id: Account.default.id.to_s,
                           id: @root_tool.id.to_s },
@@ -529,6 +532,28 @@ describe ExternalToolsController, type: :request do
                         {},
                         { expected_status: 400 })
         expect(json["message"]).to eq "Cannot have more than 2 favorited tools"
+      end
+
+      it "allows adding on_by_default tools even if there are already 2 favorited tools" do
+        tool2 = create_editor_tool(Account.default)
+        tool3 = create_editor_tool(Account.default)
+        Account.default.tap do |ra|
+          ra.settings[:rce_favorite_tool_ids] = { value: [tool2.global_id, tool3.global_id] }
+          ra.save!
+        end
+        Setting.set("rce_always_on_developer_key_ids", @root_tool.developer_key.global_id.to_s)
+
+        json = api_call(:post,
+                        "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+                        { controller: "external_tools",
+                          action: "mark_rce_favorite",
+                          format: "json",
+                          account_id: Account.default.id.to_s,
+                          id: @root_tool.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 200 })
+        expect(json["rce_favorite_tool_ids"]).to include(@root_tool.id)
       end
 
       describe "handling deleted tools" do
@@ -543,7 +568,7 @@ describe ExternalToolsController, type: :request do
 
         it "handles adding a favorite after a previous tool is deleted" do
           @tool3.destroy
-          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+          mark_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
         end
 
         it "uses Lti::ContextToolFinder to return tools and can handle global ids" do
@@ -553,34 +578,34 @@ describe ExternalToolsController, type: :request do
           )
           expect(scope_union_double).to receive(:pluck).with(:id).and_return([@tool2.global_id])
 
-          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+          mark_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
         end
       end
 
       it "adds to existing favorites configured with old column if not specified on account" do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
-        add_favorite_tool(Account.default, tool2)
+        mark_favorite_tool(Account.default, tool2)
         expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be true
         expect(tool2.is_rce_favorite_in_context?(Account.default)).to be true
       end
 
       it "can add a root account tool as a favorite for a sub-account" do
-        add_favorite_tool(@sub_account, @root_tool)
+        mark_favorite_tool(@sub_account, @root_tool)
         expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true
         expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be false # didn't affect parent account
       end
 
       it "adds to existing favorites for a sub-account inherited from a root account" do
-        add_favorite_tool(Account.default, @root_tool)
-        add_favorite_tool(@sub_account, @sub_tool)
+        mark_favorite_tool(Account.default, @root_tool)
+        mark_favorite_tool(@sub_account, @sub_tool)
 
         expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true # now saved directly on sub-account
         expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to be true
       end
     end
 
-    describe "#remove_rce_favorite" do
+    describe "#unmark_rce_favorite" do
       before :once do
         @root_tool = create_editor_tool(Account.default)
         @sub_account = Account.default.sub_accounts.create!
@@ -588,11 +613,11 @@ describe ExternalToolsController, type: :request do
         account_admin_user(active_all: true)
       end
 
-      def remove_favorite_tool(account, tool)
+      def unmark_favorite_tool(account, tool)
         json = api_call(:delete,
                         "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
                         { controller: "external_tools",
-                          action: "remove_rce_favorite",
+                          action: "unmark_rce_favorite",
                           format: "json",
                           account_id: account.id.to_s,
                           id: tool.id.to_s },
@@ -609,20 +634,20 @@ describe ExternalToolsController, type: :request do
         api_call(:delete,
                  "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
                  { controller: "external_tools",
-                   action: "remove_rce_favorite",
+                   action: "unmark_rce_favorite",
                    format: "json",
                    account_id: Account.default.id.to_s,
                    id: @root_tool.id.to_s },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "works with existing favorites configured with old column if not specified on account" do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
         tool2.update_attribute(:is_rce_favorite, true)
-        remove_favorite_tool(Account.default, @root_tool)
+        unmark_favorite_tool(Account.default, @root_tool)
         expect(Account.default.reload.settings[:rce_favorite_tool_ids][:value]).to eq [tool2.global_id] # saves it onto the account
       end
 
@@ -633,7 +658,7 @@ describe ExternalToolsController, type: :request do
           ra.save!
         end
 
-        remove_favorite_tool(@sub_account, @root_tool)
+        unmark_favorite_tool(@sub_account, @root_tool)
         expect(@sub_account.settings[:rce_favorite_tool_ids][:value]).to eq [root_tool2.global_id]
       end
     end
@@ -794,14 +819,13 @@ describe ExternalToolsController, type: :request do
                       "#{type.singularize}_id": context.id.to_s },
                     post_hash)
     expect(context.context_external_tools.count).to eq 1
-
     et = context.context_external_tools.last
     expect(json).to eq example_json(et)
   end
 
   def update_call(context, successful: true)
     type = context.class.table_name
-    et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti")
+    et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti", unified_tool_id: "utid_12345")
 
     json = api_call(:put,
                     "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
@@ -857,7 +881,7 @@ describe ExternalToolsController, type: :request do
                    action: "index",
                    format: "json",
                    "#{type.singularize}_id": context.id.to_s })
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   def authorized_call(context)
@@ -910,6 +934,8 @@ describe ExternalToolsController, type: :request do
     et.custom_fields = { key1: "val1", key2: "val2" }
     et.course_navigation = { :url => "http://www.example.com/ims/lti/course", :visibility => "admins", :text => "Course nav", "default" => "disabled" }
     et.account_navigation = { url: "http://www.example.com/ims/lti/account", text: "Account nav", custom_fields: { "key" => "value" } }
+    et.ActivityAssetProcessor = { url: "http://www.example.com/ims/lti/resource", text: "assignment document processor", display_type: "full_width" }
+    et.analytics_hub = { url: "http://www.example.com/ims/lti/resource", text: "analytics hub", display_type: "full_width", visibility: "admins" }
     et.user_navigation = { url: "http://www.example.com/ims/lti/user", text: "User nav" }
     et.editor_button = { url: "http://www.example.com/ims/lti/editor", icon_url: "/images/delete.png", selection_width: 50, selection_height: 50, text: "editor button" }
     et.homework_submission = { url: "http://www.example.com/ims/lti/editor", selection_width: 50, selection_height: 50, text: "homework submission" }
@@ -943,6 +969,7 @@ describe ExternalToolsController, type: :request do
     et.context_external_tool_placements.new(placement_type: opts[:placement]) if opts[:placement]
     et.allow_membership_service_access = opts[:allow_membership_service_access] if opts[:allow_membership_service_access]
     et.conference_selection = { url: "http://www.example.com/ims/lti/conference", icon_url: "/images/delete.png", text: "conference selection" }
+    et.unified_tool_id = "utid_12345"
     et.save!
     et
   end
@@ -1011,8 +1038,8 @@ describe ExternalToolsController, type: :request do
       "id" => et&.id,
       "not_selectable" => et&.not_selectable,
       "workflow_state" => "public",
-      "vendor_help_link" => nil,
       "version" => "1.1",
+      "unified_tool_id" => "utid_12345",
       "deployment_id" => et&.deployment_id,
       "resource_selection" => {
         "enabled" => true,
@@ -1020,7 +1047,7 @@ describe ExternalToolsController, type: :request do
         "url" => "http://www.example.com/ims/lti/resource",
         "selection_height" => 50,
         "selection_width" => 50,
-        "label" => ""
+        "label" => "External Tool Eh"
       },
       "privacy_level" => "public",
       "editor_button" => {
@@ -1066,6 +1093,25 @@ describe ExternalToolsController, type: :request do
         "url" => "http://www.example.com/ims/lti/account",
         "custom_fields" => { "key" => "value" },
         "label" => "Account nav",
+        "selection_height" => 400,
+        "selection_width" => 800
+      },
+      "ActivityAssetProcessor" => {
+        "enabled" => true,
+        "text" => "assignment document processor",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "label" => "assignment document processor",
+        "display_type" => "full_width",
+        "selection_height" => 400,
+        "selection_width" => 800
+      },
+      "analytics_hub" => {
+        "enabled" => true,
+        "text" => "analytics hub",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => "admins",
+        "label" => "analytics hub",
+        "display_type" => "full_width",
         "selection_height" => 400,
         "selection_width" => 800
       },
@@ -1323,6 +1369,7 @@ describe ExternalToolsController, type: :request do
                                    end
     }
     example["is_rce_favorite"] = et.is_rce_favorite if et&.can_be_rce_favorite?
+    example["is_top_nav_favorite"] = et.top_nav_favorite_in_context?(@tool_context) if et&.can_be_top_nav_favorite?
     example
   end
 end

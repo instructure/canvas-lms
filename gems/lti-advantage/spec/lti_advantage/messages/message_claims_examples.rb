@@ -104,5 +104,13 @@ RSpec.shared_examples "message_claims_examples" do
         "lti1p1 must be an instance of LtiAdvantage::Claims::Lti1p1"
       ]
     end
+
+    it 'verifies that "eulaservice" is an Eulaservice' do
+      message.eulaservice = "foo"
+      message.validate
+      expect(message.errors.messages[:eulaservice]).to match_array [
+        "eulaservice must be an instance of LtiAdvantage::Claims::Eulaservice"
+      ]
+    end
   end
 end

@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import { ToggleDetails } from '@instructure/ui-toggle-details'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SearchResult from './SearchResult'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
 export default function SearchResults({onDislike, onExplain, onLike, searchResults, searchTerm}) {
   const searchItemKey = ({content_id, content_type}) => `${content_type}_${content_id}`
@@ -30,34 +30,38 @@ export default function SearchResults({onDislike, onExplain, onLike, searchResul
   const topResults = searchResults.filter(result => result.relevance >= 50)
   const otherResults = searchResults.filter(result => result.relevance < 50)
 
-  return (<>
-    <Flex as="ul" className="searchResults" direction="column">
-      {topResults.map(result => (
-        <SearchResult
-          key={searchItemKey(result)}
-          result={result}
-          onDislike={onDislike}
-          onExplain={onExplain}
-          onLike={onLike}
-          searchTerm={searchTerm}
-        />
-      ))}
-    </Flex>
-    {otherResults.length > 0 && (
-      <ToggleDetails summary={I18n.t('Show additional results that may be less relevant')}>
-        <Flex as="ul" className="searchResults" direction="column">
-          {searchResults.filter(result => result.relevance < 50).map(result => (
-            <SearchResult
-              key={searchItemKey(result)}
-              result={result}
-              onDislike={onDislike}
-              onExplain={onExplain}
-              onLike={onLike}
-              searchTerm=""
-            />
-          ))}
-        </Flex>
-      </ToggleDetails>
-    )}
-  </>)
+  return (
+    <>
+      <Flex as="ul" className="searchResults" direction="column">
+        {topResults.map(result => (
+          <SearchResult
+            key={searchItemKey(result)}
+            result={result}
+            onDislike={onDislike}
+            onExplain={onExplain}
+            onLike={onLike}
+            searchTerm={searchTerm}
+          />
+        ))}
+      </Flex>
+      {otherResults.length > 0 && (
+        <ToggleDetails summary={I18n.t('Show additional results that may be less relevant')}>
+          <Flex as="ul" className="searchResults" direction="column">
+            {searchResults
+              .filter(result => result.relevance < 50)
+              .map(result => (
+                <SearchResult
+                  key={searchItemKey(result)}
+                  result={result}
+                  onDislike={onDislike}
+                  onExplain={onExplain}
+                  onLike={onLike}
+                  searchTerm=""
+                />
+              ))}
+          </Flex>
+        </ToggleDetails>
+      )}
+    </>
+  )
 }

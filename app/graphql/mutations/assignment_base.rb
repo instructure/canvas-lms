@@ -21,43 +21,55 @@
 module Mutations::AssignmentBase; end
 
 class Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate < GraphQL::Schema::InputObject
-  argument :id, ID, required: false
   argument :due_at, Types::DateTimeType, required: false
+  argument :id, ID, required: false
   argument :lock_at, Types::DateTimeType, required: false
-  argument :unlock_at, Types::DateTimeType, required: false
   argument :unassign_item, Boolean, required: false
+  argument :unlock_at, Types::DateTimeType, required: false
 
   argument :course_id, ID, required: false
   argument :course_section_id, ID, required: false
   argument :group_id, ID, required: false
-  argument :student_ids, [ID], required: false
   argument :noop_id, ID, required: false
+  argument :student_ids, [ID], required: false
   argument :title, String, required: false
 end
 
 class Mutations::AssignmentBase::AssignmentModeratedGradingUpdate < GraphQL::Schema::InputObject
   argument :enabled, Boolean, required: false
-  argument :grader_count, Int, required: false
+  argument :final_grader_id, ID, required: false
   argument :grader_comments_visible_to_graders, Boolean, required: false
+  argument :grader_count, Int, required: false
   argument :grader_names_visible_to_final_grader, Boolean, required: false
   argument :graders_anonymous_to_graders, Boolean, required: false
-  argument :final_grader_id, ID, required: false
 end
 
 class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::InputObject
-  argument :enabled, Boolean, required: false
-  argument :count, Int, required: false
-  argument :due_at, Types::DateTimeType, required: false
-  argument :intra_reviews, Boolean, required: false
   argument :anonymous_reviews, Boolean, required: false
   argument :automatic_reviews, Boolean, required: false
+  argument :count, Int, required: false
+  argument :due_at, Types::DateTimeType, required: false
+  argument :enabled, Boolean, required: false
+  argument :intra_reviews, Boolean, required: false
+end
+
+class Mutations::AssignmentBase::LtiAssetProcessorCreateOrUpdate < GraphQL::Schema::InputObject
+  # Structure should match up with UI's AttachedAssetProcessorDto
+  argument :existing_id, Int, required: false
+  # OR:
+  argument :new_content_item, Mutations::LtiContentItems::LtiAssetProcessorDto, required: false
 end
 
 class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :ab_guid, [String], required: false
+  argument :asset_processors, [Mutations::AssignmentBase::LtiAssetProcessorCreateOrUpdate], required: false
   argument :assignment_group_id, ID, required: false
   argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false
+  argument :for_checkpoints,
+           Boolean,
+           "if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at",
+           required: false
   argument :grading_standard_id, ID, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :group_category_id, ID, required: false
@@ -68,8 +80,8 @@ class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObj
   argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
   argument :points_possible, Float, required: false
   argument :post_to_sis, Boolean, required: false
+  argument :suppress_assignment, Boolean, required: false
   argument :unlock_at, Types::DateTimeType, required: false
-  argument :for_checkpoints, Boolean, required: false
 end
 
 class Mutations::AssignmentBase::AssignmentCreate < Mutations::AssignmentBase::AssignmentInputBase
@@ -103,9 +115,7 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
 
     attr_reader :session
 
-    def context
-      @working_assignment.context
-    end
+    delegate :context, to: :@working_assignment
 
     def grading_periods?
       @working_assignment.context.try(:grading_periods?)
@@ -115,9 +125,7 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
       ArbitraryStrongishParams::ANYTHING
     end
 
-    def value_to_boolean(value)
-      Canvas::Plugin.value_to_boolean(value)
-    end
+    delegate :value_to_boolean, to: :"Canvas::Plugin"
 
     def process_incoming_html_content(html)
       Api::Html::Content.process_incoming(html)
@@ -129,35 +137,39 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
   end
 
   # input arguments
-  argument :state, Types::AssignmentType::AssignmentStateType, required: false
-  argument :due_at, Types::DateTimeType, required: false
-  argument :lock_at, Types::DateTimeType, required: false
-  argument :unlock_at, Types::DateTimeType, required: false
-  argument :description, String, required: false
-  argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
-  argument :position, Int, required: false
-  argument :points_possible, Float, required: false
-  argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
-  argument :allowed_extensions, [String], required: false
-  argument :assignment_group_id, ID, required: false
-  argument :group_set_id, ID, required: false
   argument :allowed_attempts, Int, required: false
-  argument :only_visible_to_overrides, Boolean, required: false
-  argument :submission_types, [Types::AssignmentSubmissionType], required: false
-  argument :grading_standard_id, ID, required: false
-  argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
-  argument :moderated_grading, Mutations::AssignmentBase::AssignmentModeratedGradingUpdate, required: false
-  argument :grade_group_students_individually, Boolean, required: false
-  argument :group_category_id, ID, required: false
-  argument :omit_from_final_grade, Boolean, required: false
-  argument :anonymous_instructor_annotations, Boolean, required: false
-  argument :post_to_sis, Boolean, required: false
+  argument :allowed_extensions, [String], required: false
   argument :anonymous_grading,
            Boolean,
            "requires anonymous_marking course feature to be set to true",
            required: false
+  argument :anonymous_instructor_annotations, Boolean, required: false
+  argument :assignment_group_id, ID, required: false
+  argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
+  argument :description, String, required: false
+  argument :due_at, Types::DateTimeType, required: false
+  argument :for_checkpoints,
+           Boolean,
+           "if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at",
+           required: false
+  argument :grade_group_students_individually, Boolean, required: false
+  argument :grading_standard_id, ID, required: false
+  argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
+  argument :group_category_id, ID, required: false
+  argument :group_set_id, ID, required: false
+  argument :lock_at, Types::DateTimeType, required: false
+  argument :moderated_grading, Mutations::AssignmentBase::AssignmentModeratedGradingUpdate, required: false
   argument :module_ids, [ID], required: false
-  argument :for_checkpoints, Boolean, required: false
+  argument :omit_from_final_grade, Boolean, required: false
+  argument :only_visible_to_overrides, Boolean, required: false
+  argument :peer_reviews, Mutations::AssignmentBase::AssignmentPeerReviewsUpdate, required: false
+  argument :points_possible, Float, required: false
+  argument :position, Int, required: false
+  argument :post_to_sis, Boolean, required: false
+  argument :state, Types::AssignmentType::AssignmentStateType, required: false
+  argument :submission_types, [Types::AssignmentSubmissionType], required: false
+  argument :suppress_assignment, Boolean, required: false
+  argument :unlock_at, Types::DateTimeType, required: false
 
   # the return data if the update is successful
   field :assignment, Types::AssignmentType, null: true
@@ -295,9 +307,9 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
   end
 
   def ensure_restored
-    raise GraphQL::ExecutionError, "insufficient permission" unless @working_assignment.grants_right? current_user, :delete
     # if we are already not destroyed, then dont do anything
     return if @working_assignment.workflow_state != "deleted"
+    raise GraphQL::ExecutionError, "insufficient permission" unless @working_assignment.grants_right? current_user, :delete
 
     @working_assignment.restore
   end

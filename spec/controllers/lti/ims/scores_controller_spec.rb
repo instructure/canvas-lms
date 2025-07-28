@@ -167,7 +167,7 @@ module Lti::IMS
               expect(rslt.submission).to be_nil
             end
 
-            context do
+            context "with PendingManual" do
               let(:params_overrides) { super().merge(gradingProgress: "PendingManual") }
 
               it "does not create submission with PendingManual" do
@@ -370,7 +370,7 @@ module Lti::IMS
 
           context "with gradingProgress set to PendingManual" do
             let(:params_overrides) do
-              super().merge(gradingProgress: "PendingManual", scoreGiven: 10, scoreMaximum: line_item.score_maximum)
+              super().merge(gradingProgress: "PendingManual", scoreGiven: 10, scoreMaximum: line_item.score_maximum, comment: "Test comment")
             end
 
             it "updates the submission" do
@@ -383,6 +383,13 @@ module Lti::IMS
               result.reload
               expect(result.needs_review?).to be true
               expect(result.submission.needs_review?).to be true
+            end
+
+            it "student can read their own comments" do
+              send_request
+              result.reload
+              comment = SubmissionComment.find_by(submission_id: result.submission.id)
+              expect(comment.grants_right?(user, :read)).to be true
             end
 
             context "with submission already graded and using preserve_score param" do
@@ -491,23 +498,9 @@ module Lti::IMS
             let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) { super().merge(submittedAt: submitted_at) }
 
-            context "when FF is off" do
-              before do
-                Account.site_admin.disable_feature!(:lti_ags_remove_top_submitted_at)
-              end
-
-              it_behaves_like "a request specifying when the submission occurred"
-            end
-
-            context "when FF is on" do
-              before do
-                Account.site_admin.enable_feature!(:lti_ags_remove_top_submitted_at)
-              end
-
-              it "ignores submittedAt" do
-                send_request
-                expect(result.submission.reload.submitted_at).not_to eq submitted_at
-              end
+            it "ignores submittedAt" do
+              send_request
+              expect(result.submission.reload.submitted_at).not_to eq submitted_at
             end
           end
 
@@ -535,7 +528,7 @@ module Lti::IMS
             end
             let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: false, submitted_at: }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, submitted_at: }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
               "http://canonical.host/api/lti/courses/#{context_id}/progress/"
@@ -563,6 +556,10 @@ module Lti::IMS
                 end
 
                 context "when over attempt limit" do
+                  let(:params_overrides) do
+                    super().merge(Lti::Result::AGS_EXT_SUBMISSION => { new_submission: false })
+                  end
+
                   it "succeeds" do
                     result.submission.update!(attempt: 4)
                     send_request
@@ -625,58 +622,41 @@ module Lti::IMS
                 expect(Attachment.last.content_type).to eq "text/plain"
               end
 
-              context "with FF on" do
-                let(:params_overrides) do
-                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: true, submitted_at: })
-                end
-
-                before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
-                end
-
-                it "sets submitted_at correctly" do
-                  send_request
-                  expect(result.submission.reload.submitted_at).to eq submitted_at
-                end
-
-                context "and multiple file content items" do
-                  let(:params_overrides) do
-                    super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
-                                                                         {
-                                                                           type: "file",
-                                                                           url: "https://getsamplefiles.com/download/txt/sample-1.txt",
-                                                                           title: "sample1.txt"
-                                                                         },
-                                                                         {
-                                                                           type: "file",
-                                                                           url: "https://getsamplefiles.com/download/txt/sample-2.txt",
-                                                                           title: "sample2.txt"
-                                                                         },
-                                                                       ],
-                                                                       new_submission: true })
-                  end
-
-                  it "handles multiple attachments" do
-                    send_request
-                    expect(result.submission.reload.attachments.length).to eq 2
-                  end
-
-                  it "only creates one attempt" do
-                    attempt_count = result.submission.attempt || 0
-                    send_request
-                    expect(result.submission.reload.attempt).to eq(attempt_count + 1)
-                  end
-                end
+              let(:params_overrides) do
+                super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: true, submitted_at: })
               end
 
-              context "with FF off" do
-                before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
+              it "sets submitted_at correctly" do
+                send_request
+                expect(result.submission.reload.submitted_at).to eq submitted_at
+              end
+
+              context "and multiple file content items" do
+                let(:params_overrides) do
+                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
+                                                                       {
+                                                                         type: "file",
+                                                                         url: "https://getsamplefiles.com/download/txt/sample-1.txt",
+                                                                         title: "sample1.txt"
+                                                                       },
+                                                                       {
+                                                                         type: "file",
+                                                                         url: "https://getsamplefiles.com/download/txt/sample-2.txt",
+                                                                         title: "sample2.txt"
+                                                                       },
+                                                                     ],
+                                                                     new_submission: true })
                 end
 
-                it "ignores submitted_at" do
+                it "handles multiple attachments" do
                   send_request
-                  expect(result.submission.reload.submitted_at).not_to eq submitted_at
+                  expect(result.submission.reload.attachments.length).to eq 2
+                end
+
+                it "only creates one attempt" do
+                  attempt_count = result.submission.attempt || 0
+                  send_request
+                  expect(result.submission.reload.attempt).to eq(attempt_count + 1)
                 end
               end
 
@@ -721,7 +701,6 @@ module Lti::IMS
                 )
               end
 
-              # it_behaves_like 'creates a new submission'
               # See spec/integration/scores_spec.rb
               # for Instfs, we have to mock a request to the files capture API
               # that doesn't work well in a controller spec for this controller
@@ -734,11 +713,7 @@ module Lti::IMS
                 expect(progress_url).to include expected_progress_url
               end
 
-              shared_examples_for "no updates are made with FF on" do
-                before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
-                end
-
+              shared_examples_for "no updates are made" do
                 it "does not update submission" do
                   score = result.submission.score
                   send_request
@@ -759,40 +734,13 @@ module Lti::IMS
                 end
               end
 
-              shared_examples_for "updates are made with FF off" do
-                before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
-                end
-
-                it "updates submission" do
-                  result
-                  send_request
-                  expect(result.submission.reload.score).to eq 10
-                end
-
-                it "updates result" do
-                  result
-                  send_request
-                  expect(result.reload.result_score).to eq 10
-                end
-
-                # since the file upload process submits the assignment when content items are present
-                it "does not submit assignment" do
-                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
-                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
-                  send_request
-                  expect(result.submission.reload.attempt).to eq attempt
-                end
-              end
-
               shared_examples_for "a 400" do
                 it "returns bad request" do
                   send_request
                   expect(response).to be_bad_request
                 end
 
-                it_behaves_like "no updates are made with FF on"
-                it_behaves_like "updates are made with FF off"
+                it_behaves_like "no updates are made"
               end
 
               shared_examples_for "a 500" do
@@ -801,8 +749,7 @@ module Lti::IMS
                   expect(response).to be_server_error
                 end
 
-                it_behaves_like "no updates are made with FF on"
-                it_behaves_like "updates are made with FF off"
+                it_behaves_like "no updates are made"
               end
 
               context "when InstFS is unreachable" do
@@ -834,63 +781,31 @@ module Lti::IMS
               end
 
               context "when file upload url times out" do
-                context "and FF is on" do
+                context "and InstFS responds with a 502" do
                   before do
-                    Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
+                    allow(CanvasHttp).to receive(:post).and_return(
+                      double(class: Net::HTTPBadRequest, code: 502, body: {})
+                    )
                   end
 
-                  context "and InstFS responds with a 502" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 502, body: {})
-                      )
-                    end
-
-                    it "returns 504 and specific error message" do
-                      send_request
-                      expect(response).to have_http_status :gateway_timeout
-                      expect(response.body).to include("file url timed out")
-                    end
-                  end
-
-                  context "and InstFS responds with a 400" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
-                      )
-                    end
-
-                    it "returns 504 and specific error message" do
-                      send_request
-                      expect(response).to have_http_status :gateway_timeout
-                      expect(response.body).to include("file url timed out")
-                    end
+                  it "returns 504 and specific error message" do
+                    send_request
+                    expect(response).to have_http_status :gateway_timeout
+                    expect(response.body).to include("file url timed out")
                   end
                 end
 
-                context "and FF is off" do
+                context "and InstFS responds with a 400" do
                   before do
-                    Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
+                    allow(CanvasHttp).to receive(:post).and_return(
+                      double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                    )
                   end
 
-                  context "and InstFS responds with a 502" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 502, body: {})
-                      )
-                    end
-
-                    it_behaves_like "a 500"
-                  end
-
-                  context "and InstFS responds with a 400" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
-                      )
-                    end
-
-                    it_behaves_like "a 400"
+                  it "returns 504 and specific error message" do
+                    send_request
+                    expect(response).to have_http_status :gateway_timeout
+                    expect(response.body).to include("file url timed out")
                   end
                 end
               end
@@ -1219,25 +1134,49 @@ module Lti::IMS
         it_behaves_like "a successful scores request"
       end
 
-      context "when activityProdress is set to Initialized" do
+      context "when activityProgress is set to Initialized" do
         let(:params_overrides) { super().merge(activityProgress: "Initialized") }
 
-        shared_examples_for "an unsubmitted submission" do
+        before do
+          Account.root_accounts.first.disable_feature! :ags_score_trigger_needs_grading_after_submitted
+        end
+
+        it "does not update the submission" do
+          send_request
+          rslt = Lti::Result.find(json["resultUrl"].split("/").last)
+          expect(rslt.submission.workflow_state).to eq("unsubmitted")
+        end
+      end
+
+      %w[Initialized Started InProgress].each do |activity_progress|
+        context "when activityProgress is set to #{activity_progress}" do
+          before do
+            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
+          end
+
+          let(:params_overrides) { super().merge(activityProgress: activity_progress) }
+
           it "does not update the submission" do
             send_request
             rslt = Lti::Result.find(json["resultUrl"].split("/").last)
             expect(rslt.submission.workflow_state).to eq("unsubmitted")
           end
         end
+      end
 
-        it_behaves_like "an unsubmitted submission"
-
-        context "ags_scores_multiple_files FF is on" do
+      %w[Submitted Completed].each do |activity_progress|
+        context "when activityProgress is set to #{activity_progress}" do
           before do
-            Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
+            Account.root_accounts.first.enable_feature! :ags_score_trigger_needs_grading_after_submitted
           end
 
-          it_behaves_like "an unsubmitted submission"
+          let(:params_overrides) { super().merge(activityProgress: activity_progress) }
+
+          it "does update the submission" do
+            send_request
+            rslt = Lti::Result.find(json["resultUrl"].split("/").last)
+            expect(rslt.submission.workflow_state).to eq("submitted")
+          end
         end
       end
 
@@ -1247,6 +1186,28 @@ module Lti::IMS
         end
 
         it_behaves_like "a successful scores request"
+      end
+
+      context "with different activityProgress values" do
+        %w[Initialized Started InProgress].each do |activity_progress|
+          context "when activityProgress is #{activity_progress}" do
+            let(:params_overrides) do
+              super().merge(activityProgress: activity_progress, gradingProgress: "PendingManual")
+            end
+
+            it "does not mark result as needing review for non-final activity progress" do
+              send_request
+              result.reload
+              expect(result.needs_review?).to be false
+              expect(result.submission.needs_review?).to be false
+            end
+
+            it "does not set submission workflow_state to pending_review" do
+              send_request
+              expect(result.reload.submission.workflow_state).not_to eq("pending_review")
+            end
+          end
+        end
       end
 
       context "with invalid params" do
@@ -1409,6 +1370,129 @@ module Lti::IMS
           end
 
           it_behaves_like "an unprocessable entity"
+        end
+
+        context "when assignment is unpublished" do
+          before { assignment.update!(workflow_state: "unpublished") }
+
+          let(:params_overrides) do
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
+                            {
+                              type: "file",
+                              url: "https://getsamplefiles.com/download/txt/sample-1.txt",
+                              title: "sample1.txt"
+                            }
+                          ] })
+          end
+
+          it "does not modify the submission" do
+            result
+            send_request
+            expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
+            expect(response).to have_http_status :unprocessable_entity
+            expect(response.body).to include "This assignment is still unpublished"
+          end
+        end
+      end
+
+      context "race condition scenarios" do
+        let(:original_score) { 3 }
+        let(:original_maximum) { 5 }
+        let(:new_score) { 4 }
+
+        describe "simultaneous result.update! calls causing inconsistent data" do
+          def setup_controller(test_user, test_line_item, params_hash)
+            controller = Lti::IMS::ScoresController.new
+
+            # Set up the controller with necessary context
+            controller.instance_variable_set(:@current_user, test_user)
+            controller.instance_variable_set(:@domain_root_account, Account.default)
+            controller.instance_variable_set(:@context, course)
+
+            # Mock request and params for this controller
+            allow(controller).to receive_messages(
+              params: ActionController::Parameters.new(params_hash.merge({
+                                                                           controller: "lti/ims/scores",
+                                                                           action: "create"
+                                                                         })),
+              lti_result_show_url: "https://example.com/results/#{test_line_item.id}",
+              render: nil,
+              tool:
+            )
+
+            controller
+          end
+
+          it "reproduces race condition with concurrent scores endpoint calls" do
+            test_line_item = line_item_model(course:)
+            test_user = student_in_course(course:, active_all: true).user
+            test_submission = test_line_item.assignment.find_or_create_submission(test_user)
+
+            result = Lti::Result.create!(
+              line_item: test_line_item,
+              user: test_user,
+              submission: test_submission,
+              result_score: original_score,
+              result_maximum: original_maximum,
+              activity_progress: "Completed",
+              grading_progress: "FullyGraded",
+              created_at: Time.zone.now,
+              updated_at: Time.zone.now
+            )
+            result_id = result.id
+
+            base_params = {
+              course_id: course.id,
+              line_item_id: test_line_item.id,
+              userId: test_user.id,
+              activityProgress: "Completed",
+              timestamp: Time.zone.now.iso8601(3)
+            }
+
+            thread1_params = base_params.merge(gradingProgress: "Pending")
+            thread2_params = base_params.merge(
+              gradingProgress: "FullyGraded",
+              scoreGiven: new_score,
+              scoreMaximum: original_maximum
+            )
+
+            # Use threads to simulate concurrent endpoint calls
+            threads = []
+            exceptions = []
+
+            # Initial state (score_given=3, score_maximum=5)
+            # Thread 1 delay
+            # Thread 2 load result record
+            # Thread 1 load result record
+            # Thread 1 updates result record (score_given=nil, score_maximum=nil)
+            # Thread 2 updates result records  (score_given=4, score_maximum=5 but will not be updated treated as unchanged)
+            # Final state (score_given=4, score_maximum=nil) and that is invalid
+            threads << Thread.new do
+              # Small delay so thread2 could load the result record before thread1 updates it
+              sleep(0.1)
+              controller1 = setup_controller(test_user, test_line_item, thread1_params)
+              controller1.create
+            rescue => e
+              exceptions << { thread: 1, exception: e }
+            end
+
+            # Thread 2: Update with new score
+            threads << Thread.new do
+              controller2 = setup_controller(test_user, test_line_item, thread2_params)
+              # simulate loading the result record on a before_action
+              controller2.send(:result)
+              # Wait for 1st thread to do result update
+              sleep(0.2)
+              controller2.create
+            rescue => e
+              exceptions << { thread: 2, exception: e }
+            end
+
+            threads.each(&:join)
+
+            expect(exceptions).to be_empty
+            expect(Lti::Result.find(result_id).reload.valid?).to be true
+          end
         end
       end
     end

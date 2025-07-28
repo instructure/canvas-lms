@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {arrayOf, func, string} from 'prop-types'
+import {arrayOf, func, string, bool} from 'prop-types'
 import {Tag} from '@instructure/ui-tag'
 import ContentShareUserSearchSelector from './ContentShareUserSearchSelector'
 import {basicUser} from '@canvas/users/react/proptypes/user'
 
-const I18n = useI18nScope('direct_share_user_panel')
+const I18n = createI18nScope('direct_share_user_panel')
 
 DirectShareUserPanel.propTypes = {
   courseId: string,
   selectedUsers: arrayOf(basicUser),
   onUserSelected: func, // basicUser => {}
   onUserRemoved: func, // basicUser => {}
+  selectedUsersError: bool,
+  userSelectInputRef: func,
 }
 
 export default function DirectShareUserPanel({
@@ -37,6 +39,8 @@ export default function DirectShareUserPanel({
   onUserSelected,
   onUserRemoved,
   courseId,
+  selectedUsersError,
+  userSelectInputRef,
 }) {
   function renderSelectedUserTags() {
     return selectedUsers.map(user => (
@@ -56,6 +60,8 @@ export default function DirectShareUserPanel({
       onUserSelected={onUserSelected}
       selectedUsers={selectedUsers}
       renderBeforeInput={renderSelectedUserTags}
+      selectedUsersError={selectedUsersError}
+      userSelectInputRef={userSelectInputRef}
     />
   )
 }

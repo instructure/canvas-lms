@@ -34,7 +34,7 @@ describe('Embed', () => {
     const onDismiss = jest.fn()
 
     const {getByLabelText, getByText} = render(
-      <Embed onSubmit={handleEmbedCode} onDismiss={onDismiss} />
+      <Embed onSubmit={handleEmbedCode} onDismiss={onDismiss} />,
     )
 
     const textArea = getByLabelText('Embed Code')
@@ -58,7 +58,7 @@ describe('Embed', () => {
     const handleEmbedCode = jest.fn()
     const onDismiss = jest.fn()
     const {getByText, getByLabelText} = render(
-      <Embed onSubmit={handleEmbedCode} onDismiss={onDismiss} />
+      <Embed onSubmit={handleEmbedCode} onDismiss={onDismiss} />,
     )
     const textArea = getByLabelText('Embed Code')
     fireEvent.change(textArea, {target: {value: 'embed code here'}})

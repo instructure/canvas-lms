@@ -47,9 +47,9 @@ describe('when the iframe property is specified', () => {
 
   it('returns markup for an iframe', () => {
     expect(
-      resourceLinkContentItemToHtmlString(overrideResourceLinkContentItem({iframe}), endpoint)
+      resourceLinkContentItemToHtmlString(overrideResourceLinkContentItem({iframe}), endpoint),
     ).toEqual(
-      '<iframe src="http://test.canvas.com/accounts/1/external_tools/retrieve?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
+      '<iframe src="http://test.canvas.com/accounts/1/external_tools/retrieve?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>',
     )
   })
 })

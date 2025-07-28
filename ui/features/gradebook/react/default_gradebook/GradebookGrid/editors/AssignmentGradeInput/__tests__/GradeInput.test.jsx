@@ -101,9 +101,9 @@ describe('GradebookGrid AssignmentGradeInput', () => {
     test('renders a button trigger for the menu', () => {
       mountComponent()
       const button = wrapper.container.querySelectorAll(
-        '.Grid__GradeCell__CompleteIncompleteMenu button'
+        '.Grid__GradeCell__CompleteIncompleteMenu button',
       )
-      expect(button.length).toBe(1)
+      expect(button).toHaveLength(1)
     })
 
     test('sets the input value to "–" when the submission is not graded and not excused', () => {
@@ -148,7 +148,7 @@ describe('GradebookGrid AssignmentGradeInput', () => {
 
     test('renders a text input', () => {
       mountComponent()
-      expect(wrapper.container.querySelectorAll('input[type="text"]').length).toBe(1)
+      expect(wrapper.container.querySelectorAll('input[type="text"]')).toHaveLength(1)
     })
 
     test('optionally disables the input', () => {
@@ -202,7 +202,7 @@ describe('GradebookGrid AssignmentGradeInput', () => {
 
     test('renders a text input', () => {
       mountComponent()
-      expect(wrapper.container.querySelectorAll('input[type="text"]').length).toBe(1)
+      expect(wrapper.container.querySelectorAll('input[type="text"]')).toHaveLength(1)
     })
 
     test('optionally disables the input', () => {
@@ -211,21 +211,21 @@ describe('GradebookGrid AssignmentGradeInput', () => {
       expect(wrapper.container.querySelector('input[type="text"]')).toBeDisabled()
     })
 
-    test('sets the input value to the percentage value of the entered score of the submission', () => {
+    test('sets the input value to the percentage value of the submission score', () => {
       mountComponent()
-      expect(getTextInputValue()).toBe('7.8')
+      expect(getTextInputValue()).toBe('78%')
     })
 
-    test('rounds the input value to two decimal places', () => {
+    test('rounds the percentage value of the input to two decimal places', () => {
       props.submission.enteredScore = 7.8916
       mountComponent()
-      expect(getTextInputValue()).toBe('7.89')
+      expect(getTextInputValue()).toBe('78.92%')
     })
 
     test('strips insignificant zeros', () => {
       props.submission.enteredScore = 8.0
       mountComponent()
-      expect(getTextInputValue()).toBe('8')
+      expect(getTextInputValue()).toBe('80%')
     })
 
     test('keeps the input blank when the submission is not graded', () => {

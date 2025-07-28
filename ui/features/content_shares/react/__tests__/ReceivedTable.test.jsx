@@ -37,7 +37,7 @@ describe('content shares table', () => {
 
   it('renders share data', () => {
     const {container, getByText, getAllByText} = render(
-      <ReceivedTable shares={[assignmentShare]} />
+      <ReceivedTable shares={[assignmentShare]} />,
     )
     expect(container.querySelector('th')).toBeInTheDocument()
     expect(container.querySelector('td')).toBeInTheDocument()
@@ -50,7 +50,7 @@ describe('content shares table', () => {
 
   it('renders ok without sender data', () => {
     const {container, getByText, getAllByText} = render(
-      <ReceivedTable shares={[senderlessAssignmentShare]} />
+      <ReceivedTable shares={[senderlessAssignmentShare]} />,
     )
     expect(container.querySelector('th')).toBeInTheDocument()
     expect(container.querySelector('td')).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe('content shares table', () => {
     const onUpdate = jest.fn()
 
     const {getByTestId} = render(
-      <ReceivedTable shares={[unreadDiscussionShare]} onUpdate={onUpdate} />
+      <ReceivedTable shares={[unreadDiscussionShare]} onUpdate={onUpdate} />,
     )
     fireEvent.click(getByTestId('received-table-row-unread'))
     expect(onUpdate).toHaveBeenCalledWith(unreadDiscussionShare.id, {read_state: 'read'})
@@ -105,7 +105,7 @@ describe('content shares table', () => {
     const onUpdate = jest.fn()
 
     const {getByTestId} = render(
-      <ReceivedTable shares={[readDiscussionShare]} onUpdate={onUpdate} />
+      <ReceivedTable shares={[readDiscussionShare]} onUpdate={onUpdate} />,
     )
     fireEvent.click(getByTestId('received-table-row-read'))
     expect(onUpdate).toHaveBeenCalledWith(unreadDiscussionShare.id, {read_state: 'unread'})
@@ -116,7 +116,7 @@ describe('content shares table', () => {
     const onImport = jest.fn()
 
     const {getByText, getByTestId} = render(
-      <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />
+      <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />,
     )
     fireEvent.click(getByText(/manage options/i))
     const previewOption = getByTestId('preview-menu-action')
@@ -131,7 +131,7 @@ describe('content shares table', () => {
     const onImport = jest.fn()
 
     const {getByText, getByTestId} = render(
-      <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />
+      <ReceivedTable shares={[assignmentShare]} onPreview={onPreview} onImport={onImport} />,
     )
     fireEvent.click(getByText(/manage options/i))
     const previewOption = getByTestId('import-menu-action')
@@ -162,7 +162,7 @@ describe('content shares table', () => {
   it('handles an incomplete content_export', () => {
     const pendingShare = mockShare({content_export: {id: '4', workflow_state: 'exporting'}})
     const {getByText, queryByText, queryByTestId} = render(
-      <ReceivedTable shares={[pendingShare]} />
+      <ReceivedTable shares={[pendingShare]} />,
     )
     fireEvent.click(getByText(/manage options/i))
     expect(queryByText('Remove')).toBeInTheDocument()

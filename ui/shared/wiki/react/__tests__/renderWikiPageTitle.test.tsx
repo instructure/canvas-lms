@@ -43,7 +43,7 @@ const getProps = (overrides?: {[k: string]: any}): ComponentProps => ({
 })
 
 describe('renderWikiPageTitle', () => {
-  it('sets the wikipage title to the input', () => {
+  it('sets the wiki page title to the input', () => {
     const props = getProps()
     const component = renderWikiPageTitle(props)
     const {getByTestId} = render(component)
@@ -69,16 +69,46 @@ describe('renderWikiPageTitle', () => {
     expect(getByText('Test Title')).toBeInTheDocument()
   })
 
-  it('calls validationCallback when submitting', () => {
+  it('calls validationCallback when submitting empty title', () => {
     const titleErrors = [{message: 'title is required', type: 'required'}]
     const callback = jest.fn(() => ({title: titleErrors}))
     const props = getProps({validationCallback: callback})
+
     const component = renderWikiPageTitle(props)
 
     const {getByText} = render(component)
-    props.viewElement.submit()
+    props.viewElement.trigger('submit')
     expect(getByText(titleErrors[0].message)).toBeInTheDocument()
     expect(callback).toHaveBeenCalled()
+  })
+
+  it('shows error from server when submitting', () => {
+    const mockViewElement = {
+      on: jest.fn(),
+      off: jest.fn(),
+      getFormData: jest.fn(),
+    }
+    const props = getProps({ viewElement: mockViewElement })
+    const component = renderWikiPageTitle(props)
+    const {getByText} = render(component)
+  
+    const submitterFn = mockViewElement.on.mock.calls[0][1]
+    const mockEvent = {
+      stopPropagation: jest.fn(),
+      result: Promise.reject({
+        responseJSON: {
+          errors: {
+            title: [{message: 'Title error message'}]
+          }
+        }
+      })
+    }
+
+    submitterFn(mockEvent)
+    expect(mockEvent.stopPropagation).toHaveBeenCalled()
+    mockEvent.result.catch(() => {
+      expect(getByText('Title error message')).toBeInTheDocument()
+    })
   })
 
   describe('handleOnChange', () => {
@@ -107,7 +137,7 @@ describe('renderWikiPageTitle', () => {
       expect(checkForTitleConflictDebounced).not.toHaveBeenCalled()
     })
 
-    it('does not call checkForTitleConflictDebounced when new value is whitepace', () => {
+    it('does not call checkForTitleConflictDebounced when new value is whitespace', () => {
       const {getByTestId} = render(renderWikiPageTitle(getProps()))
       const input = getByTestId('wikipage-title-input')
       fireEvent.change(input, {target: {value: '       '}})

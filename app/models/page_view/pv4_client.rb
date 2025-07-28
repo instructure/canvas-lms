@@ -20,7 +20,12 @@
 
 class PageView
   class Pv4Client
+    class Pv4BadRequest < StandardError; end
+    class Pv4EmptyResponse < StandardError; end
+    class Pv4NotFound < StandardError; end
     class Pv4Timeout < StandardError; end
+    class Pv4TooManyRequests < StandardError; end
+    class Pv4Unauthorized < StandardError; end
 
     def initialize(uri, access_token)
       uri = URI.parse(uri) if uri.is_a?(String)
@@ -29,7 +34,7 @@ class PageView
 
     PRECISION = 3
 
-    def fetch(user_id,
+    def fetch(user,
               start_time: nil,
               end_time: Time.now.utc,
               last_page_view_id: nil,
@@ -37,17 +42,34 @@ class PageView
       end_time ||= Time.now.utc
       start_time ||= Time.at(0).utc
 
-      params = +"start_time=#{start_time.utc.iso8601(PRECISION)}"
+      params = "start_time=#{start_time.utc.iso8601(PRECISION)}"
       params << "&end_time=#{end_time.utc.iso8601(PRECISION)}"
+      params << "&#{cached_root_account_uuids_for(user:)}"
       params << "&last_page_view_id=#{last_page_view_id}" if last_page_view_id
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
-        @uri.merge("users/#{user_id}/page_views?#{params}").to_s,
+        @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
         { "Authorization" => "Bearer #{@access_token}" }
       )
 
-      json = JSON.parse(response.body)
-      raise response.body unless json["page_views"]
+      case response.code.to_i
+      when 400
+        raise Pv4BadRequest, "invalid request"
+      when 401
+        raise Pv4Unauthorized, "unauthorized request"
+      when 404
+        raise Pv4NotFound, "resource not found"
+      when 429
+        raise Pv4TooManyRequests, "rate limit exceeded"
+      end
+
+      json =
+        begin
+          response.body.empty? ? {} : JSON.parse(response.body)
+        rescue JSON::ParserError
+          {}
+        end
+      raise Pv4EmptyResponse, "the response is empty or does not contain expected keys" unless json["page_views"]
 
       json["page_views"].map! do |pv|
         pv["session_id"] = pv.delete("sessionid")
@@ -68,7 +90,7 @@ class PageView
       raise Pv4Timeout, "failed to load page view history due to service timeout"
     end
 
-    def for_user(user_id, oldest: nil, newest: nil)
+    def for_user(user, oldest: nil, newest: nil)
       bookmarker = Bookmarker.new(self)
       BookmarkedCollection.build(bookmarker) do |pager|
         bookmark = pager.current_bookmark
@@ -76,7 +98,7 @@ class PageView
           end_time, last_page_view_id = bookmark
           newest = Time.zone.parse(end_time)
         end
-        pager.replace(fetch(user_id,
+        pager.replace(fetch(user,
                             start_time: oldest,
                             end_time: newest,
                             last_page_view_id:,
@@ -84,6 +106,17 @@ class PageView
         pager.has_more! unless pager.empty?
         pager
       end
+    end
+
+    private
+
+    def cached_root_account_uuids_for(user:)
+      root_account_uuids = user.shard.activate do
+        user.root_account_ids.map do |id|
+          Account.find_cached(id).uuid
+        end
+      end
+      "root_account_uuids=#{root_account_uuids.join(",")}"
     end
 
     class Bookmarker
@@ -99,5 +132,6 @@ class PageView
         bookmark.is_a?(Array) && bookmark.size == 2
       end
     end
+    private_constant :Bookmarker
   end
 end

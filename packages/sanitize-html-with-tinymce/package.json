@@ -6,6 +6,7 @@
   "owner": "VICE",
   "main": "./index.js",
   "dependencies": {
+    "@instructure/canvas-rce": "*",
     "tinymce": "^5"
   }
 }

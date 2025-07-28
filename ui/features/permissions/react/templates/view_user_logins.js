@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_76')
+const I18n = createI18nScope('permissions_templates_76')
 
 export const template = generateActionTemplates(
   [
     {
       title: I18n.t('People (Account, Course)'),
       description: I18n.t(
-        'Allows user to search for other users by Login ID in the account People page.'
+        'Allows user to search for other users by Login ID in the account People page.',
       ),
     },
   ],
@@ -37,12 +37,12 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.'
+        'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.',
       ),
     },
     {
       description: I18n.t(
-        'To view login IDs, Users - allow administrative actions in courses must also be enabled.'
+        'To view login IDs, Users - allow administrative actions in courses must also be enabled.',
       ),
     },
   ],
@@ -50,7 +50,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'Allows user to search for other users by Login ID in the course People page.'
+        'Allows user to search for other users by Login ID in the course People page.',
       ),
     },
   ],
@@ -61,13 +61,13 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.'
+        'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.',
       ),
     },
     {
       description: I18n.t(
-        'To view login IDs, Users - allow administrative actions in courses must also be enabled.'
+        'To view login IDs, Users - allow administrative actions in courses must also be enabled.',
       ),
     },
-  ]
+  ],
 )

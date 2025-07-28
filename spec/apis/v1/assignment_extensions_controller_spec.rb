@@ -59,7 +59,7 @@ describe AssignmentExtensionsController, type: :request do
           { user_id: @student.id, extra_attempts: 3 },
         ]
         api_create_assignment_extensions(assignment_extension_params, {}, true)
-        assert_status(401)
+        assert_forbidden
       end
     end
 

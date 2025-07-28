@@ -28,7 +28,7 @@ describe('useSelectedOutcomes', () => {
           linkId: `${ind + 1}`,
         },
       }),
-      {}
+      {},
     )
   const initialState = new Set([...Object.keys(generateOutcomes(2))])
 

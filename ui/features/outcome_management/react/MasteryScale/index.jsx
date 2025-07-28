@@ -17,8 +17,7 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {useQuery} from 'react-apollo'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyTable from './ProficiencyTable'
@@ -28,18 +27,43 @@ import {
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
   COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '@canvas/outcomes/graphql/MasteryScale'
+import {useAllPages} from '@canvas/query'
+import {executeQuery} from '@canvas/graphql'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('MasteryScale')
+const I18n = createI18nScope('MasteryScale')
+
+const queryFn = ({pageParam, queryKey}) => {
+  const [_key, contextType, contextId] = queryKey
+  const query =
+    contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
+  return executeQuery(query, {
+    contextId,
+    proficiencyRatingsCursor: pageParam,
+  })
+}
+
+const getNextPageParam = lastPage => {
+  const pageInfo = lastPage?.context.outcomeProficiency?.proficiencyRatingsConnection?.pageInfo
+  return pageInfo?.hasNextPage ? pageInfo.endCursor : null
+}
 
 const MasteryScale = ({onNotifyPendingChanges}) => {
   const {contextType, contextId} = useCanvasContext()
-  const query =
-    contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 
-  const {loading, error, data} = useQuery(query, {
-    variables: {contextId},
-    fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache',
+  const {
+    data,
+    isError: error,
+    isLoading: loading,
+    hasNextPage,
+  } = useAllPages({
+    queryKey: [
+      contextType === 'Course' ? 'courseProficiencyRatings' : 'accountProficiencyRatings',
+      contextType,
+      contextId,
+    ],
+    queryFn,
+    getNextPageParam,
   })
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
@@ -55,15 +79,15 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
         setUpdateProficiencyRatingsError(
           I18n.t('An error occurred updating the mastery scale: %{message}', {
             message: e.message,
-          })
+          }),
         )
         throw e
       }
     },
-    [contextType, contextId]
+    [contextType, contextId],
   )
 
-  if (loading) {
+  if (loading || hasNextPage) {
     return (
       <div style={{textAlign: 'center'}}>
         <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
@@ -77,7 +101,17 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
       </Text>
     )
   }
-  const {outcomeProficiency} = data.context
+
+  const getOutcomeProficiency = () => {
+    return data.pages.reduce((acc, page) => {
+      if (!acc) return page
+      acc.context.outcomeProficiency.proficiencyRatingsConnection.nodes = [
+        ...acc.context.outcomeProficiency.proficiencyRatingsConnection.nodes,
+        ...page.context.outcomeProficiency.proficiencyRatingsConnection.nodes,
+      ]
+      return acc
+    }, null).context.outcomeProficiency
+  }
 
   const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
   const accountRoles = roles.filter(role => role.is_account_role)
@@ -89,7 +123,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
         <p>
           <Text>
             {I18n.t(
-              'This mastery scale will be used as the default for all courses within your account.'
+              'This mastery scale will be used as the default for all courses within your account.',
             )}
           </Text>
         </p>
@@ -97,7 +131,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
 
       <ProficiencyTable
         contextType={contextType}
-        proficiency={outcomeProficiency || undefined} // send undefined when value is null
+        proficiency={getOutcomeProficiency() || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
         onNotifyPendingChanges={onNotifyPendingChanges}
@@ -106,7 +140,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
       {accountRoles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery scale at the account level is enabled for:'
+            'Permission to change this mastery scale at the account level is enabled for:',
           )}
           roles={accountRoles}
         />
@@ -115,7 +149,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
       {roles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery scale at the course level is enabled for:'
+            'Permission to change this mastery scale at the course level is enabled for:',
           )}
           roles={roles}
         />

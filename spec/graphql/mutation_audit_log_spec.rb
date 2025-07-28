@@ -29,6 +29,8 @@ describe AuditLogFieldExtension do
   end
 
   before(:once) do
+    next unless AuditLogFieldExtension.enabled?
+
     creds = Aws::Credentials.new("key", "secret")
     Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true, credentials: creds)
     course_with_student(active_all: true)
@@ -91,6 +93,8 @@ describe AuditLogFieldExtension::Logger do
   let(:mutation) { double(graphql_name: "asdf") }
 
   before(:once) do
+    next unless AuditLogFieldExtension.enabled?
+
     WebMock.enable_net_connect!
     creds = Aws::Credentials.new("key", "secret")
     Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true, credentials: creds)
@@ -120,7 +124,13 @@ describe AuditLogFieldExtension::Logger do
                                                          })
   end
 
-  context "#log_entry_ids" do
+  describe "#log_entry_ids" do
+    before do
+      unless AuditLogFieldExtension.enabled?
+        skip("AuditLog needs to be enabled by configuring dynamodb.yml")
+      end
+    end
+
     it "uses #asset_string and includes the domain_root_account id for the object_id" do
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, { input: {} })
       expect(logger.log_entry_ids(@entry, "some_field")).to eq ["#{@course.root_account.global_id}-assignment_#{@entry.id}"]

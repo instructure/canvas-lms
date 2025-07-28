@@ -46,7 +46,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('returns the "html"', () => {
     expect(htmlContentItem().toHtmlString()).toEqual(
-      '<a href="test.com">link</a><p><strong>bold</strong></p>'
+      '<a href="test.com">link</a><p><strong>bold</strong></p>',
     )
   })
 })

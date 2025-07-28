@@ -21,15 +21,21 @@ import React from 'react'
 import GenericErrorPage from '../index'
 import {render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
+const server = setupServer()
+
+beforeAll(() => server.listen())
 beforeEach(() => {
-  moxios.install()
+  fakeENV.setup()
 })
-
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
+  fakeENV.teardown()
 })
+afterAll(() => server.close())
 
 const defaultProps = () => ({
   errorSubject: 'Testing Stuff',
@@ -70,15 +76,11 @@ describe('GenericErrorPage component', () => {
   test('show the submitted text when comment is submitted', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...defaultProps()} />
+      <GenericErrorPage {...defaultProps()} />,
     )
-    moxios.stubRequest('/error_reports', {
-      status: 200,
-      response: {
-        logged: true,
-        id: '7',
-      },
-    })
+
+    server.use(http.post('/error_reports', () => HttpResponse.json({logged: true, id: '7'})))
+
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
     await user.click(getByText('Submit'))
@@ -87,62 +89,81 @@ describe('GenericErrorPage component', () => {
 
   test('show the loading indicator when comment is submitted', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
-    const {getByText, getByTitle, getByPlaceholderText} = render(
-      <GenericErrorPage {...defaultProps()} />
+    const {getByText, getByPlaceholderText, findByTitle} = render(
+      <GenericErrorPage {...defaultProps()} />,
     )
+
+    let resolveRequest
+    const requestPromise = new Promise(resolve => {
+      resolveRequest = resolve
+    })
+
+    server.use(
+      http.post('/error_reports', async () => {
+        await requestPromise
+        return HttpResponse.json({logged: true, id: '7'})
+      }),
+    )
+
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    await user.click(getByText('Submit'))
-    expect(getByTitle('Loading')).toBeInTheDocument()
+    const submitPromise = user.click(getByText('Submit'))
+
+    expect(await findByTitle('Loading')).toBeInTheDocument()
+
+    resolveRequest()
+    await submitPromise
   })
 
   test('correct info posted to server', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
-    moxios.stubRequest('/error_reports', {
-      status: 200,
-      response: {
-        logged: true,
-        id: '7',
-      },
-    })
+
+    let capturedRequest
+    server.use(
+      http.post('/error_reports', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({logged: true, id: '7'})
+      }),
+    )
+
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
     modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...modifiedProps} />
+      <GenericErrorPage {...modifiedProps} />,
     )
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
     await user.click(getByText('Submit'))
-    const moxItem = moxios.requests.mostRecent()
-    const requestData = JSON.parse(moxItem.config.data)
-    expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
-    expect(requestData.error.message).toEqual(modifiedProps.errorMessage)
+
     expect(await findByText('Comment submitted!')).toBeInTheDocument()
+    expect(capturedRequest.error.subject).toEqual(modifiedProps.errorSubject)
+    expect(capturedRequest.error.message).toEqual(modifiedProps.errorMessage)
   })
 
   test('correctly handles error posted from server', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
-    moxios.stubRequest('/error_reports', {
-      status: 503,
-      response: {
-        logged: false,
-        id: '7',
-      },
-    })
+
+    let capturedRequest
+    server.use(
+      http.post('/error_reports', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({logged: false, id: '7'}, {status: 503})
+      }),
+    )
+
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
     modifiedProps.errorMessage = 'Test Message'
     const {getByText, getByPlaceholderText, findByText} = render(
-      <GenericErrorPage {...modifiedProps} />
+      <GenericErrorPage {...modifiedProps} />,
     )
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
     await user.click(getByText('Submit'))
-    const moxItem = moxios.requests.mostRecent()
-    const requestData = JSON.parse(moxItem.config.data)
-    expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
-    expect(requestData.error.message).toEqual(modifiedProps.errorMessage)
+
     expect(await findByText('Comment failed to post! Please try again later.')).toBeInTheDocument()
+    expect(capturedRequest.error.subject).toEqual(modifiedProps.errorSubject)
+    expect(capturedRequest.error.message).toEqual(modifiedProps.errorMessage)
   })
 })

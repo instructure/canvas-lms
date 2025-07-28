@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import round from '@canvas/round'
 import {escape as lodashEscape} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from '@instructure/html-escape'
@@ -29,7 +28,7 @@ import type {Assignment} from '../../../../../../api.d'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -44,7 +43,7 @@ function buildHiddenAssignmentsWarning() {
   return {
     icon: 'icon-off',
     warningText: I18n.t(
-      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
+      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted",
     ),
   }
 }
@@ -59,7 +58,7 @@ function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: str
     {
       count: names.length,
       groups: listFormatter.format(names),
-    }
+    },
   )
 
   return {
@@ -75,6 +74,7 @@ function buildNoPointsPossibleWarning() {
   }
 }
 
+// @ts-expect-error
 // xsslint safeString.property score possible warningText icon letterGrade
 function render(options) {
   let tooltip = ''
@@ -164,6 +164,7 @@ export default class TotalGradeCellFormatter {
     }
   }
 
+  // @ts-expect-error
   render = (_row, _cell, grade /* value */, _columnDef, student /* dataContext */) => {
     if (grade == null) {
       return ''
@@ -179,7 +180,7 @@ export default class TotalGradeCellFormatter {
     const scheme = this.options.getGradingStandard()
     if (grade.possible && scheme) {
       letterGrade = GradeFormatHelper.replaceDashWithMinus(
-        scoreToGrade(percentage, scheme.data, scheme.pointsBased)
+        scoreToGrade(percentage, scheme.data, scheme.pointsBased, scheme.scalingFactor),
       )
     }
 
@@ -201,7 +202,7 @@ export default class TotalGradeCellFormatter {
 
         const scaledPercentage = getGradePercentage(scaledScore, scaledPossible)
         letterGrade = GradeFormatHelper.replaceDashWithMinus(
-          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased)
+          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased, scheme.scalingFactor),
         )
       }
     }

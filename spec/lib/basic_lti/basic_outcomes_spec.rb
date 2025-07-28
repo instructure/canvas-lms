@@ -31,7 +31,7 @@ describe BasicLTI::BasicOutcomes do
     @root_account = @course.root_account
     @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
+    @user = User.create!(name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -134,7 +134,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it "sends unauthorized request metrics to datadog" do
-      expect(InstStatsd::Statsd).to receive(:increment)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment)
         .with("lti.1_1.basic_outcomes.bad_requests",
               tags: { error_code: "Unauthorized" })
       expect { raise BasicLTI::BasicOutcomes::Unauthorized, "some unauthorized reason" }
@@ -148,7 +148,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it "sends invalid request metrics to datadog" do
-      expect(InstStatsd::Statsd).to receive(:increment)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment)
         .with("lti.1_1.basic_outcomes.bad_requests",
               tags: { error_code: "InvalidRequest" })
       expect { raise BasicLTI::BasicOutcomes::InvalidRequest, "some invalid request reason" }
@@ -281,22 +281,22 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "does not report a total count metric" do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
         response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
         response.handle_request(tool)
-        expect(InstStatsd::Statsd).not_to have_received(:increment).with("lti.1_1.basic_outcomes.requests")
+        expect(InstStatsd::Statsd).not_to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.requests")
       end
     end
 
     context "request metrics" do
       before do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       end
 
       it "increments a total count metric" do
         response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
         response.handle_request(tool)
-        expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :basic })
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :basic })
       end
 
       context "when report_failure is called" do
@@ -308,7 +308,7 @@ describe BasicLTI::BasicOutcomes do
         it "increments a failure count metric" do
           response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
           response.handle_request(tool)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.failures", tags: { op: "replace_result", type: :basic, error_code: :test })
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.failures", tags: { op: "replace_result", type: :basic, error_code: :test })
         end
       end
     end
@@ -335,7 +335,7 @@ describe BasicLTI::BasicOutcomes do
       end
 
       it "replace_result succeeds when section dates override course dates" do
-        cs = CourseSection.where(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id)).take
+        cs = CourseSection.find_by(id: @course.enrollments.where(user_id: @user).pluck(:course_section_id))
         cs.start_at = 1.day.ago
         cs.end_at = 1.day.from_now
         cs.restrict_enrollments_to_section_dates = true
@@ -672,12 +672,12 @@ describe BasicLTI::BasicOutcomes do
 
       context "request metrics" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+          allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
         end
 
         it "tags count with request type quizzes" do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :quizzes })
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.requests", tags: { op: "replace_result", type: :quizzes })
         end
       end
     end
@@ -885,7 +885,7 @@ describe BasicLTI::BasicOutcomes do
 
     context "job metrics" do
       before do
-        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+        allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       end
 
       context "on success" do
@@ -896,7 +896,7 @@ describe BasicLTI::BasicOutcomes do
         it "increments a total count metric" do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
           run_jobs
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.fetch_jobs")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.fetch_jobs")
         end
       end
 
@@ -908,7 +908,7 @@ describe BasicLTI::BasicOutcomes do
         it "increments a failure metric" do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
           run_jobs
-          expect(InstStatsd::Statsd).to have_received(:increment).with("lti.1_1.basic_outcomes.fetch_jobs_failures")
+          expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("lti.1_1.basic_outcomes.fetch_jobs_failures")
         end
       end
     end

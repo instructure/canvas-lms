@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../helpers/blueprint_common"
+require_relative "../helpers/items_assign_to_tray"
+require_relative "../assignments/page_objects/assignment_create_edit_page"
 
 shared_context "blueprint courses assignment context" do
   def assignment_options
@@ -36,41 +38,7 @@ describe "blueprint courses assignments" do
   include_context "blueprint courses files context"
   include_context "blueprint courses assignment context"
   include BlueprintCourseCommon
-
-  context "as a blueprint teacher" do
-    before :once do
-      @master = course_factory(active_all: true)
-      @master_teacher = @teacher
-      @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
-      @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
-      @minion.enroll_teacher(@master_teacher).accept!
-
-      # sets up the assignment that gets blueprinted
-      @original_assmt = @master.assignments.create! title: "Blah", points_possible: 10, due_at: 5.days.from_now
-      @original_assmt.description = "this is the original content"
-      run_master_course_migration(@master)
-      @copy_assmt = @minion.assignments.last
-    end
-
-    before do
-      user_session(@master_teacher)
-    end
-
-    it "can lock down associated course's assignment fields", priority: "1" do
-      change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-      get "/courses/#{@master.id}/assignments/#{@original_assmt.id}"
-      f(".bpc-lock-toggle button").click
-      expect(f(".bpc-lock-toggle__label")).to include_text("Locked")
-      run_master_course_migration(@master)
-      get "/courses/#{@minion.id}/assignments/#{@copy_assmt.id}/edit"
-      expect(f("#edit_assignment_form")).to contain_css(".tox-tinymce .tox-editor-container")
-      expect(f(".bpc-lock-toggle__label")).to include_text("Locked")
-      expect(f("#assignment_points_possible")).to have_attribute("readonly", "true")
-      expect(f("#due_at")).to have_attribute("readonly", "true")
-      expect(f("#unlock_at")).to have_attribute("readonly", "true")
-      expect(f("#lock_at")).to have_attribute("readonly", "true")
-    end
-  end
+  include ItemsAssignToTray
 
   context "in the associated course" do
     before :once do
@@ -143,7 +111,7 @@ describe "blueprint courses assignments" do
       expect(assignment_header).to contain_css("a.delete_assignment_link")
     end
 
-    it "does not allow editing of restricted items" do
+    it "does not allow editing of restricted due dates and availability dates in SR tray" do
       # restrict everything
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
@@ -152,11 +120,61 @@ describe "blueprint courses assignments" do
       expect(f("#assignment_name").tag_name).to eq "h1"
       expect(f("#assignment_description").tag_name).to eq "div"
       expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
-      expect(f("#due_at").attribute("readonly")).to eq "true"
-      expect(f("#unlock_at").attribute("readonly")).to eq "true"
-      expect(f("#lock_at").attribute("readonly")).to eq "true"
       expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
       expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      expect(assign_to_due_date(0).enabled?).to be_falsey
+      expect(assign_to_due_time(0).enabled?).to be_falsey
+      expect(assign_to_available_from_date(0).enabled?).to be_falsey
+      expect(assign_to_available_from_time(0).enabled?).to be_falsey
+      expect(assign_to_until_date(0).enabled?).to be_falsey
+      expect(assign_to_until_time(0).enabled?).to be_falsey
+
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates & Availability Dates"), true)).to be_truthy
+    end
+
+    it "does not allow editing of restricted due dates in SR tray" do
+      # restrict everything
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: false })
+
+      get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+      expect(f("#assignment_name").tag_name).to eq "h1"
+      expect(f("#assignment_description").tag_name).to eq "div"
+      expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+      expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
+      expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      expect(assign_to_due_date(0).enabled?).to be_falsey
+      expect(assign_to_due_time(0).enabled?).to be_falsey
+      expect(assign_to_available_from_date(0).enabled?).to be_truthy
+      expect(assign_to_available_from_time(0).enabled?).to be_truthy
+      expect(assign_to_until_date(0).enabled?).to be_truthy
+      expect(assign_to_until_time(0).enabled?).to be_truthy
+
+      expect(element_exists?(bp_locked_alert_text_selector("Due Dates"), true)).to be_truthy
+    end
+
+    it "does not allow editing of restricted availability dates in SR tray" do
+      # restrict everything
+      @tag.update(restrictions: { content: true, points: true, due_dates: false, availability_dates: true })
+
+      get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
+
+      expect(f("#assignment_name").tag_name).to eq "h1"
+      expect(f("#assignment_description").tag_name).to eq "div"
+      expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
+      expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
+      expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
+
+      expect(assign_to_due_date(0).enabled?).to be_truthy
+      expect(assign_to_due_time(0).enabled?).to be_truthy
+      expect(assign_to_available_from_date(0).enabled?).to be_falsey
+      expect(assign_to_available_from_time(0).enabled?).to be_falsey
+      expect(assign_to_until_date(0).enabled?).to be_falsey
+      expect(assign_to_until_time(0).enabled?).to be_falsey
+
+      expect(element_exists?(bp_locked_alert_text_selector("Availability Dates"), true)).to be_truthy
     end
 
     it "does not allow making a non-graded assignment graded when points are locked" do
@@ -187,12 +205,45 @@ describe "blueprint courses assignments" do
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments"
-
       hover_and_click(".edit_assignment")
-      expect(f(".ui-dialog-titlebar .ui-dialog-title").text).to eq "Edit Assignment"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_name").tag_name).to eq "h3"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_due_at").attribute("readonly")).to eq "true"
-      expect(f("#assign_#{@assmt_copy.id}_assignment_points").attribute("readonly")).to eq "true"
+
+      expect(f("[data-testid='assignment-name-input']")).to be_disabled
+      expect(f("[data-testid='points-input']")).to be_disabled
+      # Date
+      expect(f("#Selectable___0")).to be_disabled
+      # Time
+      expect(f("#Select___0")).to be_disabled
+    end
+
+    it "does allow popup editing of non-restricted items" do
+      # restrict nothing
+      @tag.update(restrictions: {})
+
+      get "/courses/#{@copy_to.id}/assignments"
+      hover_and_click(".edit_assignment")
+
+      expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
+      expect(f("[data-testid='points-input']")).not_to be_disabled
+      # Date
+      expect(f("#Selectable___0")).not_to be_disabled
+      # Time
+      expect(f("#Select___0")).not_to be_disabled
+    end
+
+    it "allows certain fields to be edited when allowed by blueprint course" do
+      # restrict everything but content and points
+      @tag.update(restrictions: { content: false, points: false, due_dates: true, availability_dates: true })
+
+      get "/courses/#{@copy_to.id}/assignments"
+      hover_and_click(".edit_assignment")
+
+      expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
+      expect(f("[data-testid='points-input']")).not_to be_disabled
+
+      # Date
+      expect(f("#Selectable___0")).to be_disabled
+      # Time
+      expect(f("#Select___0")).to be_disabled
     end
   end
 

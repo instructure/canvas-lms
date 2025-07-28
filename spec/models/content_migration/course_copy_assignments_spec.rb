@@ -24,6 +24,65 @@ describe ContentMigration do
   context "course copy assignments" do
     include_context "course copy"
 
+    context "pre_date_shift_for_assignment_importing" do
+      before do
+        @copy_to.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active")
+        @copy_to.update!(workflow_state: "available")
+        @cm.migration_settings["date_shift_options"] = { "remove_dates" => "1" }
+        @cm.save!
+      end
+
+      context "when FF is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:pre_date_shift_for_assignment_importing)
+        end
+
+        it "generates submissions for assignment with date shift options" do
+          @copy_from.assignments.create!(title: "title")
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+
+        it "generates submissions for quiz with date shift options" do
+          quiz = @copy_from.quizzes.create!(title: "quiz")
+          quiz.publish!
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+      end
+
+      context "when FF is disabled" do
+        before do
+          Account.site_admin.disable_feature!(:pre_date_shift_for_assignment_importing)
+        end
+
+        it "generates submissions for assignment with date shift options" do
+          @copy_from.assignments.create!(title: "title")
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+
+        it "generates submissions for quiz with date shift options" do
+          quiz = @copy_from.quizzes.create!(title: "quiz")
+          quiz.publish!
+
+          run_course_copy
+
+          to_assign = @copy_to.assignments.first
+          expect(to_assign.submissions.length).to eq(1)
+        end
+      end
+    end
+
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
       lo = create_outcome(account)
@@ -827,9 +886,8 @@ describe ContentMigration do
       end
 
       it "copies only noop overrides" do
-        account = Account.default
-        account.settings[:conditional_release] = { value: true }
-        account.save!
+        @copy_from.conditional_release = true
+        @copy_from.save!
         assignment_override_model(assignment: @assignment, set_type: "ADHOC")
         assignment_override_model(assignment: @assignment,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
@@ -863,9 +921,8 @@ describe ContentMigration do
       end
 
       it "copies dates" do
-        account = Account.default
-        account.settings[:conditional_release] = { value: true }
-        account.save!
+        @copy_from.conditional_release = true
+        @copy_from.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(assignment: @assignment,
                                   set_type: "Noop",
@@ -889,17 +946,37 @@ describe ContentMigration do
         a2 = assignment_model(context: @copy_from, title: "a2", submission_types: "wiki_page", only_visible_to_overrides: false)
         a2.build_wiki_page(title: a2.title, context: a2.context).save!
         run_course_copy
-        a1_to = @copy_to.assignments.where(migration_id: mig_id(a1)).take
+        a1_to = @copy_to.assignments.find_by(migration_id: mig_id(a1))
         expect(a1_to.only_visible_to_overrides).to be true
-        a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
+        a2_to = @copy_to.assignments.find_by(migration_id: mig_id(a2))
         expect(a2_to.only_visible_to_overrides).to be false
+      end
+
+      it "preserves assignment_overrides for page assignments" do
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
+        a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page")
+        a1.build_wiki_page(title: a1.title, context: a1.context).save!
+        a2 = assignment_model(context: @copy_from, title: "a2", submission_types: "wiki_page")
+        a2.build_wiki_page(title: a2.title, context: a2.context).save!
+        assignment_override_model(assignment: a1, set_type: "Noop", title: "A1")
+        assignment_override_model(assignment: a2, set_type: "Noop", title: "A2")
+        run_course_copy
+
+        a1_to = @copy_to.assignments.find_by(migration_id: mig_id(a1))
+        expect(a1_to.assignment_overrides.length).to eq 1
+        expect(a1_to.assignment_overrides.first.title).to eq "A1"
+        a2_to = @copy_to.assignments.find_by(migration_id: mig_id(a2))
+        expect(a2_to.assignment_overrides.length).to eq 1
+        expect(a2_to.assignment_overrides.first.title).to eq "A2"
       end
 
       it "ignores page assignments if mastery paths is not enabled in destination" do
         a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page", only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         run_course_copy
-        page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
+        page_to = @copy_to.wiki_pages.find_by(migration_id: mig_id(a1.wiki_page))
         expect(page_to.assignment).to be_nil
         expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to be false
       end

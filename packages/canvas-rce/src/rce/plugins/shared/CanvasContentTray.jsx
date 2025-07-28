@@ -16,24 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
-import Filter, {useFilterSettings} from './Filter'
+import Filter from './Filter'
+import {useFilterSettings} from './useFilterSettings'
+
 import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
 import {LinkDisplay} from './LinkDisplay'
 import {showFlashAlert} from '../../../common/FlashAlert'
+import {FILTER_SETTINGS_BY_PLUGIN, DynamicPanel, isLoading} from './canvasContentUtils'
 
 /**
  * Returns the translated tray label
@@ -69,172 +71,6 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
   }
 }
 
-const thePanels = {
-  icon_maker_icons: React.lazy(() =>
-    import('../instructure_icon_maker/components/SavedIconMakerList')
-  ),
-  links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
-  images: React.lazy(() => import('../instructure_image/Images')),
-  documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
-  media: React.lazy(() => import('../instructure_record/MediaPanel')),
-  all: React.lazy(() => import('./RceFileBrowser')),
-  unknown: React.lazy(() => import('./UnknownFileTypePanel')),
-}
-
-// Returns a Suspense wrapped lazy loaded component
-// pulled from useLazy's cache
-function DynamicPanel(props) {
-  let key = ''
-  if (props.contentType === 'links') {
-    key = 'links'
-  } else {
-    key = props.contentSubtype in thePanels ? props.contentSubtype : 'unknown'
-  }
-  const Component = thePanels[key]
-  return (
-    <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-      <Component {...props} />
-    </Suspense>
-  )
-}
-
-function renderLoading() {
-  return formatMessage('Loading')
-}
-
-const FILTER_SETTINGS_BY_PLUGIN = {
-  user_documents: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_documents: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_documents: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'documents',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  user_images: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_images: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_images: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'images',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  user_media: {
-    contextType: 'user',
-    contentType: 'user_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_media: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_media: {
-    contextType: 'group',
-    contentType: 'group_files',
-    contentSubtype: 'media',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_links: {
-    contextType: 'course',
-    contentType: 'links',
-    contentSubtype: 'all',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  course_link_edit: {
-    contextType: 'course',
-    contentType: 'links',
-    contentSubtype: 'edit',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  group_links: {
-    contextType: 'group',
-    contentType: 'links',
-    contentSubtype: 'all',
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  list_icon_maker_icons: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: ICON_MAKER_ICONS,
-    sortValue: 'date_added',
-    sortDir: 'desc',
-    searchString: '',
-  },
-  all: {
-    contextType: 'course',
-    contentType: 'course_files',
-    contentSubtype: 'all',
-    sortValue: 'alphabetical',
-    sortDir: 'asc',
-    searchString: '',
-  },
-}
-
-function isLoading(sprops) {
-  return (
-    sprops.collections.announcements?.isLoading ||
-    sprops.collections.assignments?.isLoading ||
-    sprops.collections.discussions?.isLoading ||
-    sprops.collections.modules?.isLoading ||
-    sprops.collections.quizzes?.isLoading ||
-    sprops.collections.wikiPages?.isLoading ||
-    sprops.documents.course?.isLoading ||
-    sprops.documents.user?.isLoading ||
-    sprops.documents.group?.isLoading ||
-    sprops.media.course?.isLoading ||
-    sprops.media.user?.isLoading ||
-    sprops.media.group?.isLoading ||
-    sprops.all_files?.isLoading
-  )
-}
-
 /**
  * This component is used within various plugins to handle loading in content
  * from Canvas.  It is essentially the main component.
@@ -250,7 +86,7 @@ export default function CanvasContentTray(props) {
 
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
-  const closeButtonRef = useRef(null)
+  const [closeButtonRef, setCloseButtonRef] = useState(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
   const [isEditTray, setIsEditTray] = useState(false)
   const [link, setLink] = useState(null)
@@ -269,6 +105,14 @@ export default function CanvasContentTray(props) {
     setIsOpen(false)
   }, [bridge, onTrayClosing])
 
+  // this shouldn't be necessary, but INSTUI isn't focusing the close button
+  // like it should.
+  useEffect(() => {
+    if (isOpen && closeButtonRef) {
+      closeButtonRef.focus()
+    }
+  }, [closeButtonRef, isOpen])
+
   useEffect(() => {
     const controller = {
       showTrayForPlugin(plugin) {
@@ -281,7 +125,7 @@ export default function CanvasContentTray(props) {
         if (plugin === 'course_link_edit') {
           setIsEditTray(true)
           const {fileName, contentType, url, published, text} = getLinkContentFromEditor(
-            editor.editor
+            editor.editor,
           )
           setLink({
             title: fileName,
@@ -294,7 +138,6 @@ export default function CanvasContentTray(props) {
         } else {
           setIsEditTray(false)
         }
-        closeButtonRef.current?.focus()
       },
       hideTray(forceClose) {
         if (forceClose || hidingTrayOnAction) {
@@ -448,6 +291,22 @@ export default function CanvasContentTray(props) {
   function getHeader() {
     return isEditTray ? formatMessage('Edit Course Link') : formatMessage('Add')
   }
+
+  function renderLinkDisplay() {
+    return (
+      isEditTray && (
+        <LinkDisplay
+          linkText={linkText}
+          placeholderText={link?.title || placeholderText}
+          linkFileName={link?.title || ''}
+          published={link?.published || false}
+          handleTextChange={setLinkText}
+          linkType={link?.type}
+        />
+      )
+    )
+  }
+
   return (
     <Tray
       data-mce-component={true}
@@ -455,7 +314,7 @@ export default function CanvasContentTray(props) {
       label={getTrayLabel(
         filterSettings.contentType,
         filterSettings.contentSubtype,
-        props.contextType
+        props.contextType,
       )}
       mountNode={mountNode}
       open={isOpen}
@@ -470,55 +329,46 @@ export default function CanvasContentTray(props) {
       onOpen={handleOpenTray}
       contentRef={el => (trayRef.current = el)}
     >
-      {isOpen && hasOpened ? (
-        <Flex
-          direction="column"
-          as="div"
-          height={getTrayHeight()}
-          overflowY="hidden"
-          tabIndex={-1}
-          data-canvascontenttray-content={true}
-        >
-          <Flex.Item padding="medium" shadow="above">
-            <View as="div" margin="none none medium none">
-              <Heading level="h2">{getHeader()}</Heading>
+      <Flex
+        direction="column"
+        as="div"
+        height={getTrayHeight()}
+        overflowY="hidden"
+        tabIndex={-1}
+        data-canvascontenttray-content={true}
+      >
+        <Flex.Item padding="medium" shadow="above">
+          <View as="div" margin="none none medium none">
+            <Heading level="h2">{getHeader()}</Heading>
 
-              <CloseButton
-                placement="end"
-                offset="medium"
-                onClick={handleDismissTray}
-                data-testid="CloseButton_ContentTray"
-                screenReaderLabel={formatMessage('Close')}
-                elementRef={el => (closeButtonRef.current = el)}
-              />
-            </View>
-            {isEditTray && (
-              <LinkDisplay
-                linkText={linkText}
-                placeholderText={link?.title || placeholderText}
-                linkFileName={link?.title || ''}
-                published={link?.published || false}
-                handleTextChange={setLinkText}
-                linkType={link?.type}
-              />
-            )}
-            <Filter
-              {...filterSettings}
-              mountNode={props.mountNode}
-              userContextType={props.contextType}
-              containingContextType={props.containingContext.contextType}
-              onChange={newFilter => {
-                handleFilterChange(
-                  newFilter,
-                  storeProps.onChangeContext,
-                  storeProps.onChangeSearchString,
-                  storeProps.onChangeSortBy
-                )
-              }}
-              isContentLoading={isLoading(storeProps)}
-              use_rce_icon_maker={props.use_rce_icon_maker}
+            <CloseButton
+              placement="end"
+              offset="medium"
+              onClick={handleDismissTray}
+              data-testid="CloseButton_ContentTray"
+              screenReaderLabel={formatMessage('Close')}
+              elementRef={el => setCloseButtonRef(el)}
             />
-          </Flex.Item>
+          </View>
+          {renderLinkDisplay()}
+          <Filter
+            {...filterSettings}
+            mountNode={props.mountNode}
+            userContextType={props.contextType}
+            containingContextType={props.containingContext.contextType}
+            onChange={newFilter => {
+              handleFilterChange(
+                newFilter,
+                storeProps.onChangeContext,
+                storeProps.onChangeSearchString,
+                storeProps.onChangeSortBy,
+              )
+            }}
+            isContentLoading={isLoading(storeProps)}
+            use_rce_icon_maker={props.use_rce_icon_maker}
+          />
+        </Flex.Item>
+        {isOpen && hasOpened ? (
           <Flex.Item
             shouldGrow={true}
             shouldShrink={true}
@@ -545,22 +395,15 @@ export default function CanvasContentTray(props) {
               {isEditTray && renderFooter()}
             </Flex>
           </Flex.Item>
-        </Flex>
-      ) : null}
+        ) : null}
+      </Flex>
     </Tray>
   )
 }
 
 CanvasContentTray.globalOpenCount = 0
 
-function requiredWithoutSource(props, propName, componentName) {
-  if (props.source == null && props[propName] == null) {
-    throw new Error(
-      `The prop \`${propName}\` is marked as required in \`${componentName}\`, but its value is \`${props[propName]}\`.`
-    )
-  }
-}
-
+// Changes made here may need to be reflected in the trayProps type in CanvasContentPanel
 const trayPropsMap = {
   canUploadFiles: bool.isRequired,
   contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's
@@ -571,8 +414,8 @@ const trayPropsMap = {
     userId: string.isRequired,
   }),
   filesTabDisabled: bool,
-  host: requiredWithoutSource,
-  jwt: requiredWithoutSource,
+  host: string,
+  jwt: string,
   refreshToken: func,
   source: shape({
     fetchImages: func.isRequired,
@@ -592,7 +435,7 @@ CanvasContentTray.propTypes = {
 }
 
 // the way we define trayProps, eslint doesn't recognize the following as props
-/* eslint-disable react/default-props-match-prop-types */
+
 CanvasContentTray.defaultProps = {
   canUploadFiles: false,
   filesTabDisabled: false,
@@ -600,4 +443,3 @@ CanvasContentTray.defaultProps = {
   source: null,
   themeUrl: null,
 }
-/* eslint-enable react/default-props-match-prop-types */

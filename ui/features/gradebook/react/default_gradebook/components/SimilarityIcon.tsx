@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -18,7 +17,6 @@
  */
 
 import React from 'react'
-import {oneOf, number} from 'prop-types'
 import {
   IconCertifiedSolid,
   IconEmptySolid,
@@ -27,23 +25,23 @@ import {
   IconWarningLine,
 } from '@instructure/ui-icons'
 
-export default function SimilarityIcon({similarityScore, status}) {
-  if (status === 'scored' && similarityScore != null) {
-    if (similarityScore <= 20) {
-      return <IconCertifiedSolid color="success" />
-    } else if (similarityScore <= 60) {
-      return <IconOvalHalfLine color="error" />
-    } else {
-      return <IconEmptySolid color="error" />
-    }
-  } else if (status === 'pending') {
-    return <IconClockLine />
-  }
-
-  return <IconWarningLine />
+interface SimilarityIconProps {
+  similarityScore?: number
+  status: 'error' | 'pending' | 'scored'
 }
 
-SimilarityIcon.propTypes = {
-  similarityScore: number,
-  status: oneOf(['error', 'pending', 'scored']).isRequired,
+export default function SimilarityIcon({similarityScore, status}: SimilarityIconProps) {
+  if (status === 'scored' && similarityScore != null) {
+    if (similarityScore <= 20) {
+      return <IconCertifiedSolid color="success" data-testid="similarity-icon" />
+    } else if (similarityScore <= 60) {
+      return <IconOvalHalfLine color="error" data-testid="similarity-icon" />
+    } else {
+      return <IconEmptySolid color="error" data-testid="similarity-icon" />
+    }
+  } else if (status === 'pending') {
+    return <IconClockLine data-testid="similarity-clock-icon" />
+  }
+
+  return <IconWarningLine data-testid="similarity-icon" />
 }

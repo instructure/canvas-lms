@@ -21,18 +21,18 @@ module TestDatabaseUtils
   class << self
     def check_migrations!
       if ENV["SKIP_MIGRATION_CHECK"] != "1"
-        migrations = ActiveRecord::Base.connection.migration_context.migrations
-        skipped_migrations = if $canvas_rails == "7.1"
-                               internal_metadata = ActiveRecord::InternalMetadata.new(ActiveRecord::Base.connection)
-                               ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration, internal_metadata).skipped_migrations
-                             else
-                               ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
-                             end
+        migrations = ActiveRecord::Base.migration_context.migrations
+        skipped_migrations = ActiveRecord::Migrator.new(
+          :up,
+          migrations,
+          ActiveRecord::Base.schema_migration,
+          ActiveRecord::Base.internal_metadata
+        ).skipped_migrations
 
         # total migration - all run migrations - all skipped migrations
         needs_migration =
-          ActiveRecord::Base.connection.migration_context.migrations.map(&:version) -
-          ActiveRecord::Base.connection.migration_context.get_all_versions -
+          migrations.map(&:version) -
+          ActiveRecord::Base.migration_context.get_all_versions -
           skipped_migrations.map(&:version)
 
         unless needs_migration.empty?
@@ -51,7 +51,7 @@ module TestDatabaseUtils
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
-      start = Time.now
+      start = Time.zone.now
 
       # this won't create/migrate them, but it will let us with_each_shard any
       # persistent ones that already exist
@@ -66,7 +66,7 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
+      puts "finished resetting test db in #{Time.zone.now - start} seconds" unless ENV["SUPPRESS_OUTPUT"] == "1"
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the

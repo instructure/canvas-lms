@@ -20,6 +20,7 @@ import CanvasTray from './Tray'
 import $ from 'jquery'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
+import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
 
 type Tool = {
   id: string
@@ -37,6 +38,7 @@ type KnownResourceType =
   | 'image'
   | 'module'
   | 'quiz'
+  | 'quizzesnext'
   | 'page'
   | 'video'
 
@@ -46,7 +48,7 @@ export type SelectableItem = {
 }
 
 type Props = {
-  tool: Tool
+  tool: Tool | null
   placement: string
   acceptedResourceTypes: KnownResourceType[]
   targetResourceType: KnownResourceType
@@ -82,12 +84,17 @@ export default function ContentTypeExternalToolTray({
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
+  const iframeRef = React.useRef<HTMLIFrameElement>(null)
 
   useEffect(
     // returns cleanup function:
     () => handleExternalContentMessages({ready: onExternalContentReady}),
-    [onExternalContentReady]
+    [onExternalContentReady],
   )
+
+  useEffect(() => {
+    return onLtiClosePostMessage(() => iframeRef.current, onDismiss)
+  }, [onDismiss])
 
   return (
     <CanvasTray
@@ -100,11 +107,11 @@ export default function ContentTypeExternalToolTray({
       headerPadding="medium"
     >
       <ToolLaunchIframe
-        // @ts-expect-error
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
         src={iframeUrl}
         title={title}
+        ref={iframeRef}
       />
     </CanvasTray>
   )

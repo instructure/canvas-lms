@@ -40,7 +40,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   validates :assignment_override, :user, presence: true
   validates :user_id, uniqueness: { scope: %i[assignment_id quiz_id context_module_id wiki_page_id discussion_topic_id attachment_id],
                                     conditions: -> { where.not(workflow_state: "deleted") },
-                                    message: -> { t("already belongs to an assignment override") } }
+                                    message: ->(_object, _data) { t("already belongs to an assignment override") } }
 
   validate :assignment_override, if: :active? do |record|
     if record.assignment_override && record.assignment_override.set_type != "ADHOC"

@@ -70,7 +70,7 @@ describe CC::NewQuizzesLinksReplacer do
                   <presentation>
                     <material>
                       <mattext texttype="text/html">&lt;div&gt;&lt;p&gt;insert question here&lt;/p&gt;
-          &lt;p&gt;&lt;img src="$IMS-CC-FILEBASE$/Uploaded%20Media/aws_opensearch-2.png" alt="aws_opensearch-2.png"&gt;&lt;/p&gt;&lt;/div&gt;</mattext>
+          &lt;p&gt;&lt;img src="$IMS-CC-FILEBASE$/Uploaded%20Media/aws_opensearch-2.png" alt="aws_opensearch-2.png" loading="lazy"&gt;&lt;/p&gt;&lt;/div&gt;</mattext>
                     </material>
                   </presentation>
                 </item>

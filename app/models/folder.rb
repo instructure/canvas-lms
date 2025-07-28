@@ -24,6 +24,7 @@ class Folder < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   include Workflow
+  include SearchTermHelper
 
   ICON_MAKER_UNIQUE_TYPE = "icon maker icons"
   ROOT_FOLDER_NAME = "course files"
@@ -31,6 +32,7 @@ class Folder < ActiveRecord::Base
   MY_FILES_FOLDER_NAME = "my files"
   CONVERSATION_ATTACHMENTS_FOLDER_NAME = "conversation attachments"
   STUDENT_ANNOTATION_DOCUMENTS_UNIQUE_TYPE = "student annotation documents"
+  FLAMEGRAPHS_FOLDER_NAME = "flamegraphs"
 
   belongs_to :context, polymorphic: %i[user group account course], optional: false
   belongs_to :cloned_item
@@ -38,8 +40,8 @@ class Folder < ActiveRecord::Base
   has_many :file_attachments, class_name: "Attachment"
   has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: "Attachment"
   has_many :visible_file_attachments, -> { where(file_state: ["available", "public"]) }, class_name: "Attachment"
-  has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
-  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
+  has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy, inverse_of: :parent_folder
+  has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy, inverse_of: :parent_folder
 
   acts_as_list scope: :parent_folder
 
@@ -132,7 +134,7 @@ class Folder < ActiveRecord::Base
             )
             SELECT id FROM associated_folders WHERE associated_folders.workflow_state <> 'deleted' ORDER BY id LIMIT 1000 FOR UPDATE
           SQL
-          Attachment.batch_destroy(Attachment.active.where(folder_id: associated_folders).order(:id))
+          Attachment.batch_destroy(Attachment.not_deleted.where(folder_id: associated_folders).order(:id))
           delete_time = Time.now.utc
           Folder.where(id: associated_folders).update_all(workflow_state: "deleted", deleted_at: delete_time, updated_at: delete_time)
           folder_count = associated_folders.length
@@ -161,7 +163,7 @@ class Folder < ActiveRecord::Base
   end
 
   def full_name(reload = false)
-    return read_attribute(:full_name) if !reload && read_attribute(:full_name)
+    return super() if !reload && super()
 
     folder = self
     names = [name]
@@ -318,7 +320,7 @@ class Folder < ActiveRecord::Base
         end
       end
     end
-    dup.updated_at = Time.now
+    dup.updated_at = Time.zone.now
     dup.clone_updated = true
     dup
   end
@@ -345,21 +347,86 @@ class Folder < ActiveRecord::Base
     return root_folders unless context.respond_to?(:folders)
 
     context.shard.activate do
-      Folder.unique_constraint_retry do
-        root_folder = context.folders.active.where(parent_folder_id: nil, name:).first
-        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(name:, full_name: name, workflow_state: "visible") }
-        root_folders = [root_folder]
-      end
+      root_folder = get_or_create_root_folder_for(context, name)
+      root_folders = Array(root_folder)
     end
 
     root_folders
+  end
+
+  # Optimized method to preload and find root folders for multiple contexts
+  # This eliminates N+1 queries when loading root folders for multiple contexts
+  def self.preload_root_folders(contexts)
+    return {} if contexts.empty?
+
+    # Group contexts by type and shard to minimize cross-shard queries
+    contexts_by_type = contexts.group_by { |c| c.class.to_s }
+    result = {}
+
+    contexts_by_type.each do |context_type, contexts_of_type|
+      next unless contexts_of_type.first.respond_to?(:folders)
+
+      folder_name = root_folder_name_for_context(contexts_of_type.first)
+      contexts_by_shard = contexts_of_type.group_by(&:shard)
+      current_shard = Shard.current
+
+      contexts_by_shard.each do |shard, shard_contexts|
+        shard.activate do
+          # Get all possible context IDs for this type and shard
+          context_ids = shard_contexts.map(&:id)
+
+          # Load all root folders for these contexts in a single query
+          found_folders = where(
+            context_type:,
+            context_id: context_ids,
+            parent_folder_id: nil,
+            name: folder_name
+          ).where("folders.workflow_state<>'deleted'").preload(:context).to_a
+
+          # Reference the asset string from the same shard the controller will use
+          current_shard.activate do
+            # Index by context asset string for easy lookup
+            found_folders.each do |folder|
+              result[folder.context.asset_string] = folder
+            end
+          end
+
+          # For contexts that don't have a root folder yet, we need to create them
+          missing_context_ids = context_ids - found_folders.map(&:context_id)
+          missing_context_ids.each do |context_id|
+            context = shard_contexts.find { |c| c.id == context_id }
+            root_folder = GuardRail.activate(:primary) do
+              folder = context.folders.build(name: folder_name, full_name: folder_name, workflow_state: "visible")
+              folder.insert(on_conflict: -> { get_root_folder_for(context, folder_name) })
+            end
+            current_shard.activate do
+              result[context.asset_string] = root_folder
+            end
+          end
+        end
+      end
+    end
+
+    result
+  end
+
+  def self.get_or_create_root_folder_for(context, name)
+    root_folder = get_root_folder_for(context, name)
+    root_folder || GuardRail.activate(:primary) do
+      folder = context.folders.build(name:, full_name: name, workflow_state: "visible")
+      folder.insert(on_conflict: -> { get_root_folder_for(context, name) })
+    end
+  end
+
+  def self.get_root_folder_for(context, name)
+    context.folders.active.where(parent_folder_id: nil, name:).first
   end
 
   def self.unique_folder(context, unique_type, default_name_proc)
     folder = nil
     context.shard.activate do
       Folder.unique_constraint_retry do
-        folder = context.folders.active.where(unique_type:).take
+        folder = context.folders.active.find_by(unique_type:)
         folder ||= context.folders.create!(unique_type:,
                                            name: default_name_proc.call,
                                            parent_folder_id: Folder.root_folders(context).first,
@@ -422,9 +489,15 @@ class Folder < ActiveRecord::Base
   end
 
   def self.unfiled_folder(context)
-    folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: "visible", name: "unfiled").first
+    return unless context.respond_to?(:folders)
+
+    parent_folder = Folder.root_folders(context).first
+    folder = context.folders
+                    .where(parent_folder_id: parent_folder, workflow_state: "visible")
+                    .where(%q{name SIMILAR TO 'unfiled(\s\d+)?'})
+                    .first
     unless folder
-      folder = context.folders.build(parent_folder: Folder.root_folders(context).first, name: "unfiled")
+      folder = context.folders.build(parent_folder:, name: "unfiled")
       folder.workflow_state = "visible"
       folder.save!
     end
@@ -587,6 +660,7 @@ class Folder < ActiveRecord::Base
       next_clear_cache = next_lock_change
       if next_clear_cache.present? && next_clear_cache < (Time.zone.now + AdheresToPolicy::Cache::CACHE_EXPIRES_IN)
         delay(run_at: next_clear_cache, singleton: "clear_permissions_cache_#{global_id}").clear_permissions_cache
+        delay(run_at: next_clear_cache, singleton: "clear_active_users_cache_#{global_id}").clear_active_users_cache
       end
     end
   end
@@ -594,6 +668,10 @@ class Folder < ActiveRecord::Base
   def clear_downstream_permissions
     active_file_attachments.touch_all
     active_sub_folders.each(&:clear_permissions_cache)
+  end
+
+  def clear_active_users_cache
+    context.active_users.each(&:clear_caches) if context.is_a?(Course)
   end
 
   def next_lock_change

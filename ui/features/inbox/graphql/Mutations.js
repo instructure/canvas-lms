@@ -21,7 +21,7 @@ import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import {SubmissionComment} from './SubmissionComment'
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
   mutation UpdateConversationParticipants(
@@ -73,7 +73,6 @@ export const CREATE_CONVERSATION = gql`
     $recipients: [String!]!
     $subject: String
     $tags: [String!]
-    $userNote: Boolean
   ) {
     createConversation(
       input: {
@@ -88,7 +87,6 @@ export const CREATE_CONVERSATION = gql`
         recipients: $recipients
         subject: $subject
         tags: $tags
-        userNote: $userNote
       }
     ) {
       conversations {
@@ -111,7 +109,6 @@ export const ADD_CONVERSATION_MESSAGE = gql`
   mutation AddConversationMessage(
     $attachmentIds: [ID!]
     $body: String!
-    $userNote: Boolean
     $conversationId: ID!
     $includedMessages: [ID!]
     $mediaCommentId: ID
@@ -123,7 +120,6 @@ export const ADD_CONVERSATION_MESSAGE = gql`
       input: {
         attachmentIds: $attachmentIds
         body: $body
-        userNote: $userNote
         conversationId: $conversationId
         includedMessages: $includedMessages
         mediaCommentId: $mediaCommentId

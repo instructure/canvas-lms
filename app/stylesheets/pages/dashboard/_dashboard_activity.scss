@@ -22,6 +22,35 @@
   height: 200px;
 }
 
+.page_header {
+  @include page_header;
+}
+
+.page_header_container {
+  @include page_header_container;
+}
+
+.actions_buttons-container {
+  @include action_buttons_container;
+}
+
+#student-group-dialog-mount-point {
+  display: none;
+}
+
+.show-only-on-mobile{
+  display: none;
+  @media (max-width: 767px) {
+    display: block;
+  }
+}
+
+.hide-on-mobile {
+  @media (max-width: 767px) {
+    display: none;
+  }
+}
+
 .recent-activity-header {
   margin: 0;
   border-bottom: 1px solid $ic-border-light;

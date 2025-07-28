@@ -28,6 +28,7 @@ describe "Group Categories API", type: :request do
       "name" => category.name,
       "role" => category.role,
       "self_signup" => category.self_signup,
+      "self_signup_end_at" => category.self_signup_end_at,
       "context_type" => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
       "created_at" => category.created_at.iso8601,
@@ -105,13 +106,11 @@ describe "Group Categories API", type: :request do
 
       context "granular permissions" do
         it "succeeds" do
-          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
           status = raw_api_call(:get, api_url, api_route)
           expect(status).to eq 200
         end
 
         it "does not succeed if :manage_groups_add is not enabled" do
-          @course.root_account.enable_feature!(:granular_permissions_manage_groups)
           @course.account.role_overrides.create!(
             permission: "manage_groups_manage",
             role: teacher_role,
@@ -209,10 +208,10 @@ describe "Group Categories API", type: :request do
         end
       end
 
-      it "returns 401 for users outside the group_category" do
+      it "returns 403 for users outside the group_category" do
         user_factory # ?
         raw_api_call(:get, api_url, api_route)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "returns an error when search_term is fewer than 2 characters" do
@@ -283,7 +282,7 @@ describe "Group Categories API", type: :request do
                         @category_path_options.merge(action: "update", group_category_id: category2.to_param),
                         { :name => @name, :self_signup => "enabled", "create_group_count" => 3, :course_id => og_course.id },
                         {},
-                        { expected_status: 401 })
+                        { expected_status: 403 })
         expect(json["status"]).to eq "unauthorized"
         expect(category2.reload.name).to_not eq @name
       end
@@ -506,7 +505,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/courses/#{@course.to_param}/group_categories.json",
                      @category_path_options.merge(action: "index",
                                                   course_id: @course.to_param))
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not list all groups in category for a student" do
@@ -514,7 +513,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{@category.id}/groups",
                      @category_path_options.merge(action: "groups",
                                                   group_category_id: @category.to_param))
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not allow a student to create a course group category" do
@@ -524,7 +523,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(action: "create",
                                                   course_id: @course.to_param),
                      { "name" => name })
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not allow a teacher to delete the student groups category" do
@@ -533,7 +532,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: @category.to_param)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not allow a student to delete a category for a course" do
@@ -545,7 +544,7 @@ describe "Group Categories API", type: :request do
                      "/api/v1/group_categories/#{project_groups.id}",
                      @category_path_options.merge(action: "destroy",
                                                   group_category_id: project_groups.to_param)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not allow a student to update a category for a course" do
@@ -554,7 +553,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(action: "update",
                                                   group_category_id: @category.to_param),
                      { name: "name" }
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -569,7 +568,7 @@ describe "Group Categories API", type: :request do
                      @category_path_options.merge(action: "assign_unassigned_members",
                                                   group_category_id: category.to_param),
                      { "sync" => true }
-        assert_status(401)
+        assert_forbidden
       end
 
       it "requires valid group :category_id" do

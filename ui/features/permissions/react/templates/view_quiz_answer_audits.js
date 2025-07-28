@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_74')
+const I18n = createI18nScope('permissions_templates_74')
 
 export const template = generateActionTemplates(
   [
@@ -36,10 +36,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'The Quiz Log Auditing feature option must be enabled in Course Settings.'
+        'The Quiz Log Auditing feature option must be enabled in Course Settings.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

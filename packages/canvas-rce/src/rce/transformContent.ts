@@ -30,7 +30,7 @@ export const attributeNamesToRemove = ['data-api-endpoint', 'data-api-returntype
  */
 export function transformRceContentForEditing(
   inputHtml: string | null | undefined,
-  options: TransformRceContentForEditingOptions
+  options: TransformRceContentForEditingOptions,
 ) {
   if (!inputHtml) {
     // It's important to return null/undefined here if that was passed in, otherwise tests fail because
@@ -57,7 +57,7 @@ export function transformRceContentForEditing(
       if (attributeValue) {
         element.setAttribute(
           attributeName,
-          relativeHttpUrlForHostname(attributeValue, options.origin)
+          relativeHttpUrlForHostname(attributeValue, options.origin),
         )
       }
     })

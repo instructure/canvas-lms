@@ -44,7 +44,7 @@ type NoResultsProps = {
 export function buildUrl(
   contextType: ContextType,
   contextId: string,
-  collectionType: CollectionType
+  collectionType: CollectionType,
 ): string {
   const typeMap: Partial<Record<CollectionType, string>> = {
     wikiPages: 'pages',

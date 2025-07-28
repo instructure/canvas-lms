@@ -21,7 +21,7 @@ export function isValid(return_to) {
     return false
   }
   const url = new URL(return_to, window.location.origin)
-  // eslint-disable-next-line no-script-url
+
   if (url.protocol === 'javascript:' || url.protocol === 'data:') {
     return false
   }

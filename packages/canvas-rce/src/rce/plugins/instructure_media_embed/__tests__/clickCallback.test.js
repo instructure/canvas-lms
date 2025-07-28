@@ -43,7 +43,7 @@ describe('instructure_media_embed clickCallback', () => {
     container.className = 'canvas-rce-embed-container'
     document.body.appendChild(container)
     await clickCallback(fauxEditor, document)
-    expect(document.querySelectorAll('.canvas-rce-embed-container').length).toEqual(1)
+    expect(document.querySelectorAll('.canvas-rce-embed-container')).toHaveLength(1)
   })
 
   it('opens the Embed modal when called', async () => {
@@ -51,7 +51,7 @@ describe('instructure_media_embed clickCallback', () => {
     expect(
       getAllByLabelText(document, 'Embed', {
         selector: '[role="dialog"]',
-      })[0]
+      })[0],
     ).toBeVisible()
   })
 })

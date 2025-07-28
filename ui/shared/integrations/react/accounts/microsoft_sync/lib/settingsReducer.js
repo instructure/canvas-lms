@@ -16,15 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  doUpdateSettings,
-  getTenantErrorMessages,
-  setTenantInfoMessages,
-  getSuffixErrorMessages,
-} from './settingsHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {doUpdateSettings, getTenantErrorMessages, getSuffixErrorMessages} from './settingsHelper'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_settings_jsx_bundle')
+const I18n = createI18nScope('account_settings_jsx_bundle')
 
 /**
  * @typedef {Object} ReducerAction
@@ -70,8 +65,6 @@ export const reducerActions = {
  * Any error messages from fetching/updating settings.
  * @property {{text: string, type: string}[]} tenantErrorMessages
  * Any tenant input validation error messages
- * @property {{text: string, type: string}[]} tenantInfoMessages
- * Any tenant input info messages.
  * @property {{text: string, type: string}[]} suffixErrorMessages
  * Any error messages related to the user specified suffix
  * @property {boolean} loading
@@ -100,7 +93,6 @@ export const reducerActions = {
 export const defaultState = {
   errorMessage: '',
   tenantErrorMessages: [],
-  tenantInfoMessages: [],
   suffixErrorMessages: [],
   loading: true,
   uiEnabled: true,
@@ -151,13 +143,10 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       }
     }
     case reducerActions.updateTenant: {
-      const tenantInfoMessages = setTenantInfoMessages(state, payload)
-
       return {
         ...state,
         microsoft_sync_tenant: payload.microsoft_sync_tenant,
         tenantErrorMessages: [],
-        tenantInfoMessages,
       }
     }
     case reducerActions.updateSettings: {
@@ -213,7 +202,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         errorMessage: I18n.t(
-          'Unable to fetch current Microsoft Teams Sync settings. Please check your internet connection. If the problem persists, please contact support.'
+          'Unable to fetch current Microsoft Teams Sync settings. Please check your internet connection. If the problem persists, please contact support.',
         ),
       }
     }
@@ -223,14 +212,13 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         successMessage: I18n.t('Microsoft Teams Sync settings updated!'),
         uiEnabled: true,
         last_saved_microsoft_sync_tenant: state.microsoft_sync_tenant,
-        tenantInfoMessages: [],
       }
     }
     case reducerActions.updateError: {
       return {
         ...state,
         errorMessage: I18n.t(
-          'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
+          'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.',
         ),
         uiEnabled: true,
       }
@@ -239,7 +227,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         errorMessage: I18n.t(
-          'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
+          'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.',
         ),
         microsoft_sync_enabled: !state.microsoft_sync_enabled,
         uiEnabled: true,

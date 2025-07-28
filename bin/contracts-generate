@@ -3,7 +3,7 @@
 set -e
 
 if [ -f config/consul.yml ]; then # canvas is running in docker
-  docker-compose run --rm --no-deps \
+  docker compose run --rm --no-deps \
     -e RAILS_ENV=test  \
     web bundle exec rspec pact/spec \
       --tag pact --format doc
@@ -26,8 +26,8 @@ function print_results() {
 }
 trap print_results INT TERM EXIT
 set -e
-docker-compose run --no-deps --name contracts web \
+docker compose run --no-deps --name contracts web \
   bundle exec rspec spec/contracts/service_providers/ --format doc --tag pact
 sha="$(git rev-parse --short HEAD)"
-docker-compose run --no-deps --rm -e SHA="${sha}" \
+docker compose run --no-deps --rm -e SHA="${sha}" \
   web bundle exec rake broker:pact:publish:local

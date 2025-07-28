@@ -26,7 +26,7 @@ module Lti
       resource_selection
     ].freeze
 
-    def initialize(tool:, context:, user:, session_id:, launch_type:, placement: nil)
+    def initialize(tool:, context:, user:, session_id:, launch_type:, launch_url: nil, placement: nil, message_type: nil, lti2: false)
       raise ArgumentError, "context must be a Course, Account, or Group" unless [Course, Account, Group].include? context.class
       raise ArgumentError, "launch_type must be one of #{LAUNCH_TYPES.join(", ")}" unless LAUNCH_TYPES.include?(launch_type.to_sym)
 
@@ -35,22 +35,44 @@ module Lti
       @context = context
       @user = user
       @launch_type = launch_type
+      @launch_url = launch_url
       @placement = placement
       @session_id = session_id
+      @message_type = message_type
+      @lti2 = lti2
     end
 
     def call
-      return unless @context.root_account.feature_enabled?(:lti_log_launches)
-      return unless Account.site_admin.feature_enabled?(:lti_log_launches_site_admin)
+      return unless log_lti_launches?
 
-      PandataEvents.send_event(:lti_launch, log_data, for_user_id: @user&.global_id)
+      if @lti2
+        log_lti2
+      else
+        PandataEvents.send_event(:lti_launch, log_data, for_user_id: @user&.global_id)
+      end
+    end
+
+    private
+
+    def log_lti2
+      return unless @context.root_account.feature_enabled?(:lti_v2_turnitin_usage_log)
+      return unless turnitin_url?
+
+      PandataEvents.send_event(:lti_launch, log_lti2_data, for_user_id: @user&.global_id)
+    end
+
+    def log_lti_launches?
+      Setting.get("log_lti_launches", "true") == "true"
+    end
+
+    def turnitin_url?
+      uri = URI.parse(@launch_url)
+      uri.host.end_with?("turnitin.com")
     end
 
     def log_data
       {
-        # We'll need this column in the near future but don't have the values for it yet.
-        # We're including it to make everyone's life easier when we do have the values.
-        unified_tool_id: nil,
+        unified_tool_id: @tool.unified_tool_id,
         tool_id: @tool.id.to_s,
         tool_provided_id: @tool.tool_id,
         tool_domain: @tool.domain,
@@ -61,6 +83,7 @@ module Lti
         account_id: account_for_context.id.to_s,
         root_account_uuid: @context.root_account.uuid,
         launch_type: @launch_type,
+        launch_url: @launch_url,
         message_type:,
         placement: @placement,
         context_id: @context.id.to_s,
@@ -72,7 +95,33 @@ module Lti
       }
     end
 
+    def log_lti2_data
+      {
+        unified_tool_id: turnitin_utid,
+        tool_id: nil,
+        tool_provided_id: nil,
+        tool_domain: nil,
+        tool_url: nil,
+        tool_name: "Turnitin",
+        tool_version: "2.0",
+        tool_client_id: nil,
+        account_id: account_for_context.id.to_s,
+        message_type: "basic-lti_launch-request",
+        root_account_uuid: @context.root_account.uuid,
+        launch_type: @launch_type,
+        launch_url: @launch_url,
+        placement: nil,
+        context_id: @context.id.to_s,
+        context_type: @context.class.name,
+        user_id: Shard.relative_id_for(@user&.id, @user&.shard, Shard.current).to_s,
+        session_id: @session_id,
+        shard_id: Shard.current.id.to_s,
+        user_relationship:
+      }
+    end
+
     def message_type
+      return @message_type if @message_type
       return @tool.extension_setting(@placement, :message_type) if @placement
 
       # no placement means this is a launch from a content item
@@ -109,8 +158,6 @@ module Lti
       relationships.uniq.join(",")
     end
 
-    private
-
     def user_group_relationship(group)
       group.participating_users(@user.id).map { |_| "GroupMembership" }
     end
@@ -136,6 +183,10 @@ module Lti
           @context.context
         end
       end
+    end
+
+    def turnitin_utid
+      Setting.get("lti_v2_turnitin_utid", "")
     end
   end
 end

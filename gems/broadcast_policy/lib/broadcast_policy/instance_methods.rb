@@ -21,10 +21,6 @@ require "active_support/hash_with_indifferent_access"
 
 module BroadcastPolicy
   module InstanceMethods
-    def just_created
-      saved_changes? && id_before_last_save.nil?
-    end
-
     # Some flags for auditing policy matching
     def messages_sent
       @messages_sent ||= {}
@@ -71,11 +67,14 @@ module BroadcastPolicy
             end
           end
           @mutations_before_last_save = ActiveModel::AttributeMutationTracker.new(other_attributes)
+          previously_new_record = @previously_new_record
+          @previously_new_record = !new_record? && other.new_record?
         end
         yield
       ensure
         @changed_attributes = frd_changed_attributes
         @mutations_before_last_save = frd_mutations_before_last_save
+        @previously_new_record = previously_new_record
       end
     end
 

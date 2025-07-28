@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, bool, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {MediaSource} from './MediaSource'
 import {MediaTrack} from './MediaTrack'
 

@@ -97,6 +97,9 @@ class TermsApiController < ApplicationController
 
   before_action :require_context, :require_root_account, :require_account_access
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index]
+
   include Api::V1::EnrollmentTerm
 
   # @API List enrollment terms
@@ -149,6 +152,8 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
+    add_crumb(t("Terms"))
+    page_has_instui_topnav
     @terms = @context.enrollment_terms
 
     @term_name = params[:term_name]
@@ -161,7 +166,7 @@ class TermsApiController < ApplicationController
         @root_account = @context.root_account
 
         @terms = @terms.active.preload(:enrollment_dates_overrides)
-        @terms = @terms.order(Arel.sql("COALESCE(start_at, created_at) DESC"))
+        @terms = @terms.order(Arel.sql("COALESCE(start_at, created_at) DESC, id ASC"))
         @terms = @terms.paginate(per_page: PER_PAGE, page: params[:page])
 
         @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
@@ -182,8 +187,10 @@ class TermsApiController < ApplicationController
                            @terms,
                            @current_user,
                            session,
+                           @context.root_account,
                            nil,
-                           Array(params[:include])
+                           Array(params[:include]),
+                           params[:subaccount_id] || nil
                          ) }
       end
     end

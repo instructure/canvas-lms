@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TutorialTrayContent from './TutorialTrayContent'
 
-const I18n = useI18nScope('new_user_tutorial')
+const I18n = createI18nScope('new_user_tutorial')
 
 const PeopleTray = () => (
   <TutorialTrayContent
@@ -55,7 +55,7 @@ const PeopleTray = () => (
       shows the list of users in your course. Depending on your permissions,
       you may be able to add students, teacher assistants, and observers to
       your course. You can also create student groups to house group assignments,
-      discussions, and files.`
+      discussions, and files.`,
     )}
   </TutorialTrayContent>
 )

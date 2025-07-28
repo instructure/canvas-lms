@@ -51,7 +51,7 @@ module CanvasCache
 
     module Cluster
       def disconnect_if_idle(since_when)
-        @router.instance_variable_get(:@node).clients.each { |c| c.disconnect_if_idle(since_when) }
+        @router.instance_variable_get(:@node)&.clients&.each { |c| c.disconnect_if_idle(since_when) }
       end
     end
 
@@ -62,6 +62,18 @@ module CanvasCache
         super(**kwargs, &)
       end
       # rubocop:enable Style/ArgumentsForwarding
+    end
+
+    module TaggedRingConfig
+      def initialize(*, **kwargs)
+        @ring_tag = kwargs.delete(:_ring_tag)
+
+        super
+      end
+
+      def ring_tag
+        @ring_tag
+      end
     end
 
     module Distributed
@@ -168,6 +180,7 @@ module CanvasCache
         ::Redis.prepend(Redis)
         ::Redis.prepend(IgnorePipelinedKey)
         ::RedisClient.prepend(Client)
+        ::RedisClient::Config.prepend(TaggedRingConfig)
         ::Redis::Cluster::Client.prepend(Cluster)
         ::RedisClient::Cluster.prepend(IgnorePipelinedKey)
         ::Redis::Client.prepend(Client)

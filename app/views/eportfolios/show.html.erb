@@ -15,19 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
+<div id="eportfolio_portal_mount"></div>
 
 <% provide :page_title do %><%= join_title @page.name, @category.name, @portfolio.name %><% end %>
 
 <% provide :left_side do %>
-  <div class="eportfolio-name">
-    <h3><%= @portfolio.name %></h3>
-    <% if @owner_url %>
-      <a href="<%= @owner_url %>" id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></a>
-    <% else %>
-      <span id="section-tabs-header-subtitle" class="ellipsis"><%= @portfolio.user.name %></span>
-    <% end %>
-  </div>
-  <%= render :partial => "eportfolios/section_list" %>
+  <div id='section_list_mount'></div>
 <% end %>
 
 <% provide :right_side do %>
@@ -37,7 +30,40 @@
         <a href="#" class="wizard_popup_link"><%= help_link_text %></a>
       </div>
     <% end %>
-    <%= render :partial => "eportfolios/page_list" %>
+
+    <div id="section_pages">
+      <% if @portfolio.grants_right?(@current_user, :moderate) %>
+        <% if @portfolio.spam? %>
+          <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'mark_eportfolio_safe_form', class: 'ic-Form-group' }  do |f| %>
+            <input type="hidden" name="eportfolio[spam_status]" value="marked_as_safe"/>
+            <button type="submit" class="Button Button--default button-sidebar-wide">
+              <i class="icon-check"></i>&nbsp;
+              <%= t('Mark as Safe') %>
+            </button>
+          <% end %>
+
+          <% if @portfolio.flagged_as_possible_spam? %>
+            <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'mark_eportfolio_spam_form' }  do |f| %>
+              <input type="hidden" name="eportfolio[spam_status]" value="marked_as_spam"/>
+              <button type="submit" class="Button Button--default button-sidebar-wide">
+                <i class="icon-flag"></i>&nbsp;
+                <%= t('Confirm as Spam') %>
+              </button>
+            <% end %>
+          <% end %>
+        <% else %>
+          <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'edit_eportfolio_spam_form' }  do |f| %>
+            <input type="hidden" name="eportfolio[spam_status]" value="marked_as_spam"/>
+            <button type="submit" class="Button button-sidebar-wide">
+              <i class="icon-flag"></i>&nbsp;
+              <%= t('Mark as Spam') %>
+            </button>
+          <% end %>
+        <% end %>
+      <% end %>
+      <div id='page_list_mount'></div>
+    </div>
+
     <% if can_do(@portfolio, @current_user, :manage) && !@owner_view %>
     <div class="edit_content_link_holder">
       <a href="#" class="edit_content_link btn button-sidebar-wide"><%= edit_link_text %></a>
@@ -52,16 +78,7 @@
           <li><a class="add_content_link add_submission_link" href="#"><%= t('links.choose_submission', "Course Submission") %></a></li>
           <li><a class="add_content_link add_file_link" href="#"><%= t('links.file_uload', "Image/File Upload") %></a></li>
         </ul>
-        <div class="form_content button-container">
-          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
-          <button type="button" class="preview_button btn btn-small"><%= t('buttons.preview', "Preview") %></button>
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-        </div>
-        <div class="preview_content button-container">
-          <button type="button" class="cancel_button btn button-secondary btn-small"><%= t('#buttons.cancel', "Cancel") %></button>
-          <button type="button" class="keep_editing_button btn btn-small"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-          <button type="button" class="submit_button btn btn-small btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-        </div>
+        <div id="side_button_mount"></div>
       </div>
     </div>
     <% end %>
@@ -114,7 +131,7 @@
     <p><%= t(:private_eportfolio, <<-DETAILS)
       That means people can't find it or even view it without permission. You
       can see it since it's your portfolio, but if you want to let anybody else
-      see it, you'll need to copy and share the the following special link so
+      see it, you'll need to copy and share the following special link so
       they can access your portfolio:
       DETAILS
     %></p>
@@ -131,35 +148,7 @@
   <% end %>
 
   <h3><%= t('headers.recent_submissions', "Recent Submissions") %></h3>
-  <p><%= t(:recent_submissions, "Click any submission to add it to a new page in your ePortfolio.") %></p>
-  <% if @recent_submissions.empty? %>
-    <div style="margin: 5px 20px;"><%= t(:no_submissions, "No Submissions Found") %></div>
-  <% end %>
-  <ul class="submission_list" id="recent_submissions" style="max-height: 200px; overflow: auto;">
-    <% @recent_submissions.each do |submission| %>
-      <% already_used = (@used_submission_ids.include?(submission.id) rescue false) %>
-      <li class="clearfix submission <%= 'already_used' if already_used %>" title="<%= t('titles.already_used', "This submission is already included in your portfolio") if already_used %>" id="recent_submission_<%= submission.id %>" tabindex="0">
-        <a href="<%= eportfolio_entry_preview_submission_path(@portfolio, @page, submission.id) %>"
-          style="display: none;"
-          class="submission_info">
-          <%= submission.assignment.title %>, <%= submission.assignment.context.name %>
-        </a>
-        <span class="text" style="font-size: 1.2em;" role="button">
-          <span class="text assignment_title"><%= submission.assignment.title %></span>
-          <span style="font-size: 0.8em; padding-<%= direction('left') %>: 5px;" class="text context_name"><%= submission.assignment.context.name %></span>
-        </span>
-        <div style="float: <%= direction('right') %>; font-size: 0.8em; color: #aaa; margin-<%= direction('right') %>: 20px; margin-top: 0.5em;">
-          <%= datetime_string(submission.submitted_at || submission.updated_at) %>
-          &nbsp;<a href="<%= context_url(submission.assignment.context, :context_assignment_submission_url, submission.assignment_id, @portfolio.user.id) %>" target="_blank" class="no-hover view_submission_url"><%= image_tag "popout.png", :alt => t('titles.view_submission', "View the Submission") %></a>
-        </div>
-        <div style="font-size: 0.8em; color #aaa; margin-<%= direction('left') %>: 20px;">
-          <%= t(:attachment_count, { :one => "1 Attachment", :other => "%{count} Attachments" },
-                :count => submission.attachments.length) unless submission.attachments.empty? %></div>
-        <span class="submission_id" style="display: none;"><%= submission.id %></span>
-        <div class="clear"></div>
-      </li>
-    <% end %>
-  </ul>
+  <div id="recent_submission_mount"></div>
   <ul id="eportfolio_structure" style="display: none;">
     <% @categories.each do |category| %>
       <li id="structure_category_<%= category.id %>" class="category">
@@ -182,54 +171,6 @@
       <span class="name">&nbsp;</span>
     </li>
   </ul>
-  <form id="add_submission_form" style="display: none;">
-    <input type="hidden" name="section_1[section_type]" value="rich_text"/>
-    <input type="hidden" name="section_1[content]" class="submission_description" value=""/>
-    <input type="hidden" name="section_2[section_type]" value="submission"/>
-    <input type="hidden" name="section_2[submission_id]" class="submission_id" value=""/>
-    <input type="hidden" name="section_count" value="2"/>
-    <p style="font-size: 0.8em;"><%= t(:add_submission, <<-INSTRUCTIONS)
-      To make a new page for this submission, select a section and enter the
-      name for the new page.
-      INSTRUCTIONS
-    %></p>
-    <table class="formtable">
-      <tr>
-        <td><%= before_label(:section, "Section") %></td>
-        <td>
-          <select id="category_select" name="eportfolio_entry[eportfolio_category_id]">
-            <% @categories.each do |category| %>
-              <option value="<%= category.id %>" id="category_select_<%= category.id %>"><%= category.name %></option>
-            <% end %>
-          </select>
-          <div style="display: none;">
-            <option value="new" id="category_select_blank">
-              <%= t(:new_section, "New Section") %>
-            </option>
-          </div>
-        </td>
-      </tr><tr>
-        <td><%= before_label(:page_name, "Page Name") %></td>
-        <td><input type="text" name="eportfolio_entry[name]" style="width: 100px;"/></td>
-      </tr><tr>
-        <td colspan="2" style="padding-<%= direction('left') %>: 20px; font-size: 0.8em; padding-top: 10px;">
-          <%= t(:current_pages, "Current Pages") %>
-          <ul id="page_select_list" class="unstyled_list" style="padding-<%= direction('left') %>: 20px; margin-top: 5px;">
-            <li class="page_select" id="page_select_blank" style="display: none;">
-            </li>
-          </ul>
-        </td>
-      </tr>
-    </table>
-    <div class="button-container">
-      <button type="button" class="btn cancel_button"><%= t('#buttons.cancel', "Cancel") %></button>
-      <button type="submit" class="btn btn-primary"><%= t('buttons.add_page', "Add Page") %></button>
-    </div>
-    <div style="display: none;">
-      <a class="add_eportfolio_entry_url" href="<%= eportfolio_entries_path(@portfolio.id) %>">&nbsp;</a>
-      <a class="eportfolio_named_entry_url" href="<%= eportfolio_named_category_entry_path(@portfolio.id, "{{ category_slug }}", "{{ slug }}") %>">&nbsp;</a>
-    </div>
-  </form>
 <% else %>
   <% if can_do(@portfolio, @current_user, :manage) %>
   <div style="float: <%= direction('right') %>; display: none;"><a href="#" class="edit_content_link icon-edit"><%= edit_link_text %></a></div>
@@ -275,9 +216,9 @@
   <% end %>
   <h2 id="eportfolio_entry_<%= @page.id %>"><span class="name"><%= @page.name %></span></h2>
   <%= form_for @page, :url => eportfolio_entry_url(@portfolio, @page), :html => {:id => "edit_page_form" } do |f| %>
+  <div id="page_name_mount"></div>
   <div class="form_content">
-    <%= f.label :name, before_label(:page_name, "Page Name") %>
-    <%= f.text_field :name %>
+    <%= f.hidden_field :name, id: "page_name_field" %>
   </div>
   <div id="page_content">
     <% @page.content_sections.each_with_index do |c, idx| %>
@@ -292,16 +233,7 @@
       <%= f.label :show_comments, t('labels.show_comments', "Make Comments Public") %>
     </div>
   </div>
-  <div class="form_content button-container">
-    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="button" class="preview_button btn"><%= t('buttons.preview', "Preview") %></button>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-  </div>
-  <div class="preview_content button-container">
-    <button type="button" class="cancel_button btn button-secondary"><%= t('#buttons.cancel', "Cancel") %></button>
-    <button type="button" class="keep_editing_button btn"><%= t('buttons.keep_editing', "Keep Editing") %></button>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.save_page', "Save Page") %></button>
-  </div>
+  <div id="page_button_mount"></div>
   <table class="formtable" style="width: 100%; display: none;">
     <tr>
       <td colspan="2">
@@ -348,7 +280,7 @@
             <div style="float: <%= direction('right') %>; font-size: 0.8em; color: #aaa; margin-<%= direction('right') %>: 20px; margin-top: 0.5em;"><%= datetime_string(submission.submitted_at || submission.updated_at) %></div>
             <div style="font-size: 0.8em; color #aaa; margin-<%= direction('left') %>: 20px;">
               <%= t(:attachment_count, { :one => "1 Attachment", :other => "%{count} Attachments" },
-                    :count => submission.attachments.length) unless submission.attachments.empty? %></div>
+                    :count => submission.attachments.size) unless submission.attachments.empty? %></div>
             <div class="clear"></div>
           </li>
         <% end %>
@@ -404,25 +336,6 @@
   <% end %>
 
 <% end %>
-<%= form_for @portfolio, :url => eportfolio_path(@portfolio), :html => {:style => "display: none; position: relative;", :id => "edit_eportfolio_form"} do |f| %>
-<table class="formtable">
-  <tr>
-    <td><%= f.label :name, before_label(:eportfolio_name, "ePortfolio Name") %></td>
-    <td><%= f.text_field :name %></td>
-  </tr><tr>
-    <td colspan="2">
-      <%= f.check_box :public %>
-      <%= f.label :public, t('labels.make_public', "Make it Public") %>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2" class="button-container">
-      <button type="submit" class="btn btn-primary"><%= t('buttons.update_eportfolio', "Update ePortfolio") %></button>
-      <button class="btn dialog_closer"><%= t('#buttons.cancel', "Cancel") %></button>
-    </td>
-  <td>
-</table>
-<% end %>
 <% if !@owner_view %>
 <div id="page_comments_holder" style="margin-top: 50px;">
   <h2 style="<%= hidden unless @page.show_comments || @page.allow_comments || can_do(@portfolio, @current_user, :update) %>"><%= t 'headings.page_comments', 'Page Comments' %></h2>
@@ -469,7 +382,7 @@
     <a href="<%= eportfolio_export_portfolio_path(@portfolio.id) %>" class="download_eportfolio_link icon-zipped"><%= t('links.download_eportfolio', "Download the contents of this ePortfolio as a zip file") %></a>
     <div style="display: none; font-size: 1.2em;" id="downloading_eportfolio_message">
       <span class="message">
-        <%= t('headers.export_progress', "Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.") %>
+        <%= t("Collecting ePortfolio resources. This may take a while if you have a lot of files in your ePortfolio.") %>
       </span>
       <div style="margin: 20px 10px;">
         <div id="export_progress"></div>

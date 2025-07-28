@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_2')
+const I18n = createI18nScope('permissions_templates_2')
 
 export const template = generateActionTemplates(
   [
@@ -29,12 +29,12 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'This permission should only be assigned to users that your institution has authorized to act as other users in your entire Canvas account.'
+        'This permission should only be assigned to users that your institution has authorized to act as other users in your entire Canvas account.',
       ),
     },
     {
       description: I18n.t(
-        'Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc.'
+        'Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc.',
       ),
     },
     {
@@ -58,7 +58,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'To view the list of users in an account, Users - view list must be enabled.'
+        'To view the list of users in an account, Users - view list must be enabled.',
       ),
     },
     {
@@ -71,5 +71,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

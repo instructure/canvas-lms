@@ -38,13 +38,13 @@ import {
   toggleMissingItems,
 } from '../../actions'
 import ErrorAlert from '../ErrorAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isInMomentRange} from '../../utilities/dateUtils'
 import TodoEditorModal from '../TodoEditorModal'
 
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const WEEKLY_PLANNER_ACTIVE_BTN_ID = 'weekly-header-active-button'
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {initializeContent, convertApiUserContent} from '../contentUtils'
+import {initializeContent, convertApiUserContent, assignmentType} from '../contentUtils'
 
 describe('contentUtils::convertApiUserContent', () => {
   const oldEnv = process.env
@@ -44,5 +44,20 @@ describe('contentUtils::convertApiUserContent', () => {
     process.env.NODE_ENV = 'test'
 
     expect(convertApiUserContent(value)).toBe(value)
+  })
+})
+
+describe('contentUtils::assignmentType', () => {
+  it('converts properly assignment types', () => {
+    expect(assignmentType('Quiz')).toBe('Quiz')
+    expect(assignmentType('Discussion')).toBe('Discussion')
+    expect(assignmentType('Discussion Checkpoint')).toBe('Discussion')
+    expect(assignmentType('Assignment')).toBe('Assignment')
+    expect(assignmentType('Page')).toBe('Page')
+    expect(assignmentType('Announcement')).toBe('Announcement')
+    expect(assignmentType('To Do')).toBe('To Do')
+    expect(assignmentType('Calendar Event')).toBe('Calendar Event')
+    expect(assignmentType('Peer Review')).toBe('Peer Review')
+    expect(assignmentType('')).toBe('Task')
   })
 })

@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CommonEvent from './CommonEvent'
 import fcUtil from '../fcUtil'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 const deleteConfirmation = I18n.t(
   'prompts.delete_override',
-  'Are you sure you want to delete this assignment override?'
+  'Are you sure you want to delete this assignment override?',
 )
 
 extend(AssignmentOverride, CommonEvent)
@@ -48,7 +48,12 @@ Object.assign(AssignmentOverride.prototype, {
       this.copyDataFromOverride(data)
     }
 
-    this.title = `${this.assignment.name} (${this.override.title})`
+    if (this.override.title) {
+      this.title = `${this.assignment.name} (${this.override.title})`
+    } else {
+      this.title = this.assignment.name
+    }
+
     this.object = this.override
     this.addClass(`group_${this.contextCode()}`)
     return AssignmentOverride.__super__.copyDataFromObject.apply(this, arguments)
@@ -101,7 +106,7 @@ Object.assign(AssignmentOverride.prototype, {
     return this.save(
       {'assignment_override[due_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : ''},
       success,
-      error
+      error,
     )
   },
 

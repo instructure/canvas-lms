@@ -32,7 +32,7 @@ describe('studioAttributesFrom', () => {
   it('uses the default values for missing attributes', () => {
     const customJson: StudioContentItemCustomJson = {source: 'studio'}
     expect(studioAttributesFrom(customJson)).toMatchInlineSnapshot(`
-      Object {
+      {
         "data-studio-convertible-to-link": true,
         "data-studio-resizable": false,
         "data-studio-tray-enabled": false,
@@ -47,7 +47,7 @@ describe('studioAttributesFrom', () => {
       resizable: true,
     }
     expect(studioAttributesFrom(customJson)).toMatchInlineSnapshot(`
-      Object {
+      {
         "data-studio-convertible-to-link": true,
         "data-studio-resizable": true,
         "data-studio-tray-enabled": true,
@@ -60,7 +60,7 @@ describe('studioAttributesFrom', () => {
       resizable: false,
     }
     expect(studioAttributesFrom(customJson)).toMatchInlineSnapshot(`
-      Object {
+      {
         "data-studio-convertible-to-link": true,
         "data-studio-resizable": false,
         "data-studio-tray-enabled": false,

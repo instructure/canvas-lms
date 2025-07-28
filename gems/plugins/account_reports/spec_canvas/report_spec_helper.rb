@@ -105,3 +105,9 @@ RSpec::Matchers.define :eq_stringified_array do |expected|
     actual == expected.map { |item| stringify_csv_record.call(item) }
   end
 end
+
+module CustomReports
+  module Rubrics
+    class RootAccountRequiredError < RuntimeError; end
+  end
+end

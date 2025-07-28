@@ -18,7 +18,7 @@
 
 import React, {useMemo} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MessageStudentsWhoDialog, {
   MSWLaunchContext,
   type SendMessageArgs,
@@ -33,7 +33,7 @@ import type {
 } from '../../../types'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type MessageStudentsWhoModalProps = {
   assignment: AssignmentConnection
@@ -55,16 +55,20 @@ export default function MessageStudentsWhoModal({
 }: MessageStudentsWhoModalProps) {
   const {userId} = gradebookOptions
 
+  // @ts-expect-error
   const messageWhoAssignment: CamelizedAssignment = {
     ...assignment,
     muted: false,
   }
 
   const submissionMap = useMemo(() => {
-    return submissions.reduce((acc, submission) => {
-      acc[submission.userId] = submission
-      return acc
-    }, {} as Record<string, SubmissionConnection>)
+    return submissions.reduce(
+      (acc, submission) => {
+        acc[submission.userId] = submission
+        return acc
+      },
+      {} as Record<string, SubmissionConnection>,
+    )
   }, [submissions])
 
   const studentsWithSubmissionDetails = useMemo(() => {
@@ -96,7 +100,7 @@ export default function MessageStudentsWhoModal({
         messageArgs.body,
         `course_${assignment.courseId}`,
         messageArgs.mediaFile,
-        messageArgs.attachmentIds
+        messageArgs.attachmentIds,
       )
       if (status === 202) {
         showFlashSuccess(I18n.t('Your message was sent!'))()
@@ -106,7 +110,7 @@ export default function MessageStudentsWhoModal({
       }
     } catch (error) {
       showFlashError(I18n.t('There was a problem sending your message.'))(
-        new Error(I18n.t('%{errorMessage}', {errorMessage}))
+        new Error(I18n.t('%{errorMessage}', {errorMessage})),
       )
     }
   }

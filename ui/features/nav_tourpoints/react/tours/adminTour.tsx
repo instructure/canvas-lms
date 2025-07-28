@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -24,7 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import handleOpenTray from '../handleOpenTray'
 import assetFactory from '@canvas/confetti/javascript/assetFactory'
 
-const I18n = useI18nScope('TourPoints')
+const I18n = createI18nScope('TourPoints')
 
 export default [
   {
@@ -46,7 +46,7 @@ export default [
         </Heading>
         <p>
           {I18n.t(
-            "We know it's a priority to transition your institution for online learning during this time. This quick tour will show you how to:"
+            "We know it's a priority to transition your institution for online learning during this time. This quick tour will show you how to:",
           )}
         </p>
         <ol>
@@ -141,7 +141,7 @@ export default [
             rel="noopener noreferrer"
           >
             {I18n.t(
-              'Video conferencing tools enable face-to-face connection between teachers and students.'
+              'Video conferencing tools enable face-to-face connection between teachers and students.',
             )}
           </Link>
         </Text>

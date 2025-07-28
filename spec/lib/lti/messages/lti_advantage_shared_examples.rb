@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../../lti_1_3_spec_helper"
-
 RSpec.shared_context "lti_advantage_shared_examples" do
-  include_context "lti_1_3_spec_helper"
+  include_context "key_storage_helper"
 
   let(:return_url) { "http://www.platform.com/return_url" }
   let(:opts) { { resource_type: "course_navigation" } }
@@ -38,17 +36,20 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
     request
   end
+  let(:expander_opts) do
+    {
+      current_user: user,
+      tool:,
+      assignment:,
+      collaboration:
+    }
+  end
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
       course,
       controller,
-      {
-        current_user: user,
-        tool:,
-        assignment:,
-        collaboration:
-      }
+      expander_opts
     )
   end
   let(:collaboration) { nil }
@@ -65,77 +66,71 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     @course
   end
 
-  let(:tool) do
-    tool = course.context_external_tools.new(
-      name: "bob",
-      consumer_key: "key",
-      shared_secret: "secret",
-      url: "http://www.example.com/basic_lti"
-    )
-    tool.course_navigation = {
-      enabled: true,
-      message_type: "ResourceLinkRequest",
-      selection_width: "500",
-      selection_height: "400",
-      custom_fields: {
-        has_expansion: "$User.id",
-        no_expansion: "foo"
-      }
-    }
-    tool.use_1_3 = true
-    tool.developer_key = developer_key
-    tool.save!
-    tool
-  end
-  let(:developer_key) do
-    DeveloperKey.create!(
-      name: "Developer Key With Scopes",
+  let(:registration) do
+    lti_registration_with_tool(
       account: course.root_account,
-      scopes: developer_key_scopes,
-      require_scopes: true
+      developer_key_params: { scopes: developer_key_scopes },
+      configuration_params: {
+        target_link_uri: "http://www.example.com/basic_lti",
+        oidc_initiation_url: "http://www.example.com/basic_lti",
+        domain: "www.example.com",
+        placements: [
+          {
+            placement: "course_navigation",
+            message_type: "LtiResourceLinkRequest",
+            selection_width: 500,
+            selection_height: 400,
+            custom_fields: {
+              has_expansion: "$User.id",
+              no_expansion: "foo"
+            }
+          }
+        ]
+      }
     )
   end
+  let(:tool) { registration.deployments.first }
   let(:developer_key_scopes) { [] }
 
   shared_examples_for "lti 1.3 message initialization" do
     it "adds public claims if the tool is public" do
       tool.update!(workflow_state: "public")
-      expect(jws["picture"]).to eq user.avatar_url
+      expect(jws[:post_payload]["picture"]).to eq user.avatar_url
     end
 
     it "does not add public claims if the tool is not public" do
       tool.update!(workflow_state: "private")
-      expect(jws).not_to include "picture"
+      expect(jws[:post_payload]).not_to include "picture"
     end
 
     it "adds include email claims if the tool is include email" do
       tool.update!(workflow_state: "email_only")
-      expect(jws["email"]).to eq user.email
+      expect(jws[:post_payload]["email"]).to eq user.email
     end
 
     it "does not add include email claims if the tool is not include email" do
       user.update!(email: "banana@test.com")
       tool.update!(workflow_state: "private")
-      expect(jws).not_to include "email"
+      expect(jws[:post_payload]).not_to include "email"
     end
 
     it "adds include name claims if the tool is include name" do
       tool.update!(workflow_state: "name_only")
-      expect(jws["name"]).to eq user.name
+      expect(jws[:post_payload]["name"]).to eq user.name
     end
 
     it "does not add include name claims if the tool is not include name" do
       tool.update!(workflow_state: "private")
-      expect(jws).not_to include "name"
+      expect(jws[:post_payload]).not_to include "name"
     end
 
     it "adds private claims" do
-      expect(jws["locale"]).to eq "en"
+      expect(jws[:post_payload]["locale"]).to eq "en"
     end
 
     it "adds security claims" do
       expected_sub = user.lti_id
-      expect(jws["sub"]).to eq expected_sub
+      expect(jws[:post_payload]["sub"]).to eq expected_sub
     end
   end
 end

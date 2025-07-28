@@ -48,12 +48,10 @@
  * check the mapping in src/rce/editorLanguages.js to be sure it's still complete.
  */
 
-const shell = require('shelljs')
 const fs = require('fs')
 const path = require('path')
-const getTranslationList = require('@instructure/translations/bin/get-translation-list')
-const readTranslationFile = require('@instructure/translations/bin/read-translation-file')
-const editorLanguage = require('../src/rce/editorLanguage')
+const {getTranslationList, readTranslationFile} = require('@instructure/translations')
+const {editorLanguage} = require('../src/rce/editorLanguage.js')
 
 // Here we go.
 installTranslations()
@@ -97,7 +95,7 @@ function generateCombinedImporters(canvasLocaleFileBasenames, tinyLocales) {
   for (const basename of canvasLocaleFileBasenames) {
     const filepath = path.resolve(
       __dirname,
-      path.join('../src/translations/locales', `${basename}.js`)
+      path.join('../src/translations/locales', `${basename}.js`),
     )
     const content = localeFileContent(basename, tinyLocales[basename])
     fs.writeFileSync(filepath, content, {flag: 'w'})
@@ -108,10 +106,11 @@ function generateCombinedImporters(canvasLocaleFileBasenames, tinyLocales) {
 // for locales no longer in the new list, remove them
 function removeStaleTranslationFiles(locales) {
   const newLocalesFiles = locales.map(l => `${l}.js`)
-  const curLocalesFiles = fs.readdirSync(path.resolve(__dirname, `../src/translations/locales`))
+  const localesDir = path.resolve(__dirname, '../src/translations/locales')
+  const curLocalesFiles = fs.readdirSync(localesDir)
   const staleFiles = curLocalesFiles.filter(f => !newLocalesFiles.includes(f))
-  for (f of staleFiles) {
-    fs.rmSync(path.resolve(__dirname, path.join('../src/translations/locales/', f)))
+  for (const f of staleFiles) {
+    fs.rmSync(path.resolve(localesDir, f))
   }
 }
 

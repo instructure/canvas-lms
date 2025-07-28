@@ -172,7 +172,7 @@
                   <li><a href="#", class="direct-share-copy-to-menu-item"><i class="icon-duplicate" aria-hidden="true"></i> <%= t("Copy To...") %></a></li>
                 <% end %>
 
-                <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
+                <% if can_do(@context, @current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
                   <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
               </ul>
@@ -235,7 +235,7 @@
 
         <div class="discussion-section message_wrapper">
           <% unless @locked.is_a?(Hash) && !@locked[:can_view] && !can_do(@topic, @current_user, :update) %>
-            <div data-bind="message" class="message user_content"><%= public_user_content(@topic.message) %></div>
+            <div data-bind="message" class="message user_content"><%= user_content(@topic.message) %></div>
           <% end %>
           <% if @unlock_at && @unlock_at > Time.now && @topic.is_a?(Announcement) %>
             <div class="discussion-fyi">

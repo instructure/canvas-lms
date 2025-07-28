@@ -55,21 +55,21 @@ describe('RequirementCountInput', () => {
   it('checkbox is checked when requirementCount is all and requireSequentialProgress is true', () => {
     const {getByLabelText} = renderComponent({requireSequentialProgress: true})
     expect(
-      getByLabelText('Students must move through requirements in sequential order')
+      getByLabelText('Students must move through requirements in sequential order'),
     ).toBeChecked()
   })
 
   it('checkbox is not checked when requirementCount is all and requireSequentialProgress is false', () => {
     const {getByLabelText} = renderComponent({requireSequentialProgress: false})
     expect(
-      getByLabelText('Students must move through requirements in sequential order')
+      getByLabelText('Students must move through requirements in sequential order'),
     ).not.toBeChecked()
   })
 
   it('checkbox is not visible when requirementCount is one', () => {
     const {queryByLabelText} = renderComponent({requirementCount: 'one'})
     expect(
-      queryByLabelText('Students must move through requirements in sequential order')
+      queryByLabelText('Students must move through requirements in sequential order'),
     ).not.toBeInTheDocument()
   })
 

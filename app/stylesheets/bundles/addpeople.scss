@@ -3,25 +3,6 @@
 // these are the styles for the  Add people dialog
 .addpeople {
   .addpeople__peoplesearch {
-    fieldset {
-      margin-top:1.5em;
-    }
-    fieldset.peoplesearch__selections {
-      margin-#{direction(right)}: auto;
-      margin-#{direction(left)}: auto;
-      margin-top: .5rem;
-      text-align: center;
-      &>div {
-        display: flex;
-        justify-content: center;
-      }
-      .peoplesearch__selection {
-        text-align: direction(left);
-        margin: 0 1em;
-        flex: 0 0 auto;
-        width: 30%;
-      }
-    }
     .peoplesearch__instructions {
       margin: 1.5em 0;
       text-align: center;
@@ -31,12 +12,27 @@
         line-height: 50px;
       }
     }
+    .peoplesearch_container {
+      margin-top: 1.5em;
+    }
+  }
+  .addpeople__peoplevalidationissues {
+    tr {
+      td {
+        align-content: start;
+
+        &:first-of-type {
+          width: 30px;
+        }
+
+        & > :first-child:has(input:checked) {
+          padding-top: .5rem;
+        }
+      }
+    }
   }
   .namelist {
     margin: 1.5em 0;
-  }
-  .peoplevalidationissues__missing tr td:first-child {
-    width: 30px;
   }
   &:focus {
     outline: none;

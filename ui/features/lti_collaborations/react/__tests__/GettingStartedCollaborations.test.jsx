@@ -30,15 +30,15 @@ describe('GettingStartedCollaborations', () => {
   test('renders the Getting Startted app div', () => {
     setEnvironment([], 'course_4')
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />,
     )
-    expect(wrapper.container.querySelectorAll('.GettingStartedCollaborations').length).toEqual(1)
+    expect(wrapper.container.querySelectorAll('.GettingStartedCollaborations')).toHaveLength(1)
   })
 
   test('renders the correct content with lti tools configured as a teacher', () => {
     setEnvironment(['teacher'], 'course_4')
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />,
     )
     const expectedHeader = 'Getting started with Collaborations'
     const expectedContent =
@@ -46,7 +46,7 @@ describe('GettingStartedCollaborations', () => {
     const expectedLinkText = 'Learn more about collaborations'
 
     expect(expectedHeader).toEqual(
-      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent,
     )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
@@ -55,7 +55,7 @@ describe('GettingStartedCollaborations', () => {
   test('renders the correct content with no lti tools configured data as a teacher', () => {
     setEnvironment(['teacher'], 'course_4')
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: []}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: []}} />,
     )
     const expectedHeader = 'No Collaboration Apps'
     const expectedContent =
@@ -63,7 +63,7 @@ describe('GettingStartedCollaborations', () => {
     const expectedLinkText = 'Learn more about collaborations'
 
     expect(expectedHeader).toEqual(
-      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent,
     )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
@@ -72,14 +72,14 @@ describe('GettingStartedCollaborations', () => {
   test('renders the correct content with no collaborations data as a student', () => {
     setEnvironment(['student'], 'course_4')
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: []}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: []}} />,
     )
     const expectedHeader = 'No Collaboration Apps'
     const expectedContent =
       'You have no Collaboration apps configured. Talk to your teacher to get some set up.'
 
     expect(expectedHeader).toEqual(
-      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent,
     )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
   })
@@ -87,7 +87,7 @@ describe('GettingStartedCollaborations', () => {
   test('renders the correct content with lti tools configured as a student with create permission enabled', () => {
     setEnvironment(['student'], 'course_4')
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />,
     )
     const expectedHeader = 'Getting started with Collaborations'
     const expectedContent =
@@ -95,7 +95,7 @@ describe('GettingStartedCollaborations', () => {
     const expectedLinkText = 'Learn more about collaborations'
 
     expect(expectedHeader).toEqual(
-      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent,
     )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)
@@ -106,7 +106,7 @@ describe('GettingStartedCollaborations', () => {
     ENV.CREATE_PERMISSION = false
 
     const wrapper = render(
-      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />
+      <GettingStartedCollaborations ltiCollaborators={{ltiCollaboratorsData: ['test']}} />,
     )
     const expectedHeader = 'Getting started with Collaborations'
     const expectedContent =
@@ -114,7 +114,7 @@ describe('GettingStartedCollaborations', () => {
     const expectedLinkText = 'Learn more about collaborations'
 
     expect(expectedHeader).toEqual(
-      wrapper.container.querySelector('.ic-Action-header__Heading').textContent
+      wrapper.container.querySelector('.ic-Action-header__Heading').textContent,
     )
     expect(expectedContent).toEqual(wrapper.container.querySelector('p').textContent)
     expect(expectedLinkText).toEqual(wrapper.container.querySelector('a').textContent)

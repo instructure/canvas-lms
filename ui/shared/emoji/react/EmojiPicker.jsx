@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Emoji, Picker} from 'emoji-mart'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 
-const I18n = useI18nScope('i18n!emoji')
+const I18n = createI18nScope('i18n!emoji')
 
 export default function EmojiPicker(props) {
   const [showPicker, setShowPicker] = useState(false)

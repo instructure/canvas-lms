@@ -28,11 +28,11 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import FormContent from './FormContent'
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},
@@ -46,6 +46,7 @@ export default function Layout({
   sectionSelectionChanged,
   selectedSectionIds,
   unhiddenCount,
+  showSectionValidation,
 }) {
   const hasSections = sections.length > 0
 
@@ -54,7 +55,7 @@ export default function Layout({
       {!gradesPublished && (
         <Alert margin="x-small" variant="warning">
           {I18n.t(
-            'Hiding grades is not allowed because grades have not been released for this assignment.'
+            'Hiding grades is not allowed because grades have not been released for this assignment.',
           )}
         </Alert>
       )}
@@ -68,7 +69,7 @@ export default function Layout({
       {gradesPublished && hasSections && anonymousGrading && (
         <Alert margin="x-small" variant="info">
           {I18n.t(
-            'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.'
+            'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.',
           )}
         </Alert>
       )}
@@ -110,6 +111,7 @@ export default function Layout({
           sectionSelectionChanged={sectionSelectionChanged}
           sections={sections}
           selectedSectionIds={selectedSectionIds}
+          showSectionValidation={showSectionValidation}
         />
       </FormFieldGroup>
     </>

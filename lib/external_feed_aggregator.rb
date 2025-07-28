@@ -96,13 +96,7 @@ class ExternalFeedAggregator
       @logger.info("request failed #{response.class}")
       handle_failure(feed)
     end
-  rescue CanvasHttp::Error,
-         CanvasHttp::RelativeUriError,
-         CanvasHttp::InsecureUriError,
-         Timeout::Error,
-         SocketError,
-         SystemCallError,
-         OpenSSL::SSL::SSLError => e
+  rescue *CanvasHttp::ALL_HTTP_ERRORS => e
     Canvas::Errors.capture_exception(:external_feed, e, :info)
     handle_failure(feed)
   end

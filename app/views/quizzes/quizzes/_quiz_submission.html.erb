@@ -23,9 +23,10 @@
 
 <% js_env IS_SURVEY: @quiz.survey? %>
 <% unless show_correct_answers? %>
+  <% message = render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>
   <div class="alert">
-    <i class="icon-warning" aria-label="<%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %>"></i>
-    <span><%= render_correct_answer_protection(@quiz, (@current_submission || @submission)) %></span>
+    <i class="icon-warning" aria-label="<%= t("labels.warning_icon", "Warning") %>"></i>
+    <span><%= message %></span>
   </div>
 <% end %>
 

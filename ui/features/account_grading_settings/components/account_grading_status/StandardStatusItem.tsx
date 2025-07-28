@@ -19,14 +19,14 @@
 import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 import type {GradeStatus, StandardStatusAllowedName} from '@canvas/grading/accountGradingStatus'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 import {statusesTitleMap} from '../../utils/accountStatusUtils'
 
-const I18n = useI18nScope('standard_grading_status')
+const I18n = createI18nScope('standard_grading_status')
 
 type StandardStatusItemProps = {
   editable: boolean

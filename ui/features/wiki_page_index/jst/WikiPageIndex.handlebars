@@ -4,25 +4,46 @@
   <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
-        {{#if CAN.DELETE}}
-          <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
-            <i class="icon-trash" role="presentation"></i>
-          </button>
-        {{/if}}
-        {{#if CAN.CREATE}}
-          <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
-          {{#if hasWikiIndexPlacements}}
-            <div class="inline-block">
-              <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
-                <i class="icon-more" aria-hidden="true"></i>
-                <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
-              </a>
-
-              <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
-                {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
-              </ul>
-            </div>
+        <div>
+          {{#if CAN.DELETE}}
+            <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
+              <i class="icon-trash" role="presentation"></i>
+            </button>
           {{/if}}
+          {{#if CAN.CREATE}}
+            <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">
+              {{#if block_editor_is_preferred }} {{#t 'buttons.new_page'}}Page{{/t}} {{/if}}
+              {{#if no_preferred_editor }} {{#t 'buttons.new_page'}}Page{{/t}} {{/if}}
+              {{#if rce_is_preferred }} {{#t 'buttons.new_rce_page'}}RCE Page{{/t}} {{/if}}
+            </a>
+              {{#if hasWikiIndexPlacements}}
+                <div class="inline-block">
+                  <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+                    <i class="icon-more" aria-hidden="true"></i>
+                    <span class="screenreader-only">{{#t}}Pages Settings{{/t}}</span>
+                  </a>
+                  <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
+                    {{>ui/shared/external-tools/jst/_external_tools_menu.handlebars wikiIndexPlacements}}
+                  </ul>
+                </div>
+              {{/if}}
+          {{/if}}
+        </div>
+
+        {{#if CAN.CREATE}}
+          <div style="margin-top: 15px; text-align: right;">
+            {{#if block_editor_is_preferred }}
+            <a href="#" class="new_rce_page">
+              {{#t 'buttons.use_the_rce'}}Use the RCE{{/t}}
+            </a>
+            {{/if}}
+
+            {{#if rce_is_preferred }}
+            <a href="#" class="new_block_editor_page">
+              {{#t 'buttons.try_the_block_editor'}}Try the Block Editor{{/t}}
+            </a>
+            {{/if}}
+          </div>
         {{/if}}
       </div>
     </div>
@@ -83,6 +104,11 @@
                   <span class="screenreader-only">{{#t}}Select page{{/t}}</span>
                 </th>
               {{/if}}
+              {{#if block_editor}}
+                <th scope="col" width="24px" role="columnheader">
+                  <span class="screenreader-only">{{#t}}page type{{/t}}</span>
+                </th>
+              {{/if}}
               <th scope="col" width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
                 <span class="mobile-screenreader-only">
                   <a href="#" data-sort-field="title" tabindex="0" role="button" class="sort-field">{{#t 'headers.page_title'}}Page title{{/t}} <i></i></a>
@@ -124,8 +150,7 @@
         </table>
       {{/if}}
     {{/if}}
-      <div class="paginatedLoadingIndicator loading {{#unless fetched}}loading{{else}}loading-more{{/unless}}" style="background-image: none;">
-        <img src="/images/ajax-reload-animated.gif">
+      <div class="paginatedLoadingIndicator {{#unless fetched}}loading{{else}}loading-more{{/unless}}" style="background-image: none;">
         {{#unless fetched}}{{#t 'loading'}}Loading ...{{/t}}{{else}}{{#t 'loading_more'}}Loading more ...{{/t}}{{/unless}}
       </div>
     {{#if fetched}}
@@ -134,4 +159,5 @@
       {{/unless}}
     {{/if}}
   </div>
+  <div id="choose-editor-mount-point"></div>
 </div>

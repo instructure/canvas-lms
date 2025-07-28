@@ -402,7 +402,7 @@ describe "quizzes question creation" do
 
       wait_for_ajaximations
       expect(question).to be_displayed
-      assert_error_box(".question_form:visible input[name='question_points']")
+      expect(ff(".error_text")[0]).to include_text("Must be zero or greater")
     end
 
     it "shows an error when the quiz question exceeds character limit", priority: "2" do

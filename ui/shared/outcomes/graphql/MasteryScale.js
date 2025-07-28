@@ -18,16 +18,20 @@
 
 import axios from '@canvas/axios'
 import pluralize from '@canvas/util/stringPluralize'
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
-  query GetOutcomeProficiencyData($contextId: ID!) {
+  query GetOutcomeProficiencyData($contextId: ID!, $proficiencyRatingsCursor: String) {
     context: account(id: $contextId) {
       outcomeProficiency {
         _id
         contextId
         contextType
-        proficiencyRatingsConnection {
+        proficiencyRatingsConnection(after: $proficiencyRatingsCursor) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
           nodes {
             _id
             color
@@ -42,13 +46,17 @@ export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
 `
 
 export const COURSE_OUTCOME_PROFICIENCY_QUERY = gql`
-  query GetOutcomeProficiencyData($contextId: ID!) {
+  query GetOutcomeProficiencyData($contextId: ID!, $proficiencyRatingsCursor: String) {
     context: course(id: $contextId) {
       outcomeProficiency {
         _id
         contextId
         contextType
-        proficiencyRatingsConnection {
+        proficiencyRatingsConnection(after: $proficiencyRatingsCursor) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
           nodes {
             _id
             color
@@ -65,6 +73,6 @@ export const COURSE_OUTCOME_PROFICIENCY_QUERY = gql`
 export const saveProficiency = (contextType, contextId, config) => {
   return axios.post(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_proficiency`,
-    config
+    config,
   )
 }

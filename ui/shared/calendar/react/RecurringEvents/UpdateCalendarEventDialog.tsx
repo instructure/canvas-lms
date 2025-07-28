@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import type {Which, CalendarEvent} from './types'
 
-const I18n = useI18nScope('calendar_event')
+const I18n = createI18nScope('calendar_event')
 
 type Props = {
   readonly event: CalendarEvent
@@ -40,12 +40,13 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
 
   const handleCancel = useCallback(
     (e = null) => {
+      // @ts-expect-error
       if (e?.code !== 'Escape' && e?.target.type === 'radio') {
         return
       }
       onCancel?.()
     },
-    [onCancel]
+    [onCancel],
   )
 
   const handleSubmit = useCallback(() => {
@@ -55,10 +56,16 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
   const renderFooter = useCallback((): JSX.Element => {
     return (
       <Flex as="section" justifyItems="end">
-        <Button color="secondary" margin="0 small 0" onClick={handleCancel}>
+        <Button
+          color="secondary"
+          margin="0 small 0"
+          // @ts-expect-error
+          onClick={handleCancel}
+          data-testid="cancel-button"
+        >
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" onClick={handleSubmit}>
+        <Button color="primary" onClick={handleSubmit} data-testid="confirm-button">
           {I18n.t('Confirm')}
         </Button>
       </Flex>
@@ -73,6 +80,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
       size="small"
       label={I18n.t('Confirm Changes')}
       footer={renderFooter}
+      data-testid="update-calendar-dialog"
     >
       <View as="div" margin="0 small">
         <RadioInputGroup
@@ -80,11 +88,16 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
           defaultValue="one"
           description={I18n.t('Change:')}
           onChange={(_event, value: any) => setWhich(value)}
+          data-testid="radio-group"
         >
-          <RadioInput value="one" label={I18n.t('This event')} />
-          <RadioInput value="all" label={I18n.t('All events')} />
+          <RadioInput value="one" label={I18n.t('This event')} data-testid="this-event-option" />
+          <RadioInput value="all" label={I18n.t('All events')} data-testid="all-events-option" />
           {!event.series_head && (
-            <RadioInput value="following" label={I18n.t('This and all following events')} />
+            <RadioInput
+              value="following"
+              label={I18n.t('This and all following events')}
+              data-testid="following-events-option"
+            />
           )}
         </RadioInputGroup>
       </View>
@@ -114,7 +127,7 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
           resolve(which)
         }}
       />,
-      modalContainer as HTMLElement
+      modalContainer as HTMLElement,
     )
   })
   return whichPromise

@@ -133,11 +133,11 @@ class GradeBookHistory
     end
 
     def contains_final_grade_override_entries?
-      (1...results_table_rows.size + 1).any? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
+      (1...(results_table_rows.size + 1)).any? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
     end
 
     def contains_only_final_grade_override_entries?
-      (1...results_table_rows.size + 1).all? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
+      (1...(results_table_rows.size + 1)).all? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
     end
 
     def check_table_for_grader_name(string_in_row)
@@ -183,7 +183,7 @@ class GradeBookHistory
     end
 
     def final_grade_override_checkbox
-      f('div[data-testid="show-final-grade-overrides-only-checkbox"]')
+      f('div[data-testid="show-final-grade-overrides-only-checkbox"] div div')
     end
 
     def start_date_textfield
@@ -195,7 +195,7 @@ class GradeBookHistory
     end
 
     def error_text_invalid_dates
-      fxpath("(//span[contains(text(), 'date must be before')])[2]")
+      fxpath("(//span[contains(text(), 'date must be before')])[1]")
     end
 
     def filter_button

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import gradeDisplayWarningDialogTemplate from '../jst/GradeDisplayWarningDialog.handlebars'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('gradebookGradeDisplayWarningDialog')
+const I18n = createI18nScope('gradebookGradeDisplayWarningDialog')
 
 function GradeDisplayWarningDialog(options) {
   this.cancel = this.cancel.bind(this)
@@ -29,11 +29,11 @@ function GradeDisplayWarningDialog(options) {
   this.options = options
   const points_warning = I18n.t(
     'grade_display_warning.points_text',
-    'Students will also see their final grade as points. Are you sure you want to continue?'
+    'Students will also see their final grade as points. Are you sure you want to continue?',
   )
   const percent_warning = I18n.t(
     'grade_display_warning.percent_text',
-    'Students will also see their final grade as a percentage. Are you sure you want to continue?'
+    'Students will also see their final grade as a percentage. Are you sure you want to continue?',
   )
   const locals = {
     warning_text: this.options.showing_points ? percent_warning : points_warning,

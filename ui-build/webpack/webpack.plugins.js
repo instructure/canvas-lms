@@ -23,7 +23,6 @@ const {
   EnvironmentPlugin,
   SwcJsMinimizerRspackPlugin,
 } = require('@rspack/core')
-const {resolve} = require('path')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const {WebpackManifestPlugin} = require('rspack-manifest-plugin')
 const {RetryChunkLoadPlugin} = require('webpack-retry-chunk-load-plugin')
@@ -31,12 +30,16 @@ const {
   container: {ModuleFederationPlugin},
 } = require('@rspack/core')
 const WebpackHooks = require('./webpackHooks')
-const {fetchSpeedGraderLibrary, fetchAnalyticsHub} = require('./remotes')
+const {
+  fetchSpeedGraderLibrary,
+  fetchAnalyticsHub,
+  fetchLtiUsage,
+  fetchCanvasCareerLearningProviderApp,
+  fetchCanvasCareerLearnerApp,
+} = require('./remotes')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
-
-const {canvasDir} = require('../params')
 
 exports.provideJQuery = new ProvidePlugin({
   $: 'jquery',
@@ -99,7 +102,6 @@ exports.readOnlyCache = function (compiler) {
 exports.failOnWebpackWarnings = function (compiler) {
   compiler.hooks.done.tap('Canvas:FailOnWebpackWarnings', compilation => {
     if (compilation.warnings && compilation.warnings.length) {
-      // eslint-disable-next-line no-console
       console.error(compilation.warnings)
       // If there's a bad import, webpack doesn't say where.
       // Only if we let the compilation complete do we get
@@ -126,6 +128,7 @@ exports.webpackManifest = new WebpackManifestPlugin({
   fileName: 'webpack-manifest.json',
   publicPath: '',
   useEntryKeys: true,
+  writeToFileEmit: process.env.NODE_ENV === 'development',
 })
 
 exports.minimizeCode = new SwcJsMinimizerRspackPlugin({
@@ -168,6 +171,9 @@ exports.moduleFederation = new ModuleFederationPlugin({
   remotes: {
     analyticshub: `promise new Promise(${fetchAnalyticsHub.toString()})`,
     speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
+    canvas_career_learning_provider: `promise new Promise(${fetchCanvasCareerLearningProviderApp.toString()})`,
+    canvas_career_learner: `promise new Promise(${fetchCanvasCareerLearnerApp.toString()})`,
+    ltiusage: `promise new Promise(${fetchLtiUsage.toString()})`,
   },
   exposes: {},
   shared: {},

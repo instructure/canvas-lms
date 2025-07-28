@@ -90,8 +90,6 @@ module Canvas::Migration::Helpers
         data
       end
 
-      selectable_outcomes = @migration.context.respond_to?(:root_account) &&
-                            @migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       if type
         if (match_data = type.match(/submodules_(.*)/))
@@ -106,7 +104,7 @@ module Canvas::Migration::Helpers
             attachment_data(content_list, course_data)
           else
             processed = false
-            if type == "learning_outcomes" && selectable_outcomes
+            if type == "learning_outcomes" && @migration.context.respond_to?(:root_account)
               processed = !outcome_data(content_list, course_data).nil?
             end
             unless processed
@@ -130,7 +128,7 @@ module Canvas::Migration::Helpers
           next unless course_data[type2] && course_data[type2].count > 0
 
           hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: course_data[type2].count }
-          add_url!(hash, type2, selectable_outcomes)
+          add_url!(hash, type2)
           content_list << hash
         end
       end
@@ -262,7 +260,6 @@ module Canvas::Migration::Helpers
       source ||= @migration.source_course || Course.find(@migration.migration_settings[:source_course_id]) if @migration
       return [] unless source
 
-      selectable_outcomes = source.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       source.shard.activate do
         if type
@@ -280,15 +277,9 @@ module Canvas::Migration::Helpers
               content_list << course_item_hash(type, item)
             end
           when "learning_outcomes"
-            if selectable_outcomes
-              root = source.root_outcome_group(false)
-              if root
-                add_learning_outcome_group_content(root, content_list)
-              end
-            else
-              source.linked_learning_outcomes.active.select("learning_outcomes.id,short_description").each do |item|
-                content_list << course_item_hash(type, item)
-              end
+            root = source.root_outcome_group(false)
+            if root
+              add_learning_outcome_group_content(root, content_list)
             end
           when "tool_profiles"
             source.tool_proxies.active.select("id, name").each do |item|
@@ -316,7 +307,7 @@ module Canvas::Migration::Helpers
               scope.each do |item|
                 content_list << course_item_hash(type, item)
               end
-            elsif selectable_outcomes && (match_data = type.match(/learning_outcome_groups_(.*)/))
+            elsif (match_data = type.match(/learning_outcome_groups_(.*)/))
               group = source.learning_outcome_groups.find(match_data[1])
               add_learning_outcome_group_content(group, content_list)
             end
@@ -327,7 +318,7 @@ module Canvas::Migration::Helpers
           content_list << { type: "course_paces", property: "#{property_prefix}[all_course_paces]", title: COURSE_PACE_TYPE.call } if source.course_paces.primary.not_deleted.any?
 
           if @migration && MasterCourses::MasterTemplate.is_master_course?(source) && MasterCourses::MasterTemplate.blueprint_eligible?(@migration.context) &&
-             (@migration.context.account.grants_any_right?(@migration.user, :manage_courses, :manage_courses_admin) && @migration.context.account.grants_right?(@migration.user, :manage_master_courses))
+             @migration.context.account.grants_all_rights?(@migration.user, :manage_courses_admin, :manage_master_courses)
             content_list << { type: "blueprint_settings", property: "#{property_prefix}[all_blueprint_settings]", title: BLUEPRINT_SETTING_TYPE.call }
           end
 
@@ -354,7 +345,7 @@ module Canvas::Migration::Helpers
             next if count == 0
 
             hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: }
-            add_url!(hash, type2, selectable_outcomes)
+            add_url!(hash, type2)
             content_list << hash
           end
         end
@@ -363,9 +354,7 @@ module Canvas::Migration::Helpers
       content_list
     end
 
-    def add_url!(hash, type, selectable_outcomes = false)
-      return if !selectable_outcomes && type == "learning_outcomes"
-
+    def add_url!(hash, type)
       if @base_url
         hash[:sub_items_url] = @base_url + "?type=#{type}"
       end

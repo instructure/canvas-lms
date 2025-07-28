@@ -89,7 +89,7 @@ export function updateMediaObject({media_object_id, attachment_id, title, subtit
       .catch(e => {
         alertHandler.handleAlert({
           text: formatMessage(
-            'Though your video will have the correct title in the browser, we failed to update it in the database.'
+            'Though your video will have the correct title in the browser, we failed to update it in the database.',
           ),
           variant: 'error',
         })

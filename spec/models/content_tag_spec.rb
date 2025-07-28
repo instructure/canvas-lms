@@ -614,7 +614,7 @@ describe ContentTag do
     Setting.set("touch_personal_space", "10")
     course_factory
     mod = @course.context_modules.create!
-    recent = Time.now
+    recent = Time.zone.now
     ContextModule.where(id: mod).update_all(updated_at: recent)
     Timecop.travel(recent + 1.second) do
       ContextModule.transaction do
@@ -736,12 +736,34 @@ describe ContentTag do
       end
     end
 
-    context "other" do
-      it "properly returns wiki pages" do
+    context "wiki pages" do
+      before do
         @page = @course.wiki_pages.create!(title: "some page")
         @module = @course.context_modules.create!(name: "module")
         @tag = @module.add_item({ type: "WikiPage", title: "oh noes!" * 35, id: @page.id })
+      end
+
+      it "includes pages without assignment that are assigned" do
         expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+
+      it "includes pages with assignment that are assigned" do
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @page.assignment = @assignment
+        @page.save!
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@tag)
+      end
+
+      it "does not include pages without assignment that are not assigned" do
+        @page.update!(only_visible_to_overrides: true)
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
+      end
+
+      it "does not include pages with assignment that are not assigned" do
+        @assignment = @course.assignments.create!(title: "some assignment", only_visible_to_overrides: true)
+        @page.assignment = @assignment
+        @page.save!
+        expect(ContentTag.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@tag)
       end
     end
   end
@@ -991,7 +1013,6 @@ describe ContentTag do
   describe "#update_course_pace_module_items" do
     before do
       course_factory
-      @course.account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @context_module = @course.context_modules.create!
@@ -1038,7 +1059,6 @@ describe ContentTag do
 
   describe "#update_module_item_submissions" do
     before do
-      Account.site_admin.enable_feature!(:differentiated_modules)
       course_factory
       @student1 = student_in_course(active_all: true, name: "Student 1").user
       @student2 = student_in_course(active_all: true, name: "Student 2").user
@@ -1321,6 +1341,12 @@ describe ContentTag do
             direct_tag
 
             expect(subject).to contain_exactly(direct_tag, unpublished_direct)
+          end
+
+          it "does not find items non-tool related items" do
+            direct_tag.update!(content_type: Assignment)
+
+            expect(subject).to be_empty
           end
         end
 

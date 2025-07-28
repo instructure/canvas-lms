@@ -26,6 +26,16 @@ describe "quizzes assignments" do
   before do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
+    provision_quizzes_next @course
+    @course.root_account.enable_feature!(:quizzes_next)
+    @course.enable_feature!(:quizzes_next)
+    @tool = @course.context_external_tools.create!(
+      name: "Quizzes.Next",
+      consumer_key: "test123",
+      shared_secret: "test123",
+      tool_id: "Quizzes 2",
+      url: "http://example.com/launch"
+    )
   end
 
   context "created on the index page" do
@@ -46,6 +56,15 @@ describe "quizzes assignments" do
       expect_new_page_load { build_assignment_with_type("Quiz", assignment_group_id: ag.id, name: "Testy!", more_options: true) }
       expect(f('input[name="quiz[title]"]')).to have_value "Testy!"
     end
+
+    it "redirects to the assignments new page (new quizzes) and maintains parameters if classic quizzes are disabled" do
+      @course.enable_feature!(:new_quizzes_by_default)
+      ag = @course.assignment_groups.create!(name: "Quiz group")
+      get "/courses/#{@course.id}/assignments"
+      expect_new_page_load { build_assignment_with_type("Quiz", assignment_group_id: ag.id, name: "Testy!", more_options: true) }
+      expect(f('input[name="name"]')).to have_value "Testy!"
+      expect(driver.current_url).to match(%r{/courses/\d+/assignments/new\?quiz_lti})
+    end
   end
 
   context "edited from the index page" do
@@ -63,6 +82,16 @@ describe "quizzes assignments" do
       get "/courses/#{@course.id}/assignments"
       expect_new_page_load { edit_assignment(assign.id, name: "Retest!", more_options: true) }
       expect(f('input[name="quiz[title]"]')).to have_value "Retest!"
+    end
+
+    it "redirects to the assignment edit page (new quizzes) and maintains parameters if classic quizzes are disabled" do
+      @course.enable_feature!(:new_quizzes_by_default)
+      assign = @course.assignments.create!(name: "Testy!")
+      assign.quiz_lti!
+      assign.save!
+      get "/courses/#{@course.id}/assignments"
+      expect_new_page_load { edit_assignment(assign.id, name: "Retest!", more_options: true) }
+      expect(f('input[name="name"]')).to have_value "Retest!"
     end
   end
 end

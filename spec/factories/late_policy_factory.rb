@@ -19,13 +19,13 @@
 #
 
 module Factories
-  def late_policy_factory(**opts)
-    params = late_policy_params(**opts)
+  def late_policy_factory(**)
+    params = late_policy_params(**)
     LatePolicy.create!(params)
   end
 
-  def late_policy_model(**opts)
-    params = late_policy_params(**opts)
+  def late_policy_model(**)
+    params = late_policy_params(**)
     LatePolicy.new(params)
   end
 

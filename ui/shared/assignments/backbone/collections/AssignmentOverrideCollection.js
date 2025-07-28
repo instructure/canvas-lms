@@ -51,7 +51,7 @@ AssignmentOverrideCollection.prototype.courseIDs = function () {
 }
 
 AssignmentOverrideCollection.prototype.contextModuleIDs = function () {
-  return this.pluck('context_module_id').filter(id => id !== undefined)
+  return this.pluck('context_module_id').filter(id => id !== undefined && id !== null && id !== '')
 }
 
 AssignmentOverrideCollection.prototype.comparator = function (override) {
@@ -60,7 +60,9 @@ AssignmentOverrideCollection.prototype.comparator = function (override) {
 
 AssignmentOverrideCollection.prototype.getDefaultDueDate = function () {
   return this.detect(function (override) {
-    return override.getCourseSectionID() === Section.defaultDueDateSectionID
+    return (
+      override.getCourseSectionID() === Section.defaultDueDateSectionID || override.getCourseID()
+    )
   })
 }
 

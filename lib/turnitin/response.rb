@@ -33,8 +33,8 @@ module Turnitin
       extract_data_at("./assignmentid")
     end
 
-    def css(*args)
-      @document.css(*args)
+    def css(*)
+      @document.css(*)
     end
 
     def error?

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -32,44 +32,52 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {fromNow} from '@canvas/fuzzy-relative-time'
 
-const I18n = useI18nScope('QRMobileLogin')
+const I18n = createI18nScope('QRMobileLogin')
 
-const REFRESH_INTERVAL = 1000 * (9 * 60 + 45) // 9 min 45 sec
-const POLL_INTERVAL = 1000 * 5 // 5 sec
+const POLL_INTERVAL = 1000 // 1 second
 const QR_CODE_LIFETIME = 1000 * 10 * 60 // 10 minutes
 
-const DISPLAY_STATE = {
-  canceled: 0,
-  warning: 1,
-  displayed: 2,
+// UI state
+enum State {
+  warning, // waiting for the user to confirm the display of the QR code
+  canceled, // the user canceled the display of the QR code
+  displayed, // the QR code is being displayed
+}
+
+type LoginPngApiResponse = {
+  png: string
 }
 
 const modalLabel = () => I18n.t('Confirm QR code display')
 
-export function QRMobileLogin({
-  refreshInterval,
-  pollInterval,
-  withWarning,
-}: {
-  refreshInterval: number
-  pollInterval: number
-  withWarning: boolean
-}) {
-  const [imagePng, setImagePng] = useState(null)
-  const [validFor, setValidFor] = useState(null)
-  const [display, setDisplay] = useState(
-    withWarning ? DISPLAY_STATE.warning : DISPLAY_STATE.displayed
-  )
+export interface QRMobileLoginProps {
+  refreshInterval?: number
+  pollInterval?: number
+  withWarning?: boolean
+}
+
+const defaultProps: Required<QRMobileLoginProps> = {
+  refreshInterval: QR_CODE_LIFETIME,
+  pollInterval: POLL_INTERVAL,
+  withWarning: false,
+}
+
+export function QRMobileLogin(props: QRMobileLoginProps): JSX.Element {
+  const {refreshInterval, pollInterval, withWarning} = {...defaultProps, ...props}
+
+  const [imagePng, setImagePng] = useState<string | null>(null)
+  const [validFor, setValidFor] = useState('')
+  const [display, setDisplay] = useState<State>(withWarning ? State.warning : State.displayed)
 
   function renderQRCode() {
     let body
 
     switch (display) {
-      case DISPLAY_STATE.canceled:
+      case State.canceled:
         body = <Text size="large">{I18n.t('QR code display was canceled')}</Text>
         break
 
-      case DISPLAY_STATE.warning:
+      case State.warning:
         body = (
           <Spinner
             data-testid="qr-code-spinner"
@@ -78,7 +86,7 @@ export function QRMobileLogin({
         )
         break
 
-      case DISPLAY_STATE.displayed:
+      case State.displayed:
         if (imagePng) {
           body = (
             <span className="fs-exclude">
@@ -102,10 +110,10 @@ export function QRMobileLogin({
 
     return (
       <>
-        {display !== DISPLAY_STATE.canceled && (
+        {display !== State.canceled && (
           <View display="block">
             {I18n.t(
-              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.',
             )}
           </View>
         )}
@@ -117,39 +125,44 @@ export function QRMobileLogin({
   }
 
   function onModalProceed() {
-    setDisplay(DISPLAY_STATE.displayed)
+    setDisplay(State.displayed)
   }
 
   function onModalCancel() {
-    setDisplay(DISPLAY_STATE.canceled)
+    setDisplay(State.canceled)
   }
 
   function startTimedEvents() {
-    let timerId: number
+    let timerId: NodeJS.Timeout | null = null
     let isFetching = false
-    let validUntil: number | undefined
-    let refetchAt: number | undefined
+    let refetchAt: number | null = null
+    let expireAt: number | null = null
 
-    function displayValidFor(expireTime?: number) {
-      if (expireTime) validUntil = expireTime
-      if (validUntil) {
-        const newValidFor =
-          Date.now() < validUntil
-            ? I18n.t('This code expires %{timeFromNow}.', {
-                timeFromNow: fromNow(validUntil),
-              })
-            : I18n.t('This code has expired.')
-        setValidFor(newValidFor)
-      }
+    function displayValidFor(): void {
+      if (expireAt === null) return
+      const newValidFor =
+        Date.now() < expireAt
+          ? I18n.t('This code will expire %{inThisAmountOfTime}.', {
+              inThisAmountOfTime: fromNow(expireAt),
+            })
+          : I18n.t('This code has expired. Wait a few seconds for a new one...')
+      setValidFor(newValidFor)
     }
 
     async function getQRCode() {
       isFetching = true
       try {
-        const {json} = await doFetchApi({path: '/canvas/login.png', method: 'POST'})
-        displayValidFor(Date.now() + QR_CODE_LIFETIME)
+        refetchAt = null
+        const {json} = await doFetchApi<LoginPngApiResponse>({
+          path: '/canvas/login.png',
+          method: 'POST',
+        })
         refetchAt = Date.now() + refreshInterval
-        setImagePng(json.png)
+        if (json) {
+          expireAt = Date.now() + QR_CODE_LIFETIME
+          displayValidFor()
+          setImagePng(json.png)
+        } else throw new RangeError('No QR code was made available')
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while retrieving your QR Code'),
@@ -161,19 +174,19 @@ export function QRMobileLogin({
     }
 
     function poll() {
-      displayValidFor()
       if (!isFetching && (!refetchAt || Date.now() > refetchAt)) getQRCode()
-      timerId = setTimeout(poll, pollInterval) as unknown as number
+      else displayValidFor()
+      timerId = setTimeout(poll, pollInterval)
     }
 
-    if (display === DISPLAY_STATE.displayed) poll()
+    if (display === State.displayed) poll()
 
     return () => {
-      if (timerId) clearTimeout(timerId)
+      if (timerId !== null) clearTimeout(timerId)
     }
   }
 
-  useEffect(startTimedEvents, [display])
+  useEffect(startTimedEvents, [display, pollInterval, refreshInterval])
 
   return (
     <>
@@ -193,7 +206,7 @@ export function QRMobileLogin({
             as="div"
           >
             {renderQRCode()}
-            {validFor && display === DISPLAY_STATE.displayed && (
+            {validFor && display === State.displayed && (
               <Text weight="light" size="small">
                 {validFor}
               </Text>
@@ -203,7 +216,7 @@ export function QRMobileLogin({
       </Flex>
       <Modal
         size="small"
-        open={display === DISPLAY_STATE.warning}
+        open={display === State.warning}
         onDismiss={onModalCancel}
         shouldCloseOnDocumentClick={false}
         label={modalLabel()}
@@ -224,12 +237,12 @@ export function QRMobileLogin({
               <p>
                 {I18n.t(
                   'Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications.',
-                  {canvas: 'Canvas'}
+                  {canvas: 'Canvas'},
                 )}
               </p>
               <p>
                 {I18n.t(
-                  'Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.'
+                  'Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.',
                 )}
               </p>
               <p>{I18n.t('Click "Proceed" to continue.')}</p>
@@ -253,10 +266,4 @@ export function QRMobileLogin({
       </Modal>
     </>
   )
-}
-
-QRMobileLogin.defaultProps = {
-  refreshInterval: REFRESH_INTERVAL,
-  pollInterval: POLL_INTERVAL,
-  withWarning: false,
 }

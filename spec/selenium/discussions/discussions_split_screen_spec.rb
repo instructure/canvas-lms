@@ -33,7 +33,6 @@ describe "threaded discussions" do
 
   before do
     stub_rcs_config
-    Account.site_admin.enable_feature! :react_discussions_post
 
     @first_reply = @topic.discussion_entries.create!(
       user: @student,
@@ -41,20 +40,29 @@ describe "threaded discussions" do
     )
     @second_reply = DiscussionEntry.create!(
       message: "2nd level reply",
-      discussion_topic_id: @first_reply.discussion_topic_id,
-      user_id: @first_reply.user_id,
+      discussion_topic_id: @topic.id,
+      user: @student,
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
 
     @deleted_reply = DiscussionEntry.create!(
       message: "1.2 reply",
-      discussion_topic_id: @first_reply.discussion_topic_id,
-      user_id: @first_reply.user_id,
+      discussion_topic_id: @topic.id,
+      user: @student,
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
     @deleted_reply.destroy
+  end
+
+  it "does not render the SpeedGraderNavigator if not in the speedgrader" do
+    user_session(@teacher)
+    Discussion.visit(@course, @topic)
+
+    expect(element_exists?("[data-testid=previous-in-speedgrader]")).to be_falsey
+    expect(element_exists?("[data-testid=next-in-speedgrader]")).to be_falsey
+    expect(element_exists?("[data-testid=jump-to-speedgrader-navigation]")).to be_falsey
   end
 
   it "toggles from inline to split-screen" do
@@ -130,8 +138,6 @@ describe "threaded discussions" do
     expect(@second_reply.discussion_entry_participants.where(user: @teacher).count).to eq 0
     Discussion.visit(@course, @topic)
     wait_for_ajaximations
-    expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies, 2 Unread")
-    expect(f("div[data-testid='is-unread']")).to be_displayed
     f("button[data-testid='expand-button']").click
     wait_for_ajaximations
     # Auto read has a 3 second delay before firing off the read event
@@ -154,8 +160,6 @@ describe "threaded discussions" do
     expect(@second_reply.discussion_entry_participants.where(user: @teacher).count).to eq 0
     Discussion.visit(@course, @topic)
     wait_for_ajaximations
-    expect(f("div[data-testid='replies-counter']")).to include_text("2 Replies, 2 Unread")
-    expect(f("div[data-testid='is-unread']")).to be_displayed
     f("button[data-testid='expand-button']").click
     wait_for_ajaximations
     wait_for_ajax_requests
@@ -224,21 +228,23 @@ describe "threaded discussions" do
       expect(fj("span:contains('Due Dates')")).to be_present
       reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
       expect(reply_to_entry_contents).to include("Additional Replies Required: #{@replies_required}")
-      expect(reply_to_entry_contents).not_to include("Competed")
+      expect(reply_to_entry_contents).not_to include("Completed")
       fj("button:contains('Close')").click
 
       f("button[data-testid='threading-toolbar-reply']").click
       type_in_tiny("textarea", "additional reply 1")
+      # this sleep is necessary to avoid RCE auto-save alert, uncatchable by wait_for_ajaximations
+      # rubocop:disable Lint/NoSleep
+      sleep 1
+      # rubocop:enable Lint/NoSleep
       f("button[data-testid='DiscussionEdit-submit']").click
-      fj("button:contains('Close')").click
-      fj("button:contains('Due Dates')").click
-      reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text
-      expect(reply_to_entry_contents).not_to include("Competed")
-      fj("button:contains('Close')").click
+      wait_for_ajaximations
 
       f("button[data-testid='threading-toolbar-reply']").click
       type_in_tiny("textarea", "additional reply 2")
       f("button[data-testid='DiscussionEdit-submit']").click
+      wait_for_ajaximations
+
       fj("button:contains('Close')").click
       fj("button:contains('Due Dates')").click
       reply_to_entry_contents = f("span[data-testid='reply_to_entry_section']").text

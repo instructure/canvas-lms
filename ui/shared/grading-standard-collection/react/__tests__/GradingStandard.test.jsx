@@ -122,7 +122,7 @@ describe('GradingStandard', () => {
       renderGradingStandard()
 
       expect(screen.getByText('Edit Grading Scheme Example Grading Scheme')).toHaveClass(
-        'screenreader-only'
+        'screenreader-only',
       )
     })
 
@@ -130,7 +130,7 @@ describe('GradingStandard', () => {
       renderGradingStandard()
 
       expect(screen.getByRole('button', {name: /Edit Grading Scheme/i})).not.toHaveClass(
-        'read_only'
+        'read_only',
       )
     })
 
@@ -144,7 +144,7 @@ describe('GradingStandard', () => {
       renderGradingStandard()
 
       expect(screen.getByText('Delete Grading Scheme Example Grading Scheme')).toHaveClass(
-        'screenreader-only'
+        'screenreader-only',
       )
     })
 

@@ -65,6 +65,16 @@ RSpec.shared_examples "a submission update action" do |controller|
         expect(assigns[:submission].submission_comments.first.comment).to eql("some comment")
       end
 
+      it "doesn't 500 when the comment is invalid" do
+        submission = assignment.submit_homework(student)
+        resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: submission.anonymous_id } : { id: student.id }
+        params = { course_id: course.id, assignment_id: assignment.id, submission: { comment: "some comment", attempt: 99 } }.merge(resource_pair)
+        user_session(student)
+        put(:update, params:, format: :json)
+        expect(response).to be_a_bad_request
+        expect(json_parse(response.body).dig("errors", "base")).to eq "Update Failed"
+      end
+
       it "teacher adding a comment posts the submission when assignment posts automatically" do
         assignment.ensure_post_policy(post_manually: false)
         submission = assignment.submit_homework(student)

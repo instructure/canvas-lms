@@ -30,9 +30,20 @@ class ToDoListPresenter
 
     if user
       @needs_grading = assignments_needing(:grading)
+      # at this point, we also have to check all sub_assignments that need submitting
+      sub_assignments_needing_grading = assignments_needing(:grading, is_sub_assignment: true)
+      if discussion_checkpoints_enabled_somewhere(sub_assignments_needing_grading)
+        @needs_grading += sub_assignments_needing_grading
+        @needs_grading.sort_by! { |a| a.due_at || a.updated_at }
+      end
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
+      # at this point, we also have to check all sub_assignments that need submitting
+      sub_assignments_needing_submitting = assignments_needing(:submitting, include_ungraded: true, is_sub_assignment: true)
+      if discussion_checkpoints_enabled_somewhere(sub_assignments_needing_submitting)
+        @needs_submitting += sub_assignments_needing_submitting
+      end
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
 
       assessment_requests = user.submissions_needing_peer_review(contexts:, limit: ASSIGNMENT_LIMIT)
@@ -59,6 +70,10 @@ class ToDoListPresenter
       @needs_submitting = []
       @needs_reviewing = []
     end
+  end
+
+  def discussion_checkpoints_enabled_somewhere(assignment_presenter_array)
+    assignment_presenter_array&.any? { |ap| ap.assignment.discussion_checkpoints_enabled? } || false
   end
 
   def assignments_needing(type, opts = {})
@@ -111,8 +126,8 @@ class ToDoListPresenter
 
   class AssignmentPresenter
     attr_reader :assignment
-    protected :assignment
-    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, to: :assignment
+
+    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, :sub_assignment_tag, to: :assignment
 
     def initialize(view, assignment, user, type)
       @view = view
@@ -159,7 +174,8 @@ class ToDoListPresenter
     end
 
     def gradebook_path
-      @view.speed_grader_course_gradebook_path(assignment.context_id, assignment_id: assignment.id)
+      assignment_id = sub_assignment? ? assignment.parent_assignment.id : assignment.id
+      @view.speed_grader_course_gradebook_path(assignment.context_id, assignment_id:)
     end
 
     def moderate_path
@@ -169,6 +185,8 @@ class ToDoListPresenter
     def assignment_path
       if assignment.is_a?(Quizzes::Quiz)
         @view.course_quiz_path(assignment.context_id, assignment.id)
+      elsif assignment.is_a?(SubAssignment)
+        @view.course_assignment_path(assignment.context_id, assignment.parent_assignment_id)
       else
         @view.course_assignment_path(assignment.context_id, assignment.id)
       end
@@ -220,6 +238,14 @@ class ToDoListPresenter
         I18n.t("No Due Date")
       end
     end
+
+    def sub_assignment?
+      assignment.is_a?(SubAssignment)
+    end
+
+    def required_replies
+      assignment.parent_assignment.discussion_topic.reply_to_entry_required_count
+    end
   end
 
   class AssessmentRequestPresenter
@@ -227,6 +253,7 @@ class ToDoListPresenter
     attr_reader :assignment
 
     include ApplicationHelper
+    include AssignmentsHelper
     include Rails.application.routes.url_helpers
 
     def initialize(view, assessment_request, user)
@@ -245,11 +272,7 @@ class ToDoListPresenter
     end
 
     def submission_path
-      if @assignment.anonymous_peer_reviews?
-        context_url(context, :context_assignment_anonymous_submission_url, @assignment.id, @assessment_request.submission.anonymous_id)
-      else
-        @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
-      end
+      student_peer_review_url(@assignment.context, @assignment, @assessment_request)
     end
 
     def ignore_url

@@ -22,6 +22,7 @@ require "ipaddr"
 require "resolv"
 require "canvas_http/circuit_breaker"
 require "logger"
+require "active_support/core_ext/object/blank"
 
 module CanvasHttp
   OPEN_TIMEOUT = 5
@@ -71,6 +72,9 @@ module CanvasHttp
 
   class ResponseTooLargeError < CanvasHttp::Error; end
 
+  UPSTREAM_HTTP_ERRORS = [Timeout::Error, SocketError, SystemCallError, OpenSSL::SSL::SSLError].freeze
+  ALL_HTTP_ERRORS = [CanvasHttp::Error, *UPSTREAM_HTTP_ERRORS].freeze
+
   def self.put(...)
     CanvasHttp.request(Net::HTTP::Put, ...)
   end
@@ -107,8 +111,17 @@ module CanvasHttp
   # parameter, which is the redirect response.
   #
   # Eventually it may be expanded to optionally do cert verification as well.
-  def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-                   streaming: false, body: nil, content_type: nil, redirect_spy: nil, max_response_body_length: nil)
+  def self.request(request_class,
+                   url_str,
+                   other_headers = {},
+                   redirect_limit: 3,
+                   form_data: nil,
+                   multipart: false,
+                   streaming: false,
+                   body: nil,
+                   content_type: nil,
+                   redirect_spy: nil,
+                   max_response_body_length: nil)
     last_scheme = nil
     last_host = nil
     current_host = nil
@@ -219,7 +232,7 @@ module CanvasHttp
 
   # returns [normalized_url_string, URI] if valid, raises otherwise
   def self.validate_url(value, host: nil, scheme: nil, allowed_schemes: %w[http https], check_host: false)
-    value = value.strip
+    value = value&.strip || ""
     raise ArgumentError if value.empty?
 
     uri = nil
@@ -323,10 +336,11 @@ module CanvasHttp
   # returns a tempfile with a filename based on the uri (same extension, if
   # there was an extension)
   def self.tempfile_for_uri(uri)
-    basename = File.basename(uri.path)
-    basename, ext = basename.split(".", 2)
-    basename = basename.slice(0, 100)
-    tmpfile = if ext
+    ext = File.extname(uri.path || "")
+    basename = File.basename(uri.path || "", ext)
+    basename = (basename || "").slice(0, 100)
+
+    tmpfile = if ext.present?
                 Tempfile.new([basename, ext])
               else
                 Tempfile.new(basename)

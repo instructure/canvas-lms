@@ -19,13 +19,13 @@
 import {find, groupBy} from 'lodash'
 import React from 'react'
 import {string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FileStore from '../../stores/FileStore'
 import FolderStore from '../../stores/FolderStore'
 import natcompare from '@canvas/util/natcompare'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('context_modulesFileSelectBox')
+const I18n = createI18nScope('context_modulesFileSelectBox')
 
 export default class FileSelectBox extends React.Component {
   static propTypes = {
@@ -98,7 +98,7 @@ export default class FileSelectBox extends React.Component {
 
     folders = folders.sort((a, b) =>
       // Make sure we use a sane sorting mechanism.
-      natcompare.strings(a.full_name, b.full_name)
+      natcompare.strings(a.full_name, b.full_name),
     )
 
     return folders
@@ -141,7 +141,7 @@ export default class FileSelectBox extends React.Component {
           aria-busy={this.isLoading()}
           className="module_item_select"
           aria-label={I18n.t(
-            'Select the files you want to associate, or add files by selecting "Create File(s)".'
+            'Select the files you want to associate, or add files by selecting "Create File(s)".',
           )}
           multiple={true}
         >

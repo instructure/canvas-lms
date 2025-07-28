@@ -31,4 +31,16 @@ describe "terms_api/index" do
     page = Nokogiri("<document>" + response.body + "</document>")
     expect(page.css(".delete_term_link")[0]["class"]).to include("delete_term_link")
   end
+
+  it "creates a link to the courses belonging to that term" do
+    assign(:context, assign(:root_account, Account.default))
+    term = Account.default.enrollment_terms.create!
+    terms = assign(:terms, Account.default.enrollment_terms.active.sort_by { |t| t.start_at || t.created_at }.reverse)
+    assign(:course_counts_by_term, EnrollmentTerm.course_counts(terms))
+    link_url = "/accounts/#{term.root_account_id}?enrollment_term_id=#{term.id}"
+    render "terms_api/index"
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("a#filter_link_#{term.id}").length).to eq 1
+    expect(page.css("a#filter_link_#{term.id}")[0]["href"]).to eq link_url
+  end
 end

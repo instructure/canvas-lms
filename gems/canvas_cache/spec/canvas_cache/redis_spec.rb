@@ -133,7 +133,7 @@ describe CanvasCache::Redis do
 
         it "does not fail cache.write" do
           override_cache(cache) do
-            expect(Rails.cache.write("blah", "someval")).to be false
+            expect(Rails.cache.write("blah", "someval")).to be_falsey
           end
         end
 
@@ -351,6 +351,11 @@ describe CanvasCache::Redis do
       end
 
       include_examples "disconnect_if_idle"
+    end
+
+    it "works with a cluster that hasn't connected yet" do
+      r = Redis::Cluster.new(nodes: ["rediss://somewhere:6379"])
+      r._client.disconnect_if_idle(1)
     end
   end
 end

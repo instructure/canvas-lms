@@ -73,7 +73,6 @@ describe "quizzes/quizzes/show" do
   end
 
   it "shows assign to button if flag is on" do
-    Account.site_admin.enable_feature!(:differentiated_modules)
     course_with_teacher(active_all: true)
     assign(:quiz, @course.quizzes.create!)
 
@@ -81,16 +80,6 @@ describe "quizzes/quizzes/show" do
     render "quizzes/quizzes/show"
 
     expect(response).to have_tag ".assign-to-link"
-  end
-
-  it "does not show assign to button if flag is off" do
-    course_with_teacher(active_all: true)
-    assign(:quiz, @course.quizzes.create!)
-
-    view_context
-    render "quizzes/quizzes/show"
-
-    expect(response).not_to have_tag ".assign-to-link"
   end
 
   it "shows unpublished quiz changes to instructors" do
@@ -147,7 +136,7 @@ describe "quizzes/quizzes/show" do
   it "renders direct share menu options for user with :read_as_admin, even without manage permission" do
     @account = Account.default
     @role = custom_teacher_role("No Manage")
-    @account.role_overrides.create!(permission: :manage_assignments, role: @role, enabled: false)
+    @account.role_overrides.create!(permission: :manage_assignments_add, role: @role, enabled: false)
     course_with_teacher(active_all: true, role: @role)
     view_context
     assign(:quiz, @course.quizzes.create!)

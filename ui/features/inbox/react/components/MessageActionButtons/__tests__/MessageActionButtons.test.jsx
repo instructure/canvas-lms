@@ -119,7 +119,7 @@ describe('MessageActionButtons', () => {
     const {queryByTestId} = render(
       <ConversationContext.Provider value={{isSubmissionCommentsType: true}}>
         <MessageActionButtons {...props} />
-      </ConversationContext.Provider>
+      </ConversationContext.Provider>,
     )
 
     expect(queryByTestId('reply')).toBeInTheDocument()

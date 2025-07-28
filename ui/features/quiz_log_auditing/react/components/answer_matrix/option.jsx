@@ -21,7 +21,7 @@ import React from 'react'
 const Option = ({checked, label, name, onChange}) => {
   return (
     // it's a fluke since we are passing children for the label
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
+
     <label>
       <input
         data-testid="checkbox"

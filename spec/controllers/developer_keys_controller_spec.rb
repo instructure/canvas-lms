@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../lti_1_3_spec_helper"
+require_relative "../lti_1_3_tool_configuration_spec_helper"
 
 describe DeveloperKeysController do
   let(:test_domain_root_account) { Account.create! }
@@ -73,6 +73,13 @@ describe DeveloperKeysController do
           expect(expected_id).to eq(dk.global_id)
         end
 
+        it "references the API endpoint in the Link (pagination) header" do
+          get "index", params: { account_id: Account.site_admin.id }, format: :json
+          route = Rails.application.routes.url_helpers.api_v1_account_developer_keys_path(Account.site_admin)
+          expect(response.headers["Link"]).to include(route)
+          expect(response.headers["Link"]).to include("http")
+        end
+
         it "does not include non-siteadmin keys" do
           site_admin_key = DeveloperKey.create!
           DeveloperKey.create!(account: Account.default)
@@ -82,9 +89,21 @@ describe DeveloperKeysController do
           expect(json_parse.pluck("id")).to match_array [site_admin_key.global_id]
         end
 
-        it "includes valid LTI scopes in js env" do
-          get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns[:js_env][:validLtiScopes]).to eq TokenScopes::LTI_SCOPES
+        it "includes public LTI scopes for that root account (possible feature-flag-gated) in js env" do
+          sample_scopes_for_root_account =
+            TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_ASSET_REPORT_SCOPE)
+
+          acct_id_from_stub = nil
+          expect(TokenScopes).to receive(:public_lti_scopes_hash_for_account) do |acct|
+            acct_id_from_stub = acct.id
+            sample_scopes_for_root_account
+          end
+
+          get "index", params: { account_id: Account.default.id }
+          expect(acct_id_from_stub).to eq(Account.default.id)
+
+          expect(assigns[:js_env][:validLtiScopes]).to \
+            eq(sample_scopes_for_root_account)
         end
 
         it "includes all valid LTI placements in js env" do
@@ -92,11 +111,6 @@ describe DeveloperKeysController do
           Account.site_admin.enable_feature! :conference_selection_lti_placement
           get "index", params: { account_id: Account.site_admin.id }
           expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement.public_placements(Account.site_admin)
-        end
-
-        it 'includes the "includes parameter" release flag' do
-          get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to be false
         end
 
         describe "js bundles" do
@@ -184,12 +198,12 @@ describe DeveloperKeysController do
 
         context "when request fails" do
           before do
-            allow(InstStatsd::Statsd).to receive(:increment)
+            allow(InstStatsd::Statsd).to receive(:distributed_increment)
           end
 
           it "reports error metric" do
             get :index, params: { account_id: Account.last.id + 2, format: "json" }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "index", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "index", code: 404 })
             expect(response).to be_not_found
           end
         end
@@ -226,7 +240,7 @@ describe DeveloperKeysController do
 
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when request fails" do
@@ -237,7 +251,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             post :create, params: create_params
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "create", code: 500 })
           end
         end
 
@@ -254,7 +268,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 400" do
             post :create, params: create_params
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 400 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "create", code: 400 })
           end
         end
       end
@@ -312,14 +326,14 @@ describe DeveloperKeysController do
 
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when key is not found" do
           it "reports error metric with code 404" do
             put :update, params: { id: dk.id + 1, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
             expect(response).to be_not_found
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 404 })
           end
         end
 
@@ -331,14 +345,16 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             put :update, params: { id: dk.id, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 500 })
           end
         end
 
         context "when key validation fails" do
+          let(:long_string) { "a" * 5000 }
+
           it "reports error metric with code 400" do
-            put :update, params: { id: dk.id, developer_key: { scopes: ["bad_scope"] }, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 400 })
+            put :update, params: { id: dk.id, developer_key: { redirect_uris: long_string }, account_id: Account.site_admin.id }
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 400 })
           end
         end
       end
@@ -372,14 +388,9 @@ describe DeveloperKeysController do
           expect(developer_key.reload.scopes).to match_array valid_scopes
         end
 
-        it "returns an error if an invalid scope is used" do
-          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes } }
-          expect(json_parse.dig("errors", "scopes").first["attribute"]).to eq "scopes"
-        end
-
-        it "does not persist scopes if any are invalid" do
-          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
-          expect(developer_key.reload.scopes).to be_blank
+        it "removes invalid scopes and saves valid ones" do
+          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes | valid_scopes } }
+          expect(developer_key.reload.scopes).to match_array valid_scopes
         end
 
         it "sets the scopes to empty if the scopes parameter is an empty string" do
@@ -402,16 +413,139 @@ describe DeveloperKeysController do
         expect(dk.reload.state).to eq :deleted
       end
 
+      # These tests might seem odd, but we've run into issues in the past where a destroy call
+      # actually returned false, but we still returned a 200 and were left in a weird state.
+      # These are regression tests for that.
+      context "when the destroy fails" do
+        subject { delete :destroy, params: { id: dk.id, account_id: account.id } }
+
+        let_once(:account) { account_model }
+
+        before do
+          allow_any_instance_of(DeveloperKey).to receive(:destroy).and_return(false)
+        end
+
+        it "rolls everything back" do
+          subject
+          expect(dk.reload).to be_active
+        end
+
+        context "when the dev key is associated with a dynamic registration" do
+          let(:reg) { dk.ims_registration }
+          let(:dk) { dev_key_model_dyn_reg(account: account_model) }
+
+          it "still rolls back properly" do
+            subject
+            expect(dk.reload).to be_active
+            expect(reg.reload).to be_active
+            expect(dk.lti_registration).to be_active
+          end
+        end
+
+        context "when the dev key is associated with a tool configuration" do
+          let(:dk) { lti_developer_key_model(account:) }
+          let(:registration) { dk.lti_registration }
+
+          it "still rolls back properly" do
+            subject
+            expect(dk.reload).to be_active
+            expect(registration.reload).to be_active
+          end
+        end
+      end
+
+      context "when the key is associated with a tool configuration" do
+        include_context "lti_1_3_tool_configuration_spec_helper"
+
+        let(:dk) { lti_registration.developer_key }
+        let(:account) { account_model }
+        let(:lti_registration) do
+          Lti::CreateRegistrationService.call(
+            account:,
+            created_by: @admin,
+            registration_params: {
+              name: "Test Registration",
+            },
+            configuration_params: internal_lti_configuration
+          )
+        end
+        let(:tool_config) { lti_registration.manual_configuration }
+
+        it "hard deletes the tool configuration and soft deletes the registration" do
+          # Ensure config is initialized before it's hard deleted
+          tool_config
+          delete :destroy, params: { id: dk.id, account_id: account.id }
+          expect(lti_registration.reload).to be_deleted
+          expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+        end
+
+        context "tools were installed from that config" do
+          let(:tool) { lti_registration.new_external_tool(account) }
+          let(:course_tool) { lti_registration.new_external_tool(course) }
+          let(:course) { course_model(account:) }
+
+          before do
+            tool
+          end
+
+          it "deletes the tools in a job" do
+            # Ensure config is initialized before it's hard deleted
+            tool_config
+            expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
+              .to change { lti_registration.reload.workflow_state }.to "deleted"
+            expect(Lti::ToolConfiguration.where(id: tool_config.id)).to be_empty
+            expect(dk.reload).to be_deleted
+            run_jobs
+            expect(tool.reload).to be_deleted
+          end
+        end
+      end
+
+      context "when the key is associated with a dynamic registration" do
+        let(:account) { account_model }
+        let(:dk) { dev_key_model_dyn_reg(account:) }
+        let(:lti_registration) { dk.lti_registration }
+        let(:ims_registration) { dk.ims_registration }
+
+        it "soft deletes the registration" do
+          delete :destroy, params: { id: dk.id, account_id: account.id }
+          expect(dk.reload).to be_deleted
+          expect(lti_registration.reload).to be_deleted
+          expect(ims_registration.reload).to be_deleted
+        end
+
+        context "tools were installed from the ims registration" do
+          let(:tool) { lti_registration.new_external_tool(account) }
+          let(:course_tool) { lti_registration.new_external_tool(course) }
+          let(:course) { course_model(account:) }
+
+          before do
+            tool
+            course_tool
+          end
+
+          it "deletes the tools in a job" do
+            expect { delete :destroy, params: { id: dk.id, account_id: account.id } }
+              .to change { lti_registration.reload.workflow_state }.to "deleted"
+            expect(ims_registration.reload).to be_deleted
+            expect(dk.reload).to be_deleted
+            run_jobs
+            expect(tool.reload).to be_deleted
+            expect(course_tool.reload).to be_deleted
+          end
+        end
+      end
+
       context "when request errors" do
         before do
-          allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:distributed_increment)
         end
 
         context "when key is not found" do
           it "reports error metric with code 404" do
             delete :destroy, params: { id: dk.id + 1, account_id: Account.site_admin.id }
             expect(response).to be_not_found
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 404 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "destroy", code: 404 })
           end
         end
 
@@ -423,7 +557,7 @@ describe DeveloperKeysController do
 
           it "reports error metric with code 500" do
             delete :destroy, params: { id: dk.id, account_id: Account.site_admin.id }
-            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 500 })
+            expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "destroy", code: 500 })
           end
         end
       end
@@ -468,6 +602,33 @@ describe DeveloperKeysController do
         root_account_key.update!(visible: false)
         get "index", params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
+      end
+
+      context "an overlay exists for one of the keys" do
+        let(:developer_key) do
+          lti_developer_key_model(account: test_domain_root_account).tap do |developer_key|
+            lti_tool_configuration_model(developer_key:, lti_registration: developer_key.lti_registration)
+          end
+        end
+        let(:overlay) do
+          Lti::Overlay.create!(account: test_domain_root_account,
+                               registration: developer_key.lti_registration,
+                               updated_by: user_model,
+                               data: {
+                                 "placements" => {
+                                   "course_navigation" => {
+                                     "text" => "some great little text"
+                                   }
+                                 }
+                               })
+        end
+
+        it "applies the overlay to the returned configuration" do
+          overlay
+          get "index", params: { account_id: test_domain_root_account.id }, format: :json
+          result = json_parse.first.dig("tool_configuration", "extensions", 0, "settings", "placements")
+          expect(result.find { |p| p["placement"] == "course_navigation" }["text"]).to eq "some great little text"
+        end
       end
 
       context 'with "inherited" parameter' do
@@ -529,7 +690,7 @@ describe DeveloperKeysController do
     end
 
     describe "Should be able to create developer key" do
-      include_context "lti_1_3_spec_helper"
+      include_context "key_storage_helper"
 
       let(:create_params) do
         {

@@ -21,19 +21,10 @@
 class GradingStandard < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  belongs_to :context, polymorphic: [:account, :course], required: true
+  belongs_to :context, polymorphic: [:account, :course], optional: false
   belongs_to :user
   has_many :assignments
   has_many :courses
-  has_many :assessed_course_assignments,
-           lambda {
-             where(grading_standard_id: nil, grading_type: ["letter_grade", "gpa_scale"])
-               .joins(:submissions)
-               .where("submissions.workflow_state='graded'")
-           },
-           through: :courses,
-           source: :assignments
-
   has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
 
   validates :workflow_state, presence: true
@@ -83,6 +74,7 @@ class GradingStandard < ActiveRecord::Base
 
   scope :active, -> { where("grading_standards.workflow_state = 'active'") }
   scope :archived, -> { where("grading_standards.workflow_state = 'archived'") }
+  scope :non_deleted, -> { where.not(workflow_state: "deleted") }
   scope :sorted, -> { order(Arel.sql("usage_count >= 3 DESC")).order(nulls(:last, best_unicode_collation_key("title"))) }
   scope :for_context, lambda { |context|
     context_codes = [context.asset_string]
@@ -97,14 +89,14 @@ class GradingStandard < ActiveRecord::Base
     can :manage
   end
 
-  def self.for(context, include_archived: false)
+  def self.for(context, include_archived: false, include_parent_accounts: true)
     unless Account.site_admin.feature_enabled?(:archived_grading_schemes)
       return GradingStandard.active.for_context(context)
     end
 
     case context
     when Account
-      for_account(context)
+      for_account(context, include_parent_accounts:)
     when Course
       for_course(context, include_archived:)
     else
@@ -113,29 +105,42 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def self.for_assignment(assignment, include_archived: false)
-    standards = include_archived ? GradingStandard.for_context(assignment.context) : GradingStandard.active.for_context(assignment.context)
-    standards = GradingStandard.where(id: standards)
-    course_scheme = assignment.context.grading_standard
-    standards = standards.union(GradingStandard.where(id: course_scheme)) if course_scheme&.archived?
-    if assignment.grading_standard&.archived?
-      standards = standards.union(GradingStandard.where(id: assignment.grading_standard))
+    standards = include_archived ? GradingStandard.non_deleted : GradingStandard.active
+    standards = standards.for_context(assignment.context)
+
+    ids = standards.pluck(:id)
+
+    context_grading_standard = assignment.context.grading_standard
+    if context_grading_standard&.archived?
+      ids << context_grading_standard.id
     end
-    standards
+
+    if assignment.grading_standard&.archived?
+      ids << assignment.grading_standard_id
+    end
+
+    GradingStandard.where(id: ids)
   end
 
   def self.for_course(course, include_archived: false)
-    standards = include_archived ? GradingStandard.for_context(course) : GradingStandard.active.for_context(course)
-    standards = GradingStandard.where(id: standards)
-    standards = standards.union(GradingStandard.where(id: course.grading_standard)) if course.grading_standard&.archived?
-    standards
+    standards = include_archived ? GradingStandard.non_deleted : GradingStandard.active
+    standards = standards.for_context(course)
+
+    return standards unless course.grading_standard&.archived?
+
+    ids = standards.pluck(:id) + [course.grading_standard_id]
+    GradingStandard.where(id: ids)
   end
 
-  def self.for_account(account)
-    GradingStandard.active.union(GradingStandard.archived).for_context(account)
+  def self.for_account(account, include_parent_accounts: true)
+    scope = GradingStandard.non_deleted
+    return scope.for_context(account) if include_parent_accounts
+
+    scope.where(context_type: Account.to_s, context_id: account.id)
   end
 
   def version
-    read_attribute(:version).presence || 1
+    super || 1
   end
 
   def ordered_scheme
@@ -192,6 +197,7 @@ class GradingStandard < ActiveRecord::Base
   # e.g. convert 89.7 to B+
   def score_to_grade(score)
     score = 0 if score < 0
+    score = scale_score(score) if points_based?
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     if points_based
@@ -209,17 +215,17 @@ class GradingStandard < ActiveRecord::Base
     if new_val.respond_to?(:map)
       new_val = new_val.map { |grade_name, lower_bound| [grade_name, lower_bound.round(4)] }
     end
-    write_attribute(:data, new_val)
+    super
     @ordered_scheme = nil
   end
 
   def data
     unless version == VERSION
-      data = read_attribute(:data)
+      data = super
       data = GradingStandard.upgrade_data(data, version) unless data.nil?
       self.data = data
     end
-    read_attribute(:data)
+    super
   end
 
   def self.upgrade_data(data, version)
@@ -246,7 +252,7 @@ class GradingStandard < ActiveRecord::Base
 
   def update_usage_count
     self.usage_count = assignments.active.count
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
   end
 
   def prevent_deletion_of_used_schemes
@@ -263,20 +269,11 @@ class GradingStandard < ActiveRecord::Base
         return assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
       end
 
-      return true if assessed_course_assignments.exists? || assessed_assignments.exists?
+      return true if accounts.active.any?
+      return true if assignments.active.joins(:submissions).where("submissions.workflow_state='graded'").exists?
 
       false
     end
-  end
-
-  def used_locations
-    assessed_assignments.union(assessed_course_assignments)
-  end
-
-  def assessed_assignments
-    assignments
-      .except(:order).joins(:submissions)
-      .where("submissions.workflow_state='graded'")
   end
 
   delegate :name, to: :context, prefix: true
@@ -287,8 +284,8 @@ class GradingStandard < ActiveRecord::Base
 
   def display_name
     res = ""
-    res += user.name + ", " rescue ""
-    res += context.name rescue ""
+    res += user.name + ", " if user
+    res += context.name
     res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end
@@ -311,8 +308,9 @@ class GradingStandard < ActiveRecord::Base
   def standard_data=(params = {})
     params ||= {}
     res = {}
+    scaling_factor = points_based ? self.scaling_factor : 100.0
     params.each_value do |row|
-      res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
+      res[row[:name]] = (row[:value].to_f / scaling_factor) if row[:name] && row[:value]
     end
     self.data = res.to_a.sort_by { |_, lower_bound| lower_bound }.reverse
   end
@@ -371,7 +369,24 @@ class GradingStandard < ActiveRecord::Base
     self.root_account_id ||= context.is_a?(Account) ? context.resolved_root_account_id : context.root_account_id
   end
 
+  def used_as_default?
+    courses.active.any? || accounts.active.any? || assignments.active.any?
+  end
+
+  def data_with_calculated_value
+    scaling_factor = points_based ? self.scaling_factor : 100.0
+    data.map { |name, value| { name:, value:, calculated_value: (value * scaling_factor).round(2) } }
+  end
+
   private
+
+  def scale_score(score)
+    return score if scaling_factor == 100 || scaling_factor <= 0
+
+    scaled = score.to_d / (100 / scaling_factor)
+    rounded = scaled.round(2)
+    (rounded / scaling_factor) * 100
+  end
 
   def minus_grade?(grade)
     !!grade && /.+−$/.match?(grade)

@@ -42,12 +42,12 @@ RSpec.shared_examples "a provisional grades status action" do |controller|
     end
 
     it "gives a status message of unauthorized when called as a student" do
-      json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 401 })
+      json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 403 })
       expect(json["status"]).to eq "unauthorized"
     end
 
-    it "gives an error message of unauthorized when called as a student" do
-      json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 401 })
+    it "gives an error message of not authorized when called as a student" do
+      json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 403 })
       expect(json.fetch("errors")).to include({ "message" => "user not authorized to perform that action" })
     end
 
@@ -63,11 +63,11 @@ RSpec.shared_examples "a provisional grades status action" do |controller|
       expect(response).to be_successful
     end
 
-    it "is unauthorized when the user is an admin without permission to select final grade" do
+    it "is forbidden when the user is an admin without permission to select final grade" do
       admin = account_admin_user(account: @course.account)
       @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
       api_call_as_user(admin, :get, @path, @params.merge(last_updated_at: 1.day.ago(@submission.updated_at)), {}, {})
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     context "when called as a moderator" do

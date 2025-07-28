@@ -22,7 +22,7 @@ module CC::Importer::Canvas
     include CC::Importer
 
     FLOAT_REGEX = /^[-+]?\d+[.]\d+$/
-    INTEGER_REGEX = /^[-+]?\d+$/
+    INTEGER_REGEX = /^[-+]?(?:0|[1-9]\d*)$/
 
     def convert_lti_resource_links
       resource_links = []
@@ -50,16 +50,10 @@ module CC::Importer::Canvas
 
           # As `el.content` returns a String, we're trying to convert the
           # custom parameter value to the orignal data type
-          value = if FLOAT_REGEX.match? value
-                    value.to_f
-                  elsif INTEGER_REGEX.match? value
-                    value.to_i
-                  elsif value == "true"
-                    true
-                  elsif value == "false"
-                    false
+          value = if Account.site_admin.feature_enabled?(:import_numeric_lti_custom_params_as_string)
+                    convert_bool_custom_param(value)
                   else
-                    value
+                    convert_custom_param(value)
                   end
 
           custom[key.to_sym] = value
@@ -83,6 +77,30 @@ module CC::Importer::Canvas
       end
 
       resource_links
+    end
+
+    def convert_custom_param(value)
+      if FLOAT_REGEX.match? value
+        value.to_f
+      elsif INTEGER_REGEX.match? value
+        value.to_i
+      elsif value == "true"
+        true
+      elsif value == "false"
+        false
+      else
+        value
+      end
+    end
+
+    def convert_bool_custom_param(value)
+      if value == "true"
+        true
+      elsif value == "false"
+        false
+      else
+        value
+      end
     end
   end
 end

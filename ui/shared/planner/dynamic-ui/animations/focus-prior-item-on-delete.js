@@ -27,7 +27,7 @@ export class FocusPriorItemOnDelete extends Animation {
     const doomedItemComponentId = action.payload.uniqueId
     const sortedItemComponents = this.registry().getAllItemsSorted()
     const doomedItemComponentIndex = sortedItemComponents.findIndex(
-      c => c.componentIds[0] === doomedItemComponentId
+      c => c.componentIds[0] === doomedItemComponentId,
     )
     const priorComponentIndex = doomedItemComponentIndex - 1
     this.setItemFocusUniqueId =

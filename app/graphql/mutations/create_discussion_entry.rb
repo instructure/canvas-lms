@@ -22,9 +22,9 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   graphql_name "CreateDiscussionEntry"
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
+  argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :message, String, required: true
   argument :parent_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
-  argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
 
   argument :is_anonymous_author, Boolean, required: false
   argument :quoted_entry_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
@@ -34,6 +34,11 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
   def resolve(input:)
     topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise ActiveRecord::RecordNotFound unless topic.grants_right?(current_user, session, :read)
+
+    # if the user is writing a threaded reply when the allow threaded replies feature is disabled
+    if !topic.threaded? && !input[:parent_entry_id].nil?
+      return validation_error(I18n.t("Threaded replies are not allowed in this context"))
+    end
 
     association = topic.discussion_entries
     entry = build_entry(association, input[:message], topic, !!input[:is_anonymous_author])

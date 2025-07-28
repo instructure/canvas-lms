@@ -42,7 +42,7 @@ class WimbaConference < WebConference
           new_date = nil
 
           Time.use_zone(tz) do
-            new_date = datetime_string(DateTime.strptime(date_info[1], "%m/%d/%Y %H:%M"))
+            new_date = datetime_string(Time.strptime(date_info[1], "%m/%d/%y %H:%M"))
           end
 
           data[:longname].sub!(date_info[1], new_date)

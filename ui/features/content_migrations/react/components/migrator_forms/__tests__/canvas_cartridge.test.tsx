@@ -16,50 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import CanvasCartridgeImporter from '../canvas_cartridge'
-
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
-
-const renderComponent = (overrideProps?: any) =>
-  render(<CanvasCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+import {sharedContentTests, sharedDateParsingTests, sharedFormTests} from './shared_form_cases'
 
 describe('CanvasCartridgeImporter', () => {
   beforeAll(() => (window.ENV.UPLOAD_LIMIT = 1024))
 
   afterEach(() => jest.clearAllMocks())
 
-  it('calls onSubmit', async () => {
-    renderComponent()
-
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    const input = screen.getByTestId('migrationFileUpload')
-    await userEvent.upload(input, file)
-    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        pre_attachment: {
-          name: 'my_file.zip',
-          no_redirect: true,
-          size: 16,
-        },
-      }),
-      expect.any(Object)
-    )
-  })
-
-  it('calls onCancel', async () => {
-    renderComponent()
-
-    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
-    expect(onCancel).toHaveBeenCalled()
-  })
-
-  it('renders the progressbar info', async () => {
-    renderComponent({fileUploadProgress: 10})
-    expect(screen.getByText('Uploading File')).toBeInTheDocument()
-  })
+  sharedFormTests(CanvasCartridgeImporter)
+  sharedContentTests(CanvasCartridgeImporter)
+  sharedDateParsingTests(CanvasCartridgeImporter)
 })

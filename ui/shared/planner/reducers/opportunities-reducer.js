@@ -29,8 +29,8 @@ function setOpportunityState(state, action) {
   // this approach favors the existing item over the new
   const opportunities = [...state.items].concat(
     action.payload.items.filter(
-      payitem => state.items.findIndex(stateitem => stateitem.id === payitem.id) < 0
-    )
+      payitem => state.items.findIndex(stateitem => stateitem.id === payitem.id) < 0,
+    ),
   )
   return {
     items: opportunities,
@@ -44,7 +44,7 @@ export default handleActions(
     DISMISSED_OPPORTUNITY: (state, action) => {
       const stateCopy = cloneDeep(state)
       const dismissedOpportunity = stateCopy.items.find(
-        opportunity => opportunity.id === action.payload.assignment_id
+        opportunity => opportunity.id === action.payload.assignment_id,
       )
       if (dismissedOpportunity.planner_override) {
         dismissedOpportunity.planner_override.dismissed = action.payload.dismissed
@@ -64,5 +64,5 @@ export default handleActions(
       return defaultState
     },
   },
-  defaultState
+  defaultState,
 )

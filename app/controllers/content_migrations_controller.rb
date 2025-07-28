@@ -87,7 +87,7 @@
 #           "type": "datetime"
 #         },
 #         "pre_attachment": {
-#           "description": "file uploading data, see {file:file_uploads.html File Upload Documentation} for file upload workflow This works a little differently in that all the file data is in the pre_attachment hash if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key This data will only be here after a create or update call",
+#           "description": "file uploading data, see {file:file.file_uploads.html File Upload Documentation} for file upload workflow This works a little differently in that all the file data is in the pre_attachment hash if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key This data will only be here after a create or update call",
 #           "example": "{\"upload_url\"=>\"\", \"message\"=>\"file exceeded quota\", \"upload_params\"=>{}}",
 #           "type": "string"
 #         }
@@ -128,10 +128,8 @@ class ContentMigrationsController < ApplicationController
   include Api::V1::ExternalTools
   include NewQuizzesFeaturesHelper
   include K5Mode
-  include GranularPermissionEnforcement
 
   before_action :require_context
-  before_action :authorize_action
 
   # @API List content migrations
   #
@@ -144,6 +142,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [ContentMigration]
   def index
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     Folder.root_folders(@context) # ensure course root folder exists so file imports can run
 
     if Account.site_admin.feature_enabled?(:instui_for_import_page) && !api_request?
@@ -152,14 +152,21 @@ class ContentMigrationsController < ApplicationController
       js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
       js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
       js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-        @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
-        @context.account.grants_right?(@current_user, :manage_master_courses))
+        @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
 
       # These values are used based on the same logic as ui/features/content_migrations/setup.js do.
       js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
       js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
       js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
       js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
+      js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
+      js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
+
+      js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
+      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
+      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
+      js_env(SHOW_SELECT: should_show_course_copy_dropdown)
+      set_tutorial_js_env
     else
       scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
@@ -173,7 +180,7 @@ class ContentMigrationsController < ApplicationController
 
         options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
-        external_tools = Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user)
+        external_tools = fetch_external_tools
         options.concat(external_tools.map do |et|
           {
             id: et.asset_string,
@@ -196,11 +203,11 @@ class ContentMigrationsController < ApplicationController
         js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
         js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
         js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
-        js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
+        js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
+        js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
         js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
         js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-          @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
-          @context.account.grants_right?(@current_user, :manage_master_courses))
+          @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
         set_tutorial_js_env
       end
     end
@@ -217,9 +224,15 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def show
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     render json: content_migration_json(@content_migration, @current_user, session, nil, params[:include])
+  end
+
+  def fetch_external_tools
+    Lti::ContextToolFinder.all_tools_for(@context, placements: :migration_selection, current_user: @current_user) || []
   end
 
   def migration_plugin_supported?(plugin)
@@ -231,7 +244,7 @@ class ContentMigrationsController < ApplicationController
   #
   # Create a content migration. If the migration requires a file to be uploaded
   # the actual processing of the file will start once the file upload process is completed.
-  # File uploading works as described in the {file:file_uploads.html File Upload Documentation}
+  # File uploading works as described in the {file:file.file_uploads.html File Upload Documentation}
   # except that the values are set on a *pre_attachment* sub-hash.
   #
   # For migrations that don't require a file to be uploaded, like course copy, the
@@ -251,7 +264,7 @@ class ContentMigrationsController < ApplicationController
   # For file uploading:
   #
   # 1. POST to create with file info in *pre_attachment*
-  # 2. Do {file:file_uploads.html file upload processing} using the data in the *pre_attachment* data
+  # 2. Do {file:file.file_uploads.html file upload processing} using the data in the *pre_attachment* data
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
@@ -264,11 +277,11 @@ class ContentMigrationsController < ApplicationController
   #
   # @argument pre_attachment[name] [String]
   #   Required if uploading a file. This is the first step in uploading a file
-  #   to the content migration. See the {file:file_uploads.html File Upload
+  #   to the content migration. See the {file:file.file_uploads.html File Upload
   #   Documentation} for details on the file upload workflow.
   #
   # @argument pre_attachment[*]
-  #   Other file upload properties, See {file:file_uploads.html File Upload
+  #   Other file upload properties, See {file:file.file_uploads.html File Upload
   #   Documentation}
   #
   # @argument settings[file_url] [string] A URL to download the file from. Must not require authentication.
@@ -382,6 +395,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def create
+    return unless authorized_action(@context, @current_user, :manage_course_content_add)
+
     @plugin = find_migration_plugin params[:migration_type]
 
     unless @plugin
@@ -428,6 +443,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns ContentMigration
   def update
+    return unless authorized_action(@context, @current_user, :manage_course_content_edit)
+
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
     @plugin = find_migration_plugin @content_migration.migration_type
@@ -450,6 +467,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns [Migrator]
   def available_migrators
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
     json = systems.map do |p|
       {
@@ -458,6 +477,18 @@ class ContentMigrationsController < ApplicationController
         name: p.meta["select_text"].call,
         required_settings: p.settings[:required_settings] || []
       }
+    end
+
+    if Account.site_admin.feature_enabled? :instui_for_import_page
+      external_tool_migrators = fetch_external_tools.map do |tool|
+        {
+          type: tool.asset_string,
+          requires_file_upload: false,
+          name: tool.label_for("migration_selection", I18n.locale),
+          required_settings: []
+        }
+      end
+      json.concat(external_tool_migrators)
     end
 
     render json:
@@ -524,6 +555,8 @@ class ContentMigrationsController < ApplicationController
   #
   # @returns list of content items
   def content_list
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
     formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration,
@@ -560,6 +593,8 @@ class ContentMigrationsController < ApplicationController
   #    }
   #
   def asset_id_mapping
+    return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
     content_migration = @context.content_migrations.find(params[:id])
     return render json: { message: "Migration is incomplete" }, status: :bad_request unless content_migration.imported?
     return render json: { message: "Migration is not course copy or blueprint" }, status: :bad_request unless content_migration.source_course_id.present?
@@ -568,22 +603,6 @@ class ContentMigrationsController < ApplicationController
   end
 
   protected
-
-  def authorize_action
-    enforce_granular_permissions(
-      @context,
-      overrides: [:manage_content],
-      actions: {
-        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        available_migrators: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        content_list: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
-        create: [:manage_course_content_add],
-        update: [:manage_course_content_edit],
-        asset_id_mapping: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
-      }
-    )
-  end
 
   def find_migration_plugin(name)
     if name.include?("context_external_tool")
@@ -623,6 +642,9 @@ class ContentMigrationsController < ApplicationController
       @content_migration.migration_settings[:migration_ids_to_import] ||= {}
       @content_migration.migration_settings[:migration_ids_to_import][:copy] = copy_options
       @content_migration.copy_options = copy_options
+      if params[:import_immediately] && @context.try(:horizon_course?)
+        @content_migration.migration_settings[:import_immediately] = true
+      end
     else
       @content_migration.migration_settings[:import_immediately] = true
       @content_migration.copy_options = { everything: true }

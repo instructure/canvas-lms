@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,8 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent, useEffect} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {
+  useState,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+  type ChangeEvent,
+  useEffect,
+} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -26,7 +32,7 @@ import getLiveRegion from './liveRegion'
 
 import type {SelectProps} from '@instructure/ui-select'
 
-const I18n = useI18nScope('canvas_async_search_selesct')
+const I18n = createI18nScope('canvas_async_search_selesct')
 
 const noOptionsId = '~~empty-option~~'
 
@@ -37,13 +43,18 @@ export type CanvasAsyncSelectProps = {
   noOptionsLabel: string
   noOptionsValue?: string
   renderLabel?: string | ReactNode
+  // @ts-expect-error
   onOptionSelected: (event, optionId: string) => void
   onHighlightedOptionChange?: (optionId: string | null) => void
+  // @ts-expect-error
   onInputChange: (event, value) => void
+  // @ts-expect-error
   onBlur?: (event) => void
+  // @ts-expect-error
   onFocus?: (event) => void
   children?: ReactElement | ReactElement[]
   options?: any[]
+  inputRef?: (ref: HTMLInputElement | null) => void
   [key: string]: any
 }
 
@@ -62,6 +73,7 @@ export default function CanvasAsyncSelect({
   onFocus = () => {},
   onBlur = () => {},
   children = [],
+  inputRef,
   ...selectProps
 }: CanvasAsyncSelectProps): ReactElement {
   const previousLoadingRef = useRef(isLoading)
@@ -84,6 +96,7 @@ export default function CanvasAsyncSelect({
     React.Children.forEach(children, (c: ReactElement) => {
       if (c?.props.id === id) option = c
     })
+    // @ts-expect-error
     return option
   }
 
@@ -211,6 +224,7 @@ export default function CanvasAsyncSelect({
     onRequestHideOptions: handleHideOptions,
     onRequestHighlightOption: handleHighlightOption,
     onRequestSelectOption: handleSelectOption,
+    inputRef: inputRef,
   }
 
   // remember previous isLoading value so we know whether we need to send announcements

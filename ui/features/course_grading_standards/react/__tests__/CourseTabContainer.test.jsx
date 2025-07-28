@@ -17,71 +17,86 @@
  */
 
 import React from 'react'
-
 import $ from 'jquery'
-import 'jquery-migrate'
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import CourseTabContainer from '../CourseTabContainer'
+import '@canvas/jquery/jquery.instructure_misc_plugins'
+import 'jqueryui/tabs'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Mock the child components to avoid their AJAX calls
+jest.mock('../gradingPeriodCollection', () => {
+  return function MockGradingPeriodCollection() {
+    return <div data-testid="grading-period-collection">Grading Period Collection</div>
+  }
+})
+
+jest.mock('@canvas/grading-standard-collection', () => {
+  return function MockGradingStandardCollection() {
+    return <div data-testid="grading-standard-collection">Grading Standard Collection</div>
+  }
+})
 
 const renderCourseTabContainer = (props = {}) => render(<CourseTabContainer {...props} />)
 
 describe('CourseTabContainer', () => {
   beforeEach(() => {
-    jest
-      .spyOn($, 'getJSON')
-      .mockImplementation(() => ({success: () => ({error: () => {}}), done: () => {}}))
+    fakeENV.setup({
+      GRADING_PERIODS_URL: '/api/v1/courses/1/grading_periods',
+      GRADING_STANDARDS_URL: '/api/v1/courses/1/grading_standards',
+      current_user_roles: ['admin'],
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+    jest.restoreAllMocks()
   })
 
   it('tabs are present when there are grading periods', () => {
-    renderCourseTabContainer({hasGradingPeriods: true})
-
-    expect(screen.getAllByRole('tablist')).toHaveLength(1)
-    expect(screen.getAllByRole('tab')).toHaveLength(2)
+    const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
+    const tabs = getByTestId('grading-tabs')
+    expect(tabs).toBeInTheDocument()
+    expect(getByTestId('grading-periods-tab-link')).toBeInTheDocument()
+    expect(getByTestId('grading-standards-tab-link')).toBeInTheDocument()
   })
 
   it('tabs are not present when there are no grading periods', () => {
     const {container} = renderCourseTabContainer({hasGradingPeriods: false})
-
     expect(container.querySelector('.ui-tabs')).not.toBeInTheDocument()
   })
 
   it('jquery-ui tabs() is called when there are grading periods', () => {
     const tabsSpy = jest.spyOn($.fn, 'tabs')
-
     renderCourseTabContainer({hasGradingPeriods: true})
-
     expect(tabsSpy).toHaveBeenCalled()
+    tabsSpy.mockRestore()
   })
 
   it('jquery-ui tabs() is not called when there are no grading periods', () => {
     const tabsSpy = jest.spyOn($.fn, 'tabs')
-
     renderCourseTabContainer({hasGradingPeriods: false})
-
     expect(tabsSpy).not.toHaveBeenCalled()
+    tabsSpy.mockRestore()
   })
 
   it('does not render grading periods if there are no grading periods', () => {
-    renderCourseTabContainer({hasGradingPeriods: false})
-
-    expect(screen.queryByText('Grading Periods')).not.toBeInTheDocument()
+    const {queryByText} = renderCourseTabContainer({hasGradingPeriods: false})
+    expect(queryByText('Grading Periods')).not.toBeInTheDocument()
   })
 
   it('renders the grading periods if there are grading periods', () => {
-    renderCourseTabContainer({hasGradingPeriods: true})
-
-    expect(screen.getByText('Grading Periods')).toBeInTheDocument()
+    const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
+    expect(getByTestId('grading-periods-tab-link')).toHaveTextContent('Grading Periods')
   })
 
   it('renders the grading standards if there are no grading periods', () => {
-    renderCourseTabContainer({hasGradingPeriods: false})
-
-    expect(screen.getByText('Grading Schemes')).toBeInTheDocument()
+    const {getByText} = renderCourseTabContainer({hasGradingPeriods: false})
+    expect(getByText('Grading Schemes')).toBeInTheDocument()
   })
 
   it('renders the grading standards if there are grading periods', () => {
-    renderCourseTabContainer({hasGradingPeriods: true})
-
-    expect(screen.getByText('Grading Schemes')).toBeInTheDocument()
+    const {getByTestId} = renderCourseTabContainer({hasGradingPeriods: true})
+    expect(getByTestId('grading-standards-tab-link')).toHaveTextContent('Grading Schemes')
   })
 })

@@ -42,7 +42,6 @@ $(function () {
     },
     type: 'number',
   })
-  const has_user_notes = $('.report').hasClass('has_user_notes')
   const params = {
     headers: {
       0: {
@@ -53,15 +52,10 @@ $(function () {
       },
     },
   }
-  if (has_user_notes) {
-    params.headers[2] = {
-      sorter: 'days_or_never',
-    }
-  }
-  params.headers[4 + (has_user_notes ? 1 : 0)] = {
+  params.headers[4] = {
     sorter: 'data-number',
   }
-  params.headers[5 + (has_user_notes ? 1 : 0)] = {
+  params.headers[5] = {
     sorter: false,
   }
   return $('.report').tablesorter(params)

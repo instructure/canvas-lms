@@ -27,7 +27,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
       @dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
       @sequence = 0
-      @timestamp = Time.now
+      @timestamp = Time.zone.now
       @ttl = 90.days.from_now.to_i
     end
 
@@ -146,12 +146,17 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # Also skip audit logs for user inbox label mutations, which can only
       # be executed by the user itself. We can improve that later outside of
       # hackweek.
+      #
+      # Via the same logic for skipping audit logs for user inbox label,
+      # we can skip audit logs for updating gradebook group filter, as it
+      # updates the current user's settings.
       next if [Mutations::CreateDiscussionEntryDraft,
                Mutations::CreateInternalSetting,
                Mutations::UpdateInternalSetting,
                Mutations::DeleteInternalSetting,
                Mutations::CreateUserInboxLabel,
-               Mutations::DeleteUserInboxLabel].include? mutation
+               Mutations::DeleteUserInboxLabel,
+               Mutations::UpdateGradebookGroupFilter].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 

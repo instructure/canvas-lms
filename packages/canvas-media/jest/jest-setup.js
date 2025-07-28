@@ -40,7 +40,16 @@ window.scroll = () => {}
  */
 /* eslint-disable no-console */
 const globalError = global.console.error
-const ignoredErrors = [/A theme registry has already been initialized/]
+const ignoredErrors = [
+  /A theme registry has already been initialized/,
+  /Warning: %s: Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.%s/,
+  /Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom\/test-utils`. See https:\/\/react.dev\/warnings\/react-dom-test-utils for more info./,
+  /Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom\/test-utils`./,
+  /Warning: unmountComponentAtNode is deprecated and will be removed in the next major release. Switch to the createRoot API. Learn more: https:\/\/reactjs.org\/link\/switch-to-createroot/,
+  /Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https:\/\/reactjs.org\/link\/strict-mode-find-node%s/,
+  /Warning: %s uses the legacy childContextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) instead/,
+  /Warning: %s uses the legacy contextTypes API which is no longer supported and will be removed in the next major release. Use React.createContext\(\) with static contextType instead./,
+]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
   /Translation for .* in "en" is missing/,

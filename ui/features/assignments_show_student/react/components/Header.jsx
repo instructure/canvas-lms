@@ -17,12 +17,13 @@
  */
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+import AssignmentAssetProcessorEula from '@canvas/assignments/react/AssignmentAssetProcessorEula'
 import AssignmentDetails from './AssignmentDetails'
 import PeerReviewsCounter from './PeerReviewsCounter'
 import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -32,7 +33,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Tooltip} from '@instructure/ui-tooltip'
 import PeerReviewNavigationLink from './PeerReviewNavigationLink'
 
-const I18n = useI18nScope('assignments_2_student_header')
+const I18n = createI18nScope('assignments_2_student_header')
 
 class Header extends React.Component {
   static propTypes = {
@@ -131,18 +132,18 @@ class Header extends React.Component {
               <PeerReviewNavigationLink
                 assignedAssessments={this.props.peerReviewLinkData?.assignedAssessments}
                 currentAssessmentIndex={this.currentAssessmentIndex(
-                  this.props.peerReviewLinkData?.assignedAssessments
+                  this.props.peerReviewLinkData?.assignedAssessments,
                 )}
               />
             </Flex.Item>
           ) : (
             <>
               {/* EVAL-3711 Remove ICE Feature Flag */}
-              {!window.ENV.FEATURES.instui_nav && (
+              {!window.ENV.FEATURES?.instui_nav && (
                 <Flex.Item margin="0 small 0 0">
                   <PeerReviewsCounter
                     current={this.currentAssessmentIndex(
-                      this.props.reviewerSubmission?.assignedAssessments
+                      this.props.reviewerSubmission?.assignedAssessments,
                     )}
                     total={this.props.reviewerSubmission?.assignedAssessments?.length || 0}
                   />
@@ -152,7 +153,7 @@ class Header extends React.Component {
                 <PeerReviewNavigationLink
                   assignedAssessments={this.props.reviewerSubmission?.assignedAssessments}
                   currentAssessmentIndex={this.currentAssessmentIndex(
-                    this.props.reviewerSubmission?.assignedAssessments
+                    this.props.reviewerSubmission?.assignedAssessments,
                   )}
                 />
               </Flex.Item>
@@ -183,7 +184,9 @@ class Header extends React.Component {
               h1 to actually come before them for a11y */}
           <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
         </Heading>
-
+        {window.ENV.FEATURES?.lti_asset_processor && (
+          <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
+        )}
         <Flex
           margin="0"
           alignItems="start"
@@ -201,7 +204,7 @@ class Header extends React.Component {
             <Flex.Item>
               <Flex as="div" alignItems="center">
                 {/* EVAL-3711 Remove ICE Feature Flag */}
-                {!window.ENV.FEATURES.instui_nav && (
+                {!window.ENV.FEATURES?.instui_nav && (
                   <Flex.Item margin="0 x-small 0 0">
                     <SubmissionStatusPill
                       submissionStatus={this.props.submission.submissionStatus}

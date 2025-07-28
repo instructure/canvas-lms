@@ -47,6 +47,12 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
     submit_type = 'POST'
     data.authenticity_token = authenticity_token()
   }
+
+  let debugStack = undefined
+  if (process.env.NODE_ENV === 'test') {
+    debugStack = new Error().stack
+  }
+
   const ajaxError = function (xhr, textStatus, errorThrown) {
     if (textStatus === 'abort') {
       return // request aborted, do nothing
@@ -57,7 +63,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
       data = {message: text}
       try {
         data = JSON.parse(xhr.responseText)
-      } catch (e) {
+      } catch (_e) {
         // no-op
       }
     }
@@ -65,6 +71,18 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
       $.ajaxJSON.ignoredXHRs.push(xhr)
     }
     if (error && $.isFunction(error)) {
+      if (process.env.NODE_ENV === 'test') {
+        try {
+          const blurb =
+            'An unstubbed ajaxJSON request was made and has likely caused an unrelated test to fail. Please inspect the following stacktrace to find the offending test and either skip it and create a ticket with the appropriate team or fix it yourself. We recommend using Mock Service Worker (MSW).'
+          const msg = `${blurb}\nstack: ${new Error().stack}\n*** initiator: ${debugStack}`
+          if (data && !data.stack) {
+            data.stack = msg
+          } else {
+            console.error(msg)
+          }
+        } catch (_e) {}
+      }
       error(data, xhr, textStatus, errorThrown)
     } else {
       $.ajaxJSON.unhandledXHRs.push(xhr)
@@ -74,7 +92,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
     url,
     dataType: 'json',
     type: submit_type,
-    success(data, textStatus, xhr) {
+    success(data, _textStatus, xhr) {
       data = data || {}
       let page_view_update_url = null
       if (
@@ -94,7 +112,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
             null,
             data,
             '0',
-            data.errors
+            data.errors,
           )
         } else {
           $.ajaxJSON.ignoredXHRs.push(xhr)
@@ -120,6 +138,7 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
   $.ajaxJSON.storeRequest(xhr, url, submit_type, data)
   return xhr
 }
+export const ajaxJSON = $.ajaxJSON
 $.ajaxJSON.unhandledXHRs = []
 $.ajaxJSON.ignoredXHRs = []
 $.ajaxJSON.passedRequests = []

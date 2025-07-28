@@ -1,0 +1,9 @@
+<% if object.has_tag?(:example_request) %>
+#### Example Request:
+    <% object.tags(:example_request).each do |tag| %>
+<% if tag.name && !tag.name.strip.empty? %>#### <%= htmlify tag.name %> <% end %>
+```bash
+<%= tag.text.lstrip %>
+```
+    <% end %>
+<% end %>

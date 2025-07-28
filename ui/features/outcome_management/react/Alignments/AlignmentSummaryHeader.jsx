@@ -27,9 +27,9 @@ import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons
 import AlignmentStatItem from './AlignmentStatItem'
 import OutcomeSearchBar from '../Management/OutcomeSearchBar'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const AlignmentSummaryHeader = ({
   totalOutcomes,

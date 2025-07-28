@@ -11,20 +11,20 @@
 
       {{!-- Submission type accepted --}}
       <select id="assignment_submission_type" name="submission_type" style="margin-left: 0; width: 100%;"
-        aria-controls="assignment_online_submission_types,assignment_external_tool_settings,assignment_group_selector,assignment_peer_reviews_fields"
+        aria-controls="assignment_online_submission_types assignment_external_tool_settings assignment_group_selector assignment_peer_reviews_fields"
         {{disabledIfIncludes frozenAttributes "submission_types"}}>
         {{#if defaultToolName}}
         <option value="default_external_tool" {{selectedIf isDefaultTool}}>
           {{defaultToolName}}
         </option>
         {{/if}}
-        <option value="none" {{selectedIf defaultToNone}}>
+        <option value="none" {{selectedIf defaultToNone}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
         </option>
         <option value="online" {{selectedIf defaultToOnline}}>
           {{#t "submission_types.online"}}Online{{/t}}
         </option>
-        <option value="on_paper" {{selectedIf defaultToOnPaper}}>
+        <option value="on_paper" {{selectedIf defaultToOnPaper}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
         <option value="external_tool" {{selectedIf isGenericExternalTool}}>
@@ -43,14 +43,15 @@
       {{/if}}
 
       {{!-- Online submission types --}}
-      <div id="assignment_online_submission_types" aria-enabled="{{isOnlineSubmission}}"
-        style="{{hiddenUnless isOnlineSubmission}}">
+      <div id="assignment_online_submission_types" style="{{hiddenUnless isOnlineSubmission}}">
 
         <div class="subtitle" style="margin-left: 0;">
           <strong>
             {{#t 'online_entry_options'}}Online Entry Options{{/t}}
+            <span id='online_entry_options_asterisk'>*</span>
           </strong>
         </div>
+        <div id='online_submission_types[online_text_entry]_errors'></div>
 
         <label class="checkbox" for="assignment_text_entry">
           {{checkbox "acceptsOnlineTextEntries"
@@ -61,7 +62,7 @@
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
 
-        <label class="checkbox" for="assignment_online_url">
+        <label class="checkbox" for="assignment_online_url" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsOnlineURL"
           id="assignment_online_url"
           name="online_submission_types[online_url]"
@@ -70,7 +71,7 @@
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
         {{#if kalturaEnabled}}
-        <label class="checkbox" for="assignment_media_recording">
+        <label class="checkbox" for="assignment_media_recording" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsMediaRecording"
           id="assignment_media_recording"
           name="online_submission_types[media_recording]"
@@ -79,7 +80,7 @@
           {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
         </label>
         {{/if}}
-        <label class="checkbox" for="assignment_annotated_document">
+        <label class="checkbox" for="assignment_annotated_document" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsAnnotatedDocument"
           id="assignment_annotated_document"
           name="online_submission_types[student_annotation]"
@@ -88,6 +89,8 @@
           disabled=submissionTypesFrozen}}
           {{#t "labels.allows_annotated_document"}}Student Annotation{{/t}}
         </label>
+        {{!-- Student Annotation File Upload Error Container --}}
+        <div id="online_submission_types[student_annotation]_errors"></div>
         <div id="assignment_annotated_document_info" style="{{hiddenUnless acceptsAnnotatedDocument}}">
           {{#t}}Consider selecting multiple submission types to accommodate students who may not be able to create
           annotations.{{/t}}
@@ -107,7 +110,7 @@
         </label>
 
         {{!-- Online submission restrict file types? --}}
-        <div id="restrict_file_extensions_container" class="nested" aria-expanded="{{acceptsOnlineUpload}}"
+        <div id="restrict_file_extensions_container" class="nested"
           style="{{hiddenUnless acceptsOnlineUpload}}">
 
           <label class="checkbox" for="assignment_restrict_file_extensions">
@@ -123,7 +126,7 @@
           </label>
 
           {{!-- Online submission allowed extensions --}}
-          <div id="allowed_extensions_container" aria-expanded="{{restrictFileExtensions}}"
+          <div id="allowed_extensions_container"
             style="{{hiddenUnless restrictFileExtensions}}" class="nested">
             <label for="assignment_allowed_extensions" class="hidden-readable">
               {{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}
@@ -133,11 +136,11 @@
               id="assignment_allowed_extensions"
               name="allowed_extensions"
               type="text"
-              maxlength="254"
               placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
               aria-labelledby="explanation_nest"
               value="{{join allowedExtensions ", "}}"
               {{disabledIfIncludes frozenAttributes "submission_types"}} />
+            <div id="allowed_extensions_errors" style="margin-left:60px" aria-live="assertive"></div>
             <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
               Enter a list of accepted extensions, for example: doc,xls,txt
@@ -269,25 +272,23 @@
                    value="{{externalToolIframeHeight}}"/>
 
             <div class="ic-Input-group">
-              <div class="ic-Input-group__add-on" aria-hidden="true">
-                <i class="icon-link"></i>
-              </div>
-
-              <input id="assignment_external_tool_tag_attributes_url"
+              <div class="ic-Input"
+                   style="margin-right:5px;margin-left:0px;border-top-right-radius:3px;border-bottom-right-radius:3px"
+                   id="assignment_external_tool_tag_attributes_url_container" >
+                 <input id="assignment_external_tool_tag_attributes_url"
                      name="external_tool_tag_attributes[url]"
                      class="ic-Input"
-                     type="url"
                      value="{{externalToolUrl}}"
+                     type="text"
                      placeholder="http://www.example.com/launch"
+                     style="margin-right:5px;margin-left:0px;border-top-right-radius:3px;border-bottom-right-radius:3px;height:100%"
                   {{disabledIfIncludes frozenAttributes "submission_types"}} />
+              </div>
               <button id="assignment_external_tool_tag_attributes_url_find"
-                      class="Button"
+                      class="btn btn-secondary"
                       type="button"
                       {{disabledIfIncludes frozenAttributes "submission_types"}}
-              >
-                  {{#t}}Find{{/t}}
-              </button>
-
+              >{{#t}}Find{{/t}}</button>
               {{#if submissionTypesFrozen}}
               <input name="external_tool_tag_attributes[url]"
                      type="hidden"
@@ -295,6 +296,7 @@
               {{/if}}
 
             </div>
+            <div id="external_tool_tag_attributes[url]_errors"></div>
           </div>
           <input id="assignment_external_tool_tag_attributes_content_type"
                  name="external_tool_tag_attributes[content_type]"

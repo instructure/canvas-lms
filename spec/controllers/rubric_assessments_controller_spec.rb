@@ -45,6 +45,55 @@ describe RubricAssessmentsController do
     end
   end
 
+  describe "GET 'export'" do
+    it "downloads a file" do
+      course_with_teacher_logged_in(active_all: true)
+      rubric_assessment_model(user: @user, context: @course, purpose: "grading")
+      get :export, params: {
+        course_id: @course.id,
+        assignment_id: @rubric_association.association_object.id,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      expect(response.headers["Content-Type"]).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("export_rubric_assessments.csv")
+    end
+
+    it "return error if assignment is anonymous grading" do
+      course_with_teacher_logged_in(active_all: true)
+      rubric_assessment_model(user: @user, context: @course, purpose: "grading")
+      @rubric_association.association_object.update!(anonymous_grading: true, moderated_grading: true, grader_count: 1)
+      get :export, params: {
+        course_id: @course.id,
+        assignment_id: @rubric_association.association_object.id,
+        format: :json
+      }
+
+      expect(response).to be_bad_request
+      expect(response.body).to match(/Rubric export is not supported for assignments with anonymous grading/)
+    end
+
+    it "download file if assignment is de-anonymized grading" do
+      course_with_teacher_logged_in(active_all: true)
+      rubric_assessment_model(user: @user, context: @course, purpose: "grading")
+      @rubric_association.association_object.update!(
+        anonymous_grading: true, moderated_grading: true, grader_count: 1, grades_published_at: 1.hour.ago
+      )
+      get :export, params: {
+        course_id: @course.id,
+        assignment_id: @rubric_association.association_object.id,
+        format: :json
+      }
+
+      expect(response).to be_successful
+      expect(response.headers["Content-Type"]).to include("text/csv")
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("export_rubric_assessments.csv")
+    end
+  end
+
   describe "PUT 'update'" do
     it "requires authorization" do
       course_with_teacher(active_all: true)
@@ -62,7 +111,7 @@ describe RubricAssessmentsController do
 
     it "returns anonymized user comments when anonymous grading is enabled" do
       course_with_teacher_logged_in(active_all: true)
-      @student = factory_with_protected_attributes(User, name: "Some Student", workflow_state: "registered")
+      @student = User.create!(name: "Some Student", workflow_state: "registered")
       @course.enroll_student(@student).accept!
       @assignment = @course.assignments.create!(title: "Some Assignment")
       @assignment.update(anonymous_grading: true)
@@ -80,7 +129,7 @@ describe RubricAssessmentsController do
 
     it "returns anonymized user comments when anonymous grading and moderated grading are enabled" do
       course_with_teacher_logged_in(active_all: true)
-      @student = factory_with_protected_attributes(User, name: "Some Student", workflow_state: "registered")
+      @student = User.create!(name: "Some Student", workflow_state: "registered")
       @course.enroll_student(@student).accept!
       @assignment = @course.assignments.create!(title: "Some Assignment", anonymous_grading: true, moderated_grading: true, grader_count: 1, final_grader: @teacher)
       rubric_assessment_model(user: @student, assessor: @teacher, context: @course, association_object: @assignment, purpose: "grading")
@@ -538,12 +587,70 @@ describe RubricAssessmentsController do
     end
   end
 
+  describe "student self assessments" do
+    before do
+      setup_assignment_self_assessment
+      @assignment.update(rubric_self_assessment_enabled: true)
+    end
+
+    let(:base_request_params) { { course_id: @course.id, rubric_association_id: @rubric_association.id } }
+
+    it "does not allow students to self assess other students" do
+      user_session(@student2)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
+    end
+
+    it "does not allow a student to modify their own self assessment" do
+      user_session(@student1)
+      rubric_assessment_model(user: @student1, context: @course, association_object: @assignment, assessment_type: "self_assessment")
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
+    end
+
+    it "does not allow a student to self assess if the assignment is not set up as a self assessment" do
+      user_session(@student1)
+      @assignment.update(rubric_self_assessment_enabled: false)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
+    end
+
+    it "does not allow a student to self assess if the assessment_type param is not 'self_assessment'" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "grading" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
+    end
+
+    it "allows a student to create a self assessment" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      expect(response).to be_successful
+    end
+
+    it "allows for multiple students to submit a self assessment" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      expect(response).to be_successful
+
+      user_session(@student2)
+      assessment_params = { user_id: @student2.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      expect(response).to be_successful
+    end
+  end
+
   def setup_course_assessment
     course_with_teacher_logged_in(active_all: true)
-    @student1 = factory_with_protected_attributes(User, name: "student 1", workflow_state: "registered")
-    @student2 = factory_with_protected_attributes(User, name: "student 2", workflow_state: "registered")
-    @student3 = factory_with_protected_attributes(User, name: "student 3", workflow_state: "registered")
-    @teacher2 = factory_with_protected_attributes(User, name: "teacher 2", workflow_state: "registered")
+    @student1 = User.create!(name: "student 1", workflow_state: "registered")
+    @student2 = User.create!(name: "student 2", workflow_state: "registered")
+    @student3 = User.create!(name: "student 3", workflow_state: "registered")
+    @teacher2 = User.create!(name: "teacher 2", workflow_state: "registered")
     @course.enroll_student(@student1).accept!
     @course.enroll_student(@student2).accept!
     @course.enroll_student(@student3).accept!
@@ -555,5 +662,15 @@ describe RubricAssessmentsController do
     student3_asset = @assignment.find_or_create_submission(@student3)
     @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student2, assessor_asset: student2_asset)
     @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student3, assessor_asset: student3_asset)
+  end
+
+  def setup_assignment_self_assessment
+    course_with_teacher_logged_in(active_all: true)
+    @student1 = User.create!(name: "student 1", workflow_state: "registered")
+    @student2 = User.create!(name: "student 2", workflow_state: "registered")
+    @course.enroll_student(@student1).accept!
+    @course.enroll_student(@student2).accept!
+    @assignment = @course.assignments.create!(title: "Some Assignment", rubric_self_assessment_enabled: true)
+    rubric_assessment_model(user: @user, context: @course, association_object: @assignment, purpose: "grading")
   end
 end

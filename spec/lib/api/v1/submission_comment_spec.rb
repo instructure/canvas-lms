@@ -80,6 +80,43 @@ describe Api::V1::SubmissionComment do
       submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
       expect(submission_comment_json["media_comment"]["media_type"]).to eq("audio")
     end
+
+    it "does not include html tags in comment" do
+      @submission_comment.comment = "<div>My html comment</div>"
+      fake_controller.current_user = @student
+      submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
+      expect(submission_comment_json["comment"]).to eq("My html comment")
+    end
+
+    it "includes html tags in html_comment if use_html_comment is true" do
+      @submission_comment.comment = "<div>My html comment</div>"
+      fake_controller.current_user = @student
+      submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student, use_html_comment: true)
+      expect(submission_comment_json["comment"]).to eq("<div>My html comment</div>")
+    end
+
+    it "does not throw an error for poorly formatted html" do
+      @submission_comment.comment = "<div>My bad html comment</div></div>"
+      fake_controller.current_user = @student
+      submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
+      expect(submission_comment_json["comment"]).to eq("My bad html comment")
+    end
+
+    context "with attachments" do
+      before do
+        attachment_model
+        @submission_comment.submission.assignment.attachments = [@attachment]
+        @submission_comment.attachments = [@attachment]
+        @submission_comment.save!
+      end
+
+      it "adds asset location tag to url for attachments when file_association_access feature flag is enabled" do
+        @attachment.root_account.enable_feature!(:file_association_access)
+        fake_controller.current_user = @student
+        submission_comment_json = fake_controller.submission_comment_json(@submission_comment, @student)
+        expect(submission_comment_json["attachments"].first["url"]).to include("location=#{@submission_comment.asset_string}")
+      end
+    end
   end
 
   describe "#anonymous_moderated_submission_comments_json" do

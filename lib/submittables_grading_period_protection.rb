@@ -178,4 +178,5 @@ module SubmittablesGradingPeriodProtection
     delete_override_in_closed: I18n.t("Cannot delete an override with a due date within a closed grading period"),
     change_only_visible_to_overrides: I18n.t("Cannot set only visible to overrides when due in a closed grading period")
   }.freeze
+  private_constant :ERROR_MESSAGES
 end

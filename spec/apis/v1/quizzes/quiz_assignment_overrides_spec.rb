@@ -39,7 +39,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                    { controller: "quizzes/quiz_assignment_overrides", action: "index", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "includes visible overrides" do
@@ -82,7 +82,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
       @course.account.role_overrides.create!({
                                                role: teacher_role,
-                                               permission: "manage_assignments",
+                                               permission: "manage_assignments_add",
                                                enabled: false
                                              })
 
@@ -117,6 +117,64 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
         expect(override["due_dates"][0]["due_at"]).to eq due_at.iso8601
       end
     end
+
+    context "differentiaiton tag overrides" do
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+
+        @student = course_with_student(course: @course).user
+
+        @diff_tag_category = @course.group_categories.create!(name: "Differentiation Tags", non_collaborative: true)
+        @diff_tag = @course.groups.create!(name: "Tag 1", group_category: @diff_tag_category, non_collaborative: true)
+        @diff_tag.add_user(@student, "accepted")
+      end
+
+      it "includes differentiation tag overrides for student (and does not expose diff tag title)" do
+        quiz_override = assignment_override_model({
+                                                    set: @diff_tag,
+                                                    quiz: @quiz,
+                                                    due_at: 5.days.from_now
+                                                  })
+
+        expect(@quiz.reload.assignment_overrides.count).to eq 1
+
+        json = api_call_as_user(@student,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
+                                {
+                                  controller: "quizzes/quiz_assignment_overrides",
+                                  action: "index",
+                                  format: "json",
+                                  course_id: @course.id.to_s
+                                },
+                                {
+                                  quiz_assignment_overrides: [{
+                                    quiz_ids: [@quiz.id.to_s]
+                                  }]
+                                })
+        expect(json).to eq({
+                             "quiz_assignment_overrides" => [
+                               {
+                                 "quiz_id" => @quiz.id,
+                                 "due_dates" => [
+                                   {
+                                     "id" => quiz_override.id,
+                                     "due_at" => quiz_override.due_at.iso8601,
+                                     "unlock_at" => nil,
+                                     "lock_at" => nil,
+                                     "set_id" => @diff_tag.id,
+                                     "set_type" => "Group",
+                                   }
+                                 ]
+                               }
+                             ]
+                           })
+      end
+    end
   end
 
   describe "[GET] /courses/:course_id/new_quizzes/assignment_overrides" do
@@ -142,7 +200,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                    { controller: "quizzes/quiz_assignment_overrides", action: "new_quizzes", format: "json", course_id: @course.id.to_s },
                    { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "includes visible overrides" do

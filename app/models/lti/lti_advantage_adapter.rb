@@ -87,8 +87,8 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload_for_assignment(*args)
-      login_request(resource_link_request.generate_post_payload_for_assignment(*args))
+    def generate_post_payload_for_assignment(*)
+      login_request(resource_link_request.generate_post_payload_for_assignment(*))
     end
 
     # Generates a login request pointing to a cached launch (ID token)
@@ -104,8 +104,8 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload_for_homework_submission(*args)
-      login_request(resource_link_request.generate_post_payload_for_homework_submission(*args))
+    def generate_post_payload_for_homework_submission(*)
+      login_request(resource_link_request.generate_post_payload_for_homework_submission(*))
     end
 
     # Generates a login request pointing to a cached launch (ID token)
@@ -121,9 +121,10 @@ module Lti
     # For information on how the cached ID token is eventually retrieved
     # and sent to a tool, please refer to the inline documentation of
     # app/controllers/lti/ims/authentication_controller.rb
-    def generate_post_payload_for_student_context_card(student_id:)
-      @opts[:student_id] = student_id
-      login_request(resource_link_request.generate_post_payload)
+    def generate_post_payload_for_student_context_card(student:)
+      @opts[:student_id] = student.global_id
+      @opts[:student_lti_id] = student.lti_id
+      login_request(resource_link_request.to_cached_hash)
     end
 
     # Generates a login request pointing to a general-use
@@ -159,6 +160,33 @@ module Lti
       @tool.login_or_launch_url(extension_type: resource_type)
     end
 
+    # Generates a login request pointing to a cached launch (ID token)
+    # suitable for asset processor settings request
+    #
+    # These launches occur when an already attached asset processor
+    # settings are requested from the tool and used to update those.
+    def generate_post_payload_for_asset_processor_settings
+      login_request(asset_processor_settings_request.to_cached_hash)
+    end
+
+    # Generates a login request pointing to a cached launch (ID token)
+    # suitable for report review request used in asset processor.
+    #
+    # These launches show a detailed report of an asset
+    # processed created by an lti tool using asset processor.
+    def generate_post_payload_for_report_review
+      login_request(report_review_request.to_cached_hash)
+    end
+
+    # Generates a login request pointing to a cached launch (ID token)
+    # for an deployment-level EULA launch (1EdTech Eula Message spec)
+    #
+    # These launches show the EULA of a tool
+    # that can be accessed on deployment level.
+    def generate_post_payload_for_eula
+      login_request(eula_request.to_cached_hash)
+    end
+
     private
 
     def target_link_uri
@@ -168,14 +196,9 @@ module Lti
     end
 
     def generate_lti_params
-      if resource_type&.to_sym == :course_assignments_menu &&
-         !@context.root_account.feature_enabled?(:lti_multiple_assignment_deep_linking)
-        return resource_link_request.generate_post_payload
-      end
-
       if resource_type&.to_sym == :module_index_menu_modal &&
          !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
-        return resource_link_request.generate_post_payload
+        return resource_link_request.to_cached_hash
       end
 
       message_type = @tool.extension_setting(resource_type, :message_type)
@@ -186,26 +209,31 @@ module Lti
         raise e
       end
       if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
-        deep_linking_request.generate_post_payload
+        deep_linking_request.to_cached_hash
       else
-        resource_link_request.generate_post_payload
+        resource_link_request.to_cached_hash
       end
     end
 
     def login_request(lti_params)
       message_hint = cache_payload(lti_params)
-      login_hint = Lti::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
+      login_hint = Lti::V1p1::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
+      deployment_id_flag_on = @context.root_account.feature_enabled?(:lti_deployment_id_in_login_request)
 
-      req = LtiAdvantage::Messages::LoginRequest.new(
+      req_params = {
         iss: Canvas::Security.config["lti_iss"],
         login_hint:,
         client_id: @tool.global_developer_key_id,
-        deployment_id: @tool.deployment_id,
+        lti_deployment_id: @tool.deployment_id,
         target_link_uri:,
         lti_message_hint: message_hint,
         canvas_environment: ApplicationController.test_cluster_name || "prod",
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
-      )
+      }
+
+      req_params[:deployment_id] = @tool.deployment_id unless deployment_id_flag_on
+
+      req = LtiAdvantage::Messages::LoginRequest.new(req_params)
       req.lti_storage_target = Lti::PlatformStorage::FORWARDING_TARGET if @include_storage_target
       req.as_json
     end
@@ -222,7 +250,7 @@ module Lti
           parent_frame_context: @opts[:parent_frame_context],
           include_storage_target: @include_storage_target
         }.compact,
-        (Time.zone.now + MESSAGE_HINT_LIFESPAN)
+        Time.zone.now + MESSAGE_HINT_LIFESPAN
       )
     end
 
@@ -239,6 +267,41 @@ module Lti
 
     def resource_link_request
       @_resource_link_request ||= Lti::Messages::ResourceLinkRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
+        opts: @opts.merge(option_overrides)
+      )
+    end
+
+    def asset_processor_settings_request
+      @_asset_processor_settings_request ||= Lti::Messages::AssetProcessorSettingsRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
+        asset_processor: @opts[:asset_processor],
+        opts: @opts.merge(option_overrides)
+      )
+    end
+
+    def report_review_request
+      @_report_review_request ||= Lti::Messages::ReportReviewRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
+        asset_report: @opts[:asset_report],
+        opts: @opts.merge(option_overrides)
+      )
+    end
+
+    def eula_request
+      @_eula_request ||= Lti::Messages::EulaRequest.new(
         tool: @tool,
         context: @context,
         user: @user,

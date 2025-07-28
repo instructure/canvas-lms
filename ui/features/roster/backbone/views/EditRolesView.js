@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, uniq, filter, every, includes, extend as lodashExtend} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -24,7 +24,7 @@ import template from '../../jst/editRolesView.handlebars'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 export default class EditRolesView extends DialogBaseView {
   static initClass() {
@@ -69,7 +69,7 @@ export default class EditRolesView extends DialogBaseView {
 
     // section ids that already have the new role
     const existing_section_ids = filter(enrollments, en => en.role_id === new_role_id).map(
-      en => en.course_section_id
+      en => en.course_section_id,
     )
 
     const new_enrollments = []
@@ -106,8 +106,8 @@ export default class EditRolesView extends DialogBaseView {
               new_enrollment => {
                 lodashExtend(new_enrollment, {can_be_removed: true})
                 return new_enrollments.push(new_enrollment)
-              }
-            )
+              },
+            ),
           )
         }
       }
@@ -121,10 +121,10 @@ export default class EditRolesView extends DialogBaseView {
         })
         .fail(() =>
           $.flashError(
-            I18n.t("Something went wrong updating the user's role. Please try again later.")
-          )
+            I18n.t("Something went wrong updating the user's role. Please try again later."),
+          ),
         )
-        .always(() => this.close())
+        .always(() => this.close()),
     )
   }
 }

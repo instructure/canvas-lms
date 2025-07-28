@@ -28,7 +28,7 @@ class GradingPeriod extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
     weight: PropTypes.number,
-    weighted: PropTypes.bool.isRequired,
+    weighted: PropTypes.bool,
     startDate: PropTypes.instanceOf(Date).isRequired,
     endDate: PropTypes.instanceOf(Date).isRequired,
     closeDate: PropTypes.instanceOf(Date).isRequired,
@@ -94,6 +94,7 @@ class GradingPeriod extends React.Component {
   render() {
     return (
       <GradingPeriodTemplate
+        data-testid="grading-period"
         key={this.props.id}
         ref={c => (this.templateRef = c)}
         id={this.props.id}

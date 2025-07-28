@@ -24,8 +24,8 @@ import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation, useQuery} from 'react-apollo'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useMutation, useQuery} from '@apollo/client'
 import {
   CREATE_USER_INBOX_LABEL,
   DELETE_CONVERSATIONS,
@@ -38,16 +38,15 @@ import {
   USER_INBOX_LABELS_QUERY,
   VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../graphql/Queries'
-import {decodeQueryString} from '@canvas/query-string-encoding'
-import {responsiveQuerySizes} from '../../util/utils'
+import {decodeQueryString} from '@instructure/query-string-encoding'
+import WithBreakpoints from '@canvas/with-breakpoints'
 
 import {Flex} from '@instructure/ui-flex'
-import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
 import {ManageUserLabels} from '../components/ManageUserLabels/ManageUserLabels'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {IconSettingsLine, IconComposeLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import InboxSettingsModalContainer, {
@@ -55,12 +54,31 @@ import InboxSettingsModalContainer, {
   SAVE_SETTINGS_FAIL,
   LOAD_SETTINGS_FAIL,
 } from './InboxSettingsModalContainer/InboxSettingsModalContainer'
+import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
+import { InstUISettingsProvider } from '@instructure/emotion'
+import canvas from '@instructure/ui-themes'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
-const CanvasInbox = () => {
-  const [scope, setScope] = useState('inbox')
-  const [courseFilter, setCourseFilter] = useState()
+const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
+
+const parseFilterHash = hash => {
+  const hashParams = hash.substring('#filter='.length)
+  const hashData = decodeQueryString(hashParams)
+  const filterType = hashData.filter(i => i.type !== undefined)[0]?.type
+  const courseSelection = hashData.filter(i => i.course !== undefined)[0]?.course
+
+  return {
+    filterType: validFilters.includes(filterType) ? filterType : null,
+    courseSelection: courseSelection || null,
+  }
+}
+
+const CanvasInbox = ({breakpoints}) => {
+  const urlFilters = parseFilterHash(window.location.hash)
+
+  const [scope, setScope] = useState(urlFilters.filterType || 'inbox')
+  const [courseFilter, setCourseFilter] = useState(urlFilters.courseSelection)
   const [userFilter, setUserFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
@@ -89,19 +107,10 @@ const CanvasInbox = () => {
   const inboxSettingsFeature = inboxSignatureBlock || inboxAutoResponse
 
   const setFilterStateToCurrentWindowHash = () => {
-    const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
+    const {filterType, courseSelection} = parseFilterHash(window.location.hash)
 
-    const urlHash = window.location.hash
-    const hashParams = urlHash.substring('#filter='.length)
-    const hashData = decodeQueryString(hashParams)
-    const filterType = hashData.filter(i => i.type !== undefined)[0]?.type
-    const courseSelection = hashData.filter(i => i.course !== undefined)[0]?.course
-
-    const newCourseFilter = courseSelection || null
-    setCourseFilter(newCourseFilter)
-
-    const isValidFilter = filterType && validFilters.includes(filterType)
-    if (isValidFilter) setScope(filterType)
+    setCourseFilter(courseSelection)
+    if (filterType) setScope(filterType)
   }
 
   const setUrlUserRecepientFromUrlParam = () => {
@@ -164,7 +173,7 @@ const CanvasInbox = () => {
     if (
       selectedConversations.length > 0 &&
       !JSON.parse(sessionStorage.getItem('conversationsManuallyMarkedUnread'))?.includes(
-        selectedConversations[0]._id
+        selectedConversations[0]._id,
       )
     ) {
       sessionStorage.removeItem('conversationsManuallyMarkedUnread')
@@ -261,14 +270,14 @@ const CanvasInbox = () => {
     }
 
     const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(conversationsQueryOption))
+      JSON.stringify(cache.readQuery(conversationsQueryOption)),
     )
     const conversationParticipantIDsFromResult =
       result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
 
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
       conversationParticipant =>
-        !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
+        !conversationParticipantIDsFromResult.includes(conversationParticipant._id),
     )
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
     cache.writeQuery({...conversationsQueryOption, data: conversationsFromCache})
@@ -291,16 +300,15 @@ const CanvasInbox = () => {
         one: 'Are you sure you want to archive your copy of this conversation?',
         other: 'Are you sure you want to archive your copy of these conversations?',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
 
-    const confirmResult = window.confirm(archiveConfirmMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(archiveConfirmMsg)
     if (confirmResult) {
       archiveConversationParticipants({
         variables: {
           conversationIds: selectedConversations.map(convo => convo._id),
           workflowState: 'archived',
-          subscribed: false,
         },
       })
     } else {
@@ -315,10 +323,10 @@ const CanvasInbox = () => {
         one: 'Are you sure you want to unarchive your copy of this conversation?',
         other: 'Are you sure you want to unarchive your copy of these conversations?',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
 
-    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(unarchiveConfirmMsg)
     if (confirmResult) {
       unarchiveConversationParticipants({
         variables: {
@@ -339,7 +347,7 @@ const CanvasInbox = () => {
         one: 'Message archived!',
         other: 'Messages archived!',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
     if (data.updateConversationParticipants.errors) {
       setArchiveDisabled(false)
@@ -360,7 +368,7 @@ const CanvasInbox = () => {
         one: 'Message unarchived!',
         other: 'Messages unarchived!',
       },
-      {count: selectedConversations.length}
+      {count: selectedConversations.length},
     )
     if (data.updateConversationParticipants.errors) {
       setArchiveDisabled(true)
@@ -443,9 +451,9 @@ const CanvasInbox = () => {
         other:
           'Are you sure you want to delete your copy of these conversations? This action cannot be undone.',
       },
-      {count: conversationsToDeleteByID.length}
+      {count: conversationsToDeleteByID.length},
     )
-    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(delMsg)
     if (confirmResult) {
       deleteConversations({variables: {ids: conversationsToDeleteByID}})
     } else {
@@ -461,7 +469,7 @@ const CanvasInbox = () => {
         one: 'Message Deleted!',
         other: 'Messages Deleted!',
       },
-      {count: deletedConversationIDs.length}
+      {count: deletedConversationIDs.length},
     )
 
     if (data.deleteConversations.errors) {
@@ -486,7 +494,7 @@ const CanvasInbox = () => {
 
   const removeDeletedConversationsFromCache = (cache, result) => {
     const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(conversationsQueryOption))
+      JSON.stringify(cache.readQuery(conversationsQueryOption)),
     )
 
     const conversationIDsFromResult = result.data.deleteConversations.conversationIds
@@ -494,7 +502,7 @@ const CanvasInbox = () => {
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
       conversationParticipant => {
         return !conversationIDsFromResult.includes(conversationParticipant.conversation._id)
-      }
+      },
     )
 
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
@@ -525,8 +533,8 @@ const CanvasInbox = () => {
               one: 'The conversation has been successfully unstarred.',
               other: 'The conversations has been successfully unstarred.',
             },
-            {count}
-          )
+            {count},
+          ),
         )
       } else {
         setOnSuccess(
@@ -535,8 +543,8 @@ const CanvasInbox = () => {
               one: 'The conversation has been successfully starred.',
               other: 'The conversations has been successfully starred.',
             },
-            {count}
-          )
+            {count},
+          ),
         )
       }
     },
@@ -580,8 +588,8 @@ const CanvasInbox = () => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
       }
     },
@@ -601,8 +609,8 @@ const CanvasInbox = () => {
               one: 'Read state Changed!',
               other: 'Read states Changed!',
             },
-            {count: '1000'}
-          )
+            {count: '1000'},
+          ),
         )
       }
     },
@@ -670,7 +678,7 @@ const CanvasInbox = () => {
       setDisplayUnarchiveButton(false)
     } else {
       setDisplayUnarchiveButton(
-        selectedConversations.some(conversation => conversation.workflowState === 'archived')
+        selectedConversations.some(conversation => conversation.workflowState === 'archived'),
       )
     }
   }, [selectedConversations, userID])
@@ -686,83 +694,126 @@ const CanvasInbox = () => {
     }
   }
 
+  const renderSettingsButton = () => {
+    return (
+      <Tooltip key="settings-button" renderTip={I18n.t('Inbox settings')} placement="top">
+        <Button
+          color="secondary"
+          onClick={() => setInboxSettingsModal(true)}
+          renderIcon={IconSettingsLine}
+          display={getResponsiveStyles().buttonsDisplay}
+          key="settings-button"
+        >
+          {I18n.t('Settings')}
+        </Button>
+      </Tooltip>
+    )
+  }
+
+  const renderComposeButton = () => {
+    return (
+      <Tooltip key="compose-button" renderTip={I18n.t('Compose a new message')} placement="top">
+        <Button
+          color="primary"
+          margin="none"
+          renderIcon={IconComposeLine}
+          onClick={() => {
+            if (/#filter=type=submission_comments/.test(window.location.hash))
+              window.location.hash = '#filter=type=inbox'
+            setComposeModal(true)
+          }}
+          testid="compose"
+          display={getResponsiveStyles().buttonsDisplay}
+          ariaLabel={I18n.t('Compose a new message')}
+        >
+          {I18n.t('Compose')}
+        </Button>
+      </Tooltip>
+    )
+  }
+
+  const renderActionButtons = () => {
+    return breakpoints.mobileOnly
+      ? [renderComposeButton(), renderSettingsButton()]
+      : [renderSettingsButton(), renderComposeButton()]
+  }
+
+  const getResponsiveStyles = () => {
+    return {
+      conversationListWidth: breakpoints.mobileOnly ? '100%' : '400px',
+      messageDetailMargin: breakpoints.mobileOnly ? '0 0 0 small' : undefined,
+      buttonsWidth: breakpoints.mobileOnly ? '100%' : 'auto',
+      buttonsDirection: breakpoints.mobileOnly ? 'column' : 'row',
+      buttonsDisplay: breakpoints.mobileOnly ? 'block' : 'inline-block',
+      headerMargin: breakpoints.ICEDesktop ? '0' : '0 0 medium 0',
+      containerWidth: breakpoints.ICEDesktop ? 'auto' : '100%',
+    }
+  }
+
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
-      props={{
-        mobile: {
-          conversationListWidth: '100%',
-          messageDetailMargin: '0 0 0 small',
-        },
-        desktop: {
-          conversationListWidth: '400px',
-          messageDetailMargin: undefined,
-        },
-      }}
-      render={(responsiveProps, matches) => (
-        <ConversationContext.Provider value={conversationContext}>
-          {!inboxSettingsFeature && (
-            <Heading level="h1">
-              <ScreenReaderContent>{I18n.t('Inbox')}</ScreenReaderContent>
-            </Heading>
-          )}
+    <>
+      <TopNavPortal />
+      <ConversationContext.Provider value={conversationContext}>
+        {!inboxSettingsFeature && (
+          <Heading level="h1">
+            <ScreenReaderContent>{I18n.t('Inbox')}</ScreenReaderContent>
+          </Heading>
+        )}
+        <InstUISettingsProvider
+          theme={{
+            componentOverrides: {
+              View: { borderColorSecondary: canvas.colors.contrasts.grey3045 }
+            }
+          }}
+        >
           <Flex as="div" height="100vh" direction="column">
             {inboxSettingsFeature && (
               <Flex.Item>
-                <Flex data-testid="inbox-settings-in-header">
-                  <Flex.Item
-                    padding="medium small medium x-large"
-                    shouldShrink={true}
-                    shouldGrow={true}
-                  >
-                    <Heading level="h1">{I18n.t('Inbox')}</Heading>
+                <Flex
+                  data-testid="inbox-settings-in-header"
+                  as="div"
+                  direction="row"
+                  justifyItems="space-between"
+                  wrap="wrap"
+                  overflowX="hidden"
+                  overflowY="hidden"
+                  margin="small medium medium medium"
+                >
+                  <Flex.Item width={getResponsiveStyles().containerWidth} shouldShrink={true}>
+                    <Heading margin={getResponsiveStyles().headerMargin} level="h1">
+                      {I18n.t('Inbox')}
+                    </Heading>
                   </Flex.Item>
-                  <Flex.Item padding="small xxx-small small small" shouldShrink={true}>
-                    <Tooltip renderTip={I18n.t('Inbox settings')} placement="top">
-                      <IconButton
-                        color="secondary"
-                        screenReaderLabel={I18n.t('Inbox Settings')}
-                        onClick={() => setInboxSettingsModal(true)}
-                      >
-                        <IconSettingsLine />
-                      </IconButton>
-                    </Tooltip>
-                  </Flex.Item>
-                  <Flex.Item padding="small x-large small xx-small" shouldShrink={true}>
-                    <Tooltip renderTip={I18n.t('Compose a new message')} placement="top">
-                      <Button
-                        color="primary"
-                        margin="none"
-                        renderIcon={IconComposeLine}
-                        onClick={() => {
-                          if (/#filter=type=submission_comments/.test(window.location.hash))
-                            window.location.hash = '#filter=type=inbox'
-                          setComposeModal(true)
-                        }}
-                        testid="compose"
-                        ariaLabel={I18n.t('Compose a new message')}
-                      >
-                        {I18n.t('Compose')}
-                      </Button>
-                    </Tooltip>
+                  <Flex.Item width={getResponsiveStyles().buttonsWidth}>
+                    <Flex
+                      wrap="no-wrap"
+                      direction={getResponsiveStyles().buttonsDirection}
+                      gap="small"
+                      justifyItems="end"
+                      overflowX="hidden"
+                      overflowY="hidden"
+                      width="100%"
+                      height="100%"
+                    >
+                      {renderActionButtons()}
+                    </Flex>
                   </Flex.Item>
                 </Flex>
               </Flex.Item>
             )}
-            {(matches.includes('desktop') ||
-              (matches.includes('mobile') && !selectedConversations.length) ||
+            {(breakpoints.desktopOnly ||
+              (breakpoints.mobileOnly && !selectedConversations.length) ||
               multiselect) && (
               <Flex.Item
                 data-testid={
-                  matches.includes('desktop')
-                    ? 'desktop-message-action-header'
-                    : 'mobile-message-action-header'
+                  breakpoints.mobileOnly
+                    ? 'mobile-message-action-header'
+                    : 'desktop-message-action-header'
                 }
               >
                 <MessageListActionContainer
                   activeMailbox={scope}
-                  activeCourseFilter={courseFilter}
+                  activeCourseFilterID={courseFilter}
                   onSelectMailbox={newScope => {
                     setSelectedConversations([])
                     setScope(newScope)
@@ -776,9 +827,7 @@ const CanvasInbox = () => {
                   }}
                   selectedConversations={selectedConversations}
                   onCompose={() => setComposeModal(true)}
-                  onManageLabels={() =>
-                    userInboxLabelsQuery.loading ? null : setManageLabels(true)
-                  }
+                  onManageLabels={() => (userInboxLabelsQuery.loading ? null : setManageLabels(true))}
                   onReply={() => onReply()}
                   onReplyAll={() => onReply({replyAll: true})}
                   onForward={() => onForward()}
@@ -802,13 +851,13 @@ const CanvasInbox = () => {
             )}
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Flex height="100%" as="div" align="center" justifyItems="center">
-                {(matches.includes('desktop') ||
-                  (matches.includes('mobile') && !selectedConversations.length) ||
+                {(breakpoints.desktopOnly ||
+                  (breakpoints.mobileOnly && !selectedConversations.length) ||
                   multiselect) && (
                   <Flex.Item
                     width={
                       conversationLength || submissionCommentLength
-                        ? responsiveProps.conversationListWidth
+                        ? getResponsiveStyles().conversationListWidth
                         : '100%'
                     }
                     height="100%"
@@ -827,16 +876,14 @@ const CanvasInbox = () => {
                     />
                   </Flex.Item>
                 )}
-                {(matches.includes('desktop') ||
-                  (matches.includes('mobile') &&
-                    selectedConversations.length > 0 &&
-                    !multiselect)) && (
+                {(breakpoints.desktopOnly ||
+                  (breakpoints.mobileOnly && selectedConversations.length > 0 && !multiselect)) && (
                   <Flex.Item
                     shouldGrow={true}
                     shouldShrink={true}
                     height="100%"
                     overflowY="auto"
-                    margin={responsiveProps.messageDetailMargin}
+                    margin={getResponsiveStyles().messageDetailMargin}
                   >
                     {!conversationsQuery.loading &&
                     !submissionCommentsQuery.loading &&
@@ -881,63 +928,63 @@ const CanvasInbox = () => {
               </Flex>
             </Flex.Item>
           </Flex>
-          {inboxSettingsFeature && inboxSettingsModal && (
-            <InboxSettingsModalContainer
-              onDismissWithAlert={handleDismissWithAlert}
-              inboxSignatureBlock={inboxSignatureBlock}
-              inboxAutoResponse={inboxAutoResponse}
-            />
-          )}
-          <ComposeModalManager
-            conversation={selectedConversations[0]}
-            conversationMessage={selectedConversationMessage}
-            isReply={isReply}
-            isReplyAll={isReplyAll}
-            isForward={isForward}
-            onDismiss={() => {
-              setComposeModal(false)
-              setIsReply(false)
-              setIsReplyAll(false)
-              setIsForward(false)
-              setSelectedConversationMessage(null)
-              setSelectedIds([])
-            }}
-            open={composeModal}
-            conversationsQueryOption={conversationsQueryOption}
-            onSelectedIdsChange={setSelectedIds}
-            selectedIds={selectedIds}
-            contextIdFromUrl={urlContextId}
-            maxGroupRecipientsMet={maxGroupRecipientsMet}
-            currentCourseFilter={courseFilter}
+        </InstUISettingsProvider>
+        {inboxSettingsFeature && inboxSettingsModal && (
+          <InboxSettingsModalContainer
+            onDismissWithAlert={handleDismissWithAlert}
             inboxSignatureBlock={inboxSignatureBlock}
+            inboxAutoResponse={inboxAutoResponse}
           />
-          <ManageUserLabels
-            open={manageLabels}
-            labels={
-              userInboxLabelsQuery.loading
-                ? []
-                : userInboxLabelsQuery.data?.legacyNode?.inboxLabels || []
-            }
-            onCreate={names => {
-              createUserInboxLabel({
-                variables: {
-                  names,
-                },
-              })
-            }}
-            onDelete={names => {
-              deleteUserInboxLabel({
-                variables: {
-                  names,
-                },
-              })
-            }}
-            onClose={() => setManageLabels(false)}
-          />
-        </ConversationContext.Provider>
-      )}
-    />
+        )}
+        <ComposeModalManager
+          conversation={selectedConversations[0]}
+          conversationMessage={selectedConversationMessage}
+          isReply={isReply}
+          isReplyAll={isReplyAll}
+          isForward={isForward}
+          onDismiss={() => {
+            setComposeModal(false)
+            setIsReply(false)
+            setIsReplyAll(false)
+            setIsForward(false)
+            setSelectedConversationMessage(null)
+            setSelectedIds([])
+          }}
+          open={composeModal}
+          conversationsQueryOption={conversationsQueryOption}
+          onSelectedIdsChange={setSelectedIds}
+          selectedIds={selectedIds}
+          contextIdFromUrl={urlContextId}
+          maxGroupRecipientsMet={maxGroupRecipientsMet}
+          activeCourseFilterID={courseFilter}
+          inboxSignatureBlock={inboxSignatureBlock}
+        />
+        <ManageUserLabels
+          open={manageLabels}
+          labels={
+            userInboxLabelsQuery.loading
+              ? []
+              : userInboxLabelsQuery.data?.legacyNode?.inboxLabels || []
+          }
+          onCreate={names => {
+            createUserInboxLabel({
+              variables: {
+                names,
+              },
+            })
+          }}
+          onDelete={names => {
+            deleteUserInboxLabel({
+              variables: {
+                names,
+              },
+            })
+          }}
+          onClose={() => setManageLabels(false)}
+        />
+      </ConversationContext.Provider>
+    </>
   )
 }
 
-export default CanvasInbox
+export default WithBreakpoints(CanvasInbox)

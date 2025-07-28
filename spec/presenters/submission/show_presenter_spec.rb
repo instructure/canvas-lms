@@ -260,7 +260,7 @@ describe Submission::ShowPresenter do
       end
 
       it "returns nil if the passed in grade is nil" do
-        expect(presenter.entered_grade).to be_nil
+        expect(presenter.entered_grade).to eq(en_dash)
       end
 
       it "returns a letter grade with trailing en-dash replaced with minus" do
@@ -273,6 +273,10 @@ describe Submission::ShowPresenter do
         @assignment.grade_student(@student, grader: @teacher, grade: "complete")
         expect(presenter.entered_grade).to eq "complete"
       end
+    end
+
+    it "returns the dash if no the submission was graded" do
+      expect(presenter.entered_grade).to eq(en_dash)
     end
 
     it "returns the entered grade" do

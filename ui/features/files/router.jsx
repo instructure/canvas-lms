@@ -39,7 +39,7 @@ function renderShowFolder(ctx) {
     >
       <ShowFolder />
     </FilesApp>,
-    document.getElementById('content')
+    document.getElementById('content'),
   )
 }
 
@@ -54,7 +54,7 @@ function renderSearchResults(ctx) {
     >
       <SearchResults />
     </FilesApp>,
-    document.getElementById('content')
+    document.getElementById('content'),
   )
 }
 

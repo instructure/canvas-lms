@@ -114,7 +114,8 @@ class FoldersController < ApplicationController
   include Api::V1::Attachment
   include AttachmentHelper
 
-  before_action :require_context, except: %i[api_index show api_destroy update create create_file copy_folder copy_file]
+  before_action :require_context, except: %i[list_folders_and_files api_index show api_destroy update create create_file copy_folder copy_file]
+  before_action :check_limited_access_for_students, only: %i[create_file]
 
   def index
     if authorized_action(@context, @current_user, :read_files)
@@ -133,27 +134,136 @@ class FoldersController < ApplicationController
   #
   # @returns [Folder]
   def api_index
-    folder = Folder.find(params[:id])
-    if authorized_action(folder, @current_user, :read_contents)
-      can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
-      opts = { can_view_hidden_files:, context: folder.context }
-      if can_view_hidden_files && folder.context.is_a?(Course) &&
-         MasterCourses::ChildSubscription.is_child_course?(folder.context)
-        opts[:master_course_restricted_folder_ids] = MasterCourses::FolderHelper.locked_folder_ids_for_course(folder.context)
-      end
+    @folder = Folder.find(params[:id])
+    return unless authorized_action(@folder, @current_user, :read_contents)
 
-      scope = folder.active_sub_folders
-      unless can_view_hidden_files
-        scope = scope.not_hidden.not_locked
-      end
-      scope = if params[:sort_by] == "position"
-                scope.by_position
-              else
-                scope.by_name
-              end
-      @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
-      render json: folders_json(@folders, @current_user, session, opts)
+    opts = lock_options(@folder.context, @current_user, session)
+
+    scope = folder_index_scope(opts[:can_view_hidden_files])
+    scope = if params[:sort_by] == "position"
+              scope.by_position
+            else
+              scope.by_name
+            end
+    @folders = Api.paginate(scope, self, api_v1_list_folders_url(@folder))
+    render json: folders_json(@folders, @current_user, session, opts)
+  end
+
+  # internal API
+  def list_folders_and_files
+    return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+
+    @folder = Folder.find(params[:id])
+    if authorized_action(@folder, @current_user, :read_contents)
+      items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
+      headers["X-Total-Items"] = all_item_count.to_s
+      render json: folders_or_files_json(items, @current_user, session, opts)
+    else
+      store_location(request.referer)
     end
+  end
+
+  # internal API
+  def list_all_folders_and_files
+    return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+
+    if authorized_action(@context, @current_user, :read_files)
+      base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
+      items, opts, all_item_count = paginated_folders_and_files(base_url)
+      headers["X-Total-Items"] = all_item_count.to_s
+      render json: folders_or_files_json(items, @current_user, session, opts)
+    else
+      store_location(request.referer)
+    end
+  end
+
+  # Setup additional options based on context and permissions
+  def lock_options(context, user, session)
+    can_view_hidden_files = can_view_hidden_files?(context, user, session)
+    opts = { can_view_hidden_files:, context: }
+    if can_view_hidden_files &&
+       context.is_a?(Course) &&
+       MasterCourses::ChildSubscription.is_child_course?(context)
+      opts[:master_course_restricted_folder_ids] = MasterCourses::FolderHelper.locked_folder_ids_for_course(context)
+    end
+    opts
+  end
+
+  def paginated_folders_and_files(base_url)
+    opts = lock_options(@folder ? @folder.context : @context, @current_user, session)
+    opts = opts.merge(include: params[:include]) if params[:include].present?
+
+    folder_scope = folder_index_scope(opts[:can_view_hidden_files]).preload(:active_file_attachments, :active_sub_folders)
+    file_scope = file_index_scope(@folder || @context, @current_user, params).preload(:attachment_upload_statuses, :root_attachment)
+
+    collections = paginated_folders_and_files_collection(folder_scope, file_scope)
+
+    per_page = Api.per_page_for(self, default: 25)
+
+    combined = Api.paginate(
+      BookmarkedCollection.concat(*collections),
+      self,
+      base_url,
+      { per_page: }
+    )
+
+    if opts[:can_view_hidden_files] && opts[:context]
+      opts[:master_course_status] = setup_master_course_restrictions(combined, opts[:context])
+    end
+
+    all_item_count = folder_scope.count + file_scope.count
+    [combined, opts, all_item_count]
+  end
+
+  def paginated_folders_and_files_collection(folder_scope, file_scope)
+    # Make copies of the scopes to avoid modifying the original ones
+    folder_scope_copy = folder_scope
+    file_scope_copy = file_scope
+
+    folder_column_map = {
+      "name" => Folder.best_unicode_collation_key("folders.name"),
+      "updated_at" => "updated_at",
+      "created_at" => "created_at"
+    }
+
+    file_column_map = {
+      "name" => Attachment.best_unicode_collation_key("attachments.display_name"),
+      "updated_at" => "updated_at",
+      "created_at" => "created_at",
+      "size" => "size",
+      "modified_by" => { user: :sortable_name },
+      "rights" => { usage_rights: :use_justification }
+    }
+
+    folder_sort = folder_column_map[params[:sort]] || "name"
+    folder_desc = params[:order] == "desc" && folder_column_map.key?(params[:sort])
+    file_sort = file_column_map[params[:sort]] || "display_name"
+    file_desc = params[:order] == "desc"
+
+    # Explicit LEFT JOIN for sorting by modified_by and rights
+    if params[:sort] == "modified_by"
+      file_scope_copy = file_scope_copy.left_outer_joins(:user).select("attachments.*, users.sortable_name AS sortable_name")
+    elsif params[:sort] == "rights"
+      file_scope_copy = file_scope_copy.left_outer_joins(:usage_rights).select("attachments.*, usage_rights.use_justification AS use_justification")
+    end
+
+    folder_bookmarker = Plannable::Bookmarker.new(Folder, folder_desc, folder_sort, :id)
+    folders_collection = BookmarkedCollection.wrap(folder_bookmarker, folder_scope_copy)
+
+    file_bookmarker = Plannable::Bookmarker.new(Attachment, file_desc, file_sort, :id)
+    files_collection = BookmarkedCollection.wrap(file_bookmarker, file_scope_copy)
+
+    [
+      ["folders", folders_collection],
+      ["files", files_collection]
+    ]
+  end
+
+  def folder_index_scope(can_view_hidden_files)
+    scope = @folder ? @folder.active_sub_folders : @context.active_folders
+    scope = scope.not_hidden.not_locked unless can_view_hidden_files
+    scope = Folder.search_by_attribute(scope, :name, params[:search_term], normalize_unicode: true) if params[:search_term].present?
+    scope
   end
 
   # @API List all folders
@@ -171,18 +281,14 @@ class FoldersController < ApplicationController
     if authorized_action(@context, @current_user, :read_files)
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
 
-      url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
-
-      scope = @context.active_folders
-      unless can_view_hidden_files
-        scope = scope.not_hidden.not_locked
-      end
+      scope = folder_index_scope(can_view_hidden_files)
       scope = if params[:sort_by] == "position"
                 scope.by_position
               else
                 scope.by_name
               end
 
+      url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
       folders = Api.paginate(scope, self, url)
       render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
     end
@@ -211,6 +317,8 @@ class FoldersController < ApplicationController
       raise ActiveRecord::RecordNotFound if folders.blank?
 
       render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
+    else
+      store_location(request.referer)
     end
   end
 
@@ -264,10 +372,7 @@ class FoldersController < ApplicationController
                   end
           files_options = { permissions: { user: @current_user }, methods: %i[currently_locked mime_class readable_size], only: %i[id comments content_type context_id context_type display_name folder_id position media_entry_id filename workflow_state] }
           folders_options = { permissions: { user: @current_user }, methods: [:currently_locked, :mime_class], only: %i[id context_id context_type lock_at name parent_folder_id position unlock_at] }
-          sub_folders_scope = @folder.active_sub_folders
-          unless can_view_hidden_files
-            sub_folders_scope = sub_folders_scope.not_hidden.not_locked
-          end
+          sub_folders_scope = folder_index_scope(can_view_hidden_files)
           res = {
             actual_folder: @folder.as_json(folders_options),
             sub_folders: sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
@@ -448,7 +553,7 @@ class FoldersController < ApplicationController
       end
       respond_to do |format|
         if @folder.save
-          flash[:notice] = t :folder_created, "Folder was successfully created."
+          flash.now[:notice] = t :folder_created, "Folder was successfully created."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           if api_request?
             format.json { render json: folder_json(@folder, @current_user, session) }
@@ -527,7 +632,7 @@ class FoldersController < ApplicationController
   # Upload a file to a folder.
   #
   # This API endpoint is the first step in uploading a file.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a course or group can

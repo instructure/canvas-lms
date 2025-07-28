@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Layout from './Layout'
 import {EVERYONE, GRADED} from './PostTypes'
@@ -35,7 +35,7 @@ import {
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('post_grades_tray')
+const I18n = createI18nScope('post_grades_tray')
 
 function initialShowState() {
   return {
@@ -45,6 +45,7 @@ function initialShowState() {
     open: true,
     selectedSectionIds: [],
     submissions: [],
+    showSectionValidation: false,
   }
 }
 
@@ -67,6 +68,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       open: false,
       selectedSectionIds: [],
       submissions: [],
+      showSectionValidation: false,
     }
   }
 
@@ -82,7 +84,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
   }
 
   postBySectionsChanged(postBySections) {
-    this.setState({postBySections, selectedSectionIds: []})
+    this.setState({postBySections, selectedSectionIds: [], showSectionValidation: false})
   }
 
   postTypeChanged(event) {
@@ -101,17 +103,15 @@ export default class PostAssignmentGradesTray extends PureComponent {
 
     if (this.state.postBySections) {
       if (selectedSectionIds.length === 0) {
-        showFlashAlert({
-          message: I18n.t('At least one section must be selected to post grades by section.'),
-          type: 'error',
-        })
-        return
+        return this.setState({showSectionValidation: true})
       }
+
+      this.setState({showSectionValidation: false})
 
       postRequest = postAssignmentGradesForSections(assignment.id, selectedSectionIds, options)
       successMessage = I18n.t(
         'Success! Grades have been posted for the selected sections of %{assignmentName}.',
-        {assignmentName: assignment.name}
+        {assignmentName: assignment.name},
       )
     } else {
       postRequest = postAssignmentGrades(assignment.id, options)
@@ -120,14 +120,14 @@ export default class PostAssignmentGradesTray extends PureComponent {
           'Success! Grades have been posted to everyone graded for %{assignmentName}.',
           {
             assignmentName: assignment.name,
-          }
+          },
         )
       } else {
         successMessage = I18n.t(
           'Success! Grades have been posted to everyone for %{assignmentName}.',
           {
             assignmentName: assignment.name,
-          }
+          },
         )
       }
     }
@@ -163,7 +163,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
     } else {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
-          selectedSection => selectedSection !== sectionId
+          selectedSection => selectedSection !== sectionId,
         ),
       })
     }
@@ -181,6 +181,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       sections,
       selectedSectionIds,
       submissions,
+      showSectionValidation,
     } = this.state
 
     if (!assignment) {
@@ -225,6 +226,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
           sectionSelectionChanged={this.sectionSelectionChanged}
           selectedSectionIds={selectedSectionIds}
           unpostedCount={unpostedCount}
+          showSectionValidation={showSectionValidation}
         />
       </Tray>
     )

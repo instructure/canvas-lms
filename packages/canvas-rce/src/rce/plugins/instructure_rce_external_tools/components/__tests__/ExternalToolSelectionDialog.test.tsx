@@ -30,9 +30,8 @@ import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegi
 
 describe('ExternalToolSelectionDialog', () => {
   const fakeEnv = createDeepMockProxy<ExternalToolsEnv>()
-
   function buildProps(
-    override: Partial<ExternalToolSelectionDialogProps> = {}
+    override: Partial<ExternalToolSelectionDialogProps> = {},
   ): ExternalToolSelectionDialogProps {
     return {
       onDismiss: () => null,
@@ -107,8 +106,8 @@ describe('ExternalToolSelectionDialog', () => {
     expect(tool3Row.queryByText('View description')).toBeNull()
     expect(
       baseElement.querySelector(
-        'img[src="https://www.edu-apps.org/assets/lti_public_resources/tool3.png"]'
-      )
+        'img[src="https://www.edu-apps.org/assets/lti_public_resources/tool3.png"]',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -129,6 +128,7 @@ describe('ExternalToolSelectionDialog', () => {
   })
 
   it('calls onAction when clicking a tool', () => {
+    window.CSS.supports = () => false
     const helpers = RceToolWrapper.forEditorEnv(
       createDeepMockProxy<ExternalToolsEnv>({
         ltiIframeAllowPolicy: 'allow',
@@ -147,7 +147,7 @@ describe('ExternalToolSelectionDialog', () => {
           icon_url: 'tool1/icon.png',
         },
       ],
-      []
+      [],
     )
 
     const doAction = jest.spyOn(helpers[0], 'openDialog')

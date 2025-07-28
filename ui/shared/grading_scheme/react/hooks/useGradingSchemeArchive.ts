@@ -26,19 +26,19 @@ export const useGradingSchemeArchive = (): {
   archiveGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => Promise<void>
   archiveGradingSchemeStatus: string
 } => {
   const [archiveGradingSchemeStatus, setArchiveGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const archiveGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeId: string
+      gradingSchemeId: string,
     ): Promise<void> => {
       setArchiveGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
       try {
@@ -59,7 +59,7 @@ export const useGradingSchemeArchive = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

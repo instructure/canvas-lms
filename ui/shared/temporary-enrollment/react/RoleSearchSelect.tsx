@@ -17,7 +17,7 @@
  */
 
 import React, {Children, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,7 +27,7 @@ import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {MODULE_NAME} from './types'
 
-const I18n = useI18nScope('managed_course_selector')
+const I18n = createI18nScope('managed_course_selector')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
@@ -39,14 +39,14 @@ const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = (str: string) => str.replace(reEscapeMatcher, '\\$1')
 
 const SearchableSelectOption = () => <div />
-/* eslint-disable react/no-unused-prop-types */
+
 SearchableSelectOption.propTypes = {
   id: string,
   value: string,
   children: string,
   label: string,
 }
-/* eslint-enable react/no-unused-prop-types */
+
 SearchableSelectOption.displayName = 'Option'
 
 interface Props {
@@ -59,6 +59,8 @@ interface Props {
   noResultsLabel: string
   noSearchMatchLabel: string
   children: any
+  setRef: Function
+  invalidRole: Function
 }
 
 function flattenOptions(nodes: any) {
@@ -84,7 +86,7 @@ export default function RoleSearchSelect(props: Props) {
   const [matcher, setMatcher] = useState(new RegExp(''))
   const [messages, setMessages] = useState<
     Array<{
-      type: 'error' | 'hint' | 'success' | 'screenreader-only'
+      type: 'newError' | 'hint' | 'success' | 'screenreader-only'
       text: React.ReactNode
     }>
     // @ts-expect-error
@@ -123,12 +125,13 @@ export default function RoleSearchSelect(props: Props) {
     setSelectedOptionId(null)
     handleUpdateSearchStatusMessage(doesAnythingMatch)
     setIsShowingOptions(doesAnythingMatch)
+    props.invalidRole(false)
   }
 
   // messages are not being accidentally set
   const handleUpdateSearchStatusMessage = (matches: any) => {
     if (!matches) {
-      setMessages([{type: 'error', text: noSearchMatchLabel}])
+      setMessages([{type: 'newError', text: noSearchMatchLabel}])
       return
     }
     if (noResults) {
@@ -166,6 +169,7 @@ export default function RoleSearchSelect(props: Props) {
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('%{option} selected. List collapsed.', {option: selectedOption?.name}))
     onChange(event, {id, option: selectedOption})
+    setMessages([])
   }
 
   const handleBlur = (e: any) => {
@@ -174,6 +178,10 @@ export default function RoleSearchSelect(props: Props) {
     if (possibleSelection) {
       handleRequestSelectOption(e, possibleSelection)
       handleUpdateSearchStatusMessage(true)
+      // show an error if the current inputValue is not the same as any of the options
+    } else if (options.every(i => i.name !== inputValue)) {
+      setMessages([{type: 'newError', text: I18n.t('Select a valid role')}])
+      props.invalidRole(true)
     }
   }
 
@@ -245,6 +253,8 @@ export default function RoleSearchSelect(props: Props) {
         onRequestHighlightOption={handleRequestHighlightOption}
         onRequestSelectOption={handleRequestSelectOption}
         {...analyticProps('Role')}
+        isRequired={true}
+        ref={ref => props.setRef(ref)}
       >
         {renderChildren()}
       </Select>

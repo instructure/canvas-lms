@@ -110,7 +110,7 @@ describe SIS::Models::Enrollment do
   describe "#row_info" do
     it "provides row info for available attributes" do
       subject.notify = "true"
-      expect(subject.row_info).to include(':notify=>"true"')
+      expect(subject.row_info).to include('notify: "true"')
     end
   end
 end

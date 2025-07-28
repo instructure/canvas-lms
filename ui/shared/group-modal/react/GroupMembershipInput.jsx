@@ -17,11 +17,11 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {func, string} from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 const MIN = 1
 const MAX = 100000
@@ -81,6 +81,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
 
   return (
     <NumberInput
+      allowStringValue={true}
       {...props}
       id="group_max_membership"
       renderLabel={I18n.t('Group Membership Limit')}

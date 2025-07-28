@@ -32,7 +32,7 @@ export default class PageBlurred extends EventTracker {
           }
         })
       },
-      {throttle: this.getOption('frequency')}
+      {throttle: this.getOption('frequency')},
     )
   }
 }

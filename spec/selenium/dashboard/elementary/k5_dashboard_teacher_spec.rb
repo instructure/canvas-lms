@@ -316,6 +316,7 @@ describe "teacher k5 dashboard" do
 
   context "k5 teacher new course creation" do
     before :once do
+      @account.root_account.enable_feature!(:create_course_subaccount_picker)
       @account.root_account.update!(settings: { teachers_can_create_courses: true })
     end
 

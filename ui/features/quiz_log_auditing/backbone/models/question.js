@@ -33,7 +33,7 @@ export default Backbone.Model.extend({
     attrs.id = '' + attrs.id
     attrs.readableType = camelize(
       attrs.questionType.replace(/_question$/, '').replace(/_/g, ' '),
-      false
+      false,
     )
 
     return attrs

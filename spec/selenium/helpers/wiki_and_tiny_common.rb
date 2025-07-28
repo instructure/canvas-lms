@@ -28,6 +28,14 @@ module WikiAndTinyCommon
     f("input[data-testid='wikipage-title-input']")
   end
 
+  def publish_at_input
+    f("#publish_at_input")
+  end
+
+  def submit_button
+    f("form.edit-form button.submit")
+  end
+
   def clear_wiki_rce
     wait_for_rce
     clear_tiny(element)

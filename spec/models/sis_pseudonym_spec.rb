@@ -165,11 +165,48 @@ describe SisPseudonym do
     expect { SisPseudonym.for(u, context) }.to raise_error("could not resolve root account")
   end
 
-  it "includes a pseudonym from a trusted account" do
-    pseudonym = account2.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
-    allow(account1).to receive_messages(trust_exists?: true, trusted_account_ids: [account2.id])
-    expect(SisPseudonym.for(u, account1)).to be_nil
-    expect(SisPseudonym.for(u, account1, type: :trusted)).to eq(pseudonym)
+  it "raises if no user is provided" do
+    expect { SisPseudonym.for(nil, @account) }.to raise_error("user is required")
+  end
+
+  it "allows an explicit no-context... in implicit mode" do
+    pseudonym = account1.pseudonyms.create!(user: u, unique_id: "user")
+
+    expect { SisPseudonym.for(u, nil) }.to raise_error(ArgumentError)
+    expect { SisPseudonym.for(u, nil, type: :implicit) }.to raise_error(ArgumentError)
+    expect { SisPseudonym.for(u, nil, require_sis: false) }.to raise_error(ArgumentError)
+    expect(SisPseudonym.for(u, nil, type: :implicit, require_sis: false)).to eq pseudonym
+  end
+
+  context "with multiple shards" do
+    specs_require_sharding
+
+    let(:user_on_other_shard) do
+      @shard1.activate { User.create! }
+    end
+    let(:account3) do
+      @shard1.activate { account_model }
+    end
+    let!(:pseudonym) do
+      @shard1.activate do
+        account3.pseudonyms.create!(user: user_on_other_shard, unique_id: "user") do |p|
+          p.sis_user_id = "abc"
+        end
+      end
+    end
+
+    it "includes a pseudonym from a trusted account" do
+      allow(account1).to receive_messages(trust_exists?: true, trusted_account_ids: [account3.id])
+      expect(SisPseudonym.for(user_on_other_shard, account1)).to be_nil
+      expect(SisPseudonym.for(user_on_other_shard, account1, type: :trusted)).to eq(pseudonym)
+    end
+
+    it "includes a pseudonym from a trusted account when association cache is loaded" do
+      user_on_other_shard.pseudonyms.reload # to get pseudonyms collection pre-loaded
+      allow(account1).to receive_messages(trust_exists?: true, trusted_account_ids: [account3.id])
+      expect(SisPseudonym.for(user_on_other_shard, account1)).to be_nil
+      expect(SisPseudonym.for(user_on_other_shard, account1, type: :trusted)).to eq(pseudonym)
+    end
   end
 
   context "with multiple acceptable sis pseudonyms" do
@@ -186,7 +223,7 @@ describe SisPseudonym do
         p.workflow_state = "active"
         p.sis_user_id = "SIS2"
       end
-      u.pseudonyms.create!(pseud_params("alphabet@example.com")) do |p|
+      u.pseudonyms.create!(pseud_params("alphabet2@example.com")) do |p|
         p.workflow_state = "active"
         p.sis_user_id = "SIS3"
         p.authentication_provider = ldap_ap

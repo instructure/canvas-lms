@@ -20,7 +20,7 @@ const getConferenceType = (conferenceTypes, conference) =>
   conferenceTypes.find(conferenceType =>
     conferenceType.type === 'LtiConference'
       ? conferenceType.lti_settings?.tool_id === conference.lti_settings?.tool_id
-      : conferenceType.type === conference.conference_type
+      : conferenceType.type === conference.conference_type,
   )
 
 export default getConferenceType

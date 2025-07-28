@@ -218,9 +218,7 @@ class ReleaseNote
     @langs[lang] ||= fetch_i18n(lang)
   end
 
-  def []=(lang, translations)
-    @langs[lang] = translations
-  end
+  delegate :[]=, to: :@langs
 
   def langs
     load_all_langs

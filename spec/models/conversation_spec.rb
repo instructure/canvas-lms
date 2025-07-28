@@ -600,11 +600,11 @@ describe Conversation do
         u1 = student_in_course.user
         u2 = student_in_course(course: @course).user
         conversation = Conversation.initiate([u1, u2], true)
-        expect(conversation.read_attribute(:tags)).not_to be_nil
+        expect(conversation["tags"]).not_to be_nil
         expect(conversation.tags).to eql []
-        expect(u1.all_conversations.first.read_attribute(:tags)).not_to be_nil
+        expect(u1.all_conversations.first["tags"]).not_to be_nil
         expect(u1.all_conversations.first.tags).to eql []
-        expect(u2.all_conversations.first.read_attribute(:tags)).not_to be_nil
+        expect(u2.all_conversations.first["tags"]).not_to be_nil
         expect(u2.all_conversations.first.tags).to eql []
       end
 
@@ -1201,6 +1201,39 @@ describe Conversation do
       # we just want to form the query and make sure it has a qualified name;
       # so for this spec to be useful you need to have qualified names enabled
       Conversation.batch_regenerate_private_hashes!(1)
+    end
+  end
+
+  describe "logging usage of #delete and #delete_all" do
+    before do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    end
+
+    it "increments 'conversation.delete' metric with caller tag in 'file.rb:method' format" do
+      conversation = Conversation.initiate([sender, recipient], true)
+
+      expect { conversation.delete }.to change { Conversation.exists?(conversation.id) }.from(true).to(false)
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "conversation.delete",
+        tags: hash_including(
+          caller: match(/\A\w+\.rb:[\w:#]+\z/)
+        )
+      )
+    end
+
+    it "increments 'conversation.delete_all' metric with caller tag in 'file.rb:method' format" do
+      ids = Array.new(2) { Conversation.create!.id }
+      convos = Conversation.where(id: ids)
+
+      expect { convos.delete_all }.to change { Conversation.where(id: ids).count }.from(2).to(0)
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "conversation.delete_all",
+        tags: hash_including(
+          caller: match(/\A\w+\.rb:[\w:#]+\z/)
+        )
+      )
     end
   end
 end

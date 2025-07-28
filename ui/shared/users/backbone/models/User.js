@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {filter, isEmpty, find} from 'lodash'
 import Backbone from '@canvas/backbone'
 
@@ -29,7 +29,7 @@ function where(collection, properties, first) {
   }
 }
 
-const I18n = useI18nScope('user')
+const I18n = createI18nScope('user')
 
 export default (function (superClass) {
   function User() {
@@ -54,7 +54,7 @@ export default (function (superClass) {
       invalid: I18n.t('errors.invalid_code', 'Invalid code'),
       already_enrolled: I18n.t(
         'errors.already_enrolled',
-        'You are already enrolled in this course'
+        'You are already enrolled in this course',
       ),
       concluded: I18n.t('This course has concluded'),
       full: I18n.t('errors.course_full', 'This course is full'),
@@ -74,7 +74,7 @@ export default (function (superClass) {
       {
         type,
       },
-      true
+      true,
     )
   }
 
@@ -83,7 +83,7 @@ export default (function (superClass) {
       {
         role,
       },
-      true
+      true,
     )
   }
 
@@ -92,7 +92,7 @@ export default (function (superClass) {
       {
         role,
       },
-      true
+      true,
     )
   }
 

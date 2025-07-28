@@ -274,12 +274,13 @@ describe SubmissionList do
     let!(:enroll_teacher_and_student) do
       course.enroll_teacher(grader).accept
       course.enroll_student student
+      assignment.submit_homework(student, body: "hello world")
     end
 
     context "when the grade is not blank" do
       let!(:grade_assignment) do
         assignment.grade_student(student, { grade: 5, grader: })
-        assignment.grade_student student, { grade: 3, grader: }
+        assignment.grade_student(student, { grade: 3, grader: })
       end
 
       it "remembers the 'Before' grade" do
@@ -299,7 +300,7 @@ describe SubmissionList do
       let!(:grade_assignment) do
         assignment.grade_student(student, { grade: 6, grader: })
         assignment.grade_student(student, { grade: 7, grader: })
-        assignment.grade_student student, { grade: "", grader: }
+        assignment.grade_student(student, { grade: "", grader: })
       end
 
       it "remembers the 'Before' grade" do
@@ -332,8 +333,8 @@ def interesting_submission_data(opts = {})
 
   @grader = user_model({ name: "some_grader" }.merge(opts[:grader]))
   @grader2 = user_model({ name: "another_grader" }.merge(opts[:grader]))
-  @student = factory_with_protected_attributes(User, { name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
-  @course = factory_with_protected_attributes(Course, { name: "some course", workflow_state: "available" }.merge(opts[:course]))
+  @student = User.create!({ name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
+  @course = Course.create!({ name: "some course", workflow_state: "available" }.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
     e = @course.enroll_teacher(grader)
     e.accept

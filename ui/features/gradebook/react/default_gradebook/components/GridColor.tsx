@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import React from 'react'
-import {statuses} from '../constants/statuses'
+import {getStatuses} from '../constants/statuses'
 import {darken} from '../constants/colors'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
@@ -39,10 +38,12 @@ function GridColor(props: Props) {
   const styleRules = props.statuses
     .map(status =>
       [
+        // @ts-expect-error
         `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
+        // @ts-expect-error
         `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
         `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`,
-      ].join('')
+      ].join(''),
     )
     .join('')
   const customStyleRules = props.customStatuses
@@ -51,10 +52,10 @@ function GridColor(props: Props) {
         `.even .gradebook-cell.custom-grade-status-${status.id} { background-color: ${status.color}; }`,
         `.odd .gradebook-cell.custom-grade-status-${status.id} { background-color: ${darken(
           status.color,
-          5
+          5,
         )}; }`,
         `.slick-cell.editable .gradebook-cell.custom-grade-status-${status.id} { background-color: white; }`,
-      ].join('')
+      ].join(''),
     )
     .join('')
 
@@ -67,7 +68,7 @@ function GridColor(props: Props) {
 }
 
 GridColor.defaultProps = {
-  statuses,
+  statuses: getStatuses(),
   customStatuses: [],
 }
 

@@ -132,29 +132,38 @@ describe CoursePacing::PaceService do
           CoursePacing::PaceService.create_in_context(context)
         end.to raise_error NotImplementedError
       end
-
-      it "starts off publishing progress" do
-        allow(CoursePacing::PaceService).to receive(:course_for).and_return(course_factory)
-
-        expect(Progress).to receive(:create!)
-          .with({ context: instance_of(CoursePace), tag: "course_pace_publish" })
-          .and_return(double(process_job: nil))
-
-        CoursePacing::PaceService.create_in_context(context)
-      end
     end
   end
 
   describe ".update_pace" do
-    let(:update_params) { { exclude_weekends: false } }
+    context "the update is successful add_selected_days_to_skip_param is enabled" do
+      let(:pace) { course_pace_model(selected_days_to_skip: %w[mon tue wed fri]) }
+      let(:update_params) { { selected_days_to_skip: %w[sat sun] } }
 
-    context "the update is successful" do
-      let(:pace) { course_pace_model }
+      before do
+        pace.course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
 
       it "returns the updated pace" do
-        expect(Progress).to receive(:create!)
-          .with({ context: pace, tag: "course_pace_publish" })
-          .and_return(double(process_job: nil))
+        expect do
+          expect(
+            CoursePacing::PaceService.update_pace(pace, update_params)
+          ).to eq pace
+        end.to change {
+          pace.selected_days_to_skip
+        }.to %w[sat sun]
+      end
+    end
+
+    context "the update is successful add_selected_days_to_skip_param is disabled" do
+      let(:pace) { course_pace_model(exclude_weekends: true) }
+      let(:update_params) { { exclude_weekends: false } }
+
+      before do
+        pace.course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "returns the updated pace" do
         expect do
           expect(
             CoursePacing::PaceService.update_pace(pace, update_params)
@@ -167,6 +176,7 @@ describe CoursePacing::PaceService do
 
     context "the update failed" do
       let(:pace) { double }
+      let(:update_params) { { exclude_weekends: false } }
 
       it "returns false" do
         allow(pace).to receive(:update).and_return false

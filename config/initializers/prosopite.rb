@@ -26,6 +26,10 @@ module ProsopiteInitializer
       Prosopite.rails_logger = true
       # Send warnings to log/prosopite.log for development
       Prosopite.prosopite_logger = true if Rails.env.development?
+
+      Prosopite.ignore_queries = [
+        /SELECT "plugin_settings".* FROM "public"."plugin_settings".*/
+      ]
     end
   end
 end

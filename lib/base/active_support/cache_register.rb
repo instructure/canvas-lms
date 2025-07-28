@@ -35,7 +35,7 @@ module ActiveSupport
         # NOTE: you won't be able to invalidate this directly using Rails.cache.delete
         # because of issues with the redis ring distribution (everything for batch_object is on the same node)
         # so you should just use clear_cache_key
-        def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &block)
+        def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &)
           batched_keys = Array(batched_keys)
           multi_types = batched_keys.select { |type| batch_object&.class&.prefer_multi_cache_for_key_type?(type) }
           if multi_types.any? && !::Rails.env.production?
@@ -45,7 +45,7 @@ module ActiveSupport
           if batch_object && !opts[:force] &&
              defined?(::ActiveSupport::Cache::RedisCacheStore) && is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
              batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
-            fetch_with_cache_register(key, batch_object, batched_keys, **opts, &block)
+            fetch_with_cache_register(key, batch_object, batched_keys, **opts, &)
           elsif skip_cache_if_disabled
             yield # use for new caches that we're not already using updated_at+touch for
           else
@@ -56,7 +56,7 @@ module ActiveSupport
                         "/#{batch_object.cache_key}"
                       end)
             end
-            fetch(key, opts, &block)
+            fetch(key, opts, &)
           end
         end
 
@@ -87,7 +87,7 @@ module ActiveSupport
               Canvas::CacheRegister.lua.run(:get_with_batched_keys, keys, [now], redis)
             end
 
-            cached_entry = Marshal.load(cached_entry) if cached_entry # rubocop:disable Security/MarshalLoad
+            cached_entry = deserialize_entry(cached_entry, **options)
 
             entry = handle_expired_entry(cached_entry, frd_key, options)
             if payload
@@ -105,7 +105,7 @@ module ActiveSupport
             instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               failsafe :write_entry, returning: false do
-                redis.set(frd_key, Marshal.dump(entry)) # write to the key generated in the lua script
+                redis.set(frd_key, serialize_entry(entry, **options)) # write to the key generated in the lua script
               end
             end
             result

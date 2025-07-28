@@ -17,7 +17,7 @@
  */
 import coronavirusImage from './coronavirus.png'
 import {EnemySpawner, PowerUpSpawner} from './spawners'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ParticleFactory from './explodingParticle'
 import PlayerShip from './playerShip'
 import React from 'react'
@@ -25,7 +25,7 @@ import shipImage from './ship.png'
 import syringeImage from './syringe.png'
 import tpImage from './tp.png'
 
-const I18n = useI18nScope('not_found_page_space_invaders')
+const I18n = createI18nScope('not_found_page_space_invaders')
 
 const CANVAS_WIDTH = 256
 const CANVAS_HEIGHT = 307
@@ -81,7 +81,7 @@ class SpaceInvaders extends React.Component {
       2,
       'bold 32px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2 - 40
+      CANVAS_HEIGHT / 2 - 40,
     )
 
     this.drawText(
@@ -90,7 +90,7 @@ class SpaceInvaders extends React.Component {
       1,
       '18px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2
+      CANVAS_HEIGHT / 2,
     )
 
     this.drawText(
@@ -99,7 +99,7 @@ class SpaceInvaders extends React.Component {
       1,
       '18px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2 + 40
+      CANVAS_HEIGHT / 2 + 40,
     )
 
     document.addEventListener('keydown', this.handleStartGameEvent)
@@ -132,7 +132,7 @@ class SpaceInvaders extends React.Component {
             this.particleFactory.createParticles(
               spawnedObject.position.x,
               spawnedObject.position.y,
-              10
+              10,
             )
           }
         }
@@ -214,18 +214,18 @@ class SpaceInvaders extends React.Component {
     this.handleCollisions(
       this.player,
       this.enemySpawner?.getSpawnedGameObjects(),
-      this.playerEnemyCollisionCallback
+      this.playerEnemyCollisionCallback,
     )
     this.handleCollisions(
       this.player,
       this.powerUpSpawner?.getSpawnedGameObjects(),
-      this.playerPowerupCollisionCallback
+      this.playerPowerupCollisionCallback,
     )
     this.handleCollisions(
       this.player?.getSpawnedProjectiles(),
       this.enemySpawner?.getSpawnedGameObjects(),
       this.projectileEnemyCollisionCallback,
-      true
+      true,
     )
     this.particleFactory.updateParticles(ctx)
   }
@@ -265,7 +265,7 @@ class SpaceInvaders extends React.Component {
           style={{
             border: '2px',
             borderStyle: 'solid',
-            borderColor: '#394B58',
+            borderColor: '#334451',
           }}
         />
       </div>

@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import {compact} from 'lodash'
@@ -28,7 +28,7 @@ import OutcomeCollection from '../../../backbone/collections/OutcomeCollection'
 import OutcomeGroupCollection from '../collections/OutcomeGroupCollection'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('outcomesFindDirectoryVew')
+const I18n = createI18nScope('outcomesFindDirectoryVew')
 
 // Used in the FindDialog.
 export default class FindDirectoryView extends OutcomesDirectoryView {
@@ -42,7 +42,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
       title: I18n.t('account_standards', 'Account Standards'),
       description: I18n.t(
         'account_standards_description',
-        "To the left you'll notice the standards your institution has created for you to use in your courses."
+        "To the left you'll notice the standards your institution has created for you to use in your courses.",
       ),
       directoryClass: AccountDirectoryView,
     })
@@ -52,7 +52,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
         title: I18n.t('state_standards', 'State Standards'),
         description: I18n.t(
           'state_standards_description',
-          "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course."
+          "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course.",
         ),
         directoryClass: StateStandardsDirectoryView,
       })
@@ -85,8 +85,8 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
         setTimeout(() => {
           this.reset()
           return this.$el.find('[tabindex=0]:first').focus()
-        })
-      )
+        }),
+      ),
     )
   }
 
@@ -98,7 +98,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
         title: group.previous('title'),
         description: group.previous('description'),
       },
-      {silent: true}
+      {silent: true},
     )
   }
 }

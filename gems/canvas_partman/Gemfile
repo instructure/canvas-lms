@@ -5,3 +5,6 @@ source "https://rubygems.org"
 gemspec
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "rspec", "~> 3.12"
+gem "simplecov", "~> 0.22"

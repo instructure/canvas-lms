@@ -105,7 +105,7 @@ module GraphQLNodeLoader
     when "InternalSettingByName"
       return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
 
-      Setting.where(name: id).take
+      Setting.find_by(name: id)
     when "MyInboxSettings"
       return nil unless Account.site_admin.feature_enabled?(:inbox_settings)
       return nil unless !id.nil? && !ctx[:domain_root_account].nil?
@@ -171,7 +171,15 @@ module GraphQLNodeLoader
     when "Submission"
       Loaders::IDLoader.for(Submission).load(id).then(check_read_permission)
     when "SubmissionByAssignmentAndUser"
-      submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), user_id: id.fetch(:user_id))
+      submission = Submission.active.preload(assignment: :context).find_by(assignment_id: id.fetch(:assignment_id),
+                                                                           user_id: id.fetch(:user_id))
+      if Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) &&
+         !submission&.can_read_submission_user_name?(ctx[:current_user], ctx[:session])
+        submission = nil
+      end
+      check_read_permission.call(submission)
+    when "SubmissionByAssignmentAndAnonymousId"
+      submission = Submission.active.find_by(assignment_id: id.fetch(:assignment_id), anonymous_id: id.fetch(:anonymous_id))
       check_read_permission.call(submission)
     when "Progress"
       Loaders::IDLoader.for(Progress).load(id).then do |progress|
@@ -241,6 +249,12 @@ module GraphQLNodeLoader
 
         record
       end
+    when "Folder"
+      Loaders::IDLoader.for(Folder).load(id).then do |folder|
+        next nil unless folder&.grants_right?(ctx[:current_user], :read)
+
+        folder
+      end
     when "CommentBankItem"
       Loaders::IDLoader.for(CommentBankItem).load(id).then do |record|
         next if !record || record.deleted? || !record.grants_right?(ctx[:current_user], :read)
@@ -252,6 +266,19 @@ module GraphQLNodeLoader
         next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
 
         record
+      end
+    when "ModuleProgression"
+      Loaders::IDLoader.for(ContextModuleProgression).load(id).then do |progression|
+        next unless progression
+
+        Loaders::AssociationLoader.for(ContextModuleProgression, :context_module).load(progression).then do |mod|
+          Loaders::AssociationLoader.for(ContextModule, :context).load(mod).then do
+            next nil unless mod.context.grants_right?(ctx[:current_user], :read)
+            next nil unless progression.user_id == ctx[:current_user].id || mod.context.grants_right?(ctx[:current_user], :view_all_grades)
+
+            progression
+          end
+        end
       end
     when "UsageRights"
       Loaders::IDLoader.for(UsageRights).load(id).then do |usage_rights|

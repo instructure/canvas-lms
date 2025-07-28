@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
+import {render, screen} from '@testing-library/react'
 import SyncHistoryItem from '../SyncHistoryItem'
 import getSampleData from './getSampleData'
 
@@ -29,26 +28,26 @@ describe('SyncHistoryItem component', () => {
   })
 
   test('renders the SyncHistoryItem component', () => {
-    const tree = shallow(<SyncHistoryItem {...defaultProps()} />)
-    const node = tree.find('.bcs__history-item')
-    expect(node).toBeTruthy()
+    const {container} = render(<SyncHistoryItem {...defaultProps()} />)
+    const node = container.querySelector('.bcs__history-item')
+    expect(node).toBeInTheDocument()
   })
 
   test('renders heading component when migration has changes', () => {
     const props = defaultProps()
     props.heading = <p className="test-heading">test</p>
-    const tree = shallow(<SyncHistoryItem {...props} />)
-    const node = tree.find('.bcs__history-item .test-heading')
-    expect(node).toBeTruthy()
+    const {container} = render(<SyncHistoryItem {...props} />)
+    const node = container.querySelector('.bcs__history-item .test-heading')
+    expect(node).toBeInTheDocument()
   })
 
   test('does not render the heading component when migration has no changes', () => {
     const props = defaultProps()
     props.heading = <p className="test-heading">test</p>
     props.migration.changes = []
-    const tree = shallow(<SyncHistoryItem {...props} />)
-    const node = tree.find('.bcs__history-item .test-heading')
-    expect(node.exists()).toBeFalsy()
+    const {container} = render(<SyncHistoryItem {...props} />)
+    const node = container.querySelector('.bcs__history-item .test-heading')
+    expect(node).not.toBeInTheDocument()
   })
 
   test('renders changes using the appropriate prop component', () => {
@@ -56,7 +55,7 @@ describe('SyncHistoryItem component', () => {
     props.ChangeComponent = () => <div className="test-change" />
     const tree = render(<SyncHistoryItem {...props} />)
     const node = tree.container.querySelectorAll('.bcs__history-item .test-change')
-    expect(node.length).toEqual(props.migration.changes.length)
+    expect(node).toHaveLength(props.migration.changes.length)
   })
 
   test('includes the name of the person who started the sync', () => {

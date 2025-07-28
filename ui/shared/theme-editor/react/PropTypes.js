@@ -68,7 +68,7 @@ types.sharedBrandConfig = PropTypes.shape({
 })
 
 types.variableGroup = PropTypes.shape({
-  group_name: PropTypes.string.isRequired,
+  group_name: PropTypes.string,
   variables: PropTypes.arrayOf(types.varDef).isRequired,
 })
 
@@ -77,7 +77,7 @@ types.userVariableInput = PropTypes.shape({
   invalid: PropTypes.bool,
 })
 
-types.variableSchema = PropTypes.arrayOf(types.variableGroup).isRequired
+types.variableSchema = PropTypes.arrayOf(types.variableGroup)
 
 types.variableDescription = PropTypes.shape({
   default: PropTypes.string.isRequired,

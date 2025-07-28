@@ -17,19 +17,22 @@
       <input type="hidden" name="name" value="{{name}}"></input>
     {{else}}
       <div>
-        <label for="assignment_name">{{#t}}Assignment Name{{/t}}</label>
+        <label for="assignment_name">{{#t}}Assignment Name{{/t}}
+          <span id="assignment_name_asterisk" aria-hidden="true">*</span>
+        </label>
         <input id="assignment_name"
           name="name"
           placeholder="{{#t "assignment_name"}}Assignment Name{{/t}}"
           value="{{name}}"
           type="text"
-          maxlength="254"
+          required
           class="input-block-level"
           {{#if inClosedGradingPeriod}}
             readonly
           {{/if}}
           {{disabledIfIncludes frozenAttributes "title"}}
           autofocus></input>
+          <div id="name_errors" aria-live="assertive"></div>
       </div>
     {{/if}}
   </div>
@@ -65,10 +68,10 @@
       </label>
     </div>
 
-    <div class="form-column-right" style="display: inline-flex">
+    <div class="form-column-right" style="display:inline-flex;flex-direction:column">
       <input id="assignment_points_possible"
         name="points_possible"
-        style="width: 100%;"
+        style="width: 95%;"
         value="{{n pointsPossible}}"
         type="text"
         {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
@@ -76,6 +79,7 @@
         {{/ifAny}}
         {{disabledIfIncludes frozenAttributes "points_possible"}}
       ></input>
+      <div id="points_possible_errors"></div>
       {{#unless lockedItems.points}}
         <div aria-live="polite" role="alert">
           <div id=point_change_warning class="alert">
@@ -93,7 +97,6 @@
   <div id="grading_type_selector"></div>
 
   <div id="graded_assignment_fields"
-    aria-expanded="{{not isNotGraded}}"
     style="{{hiddenIf isNotGraded}}">
 
     {{!--this empty div is in place to push the checkbox to the right of it--}}
@@ -116,6 +119,21 @@
         {{#t}}Do not count this assignment towards the final grade{{/t}}
       </label>
     </div>
+    {{#if suppressAssignmentAllowed}}
+      <div class="control-group">
+        <div class="form-column-left no-group"></div>
+        <div id="suppress_from_gradebook" class="form-column-right" style="margin-top: 14px;">
+          <label class="checkbox">
+
+              {{checkbox "suppressAssignment"
+                id="assignment_suppress_from_gradebook"
+                name="suppress_from_gradebook"
+              }}
+              {{#t}}Hide from gradebook view and student grades view{{/t}}
+          </label>
+        </div>
+      </div>
+    {{/if}}
     {{#if hideZeroPointQuizzesOptionEnabled}}
       {{#if isQuizLTIAssignment}}
           <div id="assignment_hide_in_gradebook_option">
@@ -251,18 +269,23 @@
     <div class="form-column-left">
       <legend id="assignment_overrides">
         <label for="assignment_overrides">
-          {{#if differentiatedModulesEnabled}}
-            {{#t}}Assign Access{{/t}}
-          {{else}}
-            {{#t}}Assign{{/t}}
-          {{/if}}
+          {{#t}}Assign Access{{/t}}
         </label>
       </legend>
     </div>
     <div class="overrides-column-right js-assignment-overrides overrideFormFlex">
     </div>
   </fieldset>
+  {{#if coursePaceWithMasteryPath}}
+    <div class="form-column-left">
+      {{#t}}Mastery Paths{{/t}}
+    </div>
+    <div class="overrides-column-right js-assignment-overrides-mastery-path overrideFormFlex">
+    </div>
+  {{/if}}
 </div>
+
+<div id="asset_processors_container" style="margin-bottom: 14px"></div>
 
 {{#if conditionalReleaseServiceEnabled}}
 <div id="mastery-paths-editor" style="display: none">
@@ -292,9 +315,11 @@
       {{#t "#buttons.cancel"}}Cancel{{/t}}
     </button>
     {{#unless published}}
-      <button type="button" class="btn btn-default save_and_publish">
-        {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
-      </button>
+      {{#unless is_horizon_course}}
+        <button type="button" class="btn btn-default save_and_publish">
+          {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
+        </button>
+      {{/unless}}
     {{/unless}}
     {{#if showBuildButton}}
       <button type="button" class="btn btn-default save_button">

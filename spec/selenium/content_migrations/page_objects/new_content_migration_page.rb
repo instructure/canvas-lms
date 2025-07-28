@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ContentMigrationPage
+class NewContentMigrationPage
   class << self
     include SeleniumDependencies
 
@@ -30,9 +30,17 @@ class ContentMigrationPage
       '[data-cid="BaseButton Button"]'
     end
 
+    def course_search_input_selector
+      "#course-copy-select-course"
+    end
+
+    def migration_type_options
+      INSTUI_Select_options('[data-testid="select-content-type-dropdown"]')
+    end
+
     # Selectors
     def migration_type_dropdown
-      f("#Select_0")
+      f("#Select___0")
     end
 
     def migration_type_option_by_id(id)
@@ -43,20 +51,20 @@ class ContentMigrationPage
       f('[data-testid="submitMigration"]')
     end
 
+    def clear_button
+      f('[data-testid="clear-migration-button"]')
+    end
+
     def selective_import_dropdown
       ff("input[name=selective_import]")
     end
 
     def all_content_radio
-      f('[for="RadioInput_0"]')
+      fxpath('//*[text()="All content"]')
     end
 
     def specific_content_radio
-      f('[for="RadioInput_1"]')
-    end
-
-    def progress_status_label
-      f('[data-testid="migrationStatus"]')
+      fxpath('//*[text()="Select specific content"]')
     end
 
     def migration_file_upload_input
@@ -64,15 +72,15 @@ class ContentMigrationPage
     end
 
     def select_content_button
-      f('td [data-cid="BaseButton Button"]')
+      find_button("Select content")
     end
 
     def all_assignments_checkbox
-      f('input[data-testid="checkbox-copy[all_assignments]]"]')
+      f('input[data-testid="checkbox-copy[all_assignments]"] + label')
     end
 
     def select_content_submit_button
-      f(".selectContentDialog input[type=submit]")
+      f("#content-selection-modal button[data-testid='select-content-button']")
     end
 
     def content
@@ -80,11 +88,15 @@ class ContentMigrationPage
     end
 
     def course_search_input
-      f("#Select_1")
+      f("#course-copy-select-course")
+    end
+
+    def course_search_input_has_options?
+      course_search_input.attribute("aria-expanded") == "true"
     end
 
     def course_search_result(id)
-      f('#Selectable_1-list > li > [id="' + id + '"]')
+      f('#Selectable___1-list > li > [id="' + id + '"]')
     end
 
     def ui_auto_complete
@@ -96,7 +108,7 @@ class ContentMigrationPage
     end
 
     def course_search_results
-      ff("Selectable_1-list > li")
+      ff("Selectable___1-list > li")
     end
 
     def course_search_results_visible
@@ -108,35 +120,27 @@ class ContentMigrationPage
     end
 
     def include_completed_courses_checkbox
-      f("#include_completed_courses")
+      fxpath('//*[text()="Include completed courses"]')
     end
 
     def migration_progress_items
-      ff(".migrationProgressItem")
+      find_table_rows("Content Migrations")
     end
 
     def course_select_warning
       f("#courseSelectWarning")
     end
 
-    def module
-      f('li.top-level-treeitem[data-type="context_modules"] a.checkbox-caret')
-    end
-
-    def submodule
-      f('li.top-level-treeitem[data-type="context_modules"] li.normal-treeitem')
-    end
-
     def external_tool_launch_button
-      f("button#externalToolLaunch")
+      external_tool_launch.find_element(:xpath, "../parent::button")
     end
 
     def lti_iframe
       f(".tool_launch")
     end
 
-    def lti_title
-      f(".ui-dialog-title")
+    def lti_title(lti_title = "Launch External Tool")
+      fxpath("//*[@aria-label='#{lti_title}']//h2")
     end
 
     def basic_lti_link
@@ -144,15 +148,64 @@ class ContentMigrationPage
     end
 
     def file_name_label
-      f("#converter .file_name")
+      fxpath('//*[text()="lti embedded link"]')
     end
 
     def external_tool_launch
-      f("#converter .externalToolLaunch")
+      fxpath('//*[text()="Find a Course"]')
     end
 
     def lti_select_content
-      f("#converter .selectContent")
+      fxpath('//*[text()="Content"]')
+    end
+
+    def date_adjust_checkbox
+      fxpath('//*[text()="Adjust events and due dates"]')
+    end
+
+    def date_remove_radio
+      f('input[value="remove_dates"] + label')
+    end
+
+    def add_day_substitution_button
+      fxpath('//*[@aria-hidden="true" and text()="Substitution"]/ancestor::button')
+    end
+
+    def day_substitution_delete_button_by_index(index)
+      f("#remove-substitution-#{index}")
+    end
+
+    def number_of_day_substitutions
+      ffxpath('//*[text()="Move from:"]').count
+    end
+
+    def add_day_containers
+      ff("#daySubstitution ul > div")
+    end
+
+    def old_start_date_input
+      find_by_test_id("old_start_date")
+    end
+
+    def old_end_date_input
+      find_by_test_id("old_end_date")
+    end
+
+    def new_start_date_input
+      find_by_test_id("new_start_date")
+    end
+
+    def new_end_date_input
+      find_by_test_id("new_end_date")
+    end
+
+    def progress_status_label
+      f("[data-testid='migrationStatus']")
+    end
+
+    def select_day_substition_range(index, from_weekday, to_weekday)
+      click_option("#day-substition-from-#{index}", from_weekday)
+      click_option("#day-substition-to-#{index}", to_weekday)
     end
   end
 end

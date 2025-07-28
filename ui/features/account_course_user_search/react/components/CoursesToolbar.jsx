@@ -19,20 +19,20 @@
 import React from 'react'
 import {arrayOf, string, bool, func, shape, oneOf} from 'prop-types'
 import {isEqual, groupBy, map, compact} from 'lodash'
-import {IconPlusLine} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconPlusLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import SearchableSelect from './SearchableSelect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
-import {propType as termsPropType} from '../store/TermsStore'
+import {propType as termsPropType, termType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 function termGroup(term) {
   if (term.start_at && new Date(term.start_at) > new Date()) return 'future'
@@ -55,16 +55,22 @@ const allTermsGroup = (
 )
 
 export default function CoursesToolbar({
-  can_create_courses,
-  terms,
+  can_create_courses = window.ENV &&
+    window.ENV.PERMISSIONS &&
+    window.ENV.PERMISSIONS.can_create_courses,
+  terms = {
+    data: [],
+    loading: false,
+  },
+  filteredTerms,
   onApplyFilters,
   onUpdateFilters,
-  isLoading,
+  isLoading = false,
   errors,
   draftFilters,
   toggleSRMessage,
 }) {
-  const groupedTerms = groupBy(terms.data, termGroup)
+  const groupedTerms = groupBy(filteredTerms, termGroup)
   const searchLabel =
     draftFilters.search_by === 'teacher'
       ? I18n.t('Search courses by teacher...')
@@ -86,10 +92,24 @@ export default function CoursesToolbar({
                 </SearchableSelect.Option>
               ))}
             </SearchableSelect.Group>
-          )
-      )
-    )
+          ),
+      ),
+    ),
   )
+  const renderClearButton = () =>
+    draftFilters.search_term.length ? (
+      <IconButton
+        type="button"
+        size="small"
+        data-testid="clear-search"
+        withBackground={false}
+        withBorder={false}
+        screenReaderLabel="Clear search"
+        onClick={() => onUpdateFilters({search_term: ''})}
+      >
+        <IconTroubleLine />
+      </IconButton>
+    ) : undefined
 
   return (
     <div>
@@ -106,7 +126,7 @@ export default function CoursesToolbar({
                       isLoading={terms.loading}
                       label={<ScreenReaderContent>{I18n.t('Filter by term')}</ScreenReaderContent>}
                       value={draftFilters.enrollment_term_id}
-                      onChange={(e, {value}) => onUpdateFilters({enrollment_term_id: value})}
+                      onChange={(_e, {value}) => onUpdateFilters({enrollment_term_id: value})}
                     >
                       {termOptions}
                     </SearchableSelect>
@@ -116,7 +136,7 @@ export default function CoursesToolbar({
                       id="searchByFilter"
                       label={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
                       value={draftFilters.search_by || 'course'}
-                      onChange={(e, value) => onUpdateFilters({search_by: value})}
+                      onChange={(_e, value) => onUpdateFilters({search_by: value})}
                     >
                       <CanvasSelect.Group
                         key="search"
@@ -135,6 +155,10 @@ export default function CoursesToolbar({
                   <Grid.Col width={6}>
                     <TextInput
                       type="search"
+                      renderBeforeInput={
+                        <IconSearchLine inline={false} data-testid="icon-search-line" />
+                      }
+                      renderAfterInput={renderClearButton()}
                       renderLabel={<ScreenReaderContent>{searchLabel}</ScreenReaderContent>}
                       value={draftFilters.search_term}
                       placeholder={searchLabel}
@@ -156,9 +180,16 @@ export default function CoursesToolbar({
                   <Grid.Col width="auto">
                     <Checkbox
                       checked={isEqual(draftFilters.enrollment_type, ['student'])}
-                      onChange={e =>
-                        onUpdateFilters({enrollment_type: e.target.checked ? ['student'] : null})
-                      }
+                      onChange={e => {
+                        const isChecked = e.target.checked
+
+                        onUpdateFilters({
+                          enrollment_type: isChecked ? ['student'] : null,
+                          enrollment_workflow_state: isChecked
+                            ? ['active', 'invited', 'pending', 'creation_pending']
+                            : null,
+                        })
+                      }}
                       label={I18n.t('Hide courses without students')}
                     />
                   </Grid.Col>
@@ -182,8 +213,7 @@ export default function CoursesToolbar({
             {can_create_courses && (
               <Grid.Col width="auto">
                 <NewCourseModal terms={terms}>
-                  <Button aria-label={I18n.t('Create new course')}>
-                    <IconPlusLine />
+                  <Button renderIcon={IconPlusLine} aria-label={I18n.t('Create new course')}>
                     {I18n.t('Course')}
                   </Button>
                 </NewCourseModal>
@@ -201,10 +231,10 @@ CoursesToolbar.propTypes = {
   can_create_courses: bool,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
-  isLoading: bool.isRequired,
+  isLoading: bool,
   draftFilters: shape({
     enrollment_type: arrayOf(
-      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired
+      oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired,
     ),
     search_by: oneOf(['course', 'teacher']).isRequired,
     search_term: string.isRequired,
@@ -212,14 +242,5 @@ CoursesToolbar.propTypes = {
   }).isRequired,
   errors: shape({search_term: string}).isRequired,
   terms: termsPropType,
-}
-
-CoursesToolbar.defaultProps = {
-  can_create_courses:
-    window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_courses,
-  terms: {
-    data: [],
-    loading: false,
-  },
-  isLoading: false,
+  filteredTerms: arrayOf(termType).isRequired,
 }

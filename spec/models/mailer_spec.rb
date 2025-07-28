@@ -69,15 +69,14 @@ describe Mailer do
     end
 
     it "sends stat to stat service" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
       message = message_model(to: "someemail@example.com")
       mail = Mailer.create_message(message)
       expect(mail).to receive(:deliver_now)
       Mailer.deliver(mail)
-      expect(InstStatsd::Statsd).to have_received(:increment).with(
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
         "message.deliver",
-        { short_stat: "message.deliver",
-          tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" } }
+        { tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" } }
       )
     end
 
@@ -88,6 +87,19 @@ describe Mailer do
       expect(mail).not_to receive(:deliver_now)
       expect(Services::NotificationService).to receive(:process)
       Mailer.deliver(mail)
+    end
+
+    it "truncate display name if it exceeds the maximum email display name length" do
+      message = message_model
+      # Latin should have a 1 for 1 byte ratio
+      message.from_name = "Maior pars mortalium, Pauline, de naturae malignitate conqueritur, quod in exiguum aeui gignimur, quod haec tam uelociter, tam rapide dati nobis temporis spatia decurrant, adeo ut exceptis admodum paucis ceteros in ipso uitae apparatu uita destituat. Nec huic publico, ut opinantur, malo turba tantum et imprudens uulgus ingemuit; clarorum quoque uirorum hic affectus querellas euocauit. "
+      mail = Mailer.create_message(message)
+      expect(mail.header["From"].to_s.bytesize).to be <= Mailer::MAX_EMAIL_DISPLAY_NAME_BYTE
+
+      # non latin chars should have a 4 for 1 byte ratio
+      message.from_name = "𓄿𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅀𓅁𓅂𓅃𓅄𓅅𓅆𓅇𓅈𓅉𓅊𓅋𓅌𓅍𓅎𓅏𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅠𓅡𓅢𓅣𓅤𓅥𓅦𓅧𓅨𓅩𓅪𓅫𓅬𓅭𓅮𓅯𓅰𓅱𓄿𓅲𓅳𓅴𓅵𓅶𓆐𓅷𓅸𓅹𓅺𓅻𓅼𓆀𓆁𓆂𓅽𓅾𓅿𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓄿𓄿𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅀𓅁𓅂𓅃𓅄𓅅𓅆𓅇𓅈𓅉𓅊𓅋𓅌𓅍𓅎𓅏𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅠𓅡𓅢𓅣𓅤𓅥𓅦𓅧𓅨𓅩𓅪𓅫𓅬𓅭𓅮𓅯𓅰𓅱𓄿𓅲𓅳𓅴𓅵𓅶𓆐𓅷𓅸𓅹𓅺𓅻𓅼𓆀𓆁𓆂𓅽𓅾𓅿𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓄿𓄿𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅀𓅁𓅂𓅃𓅄𓅅𓅆𓅇𓅈𓅉𓅊𓅋𓅌𓅍𓅎𓅏𓅐𓅑𓅒𓅓𓅔𓅕𓅖𓅗𓅘𓅙𓅚𓅛𓅜𓅝𓅞𓅟𓅠𓅡𓅢𓅣𓅤𓅥𓅦𓅧𓅨𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅩𓅪𓅫𓅬𓅭𓅮𓅯𓅰𓅱𓄿𓅲𓅳𓅴𓅵𓅶𓆐𓅷𓅸𓅹𓅺𓅻𓅼𓆀𓆁𓆂𓅽𓅾𓅿𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓃠𓄿"
+      mail = Mailer.create_message(message)
+      expect(mail.header["From"].to_s.bytesize).to be <= Mailer::MAX_EMAIL_DISPLAY_NAME_BYTE
     end
   end
 end

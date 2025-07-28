@@ -533,7 +533,47 @@ describe AssignmentOverridesController, type: :request do
         @assignment.save!
 
         raw_api_create_override(@course, @assignment, assignment_override: { group_id: @group.id })
-        expect_error("group_id is not valid for non-group assignments")
+        expect_error("group_id is not valid")
+      end
+
+      context "differentiation tags" do
+        before do
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @course.account.save!
+          @course.account.reload
+
+          @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+          @group_category.create_groups(1)
+          @differentiation_tag_group_1 = @group_category.groups.first
+        end
+
+        def assert_differentiation_tag_is_assigned
+          api_create_override(@course, @assignment, assignment_override: { group_id: @differentiation_tag_group_1.id })
+
+          @override = @assignment.assignment_overrides.reload.first
+          expect(@override).not_to be_nil
+          expect(@override.set).to eq @differentiation_tag_group_1
+        end
+
+        it "assigns differentiation tag group to group assignment" do
+          assert_differentiation_tag_is_assigned
+        end
+
+        it "assigns differentiation tag group to non group assignment" do
+          @assignment.group_category = nil
+          @assignment.save!
+
+          assert_differentiation_tag_is_assigned
+        end
+
+        it "errors if differentiation tags are not enabled" do
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          @course.account.save!
+
+          raw_api_create_override(@course, @assignment, assignment_override: { group_id: @differentiation_tag_group_1.id })
+          expect_error("group_id is not valid")
+        end
       end
     end
 
@@ -610,7 +650,7 @@ describe AssignmentOverridesController, type: :request do
       @override.save!
 
       raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id })
-      expect_errors("set_id" => [{ "message" => "taken", "attribute" => "set_id", "type" => "taken" }])
+      expect_errors("set_id" => [{ "message" => "has already been taken", "attribute" => "set_id", "type" => "taken" }])
     end
 
     it "errors if you try and duplicate a student in an adhoc set" do
@@ -1307,7 +1347,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails for user without permissions" do
         student_in_course
-        call_batch_update({ @a.id => [{ id: @a1.id, due_at: Time.zone.now.to_s }] }, expected_status: 401)
+        call_batch_update({ @a.id => [{ id: @a1.id, due_at: Time.zone.now.to_s }] }, expected_status: 403)
       end
 
       it "fails if ids not present" do

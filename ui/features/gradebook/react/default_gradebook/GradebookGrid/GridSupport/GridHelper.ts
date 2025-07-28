@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,10 +19,12 @@
 export default class GridHelper {
   grid: any
 
+  // @ts-expect-error
   constructor(grid) {
     this.grid = grid
   }
 
+  // @ts-expect-error
   getColumnHeaderNode(columnId) {
     return document.getElementById(this.grid.getUID() + columnId)
   }

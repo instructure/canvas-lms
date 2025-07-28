@@ -18,12 +18,18 @@
 
 import React from 'react'
 import {render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
-import moxios from 'moxios'
+import {MockedProvider} from '@apollo/client/testing'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '@canvas/outcomes/graphql/MasteryScale'
 import MasteryScale from '../index'
 import {masteryScalesGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
+import {useAllPages} from '@canvas/query'
+
+jest.mock('@canvas/query', () => ({
+  useAllPages: jest.fn(),
+}))
 
 jest.useFakeTimers()
 
@@ -58,57 +64,81 @@ describe('MasteryScale', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '11', mocks = masteryScalesGraphqlMocks} = {}
+    {contextType = 'Account', contextId = '11', mocks = masteryScalesGraphqlMocks} = {},
   ) => {
     return rtlRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider mocks={mocks}>{children}</MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
   it('loads proficiency data', async () => {
-    const {getByText, getByDisplayValue} = render(<MasteryScale />)
-    expect(getByText('Loading')).toBeInTheDocument()
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
+    const {getByDisplayValue} = render(<MasteryScale />)
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads proficiency data to Course', async () => {
-    const {getByText, getByDisplayValue} = render(
-      <MasteryScale contextType="Course" contextId="12" />,
-      {contextType: 'Course', contextId: '12'}
-    )
-    expect(getByText('Loading')).toBeInTheDocument()
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
+    const {getByDisplayValue} = render(<MasteryScale contextType="Course" contextId="12" />, {
+      contextType: 'Course',
+      contextId: '12',
+    })
     await waitFor(() => expect(getByDisplayValue(/Rating A/)).toBeInTheDocument())
   })
 
   it('loads role list', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
     const {getByText, getAllByText} = render(<MasteryScale />)
-    expect(getByText('Loading')).toBeInTheDocument()
     await waitFor(() => {
       expect(
-        getByText(/Permission to change this mastery scale at the account level is enabled for/)
+        getByText(/Permission to change this mastery scale at the account level is enabled for/),
       ).toBeInTheDocument()
       expect(
-        getByText(/Permission to change this mastery scale at the course level is enabled for/)
+        getByText(/Permission to change this mastery scale at the course level is enabled for/),
       ).toBeInTheDocument()
-      expect(getAllByText(/Account Admin/).length).not.toBe(0)
+      expect(getAllByText(/Account Admin/)).not.toHaveLength(0)
       expect(getByText(/Teacher/)).toBeInTheDocument()
     })
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(<MasteryScale />, {mocks: []})
+    useAllPages.mockReturnValue({
+      data: {},
+      isError: true,
+      isLoading: false,
+    })
+
+    const {getByText} = render(<MasteryScale />)
     await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 
   it('loads default data when request returns no ratings/method', async () => {
+    useAllPages.mockReturnValue({
+      data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+      isError: false,
+      isLoading: false,
+    })
     const emptyMocks = [
       {
         request: {
           query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
             contextId: '11',
+            proficiencyRatingsCursor: null,
           },
         },
         result: {
@@ -126,14 +156,26 @@ describe('MasteryScale', () => {
   })
 
   describe('update outcomeProficiency', () => {
-    beforeEach(() => {
-      moxios.install()
-    })
-    afterEach(() => {
-      moxios.uninstall()
-    })
+    const server = setupServer()
+
+    beforeAll(() => server.listen())
+    afterEach(() => server.resetHandlers())
+    afterAll(() => server.close())
 
     it('submits a request when ratings are saved', async () => {
+      let requestUrl = null
+      server.use(
+        http.post('/api/v1/accounts/11/outcome_proficiency', ({request}) => {
+          requestUrl = request.url
+          return HttpResponse.json({})
+        }),
+      )
+
+      useAllPages.mockReturnValue({
+        data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+        isError: false,
+        isLoading: false,
+      })
       const {findAllByLabelText, getByText} = render(<MasteryScale />)
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
       fireEvent.change(pointsInput, {target: {value: '100'}})
@@ -141,9 +183,8 @@ describe('MasteryScale', () => {
       fireEvent.click(getByText('Save'))
 
       await waitFor(() => {
-        const request = moxios.requests.mostRecent()
-        expect(request).not.toBeUndefined()
-        expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
+        expect(requestUrl).not.toBeNull()
+        expect(requestUrl).toContain('/api/v1/accounts/11/outcome_proficiency')
       })
     })
   })
@@ -160,14 +201,18 @@ describe('MasteryScale', () => {
     })
 
     it('hides mastery info', async () => {
+      useAllPages.mockReturnValue({
+        data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
+        isError: false,
+        isLoading: false,
+      })
       const {getByText, queryByText} = render(<MasteryScale />)
-      expect(getByText('Loading')).toBeInTheDocument()
       await waitFor(() =>
         expect(
           queryByText(
-            /This mastery scale will be used as the default for all courses within your account/
-          )
-        ).not.toBeInTheDocument()
+            /This mastery scale will be used as the default for all courses within your account/,
+          ),
+        ).not.toBeInTheDocument(),
       )
     })
   })

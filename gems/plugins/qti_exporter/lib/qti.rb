@@ -22,8 +22,8 @@ require "shellwords"
 
 module Qti
   PYTHON_MIGRATION_EXECUTABLE = "migrate.py"
-  EXPECTED_LOCATION = Rails.root.join("vendor/QTIMigrationTool", PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
-  EXPECTED_LOCATION_ALT = Rails.root.join("vendor/qti_migration_tool", PYTHON_MIGRATION_EXECUTABLE).to_s rescue nil
+  EXPECTED_LOCATION = Rails.root.join("vendor/QTIMigrationTool", PYTHON_MIGRATION_EXECUTABLE).to_s
+  EXPECTED_LOCATION_ALT = Rails.root.join("vendor/qti_migration_tool", PYTHON_MIGRATION_EXECUTABLE).to_s
   @migration_executable = nil
 
   if File.exist?(EXPECTED_LOCATION)
@@ -78,7 +78,7 @@ module Qti
         nq_assessment_path = opts[:package_root].item_path("non_cc_assessments/#{a[:migration_id]}.xml.qti")
         if File.exist?(nq_assessment_path)
           nq_assessment_file = Nokogiri::XML(File.open(nq_assessment_path))
-          is_qti_new_quiz = !nq_assessment_file.css("questestinterop assessment").first.attr("external_assignment_id").nil?
+          is_qti_new_quiz = nq_assessment_file.css("questestinterop assessment").first.attr("external_assignment_id").present?
           a[:qti_new_quiz] = true if is_qti_new_quiz
         end
       end

@@ -45,7 +45,7 @@ export const fillAssessment = (rubric, partialAssessment, assessmentDefaults) =>
     ...assessmentDefaults,
     ...partialAssessment,
     data: rubric.criteria.map(c =>
-      _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id)
+      _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id),
     ),
   }
 }

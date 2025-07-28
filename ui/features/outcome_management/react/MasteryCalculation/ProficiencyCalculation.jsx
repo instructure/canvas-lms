@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -35,7 +35,7 @@ import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('MasteryScale')
+const I18n = createI18nScope('MasteryScale')
 
 const defaultCalculationMethod = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
   ? 'weighted_average'
@@ -81,14 +81,14 @@ const CalculationIntInput = ({
 
   const errorMessages = []
   if (calculationInt === '') {
-    errorMessages.push({text: I18n.t('Must be a number'), type: 'error'})
+    errorMessages.push({text: I18n.t('Must be a number'), type: 'newError'})
   } else if (!validInt(calculationMethod, calculationInt)) {
     errorMessages.push({
       text: I18n.t('Must be between %{lower} and %{upper}', {
         lower: calculationMethod.validRange[0],
         upper: calculationMethod.validRange[1],
       }),
-      type: 'error',
+      type: 'newError',
     })
   }
 
@@ -128,6 +128,7 @@ const CalculationIntInput = ({
   } else {
     return (
       <NumberInput
+        allowStringValue={true}
         renderLabel={() => I18n.t('Parameter')}
         value={typeof calculationInt === 'number' ? calculationInt : ''}
         messages={errorMessages}
@@ -205,7 +206,7 @@ const Form = ({
   >
     <ScreenReaderContent>
       {I18n.t(
-        'See example below to see how different calculation parameters affect student mastery calculation.'
+        'See example below to see how different calculation parameters affect student mastery calculation.',
       )}
     </ScreenReaderContent>
     <SimpleSelect
@@ -266,21 +267,23 @@ const getModalText = contextType => {
     return I18n.t('This will update all student mastery results within this course.')
   }
   return I18n.t(
-    'This will update all student mastery results tied to the account level mastery calculation.'
+    'This will update all student mastery results tied to the account level mastery calculation.',
   )
 }
 
 const ProficiencyCalculation = ({
-  method,
-  update,
-  updateError,
+  method = defaultProficiencyCalculation,
+  update = () => {},
+  updateError = null,
   canManage,
   onNotifyPendingChanges,
   masteryPoints,
   individualOutcome,
   setError,
-  calcIntInputRef,
+  calcIntInputRef = () => {},
 }) => {
+  method = JSON.parse(JSON.stringify(method))
+
   const newDecayingAverageFF = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
 
   if (newDecayingAverageFF) {
@@ -333,7 +336,7 @@ const ProficiencyCalculation = ({
       updateCalculationInt(method.calculationInt)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method])
+  }, [method.calculationMethod, method.calculationInt])
 
   const [showAlert, setShowAlert] = useState(true)
 
@@ -345,7 +348,7 @@ const ProficiencyCalculation = ({
       })
       setShowAlert(false)
     }
-  }, [displayInvalidCalculationMethod, method, showAlert])
+  }, [displayInvalidCalculationMethod, method.calculationMethod, showAlert])
 
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,
@@ -409,8 +412,8 @@ const ProficiencyCalculation = ({
             individualOutcomeDisplay
               ? 'none'
               : individualOutcomeEdit
-              ? 'none medium none none'
-              : 'small'
+                ? 'none medium none none'
+                : 'small'
           }
         >
           {canManage ? (
@@ -486,13 +489,6 @@ ProficiencyCalculation.propTypes = {
   individualOutcome: PropTypes.oneOf(['display', 'edit']),
   setError: PropTypes.func,
   calcIntInputRef: PropTypes.func,
-}
-
-ProficiencyCalculation.defaultProps = {
-  method: defaultProficiencyCalculation,
-  updateError: null,
-  update: () => {},
-  calcIntInputRef: () => {},
 }
 
 export default ProficiencyCalculation

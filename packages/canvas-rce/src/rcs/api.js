@@ -17,7 +17,6 @@
  */
 
 import 'isomorphic-fetch'
-import {parse} from 'url'
 import {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
@@ -26,7 +25,7 @@ import {
 import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import alertHandler from '../rce/alertHandler'
 import buildError from './buildError'
-import RCEGlobals from '../rce/RCEGlobals'
+import {parseUrlPath} from '../util/url-util'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -73,7 +72,7 @@ function normalizeFileData(file) {
 
 function throwConnectionError(error) {
   if (error.name === 'TypeError') {
-    // eslint-disable-next-line no-console
+     
     console.error(`Failed to fetch from the canvas-rce-api.
       Did you forget to start it or configure it?
       Details can be found at https://github.com/instructure/canvas-rce-api
@@ -176,7 +175,7 @@ class RceApiSource {
       return {
         bookmark,
         files: files.map(f =>
-          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin),
         ),
       }
     })
@@ -186,18 +185,14 @@ class RceApiSource {
     const media = props.media[props.contextType]
     const uri = media.bookmark || this.uriFor('media', props)
 
-    if (RCEGlobals.getFeatures()?.media_links_use_attachment_id) {
-      return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
-        return {
-          bookmark,
-          files: files.map(f =>
-            fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
-          ),
-        }
-      })
-    }
-
-    return this.apiFetch(uri, headerFor(this.jwt))
+    return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
+      return {
+        bookmark,
+        files: files.map(f =>
+          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin),
+        ),
+      }
+    })
   }
 
   fetchFiles(uri) {
@@ -240,14 +235,14 @@ class RceApiSource {
 
   updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
     const uri =
-      RCEGlobals.getFeatures()?.media_links_use_attachment_id && attachment_id
+      attachment_id
         ? `${this.baseUri(
             'media_attachments',
-            apiProps.host
+            apiProps.host,
           )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
         : `${this.baseUri(
             'media_objects',
-            apiProps.host
+            apiProps.host,
           )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
     return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
   }
@@ -257,7 +252,7 @@ class RceApiSource {
   updateClosedCaptions(
     apiProps,
     {media_object_id, attachment_id, subtitles},
-    maxBytes = CONSTANTS.CC_FILE_MAX_BYTES
+    maxBytes = CONSTANTS.CC_FILE_MAX_BYTES,
   ) {
     const rcsConfig = {
       origin: originFromHost(apiProps.host),
@@ -348,7 +343,7 @@ class RceApiSource {
       return {
         bookmark,
         files: files.map(f =>
-          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+          fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin),
         ),
         searchString: props.searchString,
       }
@@ -388,7 +383,23 @@ class RceApiSource {
     }
     return fetch(preflightProps.upload_url, fetchOptions)
       .then(checkStatus)
-      .then(res => res.json())
+      .then(res => {
+        if (res.headers.get('content-type').includes('application/xml')) {
+          if (res.status === 201) {
+            return res.text().then(text => {
+              const xmldoc = new window.DOMParser().parseFromString(text, 'application/xml')
+              const location = xmldoc.querySelector('Location').textContent
+              return {
+                Location: location,
+              }
+            })
+          } else {
+            throw new Error('upload failed to create the file')
+          }
+        } else {
+          return res.json()
+        }
+      })
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
@@ -409,7 +420,7 @@ class RceApiSource {
       // response. we can't just fetch the location as would be intended because
       // it requires Canvas authentication. we also don't have an RCE API
       // endpoint to forward it through.
-      const {pathname} = parse(uploadResults.location)
+      const pathname = parseUrlPath(uploadResults.location)
       const matchData = pathname.match(/^\/api\/v1\/files\/((?:\d+~)?\d+)$/)
       if (!matchData) {
         const error = new Error('cannot determine file ID from location')
@@ -463,7 +474,7 @@ class RceApiSource {
 
     try {
       url = new URL(uri)
-    } catch (e) {
+    } catch (_e) {
       // Just return the URI if it was invalid
       return uri
     }
@@ -540,10 +551,10 @@ class RceApiSource {
       .catch(throwConnectionError)
       .catch(e =>
         e.response.json().then(responseBody => {
-          console.error(e) // eslint-disable-line no-console
+          console.error(e)  
           this.alertFunc(buildError(responseBody))
           throw e
-        })
+        }),
       )
   }
 
@@ -592,25 +603,25 @@ class RceApiSource {
     switch (endpoint) {
       case 'images':
         extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
-          searchString
+          searchString,
         )}${optionalQuery(props, 'category')}`
         break
       case 'media': // when requesting media files via the documents endpoint
         extra = `&content_types=video,audio${getSortParams(
           sortBy.sort,
-          sortBy.dir
+          sortBy.dir,
         )}${getSearchParam(searchString)}`
         break
       case 'documents':
         extra = `&exclude_content_types=image,video,audio${getSortParams(
           sortBy.sort,
-          sortBy.dir
+          sortBy.dir,
         )}${getSearchParam(searchString)}`
         break
       case 'media_objects': // when requesting media objects (this is the currently used branch)
         extra = `${getSortParams(
           sortBy.sort === 'alphabetical' ? 'title' : 'date',
-          sortBy.dir
+          sortBy.dir,
         )}${getSearchParam(searchString)}`
         break
       default:
@@ -619,7 +630,7 @@ class RceApiSource {
 
     return `${this.baseUri(
       endpoint,
-      host
+      host,
     )}?contextType=${contextType}&contextId=${contextId}${pageSizeParam}${extra}`
   }
 }

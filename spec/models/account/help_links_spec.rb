@@ -22,10 +22,6 @@ describe Account::HelpLinks do
   let(:account) { Account.create! }
   let(:subject) { Account::HelpLinks.new(account) }
 
-  before do
-    Account.site_admin.enable_feature! :featured_help_links
-  end
-
   describe ".instantiate_links" do
     it "calls procs" do
       links = [{ text: -> { "abc" } }]
@@ -86,15 +82,16 @@ describe Account::HelpLinks do
     end
 
     it "removes default values from default links" do
-      links = account.help_links.first(3).deep_dup
+      links = account.help_links.sort_by { |a| a[:id] }.deep_dup
       updates = [
         { text: "this is new text", subtext: "this is new subtext" },
         { url: "this is a new url" },
-        { feature_headline: "this is a new headline", is_new: true }
+        { feature_headline: "this is a new headline", is_new: true },
+        { url: "yet another new url" }
       ]
       links.zip(updates).each { |link, update| link.merge!(update) }
 
-      processed = subject.process_links_before_save(links)
+      processed = subject.process_links_before_save(links).sort_by { |a| a[:id] }
       non_trivial_text = processed.map { |link| link.slice(:text, :subtext, :url, :feature_headline, :is_new).compact }
       expect(non_trivial_text).to eq updates
     end
@@ -114,25 +111,6 @@ describe Account::HelpLinks do
     it "includes error if a link is marked new and featured" do
       links = [{ is_featured: false, is_new: false }, { is_featured: true, is_new: true }, { is_featured: false, is_new: false }]
       expect(described_class.validate_links(links)).to include(/cannot be featured and new/)
-    end
-  end
-
-  describe "with featured_help_links disabled" do
-    it "does not return featured_help_links fields" do
-      Account.site_admin.disable_feature! :featured_help_links
-      links = account.help_links
-      links.each do |link|
-        expect(link).not_to have_key(:is_featured)
-        expect(link).not_to have_key(:is_new)
-        expect(link).not_to have_key(:feature_headline)
-      end
-    end
-
-    it "does not return a link for covid resources" do
-      Account.site_admin.disable_feature! :featured_help_links
-      links = account.help_links
-      link_ids = links.pluck(:id)
-      expect(link_ids).not_to include(:covid)
     end
   end
 end

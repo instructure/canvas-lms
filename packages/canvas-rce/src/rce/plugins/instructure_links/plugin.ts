@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -212,14 +211,17 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
           text: item.text,
           value: item.value,
           onAction: () => doMenuItem(ed, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
+      // @ts-expect-error
       function handleNodeChange(e) {
         if (e?.element) {
           api.setActive(!!getAnchorElement(ed, e.element))
         }
-        api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        if (ed.selection) {
+          api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        }
       }
 
       // if the user selects all the content w/in a link and deletes it via the keyboard

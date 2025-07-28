@@ -1,0 +1,113 @@
+---
+# Main flag
+horizon_course_setting:
+  applies_to: Account
+  state: hidden
+  display_name: Canvas Career
+  description: |-
+    Enables the Canvas Career tab in account settings.
+  beta: true
+
+# Module Federation flags
+horizon_learning_provider_app_for_accounts:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Provider App (Account Contexts)"
+  description: |-
+    Enables the Canvas Career Learning Provider App in account contexts.
+horizon_learning_provider_app_for_courses:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Provider App (Course Contexts)"
+  description: |-
+    Enables the Canvas Career Learning Provider App in course contexts.
+horizon_learning_provider_app_on_contextless_routes:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learning Provider App (Contextless Routes)"
+  description: |-
+    Enables the Canvas Career Learning Provider App on contextless routes.
+horizon_learner_app:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Learner App"
+  description: |-
+    Enables the Learner app in Canvas Career on all routes.
+horizon_injected_config:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Injected Config"
+  description: |-
+    Injects config into the microfrontend at load time instead of fetching from the server.
+
+# Feature flags read by Horizon app
+horizon_crm_integration:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: CRM Integration"
+  description: |-
+    Enables the CRM integration settings in Canvas Career.
+horizon_leader_dashboards:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Leader Dashboards"
+  description: |-
+    Enables dashboards for leaders in Canvas Career.
+horizon_admin_dashboards:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Admin Dashboards"
+  description: |-
+    Enables dashboards for admins in Canvas Career.
+horizon_roles_and_permissions:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Roles & Permissions"
+  description: |-
+    Enables updated Roles & Permissions UI in Canvas Career.
+horizon_agent:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Agent"
+  description: |-
+    Enables the Career agent.
+horizon_content_library:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Content Library"
+  description: |-
+    Enables the Content Library in Canvas Career.
+horizon_program_management:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Program Management"
+  description: |-
+    Enables Program Management in Canvas Career.
+horizon_skill_management:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Skill Management"
+  description: |-
+    Enables Skill Management in Canvas Career.
+
+# Feature flags read by Canvas
+horizon_bulk_api_permission:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Manage Bulk API & Permission"
+  description: |-
+    Enables the ability to manage bulk API and permission settings in Canvas Career.

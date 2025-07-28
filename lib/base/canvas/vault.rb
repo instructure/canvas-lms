@@ -24,6 +24,10 @@ module Canvas::Vault
   class MissingVaultSecret < StandardError; end
 
   class << self
+    def cached?(path)
+      LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path).present?
+    end
+
     def read(path, required: true, cache: true)
       Rails.logger.info("Reading #{path} from vault")
       unless cache

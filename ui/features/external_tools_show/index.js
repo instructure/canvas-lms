@@ -16,3 +16,4 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import './jquery/tool_inline'
+import './react'

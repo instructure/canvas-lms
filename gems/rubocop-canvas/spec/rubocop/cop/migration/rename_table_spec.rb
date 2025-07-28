@@ -21,20 +21,20 @@ describe RuboCop::Cop::Migration::RenameTable do
   subject(:cop) { described_class.new }
 
   it "flags calls to rename_table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           rename_table :users, :shibes
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Renaming a table requires a multi-deploy process"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to include "Renaming a table requires a multi-deploy process"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "doesn't flag if the migration also drops a view using the new name" do
-    inspect_source(<<~'RUBY')
+    offenses = inspect_source(<<~'RUBY')
       class TestMigration < ActiveRecord::Migration
         def up
           execute("DROP VIEW #{connection.quote_table_name("shibes")}")
@@ -42,6 +42,6 @@ describe RuboCop::Cop::Migration::RenameTable do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

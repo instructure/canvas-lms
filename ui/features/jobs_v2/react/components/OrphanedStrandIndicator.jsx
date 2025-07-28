@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
@@ -28,7 +28,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function OrphanedStrandIndicator({name, type, onComplete}) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -133,7 +133,7 @@ export default function OrphanedStrandIndicator({name, type, onComplete}) {
         )}
         <Text>
           {I18n.t(
-            'This will set next_in_strand on the appropriate number of jobs to unblock the strand or singleton.'
+            'This will set next_in_strand on the appropriate number of jobs to unblock the strand or singleton.',
           )}
         </Text>
         <LoadingFeedback />

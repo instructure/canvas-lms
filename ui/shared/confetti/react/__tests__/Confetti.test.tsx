@@ -19,20 +19,19 @@
 import {render, act, fireEvent} from '@testing-library/react'
 import Confetti from '../Confetti'
 import React from 'react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.useFakeTimers()
 
 describe('Confetti', () => {
-  let originalEnv: any
   beforeEach(() => {
-    originalEnv = JSON.parse(JSON.stringify(window.ENV))
     act(() => {
       jest.advanceTimersByTime(10000)
     })
   })
 
   afterEach(() => {
-    window.ENV = originalEnv
+    fakeENV.teardown()
   })
 
   it('renders confetti', () => {
@@ -82,10 +81,9 @@ describe('Confetti', () => {
 
   describe('user has disabled celebrations', () => {
     it('does not render confetti', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeENV.setup({
         disable_celebrations: true,
-      }
+      })
       const {queryByTestId} = render(<Confetti />)
       expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
     })
@@ -93,10 +91,9 @@ describe('Confetti', () => {
 
   describe('user has enabled celebrations', () => {
     it('does render confetti', () => {
-      // @ts-expect-error
-      window.ENV = {
+      fakeENV.setup({
         disable_celebrations: false,
-      }
+      })
       const {queryByTestId} = render(<Confetti />)
       expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
     })

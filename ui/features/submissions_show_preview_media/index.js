@@ -17,14 +17,88 @@
 
 import $ from 'jquery'
 import '@canvas/media-comments'
+import CanvasStudioPlayer from '@canvas/canvas-studio-player'
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 
 $(document).ready(() => {
+  function isConsolidatedMediaPlayerEnabled() {
+    return ENV?.FEATURES?.consolidated_media_player
+  }
+
+  function renderStudioMediaPlayer(domId, media_id, type) {
+    const root = createRoot(document.getElementById(domId))
+    root?.render(
+      React.createElement(CanvasStudioPlayer, {
+        media_id: media_id,
+        type: type === 'audio' ? 'audio' : 'video',
+        explicitSize: {width: 480, height: 300},
+      }),
+    )
+  }
+
   $('.play_media_recording_link').click(function (event) {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()
-    $('#media_recording_box .box_content').mediaComment('show_inline', id)
+
+    if (isConsolidatedMediaPlayerEnabled()) {
+      const type = $('.play_media_recording_link').data('media_comment_type')
+      const domId = 'box_content'
+
+      renderStudioMediaPlayer(domId, id, type)
+    } else {
+      $('#media_recording_box .box_content').mediaComment('show_inline', id)
+    }
     $(this).remove()
   })
 
   $('.play_media_recording_link').mediaCommentThumbnail()
+
+  if (ENV.FEATURES?.discussion_checkpoints) {
+    $('#discussion_temporary_toggle').click(function (event) {
+      event.preventDefault()
+      window.parent.postMessage(
+        {
+          subject: 'SG.switchToFullContext',
+        },
+        '*',
+      )
+    })
+  }
+
+  function getEntryId(str) {
+    const match = str.match(/entryId=([^&]+)$/)
+    return match ? match[1] : null
+  }
+
+  if (ENV.FEATURES?.discussion_checkpoints) {
+    $("a[id^='discussion_link_entryId']").click(function (event) {
+      const entryId = getEntryId(event.target.id)
+      if (entryId) {
+        window.parent.postMessage(
+          {
+            subject: `SG.switchToFullContext&entryId=${entryId}`,
+          },
+          '*',
+        )
+      }
+    })
+  }
+
+  const discussionPreviewIframe = $('#discussion_preview_iframe')
+  discussionPreviewIframe.on('load', function () {
+    const iframeWindow = discussionPreviewIframe[0].contentWindow
+    if (iframeWindow) {
+      iframeWindow.addEventListener('message', function (event) {
+        if (event.data && event.data.subject === 'SG.switchToIndividualPosts') {
+          window.parent.postMessage(
+            {
+              subject: 'SG.switchToIndividualPosts',
+            },
+            '*',
+          )
+        }
+      })
+    }
+  })
 })

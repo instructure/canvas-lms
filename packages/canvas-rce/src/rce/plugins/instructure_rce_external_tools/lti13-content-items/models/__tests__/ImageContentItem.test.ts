@@ -46,7 +46,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('creates an image tag', () => {
     expect(imageContentItem().toHtmlString()).toEqual(
-      '<img src="https://www.test.com/image" alt="some text">'
+      '<img src="https://www.test.com/image" alt="some text">',
     )
   })
 
@@ -58,7 +58,7 @@ describe('toHtmlString', () => {
 
     it('sets the width and height', () => {
       expect(contentItem.toHtmlString()).toEqual(
-        '<img src="https://www.test.com/image" alt="some text" width="100%" height="200">'
+        '<img src="https://www.test.com/image" alt="some text" width="100%" height="200">',
       )
     })
   })
@@ -72,7 +72,7 @@ describe('toHtmlString', () => {
 
     it('creates a link to the image using the thumbnail', () => {
       expect(contentItem.toHtmlString()).toEqual(
-        '<a href="https://www.test.com/image" title="Title" target="_blank"><img src="http://www.test.com/thumbnail" alt="some text"></a>'
+        '<a href="https://www.test.com/image" title="Title" target="_blank"><img src="http://www.test.com/thumbnail" alt="some text"></a>',
       )
     })
   })

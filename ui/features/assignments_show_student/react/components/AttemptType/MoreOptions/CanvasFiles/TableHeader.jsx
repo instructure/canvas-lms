@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {shape, string} from 'prop-types'
 
@@ -24,11 +24,11 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const TableHeader = props => {
   const headerStyle = {
-    borderBottom: `1px solid ${theme.variables.colors.borderMedium}`,
+    borderBottom: `1px solid ${theme.colors.contrasts.grey1214}`,
   }
 
   const renderTableHeader = (name, size, key, grow) => (
@@ -52,7 +52,7 @@ const TableHeader = props => {
     <div style={headerStyle}>
       <Flex aria-hidden={true}>
         {tableHeadings.map((header, index) =>
-          renderTableHeader(header.name, header.size, index, header.grow)
+          renderTableHeader(header.name, header.size, index, header.grow),
         )}
       </Flex>
     </div>

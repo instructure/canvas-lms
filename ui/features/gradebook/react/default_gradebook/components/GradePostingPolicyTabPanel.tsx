@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -26,9 +25,9 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const {Item: ListItem} = List as any
 
@@ -51,11 +50,12 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     this.handlePostPolicySelected = this.handlePostPolicySelected.bind(this)
   }
 
+  // @ts-expect-error
   handlePostPolicySelected(_e, value) {
     if (value === AUTOMATIC_POST && this.props.anonymousAssignmentsPresent) {
       showFlashAlert({
         message: I18n.t(
-          'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.'
+          'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.',
         ),
         type: 'warning',
         err: null,
@@ -98,7 +98,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <View as="div">
             <Text size="small" as="p">
               {I18n.t(
-                'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:'
+                'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:',
               )}
             </Text>
 
@@ -112,7 +112,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
 
             <Text size="small" as="p">
               {I18n.t(
-                'Once a grade is posted manually, it will automatically send new notifications and be visible to students.'
+                'Once a grade is posted manually, it will automatically send new notifications and be visible to students.',
               )}
             </Text>
           </View>
@@ -135,6 +135,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <RadioInput
             name="postPolicy"
             id="GradePostingPolicyTabPanel__PostAutomatically"
+            data-testid="GradePostingPolicyTabPanel__PostAutomatically"
             label={automaticallyPostLabel}
             value={AUTOMATIC_POST}
             disabled={!this.props.gradebookIsEditable}
@@ -143,6 +144,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <RadioInput
             name="postPolicy"
             id="GradePostingPolicyTabPanel__PostManually"
+            data-testid="GradePostingPolicyTabPanel__PostManually"
             label={manuallyPostLabel}
             value={MANUAL_POST}
             disabled={!this.props.gradebookIsEditable}

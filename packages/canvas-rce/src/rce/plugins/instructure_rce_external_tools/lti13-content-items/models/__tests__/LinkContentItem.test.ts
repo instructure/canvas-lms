@@ -88,7 +88,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('correctly creates a link with the thumbnail', () => {
     expect(linkContentItem().toHtmlString()).toEqual(
-      '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+      '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>',
     )
   })
 
@@ -96,7 +96,7 @@ describe('toHtmlString', () => {
     const overrides = {thumbnail: {width: 123, height: 456, url: 'https://www.test.com/thumb'}}
     it('creates a link with a thumbnail with width and height', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumb" alt="some text" width="123" height="456"></a>'
+        '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumb" alt="some text" width="123" height="456"></a>',
       )
     })
   })
@@ -105,17 +105,17 @@ describe('toHtmlString', () => {
     const overrides = {thumbnail: undefined}
     it('creates an anchor tag with the correct values', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="https://www.test.com" title="Title" target="_blank">some text</a>'
+        '<a href="https://www.test.com" title="Title" target="_blank">some text</a>',
       )
     })
   })
 
   describe('when the link needs to be sanitized', () => {
-    // eslint-disable-next-line no-script-url
+     
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
+        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title" target="_blank"><img src="https://www.test.com/thumbnail" alt="some text"></a>',
       )
     })
   })
@@ -129,7 +129,7 @@ describe('toHtmlString', () => {
 
     it('returns markup for an iframe', () => {
       expect(linkContentItem({iframe}).toHtmlString()).toEqual(
-        '<iframe src="http://www.instructure.com" title="Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
+        '<iframe src="http://www.instructure.com" title="Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>',
       )
     })
   })

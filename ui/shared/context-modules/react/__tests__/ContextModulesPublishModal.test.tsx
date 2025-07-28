@@ -18,10 +18,12 @@
 
 import React from 'react'
 import {act, render} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import type doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishModal from '../ContextModulesPublishModal'
 
 jest.mock('@canvas/do-fetch-api-effect')
+
+const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
 
 const defaultProps = {
   isOpen: true,
@@ -41,11 +43,15 @@ const defaultProps = {
 }
 
 beforeAll(() => {
-  doFetchApi.mockResolvedValue({response: {ok: true}, json: {completed: []}})
+  mockDoFetchApi.mockResolvedValue({
+    response: new Response('', {status: 200}),
+    json: {completed: []},
+    text: '',
+  })
 })
 
 beforeEach(() => {
-  doFetchApi.mockClear()
+  mockDoFetchApi.mockClear()
 })
 
 afterEach(() => {
@@ -59,38 +65,38 @@ describe('ContextModulesPublishModal', () => {
     expect(modalTitle).toBeInTheDocument()
     expect(
       getByText(
-        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
-      )
+        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.',
+      ),
     ).toBeInTheDocument()
     expect(
       getByText(
-        'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.'
-      )
+        'To discontinue processing, click the Stop button. Note: Modules and items that have already been processed will not be reverted to their previous state when the process is discontinued.',
+      ),
     ).toBeInTheDocument()
   })
 
   it('renders warning text for bulk publish modules only', () => {
     const {getByRole, getByText} = render(
-      <ContextModulesPublishModal {...defaultProps} skippingItems={true} />
+      <ContextModulesPublishModal {...defaultProps} skippingItems={true} />,
     )
     const modalTitle = getByRole('heading', {name: 'Test Title'})
     expect(modalTitle).toBeInTheDocument()
     expect(
       getByText(
-        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.'
-      )
+        'This process could take a few minutes. You may close the modal or navigate away from the page during this process.',
+      ),
     ).toBeInTheDocument()
     expect(
       getByText(
-        'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.'
-      )
+        'To discontinue processing, click the Stop button. Note: Modules that have already been processed will not be reverted to their previous state when the process is discontinued.',
+      ),
     ).toBeInTheDocument()
   })
 
   it('calls onPublish when the publish button is clicked', () => {
     const onPublish = jest.fn()
     const {getByText} = render(
-      <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />
+      <ContextModulesPublishModal {...defaultProps} onPublish={onPublish} />,
     )
     const publishButton = getByText('Continue')
     act(() => publishButton.click())
@@ -100,7 +106,7 @@ describe('ContextModulesPublishModal', () => {
   it('has a close button', () => {
     const onDismiss = jest.fn()
     const {getByTestId} = render(
-      <ContextModulesPublishModal {...defaultProps} onDismiss={onDismiss} />
+      <ContextModulesPublishModal {...defaultProps} onDismiss={onDismiss} />,
     )
     const closeButton = getByTestId('close-button')
     act(() => closeButton.click())
@@ -117,7 +123,7 @@ describe('ContextModulesPublishModal', () => {
 
   it('disables the stop button if canceling', () => {
     const {getByTestId} = render(
-      <ContextModulesPublishModal {...defaultProps} isPublishing={true} isCanceling={true} />
+      <ContextModulesPublishModal {...defaultProps} isPublishing={true} isCanceling={true} />,
     )
     const publishButton = getByTestId('publish-button')
     expect(publishButton.textContent).toBe('Stop button. Click to discontinue processing.Stop')
@@ -126,7 +132,7 @@ describe('ContextModulesPublishModal', () => {
 
   it('displays publishing progress message when mode is publish', () => {
     const {getByText, queryByText} = render(
-      <ContextModulesPublishModal {...defaultProps} isPublishing={true} progressId={8} />
+      <ContextModulesPublishModal {...defaultProps} isPublishing={true} progressId={8} />,
     )
     expect(queryByText('Unpublish Progress')).not.toBeInTheDocument()
     expect(getByText('Publishing Progress')).toBeInTheDocument()
@@ -139,7 +145,7 @@ describe('ContextModulesPublishModal', () => {
         isPublishing={true}
         progressId={8}
         mode="unpublish"
-      />
+      />,
     )
     expect(getByText('Unpublish Progress')).toBeInTheDocument()
     expect(queryByText('Publishing Progress')).not.toBeInTheDocument()

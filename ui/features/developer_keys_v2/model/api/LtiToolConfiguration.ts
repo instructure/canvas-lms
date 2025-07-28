@@ -18,7 +18,7 @@
 
 import type {LtiPlacement} from '../LtiPlacements'
 import type {LtiPrivacyLevel} from '../LtiPrivacyLevel'
-import type {LtiScope} from '../LtiScopes'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 
 /// @see lib/schemas/lti/tool_configuration.rb
 export interface LtiToolConfiguration {
@@ -65,7 +65,8 @@ export interface PlatformSettings {
 
 export interface PlacementConfig {
   placement: LtiPlacement
-  enabled?: boolean
+  // TODO: make this just a boolean along with INTEROP-8921
+  enabled?: boolean | 'true' | 'false'
   message_type: string
   target_link_uri?: string
   text?: string

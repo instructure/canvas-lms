@@ -1,4 +1,3 @@
-// @ts-nocheck
 //
 // Copyright (C) 2023 - present Instructure, Inc.
 //
@@ -16,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-export default function preventDefault(fn) {
+export default function preventDefault(fn: Function) {
   return function (event: Event) {
     if (event) event.preventDefault()
     // @ts-expect-error

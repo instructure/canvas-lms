@@ -36,11 +36,13 @@ describe('BlackoutDatesModal', () => {
   })
 
   it('renders', () => {
-    const {getByRole} = render(<NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />)
+    const {getByRole, getByText} = render(
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
+    )
 
     expect(getByRole('textbox', {name: 'Event Title'})).toBeInTheDocument()
-    expect(getByRole('combobox', {name: 'Start Date'})).toBeInTheDocument()
-    expect(getByRole('combobox', {name: 'End Date'})).toBeInTheDocument()
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
     const addBtn = getByRole('button', {name: 'Add'})
     expect(addBtn).toBeInTheDocument()
     act(() => addBtn.click())
@@ -49,7 +51,7 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing event title', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Title required')).not.toBeInTheDocument()
 
@@ -66,11 +68,11 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing start date', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Date required')).not.toBeInTheDocument()
 
-    const dateInput = getByRole('combobox', {name: 'Start Date'})
+    const dateInput = getByText('Start Date')
     const addBtn = getByRole('button', {name: 'Add'})
     act(() => dateInput.focus())
     act(() => addBtn.focus())
@@ -82,11 +84,11 @@ describe('BlackoutDatesModal', () => {
 
   it('shows error message for missing start date when end date blurs', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Date required')).not.toBeInTheDocument()
 
-    const dateInput = getByRole('combobox', {name: 'End Date'})
+    const dateInput = getByText('End Date')
     const addBtn = getByRole('button', {name: 'Add'})
     act(() => dateInput.focus())
     act(() => addBtn.focus())
@@ -97,13 +99,13 @@ describe('BlackoutDatesModal', () => {
   })
 
   it('shows error message when end date is before start date', () => {
-    const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+    const {getByRole, getByTestId, queryByText} = render(
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('End date cannot be before start date')).not.toBeInTheDocument()
 
-    const startDateInput = getByRole('combobox', {name: 'Start Date'})
-    const endDateInput = getByRole('combobox', {name: 'End Date'})
+    const startDateInput = getByTestId('new-blackout-dates-start')
+    const endDateInput = getByTestId('new-blackout-dates-end')
     const addBtn = getByRole('button', {name: 'Add'})
     act(() => startDateInput.focus())
     act(() => {
@@ -115,14 +117,14 @@ describe('BlackoutDatesModal', () => {
     })
     act(() => addBtn.focus())
 
-    expect(getByText('End date cannot be before start date')).toBeInTheDocument()
+    expect(queryByText('End date cannot be before start date')).toBeInTheDocument()
     act(() => addBtn.click())
     expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows title and start date errors when fields are empty and Add button gets focus', () => {
     const {getByRole, getByText, queryByText} = render(
-      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
     )
     expect(queryByText('Title required')).not.toBeInTheDocument()
     expect(queryByText('Date required')).not.toBeInTheDocument()
@@ -137,9 +139,11 @@ describe('BlackoutDatesModal', () => {
   })
 
   it('enables Add when data is provided', () => {
-    const {getByRole} = render(<NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />)
+    const {getByRole, getByTestId} = render(
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />,
+    )
     const titleInput = getByRole('textbox', {name: 'Event Title'})
-    const startDateInput = getByRole('combobox', {name: 'Start Date'})
+    const startDateInput = getByTestId('new-blackout-dates-start')
     const addBtn = getByRole('button', {name: 'Add'})
     act(() => titleInput.focus())
     act(() => {

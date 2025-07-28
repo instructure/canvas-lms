@@ -19,11 +19,14 @@
 
 class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
   AggregateSubmission = Struct.new(
+    :excused,
     :grade,
     :graded_at,
     :graded_anonymously,
     :grader_id,
     :grade_matches_current_submission,
+    :grading_period_id,
+    :late_policy_status,
     :published_grade,
     :published_score,
     :posted_at,
@@ -43,7 +46,7 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
   def call
     return false unless checkpoint_aggregation_supported?(@assignment)
 
-    parent_submission = @assignment.submissions.find_by(user: @student)
+    parent_submission = @assignment.find_or_create_submission(@student)
     submissions = @assignment.sub_assignment_submissions.where(user: @student).order(updated_at: :desc).to_a
     return false if parent_submission.nil? || submissions.empty?
 
@@ -67,7 +70,10 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
       submission.grader_id = most_recently_graded.grader_id
     end
 
+    submission.excused = submissions.any?(&:excused)
     submission.grade = grade(submissions, submission.score)
+    submission.grading_period_id = shared_attribute(submissions, :grading_period_id, nil)
+    submission.late_policy_status = calculate_late_policy_status(submissions)
     submission.published_grade = grade(submissions, submission.published_score)
     submission.grade_matches_current_submission = calculate_grade_matches_current_submission(submissions)
     submission.posted_at = max_if_all_present(submissions, :posted_at)
@@ -102,6 +108,20 @@ class Checkpoints::SubmissionAggregatorService < Checkpoints::AggregatorService
   def calculate_grade_matches_current_submission(submissions)
     values = submissions.pluck(:grade_matches_current_submission)
     values.any?(false) ? false : values.compact.first
+  end
+
+  def calculate_late_policy_status(submissions)
+    values = submissions.pluck(:late_policy_status)
+    return "late" if any_submission_attribute?(submissions, :late?)
+    return "missing" if any_submission_attribute?(submissions, :missing?)
+    return "extended" if any_submission_attribute?(submissions, :extended?)
+    return "none" if values.include?("none")
+
+    nil
+  end
+
+  def any_submission_attribute?(submissions, attribute)
+    submissions.any? { |submission| submission.send(attribute) }
   end
 
   def shared_attribute(submissions, field_name, default)

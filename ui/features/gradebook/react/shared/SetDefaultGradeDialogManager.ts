@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -18,15 +17,15 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
 import type {Assignment, StudentMap} from '../../../../api.d'
 
-const I18n = useI18nScope('gradebooksharedSetDefaultGradeDialogManager')
+const I18n = createI18nScope('gradebooksharedSetDefaultGradeDialogManager')
 
 class SetDefaultGradeDialogManager {
-  assignment: Assignment
+  assignment: Pick<Assignment, 'id' | 'grades_published' | 'inClosedGradingPeriod'>
 
   isAdmin: boolean
 
@@ -41,13 +40,13 @@ class SetDefaultGradeDialogManager {
   getStudents: (assignmentId: string) => StudentMap
 
   constructor(
-    assignment: Assignment,
+    assignment: Pick<Assignment, 'id' | 'grades_published' | 'inClosedGradingPeriod'>,
     getStudents: (assignmentId: string) => StudentMap,
     contextId: string,
     missingShortcutEnabled: boolean,
     selectedSection: string | null,
     isAdmin = false,
-    submissionsLoaded = false
+    submissionsLoaded = false,
   ) {
     this.assignment = assignment
     this.getStudents = getStudents
@@ -70,6 +69,7 @@ class SetDefaultGradeDialogManager {
     }
   }
 
+  // @ts-expect-error
   async showDialog(cb) {
     if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
       const SetDefaultGradeDialog = await AsyncComponents.loadSetDefaultGradeDialog()
@@ -80,8 +80,8 @@ class SetDefaultGradeDialogManager {
       $.flashError(
         I18n.t(
           'Unable to set default grade because this ' +
-            'assignment is due in a closed grading period for at least one student'
-        )
+            'assignment is due in a closed grading period for at least one student',
+        ),
       )
     }
   }

@@ -18,6 +18,53 @@
 
 import {z} from 'zod'
 import getCookie from '@instructure/get-cookie'
+import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
+import type {Submission} from 'api'
+
+export const ZUpdateSubmissionGradeParams = z.object({
+  assignmentId: z.string(),
+  userId: z.string(),
+  courseId: z.string(),
+  gradedAnonymously: z.boolean(),
+  grade: z.string().nullable(),
+  excuse: z.boolean(),
+  checkpointTag: z.string().nullable(),
+})
+
+type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
+
+export async function updateSubmissionGrade({
+  assignmentId,
+  userId,
+  courseId,
+  gradedAnonymously,
+  grade,
+  excuse,
+  checkpointTag,
+}: UpdateSubmissionGradeParams): Promise<any> {
+  if (checkpointTag) {
+    return updateCheckpointedSubmissionGrade({
+      checkpointTag,
+      courseId,
+      assignmentId,
+      studentId: userId,
+      grade,
+    })
+  }
+
+  return updateNonCheckpointedSubmissionGrade({
+    assignmentId,
+    userId,
+    courseId,
+    gradedAnonymously,
+    grade,
+    excuse,
+  })
+}
+
+/** *********************************************************** */
+/* Non-Checkpoint grading code below */
+/** *********************************************************** */
 
 function transform(result: any) {
   if (result.errors?.length > 0) {
@@ -30,45 +77,85 @@ function transform(result: any) {
       _id: submission.id,
       grade: submission.grade,
       score: submission.score,
+      gradingStatus: submission.grading_status,
     },
   }
 }
 
-export const ZUpdateSubmissionGradeParams = z.object({
+export const ZUpdateNonCheckpointSubmissionGradeParams = z.object({
   assignmentId: z.string(),
   userId: z.string(),
+  courseId: z.string(),
   gradedAnonymously: z.boolean(),
-  grade: z.string(),
+  grade: z.string().nullable(),
+  excuse: z.boolean(),
 })
 
-type UpdateSubmissionGradeParams = z.infer<typeof ZUpdateSubmissionGradeParams>
+type NonCheckpointSubmissionGradeParams = z.infer<typeof ZUpdateNonCheckpointSubmissionGradeParams>
 
-export async function updateSubmissionGrade({
+async function updateNonCheckpointedSubmissionGrade({
   assignmentId,
   userId,
+  courseId,
   gradedAnonymously,
   grade,
-}: UpdateSubmissionGradeParams): Promise<any> {
-  const data = {
+  excuse,
+}: NonCheckpointSubmissionGradeParams): Promise<any> {
+  const body: Record<any, any> = {
+    originator: 'speed_grader',
     submission: {
       assignment_id: assignmentId,
       user_id: userId,
       graded_anonymously: gradedAnonymously,
-      originator: 'speed_grader',
-      grade,
     },
   }
-
-  const response = await fetch('/courses/1/gradebook/update_submission', {
+  if (excuse) {
+    body.submission.excuse = excuse
+  } else {
+    body.submission.grade = grade
+  }
+  const {data} = await executeApiRequest<Submission>({
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      Accept: 'application/json',
+    path: `/courses/${courseId}/gradebook/update_submission`,
+    body,
+  })
+  return transform(data)
+}
+
+/** *********************************************************** */
+/* Checkpoint grading code below */
+/** *********************************************************** */
+
+const ZUpdateCheckpointSubmissionGradeParams = z.object({
+  checkpointTag: z.string(),
+  courseId: z.string(),
+  assignmentId: z.string(),
+  studentId: z.string(),
+  grade: z.string().nullable(),
+})
+
+type CheckpointSubmissionGradeParams = z.infer<typeof ZUpdateCheckpointSubmissionGradeParams>
+
+const updateCheckpointedSubmissionGrade = async ({
+  checkpointTag,
+  courseId,
+  assignmentId,
+  studentId,
+  grade,
+}: CheckpointSubmissionGradeParams): Promise<any> => {
+  const {data} = await executeApiRequest({
+    method: 'PUT',
+    path: `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`,
+    body: {
+      course_id: courseId,
+      sub_assignment_tag: checkpointTag,
+      submission: {
+        assignment_id: assignmentId,
+        user_id: studentId,
+        posted_grade: grade,
+      },
     },
-    body: JSON.stringify(data),
   })
 
-  const json = await response.json()
-  return transform(json)
+  return data
 }

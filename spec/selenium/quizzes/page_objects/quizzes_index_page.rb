@@ -27,6 +27,10 @@ module QuizzesIndexPage
     "#{quiz_settings_menu_selector(quiz_id)} .assign-to-link"
   end
 
+  def assign_to_card_selector
+    "[data-testid='item-assign-to-card']"
+  end
+
   def quiz_row_selector(quiz_id)
     "#summary_quiz_#{quiz_id}"
   end
@@ -57,7 +61,7 @@ module QuizzesIndexPage
   end
 
   def manage_quiz_menu(quiz_id)
-    f("button[aria-owns='ui-id-#{quiz_id}-1']")
+    f("button#btn-id-#{quiz_id}-1")
   end
 
   def quiz_settings_menu(quiz_id)

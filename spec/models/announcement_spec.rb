@@ -56,7 +56,7 @@ describe Announcement do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
-      announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: Time.now + 1.week))
+      announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: 1.week.from_now))
       announcement.workflow_state = "post_delayed"
       announcement.save!
 
@@ -76,7 +76,7 @@ describe Announcement do
       course_factory(active_all: true)
       att = attachment_model(context: @course)
       announcement = @course.announcements.create!(valid_announcement_attributes
-        .merge(delayed_post_at: Time.now + 1.week, workflow_state: "post_delayed", attachment: att))
+        .merge(delayed_post_at: 1.week.from_now, workflow_state: "post_delayed", attachment: att))
       att.reload
       expect(att).to be_locked
 
@@ -213,6 +213,26 @@ describe Announcement do
       expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
     end
 
+    it "does send a notification to the creator of the announcement after update" do
+      course_with_student(active_all: true)
+      Notification.create(name: "Announcement Created By You", category: "TestImmediately")
+
+      communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
+
+      @context = @course
+      announcement_model(user: @teacher, notify_users: true)
+      expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
+
+      message = "Updated message"
+      @a.update(message:)
+
+      sent_messages = @a.messages_sent["Announcement Created By You"].select { |m| m.id.present? }
+
+      expect(sent_messages.size).to eq(2)
+      expect(sent_messages.map(&:user)).to include(@teacher)
+      expect(sent_messages[1].body).to include(message)
+    end
+
     it "does not broadcast if read_announcements is diabled" do
       Account.default.role_overrides.create!(role: student_role, permission: "read_announcements", enabled: false)
       course_with_student(active_all: true)
@@ -242,6 +262,69 @@ describe Announcement do
       to_users = @a.messages_sent[notification_name].map(&:user)
       expect(to_users).to include(@student)
       expect(to_users).to_not include(other_student)
+    end
+
+    it "does not broadcast if it just got edited to active, if notify_users is false" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: false, context: @course)
+
+      expect do
+        @a.publish!
+      end.not_to change { @a.messages_sent[notification_name] }
+    end
+
+    it "still broadcasts if it just got edited to active, if notify_users is true" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: true, context: @course)
+
+      expect do
+        @a.publish!
+      end.to change { @a.messages_sent[notification_name] }
+    end
+
+    it "still broadcasts on delayed_post event even if notify_users was false" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      announcement_model(user: @teacher, workflow_state: :post_delayed, notify_users: false, context: @course)
+
+      expect do
+        @a.delayed_post
+      end.to change { @a.messages_sent[notification_name] }
+    end
+  end
+
+  describe "show_in_search_for_user?" do
+    shared_examples_for "expected_values_for_teacher_student" do |teacher_expected, student_expected|
+      it "returns #{teacher_expected} for teacher" do
+        expect(announcement.show_in_search_for_user?(@teacher)).to eq(teacher_expected)
+      end
+
+      it "returns #{student_expected} for student" do
+        expect(announcement.show_in_search_for_user?(@student)).to eq(student_expected)
+      end
+    end
+
+    let(:announcement) { @course.announcements.create!(message: "announcement") }
+
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+    end
+
+    include_examples "expected_values_for_teacher_student", true, true
+
+    context "when locked" do
+      let(:announcement) { @course.announcements.create!(message: "announcement", locked: true) }
+
+      include_examples "expected_values_for_teacher_student", true, false
     end
   end
 end

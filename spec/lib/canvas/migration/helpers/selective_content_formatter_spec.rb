@@ -64,7 +64,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                  { type: "wiki_pages", property: "copy[all_wiki_pages]", title: "Pages", count: 1, sub_items_url: "https://example.com?type=wiki_pages" },
                                                  { type: "context_external_tools", property: "copy[all_context_external_tools]", title: "External Tools", count: 1, sub_items_url: "https://example.com?type=context_external_tools" },
                                                  { type: "tool_profiles", property: "copy[all_tool_profiles]", title: "Tool Profiles", count: 1, sub_items_url: "https://example.com?type=tool_profiles" },
-                                                 { type: "learning_outcomes", property: "copy[all_learning_outcomes]", title: "Learning Outcomes", count: 1 },
+                                                 { type: "learning_outcomes", property: "copy[all_learning_outcomes]", title: "Learning Outcomes", count: 1, sub_items_url: "https://example.com?type=learning_outcomes" },
                                                  { type: "attachments", property: "copy[all_attachments]", title: "Files", count: 1, sub_items_url: "https://example.com?type=attachments" }]
     end
 
@@ -77,47 +77,37 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(@formatter.get_content_list("attachments").length).to eq 1
     end
 
-    context "selectable_outcomes_in_course_copy enabled" do
+    context "with learning_outcome_groups course data" do
       before do
-        @migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+        @overview["learning_outcome_groups"] = [{
+          "title" => "my group",
+          "migration_id" => "g1",
+          "child_groups" => []
+        }]
+        @overview["outcomes"].first["parent_migration_id"] = "g1"
+        allow(@migration).to receive(:read).and_return(@overview.to_json)
       end
 
-      after do
-        @migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+      it "arranges an outcome hiearchy" do
+        expect(@formatter.get_content_list("learning_outcomes")).to eq [
+          {
+            type: "learning_outcome_groups",
+            property: "copy[learning_outcome_groups][id_g1]",
+            title: "my group",
+            migration_id: "g1",
+            sub_items: [{
+              type: "learning_outcomes",
+              property: "copy[learning_outcomes][id_a1]",
+              title: "a1",
+              migration_id: "a1"
+            }]
+          }
+        ]
       end
+    end
 
-      context "with learning_outcome_groups course data" do
-        before do
-          @overview["learning_outcome_groups"] = [{
-            "title" => "my group",
-            "migration_id" => "g1",
-            "child_groups" => []
-          }]
-          @overview["outcomes"].first["parent_migration_id"] = "g1"
-          allow(@migration).to receive(:read).and_return(@overview.to_json)
-        end
-
-        it "arranges an outcome hiearchy" do
-          expect(@formatter.get_content_list("learning_outcomes")).to eq [
-            {
-              type: "learning_outcome_groups",
-              property: "copy[learning_outcome_groups][id_g1]",
-              title: "my group",
-              migration_id: "g1",
-              sub_items: [{
-                type: "learning_outcomes",
-                property: "copy[learning_outcomes][id_a1]",
-                title: "a1",
-                migration_id: "a1"
-              }]
-            }
-          ]
-        end
-      end
-
-      it "returns standard outcomes without learning_outcome_groups course data" do
-        expect(@formatter.get_content_list("learning_outcomes").length).to eq 1
-      end
+    it "returns standard outcomes without learning_outcome_groups course data" do
+      expect(@formatter.get_content_list("learning_outcomes").length).to eq 1
     end
 
     it "groups assignments into assignment groups" do
@@ -278,33 +268,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                     })
     end
 
-    context "with selectable_outcomes_in_course_copy disabled" do
-      before do
-        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
-        allow(@migration).to receive(:context).and_return(course_model)
-      end
-
-      it "lists top-level items" do
-        # groups should not show up even though there are some
-        expect(formatter.get_content_list).to match_array top_level_items
-      end
-
-      it "lists learning outcomes" do
-        outcomes = formatter.get_content_list("learning_outcomes")
-        expect(outcomes.pluck(:title)).to match_array(
-          %w[
-            alpaca
-            moonshine
-            speakeasy
-            zebra
-          ]
-        )
-      end
-    end
-
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
-        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
         allow(@migration).to receive(:context).and_return(course_model)
       end
 

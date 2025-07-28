@@ -62,7 +62,7 @@ const buildProps = options =>
         itemIdPath: 'COURSE_PACE_ID',
       },
     }[options.itemType],
-    options
+    options,
   )
 
 export default buildProps

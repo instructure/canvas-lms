@@ -33,7 +33,7 @@ const ConnectorIcon = props => (
           id="Alt-Move-Module-To-02"
           transform="translate(-1174.000000, -193.000000)"
           fillRule="nonzero"
-          fill="#A5AFB5"
+          fill="#6A7883"
         >
           <g id="Group" transform="translate(1174.000000, 193.000000)">
             <path

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from './utils'
 import {forEach, map} from 'lodash'
@@ -145,7 +145,7 @@ export function patch(Backbone) {
           return function (viewObj) {
             return _this[viewObj.name]
           }
-        })(this)
+        })(this),
       ))
     }
 
@@ -298,9 +298,9 @@ export function patch(Backbone) {
         selector = ref1.selector
         if (this[name] == null) {
           if (typeof console !== 'undefined' && console !== null) {
-            // eslint-disable-next-line no-console
+             
             if (typeof console.warn === 'function') {
-              // eslint-disable-next-line no-console
+               
               console.warn("I need a child view '" + name + "' but one was not provided")
             }
           }
@@ -340,7 +340,7 @@ export function patch(Backbone) {
               return $el.html(_this.format(attribute, value))
             })
           }
-        })(this)
+        })(this),
       )
     }
 
@@ -376,7 +376,7 @@ export function patch(Backbone) {
     // @api public
     View.mixin = function () {
       const mixins = arguments.length >= 1 ? slice.call(arguments, 0) : []
-      // eslint-disable-next-line prefer-spread
+       
       return mixin.apply(null, [this].concat(slice.call(mixins)))
     }
 

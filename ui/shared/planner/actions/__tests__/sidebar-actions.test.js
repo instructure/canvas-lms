@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable promise/catch-or-return */
-/* eslint-disable promise/no-callback-in-promise */
-
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {moxiosRespond} from '@canvas/jest-moxios-utils'
 import {initialize} from '../../utilities/alertUtils'
 
 import * as Actions from '../sidebar-actions'
@@ -32,21 +29,27 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`),
 }))
 
+const server = setupServer()
+
 beforeAll(() => {
   const alertSpy = jest.fn()
   initialize({visualErrorCallback: alertSpy})
+  server.listen()
 })
 
 beforeEach(() => {
-  moxios.install()
   MockDate.set('2018-01-01', 'UTC')
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   MockDate.reset()
   Actions.sidebarLoadNextItems.reset()
   Actions.maybeUpdateTodoSidebar.reset()
+})
+
+afterAll(() => {
+  server.close()
 })
 
 function mockGetState(overrides) {
@@ -90,92 +93,108 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expect.objectContaining(expected))
     const action = fakeDispatch.mock.calls[0][0]
     expect(action.payload.firstMoment.toISOString()).toBe(
-      today.clone().add(-2, 'weeks').toISOString()
+      today.clone().add(-2, 'weeks').toISOString(),
     )
   })
 
-  it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', done => {
-    expect.hasAssertions()
-    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    thunk(fakeDispatch, mockGetState())
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
+  it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
           status: 200,
           headers: {
+            'Content-Type': 'application/json',
             link: '</>; rel="current"',
           },
-          response: [{uniqueId: 1}, {uniqueId: 2}],
         })
-        .then(() => {
-          const expected = {
-            type: 'SIDEBAR_ITEMS_LOADED',
-            payload: {items: ['transformed-1', 'transformed-2'], nextUrl: null},
-          }
-          expect(fakeDispatch).toHaveBeenCalledWith(expected)
-          done()
-        })
-    })
-  })
+      }),
+    )
 
-  it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', done => {
-    expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    thunk(fakeDispatch, mockGetState())
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
+    await thunk(fakeDispatch, mockGetState())
+
+    const expected = {
+      type: 'SIDEBAR_ITEMS_LOADED',
+      payload: {items: ['transformed-1', 'transformed-2'], nextUrl: null},
+    }
+    expect(fakeDispatch).toHaveBeenCalledWith(expected)
+  })
+
+  it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
           status: 200,
           headers: {
+            'Content-Type': 'application/json',
             link: '</>; rel="next"',
           },
-          response: [{uniqueId: 1}, {uniqueId: 2}],
         })
-        .then(() => {
-          const expected = {
-            type: 'SIDEBAR_ITEMS_LOADED',
-            payload: {items: ['transformed-1', 'transformed-2'], nextUrl: '/'},
-          }
-          expect(fakeDispatch).toHaveBeenCalledWith(expected)
-          done()
-        })
-    })
-  })
+      }),
+    )
 
-  it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', done => {
-    expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    thunk(fakeDispatch, mockGetState({nextUrl: null}))
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
+    await thunk(fakeDispatch, mockGetState())
+
+    const expected = {
+      type: 'SIDEBAR_ITEMS_LOADED',
+      payload: {items: ['transformed-1', 'transformed-2'], nextUrl: '/'},
+    }
+    expect(fakeDispatch).toHaveBeenCalledWith(expected)
+  })
+
+  it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
           status: 200,
-          headers: {}, // no link header means we got them all
-          response: [{uniqueId: 1}, {uniqueId: 2}],
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .then(() => {
-          const expected = {
-            type: 'SIDEBAR_ITEMS_LOADED',
-            payload: {items: ['transformed-1', 'transformed-2'], nextUrl: null},
-          }
-          expect(fakeDispatch).toHaveBeenCalledWith(expected)
-          expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
-          done()
-        })
-    })
-  })
+      }),
+    )
 
-  it('continues to load if there are less than 14 incomplete items loaded', done => {
-    expect.hasAssertions()
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(fakeDispatch, mockGetState({nextUrl: null}))
+
+    const expected = {
+      type: 'SIDEBAR_ITEMS_LOADED',
+      payload: {items: ['transformed-1', 'transformed-2'], nextUrl: null},
+    }
+    expect(fakeDispatch).toHaveBeenCalledWith(expected)
+    expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
+  })
+
+  it('continues to load if there are less than 14 incomplete items loaded', async () => {
+    let requestCount = 0
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        requestCount++
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: requestCount === 1 ? '</>; rel="next"' : '',
+          },
+        })
+      }),
+      http.get('*/', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -188,55 +207,60 @@ describe('load items', () => {
           {completed: false},
           {completed: false},
         ],
-      })
+      }),
     )
-    moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
-      expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
-      expect(fakeDispatch).toHaveBeenCalledTimes(6)
-      const secondCallThunk = fakeDispatch.mock.calls[5][0]
-      expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems)
-      fakeDispatch.mockReset()
-      const secondFetchPromise = secondCallThunk(
-        fakeDispatch,
-        mockGetState({
-          nextUrl: '/',
-          items: [
-            {completed: true},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: true},
-            {completed: true},
-            {completed: true},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: false},
-            {completed: true},
-            {completed: true},
-          ],
-        })
-      )
-      return moxiosRespond([], secondFetchPromise).then(__response => {
-        // make sure we got here because another load happened.
-        // test times out if we don't get here.
-        done()
-      })
-    })
+
+    expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
+    expect(fakeDispatch).toHaveBeenCalledTimes(6)
+    const secondCallThunk = fakeDispatch.mock.calls[5][0]
+    expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems)
+    fakeDispatch.mockReset()
+    await secondCallThunk(
+      fakeDispatch,
+      mockGetState({
+        nextUrl: '/',
+        items: [
+          {completed: true},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: true},
+          {completed: true},
+          {completed: true},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: false},
+          {completed: true},
+          {completed: true},
+        ],
+      }),
+    )
   })
 
-  it('stops loading when it gets 14 incomplete items', () => {
-    expect.hasAssertions()
+  it('stops loading when it gets 14 incomplete items', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: '</>; rel="next"',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -255,18 +279,27 @@ describe('load items', () => {
           {completed: false},
           {completed: false},
         ],
-      })
+      }),
     )
-    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
-      expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-    })
+
+    expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
-  it('finishes loading even when there are less then 5 incomplete items', () => {
-    expect.hasAssertions()
+  it('finishes loading even when there are less then 5 incomplete items', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -277,67 +310,60 @@ describe('load items', () => {
           {completed: true},
           {completed: true},
         ],
-      })
+      }),
     )
-    return moxiosRespond([], fetchPromise).then(_response => {
-      expect(fakeDispatch).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'SIDEBAR_ENOUGH_ITEMS_LOADED',
-        })
-      )
-    })
+
+    expect(fakeDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'SIDEBAR_ENOUGH_ITEMS_LOADED',
+      }),
+    )
   })
 
-  it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', done => {
-    expect.hasAssertions()
-    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
-    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    thunk(fakeDispatch, mockGetState())
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      request
-        .respondWith({
+  it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify({error: 'Something terrible'}), {
           status: 500,
-          response: {error: 'Something terrible'},
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .then(() => {
-          expect(fakeDispatch).toHaveBeenCalledWith(
-            expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true})
-          )
-          done()
-        })
-    })
+      }),
+    )
+
+    const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
+    const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
+    await thunk(fakeDispatch, mockGetState())
+
+    expect(fakeDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),
+    )
   })
 })
 
 describe('fetch more items', () => {
-  it('resumes loading when there are less than the desired number of incomplete items', () => {
-    expect.hasAssertions()
+  it('resumes loading when there are less than the desired number of incomplete items', async () => {
     const mockDispatch = jest.fn()
     const mockGs = mockGetState({nextUrl: '/', items: generateItems(13)})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs).then(() => {
-      expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-    })
+    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, mockGs)
+    expect(mockDispatch).toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
-  it('will not resume loading if desired number of items is loaded', () => {
-    expect.hasAssertions()
+  it('will not resume loading if desired number of items is loaded', async () => {
     const mockDispatch = jest.fn()
     const gs = mockGetState({nextUrl: '/', items: generateItems(14)})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs).then(() => {
-      expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-    })
+    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
+    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
-  it('will not resume loading if all items are loaded', () => {
-    expect.hasAssertions()
+  it('will not resume loading if all items are loaded', async () => {
     const mockDispatch = jest.fn()
     const gs = mockGetState({nextUrl: null})
     const savedItemPromise = new Promise(resolve => resolve({item: {completed: true}}))
-    return Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs).then(() => {
-      expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
-    })
+    await Actions.maybeUpdateTodoSidebar(savedItemPromise)(mockDispatch, gs)
+    expect(mockDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 })

@@ -32,7 +32,7 @@ export const alignmentShape = PropTypes.shape({
     PropTypes.shape({
       _id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-    })
+    }),
   ),
   alignmentsCount: PropTypes.number.isRequired,
 })
@@ -60,7 +60,7 @@ export const groupDataShape = PropTypes.shape({
           description: PropTypes.string,
           alignments: PropTypes.arrayOf(alignmentShape),
         }),
-      })
+      }),
     ),
   }),
 })

@@ -59,17 +59,13 @@ module Courses
         opts = { user_id: user_ids, course_id: [id] }
         case item_type
         when :assignment
-          AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)
+          AssignmentVisibility::AssignmentVisibilityService.visible_assignment_ids_in_course_by_user(user_ids: opts[:user_id], course_ids: opts[:course_id])
         when :discussion
           DiscussionTopic.visible_ids_by_user(opts)
         when :page
           WikiPage.visible_ids_by_user(opts)
         when :quiz
-          if Account.site_admin.feature_enabled?(:differentiated_modules)
-            QuizVisibility::QuizVisibilityService.visible_quiz_ids_in_course_by_user(user_ids: opts[:user_id], course_ids: opts[:course_id])
-          else
-            Quizzes::QuizStudentVisibility.visible_quiz_ids_in_course_by_user(opts)
-          end
+          QuizVisibility::QuizVisibilityService.visible_quiz_ids_in_course_by_user(user_ids: opts[:user_id], course_ids: opts[:course_id])
         end
       end
     end

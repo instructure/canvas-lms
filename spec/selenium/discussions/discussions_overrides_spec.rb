@@ -19,11 +19,13 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/assignment_overrides"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "discussions overrides" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
   include DiscussionsCommon
+  include ItemsAssignToTray
 
   before do
     course_with_teacher_logged_in
@@ -33,19 +35,6 @@ describe "discussions overrides" do
                                                           title: "Discussion 1",
                                                           message: "Discussion with multiple due dates",
                                                           assignment: @assignment)
-  end
-
-  it "adds multiple due dates", priority: "2" do
-    get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-    expect_new_page_load { f(".edit-btn").click }
-    expect(f(".ic-token-label")).to include_text("Everyone")
-    assign_dates_for_first_override_section
-    f("#add_due_date").click
-    wait_for_ajaximations
-    select_last_override_section(@new_section.name)
-    assign_dates_for_last_override_section
-    expect_new_page_load { f(".form-actions button[type=submit]").click }
-    expect(f(".discussion-title").text).to include("This is a graded discussion: 0 points possible")
   end
 
   describe "set overrides" do
@@ -63,29 +52,8 @@ describe "discussions overrides" do
       @override_due_at_time = format_time_for_view(override_due_at)
     end
 
-    context "when Discussions Redesign feature flag is ON" do
-      before :once do
-        Account.site_admin.enable_feature! :react_discussions_post
-      end
-
-      it "shows correct assignment dates in the tray" do
-        get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-        fj("button:contains('View Due Dates')").click
-        rows = ff("tr[data-testid='assignment-override-row']")
-        expect(rows[0].text).to eq "Dec 17, 2016 10am New Section Dec 14, 2016 10am Dec 18, 2016 10am"
-        expect(rows[1].text).to eq "Dec 16, 2016 10am Everyone Else No Start Date No End Date"
-      end
-
-      it "shows course pace notice in the tray in a course with pacing on" do
-        @course.enable_course_paces = true
-        @course.save!
-        get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-        fj("button:contains('View Due Dates')").click
-        expect(f('[data-testid="CoursePacingNotice"]')).to be_displayed
-      end
-    end
-
     it "shows course pace notice when expanding grades in a course with pacing on" do
+      skip "Will be fixed in VICE-5411"
       @course.enable_course_paces = true
       @course.save!
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
@@ -94,6 +62,7 @@ describe "discussions overrides" do
     end
 
     it "toggles between due dates", priority: "2" do
+      skip "Will be fixed in VICE-5412"
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       f(" .toggle_due_dates").click
       wait_for_ajaximations
@@ -106,23 +75,6 @@ describe "discussions overrides" do
       f(".toggle_due_dates").click
       wait_for_ajaximations
       expect(f(".discussion-topic-due-dates")).to be_present
-    end
-
-    it "allows to not set due dates for everyone", priority: "2" do
-      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-      expect_new_page_load { f(".edit-btn").click }
-      f('#bordered-wrapper .Container__DueDateRow-item:nth-of-type(2) button[title = "Remove These Dates"]').click
-      f(".form-actions button[type=submit]").click
-      wait_for_ajaximations
-      expect(fj('.ui-dialog:contains("Warning")')).to be_present
-      expect(fj('.ui-dialog:contains("Warning")').text).to include("Not all sections will be assigned this item")
-      wait_for_new_page_load { f(".ui-dialog .ui-dialog-buttonset .btn-primary").click }
-      f(".toggle_due_dates").click
-      wait_for_ajaximations
-      # The toggle dates does not show the due date for everyone else
-      expect(f(".discussion-topic-due-dates")).to be_present
-      expect(f(".discussion-topic-due-dates tbody tr td:nth-of-type(1)").text).to include(@override_due_at_time)
-      expect(f(".discussion-topic-due-dates tbody tr td:nth-of-type(2)").text).to include("New Section")
     end
 
     context "outside discussions page" do
@@ -155,8 +107,80 @@ describe "discussions overrides" do
       it "lists the discussions in main dashboard page", priority: "2" do
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f(".coming_up .event a").text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates")
+        element = f(".coming_up .event a")
+        wait_for_ajaximations
+        keep_trying_until { expect(element.text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates") }
       end
+    end
+  end
+
+  describe "Differentiation Tags" do
+    before do
+      Account.site_admin.enable_feature! :discussion_create
+      course_with_teacher_logged_in
+      @course.account.enable_feature!(:assign_to_differentiation_tags)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        a.save!
+      end
+      @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+      @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+      @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      @group_category.create_groups(1)
+      @differentiation_tag_group_1 = @group_category.groups.first_or_create
+      @differentiation_tag_group_1.add_user(@student1)
+      @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group)
+      @discussion_topic = @course.discussion_topics.create!(user: @teacher,
+                                                            title: "Discussion 1",
+                                                            message: "Discussion with multiple due dates",
+                                                            assignment: @assignment)
+      @assignment.assignment_overrides.create!(set: @differentiation_tag_group_1)
+      @assignment.update!(only_visible_to_overrides: true)
+    end
+
+    it "shows convert override message when diff tags setting disabled" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      expect(element_exists?(convert_override_alert_selector)).to be_truthy
+    end
+
+    it "clicking convert overrides button converts the override and refreshes the cards" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@differentiation_tag_group_1.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@student1.name)
+    end
+
+    it "clicking convert overrides button converts overrides and refreshes the cards" do
+      gc = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      gc.create_groups(1)
+      differentiation_tag_group_2 = gc.groups.first_or_create
+      differentiation_tag_group_2.add_user(@student2)
+      @assignment.assignment_overrides.create!(set: differentiation_tag_group_2)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      overrides = ff(assignee_selected_option_selector)
+      expect(overrides[0].text).to include(@differentiation_tag_group_1.name)
+      expect(overrides[1].text).to include(differentiation_tag_group_2.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      converted_overrides = ff(assignee_selected_option_selector)
+      expect(converted_overrides[0].text).to include(@student2.name)
+      expect(converted_overrides[1].text).to include(@student1.name)
     end
   end
 end

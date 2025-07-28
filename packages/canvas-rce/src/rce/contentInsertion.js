@@ -128,7 +128,7 @@ export function insertImage(editor, image, canvasOrigin) {
       {
         ...image,
       },
-      canvasOrigin
+      canvasOrigin,
     )
   }
   return insertContent(editor, content)
@@ -137,7 +137,9 @@ export function insertImage(editor, image, canvasOrigin) {
 export function insertEquation(editor, latex) {
   const docSz =
     parseFloat(
-      editor.dom.doc.defaultView.getComputedStyle(editor.dom.doc.body).getPropertyValue('font-size')
+      editor.dom.doc.defaultView
+        .getComputedStyle(editor.dom.doc.body)
+        .getPropertyValue('font-size'),
     ) || 1
 
   const sel = editor.selection.getNode()

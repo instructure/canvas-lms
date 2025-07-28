@@ -29,11 +29,11 @@ module Api::V1::Lti::RegistrationAccountBinding
   def lti_registration_account_binding_json(account_binding, user, session, context)
     api_json(account_binding, user, session, only: JSON_ATTRS).tap do |json|
       if account_binding.created_by.present?
-        json["created_by"] = user_json(account_binding.created_by, user, session, [], context)
+        json["created_by"] = user_json(account_binding.created_by, user, session, [], context, nil, ["pseudonym"])
       end
 
       if account_binding.updated_by.present?
-        json["updated_by"] = user_json(account_binding.updated_by, user, session, [], context)
+        json["updated_by"] = user_json(account_binding.updated_by, user, session, [], context, nil, ["pseudonym"])
       end
     end
   end

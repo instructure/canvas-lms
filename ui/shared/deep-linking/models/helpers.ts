@@ -17,11 +17,14 @@
  */
 
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import {IframeDimensions} from '@canvas/lti/model/common'
+
+export type ContentItemIframeDimensions = IframeDimensions
 
 export type ContentItemIframe = {
   src: string
-  width?: string | number
-  height?: string | number
+  width?: number
+  height?: number
 }
 export type ContentItemThumbnail =
   | string
@@ -47,7 +50,7 @@ export const anchorTag = (
     url: string
     title?: string
   },
-  innerHTML?: string
+  innerHTML?: string,
 ) => {
   const anchorTagEl = document.createElement('a')
   anchorTagEl.setAttribute('href', safeUrl(item.url))
@@ -61,7 +64,7 @@ export const imageTag = (
   url: string,
   text?: string,
   width?: string | number,
-  height?: string | number
+  height?: string | number,
 ) => {
   const imgTag = document.createElement('img')
   imgTag.setAttribute('src', url)

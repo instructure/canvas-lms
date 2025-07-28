@@ -50,7 +50,7 @@ describe('DashboardCardMenu - reordering', () => {
   beforeEach(() => {
     ref = React.createRef()
     wrapper = render(
-      <DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} ref={ref} />
+      <DashboardCardMenu {...defaultProps()} {...defaultMovementMenuProps()} ref={ref} />,
     )
   })
 
@@ -71,7 +71,7 @@ describe('DashboardCardMenu - reordering', () => {
           {...defaultMovementMenuProps()}
           ref={ref}
           handleShow={handleShow}
-        />
+        />,
       )
 
       wrapper.getByText('menu').click()
@@ -101,7 +101,7 @@ describe('DashboardCardMenu - reordering', () => {
           ref={ref}
           handleShow={handleShow}
           popoverContentRef={popoverContentRef}
-        />
+        />,
       )
       wrapper.getByText('menu').click()
     })
@@ -129,7 +129,7 @@ describe('DashboardCardMenu - reordering', () => {
           ref={ref}
           handleShow={handleShow}
           popoverContentRef={popoverContentRef}
-        />
+        />,
       )
       wrapper.getByText('menu').click()
     })
@@ -159,7 +159,7 @@ describe('DashboardCardMenu - reordering', () => {
           ref={ref}
           handleShow={handleShow}
           popoverContentRef={popoverContentRef}
-        />
+        />,
       )
       wrapper.getByText('menu').click()
     })

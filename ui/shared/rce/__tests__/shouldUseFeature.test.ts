@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -43,39 +44,29 @@ describe('shouldUseFeature()', () => {
   describe('when the feature is icon maker', () => {
     beforeEach(() => (feature = Feature.IconMaker))
 
-    // This feature was re-named to match the updated name: "Buttons and Icons" => "Icon Maker"
-    // But the feature flag was NOT renamed so it's still "buttons_and_icons_root_account"
-    describe('and the buttons & icons (icon maker) feature flag is on', () => {
+    describe('and the user has only "add file" permissions', () => {
       beforeEach(() => {
-        windowEnv.FEATURES = {
-          buttons_and_icons_root_account: true,
-        }
+        windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES = true
       })
 
-      describe('and the user has only "add file" permissions', () => {
-        beforeEach(() => {
-          windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES = true
-        })
+      sharedExamplesForFeaturesToDisable()
+    })
 
-        sharedExamplesForFeaturesToDisable()
+    describe('and the user has only "edit file" permissions', () => {
+      beforeEach(() => {
+        windowEnv.RICH_CONTENT_CAN_EDIT_FILES = true
       })
 
-      describe('and the user has only "edit file" permissions', () => {
-        beforeEach(() => {
-          windowEnv.RICH_CONTENT_CAN_EDIT_FILES = true
-        })
+      sharedExamplesForFeaturesToDisable()
+    })
 
-        sharedExamplesForFeaturesToDisable()
+    describe('and the user has both "add file" and "edit file" permissions', () => {
+      beforeEach(() => {
+        windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES = true
+        windowEnv.RICH_CONTENT_CAN_EDIT_FILES = true
       })
 
-      describe('and the user has both "add file" and "edit file" permissions', () => {
-        beforeEach(() => {
-          windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES = true
-          windowEnv.RICH_CONTENT_CAN_EDIT_FILES = true
-        })
-
-        sharedExamplesForFeaturesToEnable()
-      })
+      sharedExamplesForFeaturesToEnable()
     })
 
     // This feature was re-named to match the updated name: "Buttons and Icons" => "Icon Maker"
@@ -83,7 +74,7 @@ describe('shouldUseFeature()', () => {
     describe('and the buttons & icons (icon maker) feature flag is off', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
-          buttons_and_icons_root_account: true,
+          buttons_and_icons_root_account: false,
         }
       })
 

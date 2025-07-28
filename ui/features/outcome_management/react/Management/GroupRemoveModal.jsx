@@ -19,7 +19,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -28,7 +28,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId} = useCanvasContext()
@@ -48,14 +48,14 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
       }
     } catch (err) {
       const message = err?.response?.data?.match(
-        /cannot be deleted because it is aligned to content/
+        /cannot be deleted because it is aligned to content/,
       )
         ? I18n.t(
             'An error occurred while removing this group: "%{groupTitle}" contains one or ' +
               'more Outcomes that are currently aligned to content.',
             {
               groupTitle,
-            }
+            },
           )
         : I18n.t('An error occurred while removing this group. Please try again.')
 
@@ -79,10 +79,10 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
           <Text size="medium">
             {isAccount
               ? I18n.t(
-                  'Are you sure that you want to remove this group and all of its content from your account?'
+                  'Are you sure that you want to remove this group and all of its content from your account?',
                 )
               : I18n.t(
-                  'Are you sure that you want to remove this group and all of its content from your course?'
+                  'Are you sure that you want to remove this group and all of its content from your course?',
                 )}
           </Text>
         </View>

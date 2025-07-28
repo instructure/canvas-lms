@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -24,13 +23,13 @@ import {Modal} from '@instructure/ui-modal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {bool, func, shape, string} from 'prop-types'
 import React, {useState} from 'react'
 
 import numberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const APPLY_TO_ALL = 'apply_to_all'
 const APPLY_TO_PAST_DUE = 'apply_to_only_past_due'
@@ -69,10 +68,10 @@ const ApplyScoreToUngradedModal = ({assignmentGroup, onApply, onClose, open}: Pr
     assignmentGroup != null
       ? I18n.t(
           'Select the score that you would like to apply to ungraded artifacts in %{groupName}. Once applied, this action cannot be undone.',
-          {groupName: assignmentGroup.name}
+          {groupName: assignmentGroup.name},
         )
       : I18n.t(
-          'Select the score that you would like to apply to ungraded artifacts. Once applied, this action cannot be undone.'
+          'Select the score that you would like to apply to ungraded artifacts. Once applied, this action cannot be undone.',
         )
 
   const handleApply = () => {
@@ -142,6 +141,7 @@ const ApplyScoreToUngradedModal = ({assignmentGroup, onApply, onClose, open}: Pr
           {I18n.t('Cancel')}
         </Button>
         <Button
+          id="apply-score-to-ungraded" // EVAL-4236
           interaction={isCurrentInputValid ? 'enabled' : 'disabled'}
           onClick={handleApply}
           color="primary"

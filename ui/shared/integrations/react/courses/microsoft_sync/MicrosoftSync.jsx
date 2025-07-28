@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {InlineList} from '@instructure/ui-list'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const stateMap = {
   pending: I18n.t('Ready for sync'),
@@ -53,7 +53,7 @@ const MicrosoftSync = ({group, loading, children}) => {
       <br />
       <Text>
         {I18n.t(
-          'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.'
+          'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.',
         )}
       </Text>
       <br />
@@ -63,7 +63,7 @@ const MicrosoftSync = ({group, loading, children}) => {
           {
             max_enrollments: ENV.MSFT_SYNC_MAX_ENROLLMENT_MEMBERS,
             max_owners: ENV.MSFT_SYNC_MAX_ENROLLMENT_OWNERS,
-          }
+          },
         )}
       </Text>
       <Flex margin="small 0 0 0">

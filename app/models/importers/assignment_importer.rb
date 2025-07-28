@@ -21,6 +21,7 @@ module Importers
   class AssignmentImporter < Importer
     # Used to avoid adding duplicate line items when doing a re-import
     LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag].freeze
+    ATTRIBUTES_FOR_DATE_SHIFT = %i[due_at lock_at unlock_at peer_reviews_due_at needs_update_cached_due_dates].freeze
 
     self.item_class = Assignment
 
@@ -192,10 +193,16 @@ module Importers
           item.submission_types = "not_graded"
         end
       end
-      if hash[:assignment_group_migration_id]
-        item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
+
+      if Account.site_admin.feature_enabled?(:wiki_page_mastery_path_no_assignment_group)
+        if hash[:submission_types] == "wiki_page" && context.conditional_release?
+          item.assignment_group = nil
+        else
+          associate_assignment_group(hash, context, item)
+        end
+      else
+        associate_assignment_group(hash, context, item)
       end
-      item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
       if item.points_possible.to_i < 0
         item.points_possible = 0
@@ -208,11 +215,19 @@ module Importers
         item.assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP).destroy_all
       end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
-      item.save_without_broadcasting!
+
+      if migration.send_item_notifications?
+        item.save!
+      else
+        item.save_without_broadcasting!
+      end
+
       # somewhere in the callstack, save! will call Quiz#update_assignment, and Rails will have helpfully
       # reloaded the quiz's assignment, so we won't know about the changes to the object (in particular,
       # workflow_state) that it did
       item.reload
+
+      handle_sub_assignments(hash, item, migration)
 
       unless master_migration && migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("rubric")
         rubric = nil
@@ -285,7 +300,7 @@ module Importers
           # the quiz is published because it has an assignment
           q.assignment = item
           q.generate_quiz_data
-          q.published_at = Time.now
+          q.published_at = Time.zone.now
           q.workflow_state = "available"
           q.save
         end
@@ -301,8 +316,12 @@ module Importers
       end
 
       if hash[:has_group_category]
-        item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
-        item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
+        if migration.context.feature_enabled?(:migrate_assignment_group_categories)
+          item.group_category = context.group_categories.active.where(name: hash[:group_category]).first_or_create
+        else
+          item.group_category = context.group_categories.active.where(name: hash[:group_category]).first
+          item.group_category ||= context.group_categories.active.where(name: t("Project Groups")).first_or_create
+        end
       end
 
       if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
@@ -371,50 +390,28 @@ module Importers
 
       migration.add_imported_item(item)
 
-      if migration.date_shift_options
-        # Unfortunately, we save the assignment here, and then shift dates and
-        # save the assignment again later in the course migration. Saving here
-        # would normally schedule the auto peer reviews job with the
-        # pre-shifted due date, which is probably in the past. After shifting
-        # dates, it is saved again, but because the job is stranded, and
-        # because the new date is probably later than the old date, the new job
-        # is not scheduled, even though that's the date we want.
-        item.skip_schedule_peer_reviews = true
-      end
       item.needs_update_cached_due_dates = true if new_record || item.update_cached_due_dates?
-      item.save_without_broadcasting!
-      item.skip_schedule_peer_reviews = nil
+      if Account.site_admin.feature_enabled?(:pre_date_shift_for_assignment_importing)
+        try_to_save_with_date_shift(item, migration)
+      else
+        if migration.date_shift_options
+          # Unfortunately, we save the assignment here, and then shift dates and
+          # save the assignment again later in the course migration. Saving here
+          # would normally schedule the auto peer reviews job with the
+          # pre-shifted due date, which is probably in the past. After shifting
+          # dates, it is saved again, but because the job is stranded, and
+          # because the new date is probably later than the old date, the new job
+          # is not scheduled, even though that's the date we want.
+          item.skip_schedule_peer_reviews = true
+        end
+        item.save_without_broadcasting!
+        item.skip_schedule_peer_reviews = nil
+      end
       item.lti_resource_link_lookup_uuid = hash["resource_link_lookup_uuid"]
 
       create_lti_13_models(hash, context, migration, item)
 
-      if hash["similarity_detection_tool"].present?
-        similarity_tool = hash["similarity_detection_tool"]
-        vendor_code = similarity_tool["vendor_code"]
-        product_code = similarity_tool["product_code"]
-        resource_type_code = similarity_tool["resource_type_code"]
-        item.assignment_configuration_tool_lookups.find_or_create_by!(
-          tool_vendor_code: vendor_code,
-          tool_product_code: product_code,
-          tool_resource_type_code: resource_type_code,
-          tool_type: "Lti::MessageHandler",
-          context_type: context.class.name
-        )
-        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context:, vendor_code:, product_code:
-        )
-
-        if active_proxies.blank?
-          migration.add_warning(I18n.t(
-                                  "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-                                  vendor_code:,
-                                  product_code:
-                                ))
-        else
-          item.lti_context_id ||= SecureRandom.uuid
-          create_tool_settings(hash["tool_setting"], active_proxies.first, item)
-        end
-      end
+      import_similarity_detection_tool(hash, context, migration, item)
 
       # Ensure anonymous and moderated assignments always start out manually
       # posted, even if the moderated assignment in the old course was switched
@@ -423,6 +420,57 @@ module Importers
       item.post_policy.update!(post_manually: !!post_manually)
 
       item
+    end
+
+    def self.handle_sub_assignments(assignment_hash, parent_item, migration)
+      return unless assignment_hash[:sub_assignments].present?
+      return unless parent_item.context.discussion_checkpoints_enabled?
+
+      parent_item.has_sub_assignments = true
+
+      assignment_hash[:sub_assignments].each do |sub_assignment_hash|
+        sub_assignment = find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+        sub_assignment.context = parent_item.context
+        sub_assignment.sub_assignment_tag = sub_assignment_hash[:tag]
+
+        sub_assignment = import_from_migration(sub_assignment_hash, parent_item.context, migration, sub_assignment)
+
+        parent_item.sub_assignments << sub_assignment
+      end
+    end
+
+    def self.find_or_create_sub_assignment(sub_assignment_hash, parent_item)
+      sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, id: sub_assignment_hash[:id]).first
+      sub_item ||= SubAssignment.where(context_type: parent_item.context.class.to_s, context_id: parent_item.context, migration_id: sub_assignment_hash[:migration_id]).first if sub_assignment_hash[:migration_id]
+
+      sub_item || parent_item.sub_assignments.temp_record
+    end
+
+    def self.import_similarity_detection_tool(hash, context, migration, item)
+      tool_hash = hash["similarity_detection_tool"]
+
+      if tool_hash
+        active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])
+        return migration.add_warning(I18n.t("We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".", vendor_code: tool_hash["vendor_code"], product_code: tool_hash["product_code"])) if active_proxies.blank?
+      else
+        item.assignment_configuration_tool_lookups.destroy_all if migration.for_master_course_import?
+        return
+      end
+
+      actl = item.assignment_configuration_tool_lookups.find_or_create_by!(actl_query_hash(context, tool_hash))
+      item.assignment_configuration_tool_lookups.where.not(id: actl.reload.id).destroy_all if item.assignment_configuration_tool_lookups.count > 1
+      item.lti_context_id ||= SecureRandom.uuid
+      create_tool_settings(hash["tool_setting"], active_proxies.first, item)
+    end
+
+    def self.actl_query_hash(context, similarity_detection_tool_hash)
+      {
+        tool_vendor_code: similarity_detection_tool_hash["vendor_code"],
+        tool_product_code: similarity_detection_tool_hash["product_code"],
+        tool_resource_type_code: similarity_detection_tool_hash["resource_type_code"],
+        tool_type: "Lti::MessageHandler",
+        context_type: context.class.name
+      }
     end
 
     # Create the interrelated LTI 1.3 models (ContentTag, Lti::ResourceLink,
@@ -456,7 +504,7 @@ module Importers
             # In some cases the tool ID in the source context does not match the
             # tool ID from the destination context. This check should help find
             # a matching tool correctly.
-            tool = ContextExternalTool.find_external_tool(hash[:external_tool_url], context, tool_id)
+            tool = Lti::ToolFinder.from_url(hash[:external_tool_url], context, preferred_tool_id: tool_id)
 
             # If no match is found in the first search, fall back on using the tool ID
             # provided in the migration hash if a tool with that ID is present
@@ -465,7 +513,7 @@ module Importers
 
             tag.content_id = tool&.id
           elsif hash[:external_tool_migration_id]
-            tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
+            tool = Lti::ContextToolFinder.only_for(context).where(migration_id: hash[:external_tool_migration_id]).first
             tag.content_id = tool.id if tool
           end
           if hash[:external_tool_data_json]
@@ -484,6 +532,13 @@ module Importers
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
         end
+
+        if current_tag && !hash[:external_tool_new_tab].nil? && current_tag.new_tab != hash[:external_tool_new_tab]
+          current_tag.mark_as_importing! migration
+
+          current_tag.update(new_tab: hash[:external_tool_new_tab])
+        end
+
         # All external_tool assignments have at least one line item. Create the
         # default one here; we may modify it or add more below if line items
         # are explicitly provided in the imported data
@@ -578,6 +633,51 @@ module Importers
         end
       end
       params
+    end
+
+    def self.try_to_save_with_date_shift(item, migration)
+      unless migration.date_shift_options
+        item.save_without_broadcasting!
+        return item
+      end
+      shift_options = CourseContentImporter.shift_date_options_from_migration(migration)
+
+      original_due_at = item.due_at
+      original_lock_at = item.lock_at
+      original_unlock_at = item.unlock_at
+      original_peer_reviews_due_at = item.peer_reviews_due_at
+      original_needs_update_cached_due_dates = item.needs_update_cached_due_dates
+
+      item.due_at = CourseContentImporter.shift_date(item.due_at, shift_options) if item.due_at
+      item.lock_at = CourseContentImporter.shift_date(item.lock_at, shift_options) if item.lock_at
+      item.unlock_at = CourseContentImporter.shift_date(item.unlock_at, shift_options) if item.unlock_at
+      item.peer_reviews_due_at = CourseContentImporter.shift_date(item.peer_reviews_due_at, shift_options) if item.peer_reviews_due_at
+      item.needs_update_cached_due_dates ||= item.update_cached_due_dates?
+
+      if item.invalid? && CourseContentImporter.error_on_dates?(item, ATTRIBUTES_FOR_DATE_SHIFT)
+        migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: item.title, id: item.id&.to_s))
+
+        item.errors.delete(:due_at)
+        item.due_at = original_due_at
+        item.errors.delete(:lock_at)
+        item.lock_at = original_lock_at
+        item.errors.delete(:unlock_at)
+        item.unlock_at = original_unlock_at
+        item.errors.delete(:peer_reviews_due_at)
+        item.peer_reviews_due_at = original_peer_reviews_due_at
+        item.errors.delete(:needs_update_cached_due_dates)
+        item.needs_update_cached_due_dates = original_needs_update_cached_due_dates
+      end
+
+      item.save_without_broadcasting!
+      item
+    end
+
+    def self.associate_assignment_group(hash, context, item)
+      if hash[:assignment_group_migration_id]
+        item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
+      end
+      item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
     end
   end
 end

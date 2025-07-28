@@ -60,7 +60,7 @@ module DatadogRumHelper
   private
 
   def enabled?
-    Account.site_admin.feature_enabled?(:datadog_rum_js) && sample_rate > 0.0
+    sample_rate > 0.0
   end
 
   def randomly_include?

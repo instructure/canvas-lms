@@ -1,0 +1,43 @@
+<%
+# Copyright (C) 2024 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+<style>
+  body { 
+    margin: 0; 
+    padding: 0;
+  }
+</style>
+<script>
+  function originOfUrl(urlStr) {
+    const url = new URL(urlStr)
+    return url.origin
+  }
+
+  const onMessage = function(message) {
+    if (
+      message.data.subject === 'org.imsglobal.lti.close' &&
+      message.origin === originOfUrl("<%= @dr_url %>")
+    ) {
+      window.removeEventListener('message', onMessage)
+      // Forward close message to parent window, which is the DR wizzard
+      window.parent.postMessage(message.data, '*');
+    }
+  };
+  window.addEventListener('message', onMessage);
+</script>
+
+<iframe src="<%= @dr_url %>" style="width: 100%; height: 600px; border: 0; display: block"></iframe>

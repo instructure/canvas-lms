@@ -12,11 +12,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.license       = "AGPL"
 
-  spec.add_dependency "activerecord", ">= 6.1", "< 7.2"
+  spec.add_dependency "activerecord", ">= 6.1", "< 8.0"
   spec.add_dependency "activerecord-pg-extensions", "~> 0.4"
   spec.add_dependency "pg", ">= 0.17", "< 2.0"
-
-  spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rspec", "~> 3.12"
-  spec.add_development_dependency "simplecov", "~> 0.22"
 end

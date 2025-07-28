@@ -19,13 +19,13 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/missingDueDateDialog.handlebars'
 import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('calendar.edit')
+const I18n = createI18nScope('calendar.edit')
 
 extend(MissingDateDialogView, View)
 
@@ -35,14 +35,9 @@ function MissingDateDialogView() {
   return MissingDateDialogView.__super__.constructor.apply(this, arguments)
 }
 
-MissingDateDialogView.prototype.dialogTitle =
-  '<span>\n  <i class="icon-warning"></i>\n  ' +
-  htmlEscape(I18n.t('titles.warning', 'Warning')) +
-  '\n</span>'
-
 MissingDateDialogView.prototype.initialize = function (options) {
   MissingDateDialogView.__super__.initialize.apply(this, arguments)
-  this.validationFn = options.validationFn
+  this.validationFn = options.validationFn || function () {}
   this.labelFn = options.labelFn || this.defaultLabelFn
   return (this.success = options.success)
 }
@@ -56,52 +51,18 @@ MissingDateDialogView.prototype.render = function () {
   if (this.invalidFields === true) {
     return false
   } else {
-    const mappedSectionNames = this.invalidFields.map((index, input) => this.labelFn(index, input))
-
-    // Convert to array if jquery object
-    if (this.invalidFields.jquery) {
-      this.invalidSectionNames = mappedSectionNames.get()
-    } else {
-      this.invalidSectionNames = mappedSectionNames
-    }
     this.showDialog()
     return this
   }
 }
 
-MissingDateDialogView.prototype.getInvalidFields = function () {
-  const invalidDates = this.$dateFields.filter(date => $(date).val() === '')
-  const sectionNames = invalidDates.map(this.labelFn)
-  if (sectionNames.length > 0) {
-    return [invalidDates, sectionNames]
-  } else {
-    return false
-  }
-}
-
 MissingDateDialogView.prototype.showDialog = function () {
-  const description = I18n.t(
-    'missingDueDate',
-    {
-      one: '%{sections} does not have a due date assigned.',
-      other: '%{sections} do not have a due date assigned.',
-    },
-    {
-      sections: '',
-      count: this.invalidSectionNames.length,
-    }
-  )
-  const tpl = template({
-    description,
-    sections: this.invalidSectionNames,
-  })
-  this.$dialog = $(tpl)
+  this.$dialog = $(template())
     .dialog({
-      dialogClass: 'dialog-warning',
       draggable: false,
       modal: true,
       resizable: false,
-      title: $(this.dialogTitle),
+      title: I18n.t('titles.warning', 'Warning'),
       zIndex: 1000,
     })
     .fixDialogButtons()

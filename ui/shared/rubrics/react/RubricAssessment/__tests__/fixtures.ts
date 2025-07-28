@@ -16,10 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Rubric, RubricCriterion} from '../../types/rubric'
+import type {Rubric, RubricAssessmentData, RubricCriterion} from '../../types/rubric'
 
-export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder'> & {criteria: RubricCriterion[]} = {
+export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder' | 'pointsPossible'> & {
+  criteria: RubricCriterion[]
+} = {
   title: 'Rubric Title',
+  pointsPossible: 14,
   criteria: [
     {
       id: '1',
@@ -46,7 +49,7 @@ export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder'> & {criteria: Rub
           id: '2',
           description: 'Rating 2',
           points: 2,
-          longDescription: '',
+          longDescription: 'mid',
         },
         {
           id: '1',
@@ -65,7 +68,7 @@ export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder'> & {criteria: Rub
     {
       id: '2',
       description: 'Criteria 2',
-      criterionUseRange: true,
+      criterionUseRange: false,
       ignoreForScoring: false,
       longDescription: '',
       masteryPoints: 0,
@@ -88,3 +91,33 @@ export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder'> & {criteria: Rub
   ],
   ratingOrder: 'descending',
 }
+
+export const SELF_ASSESSMENT_DATA: RubricAssessmentData[] = [
+  {
+    id: '3',
+    comments: 'Self Assessment Comment 1',
+    criterionId: '1',
+    points: 3,
+    description: 'Rating 3',
+    commentsEnabled: true,
+  },
+  {
+    id: '10',
+    comments: '',
+    criterionId: '2',
+    points: 10,
+    description: 'Rating 10',
+    commentsEnabled: true,
+  },
+]
+
+export const TEACHER_ASSESSMENT_DATA: RubricAssessmentData[] = [
+  {
+    id: '2',
+    comments: 'I graded this as a 2',
+    criterionId: '1',
+    points: 2,
+    description: 'Rating 2',
+    commentsEnabled: true,
+  },
+]

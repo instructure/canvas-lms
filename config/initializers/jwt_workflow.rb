@@ -24,7 +24,7 @@ require "canvas_security"
 # - Try to keep workflow state in tokens to a minium. Remember this will be
 #   passed around with every request in the service workflow.
 #
-CanvasSecurity::JWTWorkflow.register(:rich_content) do |context, user|
+CanvasSecurity::JWTWorkflow.register(:rich_content, requires_context: true, requires_symmetric_encryption: true) do |context, user|
   tool_context = context.is_a?(Group) ? context.context : context
   {
     usage_rights_required: (

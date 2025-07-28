@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -23,12 +22,12 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {gradeEntry, gradeInfo} from './PropTypes'
 import TextGradeInput from './TextGradeInput'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
@@ -59,6 +58,7 @@ export default class GradeInput extends PureComponent {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -69,6 +69,7 @@ export default class GradeInput extends PureComponent {
    * GradeInfo for the grade currently represented in the input.
    */
   get gradeInfo() {
+    // @ts-expect-error
     return this.gradeInput.gradeInfo
   }
 
@@ -76,13 +77,16 @@ export default class GradeInput extends PureComponent {
    * Set focus on the default element of the grade input.
    */
   focus() {
+    // @ts-expect-error
     this.gradeInput.focus()
   }
 
   /*
    * Delegate a SlickGrid keyDown event to the input.
    */
+  // @ts-expect-error
   handleKeyDown(event) {
+    // @ts-expect-error
     return this.gradeInput.handleKeyDown(event)
   }
 
@@ -90,17 +94,23 @@ export default class GradeInput extends PureComponent {
    * Returns true if the grade entered differs from the original grade.
    */
   hasGradeChanged() {
+    // @ts-expect-error
     return this.props.gradeEntry.hasGradeChanged(
+      // @ts-expect-error
       this.props.gradeInfo,
+      // @ts-expect-error
       this.gradeInput.gradeInfo,
-      this.props.pendingGradeInfo
+      // @ts-expect-error
+      this.props.pendingGradeInfo,
     )
   }
 
   render() {
+    // @ts-expect-error
     const className = CLASSNAME_FOR_ENTER_GRADES_AS[this.props.gradeEntry.enterGradesAs]
 
     const messages = []
+    // @ts-expect-error
     if (this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid) {
       messages.push({type: 'error', text: I18n.t('This grade is invalid')})
     }
@@ -108,11 +118,13 @@ export default class GradeInput extends PureComponent {
     return (
       <div className={className}>
         <InstUISettingsProvider theme={{componentOverrides}}>
+          {/* @ts-expect-error */}
           <TextGradeInput
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
             ref={ref => {
+              // @ts-expect-error
               this.gradeInput = ref
             }}
           />

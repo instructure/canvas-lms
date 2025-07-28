@@ -20,15 +20,22 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
-const I18n = useI18nScope('RubricAddCriterionPopover')
+const I18n = createI18nScope('RubricAddCriterionPopover')
 
 class RubricAddCriterionPopover extends React.Component {
   static propTypes = {
     rubric: PropTypes.instanceOf($).isRequired,
     duplicateFunction: PropTypes.func.isRequired,
+  }
+
+  handleKeyPress = e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      e.currentTarget.click()
+    }
   }
 
   render() {
@@ -48,7 +55,7 @@ class RubricAddCriterionPopover extends React.Component {
           placement="bottom"
           trigger={
             // eslint-disable-next-line jsx-a11y/anchor-is-valid
-            <a className="icon-plus" href="#">
+            <a role="button" className="icon-plus" href="#" onKeyDown={this.handleKeyPress}>
               {I18n.t('Criterion')}
             </a>
           }
@@ -56,6 +63,8 @@ class RubricAddCriterionPopover extends React.Component {
           <Menu.Item
             id="add_criterion_button"
             onClick={() => $('#add_criterion_link').trigger('click')}
+            role="button"
+            onKeyDown={this.handleKeyPress}
           >
             <Text size="small" weight="bold">
               {I18n.t('New Criterion')}
@@ -64,7 +73,11 @@ class RubricAddCriterionPopover extends React.Component {
           <Menu.Separator />
           <Menu.Group id="criterion_duplicate_menu" label={I18n.t('Duplicate')}>
             {rubric_data.map(item => (
-              <Menu.Item onClick={() => duplicateFunction(rubric, item.index)} key={item.index}>
+              <Menu.Item
+                onClick={() => duplicateFunction(rubric, item.index)}
+                role="button"
+                key={item.index}
+              >
                 <div className="ellipsis popover_menu_width">{item.description}</div>
               </Menu.Item>
             ))}
@@ -76,6 +89,7 @@ class RubricAddCriterionPopover extends React.Component {
           id="add_learning_outcome_link"
           className="icon-search find_outcome_link outcome"
           role="button"
+          onKeyDown={this.handleKeyPress}
         >
           {I18n.t('Find Outcome')}
         </a>
@@ -85,6 +99,7 @@ class RubricAddCriterionPopover extends React.Component {
           id="add_criterion_link"
           className="hidden icon-plus add_criterion_link"
           role="button"
+          onKeyDown={this.handleKeyPress}
         >
           {I18n.t('New Criterion')}
         </a>

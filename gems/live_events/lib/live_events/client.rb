@@ -25,8 +25,6 @@ require "active_support/core_ext/object/blank"
 
 module LiveEvents
   class Client
-    ATTRIBUTE_BLACKLIST = [:compact_live_events].freeze
-
     attr_reader :stream_name, :stream_client
 
     def self.config
@@ -100,15 +98,15 @@ module LiveEvents
       false
     end
 
-    def post_event(event_name, payload, time = Time.now, ctx = {}, partition_key = nil)
+    def post_event(event_name, payload, time = Time.zone.now, ctx = {}, partition_key = nil)
       statsd_prefix = "live_events.events"
       tags = { event: event_name }
 
       ctx ||= {}
-      attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
-                                                            event_name:,
-                                                            event_time: time.utc.iso8601(3)
-                                                          })
+      attributes = ctx.merge({
+                               event_name:,
+                               event_time: time.utc.iso8601(3)
+                             })
 
       event = {
         attributes:,
@@ -123,7 +121,7 @@ module LiveEvents
 
       unless pusher.push(event, partition_key)
         LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
-        LiveEvents.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags:)
+        LiveEvents.statsd&.distributed_increment("#{statsd_prefix}.queue_full_errors", tags:)
       end
     end
   end

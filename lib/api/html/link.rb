@@ -38,8 +38,9 @@ module Api
 
       APPLICABLE_CONTEXT_TYPES = %w[Course Group Account].freeze
       SKIP_CONTEXT_TYPES = ["User"].freeze
-      FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
+      FILE_LINK_REGEX = %r{/files/(\d+)/?(?:download|preview|\?wrap=1)}
       VERIFIER_REGEX = /(\?)verifier=[^&]*&?|&verifier=[^&]*/
+      private_constant :APPLICABLE_CONTEXT_TYPES, :SKIP_CONTEXT_TYPES, :FILE_LINK_REGEX, :VERIFIER_REGEX
 
       def strip_host(link)
         return link if @host.nil?
@@ -66,7 +67,7 @@ module Api
       end
 
       def scope_link_to_context(local_link)
-        if local_link.start_with?("/files") && (attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type))
+        if local_link.start_with?("/files") && attachment && APPLICABLE_CONTEXT_TYPES.include?(attachment.context_type)
           return "/#{attachment.context_type.underscore.pluralize}/#{attachment.context_id}" + local_link
         end
 

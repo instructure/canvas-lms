@@ -45,6 +45,10 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
     ].freeze
   end
 
+  def self.supports_autoconfirmed_email?
+    false
+  end
+
   # Rename db field
   alias_attribute :domain, :auth_host
 

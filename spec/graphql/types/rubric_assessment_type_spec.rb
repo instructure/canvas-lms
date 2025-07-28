@@ -91,12 +91,23 @@ describe Types::RubricAssessmentType do
       expect(
         submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }")
       ).to eq [rubric_assessment.data.map { |r| r[:id].to_s }]
+
+      rubric_assessment.update(data: nil)
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { assessmentRatings { _id } } }")
+      ).to eq [nil]
     end
 
     it "rubric_association" do
       expect(
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }")
       ).to eq [rubric_association.id.to_s]
+    end
+
+    it "updated_at" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { updatedAt } }")
+      ).to eq [rubric_assessment.updated_at.iso8601]
     end
   end
 

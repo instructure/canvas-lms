@@ -39,6 +39,30 @@ module Canvas::OAuth
       end
     end
 
+    describe "#code_challenge" do
+      it "returns the code_challenge when pkce is set" do
+        provider = Provider.new("123", "", [], nil, pkce: { code_challenge: "challenge" })
+        expect(provider.code_challenge).to eq "challenge"
+      end
+
+      it "returns nil when pkce is not set" do
+        provider = Provider.new("123")
+        expect(provider.code_challenge).to be_nil
+      end
+    end
+
+    describe "#code_challenge_method" do
+      it "returns the code_challenge_method when pkce is set" do
+        provider = Provider.new("123", "", [], nil, pkce: { code_challenge_method: "S256" })
+        expect(provider.code_challenge_method).to eq "S256"
+      end
+
+      it "returns nil when pkce is not set" do
+        provider = Provider.new("123")
+        expect(provider.code_challenge_method).to be_nil
+      end
+    end
+
     describe "#has_valid_key?" do
       it "is true when there is a key and the key is active" do
         stub_dev_key(double(active?: true))
@@ -67,6 +91,26 @@ module Canvas::OAuth
 
       it "is true for an integer" do
         expect(Provider.new("123", "456").client_id_is_valid?).to be_truthy
+      end
+
+      it "is true for minimum 64-bit integer value" do
+        min_64bit = -(2**63)
+        expect(Provider.new(min_64bit.to_s, "456").client_id_is_valid?).to be_truthy
+      end
+
+      it "is true for maximum 64-bit integer value" do
+        max_64bit = (2**63) - 1
+        expect(Provider.new(max_64bit.to_s, "456").client_id_is_valid?).to be_truthy
+      end
+
+      it "is false for values below minimum 64-bit integer" do
+        below_min = -(2**63) - 1
+        expect(Provider.new(below_min.to_s, "456").client_id_is_valid?).to be_falsey
+      end
+
+      it "is false for values above maximum 64-bit integer" do
+        above_max = (2**63)
+        expect(Provider.new(above_max.to_s, "456").client_id_is_valid?).to be_falsey
       end
     end
 
@@ -161,7 +205,7 @@ module Canvas::OAuth
       before { stub_dev_key(double(id: 123)) }
 
       it "uses the key id for a client id" do
-        expect(provider.session_hash[:client_id]).to eq 123
+        expect(provider.session_hash[:client_id]).to eq "123"
       end
 
       it "passes the redirect_uri through" do

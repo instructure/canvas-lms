@@ -78,7 +78,7 @@ const Controller = {
         new Error(`
           You have requested to load on start-up, but have not
           provided a url to load from in CQS.config.quizStatisticsUrl.
-        `)
+        `),
       )
     }
   },

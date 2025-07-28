@@ -108,7 +108,7 @@ module Qti
             @quiz[:questions].unshift({ question_type: "text_only_question", question_text: intro, migration_id: unique_local_id })
           end
           if (html = get_node_att(meta, "instructureField[name=assessment_rubric_html]", "value")) &&
-             (node = (Nokogiri::HTML5.fragment(html) rescue nil))
+             (node = Nokogiri::HTML5.fragment(html))
             description = sanitize_html_string(node.text)
             @quiz[:description] = description if description.present?
           end

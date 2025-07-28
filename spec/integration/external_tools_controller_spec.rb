@@ -90,7 +90,7 @@ describe ExternalToolsController do
         params: post_body,
         headers: { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
       )
-      assert_status(401)
+      assert_forbidden
     end
 
     it "updates tool if user is granted update_manually" do

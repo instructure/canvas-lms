@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense} from 'react'
 import page from 'page'
 import $ from 'jquery'
 import {each, find} from 'lodash'
@@ -25,16 +25,17 @@ import {Mask, Overlay} from '@instructure/ui-overlays'
 import FilePreviewInfoPanel from './FilePreviewInfoPanel'
 import CollectionHandler from '../../util/collectionHandler'
 import preventDefault from '@canvas/util/preventDefault'
+import StudioMediaPlayer from '@canvas/canvas-studio-player'
 
 import PropTypes from 'prop-types'
 import customPropTypes from '../modules/customPropTypes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File'
 import FilesystemObject from '../../backbone/models/FilesystemObject'
-import codeToRemoveLater from '../../jquery/codeToRemoveLater'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('file_preview')
+const I18n = createI18nScope('file_preview')
+const FLAMEGRAPH_FOLDER_REGEX = /^users_.+\/flamegraphs$/
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {
@@ -66,10 +67,6 @@ export default class FilePreview extends React.PureComponent {
     }
   }
 
-  componentDidMount() {
-    return codeToRemoveLater.hideFileTreeFromPreviewInJaws()
-  }
-
   UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.isOpen) {
       this.getItemsToView(newProps, items => this.setState(this.stateProperties(items)))
@@ -78,7 +75,6 @@ export default class FilePreview extends React.PureComponent {
 
   componentWillUnmount() {
     $(this.previewOverlay).on('keydown', this.handleKeyboardNavigation)
-    return codeToRemoveLater.revertJawsChangesBackToNormal()
   }
 
   getRouteIdentifier = () => {
@@ -115,7 +111,7 @@ export default class FilePreview extends React.PureComponent {
   getItemsToView = (props, cb) => {
     if (typeof cb !== 'function')
       throw new Error(
-        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function'
+        'getItemsToView(props: obj, callback: fn) requires `callback` to be a function',
       )
     // Sets up our collection that we will be using.
     let initialItem = null
@@ -173,22 +169,24 @@ export default class FilePreview extends React.PureComponent {
     if (event.keyCode === $.ui.keyCode.LEFT) {
       nextItem = CollectionHandler.getPreviousInRelationTo(
         this.state.otherItems,
-        this.state.displayedItem
+        this.state.displayedItem,
       )
     }
     if (event.keyCode === $.ui.keyCode.RIGHT) {
       nextItem = CollectionHandler.getNextInRelationTo(
         this.state.otherItems,
-        this.state.displayedItem
+        this.state.displayedItem,
       )
     }
 
-    page(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({id: nextItem.id}))}`)
+    if (nextItem) {
+      page(`${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({id: nextItem.id}))}`)
+    }
   }
 
   closeModal = () => {
     this.props.closePreview(
-      `${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`
+      `${this.getRouteIdentifier()}?${$.param(this.getNavigationParams({except: 'only_preview'}))}`,
     )
   }
 
@@ -213,7 +211,7 @@ export default class FilePreview extends React.PureComponent {
       <div className="col-xs-1 ef-file-arrow_container">
         <a
           href={`${baseUrl}${this.getRouteIdentifier()}?${$.param(
-            this.getNavigationParams({id: nextItem.id})
+            this.getNavigationParams({id: nextItem.id}),
           )}`}
           className="ef-file-preview-container-arrow-link"
           onClick={e => page.clickHandler(e.nativeEvent)}
@@ -227,23 +225,61 @@ export default class FilePreview extends React.PureComponent {
     )
   }
 
-  renderPreview = () => {
-    if (this.state.displayedItem && this.state.displayedItem.get('preview_url')) {
-      const html = this.state.displayedItem.get('content-type') === 'text/html'
-      const iFrameClasses = classnames({
-        'ef-file-preview-frame': true,
-        'ef-file-preview-frame-html': html,
-        'attachment-html-iframe': html,
-      })
+  renderStudioPlayer = item => {
+    const containerClasses = classnames({
+      'ef-file-studio-player-container': true,
+    })
+    return (
+      <div className={containerClasses}>
+        <Suspense>
+          <StudioMediaPlayer
+            key={item.get('media_entry_id') || ''}
+            media_id={item.get('media_entry_id') || ''}
+            type={item.get('mime_class')}
+            is_attachment={true}
+            attachment_id={item.get('id')}
+            show_loader={true}
+            maxHeight={'100%'}
+            explicitSize={{
+              width: '100%',
+              height: '100%',
+            }}
+            hideUploadCaptions={item.get('restricted_by_master_course') ?? false}
+          />
+        </Suspense>
+      </div>
+    )
+  }
 
-      return (
-        <iframe
-          allowFullScreen={true}
-          title={I18n.t('File Preview')}
-          src={this.state.displayedItem.get('preview_url')}
-          className={iFrameClasses}
-        />
-      )
+  renderCanvasPlayer = item => {
+    const html = item.get('content-type') === 'text/html'
+    const iFrameClasses = classnames({
+      'ef-file-preview-frame': true,
+      'ef-file-preview-frame-html': html,
+      'attachment-html-iframe': html,
+    })
+    const disableSandboxing = ENV.FEATURES?.disable_iframe_sandbox_file_show
+    const sandbox = classnames('allow-same-origin', 'allow-downloads', {
+      'allow-scripts': !html || FLAMEGRAPH_FOLDER_REGEX.test(this.props.splat),
+    })
+    return (
+      <iframe
+        allowFullScreen={true}
+        title={I18n.t('File Preview')}
+        src={item.get('preview_url')}
+        className={iFrameClasses}
+        {...(disableSandboxing ? {} : {sandbox})}
+      />
+    )
+  }
+
+  renderPreview = () => {
+    const item = this.state.displayedItem
+    if (item && item.get('preview_url')) {
+      const isNewStudioPlayer = ENV.FEATURES?.consolidated_media_player
+      return isNewStudioPlayer && ['video', 'audio'].includes(item.get('mime_class'))
+        ? this.renderStudioPlayer(item)
+        : this.renderCanvasPlayer(item)
     } else {
       return (
         <div className="ef-file-not-found ef-file-preview-frame">

@@ -212,7 +212,7 @@
     "description": "This feature has pending enforcement on",
     "feature_flag": {
       "feature": "feature7",
-      "state": "hidden",
+      "state": "allowed",
       "transitions": {
         "off": {
           "locked": false
@@ -234,7 +234,7 @@
     "display_name": "Feature with Pending Enforcement Off",
     "description": "This feature has pending enforcement off",
     "feature_flag": {
-      "feature": "feature7",
+      "feature": "feature8",
       "state": "hidden",
       "transitions": {
         "off": {

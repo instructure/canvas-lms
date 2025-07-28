@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
 import $ from 'jquery'
+import React, {useState} from 'react'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {assignLocation, reloadWindow} from '@canvas/util/globalUtils'
+import getCookie from '@instructure/get-cookie'
+import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
-import {Button} from '@instructure/ui-buttons'
-import getCookie from '@instructure/get-cookie'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('quiz_engine_modal')
+const I18n = createI18nScope('quiz_engine_modal')
 
 const CLASSIC = 'classic'
 const NEW = 'new'
@@ -57,8 +59,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const classicDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
       <Text weight="light">
-        {I18n.t(`Currently, Student Analysis Report (CSV format)
-        is available through Classic Quizzes.`)}
+        {I18n.t(`Currently, Surveys are available through Classic Quizzes.`)}
       </Text>
     </div>
   )
@@ -108,9 +109,9 @@ function QuizEngineModal({setOpen, onDismiss}) {
         newquizzes_engine_selected: newquizzes_engine,
       },
       () => {
-        window.location.reload()
+        reloadWindow()
         loadQuizEngine()
-      }
+      },
     )
   }
 
@@ -118,7 +119,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
     if (option === CLASSIC) {
       post(ENV.URLS.new_quiz_url, {authenticity_token: authenticity_token()})
     } else if (option === NEW) {
-      window.location.href = `${ENV.URLS.new_assignment_url}?quiz_lti`
+      assignLocation(`${ENV.URLS.new_assignment_url}?quiz_lti`)
     }
   }
 
@@ -145,17 +146,38 @@ function QuizEngineModal({setOpen, onDismiss}) {
       padding="medium"
       label={I18n.t('Choose a Quiz Engine')}
       footer={footer}
+      aria-modal={true}
     >
       {description}
       <RadioInputGroup
         name="quizEngine"
         onChange={handleChange}
         defaultValue={option}
-        description=""
+        description={I18n.t('Select a quiz engine')}
       >
-        <RadioInput key={NEW} value={NEW} label={newQuizLabel} size="large" />
+        <RadioInput
+          key={NEW}
+          value={NEW}
+          label={
+            <span>
+              {newQuizLabel}
+              <ScreenReaderContent>- {newDesc}</ScreenReaderContent>
+            </span>
+          }
+          size="large"
+        />
         {newDesc}
-        <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
+        <RadioInput
+          key={CLASSIC}
+          value={CLASSIC}
+          label={
+            <span>
+              {classicLabel}
+              <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>
+            </span>
+          }
+          size="large"
+        />
         {classicDesc}
       </RadioInputGroup>
       <hr />

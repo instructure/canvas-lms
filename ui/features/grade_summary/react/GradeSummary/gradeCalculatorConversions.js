@@ -59,7 +59,7 @@ export const convertToSubmissionCriteria = (
   submission,
   assignmentId,
   assignment_state,
-  activeWhatIfScores
+  activeWhatIfScores,
 ) => {
   const score = activeWhatIfScores.includes(assignmentId)
     ? submission?.studentEnteredScore || 0
@@ -157,13 +157,13 @@ export const convertGradingPeriodSet = relevantGradingPeriodGroup => {
 export const calculateAssignmentGroupGrade = (
   assignments,
   assignmentGroup,
-  ignoreUnpostedAnonymous
+  ignoreUnpostedAnonymous,
 ) => {
   const convertedSubmissions = assignments.map(assignment => {
     return convertToSubmissionCriteria(
       assignment.submissionsConnection.nodes[0],
       assignment._id,
-      assignment.state
+      assignment.state,
     )
   })
 
@@ -176,14 +176,14 @@ export const calculateAssignmentGroupGrade = (
   return AssignmentGroupGradeCalculator.calculate(
     convertedSubmissions,
     {...convertedAssignmentGroup, assignments: convertedAssignments},
-    ignoreUnpostedAnonymous
+    ignoreUnpostedAnonymous,
   )
 }
 
 export const convertAssignmentGroupCriteriaMap = (
   assignmentGroups,
   assignments,
-  activeWhatIfScores
+  activeWhatIfScores,
 ) => {
   const assignmentGroupCriteriaMap = {}
   assignmentGroups.forEach(assignmentGroup => {
@@ -232,14 +232,14 @@ export const calculateCourseGrade = (
   assignments,
   calculateOnlyGradedAssignments,
   applyGroupWeights,
-  activeWhatIfScores
+  activeWhatIfScores,
 ) => {
   const convertedSubmissions = assignments.map(assignment => {
     return convertToSubmissionCriteria(
       assignment.submissionsConnection.nodes[0],
       assignment._id,
       assignment.state,
-      activeWhatIfScores
+      activeWhatIfScores,
     )
   })
 
@@ -253,6 +253,6 @@ export const calculateCourseGrade = (
     applyGroupWeights ? 'percent' : 'points',
     calculateOnlyGradedAssignments,
     convertedGradingPeriods,
-    convertedEffectiveDueDates
+    convertedEffectiveDueDates,
   )
 }

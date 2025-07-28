@@ -18,7 +18,7 @@
 
 // TODO: Get rid of this component.  AnnouncementRow should manage its own layout
 // with the shared utilities created in g/something.
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {bool, node, string, func, shape, oneOf} from 'prop-types'
 import cx from 'classnames'
@@ -37,7 +37,7 @@ import LockIconView from '@canvas/lock-icon'
 import {author as authorShape} from '@canvas/users/react/proptypes/user'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 
-const I18n = useI18nScope('shared_components')
+const I18n = createI18nScope('shared_components')
 
 export default class CourseItemRow extends Component {
   static propTypes = {
@@ -227,6 +227,7 @@ export default class CourseItemRow extends Component {
           {this.props.selectable && (
             <div className="ic-item-row__select-col">
               <Checkbox
+                data-testid="select-announcement-checkbox"
                 defaultChecked={this.props.defaultSelected}
                 onChange={this.onSelectChanged}
                 label={<ScreenReaderContent>{this.props.title}</ScreenReaderContent>}
@@ -252,7 +253,7 @@ export default class CourseItemRow extends Component {
                 )}
                 {this.props.title}
               </Heading>,
-              '_titleElement'
+              '_titleElement',
             )}
             {this.props.sectionToolTip}
             {this.props.body ? this.renderDiv(this.props.body) : null}
@@ -299,8 +300,8 @@ export default class CourseItemRow extends Component {
             <div className="ic-item-row__meta-content">{this.props.metaContent}</div>
           </div>
         </div>,
-        {dropEffect: 'copy'}
-      )
+        {dropEffect: 'copy'},
+      ),
     )
   }
 }

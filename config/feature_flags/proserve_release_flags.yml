@@ -9,3 +9,9 @@ extended_submission_state:
       state: allowed_on
     development:
       state: allowed_on
+allow_limited_access_for_students:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Allow Limited Access for Students
+  description: Makes available an account setting to make certain Canvas features unavailable to students in that account.

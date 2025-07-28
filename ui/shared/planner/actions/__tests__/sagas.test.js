@@ -84,14 +84,14 @@ describe('loadPastUntilNewActivitySaga', () => {
         getState: expect.any(Function),
         fromMoment: startOfDay,
         mode: 'past',
-      })
+      }),
     )
   })
 
   it('an iteration calls sendFetchRequest, calls the action creator, puts the thunk, and quits', () => {
     const generator = setupLoadingPastUntilNewActivitySaga()
     expect(
-      generator.next({transformedItems: 'some items', response: 'some response'}).value
+      generator.next({transformedItems: 'some items', response: 'some response'}).value,
     ).toEqual(call(mergePastItemsForNewActivity, 'some items', 'some response'))
     expect(generator.next('a thunk').value).toEqual(put('a thunk'))
     expect(generator.next(true).done).toBeTruthy()
@@ -131,10 +131,10 @@ describe('loadPastSaga', () => {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'past',
-      })
+      }),
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
-      call(mergePastItems, 'some items', 'response')
+      call(mergePastItems, 'some items', 'response'),
     )
   })
 
@@ -151,10 +151,10 @@ describe('peekIntoPastSaga', () => {
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'past',
         perPage: 1,
-      })
+      }),
     )
     expect(generator.next({transformedItems: ['some items'], response: 'response'}).value).toEqual(
-      call(consumePeekIntoPast, ['some items'], 'response')
+      call(consumePeekIntoPast, ['some items'], 'response'),
     )
   })
 })
@@ -168,10 +168,10 @@ describe('loadFutureSaga', () => {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'future',
-      })
+      }),
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
-      call(mergeFutureItems, 'some items', 'response')
+      call(mergeFutureItems, 'some items', 'response'),
     )
   })
 
@@ -197,7 +197,7 @@ describe('loadGradesSaga', () => {
           enrollment_type: 'student',
           enrollment_state: 'active',
         },
-      })
+      }),
     )
   })
   it('passes correct observee parameters to the api', () => {
@@ -215,7 +215,7 @@ describe('loadGradesSaga', () => {
           enrollment_state: 'active',
           observed_user_id: '17',
         },
-      })
+      }),
     )
   })
 
@@ -226,7 +226,7 @@ describe('loadGradesSaga', () => {
       generator.next({
         headers: {link: '<some-url>; rel="next"'},
         data: [],
-      }).value
+      }).value,
     ).toEqual(call(axios.get, expect.anything(), expect.anything()))
     generator.next({headers: {}, data: []}) // put
     expect(generator.next().done).toBe(true)
@@ -245,8 +245,8 @@ describe('loadGradesSaga', () => {
         gotGradesSuccess({
           1: transformApiToInternalGrade(mockCourses[0]),
           2: transformApiToInternalGrade(mockCourses[1]),
-        })
-      )
+        }),
+      ),
     )
     expect(generator.next().done).toBe(true)
   })
@@ -278,10 +278,10 @@ describe('loadWeekSaga', () => {
           end_date: state.weeklyDashboard.weekEnd.toISOString(),
           per_page: 100,
         },
-      })
+      }),
     )
     expect(
-      JSON.stringify(generator.next({transformedItems: 'some items', response: 'response'}).value)
+      JSON.stringify(generator.next({transformedItems: 'some items', response: 'response'}).value),
     ).toEqual(JSON.stringify(call(mergeWeekItems(), 'some items', 'response')))
   })
   // We're not testing all the scenarios, like multiple pages of items in a week
@@ -298,7 +298,7 @@ describe('loadAllOpportunitiesSaga', () => {
         filter: ['submittable', 'current_grading_period'],
         per_page: 100,
         observed_user_id: null,
-      })
+      }),
     )
   })
 
@@ -311,7 +311,7 @@ describe('loadAllOpportunitiesSaga', () => {
       generator.next({
         headers: {link: '<some-url>; rel="next"'},
         data: [],
-      }).value
+      }).value,
     ).toEqual(call(sendBasicFetchRequest, expect.anything(), expect.anything()))
     generator.next({headers: {}, data: []}) // add opportunities
     generator.next() // mark all opportunities as loaded
@@ -378,7 +378,7 @@ describe('loadAllOpportunitiesSaga', () => {
         include: ['planner_overrides'],
         filter: ['submittable', 'current_grading_period'],
         per_page: 100,
-      })
+      }),
     )
   })
 })

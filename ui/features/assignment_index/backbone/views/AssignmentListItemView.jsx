@@ -23,7 +23,9 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ListViewCheckpoints} from '@canvas/list-view-checkpoints/react/ListViewCheckpoints'
+import {TeacherCheckpointsInfo} from '@canvas/list-view-checkpoints/react/TeacherCheckpointsInfo'
 import LockIconView from '@canvas/lock-icon'
 import * as MoveItem from '@canvas/move-item-tray'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -42,13 +44,16 @@ import template from '../../jst/AssignmentListItem.handlebars'
 import scoreTemplate from '../../jst/_assignmentListItemScore.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {captureException} from '@sentry/browser'
+import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
+import {createRoot} from 'react-dom/client'
 
-const I18n = useI18nScope('AssignmentListItemView')
+const I18n = createI18nScope('AssignmentListItemView')
 
 let AssignmentListItemView
 
-export default AssignmentListItemView = (function () {
+export default (AssignmentListItemView = (function () {
   AssignmentListItemView = class AssignmentListItemView extends Backbone.View {
     constructor(...args) {
       super(...args)
@@ -100,12 +105,10 @@ export default AssignmentListItemView = (function () {
       this.child('lockIconView', '[data-view=lock-icon]')
       this.child('dateDueColumnView', '[data-view=date-due]')
       this.child('dateAvailableColumnView', '[data-view=date-available]')
-      this.child('editAssignmentView', '[data-view=edit-assignment]')
       this.child('sisButtonView', '[data-view=sis-button]')
 
       this.prototype.els = {
         '.al-trigger': '$settingsButton',
-        '.edit_assignment': '$editAssignmentButton',
         '.move_assignment': '$moveAssignmentButton',
       }
 
@@ -127,6 +130,7 @@ export default AssignmentListItemView = (function () {
         'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
         'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
         'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
+        'click .edit_assignment': 'renderCreateEditAssignmentModal',
       }
 
       this.prototype.messages = shimGetterShorthand(
@@ -138,7 +142,7 @@ export default AssignmentListItemView = (function () {
           ag_move_label() {
             return I18n.beforeLabel(I18n.t('Assignment Group'))
           },
-        }
+        },
       )
     }
 
@@ -249,7 +253,7 @@ export default AssignmentListItemView = (function () {
             this.model.collection.view != null
               ? this.model.collection.view.parentCollection
               : undefined,
-            col => col.get('assignments')
+            col => col.get('assignments'),
           ),
         },
         onMoveSuccess: res => {
@@ -261,7 +265,7 @@ export default AssignmentListItemView = (function () {
             res.data.order,
             res.groupId,
             this.model,
-            keys
+            keys,
           )
         },
         focusOnExit: () => {
@@ -315,15 +319,48 @@ export default AssignmentListItemView = (function () {
     afterRender() {
       this.createModuleToolTip()
 
-      if (this.editAssignmentView) {
-        this.editAssignmentView.hide()
-        if (this.canEdit()) {
-          this.editAssignmentView.setTrigger(this.$editAssignmentButton)
+      const {attributes = {}} = this.model
+      const {assessment_requests: assessmentRequests, checkpoints} = attributes
+
+      if (checkpoints && checkpoints.length && !this.canManage()) {
+        try {
+          const checkpointsElem =
+            this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
+          const mountPoint = checkpointsElem[0]
+
+          ReactDOM.render(
+            React.createElement(ListViewCheckpoints, {
+              assignment: attributes,
+            }),
+            mountPoint,
+          )
+        } catch (error) {
+          const errorMessage = I18n.t('Checkpoints mount point element not found')
+
+          console.error(errorMessage, error)
+          captureException(new Error(errorMessage), error)
+        }
+      } else if (checkpoints && checkpoints.length && this.canManage()) {
+        const checkpointsElem = this.$el.find(
+          `#assignment_teacher_checkpoint_info_${this.model.id}`,
+        )
+        const mountPoint = checkpointsElem[0]
+        if (mountPoint) {
+          try {
+            ReactDOM.render(
+              React.createElement(TeacherCheckpointsInfo, {
+                assignment: this.model.attributes,
+              }),
+              mountPoint,
+            )
+          } catch (error) {
+            const errorMessage = I18n.t('Checkpoints mount point element not found')
+            console.error(errorMessage, error)
+            captureException(new Error(errorMessage), error)
+          }
         }
       }
 
-      const {attributes = {}} = this.model
-      const {assessment_requests: assessmentRequests} = attributes
       if (assessmentRequests && assessmentRequests.length) {
         const peerReviewElem =
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
@@ -333,13 +370,17 @@ export default AssignmentListItemView = (function () {
             React.createElement(StudentViewPeerReviews, {
               assignment: attributes,
             }),
-            mountPoint
+            mountPoint,
           )
         }
       }
 
       if (this.canReadGrades()) {
         return this.updateScore()
+      }
+
+      if (ENV.horizon_course) {
+        this.publishIconView.$el.addClass('disabled')
       }
     }
 
@@ -379,7 +420,6 @@ export default AssignmentListItemView = (function () {
         data = this._setJSONForGrade(data)
       }
       data.courseId = this.model.get('course_id')
-      data.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
       data.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
       data.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
       // publishing and unpublishing the underlying model does not rerender this view.
@@ -392,16 +432,18 @@ export default AssignmentListItemView = (function () {
       data.canDuplicate = this.canDuplicate()
       data.canManageAssignTo = this.canManageAssignTo()
       data.is_locked = this.model.isRestrictedByMasterCourse()
+      data.isCheckpoint = this.model.get('checkpoints') && this.model.get('checkpoints').length > 0
       data.showAvailability =
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || !this.model.defaultDates().available())
       data.showDueDate =
+        !data.isCheckpoint &&
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || this.model.singleSectionDueDate())
 
       data.cyoe = CyoeHelper.getItemData(
         data.id,
-        this.isGraded() && (!this.model.isQuiz() || data.is_quiz_assignment)
+        this.isGraded() && (!this.model.isQuiz() || data.is_quiz_assignment),
       )
       data.return_to = encodeURIComponent(window.location.pathname)
 
@@ -413,8 +455,8 @@ export default AssignmentListItemView = (function () {
       data.item_assignment_type = data.is_quiz_assignment
         ? 'quiz'
         : data.isQuizLTIAssignment
-        ? 'lti-quiz'
-        : 'assignment'
+          ? 'lti-quiz'
+          : 'assignment'
 
       if (data.canManage) {
         data.spanWidth = 'span3'
@@ -436,13 +478,22 @@ export default AssignmentListItemView = (function () {
             tool.base_url +
             `&discussion_topics[]=${__guard__(this.model.get('discussion_topic'), x => x.id)}`)
         })
+        data.item_assignment_type = 'discussion_topic'
       } else {
-        data.menu_tools = ENV.assignment_menu_tools || []
+        const isNewQuizzes = this.model.isQuizLTIAssignment()
+        const isShareToCommons = tool => tool.canvas_icon_class === 'icon-commons'
+        const tools = ENV.assignment_menu_tools || []
+
+        if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
+          data.menu_tools = tools
+        } else {
+          data.menu_tools = tools.filter(tool => !isShareToCommons(tool))
+        }
+
         data.menu_tools.forEach(tool => {
           return (tool.url = tool.base_url + `&assignments[]=${this.model.get('id')}`)
         })
       }
-
       if ((modules = this.model.get('modules'))) {
         const moduleName = modules[0]
         const has_modules = modules.length > 0
@@ -547,12 +598,30 @@ export default AssignmentListItemView = (function () {
       return this.delete({silent: true})
     }
 
+    renderCreateEditAssignmentModal() {
+      const mountPoint = document.getElementById('create-edit-mount-point')
+      const root = createRoot(mountPoint)
+      const onClose = () => {
+        root.unmount()
+
+        // Rerender the list item
+        this.render()
+      }
+      root.render(<CreateAssignmentViewAdapter assignment={this.model} closeHandler={onClose} />)
+    }
+
     renderItemAssignToTray(open, returnFocusTo, itemProps) {
+      const mountPoint = document.getElementById('assign-to-mount-point')
+      if (mountPoint.hasChildNodes()) {
+        ReactDOM.unmountComponentAtNode(mountPoint)
+        mountPoint.innerHTML = ''
+      }
+
       ReactDOM.render(
-        <ItemAssignToTray
+        <ItemAssignToManager
           open={open}
           onClose={() => {
-            ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
+            ReactDOM.unmountComponentAtNode(mountPoint)
           }}
           onDismiss={() => {
             this.renderItemAssignToTray(false, returnFocusTo, itemProps)
@@ -561,9 +630,10 @@ export default AssignmentListItemView = (function () {
           itemType="assignment"
           locale={ENV.LOCALE || 'en'}
           timezone={ENV.TIMEZONE || 'UTC'}
+          isCheckpointed={itemProps.isCheckpoint}
           {...itemProps}
         />,
-        document.getElementById('assign-to-mount-point')
+        mountPoint,
       )
     }
 
@@ -576,12 +646,14 @@ export default AssignmentListItemView = (function () {
       const itemContentId = e.target.getAttribute('data-assignment-id')
       const pointsPossible = this.model.get('points_possible')
       const iconType = e.target.getAttribute('data-assignment-type')
+      const isCheckpoint = e.target.getAttribute('data-assignment-has-checkpoint')
       this.renderItemAssignToTray(true, returnFocusTo, {
         courseId,
         itemName,
         itemContentId,
         pointsPossible,
         iconType,
+        isCheckpoint,
       })
     }
 
@@ -590,7 +662,7 @@ export default AssignmentListItemView = (function () {
       if (!this.canDelete()) {
         return
       }
-      // eslint-disable-next-line no-alert
+
       if (!window.confirm(this.messages.confirm)) {
         return this.$el.find('a[id*=manage_link]').focus()
       }
@@ -611,6 +683,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
+
         ReactDOM.render(
           React.createElement(DirectShareUserModal, {
             open,
@@ -619,7 +692,7 @@ export default AssignmentListItemView = (function () {
             shouldReturnFocus: false,
             onDismiss: dismissModal,
           }),
-          mountPoint
+          mountPoint,
         )
       }
 
@@ -639,6 +712,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
+
         ReactDOM.render(
           React.createElement(DirectShareCourseTray, {
             open,
@@ -647,7 +721,7 @@ export default AssignmentListItemView = (function () {
             shouldReturnFocus: false,
             onDismiss: dismissTray,
           }),
-          mountPoint
+          mountPoint,
         )
       }
 
@@ -806,14 +880,15 @@ export default AssignmentListItemView = (function () {
           if (json.pointsPossible === 0 && json.submission.score < 0) {
             grade = json.submission.score
           } else if (json.pointsPossible === 0 && json.submission.score > 0) {
-            grade = scoreToGrade(100, ENV.grading_scheme, ENV.points_based)
+            grade = scoreToGrade(100, ENV.grading_scheme, ENV.points_based, ENV.scaling_factor)
           } else if (json.pointsPossible === 0 && json.submission.score === 0) {
             grade = 'complete'
           } else {
             grade = scoreToGrade(
               scoreToPercentage(json.submission.score, json.pointsPossible),
               ENV.grading_scheme,
-              ENV.points_based
+              ENV.points_based,
+              ENV.scaling_factor,
             )
           }
         }
@@ -926,7 +1001,7 @@ export default AssignmentListItemView = (function () {
   }
   AssignmentListItemView.initClass()
   return AssignmentListItemView
-})()
+})())
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined

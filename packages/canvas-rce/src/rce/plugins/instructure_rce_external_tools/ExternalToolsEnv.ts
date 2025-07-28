@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -17,23 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor} from 'tinymce'
+import type {Editor} from 'tinymce'
+import type {ExternalToolsEditor, RCEWrapperInterface, RCEWrapperProps} from '../../types'
 import RCEWrapper from '../../RCEWrapper'
-import {RCEWrapperProps} from '../../RCEWrapperProps'
-
-/**
- * Fallback iframe allowances used when they aren't provided to the editor.
- */
-export const fallbackIframeAllowances = [
-  'geolocation *',
-  'microphone *',
-  'camera *',
-  'midi *',
-  'encrypted-media *',
-  'autoplay *',
-  'clipboard-write *',
-  'display-capture *',
-]
+import {fallbackIframeAllowances} from './constants'
 
 /**
  * Type of the "editor buttons" that come from Canvas.
@@ -42,25 +28,9 @@ export const fallbackIframeAllowances = [
  */
 export type RceLtiToolInfo = NonNullable<NonNullable<RCEWrapperProps['ltiTools']>[number]>
 
-/**
- * Subset of TinyMCE used by the ExternalTools dialog. Used to document the subset of the API that we use so
- * it's easier to test.
- */
-export interface ExternalToolsEditor {
-  id: string
-  selection?: {
-    getContent(): string
-  }
-  getContent(): string
-  focus()
-  editorContainer: HTMLElement
-  $: Editor['$']
-  ui: Editor['ui']
-}
-
 export interface ExternalToolsEnv {
   editor: ExternalToolsEditor | null
-  rceWrapper: RCEWrapper | null
+  rceWrapper: RCEWrapperInterface | null
 
   availableRceLtiTools: RceLtiToolInfo[]
   contextAssetInfo: {
@@ -76,7 +46,9 @@ export interface ExternalToolsEnv {
   editorSelection: string | null
   editorContent: string | null
 
+  // @ts-expect-error
   insertCode(code: string)
+  // @ts-expect-error
   replaceCode(code: string)
 }
 
@@ -84,14 +56,14 @@ export interface ExternalToolsEnv {
  * Gets the environment information for the external tools dialog for a given tinyMCE editor.
  */
 export function externalToolsEnvFor(
-  editor: ExternalToolsEditor | null | undefined
+  editor: ExternalToolsEditor | null | undefined,
 ): ExternalToolsEnv {
   const props: () => RCEWrapperProps | undefined = () =>
     (RCEWrapper.getByEditor(editor as Editor)?.props as RCEWrapperProps) ?? undefined
   let cachedCanvasToolId: string | null | undefined
 
   function nonNullishArray<T>(
-    arr: Array<T | null | undefined> | null | undefined
+    arr: Array<T | null | undefined> | null | undefined,
   ): T[] | null | undefined {
     return arr?.filter(it => it != null) as T[]
   }
@@ -186,17 +158,15 @@ export function externalToolsEnvFor(
     },
 
     insertCode(code: string) {
-      this.rceWrapper?.insertCode(code)
+      if (this.rceWrapper?.insertCode) {
+        this.rceWrapper.insertCode(code)
+      }
     },
 
     replaceCode(code: string) {
-      this.rceWrapper?.replaceCode(code)
+      if (this.rceWrapper?.replaceCode) {
+        this.rceWrapper.replaceCode(code)
+      }
     },
   }
 }
-
-/**
- * Name of the parameter used to indicate to Canvas that it is being loaded in an iframe inside of an
- * LTI tool. It should be set to the global id of the containing tool.
- */
-export const PARENT_FRAME_CONTEXT_PARAM = 'parent_frame_context'

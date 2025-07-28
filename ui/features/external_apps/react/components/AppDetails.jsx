@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import page from 'page'
@@ -25,13 +25,20 @@ import Header from './Header'
 import AddApp from './AddApp'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class AppDetails extends React.Component {
   static propTypes = {
     store: PropTypes.object.isRequired,
     baseUrl: PropTypes.string.isRequired,
     shortName: PropTypes.string.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.addAppButtonRef = React.createRef()
+    this.appNameRef = React.createRef()
+    this.appDescriptionRef = React.createRef()
   }
 
   state = {
@@ -96,7 +103,7 @@ export default class AppDetails extends React.Component {
                     {this.alreadyInstalled()}
                   </div>
                   <AddApp
-                    ref="addAppButton"
+                    ref={this.addAppButtonRef}
                     app={this.state.app}
                     handleToolInstalled={this.handleToolInstalled}
                   />
@@ -106,9 +113,9 @@ export default class AppDetails extends React.Component {
                   </a>
                 </td>
                 <td className="individual-app-right" valign="top">
-                  <h2 ref="appName">{this.state.app.name}</h2>
+                  <h2 ref={this.appNameRef}>{this.state.app.name}</h2>
                   <p
-                    ref="appDescription"
+                    ref={this.appDescriptionRef}
                     dangerouslySetInnerHTML={{__html: this.state.app.description}}
                   />
                 </td>

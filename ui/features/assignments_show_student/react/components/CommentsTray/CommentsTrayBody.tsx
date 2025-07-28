@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -16,41 +15,42 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {useQuery} from '@apollo/client'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import CommentContent from './CommentContent'
-import CommentTextArea from './CommentTextArea'
+import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import ErrorBoundary from '@canvas/error-boundary'
-// @ts-ignore
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-// @ts-ignore
-import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import React, {useContext, useState} from 'react'
-import StudentViewContext from '../Context'
-import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {useQuery} from 'react-apollo'
 import {bool, func} from 'prop-types'
-import PeerReviewPromptModal from '../PeerReviewPromptModal'
+import React, {useContext, useState} from 'react'
+import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
+import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {
-  getRedirectUrlToFirstPeerReview,
   assignedAssessmentsCount,
   availableAndUnavailableCounts,
+  getPeerReviewButtonText,
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
-  getPeerReviewButtonText,
+  getRedirectUrlToFirstPeerReview,
 } from '../../helpers/PeerReviewHelpers'
+import StudentViewContext from '../Context'
+import PeerReviewPromptModal from '../PeerReviewPromptModal'
+import CommentContent from './CommentContent'
+import CommentTextArea from './CommentTextArea'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
 
+// @ts-expect-error
 export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
   const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
@@ -73,7 +73,6 @@ export default function CommentsTrayBody(props) {
     setIsFetchingMoreComments(true)
     await fetchMore({
       variables: {
-        // @ts-ignore
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
         ...queryVariables,
       },
@@ -93,6 +92,7 @@ export default function CommentsTrayBody(props) {
   }
 
   const handlePeerReviewPromptModal = () => {
+    // @ts-expect-error
     const matchingAssessment = assignedAssessments.find(x => x.assetId === props.submission._id)
     if (!matchingAssessment) return
 
@@ -106,7 +106,7 @@ export default function CommentsTrayBody(props) {
     setPeerReviewModalOpen(true)
   }
 
-  const {allowChangesToSubmission} = useContext(StudentViewContext)
+  const {allowPeerReviewComments} = useContext(StudentViewContext)
 
   const gradeAsGroup =
     props.assignment.groupCategoryId && !props.assignment.gradeGroupStudentsIndividually
@@ -124,7 +124,7 @@ export default function CommentsTrayBody(props) {
 
   const comments = data.submissionComments.commentsConnection.nodes
   const hiddenCommentsMessage = I18n.t(
-    'You may not see all comments for this assignment until grades are posted.'
+    'You may not see all comments for this assignment until grades are posted.',
   )
   return (
     <ErrorBoundary
@@ -170,7 +170,7 @@ export default function CommentsTrayBody(props) {
           />
         </Flex.Item>
 
-        {allowChangesToSubmission && (
+        {allowPeerReviewComments && (
           <Flex as="div" direction="column">
             {gradeAsGroup && (
               <Flex.Item padding="x-small medium">
@@ -180,6 +180,7 @@ export default function CommentsTrayBody(props) {
 
             <Flex.Item padding="x-small medium">
               <CommentTextArea
+                data-testid="peer-review-comment-text-area"
                 assignment={props.assignment}
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
@@ -207,7 +208,7 @@ export default function CommentsTrayBody(props) {
           onClose={() => setPeerReviewModalOpen(false)}
           onRedirect={() => {
             const url = getRedirectUrlToFirstPeerReview(assignedAssessments)
-            if (url) window.location.assign(url)
+            if (url) assignLocation(url)
           }}
         />
       </Flex>

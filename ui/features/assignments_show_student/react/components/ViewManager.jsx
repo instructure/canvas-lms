@@ -79,7 +79,7 @@ class ViewManager extends React.Component {
       ...Assignment.shape.propTypes,
       ...AssignmentSubmissionsConnection.shape.propTypes,
     }),
-    // eslint-disable-next-line react/no-unused-prop-types
+
     submissionHistoriesQueryData: shape({
       submissionHistoriesConnection: shape({
         nodes: arrayOf(Submission.shape),
@@ -92,6 +92,7 @@ class ViewManager extends React.Component {
     dummyNextSubmission: null,
     submissions: [],
     reviewerSubmission: [],
+    rubricExpanded: true,
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -216,7 +217,7 @@ class ViewManager extends React.Component {
         document
           .querySelector('button[data-testid=assignments-2-assignment-toggle-details]')
           .focus()
-      }
+      },
     )
   }
 
@@ -238,6 +239,12 @@ class ViewManager extends React.Component {
     })
   }
 
+  toggleRubricExpanded = () => {
+    this.setState(prevState => ({
+      rubricExpanded: !prevState.rubricExpanded,
+    }))
+  }
+
   render() {
     const assignment = this.getAssignment()
     const submission = this.getDisplayedSubmission()
@@ -248,8 +255,11 @@ class ViewManager extends React.Component {
         value={{
           allowChangesToSubmission:
             ENV.enrollment_state === 'active' &&
+            ENV.can_submit_assignment_from_section &&
             !ENV.ISOBSERVER &&
             submission.gradingStatus !== 'excused',
+          // we want to continue allowing peer review commenting for excused assignments
+          allowPeerReviewComments: ENV.enrollment_state === 'active' && !ENV.ISOBSERVER,
           cancelDraftAction: this.onCancelDraft,
           isLatestAttempt: !this.hasNextSubmission(),
           latestSubmission: this.getLatestSubmission(),
@@ -267,6 +277,8 @@ class ViewManager extends React.Component {
           reviewerSubmission={reviewerSubmission}
           allSubmissions={this.state.submissions}
           onChangeSubmission={this.onChangeSubmission}
+          rubricExpanded={this.state.rubricExpanded}
+          toggleRubricExpanded={this.toggleRubricExpanded}
         />
       </StudentViewContext.Provider>
     )

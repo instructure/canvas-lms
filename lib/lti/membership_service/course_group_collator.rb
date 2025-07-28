@@ -48,7 +48,7 @@ module Lti
       def generate_member(group)
         ::IMS::LTI::Models::MembershipService::Context.new(
           name: group.name,
-          context_id: Lti::Asset.opaque_identifier_for(group)
+          context_id: Lti::V1p1::Asset.opaque_identifier_for(group)
         )
       end
 

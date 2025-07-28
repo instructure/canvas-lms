@@ -38,6 +38,20 @@ const mockSections = [
     name: 'section 25',
   },
 ]
+const mockGroups = [
+  {
+    id: 'U2VjdGlvbi00',
+    _id: '1',
+    userCount: 5,
+    name: 'Amazing group',
+  },
+  {
+    id: 'U2VjdGlvbi01',
+    _id: '2',
+    userCount: 10,
+    name: 'Fantastic group',
+  },
+]
 const mockLockAt = '2022-01-19T23:59:59-07:00'
 const mockDelayedPost = '2022-01-12T00:00:00-07:00'
 
@@ -68,7 +82,7 @@ const setup = props => {
       delayedPostAt={mockDelayedPost}
       lockAt={mockLockAt}
       {...props}
-    />
+    />,
   )
 }
 
@@ -77,6 +91,30 @@ describe('DiscussionAvailabilityContainer', () => {
     it('displays View Availability', () => {
       const {queryByText} = setup()
       expect(queryByText('View Availability')).toBeInTheDocument()
+    })
+    it('displays assignment lock data when assignment is present', () => {
+      const {queryByText} = setup({
+        groupSet: null,
+        courseSections: [],
+        assignment: {lockAt: '2024-06-15T23:59:59-07:00', unlockAt: '2024-05-15T00:00:00-07:00'},
+        delayedPostAt: mockDelayedPost,
+        lockAt: mockLockAt,
+      })
+      expect(
+        queryByText('All Sections Available from May 15, 2024 7am until Jun 16, 2024 6:59am'),
+      ).toBeInTheDocument()
+    })
+    it('displays prop lock data when no assignment is present', () => {
+      const {queryByText} = setup({
+        groupSet: null,
+        courseSections: [],
+        assignment: null,
+        delayedPostAt: mockDelayedPost,
+        lockAt: mockLockAt,
+      })
+      expect(
+        queryByText('All Sections Available from Jan 12, 2022 7am until Jan 20, 2022 6:59am'),
+      ).toBeInTheDocument()
     })
     it('displays anonymous discussion when anonymous', () => {
       const {queryByText} = setup({anonymousState: 'full_anonymity'})
@@ -94,6 +132,83 @@ describe('DiscussionAvailabilityContainer', () => {
       fireEvent.click(viewAvailabilityButton)
       expect(container.getByText('99')).toBeInTheDocument()
       expect(container.getByText('section 2')).toBeInTheDocument()
+    })
+
+    it('clicking view availability opens the tray for ungraded discussion with group set', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        lockAt: '2022-04-15T23:59:59-07:00',
+        delayedPostAt: '2022-05-15T00:00:00-07:00',
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+
+      expect(container.getAllByText(/apr/i)).toHaveLength(2)
+      expect(container.getAllByText(/may/i)).toHaveLength(2)
+    })
+
+    it('clicking view availability opens the tray for graded discussion with group set', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        assignment: {lockAt: '2022-04-15T23:59:59-07:00', unlockAt: '2022-05-15T00:00:00-07:00'},
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+
+      expect(container.getAllByText(/apr/i)).toHaveLength(2)
+      expect(container.getAllByText(/may/i)).toHaveLength(2)
+    })
+
+    it('clicking view availability opens the tray for graded discussion with group set and overrides', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        assignment: {
+          lockAt: '2022-04-15T23:59:59-07:00',
+          unlockAt: '2022-05-15T00:00:00-07:00',
+          assignmentOverrides: {
+            nodes: [
+              {
+                lockAt: '2022-10-15T23:59:59-07:00',
+                unlockAt: '2022-11-15T00:00:00-07:00',
+                set: {
+                  _id: '1',
+                  __typename: 'Group',
+                },
+              },
+            ],
+          },
+        },
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+      expect(container.getByText(/oct/i)).toBeInTheDocument()
+      expect(container.getByText(/nov/i)).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+      expect(container.getByText(/apr/i)).toBeInTheDocument()
+      expect(container.getByText(/may/i)).toBeInTheDocument()
     })
   })
 
@@ -119,6 +234,83 @@ describe('DiscussionAvailabilityContainer', () => {
       fireEvent.click(viewAvailabilityButton)
       expect(container.getByText('99')).toBeInTheDocument()
       expect(container.getByText('section 2')).toBeInTheDocument()
+    })
+
+    it('clicking view availability opens the tray for ungraded discussion with group set', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        lockAt: '2022-04-15T23:59:59-07:00',
+        delayedPostAt: '2022-05-15T00:00:00-07:00',
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+
+      expect(container.getAllByText(/apr/i)).toHaveLength(2)
+      expect(container.getAllByText(/may/i)).toHaveLength(2)
+    })
+
+    it('clicking view availability opens the tray for graded discussion with group set', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        assignment: {lockAt: '2022-04-15T23:59:59-07:00', unlockAt: '2022-05-15T00:00:00-07:00'},
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+
+      expect(container.getAllByText(/apr/i)).toHaveLength(2)
+      expect(container.getAllByText(/may/i)).toHaveLength(2)
+    })
+
+    it('clicking view availability opens the tray for graded discussion with group set and group overrides', () => {
+      const container = setup({
+        groupSet: {
+          groups: mockGroups,
+        },
+        assignment: {
+          lockAt: '2022-04-15T23:59:59-07:00',
+          unlockAt: '2022-05-15T00:00:00-07:00',
+          assignmentOverrides: {
+            nodes: [
+              {
+                lockAt: '2022-10-15T23:59:59-07:00',
+                unlockAt: '2022-11-15T00:00:00-07:00',
+                set: {
+                  _id: '1',
+                  __typename: 'Group',
+                },
+              },
+            ],
+          },
+        },
+      })
+      const viewAvailabilityButton = container.queryByText('View Availability')
+      fireEvent.click(viewAvailabilityButton)
+
+      expect(container.getByText('Amazing group')).toBeInTheDocument()
+      expect(container.getByText('5')).toBeInTheDocument()
+      expect(container.getByText(/oct/i)).toBeInTheDocument()
+      expect(container.getByText(/nov/i)).toBeInTheDocument()
+
+      expect(container.getByText('Fantastic group')).toBeInTheDocument()
+      expect(container.getByText('10')).toBeInTheDocument()
+      expect(container.getByText(/apr/i)).toBeInTheDocument()
+      expect(container.getByText(/may/i)).toBeInTheDocument()
     })
   })
 })

@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, node, shape, string} from 'prop-types'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,7 @@ import {Table} from '@instructure/ui-table'
 import {getHistoryNextPage} from './actions/SearchResultsActions'
 import SearchResultsRow from './SearchResultsRow'
 
-const I18n = useI18nScope('gradebook_history')
+const I18n = createI18nScope('gradebook_history')
 
 const colHeaders = [
   I18n.t('Date'),
@@ -55,6 +55,7 @@ class SearchResultsComponent extends Component {
         assignment: shape({
           name: string.isRequired,
           muted: bool.isRequired,
+          subAssignmentTag: string,
         }),
         date: string.isRequired,
         displayAsPoints: bool.isRequired,
@@ -68,7 +69,7 @@ class SearchResultsComponent extends Component {
         pointsPossibleBefore: string.isRequired,
         pointsPossibleCurrent: string.isRequired,
         student: string.isRequired,
-      })
+      }),
     ).isRequired,
     nextPage: string.isRequired,
     requestingResults: bool.isRequired,

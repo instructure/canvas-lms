@@ -17,114 +17,143 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import SubmissionTrayRadioInput from '../SubmissionTrayRadioInput'
 
-let wrapper: any
-let props: any
-
-function mountComponent(customProps?: any) {
-  props = {
-    checked: false,
-    color: '#FEF7E5',
-    disabled: false,
-    latePolicy: {lateSubmissionInterval: 'day'},
-    locale: 'en',
-    onChange() {},
-    submission: {secondsLate: 0},
-    text: 'Missing',
-    updateSubmission() {},
-    value: 'missing',
-    ...customProps,
+type Props = {
+  checked: boolean
+  color?: string
+  disabled: boolean
+  latePolicy: {
+    lateSubmissionInterval: 'day' | 'hour'
   }
-  return render(<SubmissionTrayRadioInput {...props} />)
+  locale: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  submission: {
+    id: string
+    secondsLate: number
+  }
+  text: string
+  updateSubmission: (submission: {secondsLateOverride: number}) => void
+  value: string
 }
 
-function numberInput() {
-  return wrapper.container.querySelector('.NumberInput__Container input[type="text"]')
-}
-
-function radioInput() {
-  return wrapper.container.querySelector('input[type="radio"]')
-}
-
-function radioInputContainer() {
-  return wrapper.container.querySelector('.SubmissionTray__RadioInput')
+const defaultProps: Props = {
+  checked: false,
+  color: '#FEF7E5',
+  disabled: false,
+  latePolicy: {lateSubmissionInterval: 'day'},
+  locale: 'en',
+  onChange: () => {},
+  submission: {
+    id: '1',
+    secondsLate: 0,
+  },
+  text: 'Missing',
+  updateSubmission: () => {},
+  value: 'missing',
 }
 
 describe('SubmissionTrayRadioInput', () => {
-  test('renders a radio option with a name of "SubmissionTrayRadioInput"', () => {
-    wrapper = mountComponent()
-    expect(radioInput().getAttribute('name')).toEqual('SubmissionTrayRadioInput')
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
-  test('renders with a background color specified by the "color" prop', () => {
-    wrapper = mountComponent({color: 'green'})
-    expect(radioInputContainer().getAttribute('style')).toContain('background-color: green')
-  })
+  const renderComponent = (customProps: Partial<Props> = {}) => {
+    const props = {...defaultProps, ...customProps}
+    return render(<SubmissionTrayRadioInput {...props} />)
+  }
 
-  test('renders with a "transparent" background color if a color is not specified', () => {
-    wrapper = mountComponent({color: undefined})
-    expect(radioInputContainer().getAttribute('style')).toContain('background-color: transparent')
-  })
+  describe('radio input', () => {
+    it('renders with the expected name attribute', () => {
+      const {getByRole} = renderComponent()
+      expect(getByRole('radio')).toHaveAttribute('name', 'SubmissionTrayRadioInput')
+    })
 
-  test('renders with the radio option enabled when disabled is false', () => {
-    wrapper = mountComponent({disabled: false})
-    expect(radioInput()).not.toBeDisabled()
-  })
+    it('applies the specified background color', () => {
+      const {container} = renderComponent({color: 'green'})
+      const radioContainer = container.querySelector('.SubmissionTray__RadioInput')
+      expect(radioContainer).toHaveStyle({backgroundColor: 'rgb(0, 128, 0)'})
+    })
 
-  test('renders with the radio option disabled when disabled is true', () => {
-    wrapper = mountComponent({disabled: true})
-    expect(radioInput()).toBeDisabled()
-  })
+    it('uses transparent background when no color specified', () => {
+      const {container} = renderComponent({color: undefined})
+      const radioContainer = container.querySelector('.SubmissionTray__RadioInput')
+      expect(radioContainer).toHaveStyle({backgroundColor: 'rgba(0, 0, 0, 0)'})
+    })
 
-  test('renders with the radio option selected when checked is true', () => {
-    wrapper = mountComponent({checked: true})
-    expect(radioInput()).toBeChecked()
-  })
+    it('is enabled by default', () => {
+      const {getByRole} = renderComponent()
+      expect(getByRole('radio')).not.toBeDisabled()
+    })
 
-  test('renders with the radio option deselected when checked is false', () => {
-    wrapper = mountComponent()
-    expect(radioInput()).not.toBeChecked()
-  })
+    it('can be disabled', () => {
+      const {getByRole} = renderComponent({disabled: true})
+      expect(getByRole('radio')).toBeDisabled()
+    })
 
-  test('calls onChange when the radio option is selected', () => {
-    const onChange = jest.fn()
-    wrapper = mountComponent({onChange})
-    fireEvent.click(radioInput())
-    expect(onChange).toHaveBeenCalledTimes(1)
+    it('can be checked', () => {
+      const {getByRole} = renderComponent({checked: true})
+      expect(getByRole('radio')).toBeChecked()
+    })
+
+    it('is unchecked by default', () => {
+      const {getByRole} = renderComponent()
+      expect(getByRole('radio')).not.toBeChecked()
+    })
+
+    it('calls onChange when clicked', async () => {
+      const onChange = jest.fn()
+      const {getByRole} = renderComponent({onChange})
+      const user = userEvent.setup()
+      await user.click(getByRole('radio'))
+      expect(onChange).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('NumberInput', () => {
-    test('does not render a NumberInput when value is not "late"', () => {
-      wrapper = mountComponent()
-      expect(numberInput()).not.toBeInTheDocument()
+    it('is not rendered by default', () => {
+      const {container} = renderComponent()
+      expect(
+        container.querySelector('.NumberInput__Container input[type="text"]'),
+      ).not.toBeInTheDocument()
     })
 
-    test('renders with a NumberInput when value is "late" and checked is true', () => {
-      wrapper = mountComponent({value: 'late', checked: true})
-      expect(numberInput()).toBeInTheDocument()
+    it('is rendered when value is "late" and checked', () => {
+      const {container} = renderComponent({value: 'late', checked: true})
+      expect(
+        container.querySelector('.NumberInput__Container input[type="text"]'),
+      ).toBeInTheDocument()
     })
 
-    test('renders without a NumberInput when value is "late" and checked is false', () => {
-      wrapper = mountComponent({value: 'late'})
-      expect(numberInput()).not.toBeInTheDocument()
+    it('is not rendered when value is "late" but unchecked', () => {
+      const {container} = renderComponent({value: 'late', checked: false})
+      expect(
+        container.querySelector('.NumberInput__Container input[type="text"]'),
+      ).not.toBeInTheDocument()
     })
 
-    test('renders with the NumberInput enabled when disabled is false', () => {
-      wrapper = mountComponent({value: 'late', checked: true})
-      expect(numberInput()).not.toBeDisabled()
+    it('is enabled by default when rendered', () => {
+      const {container} = renderComponent({value: 'late', checked: true})
+      const input = container.querySelector('.NumberInput__Container input[type="text"]')
+      expect(input).not.toBeDisabled()
     })
 
-    test('renders with the NumberInput disabled when disabled is true', () => {
-      wrapper = mountComponent({value: 'late', checked: true, disabled: true})
-      expect(numberInput()).toBeDisabled()
+    it('can be disabled', () => {
+      const {container} = renderComponent({value: 'late', checked: true, disabled: true})
+      const input = container.querySelector('.NumberInput__Container input[type="text"]')
+      expect(input).toBeDisabled()
     })
 
-    test('renders NumberInput when value is changed to "late"', () => {
-      wrapper = render(<SubmissionTrayRadioInput {...props} value="late" checked={false} />)
-      wrapper.rerender(<SubmissionTrayRadioInput {...props} value="late" checked={true} />)
-      expect(numberInput()).toBeInTheDocument()
+    it('appears when radio value changes to "late" and becomes checked', () => {
+      const {container, rerender} = render(
+        <SubmissionTrayRadioInput {...defaultProps} value="late" checked={false} />,
+      )
+      rerender(<SubmissionTrayRadioInput {...defaultProps} value="late" checked={true} />)
+      expect(
+        container.querySelector('.NumberInput__Container input[type="text"]'),
+      ).toBeInTheDocument()
     })
   })
 })

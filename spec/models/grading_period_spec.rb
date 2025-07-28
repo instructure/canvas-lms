@@ -64,8 +64,6 @@ describe GradingPeriod do
     expect(grading_period).not_to be_valid
   end
 
-  it { is_expected.to validate_numericality_of(:weight) }
-
   describe ".in_closed_grading_period?" do
     let(:in_closed_grading_period) { closed_period.start_date + 1.day }
     let(:in_not_closed_grading_period) { not_closed_period.start_date + 1.day }
@@ -1004,6 +1002,8 @@ describe GradingPeriod do
 
     it "updates course score when the grading period weight is changed" do
       grading_period.save!
+      # Changing the assinment due date, so there are scores to update in the course
+      @assignment.update!(due_at: 2.hours.from_now(now))
       grading_period_group.update!(weighted: true)
       expect { grading_period.update!(weight: 50) }.to change {
         Score.where(grading_period_id: nil).first.updated_at

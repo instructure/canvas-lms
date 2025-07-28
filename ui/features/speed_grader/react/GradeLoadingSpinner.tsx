@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,11 +18,12 @@
 
 import React, {useEffect} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useStoreWithEqualityFn} from 'zustand/traditional'
 import useStore from '../stores/index'
 import type {GradeLoadingData} from '../jquery/speed_grader.d'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 const loadingForStudent = (state: GradeLoadingData) => !!state.gradesLoading[state.currentStudentId]
 const loadingStateChanged = (oldState: GradeLoadingData, newState: GradeLoadingData) =>
@@ -34,9 +34,13 @@ type Props = {
 }
 
 export default function GradeLoadingSpinner({onLoadingChange}: Props) {
-  const {currentStudentId, gradesLoading} = useStore(
-    state => ({currentStudentId: state.currentStudentId, gradesLoading: state.gradesLoading}),
-    loadingStateChanged
+  const {currentStudentId, gradesLoading} = useStoreWithEqualityFn(
+    useStore,
+    state => ({
+      currentStudentId: state.currentStudentId,
+      gradesLoading: state.gradesLoading,
+    }),
+    loadingStateChanged,
   )
 
   useEffect(() => {

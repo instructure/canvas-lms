@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
 import {
   accountMocks,
@@ -26,9 +26,9 @@ import {
   createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import TargetGroupSelector from '../TargetGroupSelector'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.useFakeTimers()
@@ -36,7 +36,6 @@ jest.useFakeTimers()
 describe('TargetGroupSelector', () => {
   let cache
   let setTargetGroupMock
-  let showFlashAlertSpy
 
   const defaultProps = (props = {}) => ({
     parentGroupId: '1',
@@ -49,7 +48,6 @@ describe('TargetGroupSelector', () => {
   beforeEach(() => {
     cache = createCache()
     setTargetGroupMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -63,14 +61,14 @@ describe('TargetGroupSelector', () => {
       contextId = '1',
       mocks = accountMocks({childGroupsCount: 0}),
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId, treeBrowserRootGroupId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -109,7 +107,7 @@ describe('TargetGroupSelector', () => {
       mocks: [],
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -123,7 +121,7 @@ describe('TargetGroupSelector', () => {
       mocks: [],
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading course learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -141,7 +139,7 @@ describe('TargetGroupSelector', () => {
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       type: 'error',
       srOnly: false,
@@ -169,7 +167,7 @@ describe('TargetGroupSelector', () => {
               groupId: '12',
             }),
           ],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       // We're in group 123
@@ -221,7 +219,7 @@ describe('TargetGroupSelector', () => {
               title: 'new group name',
             }),
           ],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       fireEvent.click(getByText('Create New Group'))
@@ -246,7 +244,7 @@ describe('TargetGroupSelector', () => {
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         type: 'success',
         message: '"new group name" was successfully created.',
       })
@@ -268,7 +266,7 @@ describe('TargetGroupSelector', () => {
       fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'new group name'}})
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         type: 'error',
         message: 'An error occurred while creating this group. Please try again.',
       })

@@ -46,6 +46,7 @@ export default class IndividualStudentView extends Backbone.View {
         outcomeProficiency={ENV.outcome_proficiency}
       />
     )
+    // eslint-disable-next-line react/no-render-return-value
     return (this.reactView = ReactDOM.render(masteryElement, $('.individualStudentView').get(0)))
   }
 

@@ -29,6 +29,7 @@ module CC::Importer::Canvas
     include QuizConverter
     include MediaTrackConverter
     include LtiResourceLinkConverter
+    include LtiContextControlConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
 
@@ -39,6 +40,7 @@ module CC::Importer::Canvas
       @resources = {}
       @resource_nodes_for_flat_manifest = {}
       @canvas_converter = true
+      @is_discussion_checkpoints_enabled = settings[:is_discussion_checkpoints_enabled] || false
     end
 
     # exports the package into the intermediary json
@@ -61,6 +63,7 @@ module CC::Importer::Canvas
       lti = CC::Importer::BLTIConverter.new
       res = lti.get_blti_resources(@manifest)
       @course[:external_tools] = lti.convert_blti_links(res, self)
+      @course[:lti_context_controls] = convert_lti_context_controls(settings_doc(LTI_CONTEXT_CONTROLS))
       set_progress(50)
       @course[:tool_profiles] = convert_tool_profiles
       set_progress(52)

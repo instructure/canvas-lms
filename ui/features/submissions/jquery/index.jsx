@@ -18,12 +18,15 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import round from '@canvas/round'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import isNumber from 'lodash/isNumber'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
+import {Flex} from '@instructure/ui-flex'
+import {Tag} from '@instructure/ui-tag'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -34,8 +37,16 @@ import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rubrics/jquery/rubric_assessment'
+import sanitizeHtml from 'sanitize-html-with-tinymce'
+import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import CheckpointGradeRoot from '../react/CheckpointGradeRoot'
+import StudentAssetReportModalWrapper from '../react/StudentAssetReportModalWrapper'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
+import theme from '@instructure/canvas-theme'
+import ready from '@instructure/ready'
+import TextEntryAssetReportStatusLink from '../react/TextEntryAssetReportStatusLink'
 
-const I18n = useI18nScope('submissions')
+const I18n = createI18nScope('submissions')
 /* global rubricAssessment */
 
 const rubricAssessments = ENV.rubricAssessments
@@ -121,7 +132,7 @@ function showGrade(submission) {
     $('.grading_box').val(submission.entered_grade)
   } else {
     $('.grading_box').val(
-      callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade, formatGradeOptions())
+      callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade, formatGradeOptions()),
     )
   }
   $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat))
@@ -134,7 +145,7 @@ function showGrade(submission) {
     const formattedGrade = callIfSet(
       submission.entered_grade,
       GradeFormatHelper.formatGrade,
-      formatGradeOptions()
+      formatGradeOptions(),
     )
     $('.entered_grade').text(formattedGrade)
   }
@@ -199,30 +210,84 @@ function closeRubric() {
   })
 }
 function openRubric() {
+  validateComments()
   $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
-    toggleSaveCommentButton($(this))
+    refreshEventHandlers()
     $(this).find('.hide_rubric_link').focus()
   })
 }
-function toggleSaveCommentButton($rubricHolder) {
-  const $rubric = $rubricHolder.find('.rubric')
-  const rubricData = rubricAssessment.assessmentData($rubric)
-  const complete = isRubricComplete(rubricData)
 
-  $('.save_rubric_button').prop('disabled', !complete)
-}
-function isRubricComplete(rubricData) {
-  return Object.keys(rubricData).some(key => {
-    return hasPoints(key, rubricData) || hasComments(key, rubricData)
+function validateComments() {
+  $('.rubric-comment textarea').each(function () {
+    validateComment($(this))
   })
 }
-function hasComments(key, data) {
-  return key.indexOf('[comments]') !== -1 && data[key].trim() !== ''
+
+function validateComment($commentTextArea) {
+  const newValue = $commentTextArea.val().trim()
+  if (newValue !== '') {
+    handleValidationClear($commentTextArea)
+  } else {
+    const $wrapper = $commentTextArea.closest('.rubric-comment')
+    showErrorMessage($wrapper, I18n.t('A comment is required.'))
+  }
 }
-function hasPoints(key, data) {
-  return key.indexOf('[points]') !== -1 && isNumber(data[key])
+
+function handleValidationClear($textArea) {
+  const $wrapper = $textArea.closest('.rubric-comment')
+  if ($wrapper.find('.error-message').length) {
+    setTimeout(() => {
+      $wrapper.find('.error-message').remove()
+      $textArea.removeClass('error-textarea')
+      $textArea.next('span').css('border-color', theme.colors?.ui?.surfaceAttention)
+    }, 100)
+  }
 }
+
+function refreshEventHandlers() {
+  $('.add-comment-button-wrapper button')
+    .off('click.commentHandler')
+    .on('click.commentHandler', function () {
+      const $row = $(this).closest('tr[data-testid="rubric-criterion"]')
+      setTimeout(() => {
+        const $comment = $row.find('.rubric-comment textarea')
+        addEvents($comment)
+      }, 500)
+    })
+
+  function addEvents($textAreas = $('.rubric-comment textarea')) {
+    $textAreas
+      .off('input.commentHandler blur.commentHandler') // avoid multiple bindings
+      .on('input.commentHandler blur.commentHandler', function () {
+        const $commentTextArea = $(this)
+        validateComment($commentTextArea)
+      })
+  }
+
+  addEvents()
+}
+function showErrorMessage(selector, message) {
+  let errorContainer = selector.find('.error-message')
+  if (errorContainer.length) return
+  errorContainer = $('<div />', {
+    class: 'error-message',
+    tabindex: '-1',
+  }).appendTo(selector)
+  $('<i />', {
+    class: 'icon-warning icon-Solid',
+  }).appendTo(errorContainer)
+  $('<span />', {
+    role: 'alert',
+    'aria-live': 'polite',
+    tabindex: '-1',
+  })
+    .text(message)
+    .appendTo(errorContainer)
+  selector.find('textarea').addClass('error-textarea')
+  selector.find('.error-textarea').next('span').css('border-color', theme.colors?.ui?.surfaceError)
+}
+
 function windowResize() {
   const $frame = $('#preview_frame')
   const margin_top = 20
@@ -243,16 +308,68 @@ function insertEmoji(emoji) {
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
   $(document).ready(function () {
+    // Render Checkpoint Score Boxes if applicable
+    // The mount point is only available if checkpoints are enabled and the assignment has checkpoints
+    // For reference the mount point is located in the "views/submissions/show.html.erb" file
+    const mountPoint = document.getElementById('checkpoints-grade-inputs-mount-point')
+    if (mountPoint) {
+      const root = createRoot(mountPoint)
+      const props = {
+        assignment: {
+          grading_type: ENV.GRADING_TYPE,
+          total_score: ENV.SUBMISSION.submission.grade || '',
+          checkpoint_submissions: [
+            {
+              tag: 'reply_to_topic',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_topic.submission_id,
+            },
+            {
+              tag: 'reply_to_entry',
+              points_possible: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.points_possible,
+              submission_score: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.entered_score,
+              submission_id: ENV.CHECKPOINT_SUBMISSIONS.reply_to_entry.submission_id,
+            },
+          ],
+        },
+      }
+      root.render(<CheckpointGradeRoot {...props} />)
+    }
+
     if (ENV.EMOJIS_ENABLED) {
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
-        document.getElementById('emoji-picker-container')
+        document.getElementById('emoji-picker-container'),
       )
+
       ReactDOM.render(
         <EmojiQuickPicker insertEmoji={insertEmoji} />,
-        document.getElementById('emoji-quick-picker-container')
+        document.getElementById('emoji-quick-picker-container'),
       )
     }
+    let textAreaErrorRoot
+    const comments = document.getElementsByClassName('comment_content')
+    Array.from(comments).forEach(comment => {
+      const content = comment.dataset.content
+      const formattedComment = containsHtmlTags(content)
+        ? sanitizeHtml(content)
+        : formatMessage(content)
+      comment.innerHTML = formattedComment
+    })
+    const textAreaContainer = document.getElementById('textarea-container')
+    const textAreaElement = document.querySelector('textarea.grading_comment')
+    const clearTextAreaErrors = () => {
+      if (textAreaErrorRoot) {
+        textAreaErrorRoot.unmount()
+        textAreaContainer?.classList.remove('error-outline')
+        textAreaContainer?.removeAttribute('aria-label')
+      }
+    }
+    textAreaElement?.addEventListener('input', _event => {
+      // clear any errors when input changes
+      clearTextAreaErrors()
+    })
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')
     $(window).bind('resize', windowResize).triggerHandler('resize')
     $('.comments_link').click(event => {
@@ -275,6 +392,14 @@ export function setup() {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
         'submission[group_comment]': $('#submission_group_comment').prop('checked') ? '1' : '0',
       }
+      const fileInputs = $("#add_comment_form input[type='file']")
+      let hasFiles = false
+      fileInputs.each((_idx, input) => {
+        if (input.files.length > 0) {
+          hasFiles = true
+          return
+        }
+      })
 
       const anonymizableIdKey = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
       formData[`submission[${anonymizableIdKey}]`] = ENV.SUBMISSION[anonymizableIdKey]
@@ -289,29 +414,37 @@ export function setup() {
         if ($('.grading_comment').val() && $('.grading_comment').val != '') {
           formData['submission[comment]'] = $('.grading_comment').val()
         }
-        if (
-          !formData['submission[comment]'] &&
-          $("#add_comment_form input[type='file']").length > 0
-        ) {
+        if (!formData['submission[comment]'] && hasFiles) {
           formData['submission[comment]'] = I18n.t(
             'see_attached_files',
-            'Please see attached files'
+            'Please see attached files',
           )
         }
       }
-      if (!formData['submission[comment]'] && !formData['submission[media_comment_id]']) {
+      if (
+        !formData['submission[comment]'] &&
+        !formData['submission[media_comment_id]'] &&
+        !hasFiles
+      ) {
         $('.submission_header').loadingImage('remove')
         $('.save_comment_button').prop('disabled', false)
+        textAreaElement?.focus()
+        const message = I18n.t('Comment or file required to save')
+        textAreaContainer?.classList.add('error-outline')
+        textAreaContainer?.setAttribute('aria-label', message)
+        const textAreaErrorContainer = document.getElementById('textarea-error-container')
+        textAreaErrorRoot = createRoot(textAreaErrorContainer)
+        textAreaErrorRoot.render(
+          <FormattedErrorMessage
+            message={message}
+            margin="xx-small 0 small 0"
+            iconMargin="0 xx-small xxx-small 0"
+          />,
+        )
         return
       }
-      if ($("#add_comment_form input[type='file']").length > 0) {
-        $.ajaxJSONFiles(
-          url + '.text',
-          method,
-          formData,
-          $("#add_comment_form input[type='file']"),
-          submissionLoaded
-        )
+      if (hasFiles) {
+        $.ajaxJSONFiles(url + '.text', method, formData, fileInputs, submissionLoaded)
       } else {
         $.ajaxJSON(url, method, formData, submissionLoaded)
       }
@@ -348,6 +481,51 @@ export function setup() {
       $attachment.find('input').attr('name', 'attachments[' + fileIndex++ + '][uploaded_data]')
       $('#add_comment_form .comment_attachments').append($attachment.slideDown())
     })
+    document.addEventListener('change', function (event) {
+      if (event.target.matches('#add_comment_form input[type="file"]')) {
+        const inputElement = event.target
+        const parentElement = inputElement.parentNode
+
+        if (inputElement.files && inputElement.files.length > 0) {
+          const fileName = inputElement.files[0].name
+
+          // Hide the input element
+          inputElement.style.height = '0'
+          inputElement.style.width = '0'
+          // Also remove the link to remove the input
+          const deleteLink = Array.from(parentElement.children).find(child =>
+            child.classList.contains('delete_comment_attachment_link'),
+          )
+          deleteLink?.remove()
+
+          // Clear any existing errors
+          clearTextAreaErrors()
+
+          // Replace with Pill
+          const container = document.createElement('div')
+          parentElement.appendChild(container)
+          const fileRoot = createRoot(container)
+          const removeFile = (root, input) => {
+            root.unmount()
+            input.remove()
+          }
+          fileRoot.render(
+            <Flex direction="column" margin="0 0 small 0">
+              <Flex.Item>
+                <Tag
+                  text={<AccessibleContent alt={fileName}>{fileName}</AccessibleContent>}
+                  dismissible={true}
+                  onClick={() => removeFile(fileRoot, inputElement)}
+                  data-testid="submission_comment_file_tag"
+                />
+              </Flex.Item>
+            </Flex>,
+          )
+        } else {
+          console.log('No file selected')
+        }
+      }
+    })
     $('.delete_comment_attachment_link').click(function (event) {
       event.preventDefault()
       $(this)
@@ -359,9 +537,28 @@ export function setup() {
     $('.save_rubric_button').click(function () {
       const $rubric = $(this).parents('#rubric_holder').find('.rubric')
       const submitted_data = rubricAssessment.assessmentData($rubric)
+      const $rubricComments = $('.rubric-comment')
 
-      if (!isRubricComplete(submitted_data)) {
-        $('.save_rubric_button').prop('disabled', true)
+      let hasError = false
+      $rubricComments.each(function () {
+        const $wrapper = $(this)
+        const $commentTextArea = $wrapper.find('textarea')
+
+        if ($commentTextArea.length > 0 && $commentTextArea.val().trim() === '') {
+          showErrorMessage($wrapper, I18n.t('A comment is required.'))
+          hasError = true
+        } else {
+          // If the textarea has a value, remove any existing error styles/messages
+          setTimeout(() => {
+            $wrapper.find('.error-message').remove()
+            $commentTextArea.removeClass('error-textarea')
+            $commentTextArea.next('span').removeClass('error-textarea__outline')
+          }, 1000)
+        }
+      })
+
+      // If any comment is invalid, prevent submission
+      if (hasError) {
         return false
       }
 
@@ -450,22 +647,6 @@ export function setup() {
         $('#rubric_holder .save_rubric_button').showIf(current_user)
       })
       .change()
-    $('#rubric_holder .rubric tbody input').on('change', () => {
-      const $rubricHolder = $('#rubric_holder')
-      toggleSaveCommentButton($rubricHolder)
-    })
-    // uses event delegation since the text area isn't on the DOM until you click on the comment icon
-    $('#rubric_holder .rubric tbody').on('change', 'textarea', () => {
-      const $rubricHolder = $('#rubric_holder')
-      toggleSaveCommentButton($rubricHolder)
-    })
-    $('#rubric_holder .rubric .rating-tier').on('click', () => {
-      // wait for next tick so that rubric data is populated with latest change
-      setTimeout(() => {
-        const $rubricHolder = $('#rubric_holder')
-        toggleSaveCommentButton($rubricHolder)
-      }, 0)
-    })
     $('.media_comment_link').click(event => {
       event.preventDefault()
       $('#media_media_recording').show()
@@ -483,7 +664,7 @@ export function setup() {
         () => {
           $('#add_comment_form').show()
           $('#media_media_recording').hide()
-        }
+        },
       )
     })
     $(document).on('click', '#media_recorder_container a', _event => {
@@ -555,6 +736,39 @@ $(document).ready(() => {
         INST.refreshGrades()
       }
     },
-    false
+    false,
   )
+})
+
+ready(() => {
+  const mountPoint = document.getElementById('asset_report_modal')
+  if (mountPoint) {
+    const root = createRoot(mountPoint)
+    root.render(<StudentAssetReportModalWrapper />)
+  }
+})
+
+ready(() => {
+  const reports = ENV['ASSET_REPORTS']
+  const assetProcessors = ENV['ASSET_PROCESSORS'] || []
+  const assignmentName = ENV['ASSIGNMENT_NAME'] || ''
+  const mountPoint = document.getElementById('asset_report_text_entry_status_container')
+
+  // if lti_asset_processor FF is off, reports will be undefined
+  if (!mountPoint || !reports || !assetProcessors || !assetProcessors.length) {
+    return
+  }
+
+  if (mountPoint) {
+    const root = createRoot(mountPoint)
+    const attempt = mountPoint.dataset['attempt']
+    root.render(
+      <TextEntryAssetReportStatusLink
+        reports={reports}
+        assetProcessors={assetProcessors}
+        assignmentName={assignmentName}
+        attempt={attempt}
+      />,
+    )
+  }
 })

@@ -18,14 +18,14 @@
 
 import React from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const ScoreDistributionGraph = props => {
   const {assignment} = props
   const GRAPH_SCALAR = 150.0
-  const GRAY_COLOR = '#556572'
+  const GRAY_COLOR = '#4A5B68'
   const BLUE_COLOR = '#224488'
   const BLUE_FILL_COLOR = '#aabbdd'
 
@@ -75,7 +75,7 @@ const ScoreDistributionGraph = props => {
     y2,
     strokeWidth = strokeWidthDefault,
     rx,
-    fill
+    fill,
   ) => ({
     className,
     x1,
@@ -96,7 +96,7 @@ const ScoreDistributionGraph = props => {
       startSvgHeight,
       `${graph.low_pos}`,
       displaySvgHeight,
-      strokeWidthDefault
+      strokeWidthDefault,
     ),
     createSvgLine(
       'bottomQ',
@@ -104,7 +104,7 @@ const ScoreDistributionGraph = props => {
       midSvgHeight,
       `${graph.lq_pos}`,
       midSvgHeight,
-      strokeWidthDefault
+      strokeWidthDefault,
     ),
     createSvgLine(
       'topQ',
@@ -112,7 +112,7 @@ const ScoreDistributionGraph = props => {
       midSvgHeight,
       `${graph.high_pos}`,
       midSvgHeight,
-      strokeWidthDefault
+      strokeWidthDefault,
     ),
     createSvgLine(
       'max',
@@ -120,7 +120,7 @@ const ScoreDistributionGraph = props => {
       startSvgHeight,
       `${graph.high_pos}`,
       displaySvgHeight,
-      strokeWidthDefault
+      strokeWidthDefault,
     ),
     createSvgLine(
       'median',
@@ -128,7 +128,7 @@ const ScoreDistributionGraph = props => {
       minSvgHeight,
       `${graph.median_pos}`,
       maxSvgHeight,
-      strokeWidthDefault
+      strokeWidthDefault,
     ),
   ]
 

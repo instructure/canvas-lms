@@ -16,31 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create from 'zustand'
+import {create} from 'zustand'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RubricAssessmentSelect} from '@canvas/rubrics/react/types/rubric'
-import type {RubricAssessmentUnderscore} from '../react/RubricAssessmentTrayWrapper/utils'
+import type {RubricAssessmentUnderscore} from '@canvas/rubrics/react/utils'
 
 type SpeedGraderStore = {
   currentStudentId: string
+  currentStudentName?: string
+  currentStudentAvatarPath?: string
   gradesLoading: Record<string, boolean>
   rubricAssessmentTrayOpen: boolean
   rubricAssessors: RubricAssessmentSelect
   rubricHidePoints: boolean
   studentAssessment?: RubricAssessmentUnderscore
+  selfAssessment?: RubricAssessmentUnderscore | null
   rubricSavedComments?: Record<string, string[]>
+  student_entries?: object
 }
 
 const useStore = create(
   subscribeWithSelector<SpeedGraderStore>(() => ({
     currentStudentId: '',
+    currentStudentName: '',
+    currentStudentAvatarPath: '',
     gradesLoading: {},
     rubricAssessmentTrayOpen: false,
     rubricAssessors: [],
     rubricHidePoints: false,
     studentAssessment: undefined,
     rubricSavedComments: {},
-  }))
+    student_entries: {},
+  })),
 )
 
 export const updateState = (newState: Partial<SpeedGraderStore>) => {

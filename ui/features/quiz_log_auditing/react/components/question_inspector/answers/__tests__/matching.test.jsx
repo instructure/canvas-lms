@@ -29,7 +29,7 @@ describe('canvas_quizzes/events/views/question_inspector/answers/matching', () =
           matches: [{match_id: 2, text: '[did match]'}],
         }}
         answer={[{answer_id: 1, match_id: 2}]}
-      />
+      />,
     )
 
     expect(document.body.textContent).toMatch('[match one]')

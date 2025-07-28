@@ -18,14 +18,16 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('DueDateRemoveRowLink')
+const I18n = createI18nScope('DueDateRemoveRowLink')
 
 class DueDateRemoveRowLink extends React.Component {
   static propTypes = {
     handleClick: PropTypes.func.isRequired,
   }
+
+  removeRowIconRef = React.createRef()
 
   render() {
     return (
@@ -33,7 +35,7 @@ class DueDateRemoveRowLink extends React.Component {
         <button
           className="Button Button--link"
           onClick={this.props.handleClick}
-          ref="removeRowIcon"
+          ref={this.removeRowIconRef}
           href="#"
           title={I18n.t('Remove These Dates')}
           aria-label={I18n.t('Remove These Dates')}

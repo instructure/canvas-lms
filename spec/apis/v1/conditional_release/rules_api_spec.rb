@@ -66,7 +66,7 @@ module ConditionalRelease
 
       it "requires authorization" do
         @user = user_factory
-        api_call(:get, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:get, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "returns all rules for a course" do
@@ -180,7 +180,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:post, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:post, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "creates successfully" do
@@ -263,7 +263,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:put, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:put, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "fails for deleted rule" do
@@ -345,11 +345,11 @@ module ConditionalRelease
                  { expected_status: 200 })
 
         rule.reload
-        changed_assoc = rule.assignment_set_associations.where(assignment_id: changed_assignment.id).take
+        changed_assoc = rule.assignment_set_associations.find_by(assignment_id: changed_assignment.id)
         expect(changed_assoc).not_to be_nil
-        new_assoc = rule.assignment_set_associations.where(assignment_id: new_assignment.id).take
+        new_assoc = rule.assignment_set_associations.find_by(assignment_id: new_assignment.id)
         expect(new_assoc).not_to be_nil
-        deleted_assoc = rule.assignment_set_associations.where(assignment_id: deleted_assignment_id).take
+        deleted_assoc = rule.assignment_set_associations.find_by(assignment_id: deleted_assignment_id)
         expect(deleted_assoc).to be_nil
         expect(rule.assignment_set_associations.count).to be 4
 
@@ -401,7 +401,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "deletes a rule" do

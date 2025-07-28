@@ -18,12 +18,12 @@
 
 import React from 'react'
 import $ from 'jquery'
-import 'jquery-migrate'
+import 'jquery-migrate' // required
 import {Provider} from 'react-redux'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import moxios from 'moxios'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 import {ConnectedCourseSidebar} from '../CourseSidebar'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
@@ -33,7 +33,6 @@ import {createStore, applyMiddleware} from 'redux'
 import {thunk} from 'redux-thunk'
 import rootReducer from '@canvas/blueprint-courses/react/reducer'
 
-let clock
 let sidebarContentRef = null
 
 const initialState = {
@@ -45,6 +44,7 @@ const initialState = {
   hasLoadedAssociations: true,
   hasLoadedUnsyncedChanges: true,
   canAutoPublishCourses: false,
+  isLoadingBeginMigration: false,
 }
 
 const defaultProps = () => ({
@@ -66,20 +66,27 @@ function connect(props = defaultProps(), storeState = initialState) {
   )
 }
 
+const server = setupServer(
+  http.get('/api/v1/courses/:courseId/blueprint_templates/default/migrations', () =>
+    HttpResponse.json([{id: '1'}]),
+  ),
+  http.get('/api/v1/courses/:courseId/blueprint_templates/default/unsynced_changes', () =>
+    HttpResponse.json([]),
+  ),
+)
+
 describe('Course Sidebar component', () => {
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
-    moxios.install()
-    moxios.stubRequest('/api/v1/courses/4/blueprint_templates/default/migrations', {
-      status: 200,
-      response: [{id: '1'}],
-    })
+    jest.useFakeTimers()
   })
 
   afterEach(() => {
-    moxios.uninstall()
-    clock.restore()
+    jest.useRealTimers()
   })
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   test('renders the closed CourseSidebar component', () => {
     const tree = render(connect())
@@ -94,7 +101,7 @@ describe('Course Sidebar component', () => {
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
 
     const sidebar = $(sidebarContentRef)
@@ -103,7 +110,7 @@ describe('Course Sidebar component', () => {
     // associations
     expect(rows.eq(0).find('button#mcSidebarAsscBtn').size()).toBeTruthy()
     expect(rows.eq(0).text().trim()).toEqual(
-      `Associations${initialState.existingAssociations.length}`
+      `Associations${initialState.existingAssociations.length}`,
     )
 
     // sync history
@@ -191,12 +198,13 @@ describe('Course Sidebar component', () => {
     const state = {...initialState}
     state.unsyncedChanges = []
     state.migrationStatus = MigrationStates.states.imports_queued
+    state.hasCheckedMigration = true
     const tree = render(connect(props, state))
     const button = tree.container.querySelector('button')
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
     const sidebar = $(sidebarContentRef)
 
@@ -212,7 +220,7 @@ describe('Course Sidebar component', () => {
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
     const sidebar = $(sidebarContentRef)
 

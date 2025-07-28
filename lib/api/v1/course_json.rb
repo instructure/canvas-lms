@@ -91,8 +91,8 @@ module Api::V1
       clear_unneeded_fields(@hash)
     end
 
-    def self.to_hash(course, user, includes, enrollments, precalculated_permissions: nil, &block)
-      new(course, user, includes, enrollments, precalculated_permissions:, &block).to_hash
+    def self.to_hash(course, user, includes, enrollments, precalculated_permissions: nil, &)
+      new(course, user, includes, enrollments, precalculated_permissions:, &).to_hash
     end
 
     def clear_unneeded_fields(hash)
@@ -129,7 +129,7 @@ module Api::V1
     end
 
     def needs_grading_count(enrollments, course)
-      if include_grading && enrollments && enrollments.any?(&:participating_instructor?)
+      if include_grading && enrollments&.any?(&:participating_instructor?)
         proxy = Assignments::NeedsGradingCountQuery::CourseProxy.new(course, user)
         course.assignments.active.to_a.sum { |a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
       end

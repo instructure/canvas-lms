@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import './react/show'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -27,7 +27,7 @@ import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import './jquery/behaviors/openAsDialog'
 
-const I18n = useI18nScope('courses.show')
+const I18n = createI18nScope('courses.show')
 
 $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
@@ -38,7 +38,7 @@ $(document).ready(() => {
         modal: true,
         zIndex: 1000,
       })
-      .fixDialogButtons()
+      .fixDialogButtons(),
   )
 
   $selfUnenrollmentDialog.on('click', '.action', function () {
@@ -55,7 +55,7 @@ $(document).ready(() => {
       'POST',
       {},
       _data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
-      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
+      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.')),
     )
   })
 

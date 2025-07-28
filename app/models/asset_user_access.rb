@@ -66,13 +66,13 @@ class AssetUserAccess < ActiveRecord::Base
 
   def display_name
     # repair existing AssetUserAccesses that have bad display_names
-    if read_attribute(:display_name) == asset_code
+    if super == asset_code
       better_display_name = asset_display_name
       if better_display_name != asset_code
         update_attribute(:display_name, better_display_name)
       end
     end
-    read_attribute(:display_name)
+    super
   end
 
   def asset_display_name
@@ -90,7 +90,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def context_code
-    "#{context_type.underscore}_#{context_id}" rescue nil
+    "#{context_type.underscore}_#{context_id}" if context_type
   end
 
   def readable_name(include_group_name: true)
@@ -155,7 +155,7 @@ class AssetUserAccess < ActiveRecord::Base
         when "topics"
           include_group_name ? t("%{group_name} - Group Discussions", group_name: group.name) : t("Group Discussions")
         else
-          "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
+          "#{"#{group.name} - " if include_group_name}Group #{split[0].titleize}"
         end
       elsif split[1].match?(/user_\d+/)
         case split[0]

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useCallback} from 'react'
 
 import {Button} from '@instructure/ui-buttons'
@@ -25,10 +25,10 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
-const I18n = useI18nScope('assignments_bulk_edit')
+const I18n = createI18nScope('assignments_bulk_edit')
 
 function BulkEditDateSelect({selectDateRange}) {
   const [startDate, setStartDate] = useState(null)
@@ -68,7 +68,7 @@ function BulkEditDateSelect({selectDateRange}) {
           {/* Use a View to trick FormFieldGroup into having one child for layout purposes */}
           {/* Otherwise all the children get equal space, and we don't want that */}
           <View>
-            <CanvasDateInput
+            <CanvasDateInput2
               selectedDate={startDate}
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Selection start date')}</ScreenReaderContent>
@@ -79,7 +79,7 @@ function BulkEditDateSelect({selectDateRange}) {
             <View as="span" margin="0 small">
               <Text weight="bold">{I18n.t('to')}</Text>
             </View>
-            <CanvasDateInput
+            <CanvasDateInput2
               selectedDate={endDate}
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Selection end date')}</ScreenReaderContent>

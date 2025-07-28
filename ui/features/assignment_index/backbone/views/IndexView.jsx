@@ -16,17 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import {debounce} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import template from '../../jst/IndexView.handlebars'
 import NoAssignments from '../../jst/NoAssignmentsSearch.handlebars'
 import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
@@ -42,7 +40,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import IndexCreate from '../../react/IndexCreate'
 
-const I18n = useI18nScope('assignmentsIndexView')
+const I18n = createI18nScope('assignmentsIndexView')
 
 extend(IndexView, Backbone.View)
 
@@ -123,7 +121,8 @@ IndexView.prototype.afterRender = function () {
     const contextId = parseInt(contextInfo[1], 10)
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
-      ReactDOM.render(
+      const settingsRoot = createRoot(this.$settingsMountPoint[0])
+      settingsRoot?.render(
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
           contextType,
@@ -131,40 +130,39 @@ IndexView.prototype.afterRender = function () {
           requestBulkEdit: !ENV.IN_PACED_COURSE ? requestBulkEditFn : void 0,
           setTrigger: this.assignmentSettingsView.setTrigger.bind(this.assignmentSettingsView),
           setDisableTrigger: this.assignmentSyncSettingsView.setTrigger.bind(
-            this.assignmentSyncSettingsView
+            this.assignmentSyncSettingsView,
           ),
           registerWeightToggle: this.assignmentSettingsView.on.bind(this.assignmentSettingsView),
           disableSyncToSis: this.assignmentSyncSettingsView.openDisableSync.bind(
-            this.assignmentSyncSettingsView
+            this.assignmentSyncSettingsView,
           ),
           sisName: ENV.SIS_NAME,
           postToSisDefault: ENV.POST_TO_SIS_DEFAULT,
           hasAssignments: ENV.HAS_ASSIGNMENTS,
           assignmentGroupsCollection: this.collection,
         }),
-        this.$settingsMountPoint[0]
       )
     }
   }
   if (this.$indexCreateMountPoint.length) {
-    ReactDOM.render(
+    const indexRoot = createRoot(this.$indexCreateMountPoint[0])
+    indexRoot?.render(
       React.createElement(IndexCreate, {
         newAssignmentUrl: ENV.URLS.new_assignment_url,
         quizLtiEnabled: ENV.QUIZ_LTI_ENABLED,
         manageAssignmentAddPermission: ENV.PERMISSIONS.manage_assignments_add,
       }),
-      this.$indexCreateMountPoint[0]
     )
   }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
-    ReactDOM.render(
+    const bulkEditRoot = createRoot(this.$bulkEditRoot[0])
+    bulkEditRoot?.render(
       React.createElement(BulkEditIndex, {
         courseId: ENV.COURSE_ID,
         onCancel: this.cancelBulkEdit,
         onSave: this.handleBulkEditSaved,
         defaultDueTime: ENV.DEFAULT_DUE_TIME,
       }),
-      this.$bulkEditRoot[0]
     )
   }
   this.filterKeyBindings()
@@ -172,39 +170,43 @@ IndexView.prototype.afterRender = function () {
     this.kbDialog = new KeyboardNavDialog().render(
       keyboardNavTemplate({
         keyBindings: this.keyBindings,
-      })
+      }),
     )
     window.onkeydown = this.focusOnAssignments
   }
-  ReactDOM.render(
-    <TextInput
-      onChange={e => {
-        // Sends events to hidden input to utilize backbone
-        const hiddenInput = $('[data-view=inputFilter]')
-        hiddenInput[0].value = e.target?.value
-        hiddenInput.keyup()
-      }}
-      display="inline-block"
-      type="text"
-      data-testid="assignment-search-input"
-      placeholder={I18n.t('Search...')}
-      width="16rem"
-      renderLabel={
-        <ScreenReaderContent>
-          {I18n.t(
-            'Search assignments. As you type in this field, the list of assignments will be automatically filtered to only include those whose names match your input.'
-          )}
-        </ScreenReaderContent>
-      }
-      renderBeforeInput={() => <IconSearchLine />}
-    />,
-    this.$el.find('#search_input_container')[0]
-  )
+
+  this.$inputMountPoint = $('#search_input_container')
+  if (this.$inputMountPoint?.length) {
+    const inputRoot = createRoot(this.$inputMountPoint[0])
+    inputRoot?.render(
+      <TextInput
+        onChange={e => {
+          // Sends events to hidden input to utilize backbone
+          const hiddenInput = $('[data-view=inputFilter]')
+          hiddenInput[0].value = e.target?.value
+          hiddenInput.keyup()
+        }}
+        display="inline-block"
+        type="text"
+        data-testid="assignment-search-input"
+        placeholder={I18n.t('Search...')}
+        width="16rem"
+        renderLabel={
+          <ScreenReaderContent>
+            {I18n.t(
+              'Search assignments. As you type in this field, the list of assignments will be automatically filtered to only include those whose names match your input.',
+            )}
+          </ScreenReaderContent>
+        }
+        renderBeforeInput={() => <IconSearchLine />}
+      />
+    )
+  }
   return this.selectGradingPeriod()
 }
 
 IndexView.prototype.requestBulkEdit = function () {
-  if (window.ENV.FEATURES.instui_nav) {
+  if (window.ENV.FEATURES?.instui_nav) {
     const bulkEditCrumb = $('<li>').text('Edit Assignment Dates')
     $('#breadcrumbs ul').append(bulkEditCrumb)
   }
@@ -218,7 +220,7 @@ IndexView.prototype.handleBulkEditSaved = function () {
 }
 
 IndexView.prototype.cancelBulkEdit = function () {
-  if (window.ENV.FEATURES.instui_nav) {
+  if (window.ENV.FEATURES?.instui_nav) {
     const lastCrumb = $('#breadcrumbs ul').children().last()
     lastCrumb.remove()
   }
@@ -245,7 +247,7 @@ IndexView.prototype.search = debounce(function () {
 }, 200)
 
 IndexView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeriods(
-  ENV.active_grading_periods
+  ENV.active_grading_periods,
 )
 
 IndexView.prototype.show_dnd_warning = function (event) {
@@ -273,7 +275,7 @@ IndexView.prototype.filterResults = function () {
         return function (group) {
           return group.groupView.endSearch()
         }
-      })(this)
+      })(this),
     )
     if (this.noAssignments != null) {
       this.noAssignments.remove()
@@ -313,7 +315,7 @@ IndexView.prototype.alertForMatchingGroups = function (numAssignments) {
     },
     {
       count: numAssignments,
-    }
+    },
   )
   return $.screenReaderFlashMessageExclusive(msg)
 }
@@ -367,7 +369,7 @@ IndexView.prototype.selectGradingPeriod = function () {
 IndexView.prototype.saveSelectedGradingPeriod = function (gradingPeriod) {
   return userSettings.contextSet(
     'assignments_current_grading_period',
-    gradingPeriod && gradingPeriod.id
+    gradingPeriod && gradingPeriod.id,
   )
 }
 

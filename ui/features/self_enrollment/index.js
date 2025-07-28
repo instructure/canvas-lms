@@ -24,7 +24,7 @@ ready(() => {
   const options = $.extend(
     {},
     ENV.SELF_ENROLLMENT_OPTIONS != null ? ENV.SELF_ENROLLMENT_OPTIONS : {},
-    {el: '#enroll_form'}
+    {el: '#enroll_form'},
   )
   new SelfEnrollmentForm(options)
 })

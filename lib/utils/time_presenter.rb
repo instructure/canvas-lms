@@ -21,8 +21,9 @@ module Utils
     attr_reader :time, :zone
 
     def initialize(time, zone = nil)
-      zone ||= ::Time.zone
-      @time = time.in_time_zone(zone) rescue time
+      zone ||= Time.zone
+      zone = ActiveSupport::TimeZone[zone] if zone.is_a?(String)
+      @time = time&.in_time_zone(zone)
       @zone = zone
     end
 
@@ -48,7 +49,7 @@ module Utils
     end
 
     def get_range_time(raw)
-      raw.in_time_zone(zone) rescue raw
+      raw&.in_time_zone(zone)
     end
 
     def is_range?(range_time)

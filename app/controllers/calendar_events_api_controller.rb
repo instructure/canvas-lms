@@ -325,6 +325,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :get_calendar_context, only: :create
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
+  before_action :check_limited_access_for_students, only: %w[index create show update]
 
   RECURRING_EVENT_LIMIT = 200
 
@@ -334,7 +335,7 @@ class CalendarEventsApiController < ApplicationController
   #
   # Retrieve the paginated list of calendar events or assignments for the current user
   #
-  # @argument type [String, "event"|"assignment"] Defaults to "event"
+  # @argument type [String, "event"|"assignment"|"sub_assignment"] Defaults to "event"
   # @argument start_date [Date]
   #   Only return events since the start_date (inclusive).
   #   Defaults to today. The value should be formatted as: yyyy-mm-dd or ISO 8601 YYYY-MM-DDTHH:MM:SSZ.
@@ -421,41 +422,54 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
+    assignment = @type == :assignment
+    sub_assignment = @type == :sub_assignment
+
     GuardRail.activate(:secondary) do
-      scope = if @type == :assignment
-                assignment_scope(
-                  user,
-                  submission_types: params.fetch(:submission_types, []),
-                  exclude_submission_types: params.fetch(:exclude_submission_types, [])
-                )
-              else
-                calendar_event_scope(user)
-              end
-
-      events = Api.paginate(scope, self, route_url)
-      ActiveRecord::Associations.preload(events, :child_events) if @type == :event
-      if @type == :assignment
-        events = apply_assignment_overrides(events, user)
-        mark_submitted_assignments(user, events)
-        if includes.include?("submission")
-          submissions = Submission.active.where(assignment_id: events, user_id: user)
-                                  .group_by(&:assignment_id)
+      if @domain_root_account.feature_enabled?(:calendar_events_api_pagination_enhancements)
+        submissions = nil
+        if assignment || sub_assignment
+          events, submissions = assignment_or_subassignment_events_and_submissions_for_user(user, route_url, sub_assignment:)
+        elsif @type == :event
+          events = calendar_events_for_user(user, route_url)
         end
-        # preload data used by assignment_json
-        ActiveRecord::Associations.preload(events, :discussion_topic)
-        Shard.partition_by_shard(events) do |shard_events|
-          having_submission = Assignment.assignment_ids_with_submissions(shard_events.map(&:id))
-          shard_events.each do |event|
-            event.has_submitted_submissions = having_submission.include?(event.id)
-          end
+      else
+        scope = if assignment || sub_assignment
+                  assignment_scope(
+                    user,
+                    submission_types: params.fetch(:submission_types, []),
+                    exclude_submission_types: params.fetch(:exclude_submission_types, []),
+                    sub_assignment:
+                  )
+                else
+                  calendar_event_scope(user)
+                end
 
-          having_student_submission = Submission.active.having_submission
-                                                .where(assignment_id: shard_events)
-                                                .where.not(user_id: nil)
-                                                .distinct
-                                                .pluck(:assignment_id).to_set
-          shard_events.each do |event|
-            event.has_student_submissions = having_student_submission.include?(event.id)
+        events = Api.paginate(scope, self, route_url)
+        ActiveRecord::Associations.preload(events, :child_events) if @type == :event
+        if assignment || sub_assignment
+          events = apply_assignment_overrides(events, user, sub_assignment:)
+          mark_submitted_assignments(user, events)
+          if includes.include?("submission")
+            submissions = Submission.active.where(assignment_id: events, user_id: user)
+                                    .group_by(&:assignment_id)
+          end
+          # preload data used by assignment_json
+          ActiveRecord::Associations.preload(events, :discussion_topic)
+          Shard.partition_by_shard(events) do |shard_events|
+            having_submission = assignment_or_sub_assignment(sub_assignment:).assignment_ids_with_submissions(shard_events.map(&:id))
+            shard_events.each do |event|
+              event.has_submitted_submissions = having_submission.include?(event.id)
+            end
+
+            having_student_submission = Submission.active.having_submission
+                                                  .where(assignment_id: shard_events)
+                                                  .where.not(user_id: nil)
+                                                  .distinct
+                                                  .pluck(:assignment_id).to_set
+            shard_events.each do |event|
+              event.has_student_submissions = having_student_submission.include?(event.id)
+            end
           end
         end
       end
@@ -544,9 +558,6 @@ class CalendarEventsApiController < ApplicationController
     end
 
     params_for_create = calendar_event_params
-    if params_for_create[:description].present?
-      params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
-    end
     if params_for_create.key?(:web_conference)
       web_conference_params = params_for_create[:web_conference]
       unless web_conference_params.empty?
@@ -565,11 +576,11 @@ class CalendarEventsApiController < ApplicationController
       rrule = params_for_create[:rrule]
       # Create multiple events if necessary
       if rrule.present?
-        start_at = Time.parse(params_for_create[:start_at]) if params_for_create[:start_at]
+        start_at = Time.zone.parse(params_for_create[:start_at]) if params_for_create[:start_at]
         rr = validate_and_parse_rrule(
           rrule,
           dtstart: start_at,
-          tzid: @current_user.time_zone&.tzinfo&.name || "UTC"
+          tzid: params_for_create[:time_zone_edited] || @current_user.time_zone&.tzinfo&.name || "UTC"
         )
         return false if rr.nil?
 
@@ -598,6 +609,10 @@ class CalendarEventsApiController < ApplicationController
 
       return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
+      events.each do |ev|
+        ev.saving_user = @current_user
+      end
+
       CalendarEvent.transaction do
         error = events.detect { |event| !event.save }
         if error
@@ -605,9 +620,14 @@ class CalendarEventsApiController < ApplicationController
           raise ActiveRecord::Rollback
         else
           statsd_event_create_tags = @current_user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }.append("calendar_event_type:#{event_type_tag}")
-          InstStatsd::Statsd.increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
+          InstStatsd::Statsd.distributed_increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
 
           original_event = events.shift
+
+          if original_event.root_account.feature_enabled?(:file_association_access)
+            AttachmentAssociation.copy_associations(original_event, events)
+          end
+
           render json: event_json(
             original_event,
             @current_user,
@@ -760,7 +780,9 @@ class CalendarEventsApiController < ApplicationController
         params_for_update = calendar_event_params
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
+        @event.saving_user = @current_user
       end
+
       context_code = params[:calendar_event].delete(:context_code)
       if context_code
         context = Context.find_by_asset_string(context_code)
@@ -777,9 +799,6 @@ class CalendarEventsApiController < ApplicationController
           @event.context = context
         end
         return unless authorized_action(@event, @current_user, :create)
-      end
-      if params_for_update[:description].present?
-        params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
       if params_for_update.key?(:web_conference)
         web_conference_params = params_for_update[:web_conference]
@@ -857,42 +876,42 @@ class CalendarEventsApiController < ApplicationController
     end
 
     error = nil
-    CalendarEvent.skip_touch_context
-    CalendarEvent.transaction do
-      events.find_each do |event|
-        event.updating_user = @current_user
-        event.cancel_reason = params[:cancel_reason]
-        if event.destroy
-          if event.appointment_group && @event.appointment_group.appointments.count == 0
-            event.appointment_group.destroy(@current_user)
-          end
-        else
-          error = event.errors
-          raise ActiveRecord::Rollback
-        end
-      end
-
-      if params[:which] == "following"
-        # the remaining series just got shorter. reflect that in the rrrule
-        front_half_events = (find_which_series_events(target_event: @event, which: "all", for_update: false) - events).to_a
-        unless front_half_events.empty?
-          params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(@event[:rrule], front_half_events.length)).permit(:rrule)
-          front_half_events.each do |event|
-            event.updating_user = @current_user
-            unless event.grants_any_right?(@current_user, session, :update)
-              error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
-              raise ActiveRecord::Rollback
+    CalendarEvent.skip_touch_context do
+      CalendarEvent.transaction do
+        events.find_each do |event|
+          event.updating_user = @current_user
+          event.cancel_reason = params[:cancel_reason]
+          if event.destroy
+            if event.appointment_group && @event.appointment_group.appointments.count == 0
+              event.appointment_group.destroy(@current_user)
             end
+          else
+            error = event.errors
+            raise ActiveRecord::Rollback
+          end
+        end
 
-            unless event.update(params_for_update_front_half)
-              error = { message: t("Failed updating an event in the series, update not saved") }
-              raise ActiveRecord::Rollback
+        if params[:which] == "following"
+          # the remaining series just got shorter. reflect that in the rrrule
+          front_half_events = (find_which_series_events(target_event: @event, which: "all", for_update: false) - events).to_a
+          unless front_half_events.empty?
+            params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(@event[:rrule], front_half_events.length)).permit(:rrule)
+            front_half_events.each do |event|
+              event.updating_user = @current_user
+              unless event.grants_any_right?(@current_user, session, :update)
+                error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+                raise ActiveRecord::Rollback
+              end
+
+              unless event.update(params_for_update_front_half)
+                error = { message: t("Failed updating an event in the series, update not saved") }
+                raise ActiveRecord::Rollback
+              end
             end
           end
         end
       end
     end
-    CalendarEvent.skip_touch_context(false)
 
     return render json: error, status: :bad_request if error
 
@@ -952,6 +971,8 @@ class CalendarEventsApiController < ApplicationController
     params_for_update[:context] = Context.find_by_asset_string(params_for_update[:context_code]) if params_for_update[:context_code]
     params_for_update.delete(:context_code)
 
+    target_event.saving_user = @current_user
+
     if which == "one" && rrule.present? && rrule_changed
       render json: { message: t("You may not update one event with a new schedule.") }, status: :bad_request
       return
@@ -997,8 +1018,8 @@ class CalendarEventsApiController < ApplicationController
     else
       first_start_at = target_start
       first_end_at = target_end
-      date_time_changed = Time.parse(params_for_update[:start_at]) != target_event.start_at ||
-                          Time.parse(params_for_update[:end_at]) != target_event.end_at
+      date_time_changed = Time.zone.parse(params_for_update[:start_at]) != target_event.start_at ||
+                          Time.zone.parse(params_for_update[:end_at]) != target_event.end_at
     end
     duration = first_end_at - first_start_at
 
@@ -1032,99 +1053,104 @@ class CalendarEventsApiController < ApplicationController
     events = events.to_a
     update_limit = rrule_changed ? RruleHelper::RECURRING_EVENT_LIMIT : events.length
 
-    error = nil
-    CalendarEvent.skip_touch_context
-    CalendarEvent.transaction do
-      dtstart_list = rr.present? ? rr.all(limit: update_limit) : []
-      if rr.present? && events.length > dtstart_list.length
-        # truncate the list of events we're updating to how many
-        # we'll end up with given the (possible updated) rrule
-        events.drop(dtstart_list.length).each do |event|
-          unless event.grants_any_right?(@current_user, session, :delete)
-            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
-            raise ActiveRecord::Rollback
-          end
+    events.each do |ev|
+      ev.saving_user = @current_user
+    end
 
-          unless event.destroy
-            error = { message: t("Failed deleting an event from the series, update not saved") }
-            raise ActiveRecord::Rollback
+    error = nil
+    CalendarEvent.skip_touch_context do
+      CalendarEvent.transaction do
+        dtstart_list = rr.present? ? rr.all(limit: update_limit) : []
+        if rr.present? && events.length > dtstart_list.length
+          # truncate the list of events we're updating to how many
+          # we'll end up with given the (possible updated) rrule
+          events.drop(dtstart_list.length).each do |event|
+            unless event.grants_any_right?(@current_user, session, :delete)
+              error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.destroy
+              error = { message: t("Failed deleting an event from the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
+          end
+          events = events.take(dtstart_list.length)
+        end
+
+        if new_series_head
+          events[0].series_head = true
+        end
+
+        dtstart_list.each_with_index do |dtstart, i|
+          params_for_update = set_series_params(params_for_update, dtstart, duration)
+          event = events[i]
+          event.update_all = true if which != "one" && event&.series_uuid && event&.series_head
+          if event.nil?
+            event = target_event.context.calendar_events.build(params_for_update)
+            events << event
+            unless event.grants_any_right?(@current_user, session, :create)
+              error = { message: t("Failed creating an event for the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.save
+              error = { message: t("Failed creating an event for the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
+          else
+            event.updating_user = @current_user
+            unless event.grants_any_right?(@current_user, session, :update)
+              error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.update(params_for_update)
+              error = { message: t("Failed updating an event in the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
           end
         end
-        events = events.take(dtstart_list.length)
-      end
 
-      if new_series_head
-        events[0].series_head = true
-      end
-
-      dtstart_list.each_with_index do |dtstart, i|
-        params_for_update = set_series_params(params_for_update, dtstart, duration)
-        event = events[i]
-        if event.nil?
-          event = target_event.context.calendar_events.build(params_for_update)
-          events << event
-          unless event.grants_any_right?(@current_user, session, :create)
-            error = { message: t("Failed creating an event for the series, update not saved"), status: :unauthorized }
+        # For convert series to single event, all the series event will be removed except the target event
+        if change_to_single_event
+          params_for_update[:series_head] = false
+          params_for_update[:series_uuid] = nil
+          params_for_update[:rrule] = nil
+          unless target_event.update(params_for_update)
+            error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
 
-          unless event.save
-            error = { message: t("Failed creating an event for the series, update not saved") }
-            raise ActiveRecord::Rollback
+          (events - [target_event]).each do |event|
+            unless event.grants_any_right?(@current_user, session, :delete)
+              error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.destroy
+              error = { message: t("Failed deleting an event from the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
           end
-        else
+          events = [target_event]
+        end
+
+        # if we updated this-and-all-following, we had to update the front half's rrule
+        front_half_events.each do |event|
           event.updating_user = @current_user
           unless event.grants_any_right?(@current_user, session, :update)
             error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
             raise ActiveRecord::Rollback
           end
 
-          unless event.update(params_for_update)
+          unless event.update(params_for_update_front_half)
             error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
         end
       end
-
-      # For convert series to single event, all the series event will be removed except the target event
-      if change_to_single_event
-        params_for_update[:series_head] = false
-        params_for_update[:series_uuid] = nil
-        params_for_update[:rrule] = nil
-        unless target_event.update(params_for_update)
-          error = { message: t("Failed updating an event in the series, update not saved") }
-          raise ActiveRecord::Rollback
-        end
-
-        (events - [target_event]).each do |event|
-          unless event.grants_any_right?(@current_user, session, :delete)
-            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
-            raise ActiveRecord::Rollback
-          end
-
-          unless event.destroy
-            error = { message: t("Failed deleting an event from the series, update not saved") }
-            raise ActiveRecord::Rollback
-          end
-        end
-        events = [target_event]
-      end
-
-      # if we updated this-and-all-following, we had to update the front half's rrule
-      front_half_events.each do |event|
-        event.updating_user = @current_user
-        unless event.grants_any_right?(@current_user, session, :update)
-          error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
-          raise ActiveRecord::Rollback
-        end
-
-        unless event.update(params_for_update_front_half)
-          error = { message: t("Failed updating an event in the series, update not saved") }
-          raise ActiveRecord::Rollback
-        end
-      end
     end
-    CalendarEvent.skip_touch_context(false)
 
     if error
       status = error[:status] || :bad_request
@@ -1133,7 +1159,15 @@ class CalendarEventsApiController < ApplicationController
     end
 
     target_event.context.touch
-    json = (front_half_events + events).map do |event|
+    all_events = front_half_events + events
+
+    if all_events[0].root_account.feature_enabled?(:file_association_access) && events.length > 1
+      source_event = all_events.shift
+      AttachmentAssociation.copy_associations(source_event, all_events)
+      all_events.unshift(source_event)
+    end
+
+    json = all_events.map do |event|
       event_json(
         event,
         @current_user,
@@ -1194,6 +1228,16 @@ class CalendarEventsApiController < ApplicationController
       GuardRail.activate(:secondary) do
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
+
+        if courses_with_checkpoints_enabled(@selected_contexts).present?
+          sub_assignments = assignment_scope(@current_user, sub_assignment: true).paginate(per_page: 1000, max: 1000)
+
+          if sub_assignments.present?
+            sub_assignments_and_overrides = apply_assignment_overrides(sub_assignments, @current_user, sub_assignment: true)
+            @events.concat sub_assignments_and_overrides
+          end
+        end
+
         @events.concat calendar_event_scope(@current_user, &:events_without_child_events).paginate(per_page: 1000, max: 1000)
 
         # Add in any appointment groups this user can manage and someone has reserved
@@ -1239,6 +1283,20 @@ class CalendarEventsApiController < ApplicationController
       GuardRail.activate(:secondary) do
         @contexts.each do |context|
           @assignments = context.assignments.active.to_a if context.respond_to?(:assignments)
+
+          if context.is_a?(Course) && context.discussion_checkpoints_enabled? && @assignments.present?
+            # replace parent assignments with their sub_assignments
+            parent_assignment_ids = @assignments.extract!(&:has_sub_assignments?).map(&:id)
+
+            if parent_assignment_ids.present?
+              sub_assignments = SubAssignment
+                                .active
+                                .where(parent_assignment_id: parent_assignment_ids)
+                                .to_a
+              @events.concat sub_assignments
+            end
+          end
+
           # no overrides to apply without a current user
           @events.concat context.calendar_events.active.to_a
           @events.concat @assignments || []
@@ -1575,7 +1633,13 @@ class CalendarEventsApiController < ApplicationController
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
-    @type ||= (params[:type] == "assignment") ? :assignment : :event
+    @type ||= if params[:type] == "assignment"
+                :assignment
+              elsif params[:type] == "sub_assignment"
+                :sub_assignment
+              else
+                :event
+              end
 
     @context ||= user
 
@@ -1636,7 +1700,19 @@ class CalendarEventsApiController < ApplicationController
     end
   end
 
-  def assignment_scope(user, submission_types: [], exclude_submission_types: [])
+  def courses_with_checkpoints_enabled(contexts)
+    contexts.select { |context| context.is_a?(Course) && context.discussion_checkpoints_enabled? }
+  end
+
+  def assignment_or_sub_assignment(sub_assignment: false)
+    if sub_assignment
+      SubAssignment
+    else
+      Assignment
+    end
+  end
+
+  def assignment_scope(user, submission_types: [], exclude_submission_types: [], sub_assignment: false)
     collections = []
     bookmarker = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
     last_scope = nil
@@ -1644,11 +1720,21 @@ class CalendarEventsApiController < ApplicationController
       # Fully ordering by due_at requires examining all the overrides linked and as it applies to
       # specific people, sections, etc. This applies the base assignment due_at for ordering
       # as a more sane default then natural DB order. No, it isn't perfect but much better.
-      scope = assignment_context_scope(user)
+      scope = assignment_context_scope(user, sub_assignment:)
+
       next unless scope
 
+      # exclude parent assignments for courses where the discussion checkpoints FF is enabled
+      # because due dates and other relevant info is stored in the sub_assignments/checkpoints
+      courses_with_active_checkpoints = courses_with_checkpoints_enabled(@selected_contexts)
+      if courses_with_active_checkpoints.present?
+        scope1 = scope.where(context: courses_with_active_checkpoints, has_sub_assignments: false)
+        scope2 = scope.where.not(context: courses_with_active_checkpoints)
+        scope = scope1.or(scope2)
+      end
+
       scope = scope.order(:due_at, :id)
-      scope = scope.active
+      scope = scope.active.without_suppressed_assignments
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
@@ -1661,25 +1747,30 @@ class CalendarEventsApiController < ApplicationController
       collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, scope)]
     end
 
+    return SubAssignment.none if sub_assignment && collections.empty?
     return Assignment.none if collections.empty?
     return last_scope if collections.length == 1
 
     BookmarkedCollection.merge(*collections)
   end
 
-  def assignment_context_scope(user)
+  def assignment_context_scope(user, sub_assignment: false)
     contexts = @selected_contexts.select { |c| c.is_a?(Course) && c.shard == Shard.current }
     return nil if contexts.empty?
+
+    if sub_assignment
+      # limit contexts to only courses where the discussion checkpoints FF is enabled
+      contexts = courses_with_checkpoints_enabled(contexts)
+      return nil if contexts.empty?
+    end
 
     # contexts have to be partitioned into two groups so they can be queried effectively
     view_unpublished, other = contexts.partition { |c| c.grants_right?(user, session, :view_unpublished_items) }
 
-    unless view_unpublished.empty?
-      scope = Assignment.for_course(view_unpublished)
-    end
+    scope = assignment_or_sub_assignment(sub_assignment:).for_course(view_unpublished) unless view_unpublished.empty?
 
     unless other.empty?
-      scope2 = Assignment.published.for_course(other)
+      scope2 = assignment_or_sub_assignment(sub_assignment:).for_course(other).published
       scope = scope ? scope.or(scope2) : scope2
     end
 
@@ -1744,7 +1835,7 @@ class CalendarEventsApiController < ApplicationController
     params.slice(:start_at, :end_at, :undated, :context_codes, :type)
   end
 
-  def apply_assignment_overrides(events, user)
+  def apply_assignment_overrides(events, user, sub_assignment: false)
     ActiveRecord::Associations.preload(events, [:context, :assignment_overrides])
     events.each { |e| e.has_no_overrides = true if e.assignment_overrides.empty? }
 
@@ -1757,7 +1848,7 @@ class CalendarEventsApiController < ApplicationController
       # improves locked_json performance
 
       student_events = events.reject { |e| e.context.grants_right?(user, session, :read_as_admin) }
-      Assignment.preload_context_module_tags(student_events) if student_events.any?
+      assignment_or_sub_assignment(sub_assignment:).preload_context_module_tags(student_events) if student_events.any?
     end
 
     courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
@@ -1906,8 +1997,8 @@ class CalendarEventsApiController < ApplicationController
     end
     event_attributes[:series_uuid] = SecureRandom.uuid
 
-    first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
-    first_end_at = Time.parse(event_attributes[:end_at]) if event_attributes[:end_at]
+    first_start_at = Time.zone.parse(event_attributes[:start_at]) if event_attributes[:start_at]
+    first_end_at = Time.zone.parse(event_attributes[:end_at]) if event_attributes[:end_at]
     duration = first_end_at - first_start_at if first_start_at && first_end_at
     dtstart_list = rrule.all(limit: RruleHelper::RECURRING_EVENT_LIMIT)
 
@@ -1995,11 +2086,7 @@ class CalendarEventsApiController < ApplicationController
       # possibly an observer without a full link
       shards = @current_user.in_region_associated_shards & @observee.in_region_associated_shards
       @observed_course_ids = @current_user.observer_enrollments.shard(shards).active_or_pending.where(associated_user_id: @observee).pluck(:course_id)
-      if @observed_course_ids.any?
-        true
-      else
-        render_unauthorized_action
-      end
+      @observed_course_ids.any? || render_unauthorized_action
     end
   end
 
@@ -2034,8 +2121,10 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_params
-    params.require(:calendar_event)
-          .permit(CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything])
+    cparams = params.require(:calendar_event)
+                    .permit(CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything])
+    cparams[:description] = process_incoming_html_content(cparams[:description]) if cparams[:description].present?
+    cparams
   end
 
   def check_for_past_signup(event)
@@ -2057,7 +2146,7 @@ class CalendarEventsApiController < ApplicationController
     # the limit. We're tracking to see how often this happens.
     per_page = Api.per_page_for(self)
     if event_count > per_page
-      InstStatsd::Statsd.increment("calendar.events_api.per_page_exceeded.count")
+      InstStatsd::Statsd.distributed_increment("calendar.events_api.per_page_exceeded.count")
       InstStatsd::Statsd.count("calendar.events_api.per_page_exceeded.value", event_count)
     end
   end
@@ -2075,5 +2164,51 @@ class CalendarEventsApiController < ApplicationController
       # one's date as the UNTIL, but this is simpler and I like simple
       old_rrule.gsub(/UNTIL=[^;]+/, "COUNT=#{new_count}")
     end
+  end
+
+  def assignment_or_subassignment_events_and_submissions_for_user(user, route_url, sub_assignment: false)
+    # Same max limit as public feed
+    scope = assignment_scope(
+      user,
+      submission_types: params.fetch(:submission_types, []),
+      exclude_submission_types: params.fetch(:exclude_submission_types, []),
+      sub_assignment:
+    ).paginate(per_page: 1000, max: 1000)
+
+    # Create dummy events for all assignment overrides
+    events = apply_assignment_overrides(scope, user, sub_assignment:)
+
+    # Pagination is applied to the dummy events collection
+    events, _meta = Api.jsonapi_paginate(events, self, route_url)
+    mark_submitted_assignments(user, events)
+    if includes.include?("submission")
+      submissions = Submission.active.where(assignment_id: events, user_id: user)
+                              .group_by(&:assignment_id)
+    end
+    # preload data used by assignment_json
+    ActiveRecord::Associations.preload(events, :discussion_topic)
+    Shard.partition_by_shard(events) do |shard_events|
+      having_submission = assignment_or_sub_assignment(sub_assignment:).assignment_ids_with_submissions(shard_events.map(&:id))
+      shard_events.each do |event|
+        event.has_submitted_submissions = having_submission.include?(event.id)
+      end
+
+      having_student_submission = Submission.active.having_submission
+                                            .where(assignment_id: shard_events)
+                                            .where.not(user_id: nil)
+                                            .distinct
+                                            .pluck(:assignment_id).to_set
+      shard_events.each do |event|
+        event.has_student_submissions = having_student_submission.include?(event.id)
+      end
+    end
+    [events, submissions]
+  end
+
+  def calendar_events_for_user(user, route_url)
+    scope = calendar_event_scope(user)
+    events = Api.paginate(scope, self, route_url)
+    ActiveRecord::Associations.preload(events, :child_events)
+    events
   end
 end

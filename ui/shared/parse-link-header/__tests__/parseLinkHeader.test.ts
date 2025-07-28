@@ -21,7 +21,8 @@ import parseLinkHeader from '../parseLinkHeader'
 const linkHeader =
   '<https://www.example.com/path?page=2&per_page=10>; rel="next", ' +
   '<https://www.example.com/path?page=1&per_page=10>; rel="prev"; foo="bar", ' +
-  '<https://www.example.com/path?page=5&per_page=10>; rel="last"'
+  '<https://www.example.com/path?page=5&per_page=10>; rel="last", ' +
+  '<https://www.example.com/path>; rel="junk"'
 
 describe('parseLinkHeader', () => {
   it('should parse a link header', () => {

@@ -17,18 +17,20 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client' // Updated import
 import SideNav from './react/SideNav'
 import Navigation from './react/OldSideNav'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 import NewTabIndicator from './react/NewTabIndicator'
-import {QueryProvider} from '@canvas/query'
+import {QueryClientProvider} from '@tanstack/react-query'
 import {getExternalTools} from './react/utils'
+import AlertManager from '@canvas/alerts/react/AlertManager'
+import {queryClient} from '@canvas/query'
 
-const I18n = useI18nScope('common')
+const I18n = createI18nScope('common')
 
 // #
 // Handle user toggling of nav width
@@ -59,65 +61,81 @@ $('body').on('click', '#primaryNavToggle', function () {
 
 if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
   const mobileHeaderHamburger = document.getElementsByClassName('mobile-header-hamburger')
-  mobileHeaderHamburger[0].addEventListener('touchstart', event => {
-    event.preventDefault()
-    globalNavIsOpen = !globalNavIsOpen
-  })
-  mobileHeaderHamburger[0].addEventListener('click', event => {
-    event.preventDefault()
-    globalNavIsOpen = !globalNavIsOpen
-  })
+  if (mobileHeaderHamburger.length > 0) {
+    mobileHeaderHamburger[0].addEventListener('touchstart', event => {
+      event.preventDefault()
+      globalNavIsOpen = !globalNavIsOpen
+    })
+    mobileHeaderHamburger[0].addEventListener('click', event => {
+      event.preventDefault()
+      globalNavIsOpen = !globalNavIsOpen
+    })
+  }
 }
 
 ready(() => {
-  if (window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev) {
+  const showInstUiNavbar = window.ENV.FEATURES.instui_nav || localStorage.instui_nav_dev
+  if (showInstUiNavbar) {
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
-    ReactDOM.render(
-      <QueryProvider>
-        <SideNav externalTools={getExternalTools()} />
-      </QueryProvider>,
-      mobileContextNavContainer,
-      () => {
-        if (mobileContextNavContainer) {
-          ReactDOM.render(
-            <QueryProvider>
-              <MobileNavigation navIsOpen={globalNavIsOpen} />
-            </QueryProvider>,
-            mobileContextNavContainer
-          )
-        }
-      }
-    )
+    if (mobileContextNavContainer) {
+      const sideNavRoot = createRoot(mobileContextNavContainer)
+      sideNavRoot.render(
+        <QueryClientProvider client={queryClient}>
+          <SideNav externalTools={getExternalTools()} />
+        </QueryClientProvider>,
+      )
+
+      // Render MobileNavigation after SideNav
+      const mobileNavRoot = createRoot(mobileContextNavContainer)
+      mobileNavRoot.render(
+        <QueryClientProvider client={queryClient}>
+          <AlertManager breakpoints={{}}>
+            <MobileNavigation navIsOpen={globalNavIsOpen} />
+          </AlertManager>
+        </QueryClientProvider>,
+      )
+    }
   } else {
     const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
     if (globalNavTrayContainer) {
-      ReactDOM.render(
-        <QueryProvider>
+      const navigationRoot = createRoot(globalNavTrayContainer)
+      navigationRoot.render(
+        <QueryClientProvider client={queryClient}>
           <Navigation />
-        </QueryProvider>,
-        globalNavTrayContainer,
-        () => {
-          const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
-          if (mobileContextNavContainer) {
-            ReactDOM.render(
-              <QueryProvider>
-                <MobileNavigation />
-              </QueryProvider>,
-              mobileContextNavContainer
-            )
-          }
-        }
+        </QueryClientProvider>,
       )
+
+      const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
+      if (mobileContextNavContainer) {
+        const mobileNavRoot = createRoot(mobileContextNavContainer)
+        mobileNavRoot.render(
+          <QueryClientProvider client={queryClient}>
+            <AlertManager breakpoints={{}}>
+              <MobileNavigation />
+            </AlertManager>
+          </QueryClientProvider>,
+        )
+      }
     }
   }
+
+  // Each element in the side bar menu can be triggered by enter and space.
+  const navLinksSelector = showInstUiNavbar ? '#instui-sidenav > ul > li > a' : '#menu > li > a'
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>(navLinksSelector)
+  navLinks.forEach(link => {
+    link.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        link.click()
+      }
+    })
+  })
 
   const newTabContainers = document.getElementsByClassName('new-tab-indicator')
   Array.from(newTabContainers).forEach(newTabContainer => {
     if (newTabContainer instanceof HTMLElement && newTabContainer.dataset.tabname) {
-      ReactDOM.render(
-        <NewTabIndicator tabName={newTabContainer.dataset.tabname} />,
-        newTabContainer
-      )
+      const newTabRoot = createRoot(newTabContainer)
+      newTabRoot.render(<NewTabIndicator tabName={newTabContainer.dataset.tabname} />)
     }
   })
 })

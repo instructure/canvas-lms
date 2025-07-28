@@ -63,7 +63,7 @@ describe('PeerReviewNavigationLink', () => {
     fireEvent.click(getByTestId('header-peer-review-link'))
     const completedMenuItem = getByTestId('peer-review-completed-1')
     expect(completedMenuItem.firstChild?.firstChild).toHaveStyle('color: white')
-    expect(completedMenuItem).toHaveStyle('background: #6B7780')
+    expect(completedMenuItem).toHaveStyle('background: #6A7883')
   })
 
   describe('required peer review link when the anonymous peer review option is disabled', () => {
@@ -92,7 +92,7 @@ describe('PeerReviewNavigationLink', () => {
       fireEvent.click(getByTestId('header-peer-review-link'))
       expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
         'href',
-        '/courses/1/assignments/1?reviewee_id=1'
+        '/courses/1/assignments/1?reviewee_id=1',
       )
     })
   })
@@ -150,7 +150,7 @@ describe('PeerReviewNavigationLink', () => {
       fireEvent.click(getByTestId('header-peer-review-link'))
       expect(getByTestId('peer-review-completed-1')).toHaveAttribute(
         'href',
-        '/courses/1/assignments/1?anonymous_asset_id=anon_1'
+        '/courses/1/assignments/1?anonymous_asset_id=anon_1',
       )
     })
   })

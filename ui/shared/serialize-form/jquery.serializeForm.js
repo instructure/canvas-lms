@@ -97,7 +97,7 @@ function getValue() {
             return {tag: 'none'}
           }
         },
-        {tag: 'none'}
+        {tag: 'none'},
       )
       if (handled.tag === 'value') {
         return handled.value
@@ -118,6 +118,6 @@ function getValue() {
 // identical to $.fn.serializeArray, except:
 // 1. it works on non-forms (see elements)
 // 2. it handles file, date picker and tinymce inputs (see getValue)
-export default $.fn.serializeForm = function () {
+export default ($.fn.serializeForm = function () {
   return this.map(elements).filter(isSerializable).map(getValue).get()
-}
+})

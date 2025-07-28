@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -25,14 +24,15 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColumnHeader from './ColumnHeader'
 import {showMessageStudentsWithObserversModal} from '../../../shared/MessageStudentsWithObserversModal'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
+// @ts-expect-error
 function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGroups}) {
   if (weightedGroups || viewUngradedAsZero) {
     let secondaryLine, secondaryLineExt
@@ -91,6 +91,7 @@ AssignmentGroupDetail.propTypes = {
   weightedGroups: bool.isRequired,
 }
 
+// @ts-expect-error
 function renderTrigger(assignmentGroup, ref) {
   return (
     <IconButton
@@ -112,7 +113,7 @@ type Props = {
   viewUngradedAsZero: any
   weightedGroups: any
   onMenuDismiss: any
-  allStudents: PartialStudent[]
+  getAllStudents: () => PartialStudent[]
   courseId: string
   messageAttachmentUploadFolderId: string
   userId: string
@@ -144,6 +145,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
     pointsBasedGradingScheme: bool.isRequired,
     viewUngradedAsZero: bool.isRequired,
     weightedGroups: bool.isRequired,
+    // @ts-expect-error
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     isRunningScoreToUngraded: bool,
     ...ColumnHeader.propTypes,
@@ -161,21 +163,25 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
     this.props.onSendMessageStudentsWho(args)
   }
 
+  // @ts-expect-error
   async showMessageStudentsWhoDialog(students, courseId) {
     // @ts-expect-error
     this.state.skipFocusOnClose = true
+    // @ts-expect-error
     this.setState({skipFocusOnClose: true})
 
     const props = {
       assignment: null,
       launchContext: MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT,
       assignmentGroupName: this.props.assignmentGroup.name,
+      // @ts-expect-error
       students: students.filter(student => !student.isInactive && !student.isTestStudent),
       courseId,
       onClose: () => {},
       onSend: this.handleSendMessageStudentsWho,
       messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
       userId: this.props.userId,
+      // @ts-expect-error
       pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
     }
 
@@ -185,7 +191,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
   render() {
     const {assignmentGroup, sortBySetting, viewUngradedAsZero, weightedGroups} = this.props
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
-    const allStudents = this.props.allStudents
+    const allStudents = this.props.getAllStudents()
     const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
 
@@ -217,7 +223,8 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
                     shouldFocusTriggerOnClose={false}
                     trigger={renderTrigger(
                       this.props.assignmentGroup,
-                      ref => (this.optionsMenuTrigger = ref)
+                      // @ts-expect-error
+                      ref => (this.optionsMenuTrigger = ref),
                     )}
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}

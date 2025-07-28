@@ -29,6 +29,14 @@ module CustomDateHelpers
     end
   end
 
+  def format_time_only(time)
+    hour = time.hour % 12
+    hour = 12 if hour == 0
+    minute = time.min
+    am_pm = (time.hour >= 12) ? "pm" : "am"
+    "#{hour}:#{minute.to_s.rjust(2, "0")}#{am_pm}"
+  end
+
   # Formatted output: Mmm d at h:mm, e.g. 'Jan 1 at 1:01pm'
   def format_time_for_view(time, date_format = nil)
     if date_format

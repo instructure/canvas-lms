@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import './datepicker'
@@ -28,7 +28,7 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 import moment from 'moment'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('datepicker')
+const I18n = createI18nScope('datepicker')
 
 const TIME_FORMAT_OPTIONS = {
   hour: 'numeric',
@@ -91,7 +91,6 @@ function computeDatepickerDefaults() {
       try {
         return I18n.lookup('date.formats.medium_month').slice(0, 2) === '%Y'
       } catch {
-        // eslint-disable-next-line no-console
         console.warn('WARNING Missing required datepicker keys in locale file')
         return false // Assume English
       }
@@ -109,9 +108,8 @@ function computeDatepickerDefaults() {
     datepickerDefaults.dayNamesShort = I18n.lookup('date.abbr_day_names') // title text for column headings
     datepickerDefaults.dayNamesMin = I18n.lookup('date.datepicker.column_headings') // column headings for days (Sunday = 0)
   } catch {
-    // eslint-disable-next-line no-console
     console.warn(
-      'WARNING Missing required datepicker keys in locale file, using US English datepicker'
+      'WARNING Missing required datepicker keys in locale file, using US English datepicker',
     )
     datepickerDefaults.dateFormat = datePickerFormat(fallbacks['date.formats.medium'])
     datepickerDefaults.monthNames = fallbacks['date.month_names'].slice(1)
@@ -138,11 +136,13 @@ export function renderDatetimeField($fields, options) {
 export default class DatetimeField {
   constructor($field, options = {}) {
     ;['alertScreenreader', 'setFromValue', 'setDatetime', 'setTime', 'setDate'].forEach(
-      m => (this[m] = this[m].bind(this))
+      m => (this[m] = this[m].bind(this)),
     )
     let $wrapper
     this.$field = $field
     this.$field.data({instance: this})
+    this.$options = options
+    this.$options.newSuggestionDesign = true
 
     this.processTimeOptions(options)
     if (this.showDate) $wrapper = this.addDatePicker(options)
@@ -185,13 +185,12 @@ export default class DatetimeField {
     // showDate || showTime will always be true; i.e. not showDate implies
     // showTime, and vice versa. that's a nice property, so let's enforce it
     // (treating the provision as both as the provision of neither)
-    /* eslint-disable no-console */
+
     if (timeOnly && dateOnly) {
       console.warn('DatetimeField instantiated with both timeOnly and dateOnly true.')
       console.warn('Treating both as false instead.')
       timeOnly = dateOnly = false
     }
-    /* eslint-enable no-console */
 
     this.showDate = !timeOnly
     this.allowTime = !dateOnly
@@ -217,7 +216,7 @@ export default class DatetimeField {
           onClose: () => this.$field.trigger('reattachTooltip'),
           firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek(),
         },
-        options.datepicker
+        options.datepicker,
       )
       this.$field.datepicker(datepickerOptions)
 
@@ -233,6 +232,9 @@ export default class DatetimeField {
   addSuggests($sibling, options = {}) {
     if (this.isReadonly()) return
     this.contextTimezone = options.contextTimezone || ENV.CONTEXT_TIMEZONE
+    if (this.$options.showFormatExample) {
+      this.$formatExample = $('<span class="format_example" />').insertAfter($sibling)
+    }
     this.$suggest = $('<div class="datetime_suggest" />').insertAfter($sibling)
     if (this.contextTimezone != null && this.contextTimezone !== ENV.TIMEZONE) {
       this.$contextSuggest = $('<div class="datetime_suggest" />').insertAfter(this.$suggest)
@@ -275,10 +277,10 @@ export default class DatetimeField {
   // private API
   setFromValue(e) {
     const inputdate = this.$field.data('inputdate')
-    if (typeof e !== 'undefined' && ['focus', 'blur'].includes(e.type) && !inputdate) return
+    if (['focus', 'blur'].includes(e?.type) && !inputdate) return
     this.parseValue()
     this.update()
-    this.updateSuggest(e?.type === 'keyup') // only show suggestions when typing
+    this.updateSuggest(e?.type === 'keyup')
   }
 
   normalizeValue(value) {
@@ -403,25 +405,79 @@ export default class DatetimeField {
   updateSuggest(show) {
     if (this.isReadonly()) return
 
+    this.$formatExample?.text('')
     let localText = this.formatSuggest()
     this.screenreaderAlert = localText
-    if (this.$contextSuggest) {
+    if (this.$contextSuggest && !this.invalid()) {
       let contextText = this.formatSuggestContext()
+      this.clearSuggestion()
       if (contextText) {
         localText = `${this.localLabel}: ${localText}`
         contextText = `${this.contextLabel}: ${contextText}`
         this.screenreaderAlert = `${localText}\n${contextText}`
       }
       this.$contextSuggest.text(contextText).show()
-    }
+    } else if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
+    this.defaultSuggestion(show, localText)
+  }
+
+  defaultSuggestion(show, localText) {
     this.$suggest.toggleClass('invalid_datetime', this.invalid()).text(localText)
     if (show || this.$contextSuggest || this.invalid()) {
+      this.$formatExample?.text(!localText ? this.getFormatExample() : '')
       this.$suggest.show()
       return
     }
     this.$suggest.hide()
     if (this.$contextSuggest) this.$contextSuggest.hide()
     this.screenreaderAlert = ''
+  }
+
+  newSuggestion(show, localText) {
+    this.$suggest.toggleClass('invalid_datetime', this.invalid())
+
+    if ((show || this.$contextSuggest || this.invalid()) && localText.length > 0) {
+      const errorContainer = document.createElement('span')
+      errorContainer.className = ''
+      errorContainer.setAttribute('tabindex', '-1')
+
+      const icon = document.createElement('i')
+      icon.className = ''
+      icon.setAttribute('tabindex', '-1')
+      icon.setAttribute('aria-hidden', 'true')
+
+      if (this.invalid()) {
+        errorContainer.className = 'error-message'
+        icon.className = 'icon-warning icon-Solid'
+        this.$field.addClass('error')
+      } else {
+        this.$field.removeClass('error')
+      }
+
+      const text = document.createElement('span')
+      text.setAttribute('role', 'alert')
+      text.setAttribute('aria-live', 'polite')
+      text.setAttribute('tabindex', '-1')
+      text.textContent = localText // Safely set text content to avoid XSS
+
+      errorContainer.appendChild(icon)
+      errorContainer.appendChild(text)
+
+      this.$suggest[0].innerHTML = ''
+      this.$suggest[0].appendChild(errorContainer)
+
+      this.$suggest.show()
+      return
+    }
+    this.clearSuggestion()
+  }
+
+  clearSuggestion() {
+    this.$field.removeClass('error')
+    this.$suggest.hide()
+    if (this.$contextSuggest) this.$contextSuggest.hide()
+    this.screenreaderAlert = ''
+    this.$formatExample?.text(this.getFormatExample())
   }
 
   alertScreenreader() {
@@ -468,7 +524,18 @@ export default class DatetimeField {
   }
 
   get parseError() {
-    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
-    return I18n.t('errors.not_a_date', "That's not a date!")
+    if (this.valid === PARSE_RESULTS.BAD_YEAR && !this.$options.timeOnly)
+      return I18n.t('Year is too far in the past.')
+    if (this.$options.newSuggestionDesign) {
+      if (this.$options.dateOnly) return I18n.t('Not a valid date format')
+      if (this.$options.timeOnly) return I18n.t('Not a valid time format')
+    }
+    return I18n.t('errors.not_a_date', 'Please enter a valid format for a date')
+  }
+
+  getFormatExample() {
+    const locale = moment.localeData(ENV.MOMENT_LOCALE)
+    const formatExample = locale.longDateFormat('L')
+    return this.$options.timeOnly ? '' : formatExample
   }
 }

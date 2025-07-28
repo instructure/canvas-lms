@@ -41,7 +41,7 @@ export function renderWithRedux(
     store = configStore(initialState, fakeAxios, {
       disableLogger: true,
     }),
-  } = {}
+  } = {},
 ) {
   return {
     ...render(<Provider store={store}>{ui}</Provider>),

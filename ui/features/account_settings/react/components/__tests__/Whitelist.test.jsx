@@ -39,7 +39,7 @@ describe('ConnectedWhitelist', () => {
   it('renders items on the allowed domain list after they are added', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -52,7 +52,7 @@ describe('ConnectedWhitelist', () => {
   it('handles adding wildcard entries to the allowed domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: '*.instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -93,7 +93,7 @@ describe('ConnectedWhitelist', () => {
   it('shows an error message when an invalid domain is entered', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'fake'}})
 
     const button = getByLabelText('Add Domain')
@@ -106,7 +106,7 @@ describe('ConnectedWhitelist', () => {
   it('shows the correct count for the domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -119,7 +119,7 @@ describe('ConnectedWhitelist', () => {
   it('clears the input box after a successful submisssion', () => {
     const {getByLabelText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -240,7 +240,7 @@ describe('ConnectedWhitelist', () => {
               inherited: exampleDomains,
             },
           },
-        }
+        },
       )
 
       const domainMessage = queryByText(/You have reached the domain limit/)
@@ -257,11 +257,11 @@ describe('ConnectedWhitelist', () => {
               inherited: ['instructure.com', 'canvaslms.com'],
             },
           },
-        }
+        },
       )
 
       const message = getByText(
-        /Domain editing is disabled when security settings are inherited from a parent account/
+        /Domain editing is disabled when security settings are inherited from a parent account/,
       )
       expect(message).toBeInTheDocument()
     })
@@ -276,7 +276,7 @@ describe('ConnectedWhitelist', () => {
               inherited: ['instructure.com'],
             },
           },
-        }
+        },
       )
 
       const badDomain = queryByText('canvaslms.com')
@@ -288,7 +288,7 @@ describe('ConnectedWhitelist', () => {
 
     it('does not show the count for the allowed domain list', () => {
       const {queryByText, getByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited={true} />
+        <ConnectedWhitelist {...defaultProps} inherited={true} />,
       )
 
       const wrongString = queryByText('Domains (0/50)')
@@ -308,7 +308,7 @@ describe('ConnectedWhitelist', () => {
               account: [],
             },
           },
-        }
+        },
       )
 
       const button = getByLabelText('Add Domain')
@@ -325,7 +325,7 @@ describe('ConnectedWhitelist', () => {
               account: [],
             },
           },
-        }
+        },
       )
 
       const button = getByRole('button', {name: 'Remove instructure.com as an allowed domain'})

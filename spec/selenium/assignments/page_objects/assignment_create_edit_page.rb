@@ -22,6 +22,9 @@ class AssignmentCreateEditPage
     include SeleniumDependencies
 
     # CSS Selectors
+    def assignment_inherited_from_selector
+      "#overrides-wrapper [data-testid='context-module-text']"
+    end
 
     def manage_assign_to_button_selector
       "[data-testid='manage-assign-to']"
@@ -47,8 +50,20 @@ class AssignmentCreateEditPage
       "#assignment_group_category_id option"
     end
 
+    def group_category_error_selector
+      "#has_group_category_blocked_error"
+    end
+
+    def group_error_selector
+      "#assignment_group_category_id_blocked_error"
+    end
+
     def error_box_selector
       ".error_text"
+    end
+
+    def post_to_sis_checkbox_selector
+      "#assignment_post_to_sis"
     end
 
     # Selectors
@@ -58,6 +73,10 @@ class AssignmentCreateEditPage
 
     def assignment_name_textfield
       f("#assignment_name")
+    end
+
+    def assignment_inherited_from
+      ff(assignment_inherited_from_selector)
     end
 
     def assignment_save_button
@@ -128,8 +147,20 @@ class AssignmentCreateEditPage
       ff(group_categories_selector)
     end
 
+    def group_category_error
+      f(group_category_error_selector)
+    end
+
+    def group_error
+      f(group_error_selector)
+    end
+
     def error_boxes
       ff(error_box_selector)
+    end
+
+    def mastery_path_toggle
+      f("[data-testid='MasteryPathToggle'] svg[name='IconCheck'], [data-testid='MasteryPathToggle'] svg[name='IconX']")
     end
 
     # Moderated Grading Options
@@ -171,6 +202,10 @@ class AssignmentCreateEditPage
 
     def pending_changes_pill
       f(pending_changes_pill_selector)
+    end
+
+    def post_to_sis_checkbox
+      f(post_to_sis_checkbox_selector)
     end
 
     # Methods & Actions
@@ -246,6 +281,10 @@ class AssignmentCreateEditPage
       options = group_categories
       option_element = id.blank? ? options.first : options[id]
       option_element.click
+    end
+
+    def click_post_to_sis_checkbox
+      post_to_sis_checkbox.click
     end
   end
 end

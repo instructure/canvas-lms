@@ -32,6 +32,7 @@ import {
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
 import {pick, uniq, flattenDeep} from 'lodash'
+import {jest} from '@jest/globals'
 
 const testRatings = defaultRatings.map(rating => pick(rating, ['description', 'points']))
 
@@ -46,6 +47,7 @@ export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
       variables: {
         id: accountId,
         type: 'Account',
+        childGroupsCursor: null,
       },
     },
     result: {
@@ -59,6 +61,11 @@ export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
             _id: '1',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
+              pageInfo: {
+                endCursor: null,
+                hasNextPage: false,
+                __typename: 'PageInfo',
+              },
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 _id: (100 + i).toString(),
@@ -79,6 +86,7 @@ export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
       variables: {
         id: courseId,
         type: 'Course',
+        childGroupsCursor: null,
       },
     },
     result: {
@@ -92,6 +100,11 @@ export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
             _id: '2',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
+              pageInfo: {
+                endCursor: null,
+                hasNextPage: false,
+                __typename: 'PageInfo',
+              },
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
                 _id: (200 + i).toString(),
@@ -194,7 +207,7 @@ export const treeGroupMocks = ({
     flattenDeep([
       Object.keys(groupsStruct).map(toString),
       Object.values(groupsStruct).flat().map(toString),
-    ])
+    ]),
   )
   const parents = groupIds.reduce((acc, gid) => {
     ;(groupsStruct[gid] || []).forEach(cid => (acc[cid] = gid))
@@ -212,6 +225,7 @@ export const treeGroupMocks = ({
         variables: {
           id: toString(gid),
           type: 'LearningOutcomeGroup',
+          childGroupsCursor: null,
         },
       },
       result: {
@@ -223,6 +237,11 @@ export const treeGroupMocks = ({
             parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
+              pageInfo: {
+                endCursor: null,
+                hasNextPage: false,
+                __typename: 'PageInfo',
+              },
               nodes: childGroups.map(cid => ({
                 __typename: 'LearningOutcomeGroup',
                 _id: toString(cid),
@@ -320,6 +339,7 @@ export const groupMocks = ({
       variables: {
         id: groupId,
         type: 'LearningOutcomeGroup',
+        childGroupsCursor: null,
       },
     },
     result: {
@@ -331,6 +351,11 @@ export const groupMocks = ({
           parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
+            pageInfo: {
+              endCursor: null,
+              hasNextPage: false,
+              __typename: 'PageInfo',
+            },
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               _id: (childGroupOffset + i).toString(),
@@ -348,7 +373,7 @@ export const outcomeGroup = {
   title: 'Grade.2.Math.3A.Elementary.CCSS.Calculus.1',
   description:
     '<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
-      2
+      2,
     ),
   outcomesCount: 15,
   outcomes: {
@@ -365,7 +390,7 @@ export const outcomeGroup = {
           title: 'CCSS.Math.Content.2.MD.A.1 - Outcome with regular length title and description',
           description:
             '<p>Partition <strong>circles</strong> and <strong><em>rectangle</em></strong> into two, three, or four equal share. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -386,7 +411,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.2.MD.A.1.CCSS.Math.Content.Outcome.with.long.title.and.description',
           description:
             '<p>Measure the <strong><em>length</em></strong> of an <strong>object</strong> by selecting and using appropriate measurements. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -424,7 +449,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
           description:
             '<p><em>Partition circles and rectangle into two, three, or four equal share. </em></p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -445,7 +470,7 @@ export const outcomeGroup = {
             'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3 CCSS.Math',
           description:
             '<p><strong>Partition circles and rectangle into two, three, or four equal share. </strong></p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -465,7 +490,7 @@ export const outcomeGroup = {
           title: 'CCSS.Math.Content.2.G.A.3 CCSS.Math.Content.2.G.A.3',
           description:
             '<p>Partition circles and rectangle into two, three, or four equal share. </p>'.repeat(
-              2
+              2,
             ),
           contextType: null,
           contextId: null,
@@ -488,7 +513,7 @@ const createSearchGroupOutcomesOutcomeMocks = (
   contextId,
   contextType,
   title,
-  outcomeCount
+  outcomeCount,
 ) => {
   const calculationMethod = 'decaying_average'
   const calculationInt = 65
@@ -608,6 +633,8 @@ export const groupDetailMocks = ({
   const calculationInt = 65
   const masteryPoints = defaultMasteryPoints
   const ratings = ratingsWithTypename(testRatings)
+
+  let wasFetchedOnce = false
 
   return [
     {
@@ -858,37 +885,41 @@ export const groupDetailMocks = ({
           targetGroupId,
         },
       },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 4`,
-            title,
-            outcomesCount: numOfOutcomes,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mx',
-                __typename: 'PageInfo',
-              },
-              edges: createSearchGroupOutcomesOutcomeMocks(
-                canUnlink,
-                canEdit,
-                canArchive,
-                contextId,
-                contextType,
-                title,
-                numOfOutcomes
-              ),
-              __typename: 'ContentTagConnection',
-            },
-            __typename: 'LearningOutcomeGroup',
-          },
-        },
-      },
-      // for testing graphqls refetch in index.js
       newData: jest.fn(() => {
+        if (!wasFetchedOnce) {
+          wasFetchedOnce = true
+
+          return {
+            data: {
+              group: {
+                _id: groupId,
+                description: `${groupDescription} 4`,
+                title,
+                outcomesCount: numOfOutcomes,
+                notImportedOutcomesCount,
+                outcomes: {
+                  pageInfo: {
+                    hasNextPage: withMorePage,
+                    endCursor: 'Mx',
+                    __typename: 'PageInfo',
+                  },
+                  edges: createSearchGroupOutcomesOutcomeMocks(
+                    canUnlink,
+                    canEdit,
+                    canArchive,
+                    contextId,
+                    contextType,
+                    title,
+                    numOfOutcomes,
+                  ),
+                  __typename: 'ContentTagConnection',
+                },
+                __typename: 'LearningOutcomeGroup',
+              },
+            },
+          }
+        }
+
         const outcome1 = {
           canUnlink,
           _id: '1',
@@ -1139,6 +1170,32 @@ export const groupDetailMocks = ({
               ],
               __typename: 'ContentTagConnection',
             },
+            __typename: 'LearningOutcomeGroup',
+          },
+        },
+      },
+    },
+    {
+      request: {
+        query: SEARCH_GROUP_OUTCOMES,
+        variables: {
+          id: groupId,
+          outcomeIsImported,
+          outcomesContextId: contextId,
+          outcomesContextType: contextType,
+          searchQuery,
+          targetGroupId,
+        },
+      },
+      result: {
+        data: {
+          group: {
+            _id: groupId,
+            description: `${groupDescription} 6`,
+            title,
+            outcomesCount: 1,
+            notImportedOutcomesCount,
+            outcomes: {},
             __typename: 'LearningOutcomeGroup',
           },
         },
@@ -2523,15 +2580,22 @@ export const courseAlignmentStatsMocks = ({
     },
   })
 
+  let wasFetchedOnce = false
+
   return [
     {
       request: {
         query: COURSE_ALIGNMENT_STATS,
         variables: {id},
       },
-      result: returnResult(),
-      // for testing data refetch
-      newData: () => returnResult(refetchIncrement),
+      newData: () => {
+        if (wasFetchedOnce) {
+          return returnResult(refetchIncrement)
+        } else {
+          wasFetchedOnce = true
+          return returnResult()
+        }
+      },
     },
   ]
 }
@@ -2574,7 +2638,7 @@ export const courseAlignmentMocks = ({
 
   const generateAlignments = (num = 2) =>
     [...Array(num).keys()].map(el =>
-      generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`})
+      generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`}),
     )
 
   const generateOutcomeNode = (outcomeId, withAlignments = true, isRefetch = false) => ({
@@ -2628,15 +2692,22 @@ export const courseAlignmentMocks = ({
     },
   })
 
+  let wasFetchedOnce = false
+
   return [
     {
       request: {
         query: SEARCH_OUTCOME_ALIGNMENTS,
         variables,
       },
-      result: returnResult(),
-      // for testing data refetch
-      newData: () => returnResult(true),
+      newData: () => {
+        if (wasFetchedOnce) {
+          return returnResult(true)
+        } else {
+          wasFetchedOnce = true
+          return returnResult()
+        }
+      },
     },
     {
       request: {

@@ -154,7 +154,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
       // audio player's poster image. We can give it a background image though
       player.classList.add(isAudio(theFile.type) ? 'audio-player' : 'video-player')
     },
-    [theFile, width, height]
+    [theFile, width, height],
   )
 
   const previewPanelRef = useRef(null)
@@ -256,6 +256,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
   return (
     <div ref={panelRef}>
       <FileDrop
+        data-testid="filedrop"
         accept={accept}
         onDropAccepted={([file]) => {
           if (messages.length) {
@@ -268,7 +269,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
             messages.concat({
               text: formatMessage('Invalid file type'),
               type: 'error',
-            })
+            }),
           )
         }}
         messages={messages}

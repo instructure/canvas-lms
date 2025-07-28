@@ -44,6 +44,30 @@ describe CC::CCHelper do
   end
 
   describe CC::CCHelper::HtmlContentExporter do
+    let :flavor_asset do
+      [
+        {
+          isOriginal: 1,
+          containerFormat: "mp4",
+          fileExt: "mp4",
+          id: "one",
+          size: 15,
+        },
+        {
+          containerFormat: "flash video",
+          fileExt: "flv",
+          id: "smaller",
+          size: 3,
+        },
+        {
+          containerFormat: "flash video",
+          fileExt: "flv",
+          id: "two",
+          size: 5,
+        },
+      ]
+    end
+
     before :once do
       course_with_teacher
       @obj = @course.media_objects.create!(media_id: "abcde", title: "some_media.mp4")
@@ -52,28 +76,11 @@ describe CC::CCHelper do
     before do
       @kaltura = double("CanvasKaltura::ClientV3")
       allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
-      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return([
-                                                                                      {
-                                                                                        isOriginal: 1,
-                                                                                        containerFormat: "mp4",
-                                                                                        fileExt: "mp4",
-                                                                                        id: "one",
-                                                                                        size: 15,
-                                                                                      },
-                                                                                      {
-                                                                                        containerFormat: "flash video",
-                                                                                        fileExt: "flv",
-                                                                                        id: "smaller",
-                                                                                        size: 3,
-                                                                                      },
-                                                                                      {
-                                                                                        containerFormat: "flash video",
-                                                                                        fileExt: "flv",
-                                                                                        id: "two",
-                                                                                        size: 5,
-                                                                                      },
-                                                                                    ])
+      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("m-noattachment").and_return(flavor_asset)
+      allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return(flavor_asset)
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId("abcde").first)
+      allow(CanvasKaltura::ClientV3).to receive_messages(new: @kaltura)
+      allow(@kaltura).to receive_messages(media_sources: {})
     end
 
     shared_examples "media_attachments_iframes examples" do
@@ -87,9 +94,9 @@ describe CC::CCHelper do
           <a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="/media_objects/abcde" data-media_comment_type="video" data-alt=""></a>
         )
 
-        exported_html = @exporter.html_content(html).split("\n").map(&:strip).select(&:present?)
-        expect(exported_html[0]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_type=video&amp;canvas_qs_embedded=true" data-media-id="abcde" data-media-type="video"></video>))
-        expect(exported_html[1]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde"><source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video"></video>))
+        exported_html = @exporter.html_content(html).split("\n").map(&:strip).compact_blank
+        expect(exported_html[0]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded%20Media/some_media.mp4?canvas_=1&amp;canvas_qs_type=video&amp;canvas_qs_embedded=true" data-media-id="abcde" data-media-type="video"></video>))
+        expect(exported_html[1]).to eq(%(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allow="fullscreen" data-media-id="abcde" loading="lazy"><source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video"></video>))
         expect(exported_html[2]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media_comment_type="video" data-alt=""></a>))
       end
 
@@ -112,6 +119,16 @@ describe CC::CCHelper do
         translated = @exporter.html_content(orig)
         expect(translated).to include %(<source src="/media_attachments_iframe/#{att.id}?type=video" data-media-id="zzzz" data-media-type="video">)
         expect(@exporter.media_object_infos.count).to eq 0
+      end
+
+      it "does not fail when attachment content_type is video" do
+        @obj.attachment.update!(content_type: "video", filename: "some_media", display_name: "some_media")
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+
+        html = %(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="/media_objects/abcde" data-media_comment_type="video" data-alt=""></a>)
+        exported_html = @exporter.html_content(html).split("\n").map(&:strip).compact_blank
+        expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+        expect(exported_html[0]).to eq(%(<a id="media_comment_abcde" class="instructure_inline_media_comment video_comment" href="$IMS-CC-FILEBASE$/Uploaded Media/some_media" data-media_comment_type="video" data-alt=""></a>))
       end
     end
 
@@ -148,6 +165,13 @@ describe CC::CCHelper do
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
       expect(@exporter.media_object_infos[@obj.id]).to be_nil
+    end
+
+    it "handles media comments with no attachments" do
+      MediaObject.create! media_id: "m-noattachment"
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      orig = '<a id="media_comment_m-noattachment" class="instructure_inline_media_comment"></a>'
+      expect { @exporter.html_content(orig) }.not_to raise_error
     end
 
     it "translates media links using an alternate flavor" do
@@ -210,7 +234,7 @@ describe CC::CCHelper do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4")
     end
 
     it "leaves sources unchanged for media iframes with unknown media id" do
@@ -255,6 +279,26 @@ describe CC::CCHelper do
       expect(doc.at_css("script")).to be_nil
     end
 
+    it "can handle deeply nested content" do
+      # The default is Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH = 400. Here we are testing that
+      # we are overriding that default with our own value of 10,000.
+      depth = 500
+      html = "<!DOCTYPE html><html><head><title>Deeply Nested HTML</title></head><body>"
+      depth.times do
+        html += "<div>"
+      end
+      html += "<p>Deeply nested content</p>"
+      depth.times do
+        html += "</div>"
+      end
+      html += "</body></html>"
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      exported = @exporter.html_page(html, "Deeply Nested HTML")
+      doc = Nokogiri::HTML5(exported, nil, **CanvasSanitize::SANITIZE[:parser_options])
+      expect(doc.title).to eq "Deeply Nested HTML"
+      expect(doc.at_css("p").text).to eq "Deeply nested content"
+    end
+
     it "only translates course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
       orig = <<~HTML
@@ -290,6 +334,27 @@ describe CC::CCHelper do
       urls = doc.css("a").pluck(:href)
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/front-page"
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
+    end
+
+    context "exploit assessment_question file links" do
+      it "will ignore links if the exporting user has no access" do
+        teacher_in_course(active_all: true, course: @course)
+        attachment_model(uploaded_data: stub_png_data, context: Course.create!)
+        question_text = "<p><img src=\"/assessment_questions/0/files/#{@attachment.id}\"/></p>"
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @teacher, for_course_copy: false)
+        translated = @exporter.html_content(question_text)
+        expect(translated).to eq "<p><img src=\"http://localhost/assessment_questions/0/files/#{@attachment.id}\" loading=\"lazy\"></p>"
+      end
+
+      it "will ignore links if the file is locked for the exporting user" do
+        student_in_course(active_all: true, course: @course)
+        @course.offer!
+        attachment_model(uploaded_data: stub_png_data, context: @course, unlock_at: 1.year.from_now)
+        question_text = "<p><img src=\"/assessment_questions/0/files/#{@attachment.id}\"/></p>"
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @student, for_course_copy: false)
+        translated = @exporter.html_content(question_text)
+        expect(translated).not_to include "$IMS-CC-FILEBASE$"
+      end
     end
 
     context "assessment_question file links" do

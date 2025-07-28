@@ -17,14 +17,14 @@
  */
 
 import {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {IMPORT_OUTCOMES} from '../../graphql/Management'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useCanvasContext from './useCanvasContext'
 
-const I18n = useI18nScope('FindOutcomesModal')
+const I18n = createI18nScope('FindOutcomesModal')
 
 export const IMPORT_NOT_STARTED = 'IMPORT_NOT_STARTED'
 export const IMPORT_PENDING = 'IMPORT_PENDING'
@@ -67,7 +67,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         }))
       }
     },
-    [setImportGroupsStatus, setImportOutcomesStatus]
+    [setImportGroupsStatus, setImportOutcomesStatus],
   )
 
   const showFlashError = (err, isGroup) =>
@@ -81,8 +81,8 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
               message: err.message,
             })
         : isGroup
-        ? I18n.t('An error occurred while importing these outcomes.')
-        : I18n.t('An error occurred while importing this outcome.'),
+          ? I18n.t('An error occurred while importing these outcomes.')
+          : I18n.t('An error occurred while importing this outcome.'),
       type: 'error',
     })
 
@@ -94,15 +94,18 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
             {
               groupTitle,
               targetGroupTitle,
-            }
+            },
           )
         : isCourse
-        ? I18n.t('All outcomes from %{groupTitle} have been successfully added to this course.', {
-            groupTitle,
-          })
-        : I18n.t('All outcomes from %{groupTitle} have been successfully added to this account.', {
-            groupTitle,
-          })
+          ? I18n.t('All outcomes from %{groupTitle} have been successfully added to this course.', {
+              groupTitle,
+            })
+          : I18n.t(
+              'All outcomes from %{groupTitle} have been successfully added to this account.',
+              {
+                groupTitle,
+              },
+            )
       try {
         await resolveProgress(
           {
@@ -111,10 +114,10 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
           },
           {
             interval: isGroup ? groupPollingInterval : outcomePollingInterval,
-          }
+          },
         )
         const shouldShowAlert = getLocalStorageActiveImports().some(
-          imp => imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId
+          imp => imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId,
         )
         if (isGroup && shouldShowAlert) {
           showFlashAlert({
@@ -130,12 +133,12 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const activeImports = getLocalStorageActiveImports()
         storeActiveImportsInLocalStorage(
           activeImports.filter(
-            imp => !(imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId)
-          )
+            imp => !(imp.isGroup === isGroup && imp.outcomeOrGroupId === outcomeOrGroupId),
+          ),
         )
       }
     },
-    [isCourse, groupPollingInterval, outcomePollingInterval, setStatus]
+    [isCourse, groupPollingInterval, outcomePollingInterval, setStatus],
   )
 
   useEffect(() => {
@@ -143,7 +146,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
       ({progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle}) => {
         setStatus(outcomeOrGroupId, IMPORT_PENDING, isGroup)
         trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle)
-      }
+      },
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -199,7 +202,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         setStatus(outcomeOrGroupId, IMPORT_FAILED, isGroup)
       }
     },
-    [targetContextId, targetContextType, setStatus, importOutcomesMutation, trackProgress]
+    [targetContextId, targetContextType, setStatus, importOutcomesMutation, trackProgress],
   )
 
   const clearGroupsStatus = () => setImportGroupsStatus({})

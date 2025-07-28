@@ -31,7 +31,7 @@ module ConversationsHelper
     domain_root_account_id:,
     media_comment_id:,
     media_comment_type:,
-    user_note:
+    automated: false
   )
     if conversation.conversation.replies_locked_for?(current_user, recipients)
       raise ConversationsHelper::RepliesLockedForUser.new(message: I18n.t("Unauthorized, unable to add messages to conversation"), status: :unauthorized, attribute: "workflow_state")
@@ -49,7 +49,8 @@ module ConversationsHelper
       recipients:,
       context_code:,
       conversation_id: conversation.conversation_id,
-      current_user:
+      current_user:,
+      session:
     )
 
     if recipients && !conversation.conversation.can_add_participants?(recipients)
@@ -74,8 +75,8 @@ module ConversationsHelper
       domain_root_account_id:,
       media_comment_id:,
       media_comment_type:,
-      user_note:,
-      current_user:
+      current_user:,
+      automated:
     )
 
     if conversation.should_process_immediately?
@@ -85,7 +86,12 @@ module ConversationsHelper
       conversation.delay(strand: "add_message_#{conversation.global_conversation_id}").process_new_message(message_args, recipients, message_ids, tags)
       # The message is delayed and will be processed later so there is nothing to return
       # right now. If there is no error, success can be assumed.
-      { message: nil, recipients_count: recipients ? recipients.count : 0, status: :accepted }
+      # for displaying purposed, a preview of the processed message is created
+      message = Conversation.build_message(*message_args)
+      message.id = 0
+      message.conversation_id = conversation.conversation_id
+      message.created_at = Time.now.utc
+      { message:, recipients_count: recipients ? recipients.count : 0, status: :accepted }
     end
   rescue ConversationsHelper::InvalidMessageForConversationError
     raise ConversationsHelper::Error.new(message: I18n.t("not for this conversation"), status: :bad_request, attribute: "included_messages")
@@ -125,11 +131,13 @@ module ConversationsHelper
     result
   end
 
-  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user)
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil, group_conversation: false, bulk_message: false)
     if defined?(params)
       recipients ||= params[:recipients]
       context_code ||= params[:context_code]
       conversation_id ||= params[:from_conversation_id]
+      group_conversation = params[:group_conversation]
+      bulk_message = params[:bulk_message]
     end
 
     return unless recipients
@@ -150,7 +158,8 @@ module ConversationsHelper
       users,
       context:,
       conversation_id:,
-      strict_checks: !Account.site_admin.grants_right?(current_user, session, :send_messages)
+      strict_checks: !Account.site_admin.grants_right?(current_user, session, :send_messages),
+      include_concluded: false
     )
 
     # include users that were already part of the given conversation
@@ -163,14 +172,23 @@ module ConversationsHelper
       known.concat(unknown_users.map { |id| MessageableUser.find(id) })
     end
 
-    contexts.each { |c| known.concat(current_user.address_book.known_in_context(c)) }
+    group_context_types = ["group", "differentiation_tag"]
+    contexts.each do |ctxt|
+      context_type, context_id = ctxt.match(MessageableUser::Calculator::CONTEXT_RECIPIENT).captures
+      if group_context_types.include?(context_type)
+        group = Group.find(context_id)
+        raise InsufficientPermissionsForDifferentiationTagsError if group&.non_collaborative? && !group.context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        raise GroupConversationForDifferentiationTagsNotAllowedError if group.non_collaborative? && group_conversation && !bulk_message
+      end
+      known.concat(current_user.address_book.known_in_context(ctxt, include_concluded: false))
+    end
     @recipients = known.uniq(&:id)
     @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
     @recipients
   end
 
   def get_invalid_recipients(context, recipients, current_user)
-    if context.is_a?(Course) && context.available? && !recipients.nil? && (context.user_is_student?(current_user) && !context.user_is_instructor?(current_user) && !context.user_is_admin?(current_user))
+    if context.is_a?(Course) && context.available? && !recipients.nil? && context.user_is_student?(current_user) && !context.user_is_instructor?(current_user) && !context.user_is_admin?(current_user)
       valid_student_recipients = context.current_users.pluck(:id, :name)
       recipients.map { |recipient| [recipient.id, recipient.name] } - valid_student_recipients
     end
@@ -223,8 +241,8 @@ module ConversationsHelper
     domain_root_account_id: nil,
     media_comment_id: nil,
     media_comment_type: nil,
-    user_note: nil,
-    current_user: @current_user
+    current_user: @current_user,
+    automated: false
   )
     if defined?(params)
       body ||= params[:body]
@@ -233,7 +251,6 @@ module ConversationsHelper
       domain_root_account_id ||= @domain_root_account.id
       media_comment_id ||= params[:media_comment_id]
       media_comment_type ||= params[:media_comment_type]
-      user_note = value_to_boolean(params[:user_note]) if user_note.nil?
     end
     [
       current_user,
@@ -241,9 +258,9 @@ module ConversationsHelper
       {
         attachment_ids:,
         forwarded_message_ids:,
+        automated:,
         root_account_id: domain_root_account_id,
         media_comment: infer_media_comment(media_comment_id, media_comment_type, domain_root_account_id, current_user),
-        generate_user_note: user_note
       }
     ]
   end
@@ -335,6 +352,98 @@ module ConversationsHelper
     end
   end
 
+  def should_send_auto_response?(user, message)
+    return true if message.nil?
+
+    # Compare setting snapshots of message and current settings for user
+    # If they differ, then we need to send an automated response
+    message.inbox_settings_ooo_hash != Inbox::InboxService.inbox_settings_ooo_hash(user_id: user.id, root_account_id: message.root_account_id)
+  end
+
+  def trigger_out_of_office_auto_responses(participant_ids, date, author, context_id, context_type, root_account_id)
+    # Get inbox settings for participants that are Out of Office
+    ooo_inbox_settings = Inbox::InboxService.users_out_of_office(user_ids: participant_ids, root_account_id:, date:)
+
+    # If no one is out of office, then do not send anything
+    return if ooo_inbox_settings.empty?
+
+    ooo_inbox_settings.each do |settings|
+      ooo_message_author = User.find(settings.user_id)
+      ooo_message_recipient = author
+
+      # user should not send themselves an OOO message
+      next unless ooo_message_author.id != ooo_message_recipient.id
+
+      # Find the most recent ooo message to the recipient since ooo start date
+      last_sent_ooo_response = ConversationMessage
+                               .joins("JOIN #{ConversationParticipant.quoted_table_name} ON #{ConversationParticipant.quoted_table_name}.conversation_id = #{ConversationMessage.quoted_table_name}.conversation_id")
+                               .where("automated = TRUE AND author_id = :author_id AND user_id = :user_id AND conversation_messages.root_account_ids = :root_account_ids AND created_at >= :start",
+                                      author_id: ooo_message_author.id,
+                                      user_id: ooo_message_recipient.id,
+                                      root_account_ids: root_account_ids.map(&:to_s),
+                                      start: settings.out_of_office_first_date).order("created_at DESC").first
+
+      should_send = should_send_auto_response?(ooo_message_author, last_sent_ooo_response)
+      next unless should_send
+
+      conversation = ooo_message_author.initiate_conversation(
+        [author],
+        false,
+        subject: settings.out_of_office_subject,
+        context_id:,
+        context_type:
+      )
+
+      # If they have Inbox Signature enabled, then append it to message body
+      message_body = settings.out_of_office_message
+      if context.enable_inbox_signature_block? && settings.use_signature
+        message_body += ("\n\n---\n" + settings.signature)
+      end
+
+      process_response(
+        conversation:,
+        context: conversation.conversation.context,
+        current_user: ooo_message_author,
+        session: nil,
+        recipients: [ooo_message_recipient.id],
+        context_code: conversation.conversation.context&.asset_string,
+        message_ids: [],
+        body: message_body,
+        attachment_ids: [],
+        domain_root_account_id: root_account_id,
+        media_comment_id: nil,
+        media_comment_type: nil,
+        automated: true
+      )
+    end
+  end
+
+  def inbox_settings_student?(user: @current_user, account: @domain_root_account)
+    admin_user = account.grants_any_right?(user, :manage_account_settings, :manage_site_settings)
+
+    active_user_enrollments = Enrollment
+                              .joins(:course)
+                              .where(
+                                user_id: user.id,
+                                root_account_id: account.id,
+                                workflow_state: "active"
+                              )
+                              .where.not(course: { workflow_state: "deleted" })
+
+    active_student = active_user_enrollments
+                     .where(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+                     .exists?
+
+    active_non_student = active_user_enrollments
+                         .where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment])
+                         .exists?
+
+    # Not a Student
+    # - User with active Teacher, TA or Designer Enrollments
+    # - Admin user without active Student, StudentView or Observer Enrollments
+    !(active_non_student || (admin_user && !active_student))
+  end
+
   class Error < StandardError
     attr_accessor :message, :status, :attribute
 
@@ -359,4 +468,8 @@ module ConversationsHelper
   class InvalidMessageForConversationError < StandardError; end
 
   class InvalidMessageParticipantError < StandardError; end
+
+  class GroupConversationForDifferentiationTagsNotAllowedError < StandardError; end
+
+  class InsufficientPermissionsForDifferentiationTagsError < StandardError; end
 end

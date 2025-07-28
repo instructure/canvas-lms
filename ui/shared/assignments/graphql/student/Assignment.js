@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {arrayOf, bool, number, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 import {AssignmentGroup} from './AssignmentGroup'
 import {GroupSet} from './GroupSet'
@@ -57,6 +57,7 @@ export const Assignment = {
       pointsPossible
       submissionTypes
       unlockAt
+      rubricSelfAssessmentEnabled
     }
     ${AssignmentGroup.fragment}
     ${GroupSet.fragment}

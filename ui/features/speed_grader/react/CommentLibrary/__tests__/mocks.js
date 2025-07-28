@@ -35,6 +35,7 @@ export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {})
     result: {
       data: {
         legacyNode: {
+          _id: '1',
           __typename: 'User',
           commentBankItemsConnection: {
             __typename: 'CommentBankItemsConnection',
@@ -43,6 +44,11 @@ export const commentBankItemMocks = ({userId = '1', numberOfComments = 10} = {})
               _id: i.toString(),
               comment: `Comment item ${i}`,
             })),
+            pageInfo: {
+              __typename: 'PageInfo',
+              hasNextPage: false,
+              endCursor: "abcdef",
+            }
           },
         },
       },
@@ -91,6 +97,7 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
     result: {
       data: {
         legacyNode: {
+          _id: '1',
           __typename: 'User',
           commentBankItemsConnection: {
             __typename: 'CommentBankItemsConnection',
@@ -99,6 +106,11 @@ export const searchMocks = ({userId = '1', query = 'search', maxResults = 5} = {
               _id: i.toString(),
               comment: `search result ${i}`,
             })),
+            pageInfo: {
+              __typename: 'PageInfo',
+              hasNextPage: false,
+              endCursor: "abcdef",
+            }
           },
         },
       },

@@ -29,8 +29,6 @@ describe "wiki pages show page assign to" do
   include CourseWikiPage
 
   before :once do
-    differentiated_modules_on
-
     course_with_teacher(active_all: true)
     @page = @course.wiki_pages.create!(title: "wikiwiki", body: "a very cool page body")
     @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
@@ -75,6 +73,7 @@ describe "wiki pages show page assign to" do
 
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
       expect(@page.assignment_overrides.last.assignment_override_students.count).to eq(1)
+      expect(@page.only_visible_to_overrides?).to be_falsey
       # TODO: check that the dates are saved with date under the title of the item
     end
 
@@ -166,6 +165,63 @@ describe "wiki pages show page assign to" do
       RoleOverride.create!(context: @course.account, permission: "manage_wiki_update", role: teacher_role, enabled: false)
       visit_wiki_page_view(@course.id, @page.title)
       expect(element_exists?(assign_to_btn_selector)).to be_falsey
+    end
+
+    it "does show mastery paths in the assign to list for pages" do
+      @course.conditional_release = true
+      @course.save!
+
+      visit_wiki_page_view(@course.id, @page.title)
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      option_elements = INSTUI_Select_options(module_item_assignee[0])
+      option_names = option_elements.map(&:text)
+      expect(option_names).to include("Mastery Paths")
+    end
+
+    it "allows mastery path to be re-assigned after a previous assignment to mastery paths and removal" do
+      @course.conditional_release = true
+      @course.save!
+
+      visit_wiki_page_view(@course.id, @page.title)
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove Everyone", 0)
+      select_module_item_assignee(0, "Mastery Paths")
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove Mastery Paths", 0)
+      select_module_item_assignee(0, @student1.name)
+
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      click_delete_assign_to_item("Remove #{@student1.name}", 0)
+      select_module_item_assignee(0, "Mastery Paths")
+
+      click_save_button
+      keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
+
+      assign_to_btn.click
+      wait_for_assign_to_tray_spinner
+      keep_trying_until { expect(item_tray_exists?).to be_truthy }
+
+      expect(assign_to_in_tray("Remove Mastery Paths")[0]).to be_displayed
     end
   end
 

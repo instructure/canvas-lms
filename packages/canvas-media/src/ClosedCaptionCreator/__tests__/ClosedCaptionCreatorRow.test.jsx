@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, render, waitFor} from '@testing-library/react'
+
 import React from 'react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import ClosedCaptionCreatorRow from '../ClosedCaptionCreatorRow'
 import {CC_FILE_MAX_BYTES} from '../../shared/constants'
+import {vi} from 'vitest'
 
 function makeProps(overrides = {}) {
   return {
@@ -78,30 +80,30 @@ describe('ClosedCaptionCreatorRow', () => {
 
     it('renders tooltip for inherited captions', () => {
       const {getByRole} = render(
-        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={true} />
+        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={true} />,
       )
       expect(
         getByRole('tooltip', {
           name: 'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.',
-        })
+        }),
       ).toBeInTheDocument()
     })
 
     it('does not renders tooltip for non-inherited captions', () => {
       const {queryByRole} = render(
-        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={false} />
+        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={false} />,
       )
       expect(
         queryByRole('tooltip', {
           name: 'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.',
-        })
+        }),
       ).not.toBeInTheDocument()
     })
 
     it('calls onDeleteRow when trashcan is clicked', () => {
-      const onDeleteRow = jest.fn()
+      const onDeleteRow = vi.fn()
       const {getByText} = render(
-        <ClosedCaptionCreatorRow {...makeConfiguredProps({onDeleteRow})} />
+        <ClosedCaptionCreatorRow {...makeConfiguredProps({onDeleteRow})} />,
       )
       const trashcan = getByText('Remove English closed captions').closest('button')
       fireEvent.click(trashcan)
@@ -116,7 +118,7 @@ describe('ClosedCaptionCreatorRow', () => {
           target: {
             files: [file],
           },
-        })
+        }),
       )
     }
 
@@ -130,26 +132,26 @@ describe('ClosedCaptionCreatorRow', () => {
 
     it('renders selected file name if a file is selected', () => {
       const {getByText} = render(
-        <ClosedCaptionCreatorRow {...makeProps({selectedFile: {name: 'caps.srt'}})} />
+        <ClosedCaptionCreatorRow {...makeProps({selectedFile: {name: 'caps.srt'}})} />,
       )
       expect(getByText('caps.srt')).toBeInTheDocument()
     })
 
     it('renders selected language when a language is selected', () => {
       const {getByDisplayValue} = render(
-        <ClosedCaptionCreatorRow {...makeProps({selectedLanguage: {id: 'fr', label: 'French'}})} />
+        <ClosedCaptionCreatorRow {...makeProps({selectedLanguage: {id: 'fr', label: 'French'}})} />,
       )
       expect(getByDisplayValue('French')).toBeInTheDocument()
     })
 
     it('calls onFileSelected when file is selected', async () => {
-      const onFileSelected = jest.fn()
+      const onFileSelected = vi.fn()
       const {container} = render(
         <ClosedCaptionCreatorRow
           {...makeProps({
             onFileSelected,
           })}
-        />
+        />,
       )
       const fileInput = container.querySelector('input[type="file"]')
       const file = new File(['foo'], 'file1.vtt', {type: 'application/vtt'})
@@ -159,14 +161,14 @@ describe('ClosedCaptionCreatorRow', () => {
       expect(onFileSelected).toHaveBeenCalledTimes(1)
     })
     it('upload a file that size is bigger than permitted', async () => {
-      const onFileSelected = jest.fn()
+      const onFileSelected = vi.fn()
       const {container, getAllByText} = render(
         <ClosedCaptionCreatorRow
           {...makeProps({
             onFileSelected,
             userLocale: 'en',
           })}
-        />
+        />,
       )
       const fileInput = container.querySelector('input[type="file"]')
       // Create a file with a size larger than allowed
@@ -176,7 +178,7 @@ describe('ClosedCaptionCreatorRow', () => {
 
       await selectFile(fileInput, file)
 
-      expect(getAllByText(fileSizeMessageError).length).toEqual(3)
+      expect(getAllByText(fileSizeMessageError)).toHaveLength(3)
     })
   })
 })

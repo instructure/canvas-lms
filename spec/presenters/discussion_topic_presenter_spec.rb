@@ -25,9 +25,9 @@ describe DiscussionTopicPresenter do
   let(:course)     { course_model }
   let(:assignment) do
     Assignment.new(title: "Test Topic",
-                   due_at: Time.now,
-                   lock_at: Time.now + 1.week,
-                   unlock_at: Time.now - 1.week,
+                   due_at: Time.zone.now,
+                   lock_at: 1.week.from_now,
+                   unlock_at: 1.week.ago,
                    submission_types: "discussion_topic")
   end
 

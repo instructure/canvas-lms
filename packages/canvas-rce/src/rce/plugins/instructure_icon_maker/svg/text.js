@@ -78,7 +78,7 @@ export function buildTextBackground({
   const fontWeight = 2
   const initialX = Math.max(0, Math.floor(xValue - TEXT_BACKGROUND_PADDING)) + radius
   const initialY = Math.floor(
-    yValue - TEXT_SIZE[textSize] + TEXT_SIZE_FONT_DIFF[textSize] - TEXT_BACKGROUND_PADDING / 2
+    yValue - TEXT_SIZE[textSize] + TEXT_SIZE_FONT_DIFF[textSize] - TEXT_BACKGROUND_PADDING / 2,
   )
   const horizontalLineLength = Math.floor(textWidth + paddingSize + fontWeight) - radius * 2
   const verticalLineLength = Math.floor(textHeight + paddingSize + fontWeight) - radius * 2

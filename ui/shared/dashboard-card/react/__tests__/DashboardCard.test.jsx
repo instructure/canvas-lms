@@ -48,21 +48,21 @@ afterEach(() => {
 describe('DashboardCardHeaderHero', () => {
   it('doesnt add instFS query params if it doesnt use an inst-fs url', () => {
     const {container} = render(
-      <DashboardCardHeaderHero image="https://example.com/path/to/image.png" />
+      <DashboardCardHeaderHero image="https://example.com/path/to/image.png" />,
     )
     expect(
-      container.querySelector('.ic-DashboardCard__header_image').style['background-image']
+      container.querySelector('.ic-DashboardCard__header_image').style['background-image'],
     ).toEqual('url(https://example.com/path/to/image.png)')
   })
 
   it('adds instFS query params if it does use an inst-fs url', () => {
     const {container} = render(
-      <DashboardCardHeaderHero image="https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz" />
+      <DashboardCardHeaderHero image="https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz" />,
     )
     expect(
-      container.querySelector('.ic-DashboardCard__header_image').style['background-image']
+      container.querySelector('.ic-DashboardCard__header_image').style['background-image'],
     ).toEqual(
-      'url(https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=262x146)'
+      'url(https://inst-fs-iad-beta.inscloudgate.net/files/blah/foo?download=1&token=abcxyz&geometry=262x146)',
     )
   })
 

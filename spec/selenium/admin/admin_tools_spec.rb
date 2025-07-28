@@ -30,20 +30,26 @@ describe "admin_tools" do
     wait_for_ajaximations
   end
 
-  def perform_user_search(form_sel, search_term, click_row = 0)
-    set_value f("#{form_sel} input[name=search_term]"), search_term
+  def perform_auth_user_search(search_term)
+    set_value f("#authLoggingSearchForm input[name=search_term]"), search_term
     sleep 0.2 # 0.2 s delay before the search fires
     wait_for_ajaximations
-    fj("#{form_sel} .roster tbody tr:nth(#{click_row}) td").click
+    fj("#authLoggingSearchForm .roster tbody tr:nth(0) td").click
   end
 
-  def perform_autocomplete_search(field_sel, search_term, click_row = 0)
-    set_value f(field_sel), search_term
-    sleep 0.5
+  def perform_view_user_search(search_term)
+    set_value f(%(#commMessagesPane input[data-testid="notifications-search-box"])), search_term
+    sleep 0.3 # 300ms delay before search fires
     wait_for_ajaximations
-    autocomplete_value = fj(".ui-autocomplete.ui-menu > .ui-menu-item:nth(#{click_row}) > a")
-    autocomplete_value.click
-    autocomplete_value
+    f("#commMessagesPane table tbody th button").click
+  end
+
+  def perform_autocomplete_search(input, search_term, row_index_to_select = 0)
+    input.send_keys(search_term)
+    wait_for_ajaximations
+    selected_option = fj("[role='listbox'] [role='option']:nth(#{row_index_to_select})")
+    selected_option.click
+    selected_option
   end
 
   def setup_users
@@ -79,15 +85,16 @@ describe "admin_tools" do
     search_term ||= @course.name
     event ||= @event
 
-    perform_autocomplete_search("#course_id-autocompleteField", search_term)
-    f("#loggingCourse button[name=course_submit]").click
+    form = f('[aria-label="Course Activity Form"]')
+    perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), search_term)
+    form.find("button[aria-label='Find']").click
     wait_for_ajaximations
 
     cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
     expect(cols[3].text).to eq event_type
 
     fj("#courseLoggingSearchResults table tbody tr:last td:last a").click
-    expect(fj(".ui-dialog dl dd:first").text).to eq event.id
+    expect(f("[data-testid='event-id'").text).to eq event.id
   end
 
   before do
@@ -116,10 +123,11 @@ describe "admin_tools" do
 
         load_admin_tools_page
         click_view_notifications_tab
-        perform_user_search("#commMessagesSearchForm", @student.id)
-        f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+        perform_view_user_search(@student.id)
+        dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+        dialog.find_element(:css, "button[type='submit']").click
         wait_for_ajaximations
-        expect(f("#commMessagesSearchResults .message-body").text).to include("this is my message")
+        expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("this is my message")
       end
     end
 
@@ -129,22 +137,26 @@ describe "admin_tools" do
           message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
+          expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("foo bar")
         end
 
         it "displays nothing found" do
           message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          set_value f(".userDateRangeSearchModal .dateEndSearchField"), 2.months.ago
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          to_date = dialog.find_element(:css, "[data-testid='to-date']")
+          set_value(to_date, 2.months.ago.to_date)
+          to_date.send_keys(:tab)
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
-          expect(f("#content")).not_to contain_css("#commMessagesSearchResults .message-body")
+          expect(f(%(#commMessagesPane [data-testid="no-msgs-alert"])).text).to include("No messages found")
+          expect(f("#content")).not_to contain_css(%(#commMessagesSearchResults [data-testid="message-result-0"]))
         end
 
         it "displays valid search params used" do
@@ -152,24 +164,32 @@ describe "admin_tools" do
           load_admin_tools_page
           click_view_notifications_tab
           # Search with no dates
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from the beginning to now.")
+          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from the beginning of time to now")
           # Search with begin date and end date - should show time actually being used
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
+          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 12:00 AM to Mar 9, 2001, 12:00 AM")
           # Search with begin date/time and end date/time - should use and show given time
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001 1:05p")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001 3p")
-          f(".userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-time']"), "1:15 PM", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001", { tab_out: true })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-time']"), "3:00 PM", { tab_out: true })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
+          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 1:15 PM to Mar 9, 2001, 3:00 PM")
         end
 
         it "filters with spanish" do
@@ -181,7 +201,7 @@ describe "admin_tools" do
           @account.default_locale = "es-ES"
           @account.save!
 
-          Timecop.travel(Time.new(2010, 1, 3, 14, 35, 0)) do
+          Timecop.travel(Time.zone.local(2010, 1, 3, 14, 35, 0)) do
             Messages::Partitioner.process
             message_model(user_id: @student.id, body: "foo bar", root_account_id: @account.id)
           end
@@ -190,31 +210,37 @@ describe "admin_tools" do
           click_view_notifications_tab
 
           # Search should find message, ene == Enero == January
-          perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "4 ene 2010")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search(@student.id)
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "4 ene 2010", { tab_out: true })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
+          expect(f(%(#commMessagesPane [data-testid="message-result-0"] [data-testid="body"])).text).to include("foo bar")
 
           # Search should not message
-          perform_user_search("#commMessagesSearchForm", "")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "2 ene 2010")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          perform_view_user_search("")
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "4 ene 2010", { tab_out: true })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
+          expect(f(%(#commMessagesPane [data-testid="no-msgs-alert"])).text).to include("No messages found")
         end
 
         it "displays an error when given invalid input data" do
           load_admin_tools_page
           click_view_notifications_tab
-          perform_user_search("#commMessagesSearchForm", @student.id)
+          perform_view_user_search(@student.id)
           # Search with invalid dates
-          set_value f(".userDateRangeSearchModal .dateStartSearchField"), "couch"
-          set_value f(".userDateRangeSearchModal .dateEndSearchField"), "pillow"
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          from_date = dialog.find_element(:css, "[data-testid='from-date']")
+          to_date = dialog.find_element(:css, "[data-testid='to-date']")
+          set_value from_date, "couch"
+          set_value to_date, "pillow"
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          assert_error_box("[name='messages_start_time']")
-          assert_error_box("[name='messages_end_time']")
+
+          expect(ff('[class$="formFieldMessage"')[0].text).to eq "Invalid date and time."
+          expect(ff('[class$="formFieldMessage"')[1].text).to eq "Invalid date and time."
         end
 
         it "hides tab if account setting disabled" do
@@ -357,8 +383,9 @@ describe "admin_tools" do
     end
 
     it "shows log history" do
-      perform_user_search("#authLoggingSearchForm", @student.id)
-      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+      perform_auth_user_search(@student.id)
+      dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+      dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations
       expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
       cols = ffj("#authLoggingSearchResults table tbody tr:first td")
@@ -367,8 +394,9 @@ describe "admin_tools" do
     end
 
     it "searches by user name" do
-      perform_user_search("#authLoggingSearchForm", "testuser")
-      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+      perform_auth_user_search("testuser")
+      dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+      dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations
       expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
     end
@@ -397,8 +425,9 @@ describe "admin_tools" do
     end
 
     it "searches by grader name and show history" do
-      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
 
@@ -415,8 +444,9 @@ describe "admin_tools" do
     end
 
     it "displays 'y' if graded anonymously" do
-      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
 
       cols = ffj("#gradeChangeLoggingSearchResults table tbody tr:first td")
@@ -424,30 +454,34 @@ describe "admin_tools" do
     end
 
     it "searches by student name" do
-      perform_autocomplete_search("#student_id-autocompleteField", @student.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='student_id'][aria-autocomplete='both']"), @student.name)
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by course id" do
-      set_value f("#gradeChangeCourseSearch"), @course.id
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='course_id']").send_keys(@course.id)
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by assignment id" do
-      set_value f("#gradeChangeAssignmentSearch"), @assignment.id
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='assignment_id']").send_keys(@assignment.id)
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       scroll_page_to_bottom
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "fails gracefully with invalid ids" do
-      set_value f("#gradeChangeAssignmentSearch"), "notarealid"
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='assignment_id']").send_keys("notarealid")
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(f("#gradeChangeLoggingSearchResults").text).to eq "No items found"
     end
@@ -466,7 +500,7 @@ describe "admin_tools" do
       @events = []
       (1..5).each do |index|
         @course.name = "Course #{index}"
-        @course.start_at = Date.today + index.days
+        @course.start_at = Time.zone.today + index.days
         @course.conclude_at = @course.start_at + 7.days
         Timecop.freeze(index.seconds.from_now) do
           @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
@@ -475,8 +509,9 @@ describe "admin_tools" do
       end
       @course.save
 
-      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
       expect(ff("#courseLoggingSearchResults table tbody tr").length).to eq @events.length
@@ -493,16 +528,18 @@ describe "admin_tools" do
       @course.name = "Course Updated"
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
-      set_value f("#course_id-autocompleteField"), @course.id
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.id)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 6
     end
 
     it "fails gracefully with invalid ids" do
-      set_value f("#course_id-autocompleteField"), "notarealid"
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), "notarealid")
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(f("#courseLoggingSearchResults ").text).to eq "No items found"
     end
@@ -511,10 +548,11 @@ describe "admin_tools" do
       @event = Auditors::Course.record_concluded(@course, @teacher)
       @course.destroy
 
-      autocomplete_value = perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      expect(autocomplete_value).not_to be_nil
+      form = f('[aria-label="Course Activity Form"]')
+      selection_option = perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      expect(selection_option).not_to be_nil
 
-      f("#loggingCourse button[name=course_submit]").click
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
       cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
@@ -528,10 +566,9 @@ describe "admin_tools" do
       @event = Auditors::Course.record_created(@course, @teacher, course.changes)
 
       show_event_details("Created")
-      cols = ffj(".ui-dialog table:first tbody tr:first td")
-      expect(cols.size).to eq 2
-      expect(cols[0].text).to eq "Name"
-      expect(cols[1].text).to eq @course.name
+      first_row = fj("[aria-label='Event Details'] tbody tr:first")
+      expect(first_row.find_element(:css, "th").text).to eq "Name"
+      expect(first_row.find_element(:css, "td").text).to eq @course.name
     end
 
     it "shows updated event details" do
@@ -540,15 +577,14 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       show_event_details("Updated", old_name)
-      items = ffj(".ui-dialog dl > dd")
-      expect(items[4].text).to eq "Manual"
-      expect(items[5].text).to eq "Updated"
+      expect(f('[data-testid="event-source"]').text).to eq "Manual"
+      expect(f('[data-testid="event-type"]').text).to eq "Updated"
 
-      cols = ffj(".ui-dialog table:first tbody tr:first td")
-      expect(cols.size).to eq 3
-      expect(cols[0].text).to eq "Name"
-      expect(cols[1].text).to eq old_name
-      expect(cols[2].text).to eq @course.name
+      first_row_header = fj("[aria-label='Event Details'] tbody tr:first th")
+      first_row_data = ffj("[aria-label='Event Details'] tbody tr:first td")
+      expect(first_row_header.text).to eq "Name"
+      expect(first_row_data[0].text).to eq old_name
+      expect(first_row_data[1].text).to eq @course.name
     end
 
     it "shows sis batch id if source is sis" do
@@ -559,9 +595,8 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch:)
 
       show_event_details("Updated", old_name)
-      items = ffj(".ui-dialog dl > dd")
-      expect(items[4].text).to eq "SIS"
-      expect(items[5].text).to eq sis_batch.id.to_s
+      expect(f('[data-testid="event-source"]').text).to eq "SIS"
+      expect(f('[data-testid="event-sis-batch"]').text).to eq sis_batch.id.to_s
     end
 
     it "shows concluded event details" do
@@ -594,7 +629,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied To", @course.name, @to_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @copied_course.name
+      expect(f('[data-testid="event-copied-to"]').text).to eq @copied_course.name
     end
 
     it "shows copied_from event details" do
@@ -602,7 +637,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied From", @copied_course.name, @from_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
+      expect(f('[data-testid="event-copied-from"]').text).to eq @course.name
     end
 
     it "shows reset_to event details" do
@@ -610,7 +645,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset To", @course.name, @to_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @reset_course.name
+      expect(f('[data-testid="event-reset-to"]').text).to eq @reset_course.name
     end
 
     it "shows reset_from event details" do
@@ -618,7 +653,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset From", @reset_course.name, @from_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
+      expect(f('[data-testid="event-reset-from"]').text).to eq @course.name
     end
   end
 

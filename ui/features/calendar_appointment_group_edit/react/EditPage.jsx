@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
@@ -34,11 +34,12 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import axios from '@canvas/axios'
+import {assignLocation} from '@canvas/util/globalUtils'
 import AppointmentGroupList from './AppointmentGroupList'
 import ContextSelector from './ContextSelector'
 import TimeBlockSelector from './TimeBlockSelector'
 
-const I18n = useI18nScope('appointment_groups')
+const I18n = createI18nScope('appointment_groups')
 
 const parseFormValues = data => ({
   description: data.description,
@@ -82,7 +83,16 @@ class EditPage extends React.Component {
         context_codes: [],
         sub_context_codes: [],
       },
-      formValues: {},
+      formValues: {
+        title: '',
+        description: '',
+        location: '',
+        limitUsersPerSlot: '',
+        limitSlotsPerUser: '',
+        allowStudentsToView: false,
+        allowObserverSignup: false,
+        timeblocks: [],
+      },
       contexts: [],
       isDeleting: false,
       eventDataSource: null,
@@ -102,7 +112,7 @@ class EditPage extends React.Component {
   componentDidMount() {
     axios
       .get(
-        `/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`
+        `/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`,
       )
       .then(response => {
         const formValues = parseFormValues(response.data)
@@ -116,18 +126,18 @@ class EditPage extends React.Component {
           () => {
             // Handle setting some pesky values
             $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(
-              formValues.limitUsersPerSlot
+              formValues.limitUsersPerSlot,
             )
             $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(
-              formValues.limitSlotsPerUser
+              formValues.limitSlotsPerUser,
             )
-          }
+          },
         )
       })
 
     axios.get('/api/v1/calendar_events/visible_contexts').then(response => {
       const contexts = response.data.contexts.filter(context =>
-        context.asset_string.match(/^course_/)
+        context.asset_string.match(/^course_/),
       )
       this.setState({
         contexts,
@@ -174,7 +184,7 @@ class EditPage extends React.Component {
     [...this.state.selectedContexts].every(
       context_code =>
         this.state.contexts.find(c => c.asset_string === context_code)
-          ?.allow_observers_in_appointment_groups
+          ?.allow_observers_in_appointment_groups,
     )
 
   deleteGroup = () => {
@@ -183,7 +193,7 @@ class EditPage extends React.Component {
         axios
           .delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
           .then(() => {
-            window.location = '/calendar'
+            assignLocation('/calendar')
           })
           .catch(() => {
             $.flashError(I18n.t('An error occurred while deleting the appointment group'))
@@ -250,7 +260,7 @@ class EditPage extends React.Component {
     axios
       .put(url, requestObj)
       .then(() => {
-        window.location.href = '/calendar?edit_appointment_group_success=1'
+        assignLocation('/calendar?edit_appointment_group_success=1')
       })
       .catch(() => {
         $.flashError(I18n.t('An error occurred while saving the appointment group'))
@@ -259,14 +269,16 @@ class EditPage extends React.Component {
 
   render() {
     return (
-      <div className="EditPage">
+      <div className="EditPage" data-testid="edit-page">
         <Breadcrumb label={I18n.t('You are here:')}>
           <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
-          {this.state.appointmentGroup.title && (
-            <Breadcrumb.Link>
-              {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
-            </Breadcrumb.Link>
-          )}
+          {...(this.state.appointmentGroup.title
+            ? [
+                <Breadcrumb.Link>
+                  {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
+                </Breadcrumb.Link>,
+              ]
+            : [])}
         </Breadcrumb>
         <ScreenReaderContent>
           <h1>
@@ -370,7 +382,7 @@ class EditPage extends React.Component {
               </div>
               <Checkbox
                 label={I18n.t(
-                  'Allow students to see who was signed up for time slots that are still available'
+                  'Allow students to see who was signed up for time slots that are still available',
                 )}
                 checked={this.state.formValues.allowStudentsToView}
                 name="allowStudentsToView"

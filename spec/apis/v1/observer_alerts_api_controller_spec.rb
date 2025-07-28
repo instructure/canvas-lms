@@ -87,6 +87,18 @@ describe ObserverAlertsApiController, type: :request do
       expect(json.pluck("id")).to eq alerts.map(&:id).reverse
     end
 
+    it "excludes alerts where enrollment is inactive" do
+      @student.enrollments.where(course_id: @course.id).update!(workflow_state: "inactive")
+      json = api_call_as_user(@observer, :get, @path, @params)
+      expect(json.length).to eq 0
+    end
+
+    it "excludes alerts where enrollment is deleted" do
+      @student.enrollments.where(course_id: @course.id).destroy_all
+      json = api_call_as_user(@observer, :get, @path, @params)
+      expect(json.length).to eq 0
+    end
+
     it "doesnt return alerts for other students" do
       user = user_model
       link = add_linked_observer(user, @observer)
@@ -128,6 +140,33 @@ describe ObserverAlertsApiController, type: :request do
           expect(alert["locked_for_user"]).to be true
         end
       end
+    end
+
+    it "filters out expired or deleted AccountNotifications" do
+      account = @course.root_account
+      account_admin_user(account:)
+      ObserverAlertThreshold.create!(observer: @observer, student: @student, alert_type: "institution_announcement")
+      @observer.user_account_associations.create!(account:, depth: 0) # ordinarily this would happen in an after transaction commit callback
+      account.announcements.create!(
+        user: @admin,
+        subject: "expired",
+        message: "...",
+        start_at: 1.day.ago,
+        end_at: 1.hour.ago
+      )
+      account.announcements.create!(
+        user: @admin,
+        subject: "this one is deleted",
+        message: "...",
+        start_at: 1.day.ago,
+        end_at: 1.day.from_now,
+        workflow_state: "deleted"
+      )
+      expected = account.announcements.create!(user: @admin, subject: "not expired nor deleted", message: "...", start_at: 1.day.ago, end_at: 1.day.from_now)
+      json = api_call_as_user(@observer, :get, @path, @params)
+      account_notification_alerts = json.select { |row| row["context_type"] == "AccountNotification" }
+
+      expect(account_notification_alerts.pluck("context_id")).to eq [expected.id]
     end
   end
 
@@ -177,7 +216,7 @@ describe ObserverAlertsApiController, type: :request do
     end
   end
 
-  context "#update" do
+  describe "#update" do
     before do
       @course = course_model
       @assignment = assignment_model(context: @course)
@@ -224,7 +263,7 @@ describe ObserverAlertsApiController, type: :request do
       user = user_model
       params = @params.merge(workflow_state: "read")
       api_call_as_user(user, :put, "#{@path}/read", params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 end

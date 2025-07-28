@@ -38,42 +38,6 @@ describe "blueprint courses quizzes" do
     }.with_indifferent_access
   end
 
-  context "in the blueprint course" do
-    before :once do
-      @master = course_factory(active_all: true)
-      @master_teacher = @teacher
-      @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
-      @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
-      @minion.enroll_teacher(@master_teacher).accept!
-
-      # sets up the quiz that gets blueprinted
-      @original_quiz = @master.quizzes.create!(title: "Discussion time!", due_at: 5.days.from_now)
-      @original_quiz.description = "this is the original content for the quiz"
-      run_master_course_migration(@master)
-      @copy_quiz = @minion.quizzes.last
-    end
-
-    context "as a blueprint's teacher" do
-      before do
-        user_session(@master_teacher)
-      end
-
-      it "locks down the associated course's quizzes fields", priority: 2 do
-        change_blueprint_settings(@master, points: true, due_dates: true, availability_dates: true)
-        get "/courses/#{@master.id}/quizzes/#{@original_quiz.id}"
-        f(".bpc-lock-toggle button").click
-        expect(f(".bpc-lock-toggle__label")).to include_text("Locked")
-        run_master_course_migration(@master)
-        get "/courses/#{@minion.id}/quizzes/#{@copy_quiz.id}/edit"
-        expect(f("#quiz_options_form")).to contain_css(".tox.tox-tinymce")
-        expect(f(".bpc-lock-toggle__label")).to include_text("Locked")
-        expect(f("#due_at")).to have_attribute("readonly", "true")
-        expect(f("#unlock_at")).to have_attribute("readonly", "true")
-        expect(f("#lock_at")).to have_attribute("readonly", "true")
-      end
-    end
-  end
-
   context "in the associated course" do
     before :once do
       due_date = format_date_for_view(1.month.ago)
@@ -133,16 +97,6 @@ describe "blueprint courses quizzes" do
 
       options_button.click
       expect(options_panel).to contain_css(".delete_quiz_link")
-    end
-
-    it "does not allow editing of restricted items" do
-      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
-
-      get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
-
-      expect(f("#quiz_edit_wrapper #quiz_title").tag_name).to eq "h1"
-      expect(f("#quiz_edit_wrapper #quiz_description").tag_name).to eq "div"
-      expect(f("#quiz_edit_wrapper #due_at").attribute("readonly")).to eq "true"
     end
 
     it "prevents editing/deleting questions if content is locked" do

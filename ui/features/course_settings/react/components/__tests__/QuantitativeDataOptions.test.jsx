@@ -47,7 +47,7 @@ function renderComponent(wrapper, overrides = {}) {
   createFormField(
     wrapper,
     'course_restrict_quantitative_data',
-    options.course_restrict_quantitative_data
+    options.course_restrict_quantitative_data,
   )
 
   return render(<QuantitativeDataOptions {...options} />, wrapper)

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_31')
+const I18n = createI18nScope('permissions_templates_31')
 
 export const template = generateActionTemplates(
   [
@@ -32,10 +32,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Options (Account Settings)'),
       description: I18n.t(
-        'To view Feature Options for an account, Feature Options - enable / disable must also be enabled.'
+        'To view Feature Options for an account, Feature Options - enable / disable must also be enabled.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

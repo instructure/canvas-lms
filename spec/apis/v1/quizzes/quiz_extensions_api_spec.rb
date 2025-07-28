@@ -23,7 +23,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
   before :once do
     course_factory
     @quiz = @course.quizzes.create!(title: "quiz")
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.workflow_state = "available"
     @quiz.save!
     @student = student_in_course(course: @course, active_all: true).user
@@ -57,7 +57,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
                        quiz_id: @quiz.id.to_s },
                      { quiz_extensions: quiz_extension_params },
                      { "Accept" => "application/vnd.api+json" })
-        assert_status(403)
+        assert_forbidden
       end
     end
 

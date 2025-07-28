@@ -50,6 +50,6 @@ export function openToolDialogFor(toolHelper: RceToolWrapper): void {
     ensureToolDialogContainerElem(),
     () => {
       dialogRef.current?.open(toolHelper)
-    }
+    },
   )
 }

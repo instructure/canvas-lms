@@ -91,7 +91,7 @@ describe('AlignmentOutcomeItem', () => {
 
     it('does not show description if no description', () => {
       const {queryByTestId, getByText} = render(
-        <AlignmentOutcomeItem {...defaultProps({description: null})} />
+        <AlignmentOutcomeItem {...defaultProps({description: null})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       expect(queryByTestId('alignment-summary-description-expanded')).not.toBeInTheDocument()
@@ -100,7 +100,7 @@ describe('AlignmentOutcomeItem', () => {
     it('displays list of alignments if outcomes has alignments', () => {
       const {getAllByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-      expect(getAllByTestId('alignment-item').length).toBe(2)
+      expect(getAllByTestId('alignment-item')).toHaveLength(2)
     })
 
     it('displays no alignments message if outcome has no alignments', () => {
@@ -125,7 +125,7 @@ describe('AlignmentOutcomeItem', () => {
 
     it('does not show description if no description', () => {
       const {queryByTestId, getByText} = render(
-        <AlignmentOutcomeItem {...defaultProps({description: null})} />
+        <AlignmentOutcomeItem {...defaultProps({description: null})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
@@ -141,7 +141,7 @@ describe('AlignmentOutcomeItem', () => {
 
     it('hides no alignments message if outcome has no alignments', () => {
       const {queryByText, getByText} = render(
-        <AlignmentOutcomeItem {...defaultProps({alignments: []})} />
+        <AlignmentOutcomeItem {...defaultProps({alignments: []})} />,
       )
       fireEvent.click(getByText('Expand description for outcome Outcome Title'))
       fireEvent.click(getByText('Collapse description for outcome Outcome Title'))

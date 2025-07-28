@@ -36,7 +36,7 @@ ready(() => {
           artifactId={ENV.canvas_outcomes.artifact_id}
         />
       </View>,
-      container
+      container,
     )
   }
 })

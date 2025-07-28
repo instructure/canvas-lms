@@ -19,7 +19,7 @@
 #
 
 class StudentEnrollment < Enrollment
-  belongs_to :student, foreign_key: :user_id, class_name: "User"
+  belongs_to :student, foreign_key: :user_id, class_name: "User", inverse_of: false
 
   has_many :course_paces, through: :student
 
@@ -72,7 +72,13 @@ class StudentEnrollment < Enrollment
     score_params = { grading_period_id: } if grading_period_id.present?
     score = find_score(score_params)
 
+    old_status = CustomGradeStatus.find(score[:custom_grade_status_id]) if score.custom_grade_status_id.present?
+
     score.update!(custom_grade_status:)
+
+    Canvas::LiveEvents.final_grade_custom_status(score, old_status, self, course)
+
+    score
   end
 
   class << self
@@ -140,7 +146,7 @@ class StudentEnrollment < Enrollment
   end
 
   def republish_course_pace_if_needed
-    return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state != "deleted")
+    return unless previously_new_record? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state != "deleted")
     return unless course.enable_course_paces?
 
     pace = course.course_paces.published.where(course_section_id:).last
@@ -163,7 +169,7 @@ class StudentEnrollment < Enrollment
                                                  .where(course_section: course.course_sections.pluck(:id))
                                                  .pluck(:course_section_id)
     if section_ids_the_student_is_enrolled_in.count > 1 && course.course_paces.published.for_section(section_ids_the_student_is_enrolled_in).size > 1
-      InstStatsd::Statsd.increment("course_pacing.student_with_multiple_sections_with_paces")
+      InstStatsd::Statsd.distributed_increment("course_pacing.student_with_multiple_sections_with_paces")
     end
   end
 end

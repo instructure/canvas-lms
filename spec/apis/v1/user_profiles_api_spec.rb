@@ -48,10 +48,10 @@ describe "User Profile API", type: :request do
 
   before :once do
     @admin = account_admin_user
-    @admin_lti_user_id = Lti::Asset.opaque_identifier_for(@admin)
+    @admin_lti_user_id = Lti::V1p1::Asset.opaque_identifier_for(@admin)
     course_with_student(user: user_with_pseudonym(name: "Student", username: "pvuser@example.com"))
     @student.pseudonym.update_attribute(:sis_user_id, "sis-user-id")
-    Lti::Asset.opaque_identifier_for(@student)
+    Lti::V1p1::Asset.opaque_identifier_for(@student)
     @user = @admin
     Account.default.tap { |a| a.enable_service(:avatars) }.save
     user_with_pseudonym(user: @user)
@@ -226,17 +226,13 @@ describe "User Profile API", type: :request do
                  action: "settings",
                  user_id: @admin.to_param,
                  format: "json")
-    assert_status(401)
+    assert_forbidden
   end
 
   context "user_services" do
     before :once do
       @student.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: false
       @student.user_services.create! service: "somethingthatdoesntexistanymore", service_user_name: "user", service_user_id: "user", visible: true
-    end
-
-    before do
-      allow(Twitter::Connection).to receive(:config).and_return({ some_hash: "fullofstuff" })
     end
 
     it "returns user_services, if requested" do

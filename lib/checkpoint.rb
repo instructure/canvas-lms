@@ -33,7 +33,9 @@ class Checkpoint
       points_possible:,
       due_at:,
       only_visible_to_overrides:,
-      overrides:
+      overrides:,
+      unlock_at:,
+      lock_at:,
     }
   end
 
@@ -55,12 +57,20 @@ class Checkpoint
     @assignment.due_at
   end
 
+  def unlock_at
+    @assignment.unlock_at
+  end
+
+  def lock_at
+    @assignment.lock_at
+  end
+
   def only_visible_to_overrides
     @assignment.only_visible_to_overrides
   end
 
   def overrides
-    assignment_overrides_json(@assignment.assignment_overrides.select(&:active?), @user)
+    @assignment.grants_right?(@user, :update) ? assignment_overrides_json(@assignment.assignment_overrides.select(&:active?), @user) : []
   end
 
   def session

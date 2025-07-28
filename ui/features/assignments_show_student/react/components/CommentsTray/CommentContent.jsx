@@ -19,7 +19,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {bool, arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/Mutations'
 import noComments from '../../../images/NoComments.svg'
 import noCommentsPeerReview from '../../../images/noCommentsPeerReview.svg'
@@ -32,10 +32,11 @@ import {
 } from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-import {useMutation} from 'react-apollo'
+import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
+import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -64,7 +65,7 @@ export default function CommentContent(props) {
         }
 
         const {submissionComments} = JSON.parse(
-          JSON.stringify(cache.readQuery(commentQueryVariables))
+          JSON.stringify(cache.readQuery(commentQueryVariables)),
         )
         submissionComments.commentsConnection.nodes.forEach(comment => {
           if (updatedCommentIDs.has(comment._id)) {
@@ -88,12 +89,15 @@ export default function CommentContent(props) {
         }
         const cachedCurrentSubmission = cache.readFragment(submissionQueryVariables)
 
-        if (props.submission.attempt === cachedCurrentSubmission.attempt) {
+        if (
+          cachedCurrentSubmission &&
+          props.submission.attempt === cachedCurrentSubmission.attempt
+        ) {
           const submission = JSON.parse(JSON.stringify(cachedCurrentSubmission))
           const newUnreadCount = Math.max(0, submission.unreadCommentCount - updatedCommentIDs.size)
           submission.unreadCommentCount = newUnreadCount
           cache.writeFragment({...submissionQueryVariables, data: submission})
-        } else {
+        } else if (cachedCurrentSubmission) {
           const cachedHistories = cache.readQuery({
             query: SUBMISSION_HISTORIES_QUERY,
             variables: {submissionID: props.submission.id},
@@ -116,7 +120,7 @@ export default function CommentContent(props) {
           })
         }
       },
-    }
+    },
   )
 
   // Mark unread comments as read when the tray is opened
@@ -127,7 +131,9 @@ export default function CommentContent(props) {
         .filter(comment => comment.read === false)
         .map(comment => comment._id)
       const timer = setTimeout(() => {
-        markCommentsRead({variables: {commentIds, submissionId: props.submission.id}})
+        markCommentsRead({variables: {commentIds, submissionId: props.submission.id}}).catch(
+          captureException,
+        )
       }, 1000)
 
       return () => clearTimeout(timer)
@@ -143,10 +149,10 @@ export default function CommentContent(props) {
   }, [data, mutationCalled, mutationError, setOnFailure, setOnSuccess])
 
   const defaultText = I18n.t(
-    "This is where you can leave a comment and view your instructor's feedback."
+    "This is where you can leave a comment and view your instructor's feedback.",
   )
   const peerReviewText = I18n.t(
-    'Add a comment to complete your peer review. You will only see comments written by you.'
+    'Add a comment to complete your peer review. You will only see comments written by you.',
   )
   const rubricPeerReviewText = I18n.t('You will only see comments written by you.')
 
@@ -187,7 +193,7 @@ export default function CommentContent(props) {
           {peerReviewCompleteText}
         </Alert>
       )}
-      {props.comments
+      {[...props.comments]
         .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
         .map(comment => (
           <View as="div" key={comment._id} padding="0 medium 0 x-small">

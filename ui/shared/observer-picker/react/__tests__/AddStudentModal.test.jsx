@@ -17,11 +17,14 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
 import {act, render, fireEvent, waitFor} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import AddStudentModal from '../AddStudentModal'
 
 const LINK_STUDENT_URL = '/api/v1/users/1/observees'
+
+const server = setupServer()
 
 const defaultProps = {
   open: true,
@@ -31,63 +34,84 @@ const defaultProps = {
 }
 
 describe('Add Student Modal', () => {
-  beforeEach(() => {
-    fetchMock.post(LINK_STUDENT_URL, JSON.stringify({response: {ok: true}}))
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    fetchMock.restore()
-  })
-
-  it('requests the pairing api when Pair is clicked and a pairing code is provided', () => {
+  it('requests the pairing api when Pair is clicked and a pairing code is provided', async () => {
+    let requestMade = false
+    server.use(
+      http.post(LINK_STUDENT_URL, () => {
+        requestMade = true
+        return HttpResponse.json({response: {ok: true}})
+      }),
+    )
     const {getByTestId} = render(<AddStudentModal {...defaultProps} />)
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
     fireEvent.change(pairingCodeInput, {target: {value: 'sQsTC'}})
-    act(() => addStudentButton.click())
-    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(1)
+    await act(async () => addStudentButton.click())
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(requestMade).toBe(true)
   })
 
-  it('does not request the pairing api when the pairing code input is empty', () => {
+  it('does not request the pairing api when the pairing code input is empty', async () => {
+    let requestMade = false
+    server.use(
+      http.post(LINK_STUDENT_URL, () => {
+        requestMade = true
+        return HttpResponse.json({response: {ok: true}})
+      }),
+    )
     const {getByTestId, getByText} = render(<AddStudentModal {...defaultProps} />)
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
     fireEvent.change(pairingCodeInput, {target: {value: ''}}) // setting to '' just to make the test case explicit
-    act(() => addStudentButton.click())
-    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(0)
+    await act(async () => addStudentButton.click())
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(requestMade).toBe(false)
     expect(getByText('Please provide a pairing code.')).toBeInTheDocument()
   })
 
   it('calls onStudentPaired when a new student is paired successfully', async () => {
+    let requestMade = false
     const onStudentPaired = jest.fn()
+    server.use(
+      http.post(LINK_STUDENT_URL, () => {
+        requestMade = true
+        return HttpResponse.json({response: {ok: true}})
+      }),
+    )
     const {getByTestId} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
     fireEvent.change(pairingCodeInput, {target: {value: 'sQsTC'}})
-    act(() => addStudentButton.click())
-    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(1)
+    await act(async () => addStudentButton.click())
+    expect(requestMade).toBe(true)
     await waitFor(() => {
       expect(onStudentPaired).toHaveBeenCalled()
     })
   })
 
   it('does not call onStudentPaired and shows invalid code error if something goes wrong', async () => {
-    fetchMock.mock(
-      LINK_STUDENT_URL,
-      {throws: new Error('422 Unprocessable Entity')},
-      {overwriteRoutes: true}
-    )
+    let requestMade = false
     const onStudentPaired = jest.fn()
+    server.use(
+      http.post(LINK_STUDENT_URL, () => {
+        requestMade = true
+        return new HttpResponse(null, {status: 422})
+      }),
+    )
     const {getByTestId, getByText} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
     fireEvent.change(pairingCodeInput, {target: {value: '12121as'}})
-    act(() => addStudentButton.click())
-    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(1)
+    await act(async () => addStudentButton.click())
+    expect(requestMade).toBe(true)
     await waitFor(() => {
       expect(getByText('Invalid pairing code.')).toBeInTheDocument()
       expect(onStudentPaired).not.toHaveBeenCalled()
@@ -95,20 +119,22 @@ describe('Add Student Modal', () => {
   })
 
   it('clears the error message once the user starts editing the pairing code', async () => {
-    fetchMock.mock(
-      LINK_STUDENT_URL,
-      {throws: new Error('422 Unprocessable Entity')},
-      {overwriteRoutes: true}
-    )
+    let requestMade = false
     const onStudentPaired = jest.fn()
+    server.use(
+      http.post(LINK_STUDENT_URL, () => {
+        requestMade = true
+        return new HttpResponse(null, {status: 422})
+      }),
+    )
     const {getByTestId, getByText, queryByText} = render(
-      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />,
     )
     const pairingCodeInput = getByTestId('pairing-code-input')
     const addStudentButton = getByTestId('add-student-btn')
     fireEvent.change(pairingCodeInput, {target: {value: '12121as'}})
-    act(() => addStudentButton.click())
-    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(1)
+    await act(async () => addStudentButton.click())
+    expect(requestMade).toBe(true)
     await waitFor(() => {
       expect(getByText('Invalid pairing code.')).toBeInTheDocument()
       expect(onStudentPaired).not.toHaveBeenCalled()

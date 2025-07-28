@@ -103,9 +103,7 @@ class NotificationPreferencesController < ApplicationController
 
     preference = notification_preferences_param
 
-    # Every other category is along the lines of `Due Date`, which is processed correctly by
-    # titleize. Make `DiscussionEntry` not a special snowflake here.
-    category = params[:category].casecmp?("discussionentry") ? "DiscussionEntry" : params[:category].titleize
+    category = parse_category(params[:category])
 
     policies = NotificationPolicy.find_or_update_for_category(@cc, category, preference[:frequency])
     render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
@@ -150,5 +148,16 @@ class NotificationPreferencesController < ApplicationController
     return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
 
     @cc.user = @user
+  end
+
+  def parse_category(category_name)
+    problematic_categories = {
+      "discussionentry" => "DiscussionEntry",
+      "discussion_mention" => "DiscussionMention",
+      "reported_reply" => "ReportedReply"
+    }
+    # Every other category is along the lines of `Due Date`, which is processed correctly by
+    # titleize. Handle the special snowflakes...
+    problematic_categories[category_name] || category_name.titleize
   end
 end

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable import/no-nodejs-modules */
 
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -26,12 +27,9 @@
  * The output from this script gets checked in.
  */
 
-/* eslint-disable no-console */
-
 const fs = require('fs')
 const path = require('path')
-const getTranslationList = require('@instructure/translations/bin/get-translation-list')
-const readTranslationFile = require('@instructure/translations/bin/read-translation-file')
+const {getTranslationList, readTranslationFile} = require('@instructure/translations')
 
 const PACKAGE_NAME = 'canvas-media'
 
@@ -62,7 +60,7 @@ function copyCanvasTranslations(canvasLocaleFileBasenames) {
   for (const basename of canvasLocaleFileBasenames) {
     const filepath = path.resolve(
       __dirname,
-      path.join('../src/translations/locales', `${basename}.js`)
+      path.join('../src/translations/locales', `${basename}.js`),
     )
     const content = localeFileContent(basename)
     fs.writeFileSync(filepath, content, {flag: 'w'})

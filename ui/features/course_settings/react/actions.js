@@ -19,12 +19,12 @@
 import axios from '@canvas/axios'
 import $ from 'jquery'
 import qs from 'qs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Helpers from './helpers'
 import {uploadFile as rawUploadFile} from '@canvas/upload-file'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('actions')
+const I18n = createI18nScope('actions')
 /* $.flashWarning */
 
 const Actions = {
@@ -128,7 +128,7 @@ const Actions = {
       this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib)
         .then(() => {
           dispatch(
-            imageId ? this.setCourseImageId(imageUrl, imageId) : this.setCourseImageUrl(imageUrl)
+            imageId ? this.setCourseImageId(imageUrl, imageId) : this.setCourseImageUrl(imageUrl),
           )
         })
         .catch(() => {
@@ -189,7 +189,7 @@ const Actions = {
         rawUploadFile(url, data, file, ajaxLib)
           .then(attachment => {
             dispatch(
-              this.prepareSetImage(attachment.url, attachment.id, settingName, courseId, ajaxLib)
+              this.prepareSetImage(attachment.url, attachment.id, settingName, courseId, ajaxLib),
             )
           })
           .catch(_response => {
@@ -197,7 +197,9 @@ const Actions = {
           })
       } else {
         dispatch(this.rejectedUpload(type))
-        $.flashWarning(I18n.t("'%{type}' is not a valid image type (try jpg, png, or gif)", {type}))
+        $.flashWarning(
+          I18n.t("'%{type}' is not a valid image type (try jpg, png, webp, or gif)", {type}),
+        )
       }
     }
   },

@@ -109,10 +109,10 @@
 export function typedKeyDict<
   TKey extends string,
   TValue extends object,
-  TKeyProp extends string = 'key'
+  TKeyProp extends string = 'key',
 >(
   dict: {[key in TKey]: Omit<TValue, TKeyProp>},
-  keyProp?: TKeyProp
+  keyProp?: TKeyProp,
 ): {
   byKey: Record<TKey, TValue & Record<TKeyProp, TKey>>
   keys: Array<TKey>

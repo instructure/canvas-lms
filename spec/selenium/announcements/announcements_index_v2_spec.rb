@@ -33,6 +33,7 @@ describe "announcements index v2" do
 
     @announcement1_title = "Free food!"
     @announcement2_title = "Flu Shot"
+    @announcement3_title = " Graduation ceremomy"
 
     # Announcement attributes: title, message, delayed_post_at, allow_rating, user
     @announcement1 = @course.announcements.create!(
@@ -44,6 +45,13 @@ describe "announcements index v2" do
       title: @announcement2_title,
       message: "In the cafe!",
       delayed_post_at: 1.day.from_now,
+      user: @teacher
+    )
+
+    @announcement3 = @course.announcements.create!(
+      title: @announcement3_title,
+      message: "In the cafe!",
+      lock_at: 1.day.ago,
       user: @teacher
     )
 
@@ -134,6 +142,38 @@ describe "announcements index v2" do
       ExternalFeedPage.delete_first_feed
       expect(ExternalFeed.all.length).to eq 1
     end
+
+    context "when instui_nav feature flag on" do
+      page_header_title_all = "Announcements"
+      page_header_title_unread = "Unread Announcements"
+
+      before do
+        @course.root_account.enable_feature!(:instui_nav)
+        AnnouncementIndex.visit_announcements(@course.id)
+      end
+
+      it "announcements header title rendered correctly without filter selection" do
+        expect(AnnouncementIndex.announcement_header_title(page_header_title_all)).to eq page_header_title_all
+      end
+
+      it "announcements header title rendered correctly with all filter" do
+        AnnouncementIndex.select_filter_from_menu("all")
+        current_title = AnnouncementIndex.announcement_header_title(page_header_title_all)
+        expect(current_title).to eq page_header_title_all
+      end
+
+      it "announcements header title rendered correctly with unread filter" do
+        AnnouncementIndex.select_filter_from_menu("unread")
+        current_title = AnnouncementIndex.announcement_header_title(page_header_title_unread)
+        expect(current_title).to eq page_header_title_unread
+      end
+
+      it "announcements can be filtered" do
+        AnnouncementIndex.select_filter_from_menu("unread")
+        expect(AnnouncementIndex.announcement(@announcement1_title)).to be_displayed
+        expect(f("#content")).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(@announcement2_title))
+      end
+    end
   end
 
   context "as a student" do
@@ -145,6 +185,12 @@ describe "announcements index v2" do
       AnnouncementIndex.visit_announcements(@course.id)
       expect(ff('[data-testid="announcement-reply"]').count).to eq 1
       expect(f("#content")).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(@announcement2_title))
+    end
+
+    it "does not display locked announcement to student", priority: "1" do
+      AnnouncementIndex.visit_announcements(@course.id)
+      expect(ff('[data-testid="announcement-reply"]').count).to eq 1
+      expect(f("#content")).not_to contain_jqcss(AnnouncementIndex.announcement_title_css(@announcement3_title))
     end
 
     it "does not reply button to use without reply permissions", priority: "1" do

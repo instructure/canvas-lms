@@ -19,6 +19,11 @@
 #
 
 module Types
+  class EnrollmentRoleType < ApplicationObjectType
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    field :name, String, null: true
+  end
+
   class EnrollmentWorkflowState < Types::BaseEnum
     graphql_name "EnrollmentWorkflowState"
     value "invited"
@@ -43,35 +48,51 @@ module Types
   class EnrollmentFilterInputType < Types::BaseInputObject
     graphql_name "EnrollmentFilterInput"
 
-    argument :types, [EnrollmentTypeType], required: false, default_value: nil
     argument :associated_user_ids,
              [ID],
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
     argument :states, [EnrollmentWorkflowState], required: false, default_value: nil
+    argument :types, [EnrollmentTypeType], required: false, default_value: nil
+    argument :user_ids,
+             [ID],
+             prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+             required: false,
+             default_value: []
   end
 
   class EnrollmentType < ApplicationObjectType
     graphql_name "Enrollment"
 
+    include GraphQLHelpers::AnonymousGrading
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
-    implements Interfaces::LegacyIDInterface
     implements Interfaces::AssetStringInterface
 
     alias_method :enrollment, :object
 
     global_id_field :id
 
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    def _id
+      unless_hiding_user_for_anonymous_grading { enrollment.id }
+    end
+
+    field :user_id, ID, null: true
+    def user_id
+      unless_hiding_user_for_anonymous_grading { object.user_id }
+    end
+
     field :user, UserType, null: true
     def user
-      load_association(:user)
+      unless_hiding_user_for_anonymous_grading { load_association(:user) }
     end
 
     field :associated_user, UserType, null: true
     def associated_user
-      load_association(:associated_user)
+      unless_hiding_user_for_anonymous_grading { load_association(:associated_user) }
     end
 
     field :course, CourseType, null: true
@@ -83,18 +104,53 @@ module Types
 
     field :section, SectionType, null: true
     def section
-      load_association(:course_section)
+      unless_hiding_user_for_anonymous_grading { load_association(:course_section) }
     end
 
     field :state, EnrollmentWorkflowState, method: :workflow_state, null: false
+
+    # This field has been copied from Api::V1::User#enrollment_json
+    # This field is provided for the gradebook
+    field :enrollment_state, EnrollmentWorkflowState, null: false
+    def enrollment_state
+      load_association(:course).then do |course|
+        if course.workflow_state == "deleted"
+          "deleted"
+        else
+          load_association(:course_section).then do |section|
+            (section.workflow_state == "deleted") ? "deleted" : enrollment.workflow_state
+          end
+        end
+      end
+    end
 
     field :type, EnrollmentTypeType, null: false
 
     field :limit_privileges_to_course_section, Boolean, null: true
 
+    field :end_at, DateTimeType, null: true
+    field :start_at, DateTimeType, null: true
+
     field :sis_import_id, ID, null: true
     def sis_import_id
+      return nil unless enrollment.root_account.grants_right?(current_user, :manage_sis)
+
       enrollment.sis_batch_id
+    end
+
+    field :sis_section_id, ID, null: true
+    def sis_section_id
+      load_association(:course).then do |course|
+        if course.grants_right?(current_user, :read_sis) || enrollment.root_account.grants_right?(current_user, :manage_sis)
+          load_association(:course_section).then(&:sis_source_id)
+        end
+        nil
+      end
+    end
+
+    field :role, EnrollmentRoleType, null: true
+    def role
+      load_association(:role)
     end
 
     field :grades, GradesType, null: true do
@@ -106,17 +162,19 @@ module Types
     end
     DEFAULT_GRADING_PERIOD = "default_grading_period"
     def grades(grading_period_id: DEFAULT_GRADING_PERIOD)
-      Promise.all([
-                    load_association(:scores),
-                    load_association(:user),
-                    load_association(:course)
-                  ]).then do
-        if grading_period_id == DEFAULT_GRADING_PERIOD
-          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
-            load_grades(gp&.id)
+      unless_hiding_user_for_anonymous_grading do
+        Promise.all([
+                      load_association(:scores),
+                      load_association(:user),
+                      load_association(:course)
+                    ]).then do
+          if grading_period_id == DEFAULT_GRADING_PERIOD
+            Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
+              load_grades(gp&.id)
+            end
+          else
+            load_grades(grading_period_id)
           end
-        else
-          load_grades(grading_period_id)
         end
       end
     end
@@ -150,14 +208,14 @@ module Types
 
     field :last_activity_at, DateTimeType, null: true
     def last_activity_at
-      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+      return nil unless enrollment.user_id == current_user.id || enrollment.course.grants_right?(current_user, session, :read_reports)
 
       object.last_activity_at
     end
 
     field :total_activity_time, Integer, null: true
     def total_activity_time
-      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+      return nil unless enrollment.user_id == current_user.id || enrollment.course.grants_right?(current_user, session, :read_reports)
 
       object.total_activity_time
     end
@@ -170,8 +228,8 @@ module Types
 
       GraphQLHelpers::UrlHelpers.course_user_url(
         course_id: context[:course].id,
-        id: enrollment.user.id,
-        host: context[:request].host_with_port
+        id: enrollment.user_id,
+        host: request.host_with_port
       )
     end
 

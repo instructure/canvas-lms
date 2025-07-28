@@ -23,7 +23,7 @@ module RuboCop
       # most of this has been stolen from:
       # https://github.com/nevir/rubocop-rspec/blob/master/lib/rubocop/rspec/top_level_describe.rb
       # https://github.com/nevir/rubocop-rspec/blob/9aa33ee7014e8d6d580b12fe2651b32ccdaa7a92/lib/rubocop/cop/rspec/file_path.rb
-      class EnsureSpecExtension < Cop
+      class EnsureSpecExtension < Base
         include RuboCop::Cop::FileMeta
 
         MSG = "Spec files need to end with \"_spec.rb\" " \

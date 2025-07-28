@@ -33,5 +33,7 @@ export async function process(file) {
         category: ICON_MAKER_ICONS,
       }
     }
-  } catch {}
+  } catch {
+    // intentionally empty
+  }
 }

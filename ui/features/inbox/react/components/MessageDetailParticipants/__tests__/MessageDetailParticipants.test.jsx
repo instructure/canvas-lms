@@ -51,6 +51,22 @@ describe('MessageDetailParticipants', () => {
     expect(container.queryByTestId('participant-list')).not.toBeInTheDocument()
   })
 
+  it('decodes HTML entities in participant names', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Chef Bear&#39;ber', shortName: 'Chef Bear&#39;ber'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
+      },
+    }
+
+    const {getByText} = render(<MessageDetailParticipants {...props} />)
+
+    expect(getByText(", Chef Bear'ber, Billy Harris")).toBeInTheDocument()
+  })
+
   it('renders with limited list until expanded', () => {
     const participantList = [
       {name: 'Bob Barker', shortName: 'Bob Barker'},
@@ -85,16 +101,16 @@ describe('MessageDetailParticipants', () => {
         `, ${participantList
           .map(person => person.name)
           .slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
-          .join(', ')}`
-      )
+          .join(', ')}`,
+      ),
     ).toBeInTheDocument()
     expect(
-      container.queryByText(`, ${participantList.map(person => person.name).join(', ')}`)
+      container.queryByText(`, ${participantList.map(person => person.name).join(', ')}`),
     ).toBeNull()
     const expandBtn = container.getByTestId('expand-participants-button')
     fireEvent.click(expandBtn)
     expect(
-      container.getByText(`, ${participantList.map(person => person.name).join(', ')}`)
+      container.getByText(`, ${participantList.map(person => person.name).join(', ')}`),
     ).toBeInTheDocument()
   })
 })

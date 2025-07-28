@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {render, within} from '@testing-library/react'
 import React from 'react'
@@ -47,7 +47,7 @@ describe('CoursePeople', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(
-    user => mockUser(user)
+    user => mockUser(user),
   )
 
   const setup = mocks => {
@@ -56,7 +56,7 @@ describe('CoursePeople', () => {
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <CoursePeople />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -97,7 +97,7 @@ describe('CoursePeople', () => {
       totalActivityTime && textToCheck.push(STOPWATCH_PATTERN)
 
       textToCheck.forEach(text =>
-        expect(within(row).getAllByText(text).length).toBeGreaterThanOrEqual(1)
+        expect(within(row).getAllByText(text).length).toBeGreaterThanOrEqual(1),
       )
     })
   })
@@ -122,7 +122,7 @@ describe('CoursePeople', () => {
       totalActivityTime && textToCheck.push(STOPWATCH_PATTERN)
 
       textToCheck.forEach(text =>
-        expect(within(listItem).getAllByText(text).length).toBeGreaterThanOrEqual(1)
+        expect(within(listItem).getAllByText(text).length).toBeGreaterThanOrEqual(1),
       )
     })
   })

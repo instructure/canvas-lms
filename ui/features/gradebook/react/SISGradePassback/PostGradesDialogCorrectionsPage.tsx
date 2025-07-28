@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -18,14 +17,14 @@
  */
 
 import {each, filter} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
 import AssignmentCorrectionRow from './AssignmentCorrectionRow'
 import type PostGradesStore from './PostGradesStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 type Props = {
   store: ReturnType<typeof PostGradesStore>
@@ -48,7 +47,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
   ignoreErrors = () => {
     // TODO: fix this as Array<AssignmentWithOverride> cast
     const assignments = assignmentUtils.withErrors(
-      this.props.store.getAssignments() as Array<AssignmentWithOverride>
+      this.props.store.getAssignments() as Array<AssignmentWithOverride>,
     )
     each(assignments, a => this.props.store.updateAssignment(a.id, {please_ignore: true}))
   }
@@ -59,6 +58,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
     this.props.advanceToSummaryPage()
   }
 
+  // @ts-expect-error
   invalidAssignmentsForCorrection = assignments => {
     const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
     const invalid_assignments: AssignmentWithOverride[] = []
@@ -80,16 +80,23 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
       a =>
         typeof a.overrides === 'undefined' ||
         a.overrides.length === 0 ||
+        // @ts-expect-error
         typeof a.overrideForThisSection !== 'undefined' ||
+        // @ts-expect-error
         typeof a.selectedSectionForEveryone !== 'undefined' ||
+        // @ts-expect-error
         (typeof a.selectedSectionForEveryone === 'undefined' &&
-          a.currentlySelected.type === 'course')
+          // @ts-expect-error
+          a.currentlySelected.type === 'course'),
     )
+    // @ts-expect-error
     const errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length
     const store = this.props.store
     const correctionRow = this.invalidAssignmentsForCorrection(assignments)
+    // @ts-expect-error
     const originalErrorAssignments = assignmentUtils.withOriginalErrors(assignments)
 
+    // @ts-expect-error
     let assignmentRow
     if (originalErrorAssignments.length !== 0) {
       assignmentRow = originalErrorAssignments
@@ -116,7 +123,7 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
                   one: '1 Assignment with Errors',
                   other: '%{count} Assignments with Errors',
                 },
-                {count: errorCount}
+                {count: errorCount},
               )}
             </legend>
             <div className="row title-row">
@@ -127,13 +134,14 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
                 {I18n.t('Due Date')}
               </h5>
             </div>
-
+            {/* @ts-expect-error */}
             {assignmentRow.map(a => (
               <AssignmentCorrectionRow
                 assignment={a}
                 assignmentList={assignments}
                 updateAssignment={store.updateAssignment.bind(store, a.id)}
                 onDateChanged={store.updateAssignmentDate.bind(store, a.id)}
+                // @ts-expect-error
                 store={store}
               />
             ))}

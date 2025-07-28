@@ -30,7 +30,7 @@ function createMockProps(opts = {}) {
     pagesUrl: '',
     defaultView: 'modules',
     frontPageTitle: '',
-    courseNickname: 'nickname',
+    courseNickname: 'the_course_nickname',
     onSuccess: null,
     ...opts,
   }
@@ -78,7 +78,7 @@ describe('PublishButton', () => {
       await wrapper.getByText('Publish').click()
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
-          'An error ocurred while fetching course details. Please try again.'
+          'An error ocurred while fetching course details. Please try again.',
         )
       })
     })
@@ -95,7 +95,7 @@ describe('PublishButton', () => {
     it('calls publishCourse immediately with onSuccess callback', async () => {
       const onSuccess = jest.fn()
       const wrapper = render(
-        <PublishButton {...createMockProps({defaultView: 'assignments', onSuccess})} />
+        <PublishButton {...createMockProps({defaultView: 'assignments', onSuccess})} />,
       )
       await wrapper.getByText('Publish').click()
       expect(apiClient.getModules).not.toHaveBeenCalled()

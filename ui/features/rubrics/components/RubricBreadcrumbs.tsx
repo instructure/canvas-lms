@@ -20,7 +20,7 @@ import React from 'react'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 
 type BreadcrumbsProps = {
-  breadcrumbs: {name: string; url: string}[]
+  breadcrumbs: {name: string; url: string | null}[]
 }
 
 export const RubricBreadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => {
@@ -30,7 +30,7 @@ export const RubricBreadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => {
         const isLastIndex = index === breadcrumbs.length - 1
         const href = isLastIndex ? undefined : url
         return (
-          <Breadcrumb.Link href={href} key={href ?? -1}>
+          <Breadcrumb.Link href={href ?? ''} key={href ?? -1}>
             {name}
           </Breadcrumb.Link>
         )

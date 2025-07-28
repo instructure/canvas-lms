@@ -24,7 +24,7 @@ module CanvasPartman
         max_id = base_class.maximum(base_class.partitioning_field)
         return ensure_partitions(advance_partitions) if max_id.nil?
 
-        (0..(max_id / base_class.partition_size) + advance_partitions).each do |index|
+        (0..((max_id / base_class.partition_size) + advance_partitions)).each do |index|
           create_partition(index * base_class.partition_size, graceful: true)
         end
       end
@@ -66,7 +66,7 @@ module CanvasPartman
         current = if partitions.empty?
                     -1
                   else
-                    partitions.last[base_class.table_name.length + 1..].to_i
+                    partitions.last[(base_class.table_name.length + 1)..].to_i
                   end
 
         if partition_on_primary_key?
@@ -96,7 +96,7 @@ module CanvasPartman
       end
 
       def partition_tables
-        super.sort_by { |t| t[base_class.table_name.length + 1..].to_i }
+        super.sort_by { |t| t[(base_class.table_name.length + 1)..].to_i }
       end
 
       protected
@@ -111,10 +111,12 @@ module CanvasPartman
           if reflection.polymorphic?
             reflection.options[:polymorphic].map do |type|
               if type.is_a?(Hash)
-                type.values.map { |v| v.constantize rescue nil }
+                type.values.map(&:constantize)
               else
-                type.to_s.classify.constantize rescue nil
+                type.to_s.classify.constantize
               end
+            rescue NameError
+              nil
             end.flatten.compact
           else
             [reflection.klass]

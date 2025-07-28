@@ -21,15 +21,15 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {string} from 'prop-types'
 
-const I18n = useI18nScope('sections_tooltip')
+const I18n = createI18nScope('sections_tooltip')
 
 function sectionsOrTotalCount(props, propName, componentName) {
   if (!props.totalUserCount && !props.sections) {
     return new Error(
-      `One of props 'totalUserCount' or 'sections' was not specified in '${componentName}'.`
+      `One of props 'totalUserCount' or 'sections' was not specified in '${componentName}'.`,
     )
   }
   return null
@@ -52,7 +52,7 @@ export default function SectionsTooltip({sections, totalUserCount, prefix, textC
         one: '1 Section',
         other: '%{count} Sections',
       },
-      {count: sections ? sections.length : 0}
+      {count: sections ? sections.length : 0},
     )
   } else {
     tipContent = (

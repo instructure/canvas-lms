@@ -48,6 +48,10 @@ class Announcement < DiscussionTopic
     between(start_date, end_date).order(Arel.sql("context_id, COALESCE(unlock_at, delayed_post_at, posted_at, created_at) DESC"))
   }
 
+  scope :available_after, lambda { |available_after|
+    where("lock_at IS NULL OR lock_at>?", available_after)
+  }
+
   def validate_draft_state_change
     _old_draft_state, new_draft_state = changes["workflow_state"]
     errors.add :workflow_state, I18n.t("#announcements.error_draft_state", "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == "unpublished"
@@ -81,16 +85,20 @@ class Announcement < DiscussionTopic
     dispatch :new_announcement
     to { users_with_permissions(active_participants_include_tas_and_teachers(true) - [user]) }
     whenever do |record|
-      record.send_notification_for_context? and
-        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
+      is_new_announcement = (record.previously_new_record? and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished)
+
+      record.send_notification_for_context? && (is_new_announcement || record.notify_users)
     end
     data { course_broadcast_data }
 
     dispatch :announcement_created_by_you
     to { user }
     whenever do |record|
-      record.send_notification_for_context? and
-        ((record.just_created and !(record.post_delayed? || record.unpublished?)) || record.changed_state(:active, :unpublished) || record.changed_state(:active, :post_delayed))
+      is_new_announcement = (record.previously_new_record? and !(record.post_delayed? || record.unpublished?)) ||
+                            record.changed_state(:active, :unpublished) ||
+                            record.changed_state(:active, :post_delayed)
+
+      record.send_notification_for_context? && (is_new_announcement || record.notify_users)
     end
     data { course_broadcast_data }
   end
@@ -164,6 +172,12 @@ class Announcement < DiscussionTopic
 
   def assignment
     nil
+  end
+
+  def show_in_search_for_user?(user)
+    return false if locked? && !grants_right?(user, :read_as_admin)
+
+    super
   end
 
   def create_observer_alerts_job

@@ -52,6 +52,7 @@ export default class ChildCourse {
 
   render() {
     const routeTo = isBlueprintShabang() ? this.router.page : noop
+
     ReactDOM.render(
       <Provider store={this.store}>
         <ChildContent
@@ -61,7 +62,7 @@ export default class ChildCourse {
           }}
         />
       </Provider>,
-      this.root
+      this.root,
     )
   }
 

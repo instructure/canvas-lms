@@ -17,20 +17,31 @@
  */
 
 import React from 'react'
-import {type Outcome} from '../../../types'
+import {
+  GradebookCourseOutcomeCalculationMethod,
+  GradebookCourseOutcomeProficiency,
+  type Outcome,
+} from '../../../types'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {type OutcomeScore} from '../LearningMasteryTabsView'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type OutcomeInformationProps = {
   outcome?: Outcome
   outcomeScore?: OutcomeScore | null
+  courseOutcomeCalculationMethod?: GradebookCourseOutcomeCalculationMethod | null
+  courseOutcomeProficiency?: GradebookCourseOutcomeProficiency | null
 }
 
-function OutcomeInformation({outcome, outcomeScore}: OutcomeInformationProps) {
+function OutcomeInformation({
+  courseOutcomeCalculationMethod,
+  courseOutcomeProficiency,
+  outcome,
+  outcomeScore,
+}: OutcomeInformationProps) {
   if (!outcome) {
     return (
       <>
@@ -50,11 +61,21 @@ function OutcomeInformation({outcome, outcomeScore}: OutcomeInformationProps) {
     )
   }
 
+  const masteryScales = window.ENV?.FEATURES?.account_level_mastery_scales
+    ? {
+        calculation_method: courseOutcomeCalculationMethod?.calculationMethod,
+        calculation_int: courseOutcomeCalculationMethod?.calculationInt,
+        mastery_points: courseOutcomeProficiency?.masteryPoints,
+      }
+    : {
+        calculation_method: outcome.calculationMethod,
+        calculation_int: outcome.calculationInt,
+        mastery_points: outcome.masteryPoints,
+      }
+
   const calculationMethods = new CalculationMethodContent({
-    calculation_method: outcome.calculationMethod,
-    calculation_int: outcome.calculationInt,
+    ...masteryScales,
     is_individual_outcome: true,
-    mastery_points: outcome.masteryPoints,
   }).present()
 
   const {method, exampleText, exampleScores, exampleResult} = calculationMethods

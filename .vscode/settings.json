@@ -1,11 +1,79 @@
 {
+  "[typescript]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[ruby]": {
     "editor.defaultFormatter": "Shopify.ruby-lsp",
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.semanticHighlighting.enabled": true
-  }
+  },
+  "cSpell.words": ["urlsafe"],
+  "search.exclude": {
+    ".bundle": true,
+    ".git": true,
+    ".sass-cache": true,
+    ".yardoc": true,
+    "app/coffeescripts/plugins": true,
+    "app/stylesheets/.sass-cache": true,
+    "app/views/jst/plugins": true,
+    "client_apps/canvas_quizzes/dist": true,
+    "client_apps/canvas_quizzes/node_modules": true,
+    "client_apps/canvas_quizzes/tmp": true,
+    "client_apps/canvas_quizzes/vendor/canvas": true,
+    "client_apps/canvas_quizzes/www/vendor/canvas": true,
+    "config/locales": true,
+    "exports": true,
+    "gems/canvas_i18nliner/node_modules": true,
+    "log": true,
+    "node_modules": true,
+    "packages/*/es/**": true,
+    "packages/canvas-rce/es": true,
+    "packages/canvas-rce/locales": true,
+    "packages/translations": true,
+    "public/assets": true,
+    "public/dist": true,
+    "public/javascripts/bower/classnames/tests": true,
+    "public/javascripts/bower/jquery/build": true,
+    "public/javascripts/bower/jquery/speed": true,
+    "public/javascripts/bower/jquery/src": true,
+    "public/javascripts/bower/jquery/test": true,
+    "public/javascripts/client_apps": true,
+    "public/javascripts/plugins": true,
+    "public/javascripts/symlink_to_node_modules": true,
+    "public/javascripts/translations": true,
+    "public/optimized": true,
+    "public/plugins": true,
+    "public/stylesheets_compiled": true,
+    "spec/coffeescripts/plugins": true,
+    "spec/plugins": true,
+    "tmp": true
+  },
+  "biome.enabled": true,
+  "prettier.enable": false,
+  "typescript.preferences.importModuleSpecifier": "project-relative",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "json.format.keepLines": true
 }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
@@ -48,6 +49,8 @@ let submit: jest.Mock
 let originalSubmit: () => void
 let originalScroll: typeof window.scroll
 
+window.CSS.supports = () => false
+
 async function waitForAssertion(cb: () => void) {
   try {
     cb()
@@ -85,12 +88,12 @@ const rceMock = createDeepMockProxy<RCEWrapper>(
       },
     }, // satisfies Partial<RCEWrapperProps> as any,
     getResourceIdentifiers: () => ({resourceType: 'assignment.body', resourceId: '132'}),
-  }
+  },
 )
 
 function getInstance(
   _container: Container | null | undefined,
-  overrides?: Partial<ExternalToolDialogProps>
+  overrides?: Partial<ExternalToolDialogProps>,
 ): Promise<ExternalToolDialog> {
   return new Promise(resolve => {
     const props: ExternalToolDialogProps = {
@@ -103,7 +106,7 @@ function getInstance(
       <InstUISettingsProvider theme={{componentOverrides: {Transition: {duration: '0ms'}}}}>
         <ExternalToolDialog ref={it => resolve(it!)} {...props} />
       </InstUISettingsProvider>,
-      _container ?? null
+      _container ?? null,
     )
   })
 }
@@ -121,7 +124,7 @@ function toolHelper(id: string | number, extras: Partial<RceLtiToolInfo> = {}) {
   return new RceToolWrapper(
     externalToolsEnvFor(editorMock),
     {id: String(id), name: 'foo', ...extras},
-    []
+    [],
   )
 }
 
@@ -192,7 +195,7 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(1))
       expect((container?.querySelector('input[name="selection"]') as HTMLInputElement)?.value).toBe(
-        selection
+        selection,
       )
       await waitFor(() => expect(submit).toHaveBeenCalled())
     })
@@ -203,7 +206,7 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(1))
       expect(
-        (container?.querySelector('input[name="editor_contents"]') as HTMLInputElement)?.value
+        (container?.querySelector('input[name="editor_contents"]') as HTMLInputElement)?.value,
       ).toBe(contents)
       await waitFor(() => expect(submit).toHaveBeenCalled())
     })
@@ -214,16 +217,16 @@ describe('ExternalToolDialog', () => {
       expect(
         (
           container?.querySelector(
-            'input[name="com_instructure_course_canvas_resource_type"]'
+            'input[name="com_instructure_course_canvas_resource_type"]',
           ) as HTMLInputElement
-        )?.value
+        )?.value,
       ).toBe('assignment.body')
       expect(
         (
           container?.querySelector(
-            'input[name="com_instructure_course_canvas_resource_id"]'
+            'input[name="com_instructure_course_canvas_resource_id"]',
           ) as HTMLInputElement
-        )?.value
+        )?.value,
       ).toBe('132')
       await waitFor(() => expect(submit).toHaveBeenCalled())
     })
@@ -232,7 +235,7 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container, {resourceSelectionUrlOverride: null})
       instance.open(toolHelper(2))
       expect(container?.querySelector('form')?.action).toBe(
-        'http://localhost/courses/1/external_tools/2/resource_selection'
+        'http://localhost/courses/1/external_tools/2/resource_selection',
       )
     })
 
@@ -248,7 +251,7 @@ describe('ExternalToolDialog', () => {
       instance.open(toolHelper(2))
       expect(window.addEventListener).toHaveBeenCalledWith(
         'beforeunload',
-        instance.handleBeforeUnload
+        instance.handleBeforeUnload,
       )
     })
 
@@ -263,6 +266,21 @@ describe('ExternalToolDialog', () => {
       const instance = await getInstance(container)
       instance.open(toolHelper(2))
       expect(document.querySelector('iframe')?.getAttribute('data-lti-launch')).toBe('true')
+    })
+
+    it('sets height of iframe properly if dwh not supported', async () => {
+      const instance = await getInstance(container)
+      instance.open(toolHelper(2, {height: 500}))
+      const style = document.querySelector('iframe')?.style
+      expect(style?.height).toBe('500px')
+    })
+
+    it('sets height of iframe properly if dwh supported', async () => {
+      window.CSS.supports = () => true
+      const instance = await getInstance(container)
+      instance.open(toolHelper(2, {height: 500}))
+      const res = instance.calcIFrameHeight()
+      expect(res).toBe('min(500px, calc(95dvh - 5.5rem))')
     })
 
     describe('tray', () => {
@@ -295,12 +313,12 @@ describe('ExternalToolDialog', () => {
 
       expect(window.removeEventListener).toHaveBeenCalledWith(
         'beforeunload',
-        instance.handleBeforeUnload
+        instance.handleBeforeUnload,
       )
 
       expect(window.removeEventListener).toHaveBeenCalledWith(
         'message',
-        instance.handlePostedMessage
+        instance.handlePostedMessage,
       )
     })
   })
@@ -500,39 +518,24 @@ describe('ExternalToolDialog', () => {
 
       expect(rceMock.insertCode).toHaveBeenNthCalledWith(
         1,
-        '<a href="http://www.tool.com" title="title" target="_blank">title</a>'
+        '<a href="http://www.tool.com" title="title" target="_blank">title</a>',
       )
     })
-  })
 
-  describe('alerts', () => {
-    it('has screenreader-only for both by default', async () => {
+    it('closes the modal when tool sends lti.close message', async () => {
       const instance = await getInstance(container)
-      instance.open(toolHelper(1))
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
-    })
+      const closeSpy = jest.spyOn(instance, 'handleClose')
 
-    it('removes screenreader-only from before alert on focus', async () => {
-      const instance = await getInstance(container)
       instance.open(toolHelper(1))
-      const ev = {target: instance.beforeInfoAlertRef.current!}
-      instance.handleInfoAlertFocus(ev)
-      expect(instance.beforeInfoAlertRef.current?.className).not.toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
-      instance.handleInfoAlertBlur()
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-    })
+      instance.handlePostedMessage({
+        origin: 'https://tool.com',
+        data: {
+          subject: 'lti.close',
+        },
+        source: document.querySelector('iframe').contentWindow,
+      })
 
-    it('removes screenreader-only from after alert on focus', async () => {
-      const instance = await getInstance(container)
-      instance.open(toolHelper(1))
-      const ev = {target: instance.afterInfoAlertRef.current!}
-      instance.handleInfoAlertFocus(ev)
-      expect(instance.beforeInfoAlertRef.current?.className).toContain('screenreader-only')
-      expect(instance.afterInfoAlertRef.current?.className).not.toContain('screenreader-only')
-      instance.handleInfoAlertBlur()
-      expect(instance.afterInfoAlertRef.current?.className).toContain('screenreader-only')
+      expect(closeSpy).toHaveBeenCalled()
     })
   })
 })

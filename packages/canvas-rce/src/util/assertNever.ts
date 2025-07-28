@@ -41,6 +41,6 @@
  */
 export function assertNever(input: never): never {
   throw new Error(
-    'Should not be reachable, something is wrong with types. Value given was: ' + input
+    'Should not be reachable, something is wrong with types. Value given was: ' + input,
   )
 }

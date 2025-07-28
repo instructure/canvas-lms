@@ -17,10 +17,10 @@
  */
 
 import {fireEvent, render} from '@testing-library/react'
-import React from 'react'
+import React, {createRef} from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
-import ExternalToolSubmission from '../ExternalToolSubmission'
+import ExternalToolSubmission, {EXTERNAL_TOOL_ERROR_MESSAGE} from '../ExternalToolSubmission'
 
 describe('ExternalToolSubmission', () => {
   const windowOrigin = window.origin || document.origin // TODO: JSDOM v16 Upgrade
@@ -52,7 +52,7 @@ describe('ExternalToolSubmission', () => {
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch'
+        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Fsubmitted-lti-launch',
       )
     })
   })
@@ -61,13 +61,13 @@ describe('ExternalToolSubmission', () => {
     it('shows the URL and content using the values specified in the draft', () => {
       const submission = {...SubmissionMocks.basicLtiLaunchReadyToSubmit}
       const {getByTestId, getByText} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} />
+        <ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Flti-launch'
+        'http://localhost/courses/100/external_tools/retrieve?assignment_id=200&display=borderless&resource_link_lookup_uuid=some_uuid&url=%2Flti-launch',
       )
 
       expect(getByText(/Website URL:\s*\/lti-launch/)).toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('ExternalToolSubmission', () => {
     it('shows the original resource-selection launch frame if the user clicks the "Change" button', () => {
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByRole, getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={tool} />
+        <ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />,
       )
 
       const changeButton = getByRole('button', {name: /Change/})
@@ -85,7 +85,7 @@ describe('ExternalToolSubmission', () => {
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -95,13 +95,13 @@ describe('ExternalToolSubmission', () => {
       const otherTool = {name: 'some other external tool', _id: '2'}
       const submission = SubmissionMocks.basicLtiLaunchReadyToSubmit
       const {getByTestId} = render(
-        <ExternalToolSubmission submission={submission} tool={otherTool} />
+        <ExternalToolSubmission submission={submission} tool={otherTool} submitButtonRef={createRef()} />,
       )
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/2/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/2/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -109,12 +109,12 @@ describe('ExternalToolSubmission', () => {
   describe('when nothing has been submitted and no draft is present', () => {
     it('shows the resource-selection launch frame for the current tool', () => {
       const submission = {state: 'unsubmitted'}
-      const {getByTestId} = render(<ExternalToolSubmission submission={submission} tool={tool} />)
+      const {getByTestId} = render(<ExternalToolSubmission submission={submission} tool={tool} submitButtonRef={createRef()} />)
 
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe).toBeInTheDocument()
       expect(iframe.src).toBe(
-        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200'
+        'http://localhost/courses/100/external_tools/1/resource_selection?launch_type=homework_submission&assignment_id=200',
       )
     })
   })
@@ -143,7 +143,8 @@ describe('ExternalToolSubmission', () => {
           onFileUploadRequested={onFileUploadRequested}
           submission={submission}
           tool={tool}
-        />
+          submitButtonRef={createRef()}
+        />,
       )
 
     it('does nothing if the submission is already submitted', () => {
@@ -182,6 +183,48 @@ describe('ExternalToolSubmission', () => {
         expect(onFileUploadRequested).not.toHaveBeenCalled()
         expect(createSubmissionDraft).not.toHaveBeenCalled()
       })
+
+      it('displays an error if the user has not uploaded a resource and tries to submit', () => {
+        const submissionProps = SubmissionMocks.basicLtiLaunchReadyToSubmit
+        submissionProps.submissionDraft.meetsBasicLtiLaunchCriteria = false
+        const submitButtonRef = createRef()
+        const submitButton = document.createElement('button')
+        submitButtonRef.current = submitButton
+        const {getByText} = render(
+          <ExternalToolSubmission
+            createSubmissionDraft={createSubmissionDraft}
+            onFileUploadRequested={onFileUploadRequested}
+            submission={submissionProps}
+            tool={tool}
+            submitButtonRef={submitButtonRef}
+          />
+        )
+        fireEvent.click(submitButtonRef.current)
+        expect(getByText(EXTERNAL_TOOL_ERROR_MESSAGE)).toBeInTheDocument()
+      })
+
+      it('clears error when the user uploads a resource', () => {
+        const submissionProps = SubmissionMocks.basicLtiLaunchReadyToSubmit
+        submissionProps.submissionDraft.meetsBasicLtiLaunchCriteria = false
+        const submitButtonRef = createRef()
+        const submitButton = document.createElement('button')
+        submitButtonRef.current = submitButton
+        const {getByText, queryByText} = render(
+          <ExternalToolSubmission
+            createSubmissionDraft={createSubmissionDraft}
+            onFileUploadRequested={onFileUploadRequested}
+            submission={submissionProps}
+            tool={tool}
+            submitButtonRef={submitButtonRef}
+          />
+        )
+        fireEvent.click(submitButtonRef.current)
+        expect(getByText(EXTERNAL_TOOL_ERROR_MESSAGE)).toBeInTheDocument()
+        postMessage('A2ExternalContentReady', {
+          content_items: [{'@type': 'FileItem', url: '/another-lti-launch'}],
+        })
+        expect(queryByText(EXTERNAL_TOOL_ERROR_MESSAGE)).not.toBeInTheDocument()
+      })
     })
 
     describe('handling messages', () => {
@@ -202,7 +245,8 @@ describe('ExternalToolSubmission', () => {
             onFileUploadRequested={onFileUploadRequested}
             submission={submission}
             tool={tool}
-          />
+            submitButtonRef={createRef()}
+          />,
         )
 
         postMessage('A2ExternalContentReady', {content_items: [contentItem]})

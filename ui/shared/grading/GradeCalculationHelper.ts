@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -33,6 +32,7 @@ export function multiply(a: number, b: number): Big {
 }
 
 export function toNumber(big: Big) {
+  // @ts-expect-error
   return Number.parseFloat(big)
 }
 
@@ -40,11 +40,15 @@ export function bigSum(values: Big[]) {
   return values.reduce((total, value) => total.plus(value || 0), Big(0))
 }
 
+// @ts-expect-error
 export function sum(collection) {
+  // @ts-expect-error
   const bigValue = reduce(collection, add, 0)
+  // @ts-expect-error
   return toNumber(bigValue)
 }
 
+// @ts-expect-error
 export function sumBy(collection, attr) {
   const values = map(collection, attr)
   return sum(values)
@@ -56,6 +60,7 @@ export function scoreToPercentage(score: number, pointsPossible: number) {
     return floatingPointResult
   }
 
+  // @ts-expect-error
   return toNumber(multiply(divide(score, pointsPossible), 100))
 }
 
@@ -65,6 +70,7 @@ export function scoreToScaledPoints(score: number, pointsPossible: number, scali
     return scoreAsScaledPoints
   }
 
+  // @ts-expect-error
   return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
 }
 
@@ -78,4 +84,17 @@ export function weightedPercent({
   weight: number
 }) {
   return score && weight && possible ? Big(score).div(possible).times(weight) : Big(0)
+}
+
+// this function is in place to ensure we round consistently with the backend when calculating total grades
+export function totalGradeRound(n: number | string | null, digits = 0) {
+  try {
+    if (n == null) {
+      return NaN
+    }
+    const floatNumber = parseFloat(n.toString())
+    return parseFloat(Big(floatNumber).round(digits).toString())
+  } catch (error) {
+    return NaN
+  }
 }

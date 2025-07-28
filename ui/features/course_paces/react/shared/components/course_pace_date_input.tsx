@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import moment, {Moment, MomentInput} from 'moment-timezone'
+import React, {useCallback, useState} from 'react'
+import moment, {type Moment, type MomentInput} from 'moment-timezone'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {Flex} from '@instructure/ui-flex'
@@ -27,15 +26,16 @@ import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningLine} from '@instructure/ui-icons'
 
-import CanvasDateInput, {
+import CanvasDateInput2, {
+  // @ts-expect-error
   CanvasDateInputMessageType,
-} from '@canvas/datetime/react/components/DateInput'
-import {BlackoutDate, InputInteraction} from '../types'
+} from '@canvas/datetime/react/components/DateInput2'
+import type {BlackoutDate, InputInteraction} from '../types'
 import {coursePaceTimezone, weekendIntegers} from '../api/backend_serializer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 
-const I18n = useI18nScope('course_pace_date_input')
+const I18n = createI18nScope('course_pace_date_input')
 
 export type CoursePacesDateInputProps = {
   readonly id?: string
@@ -95,38 +95,45 @@ const CoursePaceDateInput = ({
   const formatDateReadonly = useDateTimeFormat(
     'date.formats.medium_with_weekday',
     coursePaceTimezone,
-    ENV.LOCALE
+    ENV.LOCALE,
   )
   const formatDateForEdit = useDateTimeFormat(
     'date.formats.compact',
     coursePaceTimezone,
-    ENV.LOCALE
+    ENV.LOCALE,
   )
 
-  const calculateErrors = (date?: Moment): string[] => {
-    const errors: string[] = []
+  const calculateErrors = useCallback(
+    (isoDateToCheck?: string) => {
+      let date = isoDateToCheck ? moment(isoDateToCheck) : undefined
 
-    if (!date && !dateValue && permitEmpty) return errors
+      const errors: string[] = []
 
-    if (!date) {
-      date = moment(dateValue)
-    }
+      if (!date && !dateValue && permitEmpty) return errors
 
-    if (!date.isValid()) return [I18n.t('The date entered was invalid.')]
+      if (!date) {
+        date = moment(dateValue)
+      }
 
-    if (weekendsDisabled && weekendIntegers.includes(date.weekday()))
-      errors.push(I18n.t('The selected date is on a weekend and this course pace skips weekends.'))
-    if (DateHelpers.inBlackoutDate(date, blackoutDates))
-      errors.push(I18n.t('The selected date is on a blackout day.'))
-    if (startDate && date.isBefore(startDate))
-      errors.push(I18n.t('The selected date is too early.'))
-    if (endDate && date.isAfter(endDate)) errors.push(I18n.t('The selected date is too late.'))
+      if (!date.isValid()) return [I18n.t('The date entered was invalid.')]
 
-    const parentValidationError = validateDay && validateDay(date)
-    if (parentValidationError) errors.push(parentValidationError)
+      if (weekendsDisabled && weekendIntegers.includes(date.weekday()))
+        errors.push(
+          I18n.t('The selected date is on a weekend and this course pace skips weekends.'),
+        )
+      if (DateHelpers.inBlackoutDate(date, blackoutDates))
+        errors.push(I18n.t('The selected date is on a blackout day.'))
+      if (startDate && date.isBefore(startDate))
+        errors.push(I18n.t('The selected date is too early.'))
+      if (endDate && date.isAfter(endDate)) errors.push(I18n.t('The selected date is too late.'))
 
-    return errors
-  }
+      const parentValidationError = validateDay && validateDay(date)
+      if (parentValidationError) errors.push(parentValidationError)
+
+      return errors
+    },
+    [blackoutDates, dateValue, endDate, permitEmpty, startDate, validateDay, weekendsDisabled],
+  )
 
   const handleDateChange = (date: MomentInput) => {
     const parsedDate = moment(date)
@@ -198,14 +205,14 @@ const CoursePaceDateInput = ({
   return (
     <>
       <Flex direction="column" id={id}>
-        <CanvasDateInput
+        <CanvasDateInput2
           dataTestid="course-pace-date"
           renderLabel={dateInputLabel}
           timezone={coursePaceTimezone}
           formatDate={formatDateForEdit}
           onSelectedDateChange={handleDateChange}
           selectedDate={dateValue}
-          dateIsDisabled={d => !!calculateErrors(d).length}
+          disabledDates={d => !!calculateErrors(d).length}
           width={width}
           messages={messages}
           interaction={interaction}

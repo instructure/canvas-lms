@@ -49,7 +49,7 @@ describe('actions', () => {
             contentItems: JSON.stringify([{item: 'foo'}]),
             tool_id: 1234,
           },
-          expect.anything()
+          expect.anything(),
         )
       })
     })
@@ -68,7 +68,7 @@ describe('actions', () => {
           contentItems: JSON.stringify([{item: 'foo'}]),
           tool_id: 1234,
         },
-        expect.anything()
+        expect.anything(),
       )
     })
   })

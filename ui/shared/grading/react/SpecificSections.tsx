@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -20,24 +19,35 @@
 import React from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {List} from '@instructure/ui-list'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 const {Item: ListItem} = List as any
 
-const I18n = useI18nScope('hide_assignment_grades_tray')
+const I18n = createI18nScope('hide_assignment_grades_tray')
 
 type Props = {
   checked: boolean
   disabled: boolean
   onCheck: (checked: React.ChangeEvent<HTMLInputElement>) => void
   sections: Array<{id: string; name: string}>
-  sectionSelectionChanged: (boolean, string) => void
+  sectionSelectionChanged: (boolean: boolean, string: string) => void
   selectedSectionIds: string[]
+  showSectionValidation?: boolean
 }
 
 export default function SpecificSections(props: Props) {
-  const {checked, disabled, onCheck, sections, sectionSelectionChanged, selectedSectionIds} = props
+  const {
+    checked,
+    disabled,
+    onCheck,
+    sections,
+    sectionSelectionChanged,
+    selectedSectionIds,
+    showSectionValidation,
+  } = props
 
   return (
     <>
@@ -51,6 +61,19 @@ export default function SpecificSections(props: Props) {
           variant="toggle"
         />
       </View>
+
+      {showSectionValidation && (
+        <View as="div" margin="small 0 small" padding="0 medium">
+          <Text color="danger">
+            <View textAlign="center">
+              <View as="div" display="inline-block" margin="0 xxx-small xx-small 0">
+                <IconWarningSolid />
+              </View>
+              {I18n.t('Please select at least one option')}
+            </View>
+          </Text>
+        </View>
+      )}
 
       {checked && !disabled && (
         <View

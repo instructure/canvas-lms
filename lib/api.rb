@@ -112,80 +112,88 @@ module Api
   end
 
   SIS_MAPPINGS = {
-    "courses" =>
-      { lookups: { "sis_course_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id",
-                   "lti_context_id" => "lti_context_id",
-                   "uuid" => "uuid" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "enrollment_terms" =>
-      { lookups: { "sis_term_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "users" =>
-      { lookups: { "sis_user_id" => "pseudonyms.sis_user_id",
-                   "sis_login_id" => {
-                     column: "LOWER(pseudonyms.unique_id)",
-                     transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
-                   },
-                   "id" => "users.id",
-                   "sis_integration_id" => "pseudonyms.integration_id",
-                   "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
-                   "lti_user_id" => {
-                     column: [
-                       "users.lti_context_id",
-                       "user_past_lti_ids.user_lti_context_id",
-                     ],
-                     joins_needed_for_query: [:past_lti_ids],
-                   },
-                   "lti_1_1_id" => "users.lti_context_id",
-                   "lti_1_3_id" => "users.lti_id",
-                   "uuid" => "users.uuid" }.freeze,
-        is_not_scoped_to_account: ["users.id", "users.lti_context_id", "user_past_lti_ids.user_lti_context_id", "users.lti_id", "users.uuid"].freeze,
-        scope: "pseudonyms.account_id",
-        joins: :pseudonym }.freeze,
-    "accounts" =>
-      { lookups: { "sis_account_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id",
-                   "lti_context_id" => "lti_context_id",
-                   "uuid" => "uuid" }.freeze,
-        is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
-        scope: "root_account_id" }.freeze,
-    "course_sections" =>
-      { lookups: { "sis_section_id" => "sis_source_id",
-                   "id" => "id",
-                   "sis_integration_id" => "integration_id" }.freeze,
-        is_not_scoped_to_account: ["id"].freeze,
-        scope: "root_account_id" }.freeze,
-    "groups" =>
-        { lookups: { "sis_group_id" => "sis_source_id",
-                     "lti_context_id" => "lti_context_id",
-                     "id" => "id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
-    "group_categories" =>
-        { lookups: { "sis_group_category_id" => "sis_source_id",
-                     "id" => "id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
-    "assignments" =>
-        { lookups: { "sis_assignment_id" => "sis_source_id",
-                     "id" => "id",
-                     "lti_context_id" => "lti_context_id" }.freeze,
-          is_not_scoped_to_account: ["id"].freeze,
-          scope: "root_account_id" }.freeze,
+    "courses" => {
+      lookups: { "sis_course_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id",
+                 "lti_context_id" => "lti_context_id",
+                 "uuid" => "uuid" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "enrollment_terms" => {
+      lookups: { "sis_term_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "users" => {
+      lookups: { "sis_user_id" => "pseudonyms.sis_user_id",
+                 "sis_login_id" => {
+                   column: "LOWER(pseudonyms.unique_id)",
+                   transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                 }.freeze,
+                 "id" => "users.id",
+                 "sis_integration_id" => "pseudonyms.integration_id",
+                 "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
+                 "lti_user_id" => {
+                   column: [
+                     "users.lti_context_id",
+                     "user_past_lti_ids.user_lti_context_id",
+                   ].freeze,
+                   scope: ->(relation) { relation.left_joins(:past_lti_ids) }.freeze,
+                 }.freeze,
+                 "lti_1_1_id" => "users.lti_context_id",
+                 "lti_1_3_id" => "users.lti_id",
+                 "uuid" => "users.uuid" }.freeze,
+      is_not_scoped_to_account: ["users.id", "users.lti_context_id", "user_past_lti_ids.user_lti_context_id", "users.lti_id", "users.uuid"].freeze,
+      root_account_id_column: "pseudonyms.account_id",
+      joins: :pseudonym
+    }.freeze,
+    "accounts" => {
+      lookups: { "sis_account_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id",
+                 "lti_context_id" => "lti_context_id",
+                 "uuid" => "uuid" }.freeze,
+      is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "course_sections" => {
+      lookups: { "sis_section_id" => "sis_source_id",
+                 "id" => "id",
+                 "sis_integration_id" => "integration_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "groups" => {
+      lookups: { "sis_group_id" => "sis_source_id",
+                 "lti_context_id" => "lti_context_id",
+                 "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "group_categories" => {
+      lookups: { "sis_group_category_id" => "sis_source_id",
+                 "id" => "id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
+    "assignments" => {
+      lookups: { "sis_assignment_id" => "sis_source_id",
+                 "id" => "id",
+                 "lti_context_id" => "lti_context_id" }.freeze,
+      is_not_scoped_to_account: ["id"].freeze,
+      root_account_id_column: "root_account_id"
+    }.freeze,
   }.freeze
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/
-  UUID_REGEX = /\Auuid:(\w{40,})\z/
+  UUID_REGEX = /\Auuid:([\w|-]{36,})\z/
 
   def self.not_scoped_to_account?(columns, sis_mapping)
     flattened_array_of_columns = [columns].flatten
@@ -193,7 +201,8 @@ module Api
     (flattened_array_of_columns - not_scoped_to_account_columns).empty?
   end
 
-  def self.sis_parse_id(id, _current_user = nil,
+  def self.sis_parse_id(id,
+                        _current_user = nil,
                         root_account: nil)
     # returns sis_column_name, column_value
     return "id", id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
@@ -221,7 +230,7 @@ module Api
     # returns an object like {
     #   "column_name" => {
     #     ids: [column_value, ...].uniq,
-    #     joins_needed_for_query: [relation_name, ...] <-- optional
+    #     scope: [Proc, ...] <-- optional
     #   }
     # }
     columns = {}
@@ -242,10 +251,10 @@ module Api
             sis_id = column[:transform].call(sis_id)
           end
         end
-        if (joins_needed_for_query = column[:joins_needed_for_query])
+        if (scope = column[:scope])
           columns[column_name] ||= {}
-          columns[column_name][:joins_needed_for_query] ||= []
-          columns[column_name][:joins_needed_for_query] << joins_needed_for_query
+          columns[column_name][:scope] ||= []
+          columns[column_name][:scope] << scope
         end
         column = column_name
       end
@@ -299,14 +308,18 @@ module Api
     relation = relation.all unless relation.is_a?(ActiveRecord::Relation)
 
     if columns.keys.flatten.length == 1 && not_scoped_to_account?(columns.keys.first, sis_mapping)
-      queryable_columns = {}
-      columns.each_pair { |column_name, value| queryable_columns[column_name] = value[:ids] }
-      relation = relation.where(queryable_columns)
+      column_def = columns.first.last
+      Array.wrap(column_def[:scope]).each do |proc|
+        relation = proc.call(relation)
+      end
+      relation = relation.where(columns.first.first => column_def[:ids])
     else
       args = []
       query = []
       columns.each_key do |column|
-        relation = relation.left_outer_joins(columns[column][:joins_needed_for_query]) if columns[column][:joins_needed_for_query]
+        Array.wrap(columns[column][:scope]).each do |proc|
+          relation = proc.call(relation)
+        end
         if not_scoped_to_account?(column, sis_mapping)
           conditions = []
           if column.is_a?(Array)
@@ -320,7 +333,7 @@ module Api
           end
           query << conditions.join(" OR ").to_s
         else
-          raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
+          raise ArgumentError, "missing scope for collection" unless sis_mapping[:root_account_id_column]
 
           ids = columns[column][:ids]
           if ids.any?(Array)
@@ -349,7 +362,7 @@ module Api
                 conditions << "#{column} IN (?)"
                 sub_args << ids
               end
-              sub_query << "(#{sis_mapping[:scope]} = #{root_account.id} AND (#{conditions.join(" OR ")}))"
+              sub_query << "(#{sis_mapping[:root_account_id_column]} = #{root_account.id} AND (#{conditions.join(" OR ")}))"
             end
             if Shard.current == relation.primary_shard
               query.concat(sub_query)
@@ -536,7 +549,7 @@ module Api
     end
   end
 
-  def media_comment_json(media_object_or_hash)
+  def media_comment_json(media_object_or_hash, location: nil)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     convert_media_type = Attachment.mime_class(media_object_or_hash.media_type)
     {
@@ -547,12 +560,13 @@ module Api
       "url" => user_media_download_url(user_id: @current_user.id,
                                        entryId: media_object_or_hash.media_id,
                                        type: "mp4",
-                                       redirect: "1")
+                                       redirect: "1",
+                                       location: (location if @domain_root_account&.feature_enabled?(:file_association_access))),
     }
   end
 
   def self.api_bulk_load_user_content_attachments(htmls, context = nil)
-    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
+    regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/(?:files|media_attachments_iframe)/(\d+)}
 
     attachment_ids = []
     htmls.compact.each do |html|
@@ -606,7 +620,8 @@ module Api
                        user = @current_user,
                        preloaded_attachments = {},
                        options = {},
-                       is_public = false)
+                       is_public = false,
+                       location: nil)
     return html if html.blank?
 
     # use the host of the request if available;
@@ -622,19 +637,25 @@ module Api
       host = HostUrl.context_host(context, @account_domain.try(:host))
       protocol = HostUrl.protocol
     end
-
+    domain_root_account = @domain_root_account || options[:domain_root_account]
+    no_verifiers = domain_root_account&.feature_enabled?(:disable_adding_uuid_verifier_in_api) || (params[:no_verifiers] if defined?(params))
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
-      rewriter.set_handler("files") do |match|
+      file_handler = proc do |match|
         UserContent::FilesHandler.new(
           match:,
           context:,
           user:,
           preloaded_attachments:,
           is_public:,
-          in_app: respond_to?(:in_app?, true) && in_app?
+          in_app: respond_to?(:in_app?, true) && in_app?,
+          no_verifiers:,
+          location: (location if domain_root_account&.feature_enabled?(:file_association_access))
         ).processed_url
       end
+      rewriter.set_handler("files", &file_handler)
+      rewriter.set_handler("media_attachments_iframe", &file_handler)
+
       rewriter.translate_content(html)
     end
 
@@ -662,9 +683,7 @@ module Api
     Html::Content.process_incoming(html, host:, port:)
   end
 
-  def value_to_boolean(value)
-    Canvas::Plugin.value_to_boolean(value)
-  end
+  delegate :value_to_boolean, to: :"Canvas::Plugin"
 
   # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)

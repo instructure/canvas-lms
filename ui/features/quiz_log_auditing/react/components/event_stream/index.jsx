@@ -17,11 +17,11 @@
  */
 
 import Event from './event'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import K from '../../../constants'
 import React from 'react'
 
-const I18n = useI18nScope('quiz_log_auditing.event_stream')
+const I18n = createI18nScope('quiz_log_auditing.event_stream')
 
 const visibleEventTypes = [
   K.EVT_PAGE_BLURRED,
@@ -50,7 +50,7 @@ class EventStream extends React.Component {
           <p>
             {I18n.t(
               'notices.no_events_available',
-              'There were no events logged during the quiz-taking session.'
+              'There were no events logged during the quiz-taking session.',
             )}
           </p>
         )}

@@ -134,6 +134,12 @@ describe ContentExportsController do
       expect(assigns(:css_bundles).flatten).to include(:k5_theme)
       expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
+
+    it "redirects to login if no user is logged in" do
+      remove_user_session
+      get :index, params: { course_id: @course.id }
+      expect(response).to redirect_to(login_path)
+    end
   end
 
   describe "GET xml_schema" do
@@ -171,10 +177,11 @@ describe ContentExportsController do
         course_factory active_all: true
         course_with_ta(course: @course, active_all: true)
         student_in_course(course: @course, active_all: true)
-        @acx = factory_with_protected_attributes(@course.content_exports, user: @ta, export_type: "common_cartridge")
-        @tcx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: "common_cartridge")
-        @tzx = factory_with_protected_attributes(@course.content_exports, user: @teacher, export_type: "zip")
-        @szx = factory_with_protected_attributes(@course.content_exports, user: @student, export_type: "zip")
+        attachment_model(context: @course, uploaded_data: fixture_file_upload("migration/canvas_cc_minimum.zip", "application/zip"))
+        @acx = @course.content_exports.create!(user: @ta, export_type: "common_cartridge", attachment: @attachment)
+        @tcx = @course.content_exports.create!(user: @teacher, export_type: "common_cartridge")
+        @tzx = @course.content_exports.create!(user: @teacher, export_type: "zip")
+        @szx = @course.content_exports.create!(user: @student, export_type: "zip")
       end
 
       describe "index" do
@@ -204,6 +211,19 @@ describe ContentExportsController do
           get :show, params: { course_id: @course.id, id: @szx.id }
           assert_status(404)
         end
+
+        context "disable_verified_content_export_links enabled" do
+          before do
+            Account.site_admin.enable_feature!(:disable_verified_content_export_links)
+          end
+
+          it "does not send verifiers in the attachment link" do
+            user_session(@teacher)
+            get :show, params: { course_id: @course.id, id: @acx.id }
+            expect(response.parsed_body.dig("content_export", "download_url")).to be_present
+            expect(response.parsed_body.dig("content_export", "download_url")).not_to include "verifier="
+          end
+        end
       end
     end
 
@@ -211,9 +231,9 @@ describe ContentExportsController do
       before(:once) do
         course_factory active_all: true
         student_in_course(course: @course, active_all: true)
-        @tzx = factory_with_protected_attributes(@student.content_exports, user: @teacher, export_type: "zip")
-        @sdx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: "user_data")
-        @szx = factory_with_protected_attributes(@student.content_exports, user: @student, export_type: "zip")
+        @tzx = @student.content_exports.create!(user: @teacher, export_type: "zip")
+        @sdx = @student.content_exports.create!(user: @student, export_type: "user_data")
+        @szx = @student.content_exports.create!(user: @student, export_type: "zip")
       end
 
       describe "index" do

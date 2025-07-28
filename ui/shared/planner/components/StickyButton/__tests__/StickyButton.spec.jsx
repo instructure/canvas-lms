@@ -16,76 +16,103 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
-import {IconArrowUpSolid, IconArrowDownLine} from '@instructure/ui-icons'
+import {render, fireEvent} from '@testing-library/react'
 import StickyButton from '../index'
 
 it('renders', () => {
-  const wrapper = shallow(<StickyButton id="sb">I am a Sticky Button</StickyButton>)
-  expect(wrapper).toMatchSnapshot()
+  const {container, getByRole, getByText} = render(
+    <StickyButton id="sb">I am a Sticky Button</StickyButton>,
+  )
+
+  // Should render a span containing a button
+  expect(container.querySelector('span')).toBeInTheDocument()
+
+  // Should render button with correct attributes
+  const button = getByRole('button')
+  expect(button).toBeInTheDocument()
+  expect(button).toHaveAttribute('id', 'sb')
+  expect(button).toHaveAttribute('type', 'button')
+  expect(button).not.toHaveAttribute('aria-disabled')
+  expect(button).not.toHaveAttribute('aria-hidden')
+  expect(button).not.toHaveAttribute('aria-describedby')
+
+  // Should have the correct class names
+  expect(button).toHaveClass('StickyButton-styles__root')
+  expect(button).toHaveClass('StickyButton-styles__newActivityButton')
+
+  // Should render children within layout span
+  const layoutSpan = container.querySelector('span.StickyButton-styles__layout')
+  expect(layoutSpan).toBeInTheDocument()
+  expect(getByText('I am a Sticky Button')).toBeInTheDocument()
 })
 
 it('calls the onClick prop when clicked', () => {
   const fakeOnClick = jest.fn()
-  const wrapper = shallow(
+  const {getByRole} = render(
     <StickyButton id="sb" onClick={fakeOnClick}>
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
 
-  wrapper.find('button').simulate('click')
+  fireEvent.click(getByRole('button'))
   expect(fakeOnClick).toHaveBeenCalled()
 })
 
 it('does not call the onClick prop when disabled', () => {
   const fakeOnClick = jest.fn()
-  const wrapper = shallow(
+  const {getByRole} = render(
     <StickyButton id="sb" onClick={fakeOnClick} disabled={true}>
       Disabled button
-    </StickyButton>
+    </StickyButton>,
   )
 
-  wrapper.find('button').simulate('click', {
-    preventDefault() {},
-    stopPropagation() {},
-  })
+  fireEvent.click(getByRole('button'))
   expect(fakeOnClick).not.toHaveBeenCalled()
 })
 
 it('renders the correct up icon', () => {
-  const wrapper = shallow(
+  const {container} = render(
     <StickyButton id="sb" direction="up">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
-  expect(wrapper.find(IconArrowUpSolid)).toHaveLength(1)
+  // Check if the up arrow icon is rendered
+  const upIcon =
+    container.querySelector('svg[name="IconArrowUp"]') ||
+    container.querySelector('[data-testid="icon-arrow-up"]')
+  expect(upIcon).toBeInTheDocument()
 })
 
 it('renders the correct down icon', () => {
-  const wrapper = shallow(
+  const {container} = render(
     <StickyButton id="sb" direction="down">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
-  expect(wrapper.find(IconArrowDownLine)).toHaveLength(1)
+  // Check if the down arrow icon is rendered
+  const downIcon =
+    container.querySelector('svg[name="IconArrowDown"]') ||
+    container.querySelector('[data-testid="icon-arrow-down"]')
+  expect(downIcon).toBeInTheDocument()
 })
 
 it('adds aria-hidden when specified', () => {
-  const wrapper = shallow(
+  const {getByRole} = render(
     <StickyButton id="sb" hidden={true}>
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
 
-  expect(wrapper).toMatchSnapshot()
+  const button = getByRole('button', {hidden: true})
+  expect(button).toHaveAttribute('aria-hidden', 'true')
 })
 
 it('shows aria-describedby when a description is given', () => {
-  const wrapper = shallow(
+  const {getByRole, container} = render(
     <StickyButton id="sb" description="hello world">
       Click me
-    </StickyButton>
+    </StickyButton>,
   )
-  expect(wrapper.find('button[aria-describedby="sb_desc"]')).toHaveLength(1)
-  expect(wrapper.find('#sb_desc')).toHaveLength(1)
+  expect(getByRole('button')).toHaveAttribute('aria-describedby', 'sb_desc')
+  expect(container.querySelector('#sb_desc')).toBeInTheDocument()
 })

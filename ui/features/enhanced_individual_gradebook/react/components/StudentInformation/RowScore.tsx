@@ -19,10 +19,10 @@
 import React from 'react'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getLetterGrade, scoreToPercentage, scoreToScaledPoints} from '../../../utils/gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   name: string
@@ -60,10 +60,16 @@ export default function RowScore({gradingScheme, name, possible, score, weight}:
   const letterGradeScore = isPercentInvalid
     ? '-'
     : gradingScheme
-    ? GradeFormatHelper.replaceDashWithMinus(
-        getLetterGrade(possible, score, gradingScheme.data, gradingScheme.pointsBased)
-      )
-    : '-'
+      ? GradeFormatHelper.replaceDashWithMinus(
+          getLetterGrade(
+            possible,
+            score,
+            gradingScheme.data,
+            gradingScheme.pointsBased,
+            gradingScheme.scalingFactor,
+          ),
+        )
+      : '-'
 
   const weightText = weight ? I18n.n(weight, {percentage: true}) : '-'
 

@@ -18,6 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SubmissionSearch
+  ASC_SORT = "ASC"
+  DESC_SORT = "DESC NULLS LAST"
+
   def initialize(assignment, searcher, session, options)
     @assignment = assignment
     @course = assignment.context
@@ -57,14 +60,25 @@ class SubmissionSearch
 
     if @options[:user_id]
       # Since user_id requires an ID and not just a partial name, the user_search_scope is not needed and the 3 characters limit is not applied
-      search_scope = search_scope.where(user_id: representative_id(@options[:user_id]))
+      search_scope = search_scope.where(user_id: @options[:user_id])
+    elsif @options[:user_representative_id]
+      search_scope = search_scope.where(user_id: representative_id(@options[:user_representative_id]))
+    end
+
+    if @options[:anonymous_id].present?
+      search_scope = search_scope.where(anonymous_id: @options[:anonymous_id])
     end
 
     if @options[:enrollment_types].present?
       search_scope = search_scope.where(user_id:
         @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))
     end
-
+    if @options[:apply_gradebook_group_filter] && @course.filter_speed_grader_by_student_group?
+      # namely used for SG2 filtering when the filter SG by group option is enabled
+      group_selection = SpeedGrader::StudentGroupSelection.new(current_user: @searcher, course: @course)
+      # return all submissions for the selected group
+      search_scope = search_scope.where(user_id: group_selection.initial_group.user_ids) if group_selection.initial_group.present?
+    end
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
                      # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
@@ -108,28 +122,104 @@ class SubmissionSearch
     order_bys = Array(@options[:order_by])
     order_bys.each do |order_field_direction|
       field = order_field_direction[:field]
-      direction = (order_field_direction[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
+      direction = (order_field_direction[:direction] == "descending") ? DESC_SORT : ASC_SORT
       search_scope =
         case field
+        when "group_name"
+          order_by_group_name(search_scope:, direction:)
+        when "random"
+          search_scope.order(Arel.sql("hashint8(submissions.id)"))
+        when "submission_status"
+          order_by_submission_status(search_scope:, direction:)
+        when "needs_grading"
+          order_by_needs_grading(search_scope:, direction:)
+        when "username_first_last"
+          order_by_username(search_scope:, direction:)
         when "username"
-          order_clause = User.sortable_name_order_by_clause("users")
-          search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
+          order_by_username(search_scope:, direction:, sortable_name: true)
         when "score"
           search_scope.order(Arel.sql("submissions.score #{direction}"))
         when "submitted_at"
           search_scope.order(Arel.sql("submissions.submitted_at #{direction}"))
+        when "test_student"
+          order_by_test_student(search_scope:, direction:)
         else
           raise "submission search field '#{field}' is not supported"
         end
     end
-    search_scope.order(:user_id)
+
+    if @assignment.anonymize_students?
+      search_scope.order(Arel.sql("#{Submission.anonymous_id_order_clause} ASC"))
+    else
+      search_scope.order(:user_id)
+    end
   end
 
   private
 
+  def order_by_group_name(search_scope:, direction:)
+    return search_scope unless @assignment.has_group_category? && @assignment.group_category.deleted_at.nil?
+
+    ComputedSubmissionColumnBuilder.add_group_name_column(search_scope, @assignment) => { scope:, column: group_name_column }
+    scope.order(Arel.sql("#{group_name_column} #{direction}"))
+  end
+
+  def order_by_needs_grading(search_scope:, direction:)
+    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope) => { scope:, column: needs_grading_column }
+    # students needing grading come first when sorting ascending, last when sorting descending
+    direction = reverse_direction(direction)
+    scope.order(Arel.sql("#{needs_grading_column} #{direction}"))
+  end
+
+  def order_by_submission_status(search_scope:, direction:)
+    priorities = { not_graded: 1, resubmitted: 2, not_submitted: 3, graded: 4, not_gradeable: 5, other: 6 }
+    ComputedSubmissionColumnBuilder.add_submission_status_priority_column(
+      search_scope,
+      @searcher,
+      priorities
+    ) => { scope:, column: status_priority_column }
+    scope.order(Arel.sql("#{status_priority_column} #{direction}"))
+  end
+
+  def order_by_username(search_scope:, direction:, sortable_name: false)
+    return order_by_anonymous_username(search_scope:, direction:) if @assignment.anonymize_students?
+
+    order_clause = sortable_name ? User.sortable_name_order_by_clause("users") : User.name_order_by_clause("users")
+    search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
+  end
+
+  def order_by_anonymous_username(search_scope:, direction:)
+    search_scope.order(Arel.sql("#{Submission.anonymous_id_order_clause} #{direction}"))
+  end
+
+  def order_by_test_student(search_scope:, direction:)
+    test_student = @course.student_view_students.active.first
+    return search_scope unless test_student
+
+    # test students come first when sorting ascending, last when sorting descending
+    direction = reverse_direction(direction)
+    search_scope.order(Arel.sql("submissions.user_id = ? #{direction}", test_student.id))
+  end
+
+  def reverse_direction(direction)
+    case direction
+    when ASC_SORT
+      DESC_SORT
+    when DESC_SORT
+      ASC_SORT
+    else
+      raise "Unknown sort direction: #{direction}"
+    end
+  end
+
   def allowed_users
     users = if @options[:apply_gradebook_enrollment_filters]
-              @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+              if @assignment.only_visible_to_overrides? && @assignment.active_assignment_overrides.where.not(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).none?
+                section_ids = @assignment.active_assignment_overrides.where(set_type: AssignmentOverride::SET_TYPE_COURSE_SECTION).pluck(:set_id)
+                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings, section_ids:)
+              else
+                @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_gradebook_settings)
+              end
             elsif @options[:include_concluded] || @options[:include_deactivated]
               @course.users_visible_to(@searcher, true, exclude_enrollment_state: excluded_enrollment_states_from_filters)
             else

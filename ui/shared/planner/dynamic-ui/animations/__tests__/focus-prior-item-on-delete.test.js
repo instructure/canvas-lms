@@ -54,7 +54,7 @@ it('sets focus to the fallback item focus if deleted index is 0', () => {
   ]
   registry.getAllItemsSorted.mockReturnValueOnce(mockRegistryEntries)
   registry.getComponent.mockReturnValueOnce(
-    mockRegistryEntry([specialFallbackFocusId('item')], 'fb')
+    mockRegistryEntry([specialFallbackFocusId('item')], 'fb'),
   )
   prepareAnimation(animation)
   expect(registry.getComponent).toHaveBeenCalledWith('item', specialFallbackFocusId('item'))

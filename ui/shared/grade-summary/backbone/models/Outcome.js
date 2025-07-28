@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {assignIn, isNumber} from 'lodash'
 
@@ -27,7 +25,7 @@ import Outcome from '@canvas/outcomes/backbone/models/Outcome'
 
 import * as tz from '@instructure/moment-utils'
 
-const I18n = useI18nScope('grade_summaryOutcome')
+const I18n = createI18nScope('grade_summaryOutcome')
 
 extend(GradeSummaryOutcome, Outcome)
 
@@ -54,7 +52,7 @@ GradeSummaryOutcome.prototype.parse = function (response) {
             ? ref1.includes('assessment_question_bank')
             : void 0
           : void 0,
-    })
+    }),
   )
 }
 

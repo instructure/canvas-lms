@@ -131,7 +131,7 @@ class UserListV2
       if results.count == 1
         @resolved_results << results.first
       elsif results.uniq { |r| Shard.global_id_for(r[:user_id]) }.count == 1
-        (@resolved_results << results.detect { |r| r[:account_id] == @root_account.id }) || results.first # prioritize local result first
+        @resolved_results << (results.detect { |r| r[:account_id] == @root_account.id } || results.first) # prioritize local result first
       else
         @duplicate_results << results
       end
@@ -187,7 +187,8 @@ class UserListV2
 
     search_for_results(restricted_shards) do |account_ids|
       Pseudonym.active.where(account_id: account_ids)
-               .where("LOWER(unique_id) IN (?)", unique_ids).joins(:user, :account)
+               .by_unique_id(unique_ids)
+               .joins(:user, :account)
                .pluck(:unique_id, :user_id, "users.uuid", :account_id, "users.name", "accounts.name")
     end
     @lowercase = true

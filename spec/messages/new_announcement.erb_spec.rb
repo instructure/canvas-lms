@@ -37,7 +37,7 @@ describe "new_announcement" do
   let(:notification_name) { :new_announcement }
   let(:asset) { @a }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders for course" do
@@ -87,7 +87,7 @@ describe "new_announcement" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -95,7 +95,7 @@ describe "new_announcement" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -103,17 +103,6 @@ describe "new_announcement" do
       expect(@message.subject).to eq "#{asset.title}: #{@course.name}"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body.strip).to eq asset.message
-    end
-  end
-
-  context ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      generate_message(notification_name, path_type, asset)
-      expect(@message.subject).to eq "Canvas Alert"
-      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
-      expect(@message.body).to include("Canvas Alert - Announcement: #{asset.title}")
     end
   end
 end

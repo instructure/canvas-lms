@@ -19,8 +19,11 @@
 #
 
 RSpec.describe Lti::ResourceLink do
-  let(:tool) { external_tool_1_3_model }
-  let(:course) { Course.create!(name: "Course") }
+  let(:registration) do
+    lti_registration_with_tool(account: course.root_account, created_by: user_model)
+  end
+  let(:tool) { registration.deployments.first }
+  let(:course) { course_model }
   let(:assignment) { Assignment.create!(course:, name: "Assignment") }
   let(:resource_link) do
     Lti::ResourceLink.create!(context_external_tool: tool,
@@ -30,11 +33,6 @@ RSpec.describe Lti::ResourceLink do
   end
 
   context "relationships" do
-    it { is_expected.to belong_to(:context) }
-    it { is_expected.to belong_to(:root_account) }
-
-    it { is_expected.to have_many(:line_items) }
-
     it "maintains associated line items when destroying and undestroying" do
       line_item = line_item_model(resource_link:)
       expect(line_item).to be_active
@@ -65,10 +63,6 @@ RSpec.describe Lti::ResourceLink do
     it 'sets the "context_external_tool"' do
       expect(resource_link.original_context_external_tool).to eq tool
     end
-
-    it "`lookup_uuid` should be unique scoped to `context`" do
-      expect(resource_link).to validate_uniqueness_of(:lookup_uuid).scoped_to(:context_id, :context_type).ignoring_case_sensitivity
-    end
   end
 
   context "after saving" do
@@ -95,13 +89,13 @@ RSpec.describe Lti::ResourceLink do
       end
 
       context "when a matching tool exists in the specified context" do
-        let(:second_tool) { external_tool_1_3_model(context:) }
+        let(:second_tool) { registration.new_external_tool(context) }
 
         it { is_expected.to eq second_tool }
       end
 
       context "when a matching tool exists up the context account chain" do
-        let(:second_tool) { external_tool_1_3_model(context: context.root_account) }
+        let(:second_tool) { registration.new_external_tool(context.root_account) }
 
         it { is_expected.to eq second_tool }
       end
@@ -188,7 +182,6 @@ RSpec.describe Lti::ResourceLink do
     end
 
     let(:context) { course }
-    let(:tool) { external_tool_1_3_model(context:) }
     let(:resource_link) do
       Lti::ResourceLink.create!(context_external_tool: tool,
                                 context: course,
@@ -226,8 +219,8 @@ RSpec.describe Lti::ResourceLink do
 
         it_behaves_like "creating a new resource link"
 
-        it "ContextExternalTool.find_external_tool to look up the tool" do
-          expect(ContextExternalTool).to receive(:find_external_tool)
+        it "Lti::ToolFinder.from_url to look up the tool" do
+          expect(Lti::ToolFinder).to receive(:from_url)
             .with(tool.url, context, only_1_3: true).and_call_original
           subject
         end

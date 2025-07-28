@@ -19,11 +19,28 @@
 import Identicon from 'react-identicons'
 import React from 'react'
 import {string} from 'prop-types'
-
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 const CURRENT_USER = 'current_user'
+
+const sizeStyles = {
+  'x-small': {
+    width: '30px',
+    height: '30px',
+    identiconSize: '15',
+  },
+  small: {
+    width: '40px',
+    height: '40px',
+    identiconSize: '20',
+  },
+  medium: {
+    width: '50px',
+    height: '50px',
+    identiconSize: '30',
+  },
+}
 
 export const AnonymousAvatar = ({seedString, size, addFocus}) => {
   return (
@@ -33,16 +50,16 @@ export const AnonymousAvatar = ({seedString, size, addFocus}) => {
       textAlign="center"
       borderRadius="circle"
       borderWidth="medium"
-      width={size === 'medium' ? '50px' : '20px'}
-      height={size === 'medium' ? '50px' : '20px'}
       data-testid="anonymous_avatar"
       background={seedString === CURRENT_USER ? 'primary-inverse' : undefined}
+      width={sizeStyles[size].width}
+      height={sizeStyles[size].height}
     >
       <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
         <Flex.Item margin="xx-small 0 0 0">
           <Identicon
             string={seedString}
-            size={size === 'medium' ? 30 : 10}
+            size={sizeStyles[size].identiconSize}
             fg={seedString === CURRENT_USER ? 'white' : undefined}
           />
         </Flex.Item>

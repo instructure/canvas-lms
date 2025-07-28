@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
 import {AssignmentAvailabilityContainer} from '../AssignmentAvailabilityContainer/AssignmentAvailabilityContainer'
@@ -29,9 +29,14 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {DiscussionAvailabilityContainer} from '../DiscussionAvailabilityContainer/DiscussionAvailabilityContainer'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function DiscussionDetails({...props}) {
+  const showAssignTo =
+    !props.discussionTopic.isAnnouncement &&
+    props.discussionTopic.permissions.manageAssignTo &&
+    props.discussionTopic.contextType === 'Course' &&
+    props.discussionTopic.assignment
   const pointsPossible = props.discussionTopic?.assignment?.pointsPossible || 0
   const formattedPoints = pointsPossible
     ? numberFormat._format(pointsPossible, {
@@ -39,7 +44,6 @@ export function DiscussionDetails({...props}) {
         strip_insignificant_zeros: true,
       })
     : 0
-
   return (
     <Responsive
       match="media"
@@ -54,7 +58,7 @@ export function DiscussionDetails({...props}) {
             {
               count: pointsPossible,
               formattedPoints,
-            }
+            },
           ),
           textSize: 'x-small',
         },
@@ -67,14 +71,14 @@ export function DiscussionDetails({...props}) {
             {
               count: pointsPossible,
               formattedPoints,
-            }
+            },
           ),
           textSize: 'small',
         },
       }}
       render={responsiveProps => (
         <>
-          {props.discussionTopic.assignment ? (
+          {props.discussionTopic.assignment && !showAssignTo ? (
             <Flex data-testid="graded-discussion-info">
               <Flex.Item padding="xx-small" shouldGrow={true} shouldShrink={true} align="start">
                 <AssignmentAvailabilityContainer
@@ -105,6 +109,7 @@ export function DiscussionDetails({...props}) {
                   delayedPostAt={props.discussionTopic.delayedPostAt}
                   anonymousState={props.discussionTopic.anonymousState}
                   groupSet={props.discussionTopic.groupSet}
+                  assignment={props.discussionTopic.assignment}
                 />
               </Flex.Item>
             </Flex>

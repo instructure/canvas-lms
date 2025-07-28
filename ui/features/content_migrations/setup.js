@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import progressingMigrationCollectionTemplate from './jst/ProgressingContentMigrationCollection.handlebars'
 import daySubCollectionTemplate from '@canvas/day-substitution/jst/DaySubstitutionCollection.handlebars'
@@ -51,7 +51,7 @@ import extensions from '@canvas/bundles/extensions'
 import processMigrationContentItem from './processMigrationContentItem'
 import {subscribe} from 'jquery-tinypubsub'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 const daySubCollection = new DaySubstitutionCollection()
 
@@ -59,7 +59,7 @@ ConverterViewControl.setModel(
   new ContentMigrationModel({
     course_id: ENV.COURSE_ID,
     daySubCollection,
-  })
+  }),
 )
 
 const daySubCollectionView = new CollectionView({
@@ -97,7 +97,7 @@ progressingCollectionView.getStatusView = function (migProgress) {
   if (
     (getView = __guard__(
       __guard__(ConverterViewControl.getView(migProgress.get('migration_type')), x1 => x1.view),
-      x => x.getStatusView
+      x => x.getStatusView,
     ))
   ) {
     return getView(migProgress)
@@ -169,6 +169,8 @@ ConverterViewControl.register({
       model: ConverterViewControl.getModel(),
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+      disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: null,
     }),
 
@@ -213,6 +215,8 @@ ConverterViewControl.register({
       model: ConverterViewControl.getModel(),
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+      disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: null,
     }),
 
@@ -245,6 +249,8 @@ ConverterViewControl.register({
       model: ConverterViewControl.getModel(),
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+      disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: questionBankView,
     }),
 
@@ -279,6 +285,8 @@ ConverterViewControl.register({
       model: ConverterViewControl.getModel(),
       quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
       migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
+      disableNQMigrationCheckbox: !ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED,
+      unattachedBankMigrationsEnabled: ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS,
       questionBank: questionBankView,
     }),
 

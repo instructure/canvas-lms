@@ -47,7 +47,7 @@ $.fn.openAsDialog = function (options) {
         $iframe.width($container.outerWidth())
       })
       return $dialog.dialog(opts)
-    })
+    }),
   )
 }
 

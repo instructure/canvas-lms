@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useCallback} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function DateOptionsModal({open, startDate, endDate, timeZone, onSave, onClose}) {
   const title = I18n.t('Date/Time Options')
@@ -75,7 +75,7 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
             {renderTimeZoneOption('UTC', I18n.t('UTC'))}
             {renderTimeZoneOption(
               Intl.DateTimeFormat().resolvedOptions().timeZone,
-              I18n.t('Local')
+              I18n.t('Local'),
             )}
             {renderTimeZoneOption(ENV?.TIMEZONE, I18n.t('User'))}
             {renderTimeZoneOption(ENV?.CONTEXT_TIMEZONE, I18n.t('Account'))}
@@ -87,14 +87,14 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
           layout="columns"
           vAlign="top"
         >
-          <CanvasDateInput
+          <CanvasDateInput2
             selectedDate={newStartDate}
             renderLabel={I18n.t('After')}
             formatDate={formatDate}
             withRunningValue={true}
             onSelectedDateChange={date => setNewStartDate(date?.toISOString() || '')}
           />
-          <CanvasDateInput
+          <CanvasDateInput2
             selectedDate={newEndDate}
             renderLabel={I18n.t('Before')}
             formatDate={formatDate}

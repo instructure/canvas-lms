@@ -35,21 +35,21 @@ export default class QuestionViewed extends EventTracker {
       'scroll',
       () => {
         const newlyViewed = this.identifyVisibleQuestions().filter(
-          questionId => viewed.indexOf(questionId) === -1
+          questionId => viewed.indexOf(questionId) === -1,
         )
 
         if (newlyViewed.length > 0) {
           viewed = viewed.concat(newlyViewed)
 
           debugConsole.log(
-            `Student has just viewed the following questions: ${newlyViewed}. (Questions viewed up until now are: ${viewed})`
+            `Student has just viewed the following questions: ${newlyViewed}. (Questions viewed up until now are: ${viewed})`,
           )
 
           return deliver(newlyViewed)
         }
       },
 
-      {throttle: this.getOption('frequency')}
+      {throttle: this.getOption('frequency')},
     )
   }
 

@@ -133,13 +133,12 @@ describe Canvas::ICU do
     include_examples "ICU Collator"
 
     before do
-      if (ICU::Lib.version rescue false)
-        if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
-          raise "ICU appears to be installed, but we didn't load it correctly"
-        end
-      elsif Canvas::ICU.collator == Canvas::ICU::NaiveCollator
-        skip "ICU is not installed"
+      if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
+        ICU::Lib.version
+        raise "ICU appears to be installed, but we didn't load it correctly"
       end
+    rescue NameError
+      skip "ICU is not installed"
     end
 
     def collate(values)

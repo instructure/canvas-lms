@@ -49,10 +49,10 @@ describe('PeerReviewPromptModal', () => {
       peerReviewButtonDisabled: false,
       peerReviewButtonText,
       subHeaderText: sampleSubHeaderText,
-    }
+    },
   ) {
     return render(
-      <PeerReviewPromptModal onRedirect={onRedirect} onClose={onClose} open={true} {...props} />
+      <PeerReviewPromptModal onRedirect={onRedirect} onClose={onClose} open={true} {...props} />,
     )
   }
 
@@ -61,7 +61,7 @@ describe('PeerReviewPromptModal', () => {
       const {getByText, getByRole} = renderComponent()
       sampleHeaderText.forEach(headerText => expect(getByText(headerText)).toBeInTheDocument())
       sampleSubHeaderText.forEach(subHeaderText =>
-        expect(getByText(subHeaderText.text)).toBeInTheDocument()
+        expect(getByText(subHeaderText.text)).toBeInTheDocument(),
       )
       expect(getByText(peerReviewButtonText)).toBeInTheDocument()
       expect(getByRole('button', {name: /Peer Review/})).toBeEnabled()

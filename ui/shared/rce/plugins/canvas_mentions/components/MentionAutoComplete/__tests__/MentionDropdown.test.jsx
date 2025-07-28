@@ -33,7 +33,7 @@ const mockedEditor = {
 
 jest.mock('../getPosition')
 
-jest.mock('@apollo/react-hooks', () => {
+jest.mock('@apollo/client', () => {
   const data = {
     legacyNode: {
       id: 'Vxb',
@@ -106,8 +106,11 @@ jest.mock('@apollo/react-hooks', () => {
     },
   }
 
+  const originalGql = jest.requireActual('@apollo/client').gql
+
   return {
     __esModule: true,
+    gql: originalGql,
     useQuery: () => ({data}),
   }
 })
@@ -166,7 +169,7 @@ describe('Mention Dropdown', () => {
   describe('Positioning', () => {
     it('should called getXYPosition on load', () => {
       setup()
-      expect(getPosition.mock.calls.length).toBe(1)
+      expect(getPosition.mock.calls).toHaveLength(1)
     })
   })
 
@@ -178,15 +181,15 @@ describe('Mention Dropdown', () => {
       })
 
       // This number is always double menu count as two menus exist in the same dom
-      expect(getAllByTestId('mention-dropdown-item').length).toBe(20)
+      expect(getAllByTestId('mention-dropdown-item')).toHaveLength(20)
 
-      expect(onFocusedUserChangeMock.mock.calls.length).toBe(1)
+      expect(onFocusedUserChangeMock.mock.calls).toHaveLength(1)
 
       const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[3].querySelector('li'))
 
       // Expect 1 re-renders per click totalling 2
-      expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
+      expect(onFocusedUserChangeMock.mock.calls).toHaveLength(2)
     })
   })
 
@@ -199,7 +202,7 @@ describe('Mention Dropdown', () => {
       })
 
       // This number is always double menu count as two menus exist in the same dom
-      expect(getAllByTestId('mention-dropdown-item').length).toBe(20)
+      expect(getAllByTestId('mention-dropdown-item')).toHaveLength(20)
 
       const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[1].querySelector('li'))

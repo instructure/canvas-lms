@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
 import {groupBy} from 'lodash'
 
@@ -28,7 +28,7 @@ import FilterBar from '@canvas/filter-bar'
 import FeatureFlagTable from './FeatureFlagTable'
 import * as flagUtils from './util'
 
-const I18n = useI18nScope('feature_flags')
+const I18n = createI18nScope('feature_flags')
 
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
@@ -55,7 +55,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
     const transitions = flagUtils.buildTransitions(
       flag,
-      flagUtils.doesAllowDefaults(flag, disableDefaults)
+      flagUtils.doesAllowDefaults(flag, disableDefaults),
     )
     if (stateFilter === 'enabled') {
       return [transitions.enabled, 'allowed_on'].includes(filterableStateOf(flag))
@@ -72,9 +72,9 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   useEffect(() => {
     const groupings = groupBy(
       features.filter(
-        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
+        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat),
       ),
-      'applies_to'
+      'applies_to',
     )
 
     if (groupings.Account || groupings.RootAccount) {

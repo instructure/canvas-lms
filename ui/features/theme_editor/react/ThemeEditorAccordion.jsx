@@ -54,13 +54,13 @@ export default class ThemeEditorAccordion extends React.Component {
       },
       () => {
         this.setStoredAccordionIndex(index)
-      }
+      },
     )
   }
 
   renderRow = varDef => {
+    const key = varDef.variable_name
     const props = {
-      key: varDef.variable_name,
       currentValue: this.props.brandConfigVariables[varDef.variable_name],
       userInput: this.props.changedValues[varDef.variable_name],
       onChange: this.props.changeSomething.bind(null, varDef.variable_name),
@@ -72,14 +72,14 @@ export default class ThemeEditorAccordion extends React.Component {
 
     switch (varDef.type) {
       case 'color':
-        return <ThemeEditorColorRow {...props} />
+        return <ThemeEditorColorRow key={key} {...props} />
       case 'image':
-        return <ThemeEditorImageRow {...props} />
+        return <ThemeEditorImageRow key={key} {...props} />
       case 'percentage': {
         const defaultValue = props.currentValue || props.placeholder
         return (
           <RangeInput
-            key={varDef.variable_name}
+            key={key}
             labelText={varDef.human_name}
             min={0}
             max={1}

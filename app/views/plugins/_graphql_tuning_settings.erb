@@ -1,0 +1,95 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<%= fields_for :settings do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <tr>
+      <td><%= f.blabel :max_depth, :en => "The number of nested fields allowed per query" %></td>
+      <td><%= f.number_field :max_depth, value: settings[:max_depth] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_complexity, :en => "The max allowed value for the complexity score of the query" %></td>
+      <td><%= f.number_field :max_complexity, value: settings[:max_complexity] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :default_page_size, :en => "The default number of entries returned without specifying a size" %></td>
+      <td><%= f.number_field :default_page_size, value: settings[:default_page_size] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :default_max_page_size, :en => "The max number of entries that can be returned regardless of the size specified" %></td>
+      <td><%= f.number_field :default_max_page_size, value: settings[:default_max_page_size] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :validate_max_errors, :en => "The max number of errors returned from a single query" %></td>
+      <td><%= f.number_field :validate_max_errors, value: settings[:validate_max_errors] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_string_tokens, :en => "The max size (in tokens) of parameters allowed in a single query request" %></td>
+      <td><%= f.number_field :max_query_string_tokens, value: settings[:max_query_string_tokens] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_aliases, :en => "The max number of query aliases allowed in a single query" %></td>
+      <td><%= f.number_field :max_query_aliases, value: settings[:max_query_aliases] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :max_query_directives, :en => "The max number of query directives allowed in a single query" %></td>
+      <td><%= f.number_field :max_query_directives, value: settings[:max_query_directives] %></td>
+    </tr>
+  </table>
+<% end %>
+
+<h4>
+  Create Conversation Rate Limit
+</h4>
+<p>Values for rate limiting. The values accumulate when sending messages to the groups. After reaching threshold, new messages are rejected for 10 minutes.</p>
+
+<%= fields_for :settings do |f| %>
+  <table style="width: 500px;" class="formtable">
+    <% rate_limit_settings = (settings[:create_conversation_rate_limit] || {}).reverse_merge(GraphQLTuning.create_conversation_rate_limit_defaults) %>
+
+    <tr>
+      <td><%= f.blabel :teachers_score, :en => "Score for sending message to all teachers in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][teachers_score]", value: rate_limit_settings[:teachers_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :group_score, :en => "Score for sending message to each members of a group" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][group_score]", value: rate_limit_settings[:group_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :observers_score, :en => "Score for sending message to all observers in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][observers_score]", value: rate_limit_settings[:observers_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :section_score, :en => "Score for sending message to each members in section" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][section_score]", value: rate_limit_settings[:section_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :students_score, :en => "Score for sending message to all students in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][students_score]", value: rate_limit_settings[:students_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :course_score, :en => "Score for sending message to everyone in course" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][course_score]", value: rate_limit_settings[:course_score] %></td>
+    </tr>
+    <tr>
+      <td><%= f.blabel :threshold, :en => "The score limit. When exceeded, subsequent requests are rejected for 10 minutes" %></td>
+      <td><%= f.number_field :create_conversation_rate_limit, name: "settings[create_conversation_rate_limit][threshold]", value: rate_limit_settings[:threshold] %></td>
+    </tr>
+  </table>
+<% end %>
+

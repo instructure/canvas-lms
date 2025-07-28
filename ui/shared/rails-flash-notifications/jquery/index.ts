@@ -1,4 +1,3 @@
-// @ts-nocheck
 //
 // Copyright (C) 2012 - present Instructure, Inc.
 //
@@ -103,7 +102,7 @@ export function initFlashContainer() {
   helper.initScreenreaderHolder()
 }
 
-function makeSafeHtml(contentString) {
+function makeSafeHtml(contentString: string | {html: string}) {
   if (typeof contentString === 'object' && contentString.html) {
     return contentString.html
   }
@@ -174,6 +173,7 @@ export function renderServerNotifications() {
  * @param {MessageContent} content
  * @param {boolean} closable
  */
+// @ts-expect-error
 function createScreenreaderNodeWithDelay(content, closable = true) {
   setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }

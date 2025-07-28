@@ -21,20 +21,6 @@ import {fireEvent, render} from '@testing-library/react'
 import {MissingSectionsWarningModal} from '../MissingSectionsWarningModal'
 
 const defaultProps = {
-  sections: [
-    {
-      id: '1',
-      name: 'Section 1',
-    },
-    {
-      id: '2',
-      name: 'Section 2',
-    },
-    {
-      id: '3',
-      name: 'Section 3',
-    },
-  ],
   onClose: jest.fn(),
   onContinue: jest.fn(e => e.preventDefault()),
 }
@@ -47,15 +33,7 @@ describe('MissingSectionsWarningModal', () => {
   it('renders the modal', () => {
     const {getByText} = setup()
 
-    expect(getByText('Not all sections will be assigned this item.')).toBeInTheDocument()
-  })
-
-  it('renders the list of sections', () => {
-    const {getByText} = setup()
-
-    expect(getByText('Section 1')).toBeInTheDocument()
-    expect(getByText('Section 2')).toBeInTheDocument()
-    expect(getByText('Section 3')).toBeInTheDocument()
+    expect(getByText('Not everyone will be assigned this item!')).toBeInTheDocument()
   })
 
   it('calls onClose when the Go Back button is clicked', () => {

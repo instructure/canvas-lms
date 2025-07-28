@@ -57,7 +57,8 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
       raise "Non-matching district: #{data["district"].inspect}"
     end
 
-    data[login_attribute]
+    login_value = extract_login_attribute_value(data, login_attribute)
+    login_value || data[login_attribute]
   end
 
   def provider_attributes(token)
@@ -68,14 +69,45 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
 
   def me(token)
     token.options[:me] ||= begin
-      raw_data = token.get("/v2.1/me").parsed
-      data = raw_data["data"].dup
-      data = data.merge(token.get("/v2.1/#{raw_data["type"]}s/#{data["id"]}").parsed["data"])
+      raw_data = token.get("/v3.0/me").parsed
+      user_id = raw_data.dig("data", "id")
+
+      user_data = token.get("/v3.0/users/#{user_id}").parsed
+      data = user_data["data"].dup
+
       data["first_name"] = data.dig("name", "first")
       data["last_name"] = data.dig("name", "last")
-      data["district_username"] = data.dig("credentials", "district_username")
+
+      self.class.login_attributes.each do |attr|
+        next if %w[first_name last_name].include?(attr) # Already extracted above
+
+        value = extract_login_attribute_value(data, attr)
+        data[attr] = value
+      end
+
+      data["home_language"] = data.dig("demographics", "home_language")
+
       data.slice!(*(self.class.recognized_federated_attributes + ["district"]))
       data
+    end
+  end
+
+  def extract_login_attribute_value(data, attribute)
+    return nil unless attribute.present?
+
+    case attribute
+    when "district_username"
+      extract_role_attribute(data, %w[student teacher staff district_admin], "credentials", "district_username")
+    when "student_number"
+      extract_role_attribute(data, %w[student], "student_number")
+    when "teacher_number"
+      extract_role_attribute(data, %w[teacher], "teacher_number")
+    when "state_id"
+      extract_role_attribute(data, %w[student teacher], "state_id")
+    when "sis_id"
+      extract_role_attribute(data, %w[student teacher staff district_admin], "sis_id")
+    else
+      data[attribute] # For top-level attributes like id, email
     end
   end
 
@@ -95,6 +127,18 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   end
 
   def scope
-    "read:user_id"
+    "read:user_id read:users"
+  end
+
+  private
+
+  def extract_role_attribute(data, role_types, *attribute_path)
+    # Handle simple and nested attribute paths
+    role_types.each do |role_type|
+      value = data.dig("roles", role_type, *attribute_path)
+      return value if value.present?
+    end
+
+    nil
   end
 end

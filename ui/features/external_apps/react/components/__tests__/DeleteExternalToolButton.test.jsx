@@ -53,7 +53,7 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
         description: null,
         enabled: true,
         installed_locally: true,
-        name: 'Twitter',
+        name: 'SomeTool',
       },
     ]
   })
@@ -62,15 +62,19 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
     jest.resetAllMocks()
   })
 
-  test('does not render when the canAddEdit permission is false', () => {
-    const tool = {name: 'test tool'}
-    renderComponent({tool, canAddEdit: false, canDelete: false, returnFocus: () => {}})
+  test('does not render when the canDelete permission is false', () => {
+    renderComponent({
+      tool: tools[0],
+      canDelete: false,
+      returnFocus: () => {},
+    })
+
     expect(screen.queryByText('Delete')).not.toBeInTheDocument()
   })
 
   test('open and close modal', async () => {
     const ref = React.createRef()
-    const data = {tool: tools[1], canAddEdit: true, canDelete: false, returnFocus: jest.fn(), ref}
+    const data = {tool: tools[1], canDelete: true, returnFocus: jest.fn(), ref}
     renderComponent(data)
 
     await userEvent.click(screen.getByText(/delete/i))
@@ -83,45 +87,6 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
   test('deletes a tool', async () => {
     renderComponent({
       tool: tools[0],
-      canAddEdit: true,
-      canDelete: true,
-      returnFocus: () => {},
-    })
-    // Open the modal
-    await userEvent.click(screen.getByRole('button', {name: /delete/i}))
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
-    // Actually delete the tool
-    await userEvent.click(screen.getByTestId('modal-delete-button'))
-    expect(store.delete).toHaveBeenCalled()
-  })
-
-  test('does not render when the canDelete permission is false (granular)', () => {
-    renderComponent({
-      tool: tools[0],
-      canDelete: false,
-      canAddEdit: false,
-      returnFocus: () => {},
-    })
-
-    expect(screen.queryByText('Delete')).not.toBeInTheDocument()
-  })
-
-  test('open and close modal (granular)', async () => {
-    const ref = React.createRef()
-    const data = {tool: tools[1], canAddEdit: false, canDelete: true, returnFocus: jest.fn(), ref}
-    renderComponent(data)
-
-    await userEvent.click(screen.getByText(/delete/i))
-    expect(screen.getByRole('dialog')).toBeInTheDocument()
-    await userEvent.click(screen.getAllByRole('button', {name: /close/i})[0])
-    expect(data.returnFocus).toHaveBeenCalled()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-  })
-
-  test('deletes a tool (granular)', async () => {
-    renderComponent({
-      tool: tools[0],
-      canAddEdit: false,
       canDelete: true,
       returnFocus: () => {},
     })

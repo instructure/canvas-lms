@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class AddIndex < Cop
+      class AddIndex < Base
         include RuboCop::Canvas::NewTables
         include RuboCop::Canvas::CurrentDef
         include RuboCop::Canvas::NonTransactional

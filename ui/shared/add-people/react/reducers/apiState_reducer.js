@@ -17,11 +17,11 @@
  */
 
 import {handleActions} from 'redux-actions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {actionTypes} from '../actions'
 import {defaultState} from '../store'
 
-const I18n = useI18nScope('add_peopleapiState_reducer')
+const I18n = createI18nScope('add_peopleapiState_reducer')
 // helpers -----------------------
 //
 // There are 2 paths to *_ERROR actions.
@@ -78,7 +78,7 @@ export default handleActions(
             `${errUsr.email}: ${
               (errUsr.errors && errUsr.errors.length && errUsr.errors[0].message) ||
               I18n.t('Failed creating user')
-            }`
+            }`,
         )
       }
       return newstate
@@ -94,5 +94,5 @@ export default handleActions(
       return {pendingCount: 0, error: undefined}
     },
   },
-  defaultState.apiState
+  defaultState.apiState,
 )

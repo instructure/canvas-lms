@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {bool} from 'prop-types'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('quantitative_data_options')
+const I18n = createI18nScope('quantitative_data_options')
 
 export default function QuantitativeDataOptions({canManage}) {
   const FORM_IDS = {
@@ -38,7 +38,7 @@ export default function QuantitativeDataOptions({canManage}) {
   const getFormValue = id => document.getElementById(id).value
 
   const [viewQuantitativeData, setViewQuantitativeData] = useState(
-    getFormValue(FORM_IDS.RESTRICT_QUANTITATIVE_DATA) === 'true'
+    getFormValue(FORM_IDS.RESTRICT_QUANTITATIVE_DATA) === 'true',
   )
 
   return (
@@ -48,7 +48,7 @@ export default function QuantitativeDataOptions({canManage}) {
           <ScreenReaderContent>{I18n.t('Quantitative Data Options')}</ScreenReaderContent>
         }
         rowSpacing="small"
-        layout="inline"
+        layout="stacked"
       >
         <Checkbox
           label={I18n.t('Restrict view of quantitative data')}

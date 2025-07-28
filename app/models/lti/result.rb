@@ -24,13 +24,14 @@ class Lti::Result < ApplicationRecord
   GRADING_PROGRESS_TYPES = %w[FullyGraded Pending PendingManual Failed NotReady].freeze
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
+  ACTIVITY_PROGRESSES_NEEDS_GRADING = %w[Submitted Completed].freeze
 
   AGS_EXT_SUBMISSION = "https://canvas.instructure.com/lti/submission"
 
   self.record_timestamps = false
 
   validates :line_item, :user, presence: true
-  validates :result_maximum, presence: true, unless: proc { |r| r.read_attribute(:result_score).blank? }
+  validates :result_maximum, presence: true, unless: proc { |r| r["result_score"].nil? }
   validates :result_score, numericality: true, allow_nil: true
   validates :result_maximum, numericality: true, allow_nil: true
 
@@ -57,8 +58,8 @@ class Lti::Result < ApplicationRecord
   # the scaled score on the result in an after_save
   # callback on submission. Doing so would require
   # working out some performance issues.
-  def scaled_result_score
-    raw_result_score = read_attribute(:result_score)
+  def result_score
+    raw_result_score = super
 
     return raw_result_score if raw_result_score.blank? || submission.blank? || result_maximum.blank?
 
@@ -79,7 +80,6 @@ class Lti::Result < ApplicationRecord
     # result_score to the result_maximum
     (raw_result_score * result_maximum) / assignment.points_possible.to_f
   end
-  alias_method :result_score, :scaled_result_score
 
   # Updates score for submission safely (does not allow maximum score to be null, but
   # if it's not already set, it will set it to assignment's points_possible)
@@ -103,11 +103,11 @@ class Lti::Result < ApplicationRecord
   end
 
   def needs_review?
-    grading_progress == "PendingManual"
+    grading_progress == "PendingManual" && ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(activity_progress)
   end
 
   def mark_reviewed!
-    update!(grading_progress: "FullyGraded")
+    update_column(:grading_progress, "FullyGraded")
   end
 
   private

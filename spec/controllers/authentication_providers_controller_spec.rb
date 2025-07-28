@@ -232,6 +232,59 @@ describe AuthenticationProvidersController do
       expect(response).to have_http_status :unprocessable_entity
     end
 
+    context "when the auth provider type is restorable" do
+      subject(:create_provider) { post "create", format: :json, params: }
+
+      let(:params) do
+        {
+          auth_type: "apple",
+          account_id: account.id
+        }
+      end
+
+      before do
+        allow(AuthenticationProvider::Apple).to receive(:restorable?).and_return(true)
+      end
+
+      context "and a deleted authentication provider of the same type exists" do
+        let!(:existing_provider) { account.authentication_providers.create!(params.merge(workflow_state: "deleted")) }
+
+        it { is_expected.to be_successful }
+
+        it "restores the deleted provider" do
+          expect { create_provider }.to change { existing_provider.reload.workflow_state }.from("deleted").to("active")
+        end
+
+        it "does not create a new provider" do
+          expect { create_provider }.not_to change { account.authentication_providers.count }
+        end
+      end
+
+      context "and an active existing provider of the same type exists" do
+        before { account.authentication_providers.create!(params.merge(workflow_state: "active")) }
+
+        it { is_expected.to have_http_status :unprocessable_entity }
+
+        it "indicates an active auth provider of the type already exists" do
+          create_provider
+          expect(json_parse["errors"].first["message"]).to eq "duplicate provider apple"
+        end
+      end
+
+      context "and no existing provider of the same type exists" do
+        it { is_expected.to be_successful }
+
+        it "creates a new provider" do
+          expect { create_provider }.to change { account.authentication_providers.count }.by(1)
+        end
+
+        it "creates the requested authentication provider" do
+          create_provider
+          expect(AuthenticationProvider.find(json_parse["id"]).auth_type).to eq "apple"
+        end
+      end
+    end
+
     it "allows multiple non-singleton types" do
       cas = {
         auth_type: "cas",
@@ -305,6 +358,80 @@ describe AuthenticationProvidersController do
         ap = account.authentication_providers.active.last
         expect(ap.mfa_required).to be(false)
         expect(ap.skip_internal_mfa).to be(false)
+      end
+    end
+
+    it "does not allow non-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      post :create, params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com" }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows admins" do
+      user = account_admin_user(account:)
+      user_session(user)
+      post :create, params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com" }
+      expect(response).to be_redirect
+    end
+  end
+
+  describe "PUT #update" do
+    let!(:auth_provider) { account.authentication_providers.create!(cas_hash) }
+
+    it "does not allow non-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      put :update, params: { account_id: account.id, id: auth_provider.id, auth_base: "http://updated.example.com" }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows admins" do
+      user = account_admin_user(account:)
+      user_session(user)
+      put :update, params: { account_id: account.id, id: auth_provider.id, auth_base: "http://updated.example.com" }
+      expect(response).to be_redirect
+    end
+  end
+
+  describe "PUT #restore" do
+    it "restores a deleted auth config successfully" do
+      account.authentication_providers.create!(saml_hash)
+      aac = account.authentication_providers.active.find_by(auth_type: "saml")
+      aac.destroy
+
+      put "restore", params: { account_id: account.id, id: aac.id }
+
+      expect(aac.reload).to be_active
+    end
+  end
+
+  describe "destroy_all" do
+    subject { delete :destroy_all, params: { account_id: account.id } }
+
+    context "with multiple authentication providers" do
+      before do
+        3.times do
+          account.authentication_providers.create!(auth_type: "google")
+        end
+      end
+
+      it "soft deletes all authentication providers in the account" do
+        expect { subject }.to change {
+          account.authentication_providers.active.count
+        }.from(4).to(1)
+
+        # Canvas re-create the Canvas auth provider unless non-Canvas
+        # providers are configured
+        expect(account.authentication_providers.active.first.auth_type).to eq "canvas"
+      end
+
+      context "when the current user root account management permissions" do
+        let(:non_admin) { user_model }
+
+        before { user_session(non_admin) }
+
+        it { is_expected.to be_unauthorized }
       end
     end
   end

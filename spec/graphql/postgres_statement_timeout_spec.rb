@@ -55,5 +55,10 @@ describe "graphql pg statement_timeouts" do
       expect(result.dig("data", "updateAssignment")).to be_nil
       expect(result.dig("errors", 0, "path")).to eq ["updateAssignment"]
     end
+
+    it "does not surface other StatementInvalid exception details" do
+      allow(Assignment).to receive(:find) { raise ActiveRecord::StatementInvalid, "not a timeout" }
+      expect { CanvasSchema.execute(mutation, context: { current_user: @teacher }) }.to raise_error("not a timeout")
+    end
   end
 end

@@ -26,12 +26,12 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {Account, SubscriptionChange, VisibilityChange} from '../types'
 import SubscriptionsDropDown from './SubscriptionDropDown'
 
-const I18n = useI18nScope('account_calendar_settings_account_calendar_item')
+const I18n = createI18nScope('account_calendar_settings_account_calendar_item')
 
 const CALENDAR_ICON_SIZE = '1.25rem'
 
@@ -56,7 +56,7 @@ export const AccountCalendarItem = ({
 }: ComponentProps) => {
   const [isVisible, setIsVisible] = useState(item.visible)
   const [isAutoSubscription, setIsAutoSubscription] = useState<boolean>(
-    item.auto_subscribe ?? false
+    item.auto_subscribe ?? false,
   )
 
   useEffect(() => {

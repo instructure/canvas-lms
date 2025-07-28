@@ -95,7 +95,7 @@ describe('modal mode', () => {
 describe('popover mode', () => {
   it('shows details on click', () => {
     const {baseElement, getByRole} = render(
-      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />
+      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />,
     )
     const button = getByRole('button')
     fireEvent.click(button)
@@ -104,7 +104,7 @@ describe('popover mode', () => {
 
   it('shows details on hover', () => {
     const {baseElement, getByRole} = render(
-      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />
+      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />,
     )
     const button = getByRole('button')
     fireEvent.mouseEnter(button)
@@ -113,7 +113,7 @@ describe('popover mode', () => {
 
   it('removes details on leave', () => {
     const {baseElement, getByRole} = render(
-      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />
+      <OutcomePopover {...defaultProps()} breakpoints={{miniTablet: true}} />,
     )
     const button = getByRole('button')
     fireEvent.mouseEnter(button)
@@ -165,7 +165,7 @@ describe('friendly description', () => {
       ...{friendly_description: 'A friendly description'},
     }
     const {baseElement, getByRole} = render(
-      <OutcomePopover {...defaultProps({outcome: friendlyDescription})} />
+      <OutcomePopover {...defaultProps({outcome: friendlyDescription})} />,
     )
     const button = getByRole('button')
     fireEvent.click(button)

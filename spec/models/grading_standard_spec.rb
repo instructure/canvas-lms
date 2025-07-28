@@ -46,10 +46,6 @@ describe GradingStandard do
   end
 
   describe "validations" do
-    it { is_expected.to belong_to(:context).required }
-    it { is_expected.to validate_presence_of(:data) }
-    it { is_expected.to serialize(:data) }
-
     describe "grading standard data" do
       let(:standard) { GradingStandard.new(context: @course) }
 
@@ -152,16 +148,16 @@ describe GradingStandard do
 
   it "upgrades in memory when accessing data" do
     standard = GradingStandard.new
-    standard.write_attribute(:data, @default_standard_v1)
-    standard.write_attribute(:version, 1)
+    standard["data"] = @default_standard_v1
+    standard.version = 1
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     expect(standard.version).to eq GradingStandard::VERSION
   end
 
   it "does not upgrade repeatedly when accessing data repeatedly" do
     standard = GradingStandard.new
-    standard.write_attribute(:data, @default_standard_v1)
-    standard.write_attribute(:version, 1)
+    standard["data"] = @default_standard_v1
+    standard.version = 1
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
@@ -177,11 +173,19 @@ describe GradingStandard do
     end
   end
 
-  context "#for" do
+  describe "#for" do
     it "returns standards that match the context" do
       grading_standard_for @course
 
       standards = GradingStandard.for(@course)
+      expect(standards.length).to eq 1
+      expect(standards[0].id).to eq @standard.id
+    end
+
+    it "returns standards that match the context when archive is requested" do
+      grading_standard_for @course
+
+      standards = GradingStandard.for(@course, include_archived: true)
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
     end
@@ -208,6 +212,14 @@ describe GradingStandard do
       standards = GradingStandard.for(@course, include_archived: true)
       expect(standards.length).to eq 1
       expect(standards[0].id).to eq @standard.id
+    end
+
+    it "excludes deleted when the parameter is true for archived grading schemes" do
+      Account.site_admin.enable_feature!(:archived_grading_schemes)
+      grading_standard_for @course
+      @standard.destroy
+      standards = GradingStandard.for(@course, include_archived: true)
+      expect(standards.length).to eq 0
     end
   end
 
@@ -239,6 +251,11 @@ describe GradingStandard do
   end
 
   context "score_to_grade" do
+    it "blows up when passed nil" do
+      standard = GradingStandard.new
+      expect { standard.score_to_grade(nil) }.to raise_error(NoMethodError)
+    end
+
     it "computes correct grades" do
       input = [["A", 0.90], ["B+", 0.886], ["B", 0.80], ["C", 0.695], ["D", 0.555], ["E", 0.545], ["M", 0.00]]
       standard = GradingStandard.new
@@ -275,6 +292,29 @@ describe GradingStandard do
       expect(standard.score_to_grade(66.66666666667)).to eql("B")
       expect(standard.score_to_grade(46.66666666667)).to eql("C")
       expect(standard.score_to_grade(0)).to eql("D")
+    end
+
+    it "scales grades for points-based grading schemes" do
+      input = [["A", 0.9], ["B", 0.7], ["C+", 0.5], ["C-", 0.3], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      standard.scaling_factor = 10.0
+      # 49.98% -> 4.998 out of 10 ("scaling" step) -> 5.00 out of 10 (rounding step) -> 50% (to percentage) -> 50% (round percentage step) -> C+ (grading scheme conversion)
+      expect(standard.score_to_grade(49.98)).to eql("C+")
+
+      standard.scaling_factor = 90.0
+      # 49.98% -> 44.982 out of 90 ("scaling" step) -> 44.98 out of 90 (rounding step) -> 49.9777...% (to percentage) -> 49.98% (round percentage step) -> C- (grading scheme conversion)
+      expect(standard.score_to_grade(49.98)).to eql("C-")
+    end
+
+    it "doesn't blow up when given an invalid points-based scheme" do
+      input = [["A", 0.9], ["B", 0.7], ["C+", 0.5], ["C-", 0.3], ["D", 0]]
+      standard = GradingStandard.new
+      standard.data = input
+      standard.points_based = true
+      standard.scaling_factor = 0.00 # invalid scaling factor
+      expect(standard.score_to_grade(49.98)).to eql("C-")
     end
 
     it "assigns the lowest grade to below-scale scores" do
@@ -439,6 +479,10 @@ describe GradingStandard do
       end
 
       context "without submissions" do
+        before(:once) do
+          Account.site_admin.disable_feature!(:archived_grading_schemes)
+        end
+
         it "is false" do
           expect(@gs).not_to be_assessed_assignment
         end
@@ -447,6 +491,7 @@ describe GradingStandard do
       context "with submissions" do
         before(:once) do
           @submission = @assignment.submit_homework(@student, body: "done!")
+          Account.site_admin.disable_feature!(:archived_grading_schemes)
         end
 
         it "is false if no submissions are graded" do
@@ -675,6 +720,41 @@ describe GradingStandard do
         .to be(true)
       expect(grading_standard.halted_because)
         .to_not be_nil
+    end
+  end
+
+  describe "#used_as_default?" do
+    before do
+      @root_account = Account.create!
+      @subaccount = Account.create(root_account: @root_account)
+      @course = Course.create(account: @root_account)
+      data = [["A", 94], ["F", 0]]
+      @grading_standard = GradingStandard.new(context: @root_account, workflow_state: "active", data:)
+    end
+
+    it "returns true if used as the account default grading scheme" do
+      @root_account.grading_standard = @grading_standard
+      @root_account.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns true if used as the account default grading scheme in a sub-account" do
+      @subaccount.grading_standard = @grading_standard
+      @subaccount.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns true if used as a course default grading scheme" do
+      @course.grading_standard = @grading_standard
+      @course.save!
+
+      expect(@grading_standard.used_as_default?).to be true
+    end
+
+    it "returns false if not used as an account or course default grading scheme" do
+      expect(@grading_standard.used_as_default?).to be false
     end
   end
 end

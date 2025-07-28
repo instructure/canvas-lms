@@ -19,6 +19,18 @@
 #
 
 describe AttachmentAssociation do
+  let(:enrollment) { course_with_teacher({ active_all: true }) }
+  let(:course) { enrollment.course }
+  let(:teacher) { enrollment.user }
+  let(:course_attachment) { attachment_with_context(course) }
+  let(:course_attachment2) { attachment_with_context(course) }
+  let(:course_attachment3) { attachment_with_context(course) }
+  let(:another_user) { user_with_pseudonym({ account: enrollment.course.account }) }
+  let(:user_attachment) { attachment_with_context(another_user) }
+  let(:teacher_attachment) { attachment_with_context(teacher) }
+  let(:student_enrollment) { course_with_user("StudentEnrollment", { course:, active_all: true }) }
+  let(:student) { student_enrollment.user }
+
   context "create" do
     it "sets the root_account_id using course context" do
       attachment_model filename: "test.txt", context: account_model(root_account_id: nil)
@@ -33,6 +45,77 @@ describe AttachmentAssociation do
         cm = conversation(user_model).messages.first
         association = @attachment.attachment_associations.create!(context: cm)
         expect(association.root_account_id).to eq @attachment.root_account_id
+      end
+    end
+  end
+
+  describe "#verify_access" do
+    before do
+      course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      course.root_account.enable_feature!(:file_association_access)
+    end
+
+    def make_associations
+      html = <<~HTML
+        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+          <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
+      HTML
+      html2 = <<~HTML
+        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+          <img id="3" src="/courses/#{course.id}/files/#{course_attachment3.id}/preview"></p>
+      HTML
+      course.associate_attachments_to_rce_object(html, teacher)
+      course.associate_attachments_to_rce_object(html2, teacher, context_concern: "syllabus_body")
+    end
+
+    it "returns false if the attachment is not associated with the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment2.id, teacher)).to be_falsey
+    end
+
+    it "returns false if the user is not allowed to read the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment.id, another_user)).to be_falsey
+    end
+
+    it "returns true if the attachment is associated with the context and the user has read rights to the context" do
+      make_associations
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment.id, teacher)).to be_truthy
+    end
+
+    context "with a syllabus body attachment" do
+      context "when the course syllabus is public" do
+        before do
+          course.public_syllabus = true
+          course.save!
+        end
+
+        it "returns true for a public syllabus for an unassociated user" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, another_user)).to be_truthy
+        end
+
+        it "returns true for a public syllabus for an enrolled student" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, student)).to be_truthy
+        end
+      end
+
+      context "when the course syllabus is not public" do
+        before do
+          course.public_syllabus = false
+          course.save!
+        end
+
+        it "returns false for a nonpublic syllabus for an unassociated user" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, another_user)).to be_falsey
+        end
+
+        it "returns true for a nonpublic syllabus for an enrolled student" do
+          make_associations
+          expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment3.id, student)).to be_truthy
+        end
       end
     end
   end

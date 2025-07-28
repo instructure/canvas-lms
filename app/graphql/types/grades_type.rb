@@ -68,6 +68,15 @@ module Types
       load_association :grading_period
     end
 
+    field :html_url, UrlType, null: true
+    def html_url
+      Rails.application.routes.url_helpers.course_student_grades_url(
+        object.enrollment.course_id,
+        object.enrollment.user_id,
+        host: request&.host
+      )
+    end
+
     field :state, GradeState, method: :workflow_state, null: false
 
     field :assignment_group, AssignmentGroupType, null: true

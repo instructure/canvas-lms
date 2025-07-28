@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {arrayOf, bool, string, number} from 'prop-types'
 
 import {GradingStandard} from './GradingStandard'
@@ -45,6 +45,7 @@ export const Assignment = {
       lockAt
       name
       omitFromFinalGrade
+      suppressAssignment
       pointsPossible
       position
       published
@@ -84,6 +85,18 @@ export const Assignment = {
       rubricAssociation {
         ...RubricAssociation
       }
+      ltiAssetProcessorsConnection(first: 20) {
+        nodes {
+          _id
+          externalTool {
+            _id
+            name
+          }
+          iconOrToolIconUrl
+          text
+          title
+        }
+      }
     }
     ${GradingStandard.fragment}
     ${Rubric.fragment}
@@ -107,6 +120,7 @@ export const Assignment = {
     lockAt: string,
     name: string,
     omitFromFinalGrade: bool,
+    suppressAssignment: bool,
     pointsPossible: number,
     position: number,
     published: bool,
@@ -142,6 +156,18 @@ export const Assignment = {
     }),
     rubric: Rubric.shape,
     rubricAssociation: RubricAssociation.shape,
+    ltiAssetProcessorsConnection: {
+      nodes: arrayOf({
+        _id: string,
+        externalTool: {
+          _id: string,
+          name: string,
+        },
+        iconOrToolIconUrl: string,
+        text: string,
+        title: string,
+      }),
+    },
   },
   mock: ({
     _id = '1',
@@ -199,6 +225,9 @@ export const Assignment = {
     ],
     rubric = Rubric.mock(),
     rubricAssociation = RubricAssociation.mock(),
+    ltiAssetProcessorsConnection = {
+      nodes: [],
+    },
   } = {}) => ({
     _id,
     allowedAttempts,
@@ -228,5 +257,6 @@ export const Assignment = {
     modules,
     rubric,
     rubricAssociation,
+    ltiAssetProcessorsConnection,
   }),
 }

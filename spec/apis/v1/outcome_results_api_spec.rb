@@ -51,6 +51,14 @@ describe "Outcome Results API", type: :request do
     assignment
   end
 
+  let_once(:live_assessment) do
+    LiveAssessments::Assessment.create!(
+      key: "live_assess",
+      title: "MagicMarker",
+      context: @course
+    )
+  end
+
   let_once(:outcome_rubric_association) do
     create_outcome_rubric_association
   end
@@ -73,6 +81,18 @@ describe "Outcome Results API", type: :request do
                  (create_outcome_assignment if opts[:new]) ||
                  outcome_assignment
     assignment.find_or_create_submission(student)
+  end
+
+  def create_outcome_live_assessment
+    @outcome.align(live_assessment, @course)
+    LiveAssessments::Result.create!(
+      user: outcome_student,
+      assessor_id: outcome_teacher.id,
+      assessment_id: live_assessment.id,
+      passed: true,
+      assessed_at: Time.zone.now
+    )
+    live_assessment.generate_submissions_for([outcome_student])
   end
 
   def create_outcome_assessment(opts = {})
@@ -182,7 +202,7 @@ describe "Outcome Results API", type: :request do
                      action: "rollups",
                      format: "json",
                      course_id: outcome_course.id.to_s)
-        assert_status(403)
+        assert_forbidden
       end
 
       it "allows students to read their own results" do
@@ -206,13 +226,13 @@ describe "Outcome Results API", type: :request do
                      format: "json",
                      course_id: outcome_course.id.to_s,
                      user_ids: [outcome_students[1].id])
-        assert_status(403)
+        assert_forbidden
       end
 
       it "does not allow students to read other users' results via csv" do
         user_session outcome_students[0]
         get "/courses/#{@course.id}/outcome_rollups.csv"
-        assert_status(403)
+        assert_forbidden
       end
 
       it "requires an existing context" do
@@ -603,7 +623,7 @@ describe "Outcome Results API", type: :request do
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 1]).to include(score["score"])
+              expect(score["score"]).to be_in [0, 1]
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
@@ -680,7 +700,7 @@ describe "Outcome Results API", type: :request do
             rollup["scores"].each do |score|
               expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score["count"]).to eq 1
-              expect([0, 2]).to include(score["score"])
+              expect(score["score"]).to be_in [0, 2]
               expect(score["links"].keys.sort).to eq %w[outcome]
               expect(score["links"]["outcome"]).to eq outcome_object.id.to_s
             end
@@ -815,6 +835,28 @@ describe "Outcome Results API", type: :request do
           expect(alignments[1]["id"]).to eq outcome_rubric.asset_string
           expect(alignments[1]["name"]).to eq outcome_rubric.title
           expect(alignments[1]["html_url"]).to eq course_rubric_url(outcome_course, outcome_rubric)
+        end
+
+        it "side loads alignments with live assessment" do
+          create_outcome_live_assessment
+          api_call(:get,
+                   outcome_rollups_url(outcome_course, include: ["outcomes.alignments"]),
+                   controller: "outcome_results",
+                   action: "rollups",
+                   format: "json",
+                   course_id: outcome_course.id.to_s,
+                   include: ["outcomes.alignments"])
+          json = JSON.parse(response.body)
+          expect(json["linked"]).to be_present
+          expect(json["linked"]["outcomes.alignments"]).to be_present
+          alignments = json["linked"]["outcomes.alignments"]
+          alignments.sort_by! { |a| a["id"] }
+          expect(alignments[0]["id"]).to eq outcome_assignment.asset_string
+          expect(alignments[0]["name"]).to eq outcome_assignment.name
+          expect(alignments[0]["html_url"]).to eq course_assignment_url(outcome_course, outcome_assignment)
+          expect(alignments[1]["id"]).to eq live_assessment.asset_string
+          expect(alignments[1]["name"]).to eq live_assessment.title
+          expect(alignments[1]["html_url"]).to eq ""
         end
       end
 

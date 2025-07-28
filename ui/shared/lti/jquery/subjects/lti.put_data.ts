@@ -46,7 +46,7 @@ const handler: LtiMessageHandler<{
       const message = getKey('message', e)
       responseMessages.sendError(
         typeof code === 'string' ? code : '',
-        typeof message === 'string' ? message : undefined
+        typeof message === 'string' ? message : undefined,
       )
     }
   } else {

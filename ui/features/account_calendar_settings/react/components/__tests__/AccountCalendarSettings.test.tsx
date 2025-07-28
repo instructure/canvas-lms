@@ -51,12 +51,12 @@ describe('AccountCalendarSettings', () => {
   it('renders header and subtext', () => {
     const {getByRole, getByText} = render(<AccountCalendarSettings {...defaultProps} />)
     expect(
-      getByRole('heading', {name: 'Account Calendar Visibility', level: 1})
+      getByRole('heading', {name: 'Account Calendar Visibility', level: 1}),
     ).toBeInTheDocument()
     expect(
       getByText(
-        'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.'
-      )
+        'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -64,7 +64,7 @@ describe('AccountCalendarSettings', () => {
   it.skip('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
     const {findByText, getByText, findAllByText, getByTestId, findAllByTestId} = render(
-      <AccountCalendarSettings {...defaultProps} />
+      <AccountCalendarSettings {...defaultProps} />,
     )
     expect(await findByText('University (5)')).toBeInTheDocument()
     const universityCheckbox = (await findAllByTestId('account-calendar-checkbox-University'))[0]
@@ -85,7 +85,7 @@ describe('AccountCalendarSettings', () => {
 
   it('renders account list when filters are applied', async () => {
     const {findByText, queryByTestId, getByPlaceholderText} = render(
-      <AccountCalendarSettings {...defaultProps} />
+      <AccountCalendarSettings {...defaultProps} />,
     )
     await findByText('University (5)')
     fetchMock.restore()
@@ -117,7 +117,7 @@ describe('AccountCalendarSettings', () => {
 
     it('saves subscription type changes', async () => {
       const {findByText, getByText, getByTestId, getAllByTestId} = render(
-        <AccountCalendarSettings {...defaultProps} />
+        <AccountCalendarSettings {...defaultProps} />,
       )
       expect(await findByText('Manually-Created Courses (2)')).toBeInTheDocument()
 
@@ -132,7 +132,7 @@ describe('AccountCalendarSettings', () => {
 
     it('shows the confirmation modal if switching from manual to auto subscription', async () => {
       const {getByRole, getByText, findByText, getByTestId, getAllByTestId} = render(
-        <AccountCalendarSettings {...defaultProps} />
+        <AccountCalendarSettings {...defaultProps} />,
       )
       expect(await findByText('Manually-Created Courses (2)')).toBeInTheDocument()
 
@@ -150,7 +150,7 @@ describe('AccountCalendarSettings', () => {
       fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
 
       const {queryByRole, getByText, findByText, getByTestId} = render(
-        <AccountCalendarSettings {...defaultProps} />
+        <AccountCalendarSettings {...defaultProps} />,
       )
       expect(await findByText('Manually-Created Courses')).toBeInTheDocument()
       const applyButton = getByTestId('save-button')
@@ -167,7 +167,7 @@ describe('AccountCalendarSettings', () => {
     // LF-1202
     it.skip('does not show the confirmation modal if changing only the account visibility', async () => {
       const {queryByRole, getByRole, getByTestId, findByText} = render(
-        <AccountCalendarSettings {...defaultProps} />
+        <AccountCalendarSettings {...defaultProps} />,
       )
       expect(await findByText('Manually-Created Courses (2)')).toBeInTheDocument()
 
@@ -189,7 +189,7 @@ describe('AccountCalendarSettings', () => {
         fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
         fetchMock.get(
           /\/api\/v1\/accounts\/1\/visible_calendars_count.*/,
-          RESPONSE_ACCOUNT_1.length
+          RESPONSE_ACCOUNT_1.length,
         )
       })
 
@@ -218,7 +218,7 @@ describe('AccountCalendarSettings', () => {
 
       it('calendar subscription type changes', async () => {
         const {findByText, getByText, getAllByTestId} = render(
-          <AccountCalendarSettings {...defaultProps} />
+          <AccountCalendarSettings {...defaultProps} />,
         )
         expect(await findByText('University (5)')).toBeInTheDocument()
 

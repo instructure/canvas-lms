@@ -25,9 +25,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
       @range = numbers[0]..numbers[1]
     end
 
-    def cover?(number)
-      @range.cover?(number)
-    end
+    delegate :cover?, to: :@range
   end
 
   def i18n_decimal(val)
@@ -76,7 +74,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
         margin = BigDecimal(answer[:margin].to_s.presence || "0.0")
         min = val - margin
         max = val + margin
-        answer_number >= min && answer_number <= max
+        answer_number.between?(min, max)
       when "precision_answer"
         submission = answer_number.split
         expected = BigDecimal(answer[:approximate].to_s.presence || "0.0").split

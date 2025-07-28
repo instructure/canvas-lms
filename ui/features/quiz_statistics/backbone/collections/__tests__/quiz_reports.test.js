@@ -56,7 +56,7 @@ test('parses properly', function () {
 
   subject.add(fixture, {parse: true})
 
-  expect(subject.length).toEqual(2)
+  expect(subject).toHaveLength(2)
   expect(subject.first().get('id')).toEqual('200')
   expect(subject.first().get('reportType')).toEqual('student_analysis')
 })

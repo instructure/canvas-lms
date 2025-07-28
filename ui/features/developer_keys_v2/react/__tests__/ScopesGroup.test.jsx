@@ -59,12 +59,21 @@ describe('ScopesGroup', () => {
     expect(baseProps.setSelectedScopes).toHaveBeenCalled()
   })
 
-  it("removes all scopes from 'selected scopes' when the checbox is unchecked", () => {
-    renderScopesGroup()
+  it("removes all scopes from 'selected scopes' when the checkbox is unchecked", () => {
+    // First render with all scopes selected to ensure the checkbox is checked
+    renderScopesGroup({
+      selectedScopes: scopes.map(s => s.scope),
+    })
 
+    // Reset the mock to clear previous calls
+    baseProps.setSelectedScopes.mockClear()
+
+    // Click to uncheck
     fireEvent.click(screen.getByRole('checkbox'))
 
-    expect(baseProps.setSelectedScopes).toHaveBeenCalledTimes(2)
+    // Verify setSelectedScopes was called with empty array for this group
+    expect(baseProps.setSelectedScopes).toHaveBeenCalledTimes(1)
+    expect(baseProps.setSelectedScopes).toHaveBeenCalledWith([])
   })
 
   it('checks the selected scopes', () => {

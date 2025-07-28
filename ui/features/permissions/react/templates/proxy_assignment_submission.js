@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_77')
+const I18n = createI18nScope('permissions_templates_77')
 
 export const template = generateActionTemplates(
   [
@@ -35,7 +35,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.",
       ),
     },
   ],
@@ -52,8 +52,8 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt."
+        "Instructors are not bound by attempt limits, but an instructor's submission WILL count as a student's attempt.",
       ),
     },
-  ]
+  ],
 )

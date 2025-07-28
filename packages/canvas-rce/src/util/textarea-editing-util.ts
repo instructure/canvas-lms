@@ -37,7 +37,7 @@ export type TextEditAction =
  */
 export function performTextEditActionOnTextarea(
   textarea: HTMLTextAreaElement,
-  editAction: TextEditAction
+  editAction: TextEditAction,
 ) {
   switch (editAction.action) {
     case 'insert':

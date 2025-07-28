@@ -22,7 +22,7 @@ If you would rather do things manually, read on! And be sure to check the [Troub
 
 ## Recommendations
 
-By default `docker-compose` will look at 2 files
+By default `docker compose` will look at 2 files
 - docker-compose.yml
 - docker-compose.override.yml
 
@@ -80,27 +80,27 @@ Now you're ready to build all of the containers. This will take a while as a lot
 First let's get our Mutagen sidecar running.
 
 ```bash
-docker-compose build --pull
-docker-compose up --no-start web
+docker compose build --pull
+docker compose up --no-start web
 ```
 
 Now we can install assets, create and migrate databases.
 
 ```bash
-docker-compose run --rm web ./script/install_assets.sh
-docker-compose run --rm web bundle exec rake db:create db:initial_setup
-docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
+docker compose run --rm web ./script/install_assets.sh
+docker compose run --rm web bundle exec rake db:create db:initial_setup
+docker compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
 ```bash
-docker-compose up -d
+docker compose up -d
 open http://canvas.docker/
 ```
 
 ## Normal Usage
 
-Normally you can just start everything with `docker-compose up -d` and
+Normally you can just start everything with `docker compose up -d` and
 access Canvas at http://canvas.docker/
 
 After pulling new code, you'll want to update all your local gems, rebuild your
@@ -130,6 +130,19 @@ Go ahead and do so.
 Debug configurations will already be set up.
 You can attach to the currently running web server, or run specs for the currently active spec file.
 
+Canvas also comes with the Ruby LSP rspec extension in development mode.
+
+Add the following to your VS Code settings to run rspec tests via CodeLense UI elements:
+```json
+...
+"rubyLsp.addonSettings": {
+  "Ruby LSP RSpec": {
+    "rspecCommand": "cd /usr/src/app && rspec"
+  }
+}
+...
+```
+
 ### Debugging
 
 A Ruby debug server is running in development mode on the web and job containers
@@ -146,13 +159,13 @@ You can attach to the server once the container is started:
 Debugging web:
 
 ```
-docker-compose exec web bin/rdbg --attach
+docker compose exec web bin/rdbg --attach
 ```
 
 Debugging jobs:
 
 ```
-docker-compose exec jobs bin/rdbg --attach
+docker compose exec jobs bin/rdbg --attach
 ```
 
 ### Prefer pry?
@@ -161,60 +174,17 @@ Unfortunately, you can't start a pry session in a remote debug session. What
 you can do instead is use `pry-remote`.
 
 1. Add `pry-remote` to your Gemfile
-2. Run `docker-compose exec web bundle install` to install `pry-remote`
+2. Run `docker compose exec web bundle install` to install `pry-remote`
 3. Add `binding.remote_pry` in code where you want execution to yield a pry REPL
 4. Launch pry-remote and have it wait for execution to yield to you:
 ```
-docker-compose exec web pry-remote --wait
+docker compose exec web pry-remote --wait
 ```
 
 ## Running tests
 
 ```
-$ docker-compose exec web bundle exec rspec spec
-```
-
-## Running javascript tests
-
-First off, there's some general JS testing info in
-[testing_javascript.md](https://github.com/instructure/canvas-lms/blob/master/doc/testing_javascript.md).
-That will guide you on running JS tests natively.  To run them in docker, read on.
-
-First add `docker-compose/js-tests.override.yml` to your `COMPOSE_FILE` var in
-`.env`. Then prepare that container with:
-
-```
-docker-compose run --rm js-tests yarn install
-```
-
-If you run into issues with `yarn install`, either during initial setup or after
-updating master, try to fix it with a `nuke_node`:
-
-```
-docker-compose run --rm js-tests ./script/nuke_node.sh
-docker-compose run --rm js-tests yarn install
-```
-
-### QUnit Karma Tests in Headless Chrome
-
-Run all QUnit tests in watch mode with:
-
-```
-docker-compose up js-tests
-```
-
-Or, if you're iterating on something and want to just run a targeted test file
-in watch mode, set the `JSPEC_PATH` env var, e.g.:
-
-```
-export JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js
-docker-compose up js-tests
-```
-
-To run a targeted test without watch mode:
-
-```
-docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests yarn test:karma:headless
+$ docker compose exec web bundle exec rspec spec
 ```
 
 ### Jest Tests
@@ -222,32 +192,28 @@ docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-
 Run all Jest tests with:
 
 ```
-docker-compose run --rm js-tests yarn test:jest
+docker compose run --rm webpack yarn test:jest
 ```
 
 Or run a targeted subset of tests:
 
 ```
-docker-compose run --rm js-tests yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm webpack yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 To run a targeted subset of tests in watch mode, use `test:jest:watch` and
 specify the paths to the test files as one or more arguments, e.g.:
 
 ```
-docker-compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+
+
+docker compose run --rm webpack yarn test:jest:watch ui/features/course_paces/react/components/course_pace_table/__tests__/assignment_row.test.tsx
 ```
 
 ## Selenium
 
 To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_FILE` var in `.env`.
-
-For M1 Mac users using Chrome, the official selenium images are not ARM compatible so a standalone chromium image must be used.
-In the selenium.override.yml file, replace the image with the following below.
-
-```sh
-image: seleniarm/standalone-chromium:latest
-```
 
 The container used to run the selenium browser is only started when spinning up
 all docker-compose containers, or when specified explicitly. The selenium
@@ -256,21 +222,17 @@ Select a browser to run in selenium through config/selenium.yml and then ensure
 that only the corresponding browser is configured in selenium.override.yml.
 
 ```sh
-docker-compose up -d selenium-hub
+docker compose up -d selenium-hub
 ```
 
 With the container running, you should be able to open a VNC session:
 
-```sh
-open vnc://secret:secret@seleniumff.docker          (firefox)
-open vnc://secret:secret@seleniumch.docker:5901     (chrome)
-open vnc://secret:secret@seleniumedge.docker:5902   (edge)
-```
+<http://127.0.0.1:7900/?autoconnect=1&resize=scale&password=secret>
 
 Now just run your choice of selenium specs:
 
 ```sh
-docker-compose exec web bundle exec rspec spec/selenium/dashboard_spec.rb
+docker compose exec web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
 ### Capturing Rails Logs and Screenshots
@@ -289,14 +251,14 @@ corresponds to each failed spec, plus a screenshot of the page at the time of
 the failure, by running your specs with the `spec/spec.opts` options like:
 
 ```sh
-docker-compose exec web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
+docker compose exec web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
 ```
 
 This will produce a `log/spec_failures` directory in the container, which you
 can then `docker cp` to your host to view in a browser:
 
 ```sh
-docker cp "$(docker-compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
+docker cp "$(docker compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
 open -a "Google Chrome" file:///"$(pwd)"/spec_failures
 ```
 
@@ -305,27 +267,12 @@ colorized rails log and a browser screenshot taken at the time of the failure.
 
 ## Extra Services
 
-### Cassandra
-
-If you're using the analytics package, you'll also need Cassandra. The
-Cassandra configuration isn't enabled by default. Add `docker-compose/cassandra.override.yml` to your `COMPOSE_FILE` var in `.env`
-
-Then:
-- Uncomment configuration in config/cassandra.yml
-- See config/cassandra.yml.example for further setup instructions
-- to invoke cqlsh as directed in cassandra.yml.example use:
-```sh
-docker-compose exec cassandra cqlsh
-```
-
 ### Mail Catcher
+Mail Catcher is used to both send and view email in a development environment.
 
-To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`.
+To enable Mail Catcher: Add `docker-compose/mailcatcher.override.yml` to your `COMPOSE_FILE` var in `.env`. Then you can `docker compose up mailcatcher`.
 
-Email is often sent through background jobs if you spin up the `jobs` container.
-If you would like to test or preview any notifications, simply trigger the email
-through its normal actions, and it should immediately show up in the emulated
-webmail inbox available here: http://mail.canvas.docker/
+Email is often sent through background jobs in the jobs container. If you would like to test or preview any notifications, simply trigger the email through its normal actions, and it should immediately show up in the emulated webmail inbox available here: <http://mail.canvas.docker>
 
 ### Canvas RCE API
 
@@ -339,17 +286,29 @@ rich-content-service:
   app-host: "http://rce.canvas.docker:3000"
 ```
 
+### StatsD
+The optional StatsD service simply intercepts UDP traffic to port 8125 and echoes it.
+
+This is useful if you want to understand what metrics are being sent to DataDog when
+the application is running in production.
+
+To enable this service, add `docker-compose/statsd.override.yml` to your .env file
+
+Next, stop and start any running containers (a restart is not sufficient since environment variables change).
+
+Finally, tail the statsd service logs to see what metrics Canvas is recording: `docker compose logs -ft statsd`.
+
 ## Tips
 
-It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
+It will likely be helpful to alias the various docker-compose commands like `docker compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
 
 ```
-alias mc='docker-compose'
-alias mcu='docker-compose up'
-alias mce='docker-compose exec'
-alias mcex='docker-compose exec web bundle exec'
-alias mcr='docker-compose run --rm web'
-alias mcrx='docker-compose run --rm web bundle exec'
+alias mc='docker compose'
+alias mcu='docker compose up'
+alias mce='docker compose exec'
+alias mcex='docker compose exec web bundle exec'
+alias mcr='docker compose run --rm web'
+alias mcrx='docker compose run --rm web bundle exec'
 ```
 
 Now you can just run commands like `mcex rake db:migrate` or `mcr bundle install`
@@ -410,8 +369,8 @@ web: &WEB
 
 Sometimes, very poor performance (or not loading at all) can be due to webpack
 problems. Running
-`docker-compose exec web bundle exec rake canvas:compile_assets` again, or
-`docker-compose exec web bundle exec rake js:webpack_development` again, may help.
+`docker compose exec web bundle exec rake canvas:compile_assets` again, or
+`docker compose exec web bundle exec rake js:webpack_development` again, may help.
 
 
 ### DNS

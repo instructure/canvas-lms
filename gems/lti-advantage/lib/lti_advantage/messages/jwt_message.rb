@@ -34,10 +34,13 @@ module LtiAdvantage::Messages
       lis: LtiAdvantage::Claims::Lis,
       names_and_roles_service: LtiAdvantage::Claims::NamesAndRolesService,
       assignment_and_grade_service: LtiAdvantage::Claims::AssignmentAndGradeService,
+      platform_notification_service: LtiAdvantage::Claims::PlatformNotificationService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
       role_scope_mentor: Array,
-      lti1p1: LtiAdvantage::Claims::Lti1p1
+      lti1p1: LtiAdvantage::Claims::Lti1p1,
+      activity: LtiAdvantage::Claims::Activity,
+      eulaservice: LtiAdvantage::Claims::Eulaservice,
     }.freeze
 
     attr_accessor(*(REQUIRED_CLAIMS + OPTIONAL_CLAIMS))
@@ -94,6 +97,10 @@ module LtiAdvantage::Messages
       @assignment_and_grade_service ||= TYPED_ATTRIBUTES[:assignment_and_grade_service].new
     end
 
+    def platform_notification_service
+      @platform_notification_service ||= TYPED_ATTRIBUTES[:platform_notification_service].new
+    end
+
     def lis
       @lis ||= TYPED_ATTRIBUTES[:lis].new
     end
@@ -114,12 +121,21 @@ module LtiAdvantage::Messages
       @lti1p1 ||= TYPED_ATTRIBUTES[:lti1p1].new
     end
 
+    def activity
+      @activity ||= TYPED_ATTRIBUTES[:activity].new
+    end
+
+    def eulaservice
+      @eulaservice ||= TYPED_ATTRIBUTES[:eulaservice].new
+    end
+
     def read_attribute(attribute)
       send(attribute)
     end
 
-    def to_h
-      LtiAdvantage::Serializers::JwtMessageSerializer.new(self).serializable_hash
+    # TODO: remove without_validation_fields when we remove the remove_unwanted_lti_validation_claims flag
+    def to_h(without_validation_fields: true)
+      LtiAdvantage::Serializers::JwtMessageSerializer.new(self).serializable_hash(without_validation_fields:)
     end
 
     def to_jws(private_key, alg = :RS256)

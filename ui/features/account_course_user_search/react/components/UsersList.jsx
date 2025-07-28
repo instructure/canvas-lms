@@ -19,12 +19,12 @@
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
-import {arrayOf, string, object, func, shape} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {arrayOf, bool, string, object, func, shape} from 'prop-types'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default class UsersList extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -97,6 +97,7 @@ export default class UsersList extends React.Component {
               accountId={this.props.accountId}
               user={user}
               permissions={this.props.permissions}
+              includeDeletedUsers={this.props.includeDeletedUsers}
             />
           ))}
         </Table.Body>
@@ -117,6 +118,7 @@ UsersList.propTypes = {
     shape({
       id: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ).isRequired,
+  includeDeletedUsers: bool,
 }

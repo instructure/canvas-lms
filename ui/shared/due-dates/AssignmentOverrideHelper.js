@@ -30,11 +30,11 @@ function studentIDCollections(students) {
   forEach(students, student => {
     forEach(
       student.sections,
-      sectionID => (sections[sectionID] = addStudentID(student, sections[sectionID]))
+      sectionID => (sections[sectionID] = addStudentID(student, sections[sectionID])),
     )
     forEach(
       student.group_ids,
-      groupID => (groups[groupID] = addStudentID(student, groups[groupID]))
+      groupID => (groups[groupID] = addStudentID(student, groups[groupID])),
     )
   })
 
@@ -67,7 +67,7 @@ function effectiveDueDatesOnOverride(
   studentIDsInSections,
   studentIDsInGroups,
   studentDueDateMap,
-  override
+  override,
 ) {
   const studentIDs = studentIDsOnOverride(override, studentIDsInSections, studentIDsInGroups)
 
@@ -86,7 +86,7 @@ function effectiveDueDatesForAssignment(assignment, overrides, students) {
   const dates = reduce(
     overrides,
     effectiveDueDatesOnOverride.bind(this, studentIDsInSections, studentIDsInGroups),
-    {}
+    {},
   )
 
   students.forEach(student => {

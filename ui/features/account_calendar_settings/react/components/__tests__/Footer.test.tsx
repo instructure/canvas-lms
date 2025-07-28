@@ -77,7 +77,7 @@ describe('Footer', () => {
   it('displays the confirmation modal if showConfirmation is enabled', async () => {
     const onApplyClicked = jest.fn()
     const {getByRole} = render(
-      <Footer {...defaultProps} showConfirmation={true} onApplyClicked={onApplyClicked} />
+      <Footer {...defaultProps} showConfirmation={true} onApplyClicked={onApplyClicked} />,
     )
     getByRole('button', {name: 'Apply Changes'}).click()
     const modalTitle = getByRole('heading', {name: 'Apply Changes'})

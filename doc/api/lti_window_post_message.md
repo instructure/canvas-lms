@@ -70,10 +70,34 @@ Returning postMessage includes the following properties:
 window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 ```
 
+## lti.getPageContent
+
+Responds with an html object containing page content. This will contain all markup and children elements of the main content area of the page. Some content may be filtered from this response. The scope `https://canvas.instructure.com/lti/page_content/show` is required to use this functionality. Currently, only `Assignments` and `Wiki Pages` are supported by getPageContent, but support for additional pages is planned.
+
+**Required properties:**
+
+- subject: "lti.getPageContent"
+
+```js
+window.parent.postMessage({subject: 'lti.getPageContent'}, '*')
+```
+
+Returning postMessage includes the following properties:
+
+- subject: "lti.getPageContent"
+- pageContent: a string containing HTML
+
+```js
+{
+  subject: 'lti.getPageContent.response',
+  content: '<div>...</div>'
+}
+```
+
 ## lti.getPageSettings
 
-Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, and url to the active branding configuration file.
-This is the same json file url provided by the [Brand Configs API](https://canvas.instructure.com/doc/api/brand_configs.html).
+Responds with an object containing page settings. This includes the current locale, time zome, contrast settings, url to the active branding configuration file, and the width of the parent (Canvas) window.
+This is the same json file url provided by the [Brand Configs API](brand_configs.html).
 
 **Required properties:**
 
@@ -91,7 +115,7 @@ Returning postMessage includes the following properties:
   - time_zone
   - use_high_contrast
   - active_brand_config_json_url
-
+  - window_width
 
 ```js
 {
@@ -99,7 +123,8 @@ Returning postMessage includes the following properties:
     locale: 'en',
     time_zone: 'Etc/UTC',
     use_high_contrast: false,
-    active_brand_config_json_url: 'https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/default/variables-7dd4b80918af0e0218ec0229e4bd5873.json'
+    active_brand_config_json_url: 'https://du11hjcvx0uqb.cloudfront.net/dist/brandable_css/default/variables-7dd4b80918af0e0218ec0229e4bd5873.json',
+    window_width: 1024
   }
 }
 ```
@@ -112,7 +137,7 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+as defined [here](file.lti_launch_overview.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
@@ -172,7 +197,7 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+as defined [here](file.lti_launch_overview.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
 For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
@@ -262,18 +287,6 @@ window.parent.postMessage(
   },
   '*'
 )
-```
-
-## toggleCourseNavigationMenu
-
-Opens and closes the course navigation sidebar, giving more space for the tool to display.
-
-**Required properties:**
-
-- subject: "toggleCourseNavigationMenu"
-
-```js
-window.parent.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
 ```
 
 ## lti.resourceImported
@@ -483,4 +496,48 @@ Returning postMessage includes the following properties:
 
 ```js
 window.parent.postMessage({subject: 'lti.enableScrollEvents'}, '*')
+```
+
+## showNavigationMenu
+
+Opens the navigation sidebar, a replacement for toggleCourseNavigationMenu.
+Can be used on course, account or group page.
+
+**Required properties:**
+
+- subject: "showNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'showNavigationMenu'}, '*')
+```
+
+## hideNavigationMenu
+
+Closes the navigation sidebar, a replacement for toggleCourseNavigationMenu.
+Can be used on course, account or group page.
+
+**Required properties:**
+
+- subject: "hideNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'hideNavigationMenu'}, '*')
+```
+
+<div class="warning-message">
+    Deprecated Message Types
+</div>
+
+## toggleCourseNavigationMenu <span title="this message type is deprecated!">⚠️</span>
+
+**Use show or hideNavigationMenu instead!**
+
+Opens and closes the course navigation sidebar, giving more space for the tool to display.
+
+**Required properties:**
+
+- subject: "toggleCourseNavigationMenu"
+
+```js
+window.parent.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
 ```

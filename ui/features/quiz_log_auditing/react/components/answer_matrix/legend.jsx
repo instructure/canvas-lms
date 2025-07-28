@@ -17,10 +17,10 @@
  */
 
 import Emblem from './emblem'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('quiz_log_auditing.table_view')
+const I18n = createI18nScope('quiz_log_auditing.table_view')
 
 /**
  * @class Events.Views.AnswerMatrix.Legend
@@ -49,7 +49,7 @@ const Legend = () => (
       <Emblem answered={true} last={true} />
       {I18n.t(
         'legend.filled_circle_desc',
-        'The final answer for the question, the one that counts.'
+        'The final answer for the question, the one that counts.',
       )}
     </dd>
   </dl>

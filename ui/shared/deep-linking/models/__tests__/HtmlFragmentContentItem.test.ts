@@ -28,7 +28,7 @@ const json = htmlFragmentContentItem({
 describe('htmlFragmentContentItemToHtmlString', () => {
   it('returns the "html"', () => {
     expect(htmlFragmentContentItemToHtmlString(json)).toEqual(
-      '<a href="test.com">link</a><p><strong>bold</strong></p>'
+      '<a href="test.com">link</a><p><strong>bold</strong></p>',
     )
   })
 })

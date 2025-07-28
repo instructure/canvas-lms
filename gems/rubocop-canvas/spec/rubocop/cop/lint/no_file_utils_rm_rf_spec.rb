@@ -21,13 +21,13 @@ describe RuboCop::Cop::Lint::NoFileUtilsRmRf do
   subject(:cop) { described_class.new }
 
   it "disallows FileUtils.rm_rf" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       def rm_sekrets
         FileUtils.rm_rf
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/avoid FileUtils.rm_rf/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/avoid FileUtils.rm_rf/)
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 end

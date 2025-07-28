@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../spec_helper"
+require_relative "../conditional_release_spec_helper"
 
 describe CoursePace do
   before :once do
     course_with_student active_all: true
     @course.update start_at: "2021-06-30", restrict_enrollments_to_course_dates: true, time_zone: "UTC"
-    @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
     @module = @course.context_modules.create!
@@ -195,7 +195,7 @@ describe CoursePace do
 
   context "publish" do
     def fancy_midnight_rounded_to_last_second(date)
-      CanvasTime.fancy_midnight(date.to_datetime).to_time.in_time_zone("UTC")
+      CanvasTime.fancy_midnight(Time.zone.parse(date)).utc
     end
 
     before :once do
@@ -204,25 +204,22 @@ describe CoursePace do
     end
 
     it "respects the course timezone" do
-      @course.update! time_zone: "Abu Dhabi"
-      @course_pace.reload.publish
-      abu_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+      timezones = ["Abu Dhabi", "Brasilia", "Mountain Time (US & Canada)"]
 
-      @course.update! time_zone: "Brasilia"
-      @course_pace.reload.publish
-      br_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+      timezones.each do |tz|
+        @course.update!(time_zone: tz)
+        @course_pace.reload.publish
 
-      @course.update! time_zone: "Mountain Time (US & Canada)"
-      @course_pace.reload.publish
-      mt_due_at = @course.reload.assignments.last.assignment_overrides.last.due_at
+        Time.use_zone(@course.time_zone) do
+          due_at = @course.reload.assignments.last.assignment_overrides.last.due_at.in_time_zone(@course.time_zone)
+          expected_due_at = CanvasTime.fancy_midnight(@course.start_at)
+                                      .end_of_day
+                                      .change(usec: 999_999)
+                                      .in_time_zone(@course.time_zone)
 
-      expected_abu_due_at = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) - 4.hours
-      expected_br_due_at  = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) + 3.hours
-
-      # DST, otherwise it'd be +7 (-0700)
-      expected_mt_due_at  = CanvasTime.fancy_midnight(Date.parse(@course.start_at.to_s).in_time_zone("UTC")) + 6.hours
-
-      expect([abu_due_at, br_due_at, mt_due_at]).to eq([expected_abu_due_at, expected_br_due_at, expected_mt_due_at])
+          expect(due_at).to eq(expected_due_at), "Failed for timezone: #{tz}"
+        end
+      end
     end
 
     it "creates an override for students" do
@@ -411,7 +408,7 @@ describe CoursePace do
     end
 
     it "does not change overrides for sections that have course paces if the course pace is published" do
-      @student_enrollment.reload.update(start_at: nil, created_at: Time.at(0))
+      @student_enrollment.reload.update(start_at: nil, created_at: Time.zone.at(0))
       expect(@course_pace.publish).to be(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
@@ -452,18 +449,32 @@ describe CoursePace do
 
     it "logs if the assignment being updated has been completed" do
       @assignment.submit_homework(@student, body: "Test")
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       expect(@course_pace.publish).to be(true)
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.submitted_assignment_date_change")
     end
 
     it "compresses to hard end dates" do
-      @course_pace.course_pace_module_items.update(duration: 900)
+      @course_pace.update!(end_date: Date.new(2021, 9, 30))
+      @course_pace.course_pace_module_items.update_all(duration: 900)
       expect(AssignmentOverride.count).to eq(0)
       expect(@course_pace.publish).to be(true)
       expect(AssignmentOverride.count).to eq(2)
-      expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
+      expected_due_date = fancy_midnight_rounded_to_last_second("2021-09-30")
+      expect(AssignmentOverride.last.due_at.to_i).to eq(expected_due_date.to_i)
       expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
+    end
+
+    context "with mastery paths" do
+      before :once do
+        setup_course_with_native_conditional_release(course: @course)
+      end
+
+      it "does not create an override for unreleased assignments" do
+        @course_pace.publish
+
+        expect(AssignmentOverride.where.not(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).count).to eq(2)
+      end
     end
   end
 
@@ -523,10 +534,10 @@ describe CoursePace do
       # there's an extremely tiny window where the date may have changed between
       # when start_date called Time.now and now causing this to fail
       # I don't think it's worth worrying about.
-      expect(@course_pace.start_date.to_date).to eq(Time.now.to_date)
+      expect(@course_pace.start_date.to_date).to eq(Time.zone.now.to_date)
 
       result = @course_pace.start_date(with_context: true)
-      expect(result[:start_date].to_date).to eq(Time.now.to_date)
+      expect(result[:start_date].to_date).to eq(Time.zone.now.to_date)
       expect(result[:start_date_context]).to eq("hypothetical")
     end
   end
@@ -622,7 +633,6 @@ describe CoursePace do
   context "course pace creates" do
     before :once do
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -631,30 +641,28 @@ describe CoursePace do
     end
 
     it "writes the number of course-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course_pace = @course.course_paces.create! workflow_state: "active"
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.course_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.course_paces.count").once
     end
 
     it "writes the number of section-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @new_section = @course.course_sections.create! name: "new_section"
       @section_plan = @course.course_paces.create! course_section: @new_section
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.section_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.section_paces.count").once
     end
 
     it "writes the number of user-type course paces to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       @course.course_paces.create!(user: @student, workflow_state: "active")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.user_paces.count").once
     end
   end
 
   context "course pace deletes" do
     before :once do
-      Account.site_admin.enable_feature!(:course_paces_redesign)
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -665,32 +673,31 @@ describe CoursePace do
     it "increments the course pace deletion to statsd" do
       # This destroy does work and we log it here, but in general, the code doesn't allow for the default
       # course pace to be deleted for now.
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       course_pace = @course.course_paces.create! workflow_state: "active"
       course_pace.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_course_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_course_pace").once
     end
 
     it "increments the section-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       new_section = @course.course_sections.create! name: "new_section"
       section_plan = @course.course_paces.create! course_section: new_section
       section_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_section_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_section_pace").once
     end
 
     it "increments the student-type course pace deletion to statsd" do
-      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      allow(InstStatsd::Statsd).to receive(:distributed_increment).and_call_original
       user_plan = @course.course_paces.create!(user: @student, workflow_state: "active")
       user_plan.destroy!
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_user_pace").once
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("course_pacing.deleted_user_pace").once
     end
   end
 
   context "course pace publish logs statsd for various values" do
     before :once do
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -698,44 +705,122 @@ describe CoursePace do
       @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
     end
 
-    it "increments on initial publish when exclude_weekends set to true" do
-      allow(InstStatsd::Statsd).to receive(:increment)
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        stub_const("SKIP_WEEKEND_DAYS", %w[sun sat])
+        stub_const("NOT_SKIP_WEEKEND_DAYS", [])
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active")
+      it "increments on initial publish when weekend days selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
 
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: SKIP_WEEKEND_DAYS
+        )
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "does not decrement on initial publish when no days selected to skipped" do
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS
+        )
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
+
+      it "increments on subsequent publish when no days selected then weekend days selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS
+        )
+        @course_pace.update!(selected_days_to_skip: SKIP_WEEKEND_DAYS)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "decrements on subsequent publish when weekend days initially selected then de selected to be skipped" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          selected_days_to_skip: SKIP_WEEKEND_DAYS,
+          workflow_state: "active"
+        )
+        @course_pace.update!(selected_days_to_skip: NOT_SKIP_WEEKEND_DAYS)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
     end
 
-    it "does not decrement on initial publish when exclude_weekends set to false" do
-      allow(InstStatsd::Statsd).to receive(:decrement)
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+      it "increments on initial publish when exclude_weekends set to true" do
+        allow(InstStatsd::Statsd).to receive(:increment)
 
-      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-    end
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: true
+        )
 
-    it "increments on subsequent publish when exclude_weekends initially false then set to true" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:decrement)
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
-      @course_pace.update!(exclude_weekends: true)
-      @course_pace.publish
+      it "does not decrement on initial publish when exclude_weekends set to false" do
+        allow(InstStatsd::Statsd).to receive(:decrement)
 
-      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
-    end
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: false
+        )
 
-    it "decrements on subsequent publish when exclude_weekends initially true then set to false" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:decrement)
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
 
-      @course_pace = @course.course_paces.create!(workflow_state: "active")
-      @course_pace.update!(exclude_weekends: false)
-      @course_pace.publish
+      it "increments on subsequent publish when exclude_weekends initially false then set to true" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
 
-      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
-      expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+        @course_pace = @course.course_paces.create!(
+          workflow_state: "active",
+          exclude_weekends: false
+        )
+        @course_pace.update!(exclude_weekends: true)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      end
+
+      it "increments on subsequent publish when exclude_weekends initially true then set to false" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        @course_pace = @course.course_paces.create!(
+          exclude_weekends: true,
+          workflow_state: "active"
+        )
+        @course_pace.update!(exclude_weekends: false)
+        @course_pace.publish
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+      end
     end
 
     it "logs the average module item duration as a count" do
@@ -792,7 +877,6 @@ describe CoursePace do
     before do
       Account.site_admin.enable_feature! :account_level_blackout_dates
       course_with_student active_all: true
-      @course.root_account.enable_feature!(:course_paces)
       @course.enable_course_paces = true
       @course.save!
       @module = @course.context_modules.create!
@@ -864,7 +948,6 @@ describe CoursePace do
     it "creates a course in a subaccount with its own calendar events and counts all the account calendar events" do
       allow(InstStatsd::Statsd).to receive(:count)
       @subaccount1 = Account.find(@course.root_account.id).sub_accounts.create!
-      @subaccount1.enable_feature!(:course_paces)
       @course1 = course_factory(account: @subaccount1, active_all: true)
       @course1.enable_course_paces = true
       @course1.save!

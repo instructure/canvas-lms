@@ -24,9 +24,9 @@ import {nanoid} from 'nanoid'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('PronounsInput')
+const I18n = createI18nScope('PronounsInput')
 
 export default class PronounsInput extends React.Component {
   constructor(props) {
@@ -64,7 +64,7 @@ export default class PronounsInput extends React.Component {
 
   render() {
     const infoToolTip = I18n.t(
-      'These pronouns will be available to Canvas users in your account to choose from.'
+      'These pronouns will be available to Canvas users in your account to choose from.',
     )
     return (
       <TextInput

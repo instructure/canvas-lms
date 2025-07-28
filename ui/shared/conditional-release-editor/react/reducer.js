@@ -40,7 +40,7 @@ const createRootReducer = () => {
           [actions.SET_GLOBAL_WARNING]: (state, action) => action.payload,
           [actions.CLEAR_GLOBAL_WARNING]: () => '',
         },
-        ''
+        '',
       ),
 
       global_error: handleActions(
@@ -50,7 +50,7 @@ const createRootReducer = () => {
           [actions.GET_ASSIGNMENTS]: gotHttpError,
           [actions.DELETE_RULE]: gotHttpError,
         },
-        ''
+        '',
       ),
 
       global_warning: handleActions(
@@ -58,14 +58,14 @@ const createRootReducer = () => {
           [actions.SET_GLOBAL_WARNING]: (state, action) => action.payload,
           [actions.CLEAR_GLOBAL_WARNING]: () => '',
         },
-        ''
+        '',
       ),
 
       course_id: handleActions(
         {
           [actions.SET_COURSE_ID]: (state, action) => action.payload,
         },
-        ''
+        '',
       ),
 
       rule: combineReducers({
@@ -74,7 +74,7 @@ const createRootReducer = () => {
             [actions.LOAD_RULE_FOR_ASSIGNMENT]: gotRuleSetRuleId,
             [actions.SAVE_RULE]: savedRuleSetRuleId,
           },
-          ''
+          '',
         ),
 
         scoring_ranges: scoringRangesReducer,
@@ -84,7 +84,7 @@ const createRootReducer = () => {
         {
           [actions.GET_ASSIGNMENTS]: gotAssignments,
         },
-        Map()
+        Map(),
       ),
 
       assignment_picker: assignmentPickerReducer,
@@ -93,7 +93,7 @@ const createRootReducer = () => {
         {
           [actions.UPDATE_ASSIGNMENT]: mergePayload,
         },
-        Map()
+        Map(),
       ),
 
       received: combineReducers({
@@ -101,16 +101,16 @@ const createRootReducer = () => {
           {
             [actions.LOAD_RULE_FOR_ASSIGNMENT]: () => true,
           },
-          false
+          false,
         ),
         assignments: handleActions(
           {
             [actions.GET_ASSIGNMENTS]: () => true,
           },
-          false
+          false,
         ),
       }),
-    })
+    }),
   )
 }
 export default createRootReducer

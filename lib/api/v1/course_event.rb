@@ -25,12 +25,15 @@ module Api::V1::CourseEvent
   include Api::V1::User
 
   def course_event_json(event, _user, _session)
+    # Since these id properties are not following the expected naming conventions (i.e. they are not suffixed with "id(s)")
+    # thus they do not converted automatically to strings in ApplicationController#render function. In order to keep
+    # thing safe and do not introduce breaking api changes we do a manual conversion.
     links = {
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       page_view: event.request_id && PageView.find_by(id: event.request_id).try(:id),
       user: Shard.relative_id_for(event.user_id, Shard.current, Shard.current),
       sis_batch: Shard.relative_id_for(event.sis_batch_id, Shard.current, Shard.current)
-    }
+    }.transform_values(&:to_s)
 
     # Since copied/reset events relate to another course lets put that where it
     # belongs according to jsonapi.
@@ -96,10 +99,13 @@ module Api::V1::CourseEvent
     users = User.where(id: user_ids).to_a unless user_ids.empty?
     users ||= []
 
-    {
-      page_views: page_views_json(page_views, user, session),
-      courses: courses_json(courses, user, session, [], []),
-      users: users_json(users, user, session, [], @domain_root_account)
-    }
+    # Clients can forget to provide the "application/json+canvas-string-ids" accept header
+    # which would result in inconsistent ids. This is to make sure that the ids are always the same type
+    # (strings) on the returned object.
+    StringifyIds.recursively_stringify_ids({
+                                             page_views: page_views_json(page_views, user, session),
+                                             courses: courses_json(courses, user, session, [], []),
+                                             users: users_json(users, user, session, [], @domain_root_account)
+                                           })
   end
 end

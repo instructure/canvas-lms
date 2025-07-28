@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('choose_mastery_path')
+const I18n = createI18nScope('choose_mastery_path')
 
 const {func, bool} = PropTypes
 
@@ -63,7 +63,13 @@ export default class SelectButton extends React.Component {
     }
 
     return (
-      <button type="button" className={btnClasses} onClick={this.onClick} disabled={isDisabled}>
+      <button
+        type="button"
+        className={btnClasses}
+        onClick={this.onClick}
+        disabled={isDisabled}
+        data-testid="select-button"
+      >
         {text}
       </button>
     )

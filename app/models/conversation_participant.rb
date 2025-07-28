@@ -69,7 +69,7 @@ class ConversationParticipant < ActiveRecord::Base
     own_root_account_ids.sort!.uniq!
     id_string = "[" + own_root_account_ids.join("][") + "]"
     root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
-    where("conversation_participants.root_account_ids <> '' AND " + like_condition("?", root_account_id_matcher, false), id_string)
+    where("conversation_participants.root_account_ids <> '' AND " + like_condition("?", root_account_id_matcher, downcase: false), id_string)
   }
 
   # Produces a subscope for conversations in which the given users are
@@ -352,13 +352,13 @@ class ConversationParticipant < ActiveRecord::Base
         if operation == :delete
           scope.delete_all
         else
-          scope.update_all(workflow_state: "deleted", deleted_at: Time.now)
+          scope.update_all(workflow_state: "deleted", deleted_at: Time.zone.now)
         end
       else
         if operation == :delete
           scope.where(conversation_message_id: to_delete).delete_all
         else
-          scope.where(conversation_message_id: to_delete).update_all(workflow_state: "deleted", deleted_at: Time.now)
+          scope.where(conversation_message_id: to_delete).update_all(workflow_state: "deleted", deleted_at: Time.zone.now)
         end
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too
@@ -399,7 +399,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def starred
-    read_attribute(:label) == "starred"
+    label == "starred"
   end
   alias_method :starred?, :starred
 
@@ -407,8 +407,7 @@ class ConversationParticipant < ActiveRecord::Base
     # if starred were an actual boolean column, this is the method that would
     # be used to convert strings to appropriate boolean values (e.g. 'true' =>
     # true and 'false' => false)
-    val = Canvas::Plugin.value_to_boolean(val)
-    write_attribute(:label, val ? "starred" : nil)
+    self.label = Canvas::Plugin.value_to_boolean(val) ? "starred" : nil
   end
 
   def one_on_one?
@@ -470,12 +469,12 @@ class ConversationParticipant < ActiveRecord::Base
     # (see above)
     if options[:recalculate_last_authored_at]
       my_latest = conversation.conversation_messages.human.by_user(user_id).first
-      self.last_authored_at = my_latest ? my_latest.created_at : nil
+      self.last_authored_at = my_latest&.created_at
     end
   end
 
-  def update_cached_data!(*args)
-    update_cached_data(*args)
+  def update_cached_data!(*)
+    update_cached_data(*)
     save!
   end
 
@@ -484,7 +483,7 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def context_tags
-    read_attribute(:tags) ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
+    self["tags"] ? tags.grep(/\A(course|group)_\d+\z/) : infer_tags
   end
 
   def infer_tags
@@ -595,7 +594,7 @@ class ConversationParticipant < ActiveRecord::Base
       participant = user.all_conversations.where(conversation_id:).first
       raise t("not_participating", "The user is not participating in this conversation") unless participant
 
-      InstStatsd::Statsd.increment("inbox.conversation.unarchived.legacy") if participant[:workflow_state] == "archived" && ["mark_as_read", "mark_as_unread"].include?(update_params[:event])
+      InstStatsd::Statsd.distributed_increment("inbox.conversation.unarchived.legacy") if participant[:workflow_state] == "archived" && ["mark_as_read", "mark_as_unread"].include?(update_params[:event])
       participant.update_one(update_params)
     end
   end

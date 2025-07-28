@@ -19,10 +19,11 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
+import {clearDashboardCache} from '../../dashboard-card/dashboardCardQueries'
 
-const I18n = useI18nScope('course_nickname_edit')
+const I18n = createI18nScope('course_nickname_edit')
 
 class CourseNicknameEdit extends React.Component {
   // ===============
@@ -75,6 +76,9 @@ class CourseNicknameEdit extends React.Component {
         },
         success: data => {
           this.props.nicknameInfo.onNicknameChange(data.nickname || data.name)
+          if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
+            clearDashboardCache()
+          }
         },
         error: () => {},
       })

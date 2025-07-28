@@ -31,7 +31,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
         event={{
           data: [{quizQuestionId: 'q1'}],
         }}
-      />
+      />,
     )
   })
 
@@ -46,7 +46,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
 
     it('shows an emblem for an empty answer', function () {
       const {getByTestId} = render(
-        <Cell {...question} event={{data: [{quizQuestionId: '1', answer: null}]}} />
+        <Cell {...question} event={{data: [{quizQuestionId: '1', answer: null}]}} />,
       )
 
       expect(getByTestId('emblem').classList).toContain('is-empty')
@@ -59,7 +59,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
           event={{
             data: [{quizQuestionId: '1', answer: '123', answered: true}],
           }}
-        />
+        />,
       )
 
       expect(getByTestId('emblem').classList).toContain('is-answered')
@@ -72,7 +72,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
           event={{
             data: [{quizQuestionId: '1', answer: '123', answered: true, last: true}],
           }}
-        />
+        />,
       )
 
       expect(getByTestId('emblem').classList).toContain('is-answered')
@@ -99,7 +99,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
         event={{
           data: [{quizQuestionId: 'q1', answer: 'hello world'}],
         }}
-      />
+      />,
     )
 
     expect(document.body.textContent).toMatch('hello...')
@@ -117,7 +117,7 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
         event={{
           data: [{quizQuestionId: 'q1'}],
         }}
-      />
+      />,
     )
   })
 })

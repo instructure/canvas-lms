@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -18,9 +19,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import type Gradebook from '../../Gradebook'
 import type GridSupport from '../GridSupport'
+import type {Root} from 'react-dom/client'
 
 import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
 
@@ -32,6 +34,7 @@ function getProps(options) {
 
 export default class TotalGradeOverrideColumnHeaderRenderer {
   gradebook: Gradebook
+  root: Root | null = null
 
   constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
@@ -39,10 +42,14 @@ export default class TotalGradeOverrideColumnHeaderRenderer {
 
   render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(options)
-    ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
+    this.root = createRoot($container)
+    this.root.render(<TotalGradeOverrideColumnHeader {...props} />)
   }
 
   destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+    if (this.root) {
+      this.root.unmount()
+      this.root = null
+    }
   }
 }

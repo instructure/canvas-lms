@@ -19,11 +19,11 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import elideString from '../../helpers/elideString'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, shape, string, object} from 'prop-types'
 import {getFileThumbnail} from '@canvas/util/fileHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MoreOptions from './MoreOptions/index'
-import React, {Component} from 'react'
+import React, {Component, createRef} from 'react'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import UploadFileSVG from '../../../images/UploadFile.svg'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
@@ -40,8 +40,11 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
+import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 
-const I18n = useI18nScope('assignments_2_file_upload')
+const I18n = createI18nScope('assignments_2_file_upload')
+
+const FILE_REQUIRED_ERROR_MESSAGE = I18n.t('At least one submission type is required')
 
 class FileUpload extends Component {
   static propTypes = {
@@ -55,19 +58,22 @@ class FileUpload extends Component {
         name: string,
         loaded: number,
         total: number,
-      })
+      }),
     ).isRequired,
     focusOnInit: bool.isRequired,
     onCanvasFileRequested: func.isRequired,
     onUploadRequested: func.isRequired,
     submission: Submission.shape,
+    submitButtonRef: object
   }
 
   state = {
     messages: [],
+    showErorrMessage: false,
   }
 
   _isMounted = false
+  _inputFileDropRef = createRef()
 
   componentDidMount() {
     this._isMounted = true
@@ -76,11 +82,37 @@ class FileUpload extends Component {
     if (fileDrop && this.props.focusOnInit) {
       fileDrop.focus()
     }
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
+  }
+
+  componentDidUpdate(_prevProps) {
+    this.props.submitButtonRef?.current?.addEventListener('click', this.handleSubmitClick)
   }
 
   componentWillUnmount() {
     this._isMounted = false
     window.removeEventListener('message', this.handleLTIFiles)
+    this.props.submitButtonRef.current?.removeEventListener('click', this.handleSubmitClick)
+  }
+
+  handleSubmitClick = () => {
+    if (!this.props.submission.submissionDraft?.meetsUploadCriteria) {
+      const fileDrop = document.getElementById('inputFileDrop')
+      fileDrop?.focus()
+
+      const container = document.getElementById('file-upload-container')
+      container.classList.add('error-outline')
+      fileDrop.setAttribute('aria-label', FILE_REQUIRED_ERROR_MESSAGE)
+      this.setState({showErrorMessage: true})
+    }
+  }
+
+  clearErrors = () => {
+    const fileDrop = document.getElementById('inputFileDrop')
+    const container = document.getElementById('file-upload-container')
+    container?.classList.remove('error-outline')
+    fileDrop?.removeAttribute('aria-label')
+    this.setState({showErrorMessage: false})
   }
 
   getDraftAttachments = () => {
@@ -110,6 +142,7 @@ class FileUpload extends Component {
   }
 
   handleCanvasFiles = async fileID => {
+    this.clearErrors()
     if (!fileID) {
       this.context.setOnFailure(I18n.t('Error adding canvas file to submission draft'))
       return
@@ -123,6 +156,7 @@ class FileUpload extends Component {
   }
 
   handleDropAccepted = async files => {
+    this.clearErrors()
     if (!files.length) {
       this.context.setOnFailure(I18n.t('Error adding files to submission draft'))
       return
@@ -139,6 +173,7 @@ class FileUpload extends Component {
   }
 
   handleWebcamPhotoUpload = async ({filename, image}) => {
+    this.clearErrors()
     const {blob} = image
     blob.name = filename
 
@@ -150,7 +185,7 @@ class FileUpload extends Component {
       messages: [
         {
           text: I18n.t('Invalid file type'),
-          type: 'error',
+          type: 'newError',
         },
       ],
     })
@@ -159,7 +194,7 @@ class FileUpload extends Component {
   handleRemoveFile = async e => {
     const fileId = parseInt(e.currentTarget.id, 10)
     const fileIndex = this.getDraftAttachments().findIndex(
-      file => parseInt(file._id, 10) === fileId
+      file => parseInt(file._id, 10) === fileId,
     )
 
     const updatedFiles = this.getDraftAttachments().filter((_, i) => i !== fileIndex)
@@ -253,15 +288,15 @@ class FileUpload extends Component {
       display: desktop ? 'block' : 'inline',
       width: desktop ? '100%' : '60px',
       zIndex: 99,
-      backgroundColor: theme.variables.colors.backgroundLight,
-      padding: desktop ? `${theme.variables.spacing.medium} 0` : '0',
+      backgroundColor: theme.colors.contrasts.grey1111,
+      padding: desktop ? `${theme.spacing.medium} 0` : '0',
     }
     const lineStyle = {
       height: desktop ? '100%' : '1px',
       width: desktop ? '1px' : '100%',
       left: desktop ? '50%' : '0',
       position: 'absolute',
-      backgroundColor: theme.variables.colors.backgroundDark,
+      backgroundColor: theme.colors.contrasts.grey4570,
     }
 
     return (
@@ -288,6 +323,7 @@ class FileUpload extends Component {
                   messages={this.state.messages}
                   onDropAccepted={files => this.handleDropAccepted(files)}
                   onDropRejected={this.handleDropRejected}
+                  onClick={this.clearErrors}
                   renderLabel={fileDropLabel}
                   shouldAllowMultiple={true}
                   shouldEnablePreview={true}
@@ -352,7 +388,7 @@ class FileUpload extends Component {
     // uploaded don't have that set yet, so use the local name (which we've set
     // to the URL for files from an LTI).
     const displayName = file.displayName || file.name
-    const cellTheme = {background: theme.variables.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
 
     return (
       <Table.Row key={file._id}>
@@ -392,7 +428,7 @@ class FileUpload extends Component {
   }
 
   renderUploadedFiles = files => {
-    const cellTheme = {background: theme.variables.colors.backgroundLight}
+    const cellTheme = {background: theme.colors.contrasts.grey1111}
 
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
@@ -419,15 +455,22 @@ class FileUpload extends Component {
     }
 
     return (
-      <Flex data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
-        {files.length > 0 && (
-          <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
-        )}
+      <>
+        <Flex id="file-upload-container" data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
+          {files.length > 0 && (
+            <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
+          )}
 
-        <Flex.Item overflowY="hidden" padding="large small">
-          {this.renderUploadBox()}
-        </Flex.Item>
-      </Flex>
+          <Flex.Item overflowY="hidden" padding="large small">
+            {this.renderUploadBox()}
+          </Flex.Item>
+        </Flex>
+        {this.state.showErrorMessage && (
+          <View as='div' padding='small 0 0 0' background='primary'>
+            <FormattedErrorMessage message={FILE_REQUIRED_ERROR_MESSAGE} />
+          </View>
+        )}
+      </>
     )
   }
 }

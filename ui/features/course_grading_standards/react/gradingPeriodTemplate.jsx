@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {each, isUndefined} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('gradingPeriodTemplate')
+const I18n = createI18nScope('gradingPeriodTemplate')
 
 const postfixId = (text, {props}) => text + props.id
 
@@ -45,7 +45,7 @@ class GradingPeriodTemplate extends React.Component {
     title: PropTypes.string.isRequired,
     disabled: PropTypes.bool.isRequired,
     weight: PropTypes.number,
-    weighted: PropTypes.bool.isRequired,
+    weighted: PropTypes.bool,
     startDate: PropTypes.instanceOf(Date).isRequired,
     endDate: PropTypes.instanceOf(Date).isRequired,
     closeDate: PropTypes.instanceOf(Date).isRequired,
@@ -67,7 +67,6 @@ class GradingPeriodTemplate extends React.Component {
 
       const invalidProps = []
       each(requiredProps, (propType, propName) => {
-        // eslint-disable-next-line valid-typeof
         const invalidProp = isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })
@@ -81,9 +80,18 @@ class GradingPeriodTemplate extends React.Component {
     },
   }
 
+  constructor(props) {
+    super(props)
+    this.titleRef = React.createRef()
+    this.startDateRef = React.createRef()
+    this.endDateRef = React.createRef()
+    this.weightRef = React.createRef()
+    this.deleteButtonRef = React.createRef()
+  }
+
   componentDidMount() {
-    if (this.isNewGradingPeriod()) {
-      this.refs.title.focus()
+    if (this.isNewGradingPeriod() && this.titleRef.current) {
+      this.titleRef.current.focus()
     }
     const dateField = $(ReactDOM.findDOMNode(this)).find('.date_field')
     renderDatetimeField(dateField)
@@ -112,14 +120,15 @@ class GradingPeriodTemplate extends React.Component {
           onChange={this.props.onTitleChange}
           value={this.props.title}
           disabled={this.props.disabled}
-          ref="title"
+          ref={this.titleRef}
+          data-testid="period-title-input"
         />
       )
     } else {
       return (
         <div>
           <span className="screenreader-only">{I18n.t('Grading Period Name')}</span>
-          <span ref="title">{this.props.title}</span>
+          <span ref={this.titleRef}>{this.props.title}</span>
         </div>
       )
     }
@@ -134,7 +143,7 @@ class GradingPeriodTemplate extends React.Component {
           </label>
           <div>
             <span className="screenreader-only">{I18n.t('Grading Period Weight')}</span>
-            <span ref="weight">{I18n.n(this.props.weight, {percentage: true})}</span>
+            <span ref={this.weightRef}>{I18n.n(this.props.weight, {percentage: true})}</span>
           </div>
         </div>
       )
@@ -147,11 +156,12 @@ class GradingPeriodTemplate extends React.Component {
         <input
           id={postfixId('period_start_date_', this)}
           type="text"
-          ref="startDate"
+          ref={this.startDateRef}
           name="startDate"
           className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
           defaultValue={DateHelper.formatDateForDisplay(this.props.startDate)}
           disabled={this.props.disabled}
+          data-testid="period-start-date-input"
         />
       )
     } else {
@@ -171,10 +181,11 @@ class GradingPeriodTemplate extends React.Component {
           id={postfixId('period_end_date_', this)}
           type="text"
           className="GradingPeriod__Detail ic-Input input-grading-period-date date_field"
-          ref="endDate"
+          ref={this.endDateRef}
           name="endDate"
           defaultValue={DateHelper.formatDateForDisplay(this.props.endDate)}
           disabled={this.props.disabled}
+          data-testid="period-end-date-input"
         />
       )
     } else {
@@ -204,11 +215,12 @@ class GradingPeriodTemplate extends React.Component {
       return (
         <div className="GradingPeriod__Actions content-box">
           <button
-            ref={c => (this.deleteButtonRef = c)}
+            ref={this.deleteButtonRef}
             type="button"
             className={cssClasses}
             aria-disabled={this.props.disabled}
             onClick={this.onDeleteGradingPeriod}
+            data-testid="delete-grading-period-button"
           >
             <i className="icon-x icon-delete-grading-period" />
             <span className="screenreader-only">{I18n.t('Delete grading period')}</span>
@@ -245,7 +257,7 @@ class GradingPeriodTemplate extends React.Component {
               {this.renderEndDate()}
             </div>
             <div className="col-xs-12 col-md-8 col-lg-2">
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              {}
               <label className="ic-Label" id={postfixId('period_close_date_', this)}>
                 {I18n.t('Close Date')}
               </label>

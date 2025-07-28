@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import {sameDate, timeString, dateString, datetimeString} from './date-functions'
 import htmlEscape from '@instructure/html-escape'
 
-const I18n = useI18nScope('dates')
+const I18n = createI18nScope('dates')
 
 export default function semanticDateRange(startISO, endISO) {
   const container = document.createElement('span')

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -23,7 +24,7 @@ import {
   handleExternalContentMessages,
   postMessageExternalContentReady,
   postMessageExternalContentCancel,
-  Service,
+  type Service,
 } from '../messages'
 
 describe('1.1 content item messages', () => {
@@ -38,7 +39,7 @@ describe('1.1 content item messages', () => {
         new MessageEvent('message', {
           data,
           origin,
-        })
+        }),
       )
     }
 
@@ -54,12 +55,22 @@ describe('1.1 content item messages', () => {
       ...props,
     })
 
+    const LtiDeepLinkingResponse = (props = {}) => ({
+      subject: 'LtiDeepLinkingResponse',
+      contentItems: [{url: 'test'}],
+      service: 'equella',
+      service_id: '1',
+      ...props,
+    })
+
     let ready: () => void
+    let onDeepLinkingResponse: () => void
     let cancel: () => void
     let remove: () => void | undefined
     beforeEach(() => {
       ready = jest.fn()
       cancel = jest.fn()
+      onDeepLinkingResponse = jest.fn()
     })
 
     afterEach(() => {
@@ -74,6 +85,16 @@ describe('1.1 content item messages', () => {
 
       sendPostMessage(externalContentCancel())
       expect(cancel).toHaveBeenCalled()
+    })
+
+    it('calls onDeepLinkingResponse handler on LtiDeepLinkingResponse event', () => {
+      remove = handleExternalContentMessages({
+        onDeepLinkingResponse,
+        env,
+      })
+
+      sendPostMessage(LtiDeepLinkingResponse())
+      expect(onDeepLinkingResponse).toHaveBeenCalled()
     })
 
     it('calls ready handler on externalContentReady event', () => {
@@ -158,7 +179,7 @@ describe('1.1 content item messages', () => {
         postMessageExternalContentReady(window, eventData)
         expect(window.postMessage).toHaveBeenCalledWith(
           {subject: 'externalContentReady', ...eventData},
-          'http://canvas.test'
+          'http://canvas.test',
         )
       })
     })
@@ -169,7 +190,7 @@ describe('1.1 content item messages', () => {
         postMessageExternalContentCancel(window)
         expect(window.postMessage).toHaveBeenCalledWith(
           {subject: 'externalContentCancel'},
-          'http://canvas.test'
+          'http://canvas.test',
         )
       })
     })

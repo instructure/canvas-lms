@@ -26,10 +26,12 @@ describe AccountReports::DeveloperKeyReports do
   subject do
     first_key
     second_key
+    third_key
     site_admin_key
     read_report(report_type, report_opts)
   end
 
+  let_once(:scopes) { ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"] }
   let_once(:account) { Account.default }
   let_once(:first_key) do
     dk = dev_key_model({ scopes: [
@@ -48,8 +50,18 @@ describe AccountReports::DeveloperKeyReports do
   let_once(:second_key) do
     dk = dev_key_model_1_3({ name: "Second Key",
                              public_jwk_url: "http://test.com/jwks",
-                             account: })
+                             account:,
+                             scopes: })
+    lti_tool_configuration_model(developer_key: dk, scopes:)
     disable_developer_key_account_binding! dk
+    dk
+  end
+  let_once(:third_key) do
+    dk = dev_key_model_dyn_reg({ name: "Third Key",
+                                 public_jwk_url: "http://test.com/jwks",
+                                 account:,
+                                 scopes: })
+    enable_developer_key_account_binding! dk
     dk
   end
   let_once(:site_admin_key) do
@@ -67,7 +79,6 @@ describe AccountReports::DeveloperKeyReports do
   end
   let(:expected_result) do
     [
-
       [
         first_key.global_id,
         first_key.name,
@@ -87,8 +98,17 @@ describe AccountReports::DeveloperKeyReports do
         second_key.tool_configuration.placements.pluck("placement"),
         "Off",
         second_key.scopes
+      ].map(&:to_s),
+      [
+        third_key.global_id,
+        third_key.name,
+        false,
+        third_key.email,
+        "LTI Key",
+        third_key.tool_configuration.placements.pluck(:placement),
+        "On",
+        third_key.scopes
       ].map(&:to_s)
-
     ]
   end
 
@@ -141,6 +161,34 @@ describe AccountReports::DeveloperKeyReports do
         # goes where on each row.
         expect(subject.find { |row| row[0] == site_admin_key.global_id.to_s }[6]).to eq("On")
       end
+    end
+  end
+
+  context "one of the keys has an overlay that adds an additional placement" do
+    let(:user) { user_model }
+    let(:overlay) do
+      Lti::Overlay.create!(registration: second_key.lti_registration,
+                           account:,
+                           updated_by: user,
+                           data: {
+                             "placements" => {
+                               "module_index_menu_modal" => {
+                                 "message_type" => "LtiResourceLinkRequest",
+                                 "icon_url" => "https://www.example.com/icon.png",
+                               }
+                             }
+                           })
+    end
+
+    let(:expected_result) do
+      super().tap do |er|
+        er[1][5] = %w[course_navigation account_navigation module_index_menu_modal].to_s
+      end
+    end
+
+    it "adds the additional placement" do
+      overlay
+      expect(subject).to eq(expected_result)
     end
   end
 end

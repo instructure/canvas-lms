@@ -23,6 +23,7 @@ import {responsiveQuerySizes} from '../../../utils'
 import {ThreadingToolbar} from '../ThreadingToolbar'
 
 jest.mock('../../../utils')
+jest.mock('../../../hooks/useSpeedGrader', () => jest.fn(() => false))
 
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
@@ -42,13 +43,13 @@ beforeEach(() => {
   }))
 })
 
-describe('PostToolbar', () => {
+describe('ThreadingToolbar', () => {
   it('renders "Go to Reply" button when filter is set to unread', () => {
     const {getByText} = render(
       <ThreadingToolbar searchTerm="" filter="unread">
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('Go to Reply')).toBeTruthy()
@@ -59,7 +60,7 @@ describe('PostToolbar', () => {
       <ThreadingToolbar searchTerm="" filter="unread" isSplitView={true}>
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
@@ -70,7 +71,7 @@ describe('PostToolbar', () => {
       <ThreadingToolbar searchTerm="asdf">
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('Go to Reply')).toBeTruthy()
@@ -89,7 +90,7 @@ describe('PostToolbar', () => {
           })}
           searchTerm="neato"
           onOpenSplitView={onOpenSplitView}
-        />
+        />,
       )
 
       fireEvent.click(container.getByText('Go to Reply'))
@@ -109,7 +110,7 @@ describe('PostToolbar', () => {
           })}
           searchTerm="neato"
           onOpenSplitView={onOpenSplitView}
-        />
+        />,
       )
 
       fireEvent.click(container.getByText('Go to Reply'))
@@ -128,7 +129,7 @@ describe('PostToolbar', () => {
         })}
         searchTerm="neato"
         onOpenSplitView={onOpenSplitView}
-      />
+      />,
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
@@ -140,7 +141,7 @@ describe('PostToolbar', () => {
       <ThreadingToolbar filter="all" searchTerm="" isSplitView={false}>
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('First')).toBeTruthy()
@@ -159,7 +160,7 @@ describe('PostToolbar', () => {
         <ThreadingToolbar>
           <>First</>
           <>Second</>
-        </ThreadingToolbar>
+        </ThreadingToolbar>,
       )
 
       expect(queryAllByTestId('mobile-thread-tool')).toBeTruthy()

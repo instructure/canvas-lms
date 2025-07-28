@@ -17,10 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class WeakParameters < ActiveSupport::HashWithIndifferentAccess
-  # i think we might have to leave this in for future YAML parsing :/
-end
-
 module ArbitraryStrongishParams
   ANYTHING = Object.new.freeze
 

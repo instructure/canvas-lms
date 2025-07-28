@@ -53,7 +53,7 @@ export default Backbone.Collection.extend({
       function (payload) {
         const quizReports = this.add(payload, {parse: true, merge: true})
         return quizReports[0]
-      }.bind(this)
+      }.bind(this),
     )
   },
 

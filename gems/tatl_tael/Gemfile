@@ -3,3 +3,7 @@
 source "https://rubygems.org"
 
 gemspec
+
+gem "fakefs", "~> 1.2"
+gem "rspec", "~> 3.12"
+gem "timecop", "~> 0.9"

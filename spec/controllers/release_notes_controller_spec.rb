@@ -72,6 +72,12 @@ describe ReleaseNotesController do
       expect(res.first["id"]).to eq(the_note.id)
       expect(res.first.dig("langs", "en")&.with_indifferent_access).to eq(note["en"].with_indifferent_access)
     end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      get :index, as: :json
+      expect(response).to be_forbidden
+    end
   end
 
   describe "create" do
@@ -98,6 +104,12 @@ describe ReleaseNotesController do
       expect(the_note["en"][:title]).to eq("A great title")
       expect(the_note["en"][:description]).to eq("A great description")
       expect(the_note["en"][:url]).to eq("https://example.com/note1")
+    end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      post :create, params: { target_roles: ["user"] }, as: :json
+      expect(response).to be_forbidden
     end
   end
 
@@ -142,6 +154,12 @@ describe ReleaseNotesController do
       put "update", params: { id: SecureRandom.uuid, target_roles: ["user"] }
       expect(response).to have_http_status(:not_found)
     end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      put :update, params: { id: note.id, target_roles: ["user"] }, as: :json
+      expect(response).to be_forbidden
+    end
   end
 
   describe "destroy" do
@@ -156,6 +174,12 @@ describe ReleaseNotesController do
       delete "destroy", params: { id: SecureRandom.uuid }
       expect(response).to have_http_status(:not_found)
     end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      delete :destroy, params: { id: note.id }, as: :json
+      expect(response).to be_forbidden
+    end
   end
 
   describe "publish" do
@@ -165,6 +189,12 @@ describe ReleaseNotesController do
       put "publish", params: { id: the_note.id }
       the_note = ReleaseNote.find(note.id)
       expect(the_note.published).to be(true)
+    end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      put :publish, params: { id: note.id }
+      expect(response).to be_redirect
     end
   end
 
@@ -178,6 +208,12 @@ describe ReleaseNotesController do
       delete "unpublish", params: { id: the_note.id }
       the_note = ReleaseNote.find(note.id)
       expect(the_note.published).to be(false)
+    end
+
+    it "does not allow non-site-admins" do
+      user_session(account_admin_user(account: Account.default))
+      delete :unpublish, params: { id: note.id }
+      expect(response).to be_redirect
     end
   end
 

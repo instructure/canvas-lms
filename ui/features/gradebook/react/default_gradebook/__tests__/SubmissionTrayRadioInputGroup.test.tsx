@@ -365,7 +365,7 @@ describe('SubmissionTrayRadioInputGroup Tests', () => {
             latePolicyStatus: '',
           },
           submissionUpdating: false,
-        })
+        }),
       )
       expect(updateSubmission).toHaveBeenCalledWith({latePolicyStatus: 'missing'})
     })
@@ -394,7 +394,7 @@ describe('SubmissionTrayRadioInputGroup Tests', () => {
             latePolicyStatus: '',
           },
           submissionUpdating: false,
-        })
+        }),
       )
       expect(updateSubmission).toHaveBeenCalledWith({latePolicyStatus: 'none'})
     })
@@ -425,7 +425,7 @@ describe('SubmissionTrayRadioInputGroup Tests', () => {
             latePolicyStatus: '',
           },
           submissionUpdating: false,
-        })
+        }),
       )
       expect(updateSubmission).toHaveBeenCalledTimes(1)
       expect(updateSubmission).toHaveBeenCalledWith({

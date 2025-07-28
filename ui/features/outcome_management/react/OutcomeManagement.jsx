@@ -18,12 +18,12 @@
 
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
 import MasteryCalculation from './MasteryCalculation/index'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import OutcomesContext, {getContext} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management/index'
@@ -33,8 +33,11 @@ import {
   showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {windowConfirm} from '@canvas/util/globalUtils'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
 
@@ -87,13 +90,11 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
 
   const handleTabChange = (_, {index}) => {
     if (hasUnsavedChangesRef.current) {
-      /* eslint-disable no-restricted-globals */
-      /* eslint-disable no-alert */
       if (
-        confirm(I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'))
+        windowConfirm(
+          I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'),
+        )
       ) {
-        /* eslint-enable no-restricted-globals */
-        /* eslint-enable no-alert */
         setHasUnsavedChanges(false)
         setSelectedIndex(index)
       }
@@ -137,7 +138,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             contextUrlRoot: ENV.CONTEXT_URL_ROOT,
             onSuccessfulCreateOutcome,
           },
-          ENV.current_user.id
+          ENV.current_user.id,
         )
       }
     })()
@@ -255,7 +256,9 @@ const OutcomeManagement = ({breakpoints}) => {
 
   return (
     <ApolloProvider client={client}>
-      <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
+      <QueryClientProvider client={queryClient}>
+        <OutcomeManagementWithoutGraphql breakpoints={breakpoints} />
+      </QueryClientProvider>
     </ApolloProvider>
   )
 }

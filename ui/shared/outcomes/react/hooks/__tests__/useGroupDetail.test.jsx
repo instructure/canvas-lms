@@ -18,19 +18,21 @@
 
 import React from 'react'
 import useGroupDetail from '../useGroupDetail'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Management'
-import {MockedProvider} from '@apollo/react-testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '../../../graphql/Management'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-    // eslint-disable-next-line no-await-in-loop
+     
     await act(async () => {
       jest.runAllTimers()
     })
@@ -42,7 +44,7 @@ const outcomeFriendlyDescriptions = result =>
   result.current.group.outcomes.edges.map(edge => edge.node.friendlyDescription?.description || '')
 
 describe('groupDetailHook', () => {
-  let cache, mocks, showFlashAlertSpy
+  let cache, mocks
   const searchMocks = [
     ...groupDetailMocks(),
     ...groupDetailMocks({
@@ -55,7 +57,6 @@ describe('groupDetailHook', () => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = groupDetailMocks()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -85,13 +86,13 @@ describe('groupDetailHook', () => {
     })
     expect(result.current.loading).toBe(true)
     expect(result.current.group).toBe(null)
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.loading).toBe(false)
     expect(result.current.group.title).toBe('Group 1')
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
@@ -106,13 +107,13 @@ describe('groupDetailHook', () => {
     const {result} = renderHook(() => useGroupDetail({id: '1'}), {
       wrapper,
     })
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 2 - Group 1',
     ])
     act(() => result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.group.outcomes.edges.map(edge => edge.node.title)).toEqual([
       'Outcome 2 - Group 1',
       'New Outcome 1 - Group 1',
@@ -125,7 +126,7 @@ describe('groupDetailHook', () => {
       wrapper,
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading selected group.',
       type: 'error',
     })
@@ -137,7 +138,7 @@ describe('groupDetailHook', () => {
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
       await act(async () => jest.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 2 outcomes for Group 1.',
         srOnly: true,
       })
@@ -148,7 +149,7 @@ describe('groupDetailHook', () => {
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
       await act(async () => jest.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 1 outcome for Group 1.',
         srOnly: true,
       })
@@ -158,14 +159,14 @@ describe('groupDetailHook', () => {
   it('resets and loads correctly when change the id', async () => {
     mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '2'})]
     const {result, rerender} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.group.title).toBe('Group 1')
     act(() => rerender('2'))
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.group.title).toBe('Group 2')
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 2', 'Outcome 2 - Group 2'])
     act(() => result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 2',
       'Outcome 2 - Group 2',
@@ -176,9 +177,13 @@ describe('groupDetailHook', () => {
 
   it('refetches when id is in rhsGroupIdsToRefetch', async () => {
     mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '200'})]
+
+    // Ensure the graphQL query gets preloaded with old data
+    renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '200'})
+
     const {result, rerender} = renderHook(
       id => useGroupDetail({id, rhsGroupIdsToRefetch: ['200']}),
-      {wrapper, initialProps: '1'}
+      {wrapper, initialProps: '1'},
     )
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 1')
@@ -214,7 +219,7 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: search,
         }),
-      {wrapper}
+      {wrapper},
     )
     hook.rerender('')
     await act(async () => jest.runAllTimers())
@@ -243,13 +248,13 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: 'search',
         }),
-      {wrapper}
+      {wrapper},
     )
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
     expect(result.current.group.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual([
       'Outcome 1 - Group 1',
       'Outcome 3 - Group 1',
@@ -264,16 +269,17 @@ describe('groupDetailHook', () => {
       wrapper,
     })
 
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     let contentTags = result.current.group.outcomes.edges
-    expect(contentTags.length).toBe(2)
+    expect(contentTags).toHaveLength(2)
     expect(result.current.group.outcomesCount).toBe(2)
 
     act(() => result.current.removeLearningOutcomes(['1']))
+    await flushAllTimersAndPromises()
     contentTags = result.current.group.outcomes.edges
 
     expect(result.current.group.outcomesCount).toBe(1)
-    expect(contentTags.length).toBe(1)
+    expect(contentTags).toHaveLength(1)
     expect(contentTags[0]._id).toBe('2')
   })
 
@@ -287,28 +293,29 @@ describe('groupDetailHook', () => {
           loadOutcomesIsImported: false,
           searchString: search,
         }),
-      {wrapper}
+      {wrapper},
     )
 
     // load without search
     // it'll cache this result in graphql cache
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
 
     // load with search
     hook.rerender('search')
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 - Group 1', 'Outcome 3 - Group 1'])
 
     // remove outcome 1
     act(() => hook.result.current.removeLearningOutcomes(['1']))
+    await flushAllTimersAndPromises()
 
     // should remove outcome 1 from query with search
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 3 - Group 1'])
 
     // clear search
     hook.rerender('')
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
 
     // should remove outcome 1 from query without search
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 2 - Group 1'])

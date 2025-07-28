@@ -17,28 +17,49 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class SelectContentPage
+class NewSelectContentPage
   class << self
     include SeleniumDependencies
 
     # Selectors
     def outcome_parent
-      f('[data-testid="checkbox-copy[all_learning_outcomes]"]')
+      fxpath("//*[contains(text(), 'Learning Outcomes')]/ancestor::button")
     end
 
-    def outcome_options(index)
-      ff('li[data-type="learning_outcomes"] a')[index].click
-      wait_for_ajax_requests
+    def outcome_option_caret_by_name(name)
+      option_caret_by_name(name)
     end
 
-    def outcome_checkboxes(index)
-      ff('li[data-type="learning_outcomes"] input')[index].click
-      wait_for_ajax_requests
+    def outcome_option_checkbox_by_name(name)
+      option_checkbox_by_name(name)
+    end
+
+    def module_parent
+      fxpath("//*[contains(text(), 'Modules')]/ancestor::button")
+    end
+
+    def module_option_caret_by_name(name)
+      option_caret_by_name(name)
+    end
+
+    def module_option_checkbox_by_name(name)
+      option_checkbox_by_name(name)
+    end
+
+    def option_caret_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::button")
+    end
+
+    def import_as_standalone_module_switch_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::span//*[contains(text(), 'Import as a standalone module')]")
+    end
+
+    def option_checkbox_by_name(name)
+      fxpath("//*[contains(text(), '#{name}')]/ancestor::label//span[@aria-hidden='true']")
     end
 
     def submit_button
-      f(".selectContentDialog input[type=submit]").click
-      wait_for_ajax_requests
+      fxpath("//*[@aria-label='Select Content for Import']//button[2]")
     end
   end
 end

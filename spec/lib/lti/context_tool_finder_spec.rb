@@ -83,7 +83,7 @@ describe Lti::ContextToolFinder do
 
       tools = method_returning_scope.call(@course)
       expect(tools.count).to eq 3
-      tools = method_returning_scope.call(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
+      tools = method_returning_scope.call(@course, only_visible: true, current_user: @user, placements: ["assignment_view"])
       expect(tools.count).to eq 1
       expect(tools[0].name).to eq "a"
     end
@@ -96,11 +96,11 @@ describe Lti::ContextToolFinder do
 
     it_behaves_like "a method creating a scope for all tools for a context" do
       let(:method_returning_scope) do
-        lambda do |*args|
+        lambda do |context, **args|
           # unlike all_tools_for, this is not sorted (for multiple shards sort needs to happen
           # in ruby anyway). When we remove all_tools_for we can remove the order(:name) and
           # tweak the expectations to not expect order.
-          described_class.all_tools_scope_union(*args).scopes.first.order(:name)
+          described_class.all_tools_scope_union(context, **args).scopes.first.order(:name)
         end
       end
     end
@@ -162,16 +162,168 @@ describe Lti::ContextToolFinder do
       expect(described_class.all_tools_for(@course)).to be_a(ActiveRecord::Relation)
     end
 
-    it "returns nil if context is nil" do
-      expect(described_class.all_tools_for(nil)).to be_nil
+    it "returns empty relation if context is nil" do
+      expect(described_class.all_tools_for(nil)).to be_empty
     end
 
     it_behaves_like "a method creating a scope for all tools for a context" do
       let(:method_returning_scope) do
-        lambda do |*args|
-          described_class.all_tools_for(*args)
+        lambda do |context, **args|
+          described_class.all_tools_for(context, **args)
         end
       end
+    end
+
+    context "with tools" do
+      let(:tool1) { create_tool(@course, "c", domain: "google.com") }
+      let(:tool2) { create_tool(@account, "b", domain: "google.com") }
+      let(:tool3) { create_tool(@root_account, "c", domain: "google.com") }
+      let(:tool4) { create_tool(@course, "a", domain: "google.com") }
+
+      before do
+        [tool1, tool2, tool3, tool4] # instantiate
+      end
+
+      context "with no order options" do
+        subject { described_class.all_tools_for(@course, order_in_scope: false) }
+
+        it "does not order tools" do
+          expect(subject.to_sql).not_to include("ORDER BY")
+          expect(subject).to include(tool1, tool2, tool3, tool4)
+        end
+      end
+
+      context "with default order" do
+        subject { described_class.all_tools_for(@course) }
+
+        it "orders tools by name then id" do
+          expect(subject.to_sql).to include("ORDER BY")
+          expect(subject).to eq [tool4, tool2, tool1, tool3]
+        end
+      end
+
+      context "with only order_by_context" do
+        subject { described_class.all_tools_for(@course, order_by_context: true, order_in_scope: false) }
+
+        before do
+          tool4.destroy # to avoid ambiguity, only have one course-level tool
+        end
+
+        it "orders tools by the context chain" do
+          expect(subject.to_sql).to include("ORDER BY")
+          # course first, then subaccounts, then root account
+          expect(subject).to eq [tool1, tool2, tool3]
+        end
+      end
+
+      context "with order_by_scope and order_by_context" do
+        subject { described_class.all_tools_for(@course, order_by_context: true, order_in_scope: true) }
+
+        it "orders tools by the context chain and then by name" do
+          expect(subject.to_sql).to include("ORDER BY")
+          expect(subject).to eq [tool4, tool1, tool2, tool3]
+        end
+      end
+
+      context "with an unavailable context control" do
+        let(:registration) do
+          lti_registration_with_tool(account: @course.root_account)
+        end
+
+        let!(:registration_tool1) { registration.deployments.first }
+        let!(:registration_tool2) { registration.new_external_tool(@root_account) }
+
+        before do
+          # unavailable CC in @account for registration_tool1
+          Lti::ContextControl.create!(
+            account: @account,
+            deployment: registration_tool1,
+            registration:,
+            available: false
+          )
+        end
+
+        it "does not return an unavailable tool" do
+          expect(described_class.all_tools_for(@account, order_by_context: true)).to eq [
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool2 # @root_account, no unavailable context control
+          ]
+        end
+
+        it "does not return a tool for course that is made unavailable in parent account" do
+          expect(described_class.all_tools_for(@course, order_by_context: true)).to eq [
+            tool4, # @course
+            tool1, # @course
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool2 # @root_account, no unavailable context control
+          ]
+        end
+
+        it "returns a tool for course that is unavailable in parent account but available in course" do
+          Lti::ContextControl.create!(
+            course: @course,
+            deployment: registration_tool1,
+            registration:,
+            available: true
+          )
+
+          expect(described_class.all_tools_for(@course, order_by_context: true)).to eq [
+            tool4, # @course
+            tool1, # @course
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool1, # @root_account, context control made available for @course
+            registration_tool2  # @root_account, no unavailable context control
+          ]
+        end
+
+        it "does not affect the tool availability of the lti_registrations_next flag is off" do
+          @account.root_account.disable_feature!(:lti_registrations_next)
+
+          expect(described_class.all_tools_for(@account, order_by_context: true)).to eq [
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool1, # @root_account, unavailable context control being ignored b/c of flag
+            registration_tool2  # @root_account, no unavailable context control
+          ]
+        end
+      end
+    end
+  end
+
+  describe ".ordered_by_context_scope_union" do
+    subject { described_class.ordered_by_context_scope_union(@course).to_unsorted_array }
+
+    let(:tool1) { create_tool(@course, "c", domain: "google.com") }
+    let(:tool2) { create_tool(@account, "b", domain: "google.com") }
+    let(:tool3) { create_tool(@root_account, "c", domain: "google.com") }
+    let(:tool4) { create_tool(@course, "a", domain: "google.com") }
+
+    before do
+      [tool1, tool2, tool3, tool4] # instantiate in cross-shard
+    end
+
+    it "orders tools by the context chain" do
+      expect(subject).to eq [tool4, tool1, tool2, tool3]
+    end
+  end
+
+  describe ".ordered_by_context_for" do
+    subject { described_class.ordered_by_context_for(@course) }
+
+    let(:tool1) { create_tool(@course, "c", domain: "google.com") }
+    let(:tool2) { create_tool(@account, "b", domain: "google.com") }
+    let(:tool3) { create_tool(@root_account, "c", domain: "google.com") }
+    let(:tool4) { create_tool(@course, "a", domain: "google.com") }
+
+    before do
+      [tool1, tool2, tool3, tool4] # instantiate in cross-shard
+    end
+
+    it "orders tools by the context chain" do
+      expect(subject).to eq [tool4, tool1, tool2, tool3]
     end
   end
 end

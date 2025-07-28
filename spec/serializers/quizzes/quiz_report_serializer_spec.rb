@@ -59,6 +59,10 @@ describe Quizzes::QuizReportSerializer do
                                       })
   end
 
+  before do
+    Attachment.current_root_account = context.root_account
+  end
+
   let :context do
     Course.new.tap do |course|
       course.id = 1

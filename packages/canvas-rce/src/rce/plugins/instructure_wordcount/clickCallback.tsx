@@ -46,7 +46,7 @@ export default function (ed: Editor, document: Document, options: WordCountOptio
 
     ReactDOM.render(
       <WordCountModal headers={HEADERS} rows={generateRows(ed)} onDismiss={handleDismiss} />,
-      container
+      container,
     )
   })
 }

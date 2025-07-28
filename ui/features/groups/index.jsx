@@ -24,6 +24,6 @@ import React from 'react'
 ready(() => {
   ReactDOM.render(
     <StudentView enableGroupCreation={true} enableEveryoneTab={true} />,
-    document.getElementById('content')
+    document.getElementById('content'),
   )
 })

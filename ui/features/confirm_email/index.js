@@ -18,11 +18,11 @@
 
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 $(() => {
   let resending = false
@@ -49,8 +49,8 @@ $(() => {
           resending = false
           $this.text(text)
           $.flashError(I18n.t('failed_resending', 'Request failed. Try again.'))
-        }
+        },
       )
-    })
+    }),
   )
 })

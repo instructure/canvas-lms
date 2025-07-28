@@ -95,6 +95,9 @@ class SubmissionsController < SubmissionsBaseController
   before_action :get_course_from_section, only: :create
   before_action :require_context
 
+  include HorizonMode
+  before_action :load_canvas_career, only: [:index, :show]
+
   include K5Mode
 
   def index
@@ -119,6 +122,16 @@ class SubmissionsController < SubmissionsBaseController
     begin
       @assignment = @submission_for_show.assignment
       @submission = @submission_for_show.submission
+
+      # If the assignment has checkpoints
+      # We need to find reply_to_topic sub assignment and reply_to_entry sub assignment and their submissions
+      if @assignment.checkpoints_parent?
+        @reply_to_topic_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_TOPIC)
+        @reply_to_entry_assignment = @assignment.find_checkpoint(CheckpointLabels::REPLY_TO_ENTRY)
+
+        @reply_to_topic_submission = @reply_to_topic_assignment.submissions.find_by(user_id: @submission.user)
+        @reply_to_entry_submission = @reply_to_entry_assignment.submissions.find_by(user_id: @submission.user)
+      end
     rescue ActiveRecord::RecordNotFound
       return render_user_not_found
     end
@@ -143,8 +156,8 @@ class SubmissionsController < SubmissionsBaseController
 
   # @API Submit an assignment
   #
-  # Make a submission for an assignment. You must be enrolled as a student in
-  # the course/section to do this.
+  # Make a submission for an assignment. You must be actively enrolled as a student in
+  # the course/section to do this. Concluded and pending enrollments are not permitted.
   #
   # All online turn-in submission types are supported in this API. However,
   # there are a few things that are not yet supported:
@@ -156,13 +169,18 @@ class SubmissionsController < SubmissionsBaseController
   # @argument comment[text_comment] [String]
   #   Include a textual comment with the submission.
   #
+  # @argument submission[group_comment] [Boolean]
+  #   Whether or not this comment should be sent to the entire group (defaults
+  #   to false). Ignored if this is not a group assignment or if no text_comment
+  #   is provided.
+  #
   # @argument submission[submission_type] [Required, String, "online_text_entry"|"online_url"|"online_upload"|"media_recording"|"basic_lti_launch"|"student_annotation"]
   #   The type of submission being made. The assignment submission_types must
   #   include this submission type as an allowed option, or the submission will be rejected with a 400 error.
   #
   #   The submission_type given determines which of the following parameters is
-  #   used. For instance, to submit a URL, submission [submission_type] must be
-  #   set to "online_url", otherwise the submission [url] parameter will be
+  #   used. For instance, to submit a URL, +submission[submission_type]+ must be
+  #   set to "online_url", otherwise the +submission[url]+ parameter will be
   #   ignored.
   #
   #   "basic_lti_launch" requires the assignment submission_type "online" or "external_tool"
@@ -319,24 +337,26 @@ class SubmissionsController < SubmissionsBaseController
     respond_to do |format|
       if @submission.persisted?
         log_asset_access(@assignment, "assignments", @assignment_group, "submit")
+        tardiness = if @submission.late?
+                      2 # late
+                    elsif @submission.cached_due_date.nil?
+                      0 # don't know
+                    else
+                      1 # on time
+                    end
+        assignment_url = if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
+                           course_assignment_url(@context, @assignment, submitted: tardiness)
+                         else
+                           course_assignment_url(@context, @assignment, submitted: tardiness, confetti: true)
+                         end
         format.html do
-          flash[:notice] = t("assignment_submit_success", "Assignment successfully submitted.")
-          tardiness = if @submission.late?
-                        2 # late
-                      elsif @submission.cached_due_date.nil?
-                        0 # don't know
-                      else
-                        1 # on time
-                      end
-
-          if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
-            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness)
-          else
-            redirect_to course_assignment_url(@context, @assignment, submitted: tardiness, confetti: true)
-          end
+          redirect_to assignment_url
         end
         format.json do
-          if api_request?
+          if params[:should_redirect_to_assignment]
+            render json: { redirect_url: assignment_url },
+                   status: :created
+          elsif api_request?
             includes = %(submission_comments attachments)
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
             render json:,
@@ -379,53 +399,12 @@ class SubmissionsController < SubmissionsBaseController
 
     submission = Submission.find(params[:submission_id])
 
-    audit_events = AnonymousOrModerationEvent.events_for_submission(
-      assignment_id: params[:assignment_id],
-      submission_id: params[:submission_id]
-    )
-
-    user_data = User.find(audit_events.pluck(:user_id).compact)
-    tool_data = ContextExternalTool.find(audit_events.pluck(:context_external_tool_id).compact)
-    quiz_data = Quizzes::Quiz.find(audit_events.pluck(:quiz_id).compact)
-
     respond_to do |format|
       format.json do
-        render json: {
-                 audit_events: audit_events.as_json(include_root: false),
-                 users: audit_event_data(data: user_data, submission:),
-                 tools: audit_event_data(data: tool_data, role: "grader"),
-                 quizzes: audit_event_data(data: quiz_data, role: "grader", name_field: :title),
-               },
-               status: :ok
+        render json: submission.enriched_audit_events, status: :ok
       end
     end
   end
-
-  def audit_event_data(data:, submission: nil, role: nil, name_field: :name)
-    data.map do |datum|
-      {
-        id: datum.id,
-        name: datum.public_send(name_field),
-        role: role.presence || auditing_user_role(user: datum, submission:)
-      }
-    end
-  end
-  private :audit_event_data
-
-  def auditing_user_role(user:, submission:)
-    assignment = submission.assignment
-
-    if submission.user == user
-      "student"
-    elsif assignment.moderated_grading? && assignment.final_grader == user
-      "final_grader"
-    elsif assignment.course.account_membership_allows(user)
-      "admin"
-    else
-      "grader"
-    end
-  end
-  private :auditing_user_role
 
   def lookup_existing_attachments
     attachment_ids = if params[:submission][:file_ids].is_a?(Array)
@@ -434,7 +413,7 @@ class SubmissionsController < SubmissionsBaseController
                        (params[:submission][:attachment_ids] || "").split(",")
                      end
 
-    attachment_ids = attachment_ids.select(&:present?)
+    attachment_ids = attachment_ids.compact_blank
     params[:submission][:attachments] = []
 
     attachment_ids.each do |id|
@@ -549,7 +528,7 @@ class SubmissionsController < SubmissionsBaseController
   private :valid_text_entry?
 
   def always_permitted_create_params
-    always_permitted_params = %i[eula_agreement_timestamp submitted_at resource_link_lookup_uuid].freeze
+    always_permitted_params = %i[comment group_comment eula_agreement_timestamp submitted_at resource_link_lookup_uuid should_redirect_to_assignment].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
@@ -590,17 +569,17 @@ class SubmissionsController < SubmissionsBaseController
           cancel_cache_buster
 
           format.html do
-            send_file(attachment.full_filename, {
-                        type: attachment.content_type_with_encoding,
-                        disposition: "inline"
-                      })
+            safe_send_file(attachment.full_filename, {
+                             type: attachment.content_type_with_encoding,
+                             disposition: "inline"
+                           })
           end
 
           format.zip do
-            send_file(attachment.full_filename, {
-                        type: attachment.content_type_with_encoding,
-                        disposition: "inline"
-                      })
+            safe_send_file(attachment.full_filename, {
+                             type: attachment.content_type_with_encoding,
+                             disposition: "inline"
+                           })
           end
         else
           inline_url = authenticated_inline_url(attachment)

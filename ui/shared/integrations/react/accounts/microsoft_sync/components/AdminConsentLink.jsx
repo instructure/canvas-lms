@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('account_settings_jsx_bundle')
+const I18n = createI18nScope('account_settings_jsx_bundle')
 
 function consentUrl({baseUrl, clientId, redirectUri, tenant}) {
   const url = new URL(`${baseUrl}/${tenant}/adminconsent`)
@@ -42,7 +42,7 @@ const AdminConsentLink = props => {
           <View display="block" margin="small 0 0 0">
             <Text>
               {I18n.t(
-                'After completing the above configuration, please use the following link to grant Canvas access to your Microsoft tenant:'
+                'After completing the above configuration, please use the following link to grant Canvas access to your Microsoft tenant:',
               )}
             </Text>
           </View>

@@ -120,6 +120,7 @@ module CC
                 cm.completion_requirements.each do |c_req|
                   crs_node.completionRequirement(type: c_req[:type]) do |cr_node|
                     cr_node.min_score c_req[:min_score] unless c_req[:min_score].blank?
+                    cr_node.min_percentage c_req[:min_percentage] unless c_req[:min_percentage].blank?
                     cr_node.identifierref ct_id_map[c_req[:id]]
                   end
                 end

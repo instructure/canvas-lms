@@ -47,8 +47,8 @@ export function fetchDocs() {
       .fetchDocs(state)
       .then(response =>
         dispatch(
-          receiveDocs({response, contextType: state.contextType, contextId: state.contextId})
-        )
+          receiveDocs({response, contextType: state.contextType, contextId: state.contextId}),
+        ),
       )
       .catch(error => dispatch(failDocs({error, contextType: state.contextType})))
   }

@@ -8,3 +8,14 @@ courses_popout_sisid:
       state: allowed_on
     development:
       state: allowed_on
+show_recent_messages_on_new_roster_user_page:
+  state: hidden
+  display_name: Show Recent Messages on New Roster User Page
+  description: If Enable Profiles is checked at the Account Settings and this Flag is "On" Recent Messages
+    will show up on New Roster User page
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

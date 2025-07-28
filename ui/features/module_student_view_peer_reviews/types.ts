@@ -82,6 +82,6 @@ export type ExpandedAssignmentPeerReview = AssignmentPeerReviewSubset & {
 export type StudentViewPeerReviewsAssignment = {
   [assignmentId: string]: {
     assignment: ExpandedAssignmentPeerReview
-    container: ReactElement | undefined
+    container: Element | undefined
   }
 }

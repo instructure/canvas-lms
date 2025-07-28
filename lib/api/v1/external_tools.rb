@@ -20,6 +20,7 @@
 
 module Api::V1::ExternalTools
   include Api::V1::Json
+  include Api::V1::EstimatedDuration
 
   def external_tools_json(tools, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
     tools.map do |topic|
@@ -28,7 +29,7 @@ module Api::V1::ExternalTools
   end
 
   def external_tool_json(tool, context, user, session, extension_types = Lti::ResourcePlacement.valid_placements(@domain_root_account))
-    methods = %w[privacy_level custom_fields workflow_state vendor_help_link]
+    methods = %w[privacy_level custom_fields workflow_state]
     methods += extension_types
     only = %w[id name description url domain consumer_key created_at updated_at description]
     only << "allow_membership_service_access" if tool.context.root_account.feature_enabled?(:membership_service_for_lti_tools)
@@ -40,11 +41,14 @@ module Api::V1::ExternalTools
     json["url"] = tool.url_with_environment_overrides(tool.url, include_launch_url: true)
     json["domain"] = tool.domain_with_environment_overrides
     json["is_rce_favorite"] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?
+    json["is_top_nav_favorite"] = tool.top_nav_favorite_in_context?(context) if tool.can_be_top_nav_favorite?
     json.merge!(tool.settings.with_indifferent_access.slice("selection_width", "selection_height", "prefer_sis_email"))
     json["icon_url"] = tool.icon_url if tool.icon_url
     json["not_selectable"] = tool.not_selectable
     json["version"] = tool.use_1_3? ? "1.3" : "1.1"
+    json["unified_tool_id"] = tool.unified_tool_id
     json["developer_key_id"] = tool.developer_key_id if tool.developer_key_id
+    json["lti_registration_id"] = tool.lti_registration_id if tool.lti_registration_id
     json["deployment_id"] = tool.deployment_id if tool.deployment_id
     extension_types.each do |type|
       next unless json[type]
@@ -61,6 +65,10 @@ module Api::V1::ExternalTools
         value = tool.extension_setting type, key
         json[type][key] = value if value
       end
+    end
+
+    if context.try(:horizon_course?) && tool.estimated_duration&.marked_for_destruction? == false
+      json["estimated_duration"] = estimated_duration_json(tool.estimated_duration, user, session)
     end
 
     json

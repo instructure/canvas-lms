@@ -25,7 +25,7 @@ import SubmissionSticker from '@canvas/submission-sticker'
 import StudentViewContext from './Context'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
@@ -35,51 +35,65 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentFooter from './StudentFooter'
 import {Text} from '@instructure/ui-text'
-import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
+import {shouldRenderSelfAssessment} from '../helpers/RubricHelpers'
+import {totalAllowedAttempts, isSubmitted} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
-import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
-import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
-import {arrayOf, func} from 'prop-types'
+import {arrayOf, func, bool} from 'prop-types'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {LtiToolIframe} from './LtiToolIframe'
+import DocumentProcessorsSection from './DocumentProcessorsSection'
+import {SelfAssessmentButton} from './RubricSelfAssessment/SelfAssessmentButton'
+import {SelfAssessmentTrayClient} from './RubricSelfAssessment/SelfAssessmentTrayClient'
+import useStore from './stores/index'
 
-const I18n = useI18nScope('assignments_2_student_content')
+const I18n = createI18nScope('assignments_2_student_content')
 
-const LoggedOutTabs = lazy(() =>
-  import(
-    /* webpackChunkName: "LoggedOutTabs" */
-    /* webpackPrefetch: true */
-    './LoggedOutTabs'
-  )
+const LoggedOutTabs = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "LoggedOutTabs" */
+      /* webpackPrefetch: true */
+      './LoggedOutTabs'
+    ),
 )
 
-const RubricsQuery = lazy(() =>
-  import(
-    /* webpackChunkName: "RubricsQuery" */
-    /* webpackPrefetch: true */
-    './RubricsQuery'
-  )
+const RubricsQuery = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "RubricsQuery" */
+      /* webpackPrefetch: true */
+      './RubricsQuery'
+    ),
 )
 
-function EnrollmentConcludedNotice() {
+function EnrollmentConcludedNotice({hasActiveEnrollment}) {
   return (
     <View as="div" textAlign="center" margin="auto" padding="small">
       <Text fontStyle="italic" size="large">
-        {I18n.t(
-          'You are unable to submit to this assignment as your enrollment in this course has been concluded.'
-        )}
+        {hasActiveEnrollment
+          ? I18n.t(
+              'You are unable to submit to this assignment as your enrollment in this section has been concluded.',
+            )
+          : I18n.t(
+              'You are unable to submit to this assignment as your enrollment in this course has been concluded.',
+            )}
       </Text>
     </View>
   )
 }
 
-function SubmissionlessFooter({onMarkAsDoneError}) {
+function SubmissionlessFooter({assignment, submission, onMarkAsDoneError}) {
   // If this assignment has digital submissions, the SubmissionManager
   // component will handle rendering the footer.  If not, we still need to show
   // the "Mark as Done" button for assignments that belong to modules.
   const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
+  const {allowChangesToSubmission} = useContext(StudentViewContext)
+  const [isSelfAssessmentOpen, setIsSelfAssessmentOpen] = useState(false)
+  const selfAssessment = useStore(state => state.selfAssessment)
 
   const buttons = []
   if (moduleItem != null) {
@@ -96,8 +110,43 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
     })
   }
 
+  const renderSelfAssessment = shouldRenderSelfAssessment({
+    assignment,
+    submission,
+    allowChangesToSubmission,
+  })
+  if (renderSelfAssessment) {
+    buttons.push({
+      key: 'submit-self-assessment',
+      element: (
+        <SelfAssessmentButton
+          isEnabled={isSubmitted(submission)}
+          onOpenSelfAssessmentTrigger={() => setIsSelfAssessmentOpen(true)}
+        />
+      ),
+    })
+  }
+
   return (
-    <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+    <>
+      {renderSelfAssessment && (
+        <SelfAssessmentTrayClient
+          hidePoints={assignment?.rubricAssociation?.hidePoints}
+          isOpen={isSelfAssessmentOpen}
+          isPreviewMode={!!selfAssessment}
+          onDismiss={() => setIsSelfAssessmentOpen(false)}
+          rubric={assignment.rubric}
+          rubricAssociationId={assignment?.rubricAssociation?._id}
+          handleOnSubmitting={(isSubmitting, assessment) => {
+            if (isSubmitting) {
+              useStore.setState({selfAssessment: assessment})
+            }
+          }}
+          handleOnSuccess={() => setIsSelfAssessmentOpen(false)}
+        />
+      )}
+      <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+    </>
   )
 }
 
@@ -114,7 +163,7 @@ function renderAttemptsAndAvailability(assignment) {
                   one: '1 Attempt Allowed',
                   other: '%{count} Attempts Allowed',
                 },
-                {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0}
+                {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0},
               )}
             </Text>
           )}
@@ -128,9 +177,9 @@ function renderAttemptsAndAvailability(assignment) {
 }
 
 function renderContentBaseOnAvailability(
-  {assignment, submission, reviewerSubmission},
+  {assignment, submission, reviewerSubmission, rubricExpanded, toggleRubricExpanded},
   alertContext,
-  onSuccessfulPeerReview
+  onSuccessfulPeerReview,
 ) {
   if (assignment.env.modulePrereq) {
     return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
@@ -145,7 +194,7 @@ function renderContentBaseOnAvailability(
     // EVAL-3711 Remove ICE Feature Flag
     return (
       <>
-        {!window.ENV.FEATURES.instui_nav &&
+        {!window.ENV.FEATURES?.instui_nav &&
           !assignment.env.peerReviewModeEnabled &&
           renderAttemptsAndAvailability(assignment)}
         <AssignmentToggleDetails description={assignment.description} />
@@ -160,29 +209,35 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
-    const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
+    const queryClient = new QueryClient()
 
     return (
       <>
         <Flex margin="medium 0 0 0" alignItems="start">
           <div style={{flexGrow: 1}}>
             {/* EVAL-3711 Remove ICE Feature Flag */}
-            {!window.ENV.FEATURES.instui_nav &&
+            {!window.ENV.FEATURES?.instui_nav &&
               !assignment.env.peerReviewModeEnabled &&
               renderAttemptsAndAvailability(assignment)}
             {assignment.submissionTypes.includes('student_annotation') && (
               <VisualOnFocusMessage
                 message={I18n.t(
-                  'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.'
+                  'Warning: For improved accessibility with Annotated Assignments, please use File Upload or Text Entry to leave comments.',
                 )}
               />
             )}
-
+            <DocumentProcessorsSection submission={submission} />
             <AssignmentToggleDetails description={assignment.description} />
-
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
-                <RubricsQuery assignment={assignment} submission={submission} />
+                <QueryClientProvider client={queryClient}>
+                  <RubricsQuery
+                    assignment={assignment}
+                    submission={submission}
+                    rubricExpanded={rubricExpanded}
+                    toggleRubricExpanded={toggleRubricExpanded}
+                  />
+                </QueryClientProvider>
               </Suspense>
             )}
           </div>
@@ -205,17 +260,16 @@ function renderContentBaseOnAvailability(
             onSuccessfulPeerReview={onSuccessfulPeerReview}
           />
         ) : (
-          <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
-        )}
-        {ENV.LTI_TOOL === 'true' && (
-          <ToolLaunchIframe
-            allow={iframeAllowances()}
-            src={launchURL}
-            data-testid="lti-external-tool"
-            title={I18n.t('Tool content')}
+          <SubmissionlessFooter
+            onMarkAsDoneError={onMarkAsDoneError}
+            assignment={assignment}
+            submission={submission}
           />
         )}
-        {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
+        <LtiToolIframe assignment={assignment} submission={submission} />
+        {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
+          <EnrollmentConcludedNotice hasActiveEnrollment={ENV.enrollment_state === 'active'} />
+        )}
       </>
     )
   }
@@ -254,7 +308,7 @@ function StudentContent(props) {
           })
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+          console.log('Error loading immersive readers.', e)
         })
     }
 
@@ -275,34 +329,24 @@ function StudentContent(props) {
 
   // TODO: Move the button provider up one level
   return (
-    <div data-testid="assignments-2-student-view" style={{marginTop: '-36px'}}>
-      <View
-        as="div"
-        position="sticky"
-        stacking="above"
-        background="primary"
-        style={{top: 0}}
-        padding="large 0 0 0"
-        themeOverride={{paddingLarge: '36px'}}
-      >
-        <Header
-          assignment={props.assignment}
-          scrollThreshold={150}
-          submission={props.submission}
-          reviewerSubmission={props.reviewerSubmission}
-        />
-        <AttemptInformation
-          assignment={props.assignment}
-          submission={props.submission}
-          reviewerSubmission={props.reviewerSubmission}
-          onChangeSubmission={props.onChangeSubmission}
-          allSubmissions={props.allSubmissions}
-          openCommentTray={openCommentTray}
-          closeCommentTray={closeCommentTray}
-          commentTrayStatus={commentTrayStatus}
-          onSuccessfulPeerReview={onSuccessfulPeerReview}
-        />
-      </View>
+    <div data-testid="assignments-2-student-view">
+      <Header
+        assignment={props.assignment}
+        scrollThreshold={150}
+        submission={props.submission}
+        reviewerSubmission={props.reviewerSubmission}
+      />
+      <AttemptInformation
+        assignment={props.assignment}
+        submission={props.submission}
+        reviewerSubmission={props.reviewerSubmission}
+        onChangeSubmission={props.onChangeSubmission}
+        allSubmissions={props.allSubmissions}
+        openCommentTray={openCommentTray}
+        closeCommentTray={closeCommentTray}
+        commentTrayStatus={commentTrayStatus}
+        onSuccessfulPeerReview={onSuccessfulPeerReview}
+      />
       {renderContentBaseOnAvailability(props, alertContext, onSuccessfulPeerReview)}
     </div>
   )
@@ -314,6 +358,8 @@ StudentContent.propTypes = {
   reviewerSubmission: Submission.shape,
   onChangeSubmission: func,
   allSubmissions: arrayOf(Submission.shape),
+  rubricExpanded: bool,
+  toggleRubricExpanded: func,
 }
 
 StudentContent.defaultProps = {

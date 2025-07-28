@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState, lazy} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
@@ -31,7 +31,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('content_share')
+const I18n = createI18nScope('content_share')
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
@@ -63,7 +63,7 @@ export default function ReceivedContentView() {
           one: '1 shared item loaded.',
           other: '%{count} shared items loaded.',
         },
-        {count: shares.length}
+        {count: shares.length},
       )
       showFlashAlert({message, srOnly: true, type: 'info'})
     }
@@ -103,13 +103,12 @@ export default function ReceivedContentView() {
   }
 
   function onRemove(share) {
-    // eslint-disable-next-line no-alert
     const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})
         .then(() => removeShareFromList(share))
         .catch(err =>
-          showFlashAlert({message: I18n.t('There was an error removing the item'), err})
+          showFlashAlert({message: I18n.t('There was an error removing the item'), err}),
         )
     }
   }
@@ -163,7 +162,7 @@ export default function ReceivedContentView() {
         heading={I18n.t('Received Content')}
         description={I18n.t(
           'The list below is content that has been shared with you. You can preview the ' +
-            'content, import it into your course, or remove it from the list.'
+            'content, import it into your course, or remove it from the list.',
         )}
       />
       {renderBody()}

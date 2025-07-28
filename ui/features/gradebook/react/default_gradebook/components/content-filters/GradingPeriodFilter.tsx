@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -21,20 +20,23 @@ import React from 'react'
 import {arrayOf, shape, string, bool, func} from 'prop-types'
 import {formatGradingPeriodTitleForDisplay} from '../../Gradebook.utils'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope(
-  'gradebook_default_gradebook_components_content_filters_grading_period_filter'
+const I18n = createI18nScope(
+  'gradebook_default_gradebook_components_content_filters_grading_period_filter',
 )
 
+// @ts-expect-error
 function normalizeGradingPeriods(gradingPeriods) {
+  // @ts-expect-error
   return gradingPeriods.map(gradingPeriod => ({
     id: gradingPeriod.id,
     name: formatGradingPeriodTitleForDisplay(gradingPeriod),
   }))
 }
 
+// @ts-expect-error
 export default function GradingPeriodFilter(props) {
   const {disabled, onSelect, gradingPeriods, selectedGradingPeriodId, ...filterProps} = props
 
@@ -59,7 +61,7 @@ GradingPeriodFilter.propTypes = {
     shape({
       id: string.isRequired,
       title: string.isRequired,
-    })
+    }),
   ).isRequired,
 
   selectedGradingPeriodId: string,

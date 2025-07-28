@@ -32,7 +32,7 @@ describe "CourseAudit API", type: :request do
     course_with_teacher(account: @domain_root_account)
 
     @course.name = "Course 1"
-    @course.start_at = Date.today
+    @course.start_at = Time.zone.today
     @course.conclude_at = @course.start_at + 7.days
 
     @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
@@ -141,15 +141,15 @@ describe "CourseAudit API", type: :request do
     it "does not authorize the endpoints with no permissions" do
       @user, @viewing_user = @user, user_model
 
-      fetch_for_context(@course, expected_status: 401)
-      fetch_for_context(@domain_root_account, expected_status: 401)
+      fetch_for_context(@course, expected_status: 403)
+      fetch_for_context(@domain_root_account, expected_status: 403)
     end
 
     it "does not authorize the endpoints with revoking the :view_course_changes permission" do
       RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_course_changes.to_s, override: false)
 
-      fetch_for_context(@course, expected_status: 401)
-      fetch_for_context(@domain_root_account, expected_status: 401)
+      fetch_for_context(@course, expected_status: 403)
+      fetch_for_context(@domain_root_account, expected_status: 403)
     end
 
     it "does not allow other account models" do

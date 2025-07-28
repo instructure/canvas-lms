@@ -19,9 +19,18 @@
 const {defaults} = require('jest-config')
 const {swc} = require('./ui-build/webpack/webpack.rules')
 
-const esModules = ['mime'].join('|')
+const esModules = ['chai', 'mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graphql-request'].join(
+  '|',
+)
+
+const baseSetupFilesAfterEnv = ['<rootDir>/jest/stubInstUi.js', '@testing-library/jest-dom']
+const setupFilesAfterEnv = process.env.LOG_PLAYGROUND_URL_ON_FAILURE
+  ? baseSetupFilesAfterEnv.concat(['<rootDir>/jest/logPlaygroundURLOnFailure.js'])
+  : baseSetupFilesAfterEnv
 
 module.exports = {
+  randomize: true,
+  testRunner: process.env.LOG_PLAYGROUND_URL_ON_FAILURE && 'jest-circus/runner',
   moduleNameMapper: {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
@@ -36,8 +45,10 @@ module.exports = {
     '^nanoid(/(.*)|$)': 'nanoid$1',
     '\\.(css)$': '<rootDir>/jest/styleMock.js',
     'crypto-es': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts',
+    '@instructure/studio-player':
+      '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockStudioPlayer.js',
   },
-  roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
+  roots: ['<rootDir>/ui', 'public/javascripts'],
   moduleDirectories: ['public/javascripts', 'node_modules'],
   reporters: [
     'default',
@@ -48,16 +59,17 @@ module.exports = {
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
         outputName: 'jest.xml',
         addFileAttribute: 'true',
+        stripAnsi: true,
       },
     ],
   ],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
-  setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
-  setupFilesAfterEnv: [
-    '@testing-library/jest-dom/extend-expect',
-    './packages/validated-apollo/src/ValidatedApolloCleanup.js',
-    '<rootDir>/jest/stubInstUi.js',
+  setupFiles: [
+    'jest-localstorage-mock',
+    'jest-canvas-mock',
+    '<rootDir>/jest/jest-setup.js',
+    '<rootDir>/jest/punycodeWarningFilter.js',
   ],
+  setupFilesAfterEnv: setupFilesAfterEnv,
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
   coverageDirectory: '<rootDir>/coverage-jest/',
@@ -70,10 +82,12 @@ module.exports = {
     '!<rootDir>/ui/features/k5_dashboard/react/__tests__/k5DashboardPlanner.test.js',
   ],
 
-  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars', 'yml'],
   restoreMocks: true,
 
-  testEnvironment: '<rootDir>/jest/strictTimeLimitEnvironment.js',
+  testEnvironment: process.env.LOG_PLAYGROUND_URL_ON_FAILURE
+    ? '<rootDir>/jest/environmentWrapper.js'
+    : 'jest-fixed-jsdom',
 
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
 
@@ -89,13 +103,28 @@ module.exports = {
     '^.+\\.(j|t)sx?$': [
       '@swc/jest',
       {
-        jsc: swc[1].use.options.jsc,
+        jsc: {
+          ...swc[1].use.options.jsc,
+          transform: {
+            ...swc[1].use.options.jsc.transform,
+            react: {
+              ...swc[1].use.options.jsc.transform.react,
+              runtime: 'automatic',
+              // These are `process.env.NODE_ENV === 'development'` in the webpack config
+              // but Jest doesn't set that env var until after this file is loaded, so
+              // we need to set it manually here.
+              development: false,
+              refresh: false,
+            },
+          },
+        },
       },
     ],
   },
-
+  extensionsToTreatAsEsm: ['.jsx'],
   testEnvironmentOptions: {
     // https://github.com/mswjs/examples/blob/main/examples/with-jest/jest.config.ts#L20
     customExportConditions: [''],
   },
+  testTimeout: 10000,
 }

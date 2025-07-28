@@ -123,8 +123,8 @@ h3 .tally {
 <%= form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
 <table class="formtable">
   <tr>
-    <td><%= f.blabel :name, :en => "Section Name" %></td>
-    <td><%= f.text_field :name %></td>
+    <td><label for="course_section_name">Section Name<abbr>*</abbr>:</label></td>
+    <td><%= f.text_field :name, "aria-describedby" => "course_section_name_errors" %><div id="course_section_name_errors"></div></td>
   </tr>
   <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
     <tr>
@@ -157,13 +157,9 @@ h3 .tally {
       </label>
     </td>
     <td>
-      <%= f.text_field :start_at,
-                       class: "datetime_field",
-                       value: datetime_string(@section.start_at),
-                       style: 'width: 120px;',
-                       "aria-labelledby" => "section_starts_at_label",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
+      <%= hidden_field_tag :start_datetime_value, @section.start_at ? @section.start_at.iso8601 : "" %>
+      <%# Mount point for Start Date React Component %>
+      <div id="course_section_start_datetime_input"></div>
     </td>
   </tr>
   <tr>
@@ -175,13 +171,9 @@ h3 .tally {
       </label>
     </td>
     <td>
-      <%= f.text_field :end_at,
-                       class: "datetime_field",
-                       value: datetime_string(@section.end_at),
-                       style: 'width: 120px;',
-                       "aria-labelledby" => "section_ends_at_label",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
+      <%= hidden_field_tag :end_datetime_value, @section.end_at ? @section.end_at.iso8601 : "" %>
+      <%# Mount point for End Date React Component %>
+      <div id="course_section_end_datetime_input"></div>
     </td>
   </tr>
   <tr>
@@ -243,8 +235,7 @@ h3 .tally {
     </div>
   <% end %>
 </div>
-<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
-<% if can_do @context, @current_user, :read_roster, :manage_students, manage_perm %>
+<% if can_do @context, @current_user, :read_roster, :manage_students, :allow_course_admin_actions %>
   <div class="enrollments-lists">
     <h3><%= t('titles.current_enrollments', 'Current Enrollments') %></h3>
     <div class="user-list-wrapper" id="current-enrollment-list">
@@ -271,17 +262,19 @@ h3 .tally {
     </p>
     <table class="formtable">
       <tr>
-        <td><label for="course_autocomplete_id_lookup"><%= before_label('search_for_course', "Search for Course") %> </label></td>
         <td>
           <a href="<%= context_url(@current_user, :context_manageable_courses_url, :format => :json) %>" id="course_autocomplete_url" style="display: none;">&nbsp;</a>
           <a href="<%= context_url(@context, :context_section_confirm_crosslist_url, @section.id, "{{ id }}") %>" id="course_confirm_crosslist_url" style="display: none;">&nbsp;</a>
           <input type="hidden" name="new_course_id" id="course_autocomplete_id"/>
-          <input type="text" id="course_autocomplete_id_lookup" style="width: 250px;"/>
+          <label for="course_autocomplete_id_lookup"><strong><%= before_label('search_for_course', "Search for Course") %></strong></label>
+          <input type="text" id="course_autocomplete_id_lookup" style="width: 80%;"/>
+          <div id="course_autocomplete_id_lookup_errors"></div>
         </td>
       </tr><tr>
-        <td><label for="course_id"><%= before_label('enter_course_id', "Or Enter the Course's ID") %></label></td>
         <td>
-          <input type="text" id="course_id" style="width: 75px;"/>
+          <label for="course_id"><strong><%= before_label('enter_course_id', "Or Enter the Course's ID") %></strong></label>
+          <input type="text" id="course_id" style="width: 80%;"/>
+          <div id="course_id_errors"></div>
         </td>
       </tr><tr>
         <td colspan="2">

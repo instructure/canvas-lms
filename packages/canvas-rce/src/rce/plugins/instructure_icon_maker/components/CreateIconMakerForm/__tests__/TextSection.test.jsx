@@ -26,12 +26,12 @@ const selectOption = async (button, option) => {
   await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
-    })
+    }),
   )
   await userEvent.click(
     screen.getByRole('option', {
       name: option,
-    })
+    }),
   )
 }
 
@@ -51,7 +51,7 @@ describe('<TextSection />', () => {
       <TextSection
         settings={{...DEFAULT_SETTINGS, text: 'Hello World!Hello World!Hello!12'}}
         onChange={onChange}
-      />
+      />,
     )
     const input = container.querySelector('#icon-text')
     fireEvent.change(input, {target: {value: 'Hello World!Hello World!Hello!123'}})
@@ -62,7 +62,7 @@ describe('<TextSection />', () => {
   it("doesn't change the icon text when reaches the limit when pasting", async () => {
     const onChange = jest.fn()
     const {container} = render(
-      <TextSection settings={{...DEFAULT_SETTINGS, text: 'Hello World!'}} onChange={onChange} />
+      <TextSection settings={{...DEFAULT_SETTINGS, text: 'Hello World!'}} onChange={onChange} />,
     )
     const input = container.querySelector('#icon-text')
     fireEvent.change(input, {
@@ -70,7 +70,7 @@ describe('<TextSection />', () => {
     })
 
     await waitFor(() =>
-      expect(onChange).toHaveBeenCalledWith({text: 'Hello World!Hello World!Hello Wo'})
+      expect(onChange).toHaveBeenCalledWith({text: 'Hello World!Hello World!Hello Wo'}),
     )
   })
 

@@ -97,7 +97,7 @@ class SubmissionLifecycleManager
     SQL_FRAGMENT
   end
 
-  def self.recompute(assignment, update_grades: false, executing_user: nil)
+  def self.recompute(assignment, update_grades: false, executing_user: nil, create_sub_assignment_submissions: true, run_late_policy_applicator_for_course: false)
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.persisted? && assignment.active?
@@ -108,10 +108,12 @@ class SubmissionLifecycleManager
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
+        singleton: "cached_due_date:calculator:#{assignment.class.name}:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
         max_attempts: 10
       },
       update_grades:,
+      run_late_policy_applicator_for_course:,
+      create_sub_assignment_submissions:,
       original_caller: current_caller,
       executing_user:
     }
@@ -119,18 +121,17 @@ class SubmissionLifecycleManager
     recompute_course(assignment.context, **opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: true, run_late_policy_applicator_for_course: false)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:UpdateGrades:#{update_grades ? 1 : 0}" if assignments.nil?
     inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
-
     assignments_to_recompute = assignments || AbstractAssignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    submission_lifecycle_manager = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:)
+    submission_lifecycle_manager = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:, create_sub_assignment_submissions:, run_late_policy_applicator_for_course:)
     if run_immediately
       submission_lifecycle_manager.recompute
     else
@@ -173,7 +174,7 @@ class SubmissionLifecycleManager
     submission_lifecycle_manager.delay_if_production(**inst_jobs_opts).recompute
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: false, run_late_policy_applicator_for_course: false)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(AbstractAssignment) ? a.id : a }
 
@@ -194,6 +195,8 @@ class SubmissionLifecycleManager
     @update_grades = update_grades
     @original_caller = original_caller
     @skip_late_policy_applicator = skip_late_policy_applicator
+    @create_sub_assignment_submissions = create_sub_assignment_submissions
+    @run_late_policy_applicator_for_course = run_late_policy_applicator_for_course
 
     if executing_user.present?
       @executing_user_id = executing_user.is_a?(User) ? executing_user.id : executing_user
@@ -214,6 +217,8 @@ class SubmissionLifecycleManager
     # in a transaction on the correct shard:
     @course.shard.activate do
       values = []
+      # values must be unique by assignment_id and student_id
+      processed_pairs = Set.new
 
       assignments_by_id = AbstractAssignment.find(@assignment_ids).index_by(&:id)
 
@@ -225,6 +230,9 @@ class SubmissionLifecycleManager
         quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
         student_due_dates.each_key do |student_id|
+          key = [assignment_id, student_id]
+          next unless processed_pairs.add?(key)
+
           submission_info = student_due_dates[student_id]
           due_date = submission_info[:due_at] ? "'#{ActiveRecord::Base.connection.quoted_date(submission_info[:due_at].change(usec: 0))}'::timestamptz" : "NULL"
           grading_period_id = submission_info[:grading_period_id] || "NULL"
@@ -232,6 +240,19 @@ class SubmissionLifecycleManager
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
           sql_ready_anonymous_id = Submission.connection.quote(anonymous_id)
+
+          assignment = AbstractAssignment.find_by(id: assignment_id)
+
+          if @create_sub_assignment_submissions && assignment.checkpoints_parent? && assignment.sub_assignment_submissions.find_by(user_id: student_id).nil?
+            assignment.sub_assignments.each do |sub_assignment|
+              sub_assignment_key = [sub_assignment.id, student_id]
+              next unless processed_pairs.add?(sub_assignment_key)
+
+              values << [sub_assignment.id, student_id, "NULL", grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
+            end
+          end
+
+          # checkpoints or not, we always want to create submissions for the Assignment
           values << [assignment_id, student_id, due_date, grading_period_id, sql_ready_anonymous_id, quiz_lti, @course.root_account_id]
         end
       end
@@ -316,12 +337,15 @@ class SubmissionLifecycleManager
       assignment = @course.shard.activate { AbstractAssignment.find(@assignment_ids.first) }
 
       LatePolicyApplicator.for_assignment(assignment)
+    elsif @run_late_policy_applicator_for_course && !@skip_late_policy_applicator
+      LatePolicyApplicator.for_course(@course, @assignment_ids)
     end
   end
 
   private
 
   EnrollmentCounts = Struct.new(:accepted_student_ids, :prior_student_ids, :deleted_student_ids)
+  private_constant :EnrollmentCounts
   def enrollment_counts
     @enrollment_counts ||= begin
       counts = EnrollmentCounts.new([], [], [])

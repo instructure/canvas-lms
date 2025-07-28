@@ -73,7 +73,7 @@ describe('ModeratedGradingFormFieldGroup', () => {
   test('includes a grader count input in the moderated grading content', () => {
     mountComponent()
     const graderCountInput = content().querySelector(
-      '.ModeratedGrading__GraderCountInputContainer input'
+      '.ModeratedGrading__GraderCountInputContainer input',
     )
     expect(graderCountInput).toBeInTheDocument()
   })
@@ -157,7 +157,7 @@ describe('ModeratedGradingFormFieldGroup', () => {
   describe('Grader Names Visible to Final Grader Checkbox', () => {
     function graderNamesVisibleToFinalGraderCheckbox() {
       return wrapper.container.querySelector(
-        'input#assignment_grader_names_visible_to_final_grader'
+        'input#assignment_grader_names_visible_to_final_grader',
       )
     }
 

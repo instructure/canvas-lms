@@ -16,26 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import moxios from 'moxios'
-import {render, waitFor, act} from '@testing-library/react'
-import {K5Course} from '../K5Course'
+import {TAB_IDS} from '@canvas/k5/react/utils'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
+import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
+import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
+import React from 'react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import {K5Course} from '../K5Course'
 import {
-  MOCK_COURSE_SYLLABUS,
-  MOCK_COURSE_APPS,
-  MOCK_COURSE_TABS,
-  MOCK_GRADING_PERIODS_EMPTY,
   MOCK_ASSIGNMENT_GROUPS,
   MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
+  MOCK_COURSE_APPS,
+  MOCK_COURSE_SYLLABUS,
+  MOCK_COURSE_TABS,
   MOCK_ENROLLMENTS,
   MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
+  MOCK_GRADING_PERIODS_EMPTY,
   MOCK_GROUPS,
 } from './mocks'
-import {TAB_IDS} from '@canvas/k5/react/utils'
-import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
-import sinon from 'sinon'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
+}))
 
 const currentUser = {
   id: '1',
@@ -141,23 +145,23 @@ const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_
 
 const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
+  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores',
 )
 const OBSERVER_GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users'
+  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users',
 )
 const ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments',
 )
 const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users'
+  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users',
 )
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
 const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1&include=observed_users'
 const ANNOUNEMENTS_URL_REGEX = /\/api\/v1\/announcements\.*/
 
 const GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true&section_restricted=true&filter='
+  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true&section_restricted=true&filter=',
 )
 
 const createModulesPartial = () => {
@@ -193,23 +197,33 @@ const createStudentView = () => {
   return studentViewBarContainer
 }
 
-let fakeXhrServer
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterAll(() => {
+  server.close()
+})
 
 beforeEach(() => {
-  fakeXhrServer = sinon.fakeServer.create({autoRespond: true})
-  moxios.install()
-  fetchMock.get(FETCH_IMPORTANT_INFO_URL, JSON.stringify(MOCK_COURSE_SYLLABUS))
-  fetchMock.get(FETCH_APPS_URL, JSON.stringify(MOCK_COURSE_APPS))
-  fetchMock.get(FETCH_TABS_URL, JSON.stringify(MOCK_COURSE_TABS))
-  fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-  fetchMock.get(ASSIGNMENT_GROUPS_URL, JSON.stringify(MOCK_ASSIGNMENT_GROUPS))
-  fetchMock.get(ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS))
-  fetchMock.get(ANNOUNEMENTS_URL_REGEX, JSON.stringify([]))
-  fakeXhrServer.respondWith('GET', GROUPS_URL, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(MOCK_GROUPS),
-  ])
+  fetchMock.get(FETCH_IMPORTANT_INFO_URL, MOCK_COURSE_SYLLABUS)
+  fetchMock.get(FETCH_APPS_URL, MOCK_COURSE_APPS)
+  fetchMock.get(FETCH_TABS_URL, MOCK_COURSE_TABS)
+  fetchMock.get(GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+  fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
+  fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
+  fetchMock.get(ANNOUNEMENTS_URL_REGEX, [])
+  fetchMock.get(GROUPS_URL, MOCK_GROUPS)
+
+  // Mock the Groups URL with MSW (used by Backbone)
+  server.use(
+    http.get('/api/v1/courses/30/groups', () => {
+      return HttpResponse.json(MOCK_GROUPS)
+    }),
+  )
+
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
 })
@@ -223,9 +237,8 @@ afterEach(() => {
   modulesContainer?.remove()
 
   localStorage.clear()
-  moxios.uninstall()
   fetchMock.restore()
-  fakeXhrServer.restore()
+  server.resetHandlers()
   window.location.hash = ''
 })
 
@@ -236,7 +249,7 @@ describe('K-5 Subject Course', () => {
 
     it('displays a huge version of the course banner image if set', () => {
       const {getByTestId} = render(
-        <K5Course {...defaultProps} bannerImageUrl={bannerImageUrl} cardImageUrl={cardImageUrl} />
+        <K5Course {...defaultProps} bannerImageUrl={bannerImageUrl} cardImageUrl={cardImageUrl} />,
       )
       const hero = getByTestId('k5-course-header-hero')
 
@@ -263,7 +276,7 @@ describe('K-5 Subject Course', () => {
       const {getByTestId} = render(<K5Course {...defaultProps} />)
       const hero = getByTestId('k5-course-header-hero')
 
-      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(57, 75, 88)')
+      expect(hero.style.getPropertyValue('background-color')).toBe('rgb(51, 68, 81)')
     })
 
     it('displays the course name', () => {
@@ -292,7 +305,7 @@ describe('K-5 Subject Course', () => {
         {id: 'context_external_tool_3', hidden: true},
       ]
       const {getAllByRole} = render(
-        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />
+        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />,
       )
       const renderedTabs = getAllByRole('tab')
       expect(renderedTabs.map(({id}) => id.replace('tab-', ''))).toEqual([
@@ -311,7 +324,7 @@ describe('K-5 Subject Course', () => {
     it('does not render Resource tab if course has no LTIs nor Important Info', () => {
       const tabs = [{id: '10'}, {id: '5'}, {id: '19'}]
       const {queryByText} = render(
-        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />
+        <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />,
       )
       expect(queryByText('Resources')).not.toBeInTheDocument()
       expect(queryByText('Arts and Crafts Resources')).not.toBeInTheDocument()
@@ -319,7 +332,7 @@ describe('K-5 Subject Course', () => {
 
     it('renders an empty state instead of any tabs if none are provided', () => {
       const {getByTestId, getByText, queryByRole} = render(
-        <K5Course {...defaultProps} tabs={[]} hasSyllabusBody={false} />
+        <K5Course {...defaultProps} tabs={[]} hasSyllabusBody={false} />,
       )
       expect(getByText(defaultProps.name)).toBeInTheDocument()
       expect(queryByRole('tab')).not.toBeInTheDocument()
@@ -329,7 +342,7 @@ describe('K-5 Subject Course', () => {
 
     it('renders a link to update tab settings if no tabs are provided and the user has manage permissions', () => {
       const {getByRole} = render(
-        <K5Course {...defaultProps} canManage={true} tabs={[]} hasSyllabusBody={false} />
+        <K5Course {...defaultProps} canManage={true} tabs={[]} hasSyllabusBody={false} />,
       )
       const link = getByRole('link', {name: 'Reestablish your world'})
       expect(link).toBeInTheDocument()
@@ -344,7 +357,7 @@ describe('K-5 Subject Course', () => {
 
       // Tabs should not be shown
       ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources', 'Groups'].forEach(t =>
-        expect(queryByText(t)).not.toBeInTheDocument()
+        expect(queryByText(t)).not.toBeInTheDocument(),
       )
     })
   })
@@ -435,7 +448,7 @@ describe('K-5 Subject Course', () => {
         url: 'http://unenroll_url/',
       }
       const {getByRole, getByText} = render(
-        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />,
       )
       const button = getByRole('button', {name: 'Drop this Subject'})
       expect(button).toBeInTheDocument()
@@ -444,8 +457,8 @@ describe('K-5 Subject Course', () => {
       expect(getByText('Confirm Unenrollment')).toBeInTheDocument()
       expect(
         getByText(
-          'Are you sure you want to unenroll in this subject? You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.'
-        )
+          'Are you sure you want to unenroll in this subject? You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.',
+        ),
       ).toBeInTheDocument()
       expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
     })
@@ -457,7 +470,7 @@ describe('K-5 Subject Course', () => {
         url: 'http://unenroll_url/',
       }
       const {getByRole, getAllByRole, getByText} = render(
-        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
+        <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />,
       )
       const openModalButton = getByRole('button', {name: 'Drop this Subject'})
       act(() => openModalButton.click())
@@ -476,7 +489,8 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('Subject announcements', () => {
-    it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
+    // LX-2162
+    it.skip('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage={true} />)
       const button = getByRole('link', {name: 'Edit announcement Important announcement'})
       const attachment = getByRole('link', {name: 'hw.pdf'})
@@ -508,7 +522,7 @@ describe('K-5 Subject Course', () => {
       props.latestAnnouncement.permissions.update = false
       const {queryByRole} = render(<K5Course {...props} />)
       expect(
-        queryByRole('link', {name: 'Edit announcement Important announcement'})
+        queryByRole('link', {name: 'Edit announcement Important announcement'}),
       ).not.toBeInTheDocument()
     })
 
@@ -544,7 +558,7 @@ describe('K-5 Subject Course', () => {
           {...defaultProps}
           courseOverview={emptyCourseOverview}
           defaultTab={TAB_IDS.HOME}
-        />
+        />,
       )
       expect(getByTestId('empty-home-panda')).toBeInTheDocument()
       expect(getByText('This is where you’ll land when your home is complete.')).toBeInTheDocument()
@@ -558,7 +572,7 @@ describe('K-5 Subject Course', () => {
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
             canManage={true}
-          />
+          />,
         )
         expect(getByTestId('manage-home-button')).toBeInTheDocument()
       })
@@ -569,7 +583,7 @@ describe('K-5 Subject Course', () => {
             {...defaultProps}
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
-          />
+          />,
         )
         expect(queryByTestId('manage-home-button')).not.toBeInTheDocument()
       })
@@ -581,7 +595,7 @@ describe('K-5 Subject Course', () => {
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
             canManage={true}
-          />
+          />,
         )
         const manageHomeLink = getByTestId('manage-home-button')
         expect(manageHomeLink.href).toMatch('/courses/30/pages')
@@ -595,7 +609,7 @@ describe('K-5 Subject Course', () => {
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
             canManage={true}
-          />
+          />,
         )
         const manageHomeLink = getByTestId('manage-home-button')
         expect(manageHomeLink.href).toMatch('/courses/30/pages/home')
@@ -612,12 +626,12 @@ describe('K-5 Subject Course', () => {
           canManage={true}
           canReadAsAdmin={true}
           userIsStudent={false}
-        />
+        />,
       )
       expect(await findByTestId('kinder-panda')).toBeInTheDocument()
       expect(getByText('Schedule Preview')).toBeInTheDocument()
       expect(
-        getByText('Below is an example of how students will see their schedule')
+        getByText('Below is an example of how students will see their schedule'),
       ).toBeInTheDocument()
       expect(queryByText('Math')).not.toBeInTheDocument()
       expect(getByText('A wonderful assignment')).toBeInTheDocument()
@@ -647,10 +661,10 @@ describe('K-5 Subject Course', () => {
       const contextModules = document.getElementById('context_modules')
       contextModules.removeChild(contextModules.firstChild)
       const {getByText, getByTestId} = render(
-        <K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.MODULES} />,
       )
       expect(
-        getByText("Your modules will appear here after they're assembled.")
+        getByText("Your modules will appear here after they're assembled."),
       ).toBeInTheDocument()
       expect(getByTestId('empty-modules-panda')).toBeInTheDocument()
       expect(contextModules).not.toBeVisible()
@@ -678,7 +692,7 @@ describe('K-5 Subject Course', () => {
           {...defaultProps}
           showLearningMasteryGradebook={true}
           defaultTab={TAB_IDS.GRADES}
-        />
+        />,
       )
       expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
     })
@@ -688,7 +702,7 @@ describe('K-5 Subject Course', () => {
     describe('user is a student', () => {
       it('fetches and displays group information', async () => {
         const {findByText, getByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.GROUPS} />
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.GROUPS} />,
         )
         expect(await findByText('Fight Club')).toBeInTheDocument()
         ;['Student Clubs', '0 students'].forEach(t => expect(getByText(t)).toBeInTheDocument())
@@ -698,7 +712,7 @@ describe('K-5 Subject Course', () => {
     describe('user is an instructor', () => {
       it('displays welcome page', () => {
         const {getByText} = render(
-          <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />
+          <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />,
         )
         expect(getByText('This is where students can see their groups.')).toBeInTheDocument()
       })
@@ -711,7 +725,7 @@ describe('K-5 Subject Course', () => {
               canManageGroups={true}
               canReadAsAdmin={true}
               defaultTab={TAB_IDS.GROUPS}
-            />
+            />,
           )
           expect(getByText('Manage Groups')).toBeInTheDocument()
         })
@@ -720,7 +734,7 @@ describe('K-5 Subject Course', () => {
       describe('can not manage groups', () => {
         it('displays a View Groups button', () => {
           const {getByText} = render(
-            <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />
+            <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />,
           )
           expect(getByText('View Groups')).toBeInTheDocument()
         })
@@ -732,7 +746,7 @@ describe('K-5 Subject Course', () => {
     describe('important info section', () => {
       it('shows syllabus content with link to edit if teacher', async () => {
         const {findByText, getByRole} = render(
-          <K5Course {...defaultProps} canManage={true} defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} canManage={true} defaultTab={TAB_IDS.RESOURCES} />,
         )
         expect(await findByText('This is really important.')).toBeInTheDocument()
         const editLink = getByRole('link', {name: 'Edit important info for Arts and Crafts'})
@@ -742,17 +756,17 @@ describe('K-5 Subject Course', () => {
 
       it("doesn't show an edit button if not canManage", async () => {
         const {findByText, queryByRole} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
         expect(await findByText('This is really important.')).toBeInTheDocument()
         expect(
-          queryByRole('link', {name: 'Edit important info for Arts and Crafts'})
+          queryByRole('link', {name: 'Edit important info for Arts and Crafts'}),
         ).not.toBeInTheDocument()
       })
 
       it('shows loading skeletons while loading', async () => {
         const {getByText, queryByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
         expect(getByText('Loading important info')).toBeInTheDocument()
         await waitFor(() => {
@@ -763,7 +777,7 @@ describe('K-5 Subject Course', () => {
       it('shows an error if syllabus content fails to load', async () => {
         fetchMock.get(FETCH_IMPORTANT_INFO_URL, 400, {overwriteRoutes: true})
         const {findAllByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
         const errors = await findAllByText('Failed to load important info.')
         expect(errors[0]).toBeInTheDocument()
@@ -784,7 +798,7 @@ describe('K-5 Subject Course', () => {
 
       it('shows some loading skeletons while apps are loading', async () => {
         const {getAllByText, queryByText} = render(
-          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />,
         )
         await waitFor(() => {
           expect(getAllByText('Loading apps...')[0]).toBeInTheDocument()
@@ -801,7 +815,7 @@ describe('K-5 Subject Course', () => {
 
     it('does not load content until tab is active', async () => {
       const {getByText, findByText} = render(
-        <K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />
+        <K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />,
       )
       expect(getByText('Time to learn!')).toBeInTheDocument()
       expect(fetchMock.called(FETCH_IMPORTANT_INFO_URL)).toBeFalsy()
@@ -815,12 +829,9 @@ describe('K-5 Subject Course', () => {
 
   describe('Observer Support', () => {
     beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        JSON.stringify(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      )
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS))
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, MOCK_GRADING_PERIODS_EMPTY)
+      fetchMock.get(OBSERVER_ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+      fetchMock.get(OBSERVER_ENROLLMENTS_URL, MOCK_ENROLLMENTS_WITH_OBSERVED_USERS)
     })
 
     afterEach(() => {
@@ -829,7 +840,7 @@ describe('K-5 Subject Course', () => {
 
     it('shows picker when user is an observer', () => {
       const {getByRole} = render(
-        <K5Course {...defaultProps} observedUsersList={MOCK_OBSERVED_USERS_LIST} />
+        <K5Course {...defaultProps} observedUsersList={MOCK_OBSERVED_USERS_LIST} />,
       )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
@@ -842,7 +853,7 @@ describe('K-5 Subject Course', () => {
           {...defaultProps}
           observedUsersList={MOCK_OBSERVED_USERS_LIST}
           defaultTab={TAB_IDS.GRADES}
-        />
+        />,
       )
       const formattedSubmittedDate = `Submitted ${dateFormatter('2021-09-20T23:55:08Z')}`
       const select = getByRole('combobox', {name: 'Select a student to view'})
@@ -852,7 +863,7 @@ describe('K-5 Subject Course', () => {
         ;['Assignment 3', formattedSubmittedDate, 'Assignments', '6 pts', 'Out of 10 pts'].forEach(
           label => {
             expect(getByText(label)).toBeInTheDocument()
-          }
+          },
         )
       })
     })

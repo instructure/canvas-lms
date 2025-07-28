@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import natcompare from '@canvas/util/natcompare'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -25,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('public_message_students')
+const I18n = createI18nScope('public_message_students')
 /* showIf */
 
 let currentSettings = {}
@@ -34,7 +33,7 @@ function checkSendable() {
   const $message_students_dialog = messageStudentsDialog()
   disableSend(
     $message_students_dialog.find('#body').val().length == 0 ||
-      $message_students_dialog.find('.student:not(.blank):visible').length == 0
+      $message_students_dialog.find('.student:not(.blank):visible').length == 0,
   )
 }
 
@@ -73,7 +72,7 @@ function showStudentsMessageSentTo() {
         window.messageStudents,
         option.text,
         cutoff,
-        studentElements
+        studentElements,
       )
     }
   }
@@ -96,7 +95,6 @@ function showStudentsMessageSentTo() {
   })
 }
 
-/* global messageStudents */
 window.messageStudents = function (settings) {
   const $message_students_dialog = messageStudentsDialog()
   currentSettings = settings
@@ -242,4 +240,4 @@ $(document).ready(() => {
   $message_students_dialog.find('#body').bind('change blur keyup', checkSendable)
 })
 
-export default messageStudents
+export default window.messageStudents

@@ -31,7 +31,7 @@
     <% if @submission.preview? %>
       <p>
         <div class="alert">
-          <i class="icon-warning" aria-label="<%= t 'Warning' %>"></i>
+          <i class="icon-warning" aria-hidden="true"></i>
           <% if @quiz.published? %>
             <%= t 'This is a preview of the published version of the quiz' %>
           <% else %>

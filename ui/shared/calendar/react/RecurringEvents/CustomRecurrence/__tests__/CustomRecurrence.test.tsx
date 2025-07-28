@@ -45,7 +45,7 @@ const today = moment().tz(defaultTZ)
 
 const defaultProps = (
   overrides: UnknownSubset<CustomRecurrenceProps> = {},
-  specOverrides: UnknownSubset<RRuleHelperSpec> = {}
+  specOverrides: UnknownSubset<RRuleHelperSpec> = {},
 ): CustomRecurrenceProps => ({
   locale: 'en',
   timezone: defaultTZ,

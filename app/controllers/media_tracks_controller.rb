@@ -41,7 +41,7 @@
 class MediaTracksController < ApplicationController
   include Api::V1::MediaObject
   include Api::V1::MediaTrack
-  include FilesHelper
+  include AttachmentHelper
 
   before_action :load_media_object
   before_action :check_media_permissions, only: %i[index show]
@@ -50,6 +50,10 @@ class MediaTracksController < ApplicationController
   end
 
   TRACK_SETTABLE_ATTRIBUTES = %i[kind locale content].freeze
+
+  def token_auth_allowed?
+    params[:action] == "show"
+  end
 
   # @API List media tracks for a Media Object or Attachment
   #
@@ -112,7 +116,8 @@ class MediaTracksController < ApplicationController
   #
   # @returns MediaObject | MediaTrack
   def create
-    if authorized_action(@media_object, @current_user, :add_captions)
+    captioned_record = @attachment || @media_object
+    if authorized_action(captioned_record, @current_user, :add_captions)
       track = find_or_create_track(locale: params[:locale], attachment: @attachment, new_params: params)
       if @attachment.present?
         render json: media_track_api_json(track)
@@ -158,7 +163,8 @@ class MediaTracksController < ApplicationController
   #
   # @returns MediaObject | MediaTrack
   def destroy
-    if authorized_action(@media_object, @current_user, :delete_captions)
+    captioned_record = @attachment || @media_object
+    if authorized_action(captioned_record, @current_user, :delete_captions)
       @media_track = find_track_from_media_object(track_id: params[:id]).first
       raise ActiveRecord::RecordNotFound unless @media_track.present?
 
@@ -227,11 +233,11 @@ class MediaTracksController < ApplicationController
 
   def find_or_create_track(locale:, attachment:, new_params:)
     track = if @attachment.present?
-              @attachment.media_tracks.where(media_object: @media_object, locale:).take
+              @attachment.media_tracks.find_by(media_object: @media_object, locale:)
             else
-              @media_object.media_tracks.where(user: @current_user,
-                                               locale:,
-                                               attachment_id: [nil, @media_object.attachment_id]).take
+              @media_object.media_tracks.find_by(user: @current_user,
+                                                 locale:,
+                                                 attachment_id: [nil, @media_object.attachment_id])
             end
     track ||= @media_object.media_tracks.new(user: @current_user, locale:)
     track.update!(attachment:, **new_params.permit(*TRACK_SETTABLE_ATTRIBUTES))

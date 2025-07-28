@@ -34,9 +34,9 @@ module Lti
       @default_name = default_name
     end
 
-    def expand(expander, *args)
+    def expand(expander, *)
       if expand_for?(expander)
-        expander.instance_exec(*args, &@expansion_proc)
+        expander.instance_exec(*, &@expansion_proc)
       else
         "$#{name}"
       end
@@ -45,8 +45,7 @@ module Lti
     private
 
     def expand_for?(expander)
-      @guards.map { |guard| expander.instance_exec(&guard) }
-             .inject { |memo, obj| memo && obj }
+      @guards.all? { |guard| expander.instance_exec(&guard) }
     end
   end
 end

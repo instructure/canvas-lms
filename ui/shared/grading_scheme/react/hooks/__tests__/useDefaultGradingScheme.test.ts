@@ -27,10 +27,12 @@ const accountId = '42'
 
 jest.mock('@canvas/do-fetch-api-effect')
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
 afterEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
@@ -51,11 +53,13 @@ describe('useDefaultGradingSchemeHook', () => {
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: {title: 'Default Canvas Grading Scheme', data},
     })
     const defaultGradingScheme = await result.current.loadDefaultGradingScheme('Course', courseId)
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/courses/${courseId}/grading_schemes/default`,
@@ -75,11 +79,13 @@ describe('useDefaultGradingSchemeHook', () => {
       {name: 'A', value: 0.9},
       {name: 'B', value: 0.8},
     ]
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: {title: 'Default Canvas Grading Scheme', data},
     })
     const defaultGradingScheme = await result.current.loadDefaultGradingScheme('Account', accountId)
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/accounts/${accountId}/grading_schemes/default`,
@@ -95,6 +101,7 @@ describe('useDefaultGradingSchemeHook', () => {
   it('throws error and sets an error status if the GET request to load the default grading scheme fails', async () => {
     const {result} = renderHook(() => useDefaultGradingScheme())
 
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: false, statusText: 'I should fail'},
     })

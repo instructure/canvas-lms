@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoNoSuchElementError < Cop
+      class NoNoSuchElementError < Base
         MSG = "Avoid using Selenium::WebDriver::Error::NoSuchElementError.\n" \
               "Our finders (f/fj and ff/ffj) will wait up to the implicit wait " \
               "(just like find_element, etc), and will raise a " \

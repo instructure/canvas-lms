@@ -43,7 +43,7 @@ export function LtiToolIcon({tool}: LtiToolIconProps) {
         name={tool.title}
         src={tool.icon_url || fallbackUrl}
         shape="rectangle"
-        margin="0 small"
+        margin="0 small 0 0"
         data-testid="lti-tool-icon"
       />
     </View>

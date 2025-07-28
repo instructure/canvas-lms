@@ -28,11 +28,11 @@ export class FocusPriorItemOnLoadMore extends Animation {
     const firstNewItem = newDays[0][1][0]
     const allRegisteredItemComponents = this.registry().getAllItemsSorted()
     const indexOfFirstNewItemComponent = allRegisteredItemComponents.findIndex(
-      itemComponent => itemComponent.componentIds[0] === firstNewItem.uniqueId
+      itemComponent => itemComponent.componentIds[0] === firstNewItem.uniqueId,
     )
     const indexOfPriorItemComponent = indexOfFirstNewItemComponent - 1
     if (indexOfPriorItemComponent < 0) {
-      // eslint-disable-next-line no-console
+       
       console.error('FocusPriorItemOnLoadMore could not find the item that should receive focus')
       return
     }

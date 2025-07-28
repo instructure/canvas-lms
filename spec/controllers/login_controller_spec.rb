@@ -41,6 +41,10 @@ describe LoginController do
       Account.default.auth_discovery_url = "https://google.com/"
       Account.default.save!
 
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      expect(InstStatsd::Statsd).to receive(:distributed_increment)
+        .with("auth.new.discovery_redirect.v2", tags: { auth_type: nil, target_auth_type: nil, domain: "test.host" })
+
       get "new"
       expect(response).to redirect_to("https://google.com/")
     end
@@ -113,16 +117,23 @@ describe LoginController do
     it "passes pseudonym_session[unique_id] to redirect to populate username textbox" do
       get "new", params: { "pseudonym_session" => { "unique_id" => "test" } }
       expect(response).to redirect_to(
-        controller.url_for(controller: "login/canvas", action: :new) + "?pseudonym_session%5Bunique_id%5D=test"
+        controller.url_for(controller: "login/canvas", action: :new) + "?login_hint=test"
+      )
+    end
+
+    it "passes login_hint to redirect to populate username textbox" do
+      get "new", params: { "login_hint" => "test" }
+      expect(response).to redirect_to(
+        controller.url_for(controller: "login/canvas", action: :new) + "?login_hint=test"
       )
     end
 
     it "passes pseudonym_session[unique_id] to redirect from current username" do
-      user_with_pseudonym(unique_id: "test", active: 1)
+      user_with_pseudonym(username: "test2", active: 1)
       user_session(@user, @pseudonym)
       get "new", params: { "pseudonym_session" => { "unique_id" => "test" }, :force_login => 1 }
       expect(response).to redirect_to(
-        controller.url_for(controller: "login/canvas", action: :new) + "?pseudonym_session%5Bunique_id%5D=test"
+        controller.url_for(controller: "login/canvas", action: :new) + "?login_hint=test2"
       )
     end
 
@@ -179,7 +190,7 @@ describe LoginController do
       allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
 
       get "session_token", format: :json, params: { return_to: "javascript://localhost/" }
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 

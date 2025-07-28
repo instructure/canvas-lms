@@ -29,7 +29,7 @@ declare module 'parse-decimal-number' {
   function parseNumber(
     value: string,
     inOptions?: InOptions | FormatString | FormatArray,
-    enforceGroupSize?: boolean
+    enforceGroupSize?: boolean,
   ): number
   export = parseNumber
 }

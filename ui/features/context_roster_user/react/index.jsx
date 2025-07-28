@@ -27,6 +27,6 @@ export default function initLastAttended(rootElement, courseID, studentID, lastA
       courseID={courseID}
       studentID={studentID}
     />,
-    rootElement
+    rootElement,
   )
 }

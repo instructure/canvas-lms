@@ -19,7 +19,7 @@
 #
 
 class UserLmgbOutcomeOrderings < ActiveRecord::Base
-  belongs_to :usre
+  belongs_to :user
   belongs_to :course
   belongs_to :learning_outcome
 

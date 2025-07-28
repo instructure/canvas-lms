@@ -21,7 +21,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DropTarget} from 'react-dnd'
 import {string, func, bool} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import moment from 'moment'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -37,7 +37,7 @@ import {ConnectedDiscussionRow, ConnectedDraggableDiscussionRow} from './Discuss
 import {discussionList} from '../proptypes/discussion'
 import propTypes from '../propTypes'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 
 // Handle drag and drop on a discussion. The props passed in tell us how we
 // should update the discussion if something is dragged into this container
@@ -69,15 +69,15 @@ export class DiscussionsContainer extends Component {
   static propTypes = {
     cleanDiscussionFocus: func.isRequired,
     // this really is used
-    closedState: bool, // eslint-disable-line react/no-unused-prop-types
+    closedState: bool,
     connectDropTarget: func,
     deleteDiscussion: func.isRequired,
     deleteFocusDone: func.isRequired,
     // this really is used
-    deleteFocusPending: bool.isRequired, // eslint-disable-line react/no-unused-prop-types
+    deleteFocusPending: bool.isRequired,
     discussions: discussionList.isRequired,
     // this really is used
-    handleDrop: func, // eslint-disable-line react/no-unused-prop-types
+    handleDrop: func,
     onMoveDiscussion: func,
     onOpenAssignToTray: func,
     permissions: propTypes.permissions.isRequired,
@@ -195,7 +195,7 @@ export class DiscussionsContainer extends Component {
             draggable={false}
           />
         </div>
-      )
+      ),
     )
   }
 
@@ -208,8 +208,18 @@ export class DiscussionsContainer extends Component {
   }
 
   render() {
+    const titleKebab = this.props.title.toLowerCase().replace(/\s+/g, '-')
+
     return this.props.connectDropTarget(
-      <div className="discussions-container__wrapper">
+      <div
+        className="discussions-container__wrapper"
+        data-testid={`discussions-container-${titleKebab}`}
+        data-action-state={
+          this.state.expanded
+            ? `discussions-container-${titleKebab}-expanded`
+            : `discussions-container-${titleKebab}-collapsed`
+        }
+      >
         <span ref={this.wrapperToggleRef}>
           <ScreenReaderContent>
             <Heading level="h2">{this.props.title}</Heading>
@@ -238,7 +248,7 @@ export class DiscussionsContainer extends Component {
               : this.renderBackgroundImage()}
           </ToggleDetails>
         </span>
-      </div>
+      </div>,
     )
   }
 }
@@ -270,12 +280,12 @@ export const DroppableDiscussionsContainer = DropTarget(
     connectDropTarget: dragConnect.dropTarget(),
     isOver: monitor.isOver(),
     canDrop: monitor.canDrop(),
-  })
+  }),
 )(DiscussionsContainer)
 
 export const ConnectedDiscussionsContainer = connect(mapState, mapDispatch)(DiscussionsContainer)
 
 export const DroppableConnectedDiscussionsContainer = connect(
   mapState,
-  mapDispatch
+  mapDispatch,
 )(DroppableDiscussionsContainer)

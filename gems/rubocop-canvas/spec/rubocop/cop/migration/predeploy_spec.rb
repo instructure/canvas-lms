@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::Predeploy do
   subject(:cop) { described_class.new }
 
   it "flags table, column, and index creation in a postdeploy migration" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :postdeploy
 
@@ -42,17 +42,17 @@ describe RuboCop::Cop::Migration::Predeploy do
       end
     RUBY
 
-    expect(cop.offenses.size).to eq 6
-    expect(cop.messages[0]).to eq "Migration/Predeploy: Create tables in a predeploy migration"
-    expect(cop.messages[1]).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
-    expect(cop.messages[2]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
-    expect(cop.messages[3]).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
-    expect(cop.messages[4]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
-    expect(cop.messages[5]).to eq "Migration/Predeploy: Add columns in a predeploy migration"
+    expect(offenses.size).to eq 6
+    expect(offenses[0].message).to eq "Migration/Predeploy: Create tables in a predeploy migration"
+    expect(offenses[1].message).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
+    expect(offenses[2].message).to eq "Migration/Predeploy: Add columns in a predeploy migration"
+    expect(offenses[3].message).to eq "Migration/Predeploy: Add indexes in a predeploy migration"
+    expect(offenses[4].message).to eq "Migration/Predeploy: Add columns in a predeploy migration"
+    expect(offenses[5].message).to eq "Migration/Predeploy: Add columns in a predeploy migration"
   end
 
   it "doesn't flag column removal in a change_table block in a postdeploy migration" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :postdeploy
 
@@ -63,11 +63,11 @@ describe RuboCop::Cop::Migration::Predeploy do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 
   it "ignores `down`" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :postdeploy
 
@@ -78,11 +78,11 @@ describe RuboCop::Cop::Migration::Predeploy do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 
   it "doesn't flag table, column, or index creation in a predeploy migration" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         tag :predeploy
 
@@ -103,6 +103,6 @@ describe RuboCop::Cop::Migration::Predeploy do
       end
     RUBY
 
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

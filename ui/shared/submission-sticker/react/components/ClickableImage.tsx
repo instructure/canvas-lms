@@ -16,18 +16,69 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {ClickableImageProps} from '../types/stickers.d'
-import assetFactory, {stickerDescriptions} from '../helpers/assetFactory'
+import React, {useState} from 'react'
+import type {ClickableImageProps, IconOverlayProps} from '../types/stickers.d'
+import assetFactory, {stickerDescription} from '../helpers/assetFactory'
 import {stickerContainerClass} from '../helpers/utils'
+import {IconEditSolid, IconAddSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
+import Sparkles from '@canvas/sparkles'
 
-export default function ClickableImage({onClick, size, sticker}: ClickableImageProps) {
+function IconOverlay({showIcon, sticker}: IconOverlayProps) {
   return (
-    <button type="button" className={stickerContainerClass(size)} onClick={onClick}>
-      <div className={`StickerOverlay__Container ${size}`}>
-        <Img src={assetFactory(sticker)} alt={stickerDescriptions(sticker)} />
+    <div
+      data-testid="edit-icon-overlay"
+      className={`Sticker__Overlay${showIcon ? ' showing' : ''}`}
+    >
+      <div className="Sticker__Icon">
+        {sticker ? (
+          <IconEditSolid color="primary-inverse" size="x-small" />
+        ) : (
+          <IconAddSolid color="primary-inverse" size="x-small" />
+        )}
       </div>
-    </button>
+    </div>
+  )
+}
+
+export default function ClickableImage({editable, onClick, size, sticker}: ClickableImageProps) {
+  const [hovering, setHovering] = useState(false)
+  const startHover = () => {
+    setHovering(true)
+  }
+  const stopHover = () => {
+    setHovering(false)
+  }
+
+  return (
+    <Sparkles
+      key={sticker}
+      size={size === 'small' ? 'small' : 'medium'}
+      enabled={typeof sticker === 'string' && hovering}
+    >
+      <button
+        data-testid="sticker-button"
+        className={stickerContainerClass(size)}
+        onBlur={stopHover}
+        onClick={onClick}
+        onFocus={startHover}
+        onMouseEnter={startHover}
+        onMouseLeave={stopHover}
+        type="button"
+      >
+        <div
+          className={`StickerOverlay__Container ${size}${
+            sticker ? ' Sticker__ShinyContainer' : ''
+          }`}
+        >
+          <Img
+            data-testid="sticker-image"
+            src={assetFactory(sticker)}
+            alt={stickerDescription(sticker)}
+          />
+          {editable && <IconOverlay sticker={sticker} showIcon={hovering} />}
+        </div>
+      </button>
+    </Sparkles>
   )
 }

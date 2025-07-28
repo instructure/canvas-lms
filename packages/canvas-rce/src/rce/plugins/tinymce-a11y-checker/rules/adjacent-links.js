@@ -126,7 +126,7 @@ export default {
 
   why: () =>
     formatMessage(
-      'Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users.'
+      'Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users.',
     ),
 
   link: 'https://www.w3.org/TR/WCAG20-TECHS/H2.html',

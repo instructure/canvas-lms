@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('permissions_templates_30')
+const I18n = createI18nScope('permissions_templates_30')
 
 export const template = generateActionTemplates(
   [
@@ -32,7 +32,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Developer Keys'),
       description: I18n.t(
-        'Required fields include key name, owner email, tool ID, redirect URL, and icon URL.'
+        'Required fields include key name, owner email, tool ID, redirect URL, and icon URL.',
       ),
     },
     {
@@ -41,5 +41,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

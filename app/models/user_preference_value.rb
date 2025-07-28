@@ -60,7 +60,8 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :unread_rubric_comments, use_sub_keys: true
   add_user_preference :module_links_default_new_tab
   add_user_preference :viewed_auto_subscribed_account_calendars
-  add_user_preference :suppress_faculty_journal_deprecation_notice # remove when :deprecate_faculty_journal is removed
+  add_user_preference :text_editor_preference
+  add_user_preference :files_ui_version
 
   def self.settings
     @preference_settings ||= {}
@@ -70,9 +71,17 @@ class UserPreferenceValue < ActiveRecord::Base
 
   module UserMethods
     def get_preference(key, sub_key = nil)
+      if association(:user_preference_values).loaded?
+        # Use the in-memory loaded values
+        preference_value = user_preference_values.find do |pv|
+          pv.key.to_s == key.to_s && (sub_key.nil? || pv.sub_key.to_s == sub_key.to_s)
+        end
+        return preference_value&.value # returns nil if not found
+      end
+
       value = preferences[key]
       if value == EXTERNAL
-        id, value = user_preference_values.where(key:, sub_key:).pluck(:id, :value).first
+        id, value = user_preference_values.where(key:, sub_key:).pick(:id, :value)
         mark_preference_row(key, sub_key) if id # if we know there's a row
         value
       elsif sub_key
@@ -100,7 +109,7 @@ class UserPreferenceValue < ActiveRecord::Base
         elsif preference_row_exists?(key, sub_key)
           update_user_preference_value(key, sub_key, value)
         else
-          create_user_preference_value(key, sub_key, value)
+          upsert_user_preference_value(key, sub_key, value)
         end
         preferences[key] = EXTERNAL
       else
@@ -129,14 +138,13 @@ class UserPreferenceValue < ActiveRecord::Base
       @existing_preference_rows << [key, sub_key]
     end
 
-    def create_user_preference_value(key, sub_key, value)
-      UserPreferenceValue.unique_constraint_retry do |retry_count|
-        if retry_count == 0
-          user_preference_values.create!(key:, sub_key:, value:)
-        else
-          update_user_preference_value(key, sub_key, value) # may already exist
-        end
-      end
+    def upsert_user_preference_value(key, sub_key, value)
+      user_preference_values.upsert(
+        { key:, sub_key:, value: },
+        unique_by: sub_key ? %i[user_id key sub_key] : %i[user_id key],
+        update_only: :value
+      )
+
       mark_preference_row(key, sub_key)
     end
 
@@ -220,6 +228,10 @@ class UserPreferenceValue < ActiveRecord::Base
         end
         preferences[gb_pref_key] = new_gb_prefs
       end
+    end
+
+    def get_latest_preference_setting_by_key(key, sub_key, setting, setting_key)
+      get_preference(key, sub_key)&.dig(setting, setting_key)&.last
     end
   end
 end

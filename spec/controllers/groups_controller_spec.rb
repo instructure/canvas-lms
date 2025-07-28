@@ -31,7 +31,7 @@ describe GroupsController do
   describe "GET context_index" do
     context "student context cards" do
       it "is always enabled for teachers" do
-        %w[manage_students manage_admin_users].each do |perm|
+        %w[manage_students allow_course_admin_actions].each do |perm|
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
         user_session(@teacher)
@@ -71,6 +71,18 @@ describe GroupsController do
       expect(assigns[:groups].length).to be(3)
       expect(assigns[:groups] - [g1, g2, g3]).to be_empty
       expect(assigns[:categories].length).to be(2)
+    end
+
+    it "js_env group_categories only includes non-deleted categories" do
+      user_session(@teacher)
+      active_category = @course.group_categories.create!(name: "Active Category")
+      deleted_category = @course.group_categories.create!(name: "Deleted Category")
+      deleted_category.update!(deleted_at: Time.now.utc)
+
+      get "index", params: { course_id: @course.id }
+
+      group_categories = assigns[:js_env][:group_categories]
+      expect(group_categories.pluck("id")).to contain_exactly(active_category.id)
     end
 
     it "returns groups in sorted by group category name, then group name for student view" do
@@ -336,6 +348,94 @@ describe GroupsController do
         end
       end
     end
+
+    context "self_signup_deadline_enabled ENV variable" do
+      it "set to true if enabled at account level" do
+        @course.account.enable_feature!(:self_signup_deadline)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:self_signup_deadline_enabled]).to be_truthy
+      end
+
+      it "set to false if not enabled at account level" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(assigns[:js_env][:self_signup_deadline_enabled]).to be_falsey
+      end
+    end
+
+    context "context_groups renders successfully" do
+      it "for a student" do
+        user_session(@student)
+        get "index", params: { course_id: @course.id }, format: :html
+        expect(response).to be_successful
+      end
+
+      it "for a teacher" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }, format: :html
+        expect(response).to be_successful
+      end
+
+      context "with deprecate_context_groups_old_view FF enabled" do
+        before do
+          Account.site_admin.enable_feature!(:deprecate_context_groups_old_view)
+        end
+
+        it "for a student" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }, format: :html
+          expect(response).to be_successful
+        end
+
+        it "for a teacher" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }, format: :html
+          expect(response).to be_successful
+        end
+      end
+    end
+
+    it "forces IS_LARGE_ROSTER to true for account groups" do
+      account_admin_user
+      @account = Account.default
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }, format: :html
+      expect(assigns[:js_env][:IS_LARGE_ROSTER]).to be true
+    end
+  end
+
+  describe "group_json" do
+    it "should include context_name for group" do
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+
+      get "index", format: "json"
+      expect(response).to be_successful
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["context_name"]).to eq @group.context.name
+    end
+
+    it "should include course_id and not account_id if group's context is course'" do
+      group_with_user(group_context: @course, user: @student, active_all: true)
+      user_session(@student)
+      get "index", format: "json"
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["course_id"]).to eq @group.context.id
+      expect(parsed_json[0]["account_id"]).to be_nil
+    end
+
+    it "should include account_id and not course_id if group's context is account" do
+      group_with_user(group_context: @account, user: @student, active_all: true)
+      user_session(@student)
+      get "index", format: "json"
+      parsed_json = json_parse(response.body)
+      expect(parsed_json.length).to eq 1
+      expect(parsed_json[0]["account_id"]).to eq @group.context.id
+      expect(parsed_json[0]["course_id"]).to be_nil
+    end
   end
 
   describe "GET index" do
@@ -566,17 +666,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("some group")
     end
 
-    it "creates new group (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      post "create", params: { course_id: @course.id, group: { name: "some group" } }
-      expect(response).to be_redirect
-      expect(assigns[:group]).not_to be_nil
-      expect(assigns[:group].name).to eql("some group")
-    end
-
-    it "does not create new group if :manage_groups_add is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not create new group if :manage_groups_add is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_add",
         role: teacher_role,
@@ -614,7 +704,7 @@ describe GroupsController do
 
     describe "quota" do
       before do
-        Setting.set("group_default_quota", 11.megabytes)
+        Setting.set("group_default_quota", 11.decimal_megabytes)
       end
 
       context "teacher" do
@@ -658,18 +748,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("new name")
     end
 
-    it "updates group (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      @group = @course.groups.create!(name: "some group")
-      put "update", params: { course_id: @course.id, id: @group.id, group: { name: "new name" } }
-      expect(response).to be_redirect
-      expect(assigns[:group]).to eql(@group)
-      expect(assigns[:group].name).to eql("new name")
-    end
-
-    it "does not update group if :manage_groups_manage is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not update group if :manage_groups_manage is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_manage",
         role: teacher_role,
@@ -773,20 +852,7 @@ describe GroupsController do
       expect(@course.groups.active).not_to include(@group)
     end
 
-    it "deletes group (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      @group = @course.groups.create!(name: "some group")
-      delete "destroy", params: { course_id: @course.id, id: @group.id }
-      expect(assigns[:group]).to eql(@group)
-      expect(assigns[:group]).not_to be_frozen
-      expect(assigns[:group]).to be_deleted
-      expect(@course.groups).to include(@group)
-      expect(@course.groups.active).not_to include(@group)
-    end
-
-    it "does not delete group if :manage_groups_delete is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not delete group if :manage_groups_delete is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_delete",
         role: teacher_role,
@@ -1095,6 +1161,643 @@ describe GroupsController do
       it "does not check quota if submit_assignment is true" do
         put "create_file", params: request_params.merge(submit_assignment: true)
         expect_any_instance_of(Attachment).not_to receive(:get_quota)
+      end
+
+      context "in a limited access account" do
+        before do
+          course.root_account.enable_feature!(:allow_limited_access_for_students)
+          course.account.settings[:enable_limited_access_for_students] = true
+          course.account.save!
+        end
+
+        it "renders unauthorized" do
+          put "create_file", params: request_params.merge(submit_assignment: true)
+          expect(response.code.to_i).to be 401
+        end
+      end
+    end
+  end
+
+  context "Differentiation Tags" do
+    before do
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+      course_with_teacher(active_all: true, user: @user)
+      @non_collaborative_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
+      @non_collaborative_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collaborative_group_category)
+      @collaborative_group_category = @course.group_categories.create!(name: "Test collaborative", non_collaborative: false)
+      @collaborative_group = @course.groups.create!(name: "Collaborative group", group_category: @collaborative_group_category)
+      user_session(@teacher)
+    end
+
+    describe "GET index" do
+      it "does not return non collaborative groups" do
+        @non_collaborative_group.add_user(@student)
+        @collaborative_group.add_user(@student)
+        user_session(@student)
+
+        get "index", format: "json"
+        parsed_json = json_parse(response.body)
+        expect(parsed_json.length).to eq 1
+        expect(parsed_json[0]["name"]).to eq "Collaborative group"
+        expect(parsed_json[0]["id"]).to eq @collaborative_group.id
+      end
+    end
+
+    describe "GET context_index" do
+      it "filters out non collaborative groups when the user doesn't have permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "index", params: { course_id: @course.id, collaboration_state: "all" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@collaborative_group)
+      end
+
+      it "filters out non-collaborative groups by default" do
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@collaborative_group)
+      end
+
+      it "filters out collaborative groups" do
+        get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@non_collaborative_group)
+      end
+
+      it "errors when a user without the correct permissions tries to get only non_collaborative groups" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns both collaborative and non-collaborative groups when requested" do
+        get "index", params: { course_id: @course.id, collaboration_state: "all" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        group_ids = assigns[:groups].map(&:id)
+        expect(group_ids).to include(@collaborative_group.id, @non_collaborative_group.id)
+      end
+
+      it "filters out non-collaborative groups when requested explicitly" do
+        get "index", params: { course_id: @course.id, collaboration_state: "collaborative" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be >= 1
+        assigns[:groups].each do |group|
+          expect(group.non_collaborative).to be false
+        end
+      end
+
+      it "returns group category name when filtered by user id and non collaborative groups" do
+        students = create_users_in_course(@course, 2, return_type: :record)
+        student1, student2 = students
+        @non_collaborative_group.add_user(student1)
+        @non_collaborative_group.add_user(student2)
+        user_session(@teacher)
+        get "index",
+            params: { course_id: @course.id,
+                      collaboration_state: "non_collaborative",
+                      user_id: student1.id },
+            format: :json
+        expect(response).to be_successful
+        parsed_json = json_parse(response.body)
+        expect(parsed_json.length).to eq 1
+        expect(parsed_json.first.keys).to include "group_category_name"
+        expect(parsed_json.first["group_category_name"]).to include @non_collaborative_group_category.name
+      end
+    end
+
+    describe "GET show" do
+      it "denies access for users when group is non-collaborative" do
+        get "show", params: { id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "denies access for users without any manage tags permissions when group is non-collaborative and request is json format" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "show", params: { id: @non_collaborative_group.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative and request is json format" do
+        get "show", params: { id: @non_collaborative_group.id }, format: :json
+        expect(response).to be_successful
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "show", params: { id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "PUT update" do
+      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        put "update", params: { id: @non_collaborative_group.id, group: { name: "new name" } }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative" do
+        put "update", params: { id: @non_collaborative_group.id, group: { name: "new name" } }
+        expect(response).to be_redirect
+        expect(@non_collaborative_group.reload.name).to eq "new name"
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        put "update", params: { id: @collaborative_group.id, group: { name: "new name" } }
+        expect(response).to be_redirect
+        expect(@collaborative_group.reload.name).to eq "new name"
+      end
+    end
+
+    describe "POST create" do
+      it "denies access for users without manage_tags_add permission" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @non_collaborative_group_category.id } }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(Group.count).to eq(2)
+      end
+
+      it "does not deny access for users without manage_tags_add permission from creating normal group" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        expect(Group.count).to eq(2)
+
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @collaborative_group_category.id } }
+        expect(response).to be_redirect
+        expect(Group.count).to eq(3)
+      end
+
+      it "works correctly for users with manage_tags_add permission" do
+        expect(Group.count).to eq(2)
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @non_collaborative_group_category.id } }
+
+        expect(response).to be_redirect
+        expect(Group.count).to eq(3)
+      end
+    end
+
+    describe "DELETE destroy" do
+      it "denies access for users without manage_tags_delete permission" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_group.id }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(Group.exists?(@non_collaborative_group.id)).to be(true) # Group is not deleted
+      end
+
+      it "does noy deny access for users without manage_tags_delete permission from deleting normal group" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "destroy", params: { course_id: @course.id, id: @collaborative_group.id }
+
+        expect(@course.groups).to include(@collaborative_group)
+        expect(@course.groups.active).not_to include(@collaborative_group)
+      end
+
+      it "works correctly for users with manage_tags_delete permission" do
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_group.id }
+
+        expect(@course.differentiation_tags).to include(@non_collaborative_group)
+        expect(@course.differentiation_tags.active).not_to include(@non_collaborative_group)
+      end
+    end
+
+    describe "GET 'context_group_members'" do
+      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "context_group_members", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative" do
+        get "context_group_members", params: { group_id: @non_collaborative_group.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "context_group_members", params: { group_id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "POST add_user" do
+      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "add_user", params: { group_id: @non_collaborative_group.id, user_id: @student1.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative" do
+        post "add_user", params: { group_id: @non_collaborative_group.id, user_id: @student1.id }
+        expect(response).to be_successful
+        expect(@non_collaborative_group.users).to include(@student1)
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "add_user", params: { group_id: @collaborative_group.id, user_id: @student1.id }
+        expect(response).to be_successful
+        expect(@collaborative_group.users).to include(@student1)
+      end
+    end
+
+    describe "DELETE remove_user" do
+      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+        @non_collaborative_group.add_user(@student1)
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "remove_user", params: { group_id: @non_collaborative_group.id, user_id: @student1.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(@non_collaborative_group.users).to include(@student1)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative" do
+        @non_collaborative_group.add_user(@student1)
+        delete "remove_user", params: { group_id: @non_collaborative_group.id, user_id: @student1.id }
+        expect(response).to be_successful
+        expect(@non_collaborative_group.users).not_to include(@student1)
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        @collaborative_group.add_user(@student1)
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "remove_user", params: { group_id: @collaborative_group.id, user_id: @student1.id }
+        expect(response).to be_successful
+        expect(@collaborative_group.users).not_to include(@student1)
+      end
+    end
+
+    describe "POST invite" do
+      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "invite", params: { group_id: @non_collaborative_group.id, invitees: ["student@example.com"] }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access for users with any manage tags permission when group is non-collaborative" do
+        post "invite", params: { group_id: @non_collaborative_group.id, invitees: ["student@example.com"] }
+        expect(response).to be_successful
+      end
+
+      it "allows access for users without manage tags permissions when group is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "invite", params: { group_id: @collaborative_group.id, invitees: ["student@example.com"] }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'unassigned_members'" do
+      it "denies access for users without any manage tags permissions when group category is non-collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "unassigned_members", params: { course_id: @course.id, category_id: @non_collaborative_group_category.id }
+        expect(response).to have_http_status(:unauthorized)
+        expect(json_parse["message"]).to eq "Not authorized to manage differentiation tag."
+      end
+
+      it "allows access for users with any manage tags permission when group category is non-collaborative" do
+        get "unassigned_members", params: { course_id: @course.id, category_id: @non_collaborative_group_category.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access for users without manage tags permissions when group category is collaborative" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "unassigned_members", params: { course_id: @course.id, category_id: @collaborative_group_category.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'public_feed'" do
+      it "returns unauthorized when accessing non_collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "public_feed", params: { feed_code: @non_collaborative_group.feed_code }, format: "atom"
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Not authorized to manage differentiation tag."
+      end
+
+      it "allows access to non_collaborative group with proper permissions" do
+        get "public_feed", params: { feed_code: @non_collaborative_group.feed_code }, format: "atom"
+        expect(response).to be_successful
+      end
+
+      it "allows access to collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "public_feed", params: { feed_code: @collaborative_group.feed_code }, format: "atom"
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'activity_stream'" do
+      it "returns unauthorized when accessing non_collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "activity_stream", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Not authorized to manage differentiation tag."
+      end
+
+      it "allows access to non_collaborative group with proper permissions" do
+        get "activity_stream", params: { group_id: @non_collaborative_group.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access to collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "activity_stream", params: { group_id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'activity_stream_summary'" do
+      it "returns unauthorized when accessing non_collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "activity_stream_summary", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Not authorized to manage differentiation tag."
+      end
+
+      it "allows access to non_collaborative group with proper permissions" do
+        get "activity_stream_summary", params: { group_id: @non_collaborative_group.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access to collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "activity_stream_summary", params: { group_id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "POST 'create_file'" do
+      it "denies access to upload files when group is non-collaborative" do
+        post "create_file", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Not authorized to upload file to Differentiation Tag"
+      end
+    end
+
+    describe "GET 'users'" do
+      it "denies access when group is non-collaborative and user lacks permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "users", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access when group is non-collaborative and user has permissions" do
+        get "users", params: { group_id: @non_collaborative_group.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access when group is collaborative regardless of permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "users", params: { group_id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'permissions'" do
+      it "denies access when group is non-collaborative and user lacks permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "permissions", params: { group_id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "allows access when group is non-collaborative and user has permissions" do
+        get "permissions", params: { group_id: @non_collaborative_group.id }
+        expect(response).to be_successful
+      end
+
+      it "allows access when group is collaborative regardless of permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "permissions", params: { group_id: @collaborative_group.id }
+        expect(response).to be_successful
+      end
+    end
+
+    describe "GET 'accept_invitation'" do
+      it "returns unauthorized when accessing non_collaborative group without permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        membership = @non_collaborative_group.invite_user(@user)
+        get "accept_invitation", params: { group_id: @non_collaborative_group.id, uuid: membership.uuid }
+        expect(response).to have_http_status(:unauthorized)
+        json = response.parsed_body
+        expect(json["message"]).to eq "Not authorized to manage differentiation tag."
       end
     end
   end

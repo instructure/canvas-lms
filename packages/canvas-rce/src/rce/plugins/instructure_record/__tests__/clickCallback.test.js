@@ -47,7 +47,7 @@ describe('handleUpload()', () => {
       subject()
       expect(onUploadComplete).toHaveBeenCalledWith(
         'Size of caption file is greater than the maximum 0.001 kb allowed file size.',
-        uploadData
+        uploadData,
       )
     })
   })
@@ -81,7 +81,7 @@ describe('Instructure Media Plugin: clickCallback', () => {
     container.className = 'canvas-rce-upload-container'
     document.body.appendChild(container)
     await clickCallback(fauxEditor, document, trayProps)
-    expect(document.querySelectorAll('.canvas-rce-media-upload').length).toEqual(1)
+    expect(document.querySelectorAll('.canvas-rce-media-upload')).toHaveLength(1)
   })
 
   it('opens the UploadMedia modal when called', async () => {
@@ -89,7 +89,7 @@ describe('Instructure Media Plugin: clickCallback', () => {
     expect(
       getAllByLabelText(document, 'Upload Media', {
         selector: '[role="dialog"]',
-      })[0]
+      })[0],
     ).toBeVisible()
   })
 })

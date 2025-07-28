@@ -1,12 +1,16 @@
 require:
-  - rubocop-factory_bot
-  - rubocop-graphql
-  - rubocop-rails
-  - rubocop-rake
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
   - outrigger/cops/migration/tagged
+
+plugins:
+  - rubocop-factory_bot
+  - rubocop-graphql
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rspec_rails
 
 inherit_gem:
   rubocop-inst:
@@ -14,13 +18,10 @@ inherit_gem:
   - rubocop-rspec.yml
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.4
 
 Bundler:
   Severity: error
-
-Capybara:
-  Enabled: false # we don't use capybara (it's automatically included by rubocop-rspec until they hit 3.0)
 
 FactoryBot:
   Severity: error
@@ -72,7 +73,6 @@ Migration/Tagged:
   AllowedTags:
     - predeploy
     - postdeploy
-    - cassandra
     - dynamodb
 
 Naming:
@@ -83,6 +83,7 @@ Naming/FileName:
     - "**/urn_*.rb"
     - "**/fixtures/**/*.rb"
     - "config/environments/*-*.rb"
+    - "config/initializers/~*.rb"
     - "config/locales/*.rb" # names must match locale names
     - "spec/selenium/a11y_and_i18n/localized-timezone-lists_spec.rb" # matches JS file it tests
 
@@ -90,6 +91,9 @@ Performance:
   Severity: error
 Performance/CollectionLiteralInLoop:
   Severity: convention # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
+  Exclude: # don't care about performance in specs
+    - "gems/plugins/*/spec_canvas/**/*"
+    - "spec/**/*"
 Performance/MethodObjectAsBlock:
   Enabled: false # decreases expressiveness
 
@@ -98,6 +102,8 @@ Rails:
   Exclude:
     - "bin/**/*"
     - "gems/google_drive/**/*"
+Rails/ActionControllerFlashBeforeRender:
+  AutoCorrect: false # auto-correct just changes it to `flash.now`, when that may not be appropriate
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -117,6 +123,8 @@ Rails/DynamicFindBy:
     - find_by_asset_string # ApplicationRecord
     - find_by_pseudonym_credentials # SessionPersistenceToken
     - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
+Rails/EnumHash:
+  Enabled: false # we override Rails' enum method to only take a string array, see why at lib/extensions/active_record/enum.rb
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
@@ -125,8 +133,12 @@ Rails/I18nLocaleTexts:
   Exclude:
     - spec/**/*.rb
     - "**/spec_canvas/**/*.rb"
+Rails/InverseOf:
+  IgnoreScopes: true # config.active_record.automatic_scope_inversing is enabled
 Rails/NegateInclude:
   Enabled: false # exclude? isn't as intuitive as !include?
+Rails/Output:
+  AutoCorrect: false # Force the developer to think about what to do; don't just silently convert it to a debug log
 Rails/Present:
   UnlessBlank: false # allow `unless foo.blank?`
 Rails/RedundantPresenceValidationOnBelongsTo:
@@ -135,6 +147,10 @@ Rails/RedundantPresenceValidationOnBelongsTo:
                  # config.load_defaults line
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
+Rails/TimeZone:
+  Exclude:
+    - "gems/*/lib/**/*.rb"
+    - "gems/*/spec/**/*.rb"
 Rails/WhereExists:
   EnforcedStyle: where
 Rails/WhereNotWithMultipleConditions:
@@ -144,8 +160,6 @@ RSpec:
   Severity: error
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
-RSpec/FilePath:
-  Enabled: false # superceded by RSpec/SpecFilePathSuffix and RSpec/SpecFilePathFormat
 RSpec/IndexedLet:
   Enabled: false
 RSpec/InstanceVariable:
@@ -155,11 +169,8 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 
-RSpec/Capybara:
-  Enabled: false # we don't use capybara
-
-RSpec/Rails:
-  Severity: error
+#RSpec/Rails:
+#  Severity: error
 
 Security:
   Severity: error
@@ -200,8 +211,12 @@ Style/OpenStructUse:
   Severity: warning # unfortunately, legacy code uses it a lot;
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
+Style/RescueModifier:
+  AutoCorrect: false # force the developer to think about how to handle it; don't just blindly ignore errors
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
+Style/SafeNavigationChainLength:
+  Enabled: false # kind of Metrics-y, not clear it actually improves code quality
 Style/SoleNestedConditional:
   AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
@@ -225,10 +240,6 @@ GraphQL/FieldMethod:
 GraphQL/FieldName:
   AutoCorrect: false
 GraphQL/MultipleFieldDefinitions:
-  AutoCorrect: false
-GraphQL/OrderedArguments:
-  AutoCorrect: false
-GraphQL/OrderedFields:
   AutoCorrect: false
 GraphQL/UnusedArgument:
   AutoCorrect: false
@@ -256,16 +267,15 @@ Naming/MethodName:
   Severity: convention
 Naming/MethodParameterName:
   Severity: convention
-Naming/PredicateName:
+Naming/PredicateMethod:
+  Severity: convention
+Naming/PredicatePrefix:
   Severity: convention
 Naming/VariableName:
   Severity: convention
 Naming/VariableNumber:
   Enabled: false
 
-Rails/ActionControllerFlashBeforeRender:
-  Severity: convention
-  AutoCorrect: false
 Rails/ActionOrder:
   Severity: convention
   AutoCorrect: false
@@ -280,54 +290,20 @@ Rails/ActiveSupportOnLoad:
 Rails/ApplicationMailer:
   Severity: convention
   AutoCorrect: false
-Rails/BelongsTo:
-  Severity: convention
-  AutoCorrect: false
-Rails/Date:
-  Enabled: false
-  AutoCorrect: false
 Rails/DeprecatedActiveModelErrorsMethods:
   AutoCorrect: false
-Rails/DuplicateAssociation:
-  AutoCorrect: false
 Rails/EagerEvaluationLogMessage:
-  Severity: convention
-  AutoCorrect: false
-Rails/EnumHash:
-  Severity: convention
-  AutoCorrect: false
-Rails/FindBy:
-  Severity: convention
-  AutoCorrect: false
-Rails/FindById:
   Severity: convention
   AutoCorrect: false
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/InverseOf:
-  Severity: convention
 Rails/LexicallyScopedActionFilter:
   Severity: convention
-Rails/Output:
-  Severity: convention
-  AutoCorrect: false
 Rails/OutputSafety:
   Severity: convention
-Rails/Pick:
-  Severity: convention
-  AutoCorrect: false
-Rails/PluckInWhere:
-  Severity: convention
-  AutoCorrect: false
 Rails/RakeEnvironment:
   Severity: convention
-  AutoCorrect: false
-Rails/ReadWriteAttribute:
-  Enabled: false # accessors are often defined in terms of read_attribute
-  AutoCorrect: false
-Rails/TimeZone:
-  Enabled: false
   AutoCorrect: false
 Rails/TimeZoneAssignment:
   Severity: convention
@@ -344,18 +320,12 @@ RSpec/Be:
   Severity: convention
 RSpec/BeforeAfterAll:
   Severity: convention
-RSpec/ContextMethod:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ContextWording:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
 RSpec/DescribeMethod:
   Severity: convention
-RSpec/ExpectActual:
-  Severity: convention
-  AutoCorrect: false
 RSpec/ExpectChange:
   Enabled: false
   AutoCorrect: false
@@ -418,8 +388,6 @@ RSpec/VerifiedDoubleReference:
 RSpec/VerifiedDoubles:
   Enabled: false
 
-Style/AccessModifierDeclarations:
-  Severity: convention
 Style/AccessorGrouping:
   Severity: convention
   AutoCorrect: false
@@ -430,6 +398,9 @@ Style/ClassAndModuleChildren:
   AutoCorrect: false
 Style/ClassVars:
   Severity: convention
+Style/CollectionQuerying:
+  Severity: convention
+  AutoCorrect: false
 Style/CombinableLoops:
   Severity: convention
   AutoCorrect: false
@@ -437,8 +408,6 @@ Style/CommentedKeyword:
   Severity: convention
   AutoCorrect: false
 Style/DocumentDynamicEvalDefinition:
-  Severity: convention
-Style/ExponentialNotation:
   Severity: convention
 Style/FormatString:
   Severity: convention
@@ -472,9 +441,6 @@ Style/OptionalArguments:
   Severity: convention
 Style/OptionalBooleanParameter:
   Severity: convention
-Style/RescueModifier:
-  Severity: warning
-  AutoCorrect: false
 Style/StringConcatenation:
   Enabled: false
   AutoCorrect: false

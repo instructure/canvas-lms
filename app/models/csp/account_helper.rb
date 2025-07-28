@@ -129,6 +129,7 @@ module Csp::AccountHelper
     domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
+    domains += csp_dynamic_registration_domain(request)
     domains.compact.uniq.sort
   end
 
@@ -150,10 +151,13 @@ module Csp::AccountHelper
   end
 
   def csp_tools_grouped_by_domain(internal_service_only: false)
-    csp_tool_scope = ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
+    csp_tool_scope = Lti::ContextToolFinder.all_tools_for(self, order_in_scope: false) # unordered to not mess with the .distinct
 
     if internal_service_only
-      csp_tool_scope = csp_tool_scope.joins(:developer_key).where(developer_keys: { internal_service: true })
+      csp_tool_scope = csp_tool_scope.where.not(developer_key_id: nil)
+      unique_dev_keys = csp_tool_scope.distinct.pluck(:developer_key_id)
+      internal_service_dev_keys = DeveloperKey.where(id: unique_dev_keys, internal_service: true).pluck(:id)
+      csp_tool_scope = csp_tool_scope.where(developer_key_id: internal_service_dev_keys)
     end
 
     csp_tool_scope.each_with_object({}) do |tool, hash|
@@ -182,7 +186,7 @@ module Csp::AccountHelper
       files_host = if separator == "."
                      "*.#{files_host}"
                    else
-                     "*.#{files_host[files_host.index(".") + 1..]}"
+                     "*.#{files_host[(files_host.index(".") + 1)..]}"
                    end
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config["base_url"]).host
@@ -196,7 +200,12 @@ module Csp::AccountHelper
     csp_files_domains.compact
   end
 
-  def csp_logging_config
-    @config ||= Rails.application.credentials.csp_logging || {}
+  private
+
+  def csp_dynamic_registration_domain(request)
+    return [] unless request.respond_to?(:env)
+    return [] unless request.env&.[]("dynamic_reg_url_csp")
+
+    [URI.parse(request.env["dynamic_reg_url_csp"]).host]
   end
 end

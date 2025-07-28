@@ -97,7 +97,7 @@ describe LiveEvents do
     context "Files" do
       def course_file
         data = fixture_file_upload("docs/doc.doc", "application/msword", true)
-        factory_with_protected_attributes(@course.attachments, uploaded_data: data)
+        @course.attachments.create!(uploaded_data: data)
       end
 
       it "triggers a live event on files being added to the course" do

@@ -22,12 +22,12 @@ import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'
 import Override from '@canvas/assignments/backbone/models/AssignmentOverride'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import SearchHelpers from '@canvas/util/searchHelpers'
 import DisabledTokenInput from './DisabledTokenInput'
 
-const I18n = useI18nScope('DueDateTokenWrapper')
+const I18n = createI18nScope('DueDateTokenWrapper')
 
 const DueDateWrapperConsts = {
   MINIMUM_SEARCH_LENGTH: 3,
@@ -63,6 +63,12 @@ class DueDateTokenWrapper extends React.Component {
   // -------------------
   //      Lifecycle
   // -------------------
+
+  constructor(props) {
+    super(props)
+    this.disabledTokenInputRef = React.createRef()
+    this.tokenInputRef = React.createRef()
+  }
 
   state = {
     userInput: '',
@@ -101,7 +107,6 @@ class DueDateTokenWrapper extends React.Component {
     try {
       this.setState({currentlyTyping: false})
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('tried to set state in unmounted DueDateTokenWrapper', error)
     }
     if (
@@ -224,7 +229,7 @@ class DueDateTokenWrapper extends React.Component {
       this.conditionalReleaseOptions(),
       this.sectionOptions(),
       this.groupOptions(),
-      this.studentOptions()
+      this.studentOptions(),
     )
 
   studentOptions = () => this.optionsForType('student')
@@ -350,20 +355,22 @@ class DueDateTokenWrapper extends React.Component {
   renderTokenInput = () => {
     if (this.props.disabled) {
       return (
-        // eslint-disable-next-line react/no-string-refs
-        <DisabledTokenInput tokens={map(this.props.tokens, 'name')} ref="DisabledTokenInput" />
+        <DisabledTokenInput
+          tokens={map(this.props.tokens, 'name')}
+          ref={this.disabledTokenInputRef}
+        />
       )
     }
     const ariaLabel = I18n.t(
       'Add students by searching by name, course section or group.' +
         ' After entering text, navigate results by using the down arrow key.' +
-        ' Select a result by using the Enter key.'
+        ' Select a result by using the Enter key.',
     )
     return (
       <div>
         <div id="ic-tokeninput-description" className="screenreader-only">
           {I18n.t(
-            'Use this list to remove assigned students. Add new students with combo box after list.'
+            'Use this list to remove assigned students. Add new students with combo box after list.',
           )}
         </div>
         <TokenInput
@@ -377,8 +384,7 @@ class DueDateTokenWrapper extends React.Component {
           combobox-aria-label={ariaLabel}
           value={true}
           showListOnFocus={!this.props.disabled}
-          // eslint-disable-next-line react/no-string-refs
-          ref="TokenInput"
+          ref={this.tokenInputRef}
         />
       </div>
     )

@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {fireEvent, render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import AddTray, {mapStateToProps} from '../AddTray'
 import {ENABLED_FOR_ALL, ENABLED_FOR_NONE} from '@canvas/permissions/react/propTypes'
@@ -190,48 +191,46 @@ const defaultProps = () => ({
 it('renders proper loading state for component', () => {
   const props = defaultProps()
   props.loading = true
-  const tree = shallow(<AddTray {...props} />)
-  const node = tree.find('Spinner')
-  expect(node.exists()).toBeTruthy()
+  const {getByText} = render(<AddTray {...props} />)
+  expect(getByText('Saving New Role')).toBeInTheDocument()
 })
 
-it('onChangeRoleName changes role name properly', () => {
+it('changes role name when user types in input', async () => {
   const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  inst.onChangeRoleName({
-    target: {
-      value: 'Awesome_aaron',
-    },
-  })
-  expect(tree.state().selectedRoleName).toEqual('Awesome_aaron')
+  const {getByLabelText} = render(<AddTray {...props} />)
+
+  const roleNameInput = getByLabelText('Role Name *')
+  fireEvent.change(roleNameInput, {target: {value: 'Awesome_aaron'}})
+
+  expect(roleNameInput).toHaveValue('Awesome_aaron')
 })
 
-it('displays an error if attempting to save with an empty role name', () => {
+it('displays an error if attempting to save with an empty role name', async () => {
   const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  let errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(0)
-  inst.handleSaveButton()
-  errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(1)
+  render(<AddTray {...props} />)
+  const save = screen.getByText('Save')
+
+  fireEvent.click(save)
+
+  const errorText = await screen.findByText('A role name is required')
+  expect(errorText).toBeInTheDocument()
 })
 
-it('clears the empty role name error when text is entered', () => {
+it('clears the empty role name error when text is entered', async () => {
   const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  inst.handleSaveButton()
-  let errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(1)
-  inst.onChangeRoleName({
-    target: {
-      value: 'Custom Student Role',
-    },
-  })
-  errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(0)
+  render(<AddTray {...props} />)
+  const save = screen.getByText('Save')
+  const roleNameInput = screen.getByLabelText('Role Name *')
+
+  fireEvent.click(save)
+
+  let errorText = await screen.findByText('A role name is required')
+  expect(errorText).toBeInTheDocument()
+
+  fireEvent.input(roleNameInput, {target: {value: 'Custom Student Role'}})
+
+  errorText = screen.queryByText('A role name is required')
+  expect(errorText).not.toBeInTheDocument()
 })
 
 it('does not pass in the account admin base role in mapStateToProps', () => {
@@ -265,17 +264,16 @@ it('does not pass in the account admin base role in mapStateToProps', () => {
   expect(realProps.allBaseRoles).toEqual([state.roles[0]])
 })
 
-it('onChangeRoleLabel sets error if role is used', () => {
+it('shows error when role name is already in use', async () => {
+  const user = userEvent.setup()
   const props = defaultProps()
   props.allLabels = ['student', 'teacher']
-  const tree = shallow(<AddTray {...props} />)
-  const event = {target: {value: ' teacher   '}} // make sure trimming happens
-  tree.instance().onChangeRoleName(event)
-  const expectedErrorState = [
-    {
-      text: 'Cannot add role name teacher: already in use',
-      type: 'error',
-    },
-  ]
-  expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
+  const {getByLabelText} = render(<AddTray {...props} />)
+
+  const roleNameInput = getByLabelText('Role Name *')
+  await user.clear(roleNameInput)
+  await user.type(roleNameInput, 'teacher')
+
+  // InstUI TextInput renders error messages differently, so we need to check for aria-invalid
+  expect(roleNameInput).toHaveAttribute('aria-invalid', 'true')
 })

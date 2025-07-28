@@ -75,6 +75,7 @@ class Quizzes::QuizRegrader::Submission
   end
 
   REGRADE_KEEP_FIELDS = %w[id position name question_name published_at].freeze
+  private_constant :REGRADE_KEEP_FIELDS
 
   def regraded_question_data
     pos = 0

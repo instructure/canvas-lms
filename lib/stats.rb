@@ -54,13 +54,9 @@ module Stats
     end
     alias_method :push, :<<
 
-    def size
-      @items.size
-    end
+    delegate :size, to: :@items
     alias_method :count, :size
-    def empty?
-      @items.empty?
-    end
+    delegate :empty?, to: :@items
 
     def mean
       @items.empty? ? nil : (sum.to_f / @items.size)

@@ -29,6 +29,7 @@
  * @property {Object} sourceToolInfo - Information about the source tool.
  * @property {string} sourceToolInfo.origin - The origin of the source tool.
  * @property {number} sourceToolInfo.windowId - The window ID of the source tool.
+ * @property {number} sourceToolInfo.indexInTopFrames - Source tool's window's index in window.top.frames[].
  * @property {Object} [key] - Additional properties in the message.
  */
 
@@ -75,6 +76,8 @@ const handler = (parentOrigin, windowReferences, parentWindow, includeRCESignal)
     // We can't forward the whole `e.source` window in the postMessage,
     // so we keep a list (`windowReferences`) of all windows we've received
     // messages from, and include the index into that list as `windowId`
+    // (This is more reliable than indexInTopFrames, which can change if
+    // the DOM changes)
 
     let windowId = windowReferences.indexOf(e.source)
 
@@ -83,7 +86,17 @@ const handler = (parentOrigin, windowReferences, parentWindow, includeRCESignal)
       windowId = windowReferences.length - 1
     }
 
-    const newMessage = {...message, sourceToolInfo: {origin: e.origin, windowId}}
+    // Index of the source window in the top frames, for case where Canvas's
+    // postMessage processing needs to know which iframe the message came from.
+    let indexInTopFrames = null
+    for (let i = 0; i < window.top.frames.length; i++) {
+      if (window.top.frames[i] === e.source) {
+        indexInTopFrames = i
+        break
+      }
+    }
+
+    const newMessage = {...message, sourceToolInfo: {origin: e.origin, windowId, indexInTopFrames}}
 
     if (includeRCESignal) {
       newMessage.in_rce = true

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -23,8 +22,10 @@ export type CanvasStore<A> = {
   setState(newState: Partial<A>): void
   getState(): A
   clearState(): void
+  // @ts-expect-error
   addChangeListener(listener: () => void)
 
+  // @ts-expect-error
   removeChangeListener(listener: () => void)
 
   emitChange(): void
@@ -64,6 +65,7 @@ export type CanvasStore<A> = {
  */
 function createStore<A extends {}>(initialState: A): CanvasStore<A> {
   const events = {...Backbone.Events}
+  // @ts-expect-error
   let state: A = initialState || {}
 
   return {
@@ -77,6 +79,7 @@ function createStore<A extends {}>(initialState: A): CanvasStore<A> {
     },
 
     clearState() {
+      // @ts-expect-error
       state = {}
       this.emitChange()
     },

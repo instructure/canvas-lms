@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,23 +18,23 @@
 
 import $ from 'jquery'
 
-import React, {forwardRef, MutableRefObject, useCallback, useEffect, useState} from 'react'
+import React, {forwardRef, type MutableRefObject, useCallback, useEffect, useState} from 'react'
 import {createChainedFunction} from '@instructure/ui-utils'
-import RCE, {RCEPropTypes} from '@instructure/canvas-rce/es/rce/RCE'
+import RCE, {type RCEPropTypes} from '@instructure/canvas-rce/es/rce/RCE'
 import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 import getRCSProps from '../getRCSProps'
 import EditorConfig from '../tinymce.config'
 import loadEventListeners from '../loadEventListeners'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
 import tinymce, {Editor} from 'tinymce'
-import {EditorOptionsPropType} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
+import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
 // onInit has been called. Until then tinymce is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(
   props: CanvasRcePropTypes,
-  _rceRef: React.ForwardedRef<RCEWrapper>
+  _rceRef: React.ForwardedRef<RCEWrapper>,
 ) {
   const rceRef = _rceRef as MutableRefObject<RCEWrapper>
 
@@ -55,6 +53,8 @@ const CanvasRce = forwardRef(function CanvasRce(
     onInit,
     resourceType,
     resourceId,
+    flashAlertTimeout,
+    features,
     ...rest
   } = props
 
@@ -62,18 +62,22 @@ const CanvasRce = forwardRef(function CanvasRce(
   const [tinymceConfig] = useState(() => {
     // tinymce is a global by now via import of CanvasRce importing tinyRCE
     const editorConfig = new EditorConfig(tinymce, window.INST, textareaId)
-    const config = {...editorConfig.defaultConfig(), ...editorOptions}
+    const config = {...editorConfig.defaultConfig(), ...(editorOptions ?? {})}
     if (editorOptions?.init_instance_callback) {
+      // @ts-expect-error
       config.init_instance_callback = createChainedFunction(
         config.init_instance_callback,
-        editorOptions?.init_instance_callback
+        editorOptions.init_instance_callback,
       )
     }
     return config
   })
   const [autosave_] = useState<RCEPropTypes['autosave']>({
-    enabled: props.autosave,
-    interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
+    enabled: autosave ?? true,
+    maxAge:
+      Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
+        ? 3600000
+        : ENV.rce_auto_save_max_age_ms,
   })
   const [refCreated, setRefCreated] = useState<Element | null>(null)
 
@@ -81,6 +85,7 @@ const CanvasRce = forwardRef(function CanvasRce(
   // will never trigger it to be rerun. This way any time the ref changes,
   // the function is called. rceRef as a dependency is to quiet eslint.
   const magicRef = useCallback(
+    // @ts-expect-error
     node => {
       rceRef.current = node
       if (node) {
@@ -88,7 +93,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       }
       setRefCreated(node)
     },
-    [rceRef]
+    [rceRef],
   )
 
   useEffect(() => {
@@ -116,27 +121,37 @@ const CanvasRce = forwardRef(function CanvasRce(
       }
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}
       language={window.ENV?.LOCALES?.[0] || 'en'}
+      // @ts-expect-error
       userCacheKey={window.ENV?.user_cache_key}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      // @ts-expect-error
       ltiTools={window.INST?.editorButtons}
-      maxInitRenderedRCEs={props.maxInitRenderedRCEs}
-      mirroredAttrs={mirroredAttrs}
-      readOnly={readOnly}
-      textareaClassName={textareaClassName}
+      maxInitRenderedRCEs={props.maxInitRenderedRCEs ?? -1}
+      mirroredAttrs={mirroredAttrs ?? {}}
+      readOnly={readOnly ?? false}
+      textareaClassName={textareaClassName ?? 'input-block-level'}
       textareaId={textareaId}
       height={height}
+      // @ts-expect-error
       rcsProps={RCSProps}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onContentChange={onContentChange}
-      onInit={onInit}
+      onFocus={onFocus ?? (() => {})}
+      onBlur={onBlur ?? (() => {})}
+      onContentChange={onContentChange ?? (() => {})}
+      onInit={onInit ?? (() => {})}
       use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
       resourceType={resourceType}
       resourceId={resourceId}
+      flashAlertTimeout={flashAlertTimeout ?? ENV?.flashAlertTimeout ?? 10000}
+      features={features ?? window.ENV?.FEATURES ?? {}}
+      // @ts-expect-error
+      ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
+        // @ts-expect-error
         isA2StudentView: window.ENV?.a2_student_view,
+        // @ts-expect-error
         maxMruTools: window.ENV?.MAX_MRU_LTI_TOOLS,
+        // @ts-expect-error
         resourceSelectionUrlOverride:
           $('#context_external_tool_resource_selection_url').attr('href') || null,
       }}
@@ -160,7 +175,7 @@ export interface CanvasRcePropTypes {
    * tinymce configuration overrides
    * see RCEWrapper's editorOptionsPropType for details.
    */
-  editorOptions?: EditorOptionsPropType
+  editorOptions?: EditorOptions
 
   /**
    * height of the RCE. If a number, in px
@@ -211,7 +226,7 @@ export interface CanvasRcePropTypes {
   timezone?: string
 
   onFocus?: (rceWrapper: RCEWrapper) => void
-  onBlur?: (event: Event) => void
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   onInit?: (tinymce_editor: Editor) => void
 
   /**
@@ -228,24 +243,11 @@ export interface CanvasRcePropTypes {
    * id of the resource where the RCE is used
    */
   resourceId?: number
-}
 
-const defaultProps: Partial<CanvasRcePropTypes> = {
-  autosave: true,
-  editorOptions: {},
-  maxInitRenderedRCEs: -1,
-  mirroredAttrs: {},
-  readOnly: false,
-  textareaClassName: 'input-block-level',
-  features: ENV?.FEATURES || {},
-  flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
-  timezone: ENV?.TIMEZONE,
-  onFocus: () => {},
-  onBlur: () => {},
-  onContentChange: () => {},
-  onInit: () => {},
+  /**
+   * any other props are passed through to the RCE
+   */
+  [key: string]: any
 }
-
-CanvasRce.defaultProps = defaultProps
 
 export default CanvasRce

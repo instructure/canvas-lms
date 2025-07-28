@@ -52,9 +52,9 @@
   {{/if}}
 
   <div class="header-bar-right {{#if ENV.FEATURES.instui_nav}}assignment_index_header_right{{/if}}">
-    {{#ifAny ENV.PERMISSIONS.manage_assignments ENV.PERMISSIONS.manage_assignments_add}}
+    {{#ifAny ENV.PERMISSIONS.manage_assignments_edit ENV.PERMISSIONS.manage_assignments_add}}
       {{#if ENV.FEATURES.instui_nav}}
-        {{#if ENV.PERMISSIONS.manage_assignments}}
+        {{#if ENV.PERMISSIONS.manage_assignments_edit}}
           <div id="settingsMountPoint"></div>
         {{/if}}
         <div id="indexCreateMountPoint"></div>
@@ -89,7 +89,7 @@
       {{/if}}
 
       {{#unless ENV.FEATURES.instui_nav}}
-        {{#if ENV.PERMISSIONS.manage_assignments}}
+        {{#if ENV.PERMISSIONS.manage_assignments_edit}}
           <span id="settingsMountPoint"></span>
         {{/if}}
       {{/unless}}
@@ -136,7 +136,7 @@
 {{#if ENV.PERMISSIONS.manage_assignments_add}}
   <form data-view="createGroup" class="form-dialog"></form>
 {{/if}}
-{{#if ENV.PERMISSIONS.manage_assignments}}
+{{#if ENV.PERMISSIONS.manage_assignments_edit}}
   <form data-view="assignmentSettings" class="form-dialog"></form>
   <form data-view="assignmentSyncSettings" class="form-dialog"></form>
 {{/if}}

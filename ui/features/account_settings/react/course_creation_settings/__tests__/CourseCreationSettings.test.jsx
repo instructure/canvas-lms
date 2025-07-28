@@ -56,7 +56,7 @@ describe('CourseCreationSettings', () => {
           students_can_create_courses: true,
           no_enrollments_can_create_courses: true,
         }}
-      />
+      />,
     )
     const teacherCheckbox = getByRole('checkbox', {name: 'Teachers'})
     const studentCheckbox = getByRole('checkbox', {name: 'Students'})
@@ -74,7 +74,7 @@ describe('CourseCreationSettings', () => {
           ...defaultValues,
           students_can_create_courses: true,
         }}
-      />
+      />,
     )
     expect(queryByText('Where can teachers create courses?')).not.toBeInTheDocument()
     const teacherCheckbox = getByRole('checkbox', {name: 'Teachers'})
@@ -99,7 +99,7 @@ describe('CourseCreationSettings', () => {
           ...defaultValues,
           teachers_can_create_courses: true,
         }}
-      />
+      />,
     )
     expect(queryByText('Where can students create courses?')).not.toBeInTheDocument()
     const studentCheckbox = getByRole('checkbox', {name: 'Students'})
@@ -126,7 +126,7 @@ describe('CourseCreationSettings', () => {
           teachers_can_create_courses_anywhere: false,
           students_can_create_courses_anywhere: false,
         }}
-      />
+      />,
     )
     const studentCheckbox = getByRole('checkbox', {name: 'Students'})
     act(() => studentCheckbox.click())

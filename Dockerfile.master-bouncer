@@ -1,0 +1,6 @@
+FROM instructure/gergich
+
+ENV GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l $SSH_USER_NAME -o StrictHostKeyChecking=no'
+
+RUN apk add --no-cache \
+    openssh

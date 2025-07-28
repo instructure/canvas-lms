@@ -23,27 +23,28 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Responsive} from '@instructure/ui-responsive'
 import {UploadButton} from './UploadButton'
 import {uploadFile} from '@canvas/upload-file'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
+
+const returnFocus = () => {
+  // clear conversation selection then use timeout to give time
+  // for the conversation list to appear for mobile
+  // setSelectedConversations([])
+  setTimeout(() => {
+    // successful upload: className="discussions-attach-button"
+    // failed upload: data-testid="attach-btn"
+    const downloadLink = document.querySelector('.discussions-attach-button')
+    if (downloadLink) {
+      downloadLink.children[0].focus()
+    } else {
+      document.querySelector(`[data-testid="attach-btn"]`).focus()
+    }
+  }, 0)
+}
+
 export function AttachmentDisplay(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-
-  const returnFocus = () => {
-    // clear conversation selection then use timeout to give time
-    // for the conversation list to appear for mobile
-    // setSelectedConversations([])
-    setTimeout(() => {
-      // successful upload: className="discussions-attach-button"
-      // failed upload: data-testid="attach-btn"
-      const downloadLink = document.querySelector('.discussions-attach-button')
-      if (downloadLink) {
-        downloadLink.children[0].focus()
-      } else {
-        document.querySelector(`[data-testid="attach-btn"]`).focus()
-      }
-    }, 0)
-  }
 
   const removeAttachment = () => {
     props.setAttachment(null)
@@ -52,16 +53,13 @@ export function AttachmentDisplay(props) {
   // This method uses the uploadFile helper method to upload a discussion attachment
   // Normally attachments will be placed in the discussion attachment folder
   // Graded discussion attachments should not count against user quotas, so they use a different url/process and aren't affected by quotas
+  // When creating new discussions with an attachment, we do not have a discussion attachment folder yet, so we use the pending files endpoint
   const addAttachment = async e => {
-    // URL destination changes based on the type of discussion
-    const fileUploadURL = props.isGradedDiscussion
-      ? '/files/pending'
-      : `/api/v1/folders/${ENV.DISCUSSION?.ATTACHMENTS_FOLDER_ID}/files`
     const files = Array.from(e.currentTarget?.files)
 
     // We are only allowing a single file submission, if there is not exactly 1 file, set failure and cancel the upload
     if (files.length !== 1) {
-      setOnFailure(I18n.t('Error adding file to discussion message'))
+      setOnFailure(I18n.t('Error adding file'))
       return
     }
     const fileToUpload = files[0]
@@ -73,7 +71,18 @@ export function AttachmentDisplay(props) {
     try {
       // attachmentInformation structure changes depending on the type of discussion
       let attachmentInformation = {}
-      if (props.isGradedDiscussion) {
+      // URL destination changes based on the type of discussion
+      let fileUploadURL = ''
+      if (props.attachmentFolderId && !!props.checkContextQuota) {
+        fileUploadURL = `/api/v1/folders/${props.attachmentFolderId}/files`
+        // If uploading file to the attachment folder, only name and type are required
+        attachmentInformation = {
+          name: fileToUpload.name,
+          content_type: fileToUpload.type,
+          size: fileToUpload.size,
+        }
+      } else {
+        fileUploadURL = '/files/pending'
         // If the file is submitted in a graded discussion, a different path is used that requires different information
         // This is required to get the file to be uploaded to the submissions folder and ignore the quota limits
 
@@ -87,16 +96,17 @@ export function AttachmentDisplay(props) {
 
         attachmentInformation['attachment[filename]'] = fileToUpload.name
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
-        attachmentInformation['attachment[intent]'] = 'submit' // directs the logic in the files_controller to skip quota checks
+        attachmentInformation['attachment[size]'] = fileToUpload.size
+        // attach_discussion_file is checked against the user quota, but submissions are not
+        attachmentInformation['attachment[intent]'] = props.checkContextQuota
+          ? 'attach_discussion_file'
+          : 'submit'
         attachmentInformation['attachment[context_code]'] = `${context}` // used to find the correct course folder
         attachmentInformation['attachment[asset_string]'] = `${assetString}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
-      } else {
-        // If uploading file to the attachment folder, only name and type are required
-        attachmentInformation = {
-          name: fileToUpload.name,
-          content_type: fileToUpload.type,
-        }
       }
+
+      // Prevents overwriting attachments in separate discussions
+      attachmentInformation['attachment[on_duplicate]'] = 'rename'
 
       // Changed from uploadFiles to uploadFile because we need to control the pre-flight data ( attachmentInformation)
       const newFile = await uploadFile(fileUploadURL, attachmentInformation, fileToUpload)
@@ -172,9 +182,15 @@ AttachmentDisplay.propTypes = {
    */
   responsiveQuerySizes: PropTypes.func.isRequired,
   /**
-   * toggles file uploadUrl
+   * toggles file uploadUrl and default upload intent
    */
-  isGradedDiscussion: PropTypes.bool,
+  checkContextQuota: PropTypes.bool,
+
+  /**
+   * The attachment folder id to use for uploading attachments
+   */
+  attachmentFolderId: PropTypes.string,
+
   /**
    * Toggles when UploadButton (add attachment) renders
    * Discussion Entry and Discussion topic have different canAttach permissions.

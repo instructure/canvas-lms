@@ -100,7 +100,7 @@ EntryCollection.prototype.getEntryData = function (id) {
           return (entry = item)
         }
       }
-    })(this)
+    })(this),
   )
   if (!(rootParent != null && entry != null)) {
     return null

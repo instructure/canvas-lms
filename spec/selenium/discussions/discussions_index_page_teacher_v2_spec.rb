@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# test selenium run
+require_relative "../common"
 require_relative "pages/discussions_index_page"
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/context_modules_common"
@@ -115,6 +117,23 @@ describe "discussions index" do
       wait_for_ajaximations
       discussion.reload
       expect(discussion.published?).to be false
+    end
+
+    context "discussion with checkpoints" do
+      before :once do
+        sub_account = Account.create!(name: "Sub Account", parent_account: Account.default)
+        @course.update!(account: sub_account)
+        @course.account.enable_feature! :discussion_checkpoints
+        @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, title: "foo")
+      end
+
+      it "disables unpublish button if there are incomplete sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to topic submission for #{@student.name}"
+        expect(@topic.assignment.has_student_submissions_for_sub_assignments?).to be true
+        expect(@topic.assignment.has_student_submissions?).to be false
+        login_and_visit_course(@teacher, @course)
+        expect(DiscussionsIndex.publish_button("foo").find_element(:tag_name, "button")).to be_disabled
+      end
     end
 
     it "clicking the subscribe button changes the subscribed status", priority: "1" do
@@ -217,6 +236,64 @@ describe "discussions index" do
       expect(DiscussionsIndex.discussion(discussion1_title + " Copy")).to be_displayed
     end
 
+    it "duplicates a checkpointed discussion properly" do
+      @course.account.enable_feature! :discussion_checkpoints
+      checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+      checkpointed_discussion.lock_at = 3.days.from_now
+      checkpointed_discussion.unlock_at = 3.days.ago
+      checkpointed_discussion.save!
+
+      rtt = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          { type: "everyone", due_at: 2.days.from_now },
+          { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }
+        ],
+        points_possible: 6
+      )
+      rte = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          { type: "everyone", due_at: 3.days.from_now },
+          { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }
+        ],
+        points_possible: 7,
+        replies_required: 2
+      )
+
+      login_and_visit_course(@teacher, @course)
+      DiscussionsIndex.click_duplicate_menu_option(checkpointed_discussion.title)
+
+      dup_discussion = DiscussionTopic.last
+      expect(DiscussionsIndex.discussion(checkpointed_discussion.title)).to be_displayed
+      expect(DiscussionsIndex.discussion(checkpointed_discussion.title + " Copy")).to be_displayed
+      expect(checkpointed_discussion.reload.workflow_state).to eq "active"
+      expect(checkpointed_discussion).not_to eq dup_discussion
+      expect(dup_discussion.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_discussion.workflow_state).to eq "unpublished"
+      expect(dup_discussion.reply_to_entry_required_count).to eq checkpointed_discussion.reply_to_entry_required_count
+      expect(dup_discussion.assignment.title).to eq checkpointed_discussion.assignment.title + " Copy"
+      expect(dup_discussion.assignment.workflow_state).to eq "unpublished"
+
+      dup_rtt = dup_discussion.reply_to_topic_checkpoint
+      expect(dup_rtt.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_rtt.points_possible).to eq rtt.points_possible
+      expect(dup_rtt.due_at).to eq rtt.due_at
+      expect(dup_rtt.lock_at).to eq rtt.lock_at
+      expect(dup_rtt.unlock_at).to eq rtt.unlock_at
+      expect(dup_rtt.assignment_overrides).to be_empty
+
+      dup_rte = dup_discussion.reply_to_entry_checkpoint
+      expect(dup_rte.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_rte.points_possible).to eq rte.points_possible
+      expect(dup_rte.due_at).to eq rte.due_at
+      expect(dup_rte.lock_at).to eq rte.lock_at
+      expect(dup_rte.unlock_at).to eq rte.unlock_at
+      expect(dup_rte.assignment_overrides).to be_empty
+    end
+
     it "pill on announcement displays correct number of unread replies", priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
@@ -238,7 +315,6 @@ describe "discussions index" do
       # Displayed from the index page
 
       before do
-        differentiated_modules_on
         @student1 = student_in_course(course: @course, active_all: true).user
         @student2 = student_in_course(course: @course, active_all: true).user
         @course_section = @course.course_sections.create!(name: "section alpha")
@@ -314,11 +390,48 @@ describe "discussions index" do
         expect(displayed_overrides).to match_array(expected_overrides)
       end
 
+      it "displays checkpointed discussion assign to tray correctly" do
+        Account.site_admin.enable_feature! :discussion_checkpoints
+        checkpointed_discussion = create_graded_discussion(@course)
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 6
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 7,
+          replies_required: 2
+        )
+
+        login_and_visit_course(@teacher, @course)
+        DiscussionsIndex.click_assign_to_menu_option(checkpointed_discussion.title)
+
+        expect(module_item_assign_to_card.first).not_to contain_css(due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(reply_to_topic_due_date_input_selector)
+        expect(module_item_assign_to_card.first).to contain_css(required_replies_due_date_input_selector)
+      end
+
       it "does not render assign to tray on group discussions index" do
         group = @course.groups.create!(name: "Group 1")
         discussion = group.discussion_topics.create!(title: "group topic")
         user_session(@teacher)
         get("/groups/#{group.id}/discussion_topics/")
+        wait_for_ajaximations
+        DiscussionsIndex.discussion_menu(discussion.title).click
+        expect(DiscussionsIndex.manage_discussions_menu).to include_text("Delete")
+        expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
+
+      it "does not render assign to tray in course context with ungraded group discussions index" do
+        group = @course.groups.create!(name: "Group 1")
+        discussion = @course.discussion_topics.create!(title: "group topic", group_category: group.group_category)
+        user_session(@teacher)
+        get("/courses/#{@course.id}/discussion_topics/")
         wait_for_ajaximations
         DiscussionsIndex.discussion_menu(discussion.title).click
         expect(DiscussionsIndex.manage_discussions_menu).to include_text("Delete")
@@ -335,6 +448,39 @@ describe "discussions index" do
         login_and_visit_course(@teacher, @course)
         DiscussionsIndex.discussion_menu(discussion.title).click
         expect(DiscussionsIndex.manage_discussions_menu).not_to include_text("Assign To")
+      end
+    end
+
+    context "when instui nav feature flag on" do
+      page_header_title_all = "Discussions"
+      page_header_title_unread = "Unread Discussions"
+
+      before do
+        @course.root_account.enable_feature!(:instui_nav)
+        login_and_visit_course(@teacher, @course)
+      end
+
+      it "discussions header title rendered correctly without filter selection" do
+        expect(DiscussionsIndex.discussion_header_title(page_header_title_all)).to eq page_header_title_all
+      end
+
+      it "discussions header title rendered correctly with all filter" do
+        DiscussionsIndex.select_filter_from_menu("all")
+        current_title = DiscussionsIndex.discussion_header_title(page_header_title_all)
+        expect(current_title).to eq page_header_title_all
+      end
+
+      it "discussions header title rendered correctly with unread filter" do
+        DiscussionsIndex.select_filter_from_menu("unread")
+        current_title = DiscussionsIndex.discussion_header_title(page_header_title_unread)
+        expect(current_title).to eq page_header_title_unread
+      end
+
+      it "discussions can be filtered with unread filter" do
+        DiscussionsIndex.select_filter_from_menu("unread")
+        expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
+        expect(DiscussionsIndex.discussion_group("Closed for Comments"))
+          .not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
       end
     end
   end

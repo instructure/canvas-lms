@@ -99,8 +99,8 @@ describe OutcomeProficiencyApiController, type: :request do
     context "missing permissions" do
       let(:revoke_permissions) { true }
 
-      it "returns 401 status" do
-        assert_status(401)
+      it "returns 403 status" do
+        assert_forbidden
       end
 
       it "returns unauthorized message" do
@@ -248,8 +248,8 @@ describe OutcomeProficiencyApiController, type: :request do
           )
         end
 
-        it "returns 401 status" do
-          assert_status(401)
+        it "returns 403 status" do
+          assert_forbidden
         end
 
         it "returns unauthorized message" do
@@ -386,8 +386,8 @@ describe OutcomeProficiencyApiController, type: :request do
           )
         end
 
-        it "returns 401 status" do
-          assert_status(401)
+        it "returns 403 status" do
+          assert_forbidden
         end
 
         it "returns unauthorized message" do

@@ -20,8 +20,23 @@
 class SectionTabPresenter
   include Rails.application.routes.url_helpers
 
+  TabDefinition = Struct.new(:id,
+                             :css_class,
+                             :label,
+                             :target,
+                             :hidden,
+                             :hidden_unused,
+                             :args,
+                             :href,
+                             :no_args,
+                             :icon,
+                             :account_id,
+                             :visibility,
+                             :external,
+                             :position,
+                             keyword_init: true)
   def initialize(tab, context)
-    @tab = OpenStruct.new(tab)
+    @tab = TabDefinition.new(**tab)
     @context = context
   end
   attr_reader :tab, :context
@@ -41,7 +56,7 @@ class SectionTabPresenter
   end
 
   def target?
-    !!(tab.respond_to?(:target) && tab.target)
+    !!tab.target
   end
 
   def path

@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {sessionStoragePersister} from '@canvas/query'
 
 declare global {
   interface Window {
@@ -31,7 +33,7 @@ declare global {
   }
 }
 
-const I18n = useI18nScope('MobileNavigation')
+const I18n = createI18nScope('MobileNavigation')
 
 const mobileHeaderInboxUnreadBadge = document.getElementById('mobileHeaderInboxUnreadBadge')
 
@@ -39,11 +41,14 @@ const MobileContextMenu = React.lazy(() => import('./MobileContextMenu'))
 const MobileGlobalMenu = React.lazy(() => import('./MobileGlobalMenu'))
 
 const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) => {
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
   const [globalNavIsOpen, setGlobalNavIsOpen] = useState(navIsOpen)
   const [contextNavIsOpen, setContextNavIsOpen] = useState(false)
+  const firstRender = useRef(true)
 
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: unreadConversationsCount, isSuccess: hasUnreadConversationsCount} = useQuery({
@@ -51,6 +56,7 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     queryFn: getUnreadCount,
     staleTime: 2 * 60 * 1000, // two minutes
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
+    persister: sessionStoragePersister,
   })
 
   useEffect(() => {
@@ -87,7 +93,27 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
     if (mobileContextNavContainer) {
       mobileContextNavContainer.setAttribute('aria-expanded', contextNavIsOpen.toString())
     }
-  }, [contextNavIsOpen])
+
+    if (!firstRender.current) {
+      const message = contextNavIsOpen
+        ? I18n.t('Navigation menu is now open')
+        : I18n.t('Navigation menu is now closed')
+      setOnSuccess(message, true)
+    }
+  }, [contextNavIsOpen, setOnSuccess])
+
+  useEffect(() => {
+    if (!firstRender.current) {
+      const message = globalNavIsOpen
+        ? I18n.t('Global navigation menu is now open')
+        : I18n.t('Global navigation menu is now closed')
+      setOnSuccess(message, true)
+    }
+  }, [globalNavIsOpen, setOnSuccess])
+
+  useEffect(() => {
+    firstRender.current = false
+  }, [])
 
   const spinner = (
     <View display="block" textAlign="center">

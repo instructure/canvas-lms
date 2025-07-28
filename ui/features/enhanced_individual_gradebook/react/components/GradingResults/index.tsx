@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
@@ -39,11 +39,16 @@ import {
   submitterPreviewText,
   disableGrading,
   passFailStatusOptions,
-} from '../../../utils/gradebookUtils'
+  assignmentHasCheckpoints,
+  getCorrectSubmission,
+} from '../../../utils/gradeInputUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
+import {CheckpointGradeInputs} from './CheckpointGradeInputs'
+import {Flex} from '@instructure/ui-flex'
+import SubmissionSticker, {stickersAvailable} from '@canvas/submission-sticker'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type GradingResultsComponentProps = {
   currentStudent?: GradebookStudentDetails
@@ -57,6 +62,9 @@ export type GradingResultsComponentProps = {
   dropped: boolean
 }
 
+export const REPLY_TO_TOPIC = 'reply_to_topic'
+export const REPLY_TO_ENTRY = 'reply_to_entry'
+
 export default function GradingResults({
   assignment,
   courseId,
@@ -69,11 +77,15 @@ export default function GradingResults({
   dropped,
 }: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
-  const [gradeInput, setGradeInput] = useState<string>('')
+  const [gradeInput, setGradeInput] = useState<string>(submission?.enteredGrade ?? '')
+  const [replyToTopicGradeInput, setReplyToTopicGradeInput] = useState<string>('')
+  const [replyToEntryGradeInput, setReplyToEntryGradeInput] = useState<string>('')
   const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [proxyUploadModalOpen, setProxyUploadModalOpen] = useState<boolean>(false)
   const [passFailStatusIndex, setPassFailStatusIndex] = useState<number>(0)
+  const [replyToTopicPassFailStatusIndex, setReplyToTopicPassFailStatusIndex] = useState<number>(0)
+  const [replyToEntryPassFailStatusIndex, setReplyToEntryPassFailStatusIndex] = useState<number>(0)
 
   const {submit, submitExcused, submitScoreError, submitScoreStatus, savedSubmission} =
     useSubmitScore()
@@ -82,51 +94,101 @@ export default function GradingResults({
     submissionId: submission?.id,
   })
 
-  useEffect(() => {
-    if (submission) {
+  const getGradeInputSetter = (subAssignmentTag?: string) => {
+    if (subAssignmentTag === REPLY_TO_TOPIC) {
+      return setReplyToTopicGradeInput
+    } else if (subAssignmentTag === REPLY_TO_ENTRY) {
+      return setReplyToEntryGradeInput
+    }
+
+    return setGradeInput
+  }
+
+  const getPassFailStatusIndexSetter = (subAssignmentTag?: string) => {
+    if (subAssignmentTag === REPLY_TO_TOPIC) {
+      return setReplyToTopicPassFailStatusIndex
+    } else if (subAssignmentTag === REPLY_TO_ENTRY) {
+      return setReplyToEntryPassFailStatusIndex
+    }
+
+    return setPassFailStatusIndex
+  }
+
+  const updateStateOnSubmissionChange = useCallback(
+    (subAssignmentTag?: string) => {
+      if (!submission) return
+
+      const correctSubmission = getCorrectSubmission(submission, subAssignmentTag)
+
+      if (!correctSubmission) return
+
       if (assignment?.gradingType === 'pass_fail') {
         const index = passFailStatusOptions.findIndex(
           passFailStatusOption =>
-            passFailStatusOption.value === submission.grade ||
-            (passFailStatusOption.value === 'EX' && submission.excused)
+            passFailStatusOption.value === correctSubmission.grade ||
+            (passFailStatusOption.value === 'EX' && correctSubmission.excused),
         )
+
+        const passFailStatusIndexSetter = getPassFailStatusIndexSetter(subAssignmentTag)
+
         if (index !== -1) {
-          setPassFailStatusIndex(index)
+          passFailStatusIndexSetter(index)
         } else {
-          setPassFailStatusIndex(0)
+          passFailStatusIndexSetter(0)
         }
       }
-      setExcusedChecked(submission.excused)
-      if (submission.excused) {
-        setGradeInput(I18n.t('Excused'))
-      } else if (submission.enteredGrade == null) {
-        setGradeInput('-')
-      } else if (assignment?.gradingType === 'letter_grade') {
-        setGradeInput(GradeFormatHelper.replaceDashWithMinus(submission.enteredGrade))
-      } else {
-        setGradeInput(submission.enteredGrade)
+
+      if (!subAssignmentTag) {
+        setExcusedChecked(submission.excused)
       }
+
+      const gradeInputSetter = getGradeInputSetter(subAssignmentTag)
+
+      if (correctSubmission.excused) {
+        gradeInputSetter(I18n.t('Excused'))
+      } else if (correctSubmission.enteredGrade == null) {
+        gradeInputSetter('-')
+      } else if (assignment?.gradingType === 'letter_grade') {
+        gradeInputSetter(GradeFormatHelper.replaceDashWithMinus(correctSubmission.enteredGrade))
+      } else {
+        gradeInputSetter(correctSubmission.enteredGrade)
+      }
+    },
+    [assignment, submission],
+  )
+
+  useEffect(() => {
+    updateStateOnSubmissionChange()
+
+    if (assignment && assignmentHasCheckpoints(assignment)) {
+      updateStateOnSubmissionChange(REPLY_TO_TOPIC)
+      updateStateOnSubmissionChange(REPLY_TO_ENTRY)
     }
-  }, [assignment, submission])
+  }, [assignment, submission, updateStateOnSubmissionChange])
 
   const handleGradeChange = useCallback(
     (updateEvent: GradeChangeApiUpdate) => {
-      const {status, newSubmission, error} = updateEvent
+      const {status, newSubmission, error, shouldCloseModal} = updateEvent
       switch (status) {
         case ApiCallStatus.FAILED:
-          showFlashError(error)(new Error('Failed to submit score'))
+          if (!shouldCloseModal) {
+            showFlashError(error)(new Error('Failed to submit score'))
+          }
           break
         case ApiCallStatus.COMPLETED:
           if (!newSubmission) {
             return
           }
           onSubmissionSaved(newSubmission)
-          setModalOpen(false)
-          showFlashSuccess(I18n.t('Grade saved'))()
+          if (shouldCloseModal) {
+            setModalOpen(false)
+          } else {
+            showFlashSuccess(I18n.t('Grade saved'))()
+          }
           break
       }
     },
-    [onSubmissionSaved]
+    [onSubmissionSaved],
   )
 
   const handlePostComment = useCallback(() => {
@@ -175,9 +237,11 @@ export default function GradingResults({
   }
 
   const {
+    assignmentEnhancementsEnabled,
     changeGradeUrl,
     customOptions: {hideStudentNames},
     gradingStandardPointsBased,
+    stickersEnabled,
   } = gradebookOptions
 
   const submitScoreUrl = (changeGradeUrl ?? '')
@@ -188,25 +252,91 @@ export default function GradingResults({
     const {
       target: {checked},
     } = event
-    await submitExcused(checked, submitScoreUrl)
+
+    // This is preparing for the future, when we might have other checkpoints. Just making sure that the checkpoint
+    // we are marking as excused exists.
+    const subAssignmentTag =
+      assignment.checkpoints && assignment.checkpoints.find(({tag}) => tag === REPLY_TO_TOPIC)
+        ? REPLY_TO_TOPIC
+        : null
+
+    await submitExcused(checked, submitScoreUrl, subAssignmentTag)
   }
 
-  const submitGrade = async () => {
-    await submit(assignment, submission, gradeInput, submitScoreUrl)
+  const getGradeFromState = (subAssignmentTag?: string | null) => {
+    if (subAssignmentTag === REPLY_TO_TOPIC) {
+      return replyToTopicGradeInput
+    } else if (subAssignmentTag === REPLY_TO_ENTRY) {
+      return replyToEntryGradeInput
+    }
+
+    return gradeInput
+  }
+
+  const submitGrade = async (subAssignmentTag?: string | null) => {
+    const correctSubmission = subAssignmentTag
+      ? {...submission, ...getCorrectSubmission(submission, subAssignmentTag)}
+      : submission
+
+    await submit(
+      assignment,
+      correctSubmission,
+      getGradeFromState(subAssignmentTag),
+      submitScoreUrl,
+      subAssignmentTag,
+    )
   }
 
   const handleSetGradeInput = (input: string) => {
     setGradeInput(input)
   }
 
+  const handleSetReplyToTopicGradeInput = (input: string) => {
+    setReplyToTopicGradeInput(input)
+  }
+
+  const handleSetReplyToEntryGradeInput = (input: string) => {
+    setReplyToEntryGradeInput(input)
+  }
+
+  const handleChangePassFailStatusWrapper = (
+    value: string | number | undefined,
+    setterForGradeInput: (value: ((prevState: string) => string) | string) => void,
+    setterForPassFailStatusIndex: (value: ((prevState: number) => number) | number) => void,
+  ) => {
+    if (typeof value === 'string') {
+      setterForGradeInput(value)
+    }
+    setterForPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === value))
+  }
+
   const handleChangePassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
-    if (typeof data.value === 'string') {
-      setGradeInput(data.value)
-    }
-    setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
+    handleChangePassFailStatusWrapper(data.value, setGradeInput, setPassFailStatusIndex)
+  }
+
+  const handleChangeReplyToTopicPassFailStatus = (
+    event: React.SyntheticEvent,
+    data: {value?: string | number | undefined},
+  ) => {
+    handleChangePassFailStatusWrapper(
+      data.value,
+      setReplyToTopicGradeInput,
+      setReplyToTopicPassFailStatusIndex,
+    )
+  }
+
+  const handleChangeReplyToEntryPassFailStatus = (
+    event: React.SyntheticEvent,
+    data: {value?: string | number | undefined},
+  ) => {
+    handleChangePassFailStatusWrapper(
+      data.value,
+      setReplyToEntryGradeInput,
+      setReplyToEntryPassFailStatusIndex,
+    )
   }
 
   const latePenaltyFinalGradeDisplay = (grade: string | null) => {
@@ -217,6 +347,14 @@ export default function GradingResults({
     const displayGrade = GradeFormatHelper.formatGrade(grade)
     return GradeFormatHelper.replaceDashWithMinus(displayGrade)
   }
+
+  const showSticker = stickersAvailable(
+    {
+      assignmentEnhancementsEnabled: assignmentEnhancementsEnabled ?? false,
+      stickersEnabled: stickersEnabled ?? false,
+    },
+    assignment,
+  )
 
   return (
     <>
@@ -241,18 +379,54 @@ export default function GradingResults({
                 {submitterPreviewText(submission)}
               </Text>
             </View>
-            <DefaultGradeInput
-              assignment={assignment}
-              submission={submission}
-              passFailStatusIndex={passFailStatusIndex}
-              gradeInput={gradeInput}
-              submitScoreStatus={submitScoreStatus}
-              context="student_and_assignment_grade"
-              handleSetGradeInput={handleSetGradeInput}
-              handleSubmitGrade={submitGrade}
-              handleChangePassFailStatus={handleChangePassFailStatus}
-              gradingStandardPointsBased={gradingStandardPointsBased}
-            />
+            {assignmentHasCheckpoints(assignment) ? (
+              <CheckpointGradeInputs
+                parentAssignment={assignment}
+                parentSubmission={submission}
+                parentPassFailStatusIndex={passFailStatusIndex}
+                replyToTopicPassFailStatusIndex={replyToTopicPassFailStatusIndex}
+                replyToEntryPassFailStatusIndex={replyToEntryPassFailStatusIndex}
+                parentGradeInput={gradeInput}
+                replyToTopicGradeInput={replyToTopicGradeInput}
+                replyToEntryGradeInput={replyToEntryGradeInput}
+                submitScoreStatus={submitScoreStatus}
+                gradingStandardPointsBased={gradingStandardPointsBased}
+                handleSetReplyToTopicGradeInput={handleSetReplyToTopicGradeInput}
+                handleSetReplyToEntryGradeInput={handleSetReplyToEntryGradeInput}
+                handleSubmitGrade={submitGrade}
+                handleChangeReplyToTopicPassFailStatus={handleChangeReplyToTopicPassFailStatus}
+                handleChangeReplyToEntryPassFailStatus={handleChangeReplyToEntryPassFailStatus}
+              />
+            ) : (
+              <Flex alignItems="end" gap="none x-large">
+                <Flex.Item>
+                  <DefaultGradeInput
+                    assignment={assignment}
+                    submission={submission}
+                    passFailStatusIndex={passFailStatusIndex}
+                    gradeInput={gradeInput}
+                    submitScoreStatus={submitScoreStatus}
+                    context="student_and_assignment_grade"
+                    handleSetGradeInput={handleSetGradeInput}
+                    handleSubmitGrade={submitGrade}
+                    handleChangePassFailStatus={handleChangePassFailStatus}
+                    gradingStandardPointsBased={gradingStandardPointsBased}
+                  />
+                </Flex.Item>
+
+                {showSticker && (
+                  <Flex.Item margin="none none small none">
+                    <SubmissionSticker
+                      confetti={false}
+                      size="small"
+                      submission={{...submission, courseId: assignment.courseId}}
+                      onStickerChange={sticker => onSubmissionSaved({...submission, sticker})}
+                      editable={true}
+                    />
+                  </Flex.Item>
+                )}
+              </Flex>
+            )}
             <View as="div" margin="small 0 0 0">
               {submission.late && (
                 <>
@@ -317,7 +491,7 @@ export default function GradingResults({
             )}
             {dropped && (
               <p className="dropped muted" data-testid="dropped-assignment-message">
-                This grade is currently dropped for this student.
+                {I18n.t('This grade is currently dropped for this student.')}
               </p>
             )}
             {submission.gradeMatchesCurrentSubmission !== null &&
@@ -345,7 +519,7 @@ export default function GradingResults({
                 {I18n.t('Submission Details')}
               </Button>
             </View>
-            <View as="div" className="span4" margin="medium" width="14.6rem">
+            <View as="div" className="span4" margin="small 0 0 small" width="14.6rem">
               {gradebookOptions.proxySubmissionEnabled &&
                 assignment.submissionTypes.includes('online_upload') && (
                   <Button

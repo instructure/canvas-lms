@@ -22,9 +22,10 @@ import type {InternalSettingsData} from '../types'
 import React from 'react'
 import {InternalSettingsView} from '../InternalSettingsView'
 import {render} from '@testing-library/react'
-import {createCache} from '@canvas/apollo'
-import {MockedProvider} from '@apollo/react-testing'
-import type {ExecutionResult} from 'react-apollo'
+import {createCache} from '@canvas/apollo-v3'
+import {MockedProvider} from '@apollo/client/testing'
+// @ts-expect-error
+import type {ExecutionResult} from '@apollo/client'
 
 const mockInternalSettingsQuery = async () => {
   const queryResult = await mockGraphqlQuery(INTERNAL_SETTINGS_QUERY)
@@ -46,17 +47,19 @@ describe('InternalSettingsView', () => {
     const {findAllByText} = render(
       <MockedProvider mocks={internalSettingMocks} cache={createCache()}>
         <InternalSettingsView />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     // graphql-tools mocks most strings as "Hello World", so we have to use findAll
     const elementArrays = await Promise.all(
+      // @ts-expect-error
       internalSettingMocks[0].result.data!.internalSettings.flatMap(internalSetting => [
         findAllByText(internalSetting.name),
         internalSetting.secret ? [] : findAllByText(internalSetting.value!),
-      ])
+      ]),
     )
 
+    // @ts-expect-error
     elementArrays.flat().forEach(el => expect(el).toBeInTheDocument())
   })
 })

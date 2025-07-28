@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -30,7 +29,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 import formatMessage from '../../../../../format-message'
 import ExternalToolSelectionItem from './ExternalToolSelectionItem'
-import {instuiPopupMountNode} from '../../../../../util/fullscreenHelpers'
+import {instuiPopupMountNodeFn} from '../../../../../util/fullscreenHelpers'
 import {RceToolWrapper} from '../../RceToolWrapper'
 
 // TODO: we really need a way for the client to pass this to the RCE
@@ -47,7 +46,7 @@ const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
  */
 export function filterItemsByTitleSubstring<T extends {title: string}>(
   searchString: string | undefined | null,
-  items: T[]
+  items: T[],
 ): T[] {
   if (searchString == null || searchString.length === 0) {
     return items
@@ -78,7 +77,7 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
       size="medium"
       themeOverride={{mediumMaxWidth: '42rem'}}
       label={formatMessage('Apps')}
-      mountNode={instuiPopupMountNode}
+      mountNode={instuiPopupMountNodeFn()}
       onDismiss={props.onDismiss}
       open={true}
       shouldCloseOnDocumentClick={false}
@@ -104,6 +103,7 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
       <Modal.Body overflow="fit">
         <Flex as="div" direction="column">
           <Flex.Item as="div" shouldShrink={true} shouldGrow={true}>
+            {/* @ts-expect-error */}
             <Alert liveRegion={getLiveRegion} variant="info" screenReaderOnly={!filterEmpty}>
               {filterEmpty && formatMessage('No results found for {filterTerm}', {filterTerm})}
               {!filterEmpty &&
@@ -113,7 +113,7 @@ export function ExternalToolSelectionDialog(props: ExternalToolSelectionDialogPr
               one {# result}
               other {# results}
             }`,
-                  {count: filteredResults.length}
+                  {count: filteredResults.length},
                 )}
             </Alert>
 

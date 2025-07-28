@@ -33,7 +33,7 @@ describe "submission_comment" do
   let(:anonymous_user) { "Anonymous User" }
 
   context "anonymous peer disabled" do
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "renders" do
@@ -48,7 +48,7 @@ describe "submission_comment" do
       end
     end
 
-    context ".sms" do
+    describe ".sms" do
       let(:path_type) { :sms }
 
       it "renders" do
@@ -57,17 +57,8 @@ describe "submission_comment" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
-
-      it "renders" do
-        message = generate_message(notification_name, path_type, asset)
-        expect(message.body).not_to include(anonymous_user)
-      end
-    end
-
-    context ".twitter" do
-      let(:path_type) { :twitter }
 
       it "renders" do
         message = generate_message(notification_name, path_type, asset)
@@ -82,7 +73,7 @@ describe "submission_comment" do
       @comment.reload
     end
 
-    context ".email" do
+    describe ".email" do
       let(:path_type) { :email }
 
       it "shows anonymous when anonymous peer review enabled" do
@@ -91,7 +82,7 @@ describe "submission_comment" do
       end
     end
 
-    context ".sms" do
+    describe ".sms" do
       let(:path_type) { :sms }
 
       it "shows anonymous when anonymous peer review enabled" do
@@ -100,17 +91,8 @@ describe "submission_comment" do
       end
     end
 
-    context ".summary" do
+    describe ".summary" do
       let(:path_type) { :summary }
-
-      it "shows anonymous when anonymous peer review enabled" do
-        message = generate_message(notification_name, path_type, asset)
-        expect(message.body).to include(anonymous_user)
-      end
-    end
-
-    context ".twitter" do
-      let(:path_type) { :twitter }
 
       it "shows anonymous when anonymous peer review enabled" do
         message = generate_message(notification_name, path_type, asset)

@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import {some} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {createRoot} from 'react-dom/client'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import PublishableModuleItem from '../backbone/models/PublishableModuleItem'
@@ -30,8 +30,10 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import {ltiState} from '@canvas/lti/jquery/messages'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
+import {getResourceTypes} from '@canvas/util/resourceTypeUtil'
+import {addShowAllOrLess} from '../utils/showAllOrLess'
 
-const I18n = useI18nScope('context_modulespublic')
+const I18n = createI18nScope('context_modulespublic')
 
 const content_type_map = {
   page: 'wiki_page',
@@ -46,7 +48,7 @@ export function scrollTo($thing, time = 500) {
     {
       scrollTop: $thing.offset().top,
     },
-    time
+    time,
   )
 }
 
@@ -79,6 +81,10 @@ export function criterionMessage($mod_item) {
   } else if ($mod_item.hasClass('min_score_requirement')) {
     return I18n.t('Must score at least a %{score}', {
       score: $mod_item.getTemplateData({textValues: ['min_score']}).min_score,
+    })
+  } else if ($mod_item.hasClass('min_percentage_requirement')) {
+    return I18n.t('Must score at least a %{score}', {
+      score: $mod_item.getTemplateData({textValues: ['min_percentage']}).min_percentage,
     })
   } else {
     return I18n.t('Not yet completed')
@@ -144,12 +150,15 @@ export function initPublishButton($el, data) {
     const fileFauxView = {
       render: () => {
         const model = $el.data('view').model
-        ReactDOM.render(
+        const elem = $el[0]
+        if (!elem.reactRoot) {
+          elem.reactRoot = createRoot(elem)
+        }
+        elem.reactRoot.render(
           <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
-          $el[0]
         )
         // to look disable, we need to add the class here
-        $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
+        elem.classList[model.get('disabled') ? 'add' : 'remove']('disabled')
       },
       model: file,
     }
@@ -219,15 +228,18 @@ export function setExpandAllButton() {
 
   $('#expand_collapse_all').attr(
     'aria-label',
-    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules'),
   )
   $('#expand_collapse_all').data('expand', !someVisible)
   $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
 }
 
-export function setExpandAllButtonHandler() {
+export function setExpandAllButtonHandler(lazy_load_callback) {
   $('#expand_collapse_all').click(function () {
     const shouldExpand = $(this).data('expand')
+    if (shouldExpand) {
+      $('#expand_collapse_all').prop('disabled', true)
+    }
 
     if (ENV.FEATURES.instui_header) {
       $(this)
@@ -240,12 +252,12 @@ export function setExpandAllButtonHandler() {
 
     $(this).attr(
       'aria-label',
-      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
+      shouldExpand ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules'),
     )
     $(this).data('expand', !shouldExpand)
     $(this).attr('aria-expanded', shouldExpand ? 'true' : 'false')
 
-    $('.context_module').each(function () {
+    $('.context_module:not(#context_module_blank)').each(function () {
       const $module = $(this)
       if (
         (shouldExpand && $module.find('.content:visible').length === 0) ||
@@ -257,18 +269,27 @@ export function setExpandAllButtonHandler() {
             .css('display', shouldExpand ? 'inline-block' : 'none')
           $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
           $module.find('.footer .manage_module').css('display', '')
-          $module.toggleClass('collapsed_module', shouldExpand)
+          $module.toggleClass('collapsed_module', !shouldExpand)
+          if (ENV.FEATURE_MODULES_PERF) {
+            addShowAllOrLess($module.data('module-id'))
+          }
         }
         $module.find('.content').slideToggle({
           queue: false,
-          done: callback(),
+          done: callback,
         })
       }
     })
 
     const url = $(this).data('url')
     const collapse = shouldExpand ? '0' : '1'
-    $.ajaxJSON(url, 'POST', {collapse})
+    $.ajaxJSON(url, 'POST', {collapse}, _data => {
+      if (shouldExpand && lazy_load_callback) {
+        lazy_load_callback(shouldExpand)
+      } else {
+        $(this).prop('disabled', false)
+      }
+    })
   })
 }
 
@@ -335,8 +356,8 @@ export function updateProgressionState($module) {
 
     const completed = some(
       reqs_met,
-      // eslint-disable-next-line eqeqeq
-      req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement')
+
+      req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement'),
     )
     if (completed) {
       $mod_item.addClass('completed_item')
@@ -351,7 +372,6 @@ export function updateProgressionState($module) {
     } else {
       let incomplete_req = null
       for (const idx in incomplete_reqs) {
-        // eslint-disable-next-line eqeqeq
         if (incomplete_reqs[idx].id == mod_id) {
           incomplete_req = incomplete_reqs[idx]
         }
@@ -365,7 +385,7 @@ export function updateProgressionState($module) {
             I18n.t('You scored a %{score}.', {score: incomplete_req.score}) +
               ' ' +
               criterionMessage($mod_item) +
-              '.'
+              '.',
           )
         } else {
           // hasn't been scored yet
@@ -510,8 +530,16 @@ export function openExternalTool(ev) {
   const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
 
   const currentModule = $(ev.target).parents('.context_module')
-  const currentModuleId =
-    currentModule.length > 0 && currentModule.attr('id').substring('context_module_'.length)
+  let currentModuleId =
+    currentModule.length > 0 ? currentModule.attr('id').substring('context_module_'.length) : null
+
+  if (window.ENV.FEATURES?.create_external_apps_side_tray_overrides) {
+    currentModuleId = $(ev.target).attr('id').substring('ui-id-'.length).split('-')[0]
+  }
+
+  const returnFocusTo = currentModuleId
+    ? $(`#context_module_${currentModuleId} .al-trigger`)[0]
+    : $('.al-trigger')[0]
 
   if (launchType === 'module_index_menu_modal') {
     setExternalToolModal({tool, launchType, returnFocusTo: $('.al-trigger')[0]})
@@ -522,7 +550,7 @@ export function openExternalTool(ev) {
     setExternalToolModal({
       tool,
       launchType,
-      returnFocusTo: $('.al-trigger')[0],
+      returnFocusTo: returnFocusTo,
       contextModuleId: currentModuleId,
     })
     return
@@ -545,6 +573,14 @@ export function openExternalTool(ev) {
   setExternalToolTray(tool, moduleData, launchType, $('.al-trigger')[0])
 }
 
+let externalToolRoot = null
+const getExternalToolRoot = function () {
+  if (!externalToolRoot) {
+    externalToolRoot = createRoot($('#external-tool-mount-point')[0])
+  }
+  return externalToolRoot
+}
+
 function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', returnFocusTo) {
   const handleDismiss = () => {
     setExternalToolTray(null)
@@ -554,29 +590,38 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     }
   }
 
-  ReactDOM.render(
+  const root = getExternalToolRoot()
+  root.render(
     <ContentTypeExternalToolTray
       tool={tool}
       placement={placement}
-      acceptedResourceTypes={[
-        'assignment',
-        'audio',
-        'discussion_topic',
-        'document',
-        'image',
-        'module',
-        'quiz',
-        'page',
-        'video',
-      ]}
+      acceptedResourceTypes={getResourceTypes()}
       targetResourceType="module"
       allowItemSelection={placement === 'module_index_menu'}
       selectableItems={moduleData}
       onDismiss={handleDismiss}
       open={tool !== null}
     />,
-    $('#external-tool-mount-point')[0]
   )
+
+  const observer = new MutationObserver(() => {
+    const closeButton = document?.querySelector('button[data-cid="BaseButton"]')
+    if (closeButton) {
+      observer.disconnect()
+
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          closeButton.setAttribute('tabindex', '-1')
+          closeButton.focus()
+        })
+      }, 100)
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  })
 }
 
 function setExternalToolModal({
@@ -597,7 +642,8 @@ function setExternalToolModal({
     returnFocusTo.focus()
   }
 
-  ReactDOM.render(
+  const root = getExternalToolRoot()
+  root.render(
     <ExternalToolModalLauncher
       tool={tool}
       launchType={launchType}
@@ -608,7 +654,6 @@ function setExternalToolModal({
       onRequestClose={handleDismiss}
       contextModuleId={contextModuleId}
     />,
-    $('#external-tool-mount-point')[0]
   )
 }
 

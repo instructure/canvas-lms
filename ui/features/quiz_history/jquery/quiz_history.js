@@ -381,7 +381,7 @@ $(document).ready(function () {
   if (parentWindow.respondsTo('getQuizSubmissionSnapshot')) {
     const data = window.parent.INST.getQuizSubmissionSnapshot(
       scoringSnapshot.snapshot.user_id,
-      scoringSnapshot.snapshot.version_number
+      scoringSnapshot.snapshot.version_number,
     )
     gradingForm.setInitialSnapshot(data)
   }
@@ -391,7 +391,7 @@ $(document).ready(function () {
   }
 
   $(
-    '.question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea'
+    '.question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea',
   ).change(function () {
     onInputChange($(this))
   })

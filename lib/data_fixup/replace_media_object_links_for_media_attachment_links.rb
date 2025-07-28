@@ -32,9 +32,11 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
     { WikiPage => :body }
   ].freeze
 
-  ATTRIBUTES = %w[href data src].freeze
-
   def self.update_active_records(model, field, where_clause, start_at, end_at)
+    error_file_name = "data_fixup_replace_media_object_links_for_media_attachment_links_#{Shard.current.id}_#{model.table_name}_#{field}_#{start_at}_#{end_at}_#{Time.now.to_f}_errors.csv"
+    had_errors = false
+    error_csv = nil
+
     model.where(id: start_at..end_at).where(*where_clause).find_each(strategy: :pluck_ids) do |active_record|
       next unless (field && active_record[field]) || active_record.is_a?(Quizzes::Quiz)
 
@@ -46,7 +48,14 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
             a.merge({ "text" => fix_html(active_record, a["text"]) })
           end
         end
-        active_record.update! question_data:
+        begin
+          active_record.update! question_data:
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       elsif active_record.is_a?(Quizzes::Quiz)
         active_record.description = fix_html(active_record, active_record.description)
         active_record.quiz_data = active_record.quiz_data.map do |question|
@@ -56,32 +65,53 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
           end
           question
         end
-        active_record.save
+        begin
+          active_record.save
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       else
-        active_record.update! field => fix_html(active_record, active_record[field])
+        begin
+          active_record.update! field => fix_html(active_record, active_record[field])
+        rescue => e
+          had_errors = true
+          error_csv = CSV.open(error_file_name, "a")
+          error_csv << [Shard.current.id, active_record.class.table_name, active_record.id, e.message]
+          error_csv.close
+        end
       end
+    end
+    if had_errors
+      Attachment.create!(filename: error_file_name, uploaded_data: File.open(error_csv.path), context: Account.site_admin, content_type: "text/csv")
+      FileUtils.rm_f(error_file_name)
     end
   end
 
   def self.set_iframe_width_and_height(element, media_id)
     preexisting_style = element["style"] || ""
-    return if preexisting_style.include?("height:") || preexisting_style.include?("width:")
+    return if (preexisting_style.include?("height:") || preexisting_style.include?("width:")) && !preexisting_style.include?("height: px") && !preexisting_style.include?("width: px")
 
-    mo = MediaObject.by_media_id(media_id)
-    mo = mo.first
-    return unless mo
+    mo = MediaObject.by_media_id(media_id).first
+    ext_data = {}
 
-    mo_keys = mo.data[:extensions].keys
-    ext_data = mo.data[:extensions][mo_keys.first]
-    return unless ext_data
+    if mo && mo.data[:extensions]
+      mo_keys = mo.data[:extensions].keys
+      ext_data = mo.data[:extensions][mo_keys.first]
+    end
+
+    height = ext_data&.[](:height) ? "#{ext_data[:height]}px" : "14.25rem"
+    width = ext_data&.[](:width) ? "#{ext_data[:width]}px" : "320px"
 
     if !preexisting_style.include?("height:") && !preexisting_style.include?("width:")
-      element.set_attribute("style", "width:#{ext_data[:width]}px; height:#{ext_data[:height]}px; #{preexisting_style}")
+      element.set_attribute("style", "width:#{width}; height:#{height}; #{preexisting_style}")
     end
   end
 
   def self.fix_html(active_record, html)
-    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
+    doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, **CanvasSanitize::SANITIZE[:parser_options])
 
     # media comments
     doc.css("a.instructure_inline_media_comment").each do |e|
@@ -91,7 +121,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
       attachment = get_attachment(active_record, media_id)
       new_src = "/media_attachments_iframe/#{attachment.id}"
       new_src = add_verifier_to_link(new_src, attachment) if attachment.context_type == "User"
-      iframe = doc.document.create_element "iframe", { "src" => new_src }
+      iframe = doc.document.create_element "iframe", { "src" => new_src, "data-media-type" => attachment.content_type&.split("/")&.[](0) }
       set_iframe_width_and_height(iframe, media_id)
       e.replace iframe
     end
@@ -106,24 +136,9 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
       new_src = "#{source_parts[1]}media_attachments_iframe/#{attachment.id}#{source_parts[3]}"
       new_src = add_verifier_to_link(new_src, attachment) if attachment.context_type == "User"
       e.set_attribute("src", new_src)
+      e.set_attribute("data-media-type", attachment.content_type&.split("/")&.[](0))
       set_iframe_width_and_height(e, media_id)
     end
-
-    # misc...
-    # doc.css("a, video, iframe, object, embed").select do |e|
-    #   ATTRIBUTES.each do |attr|
-    #     next unless e.get_attribute(attr)&.match?('(.*\/)?media_objects\/([^\/\?]*)(.*)')
-    #
-    #     source_parts = e.get_attribute(attr).match('(.*\/)?media_objects\/([^\/\?]*)(.*)')
-    #     media_id = source_parts[2]
-    #     attachment = get_attachment(active_record, media_id)
-    #     new_src = "#{source_parts[1]}media_attachments/#{attachment.id}#{source_parts[3]}"
-    #     new_src = add_verifier_to_link(new_src, attachment) if attachment.context_type == "User"
-    #     iframe = doc.document.create_element "iframe", { "src" => new_src }
-    #     set_iframe_width_and_height(iframe, media_id)
-    #     e.replace iframe
-    #   end
-    # end
 
     doc.to_s
   end
@@ -151,7 +166,9 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
     chosen_context = get_preferred_contexts(active_record).compact[0]
     return unless chosen_context
 
-    Attachment.create!(context: chosen_context, media_entry_id: media_id, filename: media_id, content_type: "unknown/unknown")
+    media_type = MediaObject.where(media_id:).last&.media_type
+    media_type ||= "video/*"
+    Attachment.create!(context: chosen_context, media_entry_id: media_id, filename: media_id, content_type: media_type)
   end
 
   def self.get_valid_candidate(candidates, active_record)
@@ -168,8 +185,13 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
     (chosen_attachment = get_valid_candidate(candidates, active_record)) ? chosen_attachment : create_attachment(active_record, media_id)
   end
 
-  def self.get_dataset(model, where_clause)
-    model.where(*where_clause)
+  def self.update_dataset(model, field, where_clause)
+    model.where(*where_clause).find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
+      delay_if_production(
+        priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
+      ).update_active_records(model, field, where_clause, start_at, end_at)
+    end
   end
 
   def self.run
@@ -185,12 +207,7 @@ module DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks
         delay_if_production(
           priority: Delayed::LOW_PRIORITY,
           n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
-        ).get_dataset(model, where_clause).find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-          delay_if_production(
-            priority: Delayed::LOW_PRIORITY,
-            n_strand: ["DataFixup::ReplaceMediaObjectLinksForMediaAttachmentLinks", Shard.current.database_server.id]
-          ).update_active_records(model, field, where_clause, start_at, end_at)
-        end
+        ).update_dataset(model, field, where_clause)
       end
     end
   end

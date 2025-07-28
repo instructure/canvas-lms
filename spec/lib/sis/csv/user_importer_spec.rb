@@ -305,6 +305,18 @@ describe SIS::CSV::UserImporter do
       )
       expect(user.reload.pronouns).to eq "he/him"
     end
+
+    it "does not add pronouns when the option is turned off" do
+      @account.settings[:can_add_pronouns] = false
+      @account.save!
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,He/Him"
+      )
+      user = Pseudonym.by_unique_id("user1").first.user
+      expect(user.pronouns).to be_nil
+    end
   end
 
   describe "declared_user_type" do
@@ -800,7 +812,7 @@ describe SIS::CSV::UserImporter do
           "user_id,login_id,first_name,last_name,email,status",
           "user_1,user1,User,Uno,user1@example.com,active"
         )
-        @cc = Pseudonym.where(account_id: @account, sis_user_id: "user_1").take.communication_channels.take
+        @cc = Pseudonym.find_by(account_id: @account, sis_user_id: "user_1").communication_channels.take
         @cc.bounce_count = 3
         @cc.save!
         expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.email).to eq "user1@example.com"
@@ -1117,7 +1129,7 @@ describe SIS::CSV::UserImporter do
       "u,'long_string_for_user_login_should_throw_an_error_and_be_caught_and_be_returned_to_import_and_not_sent_to_sentry',U U,u@example.com,active"
     )
     expect(Canvas::Errors).not_to receive(:capture_exception)
-    expect(importer.errors.pluck(1)).to eq ["Could not save the user with user_id: 'u'. Unknown reason: unique_id is too long (maximum is 100 characters)"]
+    expect(importer.errors.pluck(1)).to eq ["Could not save the user with user_id: 'u'. Unknown reason: Unique ID is too long (maximum is 100 characters)"]
   end
 
   it "does not confirm an email communication channel that has an invalid email" do
@@ -1368,7 +1380,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user1@example.com,active"
     )
-    u = @account.pseudonyms.where(sis_user_id: "user_1").take.user
+    u = @account.pseudonyms.find_by(sis_user_id: "user_1").user
     pseudonym2 = u.pseudonyms.create!(account: @account, unique_id: "other_login@example.com")
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
@@ -1521,7 +1533,7 @@ describe SIS::CSV::UserImporter do
     )
     c = @account.courses.where(sis_source_id: "test_1").first
     g = c.groups.create(name: "group1")
-    p = @account.pseudonyms.where(sis_user_id: "user_1").take
+    p = @account.pseudonyms.find_by(sis_user_id: "user_1")
     u = p.user
     gm = g.group_memberships.create(user: u, workflow_state: "accepted")
     expect(gm.workflow_state).to eq "accepted"
@@ -1744,6 +1756,19 @@ describe SIS::CSV::UserImporter do
     expect(user_2.email).to eq "user2@example.com"
     expect(user_1.pseudonym.sis_communication_channel).to eq user_1.email_channel
     expect(user_2.pseudonym.sis_communication_channel).to eq user_2.email_channel
+  end
+
+  it "clears deleted_at when restoring a pseudonym" do
+    user = user_with_pseudonym(active_all: 1, sis_user_id: "user_1", account: @account)
+    user.destroy
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,#{@pseudonym.unique_id},User,Uno,#{@pseudonym.unique_id},active",
+      { override_sis_stickiness: true }
+    )
+    ps = user.reload.pseudonyms.take
+    expect(ps.workflow_state).to eq "active"
+    expect(ps.deleted_at).to be_nil
   end
 
   it "does not resurrect a non SIS user" do

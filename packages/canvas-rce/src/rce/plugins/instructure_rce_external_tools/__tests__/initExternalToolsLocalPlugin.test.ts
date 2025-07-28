@@ -40,7 +40,7 @@ describe('initExternalToolsLocalPlugin', () => {
           contextId: '1',
         },
       },
-    }
+    },
   )
 
   beforeAll(() => {
@@ -60,7 +60,7 @@ describe('initExternalToolsLocalPlugin', () => {
     initExternalToolsLocalPlugin(editor)
 
     expect(editor.ui.registry.addMenuButton).toHaveBeenCalledWith('lti_mru_button', {
-      tooltip: 'Apps',
+      tooltip: 'apps-temp',
       icon: 'lti',
       fetch: expect.any(Function),
       onSetup: expect.any(Function),
@@ -69,7 +69,7 @@ describe('initExternalToolsLocalPlugin', () => {
     const button = editor.ui.registry.addMenuButton.mock.calls[0][1]
 
     const mruItems: Parameters<Parameters<typeof button.fetch>[0]>[0] = await new Promise(resolve =>
-      button.fetch(resolve)
+      button.fetch(resolve),
     )
 
     expect(mruItems).toMatchObject([
@@ -93,7 +93,7 @@ describe('initExternalToolsLocalPlugin', () => {
         onAction: expect.any(Function),
         tooltip: favButtonConfig.title,
         icon: favButtonConfig.iconId,
-      }
+      },
     )
   })
 

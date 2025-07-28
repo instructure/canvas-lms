@@ -199,7 +199,39 @@ export const MOCK_EVENTS = [
     start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'Morning Yoga',
     type: 'event',
+    child_events_count: 0,
+    child_events: [],
   },
+]
+
+const CHILD_EVENT = {
+  context_color: '#CCCCCC',
+  context_name: 'Biology',
+  html_url: 'http://localhost:3000/calendar?event_id=101&include_contexts=course_30',
+  id: '101',
+  important_dates: true,
+  start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+  title: 'Morning Yoga (Section A)',
+  type: 'event',
+  parent_event_id: '100',
+  child_events_count: 0,
+  child_events: [],
+}
+export const MOCK_SECTION_EVENTS = [
+  {
+    context_color: '#CCCCCC',
+    context_name: 'Biology',
+    html_url: 'http://localhost:3000/calendar?event_id=100&include_contexts=course_30',
+    id: '100',
+    important_dates: true,
+    start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+    title: 'Morning Yoga',
+    type: 'event',
+    parent_event_id: null,
+    child_events_count: 1,
+    child_events: [{...CHILD_EVENT}],
+  },
+  {...CHILD_EVENT},
 ]
 
 export const MOCK_ACCOUNT_CALENDAR_EVENT = {
@@ -211,6 +243,8 @@ export const MOCK_ACCOUNT_CALENDAR_EVENT = {
   start_at: '2021-06-29T07:00:00Z',
   title: 'Football Game',
   type: 'event',
+  child_events_count: 0,
+  child_events: [],
 }
 
 export const MOCK_OBSERVEE_EVENTS = [
@@ -223,6 +257,8 @@ export const MOCK_OBSERVEE_EVENTS = [
     start_at: '2021-10-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'First Quiz',
     type: 'event',
+    child_events_count: 0,
+    child_events: [],
   },
 ]
 
@@ -263,3 +299,78 @@ export const IMPORTANT_DATES_CONTEXTS = [
   {assetString: 'course_2', name: 'Home Room', color: 'blue'},
   {assetString: 'course_3', name: 'The Maths', color: 'red'},
 ]
+
+export const MOCK_QUERY_CARDS_RESPONSE = {
+  legacyNode: {
+    favoriteCoursesConnection: {
+      nodes: [
+        {
+          _id: '1',
+          dashboardCard: {
+            id: '1',
+            assetString: 'course_1',
+            href: '/courses/1',
+            shortName: 'Economics 101',
+            originalName: 'UGLY-SIS-ECON-101',
+            color: 'yellow',
+            courseCode: 'ECON-001',
+            enrollmentState: 'active',
+            isHomeroom: false,
+            isK5Subject: true,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: true,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+        {
+          _id: '2',
+          dashboardCard: {
+            id: '2',
+            assetString: 'course_2',
+            href: '/courses/2',
+            shortName: 'Home Room',
+            originalName: 'UGLY-SIS-HOMEROOM-007',
+            color: 'blue',
+            courseCode: 'HOME-001',
+            enrollmentState: 'active',
+            isHomeroom: true,
+            isK5Subject: false,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: false,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+        {
+          _id: '3',
+          dashboardCard: {
+            id: '3',
+            assetString: 'course_3',
+            href: '/courses/3',
+            shortName: 'The Maths',
+            originalName: 'UGLY-SIS-BEG-ALG-101',
+            color: 'red',
+            courseCode: 'DA-MATHS',
+            enrollmentState: 'invited',
+            isHomeroom: false,
+            isK5Subject: true,
+            canManage: true,
+            canReadAnnouncements: true,
+            published: true,
+            term: {
+              id: 'VGVybS0x',
+              name: "fake term's name",
+            },
+          },
+        },
+      ],
+    },
+  },
+}

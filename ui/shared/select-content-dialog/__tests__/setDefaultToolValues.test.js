@@ -65,37 +65,37 @@ describe('setDefaultToolValues', () => {
         subject: 'defaultToolContentReady',
         content: result,
       },
-      'canvas.instructure.com'
+      'canvas.instructure.com',
     )
   })
 
   it('sets the definition type', () => {
     expect(
-      document.querySelector('#assignment_external_tool_tag_attributes_content_type').value
+      document.querySelector('#assignment_external_tool_tag_attributes_content_type').value,
     ).toEqual(definition_type)
   })
 
   it('sets the definition id', () => {
     expect(
-      document.querySelector('#assignment_external_tool_tag_attributes_content_id').value
+      document.querySelector('#assignment_external_tool_tag_attributes_content_id').value,
     ).toEqual(definition_id)
   })
 
   it('sets the tool URL', () => {
     expect(document.querySelector('#assignment_external_tool_tag_attributes_url').value).toEqual(
-      url
+      url,
     )
   })
 
   it('sets the iframe width', () => {
     expect(
-      document.querySelector('#assignment_external_tool_tag_attributes_iframe_width').value
+      document.querySelector('#assignment_external_tool_tag_attributes_iframe_width').value,
     ).toEqual('')
   })
 
   it('sets the iframe height', () => {
     expect(
-      document.querySelector('#assignment_external_tool_tag_attributes_iframe_height').value
+      document.querySelector('#assignment_external_tool_tag_attributes_iframe_height').value,
     ).toEqual('')
   })
 })

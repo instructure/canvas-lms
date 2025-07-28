@@ -88,7 +88,7 @@ module RollupScoreAggregatorHelper
   def alignment_aggregate_score(result_aggregates)
     return if result_aggregates[:total] == 0
 
-    possible = (@points_possible > 0) ? @points_possible : @mastery_points
+    possible = @points_possible&.positive? ? @points_possible : @mastery_points
     (result_aggregates[:weighted] / result_aggregates[:total]) * possible
   end
 
@@ -101,7 +101,7 @@ module RollupScoreAggregatorHelper
   def result_score(result)
     return result.score unless result.try(:percent)
 
-    if @points_possible > 0
+    if @points_possible&.positive?
       result.percent * @points_possible
     else
       result.percent * @mastery_points

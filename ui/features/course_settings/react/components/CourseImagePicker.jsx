@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -26,7 +26,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 
-const I18n = useI18nScope('course_images')
+const I18n = createI18nScope('course_images')
 
 const dropIcon = getIconByType('image')
 
@@ -47,7 +47,7 @@ export default class CourseImagePicker extends React.Component {
     fileDropMessages: null,
   }
 
-  handleTabChange = (event, {index}) => {
+  handleTabChange = (_event, {index}) => {
     this.setState({
       selectedIndex: index,
     })
@@ -61,7 +61,7 @@ export default class CourseImagePicker extends React.Component {
         preventDefault: () => {},
         stopPropagagtion: () => {},
       },
-      this.props.courseId
+      this.props.courseId,
     )
   }
 
@@ -82,6 +82,7 @@ export default class CourseImagePicker extends React.Component {
             </div>
           ) : (
             <FileDrop
+              data-testid="course-image-drop-zone"
               accept="image/*"
               renderLabel={
                 <Billboard

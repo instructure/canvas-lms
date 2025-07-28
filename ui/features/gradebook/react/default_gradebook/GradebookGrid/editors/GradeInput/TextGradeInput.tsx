@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import {bool, element} from 'prop-types'
 import {TextInput} from '@instructure/ui-text-input'
 
 import {gradeEntry, gradeInfo, messages} from './PropTypes'
+import {finalGradeOverrideUtils} from '@canvas/final-grade-override'
 
 export default class TextGradeInput extends PureComponent {
   textInput?: HTMLInputElement
@@ -40,6 +40,7 @@ export default class TextGradeInput extends PureComponent {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -54,6 +55,7 @@ export default class TextGradeInput extends PureComponent {
     }
   }
 
+  // @ts-expect-error
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.textInput !== document.activeElement) {
       const nextInfo = nextProps.pendingGradeInfo || nextProps.gradeInfo
@@ -66,6 +68,7 @@ export default class TextGradeInput extends PureComponent {
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.state.gradeInfo
   }
 
@@ -78,25 +81,38 @@ export default class TextGradeInput extends PureComponent {
     return undefined
   }
 
+  // @ts-expect-error
   handleTextChange(event) {
+    let {value} = event.target
+    // @ts-expect-error
+    if (this.props.gradeEntry.restrictToTwoDigitsAfterSeparator) {
+      value = finalGradeOverrideUtils.restrictToTwoDigitsAfterSeparator(value)
+    }
+
     this.setState({
-      gradeInfo: this.props.gradeEntry.parseValue(event.target.value, true),
-      inputValue: event.target.value,
+      // @ts-expect-error
+      gradeInfo: this.props.gradeEntry.parseValue(value, true),
+      inputValue: value,
     })
   }
 
   render() {
     return (
       <TextInput
+        // @ts-expect-error
         disabled={this.props.disabled}
         inputRef={ref => {
+          // @ts-expect-error
           this.textInput = ref
         }}
+        // @ts-expect-error
         renderLabel={this.props.label}
+        // @ts-expect-error
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"
         textAlign="center"
+        // @ts-expect-error
         value={this.state.inputValue}
       />
     )

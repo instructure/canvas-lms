@@ -17,7 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getHandleChangeObservedUser, autoFocusObserverPicker} from '../pageReloadHelper'
+import {reloadWindow} from '@canvas/util/globalUtils'
+import {autoFocusObserverPicker, getHandleChangeObservedUser} from '../pageReloadHelper'
+
+// mock reloadWindow
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
+}))
 
 describe('getHandleChangeObservedUser', () => {
   it('returns a function', () => {
@@ -25,40 +31,43 @@ describe('getHandleChangeObservedUser', () => {
   })
 
   describe('returned function', () => {
-    let oldLocation
     let oldSessionStorage
-    let mockReload
     let handleChangeObservedUser
 
     beforeEach(() => {
       oldSessionStorage = window.sessionStorage
-      oldLocation = window.location
       delete window.location
-      mockReload = jest.fn()
-      window.location = {reload: mockReload}
+
+      // Mock sessionStorage
+      window.sessionStorage = {
+        getItem: jest.fn(),
+        setItem: jest.fn(),
+        removeItem: jest.fn(),
+      }
 
       handleChangeObservedUser = getHandleChangeObservedUser()
     })
 
     afterEach(() => {
-      window.location = oldLocation
       window.sessionStorage = oldSessionStorage
+      jest.clearAllMocks()
     })
 
     it('does not trigger reload on initial call', () => {
       handleChangeObservedUser('initialValue')
-      expect(mockReload).not.toHaveBeenCalled()
+      expect(reloadWindow).not.toHaveBeenCalled()
     })
 
     it('triggers reload when observed user changes', () => {
       handleChangeObservedUser('initialValue')
       handleChangeObservedUser('newValue')
-      expect(mockReload).toHaveBeenCalled()
+      expect(reloadWindow).toHaveBeenCalled()
     })
 
     it('stores auto focus setting in session storage', () => {
+      handleChangeObservedUser('initialValue')
       handleChangeObservedUser('newValue')
-      expect(window.sessionStorage.autoFocusObserverPicker).toBe('true')
+      expect(window.sessionStorage.setItem).toHaveBeenCalledWith('autoFocusObserverPicker', true)
     })
   })
 })

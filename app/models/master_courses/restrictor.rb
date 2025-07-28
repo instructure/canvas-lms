@@ -87,6 +87,10 @@ module MasterCourses::Restrictor
 
     def mark_as_importing!(cm)
       @importing_migration = cm if cm&.master_course_subscription
+      # if we are doing a course copy and the source course has up-to-date search embeddings,
+      # we will copy those embeddings in batches instead of regenerating them
+      self.skip_embeddings = true if cm&.for_course_copy? && respond_to?(:skip_embeddings=) &&
+                                     SmartSearch.up_to_date?(cm.source_course)
     end
 
     def skip_downstream_changes!
@@ -265,7 +269,7 @@ module MasterCourses::Restrictor
     if @importing_migration
       @importing_migration.master_course_subscription.master_template.find_preloaded_restriction(migration_id) # for extra speeds on import
     else
-      MasterCourses::MasterContentTag.where(migration_id:).pluck(:restrictions).first
+      MasterCourses::MasterContentTag.where(migration_id:).pick(:restrictions)
     end
   end
 
@@ -276,7 +280,9 @@ module MasterCourses::Restrictor
   # preload restrictions on the child course
   def self.preload_child_restrictions(objects)
     objects = Array(objects)
-    objects_to_load = objects.select { |obj| obj.is_child_content? && !obj.child_content_restrictions_loaded? }.index_by(&:migration_id)
+    objects_to_load = objects.select do |obj|
+      !obj.is_a?(Folder) && obj.is_child_content? && !obj.child_content_restrictions_loaded?
+    end.index_by(&:migration_id)
     migration_ids = objects_to_load.keys
     return unless migration_ids.any?
 

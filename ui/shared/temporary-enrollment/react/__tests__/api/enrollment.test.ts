@@ -74,64 +74,65 @@ describe('enrollment api', () => {
     })
 
     beforeAll(() => {
-      // eslint-disable-next-line no-console
+       
       originalConsoleError = console.error
-      // eslint-disable-next-line no-console
+       
       console.error = mockConsoleError
     })
 
     afterAll(() => {
-      // eslint-disable-next-line no-console
+       
       console.error = originalConsoleError
     })
 
     describe('fetchTemporaryEnrollments', () => {
       it('fetches enrollments where the user is a recipient', async () => {
-        const mockJson = Promise.resolve([
-          {
-            ...mockEnrollment,
-            user: mockRecipientUser,
-            temporary_enrollment_provider: mockProviderUser,
-          },
-        ])
+        const mockJson = {
+          ...mockEnrollment,
+          user: mockRecipientUser,
+          temporary_enrollment_provider: mockProviderUser,
+        }
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', true)
-        expect(result).toEqual(await mockJson)
+        const result = await fetchTemporaryEnrollments('1', true, '')
+        expect(result.enrollments).toEqual(mockJson)
       })
 
       it('fetches enrollments where the user is a provider', async () => {
-        const mockJson = Promise.resolve([
-          {
-            ...mockEnrollment,
-            user: mockRecipientUser,
-          },
-        ])
+        const mockJson = {
+          ...mockEnrollment,
+          user: mockRecipientUser,
+        }
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
           json: mockJson,
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', false)
-        expect(result).toEqual(await mockJson)
+        const result = await fetchTemporaryEnrollments('1', false, 'first')
+        expect(result.enrollments).toEqual(mockJson)
       })
 
       it('returns empty array when no enrollments are found', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 204, ok: true},
           json: [],
+          link: {current: {}, next: {}},
         })
 
-        const result = await fetchTemporaryEnrollments('1', true)
-        expect(result).toEqual([])
+        const result = await fetchTemporaryEnrollments('1', true, 'first')
+        expect(result.enrollments).toEqual([])
       })
 
       it('should throw an error when doFetchApi fails', async () => {
         ;(doFetchApi as jest.Mock).mockRejectedValue(new Error('An error occurred'))
-        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow('An error occurred')
+        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
+          'An error occurred',
+        )
       })
 
       it.each([
@@ -145,27 +146,27 @@ describe('enrollment api', () => {
           response: {status, statusText, ok: false},
           json: Promise.resolve({error: statusText}),
         })
-        await expect(fetchTemporaryEnrollments('1', true)).rejects.toThrow(
-          new Error(`Failed to get temporary enrollments for recipient`)
+        await expect(fetchTemporaryEnrollments('1', true, 'first')).rejects.toThrow(
+          new Error(`Failed to get temporary enrollments for recipient`),
         )
       })
 
       it('should return enrollment data with the correct type for a provider', async () => {
         ;(doFetchApi as jest.Mock).mockResolvedValue({
           response: {status: 200, ok: true},
-          json: Promise.resolve([{}]),
+          json: [{}],
           link: null,
         })
-        await fetchTemporaryEnrollments('1', false)
+        await fetchTemporaryEnrollments('1', false, 'first')
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              state: ['current_and_future'],
+              state: ['current_future_and_restricted'],
               per_page: ITEMS_PER_PAGE,
               temporary_enrollment_recipients_for_provider: true,
             }),
-          })
+          }),
         )
       })
 
@@ -175,17 +176,17 @@ describe('enrollment api', () => {
           json: Promise.resolve([{}]),
           link: null,
         })
-        await fetchTemporaryEnrollments('1', true)
+        await fetchTemporaryEnrollments('1', true, 'first')
         expect(doFetchApi).toHaveBeenCalledWith(
           expect.objectContaining({
             path: '/api/v1/users/1/enrollments',
             params: expect.objectContaining({
-              state: ['current_and_future'],
+              state: ['current_future_and_restricted'],
               per_page: ITEMS_PER_PAGE,
               temporary_enrollments_for_recipient: true,
-              include: 'temporary_enrollment_providers',
+              include: ['avatar_url', 'temporary_enrollment_providers'],
             }),
-          })
+          }),
         )
       })
     })
@@ -321,7 +322,7 @@ describe('enrollment api', () => {
           await getTemporaryEnrollmentPairing(accountId, pairingId)
         } catch (error: any) {
           expect(error.message).toBe(
-            'Failed to retrieve temporary enrollment pairing due to an unknown error'
+            'Failed to retrieve temporary enrollment pairing due to an unknown error',
           )
         }
       })

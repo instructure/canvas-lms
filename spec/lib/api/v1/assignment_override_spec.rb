@@ -64,6 +64,119 @@ describe Api::V1::AssignmentOverride do
         expect(result.first[:students]).to eq [@student]
       end
     end
+
+    context "group overrides" do
+      describe "non collaborative group overrides" do
+        before :once do
+          course_with_teacher(active_all: true)
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @course.account.save!
+          @course.account.reload
+
+          @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+          @group_category.create_groups(2)
+          @differentiation_tag_group_1 = @group_category.groups.first
+          @differentiation_tag_group_2 = @group_category.groups.second
+        end
+
+        def returns_correct_hash(assignment, override)
+          allow(subject).to receive(:api_find_all).and_return [@differentiation_tag_group_1]
+          result = subject.interpret_assignment_override_data(assignment, override, nil)
+          expect(result.first[:group][:id]).to eq @differentiation_tag_group_1.id
+        end
+
+        it "returns the correct hash for wiki page override" do
+          wiki_page = @course.wiki_pages.create!(title: "Wiki Page 1")
+          override = { group_id: @differentiation_tag_group_1.id, wiki_page_id: wiki_page.id }
+          returns_correct_hash(wiki_page, override)
+        end
+
+        it "returns the correct hash for quiz override" do
+          quiz = @course.quizzes.create!(title: "Quiz 1")
+          override = { group_id: @differentiation_tag_group_1.id, quiz_id: quiz.id }
+          returns_correct_hash(quiz, override)
+        end
+
+        it "returns the correct hash for discussion topic override" do
+          discussion_topic = @course.discussion_topics.create!(title: "Discussion Topic 1")
+          override = { group_id: @differentiation_tag_group_1.id, discussion_topic_id: discussion_topic.id }
+          returns_correct_hash(discussion_topic, override)
+        end
+
+        it "returns the correct hash for assignment override" do
+          assignment = @course.assignments.create!(title: "Assignment 1")
+          override = { group_id: @differentiation_tag_group_1.id, assignment_id: assignment.id }
+          returns_correct_hash(assignment, override)
+        end
+
+        it "returns error if account setting is disabled" do
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          @course.account.save!
+          @course.account.reload
+
+          assignment = @course.assignments.create!(title: "Wiki Page 1")
+          override = { group_id: @differentiation_tag_group_1.id, assignment_id: assignment.id }
+          result = subject.interpret_assignment_override_data(assignment, override, nil)
+          expect(result).to eq [{}, ["group_id is not valid"]]
+        end
+      end
+
+      describe "collaborative group overrides" do
+        before :once do
+          course_with_teacher(active_all: true)
+
+          @group_category = @course.group_categories.create!(name: "Collaborative Group Set", non_collaborative: false)
+          @group_category.create_groups(2)
+          @collaborative_group_1 = @group_category.groups.first
+          @collaborative_group_1 = @group_category.groups.second
+        end
+
+        def returns_correct_hash(assignment, override)
+          allow(subject).to receive(:api_find_all).and_return [@collaborative_group_1]
+          result = subject.interpret_assignment_override_data(assignment, override, nil)
+          expect(result.first[:group][:id]).to eq @collaborative_group_1.id
+        end
+
+        it "returns the correct hash for group discussion topic" do
+          discussion_topic = @course.discussion_topics.create!(title: "Discussion Topic 1", group_category_id: @group_category.id)
+          override = { group_id: @collaborative_group_1.id, discussion_topic_id: discussion_topic.id }
+          returns_correct_hash(discussion_topic, override)
+        end
+
+        it "returns the correct hash for group assignment" do
+          assignment = @course.assignments.create!(title: "Assignment 1", group_category_id: @group_category.id)
+          override = { group_id: @collaborative_group_1.id, assignment_id: assignment.id }
+          returns_correct_hash(assignment, override)
+        end
+
+        it "returns error if group is not in the group category" do
+          group_cat = @course.group_categories.create!(name: "Another Group Category", non_collaborative: false)
+          collab_group = group_cat.groups.create!(name: "another collab group", non_collaborative: false, context: @course)
+          assignment = @course.assignments.create!(title: "Assignment 1", group_category_id: @group_category.id)
+          override = { group_id: collab_group.id, assignment_id: assignment.id }
+          allow(subject).to receive(:api_find_all).and_return [collab_group]
+          result = subject.interpret_assignment_override_data(assignment, override, nil)
+          expect(result).to eq [{}, ["group_id is not valid"]]
+        end
+
+        it "allows non collaborative group to be assigned to group assignment" do
+          @course.account.enable_feature!(:assign_to_differentiation_tags)
+          @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          @course.account.save!
+          @course.account.reload
+
+          @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+          @group_category.create_groups(1)
+          @differentiation_tag_group_1 = @group_category.groups.first
+          assignment = @course.assignments.create!(title: "Assignment 1", group_category_id: @group_category.id)
+          override = { group_id: @differentiation_tag_group_1.id, assignment_id: assignment.id }
+          allow(subject).to receive(:api_find_all).and_return [@differentiation_tag_group_1]
+          result = subject.interpret_assignment_override_data(assignment, override, nil)
+          expect(result.first[:group][:id]).to eq @differentiation_tag_group_1.id
+        end
+      end
+    end
   end
 
   describe "interpret_batch_assignment_overrides_data" do
@@ -176,7 +289,7 @@ describe Api::V1::AssignmentOverride do
         enrollment.save!
       end
 
-      context "#invisble_users_and_overrides_for_user" do
+      describe "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build
@@ -220,7 +333,7 @@ describe Api::V1::AssignmentOverride do
         @student_visible = student_in_section(@section_visible, user: user_factory)
       end
 
-      context "#invisble_users_and_overrides_for_user" do
+      describe "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build
@@ -268,6 +381,79 @@ describe Api::V1::AssignmentOverride do
     it "delegates to AssignmentOverride.visible_enrollments_for" do
       expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)
       assignment_overrides_json
+    end
+
+    context "group module overrides" do
+      before do
+        @group = @course.groups.create!(name: "Group 1")
+        @context_module = ContextModule.create!(context: @course, name: "Module 1")
+        @group_override = AssignmentOverride.create!(
+          set_type: "Group",
+          set_id: @course.groups.first.id,
+          context_module_id: @context_module.id
+        )
+        @group_override.save!
+      end
+
+      it "correctly returns group overrides" do
+        expected_result = {
+          "id" => @group_override.id,
+          "context_module_id" => @context_module.id,
+          "group_id" => @group.id,
+          "group_category_id" => @group.group_category_id,
+          "non_collaborative" => false,
+          "title" => @group.name,
+          "unassign_item" => false
+        }
+        expect(test_class.new.assignment_overrides_json([@group_override], @teacher).first).to eq expected_result
+      end
+    end
+
+    context "differentiaiton tag overrides" do
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.account.reload
+
+        @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+        @group_category.create_groups(2)
+        @differentiation_tag_group_1 = @group_category.groups.first
+        @differentiation_tag_group_2 = @group_category.groups.second
+      end
+
+      it "correctly includes differentiation tag overrides for an assignment" do
+        @assignment = @course.assignments.create!(title: "Assignment 1")
+        @override = @assignment.assignment_overrides.create!(set_type: "Group", set_id: @differentiation_tag_group_1.id)
+        expected_result = {
+          "id" => @override.id,
+          "assignment_id" => @assignment.id,
+          "group_id" => @differentiation_tag_group_1.id,
+          "group_category_id" => @group_category.id,
+          "non_collaborative" => true,
+          "title" => @differentiation_tag_group_1.name,
+          "unassign_item" => false
+        }
+        test = test_class.new
+        test.current_user = @teacher
+        expect(test.assignment_overrides_json([@override], @teacher).first).to eq expected_result
+      end
+
+      it "removes the 'title' of the override for users without differentiation tag read permissions" do
+        @assignment = @course.assignments.create!(title: "Assignment 1")
+        @override = @assignment.assignment_overrides.create!(set_type: "Group", set_id: @differentiation_tag_group_1.id)
+        expected_result = {
+          "id" => @override.id,
+          "assignment_id" => @assignment.id,
+          "group_id" => @differentiation_tag_group_1.id,
+          "group_category_id" => @group_category.id,
+          "non_collaborative" => true,
+          "unassign_item" => false
+        }
+        test = test_class.new
+        test.current_user = @student
+        expect(test.assignment_overrides_json([@override], @student).first).to eq expected_result
+      end
     end
 
     context "sharding" do

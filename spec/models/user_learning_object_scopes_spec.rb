@@ -368,6 +368,44 @@ describe UserLearningObjectScopes do
       assignments = @student.assignments_for_student("submitting", contexts: [@course])
       expect(assignments[0]).to have_attribute :only_visible_to_overrides
     end
+
+    context "sub_assignments" do
+      let(:root_account) { Account.default }
+
+      before :once do
+        @sub_account1 = root_account.sub_accounts.create!(name: "sub-account1")
+        @sub_account2 = root_account.sub_accounts.create!(name: "sub-account2")
+        root_account.allow_feature!(:discussion_checkpoints)
+      end
+
+      it "returns sub_assignments from root account with discussion checkpoints FF enabled" do
+        root_account.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true, account: root_account)
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course)
+        list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course])
+        expect(list.size).to be 2
+        expect(list.pluck(:id)).to match_array([reply_to_topic.id, reply_to_entry.id])
+      end
+
+      it "returns sub_assignments only from sub-accounts with discussion checkpoints FF enabled" do
+        # sub_account1 has FF enabled
+        @sub_account1.enable_feature!(:discussion_checkpoints)
+        course_with_student(active_all: true, account: @sub_account1)
+        @course1 = @course
+        reply_to_topic, reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
+
+        # temporary enable FF for sub_account2 to create discussion with checkpoints
+        course_with_student(active_all: true, account: @sub_account2, user: @student)
+        @sub_account2.enable_feature!(:discussion_checkpoints)
+        graded_discussion_topic_with_checkpoints(context: @course)
+        # sub_account2 has FF disabled
+        @sub_account2.disable_feature!(:discussion_checkpoints)
+
+        list = @student.assignments_for_student("submitting", is_sub_assignment: true, contexts: [@course1, @course])
+        expect(list.size).to be 2
+        expect(list.pluck(:id)).to match_array([reply_to_topic.id, reply_to_entry.id])
+      end
+    end
   end
 
   describe "assignments_needing_submitting" do
@@ -729,6 +767,47 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_grading).to all(have_attribute(:only_visible_to_overrides))
     end
 
+    context "is_sub_assignment" do
+      before do
+        @course1.account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course1)
+        @reply_to_topic.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+      end
+
+      it "default false and does not return checkpointed sub-assignments" do
+        expect(@teacher.assignments_needing_grading).not_to include(@reply_to_topic)
+      end
+
+      it "returns only checkpointed sub-assignments when true" do
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true)).to eq([@reply_to_topic])
+      end
+
+      it "returns only checkpointed sub-assignments from the given course" do
+        @course2.account.enable_feature!(:discussion_checkpoints)
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course2)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true, course_ids: [@course1.id])).to eq([@reply_to_topic])
+      end
+
+      it "returns only active checkpointed sub-assignments" do
+        reply_to_topic2, _reply_to_entry2 = graded_discussion_topic_with_checkpoints(context: @course1)
+        reply_to_topic2.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true)).to eq([@reply_to_topic, reply_to_topic2])
+
+        reply_to_topic2.parent_assignment.workflow_state = "deleted"
+        reply_to_topic2.parent_assignment.save!
+
+        expect(@teacher.assignments_needing_grading(is_sub_assignment: true)).to eq([@reply_to_topic])
+      end
+
+      it "when false does not return parent assignments of sub-assignments" do
+        @reply_to_entry.submit_homework @student_a, body: "checkpoint submission for #{@student_a.name}"
+        expect(@teacher.assignments_needing_grading).not_to include(@reply_to_topic.parent_assignment)
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
@@ -804,7 +883,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#submissions_needing_grading_count" do
+  describe "#submissions_needing_grading_count" do
     before :once do
       course_with_teacher(active_all: true)
       @sectionb = @course.course_sections.create!(name: "section B")
@@ -845,7 +924,7 @@ describe UserLearningObjectScopes do
     end
   end
 
-  context "#assignments_needing_moderation" do
+  describe "#assignments_needing_moderation" do
     before :once do
       # create courses and sections
       @course1 = course_with_teacher(active_all: true).course
@@ -1013,6 +1092,18 @@ describe UserLearningObjectScopes do
           @group_topic.save!
           expect(@student.discussion_topics_needing_viewing(**opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
         end
+
+        it "does not show for locked announcements" do
+          @a.lock_at = 1.day.ago
+          @a.save!
+          a2 = announcement_model(context: @course)
+          a2.lock_at = nil
+          a2.save!
+          a3 = announcement_model(context: @course)
+          a3.lock_at = 1.day.from_now
+          a3.save!
+          expect(@student.discussion_topics_needing_viewing(**opts)).to eq [a2, a3]
+        end
       end
 
       context "include_concluded" do
@@ -1039,8 +1130,8 @@ describe UserLearningObjectScopes do
         end
 
         it "includes topics from concluded enrollments if requested" do
-          expect(@u.discussion_topics_needing_viewing(**opts.merge(include_concluded: true)).count).to eq 2
-          expect(@u.discussion_topics_needing_viewing(**opts.merge(include_concluded: true)).map(&:id).sort).to eq [@dt1.id, @dt2.id].sort
+          expect(@u.discussion_topics_needing_viewing(**opts, include_concluded: true).count).to eq 2
+          expect(@u.discussion_topics_needing_viewing(**opts, include_concluded: true).map(&:id).sort).to eq [@dt1.id, @dt2.id].sort
         end
       end
 
@@ -1060,7 +1151,7 @@ describe UserLearningObjectScopes do
         end
 
         it "only includes assignments from given course/group ids" do
-          expect(@student.discussion_topics_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+          expect(@student.discussion_topics_needing_viewing(**@opts, course_ids: [], group_ids: []).order(:id)).to eq []
           opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
           expect(@student.discussion_topics_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
         end
@@ -1219,6 +1310,15 @@ describe UserLearningObjectScopes do
       expect(student2.wiki_pages_needing_viewing(**opts)).to eq [@course_page]
     end
 
+    it "does not show wiki pages that are not visible to the user" do
+      @course_page.update!(todo_date: 1.day.from_now, only_visible_to_overrides: true)
+      section2 = add_section("Section 2")
+      student2 = student_in_section(section2)
+      @course_page.assignment_overrides.create!(set: section2)
+      expect(@student.wiki_pages_needing_viewing(**opts)).to eq []
+      expect(student2.wiki_pages_needing_viewing(**opts)).to eq [@course_page]
+    end
+
     context "include_concluded" do
       before :once do
         @u = User.create!
@@ -1241,8 +1341,8 @@ describe UserLearningObjectScopes do
       end
 
       it "includes pages from concluded enrollments if requested" do
-        expect(@u.wiki_pages_needing_viewing(**opts.merge(include_concluded: true)).count).to eq 2
-        expect(@u.wiki_pages_needing_viewing(**opts.merge(include_concluded: true)).map(&:id).sort).to eq [@wp1.id, @wp2.id].sort
+        expect(@u.wiki_pages_needing_viewing(**opts, include_concluded: true).count).to eq 2
+        expect(@u.wiki_pages_needing_viewing(**opts, include_concluded: true).map(&:id).sort).to eq [@wp1.id, @wp2.id].sort
       end
     end
 
@@ -1262,7 +1362,7 @@ describe UserLearningObjectScopes do
       end
 
       it "only includes assignments from given course/group ids" do
-        expect(@student.wiki_pages_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+        expect(@student.wiki_pages_needing_viewing(**@opts, course_ids: [], group_ids: []).order(:id)).to eq []
         opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
         expect(@student.wiki_pages_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
       end

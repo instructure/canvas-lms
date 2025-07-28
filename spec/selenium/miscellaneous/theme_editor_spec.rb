@@ -152,11 +152,12 @@ describe "Theme Editor" do
     expect(driver.title).to include "Theme Editor"
 
     # enters invalid ID and presses tab
-    f(".Theme__editor-color-block_input-text").send_keys("#xxxxx!")
+    invalid_color = "#xxxxx!"
+    f(".Theme__editor-color-block_input-text").send_keys(invalid_color)
     f(".Theme__editor-color-block_input-text").send_keys(:tab)
 
     # validations
-    expect(f(".ic-Form-message--error")).to include_text "'#xxxxx!' is not a valid color."
+    expect(f('[id="warning-message"]')).to include_text "'#{invalid_color}' is not a valid color."
   end
 
   it "K12 Theme should be automatically set when K12 Feature Flag is turned on", priority: "1"
@@ -223,13 +224,13 @@ describe "Theme Editor" do
     end
     fj('button:contains("Save theme")').click
 
-    name_input = f("#new_theme_theme_name")
+    name_input = f('input[name="name"]')
 
     keep_trying_until(1) do
       name_input.send_keys("Test Theme")
       true
     end
-    fj('span[aria-label="Save Theme"] button:contains("Save theme")').click
+    fj('form[aria-label="Save Theme Dialog"] button:contains("Save theme")').click
     apply_btn = fj('button:contains("Apply theme")')
     keep_trying_until(1) do
       apply_btn.click

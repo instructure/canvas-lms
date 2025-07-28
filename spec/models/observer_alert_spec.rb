@@ -422,6 +422,25 @@ describe ObserverAlert do
     end
   end
 
+  describe "institution_announcement for sub accounts" do
+    before :once do
+      @no_link_account = account_model
+      @student = student_in_course(active_all: true).user
+      @account = @course.account
+      @observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      @sub_account = @account.sub_accounts.create!
+      course_with_student(user: @student, account: @sub_account, active_all: true)
+      course_with_observer(course: @course, associated_user_id: @student.id, account: @sub_accounts, active_all: true)
+      @threshold = ObserverAlertThreshold.create!(student: @student, observer: @observer, alert_type: "institution_announcement")
+    end
+
+    it "should create an alert if the student is enrolled a course in a sub account" do
+      notification = account_notification(account: @sub_account)
+      alert = ObserverAlert.where(context: notification)
+      expect(alert.count).to eq 1
+    end
+  end
+
   describe "institution_announcement" do
     before :once do
       @no_link_account = account_model
@@ -432,6 +451,7 @@ describe ObserverAlert do
     end
 
     it "doesnt create an alert if the notificaiton is not for the root account" do
+      # the user is not enrolled in a course in the sub account
       sub_account = account_model(root_account: @account, parent_account: @account)
       notification = sub_account_notification(account: sub_account)
       alert = ObserverAlert.where(context: notification).first
@@ -463,7 +483,6 @@ describe ObserverAlert do
       expect(alert.count).to eq 1
 
       expect(alert.first.context).to eq notification
-      expect(alert.first.title).to include("Institution announcement:")
     end
 
     it "does not duplicate alerts" do
@@ -529,6 +548,43 @@ describe ObserverAlert do
 
       alerts = ObserverAlert.where(context: @assignment1)
       expect(alerts.count).to eq 0
+    end
+
+    context "checkpointed discussions" do
+      before do
+        @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        due_at = 2.days.from_now
+        replies_required = 2
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 10
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: @checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 10,
+          replies_required:
+        )
+      end
+
+      it "creates an alert when threshold is met" do
+        student = student_in_course(course: @course).user
+        observer_in_course(active_all: true).tap do |enrollment|
+          enrollment.update_attribute(:associated_user_id, student.id)
+        end
+        t1 = ObserverAlertThreshold.create(observer: @observer, student:, alert_type: "assignment_grade_high", threshold: 80)
+        rtt = @checkpointed_discussion.assignment.sub_assignments.find { |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC }
+        rtt.grade_student(student, score: 10, grader: @teacher)
+
+        alert1 = ObserverAlert.where(context: rtt, alert_type: "assignment_grade_high").first
+        expect(alert1.observer_alert_threshold).to eq t1
+        expect(alert1.title).to include("Assignment graded: ")
+      end
     end
 
     it "creates an alert if the threshold is met" do

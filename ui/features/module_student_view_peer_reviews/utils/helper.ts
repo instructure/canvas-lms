@@ -26,7 +26,7 @@ import type {
 } from '../types'
 import ASSIGNMENT_QUERY from '../graphql/Queries'
 import $ from 'jquery'
-import {createClient} from '@canvas/apollo'
+import {createClient} from '@canvas/apollo-v3'
 import type {ReactElement} from 'react'
 
 export function formatAssessmentRequest({
@@ -56,7 +56,7 @@ export function formatAssignment(
     name,
     peerReviews,
   }: GraphQLAssignment,
-  moduleId: string
+  moduleId: string,
 ): {
   assessmentRequests: GraphQLAssesmentRequest[] | []
   assignmentId: string
@@ -64,9 +64,8 @@ export function formatAssignment(
 } | null {
   if (assessmentRequests.length === 0 || ENV.course_id == null) return null
 
-  // @ts-expect-error
-  const container: ReactElement | undefined = $(
-    `#module_student_view_peer_reviews_${assignmentId}_${moduleId}`
+  const container: Element | undefined = $(
+    `#module_student_view_peer_reviews_${assignmentId}_${moduleId}`,
   )[0]
 
   const {anonymousReviews} = peerReviews
@@ -97,12 +96,12 @@ export function compareByCreatedAt(a: AssessmentRequest, b: AssessmentRequest) {
 }
 
 export function formatGraphqlModuleNodes(
-  graphqlModuleItemNodes: GraphQLModuleItemsNode[]
+  graphqlModuleItemNodes: GraphQLModuleItemsNode[],
 ): [string, StudentViewPeerReviewsAssignment][] {
   const studentViewPeerReviewsAssignments: StudentViewPeerReviewsAssignment[] = []
 
   const filteredNodes = graphqlModuleItemNodes.filter(
-    node => node && node.moduleItems && node.moduleItems.length > 0
+    node => node && node.moduleItems && node.moduleItems.length > 0,
   )
 
   filteredNodes.forEach(({id: moduleId, moduleItems}) => {

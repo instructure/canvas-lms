@@ -29,7 +29,7 @@ module CC::Importer::Canvas
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
       return nil unless File.exist? path
-      return nil if File.size(path) > 25.megabytes.to_i # totally arbitrary hack to keep some broken exports from killing things
+      return nil if File.size(path) > 25.decimal_megabytes.to_i # totally arbitrary hack to keep some broken exports from killing things
 
       if html
         open_file path
@@ -81,7 +81,8 @@ module CC::Importer::Canvas
          banner_image_identifier_ref
          course_color
          alt_name
-         time_zone].each do |string_type|
+         time_zone
+         default_due_time].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
@@ -119,7 +120,9 @@ module CC::Importer::Canvas
          restrict_enrollments_to_course_dates
          homeroom_course
          allow_final_grade_override
-         enable_course_paces].each do |bool_val|
+         enable_course_paces
+         conditional_release
+         hide_sections_on_course_users_page].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
@@ -252,6 +255,7 @@ module CC::Importer::Canvas
         event["rrule"] = get_node_val(node, "rrule")
         event["series_uuid"] = get_node_val(node, "series_uuid")
         event["series_head"] = get_node_val(node, "series_head", nil)
+        event["blackout_date"] = get_bool_val(node, "blackout_date", false)
         events << event
       end
 

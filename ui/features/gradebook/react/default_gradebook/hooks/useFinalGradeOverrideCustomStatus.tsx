@@ -17,8 +17,7 @@
  */
 
 import {useState} from 'react'
-import {useMutation} from 'react-apollo'
-import gql from 'graphql-tag'
+import {gql, useMutation} from '@apollo/client'
 import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const SET_OVERRIDE_STATUS_MUTATION = gql`
@@ -49,7 +48,7 @@ export const useFinalGradeOverrideCustomStatus = () => {
   const saveFinalOverrideCustomStatus = async (
     customGradeStatusId: string | null,
     enrollmentId: string,
-    gradingPeriodId?: string | null
+    gradingPeriodId?: string | null,
   ) => {
     setSaveCallStatus(ApiCallStatus.PENDING)
     try {

@@ -28,7 +28,7 @@ module Canvas::OutcomeImportValidations
     return unless has_attribute?(:latest_outcome_import_id)
 
     if latest_outcome_import_id_changed? && latest_outcome_import && latest_outcome_import.context != self
-      errors.add(t("latest_outcome_import context is not self"))
+      errors.add(:base, t("latest_outcome_import context is not self"))
     end
   end
 end

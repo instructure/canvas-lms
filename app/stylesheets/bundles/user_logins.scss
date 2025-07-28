@@ -18,6 +18,22 @@
 
 @import 'base/environment';
 
+.login_details_list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.login_details {
+  padding: 0;
+  display: block;
+}
+.login_details_label {
+  font-weight: bold;
+}
+.login_details_link {
+  font-style: normal;
+}
+
 #login_information {
   > table {
     border-collapse: collapse;
@@ -43,22 +59,7 @@
   .account_name {
     line-height: 3.0;
   }
-  .login_details_list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .login_details {
-    padding: 0;
-    display: block;
-  }
-  .login_details_label {
-    font-weight: bold;
-  }
 
-  .login_details_link {
-    font-style: normal;
-  }
   .links {
     white-space: nowrap;
     text-align: direction(right);

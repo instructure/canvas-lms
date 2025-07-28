@@ -105,7 +105,7 @@ describe LtiOutbound::ToolLaunch do
   end
 
   let(:tool_launch) do
-    LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
+    LtiOutbound::ToolLaunch.new(url:,
                                 tool:,
                                 user:,
                                 account:,
@@ -115,6 +115,10 @@ describe LtiOutbound::ToolLaunch do
                                 outgoing_email_address: "outgoing_email_address",
                                 variable_expander:,
                                 include_module_context: true)
+  end
+
+  let(:url) do
+    "http://lti_tool.com"
   end
 
   describe "#generate" do
@@ -312,6 +316,57 @@ describe LtiOutbound::ToolLaunch do
         hash = tool_launch.generate
         expect(hash).to include({ "ext_param" => 123 })
       end
+    end
+
+    it "includes userid if not anonymous true" do
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+    end
+
+    describe "when edu-apps launch" do
+      let(:url) do
+        "https://www.edu-apps.org/redirect"
+      end
+
+      it "includes userid if privacy_level is not anonymous" do
+        tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+        hash = tool_launch.generate
+        expect(hash).to have_key "user_id"
+        tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
+        hash = tool_launch.generate
+        expect(hash).to have_key "user_id"
+        tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
+        hash = tool_launch.generate
+        expect(hash).to have_key "user_id"
+      end
+
+      it "does not includes userid if privacy_level is anonymous" do
+        tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
+        hash = tool_launch.generate
+        expect(hash).to_not have_key "user_id"
+      end
+    end
+
+    it "includes userid if it is not edu-apps tool" do
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
+      tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
+      hash = tool_launch.generate
+      expect(hash).to have_key "user_id"
     end
 
     it "does not include name and email if anonymous" do

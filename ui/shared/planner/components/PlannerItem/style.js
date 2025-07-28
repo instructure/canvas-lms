@@ -70,8 +70,8 @@ export default function buildStyle() {
 
   const theme = {
     lineHeight: variables.typography.lineHeightCondensed,
-    color: variables.colors.licorice,
-    secondaryColor: variables.colors.ash,
+    color: variables.colors.contrasts.grey125125,
+    secondaryColor: variables.colors.contrasts.grey4570,
     padding: `${variables.spacing.small} ${variables.spacing.xSmall}`,
     paddingMedium: `${variables.spacing.small}`,
     paddingLarge: `${variables.spacing.small} ${variables.spacing.medium}`,
@@ -79,9 +79,9 @@ export default function buildStyle() {
     gutterWidthXLarge: variables.spacing.medium,
     bottomMargin: variables.spacing.xSmall,
     borderWidth: variables.borders.widthSmall,
-    borderColor: variables.colors.tiara,
+    borderColor: variables.colors.contrasts.grey1214,
     iconFontSize: variables.spacing.medium,
-    iconColor: variables.colors.brand,
+    iconColor: variables.colors.contrasts.blue4570,
     badgeMargin: '0.0625rem',
     metricsPadding: variables.spacing.xxSmall,
     typeMargin: variables.spacing.xxSmall,
@@ -121,28 +121,28 @@ export default function buildStyle() {
     padding-inline-start: 0.5rem;
     padding-inline-end: 0;
   }
-  
+
   .${classNames.completed},
   .${classNames.avatar},
   .${classNames.icon},
   .${classNames.layout} {
     box-sizing: border-box;
   }
-  
+
   .${classNames.completed} {
     width: 1.375rem;
     margin-inline-start: ${theme.gutterWidth};
   }
-  
+
   .${classNames.activityIndicator} {
     padding-inline-end: 0;
     padding-inline-start: 0;
   }
-  
+
   .${classNames.activityIndicator} + .${classNames.completed} {
     margin-inline-start: calc(${theme.gutterWidth} - ${theme.activityIndicatorWidth});
   }
-  
+
   .${classNames.icon} {
     color: ${theme.iconColor};
     margin: 0 ${theme.gutterWidth};
@@ -151,19 +151,19 @@ export default function buildStyle() {
     /* stylelint-disable-line selector-no-type */
     display: block;
   }
-  
+
   .${classNames.avatar} {
     /* adjust margin so <Avatar size="small"> fits in same space as the icon */
     margin: 0 calc(${theme.gutterWidth} - ((1em * 2.5) - ${theme.iconFontSize}) / 2);
   }
-  
+
   .${classNames.layout} {
     display: flex;
     flex-direction: column;
     flex: 1 0;
     min-width: 1px;
   }
-  
+
   .${classNames.innerLayout} {
     display: flex;
     flex: 1 0;
@@ -172,7 +172,7 @@ export default function buildStyle() {
     min-height: 2.5rem;
     /* or ie11 smashes it down */
   }
-  
+
   .${classNames.details} {
     flex: 0 0 50%;
     margin-bottom: 0;
@@ -182,7 +182,7 @@ export default function buildStyle() {
   .${classNames.details}.${classNames.details_no_badges} {
     flex: 0 0 75%;
   }
-  
+
   .${classNames.secondary} {
     flex: 0 0 50%;
     box-sizing: border-box;
@@ -194,7 +194,7 @@ export default function buildStyle() {
   .${classNames.secondary}.${classNames.secondary_no_badges} {
     flex: 0 0 25%;
   }
-  
+
   .${classNames.type} {
     box-sizing: border-box;
     line-height: 1;
@@ -202,12 +202,12 @@ export default function buildStyle() {
     letter-spacing: 0.0625rem;
     margin-bottom: ${theme.typeMargin};
   }
-  
+
   .${classNames.title} {
     box-sizing: border-box;
     line-height: ${theme.titleLineHeight};
   }
-  
+
   .${classNames.metrics} {
     box-sizing: border-box;
     text-align: end;
@@ -227,7 +227,7 @@ export default function buildStyle() {
   .${classNames.missingItem} .${classNames.metrics}.${classNames.with_end_time} {
     flex-basis: 20rem;
   }
-  
+
   .${classNames.due},
   .${classNames.score} {
     color: ${theme.secondaryColor};
@@ -237,13 +237,13 @@ export default function buildStyle() {
     line-height: 1;
     white-space: nowrap;
   }
-  
+
   .${classNames.badges} {
     flex: 1;
     text-align: end;
     min-width: 1px;
   }
-  
+
   .${classNames.feedback} {
     display: flex;
     align-items: center;
@@ -259,12 +259,12 @@ export default function buildStyle() {
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-  
+
   .${classNames.location} {
     text-overflow: ellipsis;
     overflow: hidden;
   }
-  
+
   .${classNames.small} .${classNames.title},
   .${classNames.medium} .${classNames.title} {
     overflow: hidden;
@@ -272,7 +272,7 @@ export default function buildStyle() {
     text-overflow: ellipsis;
     padding-inline-end: 0.5rem;
   }
-  
+
   .${classNames.small} {
     padding-left: 0;
     padding-right: 0;
@@ -321,7 +321,7 @@ export default function buildStyle() {
     color: ${theme.secondaryColor};
     margin-inline-start: 1rem;
   }
-  
+
   :global(.${classNames.k5}) .type {
     display: none;
   }

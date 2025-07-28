@@ -33,7 +33,7 @@ describe Canvas::LockExplanation do
     let(:type) { "page" }
 
     context "with a :lock_at key in the hash" do
-      let(:hash) { { lock_at: DateTime.tomorrow } }
+      let(:hash) { { lock_at: Time.zone.tomorrow } }
 
       context "with a type of 'page'" do
         it "returns the correct explanation string" do

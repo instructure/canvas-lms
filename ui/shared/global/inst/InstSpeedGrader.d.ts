@@ -30,9 +30,9 @@ export interface InstSpeedGrader {
     retry?: (
       submission: Submission,
       originalSubmission: Submission,
-      numRequests: number
+      numRequests: number,
     ) => boolean,
-    retryDelay?: number
+    retryDelay?: number,
   )
   refreshQuizSubmissionSnapshot(data: {user_id: string; version_number: string})
   clearQuizSubmissionSnapshot(data: {user_id: string; version_number: string})

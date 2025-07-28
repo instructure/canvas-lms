@@ -32,7 +32,7 @@ class Mention < ApplicationRecord
   set_broadcast_policy do |p|
     p.dispatch :discussion_mention
     p.to { user }
-    p.whenever { |record| record.just_created && record.active? && user != discussion_entry.user }
+    p.whenever { |record| record.previously_new_record? && record.active? && user != discussion_entry.user }
     p.data { discussion_entry.course_broadcast_data }
   end
 
@@ -48,7 +48,13 @@ class Mention < ApplicationRecord
     end
   end
 
+  def reply_from(opts)
+    raise IncomingMail::Errors::UnknownAddress if discussion_entry.deleted?
+
+    discussion_entry.reply_from(opts)
+  end
+
   def log_created_mention_metrics
-    InstStatsd::Statsd.increment("discussion_mention.created")
+    InstStatsd::Statsd.distributed_increment("discussion_mention.created")
   end
 end

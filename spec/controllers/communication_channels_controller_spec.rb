@@ -1481,6 +1481,23 @@ describe CommunicationChannelsController do
           end
         end
 
+        it "creates push even if cannot manage comm channels" do
+          user_with_pseudonym(active_user: true)
+          user_session(@user, @pseudonym)
+          controller.instance_variable_set(:@access_token, second_sns_access_token)
+          @user.account.settings[:users_can_edit_comm_channels] = false
+          @user.account.save!
+
+          post "create", params: {
+            user_id: @user.id,
+            communication_channel: {
+              token: "asdasd123123", type: "push"
+            }
+          }
+          ap(response.parsed_body)
+          expect(response).to be_successful
+        end
+
         it "deletes a push_token", type: :request do
           json = api_call(:delete,
                           "/api/v1/users/self/communication_channels/push",
@@ -1506,7 +1523,7 @@ describe CommunicationChannelsController do
                      push_token: fake_token },
                    { push_token: fake_token })
           expect(NotificationEndpoint.find(another_endpoint.id).workflow_state).to eq("active")
-          expect(NotificationEndpoint.where(token: fake_token).take.workflow_state).to eq("deleted")
+          expect(NotificationEndpoint.find_by(token: fake_token).workflow_state).to eq("deleted")
         end
 
         it "does not delete the communication channel", type: :request do
@@ -1517,7 +1534,7 @@ describe CommunicationChannelsController do
                      format: "json",
                      push_token: fake_token },
                    { push_token: fake_token })
-          expect(CommunicationChannel.where(path: "push").take).to be_truthy
+          expect(CommunicationChannel.find_by(path: "push")).to be_truthy
         end
 
         it "deletes all endpoints for the given token", type: :request do

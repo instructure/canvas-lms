@@ -27,7 +27,7 @@ import DateValidator from '@canvas/grading/DateValidator'
 import template from '../../jst/CreateAssignment.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import numberHelper from '@canvas/i18n/numberHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import $ from 'jquery'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
@@ -39,10 +39,11 @@ import {
   isMidnight,
 } from '@instructure/moment-utils'
 import * as tz from '@instructure/moment-utils'
-import {encodeQueryString} from '@canvas/query-string-encoding'
+import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import CreateEditAssignmentModal from '@canvas/assignments/react/CreateEditAssignmentModal'
 
-const I18n = useI18nScope('CreateAssignmentView')
+const I18n = createI18nScope('CreateAssignmentView')
 
 extend(CreateAssignmentView, DialogFormView)
 
@@ -91,7 +92,7 @@ CreateAssignmentView.prototype.onSaveSuccess = function () {
   CreateAssignmentView.__super__.onSaveSuccess.apply(this, arguments)
   ENV.PERMISSIONS.by_assignment_id &&
     (ENV.PERMISSIONS.by_assignment_id[this.model.id] = {
-      update: ENV.PERMISSIONS.manage_assignments,
+      update: ENV.PERMISSIONS.manage_assignments_edit,
     })
   if (this.assignmentGroup) {
     this.assignmentGroup.get('assignments').add(this.model)
@@ -128,9 +129,8 @@ CreateAssignmentView.prototype.onSaveFail = function (xhr) {
   return CreateAssignmentView.__super__.onSaveFail.call(this, xhr)
 }
 
-CreateAssignmentView.prototype.moreOptions = function () {
+CreateAssignmentView.prototype.moreOptions = function (data) {
   const valid = ['submission_types', 'name', 'due_at', 'points_possible', 'assignment_group_id']
-  const data = this.getFormData()
   if (this.assignmentGroup) {
     data.assignment_group_id = this.assignmentGroup.get('id')
   }
@@ -140,6 +140,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
       return (dataParams[key] = value)
     }
   })
+
   if (dataParams.submission_types === 'online_quiz') {
     const button = this.$('.more_options')
     button.prop('disabled', true)
@@ -149,7 +150,7 @@ CreateAssignmentView.prototype.moreOptions = function () {
           return function (response) {
             return _this.redirectTo(response.url)
           }
-        })(this)
+        })(this),
       )
       .always(function () {
         return button.prop('disabled', false)
@@ -309,7 +310,7 @@ CreateAssignmentView.prototype._validatePointsPossible = function (data, errors)
   if (includes(this.model.frozenAttributes(), 'points_possible')) {
     return errors
   }
-  // eslint-disable-next-line no-restricted-globals
+
   if (data.points_possible && isNaN(data.points_possible)) {
     errors.points_possible = [
       {
@@ -382,7 +383,7 @@ CreateAssignmentView.prototype._validateDueDate = function (data, errors) {
 CreateAssignmentView.prototype.roundPointsPossible = function (e) {
   const value = $(e.target).val()
   const rounded_value = round(numberHelper.parse(value), 2)
-  // eslint-disable-next-line no-restricted-globals
+
   if (isNaN(rounded_value)) {
     // do nothing
   } else {

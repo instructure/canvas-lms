@@ -42,7 +42,7 @@ describe('BlackoutDateRow', () => {
   it('renders the start and end dates', () => {
     const {container} = render(renderRow(<BlackoutDateRow {...defaultProps} />))
     expect(container.querySelectorAll('td')[2].textContent).toEqual(
-      'Mon, Mar 21, 2022 - Fri, Mar 25, 2022'
+      'Mon, Mar 21, 2022 - Fri, Mar 25, 2022',
     )
   })
 

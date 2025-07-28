@@ -17,18 +17,31 @@
  */
 
 import React, {useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconQuestionLine} from '@instructure/ui-icons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import {GroupContext, SPLIT} from './context'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
-export const Leadership = ({onChange}) => {
+const tooltipText = I18n.t(
+  'Group leaders can manage members and edit the group name but not the group size.',
+)
+
+const HelpText = () => (
+  <div style={{maxWidth: '300px'}}>
+    <p data-testid="group-leadership-help-text">{tooltipText}</p>
+  </div>
+)
+
+export const Leadership = ({onChange, direction}) => {
   const {enableAutoLeader, autoLeaderType, selfSignup, splitGroups} = useContext(GroupContext)
 
   function handleEnableChange(event) {
@@ -42,9 +55,22 @@ export const Leadership = ({onChange}) => {
   if (!selfSignup && splitGroups === SPLIT.off) return null
 
   return (
-    <Flex data-testid="group-leadership-controls">
+    <Flex data-testid="group-leadership-controls" direction={direction}>
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Leadership')}</Text>
+        <Tooltip renderTip={<HelpText />} placement="top" on={['click', 'hover', 'focus']}>
+          <IconButton
+            data-testid="group-leadership-icon-button"
+            color="primary"
+            size="small"
+            margin="none none xx-small none"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={tooltipText}
+          >
+            <IconQuestionLine />
+          </IconButton>
+        </Tooltip>
       </Flex.Item>
       <Flex.Item shouldGrow={true}>
         <Flex direction="column">
@@ -86,4 +112,5 @@ export const Leadership = ({onChange}) => {
 
 Leadership.propTypes = {
   onChange: func.isRequired,
+  direction: string,
 }

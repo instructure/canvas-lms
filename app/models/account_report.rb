@@ -65,7 +65,8 @@ class AccountReport < ActiveRecord::Base
   end
 
   scope :complete, -> { where(progress: 100) }
-  scope :running, -> { where(workflow_state: "running") }
+  scope :running, -> { where(workflow_state: %w[running compiling]) }
+  scope :created_or_running, -> { where(workflow_state: %w[created running compiling]) }
   scope :most_recent, -> { order(created_at: :desc).limit(1) }
   scope :active, -> { where.not(workflow_state: "deleted") }
 
@@ -98,23 +99,33 @@ class AccountReport < ActiveRecord::Base
     account
   end
 
+  def title
+    report_type.to_s.titleize
+  end
+
   delegate :root_account, to: :account
 
   def in_progress?
     created? || running?
   end
 
+  def stopped?
+    aborted? || deleted?
+  end
+
   def run_report(type = nil, attempt: 1)
-    parameters["locale"] = infer_locale(user:, root_account: account)
-    self.report_type ||= type
-    if AccountReport.available_reports[self.report_type]
-      begin
-        AccountReports.generate_report(self, attempt:)
-      rescue
+    shard.activate do
+      parameters["locale"] = infer_locale(user:, root_account: account)
+      self.report_type ||= type
+      if AccountReport.available_reports[self.report_type]
+        begin
+          AccountReports.generate_report(self, attempt:)
+        rescue
+          mark_as_errored
+        end
+      else
         mark_as_errored
       end
-    else
-      mark_as_errored
     end
   end
   handle_asynchronously :run_report,
@@ -122,7 +133,9 @@ class AccountReport < ActiveRecord::Base
                         n_strand: proc { |ar| ["account_reports", ar.account.root_account.global_id] },
                         on_permanent_failure: :mark_as_errored
 
-  def mark_as_errored
+  def mark_as_errored(error = nil)
+    Rails.logger.error("AccountReport failed with error: #{error}") if error
+
     self.workflow_state = :error
     save!
   end
@@ -138,6 +151,27 @@ class AccountReport < ActiveRecord::Base
   def self.available_reports
     # check if there is a reports plugin for this account
     AccountReports.available_reports
+  end
+
+  def self.last_complete_reports(account:)
+    account.shard.activate do
+      scope = account.account_reports.active.complete.where("report_type=name").most_recent
+      AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ")
+                   .order("report_types.name")
+                   .preload(:attachment)
+                   .index_by(&:report_type)
+    end
+  end
+
+  def self.last_reports(account:)
+    account.shard.activate do
+      scope = account.account_reports.active.where("report_type=name").most_recent
+      AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ")
+                   .order("report_types.name")
+                   .index_by(&:report_type)
+    end
   end
 
   def abort_incomplete_runners_if_needed

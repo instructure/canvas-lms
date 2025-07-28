@@ -26,7 +26,7 @@
 export function replaceOneTag<TInput extends string | null | undefined = string>(
   text: TInput,
   name: string | null | undefined,
-  value: string | null | undefined
+  value: string | null | undefined,
 ): TInput {
   if (!text) {
     return text
@@ -50,7 +50,7 @@ export function replaceOneTag<TInput extends string | null | undefined = string>
 export function replaceTags<TNull extends never | null | undefined = never>(
   text: string | TNull,
   mappingOrName: Record<string, string> | string,
-  maybeValue?: string
+  maybeValue?: string,
 ) {
   if (typeof mappingOrName === 'object') {
     Object.keys(mappingOrName).forEach(name => {

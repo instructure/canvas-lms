@@ -27,13 +27,13 @@ import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import DateEventGroup from './DateEventGroup'
 import * as propTypes from './propTypes'
 import {roleLabelFor, creatorNameFor} from '../../AuditTrailHelpers'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 const componentOverrides = {
   [View.componentId]: {
@@ -79,6 +79,7 @@ export default class CreatorEventGroup extends PureComponent {
                       color="primary"
                     >
                       <IconButton
+                        data-testid="warning-icon"
                         renderIcon={<IconWarningLine color="error" />}
                         size="medium"
                         screenReaderLabel={I18n.t('Toggle tooltip')}
@@ -92,7 +93,7 @@ export default class CreatorEventGroup extends PureComponent {
             }
             toggleLabel={I18n.t('Assessment audit events for %{creatorName}', {creatorName})}
           >
-            <div>
+            <div data-testid="date-event-groups">
               {dateEventGroups.map(dateEventGroup => (
                 <DateEventGroup dateEventGroup={dateEventGroup} key={dateEventGroup.startDateKey} />
               ))}

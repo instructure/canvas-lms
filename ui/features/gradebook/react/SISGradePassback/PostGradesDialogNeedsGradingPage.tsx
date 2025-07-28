@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -17,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 type Props = {
   needsGrading: {
@@ -33,6 +32,7 @@ type Props = {
 }
 
 class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
+  // @ts-expect-error
   onClickRow = assignment_id => {
     window.location.href = `gradebook/speed_grader?assignment_id=${assignment_id}`
   }
@@ -46,7 +46,7 @@ class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
               'NOTE: Students have submitted work for these assignments' +
                 'that has not been graded. If you post these grades now, you' +
                 'will need to re-post their scores after grading their' +
-                'latest submissions.'
+                'latest submissions.',
             )}
           </em>
         </small>

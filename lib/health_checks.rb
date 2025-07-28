@@ -81,7 +81,14 @@ module HealthChecks
         # ensures `gulp rev` has ran; returns a string, treated as truthy
         rev_manifest: -> { Canvas::Cdn.registry.statics_available? },
         # ensures we retrieved something back from Vault; returns a boolean
-        vault: -> { !Canvas::Vault.read("#{Canvas::Vault.kv_mount}/data/secrets").nil? }
+        vault: lambda do
+          path = "#{Canvas::Vault.kv_mount}/data/secrets"
+
+          # First try to check if it's cached without reaching out to vault because
+          # Canvas can operate without vault if the secrets are cached
+          # If it's not cached, we'll reach out to vault and cache the response
+          Canvas::Vault.cached?(path) || !Canvas::Vault.read(path).nil?
+        end
       }
     end
 

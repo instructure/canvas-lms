@@ -16,39 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {
+  sharedBankTests,
+  sharedContentTests,
+  sharedDateParsingTests,
+  sharedFormTests,
+  sharedImportAsNQTests,
+} from './shared_form_cases'
 import CommonCartridgeImporter from '../common_cartridge'
 
-const onSubmit = jest.fn()
-const onCancel = jest.fn()
-
-const renderComponent = (overrideProps?: any) =>
-  render(<CommonCartridgeImporter onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
-
 describe('CommonCartridgeImporter', () => {
-  it('calls onSubmit', async () => {
-    renderComponent()
-
-    const file = new File(['blah, blah, blah'], 'my_file.zip', {type: 'application/zip'})
-    const input = screen.getByTestId('migrationFileUpload')
-    await userEvent.upload(input, file)
-    await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        pre_attachment: {
-          name: 'my_file.zip',
-          no_redirect: true,
-          size: 16,
-        },
-      }),
-      expect.any(Object)
-    )
-  })
-
-  it('renders the progressbar info', async () => {
-    renderComponent({fileUploadProgress: 10})
-    expect(screen.getByText('Uploading File')).toBeInTheDocument()
-  })
+  sharedFormTests(CommonCartridgeImporter)
+  sharedContentTests(CommonCartridgeImporter)
+  sharedBankTests(CommonCartridgeImporter)
+  sharedImportAsNQTests(CommonCartridgeImporter)
+  sharedDateParsingTests(CommonCartridgeImporter)
 })

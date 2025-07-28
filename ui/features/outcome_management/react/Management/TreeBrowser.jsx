@@ -21,9 +21,9 @@ import {IconArrowOpenDownLine, IconArrowOpenEndLine, IconPlusLine} from '@instru
 import {TreeBrowser as InstuiTreeBrowser} from '@instructure/ui-tree-browser'
 import AddContentItem from '../shared/AddContentItem'
 import {isRTL} from '@canvas/i18n/rtlHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const KEYCODES = {
   ENTER: 13,
@@ -59,6 +59,19 @@ const contentItem = ({
     } else if (expanded) {
       // prevent changes in text input from propagating up to the collection
       e.stopPropagation()
+    } else if (e.key === 'ArrowLeft') {
+      e.stopPropagation()
+      navigateToPrevious(containerRefs[id])
+    }
+  }
+
+  const navigateToPrevious = (thisListElement) => {
+    const parentListElement = thisListElement.parentElement.closest('li')
+    const previousSiblingListElement = Array.from(parentListElement.querySelectorAll('li')).at(-2)
+    if (previousSiblingListElement) {
+      previousSiblingListElement.focus()
+    } else {
+      parentListElement.focus()
     }
   }
 

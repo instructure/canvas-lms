@@ -17,31 +17,56 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {ProgressBar} from '@instructure/ui-progress'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
-export default function IndexingProgress({progress}) {
-  return (
-    <div>
-      <Text>
-        {I18n.t(
-          'Please wait a moment while we get Smart Search ready for this course. This only needs to happen once.'
-        )}
-      </Text>
-      <br />
-      <Text fontStyle="italic">
-        {I18n.t(
-          'You can leave this page and come back, and we will keep working in the background.'
-        )}
-      </Text>
-      <ProgressBar
-        screenReaderLabel={I18n.t('Indexing in progress')}
-        valueNow={progress}
-        valueMax={100}
-      />
-    </div>
-  )
+// TODO: Remove this temporary prop once we fully migrate to the enhanced UI
+export default function IndexingProgress({progress, isEnhanced = false}) {
+  if (isEnhanced) {
+    return (
+      <div>
+        <Text as="p">
+          {I18n.t(
+            'Please wait a moment while we get Smart Search ready for this course. This only needs to happen once.',
+          )}
+        </Text>
+        <Text as="p">
+          {I18n.t(
+            'You can leave this page and come back, and we will keep working in the background.',
+          )}
+        </Text>
+        <ProgressBar
+          data-testid="indexing_progress"
+          screenReaderLabel={I18n.t('Indexing in progress')}
+          valueNow={progress}
+          valueMax={100}
+        />
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <Text>
+          {I18n.t(
+            'Please wait a moment while we get Smart Search ready for this course. This only needs to happen once.',
+          )}
+        </Text>
+        <br />
+        <Text fontStyle="italic">
+          {I18n.t(
+            'You can leave this page and come back, and we will keep working in the background.',
+          )}
+        </Text>
+        <ProgressBar
+          data-testid="indexing_progress"
+          screenReaderLabel={I18n.t('Indexing in progress')}
+          valueNow={progress}
+          valueMax={100}
+        />
+      </div>
+    )
+  }
 }

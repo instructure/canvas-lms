@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -40,7 +40,7 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'
 
-const I18n = useI18nScope('grade_details')
+const I18n = createI18nScope('grade_details')
 
 const NUM_GRADE_SKELETONS = 10
 
@@ -56,6 +56,7 @@ const GradeDetails = ({
   gradingScheme,
   pointsBasedGradingScheme,
   restrictQuantitativeData,
+  scalingFactor,
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -76,7 +77,8 @@ const GradeDetails = ({
     observedUserId,
     restrictQuantitativeData,
     gradingScheme,
-    pointsBasedGradingScheme
+    pointsBasedGradingScheme,
+    scalingFactor,
   )
   const grades = getAssignmentGrades(assignmentGroups, observedUserId)
   const totalGrade = getTotalGradeStringFromEnrollments(
@@ -85,7 +87,8 @@ const GradeDetails = ({
     observedUserId,
     restrictQuantitativeData,
     gradingScheme,
-    pointsBasedGradingScheme
+    pointsBasedGradingScheme,
+    scalingFactor,
   )
   const include = ['assignments', 'submission', 'read_state', 'submission_comments']
   if (selectedGradingPeriodId) {
@@ -139,17 +142,20 @@ const GradeDetails = ({
     }
   }, [error, courseName])
 
-  const gradeRowSkeleton = props => (
-    <Table.Row {...props}>
-      <Table.Cell colSpan={4}>
-        <LoadingSkeleton
-          height="2.5em"
-          width="100%"
-          screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
-        />
-      </Table.Cell>
-    </Table.Row>
-  )
+  const gradeRowSkeleton = props => {
+    const {key, ...otherProps} = props
+    return (
+      <Table.Row key={key} {...otherProps}>
+        <Table.Cell colSpan={4}>
+          <LoadingSkeleton
+            height="2.5em"
+            width="100%"
+            screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
+          />
+        </Table.Cell>
+      </Table.Row>
+    )
+  }
 
   const gradesDetailsTable = content => (
     <div className={isStacked ? 'grade-details narrow' : 'grade-details'}>
@@ -253,7 +259,7 @@ const GradeDetails = ({
             isStacked,
             currentUserId: observedUserId || currentUser.id,
             ...assignment,
-          })
+          }),
         )}
       </LoadingWrapper>
     </>
@@ -272,6 +278,7 @@ GradeDetails.propTypes = {
   gradingScheme: PropTypes.array,
   pointsBasedGradingScheme: PropTypes.bool,
   restrictQuantitativeData: PropTypes.bool,
+  scalingFactor: PropTypes.number,
 }
 
 export default GradeDetails

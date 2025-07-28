@@ -21,14 +21,14 @@
 module Mutations
   class BaseLearningOutcomeMutation < BaseMutation
     # input arguments
-    argument :title, String, required: true
+    argument :calculation_int, Integer, required: false
+    argument :calculation_method, String, required: false
     argument :description, String, required: false
     argument :display_name, String, required: false
-    argument :vendor_guid, String, required: false
-    argument :calculation_method, String, required: false
-    argument :calculation_int, Integer, required: false
     argument :mastery_points, Float, required: false
     argument :ratings, [Types::ProficiencyRatingInputType], required: false
+    argument :title, String, required: true
+    argument :vendor_guid, String, required: false
 
     field :learning_outcome, Types::LearningOutcomeType, null: true
 

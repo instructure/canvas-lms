@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 import isEqual from 'lodash/isEqual'
 import range from 'lodash/range'
@@ -27,7 +27,7 @@ import * as apiClient from './apiClient'
 import {createPaginationActions} from '@canvas/pagination/redux/actions'
 import {notificationActions} from '@canvas/notifications/redux/actions'
 
-const I18n = useI18nScope('announcements_v2')
+const I18n = createI18nScope('announcements_v2')
 
 function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {
@@ -35,7 +35,7 @@ function fetchAnnouncements(dispatch, getState, payload) {
       .getAnnouncements(getState(), payload)
       .then(res => {
         $.screenReaderFlashMessageExclusive(
-          I18n.t('%{count} announcements found.', {count: res.data.length})
+          I18n.t('%{count} announcements found.', {count: res.data.length}),
         )
         resolve(res)
       })
@@ -65,6 +65,9 @@ const types = [
   'DELETE_ANNOUNCEMENTS_SUCCESS',
   'DELETE_ANNOUNCEMENTS_FAIL',
   'SET_ANNOUNCEMENTS_IS_LOCKING',
+  'MARK_ALL_ANNOUNCEMENTS_READ_START',
+  'MARK_ALL_ANNOUNCEMENTS_READ_SUCCESS',
+  'MARK_ALL_ANNOUNCEMENTS_READ_FAIL',
 ]
 
 const actions = Object.assign(createActions(...types), announcementActions.actionCreators)
@@ -97,7 +100,7 @@ actions.getExternalFeeds = function () {
           actions.loadingExternalFeedFail({
             message: I18n.t('Failed to Load External Feeds'),
             err,
-          })
+          }),
         )
       })
   }
@@ -122,7 +125,7 @@ actions.deleteExternalFeed = function ({feedId}) {
             actions.deleteExternalFeedFail({
               message: failMessage,
               err,
-            })
+            }),
           )
         })
     }
@@ -140,13 +143,15 @@ actions.toggleAnnouncementsLock =
           dispatch(actions.lockAnnouncementsSuccess({res, locked: isLocking}))
           if (isLocking) {
             dispatch(
-              notificationActions.notifyInfo({message: I18n.t('Announcements locked successfully')})
+              notificationActions.notifyInfo({
+                message: I18n.t('Announcements locked successfully'),
+              }),
             )
           } else {
             dispatch(
               notificationActions.notifyInfo({
                 message: I18n.t('Announcements unlocked successfully'),
-              })
+              }),
             )
           }
         } else if (res.failures.length) {
@@ -154,7 +159,7 @@ actions.toggleAnnouncementsLock =
             actions.lockAnnouncementsFail({
               err: res.failures,
               message: I18n.t('An error occurred while updating announcements locked state.'),
-            })
+            }),
           )
         }
       })
@@ -163,7 +168,7 @@ actions.toggleAnnouncementsLock =
           actions.lockAnnouncementsFail({
             err,
             message: I18n.t('An error occurred while locking announcements.'),
-          })
+          }),
         )
       })
   }
@@ -182,7 +187,7 @@ actions.announcementSelectionChangeStart =
     // if any of the selected items are unlocked, we lock everything
     const hasUnlockedItems = selectedItems.reduce(
       (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
-      false
+      false,
     )
 
     dispatch(actions.setAnnouncementsIsLocking(hasUnlockedItems))
@@ -199,7 +204,7 @@ actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   // if any of the selected items are unlocked, we lock everything
   const hasUnlockedItems = selectedItems.reduce(
     (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
-    false
+    false,
   )
 
   actions.toggleAnnouncementsLock(state.selectedAnnouncements, hasUnlockedItems)(dispatch, getState)
@@ -219,11 +224,11 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         dispatch(
           actions.clearAnnouncementsPage({
             pages: range(pageState.currentPage, pageState.lastPage + 1),
-          })
+          }),
         )
 
         dispatch(
-          notificationActions.notifyInfo({message: I18n.t('Announcements deleted successfully')})
+          notificationActions.notifyInfo({message: I18n.t('Announcements deleted successfully')}),
         )
 
         // reload current page after deleting items
@@ -233,7 +238,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
           actions.deleteAnnouncementsFail({
             err: res.failures,
             message: I18n.t('An error occurred while deleting announcements.'),
-          })
+          }),
         )
       }
     })
@@ -242,7 +247,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         actions.deleteAnnouncementsFail({
           err,
           message: I18n.t('An error occurred while deleting announcements.'),
-        })
+        }),
       )
     })
 }
@@ -270,15 +275,44 @@ actions.addExternalFeed = function (payload) {
           actions.addExternalFeedFail({
             message: failMessage,
             err,
-          })
+          }),
         )
       })
   }
 }
 
+actions.markAllAnnouncementRead = function () {
+  return async (dispatch, getState) => {
+    try {
+      dispatch(actions.markAllAnnouncementsReadStart())
+      const state = getState()
+      const pageState = state.announcements
+
+      await apiClient.markAllAnnouncementRead(state)
+      dispatch(
+        notificationActions.notifyInfo({
+          message: I18n.t('Announcements marked as read successfully'),
+        }),
+      )
+      dispatch(
+        actions.clearAnnouncementsPage({
+          pages: range(pageState.currentPage, pageState.lastPage + 1),
+        }),
+      )
+      dispatch(actions.markAllAnnouncementsReadSuccess())
+      dispatch(actions.getAnnouncements({page: pageState.currentPage, select: true}))
+    } catch (error) {
+      dispatch(actions.markAllAnnouncementsReadFail())
+      dispatch(
+        notificationActions.notifyError({message: I18n.t('Failed to mark announcements as read')}),
+      )
+    }
+  }
+}
+
 const actionTypes = types.reduce(
   (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
-  {}
+  {},
 )
 
 export {actionTypes, actions as default}

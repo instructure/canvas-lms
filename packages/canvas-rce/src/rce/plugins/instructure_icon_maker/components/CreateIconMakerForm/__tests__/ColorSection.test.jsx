@@ -26,12 +26,12 @@ const selectOption = async (button, option) => {
   await userEvent.click(
     screen.getByRole('combobox', {
       name: button,
-    })
+    }),
   )
   await userEvent.click(
     screen.getByRole('option', {
       name: option,
-    })
+    }),
   )
 }
 
@@ -55,7 +55,7 @@ describe('<ColorSection />', () => {
   it('changes the icon outline size', async () => {
     const onChange = jest.fn()
     render(
-      <ColorSection settings={{...DEFAULT_SETTINGS, outlineSize: 'medium'}} onChange={onChange} />
+      <ColorSection settings={{...DEFAULT_SETTINGS, outlineSize: 'medium'}} onChange={onChange} />,
     )
     await selectOption(/outline size/i, /small/i)
     expect(onChange).toHaveBeenCalledWith({outlineSize: 'small'})

@@ -44,7 +44,7 @@ it('generates the toolConfiguration', () => {
   const ref = React.createRef()
   render(<Placement {...props()} ref={ref} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(Object.keys(toolConfig).length).toEqual(6)
+  expect(Object.keys(toolConfig)).toHaveLength(6)
   expect(toolConfig.icon_url).toEqual('http://example.com/icon')
 })
 
@@ -81,7 +81,7 @@ it('changes the output when selection_height changes', () => {
     'handleHeightChange',
     250,
     {},
-    {target: {value: 250, name: 'placement_name_selection_height'}}
+    {target: {value: 250, name: 'placement_name_selection_height'}},
   )
 })
 
@@ -91,7 +91,7 @@ it('changes the output when selection_width changes', () => {
     'handleWidthChange',
     250,
     {},
-    {target: {value: 250, name: 'placement_name_selection_width'}}
+    {target: {value: 250, name: 'placement_name_selection_width'}},
   )
 })
 
@@ -101,7 +101,7 @@ it('changes the output when launch_height changes', () => {
     'handleHeightChange',
     250,
     {launch_height: 10, launch_width: 10},
-    {target: {value: 250, name: 'placement_name_launch_height'}}
+    {target: {value: 250, name: 'placement_name_launch_height'}},
   )
 })
 
@@ -111,7 +111,7 @@ it('changes the output when launch_width changes', () => {
     'handleWidthChange',
     250,
     {launch_height: 10, launch_width: 10},
-    {target: {value: 250, name: 'placement_name_launch_width'}}
+    {target: {value: 250, name: 'placement_name_launch_width'}},
   )
 })
 
@@ -158,6 +158,30 @@ it('is valid when valid', () => {
   expect(ref.current.valid()).toEqual(true)
 })
 
+it('is invalid when target link uri ', async () => {
+  const ref = React.createRef()
+  render(<Placement {...props({}, {target_link_uri: 'not_a_url'})} ref={ref} />)
+  userEvent.click(
+    screen.getByRole('button', {
+      name: /account navigation/i,
+    }),
+  )
+  await screen.findByText('Icon Url')
+  expect(ref.current.valid()).toEqual(false)
+})
+
+it('is invalid when icon url is invalid', async () => {
+  const ref = React.createRef()
+  render(<Placement {...props({}, {icon_url: 'not_a_url'})} ref={ref} />)
+  userEvent.click(
+    screen.getByRole('button', {
+      name: /account navigation/i,
+    }),
+  )
+  await screen.findByText('Icon Url')
+  expect(ref.current.valid()).toEqual(false)
+})
+
 const alwaysDeeplinkingPlacements = [
   'editor_button',
   'migration_selection',
@@ -171,7 +195,7 @@ alwaysDeeplinkingPlacements.forEach(placementName => {
     render(<Placement {...props({placementName})} />)
     await userEvent.click(screen.getByRole('button'))
     expect(
-      screen.getByText(/This placement requires Deep Link support by the vendor/i)
+      screen.getByText(/This placement requires Deep Link support by the vendor/i),
     ).toBeInTheDocument()
   })
 })
@@ -194,17 +218,6 @@ it('requires icon_url for editor_button', async () => {
 const couldBeEither = ['assignment_selection']
 
 couldBeEither.forEach(placementName => {
-  if (['course_assignments_menu', 'module_menu_modal'].includes(placementName)) {
-    beforeAll(() => {
-      global.ENV.FEATURES ||= {}
-      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = true
-    })
-
-    afterAll(() => {
-      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = false
-    })
-  }
-
   if (placementName === 'module_index_menu_modal') {
     beforeAll(() => {
       global.ENV.FEATURES ||= {}
@@ -220,7 +233,7 @@ couldBeEither.forEach(placementName => {
     render(<Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />)
     await userEvent.click(screen.getByRole('button'))
     expect(
-      screen.getByText(/This placement requires Deep Link support by the vendor/i)
+      screen.getByText(/This placement requires Deep Link support by the vendor/i),
     ).toBeInTheDocument()
   })
 
@@ -229,7 +242,7 @@ couldBeEither.forEach(placementName => {
     render(<Placement {...p} />)
     await userEvent.click(screen.getByText(p.displayName))
     expect(
-      screen.queryByRole(/This placement requires Deep Link support by the vendor/i)
+      screen.queryByRole(/This placement requires Deep Link support by the vendor/i),
     ).not.toBeInTheDocument()
   })
 })

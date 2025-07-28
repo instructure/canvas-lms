@@ -14,3 +14,8 @@ gem "canvas_errors", path: "../canvas_errors"
 gem "canvas_text_helper", path: "../canvas_text_helper"
 
 eval_gemfile("../gemfile_prefix.rb")
+
+gem "debug"
+gem "rspec", "~> 3.12"
+gem "timecop", "~> 0.9.5"
+gem "webrick"

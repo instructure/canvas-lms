@@ -81,7 +81,7 @@ describe SisApiController, type: :request do
         it "requires :view_all_grades permission" do
           context.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
           get "/api/sis/accounts/#{context.id}/assignments", params: { account_id: context.id }
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "returns paginated assignment list" do
@@ -252,7 +252,7 @@ describe SisApiController, type: :request do
         it "requires :view_all_grades permission" do
           @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: false, role: admin_role)
           get "/api/sis/courses/#{@course.id}/assignments", params: { course_id: @course.id }
-          assert_unauthorized
+          assert_forbidden
         end
 
         it "returns paginated assignment list" do

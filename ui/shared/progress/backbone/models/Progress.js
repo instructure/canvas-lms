@@ -69,7 +69,7 @@ Progress.prototype.initialize = function () {
           return _this.poll()
         }
       }
-    })(this)
+    })(this),
   )
   // don't try to do any ajax when we're leaving the page
   // workaround for https://code.google.com/p/chromium/issues/detail?id=263981
@@ -79,7 +79,7 @@ Progress.prototype.initialize = function () {
       return function () {
         return clearTimeout(_this.timeout)
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -94,14 +94,14 @@ Progress.prototype.url = function () {
 // @returns {Deferred}
 // @api public
 Progress.prototype.poll = function () {
-  // eslint-disable-next-line promise/catch-or-return
+   
   this.fetch().then(
     this.onPoll,
     (function (_this) {
       return function () {
         return _this.pollDfd.rejectWith(_this, arguments)
       }
-    })(this)
+    })(this),
   )
   return this.pollDfd
 }

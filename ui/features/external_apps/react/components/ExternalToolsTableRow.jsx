@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, number, object} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -33,19 +33,20 @@ import store from '../lib/ExternalAppsStore'
 import classMunger from '../lib/classMunger'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import ExternalToolMigrationInfo from './ExternalToolMigrationInfo'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
-const MAX_FAVS = 2
+const MAX_FAVS = 2 // RCE and Top Navigation share this value
 export default class ExternalToolsTableRow extends React.Component {
   static propTypes = {
     tool: object.isRequired,
     canAdd: bool.isRequired,
     canEdit: bool.isRequired,
     canDelete: bool.isRequired,
-    canAddEdit: bool.isRequired,
     setFocusAbove: func.isRequired,
-    favoriteCount: number.isRequired,
+    rceFavoriteCount: number.isRequired,
+    topNavFavoriteCount: number.isRequired,
     showLTIFavoriteToggles: bool,
   }
 
@@ -117,15 +118,23 @@ export default class ExternalToolsTableRow extends React.Component {
     }
   }
 
-  handleFavoriteChange = event => {
+  handleFavoriteChange = type => event => {
     const checked = event.target.checked
-    this.changeFavoriteLTI(checked)
+    this.changeFavoriteLTI(checked, type)
   }
 
-  changeFavoriteLTI = checked => {
+  changeFavoriteLTI = (checked, type) => {
     const success = _res => {
       const externalTools = store.getState().externalTools
-      externalTools.find(t => t.app_id === this.props.tool.app_id).is_rce_favorite = checked
+      const tool = externalTools.find(t => t.app_id === this.props.tool.app_id)
+      switch (type) {
+        case 'top_nav':
+          tool.is_top_nav_favorite = checked
+          break
+        case 'rce':
+          tool.is_rce_favorite = checked
+          break
+      }
       store.setState({externalTools})
     }
 
@@ -137,7 +146,7 @@ export default class ExternalToolsTableRow extends React.Component {
       })
     }
 
-    store.setAsFavorite(this.props.tool, checked, success, error)
+    store.setAsFavorite(this.props.tool, checked, type, success, error)
   }
 
   updateTool = tool => {
@@ -161,8 +170,7 @@ export default class ExternalToolsTableRow extends React.Component {
   }
 
   renderButtons = () => {
-    const permsToRenderSettingsCog =
-      this.props.canEdit || this.props.canDelete || this.props.canAddEdit
+    const permsToRenderSettingsCog = this.props.canEdit || this.props.canDelete
     const {tool} = this.props
     if (tool.installed_locally && !tool.restricted_by_master_course && permsToRenderSettingsCog) {
       let configureButton = null
@@ -207,7 +215,6 @@ export default class ExternalToolsTableRow extends React.Component {
               <EditExternalToolButton
                 tool={tool}
                 canEdit={this.props.canEdit && !this.is13Tool}
-                canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
               <ExternalToolPlacementButton
@@ -218,7 +225,6 @@ export default class ExternalToolsTableRow extends React.Component {
               <ReregisterExternalToolButton
                 tool={tool}
                 canAdd={this.props.canAdd}
-                canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
               {this.is13Tool ? (
@@ -227,7 +233,6 @@ export default class ExternalToolsTableRow extends React.Component {
               <DeleteExternalToolButton
                 tool={tool}
                 canDelete={this.props.canDelete}
-                canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
             </ul>
@@ -250,6 +255,7 @@ export default class ExternalToolsTableRow extends React.Component {
 
   render() {
     const {tool} = this.props
+    const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
@@ -259,18 +265,45 @@ export default class ExternalToolsTableRow extends React.Component {
           className={`${this.nameClassNames()} e-tool-table-data`}
           title={tool.name}
         >
-          {tool.name} {this.disabledFlag()}
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            {tool.name} {this.disabledFlag()}
+            {tool.migration_running ? (
+              <ExternalToolMigrationInfo tool={tool} />
+            ) : null}
+          </div>
         </td>
+        {this.props.showLTIFavoriteToggles && show_top_nav_toggles && (
+          <td>
+            {canBeTopNavFavorite(tool) ? (
+              <Checkbox
+                variant="toggle"
+                label={
+                  <ScreenReaderContent>{I18n.t('Top Navigation Favorite')}</ScreenReaderContent>
+                }
+                value={tool.app_id}
+                onChange={this.handleFavoriteChange('top_nav')}
+                checked={tool.is_top_nav_favorite}
+                disabled={!tool.is_top_nav_favorite && this.props.topNavFavoriteCount >= MAX_FAVS}
+              />
+            ) : (
+              I18n.t('NA')
+            )}
+          </td>
+        )}
         {this.props.showLTIFavoriteToggles && (
           <td>
             {canBeRCEFavorite(tool) ? (
               <Checkbox
                 variant="toggle"
-                label={<ScreenReaderContent>{I18n.t('Favorite')}</ScreenReaderContent>}
+                label={<ScreenReaderContent>{I18n.t('RCE Favorite')}</ScreenReaderContent>}
                 value={tool.app_id}
-                onChange={this.handleFavoriteChange}
+                onChange={this.handleFavoriteChange('rce')}
                 checked={tool.is_rce_favorite}
-                disabled={!tool.is_rce_favorite && this.props.favoriteCount === MAX_FAVS}
+                disabled={
+                  !tool.is_rce_favorite &&
+                  this.props.rceFavoriteCount >= MAX_FAVS &&
+                  !INST.editorButtons?.find(b => b.id === tool.app_id)?.on_by_default
+                }
               />
             ) : (
               I18n.t('NA')
@@ -289,5 +322,15 @@ export default class ExternalToolsTableRow extends React.Component {
 function canBeRCEFavorite(tool) {
   return (
     'is_rce_favorite' in tool && tool.editor_button_settings && tool.editor_button_settings.enabled
+  )
+}
+// Similarly, tool.is_top_nav_favorite only exists
+// on the tool if it can be a top nav favorite
+// see lib/lti/app_collator.rb#external_tool_definition
+function canBeTopNavFavorite(tool) {
+  return (
+    'is_top_nav_favorite' in tool &&
+    tool.top_navigation_settings &&
+    tool.top_navigation_settings.enabled
   )
 }

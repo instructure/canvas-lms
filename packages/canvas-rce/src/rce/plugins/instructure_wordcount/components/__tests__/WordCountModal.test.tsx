@@ -65,7 +65,7 @@ describe('WordCountModal', () => {
       const {getByRole} = renderModal()
       defaultProps.rows.forEach(({label, documentCount, selectionCount}) => {
         expect(
-          getByRole('row', {name: `${label} ${documentCount} ${selectionCount}`})
+          getByRole('row', {name: `${label} ${documentCount} ${selectionCount}`}),
         ).toBeInTheDocument()
       })
     })

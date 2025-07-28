@@ -22,6 +22,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   belongs_to :context, polymorphic: %i[abstract_course
                                        account
                                        account_user
+                                       assignment_override_student
                                        communication_channel
                                        course
                                        course_section
@@ -34,6 +35,7 @@ class SisBatchRollBackData < ActiveRecord::Base
                                        user_observer]
 
   scope :expired_data, -> { where(created_at: ...30.days.ago) }
+  scope :not_expired, -> { where(created_at: 30.days.ago..) }
   scope :active, -> { where(workflow_state: "active") }
   scope :restored, -> { where(workflow_state: "restored") }
 
@@ -49,7 +51,8 @@ class SisBatchRollBackData < ActiveRecord::Base
                      Enrollment
                      GroupMembership
                      UserObserver
-                     AccountUser].freeze
+                     AccountUser
+                     AssignmentOverrideStudent].freeze
 
   def self.cleanup_expired_data
     expired_data.in_batches(of: 10_000).delete_all
@@ -58,7 +61,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   def self.build_data(sis_batch:, context:, batch_mode_delete: false)
     return unless SisBatchRollBackData.should_create_roll_back?(context, sis_batch)
 
-    old_state = (context.id_before_last_save.nil? ? "non-existent" : context.workflow_state_before_last_save)
+    old_state = (context.previously_new_record? ? "non-existent" : context.workflow_state_before_last_save)
     sis_batch.shard.activate do
       SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
                                context:,
@@ -93,7 +96,7 @@ class SisBatchRollBackData < ActiveRecord::Base
   def self.should_create_roll_back?(object, sis_batch)
     return false unless sis_batch
 
-    object.id_before_last_save.nil? || object.workflow_state_before_last_save != object.workflow_state
+    object.previously_new_record? || object.workflow_state_before_last_save != object.workflow_state
   end
 
   def self.bulk_insert_roll_back_data(datum)

@@ -15,27 +15,28 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import $ from 'jquery'
-import {each, extend} from 'lodash'
+import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import PublishIconView from '@canvas/publish-icon-view'
 import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
+import $ from 'jquery'
+import {each, extend} from 'lodash'
 import template from '../../jst/QuizItemView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import React from 'react'
-import ReactDOM from 'react-dom'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import {assignLocation} from '@canvas/util/globalUtils'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('quizzes.index')
+const I18n = createI18nScope('quizzes.index')
 
 export default class ItemView extends Backbone.View {
   static initClass() {
@@ -126,6 +127,9 @@ export default class ItemView extends Backbone.View {
   }
 
   afterRender() {
+    if (ENV.horizon_course) {
+      this.publishIconView.$el.addClass('disabled')
+    }
     return this.$el.toggleClass('quiz-loading-overrides', !!this.model.get('loadingOverrides'))
   }
 
@@ -140,7 +144,8 @@ export default class ItemView extends Backbone.View {
   }
 
   redirectTo(path) {
-    return (window.location.href = path)
+    assignLocation(path)
+    return path
   }
 
   migrateQuizEnabled() {
@@ -174,8 +179,10 @@ export default class ItemView extends Backbone.View {
   }
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
+
     ReactDOM.render(
-      <ItemAssignToTray
+      <ItemAssignToManager
         open={open}
         onClose={() => {
           ReactDOM.unmountComponentAtNode(document.getElementById('assign-to-mount-point'))
@@ -184,12 +191,12 @@ export default class ItemView extends Backbone.View {
           this.renderItemAssignToTray(false, returnFocusTo, itemProps)
           returnFocusTo.focus()
         }}
-        itemType="assignment"
+        itemType={quizItemType}
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}
       />,
-      document.getElementById('assign-to-mount-point')
+      document.getElementById('assign-to-mount-point'),
     )
   }
 
@@ -218,7 +225,6 @@ export default class ItemView extends Backbone.View {
   onDelete(e) {
     e.preventDefault()
     if (this.canDelete()) {
-      // eslint-disable-next-line no-alert
       if (window.confirm(this.messages.confirm)) return this.delete()
     }
   }
@@ -244,6 +250,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
+
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -254,7 +261,7 @@ export default class ItemView extends Backbone.View {
           return setTimeout(() => this.$settingsButton.focus(), 100)
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
@@ -267,6 +274,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentType = isOldQuiz ? 'quiz' : 'assignment'
+
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -277,7 +285,7 @@ export default class ItemView extends Backbone.View {
           return setTimeout(() => this.$settingsButton.focus(), 100)
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
@@ -386,9 +394,20 @@ export default class ItemView extends Backbone.View {
 
   toJSON() {
     const base = extend(this.model.toJSON(), this.options)
-    base.quiz_menu_tools = ENV.quiz_menu_tools
+    const isNewQuizzes = this.model.get('quiz_type') === 'quizzes.next'
+    const modelId = this.model.get('id')
+    const resourceQueryString = isNewQuizzes ? `assignments[]=${modelId}` : `quizzes[]=${modelId}`
+    const isShareToCommons = tool => tool.canvas_icon_class === 'icon-commons'
+    const tools = ENV.quiz_menu_tools || []
+
+    if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
+      base.quiz_menu_tools = tools
+    } else {
+      base.quiz_menu_tools = tools.filter(tool => !isShareToCommons(tool))
+    }
+
     each(base.quiz_menu_tools, tool => {
-      tool.url = tool.base_url + `&quizzes[]=${this.model.get('id')}`
+      tool.url = `${tool.base_url}&${resourceQueryString}`
     })
 
     base.cyoe = CyoeHelper.getItemData(base.assignment_id, base.quiz_type === 'assignment')
@@ -435,7 +454,6 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.courseId = ENV.context_asset_string.split('_')[1]
-    base.differentiatedModulesFlag = ENV.FEATURES?.differentiated_modules
     base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
     base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
 

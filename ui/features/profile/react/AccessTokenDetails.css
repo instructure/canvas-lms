@@ -1,0 +1,14 @@
+.access-token-details__list-item {
+  display: flex;
+  padding: 10px;
+  border-bottom: 1px solid #e3e3e3;
+
+  &:first-of-type {
+    border-top: 1px solid #e3e3e3;
+  }
+
+  & :first-child {
+    flex-basis: 100px;
+    min-width: 100px;
+  }
+}

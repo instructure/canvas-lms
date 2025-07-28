@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {pick} from 'lodash'
 
-const I18n = useI18nScope('account_settings_jsx_bundle')
+const I18n = createI18nScope('account_settings_jsx_bundle')
 
 export const SYNC_SETTINGS = [
   'microsoft_sync_enabled',
@@ -38,7 +38,7 @@ export const SYNC_SETTINGS = [
  */
 export async function doUpdateSettings(state) {
   await doFetchApi({
-    path: `/api/v1/${ENV.CONTEXT_BASE_URL}`,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}`,
     method: 'PUT',
     body: {
       account: {
@@ -83,7 +83,7 @@ export function getTenantErrorMessages(state) {
     return [
       {
         text: I18n.t(
-          'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
+          'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.',
         ),
         type: 'error',
       },
@@ -104,7 +104,7 @@ export function getSuffixErrorMessages(state) {
     return [
       {
         text: I18n.t(
-          'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.'
+          'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.',
         ),
         type: 'error',
       },
@@ -119,27 +119,4 @@ export function getSuffixErrorMessages(state) {
   } else {
     return []
   }
-}
-
-/**
- * Sets the hint message that is shown when changing
- * the tenant.
- *
- * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
- * @param payload The data given to the reducer, which contains the new tenant input text
- * @returns {{text: string, type: string}[]} The array of tenantInfoMessages
- */
-export function setTenantInfoMessages(state, payload) {
-  let tenantInfoMessages = []
-
-  if (payload.microsoft_sync_tenant !== state.last_saved_microsoft_sync_tenant) {
-    tenantInfoMessages = [
-      {
-        text: I18n.t('Changing the tenant will delete existing groups.'),
-        type: 'hint',
-      },
-    ]
-  }
-
-  return tenantInfoMessages
 }

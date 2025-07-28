@@ -18,10 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {shallow} from 'enzyme'
 import {render, screen} from '@testing-library/react'
-import {Spinner} from '@instructure/ui-spinner'
-import {Table} from '@instructure/ui-table'
 import {SearchResultsComponent} from '../SearchResults'
 
 function defaultHistoryItems() {
@@ -62,26 +59,54 @@ function defaultProps() {
   }
 }
 
-function mountComponent(customProps = {}) {
-  // @ts-ignore
-  return shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
+interface SearchResultsComponentProps {
+  caption?: string
+  fetchHistoryStatus?: string
+  historyItems?: Array<{
+    assignment: {
+      anonymousGrading: boolean
+      gradingType: string
+      muted: boolean
+      name: string
+    }
+    date: string
+    displayAsPoints: boolean
+    grader: string
+    gradeAfter: string
+    gradeBefore: string
+    gradeCurrent: string
+    id: string
+    pointsPossibleBefore: string
+    pointsPossibleAfter: string
+    pointsPossibleCurrent: string
+    student: string
+    time: string
+    gradedAnonymously: boolean
+    courseOverrideGrade: boolean
+  }>
+  getNextPage?: () => void
+  nextPage?: string
+  requestingResults?: boolean
+}
+
+function renderComponent(customProps: Partial<SearchResultsComponentProps> = {}) {
+  return render(<SearchResultsComponent {...defaultProps()} {...customProps} />)
 }
 
 describe('SearchResults', () => {
   test('does not show a Table/Spinner if no historyItems passed', () => {
-    const wrapper = mountComponent({historyItems: []})
-    expect(wrapper.find(Table).exists()).toBeFalsy()
+    renderComponent({historyItems: []})
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
   test('shows a Table if there are historyItems passed', function () {
-    const wrapper = mountComponent(defaultProps())
-    expect(wrapper.find(Table).exists()).toBeTruthy()
+    renderComponent(defaultProps())
+    expect(screen.getByRole('table')).toBeInTheDocument()
   })
 
-  test('Table is passed the label and caption props', function () {
-    const wrapper = mountComponent(defaultProps())
-    const table = wrapper.find(Table)
-    expect(table.props().caption).toEqual('search results caption')
+  test('Table has the correct caption', function () {
+    renderComponent(defaultProps())
+    expect(screen.getByRole('table', {name: 'search results caption'})).toBeInTheDocument()
   })
 
   test('Table has column headers in correct order', () => {
@@ -105,19 +130,19 @@ describe('SearchResults', () => {
     const items = defaultHistoryItems()
     const props = {...defaultProps(), items}
     const tableBody = render(<SearchResultsComponent {...props} />)
-    expect(tableBody.container.querySelectorAll('tbody tr').length).toEqual(items.length)
+    expect(tableBody.container.querySelectorAll('tbody tr')).toHaveLength(items.length)
     tableBody.unmount()
   })
 
   test('does not show a Spinner if requestingResults false', function () {
-    const wrapper = mountComponent(defaultProps())
-    expect(wrapper.find(Spinner).exists()).toBeFalsy()
+    renderComponent(defaultProps())
+    expect(screen.queryByRole('img', {name: /loading/i})).not.toBeInTheDocument()
   })
 
   test('shows a Spinner if requestingResults true', () => {
     $.screenReaderFlashMessage = jest.fn()
-    const wrapper = mountComponent({requestingResults: true})
-    expect(wrapper.find(Spinner).exists()).toBeTruthy()
+    renderComponent({requestingResults: true})
+    expect(screen.getByRole('img', {name: /loading/i})).toBeInTheDocument()
   })
 
   test('Table shows text if request was made but no results were found', () => {

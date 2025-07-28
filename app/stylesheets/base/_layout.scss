@@ -102,18 +102,6 @@ div.content_notice {
   height: 100% !important;
 }
 
-.before_external_content_info_alert,
-.after_external_content_info_alert {
-  &:focus {
-    margin: 20px 0px;
-    outline: none;
-  }
-}
-
-iframe.info_alert_outline {
-  border: 2px solid #0374B5 !important;
-}
-
 body.ic-full-screen-lti-tool iframe.tool_launch {
   // gets the height of the parent element (div.tool_content_wrapper) which is calculated in
   // ui/features/external_tools_show/jquery/tool_inline.js
@@ -126,7 +114,33 @@ iframe.tool_launch {
   height: 100%;
   border: none;
   max-width: 100%;
+
+  &.tool_launch_top_navigation {
+    display: block;
+  }
 }
+
+@media screen and (min-height: 451px) and (max-height: 600px) {
+  iframe.tool_launch#external_tool_button_frame {
+    min-height: 300px !important;
+  }
+}
+
+@media screen and (max-height: 450px) {
+  iframe.tool_launch#external_tool_button_frame {
+    min-height: 200px !important;
+  }
+}
+
+
+.lti_tool_icon {
+  margin-right: 0.25rem;
+  max-width: 1.2rem;
+ }
+
+.lti_tool_icon_large {
+  max-width: 3rem;
+ }
 
 #assignment_external_tools {
   iframe.tool_launch {

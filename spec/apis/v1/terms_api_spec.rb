@@ -149,19 +149,19 @@ describe TermsApiController, type: :request do
     end
 
     describe "authorization" do
-      def expect_terms_index_401
+      def expect_terms_index_403
         api_call(:get,
                  "/api/v1/accounts/#{@account.id}/terms",
                  { controller: "terms_api", action: "index", format: "json", account_id: @account.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires auth for the right account" do
         other_account = Account.create(name: "other")
         account_admin_user(account: other_account)
-        expect_terms_index_401
+        expect_terms_index_403
       end
 
       it "allows sub-account admins to view" do
@@ -181,7 +181,7 @@ describe TermsApiController, type: :request do
       it "does not allow other enrollment types to view" do
         c = @account.courses.create!(enrollment_term: @term1)
         student_in_course(course: c, active_all: true)
-        expect_terms_index_401
+        expect_terms_index_403
       end
 
       it "requires context to be root_account and error nicely" do
@@ -241,19 +241,19 @@ describe TermsApiController, type: :request do
     end
 
     describe "authorization" do
-      def expect_terms_show_401
+      def expect_terms_show_403
         api_call(:get,
                  "/api/v1/accounts/#{@account.id}/terms/#{@term.id}",
                  { controller: "terms_api", action: "show", format: "json", account_id: @account.to_param, id: @term.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires auth for the right account" do
         other_account = Account.create(name: "other")
         account_admin_user(account: other_account)
-        expect_terms_show_401
+        expect_terms_show_403
       end
 
       it "allows sub-account admins to view" do
@@ -361,25 +361,25 @@ describe TermsController, type: :request do
     end
 
     describe "authorization" do
-      def expect_terms_create_401
+      def expect_terms_create_403
         api_call(:post,
                  "/api/v1/accounts/#{@account.id}/terms",
                  { controller: "terms", action: "create", format: "json", account_id: @account.to_param },
                  { enrollment_term: { name: "Term 2" } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires auth for the right account" do
         other_account = Account.create(name: "other")
         account_admin_user(account: other_account)
-        expect_terms_create_401
+        expect_terms_create_403
       end
 
       it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: "subaccount")
         account_admin_user(account: subaccount)
-        expect_terms_create_401
+        expect_terms_create_403
       end
     end
   end
@@ -511,25 +511,25 @@ describe TermsController, type: :request do
     end
 
     describe "authorization" do
-      def expect_terms_update_401
+      def expect_terms_update_403
         api_call(:put,
                  "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
                  { controller: "terms", action: "update", format: "json", account_id: @account.to_param, id: @term1.to_param },
                  { enrollment_term: { name: "Term 2" } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires auth for the right account" do
         other_account = Account.create(name: "other")
         account_admin_user(account: other_account)
-        expect_terms_update_401
+        expect_terms_update_403
       end
 
       it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: "subaccount")
         account_admin_user(account: subaccount)
-        expect_terms_update_401
+        expect_terms_update_403
       end
     end
   end
@@ -545,25 +545,25 @@ describe TermsController, type: :request do
     end
 
     describe "authorization" do
-      def expect_terms_destroy_401
+      def expect_terms_destroy_403
         api_call(:delete,
                  "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
                  { controller: "terms", action: "destroy", format: "json", account_id: @account.to_param, id: @term1.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "requires auth for the right account" do
         other_account = Account.create(name: "other")
         account_admin_user(account: other_account)
-        expect_terms_destroy_401
+        expect_terms_destroy_403
       end
 
       it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: "subaccount")
         account_admin_user(account: subaccount)
-        expect_terms_destroy_401
+        expect_terms_destroy_403
       end
     end
   end

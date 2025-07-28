@@ -17,7 +17,7 @@
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
 import {SubmissionCommentFile} from './File'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {MediaObject} from './MediaObject'
 import {SubmissionCommentAuthor} from './User'
 
@@ -48,6 +48,39 @@ export const SubmissionComment = {
     attachments: arrayOf(SubmissionCommentFile.shape),
     author: SubmissionCommentAuthor.shape,
     comment: string,
+    mediaObject: MediaObject.shape,
+    read: bool,
+    updatedAt: string,
+  }),
+}
+
+export const SubmissionHtmlComment = {
+  fragment: gql`
+    fragment SubmissionHtmlComment on SubmissionComment {
+      _id
+      attachments {
+        ...SubmissionCommentFile
+      }
+      author {
+        ...SubmissionCommentAuthor
+      }
+      htmlComment
+      mediaObject {
+        ...MediaObject
+      }
+      read
+      updatedAt
+    }
+    ${MediaObject.fragment}
+    ${SubmissionCommentAuthor.fragment}
+    ${SubmissionCommentFile.fragment}
+  `,
+
+  shape: shape({
+    _id: string,
+    attachments: arrayOf(SubmissionCommentFile.shape),
+    author: SubmissionCommentAuthor.shape,
+    htmlComment: string,
     mediaObject: MediaObject.shape,
     read: bool,
     updatedAt: string,

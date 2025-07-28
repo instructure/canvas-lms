@@ -45,7 +45,7 @@ class ConfettiGenerator {
   constructor(
     props: (string | ConfettiObject)[],
     colors: number[][] | null,
-    mountPoint: HTMLCanvasElement
+    mountPoint: HTMLCanvasElement,
   ) {
     this.colors = colors ?? defaultColors
     this.props = props

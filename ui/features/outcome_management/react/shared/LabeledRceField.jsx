@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import OutcomesRceField from './OutcomesRceField'
 
-const LabeledRceField = ({name, validate, label}) => {
+const LabeledRceField = ({name, validate, label, ...props}) => {
   const {
     input,
     meta: {touched, error, submitError},
@@ -44,7 +44,7 @@ const LabeledRceField = ({name, validate, label}) => {
   }
 
   return (
-    <>
+    <div {...props}>
       <Text weight="bold">{label}</Text> <br />
       <OutcomesRceField onChangeHandler={input.onChange} defaultContent={input.value} />
       {errorMessages.length > 0 && (
@@ -56,7 +56,7 @@ const LabeledRceField = ({name, validate, label}) => {
           ))}
         </View>
       )}
-    </>
+    </div>
   )
 }
 

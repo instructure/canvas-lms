@@ -17,7 +17,7 @@
  */
 
 import {camelizeProperties} from '@canvas/convert-case'
-import {createClient, gql} from '@canvas/apollo'
+import {createClient, gql} from '@canvas/apollo-v3'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
 export const HIDE_ASSIGNMENT_GRADES = gql`
@@ -32,7 +32,7 @@ export const HIDE_ASSIGNMENT_GRADES = gql`
 `
 
 export const HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS = gql`
-  mutation ($assignmentId: ID!, $sectionIds: [ID!]!) {
+  mutation HideAssignmentGradesForSections($assignmentId: ID!, $sectionIds: [ID!]!) {
     hideAssignmentGradesForSections(input: {assignmentId: $assignmentId, sectionIds: $sectionIds}) {
       progress {
         _id

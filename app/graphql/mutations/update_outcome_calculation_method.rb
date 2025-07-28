@@ -22,9 +22,9 @@ class Mutations::UpdateOutcomeCalculationMethod < Mutations::OutcomeCalculationM
   graphql_name "UpdateOutcomeCalculationMethod"
 
   # input arguments
-  argument :id, ID, required: true
-  argument :calculation_method, String, required: false
   argument :calculation_int, Integer, required: false
+  argument :calculation_method, String, required: false
+  argument :id, ID, required: true
 
   def resolve(input:)
     record_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:id], "OutcomeCalculationMethod")

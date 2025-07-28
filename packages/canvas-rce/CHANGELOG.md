@@ -5,7 +5,165 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## 7.1.1 - 2025-07-08
+
+### Changed
+
+- Change color_map to include tiny mce's default light colors and white
+
+## 7.1.0 - 2025-06-06
+
+### Changed
+
+- Change color_map for more accessible default colors
+
+## 7.0.0 - 2025-03-31
+
+### Fixed
+
+- Screen readers for RCE toolbar on mobile platform
+- Axios CSRF vulnerability
+- Mailto link insertion
+
+### Changed
+
+- Upgraded Instui to v10
+- Refactored deprecated plugins to prepare for tinymce upgrade
+- Removed media_links_use_attachment_id feature flag
+
+## 6.0.0 - 2025-03-20
+
+### Changed
+
+- Upgraded to Node 20 LTS
+
+### Fixed
+
+- Redirect focus on invalid save in Image Options tray
+- Whitelist the aria-description attribute
+- Flag external links when they have multi-part TLDs
+- Save changes to alt text when it is the only thing that changes
+- Screenreader reads out content inside raw HTML editor
+- Validations in Upload Media modal
+- Increased Link header size
+
+## 5.15.8 - 2025-02-20
+
+### Fixed
+
+- Fixed invalid `querySelectorAll` selector (`:not(.not_external, .external)`)
+  that caused errors in older Chrome versions (87 and below). Updated to
+  `:not(.not_external):not(.external)` for improved browser compatibility
+- Improved external link handling logic in canvas-rce
+
+### Added
+
+- Jest test to ensure the fix does not introduce regressions
+
+## 5.15.0 - 2025-02-12
+
+- Lazy load iframe and images by default
+- Improve TypeScript coverage
+- Use Biome for formatting
+- Upgrade ESLint
+- Remove jQuery dependency
+- Remove some node.js dependencies
+- Replace some ReactDOM.render usage with createRoot
+
+## 5.14.2 - 2024-11-26
+
+- Added an icon to find and replace tray error
+
+## 5.14.1 - 2024-10-28
+
+### Changed
+
+- Forward along access token and inst_ui parameters from file URLs.
+
+## 5.14.0 - 2024-10-18
+
+### Added
+
+- New optional media player for upload previews
+
+### Fixed
+
+- Keyboard trap when switching to the HTML Editor
+
+### Changed
+
+- Upgraded React to 18
+
+## 5.13.7 - 2024-10-28
+
+### Changed
+
+- Forward along access token and inst_ui parameters from file URLs.
+
+## 5.13.6 - 2024-09-25
+
+### Fixed
+
+- File links with data-canvas-previewable='false' will no longer try to preview
+- Change backgroundless buttons to "primary" theme color to be more visible
+- Fix LTI tool scrolling issue on small iOS devices
+- Adding missing translation strings
+- Fixed some types of non-Canvas files from trying to preview like Canvas files
+
+### Changed
+
+- Allow links with data-old-link to replace the existing src or href with the contents
+  of the data-old-link attribute
+- Added IDs to multiple objects missing IDs
+- Add loading spinners to image uploads
+
+## 5.13.5 - 2024-09-25
+
+### Fixed
+
+- File links with data-canvas-previewable='false' will no longer try to preview
+- Change backgroundless buttons to "primary" theme color to be more visible
+- Fix LTI tool scrolling issue on small iOS devices
+- Adding missing translation strings
+- Fixed some types of non-Canvas files from trying to preview like Canvas files
+
+### Changed
+
+- Allow links with data-old-link to replace the existing src or href with the contents
+  of the data-old-link attribute
+- Added IDs to multiple objects missing IDs
+- Add loading spinners to image uploads
+
+## 5.13.5 - 2024-08-12
+
+### Fixed
+
+- RCE "Lato Extended" now properly uses the "Lato Extended" font
+
+## 5.13.4 - 2024-08-12
+
+### Changed
+
+- Icon Maker tray now stays open until the user closes it with the close button
+
+## 5.13.3 - 2024-07-22
+
+### Fixed
+
+- Icon Maker tray now stays open while an image upload modal is present
+
+## 5.13.2 - 2024-06-26
+
+### Changed
+
+- Removed polyfill.io reference from README
+
+## 5.13.1 - 2024-06-03
+
+### Changed
+
+- Re-added file verifiers as a stop gap to non-Canvas contexts to allow
+  New Quiz item banks to properly share course files
 
 ### Fixed
 

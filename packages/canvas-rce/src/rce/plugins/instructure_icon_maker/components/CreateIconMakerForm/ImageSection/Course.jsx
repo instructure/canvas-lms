@@ -42,7 +42,7 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
       type: svgActions.SET_ERROR,
       payload: formatMessage(
         'GIF/PNG format images larger than {size} KB are not currently supported.',
-        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024},
       ),
     })
   }
@@ -60,7 +60,6 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
         previewHeight: PREVIEW_HEIGHT,
       })
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(e)
     }
     dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
@@ -69,7 +68,13 @@ const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
   onChange({type: svgActions.SET_EMBED_IMAGE, payload: image})
 }
 
-const Course = ({dispatch, onChange, onLoading, onLoaded, canvasOrigin}) => {
+const Course = ({
+  dispatch = () => {},
+  onChange = () => {},
+  onLoading = () => {},
+  onLoaded = () => {},
+  canvasOrigin,
+}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataBlob} = useDataUrl()
@@ -134,13 +139,6 @@ Course.propTypes = {
   onLoading: PropTypes.func,
   onLoaded: PropTypes.func,
   canvasOrigin: PropTypes.string.isRequired,
-}
-
-Course.defaultProps = {
-  dispatch: () => {},
-  onChange: () => {},
-  onLoading: () => {},
-  onLoaded: () => {},
 }
 
 export default Course

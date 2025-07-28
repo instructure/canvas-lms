@@ -31,7 +31,7 @@ import {
   IconAddSolid,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import OutcomeDescription from './Management/OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -40,7 +40,7 @@ import {IMPORT_PENDING, IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/use
 import {ratingsShape} from './Management/shapes'
 import descriptionType from './shared/descriptionType'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const FindOutcomeItem = ({
   id,

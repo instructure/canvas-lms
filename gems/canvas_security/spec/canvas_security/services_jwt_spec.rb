@@ -151,7 +151,7 @@ module CanvasSecurity
         end
 
         describe "via .for_user" do
-          let(:user) { double(global_id: 42) }
+          let(:user) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
           let(:ctx) { double(id: 47) }
           let(:host) { "example.instructure.com" }
           let(:masq_user) { double(global_id: 24) }
@@ -160,6 +160,7 @@ module CanvasSecurity
             jwt = ServicesJwt.for_user(host, user)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:sub]).to eq(42)
+            expect(decrypted_token_body[:user_uuid]).to eq("9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed")
             expect(decrypted_token_body[:domain]).to eq("example.instructure.com")
           end
 
@@ -221,6 +222,31 @@ module CanvasSecurity
             expect(decrypted_token_body[:context_id]).to eq "47"
           end
 
+          it "includes only requested audience if given" do
+            audience = ["foo", "bar"]
+            jwt = ServicesJwt.for_user(host, user, audience:)
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body[:aud]).to match_array audience
+          end
+
+          it "includes default audience if not given" do
+            jwt = ServicesJwt.for_user(host, user)
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body[:aud]).to match_array [ServicesJwt::DEFAULT_AUDIENCE]
+          end
+
+          it "includes the root account uuid if given" do
+            jwt = ServicesJwt.for_user(host, user, root_account_uuid: "abcd")
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body[:root_account_uuid]).to eq "abcd"
+          end
+
+          it "does not include the root account uuid if not given" do
+            jwt = ServicesJwt.for_user(host, user)
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body).not_to have_key :root_account_uuid
+          end
+
           it "errors without a host" do
             expect { ServicesJwt.for_user(nil, user) }
               .to raise_error(ArgumentError)
@@ -233,8 +259,8 @@ module CanvasSecurity
         end
 
         describe "refresh_for_user" do
-          let(:user1) { double(global_id: 42) }
-          let(:user2) { double(global_id: 43) }
+          let(:user1) { double(global_id: 42, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ed") }
+          let(:user2) { double(global_id: 43, uuid: "9e17836c-2b62-4d5b-b3c5-b3fbc25a31ee") }
           let(:host) { "testhost" }
 
           it "is invalid if jwt cannot be decoded" do
@@ -242,19 +268,19 @@ module CanvasSecurity
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
-          it "is invlaid if user id is different" do
+          it "is invalid if user id is different" do
             jwt = ServicesJwt.for_user(host, user1)
             expect { ServicesJwt.refresh_for_user(jwt, host, user2) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
-          it "is invlaid if host is different" do
+          it "is invalid if host is different" do
             jwt = ServicesJwt.for_user("differenthost", user1)
             expect { ServicesJwt.refresh_for_user(jwt, host, user1) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
-          it "is invlaid masquerading user is different" do
+          it "is invalid if masquerading user is different" do
             masq_user = double(global_id: 44)
             jwt = ServicesJwt.for_user(host, user1, real_user: masq_user)
             expect { ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }

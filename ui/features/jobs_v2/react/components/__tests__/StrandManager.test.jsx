@@ -46,7 +46,7 @@ describe('StrandManager', () => {
   it('edits priority but not concurrency for normal strand', async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText, queryByLabelText} = renderWithMocks(
-      <StrandManager strand="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />
+      <StrandManager strand="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />,
     )
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
     expect(queryByLabelText('Dynamic concurrency')).not.toBeInTheDocument()
@@ -65,7 +65,11 @@ describe('StrandManager', () => {
   it('edits both priority and concurrency for n_strand', async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = renderWithMocks(
-      <StrandManager strand="foobar" jobs={[{...fakeJob, max_concurrent: 2}]} onUpdate={onUpdate} />
+      <StrandManager
+        strand="foobar"
+        jobs={[{...fakeJob, max_concurrent: 2}]}
+        onUpdate={onUpdate}
+      />,
     )
     await flushPromises()
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
@@ -86,7 +90,11 @@ describe('StrandManager', () => {
   it("doesn't mutate the num_strands setting if unchanged", async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = renderWithMocks(
-      <StrandManager strand="foobar" jobs={[{...fakeJob, max_concurrent: 2}]} onUpdate={onUpdate} />
+      <StrandManager
+        strand="foobar"
+        jobs={[{...fakeJob, max_concurrent: 2}]}
+        onUpdate={onUpdate}
+      />,
     )
     await flushPromises()
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))

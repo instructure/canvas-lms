@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-restricted-globals */
-
 import 'formdata-polyfill' // Need to support FormData.has for IE
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -43,6 +41,6 @@ ready(() => {
         useHighContrast: window.ENV.use_high_contrast,
       }}
     />,
-    document.body
+    document.body,
   )
 })

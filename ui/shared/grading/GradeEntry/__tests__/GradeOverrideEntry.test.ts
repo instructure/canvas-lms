@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -630,7 +631,7 @@ describe('GradeOverrideEntry', () => {
       describe('.schemeKey', () => {
         it('is set to the scheme key matching the given grade percentage', () => {
           expect(
-            gradeInfoFromGrade({percentage: 81.1234, schemeKey: 'B'}).grade?.schemeKey
+            gradeInfoFromGrade({percentage: 81.1234, schemeKey: 'B'}).grade?.schemeKey,
           ).toEqual('B')
         })
 
@@ -646,7 +647,7 @@ describe('GradeOverrideEntry', () => {
 
       it(`is set to "${PERCENTAGE}" when using a grading scheme`, () => {
         expect(gradeInfoFromGrade({percentage: 81.1234, schemeKey: 'B'}).enteredAs).toEqual(
-          PERCENTAGE
+          PERCENTAGE,
         )
       })
 

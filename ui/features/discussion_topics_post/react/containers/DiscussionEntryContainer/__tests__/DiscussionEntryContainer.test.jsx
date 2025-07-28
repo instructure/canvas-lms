@@ -70,7 +70,7 @@ describe('DiscussionEntryContainer', () => {
     isUnread = false,
     isForcedRead = false,
     createdAt = '2021-01-01T13:00:00-07:00',
-    updatedAt = '2021-02-02T14:00:00-07:00',
+    editedAt = '2021-02-02T14:00:00-07:00',
     timingDisplay = 'Jan 1 1:00pm',
     editedTimingDisplay = 'Feb 2 2:00pm',
     lastReplyAtDisplay = null,
@@ -91,7 +91,7 @@ describe('DiscussionEntryContainer', () => {
     isUnread,
     isForcedRead,
     createdAt,
-    updatedAt,
+    editedAt,
     timingDisplay,
     editedTimingDisplay,
     lastReplyAtDisplay,
@@ -126,12 +126,12 @@ describe('DiscussionEntryContainer', () => {
 
     it('should render the reply info', () => {
       const container = setup(defaultProps())
-      expect(container.getAllByText('24 Replies, 4 Unread').length).toBe(2)
+      expect(container.getAllByText('24 Replies, 4 Unread')).toHaveLength(2)
     })
 
     it('should render the created timestamp', () => {
       const container = setup(defaultProps())
-      expect(container.getByText('Jan 1 1:00pm')).toBeInTheDocument()
+      expect(container.getByText('Posted Jan 1 1:00pm')).toBeInTheDocument()
     })
 
     it('should render the edited timestamp', () => {
@@ -155,7 +155,7 @@ describe('DiscussionEntryContainer', () => {
             },
             deleted: false,
           },
-        })
+        }),
       )
       expect(container.getByTestId('reply-preview')).toBeInTheDocument()
     })
@@ -168,6 +168,16 @@ describe('DiscussionEntryContainer', () => {
     it('should not render the attachment when it does not exist', () => {
       const container = setup(defaultProps())
       expect(container.queryByText('288777.jpeg')).not.toBeInTheDocument()
+    })
+
+    it('should render a line if it is not a topic', () => {
+      const container = setup(defaultProps({isTopic: false}))
+      expect(container.queryByTestId('post-separator')).toBeInTheDocument()
+    })
+
+    it('should not render a line if it is a topic', () => {
+      const container = setup(defaultProps())
+      expect(container.queryByTestId('post-separator')).not.toBeInTheDocument()
     })
   })
 })

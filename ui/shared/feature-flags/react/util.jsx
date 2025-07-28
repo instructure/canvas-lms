@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('feature_flags')
+const I18n = createI18nScope('feature_flags')
 
 export function buildTransitions(flag, allowsDefaults) {
   const ret = {}
@@ -47,39 +47,66 @@ export function buildTransitions(flag, allowsDefaults) {
   return ret
 }
 
-export function buildDescription(flag, allowsDefaults) {
-  let description = ''
+export function buildDescription(flag, allowsDefaults, appliesTo) {
+  const validStates = ['on', 'off', 'hidden', 'allowed', 'allowed_on']
+  if (!validStates.includes(flag.state)) {
+    return
+  }
+  const contextType = appliesTo === 'Course' ? 'Course' : 'Account'
+  let descriptions
+
   if (allowsDefaults) {
-    switch (flag.state) {
-      case 'on':
-        description = I18n.t('Enabled for all subaccounts/courses')
-        break
-      case 'off':
-      case 'hidden':
-        description = I18n.t('Disabled for all subaccounts/courses')
-        break
-      case 'allowed':
-        description = I18n.t('Allowed for subaccounts/courses, default off')
-        break
-      case 'allowed_on':
-        description = I18n.t('Allowed for subaccounts/courses, default on')
-        break
+    descriptions = {
+      on: {
+        Account: I18n.t('Enabled for all subaccounts'),
+        Course: I18n.t('Enabled for all courses'),
+      },
+      off: {
+        Account: I18n.t('Disabled for all subaccounts'),
+        Course: I18n.t('Disabled for all courses'),
+      },
+      hidden: {
+        Account: I18n.t('Disabled for all subaccounts'),
+        Course: I18n.t('Disabled for all courses'),
+      },
+      allowed: {
+        Account: I18n.t('Allowed for subaccounts, default off'),
+        Course: I18n.t('Allowed for courses, default off'),
+      },
+      allowed_on: {
+        Account: I18n.t('Allowed for subaccounts, default on'),
+        Course: I18n.t('Allowed for courses, default on'),
+      },
     }
   } else {
-    switch (flag.state) {
-      case 'on':
-      case 'allowed_on':
-        description = I18n.t('Enabled')
-        break
-      case 'off':
-      case 'hidden':
-      case 'allowed':
-        description = I18n.t('Disabled')
-        break
+    const enabled = I18n.t('Enabled')
+    const disabled = I18n.t('Disabled')
+
+    descriptions = {
+      on: {
+        Account: enabled,
+        Course: enabled,
+      },
+      allowed_on: {
+        Account: enabled,
+        Course: I18n.t('Optional in course, default on'),
+      },
+      off: {
+        Account: disabled,
+        Course: disabled,
+      },
+      hidden: {
+        Account: disabled,
+        Course: disabled,
+      },
+      allowed: {
+        Account: disabled,
+        Course: I18n.t('Optional in course, default off'),
+      },
     }
   }
 
-  return description
+  return descriptions[flag.state][contextType]
 }
 
 export function shouldDelete(flag, allowsDefaults, state) {
@@ -121,29 +148,6 @@ export function transitionLocked(flag, name) {
   }
 
   return null
-}
-
-export function transitionMessage(flag, name) {
-  let message = null
-  if (flag.transitions[name]) {
-    message = flag.transitions[name].message
-  }
-
-  if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
-    message = (
-      <div>
-        <p>
-          {I18n.t(
-            `You are currently in the %{environment} environment. This will affect every customer. Are you sure?`,
-            {environment: ENV.RAILS_ENVIRONMENT}
-          )}
-        </p>
-        <p>{message}</p>
-      </div>
-    )
-  }
-
-  return message
 }
 
 export function isEnabled(flag) {

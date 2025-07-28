@@ -46,17 +46,17 @@ module DataFixup
         sleep(sleep_duration(elapsed))
       end
       reenqueue_job(queue) unless queue.empty?
-      InstStatsd::Statsd.increment("import_instfs_attachments.job_runs.count")
+      InstStatsd::Statsd.distributed_increment("import_instfs_attachments.job_runs.count")
     end
 
     def run_expired?
-      Time.now >= @run_until
+      Time.zone.now >= @run_until
     end
 
     def import_batch(shard_id, key)
       InstStatsd::Statsd.time("import_instfs_attachments.import_batch.time") do
         lines = read_source(key)
-        started = Time.now
+        started = Time.zone.now
         Shard.find(shard_id).activate do
           InstStatsd::Statsd.time("import_instfs_attachments.import_batch.transaction.time") do
             Attachment.transaction do
@@ -64,8 +64,8 @@ module DataFixup
             end
           end
         end
-        InstStatsd::Statsd.increment("import_instfs_attachments.import_batch.count")
-        Time.now - started
+        InstStatsd::Statsd.distributed_increment("import_instfs_attachments.import_batch.count")
+        Time.zone.now - started
       end
     end
 
@@ -110,7 +110,7 @@ module DataFixup
       InstStatsd::Statsd.time("import_instfs_attachments.import_line.time") do
         Attachment.connection.execute(sql)
       end
-      InstStatsd::Statsd.increment("import_instfs_attachments.import_line.count")
+      InstStatsd::Statsd.distributed_increment("import_instfs_attachments.import_line.count")
     end
 
     def sleep_duration(elapsed)

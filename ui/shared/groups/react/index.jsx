@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable react/prefer-es6-class */
+
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -19,11 +19,11 @@
  */
 
 import React from 'react'
+import {createRoot} from 'react-dom/client'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Spinner} from '@instructure/ui-spinner'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -35,10 +35,9 @@ import PaginatedGroupList from './PaginatedGroupList'
 import Filter from './Filter'
 import NewStudentGroupModal from './NewStudentGroupModal'
 import ManageGroupDialog from './ManageGroupDialog'
-import 'jqueryui/dialog'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
 const StudentView = createReactClass({
   displayName: 'StudentView',
@@ -52,35 +51,22 @@ const StudentView = createReactClass({
   getInitialState() {
     return {
       showNewStudentGroupModal: false,
+      groupToManage: null,
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
       }),
-      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id}),
+      groupCollection: new ContextGroupCollection([], {
+        course_id: ENV.course_id,
+        disableCache: true,
+      }),
     }
   },
 
-  openManageGroupDialog(group) {
-    const $dialog = $('<div>').dialog({
-      id: 'manage_group_form',
-      title: I18n.t('Manage Student Group'),
-      height: 500,
-      width: 700,
-      'fix-dialog-buttons': false,
-
-      close: _e => {
-        ReactDOM.unmountComponentAtNode($dialog[0])
-        $(this).remove()
-      },
-      modal: true,
-      zIndex: 1000,
-    })
-
-    const closeDialog = e => {
-      e.preventDefault()
-      $dialog.dialog('close')
+  renderManageGroupDialog(group) {
+    if (group == null) {
+      return null
     }
-
-    ReactDOM.render(
+    return (
       <ManageGroupDialog
         userCollection={this.state.userCollection}
         checked={group.users.map(u => u.id)}
@@ -88,26 +74,23 @@ const StudentView = createReactClass({
         name={group.name}
         maxMembership={group.max_membership}
         updateGroup={this.updateGroup}
-        closeDialog={closeDialog}
+        closeDialog={() => {
+          this.setState({groupToManage: null})
+        }}
         loadMore={() => this._loadMore(this.state.userCollection)}
-      />,
-      $dialog[0]
+      />
     )
   },
 
   renderNewStudentGroupModal(open = true) {
     return (
-      <>
-        <NewStudentGroupModal
-          userCollection={this.state.userCollection}
-          loadMore={() => this._loadMore(this.state.userCollection)}
-          onSave={() => this._onNewStudentGroupSave()}
-          open={open}
-          onDismiss={() => {
-            this.setState({showNewStudentGroupModal: false})
-          }}
-        />
-      </>
+      <NewStudentGroupModal
+        onSave={() => this._onNewStudentGroupSave()}
+        open={open}
+        onDismiss={() => {
+          this.setState({showNewStudentGroupModal: false})
+        }}
+      />
     )
   },
 
@@ -122,7 +105,7 @@ const StudentView = createReactClass({
 
   _categoryGroups(group) {
     return this.state.groupCollection.filter(
-      g => g.get('group_category_id') === group.get('group_category_id')
+      g => g.get('group_category_id') === group.get('group_category_id'),
     )
   },
 
@@ -133,7 +116,7 @@ const StudentView = createReactClass({
 
   updateGroup(groupId, name, members) {
     $.ajaxJSON(`/api/v1/groups/${groupId}`, 'PUT', {name, members}, group =>
-      this._onUpdateGroup(group)
+      this._onUpdateGroup(group),
     )
   },
 
@@ -153,7 +136,7 @@ const StudentView = createReactClass({
   _removeUser(groupModel, userId) {
     groupModel.set(
       'users',
-      groupModel.get('users').filter(u => u.id !== userId)
+      groupModel.get('users').filter(u => u.id !== userId),
     )
     // If user was a leader, unset the leader attribute.
     const leader = groupModel.get('leader')
@@ -176,7 +159,7 @@ const StudentView = createReactClass({
 
   leave(group) {
     const dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`, 'DELETE', {}, () =>
-      this._onLeave(group)
+      this._onLeave(group),
     )
     // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
@@ -206,17 +189,13 @@ const StudentView = createReactClass({
       () =>
         this._extendAttribute(this.state.groupCollection.get(group.id), 'permissions', {
           join: false,
-        })
+        }),
     )
     // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
   },
 
-  manage(group) {
-    this.openManageGroupDialog(group)
-  },
-
-  renderGroupList(groups, loading) {
+  renderGroupList(groups) {
     const debouncedSetState = debounce((...args) => this.setState(...args), 500)
     return (
       <>
@@ -232,19 +211,61 @@ const StudentView = createReactClass({
         />
         <PaginatedGroupList
           loading={this.state.groupCollection.fetchingNextPage}
+          hasMore={
+            !this.state.groupCollection.loadedAll && !this.state.groupCollection.fetchingNextPage
+          }
           groups={groups}
           loadMore={() => this._loadMore(this.state.groupCollection)}
           onLeave={this.leave}
           onJoin={this.join}
-          onManage={this.manage}
+          onManage={group => {
+            this.setState({groupToManage: group})
+          }}
         />
-        {loading && (
-          <div className="spinner-container">
-            <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
-          </div>
-        )}
+        <div id="manage-group-dialog" />
       </>
     )
+  },
+
+  replaceHashAndFocus(tabHref) {
+    const activeTab = $('#group_categories_tabs')
+      .find('li')
+      .filter(function () {
+        return /ui-(state|tabs)-active/.test(this.className)
+      })
+    const activeItemHref = tabHref || activeTab.not('.static').find('a').attr('href')
+    if (activeItemHref) {
+      window.history.replaceState({}, document.title, activeItemHref)
+    }
+    if (activeTab) {
+      activeTab.find('a').trigger('focus')
+    }
+  },
+
+  componentDidMount() {
+    requestAnimationFrame(() => {
+      this.replaceHashAndFocus()
+    })
+    const $tabs = $('#group_categories_tabs')
+    const $groupTabs = $tabs.find('li')
+    $groupTabs.find('a').off()
+    const oldTab = $tabs.find('li.ui-state-active')
+    const newTab = $groupTabs.not('li.ui-state-active')
+    $groupTabs.on('click keyup', function (event) {
+      event.stopPropagation()
+      const $activeItemHref = $(this).find('a').attr('href')
+      window.history.replaceState({}, document.title, $activeItemHref)
+      if (event.type === 'click' || event.key === 'Enter' || event.key === ' ') {
+        window.location.href = $activeItemHref
+        window.location.reload()
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        oldTab.removeClass('ui-state-active ui-tabs-active')
+        newTab.addClass('ui-state-active ui-tabs-active')
+        newTab.find('a').trigger('focus')
+        window.location.href = newTab.find('a').attr('href')
+      }
+    })
   },
 
   render() {
@@ -280,7 +301,7 @@ const StudentView = createReactClass({
                 <a href={`/courses/${ENV.course_id}/users`}>{I18n.t('Everyone')}</a>
               </li>
               <li className="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
-                <a href="#" tabIndex="-1">
+                <a href="#" tabIndex="0">
                   {I18n.t('Groups')}
                 </a>
               </li>
@@ -289,16 +310,17 @@ const StudentView = createReactClass({
               <div className="pull-right group-categories-actions">{newGroupButton}</div>
             )}
             {this.state.showNewStudentGroupModal ? this.renderNewStudentGroupModal() : null}
+            {this.renderManageGroupDialog(this.state.groupToManage)}
             <div
               className="roster-tab tab-panel"
               ref={ref => {
                 this.panelRef = ref
               }}
             />
-            {this.renderGroupList(groups, loading)}
+            {this.renderGroupList(groups)}
           </div>
         ) : (
-          this.renderGroupList(groups, loading)
+          this.renderGroupList(groups)
         )}
       </div>
     )

@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {defaults, result} from 'lodash'
@@ -30,7 +28,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import axios from '@canvas/axios'
 
-const I18n = useI18nScope('discussion_topics')
+const I18n = createI18nScope('discussion_topics')
 
 const stripTags = function (str) {
   const div = document.createElement('div')
@@ -165,7 +163,7 @@ DiscussionTopic.prototype.duplicate = function (context_type, context_id, callba
           '/discussion_topics/' +
           this.id +
           '/duplicate',
-        {}
+        {},
       )
       // eslint-disable-next-line promise/no-callback-in-promise
       .then(callback)
@@ -190,7 +188,7 @@ DiscussionTopic.prototype.unreadTooltip = function () {
     },
     {
       count: this.get('unread_count'),
-    }
+    },
   )
 }
 
@@ -204,7 +202,7 @@ DiscussionTopic.prototype.replyTooltip = function () {
     },
     {
       count: this.get('discussion_subentry_count'),
-    }
+    },
   )
 }
 
@@ -225,7 +223,7 @@ DiscussionTopic.prototype.fetchEntries = function () {
         // TODO: handle nested replies and 'new_entries' here
         return _this.entries.reset(entries)
       }
-    })(this)
+    })(this),
   )
 }
 

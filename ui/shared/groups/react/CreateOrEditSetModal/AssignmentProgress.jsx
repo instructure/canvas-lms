@@ -17,14 +17,14 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {func, string} from 'prop-types'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'}).format
 
 const POLLING_INTERVAL = 1000
@@ -55,8 +55,8 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
         showFlashError(
           I18n.t(
             "Couldn't track assigning students to groups, but it's still happening! Check the result manually later. (%{errorMessage})",
-            {errorMessage: e.message}
-          )
+            {errorMessage: e.message},
+          ),
         )()
         onCompletion(null)
       }
@@ -94,12 +94,12 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
             <Text as="div">
               <p>
                 {I18n.t(
-                  'We are currently assigning your students into groups per your selections. This can take a while.'
+                  'We are currently assigning your students into groups per your selections. This can take a while.',
                 )}
               </p>
               <p>
                 {I18n.t(
-                  "You can close this dialog box to continue working if you don't want to wait; assigning will continue in the background."
+                  "You can close this dialog box to continue working if you don't want to wait; assigning will continue in the background.",
                 )}
               </p>
             </Text>
@@ -113,5 +113,4 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
 AssignmentProgress.propTypes = {
   url: string.isRequired,
   onCompletion: func.isRequired,
-  apiCall: func, // Used to override doFetchApi for storybook purposes
 }

@@ -44,16 +44,17 @@ function renderJoinedItem(bodyAs, renderBody, renderFooter) {
 }
 
 export const FixedContentTray = ({
-  title,
-  isOpen,
-  onDismiss,
-  onUnmount,
+  title = null,
+  isOpen = false,
+  onDismiss = () => {},
+  onUnmount = () => {},
   mountNode,
   renderHeader,
   renderBody,
   renderFooter,
-  bodyAs,
-  shouldJoinBodyAndFooter,
+  bodyAs = 'div',
+  shouldJoinBodyAndFooter = false,
+  shouldCloseOnDocumentClick = true,
 }) => {
   return (
     <Tray
@@ -64,7 +65,7 @@ export const FixedContentTray = ({
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldCloseOnDocumentClick={true}
+      shouldCloseOnDocumentClick={shouldCloseOnDocumentClick}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       size="regular"
@@ -105,13 +106,5 @@ FixedContentTray.propTypes = {
   mountNode: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
   bodyAs: PropTypes.string,
   shouldJoinBodyAndFooter: PropTypes.bool,
-}
-
-FixedContentTray.defaultProps = {
-  title: null,
-  isOpen: false,
-  onDismiss: () => {},
-  onUnmount: () => {},
-  bodyAs: 'div',
-  shouldJoinBodyAndFooter: false,
+  shouldCloseOnDocumentClick: PropTypes.bool,
 }

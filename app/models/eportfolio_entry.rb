@@ -26,7 +26,7 @@ class EportfolioEntry < ActiveRecord::Base
   belongs_to :eportfolio_category
 
   acts_as_list scope: :eportfolio_category
-  before_save :infer_unique_slug
+  before_save :infer_unique_slug, if: ->(entry) { entry.slug.blank? || entry.will_save_change_to_name? }
   before_save :infer_comment_visibility
   after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
 
@@ -74,16 +74,14 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def full_slug
-    fs = (eportfolio_category.slug rescue "") + "_" + slug
-    fs = Digest::SHA256.hexdigest(fs) if fs.length > 250 # ".html" will push this over the 255-char max filename
-    fs
+    (eportfolio_category&.slug || "") + "_" + slug
   end
 
   def attachments
     res = []
     content_sections.each do |section|
       if section["attachment_id"].present? && section["section_type"] == "attachment"
-        res << (eportfolio.user.all_attachments.where(id: section["attachment_id"]).first rescue nil)
+        res << eportfolio.user.all_attachments.where(id: section["attachment_id"]).first
       end
     end
     res.compact
@@ -93,14 +91,14 @@ class EportfolioEntry < ActiveRecord::Base
     res = []
     content_sections.each do |section|
       if section["submission_id"].present? && section["section_type"] == "submission"
-        res << (eportfolio.user.submissions.where(id: section["submission_id"]).first rescue nil)
+        res << eportfolio.user.submissions.where(id: section["submission_id"]).first
       end
     end
     res.compact
   end
 
   def parse_content(params)
-    cnt = params[:section_count].to_i rescue 0
+    cnt = params[:section_count].to_i
     self.content = []
     cnt.times do |idx|
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
@@ -136,13 +134,13 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def category_slug
-    eportfolio_category.slug rescue eportfolio_category_id
+    eportfolio_category.slug
   end
 
   def infer_unique_slug
-    pages = eportfolio_category.eportfolio_entries rescue []
+    pages = eportfolio_category.eportfolio_entries
     self.name ||= t(:default_name, "Page Name")
-    self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
+    self.slug = self.name.to_url.presence || CanvasSlug.generate
     pages = pages.where("id<>?", self) unless new_record?
     match_cnt = pages.where(slug:).count
     if match_cnt > 0
@@ -162,7 +160,7 @@ class EportfolioEntry < ActiveRecord::Base
       updated: updated_at,
       published: created_at,
       link: url,
-      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at&.strftime("%Y-%m-%d-%H-%M") || "none"}",
       content: rendered_content
     }
   end

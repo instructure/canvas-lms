@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import EntryView from './backbone/views/EntryView'
 import DiscussionFilterState from './backbone/models/DiscussionFilterState'
 import DiscussionToolbarView from './backbone/views/DiscussionToolbarView'
@@ -25,7 +25,7 @@ import MarkAsReadWatcher from './backbone/MarkAsReadWatcher'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import MaterializedDiscussionTopic from './backbone/models/Topic'
 import SideCommentDiscussionTopic from './backbone/models/SideCommentDiscussionTopic'
 import EntryCollection from './backbone/collections/EntryCollection'
@@ -37,7 +37,7 @@ import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboar
 import ready from '@instructure/ready'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 // Backbone routes
 $('body').on('click', '[data-pushstate]', function (event) {
@@ -56,7 +56,7 @@ if (ENV.MASTER_COURSE_DATA) {
         const lockManager = new LockManager()
         lockManager.init({itemType: 'discussion_topic', page: 'show'})
       })
-    }
+    },
   )
 }
 
@@ -84,7 +84,6 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
         console.error('Falied loading CoursePacingNotice', ex)
         captureException(new Error('Failed loading CoursePacingNotice: ' + ex.message))
       })
@@ -94,11 +93,15 @@ function renderCoursePacingNotice() {
 ready(() => {
   new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
+  let keyboardShortcutRoot = null
+  let sectionTooltipRoot = null
+
   if (!window.ENV.disable_keyboard_shortcuts) {
-    ReactDOM.render(
-      <DiscussionTopicKeyboardShortcutModal />,
-      document.getElementById('keyboard-shortcut-modal')
-    )
+    const keyboardShortcutModal = document.getElementById('keyboard-shortcut-modal')
+    if (keyboardShortcutModal) {
+      keyboardShortcutRoot = createRoot(keyboardShortcutModal)
+      keyboardShortcutRoot.render(<DiscussionTopicKeyboardShortcutModal />)
+    }
   }
 
   renderCoursePacingNotice()
@@ -112,12 +115,12 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
-    ReactDOM.render(
+    sectionTooltipRoot = createRoot(container)
+    sectionTooltipRoot.render(
       <SectionsTooltip
         totalUserCount={ENV.TOTAL_USER_COUNT}
         sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}
       />,
-      container
     )
   }
 
@@ -192,20 +195,20 @@ ready(() => {
   // catch when an EntryView changes the read_state
   // of a discussion entry and update the materialized view.
   EntryView.on('readStateChanged', (entry, _view) =>
-    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state')),
   )
 
   // catch when auto-mark-as-read watcher changes an entry
   // and update the materialized view to match.
   MarkAsReadWatcher.on('markAsRead', entry =>
-    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state')),
   )
 
   // detect when read_state changes on filtered model.
   // sync the change to full view collections.
   filterView.on('readStateChanged', (id, read_state) =>
     // update on materialized view
-    updateMaterializedViewReadState(id, read_state)
+    updateMaterializedViewReadState(id, read_state),
   )
 
   filterView.on('clickEntry', entry => router.navigate(`entry-${entry.get('id')}`, true))

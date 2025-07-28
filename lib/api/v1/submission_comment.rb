@@ -35,22 +35,28 @@ module Api::V1::SubmissionComment
     media_comment_type
   ].freeze
 
-  def submission_comment_json(submission_comment, user)
+  def submission_comment_json(submission_comment, user, use_html_comment: false)
     sc_hash = submission_comment.as_json(
       include_root: false,
       only: %w[id author_id author_name created_at edited_at comment attempt]
     )
 
+    unless use_html_comment
+      comment = sc_hash.delete("comment")
+      sc_hash["comment"] = Nokogiri::HTML(comment).text
+    end
+
     if submission_comment.media_comment?
       sc_hash["media_comment"] = media_comment_json(
-        media_id: submission_comment.media_comment_id,
-        media_type: submission_comment.media_comment_type
+        { media_id: submission_comment.media_comment_id,
+          media_type: submission_comment.media_comment_type },
+        location: submission_comment.asset_string
       )
     end
 
     unless submission_comment.attachments.blank?
       sc_hash["attachments"] = submission_comment.attachments.map do |a|
-        attachment_json(a, user)
+        attachment_json(a, user, { location: submission_comment.asset_string })
       end
     end
     if @current_user && submission_comment.grants_right?(@current_user, :read_author)
@@ -68,8 +74,8 @@ module Api::V1::SubmissionComment
     sc_hash
   end
 
-  def submission_comments_json(submission_comments, user)
-    submission_comments.map { |submission_comment| submission_comment_json(submission_comment, user) }
+  def submission_comments_json(submission_comments, user, use_html_comment: false)
+    submission_comments.map { |submission_comment| submission_comment_json(submission_comment, user, use_html_comment:) }
   end
 
   def anonymous_moderated_submission_comments_json(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)
@@ -77,6 +83,11 @@ module Api::V1::SubmissionComment
     comment_methods = display_avatars ? [:avatar_path] : []
 
     submission_comments.map do |comment|
+      # workaround to avoid N+1 query problem in SubmissionComment#serialization_methods
+      if !comment.association(:root_account).loaded? && course.association(:root_account).loaded? && course.root_account.present?
+        comment.root_account = course.root_account
+      end
+
       json = comment.as_json(include_root: false, methods: comment_methods, only: ANONYMOUS_MODERATED_JSON_ATTRIBUTES)
       json[:publishable] = comment.publishable_for?(current_user)
       author_id = comment.author_id.to_s

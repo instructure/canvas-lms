@@ -63,19 +63,6 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "creates a new module using enter key", priority: "2" do
-      Account.site_admin.disable_feature! :differentiated_modules
-      get "/courses/#{@course.id}/modules"
-      add_form = new_module_form
-      replace_content(add_form.find_element(:id, "context_module_name"), "module 1")
-      3.times do
-        driver.action.send_keys(:tab).perform
-        wait_for_ajaximations
-      end
-      driver.action.send_keys(:return).perform
-      expect(f(".name")).to be_present
-    end
-
     it "focuses close button on open edit modal" do
       add_existing_module_item("AssignmentModule", @assignment)
       get "/courses/#{@course.id}/modules"
@@ -97,32 +84,7 @@ describe "context modules" do
       end
     end
 
-    it "retains focus when deleting prerequisites without differentiated modules" do
-      Account.site_admin.disable_feature! :differentiated_modules
-
-      modules = create_modules(2)
-      get "/courses/#{@course.id}/modules"
-      mod1 = f("#context_module_#{modules[1].id}")
-      f(".ig-header-admin .al-trigger", mod1).click
-      f(".edit_module_link", mod1).click
-      wait_for_ajaximations
-      add_button = f(".add_prerequisite_link")
-      2.times do
-        add_button.click
-        wait_for_animations
-      end
-      links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
-      expect(links.size).to eq 2
-      links[1].click
-      wait_for_animations
-      check_element_has_focus(links[0])
-      links[0].click
-      wait_for_animations
-      check_element_has_focus(add_button)
-    end
-
     it "retains focus when deleting prerequisites with different modules" do
-      differentiated_modules_on
       modules = create_modules(3)
       go_to_modules
       manage_module_button(modules[2]).click
@@ -282,40 +244,8 @@ describe "context modules" do
       end
     end
 
-    context "Keyboard Accessibility only for non-differentiated modules modals", priority: "1" do
-      before :once do
-        Account.site_admin.disable_feature! :differentiated_modules
-        modules = create_modules(2, true)
-        modules[0].add_item({ id: @assignment.id, type: "assignment" })
-        modules[0].add_item({ id: @assignment2.id, type: "assignment" })
-        modules[1].add_item({ id: @assignment3.id, type: "assignment" })
-      end
-
-      before do
-        get "/courses/#{@course.id}/modules"
-
-        # focus the first item
-        f("html").send_keys("j")
-        @active_element = driver.execute_script("return document.activeElement")
-      end
-
-      let(:context_modules) { ff(".context_module .collapse_module_link") }
-      let(:context_module_items) { ff(".context_module_item a.title") }
-
-      it "edits modules" do
-        @active_element.send_keys("e")
-        expect(f("#add_context_module_form")).to be_displayed
-      end
-
-      it "creates a module" do
-        @active_element.send_keys("n")
-        expect(f("#add_context_module_form")).to be_displayed
-      end
-    end
-
     context "Specific Keyboard Accessibility with differentiated modules", priority: "1" do
       before :once do
-        differentiated_modules_on
         modules = create_modules(2, true)
         modules[0].add_item({ id: @assignment.id, type: "assignment" })
         modules[0].add_item({ id: @assignment2.id, type: "assignment" })

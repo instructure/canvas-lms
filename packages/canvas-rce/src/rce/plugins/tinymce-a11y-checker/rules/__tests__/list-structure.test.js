@@ -94,9 +94,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -108,9 +108,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -122,9 +122,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('UL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -136,9 +136,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('UL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -150,9 +150,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('UL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -165,9 +165,9 @@ describe('update', () => {
 
     expect(body.firstChild.tagName).toBe('OL')
     expect(body.firstChild.getAttribute('start')).toBe('3')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -179,11 +179,11 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
       [...body.firstChild.children].every(
-        child => child.textContent === 'Text Text' && child.firstChild.tagName === 'STRONG'
-      )
+        child => child.textContent === 'Text Text' && child.firstChild.tagName === 'STRONG',
+      ),
     ).toBeTruthy()
   })
 
@@ -195,11 +195,11 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(3)
+    expect(body.firstChild.children).toHaveLength(3)
     expect(
       [...body.firstChild.children].every(
-        child => child.textContent === 'List' && child.firstChild.tagName === 'DIV'
-      )
+        child => child.textContent === 'List' && child.firstChild.tagName === 'DIV',
+      ),
     ).toBeTruthy()
   })
 
@@ -211,9 +211,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(2)
+    expect(body.firstChild.children).toHaveLength(2)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 
@@ -225,9 +225,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(2)
+    expect(body.firstChild.children).toHaveLength(2)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
     expect(body.children[1].tagName).toBe('P')
     expect(body.children[1].textContent).toBe('* List')
@@ -241,9 +241,9 @@ describe('update', () => {
     rule.update(p1, {...rule.data(p1), formatAsList: true})
 
     expect(body.firstChild.tagName).toBe('OL')
-    expect(body.firstChild.children.length).toBe(4)
+    expect(body.firstChild.children).toHaveLength(4)
     expect(
-      [...body.firstChild.children].every(child => child.textContent.trim() === 'List')
+      [...body.firstChild.children].every(child => child.textContent.trim() === 'List'),
     ).toBeTruthy()
   })
 })

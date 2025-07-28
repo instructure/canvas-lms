@@ -48,7 +48,7 @@ describe Lti::PrivacyLevelExpander do
   describe "expanded_variables" do
     it "expands custom fields" do
       expected_params = {
-        "custom_context_id" => Lti::Asset.opaque_identifier_for(course)
+        "custom_context_id" => Lti::V1p1::Asset.opaque_identifier_for(course)
       }
 
       expect(helper.expanded_variables!(tool.set_custom_fields(placement))).to include expected_params

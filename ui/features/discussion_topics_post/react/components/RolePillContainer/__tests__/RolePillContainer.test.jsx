@@ -125,7 +125,7 @@ describe('RolePillContainer', () => {
         queryByTestId('mobile-Teacher') &&
           queryByTestId('mobile-TA') &&
           queryByTestId('mobile-Designer') &&
-          queryByTestId('mobile-Author')
+          queryByTestId('mobile-Author'),
       ).toBeTruthy()
     })
   })

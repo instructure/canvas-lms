@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import FolderChild from '../legacy/components/FolderChild'
@@ -32,7 +32,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 FolderChild.isFolder = function () {
   return this.props.model instanceof Folder
@@ -63,9 +63,10 @@ FolderChild.renderPublishCloud = function (canManage) {
     return (
       <PublishCloud
         model={this.props.model}
-        ref="publishButton"
+        ref={this.publishButtonRef}
         userCanEditFilesForContext={canManage && this.props.userCanRestrictFilesForContext}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+        disabled={ENV.horizon_course}
       />
     )
   }
@@ -106,7 +107,7 @@ FolderChild.renderEditingState = function () {
         <div className="ic-Input-group">
           <input
             type="text"
-            ref="newName"
+            ref={this.newNameRef}
             className="ic-Input ef-edit-name-form__input"
             placeholder={I18n.t('name', 'Name')}
             aria-label={
@@ -142,7 +143,7 @@ FolderChild.renderEditingState = function () {
   } else if (this.isFolder()) {
     return (
       <a
-        ref="nameLink"
+        ref={this.nameLinkRef}
         href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
         className="ef-name-col__link"
         params={{splat: this.props.model.urlPath()}}
@@ -172,7 +173,7 @@ FolderChild.renderEditingState = function () {
         href={this.props.model.get('url')}
         onClick={preventDefault(this.handleFileLinkClick)}
         className="ef-name-col__link"
-        ref="nameLink"
+        ref={this.nameLinkRef}
         role="button"
       >
         <span className="ef-big-icon-container">
@@ -220,7 +221,7 @@ FolderChild.render = function () {
   return (
     <div {...this.getAttributesForRootNode()}>
       <div className="ef-select-col" role="gridcell">
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        {}
         <label className={keyboardCheckboxClass}>
           <input
             type="checkbox"

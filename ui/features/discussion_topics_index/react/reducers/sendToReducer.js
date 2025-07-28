@@ -39,7 +39,7 @@ const reducer = handleActions(
     [actionTypes.SET_SEND_TO_OPEN]: setSendToOpen,
     [actionTypes.SET_SEND_TO]: setSendTo,
   },
-  {open: false, selection: {}}
+  {open: false, selection: {}},
 )
 
 export default reducer

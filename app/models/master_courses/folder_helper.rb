@@ -67,7 +67,7 @@ class MasterCourses::FolderHelper
 
     updated_folders = content_export.context.folders.where("updated_at>?", cutoff_time).where.not(cloned_item_id: nil).preload(:parent_folder)
     updated_folders.each do |source_folder|
-      dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
+      dest_folder = child_course.folders.active.find_by(cloned_item_id: source_folder.cloned_item_id)
       sync_folder_location(child_course, dest_folder, source_folder) if dest_folder
       if dest_folder && %i[name workflow_state locked lock_at unlock_at].any? { |attr| dest_folder.send(attr) != source_folder.send(attr) }
         %i[name workflow_state locked lock_at unlock_at].each do |attr|
@@ -83,10 +83,21 @@ class MasterCourses::FolderHelper
     return unless dest_folder.parent_folder && source_folder.parent_folder
 
     source_parent_folder = source_folder.parent_folder
+
+    if Account.site_admin.feature_enabled?(:blueprint_support_sync_for_folder_movement_to_root_folder)
+      source_parent_folder_is_root = source_parent_folder.cloned_item_id.nil? && source_parent_folder.parent_folder_id.nil?
+
+      if source_parent_folder_is_root
+        dest_course_parent_folder = dest_course.folders.find_by(parent_folder_id: nil)
+        dest_folder.parent_folder = dest_course_parent_folder if dest_course_parent_folder
+        return
+      end
+    end
+
     return unless source_parent_folder.cloned_item_id.present?
 
     if dest_folder.parent_folder.cloned_item_id != source_parent_folder.cloned_item_id
-      new_parent = dest_course.folders.where(cloned_item_id: source_parent_folder.cloned_item_id).take
+      new_parent = dest_course.folders.find_by(cloned_item_id: source_parent_folder.cloned_item_id)
       dest_folder.parent_folder = new_parent if new_parent
     end
   end

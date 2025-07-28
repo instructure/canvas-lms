@@ -33,7 +33,7 @@ describe "announcement_reply" do
   let(:notification_name) { :announcement_reply }
   let(:asset) { @entry }
 
-  context ".email" do
+  describe ".email" do
     let(:path_type) { :email }
 
     it "renders" do
@@ -62,7 +62,7 @@ describe "announcement_reply" do
     end
   end
 
-  context ".sms" do
+  describe ".sms" do
     let(:path_type) { :sms }
 
     it "renders" do
@@ -70,7 +70,7 @@ describe "announcement_reply" do
     end
   end
 
-  context ".summary" do
+  describe ".summary" do
     let(:path_type) { :summary }
 
     it "renders" do
@@ -78,17 +78,6 @@ describe "announcement_reply" do
       expect(msg.subject).to eq "New Comment on Announcement: value for title: value for name"
       expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
       expect(msg.body.strip).to eq "hai"
-    end
-  end
-
-  context ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.subject).to eq "Canvas Alert"
-      expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
-      expect(msg.body).to include("Canvas Alert - Announcement Comment: value for title, value for name")
     end
   end
 end

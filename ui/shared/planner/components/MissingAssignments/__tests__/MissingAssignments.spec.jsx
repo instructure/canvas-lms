@@ -76,7 +76,7 @@ const defaultProps = (expanded = false) => ({
 describe('MissingAssignments', () => {
   it('Renders nothing if there are no opportunities', () => {
     const {queryByRole} = render(
-      <MissingAssignments {...defaultProps()} opportunities={{items: []}} />
+      <MissingAssignments {...defaultProps()} opportunities={{items: []}} />,
     )
     expect(queryByRole('button', {name: /missing items/})).not.toBeInTheDocument()
   })
@@ -99,7 +99,7 @@ describe('MissingAssignments', () => {
       expect(props.toggleMissing).toHaveBeenCalled()
 
       const {getByText} = render(<MissingAssignments {...defaultProps(true)} />)
-      expect(document.getElementsByClassName('planner-item').length).toBe(3)
+      expect(document.getElementsByClassName('planner-item')).toHaveLength(3)
       expect(getByText('My First Reactor')).toBeInTheDocument()
       expect(getByText('How to Tie a Knot')).toBeInTheDocument()
       expect(getByText('Why Nuclear?')).toBeInTheDocument()
@@ -111,13 +111,13 @@ describe('MissingAssignments', () => {
       const {getByText} = render(<MissingAssignments {...defaultProps(true)} />)
 
       expect(
-        getByText('Assignment My First Reactor, due Wednesday, July 10, 2019 3:59 PM.')
+        getByText('Assignment My First Reactor, due Wednesday, July 10, 2019 3:59 PM.'),
       ).toBeInTheDocument()
       expect(
-        getByText('Quiz How to Tie a Knot, due Saturday, October 10, 2020 3:59 PM.')
+        getByText('Quiz How to Tie a Knot, due Saturday, October 10, 2020 3:59 PM.'),
       ).toBeInTheDocument()
       expect(
-        getByText('Discussion Why Nuclear?, due Thursday, December 10, 2020 3:59 PM.')
+        getByText('Discussion Why Nuclear?, due Thursday, December 10, 2020 3:59 PM.'),
       ).toBeInTheDocument()
     })
 

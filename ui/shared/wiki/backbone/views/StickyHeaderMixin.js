@@ -22,7 +22,6 @@ import '@canvas/jquery-sticky'
 // for this to work. Also don't forget to create your own styles for the
 // sticky class that gets added to the dom element
 export default {
-  // eslint-disable-next-line object-shorthand
   afterRender: function () {
     if (this.stickyHeader) {
       this.stickyHeader.remove()

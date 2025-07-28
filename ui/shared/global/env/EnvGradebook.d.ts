@@ -98,6 +98,8 @@ export interface EnvGradebookSpeedGrader {
   assignment_title: string
   custom_grade_statuses: any
   rubric: null | unknown
+  enhanced_rubrics_enabled?: boolean
+  rubric_outcome_data: null | unknown
   nonScoringRubrics: boolean
   outcome_extra_credit_enabled: boolean
   outcome_proficiency: unknown
@@ -120,6 +122,9 @@ export interface EnvGradebookSpeedGrader {
   current_anonymous_id?: unknown
 
   selected_section_id: string
+  selected_section_ids: string[]
+
+  multiselect_filters_enabled: boolean
 
   new_gradebook_plagiarism_icons_enabled?: boolean
 
@@ -145,4 +150,5 @@ export interface EnvGradebookSpeedGrader {
     assessment_user_id?: string
     anonymous_id?: string
   }
+  ENTRY_ID: string
 }

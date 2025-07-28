@@ -41,14 +41,14 @@ import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} from 'react'
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
-import {useQuery} from 'react-apollo'
+import {useQuery} from '@apollo/client'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
@@ -128,7 +128,7 @@ export const AddressBook = ({
   const showContextSelect = useMemo(() => {
     // Legacy discussions don't allow messages to all groups/sections
     // The mutation also doesn't allow using a course groups or sections asset string as a recipient
-    const disabledContextSelectOptions = ['groups', 'sections']
+    const disabledContextSelectOptions = ['groups', 'sections', 'tags']
     let contextID = currentFilter?.context?.contextID
 
     if (!hasSelectAllFilterOption || !contextID || inputValue) {
@@ -171,12 +171,14 @@ export const AddressBook = ({
     setMenuItemCurrent(refCurrent)
   }, [])
 
-  // useEffect to call set on success when browser is safari with highlighted option text
+  const selectedItemName = selectedItem?.name
+
+  // read out every item for screenreader
   useEffect(() => {
-    if (isMenuOpen && /^apple\s/i.test(navigator?.vendor)) {
-      setOnSuccess(selectedItem?.name)
+    if (selectedItemName && isMenuOpen) {
+      setOnSuccess(selectedItemName)
     }
-  }, [isMenuOpen, selectedItem, setOnSuccess])
+  }, [isMenuOpen, selectedItemName, setOnSuccess])
 
   // Update width to match componentViewRef width
   useEffect(() => {
@@ -201,8 +203,10 @@ export const AddressBook = ({
 
   // Reset selected item when data changes
   useEffect(() => {
-    if (isSubMenuSelection) setSelectedItem(data[0])
-  }, [data, isSubMenuSelection])
+    if (isSubMenuSelection && isMenuOpen) {
+      setSelectedItem(data[0])
+    }
+  }, [data, isSubMenuSelection, isMenuOpen])
 
   // Limit amount of selected tags and close menu when limit reached
   useEffect(() => {
@@ -239,7 +243,7 @@ export const AddressBook = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (menuItemCurrent) {
@@ -324,6 +328,9 @@ export const AddressBook = ({
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
           observerEnrollments={observerEnrollments}
           isOnObserverSubmenu={isOnObserverSubmenu}
+          pronouns={
+            ENV?.SETTINGS?.can_add_pronouns && itemType === USER_TYPE ? menuItem.pronouns : null
+          }
         >
           {menuItemName}
         </AddressBookItem>
@@ -548,7 +555,7 @@ export const AddressBook = ({
       onUserFilterSelect(undefined)
     }
     newSelectedMenuItems = newSelectedMenuItems.filter(
-      menuItem => menuItem.id !== removeMenuItem.id
+      menuItem => menuItem.id !== removeMenuItem.id,
     )
     setSelectedMenuItems([...newSelectedMenuItems])
     onSelectedIdsChange([...newSelectedMenuItems])
@@ -603,10 +610,8 @@ export const AddressBook = ({
                   type="search"
                   aria-owns={popoverInstanceId.current}
                   aria-label={ariaAddressBookLabel}
-                  aria-labelledby={`address-book-form ${selectedMenuItems
-                    .map(u => `address-book-label-${u?.id}-${u?.itemType}`)
-                    .join(' ')}`}
                   aria-autocomplete="list"
+                  autoComplete="off"
                   inputRef={ref => {
                     textInputRef.current = ref
                   }}
@@ -615,7 +620,7 @@ export const AddressBook = ({
                     onTextChange(e.target.value)
                     setIsMenuOpen(true)
                   }}
-                  data-testid="address-book-input"
+                  data-testid={`${props.renderingContext ?? ''}-address-book-input`}
                   messages={addressBookMessages}
                 />
               }
@@ -768,6 +773,7 @@ AddressBook.propTypes = {
    */
   placeholder: PropTypes.string,
   addressBookLabel: PropTypes.string,
+  renderingContext: PropTypes.string,
 }
 
 export default AddressBook

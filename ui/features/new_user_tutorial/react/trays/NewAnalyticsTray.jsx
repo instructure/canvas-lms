@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TutorialTrayContent from './TutorialTrayContent'
 
-const I18n = useI18nScope('new_user_tutorial')
+const I18n = createI18nScope('new_user_tutorial')
 
 const NewAnalyticsTray = () => (
   <TutorialTrayContent
@@ -35,7 +35,7 @@ const NewAnalyticsTray = () => (
     links={[
       {
         label: I18n.t(
-          'How do I send a message to all students based on specific course criteria in New Analytics?'
+          'How do I send a message to all students based on specific course criteria in New Analytics?',
         ),
         href: I18n.t('#community.instructor_message_all_criteria_new_analytics'),
       },

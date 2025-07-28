@@ -26,20 +26,15 @@ import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
 import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
-import type {
-  VisibilityChange,
-  SubscriptionChange,
-  ExpandedAccounts,
-  UpdateAccountDataResponse,
-} from '../types'
+import type {VisibilityChange, SubscriptionChange, ExpandedAccounts} from '../types'
 
-const I18n = useI18nScope('account_calendar_settings')
+const I18n = createI18nScope('account_calendar_settings')
 
 type ComponentProps = {
   readonly accountId: number
@@ -95,7 +90,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
         windowHeight -
           accountTreeRef.current.getBoundingClientRect().top -
           footerRef.current.offsetHeight -
-          BOTTOM_PADDING_OFFSET
+          BOTTOM_PADDING_OFFSET,
       )
     }
   }, [accountTreeRef, footerRef, windowHeight])
@@ -119,7 +114,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
         setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
       }
     },
-    [subscriptionChanges, visibilityChanges]
+    [subscriptionChanges, visibilityChanges],
   )
 
   const onAccountSubscriptionToggled = useCallback(
@@ -133,7 +128,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
         setSubscriptionChanges([...subscriptionChanges, {id, auto_subscribe: autoSubscription}])
       }
     },
-    [subscriptionChanges]
+    [subscriptionChanges],
   )
 
   const onAccountExpandedToggled = useCallback(
@@ -148,7 +143,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
       }
       setExpandedAccounts(ea)
     },
-    [expandedAccounts]
+    [expandedAccounts],
   )
 
   const onApplyClicked = () => {
@@ -166,23 +161,23 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
           (changes, currentChange) =>
             changes.set(
               currentChange.id,
-              Object.assign(changes.get(currentChange.id) || {}, currentChange)
+              Object.assign(changes.get(currentChange.id) || {}, currentChange),
             ),
-          new Map()
+          new Map(),
         )
         .values(),
     ]
     setSaving(true)
-    doFetchApi({
+    doFetchApi<{message: string}>({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
       body: accountCalendarChanges,
     })
-      .then((response: UpdateAccountDataResponse) => {
-        const json = response.json
+      .then(response => {
+        const {json} = response
         setVisibilityChanges([])
         setSubscriptionChanges([])
-        showFlashSuccess(json?.message)()
+        showFlashSuccess(json!.message)()
       })
       .catch((err: Error) => {
         showFlashError(I18n.t("Couldn't save account calendar visibilities"))(err)
@@ -205,7 +200,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
       </Heading>
       <Text>
         {I18n.t(
-          'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.'
+          'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.',
         )}
       </Text>
 

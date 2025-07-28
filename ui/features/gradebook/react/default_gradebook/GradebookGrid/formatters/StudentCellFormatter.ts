@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -32,6 +31,7 @@ export default class StudentCellFormatter {
     this.options = getOptions(gradebook)
   }
 
+  // @ts-expect-error
   render = (_row, _cell, _value, _columnDef, student /* dataContext */) => {
     if (student.isPlaceholder) {
       return ''

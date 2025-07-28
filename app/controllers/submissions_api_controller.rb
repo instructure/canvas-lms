@@ -219,6 +219,7 @@ class SubmissionsApiController < ApplicationController
                                              rubric_assessments_read_state
                                              mark_rubric_assessments_read
                                              mark_submission_item_read]
+  before_action :check_limited_access_for_students, only: %i[create_file]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -227,7 +228,7 @@ class SubmissionsApiController < ApplicationController
   #
   # A paginated list of all existing submissions for an assignment.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"|"read_status"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"visibility"|"course"|"user"|"group"|"read_status"|"student_entered_score"]
   #   Associations to include with the group.  "group" will add group_id and group_name.
   #
   # @argument grouped [Boolean]
@@ -281,7 +282,7 @@ class SubmissionsApiController < ApplicationController
                submissions = Api.paginate(submissions,
                                           self,
                                           polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
-               bulk_load_attachments_and_previews(submissions)
+               Submission.bulk_load_attachments_and_previews(submissions)
 
                submissions.map do |s|
                  s.visible_to_user = true
@@ -355,7 +356,7 @@ class SubmissionsApiController < ApplicationController
   #   Determines whether ordered results are returned in ascending or descending
   #   order.  Defaults to "ascending".  Doesn't affect results for "grouped" mode.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"assignment"|"total_scores"|"visibility"|"course"|"user"|"sub_assignment_submissions"|"student_entered_score"]
   #   Associations to include with the group. `total_scores` requires the
   #   `grouped` argument.
   #
@@ -451,7 +452,7 @@ class SubmissionsApiController < ApplicationController
     includes = Array(params[:include])
 
     assignment_scope = @context.assignments.published.preload(:quiz, :discussion_topic, :post_policy)
-    if includes.include?("sub_assignment_submissions") && @context.root_account.feature_enabled?(:discussion_checkpoints)
+    if includes.include?("sub_assignment_submissions") && @context.discussion_checkpoints_enabled?
       assignment_scope = assignment_scope.preload(:sub_assignments)
     end
 
@@ -462,8 +463,12 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignments = GuardRail.activate(:secondary) do
-      if params[:grading_period_id].present?
-        GradingPeriod.active.find(params[:grading_period_id]).assignments(@context, assignment_scope)
+      if params[:grading_period_id].present? && (grading_period_id = params[:grading_period_id])
+        unless grading_period_id.is_a?(String) || grading_period_id.is_a?(Integer)
+          return render json: { error: "grading_period_id is invalid, verify the parameter and type are correct" },
+                        status: :bad_request
+        end
+        GradingPeriod.active.find(grading_period_id).assignments(@context, assignment_scope)
       else
         assignment_scope.to_a
       end
@@ -473,8 +478,10 @@ class SubmissionsApiController < ApplicationController
       return render json: { error: "invalid assignment ids requested" }, status: :forbidden
     end
 
-    assignment_visibilities = {}
-    assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, user_id: student_ids, assignment_id: assignments.map(&:id))
+    unless student_ids.is_a?(Array)
+      student_ids = student_ids.pluck(:user_id)
+    end
+    assignment_visibilities = AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(course_id: @context.id, user_ids: student_ids, assignment_ids: assignments.map(&:id))
 
     # unless teacher, filter assignments down to only assignments current user can see
     unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades)
@@ -520,7 +527,7 @@ class SubmissionsApiController < ApplicationController
       submission_preloads << :attachment unless params[:exclude_response_fields]&.include?("attachments")
       submissions = submissions_scope.preload(submission_preloads).to_a
 
-      bulk_load_attachments_and_previews(submissions)
+      Submission.bulk_load_attachments_and_previews(submissions)
       submissions_for_user = submissions.group_by(&:user_id)
 
       result = []
@@ -615,10 +622,10 @@ class SubmissionsApiController < ApplicationController
   #
   # Get a single submission, based on user id.
   #
-  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
+  # @argument include[] [String, "submission_history"|"submission_comments"|"submission_html_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"|"student_entered_score"]
   #   Associations to include with the group.
   def show
-    bulk_load_attachments_and_previews([@submission])
+    Submission.bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
       if @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades) ||
@@ -660,7 +667,7 @@ class SubmissionsApiController < ApplicationController
   # Upload a file to a submission.
   #
   # This API endpoint is the first step in uploading a file to a submission as a student.
-  # See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on the file upload workflow.
   #
   # The final step of the file upload workflow will return the attachment data,
   # including the new file id. The caller can then POST to submit the
@@ -871,10 +878,11 @@ class SubmissionsApiController < ApplicationController
         end
 
         if params[:submission].key?(:sticker)
+          InstStatsd::Statsd.distributed_increment("submission_stickers.sticker_applied")
           submission[:sticker] = params[:submission].delete(:sticker)
         end
 
-        if params.key?(:sub_assignment_tag) && @domain_root_account&.feature_enabled?(:discussion_checkpoints)
+        if params.key?(:sub_assignment_tag) && @assignment.context.discussion_checkpoints_enabled?
           submission[:sub_assignment_tag] = params.delete(:sub_assignment_tag)
         end
 
@@ -918,7 +926,9 @@ class SubmissionsApiController < ApplicationController
           custom_status = @context.custom_grade_statuses.find(submission[:custom_grade_status_id])
         end
 
-        @submissions.each do |sub|
+        @submissions.each do |original_sub|
+          sub = original_sub.effective_checkpoint_submission(submission[:sub_assignment_tag])
+
           if custom_status
             sub.custom_grade_status = custom_status
           elsif submission.key?(:late_policy_status)
@@ -934,6 +944,7 @@ class SubmissionsApiController < ApplicationController
           # new submission version on this request.
           previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
           previously_graded ? sub.save! : sub.with_versioning(explicit: true) { sub.save! }
+          original_sub.reload
         end
       end
 
@@ -987,7 +998,7 @@ class SubmissionsApiController < ApplicationController
       # submission without going through the model instance -- it'd be nice to
       # fix this at some point.
       @submission.reload
-      bulk_load_attachments_and_previews([@submission])
+      Submission.bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
       includes.concat(Array.wrap(params[:include]) & %w[visibility sub_assignment_submissions])
@@ -996,7 +1007,7 @@ class SubmissionsApiController < ApplicationController
       visiblity_included = includes.include?("visibility")
       if visiblity_included
         user_ids = @submissions.map(&:user_id)
-        users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
+        users_with_visibility = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(course_ids: @context, assignment_ids: @assignment.id, user_ids:).map(&:user_id)
       end
       json = submission_json(
         @submission,
@@ -1153,7 +1164,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List gradeable students
   #
-  # A paginated list of students eligible to submit the assignment. The caller must have permission to view grades.
+  # A paginated list of gradeable students for the assignment. The caller must have permission to view grades.
   #
   # If anonymous grading is enabled for the current assignment and the allow_new_anonymous_id parameter is passed,
   # the returned data will not include any values identifying the student, but will instead include an
@@ -1233,23 +1244,16 @@ class SubmissionsApiController < ApplicationController
       assignment_ids = Array(params[:assignment_ids])
 
       student_scope = context.students_visible_to(@current_user, include: :inactive)
-      student_scope = student_scope
-                      .preload(:assignment_student_visibilities)
-                      .joins(:assignment_student_visibilities)
-                      .where(assignment_student_visibilities: {
-                               assignment_id: assignment_ids,
-                               course_id: @context.id
-                             })
-                      .distinct
-                      .order(:id)
+
+      visible_assignment_user_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids:, course_ids: context.id).map(&:user_id)
+      student_scope = student_scope.where(id: visible_assignment_user_ids).distinct.order(:id)
 
       students = Api.paginate(student_scope, self, api_v1_multiple_assignments_gradeable_students_url(@context))
 
       student_displays = students.map do |student|
         user_display = user_display_json(student, @context)
-        user_display["assignment_ids"] = student.assignment_student_visibilities
-                                                .select { |visibility| assignment_ids.include?(visibility.assignment_id.to_s) }
-                                                .map(&:assignment_id)
+        visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids:, user_ids: student.id).map(&:assignment_id)
+        user_display["assignment_ids"] = visible_assignment_ids
         user_display
       end
 
@@ -1310,7 +1314,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     assignment_ids = grade_data.keys
-    @assignments = api_find_all(@context.assignments.active, assignment_ids)
+    @assignments = api_find_all(@context.assignments_scope, assignment_ids)
 
     unless @assignments.all?(&:published?) &&
            @context.grants_right?(@current_user, session, :manage_grades)
@@ -1563,6 +1567,10 @@ class SubmissionsApiController < ApplicationController
   # @argument grouped [Boolean]
   #   If this argument is true, the response will take into account student groups.
   #
+  # @argument include_deactivated [Boolean]
+  #   If this argument is true, the response will include deactivated students in the summary
+  #   (defaults to false).
+  #
   # @example_response
   #   {
   #     "graded": 5,
@@ -1574,6 +1582,12 @@ class SubmissionsApiController < ApplicationController
       @assignment = api_find(@context.assignments.active, params[:assignment_id])
       student_ids = if should_group?
                       @assignment.representatives(user: @current_user).map(&:id)
+                    elsif include_deactivated_students_in_summary?
+                      @context.students_visible_to(@current_user, include: :inactive)
+                              .merge(Enrollment.not_fake)
+                              .where(enrollments: { workflow_state: %i[active inactive] })
+                              .distinct
+                              .pluck(:id)
                     else
                       student_scope = @context.students_visible_to(@current_user)
                                               .where("enrollments.type<>'StudentViewEnrollment' AND enrollments.workflow_state = 'active'").distinct
@@ -1604,6 +1618,10 @@ class SubmissionsApiController < ApplicationController
 
   private
 
+  def include_deactivated_students_in_summary?
+    value_to_boolean(params[:include_deactivated])
+  end
+
   def change_topic_read_state(new_state)
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
@@ -1631,25 +1649,17 @@ class SubmissionsApiController < ApplicationController
     @section ? [@section.id] : nil
   end
 
-  def bulk_load_attachments_and_previews(submissions)
-    Submission.bulk_load_versioned_attachments(submissions)
-    attachments = submissions.flat_map(&:versioned_attachments)
-    ActiveRecord::Associations.preload(attachments,
-                                       [:canvadoc, :crocodoc_document])
-    Version.preload_version_number(submissions)
-  end
-
   def bulk_process_submissions_for_visibility(submissions_scope, includes)
     result = []
 
     submissions_scope.find_in_batches(batch_size: 100) do |submission_batch|
-      bulk_load_attachments_and_previews(submission_batch)
+      Submission.bulk_load_attachments_and_previews(submission_batch)
       user_ids = submission_batch.map(&:user_id)
-      users_with_visibility = AssignmentStudentVisibility.where(
-        course_id: @context,
-        assignment_id: @assignment,
-        user_id: user_ids
-      ).pluck(:user_id).to_set
+      users_with_visibility = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(
+        course_ids: @context.id,
+        assignment_ids: @assignment.id,
+        user_ids:
+      ).map(&:user_id)
 
       submission_array = submission_batch.map do |submission|
         submission.visible_to_user = users_with_visibility.include?(submission.user_id)
@@ -1671,14 +1681,14 @@ class SubmissionsApiController < ApplicationController
   def track_update_metrics(submission, params)
     custom_grade_status_id = params.dig(:submission, :custom_grade_status_id).to_s
     if !custom_grade_status_id.empty? && custom_grade_status_id != submission.custom_grade_status_id.to_s
-      InstStatsd::Statsd.increment("custom_grade_status.applied_to.submission")
+      InstStatsd::Statsd.distributed_increment("custom_grade_status.applied_to.submission")
     end
 
     if params.dig(:submission, :posted_grade)
       if params["originator"] == "individual_gradebook"
-        InstStatsd::Statsd.increment("individual_gradebook.submission.posted_grade")
+        InstStatsd::Statsd.distributed_increment("individual_gradebook.submission.posted_grade")
       elsif params["originator"] == "gradebook"
-        InstStatsd::Statsd.increment("gradebook.submission.posted_grade")
+        InstStatsd::Statsd.distributed_increment("gradebook.submission.posted_grade")
       end
     end
   end

@@ -47,7 +47,7 @@ describe('AlignmentItem', () => {
 
   it('displays alignment title appended with (unpublished) if alignment is unpublished', () => {
     const {getByText} = render(
-      <AlignmentItem {...defaultProps({assignmentWorkflowState: 'unpublished'})} />
+      <AlignmentItem {...defaultProps({assignmentWorkflowState: 'unpublished'})} />,
     )
     expect(getByText('Assignment 1 (unpublished)')).toBeInTheDocument()
   })
@@ -59,7 +59,7 @@ describe('AlignmentItem', () => {
 
   it('displays module title appended with (unpublished) if module is unpublished', () => {
     const {getByText} = render(
-      <AlignmentItem {...defaultProps({moduleWorkflowState: 'unpublished'})} />
+      <AlignmentItem {...defaultProps({moduleWorkflowState: 'unpublished'})} />,
     )
     expect(getByText('Module 1 (unpublished)')).toBeInTheDocument()
   })
@@ -81,14 +81,14 @@ describe('AlignmentItem', () => {
 
   it('displays classic quiz icon if assignment content type is quiz', () => {
     const {getByTestId} = render(
-      <AlignmentItem {...defaultProps({assignmentContentType: 'quiz'})} />
+      <AlignmentItem {...defaultProps({assignmentContentType: 'quiz'})} />,
     )
     expect(getByTestId('alignment-item-quiz-icon')).toBeInTheDocument()
   })
 
   it('displays discussion icon if assignment content type is discussion', () => {
     const {getByTestId} = render(
-      <AlignmentItem {...defaultProps({assignmentContentType: 'discussion'})} />
+      <AlignmentItem {...defaultProps({assignmentContentType: 'discussion'})} />,
     )
     expect(getByTestId('alignment-item-discussion-icon')).toBeInTheDocument()
   })
@@ -100,7 +100,7 @@ describe('AlignmentItem', () => {
 
   it('displays bank icon if alignment type is question bank', () => {
     const {getByTestId} = render(
-      <AlignmentItem {...defaultProps({contentType: 'AssessmentQuestionBank'})} />
+      <AlignmentItem {...defaultProps({contentType: 'AssessmentQuestionBank'})} />,
     )
     expect(getByTestId('alignment-item-bank-icon')).toBeInTheDocument()
   })
@@ -131,7 +131,7 @@ describe('AlignmentItem', () => {
           assignmentContentType: 'quiz',
           quizItems: [{_id: 1, title: 'Question 1'}],
         })}
-      />
+      />,
     )
     expect(queryByText('Question 1')).not.toBeInTheDocument()
   })
@@ -139,7 +139,7 @@ describe('AlignmentItem', () => {
   describe('alignment to new quiz', () => {
     it('displays new quiz icon', () => {
       const {getByTestId} = render(
-        <AlignmentItem {...defaultProps({assignmentContentType: 'new_quiz'})} />
+        <AlignmentItem {...defaultProps({assignmentContentType: 'new_quiz'})} />,
       )
       expect(getByTestId('alignment-item-new-quiz-icon')).toBeInTheDocument()
     })
@@ -151,7 +151,7 @@ describe('AlignmentItem', () => {
             assignmentContentType: 'new_quiz',
             quizItems: [{_id: 1, title: 'Question 1'}],
           })}
-        />
+        />,
       )
       expect(getByText('Aligned Questions')).toBeInTheDocument()
       expect(getByText('Question 1')).toBeInTheDocument()
@@ -163,7 +163,7 @@ describe('AlignmentItem', () => {
           {...defaultProps({
             assignmentContentType: 'new_quiz',
           })}
-        />
+        />,
       )
       expect(queryByText('Aligned Questions')).not.toBeInTheDocument()
     })

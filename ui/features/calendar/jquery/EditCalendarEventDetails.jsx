@@ -36,7 +36,7 @@ export default class EditCalendarEventDetails {
           contextChangeCB={contextChangeCB}
           setSetContextCB={this.setSetContextCB}
         />,
-        formHolder
+        formHolder,
       )
     }
   }

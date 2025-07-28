@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import AdminTable from './AdminTable'
@@ -35,7 +35,7 @@ import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {DynamicRegistrationModal} from './dynamic_registration/DynamicRegistrationModal'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 /**
  * @see {@link DeveloperKeysApp.developerKeySaveSuccessfulHandler}
  * @description
@@ -91,7 +91,11 @@ class DeveloperKeysApp extends React.Component {
     } = this.props
 
     if (nextPage && !listDeveloperKeysPending) {
-      return <Button onClick={this.showMoreButtonHandler}>{I18n.t('Show All Keys')}</Button>
+      return (
+        <Button data-testid="show-all-account" onClick={this.showMoreButtonHandler}>
+          {I18n.t('Show All Keys')}
+        </Button>
+      )
     }
     return null
   }
@@ -118,7 +122,9 @@ class DeveloperKeysApp extends React.Component {
 
     if (inheritedNextPage && !listInheritedDeveloperKeysPending) {
       return (
-        <Button onClick={this.showMoreInheritedButtonHandler}>{I18n.t('Show All Keys')}</Button>
+        <Button data-testid="show-all-inherited" onClick={this.showMoreInheritedButtonHandler}>
+          {I18n.t('Show All Keys')}
+        </Button>
       )
     }
     return null
@@ -139,12 +145,18 @@ class DeveloperKeysApp extends React.Component {
    * workaround and do it.
    * @todo Find a better way to avoid modal-focus-screenreader-bulldozing so
    * this isn't necessary.
-   * @param {string} warningMessage - A warning message to show to the user.
+   * @param {string | string[]} warningMessage - A warning message or a list of warning messages to show to the user.
    */
   developerKeySaveSuccessfulHandler(warningMessage) {
     setTimeout(() => {
       showFlashSuccess(I18n.t('Save successful.'))()
-      if (warningMessage) {
+      if (Array.isArray(warningMessage)) {
+        for (const message of warningMessage) {
+          if (message) {
+            showFlashAlert({message, type: 'warning'})
+          }
+        }
+      } else if (warningMessage) {
         showFlashAlert({message: warningMessage, type: 'warning'})
       }
     }, ALERT_WAIT_TIME)
@@ -169,7 +181,7 @@ class DeveloperKeysApp extends React.Component {
     const tab = this.state.selectedTab
     const globalInheritedList = (inheritedList || []).filter(key => key.inherited_from === 'global')
     const parentInheritedList = (inheritedList || []).filter(
-      key => key.inherited_from === 'federated_parent'
+      key => key.inherited_from === 'federated_parent',
     )
 
     return (
@@ -180,11 +192,13 @@ class DeveloperKeysApp extends React.Component {
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}
+          data-testid="developer-keys-tabs"
         >
           <Tabs.Panel
             renderTitle={I18n.t('Account')}
             id="tab-panel-account"
             isSelected={tab === 'tab-panel-account'}
+            data-testid="account-tab"
           >
             <NewKeyModal
               store={store}
@@ -204,6 +218,7 @@ class DeveloperKeysApp extends React.Component {
               developerKeysList={list}
               ctx={ctx}
               setFocus={this.focusDevKeyButton}
+              data-testid="dev-key-admin-table"
             />
             <View as="div" margin="small" padding="large" textAlign="center">
               {listDeveloperKeysPending ? <Spinner renderTitle={I18n.t('Loading')} /> : null}
@@ -216,41 +231,46 @@ class DeveloperKeysApp extends React.Component {
               elementRef={this.setInheritedTabRef}
               id="tab-panel-inherited"
               isSelected={tab === 'tab-panel-inherited'}
+              data-testid="inherited-tab"
             >
-              {parentInheritedList.length > 0 && (
-                <>
-                  <Heading margin="small" level="h2">
-                    {I18n.t('Consortium Parent Keys')}
-                  </Heading>
-                  <InheritedTable
-                    prefix="parent"
-                    label={I18n.t('Parent Inherited Developer Keys')}
-                    store={store}
-                    actions={actions}
-                    developerKeysList={parentInheritedList}
-                    ctx={ctx}
-                  />
-                  <Heading margin="small" level="h2">
-                    {I18n.t('Global Keys')}
-                  </Heading>
-                </>
-              )}
-              <InheritedTable
-                prefix="global"
-                label={I18n.t('Global Inherited Developer Keys')}
-                ref={this.setInheritedTableRef}
-                store={store}
-                actions={actions}
-                developerKeysList={globalInheritedList}
-                ctx={ctx}
-                setFocus={this.focusInheritedTab}
-              />
-              <View as="div" margin="small" padding="large" textAlign="center">
-                {listInheritedDeveloperKeysPending ? (
-                  <Spinner renderTitle={I18n.t('Loading')} />
-                ) : null}
-                {this.showMoreInheritedButton()}
-              </View>
+              <div data-testid="inherited-tab-content">
+                {parentInheritedList.length > 0 && (
+                  <>
+                    <Heading margin="small" level="h2">
+                      {I18n.t('Consortium Parent Keys')}
+                    </Heading>
+                    <InheritedTable
+                      prefix="parent"
+                      label={I18n.t('Parent Inherited Developer Keys')}
+                      store={store}
+                      actions={actions}
+                      developerKeysList={parentInheritedList}
+                      ctx={ctx}
+                      data-testid="dev-key-inherited-table"
+                    />
+                    <Heading margin="small" level="h2">
+                      {I18n.t('Global Keys')}
+                    </Heading>
+                  </>
+                )}
+                <InheritedTable
+                  prefix="global"
+                  label={I18n.t('Global Inherited Developer Keys')}
+                  ref={this.setInheritedTableRef}
+                  store={store}
+                  actions={actions}
+                  developerKeysList={globalInheritedList}
+                  ctx={ctx}
+                  setFocus={this.focusInheritedTab}
+                  data-testid="dev-key-inherited-table"
+                />
+                <View as="div" margin="small" padding="large" textAlign="center">
+                  {listInheritedDeveloperKeysPending ? (
+                    <Spinner renderTitle={I18n.t('Loading')} />
+                  ) : null}
+                  {this.showMoreInheritedButton()}
+                </View>
+              </div>
             </Tabs.Panel>
           )}
         </Tabs>

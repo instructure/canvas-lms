@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {DiscussionEdit} from '../DiscussionEdit'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import $ from '@canvas/rails-flash-notifications'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
@@ -37,6 +37,7 @@ const defaultProps = ({
   canReplyAnonymously = false,
   discussionAnonymousState = null,
   isAnnouncement = false,
+  quotedEntry = {message: 'quoted message'},
 } = {}) => ({
   show,
   value,
@@ -46,6 +47,7 @@ const defaultProps = ({
   canReplyAnonymously,
   discussionAnonymousState,
   isAnnouncement,
+  quotedEntry,
 })
 
 describe('DiscussionEdit', () => {
@@ -72,6 +74,23 @@ describe('DiscussionEdit', () => {
       const container = getByTestId('DiscussionEdit-container')
       expect(container.style.display).toBe('')
     })
+
+    it('should add trackable attribute correctly', () => {
+      const {getByTestId} = setup(defaultProps({quotedEntry: {message: 'message'}}))
+      const button = getByTestId('quotedReplyToggle')
+      expect(button).toHaveAttribute('data-action-state', 'excludeQuotedReply')
+    })
+
+    describe('with quoted reply turned off', () => {
+      it('should add trackable attribute correctly', async () => {
+        const {getByTestId} = setup(defaultProps())
+        const button = getByTestId('quotedReplyToggle')
+        fireEvent.click(button)
+
+        await waitFor(() => expect(button).not.toBeChecked())
+        expect(button).toHaveAttribute('data-action-state', 'includeQuotedReply')
+      })
+    })
   })
 
   describe('Callbacks', () => {
@@ -80,7 +99,7 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps({onCancel: onCancelMock}))
       const cancelButton = getByTestId('DiscussionEdit-cancel')
       fireEvent.click(cancelButton)
-      expect(onCancelMock.mock.calls.length).toBe(1)
+      expect(onCancelMock.mock.calls).toHaveLength(1)
     })
 
     it('should fire onSubmit when clicked', () => {
@@ -88,7 +107,7 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
-      expect(onSubmitMock.mock.calls.length).toBe(1)
+      expect(onSubmitMock.mock.calls).toHaveLength(1)
     })
 
     it('should trigger error on submit when value is too long', () => {
@@ -100,9 +119,9 @@ describe('DiscussionEdit', () => {
       fireEvent.click(submitButton)
       expect(flashStub).toHaveBeenCalledWith(
         'The message size has exceeded the maximum text length.',
-        2000
+        2000,
       )
-      expect(onSubmitMock.mock.calls.length).toBe(0)
+      expect(onSubmitMock.mock.calls).toHaveLength(0)
     })
   })
 
@@ -114,14 +133,14 @@ describe('DiscussionEdit', () => {
     describe('Topic is anonymous', () => {
       it('should render when can reply anonymously', () => {
         const container = setup(
-          defaultProps({canReplyAnonymously: true, discussionAnonymousState: 'full_anonymity'})
+          defaultProps({canReplyAnonymously: true, discussionAnonymousState: 'full_anonymity'}),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeTruthy()
       })
 
       it('should not render when cannot reply anonymously', () => {
         const container = setup(
-          defaultProps({canReplyAnonymously: false, discussionAnonymousState: 'full_anonymity'})
+          defaultProps({canReplyAnonymously: false, discussionAnonymousState: 'full_anonymity'}),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
       })
@@ -146,7 +165,7 @@ describe('DiscussionEdit', () => {
             canReplyAnonymously: true,
             discussionAnonymousState: 'partial_anonymity',
             isEdit: true,
-          })
+          }),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
       })

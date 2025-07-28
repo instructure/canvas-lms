@@ -17,6 +17,7 @@
  */
 
 import {fireEvent} from '@testing-library/dom'
+import userEvent from '@testing-library/user-event'
 
 export default class GradeInputDriver {
   static find($parent = document.body) {
@@ -102,12 +103,11 @@ export default class GradeInputDriver {
     return this.$options.find($option => $option.textContent.trim() === optionLabel)
   }
 
-  blurInput() {
-    fireEvent.blur(this.$input)
-  }
-
-  inputValue(value) {
-    fireEvent.input(this.$input, {target: {value}})
+  async inputValueAndBlur(value) {
+    const user = userEvent.setup()
+    await user.clear(this.$input)
+    await user.type(this.$input, value)
+    await user.tab()
   }
 
   keyDown(keyCode) {

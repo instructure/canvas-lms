@@ -18,7 +18,7 @@
 
 import {ConversationContext} from '../../util/constants'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo, useState} from 'react'
@@ -27,17 +27,17 @@ import {View} from '@instructure/ui-view'
 import {inboxConversationsWrapper, responsiveQuerySizes} from '../../util/utils'
 import {Responsive} from '@instructure/ui-responsive'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const ConversationListContainer = ({
-  scope,
-  onSelectConversation,
+  scope = 'inbox',
+  onSelectConversation = () => {},
   onReadStateChange,
   onStarStateChange,
   commonQueryVariables,
   conversationsQuery,
   submissionCommentsQuery,
-  setConversationIdToGoBackTo,
+  setConversationIdToGoBackTo = () => {},
 }) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
@@ -126,7 +126,7 @@ const ConversationListContainer = ({
     const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
       : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes?.filter(
-          ({conversation}) => conversation
+          ({conversation}) => conversation,
         )
     const inboxData = inboxConversationsWrapper(data, isSubmissionCommentsType)
 
@@ -220,10 +220,4 @@ ConversationListContainer.propTypes = {
   conversationsQuery: PropTypes.object,
   submissionCommentsQuery: PropTypes.object,
   setConversationIdToGoBackTo: PropTypes.func,
-}
-
-ConversationListContainer.defaultProps = {
-  scope: 'inbox',
-  onSelectConversation: () => {},
-  setConversationIdToGoBackTo: () => {},
 }

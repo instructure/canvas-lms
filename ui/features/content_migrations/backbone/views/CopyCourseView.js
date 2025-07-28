@@ -45,7 +45,7 @@ CopyCourseView.prototype.initialize = function () {
         _this.dateShift.updateNewDates(course)
         return _this.selectContent.courseSelected(course)
       }
-    })(this)
+    })(this),
   )
 }
 

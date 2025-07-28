@@ -67,7 +67,7 @@ describe('CoursePacesDateSelector', () => {
 
   it('renders read-only text when asked', () => {
     const {getByText, queryByRole} = render(
-      <CoursePaceDateInput {...defaultProps} interaction="readonly" />
+      <CoursePaceDateInput {...defaultProps} interaction="readonly" />,
     )
     expect(getByText('The Label')).toBeInTheDocument()
     expect(getByText('Wed, Sep 1, 2021')).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('CoursePacesDateSelector', () => {
     const {getByText} = render(<CoursePaceDateInput {...defaultProps} dateValue="2021-09-04" />)
 
     expect(
-      getByText('The selected date is on a weekend and this course pace skips weekends.')
+      getByText('The selected date is on a weekend and this course pace skips weekends.'),
     ).toBeInTheDocument()
   })
 
@@ -91,7 +91,11 @@ describe('CoursePacesDateSelector', () => {
       },
     ]
     const {getByText} = render(
-      <CoursePaceDateInput {...defaultProps} dateValue="2021-09-04" blackoutDates={blackoutDates} />
+      <CoursePaceDateInput
+        {...defaultProps}
+        dateValue="2021-09-04"
+        blackoutDates={blackoutDates}
+      />,
     )
 
     expect(getByText('The selected date is on a blackout day.')).toBeInTheDocument()
@@ -111,7 +115,7 @@ describe('CoursePacesDateSelector', () => {
 
   it('renders as disabled while publishing', () => {
     const {getByLabelText} = render(
-      <CoursePaceDateInput {...defaultProps} interaction="disabled" />
+      <CoursePaceDateInput {...defaultProps} interaction="disabled" />,
     )
     const startDateInput = getByLabelText(/^The Label/) as HTMLInputElement
 

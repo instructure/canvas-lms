@@ -73,11 +73,13 @@ module CoursesHomePage
   end
 
   def unpublish_btn
-    fj("button:contains('Unpublish')")
+    f("#course_publish_button button").click
+    fj("button[role='menuitem']:contains('Unpublish')")
   end
 
   def publish_btn
-    fj("button:contains('Publish')")
+    f("#course_publish_button button").click
+    fj("button[role='menuitem']:contains('Publish')")
   end
 
   def course_user_list

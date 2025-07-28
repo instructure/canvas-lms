@@ -80,7 +80,7 @@ All of these settings are contained for the **migration_selection** placement:
     the tool use this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the 
-    <a href="file.content_item.html" target=_"blank">Deep Linking 
+    <a href="file.content_item.html" target="_blank">Deep Linking 
     documentation</a> for more information, including accepted values.
 
 -   selection_width: &lt;pixels&gt; (optional)

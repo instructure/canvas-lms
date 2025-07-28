@@ -25,14 +25,17 @@ module CollaborationsHelper
     else
       data_attrs = { id: collab.id }
       if collab.is_a?(ExternalToolCollaboration)
+        rl = Lti::ResourceLink.find_by(lookup_uuid: collab.resource_link_lookup_uuid)
+        client_id = rl&.current_external_tool(@context)&.global_developer_key_id
         url = polymorphic_url(
           [:retrieve, @context, :external_tools],
           {
             url: collab.update_url,
             display: "borderless",
             placement: "collaboration",
-            content_item_id: collab.id
-          }
+            content_item_id: collab.id,
+            client_id:
+          }.compact
         )
         data_attrs[:update_launch_url] = url
       end

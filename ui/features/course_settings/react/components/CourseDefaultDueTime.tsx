@@ -16,79 +16,96 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useRef, useState} from 'react'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_default_due_time')
+const I18n = createI18nScope('course_default_due_time')
 
-export default function CourseDefaultDueTime() {
-  const FORM_IDS = {
-    COURSE_DEFAULT_DUE_TIME: 'course_default_due_time',
-  }
+const FORM_ID = 'course'
+const FORM_FIELD_ID = 'default_due_time'
 
-  const setFormValue = (id: string, value: string): void => {
-    const field = document.getElementById(id) as HTMLInputElement
-    if (field) {
-      field.value = value
+const stringTimeToDate = (timeString: string): string => {
+  const currentDate = new Date()
+  if (!timeString) return currentDate.toISOString()
+
+  const [hours, minutes, seconds] = timeString.split(':').map(Number)
+
+  currentDate.setHours(hours || 0)
+  currentDate.setMinutes(minutes || 0)
+  currentDate.setSeconds(seconds || 0)
+  return currentDate.toISOString()
+}
+
+const isoToStringTime = (isoString: string | undefined): string | null => {
+  if (!isoString) return null
+
+  const date = new Date(isoString)
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  const seconds = date.getSeconds().toString().padStart(2, '0')
+
+  return `${hours}:${minutes}:${seconds}`
+}
+interface CourseDefaultDueTimeProps {
+  canManage: boolean // TimeInput will be disabled unless this permission is true
+  value: string // Initial value in hh:mm:ss format
+  container: HTMLElement // The div that this component was rendered in
+  locale?: string // Optional locale for the TimeInput
+  timezone?: string // Optional timezone for the TimeInput
+}
+
+export default function CourseDefaultDueTime(props: CourseDefaultDueTimeProps): JSX.Element {
+  const initialValueRef = useRef<string>(props.value)
+  const formFieldRef = useRef<HTMLInputElement | null>(null)
+  const [dueDate, setDueDate] = useState<string>(props.value)
+
+  function setFormValue(value: string): void {
+    if (formFieldRef.current === null) {
+      const field = document.createElement('input')
+      field.setAttribute('type', 'hidden')
+      field.setAttribute('id', `${FORM_ID}_${FORM_FIELD_ID}`)
+      field.setAttribute('name', `${FORM_ID}[${FORM_FIELD_ID}]`)
+      props.container.appendChild(field)
+      formFieldRef.current = field
     }
+    formFieldRef.current.setAttribute('value', value)
   }
 
-  const getFormValue = (id: string): string => {
-    const field = document.getElementById(id) as HTMLInputElement
-    return field ? field.value : ''
+  function clearFormValue(): void {
+    if (!formFieldRef.current) return
+    props.container.removeChild(formFieldRef.current)
+    formFieldRef.current = null
   }
 
-  const [defaultValue] = useState<string>(getFormValue(FORM_IDS.COURSE_DEFAULT_DUE_TIME))
-
-  const stringTimeToDate = (timeString: string): string => {
-    const currentDate = new Date()
-    if (!timeString) {
-      return currentDate.toISOString()
-    }
-
-    const [hours, minutes, seconds] = timeString.split(':').map(Number)
-
-    currentDate.setHours(hours)
-    currentDate.setMinutes(minutes)
-    currentDate.setSeconds(seconds)
-    return currentDate.toISOString()
-  }
-
-  const isoToStringTime = (isoString: string | undefined): string | null => {
-    if (!isoString) return null
-
-    const date = new Date(isoString)
-    const hours = date.getHours().toString().padStart(2, '0')
-    const minutes = date.getMinutes().toString().padStart(2, '0')
-    const seconds = date.getSeconds().toString().padStart(2, '0')
-
-    return `${hours}:${minutes}:${seconds}`
-  }
-
-  const handleChange = (isoString: string | undefined): void => {
-    const parsedValue = isoToStringTime(isoString)
-    if (parsedValue) {
-      setFormValue(FORM_IDS.COURSE_DEFAULT_DUE_TIME, parsedValue)
+  function handleChange(isoString: string | undefined): void {
+    const newValue = isoToStringTime(isoString) ?? dueDate
+    if (newValue === initialValueRef.current) {
+      clearFormValue()
     } else {
-      setFormValue(FORM_IDS.COURSE_DEFAULT_DUE_TIME, defaultValue)
+      setFormValue(newValue)
     }
+    setDueDate(newValue)
   }
 
   return (
     <FormFieldGroup
       description={<ScreenReaderContent>{I18n.t('Default Due Time')}</ScreenReaderContent>}
       rowSpacing="small"
-      layout="inline"
+      layout="stacked"
     >
       <TimeSelect
         renderLabel={I18n.t('Choose a time')}
-        onChange={(e, {value}) => handleChange(value)}
-        onInputChange={(e, value, isoValue) => handleChange(isoValue)}
-        defaultValue={stringTimeToDate(defaultValue)}
+        onChange={(_e, {value}) => handleChange(value)}
+        onInputChange={(_e, _value, isoValue) => handleChange(isoValue)}
+        value={stringTimeToDate(dueDate)}
         allowNonStepInput={true}
+        interaction={props.canManage ? 'enabled' : 'disabled'}
+        locale={props.locale}
+        timezone={props.timezone}
+        data-testid="course-default-due-time"
       />
     </FormFieldGroup>
   )

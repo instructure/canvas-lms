@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -21,15 +20,26 @@ import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrideDatastore from '../FinalGradeOverrideDatastore'
 import useStore from '../../stores'
 
+interface GradeOverride {
+  percentage: number
+}
+
+interface StudentGrades {
+  courseGrade?: GradeOverride
+  gradingPeriodGrades?: Record<string, GradeOverride>
+}
+
+type GradesMap = Record<string, StudentGrades>
+
 describe('Gradebook FinalGradeOverrideDatastore', () => {
-  let datastore
+  let datastore: FinalGradeOverrideDatastore
 
   beforeEach(() => {
     datastore = new FinalGradeOverrideDatastore()
   })
 
   describe('#getGrade()', () => {
-    let grades
+    let grades: GradesMap
 
     beforeEach(() => {
       grades = {
@@ -174,7 +184,7 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
       expect(datastore.getGrade('1101', '1501')).toEqual({percentage: 91})
       const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
       const studentOverrides = updatedFinalGradeOverrides['1101']
-      expect(studentOverrides.gradingPeriodGrades['1501']?.percentage).toEqual(91)
+      expect(studentOverrides?.gradingPeriodGrades?.['1501']?.percentage).toEqual(91)
     })
 
     it('only updates store finalGradesOverride for the student changed', () => {
@@ -182,7 +192,7 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
       expect(datastore.getGrade('1101', '1501')).toEqual({percentage: 91})
       const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
       const studentOverrides = updatedFinalGradeOverrides['1102']
-      expect(studentOverrides.gradingPeriodGrades['1501']?.percentage).toEqual(81.23)
+      expect(studentOverrides?.gradingPeriodGrades?.['1501']?.percentage).toEqual(81.23)
     })
   })
 

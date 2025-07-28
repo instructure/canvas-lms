@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
 import {debounce} from 'lodash'
@@ -40,8 +40,10 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import replaceTags from '@canvas/util/replaceTags'
+import useStore from '../stores'
+import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 
-const I18n = useI18nScope('edit_rubric')
+const I18n = createI18nScope('edit_rubric')
 
 const rubricEditing = {
   htmlBody: null,
@@ -70,12 +72,12 @@ const rubricEditing = {
     $('#add_criterion_container').remove()
     $rubric.find('#add_criterion_holder').append($('<span/>').attr('id', 'add_criterion_container'))
     setTimeout(() => {
-      ReactDOM.render(
+      const root = createRoot(document.getElementById('add_criterion_container'))
+      root.render(
         <RubricAddCriterionPopover
           rubric={$rubric}
           duplicateFunction={rubricEditing.copyCriterion}
         />,
-        document.getElementById('add_criterion_container')
       )
       if (focusTarget) {
         $rubric.find(`#add_criterion_container ${focusTarget}:visible`).focus()
@@ -99,7 +101,8 @@ const rubricEditing = {
     const $criterion = $blank.clone(true)
     $criterion.addClass('new_criterion')
     $criterion.removeClass('blank')
-    $rubric.find('.summary').before($criterion.show())
+    // $rubric.find('table.rubric_table tbody tr.criterion').last().after($criterion.show())
+    $rubric.find('tbody').append($criterion.show())
     const focusTarget = $criterion.hasClass('learning_outcome_criterion') ? '.icon-plus' : null
     rubricEditing.updateCriteria($rubric)
     rubricEditing.sizeRatings($criterion)
@@ -110,7 +113,7 @@ const rubricEditing = {
     const $rubric = $this.parents('.rubric')
     $this.addClass('add_column')
     if ($rubric.hasClass('editing')) {
-      const $td = $this.clone(true).removeClass('edge_rating'),
+      const $rating = $this.clone(true).removeClass('edge_rating'),
         pts = numberHelper.parse($this.find('.points').text()),
         $criterion = $this.parents('.criterion'),
         data = {description: '', rating_long_description: '', min_points: pts},
@@ -129,7 +132,7 @@ const rubricEditing = {
           data.points = less_points
         }
       }
-      $td.fillTemplateData({
+      $rating.fillTemplateData({
         data: {
           ...data,
           min_points: rubricEditing.localizedPoints(data.min_points),
@@ -137,16 +140,16 @@ const rubricEditing = {
         },
       })
       rubricEditing.flagInfinitesimalRating(
-        $td,
-        $criterion.find('.criterion_use_range').prop('checked')
+        $rating,
+        $criterion.find('.criterion_use_range').prop('checked'),
       )
       if (hasClassAddLeft) {
-        $this.before($td)
+        $this.before($rating)
       } else {
-        $td.addClass('new_rating')
-        $this.after($td)
+        $rating.addClass('new_rating')
+        $this.after($rating)
       }
-      const $previousRating = $td.prev('.rating')
+      const $previousRating = $rating.prev('.rating')
       if ($previousRating) {
         $previousRating.fillTemplateData({data: {min_points: data.points}})
       }
@@ -171,7 +174,7 @@ const rubricEditing = {
         type: 'error',
         message: I18n.t(
           'rubric.import_outcome.duplicated_outcome',
-          'This Outcome has not been added as it already exists in this rubric.'
+          'This Outcome has not been added as it already exists in this rubric.',
         ),
       })
 
@@ -186,7 +189,9 @@ const rubricEditing = {
     }
 
     // multiple rubrics can be open for editing but only the active one will have Find Outcome link
-    const $rubric = $('#add_learning_outcome_link').closest('.rubric table.rubric_table:visible')
+    const $rubric = $('#add_learning_outcome_link')
+      .closest('.rubric')
+      .find('table.rubric_table:visible')
     $rubric
       .find('.criterion.learning_outcome_' + outcome.id)
       .find('.delete_criterion_link')
@@ -357,7 +362,7 @@ const rubricEditing = {
           const $ratingsContainers = $ratings.find('.rating .container').css('height', ''),
             maxHeight = Math.max(
               $ratings.height(),
-              $this.find('.criterion_description .container .description_content').height()
+              $this.find('.criterion_description .container .description_content').height(),
             )
           // the -10 here is the padding on the .container.
           $ratingsContainers.css('height', maxHeight - 10 + 'px')
@@ -477,15 +482,19 @@ const rubricEditing = {
   addRubric() {
     const $rubric = $('#default_rubric').clone(true).attr('id', 'rubric_new').addClass('editing')
     $rubric.find('.edit_rubric').remove()
-    const $tr = $('#edit_rubric').clone(true).show().removeAttr('id').addClass('edit_rubric')
-    const $form = $tr.find('#edit_rubric_form')
-    $rubric.find('.rubric_table').append($tr)
+    const $editRubric = $('#edit_rubric')
+      .clone(true)
+      .show()
+      .removeAttr('id')
+      .addClass('edit_rubric')
+    const $form = $editRubric.find('#edit_rubric_form')
+    $rubric.append($editRubric)
     $form.attr('method', 'POST').attr('action', $('#add_rubric_url').attr('href'))
     // I believe this should only be visible on the assignment page (not
     // rubric page or quiz page) but we need to audit uses of the add rubric
     // dialog before we make it that restrictive
     const $assignPoints = $(
-      '#assignment_show, #assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible'
+      '#assignment_show, #assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible',
     )
     const $quizPage = $('#quiz_show,#quiz_edit_wrapper')
     $form.find('.rubric_grading').showIf($assignPoints.length > 0 && $quizPage.length === 0)
@@ -546,10 +555,14 @@ const rubricEditing = {
       rubricEditing.updateMasteryScale($rubric)
     }
 
-    const $tr = $('#edit_rubric').clone(true).show().removeAttr('id').addClass('edit_rubric')
-    const $form = $tr.find('#edit_rubric_form')
-    $rubric.find('.rubric_table').append($tr)
+    const $editRubricFormContainer = $('#edit_rubric')
+      .clone(true)
+      .show()
+      .removeAttr('id')
+      .addClass('edit_rubric')
+    $rubric.append($editRubricFormContainer.clone(true).show())
 
+    const $form = $rubric.find('#edit_rubric_form')
     $rubric.find(':text:first').focus().select()
     $form
       .find('.grading_rubric_checkbox')
@@ -601,7 +614,20 @@ const rubricEditing = {
       $rubric.find('.rubric_title .links').show()
     }
   },
+  readSrOnlyAlert(message) {
+    const $dialog = $('#rubrics').closest('.ui-dialog')
+    $dialog.attr('aria-modal', 'false')
+    showFlashAlert({
+      type: 'info',
+      message,
+      srOnly: true,
+    })
+    setTimeout(() => {
+      $dialog.attr('aria-modal', 'true')
+    }, 500)
+  },
   updateRubric($rubric, rubric) {
+    const rubricCreated = $rubric.attr('id') === 'rubric_adding'
     $rubric.find('.criterion:not(.blank)').remove()
     const $rating_template = $rubric.find('.rating:first').clone(true).removeAttr('id')
     $rubric.fillTemplateData({
@@ -622,7 +648,7 @@ const rubricEditing = {
     url = replaceTags(
       $rubric.find('.delete_rubric_url').attr('href'),
       'association_id',
-      rubric.rubric_association_id
+      rubric.rubric_association_id,
     )
     $rubric
       .find('.delete_rubric_link')
@@ -680,7 +706,7 @@ const rubricEditing = {
           .find('.range_rating')
           .showIf(
             criterion.criterion_use_range === true &&
-              numberHelper.parse(rating.min_points) !== numberHelper.parse(rating.points)
+              numberHelper.parse(rating.min_points) !== numberHelper.parse(rating.points),
           )
         $criterion.find('.ratings').append($rating)
       })
@@ -688,7 +714,7 @@ const rubricEditing = {
         $criterion.find('.edit_criterion_link').remove()
         $criterion.find('.rating .links').remove()
       }
-      $rubric.find('.summary').before($criterion)
+      $rubric.find('table.rubric_table tbody').append($criterion)
       $criterion.find('.criterion_points').val(rubricEditing.localizedPoints(criterion.points))
       $criterion.data('criterion_points', numberHelper.parse(criterion.points))
     })
@@ -700,6 +726,11 @@ const rubricEditing = {
       .find('.custom_ratings')
       .showIf(rubric.free_form_criterion_comments)
     $rubric.find('.rubric_title .title').focus()
+    rubricEditing.readSrOnlyAlert(
+      rubricCreated
+        ? I18n.t('Rubric was successfully created')
+        : I18n.t('Rubric was successfully updated'),
+    )
   },
 }
 rubricEditing.sizeRatings = debounce(rubricEditing.originalSizeRatings, 10)
@@ -716,6 +747,14 @@ rubricEditing.init = function () {
     $rubric_rating_dialog = $('#rubric_rating_dialog')
 
   rubricEditing.htmlBody = $('html,body')
+
+  const rubricContainer = $('.rubric_container.rubric')
+  const rubricVisible = !$('.add_rubric_link').is(':visible')
+  if (rubricContainer && rubricVisible) {
+    const containerId = rubricContainer.attr('id') ?? ''
+    const rubricId = containerId.split('rubric_')[1]
+    useStore.setState({rubricId})
+  }
 
   $('#rubrics')
     .on('click', '.edit_criterion_link, .long_description_link', function (event) {
@@ -801,10 +840,28 @@ rubricEditing.init = function () {
         title,
         width: 416,
         buttons: [],
-        close: closeFunction,
         beforeClose: beforeCloseFunction,
         modal: true,
         zIndex: 1000,
+        close: () => {
+          const region = $rubric_long_description_dialog.data('focusRegion')
+          if (region) {
+            const $container = $rubric_long_description_dialog.dialog('widget')
+            FocusRegionManager.blurRegion($container[0], region.id)
+            $rubric_long_description_dialog.removeData('focusRegion')
+          }
+          closeFunction()
+        },
+        open: () => {
+          const $container = $rubric_long_description_dialog.dialog('widget')
+          const region = FocusRegionManager.activateRegion($container[0], {
+            shouldContainFocus: true,
+            shouldReturnFocus: false,
+            shouldFocusOnOpen: true,
+          })
+
+          $rubric_long_description_dialog.data('focusRegion', region)
+        },
       })
 
       if (editing && !isLearningOutcome) {
@@ -826,7 +883,7 @@ rubricEditing.init = function () {
       if ($rating.parents('.criterion').hasClass('learning_outcome_criterion')) {
         return
       }
-      const $nextRating = $rating.closest('td').next('.rating')
+      const $nextRating = $rating.closest('div').next('.rating')
       const use_range = $rating.parents('.criterion').find('.criterion_use_range').prop('checked')
       $rubric_rating_dialog.find('.range_rating').showIf(use_range)
       $rubric_rating_dialog.find('.min_points').prop('disabled', !$nextRating.length)
@@ -869,7 +926,25 @@ rubricEditing.init = function () {
           title: I18n.t('titles.edit_rubric_rating', 'Edit Rating'),
           width: 400,
           buttons: [],
-          close: close_function,
+          close: () => {
+            const region = $rubric_rating_dialog.data('focusRegion')
+            if (region) {
+              const $container = $rubric_rating_dialog.dialog('widget')
+              FocusRegionManager.blurRegion($container[0], region.id)
+              $rubric_rating_dialog.removeData('focusRegion')
+            }
+            close_function()
+          },
+          open: () => {
+            const $container = $rubric_rating_dialog.dialog('widget')
+            const region = FocusRegionManager.activateRegion($container[0], {
+              shouldContainFocus: true,
+              shouldReturnFocus: true,
+              shouldFocusOnOpen: true,
+            })
+
+            $rubric_rating_dialog.data('focusRegion', region)
+          },
           modal: true,
           zIndex: 1000,
         })
@@ -883,7 +958,25 @@ rubricEditing.init = function () {
         resizable: true,
         title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric'),
         modal: true,
-        zIndex: 1000,
+        zIndex: 10000,
+        close: () => {
+          const region = $rubric_dialog.data('focusRegion')
+          if (region) {
+            const $container = $rubric_dialog.dialog('widget')
+            FocusRegionManager.blurRegion($container[0], region.id)
+            $rubric_dialog.removeData('focusRegion')
+          }
+        },
+        open: () => {
+          const $container = $rubric_dialog.dialog('widget')
+          const region = FocusRegionManager.activateRegion($container[0], {
+            shouldContainFocus: true,
+            shouldReturnFocus: true,
+            shouldFocusOnOpen: true,
+          })
+
+          $rubric_dialog.data('focusRegion', region)
+        },
       })
       if (!$rubric_dialog.hasClass('loaded')) {
         $rubric_dialog
@@ -924,9 +1017,9 @@ rubricEditing.init = function () {
             $rubric_dialog
               .find('.loading_message')
               .text(
-                I18n.t('errors.load_rubrics_failed', 'Loading rubrics failed, please try again')
+                I18n.t('errors.load_rubrics_failed', 'Loading rubrics failed, please try again'),
               )
-          }
+          },
         )
       }
     })
@@ -938,14 +1031,12 @@ rubricEditing.init = function () {
         useMasteryScale = shouldUseMasteryScale($rubric)
 
       if (rubricEditing.isEditing) return false
-      // eslint-disable-next-line no-restricted-globals, no-alert
+
       if (!$link.hasClass('copy_edit') || confirm(getEditRubricPrompt(useMasteryScale))) {
         rubricEditing.editRubric($rubric, $link.attr('href'), useMasteryScale)
       }
     })
 
-  // cant use delegate because events bound to a .delegate wont get triggered when you do .triggerHandler('click') because it wont bubble up.
-  // TODO is this still true at jQuery 3.0?
   $('.rubric .delete_rubric_link').on('click', function (event, callback) {
     event.preventDefault()
     let message = I18n.t('prompts.confirm_delete', 'Are you sure you want to delete this rubric?')
@@ -963,6 +1054,8 @@ rubricEditing.init = function () {
             if (callback && $.isFunction(callback)) {
               callback()
             }
+            useStore.setState({rubricId: undefined})
+            rubricEditing.readSrOnlyAlert(I18n.t('Rubric was successfully deleted'))
           })
         },
       })
@@ -974,10 +1067,14 @@ rubricEditing.init = function () {
         .val(),
       description = $rubric_long_description_dialog.find('textarea.description').val(),
       $criterion = $rubric_long_description_dialog.data('current_criterion')
-    const valid = $rubric_long_description_dialog.validateForm({
-      required: ['description'],
-      labels: {description: I18n.t('Description')},
-    })
+    const $form = $rubric_long_description_dialog.find('#edit_criterion_form')
+    const data = $form.getFormData()
+    if (!data['description']) {
+      showDescriptionError($form)
+      return
+    }
+
+    const valid = $rubric_long_description_dialog.validateForm({})
     if (!valid) {
       return
     }
@@ -1010,12 +1107,13 @@ rubricEditing.init = function () {
   $rubric_rating_dialog.find('.save_button').click(event => {
     event.preventDefault()
     event.stopPropagation()
-    const data = $rubric_rating_dialog.find('#edit_rating_form').getFormData()
-    const valid = $rubric_rating_dialog.find('#edit_rating_form').validateForm({
-      data,
-      required: ['description'],
-      labels: {description: I18n.t('Rating Title')},
-    })
+    const $form = $rubric_rating_dialog.find('#edit_rating_form')
+    const data = $form.getFormData()
+    if (!data['description']) {
+      showDescriptionError($form)
+      return
+    }
+    const valid = $rubric_rating_dialog.find('#edit_rating_form').validateForm({data})
     if (!valid) {
       return
     }
@@ -1054,7 +1152,7 @@ rubricEditing.init = function () {
           data.min_points,
           $nextRating,
           Math.max,
-          'min_points'
+          'min_points',
         )
       }
     }
@@ -1083,6 +1181,15 @@ rubricEditing.init = function () {
   })
   $rubric_rating_dialog.find('.cancel_button').click(() => {
     $rubric_rating_dialog.dialog('close')
+  })
+
+  $(
+    '.add_rubric_link, .find_rubric_link, .edit_criterion_link, .delete_criterion_link, .add_criterion_button',
+  ).on('keydown', e => {
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault()
+      $(e.currentTarget).click()
+    }
   })
 
   $('.add_rubric_link').click(event => {
@@ -1187,7 +1294,7 @@ rubricEditing.init = function () {
                   $criterion.find('.ratings').append($rating.show())
                 })
                 $criterion.find('.rating_holder.blank').remove()
-                $rubric.find('.rubric.rubric_summary tr.summary').before($criterion.show())
+                $rubric.find('.rubric.rubric_summary tbody').append($criterion.show())
               })
               $rubric_dialog.find('.rubrics_dialog_rubrics').append($rubric)
             }
@@ -1205,7 +1312,7 @@ rubricEditing.init = function () {
             $rubric_dialog
               .find('.rubrics_loading_message')
               .text('Loading rubrics failed, please try again')
-          }
+          },
         )
       }
     })
@@ -1264,10 +1371,11 @@ rubricEditing.init = function () {
           if (!rubric.permissions?.update) {
             $rubric.find('.edit_rubric_link').addClass('copy_edit')
           }
+          useStore.setState({rubricId: rubric.id})
         },
         () => {
           $rubric_dialog.loadingImage('remove')
-        }
+        },
       )
     })
 
@@ -1291,11 +1399,41 @@ rubricEditing.init = function () {
 
   let forceSubmit = false,
     skipPointsUpdate = false
+
+  const validForm = ($rubric, data) => {
+    const removeTitleError = () => {
+      $rubric.find('.rubric_title .title_error_message').css('display', 'none')
+      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #CCC')
+    }
+
+    const addTitleError = () => {
+      $rubric.find('.rubric_title .title_error_message').css('display', 'inline-flex')
+      $rubric.find('.rubric_title [name="title"]').css('border', '1px solid #AE1B1F')
+    }
+
+    const validTitle = () => {
+      if (!data['rubric[title]'] || data['rubric[title]'].trim().length === 0) {
+        addTitleError()
+        clearTimeout($rubric.data('titleErrorDisplayed'))
+        const titleErrorDisplayed = setTimeout(removeTitleError, 5000)
+        $rubric.data('titleErrorDisplayed', titleErrorDisplayed)
+        return false
+      }
+
+      return true
+    }
+
+    return validTitle()
+  }
+
   $('#edit_rubric_form').formSubmit({
     processData() {
       const $rubric = $(this).parents('.rubric')
       if (!$rubric.find('.criterion:not(.blank)').length) return false
       const data = rubricEditing.rubricData($rubric)
+
+      if (!validForm($rubric, data)) return false
+
       if (
         ENV.MASTER_COURSE_DATA &&
         ENV.MASTER_COURSE_DATA.restricted_by_master_course &&
@@ -1308,7 +1446,7 @@ rubricEditing.init = function () {
           ? `#tool_form_${ENV.LTI_TOOL_FORM_ID}`
           : '#tool_form'
         const externalToolPoints = $(
-          `${toolFormId} #custom_canvas_assignment_points_possible`
+          `${toolFormId} #custom_canvas_assignment_points_possible`,
         ).val()
         let assignmentPoints
         if (externalToolPoints) {
@@ -1316,8 +1454,8 @@ rubricEditing.init = function () {
         } else {
           assignmentPoints = numberHelper.parse(
             $(
-              '#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible'
-            ).text()
+              '#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible',
+            ).text(),
           )
         }
 
@@ -1325,7 +1463,7 @@ rubricEditing.init = function () {
           // For N.Q assignments, we show the rubric from the assignment edit screen instead of
           // the show screen used for other assignments.
           assignmentPoints = numberHelper.parse(
-            $('#edit_assignment_header input[id="assignment_points_possible"]').val()
+            $('#edit_assignment_header input[id="assignment_points_possible"]').val(),
           )
         }
 
@@ -1346,7 +1484,7 @@ rubricEditing.init = function () {
               assignmentPoints,
               rubricPoints,
               pointRatio,
-            })
+            }),
           )
           const closeDialog = function (skip) {
             forceSubmit = true
@@ -1402,9 +1540,10 @@ rubricEditing.init = function () {
         } else {
           $rubric.prev('.rubric').remove()
         }
-        $(this).parents('tr').hide()
+        $(this).parents('div.edit_rubric').hide()
 
         const rubric = data.rubric
+        useStore.setState({rubricId: rubric.id})
 
         rubric.rubric_association_id = data.rubric_association.id
         rubric.use_for_grading = data.rubric_association.use_for_grading
@@ -1429,7 +1568,7 @@ rubricEditing.init = function () {
               count: rubric.points_possible || 0,
               precision: 2,
               strip_insignificant_zeros: true,
-            }
+            },
           )
           $('.discussion-title .discussion-points').text(discussion_points_text)
         }
@@ -1495,11 +1634,11 @@ rubricEditing.init = function () {
       }
     })
     .on('click', '.delete_rating_link', function (event) {
-      const $rating_cell = $(this).closest('td')
-      const $target = $rating_cell.prev().find('.add_rating_link_after')
-      const $previousRating = $rating_cell.prev('.rating')
+      const $current_rating = $(this).closest('div.rating')
+      const $target = $current_rating.prev().find('.add_rating_link_after')
+      const $previousRating = $current_rating.prev('.rating')
       const previous_data = {
-        min_points: $rating_cell.next('.rating').find('.points').text(),
+        min_points: $current_rating.next('.rating').find('.points').text(),
       }
       $previousRating.fillTemplateData({data: previous_data})
       event.preventDefault()
@@ -1510,7 +1649,7 @@ rubricEditing.init = function () {
           const $criterion = $(this).parents('.criterion')
           rubricEditing.flagInfinitesimalRating(
             $previousRating,
-            $criterion.find('.criterion_use_range').prop('checked')
+            $criterion.find('.criterion_use_range').prop('checked'),
           )
           $(this).remove()
           rubricEditing.sizeRatings($criterion)
@@ -1519,7 +1658,7 @@ rubricEditing.init = function () {
     })
     .on('click', '.add_rating_link_after', function (event) {
       event.preventDefault()
-      const $this = $(this).parents('td.rating')
+      const $this = $(this).parents('div.rating')
       $this.addClass('add_right')
       rubricEditing.addNewRatingColumn($this)
     })
@@ -1537,9 +1676,9 @@ rubricEditing.init = function () {
       rubricEditing.updateCriterionPoints($(this).parents('.criterion'))
     })
   $('#edit_rating').on('click', '.cancel_button', function () {
-    $(this).closest('td.rating').find('.edit_rating_link')
+    $(this).closest('div.rating').find('.edit_rating_link')
   })
-  $('#edit_rubric_form .rubric_custom_rating')
+  $('#edit_rubric_form #rubric_custom_rating')
     .change(function () {
       $(this)
         .parents('.rubric')
@@ -1630,10 +1769,9 @@ if (
 ) {
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]
-  ReactDOM.render(
-    <RubricManagement accountId={contextId} />,
-    document.getElementById('rubric_management')
-  )
+
+  const root = createRoot(document.getElementById('rubric_management'))
+  root.render(<RubricManagement accountId={contextId} />)
 }
 
 const getEditRubricPrompt = useMasteryScale => {
@@ -1642,7 +1780,7 @@ const getEditRubricPrompt = useMasteryScale => {
       "You can't edit this " +
         "rubric, either because you don't have permission " +
         "or it's being used in more than one place. Any " +
-        'changes you make will result in a new rubric based on the old rubric. Continue anyway?'
+        'changes you make will result in a new rubric based on the old rubric. Continue anyway?',
     )
   }
   if (ENV.context_asset_string.includes('course')) {
@@ -1650,14 +1788,14 @@ const getEditRubricPrompt = useMasteryScale => {
       "You can't edit this " +
         "rubric, either because you don't have permission " +
         "or it's being used in more than one place. Any " +
-        'changes you make will result in a new rubric. Any associated outcome criteria will use the course mastery scale. Continue anyway?'
+        'changes you make will result in a new rubric. Any associated outcome criteria will use the course mastery scale. Continue anyway?',
     )
   } else {
     return I18n.t(
       "You can't edit this " +
         "rubric, either because you don't have permission " +
         "or it's being used in more than one place. Any " +
-        'changes you make will result in a new rubric. Any associated outcome criteria will use the account mastery scale. Continue anyway?'
+        'changes you make will result in a new rubric. Any associated outcome criteria will use the account mastery scale. Continue anyway?',
     )
   }
 }
@@ -1667,6 +1805,21 @@ const shouldUseMasteryScale = $rubric => {
     return false
   }
   return $rubric.find('.criterion').hasClass('learning_outcome_criterion')
+}
+
+const showDescriptionError = $form => {
+  $form.find('.description_error_message').show()
+  $form.find('[name="description"]').css('border', '1px solid red')
+
+  clearTimeout($form.data('ratingTitleErrorDisplayed'))
+
+  const ratingTitleErrorDisplayed = setTimeout(() => removeDescriptionError($form), 5000)
+  $form.data('ratingTitleErrorDisplayed', ratingTitleErrorDisplayed)
+}
+
+const removeDescriptionError = $form => {
+  $form.find('.description_error_message').hide()
+  $form.find('[name="description"]').css('border', '1px solid #ccc')
 }
 
 export default rubricEditing

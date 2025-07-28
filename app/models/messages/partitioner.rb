@@ -12,22 +12,24 @@ module Messages
         GuardRail.activate(:deploy) do
           log "*" * 80
           log "-" * 80
+          ActiveRecord::Migrator.with_advisory_lock do
+            partman = CanvasPartman::PartitionManager.create(Message)
 
-          partman = CanvasPartman::PartitionManager.create(Message)
+            partman.ensure_partitions(PRECREATE_TABLES)
 
-          partman.ensure_partitions(PRECREATE_TABLES)
-
-          if prune
-            Shard.current.database_server.unguard do
-              partman.prune_partitions(KEEP_WEEKS)
+            if prune
+              Shard.current.database_server.unguard do
+                partman.prune_partitions(KEEP_WEEKS)
+              end
             end
           end
-
           log "Done. Bye!"
           log "*" * 80
           unless Rails.env.test?
             ActiveRecord::Base.connection_pool.disconnect!
           end
+        rescue ActiveRecord::ConcurrentMigrationError
+          # ignore
         end
       end
     end
@@ -36,8 +38,8 @@ module Messages
       process(prune: true)
     end
 
-    def self.log(*args)
-      logger&.info(*args)
+    def self.log(*)
+      logger&.info(*)
     end
 
     def self.processed?

@@ -203,7 +203,7 @@ describe "Outcomes Import API", type: :request do
 
         it "requires the user to have manage_global_outcomes permissions" do
           revoke_permission(@account_user, :manage_global_outcomes)
-          available_json(expected_status: 401)
+          available_json(expected_status: 403)
         end
       end
 
@@ -214,7 +214,7 @@ describe "Outcomes Import API", type: :request do
 
         it "requires the user to have manage_global_outcomes permissions" do
           revoke_permission(@account_user, :manage_global_outcomes)
-          create_json(guid:, expected_status: 401)
+          create_json(guid:, expected_status: 403)
         end
 
         it "returns error if no guid is passed" do

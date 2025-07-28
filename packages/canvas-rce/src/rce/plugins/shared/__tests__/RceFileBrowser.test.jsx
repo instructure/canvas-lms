@@ -107,7 +107,7 @@ describe('RceFileBrowser', () => {
           'data-download-url': `${fullUrl}?icon_maker_icon=1`,
           'data-inst-icon-maker-icon': true,
           src: fullUrl,
-        })
+        }),
       )
     })
   })

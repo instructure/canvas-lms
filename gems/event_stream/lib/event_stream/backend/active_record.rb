@@ -19,31 +19,30 @@
 #
 module EventStream::Backend
   class ActiveRecord
-    include Strategy
     attr_accessor :stream
 
     def initialize(stream_obj)
       @stream = stream_obj
     end
 
-    delegate :active_record_type, to: :stream
+    delegate :record_type, to: :stream
 
     class Unavailable < RuntimeError; end
 
     def available?
-      active_record_type.connection.active?
+      record_type.connection.active?
     end
 
     def database_name
-      active_record_type.connection.shard.name
+      record_type.connection.shard.name
     end
 
     def database_fingerprint
-      active_record_type.connection.shard.name
+      record_type.connection.shard.name
     end
 
-    def fetch(ids, strategy: :batch)
-      active_record_type.where(uuid: ids)
+    def fetch(ids)
+      record_type.where(uuid: ids)
     end
 
     def execute(operation, record)
@@ -59,33 +58,24 @@ module EventStream::Backend
       raise if stream.raise_on_error
     end
 
-    def index_on_insert(index, record)
-      if (entry = index.entry_proc.call(record))
-        key = index.key_proc ? index.key_proc.call(*entry) : entry
-        index.strategy_for(:active_record).insert(record, key)
-      end
-    end
-
     def find_with_index(index, args)
       options = args.extract_options!
-      options[:strategy] = :active_record
       index.find_with(args, options)
     end
 
     def find_ids_with_index(index, args)
       options = args.extract_options!
-      options[:strategy] = :active_record
       index.find_ids_with(args, options)
     end
 
     private
 
     def insert(record)
-      active_record_type.create_from_event_stream!(record)
+      record_type.create_from_event_stream!(record)
     end
 
     def update(record)
-      active_record_type.update_from_event_stream!(record)
+      record_type.update_from_event_stream!(record)
     end
   end
 end

@@ -22,7 +22,7 @@
  */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import store from '../lib/AppCenterStore'
 import $ from 'jquery'
@@ -32,7 +32,7 @@ import {IconSearchLine, IconXLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class AppFilters extends React.Component {
   state = {filter: 'all', filterText: '', disabled: false, readOnly: false}

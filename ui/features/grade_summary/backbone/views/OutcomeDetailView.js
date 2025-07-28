@@ -56,7 +56,7 @@ class OutcomeDetailView extends DialogBaseView {
     })
 
     this.allAlignments.on('fetched:last', () =>
-      this.alignmentsForView.reset(this.allAlignments.toArray())
+      this.alignmentsForView.reset(this.allAlignments.toArray()),
     )
 
     return this.allAlignments.fetch()

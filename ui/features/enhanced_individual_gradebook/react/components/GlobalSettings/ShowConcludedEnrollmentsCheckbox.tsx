@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {HandleCheckboxChange} from '../../../types'
 import CheckboxTemplate from './CheckboxTemplate'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 type Props = {
   settingsUpdateUrl?: string | null
   handleCheckboxChange: HandleCheckboxChange
@@ -38,6 +38,7 @@ export default function ShowConcludedEnrollmentsCheckbox({
     const checked = event.target.checked
     doFetchApi({
       method: 'PUT',
+      // @ts-expect-error
       path: settingsUpdateUrl,
       body: {
         gradebook_settings: {

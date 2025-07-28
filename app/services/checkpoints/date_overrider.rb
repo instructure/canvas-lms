@@ -19,11 +19,11 @@
 
 module Checkpoints::DateOverrider
   def apply_overridden_dates(override, override_params, shell_override: false)
-    # The checkpoint override stores the actual relevant dates (due_at, unlock_at, lock_at).
-    # The parent assignment override is a "shell" override that does not contain the relevant dates;
+    # The checkpoint override stores the actual relevant due dates (due_at).
+    # The parent assignment override is a "shell" override that does not contain the due_at;
     # it only exists so that assignment visibility can be correctly determined for students.
     override_params.slice(:due_at, :unlock_at, :lock_at).each do |field, value|
-      value_to_set = shell_override ? nil : value
+      value_to_set = (field == :due_at && shell_override) ? nil : value
       override.public_send(:"override_#{field}", value_to_set)
     end
   end

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {createRef} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
 // Misconfigured types in Grid's package.json mean we have to ignore errors here
@@ -25,9 +25,8 @@ import {Grid} from '@instructure/ui-grid'
 import '@canvas/rails-flash-notifications'
 import type {I18nType, TextInputChangeHandler} from './types'
 import MembershipServiceAccess from './MembershipServiceAccess'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n: I18nType = useI18nScope('external_tools')
+const I18n: I18nType = createI18nScope('external_tools')
 
 export interface ConfigurationFormUrlProps {
   name?: string
@@ -39,8 +38,8 @@ export interface ConfigurationFormUrlProps {
 }
 
 interface ConfigurationFormUrlErrors {
-  name?: FormMessage[]
-  configUrl?: FormMessage[]
+  missing?: FormMessage[]
+  invalidUrl?: FormMessage[]
 }
 
 export interface ConfigurationFormUrlState {
@@ -49,11 +48,16 @@ export interface ConfigurationFormUrlState {
   sharedSecret: string
   configUrl: string
   allowMembershipServiceAccess: boolean
-  errors: ConfigurationFormUrlErrors
+  showMessages: boolean
+  isNameValid: boolean
+  isConfigUrlValid: boolean
 }
 
 export interface ConfigurationFormUrlFormData
-  extends Omit<ConfigurationFormUrlState, 'errors' | 'allowMembershipServiceAccess'> {
+  extends Omit<
+    ConfigurationFormUrlState,
+    'allowMembershipServiceAccess' | 'isNameValid' | 'isConfigUrlValid' | 'showMessages'
+  > {
   name: string
   consumerKey: string
   sharedSecret: string
@@ -72,38 +76,58 @@ export default class ConfigurationFormUrl extends React.Component<
     sharedSecret: this.props.sharedSecret ?? '',
     configUrl: this.props.configUrl ?? '',
     allowMembershipServiceAccess: this.props.allowMembershipServiceAccess ?? false,
-    errors: {},
+    showMessages: false,
+    isNameValid: true,
+    isConfigUrlValid: true,
+  }
+
+  nameRef = createRef<TextInput>()
+  configUrlRef = createRef<TextInput>()
+
+  errors: ConfigurationFormUrlErrors = {
+    missing: [{text: I18n.t('This field is required'), type: 'error'}],
+    invalidUrl: [
+      {text: I18n.t('Please enter a valid URL (e.g. https://example.com)'), type: 'error'},
+    ],
+  }
+
+  valid = true
+
+  validateField = (
+    fieldValue: string,
+    fieldStateKey: 'isNameValid' | 'isConfigUrlValid',
+    fieldRef: React.RefObject<TextInput>,
+    isUrl: boolean,
+  ) => {
+    if (!fieldValue || (isUrl && !URL.canParse(fieldValue))) {
+      this.invalidate(fieldStateKey, fieldRef)
+    } else {
+      this.setState(prevState => ({...prevState, [fieldStateKey]: true}))
+    }
+  }
+
+  invalidate = (
+    fieldStateKey: 'isNameValid' | 'isConfigUrlValid',
+    fieldRef: React.RefObject<TextInput>,
+  ) => {
+    this.setState(prevState => ({...prevState, [fieldStateKey]: false}))
+    if (this.valid) {
+      fieldRef.current?.focus()
+      this.valid = false
+      this.setState({showMessages: true})
+    }
   }
 
   isValid = () => {
-    const fields: (keyof ConfigurationFormUrlState & keyof ConfigurationFormUrlErrors)[] = [
-        'name',
-        'configUrl',
-      ],
-      errors: ConfigurationFormUrlErrors = {},
-      formErrors: string[] = []
+    this.valid = true
 
-    fields.forEach(field => {
-      const value = this.state[field]
-      if (!value) {
-        errors[field] = [{text: I18n.t('This field is required'), type: 'error'}]
-        formErrors.push(I18n.t('This field "%{name}" is required.', {name: field}))
-      }
-    })
-    this.setState({errors})
+    const name = this.state.name,
+      configUrl = this.state.configUrl
 
-    let isValid = true
-    if (formErrors.length > 0) {
-      isValid = false
-      showFlashAlert({
-        message: I18n.t('There were errors with the form: %{errors}', {
-          errors: formErrors.join(' '),
-        }),
-        type: 'error',
-        politeness: 'assertive',
-      })
-    }
-    return isValid
+    this.validateField(name, 'isNameValid', this.nameRef, false)
+    this.validateField(configUrl, 'isConfigUrlValid', this.configUrlRef, true)
+
+    return this.valid
   }
 
   getFormData = (): ConfigurationFormUrlFormData => {
@@ -124,11 +148,27 @@ export default class ConfigurationFormUrl extends React.Component<
 
   handleChange: (field: keyof ConfigurationFormUrlState) => TextInputChangeHandler = field => {
     return (_, value) => {
+      if (field === 'name') {
+        this.validateField(value, 'isNameValid', this.nameRef, false)
+      }
+      if (field === 'configUrl') {
+        this.validateField(value, 'isConfigUrlValid', this.configUrlRef, true)
+      }
       this.setState(prevState => ({...prevState, [field]: value}))
     }
   }
 
   render() {
+    const {
+      name,
+      isNameValid,
+      isConfigUrlValid,
+      consumerKey,
+      sharedSecret,
+      configUrl,
+      showMessages,
+    } = this.state
+
     return (
       <div className="ConfigurationFormUrl">
         <Grid hAlign="space-between" colSpacing="none" rowSpacing="small">
@@ -136,11 +176,12 @@ export default class ConfigurationFormUrl extends React.Component<
             <Grid.Col>
               <TextInput
                 id="name"
-                value={this.state.name}
+                value={name}
                 onChange={this.handleChange('name')}
                 renderLabel={I18n.t('Name')}
-                isRequired={true}
-                messages={this.state.errors.name}
+                ref={this.nameRef}
+                isRequired
+                messages={showMessages && !isNameValid ? this.errors.missing : []}
               />
             </Grid.Col>
           </Grid.Row>
@@ -148,7 +189,7 @@ export default class ConfigurationFormUrl extends React.Component<
             <Grid.Col>
               <TextInput
                 id="consumerKey"
-                value={this.state.consumerKey}
+                value={consumerKey}
                 onChange={this.handleChange('consumerKey')}
                 renderLabel={I18n.t('Consumer Key')}
               />
@@ -156,7 +197,7 @@ export default class ConfigurationFormUrl extends React.Component<
             <Grid.Col>
               <TextInput
                 id="sharedSecret"
-                value={this.state.sharedSecret}
+                value={sharedSecret}
                 onChange={this.handleChange('sharedSecret')}
                 renderLabel={I18n.t('Shared Secret')}
               />
@@ -181,12 +222,13 @@ export default class ConfigurationFormUrl extends React.Component<
             <Grid.Col>
               <TextInput
                 id="configUrl"
-                value={this.state.configUrl}
+                value={configUrl}
                 onChange={this.handleChange('configUrl')}
                 renderLabel={I18n.t('Config URL')}
                 placeholder={I18n.t('https://example.com/config.xml')}
-                isRequired={true}
-                messages={this.state.errors.configUrl}
+                ref={this.configUrlRef}
+                isRequired
+                messages={showMessages && !isConfigUrlValid ? this.errors.invalidUrl : []}
               />
             </Grid.Col>
           </Grid.Row>

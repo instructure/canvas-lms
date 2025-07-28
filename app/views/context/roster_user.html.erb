@@ -32,9 +32,6 @@
         <%= t 'links.message_user', "Send Message" %>
       </a>
     <% end %>
-    <% if @domain_root_account.enable_user_notes and can_do(@user, @current_user, :read_user_notes) %>
-      <a href="<%= user_user_notes_path(@user) %>"> <%= t 'links.faculty_journal', "Faculty Journal" %></a>
-    <% end %>
     <% if @context.is_a?(Course)%>
       <% if @context.user_is_instructor?(@user) && can_do(@user, @current_user, :read_reports) && can_do(@context, @current_user, :view_all_grades) %>
         <a href="<%= user_course_teacher_activity_url(@user, @context) %>">
@@ -120,12 +117,11 @@
 
 <h1><%= @user.name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h1>
 
-<% manage_perm = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users %>
 <% can_manage_students = can_do(@context, @current_user, :manage_students) %>
-<% can_manage_admins = can_do(@context, @current_user, manage_perm) %>
+<% can_manage_admins = can_do(@context, @current_user, :allow_course_admin_actions) %>
 
 <% if !@context.is_a?(Group) && (can_manage_students || can_manage_admins) %>
-<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/name', locals: { login_history: false } %>
 <a href="#" class="more_user_information_link"><%= t('links.more_user_details', %{more user details...}) %></a>
   <div class="more_user_information" style="display: none;">
     <% if @context.is_a?(Course) %>
@@ -175,7 +171,7 @@
               <% end %>
             </tr>
           <% end %>
-          <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
+          <% if @context.is_a?(Course) && can_do(@context, @current_user, :allow_course_admin_actions) %>
             <tr>
               <td>
                 <%= before_label('user_privileges', %{Privileges}) %>
@@ -197,11 +193,10 @@
             </tr>
           <% end %>
         </table>
-        <% if @context.is_a?(Course) && can_do(@context, @current_user, manage_perm) %>
+        <% if @context.is_a?(Course) && can_do(@context, @current_user, :allow_course_admin_actions) %>
           <div id="student_last_attended__component"></div>
         <% end %>
       </fieldset>
-      <%= render :partial => 'courses/link_enrollment' %>
     <% end %>
     <%= render :partial => 'users/logins' %>
   </div>
@@ -218,12 +213,10 @@
 <% end %>
 
 <% if @messages %>
-<h2><%= t('headings.recent_messages', %{Recent Messages}) %></h2>
-<%= t('no_messages', "No Messages") if @messages.empty? %>
-<% @messages[0,10].each do |message| %>
-  <% if message.is_a?(DiscussionEntry) %>
+  <h2><%= t('headings.recent_messages', %{Recent Messages}) %></h2>
+  <%= t('no_messages', "No Messages") if @messages.empty? %>
+  <% @messages.each do |message| %>
     <%= render :partial => 'discussion_topics/entry', :object => message, :locals => {:out_of_context => true, :show_context => true, :assignment_visible_to_user => message.discussion_topic.visible_for?(@current_user)} %>
   <% end %>
-<% end %>
 <% end %>
 

@@ -63,7 +63,7 @@ describe Quizzes::QuizSubmission do
 
     describe "#finished_at" do
       it "rectifies small amounts of drift (could be caused by JS stalling)" do
-        anchor = Time.now
+        anchor = Time.zone.now
 
         subject.started_at = anchor
         subject.end_at = anchor + 5.minutes
@@ -73,7 +73,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not rectify drift for a submission finished before the end at date" do
-        anchor = Time.now
+        anchor = Time.zone.now
 
         subject.started_at = anchor
         subject.end_at = anchor + 5.minutes
@@ -123,7 +123,7 @@ describe Quizzes::QuizSubmission do
     it "does not lose time" do
       @quiz.update_attribute(:time_limit, 10)
       q = @quiz.quiz_submissions.create!
-      q.update_attribute(:started_at, Time.now)
+      q.update_attribute(:started_at, Time.zone.now)
       original_end_at = q.end_at
 
       @quiz.update_attribute(:time_limit, 5)
@@ -347,15 +347,10 @@ describe Quizzes::QuizSubmission do
 
       expect(q.workflow_state).to eql("complete")
       expect(q.state).to be(:complete)
-      q.write_attribute(:submission_data, [])
-      res = false
-      begin
-        res = Quizzes::SubmissionGrader.new(q).grade_submission
-        expect(0).to be(1)
-      rescue => e
-        expect(e.to_s).to match(Regexp.new("Can't grade an already-submitted submission"))
-      end
-      expect(res).to be(false)
+      q.submission_data = []
+      expect do
+        Quizzes::SubmissionGrader.new(q).grade_submission
+      end.to raise_error(/Can't grade an already-submitted submission/)
     end
 
     context "explicitly setting grade" do
@@ -923,7 +918,7 @@ describe Quizzes::QuizSubmission do
         RoleOverride.create!(
           context: Account.default,
           role: teacher_role,
-          permission: "manage_assignments",
+          permission: "manage_assignments_edit",
           enabled: false
         )
         course_with_teacher(active_all: true)
@@ -1347,7 +1342,7 @@ describe Quizzes::QuizSubmission do
         end
 
         it "returns false if it isn't overdue" do
-          @quiz.due_at = Time.now + 1.hour
+          @quiz.due_at = 1.hour.from_now
           @quiz.save!
 
           submission = @quiz.generate_submission(@student)
@@ -1730,7 +1725,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "returns the correct time spent in seconds" do
-      anchor = Time.now
+      anchor = Time.zone.now
 
       subject.started_at = anchor
       subject.finished_at = anchor + 1.hour
@@ -1738,7 +1733,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "accounts for extra time" do
-      anchor = Time.now
+      anchor = Time.zone.now
 
       subject.started_at = anchor
       subject.finished_at = anchor + 1.hour

@@ -18,7 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../../spec_helper"
+require_relative "../../../lti_spec_helper"
+
 describe Lti::Concerns::ParentFrame do
+  include LtiSpecHelper
+
   subject { controller.send(:parent_frame_origin) }
 
   let(:controller_class) do
@@ -48,8 +53,8 @@ describe Lti::Concerns::ParentFrame do
     controller.instance_variable_set(:@current_user, current_pseudonym.user)
     controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
     allow(controller).to receive_messages(parent_frame_context: tool.id.to_s, session: nil, request:)
-    allow(ContextExternalTool).to receive(:find_by).and_return(nil)
-    allow(ContextExternalTool).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
+    allow(Lti::ToolFinder).to receive(:find_by).and_return(nil)
+    allow(Lti::ToolFinder).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
   end
 
   %w[course account].each do |context_type|
@@ -64,6 +69,27 @@ describe Lti::Concerns::ParentFrame do
         end
 
         it { is_expected.to eq(expected_tool_origin) }
+
+        it "handles beta url overrides" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_launch_url" => "http://beta.example.com/launch" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
+
+        it "handles beta domain overrides" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_domain" => "beta.example.com" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
+
+        it "handles beta domain overrides with https prefix" do
+          allow_beta_overrides(tool)
+          tool.settings["environments"] = { "beta_domain" => "http://beta.example.com" }
+          tool.save!
+          expect(subject).to eq("http://beta.example.com")
+        end
       end
 
       context "when the user does not have the read or launch_external_tool permission" do
@@ -88,6 +114,16 @@ describe Lti::Concerns::ParentFrame do
           expect(error_report.data).to include("query_params" => "hello=world")
         end
       end
+    end
+  end
+
+  context "when the user is the test student" do
+    let(:tool_context) { course_model }
+    let(:current_user) { tool_context.student_view_student }
+    let(:current_pseudonym) { current_user.pseudonym }
+
+    it "allows the test student to access the tool" do
+      expect(subject).to eq(expected_tool_origin)
     end
   end
 

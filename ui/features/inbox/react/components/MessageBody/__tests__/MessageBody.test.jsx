@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import {fireEvent, render } from '@testing-library/react'
 import React from 'react'
-import { MessageBody } from '../MessageBody'
-import { ModalBodyContext } from '../../../utils/constants'
+import {MessageBody} from '../MessageBody'
+import { TranslationContext } from '../../../hooks/useTranslationContext'
 
 const createProps = overrides => {
   return {
@@ -31,8 +31,13 @@ const createProps = overrides => {
 describe('MessageBody', () => {
   it('renders the message body', () => {
     const props = createProps()
-    const { getByTestId } = render(
-      <MessageBody {...props} />
+
+    const mockTranslationContext = {}
+
+    const {getByTestId} = render(
+      <TranslationContext.Provider value={mockTranslationContext}>
+        <MessageBody {...props} />
+      </TranslationContext.Provider>
     )
     expect(getByTestId('message-body')).toBeInTheDocument()
   })
@@ -40,18 +45,18 @@ describe('MessageBody', () => {
   it('uses the onBodyChange prop when the value has changed', () => {
     const props = createProps()
     const mockContext = {
-      body: "",
+      body: '',
       setBody: jest.fn(),
-      translating: false
+      translating: false,
     }
 
-    const { getByTestId } = render(
-      <ModalBodyContext.Provider value={mockContext}>
+    const {getByTestId} = render(
+      <TranslationContext.Provider value={mockContext}>
         <MessageBody {...props} />
-      </ModalBodyContext.Provider>
+      </TranslationContext.Provider>,
     )
     const messageBody = getByTestId('message-body')
-    fireEvent.change(messageBody, { target: { value: 'howdy' } })
+    fireEvent.change(messageBody, {target: {value: 'howdy'}})
     expect(mockContext.setBody).toHaveBeenCalledWith('howdy')
     expect(props.onBodyChange).toHaveBeenCalled()
   })
@@ -60,12 +65,16 @@ describe('MessageBody', () => {
     const props = createProps({
       messages: [
         {
-          text: 'Please insert a message body.',
+          text: 'Please insert a message',
           type: 'error',
         },
       ],
     })
-    const { getByText } = render(<MessageBody {...props} />)
+    const {getByText} = render(
+      <TranslationContext.Provider value={{}}>
+        <MessageBody {...props} />
+      </TranslationContext.Provider>
+    )
     expect(getByText(props.messages[0].text)).toBeInTheDocument()
   })
 
@@ -73,18 +82,18 @@ describe('MessageBody', () => {
     it('renders signature when inboxSignatureBlock prop is true', () => {
       const props = createProps({
         inboxSignatureBlock: true,
-        signature: 'My signature'
+        signature: 'My signature',
       })
 
       const mockContext = {
-        body: "",
+        body: '',
         setBody: jest.fn(),
-        translating: false
+        translating: false,
       }
       render(
-        <ModalBodyContext.Provider value={mockContext}>
+        <TranslationContext.Provider value={mockContext}>
           <MessageBody {...props} />
-        </ModalBodyContext.Provider>
+        </TranslationContext.Provider>,
       )
 
       expect(mockContext.setBody).toHaveBeenCalled()
@@ -93,9 +102,13 @@ describe('MessageBody', () => {
     it('does not render signature when inboxSignatureBlock prop is false', () => {
       const props = createProps({
         inboxSignatureBlock: false,
-        signature: 'My signature'
+        signature: 'My signature',
       })
-      render(<MessageBody {...props} />)
+      render(
+        <TranslationContext.Provider value={{}}>
+          <MessageBody {...props} />
+        </TranslationContext.Provider>
+      )
       const textArea = document.querySelectorAll('textarea')[0].value
       const signature = textArea.substring(textArea.length - props.signature.length)
       expect(signature).not.toBe(props.signature)

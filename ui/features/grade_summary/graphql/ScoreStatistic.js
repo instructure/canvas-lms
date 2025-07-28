@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {number} from 'prop-types'
 
 export const ScoreStatistic = {
@@ -47,7 +47,7 @@ export const ScoreStatistic = {
     mean = 10,
     median = 10,
     minimum = 5,
-    upperQ = 15
+    upperQ = 15,
   ) => ({
     count,
     lowerQ,
