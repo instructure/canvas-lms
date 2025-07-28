@@ -62,12 +62,12 @@ export const AccountChangeModal: React.FC<AccountChangeModalProps> = ({
         onDismiss={onClose}
         onSubmit={onConfirm}
         size="medium"
-        label={I18n.t('Change Sub-Account')}
+        label={I18n.t('Change Account')}
         shouldCloseOnDocumentClick={false}
       >
         <Modal.Header>
           <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
-          <Heading level="h2">{I18n.t('Canvas Career Sub-Account')}</Heading>
+          <Heading level="h2">{I18n.t('Canvas Career Account')}</Heading>
         </Modal.Header>
         <Modal.Body>
           <Flex direction="column" gap="large" as="div" padding="medium 0">
