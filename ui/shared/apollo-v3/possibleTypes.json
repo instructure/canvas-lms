@@ -4,6 +4,11 @@
     "Enrollment",
     "Group"
   ],
+  "AssignedDates": [
+    "Assignment",
+    "Discussion",
+    "Quiz"
+  ],
   "AssignmentOverrideSet": [
     "AdhocStudents",
     "Course",

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
-import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
+import type {ModuleItemContent} from '../../utils/types'
 import {format} from '@instructure/moment-utils'
 import DueDateLabel from '../DueDateLabel'
 
@@ -81,6 +81,102 @@ const contentWithRedundantDueDates: ModuleItemContent = {
   },
 }
 
+const gradedDiscussionWithAssignmentOverrides: ModuleItemContent = {
+  id: '1',
+  _id: '1',
+  type: 'Discussion',
+  graded: true,
+  dueAt: '2024-01-15T23:59:59Z',
+  assignment: {
+    _id: 'assignment-1',
+    dueAt: '2024-01-15T23:59:59Z', // Base due date for everyone
+    assignmentOverrides: {
+      edges: [
+        {
+          cursor: 'MQ',
+          node: {
+            dueAt: '2024-01-16T23:59:59Z',
+            set: {sectionId: '1'},
+          },
+        },
+        {
+          cursor: 'Mg',
+          node: {
+            dueAt: '2024-01-17T23:59:59Z',
+            set: {sectionId: '2'},
+          },
+        },
+      ],
+    },
+  },
+}
+
+const gradedDiscussionWithAssignmentBaseDuePlusOverride: ModuleItemContent = {
+  id: '2',
+  _id: '2',
+  type: 'Discussion',
+  graded: true,
+  assignment: {
+    _id: 'assignment-2',
+    dueAt: '2024-01-15T23:59:59Z', // Base due date for everyone (different from override)
+    assignmentOverrides: {
+      edges: [
+        {
+          cursor: 'MQ',
+          node: {
+            dueAt: '2024-01-16T23:59:59Z', // Different due date for one student
+            set: {
+              students: [{id: '123'}],
+            },
+          },
+        },
+      ],
+    },
+  },
+}
+
+const assignmentWithBaseDueDateAndStudentOverride: ModuleItemContent = {
+  id: '1',
+  _id: '1',
+  type: 'Assignment',
+  graded: true,
+  dueAt: '2024-01-15T23:59:59Z', // Base due date for everyone
+  assignmentOverrides: {
+    edges: [
+      {
+        cursor: 'MQ',
+        node: {
+          dueAt: '2024-01-16T23:59:59Z', // Different due date for one student
+          set: {
+            students: [{id: '123'}],
+          },
+        },
+      },
+    ],
+  },
+}
+
+const assignmentWithSameDueDateInOverride: ModuleItemContent = {
+  id: '2',
+  _id: '2',
+  type: 'Assignment',
+  graded: true,
+  dueAt: '2024-01-15T23:59:59Z', // Base due date for everyone
+  assignmentOverrides: {
+    edges: [
+      {
+        cursor: 'MQ',
+        node: {
+          dueAt: '2024-01-15T23:59:59Z', // Same due date for one student (redundant)
+          set: {
+            students: [{id: '123'}],
+          },
+        },
+      },
+    ],
+  },
+}
+
 const setUp = (content: ModuleItemContent = defaultContent) => {
   return render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
@@ -130,6 +226,39 @@ describe('DueDateLabel', () => {
       const container = setUp(contentWithRedundantDueDates)
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('due-date')).toBeInTheDocument()
+    })
+  })
+
+  describe('with discussion types', () => {
+    it('shows multiple due dates for graded discussion with assignment overrides', () => {
+      const container = setUp(gradedDiscussionWithAssignmentOverrides)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+      // Should show "Multiple Due Dates" link for discussions with assignment-level overrides
+      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    it('shows multiple due dates for graded discussion with assignment base due date plus override', () => {
+      const container = setUp(gradedDiscussionWithAssignmentBaseDuePlusOverride)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+      // Should show "Multiple Due Dates" when discussion has assignment base due date + student override
+      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    it('shows multiple due dates for assignment with base due date and student override', () => {
+      const container = setUp(assignmentWithBaseDueDateAndStudentOverride)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+      // Should show "Multiple Due Dates" when there's a base due date + individual student override
+      expect(container.queryByText('Multiple Due Dates')).toBeInTheDocument()
+    })
+
+    it('shows single date when base due date and override are the same', () => {
+      const container = setUp(assignmentWithSameDueDateInOverride)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
     })
   })
 })

@@ -308,6 +308,7 @@ export type SiteAdminFeatureId =
   | 'files_a11y_rewrite'
   | 'youtube_migration'
   | 'hide_legacy_course_analytics'
+  | 'standardize_assignment_date_formatting'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
