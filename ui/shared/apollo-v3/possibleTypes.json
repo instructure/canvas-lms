@@ -162,6 +162,9 @@
   "PagesConnectionInterface": [
     "Course"
   ],
+  "PlacementsInterface": [
+    "ExternalTool"
+  ],
   "ProgressContext": [
     "Assignment",
     "Course",

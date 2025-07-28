@@ -34,14 +34,14 @@ export const handlePublishToggle = async (
   moduleId: string,
   itemId: string,
   title: string,
-  content: ModuleItemContent | null,
   canBeUnpublished: boolean,
   queryClient: QueryClient,
   courseId: string,
+  published?: boolean,
 ) => {
   if (!canBeUnpublished) return
 
-  const newPublishedState = !content?.published
+  const newPublishedState = !published
 
   try {
     await doFetchApi({

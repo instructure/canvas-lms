@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ExternalToolSelector, {ExternalTool} from './ExternalToolSelector'
 import {ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
+import {ExternalToolModalItem} from '../../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -32,6 +33,7 @@ interface ExternalItemFormProps {
   externalUrlName?: string
   newTab?: boolean
   itemType?: ModuleItemContentType
+  contentItems?: ExternalToolModalItem[]
 }
 
 export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
@@ -40,25 +42,29 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   externalUrlName = '',
   newTab = false,
   itemType = 'external_url',
+  contentItems = [],
 }) => {
   const [url, setUrl] = useState(externalUrlValue)
   const [pageName, setPageName] = useState(externalUrlName)
   const [loadInNewTab, setLoadInNewTab] = useState(newTab)
-  const [selectedToolId, setSelectedToolId] = useState<string>('')
+  const [selectedToolId, setSelectedToolId] = useState<string | undefined>(undefined)
 
   // Handle tool selection and auto-populate URL/name
-  const handleToolSelect = (tool: ExternalTool | null) => {
+  const handleToolSelect = (tool: ExternalToolModalItem | null) => {
     if (tool) {
-      setSelectedToolId(tool.definition_id.toString())
+      const toolId =
+        typeof tool.definition_id === 'number' ? String(tool.definition_id) : tool.definition_id
 
-      // Get the appropriate placement URL and title
+      setSelectedToolId(toolId)
+
+      // Get the appropriate placement URL and name
       // Try to find any available placement, preferring assignment_selection
       const placement =
-        tool.placements.assignment_selection ||
-        tool.placements.link_selection ||
-        Object.values(tool.placements)[0]
-      const toolUrl = placement?.url || tool.url || ''
-      const toolTitle = placement?.title || tool.name || ''
+        tool?.placements?.assignmentSelection ||
+        tool?.placements?.linkSelection ||
+        (tool?.placements ? Object.values(tool.placements)[0] : undefined)
+      const toolUrl = placement?.url || tool?.url || ''
+      const toolTitle = placement?.title || tool?.name || ''
 
       setUrl(toolUrl)
       setPageName(toolTitle)
@@ -66,10 +72,10 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
       // Notify parent component
       onChange('url', toolUrl)
       onChange('name', toolTitle)
-      onChange('selectedToolId', tool.definition_id)
+      onChange('selectedToolId', toolId)
     } else {
-      setSelectedToolId('')
-      onChange('selectedToolId', null)
+      setSelectedToolId(undefined)
+      onChange('selectedToolId', undefined)
     }
   }
 
@@ -86,7 +92,11 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
     <View as="form" padding="small" display="block">
       {isExternalTool && (
         <View margin="0 0 medium 0">
-          <ExternalToolSelector selectedToolId={selectedToolId} onToolSelect={handleToolSelect} />
+          <ExternalToolSelector
+            selectedToolId={selectedToolId}
+            onToolSelect={handleToolSelect}
+            contentItems={contentItems}
+          />
         </View>
       )}
 
@@ -102,6 +112,7 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
         required
       />
       <TextInput
+        data-testid="external_item_page_name"
         renderLabel={I18n.t('Page Name')}
         placeholder={I18n.t('Enter page name')}
         value={pageName}

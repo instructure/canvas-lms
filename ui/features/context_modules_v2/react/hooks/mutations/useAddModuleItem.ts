@@ -123,7 +123,8 @@ export function useAddModuleItem({
       return
     }
 
-    const selectedItem = contentItems.find(item => item.id === inputValue) || null
+    const selectedItemId = itemType === 'external_tool' ? state.external.selectedToolId : inputValue
+    const selectedItem = contentItems.find(item => item.id === selectedItemId) || null
 
     const itemData = prepareModuleItemData(moduleId, {
       type: itemType,

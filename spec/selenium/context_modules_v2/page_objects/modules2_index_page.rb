@@ -330,6 +330,10 @@ module Modules2IndexPage
   def move_item_tray_selector
     "[data-testid='manage-module-content-tray']"
   end
+
+  def external_tool_page_name_input_selector
+    "[data-testid='external_item_page_name']"
+  end
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -778,5 +782,9 @@ module Modules2IndexPage
     wait = Selenium::WebDriver::Wait.new(timeout: 5)
 
     wait.until { !element_exists?(modules_publish_modal_selector) }
+  end
+
+  def external_tool_page_name_input
+    f(external_tool_page_name_input_selector)
   end
 end

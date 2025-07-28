@@ -2169,6 +2169,11 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     before: String
 
     """
+    Filter modules by various criteria
+    """
+    filter: ModuleFilterInput
+
+    """
     Returns the first _n_ elements from the list.
     """
     first: Int
@@ -4311,7 +4316,7 @@ type EntryParticipant {
   reportType: String
 }
 
-type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamped {
+type ExternalTool implements LegacyIDInterface & ModuleItemInterface & PlacementsInterface & Timestamped {
   """
   legacy canvas id
   """
@@ -4324,11 +4329,17 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   canUnpublish: Boolean
   createdAt: DateTime
   description: String
+  domain: String
   graded: Boolean
   isLockedByMasterCourse: Boolean!
   labelFor(placement: ExternalToolPlacement!): String
   modules: [Module!]
   name: String
+
+  """
+  Placements for the external tool
+  """
+  placements: Placements!
   pointsPossible: Float
   published: Boolean
   settings: ExternalToolSettings
@@ -4925,6 +4936,7 @@ type Group implements AssetString & LegacyIDInterface & Node & Timestamped {
   assetString: String
   canMessage: Boolean!
   createdAt: DateTime
+  groupCategory: GroupSet
   id: ID!
   member(userId: ID!): GroupMembership
   membersConnection(
@@ -5085,6 +5097,7 @@ type GroupSet implements LegacyIDInterface & Node {
   name: String
   nonCollaborative: Boolean
   selfSignup: SelfSignupPolicy!
+  singleTag: Boolean!
   sisId: String
 }
 
@@ -5876,6 +5889,31 @@ type ModuleCompletionRequirement {
 }
 
 """
+Filter options for module completion status
+"""
+enum ModuleCompletionStatus {
+  """
+  Modules marked as completed
+  """
+  COMPLETED
+
+  """
+  Modules not yet completed (includes locked, unlocked, started)
+  """
+  INCOMPLETE
+
+  """
+  Modules that are started but not completed
+  """
+  IN_PROGRESS
+
+  """
+  Modules that are unlocked but not started
+  """
+  NOT_STARTED
+}
+
+"""
 The connection type for Module.
 """
 type ModuleConnection {
@@ -5922,6 +5960,7 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   """
   canUnpublish: Boolean
   createdAt: DateTime
+  domain: String
   graded: Boolean
   isLockedByMasterCourse: Boolean!
   modules: [Module!]
@@ -5935,6 +5974,21 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   type: String
   updatedAt: DateTime
   url: String
+}
+
+"""
+Input type for filtering modules in a course
+"""
+input ModuleFilterInput {
+  """
+  Filter modules by completion status
+  """
+  completionStatus: ModuleCompletionStatus
+
+  """
+  Filter by specific user's progress (requires permission). Defaults to current user if not specified.
+  """
+  userId: ID
 }
 
 type ModuleItem implements LegacyIDInterface & Node & Timestamped {
@@ -6007,6 +6061,7 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): ModuleItemConnection
+  published: Boolean
   title: String
   updatedAt: DateTime
   url: URL
@@ -7263,6 +7318,63 @@ type PeerReviews {
   group assignment can be assigned to peer review their own group's work
   """
   intraReviews: Boolean
+}
+
+type Placement {
+  title: String!
+  url: String!
+}
+
+"""
+A placement for an external tool in Canvas
+"""
+type Placements {
+  """
+  Placement for assignment selection
+  """
+  assignmentSelection: Placement
+
+  """
+  Placement for course assignments menu
+  """
+  courseAssignmentsMenu: Placement
+
+  """
+  Placement for editor button
+  """
+  editorButton: Placement
+
+  """
+  Placement for link selection
+  """
+  linkSelection: Placement
+
+  """
+  Placement for module index menu modal
+  """
+  moduleIndexMenuModal: Placement
+
+  """
+  Placement for module menu modal
+  """
+  moduleMenuModal: Placement
+
+  """
+  Placement for resource selection
+  """
+  resourceSelection: Placement
+  title: String!
+  url: String!
+}
+
+"""
+Interface for placements
+"""
+interface PlacementsInterface {
+  """
+  Placements for the external tool
+  """
+  placements: Placements!
 }
 
 """

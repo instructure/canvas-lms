@@ -484,6 +484,63 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "add items to module" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @teacher = @course.teachers.first
+    end
+
+    before do
+      user_session(@teacher)
+      @empty_module = @course.context_modules.create!(name: "Multi File Module")
+    end
+
+    context "when adding an external tool" do
+      before do
+        @external_tool = @course.context_external_tools.create!(
+          context_id: @course.id,
+          context_type: "Course",
+          url: "https://example.com",
+          shared_secret: "fake",
+          consumer_key: "fake",
+          name: "Test External Tool",
+          description: "An external tool for testing",
+          settings: { "platform" => "canvas.instructure.com" },
+          workflow_state: "active"
+        )
+      end
+
+      it "allows adding an external tool to the module" do
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "External Tool")
+        wait_for_ajaximations
+
+        # Select external tool from the dropdown
+        click_INSTUI_Select_option(add_existing_item_select_selector, @external_tool.name)
+        wait_for_ajaximations
+
+        new_item_name = "External Tool Page Name"
+
+        replace_content(external_tool_page_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+
+        expect(module_item_title_links.last.text).to include(new_item_name)
+      end
+    end
+  end
+
   context "module header" do
     it "includes Complete All Items pill when Complete All requirements are present" do
       @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
