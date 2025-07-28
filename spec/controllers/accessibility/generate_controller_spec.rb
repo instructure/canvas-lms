@@ -99,6 +99,32 @@ RSpec.describe Accessibility::GenerateController do
       end
     end
 
+    context "when rate limit is exceeded" do
+      let(:params) do
+        {
+          course_id: course.id,
+          rule: "img-alt",
+          content_type: "WikiPage",
+          content_id: "123",
+          path: "img_path",
+          value: "test_value"
+        }
+      end
+
+      before do
+        # Override the previous mock to throw the rate limit exception
+        # The error requires a limit parameter
+        rate_limit_error = InstLLMHelper::RateLimitExceededError.new(limit: 10)
+        allow(InstLLMHelper).to receive(:with_rate_limit).and_raise(rate_limit_error)
+      end
+
+      it "returns a too many requests status with appropriate error message" do
+        post :create, params:, format: :json
+
+        expect(response).to have_http_status(:too_many_requests)
+      end
+    end
+
     context "rate limiting" do
       let(:params) do
         {

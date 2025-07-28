@@ -76,14 +76,20 @@ module Accessibility
         begin
           element = doc.at_xpath(path)
           if element
-            { json: { value: rule.generate_fix(element) }, status: :ok }
+            generated_value = rule.generate_fix(element)
+            if generated_value.nil?
+              { json: { error: I18n.t("Unsupported issue type") }, status: :bad_request }
+            else
+              { json: { value: generated_value }, status: :ok }
+            end
           else
-            { json: { error: "Element not found for path: #{path}" }, status: :bad_request }
+            Rails.logger.error("Element not found for path: #{path} (rule #{rule.id})")
+            { json: { error: "Invalid issue placement" }, status: :bad_request }
           end
         rescue => e
           Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
           Rails.logger.error e.backtrace.join("\n")
-          { json: { error: e.message }, status: :bad_request }
+          { json: { error: "Internal Error" }, status: :internal_server_error }
         end
       end
 

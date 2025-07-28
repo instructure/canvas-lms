@@ -33,6 +33,8 @@ module Accessibility
         response = Accessibility::Issue.new(context: @context).generate_fix(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
         render json: response[:json], status: response[:status]
       end
+    rescue InstLLMHelper::RateLimitExceededError
+      render json: { error: I18n.t("Endpoint rate limit exceeded.") }, status: :too_many_requests
     end
 
     private
