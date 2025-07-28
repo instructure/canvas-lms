@@ -52,14 +52,7 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_crm_integration
-      horizon_leader_dashboards
-      horizon_admin_dashboards
-      horizon_roles_and_permissions
-      horizon_agent
-      horizon_content_library
       horizon_program_management
-      horizon_skill_management
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end
