@@ -271,6 +271,7 @@ export interface ModuleItem {
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   newTab?: boolean
+  published?: boolean
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -315,12 +316,12 @@ export interface ExternalToolModalItem {
   description?: string
   domain?: string | null
   placements: {
-    assignment_selection?: ExternalToolPlacement
-    link_selection?: ExternalToolPlacement
-    module_group_menu?: ExternalToolPlacement
-    module_menu_modal?: ExternalToolPlacement
-    module_menu?: ExternalToolPlacement
-    module_index_menu_modal?: ExternalToolPlacement
+    assignmentSelection?: ExternalToolPlacement
+    linkSelection?: ExternalToolPlacement
+    moduleGroupMenu?: ExternalToolPlacement
+    moduleMenuModal?: ExternalToolPlacement
+    moduleMenu?: ExternalToolPlacement
+    moduleIndexMenuModal?: ExternalToolPlacement
     [key: string]: ExternalToolPlacement | undefined
   }
 }

@@ -69,6 +69,11 @@ module Types
     field :new_tab, Boolean, null: true
     delegate :new_tab, to: :object
 
+    field :published, Boolean, null: true
+    def published
+      object.published?
+    end
+
     field :title, String, null: true
     delegate :title, to: :object
 

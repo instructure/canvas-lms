@@ -32,8 +32,13 @@ import CreateLearningObjectForm from './CreateLearningObjectForm'
 import ExternalItemForm from './ExternalItemForm'
 import {Spinner} from '@instructure/ui-spinner'
 import {useAddModuleItem} from '../../hooks/mutations/useAddModuleItem'
-import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
+import {
+  useModuleItemContent,
+  ModuleItemContentType,
+  ContentItem,
+} from '../../hooks/queries/useModuleItemContent'
 import {useContextModule} from '../../hooks/useModuleContext'
+import {ExternalToolModalItem} from '../../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 type NewItem = {
@@ -91,8 +96,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   )
 
   useEffect(() => {
-    setInputValue(data?.items?.[0]?.id || '')
-  }, [data?.items])
+    if (itemType !== 'external_tool') {
+      setInputValue(data?.items?.[0]?.id || '')
+    }
+  }, [data?.items, itemType])
 
   const contentItems = useMemo(() => {
     if (itemType === 'context_module_sub_header') {
@@ -269,6 +276,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             externalUrlName={state.external.name}
             newTab={state.external.newTab}
             itemType={itemType}
+            contentItems={
+              contentItems.map((item: ContentItem) => ({
+                definition_id: item.id,
+                definition_type: 'external_tool',
+                name: item.name,
+                url: item.url,
+                domain: item.domain,
+                description: item.description,
+                placements: item.placements,
+              })) as ExternalToolModalItem[]
+            }
           />
         )}
         <IndentSelector

@@ -9,6 +9,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
             id
             url
             title
+            published
             indent
             newTab
             position
@@ -32,7 +33,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 lockAt(applyOverrides: false)
                 unlockAt(applyOverrides: false)
                 isNewQuiz
-                published
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
@@ -91,7 +91,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 lockAt
                 todoDate
                 discussionType
-                published
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
@@ -162,7 +161,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 size
                 thumbnailUrl
                 url
-                published
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
@@ -176,7 +174,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 _id
                 id
                 title
-                published
                 canUnpublish
                 type: __typename
                 isLockedByMasterCourse
@@ -189,7 +186,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 title
                 type: __typename
                 pointsPossible
-                published
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
@@ -218,7 +214,6 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 title
                 type: __typename
                 url
-                published
                 canUnpublish
                 newTab
                 graded
@@ -227,20 +222,17 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 title
                 type: __typename
                 url
-                published
                 canUnpublish
                 graded
               }
               ... on ExternalTool {
                 type: __typename
                 url
-                published
                 canUnpublish
                 graded
               }
               ... on SubHeader {
                 title
-                published
                 type: __typename
               }
             }

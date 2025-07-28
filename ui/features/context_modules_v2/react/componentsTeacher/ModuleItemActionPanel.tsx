@@ -196,8 +196,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [itemId, setIsMenuOpen])
 
   const publishIconOnClickRef = useCallback(() => {
-    handlePublishToggle(moduleId, itemId, title, content, canBeUnpublished, queryClient, courseId)
-  }, [moduleId, itemId, content, canBeUnpublished, courseId])
+    handlePublishToggle(moduleId, itemId, title, canBeUnpublished, queryClient, courseId, published)
+  }, [moduleId, itemId, content, canBeUnpublished, courseId, published])
 
   const renderFilePublishButton = () => {
     const file = new ModuleFile({
@@ -210,7 +210,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       display_name: title,
       thumbnail_url: content?.thumbnailUrl,
       module_item_id: parseInt(itemId),
-      published: content?.published,
+      published: published,
     })
 
     const props = {

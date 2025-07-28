@@ -9,6 +9,7 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
             id
             url
             title
+            published
             newTab
 
             indent
@@ -21,7 +22,6 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 type: __typename
                 pointsPossible
                 isNewQuiz
-                published
                 submissionsConnection(filter: { includeUnsubmitted: true }) {
                   nodes {
                     _id
@@ -39,7 +39,6 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 todoDate
                 discussionType
                 graded
-                published
                 replyToEntryRequiredCount
                 submissionsConnection(filter: { includeUnsubmitted: true }) {
                   nodes {
@@ -63,13 +62,11 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 size
                 thumbnailUrl
                 url
-                published
               }
               ... on Page {
                 _id
                 id
                 title
-                published
                 type: __typename
               }
               ... on Quiz {
@@ -78,7 +75,6 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 title
                 type: __typename
                 pointsPossible
-                published
                 submissionsConnection(filter: { includeUnsubmitted: true }) {
                   nodes {
                     _id
@@ -91,23 +87,19 @@ query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 title
                 type: __typename
                 url
-                published
                 newTab
               }
               ... on ModuleExternalTool {
                 title
                 type: __typename
                 url
-                published
               }
               ... on ExternalTool {
                 type: __typename
                 url
-                published
               }
               ... on SubHeader {
                 title
-                published
                 type: __typename
               }
             }

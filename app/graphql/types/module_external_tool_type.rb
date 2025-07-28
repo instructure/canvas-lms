@@ -33,6 +33,8 @@ module Types
 
     field :url, String, null: true
 
+    field :domain, String, null: true
+
     def modules
       load_association(:context_module).then { |mod| [mod] }
     end

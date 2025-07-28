@@ -20,39 +20,48 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ExternalItemForm from '../ExternalItemForm'
-import {ExternalTool} from '../ExternalToolSelector'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../../hooks/useModuleContext'
+import {ContentItem} from '../../../hooks/queries/useModuleItemContent'
+import {ExternalToolModalItem} from '../../../utils/types'
 
-const mockTool: ExternalTool = {
-  definition_type: 'ContextExternalTool',
-  definition_id: '1',
-  name: 'Google Docs',
-  description: 'Create and edit documents online',
-  domain: 'docs.google.com',
-  url: 'https://docs.google.com/launch',
-  placements: {
-    assignment_selection: {
-      url: 'https://docs.google.com/assignment',
-      title: 'Google Docs Assignment',
-    },
-    link_selection: {
-      url: 'https://docs.google.com/link',
-      title: 'Google Docs Link',
+const mockContentItems: ExternalToolModalItem[] = [
+  {
+    definition_id: '1',
+    name: 'Google Docs',
+    description: 'Create and edit documents online',
+    domain: 'docs.google.com',
+    url: 'https://docs.google.com/launch',
+    definition_type: 'external_tool',
+    placements: {},
+  },
+  {
+    definition_id: '2',
+    name: 'Youtube',
+    description: 'Watch and share videos',
+    domain: 'youtube.com',
+    definition_type: 'external_tool',
+    url: 'https://youtube.com/video',
+    placements: {
+      assignmentSelection: {
+        url: 'https://youtube.com/video/assignment_selection',
+        title: 'Youtube Assignment',
+      },
     },
   },
-}
+]
 
 const buildProps = (overrides = {}) => ({
   onChange: jest.fn(),
   itemType: 'external_url' as const,
+  contentItems: mockContentItems,
   ...overrides,
 })
 
-const setUp = (props = {}, externalTools: ExternalTool[] = [mockTool]) => {
+const setUp = (props = {}) => {
   const finalProps = buildProps(props)
   return {
     ...render(
-      <ContextModuleProvider {...contextModuleDefaultProps} moduleMenuModalTools={externalTools}>
+      <ContextModuleProvider {...contextModuleDefaultProps}>
         <ExternalItemForm {...finalProps} />
       </ContextModuleProvider>,
     ),
@@ -98,22 +107,44 @@ describe('ExternalItemForm', () => {
       expect(container).toBeInTheDocument()
     })
 
-    it('calls onChange with selected tool data', async () => {
-      const user = userEvent.setup()
-      const {props} = setUp({itemType: 'external_tool'})
+    describe('tool selection', () => {
+      const prepareExternalToolSelector = async () => {
+        const user = userEvent.setup()
+        const {props} = setUp({itemType: 'external_tool'})
+        const selectInput = screen.getByRole('combobox', {name: /select external tool/i})
+        await user.click(selectInput)
+        return {user, props, selectInput}
+      }
 
-      const selectInput = screen.getByRole('combobox', {name: /select external tool/i})
-      await user.click(selectInput)
+      it('shows all available tools', async () => {
+        await prepareExternalToolSelector()
 
-      await waitFor(() => {
-        expect(screen.getByText('Google Docs')).toBeInTheDocument()
+        await waitFor(() => {
+          expect(screen.getByText('Google Docs')).toBeInTheDocument()
+          expect(screen.getByText('Youtube')).toBeInTheDocument()
+        })
       })
 
-      await user.click(screen.getByText('Google Docs'))
+      it('calls onChange with selected tool data', async () => {
+        const {user, props} = await prepareExternalToolSelector()
 
-      expect(props.onChange).toHaveBeenCalledWith('url', 'https://docs.google.com/assignment')
-      expect(props.onChange).toHaveBeenCalledWith('name', 'Google Docs Assignment')
-      expect(props.onChange).toHaveBeenCalledWith('selectedToolId', '1')
+        await user.click(screen.getByText('Google Docs'))
+
+        expect(props.onChange).toHaveBeenCalledWith('url', 'https://docs.google.com/launch')
+        expect(props.onChange).toHaveBeenCalledWith('name', 'Google Docs')
+        expect(props.onChange).toHaveBeenCalledWith('selectedToolId', '1')
+      })
+
+      it('Assignment selection placement url and title are shown', async () => {
+        const {user} = await prepareExternalToolSelector()
+
+        await user.click(screen.getByText('Youtube'))
+
+        expect(screen.getByLabelText('URL')).toHaveValue(
+          'https://youtube.com/video/assignment_selection',
+        )
+        expect(screen.getByLabelText('Page Name')).toHaveValue('Youtube Assignment')
+      })
     })
   })
 

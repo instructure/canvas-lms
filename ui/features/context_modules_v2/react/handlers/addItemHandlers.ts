@@ -87,8 +87,12 @@ export const prepareModuleItemData = (
     result['item[id]'] = 'new'
     result['item[title]'] = textHeaderValue
     result['title'] = textHeaderValue
-  } else if (type === 'external_url' && externalUrlName && externalUrlValue) {
-    result['item[id]'] = 'new'
+  } else if (
+    (type === 'external_url' || type === 'external_tool') &&
+    externalUrlName &&
+    externalUrlValue
+  ) {
+    result['item[id]'] = type === 'external_tool' && selectedItem ? selectedItem.id : 'new'
     result['item[title]'] = externalUrlName
     result['title'] = externalUrlName
     result['item[url]'] = externalUrlValue
