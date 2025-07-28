@@ -61,7 +61,7 @@ module Lti
     RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
 
     # These placements don't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
-    STANDARD_PLACEMENTS = %i[ActivityAssetProcessor].freeze
+    STANDARD_PLACEMENTS = %i[ActivityAssetProcessor ActivityAssetProcessorContribution].freeze
 
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
@@ -108,6 +108,7 @@ module Lti
       LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE => %i[
         assignment_selection
         ActivityAssetProcessor
+        ActivityAssetProcessorContribution
         collaboration
         conference_selection
         course_assignments_menu
@@ -146,6 +147,7 @@ module Lti
       PLACEMENTS.dup.tap do |p|
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
         p.delete(:ActivityAssetProcessor) unless root_account&.feature_enabled?(:lti_asset_processor)
+        p.delete(:ActivityAssetProcessorContribution) unless root_account&.feature_enabled?(:lti_asset_processor_discussions)
       end
     end
 

@@ -130,6 +130,7 @@ RSpec.describe SecurityController, type: :request do
          "placements" =>
          ["https://canvas.instructure.com/lti/assignment_selection",
           "ActivityAssetProcessor",
+          "ActivityAssetProcessorContribution",
           "https://canvas.instructure.com/lti/collaboration",
           "https://canvas.instructure.com/lti/conference_selection",
           "https://canvas.instructure.com/lti/course_assignments_menu",
@@ -208,6 +209,25 @@ RSpec.describe SecurityController, type: :request do
       it "contains the correct information" do
         messages.each do |message|
           message["placements"] -= ["ActivityAssetProcessor"] if message["placements"]
+        end
+
+        get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+        expect(response).to have_http_status :ok
+        parsed_body = response.parsed_body
+        lti_platform_configuration = parsed_body["https://purl.imsglobal.org/spec/lti-platform-configuration"]
+        expect(lti_platform_configuration["messages_supported"]).to eq messages
+      end
+    end
+
+    context "when the lti_asset_processor_discussions feature flag is off" do
+      before do
+        Account.default.disable_feature!(:lti_asset_processor_discussions)
+      end
+
+      it "contains the correct information" do
+        messages.each do |message|
+          message["placements"] -= ["ActivityAssetProcessorContribution"] if message["placements"]
         end
 
         get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"

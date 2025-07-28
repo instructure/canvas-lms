@@ -52,6 +52,9 @@ export default class Placements extends React.Component {
     if (p === LtiPlacements.ActivityAssetProcessor) {
       return 'Assignment Document Processor'
     }
+    if (p === LtiPlacements.ActivityAssetProcessorContribution) {
+      return 'Discussions Document Processor'
+    }
     return p
       .split('_')
       .map(n => capitalizeFirstLetter(n))

@@ -45,8 +45,11 @@ export const PlacementsConfirmationWrapper = ({
       <PlacementsConfirmation
         appName={internalConfig.title}
         availablePlacements={availablePlacements.filter(p => {
-          if (!window.ENV.FEATURES.lti_asset_processor) {
-            return p !== 'ActivityAssetProcessor'
+          if ('ActivityAssetProcessor' === p) {
+            return window.ENV.FEATURES.lti_asset_processor
+          }
+          if ('ActivityAssetProcessorContribution' === p) {
+            return window.ENV.FEATURES.lti_asset_processor_discussions
           }
           return true
         })}
