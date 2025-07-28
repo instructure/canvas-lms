@@ -22,8 +22,6 @@ import {
   ZLtiRegistrationWithLegacyConfiguration,
   type LtiRegistrationWithConfiguration,
   type LtiRegistrationWithLegacyConfiguration,
-  type LtiRegistration,
-  type LtiRegistrationWithAllInformation,
   ZLtiRegistrationWithAllInformation,
 } from '../model/LtiRegistration'
 import {type ApiResult, parseFetchResult, mapApiResult} from '../../common/lib/apiResult/ApiResult'
@@ -110,24 +108,6 @@ export const refreshRegistrations = (accountId?: AccountId) => {
   }
   queryClient.invalidateQueries({queryKey: [accountId, 'lti_registrations'], exact: false})
 }
-
-export type FetchRegistrationForId = (options: {
-  ltiRegistrationId: LtiRegistrationId
-  accountId: AccountId
-}) => Promise<ApiResult<LtiRegistration>>
-
-export const fetchRegistrationForId: FetchRegistrationForId = options =>
-  parseFetchResult(ZLtiRegistration)(
-    fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}`,
-      defaultFetchOptions(),
-    ),
-  )
-
-export type FetchRegistrationWithAllInfoForId = (options: {
-  ltiRegistrationId: LtiRegistrationId
-  accountId: AccountId
-}) => Promise<ApiResult<LtiRegistrationWithAllInformation>>
 
 const createRegistrationWithAllInfoQueryKey = (
   ltiRegistrationId: LtiRegistrationId,

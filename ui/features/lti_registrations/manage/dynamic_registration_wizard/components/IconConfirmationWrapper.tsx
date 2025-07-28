@@ -22,18 +22,13 @@ import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {DynamicRegistrationActions} from '../DynamicRegistrationWizardState'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
 import type {LtiRegistrationWithConfiguration} from '../../model/LtiRegistration'
-import {
-  type LtiPlacement,
-  LtiPlacementsWithIcons,
-  type LtiPlacementWithIcon,
-} from '../../model/LtiPlacement'
+import {LtiPlacementsWithIcons, type LtiPlacementWithIcon} from '../../model/LtiPlacement'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {Footer} from '../../registration_wizard_forms/Footer'
 import {
   getInputIdForField,
   validateIconUris,
 } from '../../registration_overlay/validateLti1p3RegistrationOverlayState'
-import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import {Lti1p3RegistrationOverlayState} from '../../registration_overlay/Lti1p3RegistrationOverlayState'
 export type IconConfirmationProps = {
   overlayStore: DynamicRegistrationOverlayStore

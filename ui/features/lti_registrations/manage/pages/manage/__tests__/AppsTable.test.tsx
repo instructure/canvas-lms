@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
-import {AppsTableInner, type AppsTableInnerProps, type AppsTableProps} from '../AppsTable'
+import {AppsTableInner, type AppsTableInnerProps} from '../AppsTable'
 import {mockPageOfRegistrations, mockRegistration, mswHandlers} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
 import {ZAccountId} from '../../../model/AccountId'

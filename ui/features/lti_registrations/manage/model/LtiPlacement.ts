@@ -17,7 +17,6 @@
  */
 import * as z from 'zod'
 import {LtiDeepLinkingRequest, LtiResourceLinkRequest} from './LtiMessageType'
-import {DeveloperKeyId} from './developer_key/DeveloperKeyId'
 
 // TODO: this list is duplicated in ui/features/external_apps/react/components/ExternalToolPlacementList.jsx
 // We should consolidate some of the lti "models" into a shared package that both features depend on

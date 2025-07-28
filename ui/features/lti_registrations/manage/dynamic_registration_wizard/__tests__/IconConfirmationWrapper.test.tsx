@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {mockConfigWithPlacements, mockRegistration} from './helpers'
 import {createDynamicRegistrationOverlayStore} from '../DynamicRegistrationOverlayState'
 import {IconConfirmationWrapper} from '../components/IconConfirmationWrapper'
