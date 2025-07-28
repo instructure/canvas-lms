@@ -103,6 +103,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
     json.block_editor =
       ENV.EDITOR_FEATURE === 'block_editor' || ENV.EDITOR_FEATURE === 'block_content_editor'
+    json.page_is_edited = this.model.get('editor') !== null
     json.page_is_block =
       this.model.get('editor') === 'block_editor' ||
       this.model.get('editor') === 'block_content_editor'
