@@ -46,10 +46,17 @@ export enum SecondaryInfoDisplay {
   LOGIN_ID = 'login_id',
 }
 
+export enum DisplayFilter {
+  SHOW_STUDENTS_WITH_NO_RESULTS = 'show_students_with_no_results',
+  SHOW_STUDENT_AVATARS = 'show_student_avatars',
+}
+
 export interface GradebookSettings {
   secondaryInfoDisplay: SecondaryInfoDisplay
+  displayFilters: DisplayFilter[]
 }
 
 export const DEFAULT_GRADEBOOK_SETTINGS: GradebookSettings = {
   secondaryInfoDisplay: SecondaryInfoDisplay.NONE,
+  displayFilters: [DisplayFilter.SHOW_STUDENT_AVATARS, DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
 }

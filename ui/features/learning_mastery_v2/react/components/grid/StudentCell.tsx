@@ -29,6 +29,7 @@ export interface StudentCellProps {
   courseId: string
   student: Student
   secondaryInfoDisplay?: SecondaryInfoDisplay
+  showStudentAvatar?: boolean
 }
 
 const getSecondaryInfo = (student: Student, secondaryInfoDisplay?: SecondaryInfoDisplay) => {
@@ -50,25 +51,28 @@ export const StudentCell: React.FC<StudentCellProps> = ({
   courseId,
   student,
   secondaryInfoDisplay,
+  showStudentAvatar = true,
 }) => {
   const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
   const shouldShowStudentStatus = student.status === 'inactive' || student.status === 'concluded'
-  const displayNameWidth = shouldShowStudentStatus ? '50%' : '75%'
+  const displayNameWidth = shouldShowStudentStatus ? '50%' : showStudentAvatar ? '75%' : '100%'
   const secondaryInfo = getSecondaryInfo(student, secondaryInfoDisplay)
 
   return (
     <Flex height="100%" alignItems="center" justifyItems="start" data-testid="student-cell">
-      <Flex.Item as="div" size="25%" textAlign="center">
-        <Avatar
-          alt={student.display_name}
-          as="div"
-          size="x-small"
-          name={student.display_name}
-          src={student.avatar_url}
-          data-testid="student-avatar"
-        />
-      </Flex.Item>
-      <Flex.Item as="div" size={displayNameWidth}>
+      {showStudentAvatar && (
+        <Flex.Item as="div" size="25%" textAlign="center">
+          <Avatar
+            alt={student.display_name}
+            as="div"
+            size="x-small"
+            name={student.display_name}
+            src={student.avatar_url}
+            data-testid="student-avatar"
+          />
+        </Flex.Item>
+      )}
+      <Flex.Item as="div" size={displayNameWidth} padding="none x-small">
         <Flex direction="column">
           <Link isWithinText={false} href={studentGradesUrl} data-testid="student-cell-link">
             <TruncateText>{student.display_name}</TruncateText>

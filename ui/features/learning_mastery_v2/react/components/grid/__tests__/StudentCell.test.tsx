@@ -87,6 +87,11 @@ describe('StudentCell', () => {
     })
   })
 
+  it('does not render student avatar when showStudentAvatar is false', () => {
+    const {queryByTestId} = render(<StudentCell {...defaultProps({showStudentAvatar: false})} />)
+    expect(queryByTestId('student-avatar')).not.toBeInTheDocument()
+  })
+
   describe('secondary info display', () => {
     it('does not render secondary info when not specified', () => {
       const {queryByTestId} = render(<StudentCell {...defaultProps()} />)

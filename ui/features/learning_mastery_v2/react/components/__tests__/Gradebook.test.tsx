@@ -37,8 +37,6 @@ describe('Gradebook', () => {
         },
       ],
       courseId: '100',
-      gradebookFilters: [],
-      gradebookFilterHandler: jest.fn(),
       setCurrentPage: jest.fn(),
       sorting: {
         sortOrder: SortOrder.ASC,

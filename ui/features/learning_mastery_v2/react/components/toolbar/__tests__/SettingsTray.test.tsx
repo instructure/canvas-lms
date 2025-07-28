@@ -17,7 +17,11 @@
  */
 import {render} from '@testing-library/react'
 import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
-import {DEFAULT_GRADEBOOK_SETTINGS, SecondaryInfoDisplay} from '../../../utils/constants'
+import {
+  DEFAULT_GRADEBOOK_SETTINGS,
+  DisplayFilter,
+  SecondaryInfoDisplay,
+} from '../../../utils/constants'
 
 const makeProps = (props = {}): SettingsTrayProps => ({
   open: true,
@@ -79,6 +83,29 @@ describe('SettingsTray', () => {
       expect(props.setGradebookSettings).toHaveBeenCalledWith({
         ...props.gradebookSettings,
         secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID,
+      })
+    })
+  })
+
+  describe('DisplayFilterSelector', () => {
+    it('renders DisplayFilterSelector', () => {
+      const {getByText} = render(<SettingsTray {...makeProps({open: true})} />)
+      expect(getByText('Display')).toBeInTheDocument()
+    })
+
+    it('updates display filters on change', () => {
+      const props = makeProps({open: true})
+      const {getByLabelText, getByText} = render(
+        <SettingsTray
+          {...props}
+          gradebookSettings={{...props.gradebookSettings, displayFilters: []}}
+        />,
+      )
+      getByLabelText('Students with no results').click()
+      getByText('Apply').click()
+      expect(props.setGradebookSettings).toHaveBeenCalledWith({
+        ...props.gradebookSettings,
+        displayFilters: [DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS],
       })
     })
   })

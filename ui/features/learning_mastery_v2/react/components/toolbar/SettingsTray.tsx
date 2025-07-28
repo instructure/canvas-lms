@@ -24,6 +24,7 @@ import {Tray} from '@instructure/ui-tray'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {GradebookSettings} from '../../utils/constants'
 import {SecondaryInfoSelector} from './SecondaryInfoSelector'
+import {DisplayFilterSelector} from './DisplayFilterSelector'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -43,15 +44,18 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
   const [secondaryInfoDisplay, setSecondaryInfoDisplay] = useState(
     gradebookSettings.secondaryInfoDisplay,
   )
+  const [displayFilters, setDisplayFilters] = useState(gradebookSettings.displayFilters)
 
   const resetForm = () => {
     setSecondaryInfoDisplay(gradebookSettings.secondaryInfoDisplay)
+    setDisplayFilters(gradebookSettings.displayFilters)
   }
 
   const saveSettings = () => {
     setGradebookSettings({
       ...gradebookSettings,
       secondaryInfoDisplay,
+      displayFilters,
     })
   }
 
@@ -82,6 +86,10 @@ export const SettingsTray: React.FC<SettingsTrayProps> = ({
         <SecondaryInfoSelector
           value={secondaryInfoDisplay}
           onChange={info => setSecondaryInfoDisplay(info)}
+        />
+        <DisplayFilterSelector
+          values={displayFilters}
+          onChange={filters => setDisplayFilters(filters)}
         />
         <Flex gap="small" alignItems="stretch" direction="column">
           <Button
