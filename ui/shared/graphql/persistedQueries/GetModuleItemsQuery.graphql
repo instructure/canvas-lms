@@ -57,6 +57,18 @@ query GetModuleItemsQuery($moduleId: ID!) {
                 }
               }
             }
+            assignedToDates {
+              id
+              dueAt
+              unlockAt
+              lockAt
+              title
+              base
+              set {
+                id
+                type
+              }
+            }
           }
           ... on Discussion {
             _id
@@ -75,6 +87,49 @@ query GetModuleItemsQuery($moduleId: ID!) {
               dueAt(applyOverrides: false)
               name
               tag
+            }
+            assignment {
+              _id
+              dueAt(applyOverrides: false)
+              assignmentOverrides(first: 100) {
+                edges {
+                  cursor
+                  node {
+                    _id
+                    dueAt
+                    lockAt
+                    unlockAt
+                    set {
+                      ... on AdhocStudents {
+                        students {
+                          id
+                        }
+                      }
+                      ... on Course {
+                        courseId: id
+                      }
+                      ... on Group {
+                        groupId: id
+                      }
+                      ... on Section {
+                        sectionId: id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            assignedToDates {
+              id
+              dueAt
+              unlockAt
+              lockAt
+              title
+              base
+              set {
+                id
+                type
+              }
             }
           }
           ... on File {
@@ -115,6 +170,18 @@ query GetModuleItemsQuery($moduleId: ID!) {
             isLockedByMasterCourse
             canDuplicate
             graded
+            assignedToDates {
+              id
+              dueAt
+              unlockAt
+              lockAt
+              title
+              base
+              set {
+                id
+                type
+              }
+            }
           }
           ... on ExternalUrl {
             type: __typename

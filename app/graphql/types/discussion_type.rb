@@ -52,6 +52,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssignedDatesInterface
 
     include Rails.application.routes.url_helpers
     include Canvas::LockExplanation

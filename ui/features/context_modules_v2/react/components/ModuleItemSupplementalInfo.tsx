@@ -38,13 +38,24 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   content,
   completionRequirement,
 }) => {
-  const hasDueOrLockDate = useMemo(
-    () =>
-      content?.dueAt ||
-      content?.lockAt ||
-      content?.assignmentOverrides?.edges.some(({node}) => node.dueAt),
-    [content?.dueAt, content?.lockAt, content?.assignmentOverrides?.edges],
-  )
+  const hasDueOrLockDate = useMemo(() => {
+    // Check if standardized dates are available and feature flag is enabled
+    if (ENV.FEATURES?.standardize_assignment_date_formatting && content?.assignedToDates) {
+      return content.assignedToDates.length > 0
+    }
+
+    const assignmentOverrides =
+      content?.assignmentOverrides || content?.assignment?.assignmentOverrides
+    return (
+      content?.dueAt || content?.lockAt || assignmentOverrides?.edges.some(({node}) => node.dueAt)
+    )
+  }, [
+    content?.dueAt,
+    content?.lockAt,
+    content?.assignmentOverrides,
+    content?.assignment?.assignmentOverrides,
+    content?.assignedToDates,
+  ])
 
   const hasPointsPossible = useMemo(
     () => content?.pointsPossible !== undefined && content?.pointsPossible !== null,
@@ -107,8 +118,9 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   if (
     !content ||
     (!hasDueOrLockDate && !hasPointsPossible && !hasCompletionRequirement && !hasCheckpoints)
-  )
+  ) {
     return null
+  }
 
   const renderCompletionRequirement = () => {
     if (!completionRequirement) return null

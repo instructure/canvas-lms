@@ -27,6 +27,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssignedDatesInterface
 
     global_id_field :id
 

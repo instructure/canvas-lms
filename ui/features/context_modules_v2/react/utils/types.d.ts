@@ -29,6 +29,19 @@ export interface Checkpoint {
   tag?: string
 }
 
+export interface StandardizedDateHash {
+  id?: string
+  dueAt?: string
+  unlockAt?: string
+  lockAt?: string
+  title?: string
+  base?: boolean
+  set?: {
+    id?: string
+    type?: string
+  }
+}
+
 export type ModuleItemContent = {
   id?: string
   _id?: string
@@ -76,6 +89,12 @@ export type ModuleItemContent = {
   locked?: boolean
   graded?: boolean
   assignmentOverrides?: AssignmentOverrideGraphQLResult
+  assignedToDates?: StandardizedDateHash[]
+  assignment?: {
+    _id: string
+    dueAt?: string
+    assignmentOverrides?: AssignmentOverrideGraphQLResult
+  }
   isNewQuiz?: boolean
 } | null
 

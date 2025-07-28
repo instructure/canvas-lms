@@ -302,11 +302,21 @@ interface AssetString {
   assetString: String
 }
 
+"""
+Contains standardized date hash information for objects with date overrides
+"""
+interface AssignedDates {
+  """
+  Standardized date hash visible to current user (when feature flag enabled)
+  """
+  assignedToDates: [DateHash!]
+}
+
 input AssignedStudentsFilter {
   searchTerm: String
 }
 
-type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
+type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
@@ -349,6 +359,11 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
     """
     last: Int
   ): UserConnection
+
+  """
+  Standardized date hash visible to current user (when feature flag enabled)
+  """
+  assignedToDates: [DateHash!]
   assignmentGroup: AssignmentGroup
   assignmentGroupId: ID
   assignmentOverrides(
@@ -394,6 +409,10 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
     last: Int
     orderBy: AssignmentTargetSortOrder
   ): AssignmentOverrideConnection
+
+  """
+  Returns empty array if visible to everyone
+  """
   assignmentVisibility: [ID!]
 
   """
@@ -3259,6 +3278,27 @@ input DashboardObserveeFilter {
 }
 
 """
+Standardized date hash from backend assigned_to_dates field
+"""
+type DateHash {
+  base: Boolean
+  dueAt: DateTime
+  id: ID
+  lockAt: DateTime
+  set: DateHashSet
+  title: String
+  unlockAt: DateTime
+}
+
+"""
+Set information for a date hash entry
+"""
+type DateHashSet {
+  id: ID
+  type: String
+}
+
+"""
 an ISO8601 formatted time string
 """
 scalar DateTime
@@ -3481,7 +3521,7 @@ type DeleteUserInboxLabelPayload {
   inboxLabels: [String!]
 }
 
-type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
+type Discussion implements AssignedDates & LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
@@ -3489,6 +3529,11 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   allowRating: Boolean
   anonymousAuthor: AnonymousUser
   anonymousState: DiscussionTopicAnonymousStateType
+
+  """
+  Standardized date hash visible to current user (when feature flag enabled)
+  """
+  assignedToDates: [DateHash!]
   assignment: Assignment
   attachment: File
   author(
@@ -7643,12 +7688,17 @@ type Query {
   ): Term
 }
 
-type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
+type Quiz implements AssignedDates & LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
   _id: ID!
   anonymousSubmissions: Boolean!
+
+  """
+  Standardized date hash visible to current user (when feature flag enabled)
+  """
+  assignedToDates: [DateHash!]
   canDuplicate: Boolean
 
   """
