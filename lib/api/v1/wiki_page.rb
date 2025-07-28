@@ -43,7 +43,12 @@ module Api::V1::WikiPage
     hash["publish_at"] = wiki_page.publish_at
 
     if @context.account.feature_enabled?(:block_content_editor)
-      hash["editor"] = wiki_page.block_editor ? "block_content_editor" : "rce"
+      is_unedited = wiki_page.block_editor.nil? && ((include_body && wiki_page.body.nil?) || (wiki_page.has_attribute?("is_body_null") && wiki_page.is_body_null))
+      hash["editor"] = if is_unedited
+                         nil
+                       else
+                         wiki_page.block_editor ? "block_content_editor" : "rce"
+                       end
     elsif @context.account.feature_enabled?(:block_editor)
       hash["editor"] = wiki_page.block_editor ? "block_editor" : "rce"
     end
