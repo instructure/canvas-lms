@@ -173,7 +173,6 @@ const setupObserverTest = (
 describe('ModulePageActionHeaderStudent', () => {
   beforeEach(() => {
     queryClient.clear()
-    // @ts-expect-error
     window.ENV.CONTEXT_MODULES_HEADER_PROPS = contextModuleHeaderDefaultProps
   })
 
