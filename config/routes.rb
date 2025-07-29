@@ -1151,6 +1151,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/courses", action: :create
       get "courses/:course_id/students", action: :students
       get "courses/:course_id/settings", action: :api_settings, as: "course_settings"
+      get "courses/:course_id/roles", action: :course_roles, as: "course_roles"
       put "courses/:course_id/settings", action: :update_settings
       get "courses/:course_id/recent_students", action: :recent_students, as: "course_recent_students"
       get "courses/:course_id/users", action: :users, as: "course_users"

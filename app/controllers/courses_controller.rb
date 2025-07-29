@@ -116,7 +116,7 @@
 #           "type": "string"
 #         },
 #         "workflow_state": {
-#           "description": "the current state of the course, also known as ‘status’.  The value will be one of the following values: 'unpublished', 'available', 'completed', or 'deleted'.  NOTE: When fetching a singular course that has a 'deleted' workflow state value, an error will be returned with a message of 'The specified resource does not exist.'",
+#           "description": "the current state of the course, also known as 'status'.  The value will be one of the following values: 'unpublished', 'available', 'completed', or 'deleted'.  NOTE: When fetching a singular course that has a 'deleted' workflow state value, an error will be returned with a message of 'The specified resource does not exist.'",
 #           "example": "available",
 #           "type": "string",
 #           "allowableValues": {
@@ -3064,7 +3064,7 @@ class CoursesController < ApplicationController
   #   Use with caution as this setting will override any assignment level post policy.
   #
   # @argument override_sis_stickiness [boolean]
-  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   Default is true. If false, any fields containing "sticky" changes will not be updated.
   #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @example_request
@@ -4195,6 +4195,18 @@ class CoursesController < ApplicationController
     end
   end
   helper_method :visible_self_enrollment_option
+
+  # @API Get course roles
+  # Returns the available roles for the course including custom roles and enrollment counts
+  #
+  # @returns Array of roles with counts and permissions
+  def course_roles
+    get_context
+    if authorized_action(@context, @current_user, :read_as_admin)
+      all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
+      render json: all_roles
+    end
+  end
 
   private
 
