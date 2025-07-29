@@ -22,23 +22,6 @@ import ReactDOM from 'react-dom'
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
 import ready from '@instructure/ready'
-
-import {updateSpeedGraderSettings} from './mutations/updateSpeedGraderSettingsMutation'
-import {updateSubmissionGrade} from './mutations/updateSubmissionGradeMutation'
-import {createSubmissionComment} from './mutations/createSubmissionCommentMutation'
-import {hideAssignmentGradesForSections} from './mutations/hideAssignmentGradesForSectionsMutation'
-import {postDraftSubmissionComment} from './mutations/postDraftSubmissionCommentMutation'
-import {updateSubmissionGradeStatus} from './mutations/updateSubmissionGradeStatusMutation'
-import {deleteSubmissionComment} from './mutations/deleteSubmissionCommentMutation'
-import {postAssignmentGradesForSections} from './mutations/postAssignmentGradesForSectionsMutation'
-import {createCommentBankItem} from './mutations/comment_bank/createCommentBankItemMutation'
-import {deleteCommentBankItem} from './mutations/comment_bank/deleteCommentBankItemMutation'
-import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankItemMutation'
-import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
-import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
-import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
-import {reassignAssignment} from './mutations/reassignAssignmentMutation'
-import {deleteAttachment} from './mutations/deleteAttachmentMutation'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -47,7 +30,6 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
 import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
-import SGUploader from './sg_uploader'
 
 const I18n = createI18nScope('speed_grader')
 
@@ -67,31 +49,8 @@ ready(() => {
       'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
     }
 
-    const sgUploader = window.INST.kalturaSettings
-      ? new SGUploader('any', {defaultTitle: 'Upload Media'})
-      : null
-
     return {
       executeQuery,
-      mutationFns: {
-        updateSubmissionGrade,
-        createSubmissionComment,
-        deleteSubmissionComment,
-        deleteAttachment,
-        hideAssignmentGradesForSections,
-        postAssignmentGradesForSections,
-        postDraftSubmissionComment,
-        updateSubmissionGradeStatus,
-        updateSubmissionSecondsLate,
-        createCommentBankItem,
-        deleteCommentBankItem,
-        updateCommentBankItem,
-        updateCommentSuggestionsEnabled,
-        updateSpeedGraderSettings,
-        postSubmissionCommentMedia: sgUploader?.doUploadByFile,
-        saveRubricAssessment,
-        reassignAssignment,
-      },
       platform: 'canvas',
       postMessageAliases,
       context: {
