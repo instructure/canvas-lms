@@ -25,15 +25,21 @@ import {
 import {useShouldShowAssetProcessors} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('discussion_create')
 
+type AssetProcessorsForDiscussionProps = Omit<AssetProcessorsProps, 'type'>
+
 const queryClient = new QueryClient()
 
-function AssetProcessorsWithoutQueryClient(props: AssetProcessorsProps) {
+function AssetProcessorsWithoutQueryClient(props: AssetProcessorsForDiscussionProps) {
   // useShouldShowAssetProcessors uses tanstack query to fetch tools,
   // so this component needs to be wrapped in a QueryClientProvider
-  const shouldShow = useShouldShowAssetProcessors(props.courseId)
+  const shouldShow = useShouldShowAssetProcessors(
+    props.courseId,
+    'ActivityAssetProcessorContribution',
+  )
 
   if (!shouldShow) {
     return null
@@ -51,13 +57,13 @@ function AssetProcessorsWithoutQueryClient(props: AssetProcessorsProps) {
         borderColor="primary"
         borderRadius="none medium medium none"
       >
-        <AssetProcessors {...props} />
+        <AssetProcessors {...props} type="ActivityAssetProcessorContribution" />
       </View>
     </View>
   )
 }
 
-export function AssetProcessorsForDiscussion(props: AssetProcessorsProps) {
+export function AssetProcessorsForDiscussion(props: AssetProcessorsForDiscussionProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <AssetProcessorsWithoutQueryClient {...props} />

@@ -33,6 +33,7 @@ module Types
 
     field :icon_or_tool_icon_url, String, null: true
     def icon_or_tool_icon_url
+      # also uses assignment association, but currently this is always loaded as this type is only accessible through assignment
       load_association(:context_external_tool).then do
         object.icon_or_tool_icon_url
       end

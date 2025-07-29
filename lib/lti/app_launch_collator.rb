@@ -111,7 +111,7 @@ module Lti
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
           definition[:placements][p.to_sym].merge!(global_nav_info(tool)) if p == "global_navigation"
-          definition[:placements][p.to_sym].merge!(asset_processor_info(tool)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR
+          definition[:placements][p.to_sym].merge!(asset_processor_info(tool, p)) if p == Lti::ResourcePlacement::ASSET_PROCESSOR || p == Lti::ResourcePlacement::ASSET_PROCESSOR_CONTRIBUTION
 
           # Overwrite the URL with the target_link_uri if it is set
           # and the placement is assignment_edit or assignment_view
@@ -170,10 +170,10 @@ module Lti
         }
       end
 
-      def asset_processor_info(tool)
+      def asset_processor_info(tool, placement)
         {
           icon_url:
-            tool.extension_setting(Lti::ResourcePlacement::ASSET_PROCESSOR, :icon_url),
+            tool.extension_setting(placement, :icon_url),
 
           # TODO: use this for global nav too, for consistent default icons
           tool_name_for_default_icon: tool.name,

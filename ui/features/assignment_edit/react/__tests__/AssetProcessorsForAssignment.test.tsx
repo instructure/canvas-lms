@@ -21,7 +21,7 @@ import {
   AssetProcessorsForAssignment,
   AssetProcessorsForAssignmentProps,
 } from '../AssetProcessorsForAssignment'
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {ExistingAttachedAssetProcessor, AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 import {useAssetProcessorsToolsList} from '@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList'
@@ -128,5 +128,18 @@ describe('AssetProcessorsForAssignment', () => {
     renderComponent({initialAttachedProcessors: []})
     expect(screen.getByText('Document Processing App(s)')).toBeInTheDocument()
     expect(screen.queryByTestId('asset_processors[0]')).not.toBeInTheDocument()
+  })
+
+  it('uses ActivityAssetProcessor type for querying tools', () => {
+    const mockToolsList = jest.fn().mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+    })
+    ;(useAssetProcessorsToolsList as jest.Mock).mockImplementation(mockToolsList)
+
+    renderComponent({initialAttachedProcessors: []})
+
+    expect(mockToolsList).toHaveBeenCalledWith(1, 'ActivityAssetProcessor')
   })
 })

@@ -48,6 +48,7 @@ module Lti
     RICH_TEXT_EDITOR = "RichTextEditor"
 
     ASSET_PROCESSOR = "ActivityAssetProcessor"
+    ASSET_PROCESSOR_CONTRIBUTION = "ActivityAssetProcessorContribution"
 
     SIMILARITY_DETECTION_LTI2 = "Canvas.placements.similarityDetection"
 
