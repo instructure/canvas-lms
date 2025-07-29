@@ -208,7 +208,7 @@ describe ContentMigration do
       att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
       att.update_attribute(:hidden, true)
       expect(att.reload).to be_hidden
-      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
+      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>", user: @user)
 
       run_course_copy
 
@@ -224,7 +224,7 @@ describe ContentMigration do
       rf = Folder.root_folders(@copy_from).first
       folder = rf.sub_folders.create!(name: "course files", context: @copy_from)
       att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"), folder:, context: @copy_from)
-      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
+      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>", user: @user)
 
       run_course_copy
 
@@ -335,8 +335,8 @@ describe ContentMigration do
       body = "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att1.id}/download'>link</a>"
       body += "<a class='instructure_file_link' href='/courses/#{@copy_from.id}/files/#{att2.id}/download'>link</a>"
       body += "<img src='/courses/#{@copy_from.id}/files/#{img.id}/preview'>"
-      dt = @copy_from.discussion_topics.create!(message: body, title: "discussion title")
-      page = @copy_from.wiki_pages.create!(title: "some page", body:)
+      dt = @copy_from.discussion_topics.create!(message: body, title: "discussion title", user: @user)
+      page = @copy_from.wiki_pages.create!(title: "some page", body:, saving_user: @user)
 
       run_course_copy
 
@@ -1083,8 +1083,8 @@ describe ContentMigration do
         media_id2 = "0_livecrab"
         att = attachment_model(display_name: "lolcats.mp4", context: @copy_from, media_entry_id: media_id)
         att2 = attachment_model(display_name: "yodawg.mp4", context: @copy_from, media_entry_id: media_id2)
-        wiki = @copy_from.wiki_pages.create!(title: "lolcat", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>))
-        wiki2 = @copy_from.wiki_pages.create!(title: "yodawg", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id2}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att2.id}?type=video"></iframe></p>))
+        wiki = @copy_from.wiki_pages.create!(title: "lolcat", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>), saving_user: @user)
+        wiki2 = @copy_from.wiki_pages.create!(title: "yodawg", body: %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id2}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att2.id}?type=video"></iframe></p>), saving_user: @user)
         @cm = ContentMigration.create!(
           context: @copy_to,
           user: @user,
@@ -1192,7 +1192,7 @@ describe ContentMigration do
         att.save!
         att.media_tracks.create!(content: "en subs", media_object_id: media_object, kind: "subtitles", locale: "en", user_id: att.user_id)
 
-        @copy_from.announcements.create!(title: "links", message: <<~HTML)
+        @copy_from.announcements.create!(title: "links", message: <<~HTML, user: @user)
           <p><img src="/courses/#{@copy_from.id}/files/#{img_att.id}/preview" alt="assoc_1.png" /></p>
           <p><iframe data-media-type="video" src="/media_attachments_iframe/#{att}?type=video" data-media-id="#{media_id}"></iframe></p>
         HTML
@@ -1258,7 +1258,7 @@ describe ContentMigration do
                                uploaded_data: StringIO.new("file"),
                                folder: Folder.root_folders(@copy_from).first,
                                context: @copy_from)
-      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>")
+      topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{att.id}/preview'>", user: @user)
 
       allow(Importers::WikiPageImporter).to receive(:process_migration).and_raise(ArgumentError)
 

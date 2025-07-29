@@ -21,6 +21,8 @@
 module Factories
   def calendar_event_model(opts = {})
     @course ||= course_model(reusable: true)
+    @user ||= user_model
+    opts[:saving_user] ||= @user
     @event = @course.calendar_events.create!(valid_calendar_event_attributes.merge(opts))
   end
 

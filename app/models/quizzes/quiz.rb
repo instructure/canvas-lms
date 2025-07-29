@@ -34,6 +34,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include Plannable
   include Canvas::DraftStateValidations
   include LockedFor
+  include LinkedAttachmentHandler
 
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update, :saved_by, :saved_by_new_quizzes_migration
@@ -123,6 +124,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   ]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
+
+  has_many :attachment_associations, as: :context, inverse_of: :context
+  def self.html_fields
+    %w[description]
+  end
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
@@ -241,6 +247,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       unless deleted?
         assignment.workflow_state = published? ? "published" : "unpublished"
       end
+      assignment.saving_user = saving_user if saving_user
       assignment.save
       self.assignment_id = assignment.id
     end
@@ -501,6 +508,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       a.submission_types = "online_quiz"
       a.assignment_group_id = self.assignment_group_id
       a.saved_by = :quiz
+      a.saving_user = saving_user if saving_user
       if saved_by == :migration && a.update_cached_due_dates?
         a.needs_update_cached_due_dates = true
       end

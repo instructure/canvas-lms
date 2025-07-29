@@ -1857,6 +1857,7 @@ describe MasterCourses::MasterMigration do
 
       assignment = @copy_from.assignments.create!(title: "hahaha")
       assignment.description = "<p><a id=\"\" class=\"instructure_file_link instructure_image_thumbnail \" title=\"lalala\" href=\"/courses/#{@copy_from.id}/files/#{attachment.id}/download?wrap=1\" target=\"\">lalala</a></p>"
+      assignment.saving_user = @user
       assignment.save!
 
       run_master_migration
@@ -3305,7 +3306,7 @@ describe MasterCourses::MasterMigration do
       expect(@att_copy).to be_present
 
       Timecop.freeze(1.minute.from_now) do
-        @topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{@att.id}/download?wrap=1'>")
+        @topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<img src='/courses/#{@copy_from.id}/files/#{@att.id}/download?wrap=1'>", user: @user)
       end
       run_master_migration
 

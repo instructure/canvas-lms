@@ -582,6 +582,7 @@ describe ContentExportsApiController, type: :request do
       let_once :page_to_copy do
         page_to_copy = t_course.wiki_pages.create!(title: "other page")
         page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
+        page_to_copy.saving_user = t_teacher
         page_to_copy.save!
         page_to_copy
       end
