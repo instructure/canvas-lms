@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,18 +17,11 @@
  */
 
 import formatMessage from 'format-message'
-import generateId from 'format-message-generate-id/underscored_crc32'
 
-const ns = formatMessage.namespace()
-
-// Configure to ignore missing translations to prevent warnings
-ns.setup({
-  generateId,
-  missingTranslation: 'ignore',
-})
-
-ns.addLocale = translations => {
-  ns.setup({translations: {...ns.setup().translations, ...translations}})
+interface FormatMessageNamespace extends ReturnType<typeof formatMessage.namespace> {
+  addLocale: (translations: Record<string, any>) => void
 }
+
+declare const ns: FormatMessageNamespace
 
 export default ns
