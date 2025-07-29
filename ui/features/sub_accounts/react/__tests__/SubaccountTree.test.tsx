@@ -19,11 +19,10 @@
 import {render, waitFor} from '@testing-library/react'
 import SubaccountTree from '../SubaccountTree'
 import fetchMock from 'fetch-mock'
-import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 import type {AccountWithCounts} from '../types'
 import {QueryClient} from '@tanstack/react-query'
+import {SubaccountProvider} from '../util'
 
 const rootAccount = {
   id: '1',
@@ -50,6 +49,15 @@ const SUBACCOUNT_FETCH = (account: AccountWithCounts) => {
   )
 }
 
+const renderSubaccountTree = (overrides = {}) => {
+  const mergedProps = {...props, ...overrides}
+  return render(
+    <SubaccountProvider>
+      <SubaccountTree {...mergedProps} />
+    </SubaccountProvider>,
+  )
+}
+
 describe('SubaccountTree', () => {
   const queryClient = new QueryClient()
   beforeEach(() => {
@@ -62,15 +70,11 @@ describe('SubaccountTree', () => {
     queryClient.clear()
   })
 
-  // the only time this doesn't happen is if the subaccount count is over 100
+  // the only time this doesn't happen automatically is if the subaccount count is over 100
   it('fetches sub-accounts and expands collapses', async () => {
     const user = userEvent.setup()
     fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
-    const {getByText, getByTestId, queryByText} = render(
-      <MockedQueryClientProvider client={queryClient}>
-        <SubaccountTree {...props} />
-      </MockedQueryClientProvider>,
-    )
+    const {getByText, getByTestId, queryByText} = renderSubaccountTree()
 
     await waitFor(() => {
       expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(true)
@@ -93,11 +97,7 @@ describe('SubaccountTree', () => {
   it('does not fetch more subaccounts if subaccount count is 0', async () => {
     const account = {...rootAccount, sub_account_count: 0}
     fetchMock.get(SUBACCOUNT_FETCH(rootAccount), subAccounts)
-    const {getByText} = render(
-      <MockedQueryClientProvider client={queryClient}>
-        <SubaccountTree {...props} rootAccount={account} />
-      </MockedQueryClientProvider>,
-    )
+    const {getByText} = renderSubaccountTree({rootAccount: account})
 
     await waitFor(() => {
       expect(fetchMock.called(SUBACCOUNT_FETCH(rootAccount), 'GET')).toBe(false)
