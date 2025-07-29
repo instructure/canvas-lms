@@ -21,6 +21,7 @@ import {AddBlock} from './AddBlock'
 import {TextBlock} from './Blocks/TextBlock'
 import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {ImageBlock} from './Blocks/ImageBlock'
+import {SettingsTrayRenderer} from './SettingsTray'
 import {useBlockContentEditorIntegration} from './hooks/useBlockContentEditorIntegration'
 import {Prettify} from './utilities/Prettify'
 import {BlockContentEditorProps} from './BlockContentEditor'
@@ -43,6 +44,7 @@ export const BlockContentEditorWrapper = (props: BlockContentEditorWrapperProps)
   return (
     <Editor enabled={props.isEditMode} resolver={components} onNodesChange={onNodesChange}>
       <AddBlockModalRenderer />
+      <SettingsTrayRenderer />
       <AddBlock />
       <Frame data={props.data ?? undefined}>
         <Element is="div"></Element>
