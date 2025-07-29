@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, KeyboardEvent, MouseEvent} from 'react'
-import {View} from '@instructure/ui-view'
+import React, {useState} from 'react'
+import {type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ToggleButton} from '@instructure/ui-buttons'
 import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useContextModule} from '../hooks/useModuleContext'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
@@ -53,28 +54,17 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
   const {initialLockState, contentId, contentType} = props
 
   const {courseId, isChildCourse} = useContextModule()
-  const lockText = I18n.t('Locked. Click to unlock.')
-  const unlockText = I18n.t('Unlocked. Click to lock.')
 
   const [isLocked, setIsLocked] = useState(initialLockState)
-  const [isHovering, setIsHovering] = useState(false)
 
-  const handleClick = (event: MouseEvent | KeyboardEvent) => {
+  const handleClick = (event: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
     event.preventDefault()
     event.stopPropagation()
-
-    if (isChildCourse) return
 
     if (isLocked) {
       setLockState(false)
     } else {
       setLockState(true)
-    }
-  }
-
-  const handleKeyClick = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      handleClick(event)
     }
   }
 
@@ -96,76 +86,47 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
         if (response.response.ok) {
           setIsLocked(locked)
         } else {
-          console.error('Error setting lock state:', response)
+          showFlashError(
+            I18n.t('An error occurred %{op} item', {
+              op: locked ? I18n.t('locking') : I18n.t('unlocking'),
+            }),
+          )()
         }
       })
       .catch((error: Error) => {
-        console.error('Error setting lock state:', error)
+        showFlashError(
+          I18n.t('An error occurred %{op} item', {
+            op: locked ? I18n.t('locking') : I18n.t('unlocking'),
+          }),
+        )()
       })
   }
 
-  const handleMouseEnter = () => {
-    if (!isChildCourse) {
-      setIsHovering(true)
-    }
-  }
-
-  const handleMouseLeave = () => {
-    if (!isChildCourse) {
-      setIsHovering(false)
-    }
-  }
-
-  const getTooltipText = () => {
-    if (isChildCourse) {
-      return isLocked ? I18n.t('Locked') : I18n.t('Unlocked')
-    }
-
-    if (isHovering) {
-      return isLocked ? I18n.t('Click to unlock') : I18n.t('Click to lock')
-    } else {
-      return isLocked ? lockText : unlockText
-    }
-  }
-
   const getIcon = () => {
-    if (isLocked) {
-      return <IconBlueprintLockSolid />
-    } else {
-      return <IconBlueprintSolid />
-    }
+    return isLocked ? <IconBlueprintLockSolid /> : <IconBlueprintSolid />
   }
 
-  const tooltipText = getTooltipText()
-  const iconClass = isLocked ? LOCK_ICON_CLASS.locked : LOCK_ICON_CLASS.unlocked
-  const disabledClass = isChildCourse ? 'disabled' : ''
+  const renderChildCourseIcon = () => {
+    return getIcon()
+  }
 
-  return (
-    <View
-      as="span"
-      className={`lock-icon ${iconClass} ${disabledClass}`}
-      data-testid={iconClass}
-      onClick={handleClick}
-      onKeyDown={handleKeyClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      tabIndex={isChildCourse ? -1 : 0}
-      role="button"
-      aria-pressed={isLocked}
-      disabled={isChildCourse}
-    >
-      <Tooltip
-        renderTip={tooltipText}
-        data-testid={`lock-icon-tooltip-${iconClass}`}
-        placement="top"
-        color="primary"
-        on={['hover', 'focus']}
-      >
-        {getIcon()}
-        <ScreenReaderContent>{isLocked ? lockText : unlockText}</ScreenReaderContent>
-      </Tooltip>
-    </View>
-  )
+  const renderParentCourseIcon = () => {
+    const text = isLocked ? I18n.t('Locked. Click to unlock.') : I18n.t('Unlocked. Click to lock.')
+
+    return (
+      <ToggleButton
+        data-testid="blueprint-lock-button"
+        size="small"
+        onClick={handleClick}
+        status={isLocked ? 'pressed' : 'unpressed'}
+        screenReaderLabel={text}
+        renderTooltipContent={text}
+        renderIcon={getIcon}
+      />
+    )
+  }
+
+  return isChildCourse ? renderChildCourseIcon() : renderParentCourseIcon()
 }
 
 export default BlueprintLockIcon

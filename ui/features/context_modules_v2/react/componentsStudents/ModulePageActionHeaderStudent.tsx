@@ -32,10 +32,6 @@ import FeedbackBlock from './FeedbackBlock'
 
 const I18n = createI18nScope('context_modules_v2')
 
-declare const ENV: {
-  CONTEXT_MODULES_HEADER_PROPS: any
-}
-
 interface ModulePageActionHeaderStudentProps {
   onCollapseAll: () => void
   onExpandAll: () => void

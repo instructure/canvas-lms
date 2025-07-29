@@ -23,10 +23,7 @@ import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHe
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
-
-declare const ENV: {
-  CONTEXT_MODULES_HEADER_PROPS: any
-}
+import {ModulesPageIconLegend} from './ModulesPageIconLegend'
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
@@ -75,6 +72,9 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
           disabled,
         },
         handleAddModule: handleAddModule,
+        renderIconLegend: () => (
+          <ModulesPageIconLegend is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS} />
+        ),
       }}
     />
   )

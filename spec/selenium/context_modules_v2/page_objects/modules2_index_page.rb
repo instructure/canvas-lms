@@ -182,9 +182,20 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
 
-  def blueprint_lock_icon_selector(module_item_id, locked: false)
-    selector = locked ? "[data-testid='lock-icon-locked']" : "[data-testid='lock-icon-unlock']"
-    "#{module_item_by_id_selector(module_item_id)} #{selector}"
+  def blueprint_lock_button_selector(locked: false)
+    locked ? '[data-testid="blueprint-lock-button"][aria-pressed="true"]' : '[data-testid="blueprint-lock-button"][aria-pressed="false"]'
+  end
+
+  def module_blueprint_lock_button_selector(module_item_id, locked: false)
+    "#{module_item_by_id_selector(module_item_id)} #{blueprint_lock_button_selector(locked:)}"
+  end
+
+  def blueprint_lock_icon_selector(locked: false)
+    locked ? 'svg[name="IconBlueprintLock"]' : 'svg[name="IconBlueprint"]'
+  end
+
+  def module_blueprint_lock_icon_selector(module_item_id, locked: false)
+    "#{module_item_by_id_selector(module_item_id)} #{blueprint_lock_icon_selector(locked:)}"
   end
 
   def module_prerequisite_selector
@@ -516,8 +527,12 @@ module Modules2IndexPage
     f(modules_publish_modal_selector)
   end
 
-  def blueprint_lock_icon(module_item_id, locked: false)
-    f(blueprint_lock_icon_selector(module_item_id, locked:))
+  def module_blueprint_lock_icon(module_item_id, locked: false)
+    f(module_blueprint_lock_icon_selector(module_item_id, locked:))
+  end
+
+  def module_blueprint_lock_button(module_item_id, locked: false)
+    f(module_blueprint_lock_button_selector(module_item_id, locked:))
   end
 
   def module_prerequisite

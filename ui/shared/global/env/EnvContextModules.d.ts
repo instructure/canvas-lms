@@ -80,4 +80,5 @@ export interface EnvContextModules {
     observedStudent: {id: string; name: string} | null
     courseName: string
   }
+  CONTEXT_MODULES_HEADER_PROPS?: any
 }
