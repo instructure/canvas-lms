@@ -1470,6 +1470,12 @@ describe GradebooksController do
             expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id, @ncgc.id)
           end
 
+          it "includes non_collaborative field" do
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json[-1].key?("non_collaborative")).to be_truthy
+            expect(group_categories_json[-1]["groups"][-1].key?("non_collaborative")).to be_truthy
+          end
+
           it "excludes differentiation tag categories when user does not have a manage tags permission" do
             ta_in_course
             user_session(@ta)

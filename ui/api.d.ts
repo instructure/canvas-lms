@@ -136,6 +136,7 @@ export type StudentGroupCategory = Readonly<{
   self_signup: null | string
   sis_group_category_id: null | string
   sis_import_id: null | string
+  non_collaborative: null | boolean
 }>
 
 export type StudentGroupMap = {
