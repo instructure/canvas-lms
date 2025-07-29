@@ -541,4 +541,74 @@ describe "context modules", :ignore_js_errors do
       expect(uploaded_file_icon).to be_displayed
     end
   end
+
+  context "module action menu deletion" do
+    def trigger_module_deletion(module_id)
+      go_to_modules
+      wait_for_ajaximations
+      module_menu = module_action_menu(module_id)
+      module_menu.click
+
+      deletion_option = module_action_menu_deletetion(module_id)
+      deletion_option.click
+
+      alert = driver.switch_to.alert
+      expect(alert).not_to be_nil
+      alert
+    end
+
+    it "cancels out of deletion" do
+      trigger_module_deletion(@module1.id).dismiss
+      expect(element_exists?(module_header_selector(@module1.id))).to be_truthy
+    end
+
+    it "deletes a module" do
+      trigger_module_deletion(@module1.id).accept
+      wait_for_ajaximations
+      expect(element_exists?(module_header_selector(@module1.id))).to be_falsey
+      @module1.reload
+      expect(@module1.deleted_at).not_to be_nil
+    end
+  end
+
+  context "module action menu copy" do
+    before :once do
+      course = @course
+      @other_course = course_factory(course_name: "test for copy")
+      course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
+      @course = course
+    end
+
+    def open_module_copy_modal(module_id)
+      go_to_modules
+      wait_for_ajaximations
+      module_menu = module_action_menu(module_id)
+      module_menu.click
+
+      copy_option = module_action_menu_copy(module_id)
+      copy_option.click
+      wait_for_ajaximations
+    end
+
+    it "cancels out of copy" do
+      open_module_copy_modal(@module1.id)
+      close_copy_to_tray_button.click
+      wait_for_ajaximations
+      expect(element_exists?(close_copy_tray_button_selector)).to be_falsey
+    end
+
+    it "copies a module to another course" do
+      open_module_copy_modal(@module1.id)
+
+      set_value(copy_to_tray_course_select, "test for copy")
+      option_list_id = copy_to_tray_course_select.attribute("aria-controls")
+      expect(option_list(option_list_id).count).to eq 1
+
+      option_list_course_option(option_list_id, @other_course.name).click
+      copy_button.click
+      wait_for_ajaximations
+
+      expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["context_modules"])
+    end
+  end
 end
