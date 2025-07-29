@@ -25,6 +25,7 @@ import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
+import {EditButton} from './EditButton'
 import {RemoveButton} from './RemoveButton'
 import {ApplyButton} from './ApplyButton'
 
@@ -44,6 +45,13 @@ const DuplicateButton = () => {
   return <CopyButton onClicked={duplicateNode} />
 }
 
+const EditSettingsButton = () => {
+  const {settingsTray} = useBlockContentEditorContext()
+  const {id} = useNode()
+
+  return <EditButton onClicked={() => settingsTray.open(id)} />
+}
+
 export const BaseBlockEditWrapper = (
   props: PropsWithChildren<{
     title: string
@@ -61,10 +69,14 @@ export const BaseBlockEditWrapper = (
       addButton={<InsertButton />}
       actionButtons={
         props.isEditMode
-          ? [<ApplyButton key="action-save-btn" onClick={() => props.setIsEditMode(false)} />]
+          ? [<ApplyButton key="action-save-button" onClick={() => props.setIsEditMode(false)} />]
           : []
       }
-      menu={[<DuplicateButton key="menu-duplicate-btn" />, <DeleteButton key="menu-delete-btn" />]}
+      menu={[
+        <DuplicateButton key="menu-duplicate-button" />,
+        <EditSettingsButton key="menu-edit-settings-button" />,
+        <DeleteButton key="menu-delete-button" />,
+      ]}
     >
       {props.children}
     </BaseBlockLayout>

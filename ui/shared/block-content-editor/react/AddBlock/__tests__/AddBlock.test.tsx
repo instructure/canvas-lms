@@ -35,6 +35,11 @@ jest.mock('../../BlockContentEditorContext', () => ({
           open: openMock,
           close: closeMock,
         },
+        settingsTray: {
+          isOpen: false,
+          open: jest.fn(),
+          close: jest.fn(),
+        },
         initialAddBlockHandler: {
           shouldShow: true,
           setShouldShow: setShouldShowMock,

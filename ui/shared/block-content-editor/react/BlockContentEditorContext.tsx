@@ -20,10 +20,12 @@ import {createContext, PropsWithChildren, useContext} from 'react'
 import {SerializedNodes} from '@craftjs/core'
 import {AddBlockModal, useAddBlockModal} from './hooks/useAddBlockModal'
 import {InitialAddBlockHandler, useInitialAddBlockHandler} from './hooks/useInitialAddBlockHandler'
+import {SettingsTray, useSettingsTray} from './hooks/useSettingsTray'
 
 export type BlockContentEditorContextType = {
   addBlockModal: AddBlockModal
   initialAddBlockHandler: InitialAddBlockHandler
+  settingsTray: SettingsTray
 }
 
 export type BlockContentEditorContextProps = {
@@ -38,6 +40,7 @@ export const BlockContentEditorContext = (
   props: PropsWithChildren<BlockContentEditorContextProps>,
 ) => {
   const addBlockModal = useAddBlockModal()
+  const settingsTray = useSettingsTray()
   const initialAddBlockHandler = useInitialAddBlockHandler(props.data?.['ROOT']?.nodes.length ?? 0)
 
   return (
@@ -45,6 +48,7 @@ export const BlockContentEditorContext = (
       value={{
         addBlockModal,
         initialAddBlockHandler,
+        settingsTray,
       }}
     >
       {props.children}
