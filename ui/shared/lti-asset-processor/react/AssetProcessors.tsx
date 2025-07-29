@@ -26,7 +26,9 @@ import {AssetProcessorsAttachedProcessorCard} from './AssetProcessorsCards'
 import {useAssetProcessorsAddModalState} from './hooks/AssetProcessorsAddModalState'
 import {useAssetProcessorsState} from './hooks/AssetProcessorsState'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
-import {buildAPDisplayTitle} from '@canvas/lti/model/AssetProcessor'
+import {buildAPDisplayTitle, AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
+import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -34,6 +36,7 @@ export type AssetProcessorsProps = {
   courseId: number
   secureParams: string
   hideErrors?: () => void
+  type: AssetProcessorType
 }
 
 /**
@@ -44,14 +47,21 @@ export type AssetProcessorsProps = {
  */
 export function AssetProcessors(props: AssetProcessorsProps) {
   const openAddDialog = useAssetProcessorsAddModalState(s => s.actions.showToolList)
-  const toolsAvailable = !!useAssetProcessorsToolsList(props.courseId).data?.length
+  const toolsAvailable = !!useAssetProcessorsToolsList(props.courseId, props.type).data?.length
   const {attachedProcessors, addAttachedProcessors, removeAttachedProcessor} =
     useAssetProcessorsState(s => s)
+
+  const handleProcessorResponse = ({
+    tool,
+    data,
+  }: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => {
+    addAttachedProcessors({tool, data, type: props.type})
+  }
 
   return (
     <>
       {toolsAvailable && (
-        <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
+        <AssetProcessorsAddModal onProcessorResponse={handleProcessorResponse} {...props} />
       )}
       <Flex direction="column" gap="small">
         <Flex direction={attachedProcessors.length ? 'column' : 'row'} gap="small">

@@ -24,8 +24,8 @@ import DiscussionTopicForm from '../DiscussionTopicForm'
 import {useAssetProcessorsState} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 import {useAssetProcessorsToolsList} from '@canvas/lti-asset-processor/react/hooks/useAssetProcessorsToolsList'
 import {
-  mockTools,
-  mockDeepLinkResponse,
+  mockToolsForDiscussions,
+  mockContributionDeepLinkResponse,
   mockAssetProcessorsToolsListQuery,
 } from '../../../../../../shared/lti-asset-processor/react/__tests__/assetProcessorsTestHelpers'
 
@@ -146,8 +146,9 @@ describe('DiscussionTopicForm', () => {
 
       act(() => {
         useAssetProcessorsState.getState().addAttachedProcessors({
-          tool: mockTools[0],
-          data: mockDeepLinkResponse,
+          tool: mockToolsForDiscussions[0],
+          data: mockContributionDeepLinkResponse,
+          type: 'ActivityAssetProcessorContribution',
         })
       })
 
@@ -166,7 +167,7 @@ describe('DiscussionTopicForm', () => {
         {existingId: 1},
         {
           newContentItem: {
-            contextExternalToolId: parseInt(mockTools[0].definition_id),
+            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
             // from mockDeepLinkResponse:
             text: 'Lti 1.3 Tool Text',
             title: 'Lti 1.3 Tool Title',
@@ -190,8 +191,9 @@ describe('DiscussionTopicForm', () => {
 
       act(() => {
         useAssetProcessorsState.getState().addAttachedProcessors({
-          tool: mockTools[0],
-          data: mockDeepLinkResponse,
+          tool: mockToolsForDiscussions[0],
+          data: mockContributionDeepLinkResponse,
+          type: 'ActivityAssetProcessorContribution',
         })
       })
 
@@ -208,7 +210,7 @@ describe('DiscussionTopicForm', () => {
       expect(aps).toEqual([
         {
           newContentItem: {
-            contextExternalToolId: parseInt(mockTools[0].definition_id),
+            contextExternalToolId: parseInt(mockToolsForDiscussions[0].definition_id),
             // from mockDeepLinkResponse:
             text: 'Lti 1.3 Tool Text',
             title: 'Lti 1.3 Tool Title',

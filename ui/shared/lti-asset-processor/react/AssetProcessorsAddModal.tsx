@@ -27,7 +27,10 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
 import {handleExternalContentMessages} from '@canvas/external-tools/messages'
-import type {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import type {
+  LtiLaunchDefinition,
+  LtiLaunchPlacement,
+} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
 import {
   AssetProcessorsAddModalState,
@@ -36,6 +39,7 @@ import {
 import {AssetProcessorsCard} from './AssetProcessorsCards'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -48,6 +52,7 @@ export type AssetProcessorsAddModalProps = {
   courseId: number
   secureParams: string
   onProcessorResponse: AssetProcessorsAddModalOnProcessorResponseFn
+  type: AssetProcessorType
 }
 
 export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
@@ -110,7 +115,7 @@ function assetProcessorsAddModelFooter({tag, showToolList}: AssetProcessorsAddMo
 
 function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
   const {courseId} = props
-  const {data, isLoading, isError} = useAssetProcessorsToolsList(courseId)
+  const {data, isLoading, isError} = useAssetProcessorsToolsList(courseId, props.type)
   const state = useAssetProcessorsAddModalState(s => s.state)
 
   switch (state.tag) {
@@ -125,7 +130,7 @@ function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
       } else if (!data?.length) {
         return <Text>{I18n.t('There are no available document processing apps to add.')}</Text>
       } else {
-        return <AssetProcessorsAddModalBodyToolList toolList={data} />
+        return <AssetProcessorsAddModalBodyToolList toolList={data} type={props.type} />
       }
     case 'toolLaunch':
       return <AssetProcessorsAddModalBodyToolLaunch {...props} tool={state.tool} />
@@ -134,7 +139,10 @@ function AssetProcessorsAddModalBody(props: AssetProcessorsAddModalProps) {
   }
 }
 
-function AssetProcessorsAddModalBodyToolList({toolList}: {toolList: LtiLaunchDefinition[]}) {
+function AssetProcessorsAddModalBodyToolList({
+  toolList,
+  type,
+}: {toolList: LtiLaunchDefinition[]; type: AssetProcessorType}) {
   const {launchTool} = useAssetProcessorsAddModalState(s => s.actions)
 
   // Make tool list 800px as that is the default tool size in
@@ -146,24 +154,33 @@ function AssetProcessorsAddModalBodyToolList({toolList}: {toolList: LtiLaunchDef
           {I18n.t('Choose the document processing app that you wish to add to this assignment.')}
         </Text>
       </Flex.Item>
-      {toolList.map((tool, index) => (
-        <Flex.Item key={index}>
-          <AssetProcessorsCard
-            icon={{
-              url: tool.placements.ActivityAssetProcessor!.icon_url,
-              toolName:
-                tool.placements.ActivityAssetProcessor!.tool_name_for_default_icon || tool.name,
-              toolId: tool.definition_id,
-            }}
-            title={tool.placements?.ActivityAssetProcessor?.title || tool.name}
-            description={tool.description}
-            margin="small"
-            onClick={() => launchTool(tool)}
-          />
-        </Flex.Item>
-      ))}
+      {toolList.map((tool, index) => {
+        const placementData = getPlacementDataForType(tool, type)
+        return (
+          <Flex.Item key={index}>
+            <AssetProcessorsCard
+              icon={{
+                url: placementData?.icon_url,
+                toolName: placementData?.tool_name_for_default_icon || tool.name,
+                toolId: tool.definition_id,
+              }}
+              title={placementData?.title || tool.name}
+              description={tool.description}
+              margin="small"
+              onClick={() => launchTool(tool)}
+            />
+          </Flex.Item>
+        )
+      })}
     </Flex>
   )
+}
+
+function getPlacementDataForType(
+  tool: LtiLaunchDefinition,
+  type: AssetProcessorType,
+): LtiLaunchPlacement | undefined {
+  return tool.placements?.[type]
 }
 
 function AssetProcessorsAddModalBodyToolLaunch(
@@ -172,7 +189,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
   const {courseId, secureParams, onProcessorResponse, tool} = props
   const {close, showInvlidDeepLinkingResponse} = useAssetProcessorsAddModalState(s => s.actions)
 
-  const placement = tool.placements?.ActivityAssetProcessor
+  const placement = getPlacementDataForType(tool, props.type)
   const toolName = placement?.title || tool.name
   const width = placement?.selection_width || '800px'
   const height = placement?.selection_height || '400px'
@@ -213,7 +230,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
         <iframe
           src={
             `/courses/${courseId}/external_tools/${tool.definition_id}/resource_selection` +
-            `?display=borderless&launch_type=ActivityAssetProcessor&secure_params=${secureParams}`
+            `?display=borderless&launch_type=${props.type}&secure_params=${secureParams}`
           }
           style={{width, height, border: '0', display: 'block'}}
           title={I18n.t('Configure new document processing app')}

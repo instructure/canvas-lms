@@ -28,13 +28,13 @@ import {
   AssetProcessorsAddModalProps,
 } from '../AssetProcessorsAddModal'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
+import {AssetProcessorType, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {useAssetProcessorsState} from '../hooks/AssetProcessorsState'
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {
   mockDeepLinkResponse,
   mockDoFetchApi,
   mockExistingAttachedAssetProcessor,
-  mockTools,
+  mockToolsForAssignment,
 } from './assetProcessorsTestHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -78,7 +78,10 @@ describe('AssetProcessors', () => {
 
   beforeEach(() => {
     state = useAssetProcessorsState.getState()
-    queryClient.setQueryData(['assetProcessors', 123], mockTools)
+    queryClient.setQueryData(
+      ['assetProcessors', 123, 'ActivityAssetProcessor'],
+      mockToolsForAssignment,
+    )
     const launchDefsUrl = '/api/v1/courses/123/lti_apps/launch_definitions'
     mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
 
@@ -101,6 +104,7 @@ describe('AssetProcessors', () => {
           courseId={123}
           secureParams="my-secure-params"
           hideErrors={hideErrorsMocked}
+          type="ActivityAssetProcessor"
         />
       </MockedQueryClientProvider>,
     )
@@ -117,10 +121,15 @@ describe('AssetProcessors', () => {
   })
 
   it("doesn't show the Add button when there are no tools available", () => {
-    queryClient.setQueryData(['assetProcessors', 123], [])
+    queryClient.setQueryData(['assetProcessors', 123, 'ActivityAssetProcessor'], [])
+
     const {queryByText} = render(
       <MockedQueryClientProvider client={queryClient}>
-        <AssetProcessors courseId={123} secureParams="my-secure-params" />
+        <AssetProcessors
+          courseId={123}
+          secureParams="my-secure-params"
+          type="ActivityAssetProcessor"
+        />
       </MockedQueryClientProvider>,
     )
     expect(queryByText('Add Document Processing App')).not.toBeInTheDocument()
@@ -133,27 +142,39 @@ describe('AssetProcessors', () => {
 
   it('adds attached processors sent by the modal', async () => {
     const {getByText} = renderAssetProcessors()
-    onProcessorResponseCb!({tool: mockTools[1], data: mockDeepLinkResponse})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: mockDeepLinkResponse,
+    })
     expect(getByText('t2 · Lti 1.3 Tool Title')).toBeInTheDocument()
   })
 
   it('shows flash messages when the deep linking response contains "msg" or "errormsg"', () => {
     renderAssetProcessors()
 
-    onProcessorResponseCb!({tool: mockTools[1], data: {...mockDeepLinkResponse, msg: 'hello'}})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: {...mockDeepLinkResponse, msg: 'hello'},
+    })
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'Message from document processing app: hello',
     })
 
     const mockFlashErrorFn = jest.fn()
     ;(showFlashError as jest.Mock).mockImplementation(() => mockFlashErrorFn)
-    onProcessorResponseCb!({tool: mockTools[1], data: {...mockDeepLinkResponse, errormsg: 'oopsy'}})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: {...mockDeepLinkResponse, errormsg: 'oopsy'},
+    })
     expect(showFlashError).toHaveBeenCalledWith('Error from document processing app: oopsy')
   })
 
   it('shows a flash message when the deep linking response has no processors', () => {
     renderAssetProcessors()
-    onProcessorResponseCb!({tool: mockTools[1], data: {...mockDeepLinkResponse, content_items: []}})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: {...mockDeepLinkResponse, content_items: []},
+    })
 
     expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'The document processing app returned with no processors to attach.',
@@ -162,7 +183,10 @@ describe('AssetProcessors', () => {
 
   it('removes attached processors when the remove menu item is clicked', async () => {
     const {queryByText, getByText} = renderAssetProcessors()
-    onProcessorResponseCb!({tool: mockTools[1], data: mockDeepLinkResponse})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: mockDeepLinkResponse,
+    })
     expect(getByText('t2 · Lti 1.3 Tool Title')).toBeInTheDocument()
     getByText('Actions for document processing app: t2 · Lti 1.3 Tool Title').click()
     getByText('Remove').click()
@@ -203,7 +227,10 @@ describe('AssetProcessors', () => {
 
   it('does not allow modifying not saved attached processors', async () => {
     const {getByText, queryByText} = renderAssetProcessors()
-    onProcessorResponseCb!({tool: mockTools[1], data: mockDeepLinkResponse})
+    onProcessorResponseCb!({
+      tool: mockToolsForAssignment[1],
+      data: mockDeepLinkResponse,
+    })
     expect(getByText('t2 · Lti 1.3 Tool Title')).toBeInTheDocument()
     getByText('Actions for document processing app: t2 · Lti 1.3 Tool Title').click()
     expect(getByText('Remove')).toBeInTheDocument()

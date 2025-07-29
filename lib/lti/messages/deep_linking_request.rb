@@ -70,7 +70,7 @@ module Lti::Messages
       }.freeze,
       "ActivityAssetProcessorContribution" => {
         accept_multiple: true,
-        accept_types: %w[ltiAssetProcessor].freeze,
+        accept_types: %w[ltiAssetProcessorContribution].freeze,
         auto_create: true,
         document_targets: %w[iframe window].freeze,
         media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze

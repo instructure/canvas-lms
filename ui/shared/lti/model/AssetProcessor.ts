@@ -77,7 +77,7 @@ export const ZImageUrlWithDimensions = z.object({
  * Data sent by tool in deep linking response content item.
  */
 export const ZAssetProcessorContentItem = z.object({
-  type: z.literal('ltiAssetProcessor'),
+  type: z.literal('ltiAssetProcessor').or(z.literal('ltiAssetProcessorContribution')),
   url: z.string().optional(),
   title: z.string().optional(),
   text: z.string().optional(),
@@ -145,3 +145,4 @@ export function existingAttachedAssetProcessorFromGraphql(
       : undefined,
   }
 }
+export type AssetProcessorType = 'ActivityAssetProcessor' | 'ActivityAssetProcessorContribution'
