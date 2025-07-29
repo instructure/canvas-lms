@@ -31,8 +31,6 @@ import {queryClient} from '@canvas/query'
 const I18n = createI18nScope('widget_dashboard')
 
 ready(() => {
-  const ENV = window.ENV as GlobalEnv
-
   const container = document.getElementById('content')
 
   if (container) {

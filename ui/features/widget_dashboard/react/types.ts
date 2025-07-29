@@ -16,23 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
-import DashboardTabs from './components/DashboardTabs'
+import {TAB_IDS} from './constants'
 
-const I18n = createI18nScope('widget_dashboard')
+export type TabId = (typeof TAB_IDS)[keyof typeof TAB_IDS]
 
-const WidgetDashboardContainer: React.FC = () => {
-  return (
-    <View as="div" padding="large">
-      <Heading level="h1" margin="0 0 medium">
-        {I18n.t('Widget Dashboard')}
-      </Heading>
-      <DashboardTabs />
-    </View>
-  )
+export interface DashboardTab {
+  id: TabId
+  label: string
 }
-
-export default WidgetDashboardContainer
