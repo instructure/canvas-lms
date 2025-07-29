@@ -1201,6 +1201,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/permissions", action: :permissions
 
       get "courses/:course_id/student_view_student", action: :student_view_student
+      get "courses/:course_id/directory_tree", controller: :files, action: :directory_tree, as: "course_directory_tree"
     end
 
     scope(controller: :account_calendars_api) do
