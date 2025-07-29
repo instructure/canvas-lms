@@ -2409,13 +2409,13 @@ describe FilesController do
         expect(response).to redirect_to("/images/no_pic.gif")
       end
 
-      it "returns the same jwt if requested twice" do
+      it "returns different jwts (because of JTI) if requested twice" do
         enable_cache do
           user_session @teacher
           locations = Array.new(2) do
             get("image_thumbnail_plain", params: { id: image.id }).location
           end
-          expect(locations[0]).to eq(locations[1])
+          expect(locations[0]).not_to eq(locations[1])
         end
       end
 
@@ -2423,17 +2423,6 @@ describe FilesController do
         user_session @teacher
         token = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
         expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
-      end
-
-      it "returns the different jwts if no_cache is passed" do
-        enable_cache do
-          user_session @teacher
-          locations = Array.new(2) do
-            get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
-          end.map! { |l| l.split("?token=") }
-          # This confirms that the two base URLS are the same, but the tokens handed are different
-          expect([locations[0][0] == locations[1][0], locations[0][1] != locations[1][1]]).to all(be true)
-        end
       end
 
       it "redirects to default no_pic thumbnail if access_allowed returns false" do
