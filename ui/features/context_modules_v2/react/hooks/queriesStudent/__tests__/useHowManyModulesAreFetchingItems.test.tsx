@@ -222,37 +222,83 @@ describe('useHowManyModulesAreFetchingItems', () => {
     expect(result.current.maxFetchingCount).toBeGreaterThanOrEqual(1)
   })
 
-  it.skip('differentiates between student and teacher mode queries', async () => {
-    const {queryClient, wrapper} = setup()
+  it('differentiates between student and teacher mode queries', async () => {
+    // Create separate query clients to avoid cross-interference
+    const studentQueryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          gcTime: 0,
+        },
+      },
+    })
+
+    const teacherQueryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          gcTime: 0,
+        },
+      },
+    })
+
+    const studentWrapper = ({children}: {children: React.ReactNode}) => (
+      <QueryClientProvider client={studentQueryClient}>{children}</QueryClientProvider>
+    )
+
+    const teacherWrapper = ({children}: {children: React.ReactNode}) => (
+      <QueryClientProvider client={teacherQueryClient}>{children}</QueryClientProvider>
+    )
 
     const {result: studentResult} = renderHook(() => useHowManyModulesAreFetchingItems(false), {
-      wrapper,
+      wrapper: studentWrapper,
     })
 
     const {result: teacherResult} = renderHook(() => useHowManyModulesAreFetchingItems(true), {
-      wrapper,
+      wrapper: teacherWrapper,
     })
 
-    // Add a student query
-    queryClient.fetchQuery({
+    // Both should start with zero counts
+    expect(studentResult.current.moduleFetchingCount).toBe(0)
+    expect(teacherResult.current.moduleFetchingCount).toBe(0)
+
+    // Add a student query to student client
+    const studentQuery = studentQueryClient.fetchQuery({
       queryKey: ['moduleItemsStudent', 'module1'],
-      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'student'}), 50)),
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'student'}), 100)),
     })
 
-    // Add a teacher query
-    queryClient.fetchQuery({
+    // Add a teacher query to teacher client
+    const teacherQuery = teacherQueryClient.fetchQuery({
       queryKey: ['moduleItems', 'module1'],
-      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'teacher'}), 50)),
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'teacher'}), 100)),
+    })
+
+    // Wait for each hook to detect its respective query
+    await waitFor(() => {
+      expect(studentResult.current.moduleFetchingCount).toBe(1)
     })
 
     await waitFor(() => {
-      expect(studentResult.current.moduleFetchingCount).toBe(1)
       expect(teacherResult.current.moduleFetchingCount).toBe(1)
     })
 
+    // Wait for queries to complete
+    await Promise.all([studentQuery, teacherQuery])
+
+    // Wait for both hooks to complete
     await waitFor(() => {
       expect(studentResult.current.fetchComplete).toBe(true)
+    })
+
+    await waitFor(() => {
       expect(teacherResult.current.fetchComplete).toBe(true)
     })
+
+    // Verify final counts
+    expect(studentResult.current.moduleFetchingCount).toBe(0)
+    expect(teacherResult.current.moduleFetchingCount).toBe(0)
+    expect(studentResult.current.maxFetchingCount).toBe(1)
+    expect(teacherResult.current.maxFetchingCount).toBe(1)
   })
 })
