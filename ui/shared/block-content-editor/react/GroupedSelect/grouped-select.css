@@ -3,6 +3,10 @@
   padding: 8px;
   cursor: pointer;
 }
+.grouped-select-group:not(:last-child),
+.grouped-select-item:not(:last-child) {
+  margin-bottom: 4px;
+}
 
 .grouped-select-group.selected {
   border-left: 4px solid #133b72;
@@ -17,14 +21,13 @@
   font-weight: 600;
 }
 
-.grouped-select-item.selected {
-  background-color: #f2f4f4;
-  border: solid 1px #d7dade;
+.grouped-select-item {
+  height: 40px;
+  border: solid 1px transparent;
   border-radius: 4px;
 }
 
-.grouped-select-item:not(.selected) {
-  margin-top: 1px;
-  margin-bottom: 1px;
-  margin-left: 1px;
+.grouped-select-item.selected {
+  background-color: #f2f4f4;
+  border: solid 1px #d7dade;
 }

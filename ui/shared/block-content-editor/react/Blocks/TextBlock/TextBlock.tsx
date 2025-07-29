@@ -72,7 +72,7 @@ export const TextBlock = (props: TextBlockProps) => {
 }
 
 TextBlock.craft = {
-  displayName: I18n.t('Text Block') as string,
+  displayName: I18n.t('Text column') as string,
   related: {
     settings: TextBlockSettings,
   },

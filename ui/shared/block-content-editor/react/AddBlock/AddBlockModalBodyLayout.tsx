@@ -15,22 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {Flex} from '@instructure/ui-flex'
 import {ReactNode} from 'react'
+import {Flex} from '@instructure/ui-flex'
 
-export const GroupedSelectLayout = (props: {
-  groups: ReactNode
-  items: ReactNode
+export const AddBlockModalBodyLayout = (props: {
+  groupedSelect: ReactNode
+  preview: ReactNode
 }) => {
   return (
-    <Flex alignItems="start" gap="medium">
-      <Flex.Item direction="column" size="200px">
-        {props.groups}
-      </Flex.Item>
-      <Flex.Item direction="column" shouldGrow>
-        {props.items}
-      </Flex.Item>
+    <Flex direction="row" alignItems="start" gap="medium">
+      <Flex.Item shouldGrow>{props.groupedSelect}</Flex.Item>
+      <Flex.Item size="min-content">{props.preview}</Flex.Item>
     </Flex>
   )
 }

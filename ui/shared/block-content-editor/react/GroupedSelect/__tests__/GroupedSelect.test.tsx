@@ -27,15 +27,15 @@ describe('GroupedSelect', () => {
     {
       groupName: 'G1',
       items: [
-        {itemName: 'G1-I1', id: 'image'},
+        {itemName: 'G1-I1', id: 'fullWidthImage'},
         {itemName: 'G1-I2', id: 'imageText'},
       ],
     },
     {
       groupName: 'G2',
       items: [
-        {itemName: 'G2-I1', id: 'simpleText'},
-        {itemName: 'G2-I2', id: 'imageText'},
+        {itemName: 'G2-I1', id: 'textColumn'},
+        {itemName: 'G2-I2', id: 'video'},
       ],
     },
   ]

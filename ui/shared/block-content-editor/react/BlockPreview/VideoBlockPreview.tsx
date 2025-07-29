@@ -16,21 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import {ReactNode} from 'react'
+import {BlockPreviewLayout} from './BlockPreviewLayout'
+import SVGWrapper from '@canvas/svg-wrapper'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const GroupedSelectLayout = (props: {
-  groups: ReactNode
-  items: ReactNode
-}) => {
-  return (
-    <Flex alignItems="start" gap="medium">
-      <Flex.Item direction="column" size="200px">
-        {props.groups}
-      </Flex.Item>
-      <Flex.Item direction="column" shouldGrow>
-        {props.items}
-      </Flex.Item>
-    </Flex>
-  )
-}
+const I18n = createI18nScope('page_editor')
+
+export const VideoBlockPreview = () => (
+  <BlockPreviewLayout
+    image={<SVGWrapper url="/images/block-content-editor/video.svg" />}
+    title={I18n.t('Video')}
+    description={[
+      I18n.t('Add an embedded video to your page. This either can be YouTube or Studio embedding.'),
+    ]}
+    legend={I18n.t("For the time being, you can't add additional text to this block.")}
+  />
+)

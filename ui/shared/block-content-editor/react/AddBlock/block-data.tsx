@@ -32,6 +32,9 @@ export const blockFactory = {
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
   [ButtonBlock.name]: () => <ButtonBlock settings={{}} />,
+  pageHighlight: () => <p>page_highlight</p>,
+  imageText: () => <p>image_text</p>,
+  video: () => <p>video</p>,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -47,18 +50,33 @@ export type BlockData = {
 export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Text'),
-    items: [{itemName: TextBlock.craft.displayName, id: TextBlock.name}],
+    items: [
+      {itemName: TextBlock.craft.displayName, id: TextBlock.name},
+      {itemName: I18n.t('Page highlight'), id: 'pageHighlight'},
+      {itemName: I18n.t('Image + text'), id: 'imageText'},
+    ],
   },
   {
     groupName: I18n.t('Image'),
-    items: [{itemName: ImageBlock.craft.displayName, id: ImageBlock.name}],
+    items: [
+      {itemName: ImageBlock.craft.displayName, id: ImageBlock.name},
+      {itemName: I18n.t('Image + text'), id: 'imageText'},
+    ],
   },
   {
-    groupName: I18n.t('Divider'),
-    items: [{itemName: SeparatorLineBlock.craft.displayName, id: SeparatorLineBlock.name}],
+    groupName: I18n.t('Highlight'),
+    items: [{itemName: I18n.t('Page highlight'), id: 'pageHighlight'}],
+  },
+  {
+    groupName: I18n.t('Multimedia'),
+    items: [{itemName: I18n.t('Video'), id: 'video'}],
   },
   {
     groupName: I18n.t('Interactive element'),
     items: [{itemName: ButtonBlock.craft.displayName, id: ButtonBlock.name}],
+  },
+  {
+    groupName: I18n.t('Divider'),
+    items: [{itemName: SeparatorLineBlock.craft.displayName, id: SeparatorLineBlock.name}],
   },
 ]
