@@ -391,9 +391,10 @@ const Parent = () => {
 
             <Text>
               <Link
+                data-testid="pairing-code-link"
+                forceButtonRole={false}
                 href="https://community.canvaslms.com/t5/Canvas-Resource-Documents/Pairing-Codes-FAQ/ta-p/388738"
                 target="_blank"
-                data-testid="pairing-code-link"
               >
                 {I18n.t('What is a pairing code?')}
               </Link>

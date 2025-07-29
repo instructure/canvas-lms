@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CondensedButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useNewLogin, useNewLoginData} from '../context'
 import React from 'react'
 import {assignLocation} from '@canvas/util/globalUtils'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('new_login')
 
@@ -37,16 +37,18 @@ const LoginTroubleLink = ({url}: Props) => {
   const isDisabled = isPreviewMode || isUiActionPending
 
   return (
-    <CondensedButton
+    <Link
       data-testid="login-trouble-link"
+      forceButtonRole={false}
       href={url}
+      isWithinText={false}
       onClick={event => {
         event.preventDefault()
         if (!isDisabled) assignLocation(url)
       }}
     >
       {I18n.t('Trouble logging in?')}
-    </CondensedButton>
+    </Link>
   )
 }
 
