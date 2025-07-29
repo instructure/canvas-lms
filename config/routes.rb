@@ -1675,6 +1675,7 @@ CanvasRails::Application.routes.draw do
       get "users/:user_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "users/:user_id/folders/by_path", controller: :folders, action: :resolve_path
       get "users/:user_id/folders/:id", controller: :folders, action: :show, as: "user_folder"
+      get "users/:user_id/directory_tree", controller: :files, action: :directory_tree, as: "directory_tree"
 
       get "users/:id/settings", controller: "users", action: "settings"
       put "users/:id/settings", controller: "users", action: "settings", as: "user_settings"

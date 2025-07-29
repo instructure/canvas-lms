@@ -403,6 +403,48 @@ class FilesController < ApplicationController
     end
   end
 
+  def directory_tree
+    if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
+       tab_enabled?(@context.class::TAB_FILES)
+      @contexts = [@context]
+      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
+      get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
+      files_contexts = @contexts.map do |context|
+        tool_context = case context
+                       when Course
+                         context
+                       when User
+                         @domain_root_account
+                       when Group
+                         context.context
+                       end
+
+        has_external_tools = !context.is_a?(Group) && tool_context
+
+        file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+        file_index_menu_tools = if has_external_tools
+                                  external_tools_display_hashes(:file_index_menu, tool_context)
+                                else
+                                  []
+                                end
+        root_folder_id = Folder.root_folders(context)&.first&.id if files_version_2
+        {
+          asset_string: context.asset_string,
+          name: (context == @current_user) ? t("my_files", "My Files") : context.name,
+          usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
+          permissions: {
+            manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
+            manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
+            manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
+          },
+          root_folder_id:
+        }
+      end
+
+      render json: files_contexts
+    end
+  end
+
   def react_files
     unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
