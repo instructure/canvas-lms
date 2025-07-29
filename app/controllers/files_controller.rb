@@ -187,7 +187,6 @@ class FilesController < ApplicationController
 
   include Api::V1::Attachment
   include Api::V1::Avatar
-  include Api::V1::Folders
   include AttachmentHelper
   include K5Mode
 
@@ -844,10 +843,10 @@ class FilesController < ApplicationController
         end
         root_folder = Folder.root_folders(context)&.first
         root_folder_id = root_folder&.id if files_version_2
-        
-        # Build the complete directory tree with files and subfolders
-        folder_tree = root_folder ? build_folder_tree(root_folder) : {}
-        
+
+        # Build simple directory contents
+        contents = root_folder ? get_folder_contents(root_folder) : []
+
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
@@ -858,7 +857,7 @@ class FilesController < ApplicationController
             manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
           root_folder_id:,
-          folder_tree:
+          contents:
         }
       end
 
@@ -1800,36 +1799,51 @@ class FilesController < ApplicationController
     true
   end
 
-  def build_folder_tree(folder)
-    return {} unless folder&.grants_right?(@current_user, session, :read_contents)
-    
+  def get_folder_contents(folder)
+    return [] unless folder&.grants_right?(@current_user, session, :read_contents)
+
     can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
-    
-    # Get folder contents
+
+    # Add subfolders
     folder_scope = folder.active_sub_folders
     folder_scope = folder_scope.not_hidden.not_locked unless can_view_hidden_files
-    
+
+    contents = folder_scope.map do |subfolder|
+      {
+        id: subfolder.id,
+        name: subfolder.name,
+        type: "folder",
+        size: nil,
+        created_at: subfolder.created_at,
+        updated_at: subfolder.updated_at,
+        contents: get_folder_contents(subfolder)
+      }
+    end
+
+    # Add files
     file_scope = folder.active_file_attachments
     file_scope = file_scope.not_hidden.not_locked unless can_view_hidden_files
-    
-    # Build subfolders recursively
-    subfolders = folder_scope.map do |subfolder|
-      folder_data = folder_json(subfolder, @current_user, session, can_view_hidden_files: can_view_hidden_files)
-      folder_data[:folder_tree] = build_folder_tree(subfolder)
-      folder_data
+
+    file_scope.each do |file|
+      # Generate proper download URL with download_frd=1 and verifier
+      download_url = file_download_url(file, {
+                                         download: "1",
+                                         download_frd: "1",
+                                         verifier: file.uuid
+                                       })
+
+      contents << {
+        id: file.id,
+        name: file.display_name,
+        type: "file",
+        size: file.size,
+        content_type: file.content_type,
+        created_at: file.created_at,
+        updated_at: file.updated_at,
+        url: download_url
+      }
     end
-    
-    # Build files list
-    files = file_scope.map do |file|
-      attachment_json(file, @current_user, {}, can_view_hidden_files: can_view_hidden_files)
-    end
-    
-    {
-      id: folder.id,
-      name: folder.name,
-      full_name: folder.full_name,
-      subfolders: subfolders,
-      files: files
-    }
+
+    contents
   end
 end
