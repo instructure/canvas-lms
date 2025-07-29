@@ -277,7 +277,7 @@ describe Quizzes::QuizQuestionsController do
       expect(translated_text).to match(/verifier=/)
 
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
-      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data)
+      linked_question = @quiz.quiz_questions.build(question_data: aq.question_data, saving_user: @teacher)
       linked_question.assessment_question_id = aq.id
       linked_question.save!
 

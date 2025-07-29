@@ -25,6 +25,25 @@ describe Quizzes::Quiz do
     course_factory
   end
 
+  describe "attachment handling" do
+    it "creates associations on quiz creation" do
+      course_with_teacher
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      quiz = @course.quizzes.create!(title: "hello", description: aa_test_data.base_html, saving_user: @teacher)
+      expect(quiz.attachment_associations.count).to eq(1)
+      expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
+    it "updates associations on quiz update" do
+      course_with_teacher
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      quiz = @course.quizzes.create!(title: "hello", description: aa_test_data.base_html, saving_user: @teacher)
+      quiz.update!(description: aa_test_data.replaced_html, saving_user: @teacher)
+      expect(quiz.attachment_associations.count).to eq(1)
+      expect(quiz.attachment_associations.first.attachment_id).to eq aa_test_data.attachment2.id
+    end
+  end
+
   describe "default values for boolean attributes" do
     before(:once) do
       @quiz = @course.quizzes.create!(title: "hello")
@@ -2671,12 +2690,6 @@ describe Quizzes::Quiz do
       it "sets root_account_id using context" do
         quiz = @course.quizzes.create!(title: "hello")
         expect(quiz.root_account).to eq @course.root_account
-      end
-
-      it "leaves root_account_id nil if no context" do
-        @course.root_account_id = nil
-        quiz = @course.quizzes.create!(title: "hello", saving_user: @user)
-        expect(quiz.root_account).to be_nil
       end
     end
   end

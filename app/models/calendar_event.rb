@@ -459,8 +459,10 @@ class CalendarEvent < ActiveRecord::Base
         appointment_group.save!
       end
       if parent_event && parent_event.child_events.empty?
-        parent_event.workflow_state = parent_event.locked? ? "active" : "deleted"
-        parent_event.save!
+        parent_event.class.suspend_callbacks(:update_attachment_associations) do
+          parent_event.workflow_state = parent_event.locked? ? "active" : "deleted"
+          parent_event.save!
+        end
       end
     end
     true
