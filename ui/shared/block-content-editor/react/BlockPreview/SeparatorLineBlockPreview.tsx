@@ -16,21 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import {ReactNode} from 'react'
+import {BlockPreviewLayout} from './BlockPreviewLayout'
+import SVGWrapper from '@canvas/svg-wrapper'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const GroupedSelectLayout = (props: {
-  groups: ReactNode
-  items: ReactNode
-}) => {
-  return (
-    <Flex alignItems="start" gap="medium">
-      <Flex.Item direction="column" size="200px">
-        {props.groups}
-      </Flex.Item>
-      <Flex.Item direction="column" shouldGrow>
-        {props.items}
-      </Flex.Item>
-    </Flex>
-  )
-}
+const I18n = createI18nScope('page_editor')
+
+export const SeparatorLineBlockPreview = () => (
+  <BlockPreviewLayout
+    image={<SVGWrapper url="/images/block-content-editor/separator-line-thin.svg" />}
+    title={I18n.t('Separation line')}
+    description={[I18n.t('Add a horizontal line to visually separate content.')]}
+    legend={I18n.t(
+      'For more complex elements like images, tables, or videos, please use the dedicated blocks.',
+    )}
+  />
+)

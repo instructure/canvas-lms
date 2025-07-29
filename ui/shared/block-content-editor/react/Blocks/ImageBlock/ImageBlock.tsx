@@ -76,7 +76,7 @@ export const ImageBlock = (props: ImageBlockProps) => {
 }
 
 ImageBlock.craft = {
-  displayName: I18n.t('Image Block') as string,
+  displayName: I18n.t('Full width image') as string,
   related: {
     settings: ImageBlockSettings,
   },
