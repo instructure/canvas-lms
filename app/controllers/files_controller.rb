@@ -187,6 +187,7 @@ class FilesController < ApplicationController
 
   include Api::V1::Attachment
   include Api::V1::Avatar
+  include Api::V1::Folders
   include AttachmentHelper
   include K5Mode
 
@@ -400,48 +401,6 @@ class FilesController < ApplicationController
                 end
       headers["X-Total-Pages"] = @images.total_pages.to_s
       render partial: "shared/wiki_image", collection: @images
-    end
-  end
-
-  def directory_tree
-    if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
-       tab_enabled?(@context.class::TAB_FILES)
-      @contexts = [@context]
-      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
-      get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
-      files_contexts = @contexts.map do |context|
-        tool_context = case context
-                       when Course
-                         context
-                       when User
-                         @domain_root_account
-                       when Group
-                         context.context
-                       end
-
-        has_external_tools = !context.is_a?(Group) && tool_context
-
-        file_menu_tools = (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
-        file_index_menu_tools = if has_external_tools
-                                  external_tools_display_hashes(:file_index_menu, tool_context)
-                                else
-                                  []
-                                end
-        root_folder_id = Folder.root_folders(context)&.first&.id if files_version_2
-        {
-          asset_string: context.asset_string,
-          name: (context == @current_user) ? t("my_files", "My Files") : context.name,
-          usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
-          permissions: {
-            manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
-            manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
-            manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
-          },
-          root_folder_id:
-        }
-      end
-
-      render json: files_contexts
     end
   end
 
@@ -858,6 +817,55 @@ class FilesController < ApplicationController
       end
     end
   end
+
+  def directory_tree
+    if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
+       tab_enabled?(@context.class::TAB_FILES)
+      @contexts = [@context]
+      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
+      get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
+      files_contexts = @contexts.map do |context|
+        tool_context = case context
+                       when Course
+                         context
+                       when User
+                         @domain_root_account
+                       when Group
+                         context.context
+                       end
+
+        has_external_tools = !context.is_a?(Group) && tool_context
+
+        (has_external_tools ? external_tools_display_hashes(:file_menu, tool_context, [:accept_media_types]) : [])
+        if has_external_tools
+          external_tools_display_hashes(:file_index_menu, tool_context)
+        else
+          []
+        end
+        root_folder = Folder.root_folders(context)&.first
+        root_folder_id = root_folder&.id if files_version_2
+        
+        # Build the complete directory tree with files and subfolders
+        folder_tree = root_folder ? build_folder_tree(root_folder) : {}
+        
+        {
+          asset_string: context.asset_string,
+          name: (context == @current_user) ? t("my_files", "My Files") : context.name,
+          usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
+          permissions: {
+            manage_files_add: context.grants_right?(@current_user, session, :manage_files_add),
+            manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
+            manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
+          },
+          root_folder_id:,
+          folder_tree:
+        }
+      end
+
+      render json: files_contexts
+    end
+  end
+
   protected :render_attachment
 
   def show_relative
@@ -1790,5 +1798,38 @@ class FilesController < ApplicationController
     Canvas::Security.decode_jwt(sf_verifier, ignore_expiration: true)[:skip_redirect_for_inline_content].blank?
   rescue Canvas::Security::InvalidToken
     true
+  end
+
+  def build_folder_tree(folder)
+    return {} unless folder&.grants_right?(@current_user, session, :read_contents)
+    
+    can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
+    
+    # Get folder contents
+    folder_scope = folder.active_sub_folders
+    folder_scope = folder_scope.not_hidden.not_locked unless can_view_hidden_files
+    
+    file_scope = folder.active_file_attachments
+    file_scope = file_scope.not_hidden.not_locked unless can_view_hidden_files
+    
+    # Build subfolders recursively
+    subfolders = folder_scope.map do |subfolder|
+      folder_data = folder_json(subfolder, @current_user, session, can_view_hidden_files: can_view_hidden_files)
+      folder_data[:folder_tree] = build_folder_tree(subfolder)
+      folder_data
+    end
+    
+    # Build files list
+    files = file_scope.map do |file|
+      attachment_json(file, @current_user, {}, can_view_hidden_files: can_view_hidden_files)
+    end
+    
+    {
+      id: folder.id,
+      name: folder.name,
+      full_name: folder.full_name,
+      subfolders: subfolders,
+      files: files
+    }
   end
 end
