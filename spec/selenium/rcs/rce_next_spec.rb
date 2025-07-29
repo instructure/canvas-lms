@@ -54,7 +54,8 @@ describe "RCE next tests", :ignore_js_errors do
       @image.save!
       @course.wiki_pages.create!(
         title: page_title,
-        body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}\"></p>"
+        body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}\"></p>",
+        saving_user: @teacher
       )
     end
 
@@ -91,7 +92,7 @@ describe "RCE next tests", :ignore_js_errors do
           target="_blank" rel="noopener noreferrer">a.html</a>
         </p>
       HTML
-      @course.wiki_pages.create!(title: page_title, body: content)
+      @course.wiki_pages.create!(title: page_title, body: content, saving_user: @teacher)
     end
 
     it "clicks on sidebar wiki page to create link in body", :ignore_js_errors do

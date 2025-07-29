@@ -67,6 +67,7 @@ describe "CanvasStudioPlayer in Wiki Pages", :ignore_js_errors do
         @media_object.media_tracks.create!(kind: "subtitles", locale: "fr", media_object: @media_object, content: '0\n00:00:00,000 --> 00:00:05,000\nFrench sub …This is the first sentence n\n\n1\n00:00:05,000 --> 00:00:10,000\n French sub and a second...')
 
         @page.body = embedded_video_page_body_html(@attachment.id)
+        @page.saving_user = @teacher
         @page.save!
 
         user_session(@user)

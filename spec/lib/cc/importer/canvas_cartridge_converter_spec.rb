@@ -682,7 +682,7 @@ describe "Canvas Cartridge importing" do
       <a href="/courses/%s/files/%s/download?wrap=1">Download (wrap) File</a>
       <a href="/courses/%s/files/%s/bogus?someattr=1">Download (wrap) File</a>
       </p>}
-    page = @copy_from.wiki_pages.create!(title: "some page", body: body_with_link % ([@copy_from.id, attachment.id] * 4))
+    page = @copy_from.wiki_pages.create!(title: "some page", body: body_with_link % ([@copy_from.id, attachment.id] * 4), saving_user: @from_teacher)
     @copy_from.save!
 
     # export to html file
@@ -869,7 +869,7 @@ describe "Canvas Cartridge importing" do
           <div><img src="http://www.instructure.com/images/header-logo.png"></div>
           <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         </div>)
-      @page = @copy_from.wiki_pages.create!(title: "some page", body: @body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true)
+      @page = @copy_from.wiki_pages.create!(title: "some page", body: @body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true, saving_user: @user)
       @page.workflow_state = "unpublished"
       @copy_from.save!
 

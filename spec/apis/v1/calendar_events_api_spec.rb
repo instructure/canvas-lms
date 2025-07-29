@@ -2481,7 +2481,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "apis translate event descriptions" do
       should_translate_user_content(@course) do |content|
-        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
+        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/calendar_events/#{event.id}",
                         controller: "calendar_events_api",
@@ -2494,7 +2494,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "apis translate event descriptions without verifiers" do
       should_translate_user_content(@course, false) do |content|
-        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content)
+        event = @course.calendar_events.create!(title: "event", start_at: "2012-01-08 12:00:00", description: content, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/calendar_events/#{event.id}",
                         controller: "calendar_events_api",
@@ -2509,7 +2509,7 @@ describe CalendarEventsApiController, type: :request do
     it "apis translate event descriptions in ics" do
       allow(HostUrl).to receive(:default_host).and_return("www.example.com")
       should_translate_user_content(@course, false) do |content|
-        @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now)
+        @course.calendar_events.create!(description: content, start_at: 1.hour.from_now, end_at: 2.hours.from_now, saving_user: @teacher)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}",
                         controller: "courses",
@@ -5381,11 +5381,12 @@ describe CalendarEventsApiController, type: :request do
         <p><img src="/courses/#{@course.id}/files/#{image.id}/preview"></p>
         <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
       HTML
-      @event.update(description:)
+      @event.update(description:, saving_user: @teacher)
       @s_event = @event.child_events.create!(
         title: "course event section 1",
         start_at: @time + 1.day,
-        context: @course.course_sections.take
+        context: @course.course_sections.take,
+        saving_user: @teacher
       )
 
       raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {

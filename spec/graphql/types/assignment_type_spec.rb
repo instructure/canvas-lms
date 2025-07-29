@@ -331,7 +331,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
+      assignment.update(description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>), saving_user: teacher)
     end
 
     it "includes description when lock settings allow" do
@@ -349,7 +349,7 @@ describe Types::AssignmentType do
     end
 
     it "works for assignments in public courses" do
-      course.update! is_public: true
+      course.update!(is_public: true, saving_user: teacher)
       expect(
         assignment_type.resolve(
           "description",

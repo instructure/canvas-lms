@@ -524,6 +524,7 @@ class Quizzes::QuizzesController < ApplicationController
           @quiz.did_edit if @quiz.created?
         end
       end
+      quiz_params[:saving_user] = @current_user
 
       cached_due_dates_changed = @quiz.update_cached_due_dates?(quiz_params[:quiz_type])
 

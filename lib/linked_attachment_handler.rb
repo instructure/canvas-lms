@@ -128,7 +128,7 @@ module LinkedAttachmentHandler
   end
 
   def attachment_associations_enabled?
-    root_account.feature_enabled?(:file_association_access)
+    root_account&.feature_enabled?(:allow_attachment_association_creation)
   end
 
   def actual_saving_user

@@ -40,7 +40,7 @@ describe Course do
       data["all_files_export"] = {
         "file_path" => File.join(IMPORT_JSON_DIR, "import_from_migration_small.zip")
       }
-      migration = ContentMigration.create!(context: @course, started_at: Time.zone.now)
+      migration = ContentMigration.create!(context: @course, started_at: Time.zone.now, user: account_admin_user)
       allow(migration).to receive(:canvas_import?).and_return(true)
 
       params = { copy: {
@@ -115,6 +115,7 @@ describe Course do
 
       # assignment tests
       @course.reload
+      p @course.assignments.pluck(:migration_id)
       expect(@course.assignments.length).to eq 4
       expect(@course.assignments.map(&:migration_id).sort).to(
         eq(%w[1865116155002 1865116014002 4407365899221 4469882339231].sort)

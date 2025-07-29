@@ -2675,7 +2675,7 @@ describe Quizzes::Quiz do
 
       it "leaves root_account_id nil if no context" do
         @course.root_account_id = nil
-        quiz = @course.quizzes.create!(title: "hello")
+        quiz = @course.quizzes.create!(title: "hello", saving_user: @user)
         expect(quiz.root_account).to be_nil
       end
     end
