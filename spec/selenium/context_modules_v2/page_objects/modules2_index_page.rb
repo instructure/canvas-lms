@@ -135,7 +135,11 @@ module Modules2IndexPage
   end
 
   def module_item_header_selector(module_item_id)
-    "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-titl-text']"
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-title-text']"
+  end
+
+  def module_item_text_header_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='document-icon']"
   end
 
   def module_item_indent_selector(module_item_id)
@@ -148,6 +152,10 @@ module Modules2IndexPage
 
   def module_item_quiz_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='quiz-icon']"
+  end
+
+  def module_item_attachment_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='attachment-icon']"
   end
 
   def module_item_status_icon_selector(module_item_id)
@@ -355,6 +363,14 @@ module Modules2IndexPage
 
   def module_item_quiz_icon(module_item_id)
     f(module_item_quiz_icon_selector(module_item_id))
+  end
+
+  def module_item_attachment_icon(module_item_id)
+    f(module_item_attachment_icon_selector(module_item_id))
+  end
+
+  def module_item_text_header_icon(module_item_id)
+    f(module_item_text_header_icon_selector(module_item_id))
   end
 
   def module_item_status_icon(module_item_id)

@@ -49,9 +49,22 @@ describe "context modules", :ignore_js_errors do
     expect(screenreader_alert).to include_text("All module items loaded")
   end
 
+  it "validates that item is indented when it has a non-zero indent" do
+    indented_module_item = @module1.add_item(
+      type: "assignment",
+      id: @assignment3.id,
+      indent: 2 # Indent level 2 = 40px
+    )
+    go_to_modules
+    wait_for_ajaximations
+    module_header_expand_toggles.first.click
+    item_indent = module_item_indent(indented_module_item.id)
+    expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+  end
+
   context "modules action menu" do
     before do
-      # Create a module with at leas one item of each type
+      # Create a module with at least one item of each type
       module_setup
       # Create a module item of file type
       file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
@@ -436,5 +449,96 @@ describe "context modules", :ignore_js_errors do
   context "module expanding and collapsing" do
     it_behaves_like "module collapse and expand", :context_modules
     it_behaves_like "module collapse and expand", :course_homepage
+  end
+
+  context "module item types" do
+    before(:once) do
+      course_module
+    end
+
+    it "displays the correct icon for assignment" do
+      new_assignment = @course.assignments.create!(title: "Week3 homework", submission_types: "online_text_entry")
+      module_item = @module.add_item(type: "assignment", id: new_assignment.id)
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      assignment_icon = module_item_assignment_icon(module_item.id)
+      expect(assignment_icon).to be_displayed
+    end
+
+    it "displays the correct icon for classic Quiz" do
+      classic_quiz = @course.quizzes.create!(title: "Week3 Quiz", quiz_type: "survey")
+      module_item = @module.add_item(type: "quiz", id: classic_quiz.id)
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      quiz_icon = module_item_quiz_icon(module_item.id)
+      expect(quiz_icon).to be_displayed
+    end
+
+    it "displays the correct icon for wiki page" do
+      wiki_page = @course.wiki_pages.create!(title: "week3 Page", body: "hi")
+      module_item = @module.add_item(type: "wiki_page", id: wiki_page.id)
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      page_icon = module_item_page_icon(module_item.id)
+      expect(page_icon).to be_displayed
+    end
+
+    it "displays the correct icon for discussion" do
+      discussion = @course.discussion_topics.create!(title: "Week3 Discussion", message: "hi")
+      module_item = @module.add_item(type: "discussion_topic", id: discussion.id)
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      discussion_icon = module_item_discussion_icon(module_item.id)
+      expect(discussion_icon).to be_displayed
+    end
+
+    it "displays the correct icon for text header" do
+      text_header = @module.add_item(type: "context_module_sub_header", title: "Created header")
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      text_header_icon = module_item_text_header_icon(text_header.id)
+      expect(text_header_icon).to be_displayed
+    end
+
+    it "displays the correct icon for external URL" do
+      external_url = @module.add_item(type: "external_url", url: "http://example.com", title: "External URL")
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      external_url_icon = module_item_url_icon(external_url.id)
+      expect(external_url_icon).to be_displayed
+    end
+
+    it "displays the correct icon for external tool" do
+      @course.context_external_tools.create!(name: "lti tool",
+                                             consumer_key: "key",
+                                             shared_secret: "secret",
+                                             url: "http://example.com")
+      external_tool = @module.add_item({
+                                         type: "context_external_tool",
+                                         title: "new external tool",
+                                         url: "http://example.com"
+                                       })
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      external_tool_icon = module_item_url_icon(external_tool.id)
+      expect(external_tool_icon).to be_displayed
+    end
+
+    it "displays the correct icon for file upload" do
+      file = @course.attachments.create!(display_name: "file uploaded", uploaded_data: default_uploaded_data, locked: true)
+      uploaded_file = @module.add_item(type: "attachment", id: file.id)
+      go_to_modules
+      wait_for_ajaximations
+      module_header_expand_toggles.last.click
+      uploaded_file_icon = module_item_attachment_icon(uploaded_file.id)
+      expect(uploaded_file_icon).to be_displayed
+    end
   end
 end
