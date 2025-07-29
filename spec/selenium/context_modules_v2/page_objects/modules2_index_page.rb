@@ -78,6 +78,14 @@ module Modules2IndexPage
     "[data-testid='module-action-menu_#{module_id}']"
   end
 
+  def module_action_menu_deletetion_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}-deletion']"
+  end
+
+  def module_action_menu_copy_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}-copy']"
+  end
+
   def module_file_drop_selector(module_id)
     "[data-module-id='#{module_id}'] [data-testid='module-file-drop']"
   end
@@ -287,6 +295,14 @@ module Modules2IndexPage
 
   def module_action_menu(module_id)
     f(module_action_menu_selector(module_id))
+  end
+
+  def module_action_menu_deletetion(module_id)
+    f(module_action_menu_deletetion_selector(module_id))
+  end
+
+  def module_action_menu_copy(module_id)
+    f(module_action_menu_copy_selector(module_id))
   end
 
   def module_file_drop_element(module_id)
