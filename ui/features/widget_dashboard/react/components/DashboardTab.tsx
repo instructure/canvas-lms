@@ -18,21 +18,30 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import DashboardTabs from './components/DashboardTabs'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const WidgetDashboardContainer: React.FC = () => {
+const DashboardTab: React.FC = () => {
   return (
-    <View as="div" padding="large">
-      <Heading level="h1" margin="0 0 medium">
-        {I18n.t('Widget Dashboard')}
+    <View as="div" padding="medium" data-testid="dashboard-tab-content">
+      <Heading level="h2" margin="0 0 medium" data-testid="dashboard-tab-heading">
+        {I18n.t('Dashboard')}
       </Heading>
-      <DashboardTabs />
+      <Text>
+        {I18n.t(
+          'Welcome to your dashboard! This is where you can view and manage your dashboard widgets.',
+        )}
+      </Text>
+      <View as="div" margin="medium 0 0">
+        <Text size="small" color="secondary">
+          {I18n.t('Dashboard widgets and customization features coming soon.')}
+        </Text>
+      </View>
     </View>
   )
 }
 
-export default WidgetDashboardContainer
+export default DashboardTab
