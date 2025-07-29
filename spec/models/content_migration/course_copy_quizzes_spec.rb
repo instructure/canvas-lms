@@ -561,7 +561,7 @@ describe ContentMigration do
                          { migration_id: "QUE_1017_A2", html: "<strong>html answer 2</strong>", comments_html: "<i>comment</i>", text: "", weight: 0, id: 2279 }] }.with_indifferent_access
 
       q1 = @copy_from.quizzes.create!(title: "quiz1")
-      q1.quiz_questions.create!(question_data: data)
+      q1.quiz_questions.create!(question_data: data, saving_user: @user)
 
       run_course_copy
 

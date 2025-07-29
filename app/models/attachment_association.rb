@@ -66,6 +66,10 @@ class AttachmentAssociation < ActiveRecord::Base
     if context_type == "CourseSyllabus"
       context_concern = "syllabus_body"
       context_type = "Course"
+    elsif context_type == "Quiz"
+      context_type = "Quizzes::Quiz"
+    elsif context_type == "QuizQuestion"
+      context_type = "Quizzes::QuizQuestion"
     end
 
     association = Shard.shard_for(context_id).activate do
@@ -79,23 +83,25 @@ class AttachmentAssociation < ActiveRecord::Base
     feature_is_on && association.context&.access_for_attachment_association?(user, session, association, location_param)
   end
 
-  def self.copy_associations(source, targets, context_concern = nil)
-    return if source.nil? || targets.nil? || targets.empty?
+  def self.copy_associations(source, targets, source_context_concern = nil, target_context_concern = nil)
+    return if source.nil? || targets.nil?
 
     targets = Array(targets)
-    raise ArgumentError, "source and targets must be of same class" unless source.instance_of?(targets.first.class)
+    raise "Targets must be of same class" unless targets.all?(targets.first.class)
 
-    AttachmentAssociation.where(context_type: source.class.name, context_id: targets.pluck(:id), context_concern:).delete_all
+    return if targets.empty?
+
+    AttachmentAssociation.where(context_type: targets.first.class.name, context_id: targets.pluck(:id), context_concern: target_context_concern).delete_all
 
     to_create = []
-    AttachmentAssociation.where(context: source, context_concern:).find_each do |assoc|
+    AttachmentAssociation.where(context: source, context_concern: source_context_concern).find_each do |assoc|
       targets.each do |target|
         to_create << {
           context_type: target.class.name,
           context_id: target.id,
           attachment_id: assoc.attachment_id,
           user_id: assoc.user_id,
-          context_concern:,
+          context_concern: target_context_concern,
           root_account_id: target.root_account_id
         }
       end

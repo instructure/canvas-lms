@@ -369,7 +369,7 @@ describe CC::CCHelper do
         @question = @bank.assessment_questions.create!(question_data:)
         @question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
         @question.save!
-        quiz_model(course: @course)
+        quiz_model(course: @course, saving_user: @teacher)
         @quiz.add_assessment_questions([@question])
       end
 

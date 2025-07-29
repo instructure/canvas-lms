@@ -318,7 +318,7 @@ describe "Common Cartridge exporting" do
       question.question_data = question_data.merge("question_text" => %(<p><img src="/courses/#{@course.id}/files/#{@attachment.id}/download"></p>))
       question.save!
       att = question.attachments.take
-      quiz_model(course: @course)
+      quiz_model(course: @course, saving_user: @user)
       @quiz.add_assessment_questions([question])
 
       @ce.export_type = ContentExport::QTI
@@ -343,7 +343,7 @@ describe "Common Cartridge exporting" do
     it "includes any files referenced in html for QTI export" do
       @att = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       @att2 = Attachment.create!(filename: "second.jpg", uploaded_data: StringIO.new("ohais"), folder: Folder.unfiled_folder(@course), context: @course)
-      @q1 = @course.quizzes.create(title: "quiz1")
+      @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
 
       qq = @q1.quiz_questions.create!
       data = {
@@ -365,6 +365,7 @@ describe "Common Cartridge exporting" do
                   }]
       }.with_indifferent_access
       qq["question_data"] = data
+      qq.saving_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -389,7 +390,7 @@ describe "Common Cartridge exporting" do
 
     it "includes any files referenced in html for course export" do
       att1 = Attachment.create!(filename: "first.png", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      quiz = @course.quizzes.create(title: "quiz1")
+      quiz = @course.quizzes.create(title: "quiz1", saving_user: @user)
 
       qq = quiz.quiz_questions.create!
       data = { correct_comments: "",
@@ -405,6 +406,7 @@ describe "Common Cartridge exporting" do
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
       qq["question_data"] = data
+      qq.saving_user = @user
       qq.save!
 
       attachment_model(uploaded_data: stub_png_data)
@@ -487,7 +489,7 @@ describe "Common Cartridge exporting" do
     end
 
     it "includes media objects" do
-      @q1 = @course.quizzes.create(title: "quiz1")
+      @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
       folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
       att = Attachment.create!(context: @course, folder:, media_entry_id: "some-kaltura-id", display_name: "test.mp4", filename: "test.mp4", uploaded_data: StringIO.new("media"))
       @media_object = @course.media_objects.create!(
@@ -522,6 +524,7 @@ describe "Common Cartridge exporting" do
                   }]
       }.with_indifferent_access
       qq["question_data"] = data
+      qq.saving_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::QTI
@@ -708,7 +711,7 @@ describe "Common Cartridge exporting" do
       @att.display_name = "not_actually_first.png"
       @att.save!
 
-      @q1 = @course.quizzes.create(title: "quiz1")
+      @q1 = @course.quizzes.create(title: "quiz1", saving_user: @user)
 
       qq = @q1.quiz_questions.create!
       data = { correct_comments: "",
@@ -724,6 +727,7 @@ describe "Common Cartridge exporting" do
                answers: [{ migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080 },
                          { migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279 }] }.with_indifferent_access
       qq["question_data"] = data
+      qq.saving_user = @user
       qq.save!
 
       @ce.export_type = ContentExport::COMMON_CARTRIDGE

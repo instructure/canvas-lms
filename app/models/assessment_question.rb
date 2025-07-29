@@ -24,6 +24,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
+
   delegate :context, :context_id, :context_type, to: :assessment_question_bank
   attr_accessor :initial_context
 
@@ -278,7 +279,7 @@ class AssessmentQuestion < ActiveRecord::Base
       aq.force_version_number(current_versions[aq.id] || 0)
       qq = existing_quiz_questions[aq.id].try(:first)
       if qq
-        qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+        qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
       else
         begin
           Quizzes::QuizQuestion.transaction(requires_new: true) do
@@ -288,7 +289,7 @@ class AssessmentQuestion < ActiveRecord::Base
           qq = scope.where(assessment_question_id: aq,
                            quiz_group_id:,
                            duplicate_index:).take!
-          qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
+          qq.update_from_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
       end
       qq

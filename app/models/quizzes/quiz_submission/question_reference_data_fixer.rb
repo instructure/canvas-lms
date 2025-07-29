@@ -112,7 +112,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
 
     assessment_questions = AssessmentQuestion.where({
                                                       id: erratic_ids
-                                                    }).select([:id, :question_data])
+                                                    }).select(%i[id question_data root_account_id]).to_a
 
     quiz_questions = Quizzes::QuizQuestion.where({
                                                    quiz_id:,
