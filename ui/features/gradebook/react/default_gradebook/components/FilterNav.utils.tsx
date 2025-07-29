@@ -217,37 +217,79 @@ function useFilterDropdownData({
     }
 
     if (Object.values(studentGroupCategories).length > 0) {
-      filterItems['student-groups'] = {
-        id: 'student-groups',
-        name: I18n.t('Student Groups'),
-        parentId: 'savedFilterPresets',
-        isSelected: appliedFilters.some(c => c.type === 'student-group'),
-        itemGroups: Object.values(studentGroupCategories)
-          .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
-          .map(category => ({
-            id: category.id,
-            name: category.name,
-            items: category.groups
-              .sort((g1, g2) => natcompare.strings(g1.name, g2.name))
-              .map(group => ({
-                id: group.id,
-                name: group.name,
-                isSelected: appliedFilters.some(
-                  c => c.type === 'student-group' && c.value === group.id,
-                ),
-                onToggle: () => {
-                  const filter: Filter = {
-                    id: uuid.v4(),
-                    type: 'student-group',
-                    value: group.id,
-                    created_at: new Date().toISOString(),
-                  }
-                  toggleFilterHelper(filter)
-                },
-              })),
-          })),
+      const student_groups = Object.values(studentGroupCategories).filter(
+        category => category.non_collaborative === false,
+      )
+      if (student_groups.length > 0) {
+        filterItems['student-groups'] = {
+          id: 'student-groups',
+          name: I18n.t('Student Groups'),
+          parentId: 'savedFilterPresets',
+          isSelected: appliedFilters.some(c => c.type === 'student-group'),
+          itemGroups: student_groups
+            .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
+            .map(category => ({
+              id: category.id,
+              name: category.name,
+              items: category.groups
+                .sort((g1, g2) => natcompare.strings(g1.name, g2.name))
+                .map(group => ({
+                  id: group.id,
+                  name: group.name,
+                  isSelected: appliedFilters.some(
+                    c => c.type === 'student-group' && c.value === group.id,
+                  ),
+                  onToggle: () => {
+                    const filter: Filter = {
+                      id: uuid.v4(),
+                      type: 'student-group',
+                      value: group.id,
+                      created_at: new Date().toISOString(),
+                    }
+                    toggleFilterHelper(filter)
+                  },
+                })),
+            })),
+        }
+        dataMap['student-groups'] = filterItems['student-groups']
       }
-      dataMap['student-groups'] = filterItems['student-groups']
+
+      const non_collaborative_groups = Object.values(studentGroupCategories).filter(
+        category => category.non_collaborative === true,
+      )
+      if (non_collaborative_groups.length > 0) {
+        filterItems['non-collaborative-groups'] = {
+          id: 'non-collaborative-groups',
+          name: I18n.t('Differentiation Tags'),
+          parentId: 'savedFilterPresets',
+          isSelected: appliedFilters.some(c => c.type === 'non-collaborative-group'),
+          itemGroups: non_collaborative_groups
+            .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
+            .map(category => ({
+              id: category.id,
+              name: category.name,
+              items: category.groups
+                .sort((g1, g2) => natcompare.strings(g1.name, g2.name))
+                .map(group => ({
+                  id: group.id,
+                  name: group.name,
+                  isSelected: appliedFilters.some(
+                    c => c.type === 'non-collaborative-group' && c.value === group.id,
+                  ),
+                  onToggle: () => {
+                    const filter: Filter = {
+                      id: uuid.v4(),
+                      type: 'non-collaborative-group',
+                      value: group.id,
+                      created_at: new Date().toISOString(),
+                    }
+                    toggleFilterHelper(filter)
+                  },
+                })),
+            })),
+        }
+        dataMap['non-collaborative-groups'] = filterItems['non-collaborative-groups']
+      }
     }
     const customStatusIdStrings = getCustomStatusIdStrings(customStatuses)
     filterItems.status = {

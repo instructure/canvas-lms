@@ -1544,10 +1544,10 @@ class GradebooksController < ApplicationController
     categories
       .joins("LEFT JOIN #{Group.quoted_table_name} ON groups.group_category_id=group_categories.id AND groups.workflow_state <> 'deleted'")
       .group("group_categories.id", "group_categories.name")
-      .pluck("group_categories.id", "group_categories.name", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name))"))
-      .map do |category_id, category_name, original_groups|
+      .pluck("group_categories.id", "group_categories.name", "group_categories.non_collaborative", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name, 'non_collaborative',groups.non_collaborative))"))
+      .map do |category_id, category_name, category_non_collaborative, original_groups|
         groups = original_groups.select { |g| g["id"] }.map(&:with_indifferent_access)
-        { id: category_id, name: category_name, groups: }.with_indifferent_access
+        { id: category_id, name: category_name, non_collaborative: category_non_collaborative, groups: }.with_indifferent_access
       end
   end
 
