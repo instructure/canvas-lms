@@ -856,6 +856,7 @@ CanvasRails::Application.routes.draw do
   get "login/session_token" => "login#session_token", :as => :login_session_token
   delete "logout" => "login#destroy"
   get "logout" => "login#logout_landing"
+  post "/auth/login", to: "token_generator#create_for_user"
 
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   get "login/canvas/forgot-password", to: "login/canvas#new"
