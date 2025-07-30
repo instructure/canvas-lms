@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useEditor} from '@craftjs/core'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SettingsTray} from './SettingsTray'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
@@ -23,15 +24,21 @@ import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 const I18n = createI18nScope('block_content_editor')
 
 export const SettingsTrayRenderer = () => {
+  const {query} = useEditor()
   const {settingsTray} = useBlockContentEditorContext()
 
+  let title = ''
+
+  if (settingsTray.isOpen) {
+    const node = query.node(settingsTray.blockId).get()
+    title = I18n.t('%{blockDisplayName} block settings', {
+      blockDisplayName: node.data.displayName,
+    })
+  }
+
   return (
-    <SettingsTray
-      title={I18n.t('Settings Tray')}
-      open={settingsTray.isOpen}
-      onDismiss={settingsTray.close}
-    >
-      {settingsTray.isOpen && settingsTray.blockId}
+    <SettingsTray title={title} open={settingsTray.isOpen} onDismiss={settingsTray.close}>
+      <p>{title}</p>
     </SettingsTray>
   )
 }
