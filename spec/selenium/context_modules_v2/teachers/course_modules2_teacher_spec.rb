@@ -615,4 +615,78 @@ describe "context modules", :ignore_js_errors do
       expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["context_modules"])
     end
   end
+
+  context "view progress button" do
+    let(:progressions_status_page_url) { "/courses/#{@course.id}/modules/progressions" }
+
+    it "navigates to the progressions status page when clicked" do
+      go_to_modules
+      wait_for_ajaximations
+      progress_button.click
+
+      expect(driver.current_url).to include(progressions_status_page_url)
+    end
+  end
+
+  context "publish all menu" do
+    context "'Publish all modules and items' button" do
+      it "publishes all modules and items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        publish_all_menu.click
+        publish_all_modules_and_items.click
+        publish_all_continue_button.click
+
+        run_jobs
+
+        verify_publication_state(@course.context_modules, module_published: true, items_published: true)
+      end
+    end
+
+    context "'Publish modules only' button" do
+      it "publishes all modules but not items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        publish_all_menu.click
+        publish_modules_only.click
+        publish_module_only_continue_button.click
+
+        run_jobs
+
+        verify_publication_state(@course.context_modules, module_published: true, items_published: false)
+      end
+    end
+
+    context "'Unpublish all modules and items' button" do
+      it "unpublishes all modules and items" do
+        go_to_modules
+        wait_for_ajaximations
+        publish_all_menu.click
+        unpublish_all_modules_and_items.click
+        unpublish_all_continue_button.click
+
+        run_jobs
+
+        verify_publication_state(@course.context_modules, module_published: false, items_published: false)
+      end
+    end
+
+    context "'Unpublish modules only' button" do
+      it "unpublishes all modules but not items" do
+        go_to_modules
+        wait_for_ajaximations
+        publish_all_menu.click
+        unpublish_modules_only.click
+        unpublish_all_continue_button.click
+
+        run_jobs
+
+        verify_publication_state(@course.context_modules, module_published: false, items_published: true)
+      end
+    end
+  end
 end

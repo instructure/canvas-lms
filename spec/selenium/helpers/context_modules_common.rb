@@ -427,4 +427,21 @@ module ContextModulesCommon
       mod.find_or_create_progression(user)&.uncollapse!
     end
   end
+
+  def verify_publication_state(modules, module_published:, items_published:)
+    modules.each do |mod|
+      mod.reload
+      expect(mod.published?).to eq(module_published)
+      mod.content_tags.each do |tag|
+        expect(tag.published?).to eq(items_published)
+      end
+    end
+  end
+
+  def prepare_unpublished_modules(modules)
+    modules.each do |mod|
+      mod.update(workflow_state: "unpublished")
+      mod.unpublish_items!
+    end
+  end
 end

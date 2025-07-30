@@ -207,6 +207,42 @@ module Modules2IndexPage
     f("body")
   end
 
+  def progress_button_selector
+    "#context-modules-header-view-progress-button"
+  end
+
+  def publish_all_continue_button_selector
+    "#publish_all_continue_button"
+  end
+
+  def publish_modules_only_continue_button_selector
+    "#publish_module_only_continue_button"
+  end
+
+  def unpublish_all_continue_button_selector
+    "#unpublish_all_continue_button"
+  end
+
+  def publish_all_menu_selector
+    "#context-modules-publish-menu button"
+  end
+
+  def publish_all_modules_and_items_selector
+    "#publish_all_menu_item"
+  end
+
+  def publish_modules_only_selector
+    "#publish_module_only_menu_item"
+  end
+
+  def unpublish_all_modules_and_items_selector
+    "#unpublish_all_menu_item"
+  end
+
+  def unpublish_modules_only_selector
+    "#unpublish_module_only_menu_item"
+  end
+
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
@@ -427,6 +463,42 @@ module Modules2IndexPage
 
   def option_list_course_option(option_list_id, course_name)
     fj(course_option_selector(option_list_id, course_name))
+  end
+
+  def progress_button
+    f(progress_button_selector)
+  end
+
+  def publish_all_continue_button
+    f(publish_all_continue_button_selector)
+  end
+
+  def publish_module_only_continue_button
+    f(publish_modules_only_continue_button_selector)
+  end
+
+  def unpublish_all_continue_button
+    f(unpublish_all_continue_button_selector)
+  end
+
+  def publish_all_menu
+    f(publish_all_menu_selector)
+  end
+
+  def publish_all_modules_and_items
+    f(publish_all_modules_and_items_selector)
+  end
+
+  def publish_modules_only
+    f(publish_modules_only_selector)
+  end
+
+  def unpublish_all_modules_and_items
+    f(unpublish_all_modules_and_items_selector)
+  end
+
+  def unpublish_modules_only
+    f(unpublish_modules_only_selector)
   end
 
   def send_to_form_selected_elements
