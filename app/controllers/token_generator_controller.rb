@@ -46,7 +46,7 @@ class TokenGeneratorController < ApplicationController
           workflow_state: "active"
         )
 
-        render json: { access_token: plaintext_token }
+        render json: { access_token: plaintext_token, user_id: user.id }
       rescue => e
         render json: { error: "Failed to save token: #{e.message}" }, status: :internal_server_error
       end
