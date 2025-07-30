@@ -38,12 +38,14 @@ const HelpTray = () => {
 
   return (
     <Tray
+      data-testid="help-tray"
+      id="helpTray"
       label={I18n.t('%{helpLinkText} Menu', {helpLinkText: helpLink?.text})}
       onDismiss={closeHelpTray}
       open={isHelpTrayOpen}
       placement="start"
       shouldCloseOnDocumentClick={true}
-      id="helpTray"
+      size="regular"
     >
       <View as="div" padding="medium">
         <Flex direction="column" gap="medium">
@@ -51,6 +53,7 @@ const HelpTray = () => {
             <Flex.Item>{helpLink?.text && <Heading>{helpLink.text}</Heading>}</Flex.Item>
             <Flex.Item>
               <CloseButton
+                data-testid="close-help-tray-button"
                 offset="medium"
                 onClick={closeHelpTray}
                 placement="end"
