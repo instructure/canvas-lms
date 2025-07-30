@@ -20,17 +20,22 @@
 require "spec_helper"
 
 describe CaptchaValidation do
+  let(:root_account) { account_model }
+
   controller(ApplicationController) do
     include CaptchaValidation
   end
 
   before do
-    allow(DynamicSettings).to receive(:find).and_return({ "recaptcha_server_key" => "test_key" })
+    allow(DynamicSettings).to receive(:find).and_return(
+      DynamicSettings::FallbackProxy.new({ "recaptcha_server_key" => "test_key" })
+    )
+    controller.instance_variable_set(:@domain_root_account, root_account)
   end
 
   describe "#validate_captcha" do
     it "returns nil when captcha key is not configured" do
-      allow(DynamicSettings).to receive(:find).and_return({})
+      allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new({}))
       expect(controller.send(:validate_captcha)).to be_nil
     end
 
