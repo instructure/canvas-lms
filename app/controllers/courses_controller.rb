@@ -608,6 +608,8 @@ class CoursesController < ApplicationController
         [e.course.enrollment_term.default_term? ? 1 : 0, e.course.enrollment_term.name]
       when "enrolled_as"
         e.readable_role_name
+      when "accessibility"
+        [e.course.exceeds_accessibility_scan_limit? ? 1 : 0, accessibility_issues_count(e.course)]
       else
         if type == "past"
           [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]
@@ -4376,6 +4378,13 @@ class CoursesController < ApplicationController
     end
   end
   helper_method :visible_self_enrollment_option
+
+  def accessibility_issues_count(course)
+    return 0 if course.exceeds_accessibility_scan_limit?
+
+    AccessibilityIssue.active.where(course:).count
+  end
+  helper_method :accessibility_issues_count
 
   private
 

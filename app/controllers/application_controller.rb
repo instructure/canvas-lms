@@ -465,6 +465,7 @@ class ApplicationController < ActionController::Base
     hide_legacy_course_analytics
     standardize_assignment_date_formatting
     youtube_overlay
+    accessibility_tab_enable
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

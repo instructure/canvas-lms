@@ -53,7 +53,7 @@
     width: 15%;
   }
   .course-list-published-column {
-    width: 7%;
+    width: 10%;
   }
   .course-list-nickname-column {
     width: 25%;
@@ -62,6 +62,9 @@
   .course-list-not-favoritable,
   .course-list-group-column {
     width: 35%;
+  }
+  .course-list-accessibility-column {
+    width: 10%;
   }
   .course-list-no-left-border {
     border-#{direction(left)}: 0;
@@ -98,4 +101,8 @@
   @include fontSize(21px);
   padding-#{direction(right)}: $ic-sp*0.5;
   vertical-align: baseline;
+}
+
+.icon-publish.icon-Solid {
+  color: $ic-color-success;
 }

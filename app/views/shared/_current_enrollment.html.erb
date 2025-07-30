@@ -110,6 +110,31 @@
         <% end %>
       </td>
 
+      <% if @show_accessibility_column %>
+        <td class="course-list-no-left-border course-list-accessibility-column">
+          <% if current_enrollment.course.exceeds_accessibility_scan_limit? %>
+            <% unavailable_message = t('unavailable_message', "The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).") %>
+            <i
+              class="icon-question icon-Line"
+              data-tooltip=""
+              title="<%= unavailable_message %>">
+              <span class="screenreader-only"><%= unavailable_message %></span>
+            </i>
+            <span class="message"><%= t('unknown', "Unknown") %></span>
+          <% elsif AccessibilityResourceScan.for_course(current_enrollment.course).running.exists? %>
+            <span class="course-list-checking-spinner"></span>
+            <span class="message"><%= t('checking', "Checking...") %></span>
+          <% else %>
+            <% issues_count = accessibility_issues_count(current_enrollment.course) %>
+            <% if issues_count > 0 %>
+              <span class="status-pill"><%= t('issue_count', {:one => "%{count} issue", :other => "%{count} issues"}, :count => issues_count) %></span>
+            <% else %>
+                <i class="icon-publish icon-Solid"></i>
+                <span class="message"><%= t('no_issues', "No issues") %></span>
+            <% end %>
+          <%end%>
+        </td>
+      <% end %>
 <% end %>
 <% unless dashboard %>
   </tr>
