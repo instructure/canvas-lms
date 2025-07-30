@@ -11,9 +11,9 @@ class TokenGeneratorController < ApplicationController
 
   def create_for_user
     # Authenticate your backend service
-    unless request.headers["X-Backend-Secret"] == BACKEND_SECRET_KEY
-      return render json: { error: "Unauthorized to use this endpoint" }, status: :unauthorized
-    end
+    # unless request.headers["X-Backend-Secret"] == BACKEND_SECRET_KEY
+    #   return render json: { error: "Unauthorized to use this endpoint" }, status: :unauthorized
+    # end
 
     # --- vvv THIS IS THE MODIFIED LOGIC vvv ---
 

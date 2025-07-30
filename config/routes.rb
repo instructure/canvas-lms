@@ -856,7 +856,6 @@ CanvasRails::Application.routes.draw do
   get "login/session_token" => "login#session_token", :as => :login_session_token
   delete "logout" => "login#destroy"
   get "logout" => "login#logout_landing"
-  post "/auth/login", to: "token_generator#create_for_user"
 
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   get "login/canvas/forgot-password", to: "login/canvas#new"
@@ -1306,6 +1305,7 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/tokens/:id", action: :update
       delete "users/:user_id/tokens/:id", action: :destroy
     end
+    post "/auth/login", to: "token_generator#create_for_user"
 
     scope(controller: :authentication_audit_api) do
       get "audit/authentication/logins/:login_id", action: :for_login, as: "audit_authentication_login"
