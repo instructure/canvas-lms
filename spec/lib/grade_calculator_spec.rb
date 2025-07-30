@@ -125,6 +125,31 @@ describe GradeCalculator do
       expect(@student.enrollments.first.computed_current_score).to eq 88.36
     end
 
+    it "maintains floating-point precision when scaling grades with assignment group weights less than 100%" do
+      @course.update!(group_weighting_scheme: "percent")
+
+      group1 = @course.assignment_groups.create!(name: "Group 1", group_weight: 9.9)
+      group2 = @course.assignment_groups.create!(name: "Group 2", group_weight: 23.1)
+
+      assignment1 = @course.assignments.create!(
+        title: "Assignment 1",
+        points_possible: 100,
+        assignment_group: group1
+      )
+      assignment2 = @course.assignments.create!(
+        title: "Assignment 2",
+        points_possible: 100,
+        assignment_group: group2
+      )
+
+      assignment1.grade_student(@student, grade: 75, grader: @teacher)
+      assignment2.grade_student(@student, grade: 53.75, grader: @teacher)
+
+      GradeCalculator.recompute_final_score(@student.id, @course.id)
+      @student.reload
+      expect(@student.enrollments.first.computed_current_score).to be(60.13)
+    end
+
     it "deletes irrelevant scores for inactive grading periods" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
