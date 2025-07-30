@@ -25,6 +25,7 @@ import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockUploadModal} from './ImageBlockUploadModal'
 import {ImageBlockAddButton} from './ImageBlockAddButton'
 import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
+import {ImageBlockSettings} from './ImageBlockSettings'
 
 const I18n = createI18nScope('page_editor')
 
@@ -76,4 +77,7 @@ export const ImageBlock = (props: ImageBlockProps) => {
 
 ImageBlock.craft = {
   displayName: I18n.t('Image Block') as string,
+  related: {
+    settings: ImageBlockSettings,
+  },
 }

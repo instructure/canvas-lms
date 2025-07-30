@@ -18,13 +18,11 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
+import {type TextBlockProps} from './TextBlock'
 
 const I18n = createI18nScope('page_editor')
 
-export const TextBlockEditPreview = (props: {
-  title: string
-  content: string
-}) => {
+export const TextBlockEditPreview = (props: TextBlockProps) => {
   const isTitleDefined = props.title.trim().length > 0
   const isContentDefined = props.content.trim().length > 0
 
@@ -34,9 +32,11 @@ export const TextBlockEditPreview = (props: {
 
   return (
     <>
-      <Heading variant="titleSection" color={isTitleDefined ? 'primary' : 'secondary'}>
-        {isTitleDefined ? props.title : I18n.t('Type to add block title')}
-      </Heading>
+      {props.settings.includeBlockTitle && (
+        <Heading variant="titleSection" color={isTitleDefined ? 'primary' : 'secondary'}>
+          {isTitleDefined ? props.title : I18n.t('Type to add block title')}
+        </Heading>
+      )}
       <div dangerouslySetInnerHTML={{__html: content}}></div>
     </>
   )

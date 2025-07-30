@@ -20,6 +20,7 @@ import {View} from '@instructure/ui-view'
 import {BaseBlock} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BorderWidth, BorderWidthValues} from '@instructure/emotion'
+import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
@@ -43,4 +44,7 @@ export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
 
 SeparatorLineBlock.craft = {
   displayName: I18n.t('Separator line') as string,
+  related: {
+    settings: SeparatorLineBlockSettings,
+  },
 }
