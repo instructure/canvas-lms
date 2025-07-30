@@ -16,20 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {ComponentProps, ElementType, useCallback} from 'react'
-
-export const useSave = <T extends ElementType>() => {
-  const {
-    actions: {setProp},
-  } = useNode()
-
-  return useCallback(
-    (data: Partial<ComponentProps<T>>) => {
-      setProp((props: any) => {
-        Object.assign(props, data)
-      })
-    },
-    [setProp],
-  )
+export const ImageBlockSettings = () => {
+  return <p>Image Block Settings</p>
 }

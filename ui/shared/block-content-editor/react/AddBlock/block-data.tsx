@@ -27,7 +27,7 @@ const I18n = createI18nScope('page_editor')
 type BlockFactory = {[key: string]: () => ReactElement}
 
 export const blockFactory = {
-  [TextBlock.name]: () => <TextBlock title="" content="" />,
+  [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
 } as const satisfies BlockFactory

@@ -21,25 +21,28 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {uid} from '@instructure/uid'
 import {TextInput} from '@instructure/ui-text-input'
+import {type TextBlockProps} from './TextBlock'
 
 const I18n = createI18nScope('page_editor')
 
-export const TextBlockEdit = (props: {
-  title: string
-  content: string
-  onTitleChange: (newTitle: string) => void
-  onContentChange: (newContent: string) => void
-}) => {
+export const TextBlockEdit = (
+  props: TextBlockProps & {
+    onTitleChange: (newTitle: string) => void
+    onContentChange: (newContent: string) => void
+  },
+) => {
   const rceRef = useRef(null)
 
   return (
     <>
-      <TextInput
-        renderLabel={I18n.t('Block title')}
-        placeholder={I18n.t('Start typing...')}
-        value={props.title}
-        onChange={e => props.onTitleChange(e.target.value)}
-      />
+      {props.settings.includeBlockTitle && (
+        <TextInput
+          renderLabel={I18n.t('Block title')}
+          placeholder={I18n.t('Start typing...')}
+          value={props.title}
+          onChange={e => props.onTitleChange(e.target.value)}
+        />
+      )}
       <CanvasRce
         ref={rceRef}
         autosave={false}

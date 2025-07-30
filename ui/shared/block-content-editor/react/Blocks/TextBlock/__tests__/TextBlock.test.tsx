@@ -26,7 +26,11 @@ jest.mock('../../../BlockContentEditorContext', () => ({
 
 describe('TextBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(TextBlock, {title: 'Test Title', content: 'Test Content'})
+    renderBlock(TextBlock, {
+      title: 'Test Title',
+      content: 'Test Content',
+      settings: {includeBlockTitle: true},
+    })
     expect(true).toBe(true)
   })
 })

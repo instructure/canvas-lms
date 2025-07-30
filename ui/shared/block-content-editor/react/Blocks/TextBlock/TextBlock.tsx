@@ -20,12 +20,16 @@ import {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockEdit} from './TextBlockEdit'
 import {TextBlockEditPreview} from './TextBlockEditPreview'
+import {TextBlockSettings} from './TextBlockSettings'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 
 export type TextBlockProps = {
   title: string
   content: string
+  settings: {
+    includeBlockTitle: boolean
+  }
 }
 
 export const TextBlockContent = (props: TextBlockProps) => {
@@ -48,11 +52,12 @@ export const TextBlockContent = (props: TextBlockProps) => {
     <TextBlockEdit
       title={title}
       content={content}
+      settings={props.settings}
       onTitleChange={(newTitle: string) => setTitle(newTitle)}
       onContentChange={(newContent: string) => setContent(newContent)}
     />
   ) : (
-    <TextBlockEditPreview title={title} content={content} />
+    <TextBlockEditPreview title={title} content={content} settings={props.settings} />
   )
 }
 
@@ -68,4 +73,7 @@ export const TextBlock = (props: TextBlockProps) => {
 
 TextBlock.craft = {
   displayName: I18n.t('Text Block') as string,
+  related: {
+    settings: TextBlockSettings,
+  },
 }

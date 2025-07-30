@@ -16,32 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor} from '@craftjs/core'
+import {useNode} from '@craftjs/core'
+import {View} from '@instructure/ui-view'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {SettingsTray} from './SettingsTray'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-import React from 'react'
+import {type TextBlockProps} from './TextBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const SettingsTrayRenderer = () => {
-  const {query} = useEditor()
-  const {settingsTray} = useBlockContentEditorContext()
+export const TextBlockSettings = () => {
+  const {
+    actions: {setProp},
+    includeBlockTitle,
+  } = useNode(node => ({
+    includeBlockTitle: node.data.props.settings.includeBlockTitle,
+  }))
 
-  let title = ''
-  let settingComponent = null
-
-  if (settingsTray.isOpen) {
-    const node = query.node(settingsTray.blockId).get()
-    title = I18n.t('%{blockDisplayName} block settings', {
-      blockDisplayName: node.data.displayName,
+  const handleIncludeBlockTitleChange = (includeBlockTitle: boolean) => {
+    setProp((props: TextBlockProps) => {
+      props.settings.includeBlockTitle = includeBlockTitle
     })
-    settingComponent = React.createElement(node.related.settings)
   }
 
   return (
-    <SettingsTray title={title} open={settingsTray.isOpen} onDismiss={settingsTray.close}>
-      {settingComponent}
-    </SettingsTray>
+    <View as="div" padding="small">
+      <Checkbox
+        variant="toggle"
+        label={I18n.t('Include block title')}
+        checked={includeBlockTitle}
+        onChange={() => handleIncludeBlockTitleChange(!includeBlockTitle)}
+      />
+    </View>
   )
 }
