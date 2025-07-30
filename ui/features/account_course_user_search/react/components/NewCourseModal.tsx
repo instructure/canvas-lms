@@ -176,6 +176,7 @@ export default function NewCourseModal({terms, children}: NewCourseModalProps): 
                 label={I18n.t('Subaccount')}
                 isLoading={accountTree.loading}
                 onChange={(_e, option) => setAccount(option.id)}
+                matchAnywhere
               >
                 {renderAccountOptions(accountTree.accounts).map(account => (
                   <SearchableSelect.Option key={account.id} id={account.id} value={account.id}>
