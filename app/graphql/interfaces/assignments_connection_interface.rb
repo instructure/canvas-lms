@@ -48,8 +48,11 @@ module Interfaces::AssignmentsConnectionInterface
       # to a PostgreSQL text[] array on the fly using string_to_array. The overlap operator (&&)
       # checks if any of the requested submission_types are present in the array. Both sides are
       # explicitly cast to text[] to avoid type errors (e.g., text[] && text[]).
+      # Some assignments may have an empty string ('') instead of 'none' for submission_types,
+      # so we normalize this value during comparison.
+      normalized_submission_types_sql = "CASE WHEN assignments.submission_types = '' THEN 'none' ELSE assignments.submission_types END"
       assignments = assignments.where(
-        "string_to_array(assignments.submission_types, ',')::text[] && ARRAY[?]::text[]",
+        "string_to_array(#{normalized_submission_types_sql}, ',')::text[] && ARRAY[?]::text[]",
         submission_types
       )
     end
