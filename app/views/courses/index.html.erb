@@ -37,6 +37,8 @@ end %>
 <% @favorite_course_ids =
   @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = show_favorites_col_for_index?(:current) %>
+<% @show_accessibility_column = Account.site_admin.feature_enabled?(:accessibility_tab_enable) %>
+
 <div class="header-bar">
   <h1><%= all_courses_title %></h1>
 </div>
@@ -122,6 +124,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "cc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
     <tbody>
@@ -192,6 +203,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "pc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
 
@@ -259,6 +279,15 @@ end %>
           css:
             "course-list-published-column course-list-column-header course-list-no-left-border",
         ) %>
+        <% if @show_accessibility_column %>
+          <%= sortable_th(
+            table: "fc",
+            column: "accessibility",
+            label: t("Accessibility"),
+            css:
+              "course-list-accessibility-column course-list-column-header course-list-no-left-border",
+          ) %>
+        <% end %>
       </tr>
     </thead>
     <tbody>

@@ -278,6 +278,37 @@ describe CoursesController do
           end
         end
       end
+
+      context "on accessibility column" do
+        before do
+          skip("Flaky spec needs fixed in LMA-226") unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+
+          # For accessibility column
+          wiki_page = wiki_page_model(course: @course1)
+          scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+          scan.assign_attributes(
+            course: @course1,
+            workflow_state: "completed",
+            resource_name: wiki_page.title,
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at,
+            issue_count: 1
+          )
+          scan.save!
+        end
+
+        it "lists courses with accessibility issues first" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists courses with accessibility issues last when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
     end
 
     describe "current_enrollments" do
