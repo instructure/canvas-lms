@@ -118,35 +118,30 @@ describe('useHowManyModulesAreFetchingItems', () => {
     expect(callback).toHaveBeenCalledWith('Module items loaded')
   })
 
-  it('does not call callback when fetchComplete is true and maxFetchingCount is 1', () => {
-    const callback = jest.fn()
-    const TestComponent = ({callback}: any) => {
-      const {moduleFetchingCount, maxFetchingCount, fetchComplete} =
-        useHowManyModulesAreFetchingItems()
-      useEffect(() => {
-        if (fetchComplete) {
-          if (maxFetchingCount > 1) {
-            callback('Module items loaded')
-          }
-        }
-      }, [moduleFetchingCount, maxFetchingCount, fetchComplete, callback])
-      return <div />
-    }
-
-    // Start with 0 fetching
+  it('sets fetchComplete to true when fetch count returns to 0', () => {
     jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {rerender} = render(<TestComponent callback={callback} />)
-    expect(callback).not.toHaveBeenCalled()
+    const {result, rerender} = renderHook(() => useHowManyModulesAreFetchingItems())
 
-    // First fetch cycle: 3 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(1)
-    rerender(<TestComponent callback={callback} />)
-    expect(callback).not.toHaveBeenCalled()
+    // Initial render with 0
+    expect(result.current.moduleFetchingCount).toBe(0)
+    expect(result.current.fetchComplete).toBe(false)
 
-    // Fetching completes
+    // First rerender - change to 3 fetching
+    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
+    rerender()
+    expect(result.current.moduleFetchingCount).toBe(3)
+    expect(result.current.fetchComplete).toBe(false)
+    // Second rerender - still 3 fetching, but prevFetchCount is now 3
+    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
+    rerender()
+    expect(result.current.moduleFetchingCount).toBe(3)
+    expect(result.current.fetchComplete).toBe(false)
+
+    // Third rerender - back to 0 fetching, prevFetchCount is 3
     jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    rerender(<TestComponent callback={callback} />)
-    expect(callback).not.toHaveBeenCalled()
+    rerender()
+    expect(result.current.moduleFetchingCount).toBe(0)
+    expect(result.current.fetchComplete).toBe(true)
   })
 
   it('resets maxFetchingCount when a new fetch cycle starts after completion', () => {

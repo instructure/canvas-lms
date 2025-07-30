@@ -43,6 +43,7 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   # Should match up with UI's AssetProcessorContentItemDto
+  # and class Mutations::LtiContentItems::LtiAssetProcessorDto < GraphQL::Schema::InputObject
   def self.build_for_assignment(content_item:, context:)
     # Check tool is in the course or account:
     tool = Lti::ToolFinder.from_id(content_item["context_external_tool_id"], context)
@@ -67,13 +68,6 @@ class Lti::AssetProcessor < ApplicationRecord
     if icon.is_a?(Hash) && icon["url"].is_a?(String)
       icon["url"].presence
     end
-  end
-
-  def self.for_assignment_id(assignment_id)
-    Lti::AssetProcessor.active
-                       .where(assignment_id:)
-                       .joins(:context_external_tool)
-                       .merge(ContextExternalTool.active)
   end
 
   def icon_or_tool_icon_url

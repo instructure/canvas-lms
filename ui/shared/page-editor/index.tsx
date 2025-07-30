@@ -16,4 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {PageEditor} from './react/PageEditor'
+
 export * from './react/PageEditor'
+export default PageEditor

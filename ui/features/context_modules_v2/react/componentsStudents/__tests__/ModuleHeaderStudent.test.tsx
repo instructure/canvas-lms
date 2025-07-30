@@ -56,6 +56,7 @@ const buildDefaultProps = (overrides = {}) => {
     },
     completionRequirements: [],
     requirementCount: 0,
+    unlockAt: null,
     submissionStatistics: undefined,
   }
 

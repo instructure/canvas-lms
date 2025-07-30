@@ -23,6 +23,10 @@ module Outcomes
   # Usage:
   #   Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
   class StudentOutcomeRollupCalculationService < ApplicationService
+    include Outcomes::ResultAnalytics
+    include OutcomesServiceAuthoritativeResultsHelper
+    include CanvasOutcomesHelper
+
     attr_reader :course, :student
 
     class << self
@@ -62,53 +66,100 @@ module Outcomes
       @student = User.find(student_id)
     end
 
-    # Runs the full calculation and persists the calculation.
-    #
-    # @return [Array<OutcomeRollup>] the created or updated rollup records
+    # Runs the full calculation and returns student outcome rollups.
+    # @return [Array<Rollup>]
     def call
-      # TODO: implement fetch data, generate rollups, persist, return rollups
-      []
+      # Fetch both Canvas and Outcomes Service results
+      canvas_results = fetch_canvas_results
+      os_results     = fetch_outcomes_service_results
+
+      combined_results = combine_results(canvas_results, os_results)
+      return [] if combined_results.empty?
+
+      generate_student_rollups(combined_results)
     end
 
     private
 
-    # @return [Array<LearningOutcome>]
-    def load_course_outcomes
-      # TODO: load course.learning_outcomes
-      []
+    # Generates student outcome rollups from the provided results
+    # @param combined_results [Array<LearningOutcomeResult>]
+    # @return [Array<Rollup>]
+    def generate_student_rollups(combined_results)
+      return [] if combined_results.empty?
+
+      ActiveRecord::Associations.preload(combined_results, :learning_outcome)
+      outcome_results_rollups(
+        results: combined_results,
+        users: [student],
+        context: course
+      )
     end
 
-    # @return [Array<OutcomeRollup>]
-    def generate_student_rollups
-      # TODO: fetch_canvas_results, fetch_outcomes_service_results, combine_results, map to OutcomeRollup
-      []
-    end
-
-    # @return [Array<LearningOutcomeResult>]
+    # @return [ActiveRecord::Relation<LearningOutcomeResult>]
     def fetch_canvas_results
-      LearningOutcomeResult.where(
-        context_type: "Course",
-        context_id: @course.id,
-        user_id: @student.id
+      find_outcome_results(
+        student,
+        users: [student],
+        context: course,
+        outcomes: course.linked_learning_outcomes
       )
     end
 
     # @return [Array<LearningOutcomeResult>]
     def fetch_outcomes_service_results
-      # TODO: fetch results from Outcomes Service
-      []
+      # May be Array (in tests stub) or Relation
+      new_quiz_assignments = Assignment.active.where(context: course).quiz_lti
+      return [] if new_quiz_assignments.blank?
+
+      outcomes = course.linked_learning_outcomes
+      return [] if outcomes.blank?
+
+      begin
+        os_results_json = find_outcomes_service_outcome_results(
+          users: [student],
+          context: course,
+          outcomes:,
+          assignments: new_quiz_assignments
+        )
+        return [] if os_results_json.blank?
+      rescue => e
+        Rails.logger.error("Failed to fetch outcomes service results: #{e.message}")
+        raise e
+      end
+
+      handle_outcomes_service_results(
+        os_results_json,
+        course,
+        outcomes,
+        [student],
+        new_quiz_assignments
+      )
     end
 
-    # @param canvas_results [Array<LearningOutcomeResult>]
+    # Combines and deduplicates results from two sources
+    # @param canvas_results [ActiveRecord::Relation<LearningOutcomeResult>, Array<LearningOutcomeResult>]
     # @param outcomes_service_results [Array<LearningOutcomeResult>]
     # @return [Array<LearningOutcomeResult>]
-    def combine_results
-      # TODO: merge result sets
-      []
+    def combine_results(canvas_results = [], outcomes_results = [])
+      return canvas_results.to_a if outcomes_results.blank?
+      return outcomes_results if canvas_results.blank?
+
+      # Merge into one array
+      all_results = canvas_results.to_a + outcomes_results
+
+      # Deduplicate
+      all_results.uniq do |result|
+        [
+          result.learning_outcome_id,
+          result.user_uuid || result.user_id,
+          result.associated_asset_id || result.artifact_id
+        ]
+      end
     end
 
     # @param rollups [Array<OutcomeRollup>]
     def store_rollups(rollups)
+      # Convert rollups to OutcomeRollup record then store
       # TODO: upsert OutcomeRollup records
     end
   end

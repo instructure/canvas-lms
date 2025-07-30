@@ -84,17 +84,17 @@ describe Lti::ContextControlsController, type: :request do
       let(:account_deployment) { ContextExternalTool.find_by(lti_registration: registration, context: account) }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
-      let(:course_deployment) { deployment_for(course) }
+      let(:other_account_deployment) { deployment_for(account) }
       let(:subaccount_deployment) { deployment_for(subaccount) }
 
       before do
         9.times do
           account_course = course_model(account:)
           other_subaccount = account_model(parent_account: account)
-          subaccount_course = course_model(account: other_subaccount)
+          subaccount_course = course_model(account: subaccount)
 
           control_for(account_deployment, account_course)
-          control_for(course_deployment, other_subaccount)
+          control_for(other_account_deployment, other_subaccount)
           control_for(subaccount_deployment, subaccount_course)
         end
       end
@@ -109,10 +109,10 @@ describe Lti::ContextControlsController, type: :request do
         response_json[0]["context_controls"].each do |control|
           expect(control["deployment_id"]).to eq(account_deployment.id)
         end
-        expect(response_json[1]["id"]).to eq(course_deployment.id)
+        expect(response_json[1]["id"]).to eq(other_account_deployment.id)
         expect(response_json[1]["context_controls"].length).to eq(5)
         response_json[1]["context_controls"].each do |control|
-          expect(control["deployment_id"]).to eq(course_deployment.id)
+          expect(control["deployment_id"]).to eq(other_account_deployment.id)
         end
 
         links = Api.parse_pagination_links(response.headers["Link"])
@@ -123,10 +123,10 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to be_successful
         next_page_json = response.parsed_body
         expect(next_page_json.length).to eq(2)
-        expect(next_page_json[0]["id"]).to eq(course_deployment.id)
+        expect(next_page_json[0]["id"]).to eq(other_account_deployment.id)
         expect(next_page_json[0]["context_controls"].length).to eq(5)
         next_page_json[0]["context_controls"].each do |control|
-          expect(control["deployment_id"]).to eq(course_deployment.id)
+          expect(control["deployment_id"]).to eq(other_account_deployment.id)
         end
         expect(next_page_json[1]["id"]).to eq(subaccount_deployment.id)
         expect(next_page_json[1]["context_controls"].length).to eq(10)
@@ -448,8 +448,9 @@ describe Lti::ContextControlsController, type: :request do
 
     context "with deployment_id" do
       let(:subaccount) { account_model(parent_account: account) }
+      let(:subsubaccount) { account_model(parent_account: subaccount) }
       let(:deployment) { registration.new_external_tool(subaccount).tap(&:save!) }
-      let(:params) { { account_id: account.id, deployment_id: deployment.id } }
+      let(:params) { { account_id: subsubaccount.id, deployment_id: deployment.id } }
 
       it "creates a new control with the specified deployment" do
         subject
@@ -478,6 +479,21 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response_json["errors"]).to include(
           "No active deployment found for the root account."
+        )
+      end
+    end
+
+    context "with context outside the deployment's context chain" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:subdeployment) { registration.new_external_tool(subaccount) }
+      let(:other_account) { account_model(parent_account: account) }
+      let(:params) { { account_id: other_account.id, deployment_id: subdeployment.id } }
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json["errors"]).to include(
+          "Context must belong to the deployment's context"
         )
       end
     end
@@ -741,6 +757,25 @@ describe Lti::ContextControlsController, type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response_json["errors"]).to include(
           "Cannot create more than #{max_size} context controls at once"
+        )
+      end
+    end
+
+    context "with control for a context outside the deployment's context chain" do
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:subdeployment) { registration.new_external_tool(subaccount) }
+      let(:other_account) { account_model(parent_account: account) }
+      let(:params) do
+        [
+          { account_id: other_account.id, deployment_id: subdeployment.id, available: true }
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0, "message")).to eq(
+          "Context must belong to the deployment's context"
         )
       end
     end

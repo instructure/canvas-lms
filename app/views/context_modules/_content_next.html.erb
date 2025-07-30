@@ -25,7 +25,7 @@
     :PUBLISH_MENU_PROGRESS_ID => @progress&.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
     :FEATURE_MODULES_PERF => module_performance_improvement_is_enabled?(@context, @current_user),
-    :EXPANDED_MODULES => module_performance_improvement_is_enabled?(@context, @current_user) && @expanded_modules ? @expanded_modules : [],
+    :EXPANDED_MODULES => @expanded_modules || [],
   })
 %>
 <% js_bundle :module_student_view_peer_reviews %>
@@ -53,13 +53,6 @@ context_modules_header_props = {
     runningProgressId: @progress&.id,
     disabled: @modules.empty?,
     visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
-  },
-  expandCollapseAll: {
-    label: t('Collapse All'),
-    dataUrl: context_url(@context, :context_url) + '/collapse_all_modules',
-    dataExpand: false,
-    ariaExpanded: false,
-    ariaLabel: t('Collapse All Modules'),
   },
   addModule: {
     label: t('Add Module'),

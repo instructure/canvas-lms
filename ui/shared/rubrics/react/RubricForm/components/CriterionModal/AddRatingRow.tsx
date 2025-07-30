@@ -48,14 +48,16 @@ export const AddRatingRow = ({unassessed, onClick, isDragging}: AddRatingRowProp
           onClick()
         }
       }}
+      onBlur={() => setIsHovered(false)}
       label="Add New Rating"
       onFocus={() => setIsHovered(true)}
       onMouseOver={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {isHovered && unassessed && !isDragging && (
-        <View as="div" cursor="pointer" onClick={onClick} onBlur={() => setIsHovered(false)}>
+        <View as="div" cursor="pointer" onClick={onClick}>
           <IconButton
+            tabIndex={-1}
             screenReaderLabel={I18n.t('Add new rating')}
             shape="circle"
             size="small"

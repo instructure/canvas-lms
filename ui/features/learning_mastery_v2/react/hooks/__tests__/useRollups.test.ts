@@ -20,6 +20,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useRollups from '../useRollups'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
 
 jest.useFakeTimers()
 
@@ -138,6 +139,13 @@ describe('useRollups', () => {
           outcomes: mockedOutcomes,
         },
         rollups: mockedRollups,
+        meta: {
+          pagination: {
+            page: 1,
+            per_page: 20,
+            page_count: 1,
+          },
+        },
       },
     })
     ;(axios.get as jest.Mock).mockResolvedValue(promise)
@@ -212,11 +220,12 @@ describe('useRollups', () => {
       const params = {
         params: {
           rating_percents: true,
-          per_page: 20,
+          per_page: DEFAULT_STUDENTS_PER_PAGE,
           exclude: [],
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
           sort_by: 'student',
           add_defaults: true,
+          sort_order: SortOrder.ASC,
           page: 1,
         },
       }

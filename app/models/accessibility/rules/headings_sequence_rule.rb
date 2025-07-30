@@ -92,7 +92,7 @@ module Accessibility
         h_num = elem.tag_name[1..].to_i
         ret = {}
 
-        (h_num - 1..6).each do |i|
+        ((h_num - 1)..6).each do |i|
           ret["h#{i}"] = true
         end
 
@@ -108,49 +108,56 @@ module Accessibility
           "h6" => true
         }
 
-        return true if test_tags[elem.tag_name.downcase] != true
+        return nil if test_tags[elem.tag_name.downcase] != true
 
         valid_headings = get_valid_headings(elem)
         prior_heading = get_prior_heading(elem)
 
         if prior_heading
-          return valid_headings[prior_heading.tag_name.downcase]
+          return I18n.t("Headings are not in sequence.") unless valid_headings[prior_heading.tag_name.downcase]
         end
 
-        true
+        nil
       end
 
       def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Merge links",
-          value: "Leave as is",
-          options: ["Leave as is", "Fix heading hierarchy", "Remove heading style"]
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: I18n.t("How would you like to proceed?"),
+          undo_text: I18n.t("Heading hierarchy is now correct"),
+          value: I18n.t("Fix heading hierarchy"),
+          options: [
+            I18n.t("Fix heading hierarchy"),
+            I18n.t("Remove heading style")
+          ]
         )
       end
 
+      def self.display_name
+        I18n.t("Skipped heading level")
+      end
+
       def self.message
-        "Headings should not skip levels."
+        I18n.t(
+          "Make sure heading levels follow a logical order (for example, H2, then H3, then H4)." \
+          "This helps screen reader users understand the structure of the page."
+        )
       end
 
       def self.why
-        "When heading levels are skipped (for example, from an H2 to an H4, skipping H3), " \
+        I18n.t(
+          "When heading levels are skipped (for example, from an H2 to an H4, skipping H3), " \
           "screen reader users may have difficulty understanding the page structure. " \
           "This creates a confusing outline of the page for assistive technology users."
+        )
       end
 
-      def self.link_text
-        "Learn more about proper heading sequences"
-      end
-
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
         case value
-        when "Leave as is"
-          return elem
-        when "Fix heading hierarchy"
+        when I18n.t("Fix heading hierarchy")
           prior_h = get_prior_heading(elem)
           h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0
           elem.name = "h#{h_idx + 1}"
-        when "Remove heading style"
+        when I18n.t("Remove heading style")
           elem.name = "p"
         end
         elem

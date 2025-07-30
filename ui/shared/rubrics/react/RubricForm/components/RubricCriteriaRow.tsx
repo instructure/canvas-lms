@@ -78,6 +78,10 @@ export const RubricCriteriaRow = ({
     ignoreForScoring,
   } = criterion
 
+  const editCriterionTooltip = learningOutcomeId
+    ? I18n.t('View Outcome Criterion')
+    : I18n.t('Edit Criterion')
+
   return (
     <Draggable draggableId={criterion.id || Date.now().toString()} index={rowIndex - 1}>
       {(provided, snapshot) => {
@@ -214,52 +218,54 @@ export const RubricCriteriaRow = ({
                   </Pill>
                 )}
                 <View as="span" margin="0 0 0 medium">
-                  <IconButton
-                    withBackground={false}
-                    withBorder={false}
-                    screenReaderLabel={
-                      learningOutcomeId
-                        ? I18n.t('View Outcome Criterion')
-                        : I18n.t('Edit Criterion')
-                    }
-                    onClick={onEditCriterion}
-                    size="small"
-                    themeOverride={{smallHeight: '18px'}}
-                    data-testid="rubric-criteria-row-edit-button"
-                  >
-                    {learningOutcomeId ? <IconOutcomesLine /> : <IconEditLine />}
-                  </IconButton>
+                  <Tooltip renderTip={editCriterionTooltip}>
+                    <IconButton
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={editCriterionTooltip}
+                      onClick={onEditCriterion}
+                      size="small"
+                      themeOverride={{smallHeight: '18px'}}
+                      data-testid="rubric-criteria-row-edit-button"
+                    >
+                      {learningOutcomeId ? <IconOutcomesLine /> : <IconEditLine />}
+                    </IconButton>
+                  </Tooltip>
                 </View>
 
                 {unassessed && (
                   <View as="span" margin="0 0 0 medium">
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel={I18n.t('Delete Criterion')}
-                      onClick={onDeleteCriterion}
-                      size="small"
-                      themeOverride={{smallHeight: '18px'}}
-                      data-testid="rubric-criteria-row-delete-button"
-                    >
-                      <IconTrashLine />
-                    </IconButton>
+                    <Tooltip renderTip={I18n.t('Delete Criterion')}>
+                      <IconButton
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel={I18n.t('Delete Criterion')}
+                        onClick={onDeleteCriterion}
+                        size="small"
+                        themeOverride={{smallHeight: '18px'}}
+                        data-testid="rubric-criteria-row-delete-button"
+                      >
+                        <IconTrashLine />
+                      </IconButton>
+                    </Tooltip>
                   </View>
                 )}
 
                 {unassessed && (
                   <View as="span" margin="0 0 0 medium">
-                    <IconButton
-                      withBackground={false}
-                      withBorder={false}
-                      screenReaderLabel={I18n.t('Duplicate Criterion')}
-                      onClick={onDuplicateCriterion}
-                      size="small"
-                      themeOverride={{smallHeight: '18px'}}
-                      data-testid="rubric-criteria-row-duplicate-button"
-                    >
-                      <IconDuplicateLine />
-                    </IconButton>
+                    <Tooltip renderTip={I18n.t('Duplicate Criterion')}>
+                      <IconButton
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel={I18n.t('Duplicate Criterion')}
+                        onClick={onDuplicateCriterion}
+                        size="small"
+                        themeOverride={{smallHeight: '18px'}}
+                        data-testid="rubric-criteria-row-duplicate-button"
+                      >
+                        <IconDuplicateLine />
+                      </IconButton>
+                    </Tooltip>
                   </View>
                 )}
               </Flex.Item>

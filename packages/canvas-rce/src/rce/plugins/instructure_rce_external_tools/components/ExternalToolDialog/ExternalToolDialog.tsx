@@ -164,7 +164,7 @@ export default class ExternalToolDialog extends React.Component<
     return this.props.env.canvasOrigin
   }
 
-  handlePostedMessage = (ev: Pick<MessageEvent, 'origin' | 'data'>) => {
+  handlePostedMessage = (ev: Pick<MessageEvent, 'origin' | 'data' | 'source'>) => {
     // messages from Canvas in the tool launch frame
     if (ev.origin === this.resourceSelectionOrigin) {
       const data = ev.data as Record<string, unknown> | null | undefined
@@ -177,11 +177,15 @@ export default class ExternalToolDialog extends React.Component<
         // where events are also described/used
         this.handleExternalContentReady(ev.data)
       }
-    } else {
-      // messages from the tool
-      const data = ev.data as Record<string, unknown> | null | undefined
+    }
+    // messages from the tool
+    const data = ev.data as Record<string, unknown> | null | undefined
 
-      if (data?.subject === 'lti.close') {
+    if (data?.subject === 'lti.close') {
+      // Note we currently don't support this message from the forwarder
+      // iframe as it's not required by 1EdTech spec and requires more
+      // complicated source checking here (see INTEROP-9213)
+      if (ev.source === this.iframeRef?.current?.contentWindow) {
         this.handleClose()
       }
     }

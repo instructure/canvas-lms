@@ -77,12 +77,8 @@ class ContextModulesController < ApplicationController
       module_collapsed_base = ContextModuleProgression.for_user(@current_user)
                                                       .for_modules(@modules)
                                                       .pluck(:context_module_id, :collapsed)
-      if module_performance_improvement_is_enabled?(@context, @current_user)
-        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == true }.map(&:first)
-        @expanded_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == false }.map(&:first)
-      else
-        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed }.map(&:first)
-      end
+      @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == true }.map(&:first)
+      @expanded_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == false }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
@@ -201,20 +197,17 @@ class ContextModulesController < ApplicationController
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
 
       if @feature_student_module_selection || @feature_teacher_module_selection
-        # if the feature is enabled, and you can edit course content, you get the teacher version
-        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
-        # default is show all the things
-        @module_show_setting = if @can_edit && @feature_teacher_module_selection
+        is_teacher = @context.user_has_been_teacher?(@current_user)
+        has_admin_permissions = @context.grants_right?(@current_user, :read_as_admin)
+        @module_show_setting = if @feature_teacher_module_selection && is_teacher
                                  @context.show_teacher_only_module_id
-                               elsif @feature_student_module_selection
+                               elsif @feature_student_module_selection && !has_admin_permissions
                                  @context.show_student_only_module_id
                                else
                                  0
                                end&.to_i
         @module_show_setting = nil if @module_show_setting&.zero?
-        @module_show_setting
       end
-      nil
     end
 
     private
@@ -222,7 +215,7 @@ class ContextModulesController < ApplicationController
     def module_tool_definitions
       tools = {}
       # commons favorites tray placements expect tool in display_hash format
-      %i[module_index_menu module_group_menu].each do |type|
+      %i[module_index_menu module_group_menu module_menu].each do |type|
         tools[type] = @menu_tools[type].map { |t| external_tool_display_hash(t, type) }
       end
       # newer modal placements expect tool in launch_definition format

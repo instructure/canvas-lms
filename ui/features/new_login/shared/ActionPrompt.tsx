@@ -59,19 +59,6 @@ const ActionPrompt = ({variant}: ActionPromptProps) => {
           </Link>
         </Text>
       )
-    case 'signIn':
-      return (
-        <Text>
-          {I18n.t('Already have an account?')}{' '}
-          <Link
-            data-testid="log-in-link"
-            href={ROUTES.SIGN_IN}
-            onClick={handleNavigate(ROUTES.SIGN_IN)}
-          >
-            {I18n.t('Log in')}
-          </Link>
-        </Text>
-      )
     case 'createParentAccount':
       return (
         <Text>

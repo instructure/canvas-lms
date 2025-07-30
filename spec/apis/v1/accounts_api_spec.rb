@@ -52,6 +52,7 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
+          "course_template_id" => nil
         },
         {
           "id" => @a2.id,
@@ -66,7 +67,8 @@ describe "Accounts API", type: :request do
           "default_storage_quota_mb" => 321,
           "default_user_storage_quota_mb" => 54,
           "default_group_storage_quota_mb" => 41,
-          "workflow_state" => "active"
+          "workflow_state" => "active",
+          "course_template_id" => nil
         },
       ]
     end
@@ -98,7 +100,8 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
-          "uuid" => @a1.uuid
+          "uuid" => @a1.uuid,
+          "course_template_id" => nil
         },
       ]
     end
@@ -367,6 +370,7 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
+          "course_template_id" => nil
         }
       )
     end
@@ -1096,7 +1100,6 @@ describe "Accounts API", type: :request do
 
     context "with course_template_id" do
       before do
-        @a2.root_account.enable_feature!(:course_templates)
         @user.account_users.where(account: @a2).delete_all
       end
 
@@ -1160,6 +1163,28 @@ describe "Accounts API", type: :request do
                  "/api/v1/accounts/#{@a2.id}",
                  { controller: "accounts", action: "update", id: @a2.to_param, format: "json" },
                  { account: { course_template_id: 0 } })
+      end
+    end
+
+    describe "horizon_account setting" do
+      it "can enable the horizon account setting" do
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { horizon_account: { value: true } } } })
+        @a1.reload
+        expect(@a1.settings[:horizon_account][:value]).to be true
+        expect(@a1.settings[:horizon_account][:locked]).to be true
+      end
+
+      it "can disable the horizon account setting" do
+        @a1.settings[:horizon_account] = { value: true }
+        @a1.save!
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { horizon_account: { value: false } } } })
+        expect(@a1.reload.settings[:horizon_account][:value]).to be false
       end
     end
 
@@ -2497,6 +2522,13 @@ describe "Accounts API", type: :request do
         json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
         expect(json["allow_assign_to_differentiation_tags"]).to be_nil
       end
+    end
+
+    it "includes the horizon_account setting" do
+      @a1.settings[:horizon_account] = { value: true }
+      @a1.save!
+      json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+      expect(json["horizon_account"]["value"]).to be true
     end
   end
 

@@ -642,6 +642,7 @@ class DiscussionTopicsController < ApplicationController
       ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
+      GROUP_CONTEXT_TYPE: @context.is_a?(Group) ? @context.context.class.name : nil,
       DISCUSSION_TOPIC: hash,
       GROUP_CATEGORIES: categories
               .reject { |c| c.student_organized? || c.non_collaborative? }
@@ -913,7 +914,7 @@ class DiscussionTopicsController < ApplicationController
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
                  CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : "",
                  ATTACHMENTS_FOLDER_ID: @current_user.nil? ? Folder.unfiled_folder(@context).id : Folder.unfiled_folder(@current_user).id,
-                 ASSIGNMENT: @topic.assignment ? @topic.assignment.asset_string : nil,
+                 ASSIGNMENT: @topic.assignment&.asset_string,
                  preferences: {
                    discussions_splitscreen_view: @current_user&.discussions_splitscreen_view? || false
                  }

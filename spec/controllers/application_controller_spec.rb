@@ -109,7 +109,7 @@ RSpec.describe ApplicationController do
         it "adds location tag to attachment urls" do
           @course.root_account.enable_feature!(:file_association_access)
           attachment = @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
-          discussion_topic = discussion_topic_model(message: "<img src='/courses/#{@course.id}/files/#{attachment.id}' />")
+          discussion_topic = discussion_topic_model(message: "<img src='/courses/#{@course.id}/files/#{attachment.id}' />", user: @teacher)
           expect(controller.send(:user_content, @course.discussion_topics.first.message, location: discussion_topic.asset_string.to_s)).to include("location=#{discussion_topic.asset_string}")
         end
       end
@@ -1848,15 +1848,15 @@ RSpec.describe ApplicationController do
 
       it "doesn't return tools that are mapped to disabled feature flags -- course navigation" do
         @course = course_model
-        tool = analytics_2_tool_factory(context: @course)
+        tool = admin_analytics_tool_factory(context: @course)
 
         allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
         external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-        expect(external_tools).not_to include({ title: "Analytics 2", base_url: "http://example.com", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ANALYTICS_2 })
+        expect(external_tools).not_to include({ title: "Admin Analytics", base_url: "http://example.com", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
 
         @course.enable_feature!(:analytics_2)
         external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-        expect(external_tools).to include({ id: tool.id, title: "Analytics 2", base_url: "http://example.com", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ANALYTICS_2 })
+        expect(external_tools).to include({ id: tool.id, title: "Admin Analytics", base_url: "http://example.com", icon_url: nil, canvas_icon_class: "icon-analytics", tool_id: ContextExternalTool::ADMIN_ANALYTICS })
       end
 
       it "doesn't return tools that are mapped to disabled feature flags -- account navigation" do

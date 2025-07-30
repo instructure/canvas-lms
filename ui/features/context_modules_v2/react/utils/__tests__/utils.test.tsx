@@ -316,6 +316,7 @@ describe('utils', () => {
       prerequisites: [],
       completionRequirements: [],
       requirementCount: 0,
+      unlockAt: null,
       lockAt: defaultLockAt.toISOString(),
     }
 

@@ -20,7 +20,7 @@
 # @API Assignment Extensions
 #
 # API for setting extensions on student assignment submissions. These cannot be
-# set for discussion assignments or quizzes. For quizzes, use <a href="/doc/api/quiz_extensions.html">Quiz Extensions</a>
+# set for discussion assignments or quizzes. For quizzes, use <a href="quiz_extensions.html">Quiz Extensions</a>
 # instead.
 #
 # @model AssignmentExtension

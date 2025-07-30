@@ -19,7 +19,7 @@
 require_relative "../../common"
 require_relative "../pages/course_page"
 require_relative "../pages/student_context_tray_page"
-require_relative "../../../factories/analytics_2_tool_factory"
+require_relative "../../../factories/admin_analytics_tool_factory"
 
 describe "analytics in Canvas" do
   include_context "in-process server selenium tests"
@@ -33,7 +33,7 @@ describe "analytics in Canvas" do
       # Analytics1.0 is enabled for all tests by default
       @admin.account.update(allowed_services: "+analytics")
       # add the analytics 2 LTI to the account
-      analytics_2_tool_factory
+      admin_analytics_tool_factory
       @tool_id = @admin.account.context_external_tools.first.id
       # create a course, @teacher and student in course
       @course = course_with_teacher(
@@ -61,8 +61,8 @@ describe "analytics in Canvas" do
           wait_for_student_tray
         end
 
-        it "displays Analytics 2 button on Student Tray" do
-          expect(student_tray_quick_links.text).to include("Analytics 2")
+        it "displays Admin Analytics button on Student Tray" do
+          expect(student_tray_quick_links.text).to include("Admin Analytics")
         end
       end
 
@@ -79,7 +79,7 @@ describe "analytics in Canvas" do
 
         it "displays Analytics 1 button on Student Tray" do
           expect(student_tray_quick_links.text).to include("Analytics")
-          expect(student_tray_quick_links.text).not_to include("Analytics 2")
+          expect(student_tray_quick_links.text).not_to include("Admin Analytics")
         end
       end
 
@@ -98,22 +98,6 @@ describe "analytics in Canvas" do
           it "does not display Analytics 1 button" do
             skip "Flakey spec. Fix via LA-849"
             expect(student_tray_quick_links.text).not_to include("Analytics")
-          end
-        end
-
-        context "with A2 FF enabled and view_all_grades disabled" do
-          before do
-            @course.account.role_overrides.create!(permission: :view_all_grades, role: teacher_role, enabled: false)
-            @course.root_account.enable_feature!(:analytics_2)
-            user_session(@teacher)
-
-            visit_course_people_page(@course.id)
-            course_user_link(@student.id).click
-            wait_for_student_tray
-          end
-
-          it "does not display Analytics 2 button" do
-            expect(student_tray_quick_links.text).not_to include("Analytics 2")
           end
         end
       end

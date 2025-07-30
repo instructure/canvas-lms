@@ -53,7 +53,7 @@ RSpec.describe "HeadingsStartAtH2Rule", type: :feature do
   context "when fixing headings to start at h2" do
     it "changes an h1 to h2" do
       input_html = '<div><h1 id="test-element">Document Title</h1><h2>Section Title</h2></div>'
-      fixed_html = fix_issue(:headings_start_at_h2, input_html, './/h1[@id="test-element"]', "Change only this headings level")
+      fixed_html = fix_issue(:headings_start_at_h2, input_html, './/h1[@id="test-element"]', "Change only this heading level")
 
       expect(fixed_html).to include('<h2 id="test-element">Document Title</h2>')
       expect(fixed_html).not_to include('<h1 id="test-element">Document Title</h1>')

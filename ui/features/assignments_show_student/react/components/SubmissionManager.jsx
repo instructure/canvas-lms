@@ -628,7 +628,7 @@ const SubmissionManager = ({
 
   const handleSuccess = (message = I18n.t('Submission sent')) => {
     setOnSuccess(message)
-    const onTime = Date.now() < Date.parse(assignment.dueAt)
+    const onTime = assignment.dueAt === null || Date.now() < Date.parse(assignment.dueAt)
     setShowConfetti(window.ENV.CONFETTI_ENABLED && onTime)
     setTimeout(() => {
       // Confetti is cleaned up after 3000.

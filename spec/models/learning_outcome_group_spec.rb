@@ -26,7 +26,7 @@ describe LearningOutcomeGroup do
 
   def long_text(max = 65_535)
     text = +""
-    (0...max + 1).each do |num|
+    (0...(max + 1)).each do |num|
       text.concat(num.to_s)
     end
     text

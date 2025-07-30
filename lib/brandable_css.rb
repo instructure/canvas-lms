@@ -207,7 +207,7 @@ module BrandableCSS
     end
 
     def default_brand_file(type, high_contrast = false)
-      default_brand_folder.join("variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}")
+      default_brand_folder.join("variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}")
     end
 
     def high_contrast_overrides
@@ -251,7 +251,7 @@ module BrandableCSS
     end
 
     def public_default_path(type, high_contrast = false)
-      "dist/brandable_css/default/variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}"
+      "dist/brandable_css/default/variables#{"-high_contrast" if high_contrast}-#{default_variables_md5}.#{type}"
     end
 
     def variants

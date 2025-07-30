@@ -17,6 +17,7 @@
  */
 import * as z from 'zod'
 import {ZPlacementConfig} from './LtiPlacementConfig'
+import {ZContentMigrationSettings} from './ContentMigrationSettings'
 
 export interface PlatformSettings extends z.infer<typeof ZPlatformSettings> {}
 
@@ -25,4 +26,5 @@ export const ZPlatformSettings = z.object({
   icon_url: z.string().optional().nullable(),
   platform: z.string().optional().nullable(),
   placements: z.array(ZPlacementConfig),
+  content_migrations: ZContentMigrationSettings.optional().nullable(),
 })

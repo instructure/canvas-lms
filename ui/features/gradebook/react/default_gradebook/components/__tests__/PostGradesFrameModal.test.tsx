@@ -24,7 +24,7 @@ import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 const postGradesLtis = [
   {
-    data_url: '',
+    data_url: 'about:blank',
     id: '1',
     name: 'SIS',
     type: 'lti',
@@ -60,7 +60,8 @@ describe('PostGradesFrameModal', () => {
   it('calls onClose when tool sends lti.close message', async () => {
     const onClose = jest.fn()
 
-    renderComponent({selectedLtiId: '1', onClose})
+    const {getByTitle} = renderComponent({selectedLtiId: '1', onClose})
+    const iframe = getByTitle('Sync Grades') as HTMLIFrameElement
     monitorLtiMessages()
 
     fireEvent(
@@ -68,7 +69,7 @@ describe('PostGradesFrameModal', () => {
       new MessageEvent('message', {
         data: {subject: 'lti.close'},
         origin: 'http://example.com',
-        source: window,
+        source: iframe.contentWindow!,
       }),
     )
 

@@ -112,7 +112,7 @@ export const ContextCard = ({
               <ContextPath path={path_segments} />
             </Flex.Item>
             <View as="div" margin="0">
-              {exception_counts && renderExceptionCounts(exception_counts)}
+              {exception_counts && account_id && renderExceptionCounts(exception_counts)}
             </View>
             {inherit_note && (
               <View as="div" margin="0">

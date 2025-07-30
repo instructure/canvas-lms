@@ -319,24 +319,58 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).toBeDisabled()
     })
 
-    it('displays disabled "Allow Participants to Comment" when the setting is turned off', () => {
-      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
-
-      const {queryByLabelText} = setup()
-      const component = queryByLabelText('Allow Participants to Comment')
-
-      expect(component).toBeInTheDocument()
-      expect(component).toBeDisabled()
-    })
-
-    it('displays "Allow Participants to Comment" when the setting is turned on', () => {
+    it('displays "Allow Participants to Comment"', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
 
       const {queryByText} = setup()
 
       expect(queryByText('Allow Participants to Comment')).toBeInTheDocument()
+    })
+
+    describe('when ANNOUNCEMENTS_COMMENTS_DISABLED is true', () => {
+      beforeEach(() => {
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+        window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+      })
+
+      it('displays disabled "Allow Participants to Comment"', () => {
+        const {queryByLabelText} = setup()
+        const component = queryByLabelText('Allow Participants to Comment')
+
+        expect(component).toBeInTheDocument()
+        expect(component).toBeDisabled()
+      })
+
+      describe('when GROUP_CONTEXT_TYPE is set to null', () => {
+        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
+          window.ENV.GROUP_CONTEXT_TYPE = null
+
+          const {queryByText} = setup()
+          const component = queryByText('This option is locked in course settings')
+          expect(component).toBeInTheDocument()
+        })
+      })
+
+      describe('when GROUP_CONTEXT_TYPE is set to Course', () => {
+        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
+          window.ENV.GROUP_CONTEXT_TYPE = 'Course'
+
+          const {queryByText} = setup()
+          const component = queryByText('This option is locked in course settings')
+          expect(component).toBeInTheDocument()
+        })
+      })
+
+      describe('when GROUP_CONTEXT_TYPE is set to Account', () => {
+        it('renders tooltip for "Allow Participants to Comment" with the correct message', () => {
+          window.ENV.GROUP_CONTEXT_TYPE = 'Account'
+
+          const {queryByText} = setup()
+          const component = queryByText('This option is locked in account settings')
+          expect(component).toBeInTheDocument()
+        })
+      })
     })
   })
 

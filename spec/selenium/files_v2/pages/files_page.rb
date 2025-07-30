@@ -431,6 +431,14 @@ module FilesPage
     f('[data-testid="usage-rights-save-button"]')
   end
 
+  def session_expired_overlay
+    f("span[aria-label='Session expired']")
+  end
+
+  def redirect_to_login_button
+    fxpath("//button[.//span[contains(text(), 'Go to login')]]")
+  end
+
   def set_usage_rights_in_modal(usage_rights = :own_copyright)
     file_usage_rights_justification.click
     case usage_rights

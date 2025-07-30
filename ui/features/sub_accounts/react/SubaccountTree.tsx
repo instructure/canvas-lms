@@ -25,7 +25,7 @@ import SubaccountItem from './SubaccountItem'
 import type {AccountWithCounts, SubaccountQueryKey} from './types'
 import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
-import {calculateIndent, fetchSubAccounts, FetchSubAccountsResponse, generateQueryKey} from './util'
+import {calculateIndent, getSubAccounts, FetchSubAccountsResponse, generateQueryKey} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {queryClient} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
@@ -37,10 +37,11 @@ const I18n = createI18nScope('sub_accounts')
 // we will not auto expand themselves or their children
 // this also applies to top-level accounts
 const THRESHOLD_FOR_AUTO_EXPAND = 100
+type ModifyType = 'delete' | 'edit' | 'add'
 
 interface Props {
   parentAccount?: AccountWithCounts
-  handleParent?: (account: AccountWithCounts, modifyType: string) => void
+  handleParent?: (account: AccountWithCounts, modifyType: ModifyType) => void
   rootAccount: AccountWithCounts
   depth: number
   parentExpanded?: boolean
@@ -66,8 +67,8 @@ export default function SubaccountTree(props: Props) {
       InfiniteData<FetchSubAccountsResponse>,
       SubaccountQueryKey
     >({
-      queryKey: generateQueryKey(props.rootAccount.id),
-      queryFn: fetchSubAccounts,
+      queryKey: generateQueryKey(props.rootAccount.id, props.depth),
+      queryFn: getSubAccounts,
       getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
       enabled: isExpanded,
       staleTime: 10 * 60 * 1000, // 10 minutes
@@ -155,30 +156,34 @@ export default function SubaccountTree(props: Props) {
     [props.handleParent, props.rootAccount],
   )
 
-  const updateList = useCallback((json: AccountWithCounts, modifyType: string) => {
-    if (modifyType === 'delete') {
-      // deleted
-      setSubaccounts(subs => subs.filter(account => account.id !== json.id))
-      setSubCount(count => count - 1)
-      setHasFocus(true)
-    } else if (modifyType === 'edit') {
-      // updated
-      setSubaccounts(subs =>
-        subs.map(account => {
-          if (account.id !== json.id) {
-            return account
-          } else {
-            return json as AccountWithCounts
-          }
-        }),
-      )
-    } else {
-      // adding
-      setSubaccounts(subs => [...subs, json as AccountWithCounts])
-      setSubCount(count => count + 1)
-      newSubaccount.current = json.id
-    }
-  }, [])
+  const updateList = useCallback(
+    (json: AccountWithCounts, modifyType: ModifyType) => {
+      if (modifyType === 'delete') {
+        // deleted
+        setSubaccounts(subs => subs.filter(account => account.id !== json.id))
+        setSubCount(count => count - 1)
+        setHasFocus(true)
+      } else if (modifyType === 'edit') {
+        // updated
+        setSubaccounts(subs =>
+          subs.map(account => {
+            if (account.id !== json.id) {
+              return account
+            } else {
+              return json as AccountWithCounts
+            }
+          }),
+        )
+      } else {
+        // adding
+        setSubaccounts(subs => [...subs, json as AccountWithCounts])
+        setSubCount(count => count + 1)
+        newSubaccount.current = json.id
+      }
+      sessionStorage.removeItem(`subAccounts-${props.rootAccount.id}`)
+    },
+    [props.rootAccount.id],
+  )
 
   const renderRoot = useMemo(() => {
     const show = props.parentExpanded != null ? props.parentExpanded : true

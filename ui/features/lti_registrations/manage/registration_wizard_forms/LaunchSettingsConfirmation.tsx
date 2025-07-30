@@ -30,8 +30,8 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import {toUndefined} from '../../common/lib/toUndefined'
-import {Lti1p3RegistrationOverlayStore} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
-import {Lti1p3RegistrationOverlayState} from '../registration_overlay/Lti1p3RegistrationOverlayState'
+import type {Lti1p3RegistrationOverlayStore} from '../registration_overlay/Lti1p3RegistrationOverlayStore'
+import type {Lti1p3RegistrationOverlayState} from '../registration_overlay/Lti1p3RegistrationOverlayState'
 import {getInputIdForField} from '../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {formatCustomFields} from '../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {useShallow} from 'zustand/react/shallow'
@@ -97,7 +97,7 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
    * @returns A function that handles the onBlur event for the given field.
    */
   const handleBlur = React.useCallback(
-    (field: LaunchSettingsField, required: boolean = false) =>
+    (field: LaunchSettingsField, required = false) =>
       (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         setBlurStatus(prev => ({
           ...prev,
@@ -106,6 +106,17 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
       },
     [setBlurStatus],
   )
+
+  const [showPopover, setShowPopover] = React.useState(false)
+
+  const handleHidePopover = React.useCallback(() => {
+    if (
+      !document.getElementById('custom_fields_documentation_link')?.matches(':hover') &&
+      !document.getElementById('custom_fields_render_trigger')?.matches(':hover')
+    ) {
+      setShowPopover(false)
+    }
+  }, [])
 
   return (
     <Flex direction="column" gap="medium">
@@ -224,10 +235,15 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
               <Text>{I18n.t('Custom Fields')}</Text>
               <Popover
                 placement="end"
-                color="primary-inverse"
-                on={['click', 'focus']}
+                color="primary"
+                withArrow={false}
+                on={['hover', 'focus', 'click']}
+                isShowingContent={showPopover}
+                onShowContent={() => setShowPopover(true)}
+                onHideContent={handleHidePopover}
                 renderTrigger={
                   <IconButton
+                    id="custom_fields_render_trigger"
                     margin="0 0 0 x-small"
                     screenReaderLabel={I18n.t('Custom Fields Help')}
                     renderIcon={IconInfoLine}
@@ -236,7 +252,13 @@ export const LaunchSettingsConfirmation = (props: LaunchSettingsConfirmationProp
                   />
                 }
               >
-                <View margin="small" display="block">
+                <View
+                  id="custom_fields_documentation_link"
+                  padding="small"
+                  display="block"
+                  onMouseEnter={() => setShowPopover(true)}
+                  onMouseLeave={handleHidePopover}
+                >
                   <Text
                     dangerouslySetInnerHTML={{
                       __html: I18n.t('Refer to the *Canvas documentation* for more details.', {

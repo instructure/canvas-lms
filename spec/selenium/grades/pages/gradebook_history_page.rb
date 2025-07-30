@@ -133,11 +133,11 @@ class GradeBookHistory
     end
 
     def contains_final_grade_override_entries?
-      (1...results_table_rows.size + 1).any? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
+      (1...(results_table_rows.size + 1)).any? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
     end
 
     def contains_only_final_grade_override_entries?
-      (1...results_table_rows.size + 1).all? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
+      (1...(results_table_rows.size + 1)).all? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
     end
 
     def check_table_for_grader_name(string_in_row)

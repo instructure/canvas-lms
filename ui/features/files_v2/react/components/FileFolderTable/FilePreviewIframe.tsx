@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {File} from '../../../interfaces/File'
 
@@ -35,22 +35,44 @@ const sandboxSettings = (item: File) => {
   return 'allow-same-origin'
 }
 
-const FilePreviewIframe = ({item}: {item: File}) => (
-  <iframe
-    key={item.id}
-    sandbox={sandboxSettings(item)}
-    src={item.preview_url}
-    style={{
-      ...(item.mime_class === 'html' ? {backgroundColor: '#F2F4F4'} : {}),
-      border: 'none',
-      display: 'block',
-      height: '100%',
-      width: '100%',
-    }}
-    title={I18n.t('Preview for file: %{name}', {
-      name: item.display_name,
-    })}
-  />
-)
+const FilePreviewIframe = ({item}: {item: File}) => {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const [isChildFocused, setIsChildFocused] = useState(false)
+
+  useEffect(() => {
+    const checkFocus = () => {
+      setIsChildFocused(document.activeElement === iframeRef.current)
+    }
+
+    window.addEventListener('focus', checkFocus)
+    window.addEventListener('blur', checkFocus)
+
+    return () => {
+      window.removeEventListener('focus', checkFocus)
+      window.removeEventListener('blur', checkFocus)
+    }
+  }, [iframeRef])
+
+  return (
+    <iframe
+      ref={iframeRef}
+      id="file-preview-iframe"
+      key={item.id}
+      sandbox={sandboxSettings(item)}
+      src={item.preview_url}
+      style={{
+        ...(item.mime_class === 'html' ? {backgroundColor: '#F2F4F4'} : {}),
+        ...(isChildFocused ? {border: '2px solid #FFFFFF'} : {border: 'none'}),
+        boxSizing: 'border-box',
+        width: '100%',
+        height: '100%',
+        display: 'block',
+      }}
+      title={I18n.t('Preview for file: %{name}', {
+        name: item.display_name,
+      })}
+    />
+  )
+}
 
 export default FilePreviewIframe

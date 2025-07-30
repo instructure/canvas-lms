@@ -155,7 +155,7 @@ class AssetUserAccess < ActiveRecord::Base
         when "topics"
           include_group_name ? t("%{group_name} - Group Discussions", group_name: group.name) : t("Group Discussions")
         else
-          "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
+          "#{"#{group.name} - " if include_group_name}Group #{split[0].titleize}"
         end
       elsif split[1].match?(/user_\d+/)
         case split[0]
@@ -328,16 +328,6 @@ class AssetUserAccess < ActiveRecord::Base
 
   def readable_category
     ICON_MAP[asset_category.to_sym]&.[](1) || ""
-  end
-
-  # This is a temporary measure to filter out bad access records
-  # until we figure out how to clear up them from the DB
-  #
-  # For more info, see: FOO-5161
-  def bad_discussion_context?
-    return false unless asset_code.match?(/^discussion_topic_(\d+)$/)
-
-    asset.nil?
   end
 
   def self.expiration_date

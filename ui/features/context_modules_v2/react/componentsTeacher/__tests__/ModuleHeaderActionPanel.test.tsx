@@ -78,4 +78,18 @@ describe('ModuleHeaderActionPanel', () => {
     render(<ModuleHeaderActionPanel {...baseProps} hasActiveOverrides={false} />)
     expect(screen.queryByTestId('view-assign-to')).not.toBeInTheDocument()
   })
+
+  it('does not display prerequisites (moved to ModuleHeader)', () => {
+    const prerequisiteProps = {
+      ...baseProps,
+      prerequisites: [
+        {id: 'prereq_1', name: 'Prerequisite Module 1', type: 'context_module'},
+        {id: 'prereq_2', name: 'Prerequisite Module 2', type: 'context_module'},
+      ],
+    }
+    render(<ModuleHeaderActionPanel {...prerequisiteProps} hasActiveOverrides={false} />)
+
+    expect(screen.queryByText(/Prerequisite/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Prerequisite Module 1')).not.toBeInTheDocument()
+  })
 })

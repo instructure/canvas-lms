@@ -20,31 +20,33 @@ import {createRoot} from 'react-dom/client'
 import {Main} from './react/Main'
 import {initAccountSelectModal} from './react/HorizonModal/InitHorizonModal'
 import {LoadTab} from '../../shared/tabs/react/LoadTab'
+import ready from '@instructure/ready'
 
-let careersTabRoot: ReturnType<typeof createRoot> | null = null
+ready(() => {
+  initAccountSelectModal()
+  let careersTabRoot: ReturnType<typeof createRoot> | null = null
 
-function loadCareersTab(targetId: string) {
-  if (targetId !== 'tab-canvas-career-selected') return
+  function loadCareersTab(targetId: string) {
+    if (targetId !== 'tab-canvas-career-selected') return
 
-  const app = (
-    <Main
-      isHorizonAccount={window.ENV?.HORIZON_ACCOUNT || false}
-      hasCourses={window.ENV?.has_courses || false}
-      accountId={window.ENV?.ACCOUNT_ID || ''}
-      horizonAccountLocked={window.ENV?.horizon_account_locked || false}
-    />
-  )
+    const app = (
+      <Main
+        isHorizonAccount={window.ENV?.HORIZON_ACCOUNT || false}
+        hasCourses={window.ENV?.has_courses || false}
+        accountId={window.ENV?.ACCOUNT_ID || ''}
+        horizonAccountLocked={window.ENV?.horizon_account_locked || false}
+      />
+    )
 
-  const mountPoint = document.getElementById('tab-canvas-career-mount')
-  if (!mountPoint) return
+    const mountPoint = document.getElementById('tab-canvas-career-mount')
+    if (!mountPoint) return
 
-  if (!careersTabRoot) {
-    careersTabRoot = createRoot(mountPoint)
+    if (!careersTabRoot) {
+      careersTabRoot = createRoot(mountPoint)
+    }
+
+    careersTabRoot.render(app)
   }
 
-  careersTabRoot.render(app)
-
-  initAccountSelectModal()
-}
-
-LoadTab(loadCareersTab)
+  LoadTab(loadCareersTab)
+})

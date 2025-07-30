@@ -84,4 +84,17 @@ RSpec.describe "ImgAltLengthRule", type: :feature do
       expect(fixed_html).to include("alt=\"#{new_alt}\"")
     end
   end
+
+  context "when generating form for image alt text" do
+    it "returns a TextInputWithCheckboxField with correct configuration" do
+      long_alt_text = "looong alt text  " * 10
+      input_html = "<div><img alt='#{long_alt_text}'></div>"
+
+      elem = Nokogiri::HTML.fragment(input_html).css("img").first
+      form = Accessibility::Rules::ImgAltLengthRule.form(elem)
+
+      expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
+      expect(form.value).to eq(long_alt_text)
+    end
+  end
 end

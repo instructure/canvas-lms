@@ -77,13 +77,16 @@ function addEntry(entry, isAudioFile) {
         title: entry.title,
         user_entered_title: entry.userTitle,
       },
-      data => {
-        pubsub.publish('media_object_created', data)
+      () => {
+        pubsub.publish('media_object_created', {
+          id: entry.entryId,
+          mediaType,
+          title: entry.userTitle,
+        })
       },
       $.noop,
     )
   }
-  pubsub.publish('media_comment_created', {id: entry.entryId, mediaType, title: entry.userTitle})
 }
 
 const addedEntryIds = {}
@@ -813,6 +816,14 @@ window.addEntryComplete = function (entries) {
 
     window.alert(I18n.t('errors.save_failed_try_again', 'Entry failed to save.  Please try again.'))
   }
+}
+
+window.mediaObjectCreated = function (entryId, mediaType, title) {
+  pubsub.publish('media_object_created', {
+    id: entryId,
+    mediaType,
+    title,
+  })
 }
 
 // Debugging methods for kaltura record widget. If These exist they'll be called.

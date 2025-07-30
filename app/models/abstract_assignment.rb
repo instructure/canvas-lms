@@ -37,6 +37,8 @@ class AbstractAssignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
   include Lti::Migratable
+  include LinkedAttachmentHandler
+  include Assignments::GraderIdentities
 
   ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
@@ -105,6 +107,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :provisional_grades, through: :submissions
   belongs_to :annotatable_attachment, class_name: "Attachment"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :attachment_associations, as: :context, inverse_of: :context
   has_one :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment, foreign_key: :assignment_id
@@ -266,6 +269,10 @@ class AbstractAssignment < ActiveRecord::Base
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless (submission_types_array - HORIZON_SUBMISSION_TYPES).empty?
     self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
+  end
+
+  def self.html_fields
+    %w[description]
   end
 
   def queue_conditional_release_grade_change_handler?
@@ -2398,6 +2405,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
     submission.audit_grade_changes = did_grade || submission.excused_changed?
 
+    if score.nil? && !submission.attempt?
+      submission.workflow_state = "unsubmitted"
+    end
+
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&
        ((submission.score && submission.grade) || submission.excused?)
@@ -2650,6 +2661,7 @@ class AbstractAssignment < ActiveRecord::Base
         primary_homework = homework if is_primary_student
       end
     end
+    AttachmentAssociation.copy_associations(primary_homework, homeworks.excluding(primary_homework))
     homeworks.each do |homework|
       context_module_action(homework.student, homework.workflow_state.to_sym)
       next unless comment && (group_comment || homework == primary_homework)
@@ -2870,7 +2882,9 @@ class AbstractAssignment < ActiveRecord::Base
       students = student_scope.order_by_sortable_name.distinct
 
       if group_id.present?
-        students = students.joins(:group_memberships)
+        # group_memberships only contain collaborative groups, so we need to
+        # also include differentiation tags that are not collaborative groups.
+        students = students.joins("INNER JOIN #{GroupMembership.quoted_table_name} ON group_memberships.user_id = users.id")
                            .where(group_memberships: { group_id:, workflow_state: :accepted })
       end
 
@@ -3992,16 +4006,6 @@ class AbstractAssignment < ActiveRecord::Base
     ).merge(moderation_graders.with_slot_taken)
   end
 
-  def anonymous_grader_identities_by_user_id
-    # Response looks like: { user_id => { id: anonymous_id, name: anonymous_name } }
-    @anonymous_grader_identities_by_user_id ||= anonymous_grader_identities(index_by: :user_id)
-  end
-
-  def anonymous_grader_identities_by_anonymous_id
-    # Response looks like: { anonymous_id => { id: anonymous_id, name: anonymous_name } }
-    @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
-  end
-
   def instructor_selectable_states_by_provisional_grade_id
     @instructor_selectable_states_by_provisional_grade_id ||= instructor_selectable_states
   end
@@ -4358,17 +4362,6 @@ class AbstractAssignment < ActiveRecord::Base
 
   def set_muted
     self.muted = true
-  end
-
-  def anonymous_grader_identities(index_by:)
-    return {} unless moderated_grading?
-
-    ordered_moderation_graders_with_slot_taken.each_with_object({}).with_index(1) do |(moderation_grader, anonymous_identities), grader_number|
-      anonymous_identities[moderation_grader.public_send(index_by)] = {
-        name: I18n.t("Grader %{grader_number}", { grader_number: }),
-        id: moderation_grader.anonymous_id
-      }
-    end
   end
 
   def ensure_moderation_grader_slot_available(user)

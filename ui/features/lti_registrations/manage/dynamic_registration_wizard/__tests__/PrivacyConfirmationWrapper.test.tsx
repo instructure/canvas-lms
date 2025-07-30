@@ -25,6 +25,15 @@ import {LtiScopes} from '@canvas/lti/model/LtiScope'
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 import userEvent from '@testing-library/user-event'
 
+// Mock showFlashAlert to prevent React rendering issues during static initialization
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+  showFlashError: jest.fn(),
+  showFlashSuccess: jest.fn(),
+  showFlashWarning: jest.fn(),
+  destroyContainer: jest.fn(),
+}))
+
 describe('PrivacyConfirmationWrapper', () => {
   it('renders the privacy confirmation window', () => {
     const registration = mockRegistration({

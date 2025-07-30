@@ -48,12 +48,6 @@ class Login::OAuthBaseController < ApplicationController
       yield
       true
     end
-  rescue RetriableOAuthValidationError => e
-    redirect_to aac.try(:validation_error_retry_url, e, controller: self, target_auth_provider: try(:target_auth_provider)) || login_url
-
-    increment_statsd(:failure, reason: :retriable_oauth_validation_error)
-
-    false
   rescue => e
     Canvas::Errors.capture(e,
                            type: :oauth_consumer,
@@ -89,12 +83,19 @@ class Login::OAuthBaseController < ApplicationController
     # after the user has been created.
     #
     # See AuthenticationProvider::OAuth2#validate_found_pseudonym!
-    if pseudonym
-      @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
-      @aac.apply_federated_attributes(pseudonym, provider_attributes)
-    elsif @aac.jit_provisioning?
-      pseudonym = @aac.provision_user(unique_ids, provider_attributes)
-      @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
+    begin
+      if pseudonym
+        @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
+        @aac.apply_federated_attributes(pseudonym, provider_attributes)
+      elsif @aac.jit_provisioning?
+        pseudonym = @aac.provision_user(unique_ids, provider_attributes)
+        @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
+      end
+    rescue RetriableOAuthValidationError => e
+      redirect_to @aac.try(:validation_error_retry_url, e, controller: self, target_auth_provider: try(:target_auth_provider)) || login_url
+
+      increment_statsd(:failure, reason: :retriable_oauth_validation_error)
+      return
     end
 
     if pseudonym && (user = pseudonym.login_assertions_for_user)

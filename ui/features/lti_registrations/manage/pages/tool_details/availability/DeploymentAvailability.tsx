@@ -184,23 +184,26 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                   onClick={() => setOpenDeleteDeploymentModal(true)}
                 />
               )}
-              <Button
-                onClick={() => {
-                  setExceptionModalOpenState({
-                    open: true,
-                    deployment,
-                  })
-                }}
-                color="primary"
-              >
-                {I18n.t('Add Exception')}
-              </Button>
+              {deployment.context_type !== 'Course' ? (
+                <Button
+                  onClick={() => {
+                    setExceptionModalOpenState({
+                      open: true,
+                      deployment,
+                    })
+                  }}
+                  color="primary"
+                >
+                  {I18n.t('Add Exception')}
+                </Button>
+              ) : undefined}
             </Flex>
           </Grid.Col>
         </Grid.Row>
       </Grid>
       <ExceptionModal
         accountId={props.accountId}
+        registrationId={registration.id}
         openState={exceptionModalOpenState}
         onClose={() => setExceptionModalOpenState({open: false})}
         onConfirm={contextControls => {

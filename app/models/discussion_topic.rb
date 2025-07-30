@@ -32,6 +32,15 @@ class DiscussionTopic < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
   include DatesOverridable
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[message]
+  end
+
+  def actual_saving_user
+    user
+  end
 
   REQUIRED_CHECKPOINT_COUNT = 2
 
@@ -116,6 +125,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :insights, class_name: "DiscussionTopicInsight"
   has_many :insight_entries, class_name: "DiscussionTopicInsight::Entry"
   has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
   validates_associated :discussion_topic_section_visibilities
@@ -277,6 +287,11 @@ class DiscussionTopic < ActiveRecord::Base
     d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
+    d_sort = self["sort_order"]
+    if d_sort.nil? || !SortOrder::TYPES.include?(d_sort)
+      self.sort_order = SortOrder::DEFAULT
+    end
+
     @content_changed = message_changed? || title_changed?
 
     default_submission_values
@@ -296,7 +311,6 @@ class DiscussionTopic < ActiveRecord::Base
       allow_rating
       only_graders_can_rate
       sort_by_rating
-      sort_order
       sort_order_locked
       expanded
       expanded_locked
@@ -1126,6 +1140,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     @can_unpublish = if assignment
                        !assignment.has_student_submissions? && !assignment.has_student_submissions_for_sub_assignments?
+                     elsif !opts[:has_student_entries].nil?
+                       # Use preloaded data if available to avoid N+1 queries
+                       !opts[:has_student_entries]
                      else
                        student_ids = opts[:student_ids] || context.all_real_student_enrollments.select(:user_id)
                        if for_group_discussion?

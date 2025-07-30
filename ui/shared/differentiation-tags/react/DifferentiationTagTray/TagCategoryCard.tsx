@@ -102,7 +102,7 @@ function TagCategoryCard({
         role="group"
         aria-label={name}
       >
-        <Flex justifyItems="space-between" width="100%">
+        <Flex direction="column" width="100%">
           <Flex.Item shouldGrow shouldShrink>
             <Flex direction="column">
               <Flex.Item>
@@ -120,53 +120,62 @@ function TagCategoryCard({
                 )}
 
                 {mode === 'SINGLE_TAG_MODE' && (
-                  <View margin="0 0 small 0" as="div">
-                    <Text size="small" color="secondary">
-                      {I18n.t('Single tag')}
-                    </Text>
-                  </View>
+                  <Flex justifyItems="space-between" margin="0 0 small 0" as="div">
+                    <Flex.Item>
+                      <Text
+                        size="small"
+                        color="secondary"
+                        aria-label={I18n.t(
+                          {one: 'Single tag - 1 student', other: 'Single tag - %{count} students'},
+                          {count: groups[0].members_count},
+                        )}
+                        data-testid="single-tag-text"
+                      >
+                        {I18n.t('Single tag')}
+                      </Text>
+                    </Flex.Item>
+                    <Flex.Item>
+                      <TagInfo tags={groups} multiMode={false} />
+                    </Flex.Item>
+                  </Flex>
                 )}
               </Flex.Item>
             </Flex>
           </Flex.Item>
-
-          <Flex.Item align="start" margin="0 0 0 small" shouldShrink={false}>
-            <Flex>
-              <Flex.Item margin="0 x-small 0 0">
-                <IconButton
-                  color="primary"
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel={I18n.t('Edit')}
-                  onClick={handleEdit}
-                  aria-label={I18n.t('Edit tag set: %{name}', {name})}
-                >
-                  <IconEditLine />
-                </IconButton>
-              </Flex.Item>
-              <Flex.Item>
-                <IconButton
-                  elementRef={el => {
-                    if (focusElRef?.current && el instanceof HTMLElement) {
-                      focusElRef.current[category.id] = el
-                    }
-                  }}
-                  color="primary"
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel={I18n.t('Delete %{name}', {name})}
-                  onClick={handleDelete}
-                >
-                  <IconTrashLine />
-                </IconButton>
-              </Flex.Item>
-            </Flex>
+        </Flex>
+        {mode === 'MULTI_TAG_MODE' && <TagInfo tags={groups} multiMode={true} />}
+        <Flex margin="xx-small 0 0 0">
+          <Flex.Item margin="0 x-small 0 0">
+            <IconButton
+              color="primary"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Edit')}
+              onClick={handleEdit}
+              aria-label={I18n.t('Edit tag set: %{name}', {name})}
+            >
+              <IconEditLine />
+            </IconButton>
+          </Flex.Item>
+          <Flex.Item>
+            <IconButton
+              elementRef={el => {
+                if (focusElRef?.current && el instanceof HTMLElement) {
+                  focusElRef.current[category.id] = el
+                }
+              }}
+              color="primary"
+              size="small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Delete %{name}', {name})}
+              onClick={handleDelete}
+            >
+              <IconTrashLine />
+            </IconButton>
           </Flex.Item>
         </Flex>
-
-        <TagInfo tags={groups} onEdit={handleEdit} multiMode={mode === 'MULTI_TAG_MODE'} />
       </View>
 
       <DeleteTagWarningModal

@@ -99,6 +99,7 @@ export const mockRegistration = (
     manual_configuration_id: null,
     icon_url: null,
     vendor: null,
+    description: null,
     admin_nickname: n,
     configuration: {
       custom_fields: {},

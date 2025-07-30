@@ -67,7 +67,7 @@ export const TraditionalViewCriterionRating: FC<TraditionalViewCriterionRatingPr
   const selectedText = rubricSelectedAriaLabel(isSelected, isSelfAssessmentSelected)
 
   return (
-    <Flex.Item as="div" shouldGrow shouldShrink>
+    <Flex.Item as="div" width="100%" shouldGrow shouldShrink>
       <View
         as="div"
         borderColor={borderColor}

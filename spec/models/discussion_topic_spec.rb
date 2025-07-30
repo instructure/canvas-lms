@@ -241,6 +241,11 @@ describe DiscussionTopic do
         expect(discussion_topic.title).to eq(default_title)
       end
     end
+
+    it "set sort order default" do
+      d = DiscussionTopic.new
+      expect(d.sort_order).to eq DiscussionTopic::SortOrder::DEFAULT
+    end
   end
 
   it "santizes message" do
@@ -853,7 +858,7 @@ describe DiscussionTopic do
 
           expect(@topic.context).to eq(@group)
           expect((@topic.check_policy(@teacher) & @relevant_permissions).sort).to eq @relevant_permissions.sort
-          expect((@topic.check_policy(@student1) & @relevant_permissions)).to be_empty
+          expect(@topic.check_policy(@student1) & @relevant_permissions).to be_empty
         end
 
         it "works for subtopics for graded assignments" do
@@ -3964,6 +3969,12 @@ describe DiscussionTopic do
   describe "sort_order and expand" do
     before(:once) do
       @topic = @course.discussion_topics.create!(sort_order: "asc")
+    end
+
+    it "replaces incorrect value with default" do
+      @topic.sort_order = "incorrect sort order"
+      @topic.save!
+      expect(@topic.reload.sort_order).to eq DiscussionTopic::SortOrder::DEFAULT
     end
 
     it "returns the sort order of the topic" do

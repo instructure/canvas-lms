@@ -35,20 +35,6 @@ RSpec.describe Accessibility::PreviewController do
 
     context "for a wiki page" do
       let!(:wiki_page) { course.wiki_pages.create!(title: "test page", body: "test body") }
-      let(:update_params) do
-        {
-          "rule" => "some_rule",
-          "content_type" => "WikiPage",
-          "content_id" => wiki_page.id.to_s,
-          "path" => "some_path",
-          "value" => "some_value",
-
-          "action" => "create",
-          "course_id" => course.id.to_s,
-          "controller" => "accessibility/preview",
-          "format" => "json"
-        }
-      end
       let(:params) do
         {
           course_id: course.id,
@@ -62,7 +48,7 @@ RSpec.describe Accessibility::PreviewController do
       let(:response_data) { { json: { "result" => "success" }, status: :ok } }
 
       it "returns the correct response" do
-        expect(accessibility_issue_instance).to receive(:update_preview).with(update_params).and_return(response_data)
+        expect(accessibility_issue_instance).to receive(:update_preview).with("some_rule", "WikiPage", wiki_page.id.to_s, "some_path", "some_value").and_return(response_data)
 
         post :create, params:, format: :json
         expect(response).to have_http_status(:ok)
@@ -72,20 +58,6 @@ RSpec.describe Accessibility::PreviewController do
 
     context "for an assignment" do
       let!(:assignment) { course.assignments.create! }
-      let(:update_params) do
-        {
-          "rule" => "another_rule",
-          "content_type" => "Assignment",
-          "content_id" => assignment.id.to_s,
-          "path" => "another_path",
-          "value" => "another_value",
-
-          "action" => "create",
-          "course_id" => course.id.to_s,
-          "controller" => "accessibility/preview",
-          "format" => "json"
-        }
-      end
       let(:params) do
         {
           course_id: course.id,
@@ -99,7 +71,7 @@ RSpec.describe Accessibility::PreviewController do
       let(:response_data) { { json: { "result" => "success" }, status: :ok } }
 
       it "returns the correct response" do
-        expect(accessibility_issue_instance).to receive(:update_preview).with(update_params).and_return(response_data)
+        expect(accessibility_issue_instance).to receive(:update_preview).with("another_rule", "Assignment", assignment.id.to_s, "another_path", "another_value").and_return(response_data)
 
         post :create, params:, format: :json
         expect(response).to have_http_status(:ok)
@@ -108,15 +80,6 @@ RSpec.describe Accessibility::PreviewController do
     end
 
     context "with missing params" do
-      let(:update_params) do
-        {
-          "rule" => "some_rule",
-          "action" => "create",
-          "controller" => "accessibility/preview",
-          "course_id" => course.id.to_s,
-          "format" => "json"
-        }
-      end
       let(:params) do
         {
           course_id: course.id,
@@ -126,11 +89,88 @@ RSpec.describe Accessibility::PreviewController do
       let(:error_response) { { json: { "error" => "missing params" }, status: :bad_request } }
 
       it "returns an error" do
-        expect(accessibility_issue_instance).to receive(:update_preview).with(update_params).and_return(error_response)
+        expect(accessibility_issue_instance).to receive(:update_preview).with("some_rule", nil, nil, nil, nil).and_return(error_response)
 
         post :create, params:, format: :json
         expect(response).to have_http_status(:bad_request)
         expect(response.parsed_body).to eq({ "error" => "missing params" })
+      end
+    end
+  end
+
+  describe "#show" do
+    let!(:course) { Course.create! }
+    let!(:user) { User.create! }
+
+    before do
+      allow(controller).to receive_messages(require_context: true, require_user: true, validate_allowed: true)
+      controller.instance_variable_set(:@context, course)
+      controller.instance_variable_set(:@current_user, user)
+    end
+
+    context "for an assignment" do
+      let!(:assignment) { course.assignments.create!(description: "Assignment description") }
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Assignment",
+          content_id: assignment.id.to_s
+        }
+      end
+
+      it "returns the assignment description" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ "content" => "Assignment description" })
+      end
+    end
+
+    context "for a wiki page" do
+      let!(:wiki_page) { course.wiki_pages.create!(title: "Test Page", body: "Wiki page body") }
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Page",
+          content_id: wiki_page.id.to_s
+        }
+      end
+
+      it "returns the wiki page body" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq({ "content" => "Wiki page body" })
+      end
+    end
+
+    context "with unknown content type" do
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "UnknownType",
+          content_id: "123"
+        }
+      end
+
+      it "returns an error for unknown content type" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body).to eq({ "error" => "Unknown content type: UnknownType" })
+      end
+    end
+
+    context "with non-existent resource" do
+      let(:params) do
+        {
+          course_id: course.id,
+          content_type: "Assignment",
+          content_id: "999999"
+        }
+      end
+
+      it "returns not found for missing resource" do
+        get :show, params:, format: :json
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to eq({ "error" => "Resource 'Assignment' with id '999999' was not found." })
       end
     end
   end

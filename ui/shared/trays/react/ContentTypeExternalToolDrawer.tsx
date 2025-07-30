@@ -105,9 +105,9 @@ export default function ContentTypeExternalToolDrawer({
     // this drawer is mounted on page load, but listening for tool messages
     // only needs to happen when the drawer is open
     if (open) {
-      return onLtiClosePostMessage('top_navigation', onDismiss)
+      return onLtiClosePostMessage(() => iframeRef.current, onDismiss)
     }
-  }, [open])
+  }, [open, onDismiss])
 
   return (
     <View display="block" height={pageContentHeight}>

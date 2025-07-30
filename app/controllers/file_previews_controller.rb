@@ -39,7 +39,7 @@ class FilePreviewsController < ApplicationController
                     formats: [:html]
     end
 
-    if access_allowed(attachment: @file, user: @current_user, access_type: :read)
+    if access_allowed(attachment: @file, user: @current_user, access_type: :read, no_error_on_failure: true)
       unless access_allowed(attachment: @file, user: @current_user, access_type: :download, no_error_on_failure: true)
         @lock_info = @file.locked_for?(@current_user)
         return render template: "file_previews/lock_explanation", layout: false
@@ -73,6 +73,8 @@ class FilePreviewsController < ApplicationController
         @accessed_asset = nil # otherwise it will double-log when they download the file
         render template: "file_previews/no_preview", layout: false
       end
+    else
+      render "file_previews/unauthorized_preview", status: :unauthorized, layout: false
     end
   end
 end

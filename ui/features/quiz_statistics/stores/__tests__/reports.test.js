@@ -19,13 +19,13 @@
 import $ from 'jquery'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {waitFor} from '@testing-library/dom'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import subject from '../reports'
 import Dispatcher from '../../dispatcher'
 import config from '../../config'
 import quizReportsFixture from '../../__tests__/fixtures/quiz_reports.json'
 import K from '../../constants'
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // Helper to clean up any iframes created during tests
 const cleanupIframes = () => {
@@ -36,28 +36,26 @@ const cleanupIframes = () => {
 const server = setupServer()
 
 beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
-afterEach(async () => {
-  server.resetHandlers()
-  cleanupIframes()
-  // __reset__() will clear all callbacks
-  subject.__reset__()
-  // Restore any mocked functions
-  if (document.createElement.mockRestore) {
-    document.createElement.mockRestore()
-  }
-  // Give more time for any pending async operations to settle
-  // This helps prevent interference between tests
-  await sleep(150)
-})
-afterAll(() => server.close())
 
 beforeEach(() => {
+  fakeENV.setup()
   config.ajax = $.ajax
   config.quizReportsUrl = 'http://localhost/reports'
   cleanupIframes()
-  // Ensure we start with a clean state
   subject.__reset__()
 })
+
+afterEach(() => {
+  server.resetHandlers()
+  cleanupIframes()
+  subject.__reset__()
+  if (document.createElement.mockRestore) {
+    document.createElement.mockRestore()
+  }
+  fakeENV.teardown()
+})
+
+afterAll(() => server.close())
 
 describe('.load', () => {
   it('should load and deserialize reports', async () => {
@@ -75,14 +73,7 @@ describe('.load', () => {
   })
 
   it('emits change', async () => {
-    // Make sure we start with a clean state
-    subject.__reset__()
-
-    // Create a promise that will resolve when the change event is fired
-    let changeEventFired = false
-    const onChange = jest.fn(() => {
-      changeEventFired = true
-    })
+    const onChange = jest.fn()
 
     server.use(
       http.get('http://localhost/reports*', () => {
@@ -90,18 +81,20 @@ describe('.load', () => {
       }),
     )
 
-    // Add our listener
     subject.addChangeListener(onChange)
 
-    // Trigger the load which should emit a change
+    // Ensure onChange hasn't been called yet
+    expect(onChange).not.toHaveBeenCalled()
+
     await subject.load()
 
-    // Give time for change event to fire
-    await sleep(10)
+    // Verify the change event was fired after load completes
+    await waitFor(() => {
+      expect(onChange).toHaveBeenCalled()
+    })
 
-    // Verify that the change event was fired
-    expect(changeEventFired).toBe(true)
-    expect(onChange).toHaveBeenCalled()
+    // Verify it was called exactly once
+    expect(onChange).toHaveBeenCalledTimes(1)
   })
 
   it('should request both "file" and "progress" to be included with quiz reports', async () => {
@@ -150,15 +143,14 @@ describe('.populate', function () {
       {track: true},
     )
 
-    await sleep(10) // Give time for the request to be made
-
-    expect(capturedUrl).toBe('/progress/1')
+    await waitFor(() => {
+      expect(capturedUrl).toBe('/progress/1')
+    })
   })
 })
 
 describe('quizReports:generate', function () {
   it('tracks the generation progress', async () => {
-    // Clean up any existing iframes first
     cleanupIframes()
 
     let postRequestMade = false
@@ -183,13 +175,11 @@ describe('quizReports:generate', function () {
       }),
       http.get('*/progress/1', () => {
         progressRequestCount++
-        // Keep returning active state to avoid completion and auto-download
         return HttpResponse.json({
           workflow_state: K.PROGRESS_ACTIVE,
           completion: progressRequestCount * 10,
         })
       }),
-      // Handle the fetch request if it happens
       http.get('http://localhost/reports*', () => {
         return HttpResponse.json({
           quiz_reports: [
@@ -209,13 +199,14 @@ describe('quizReports:generate', function () {
 
     Dispatcher.dispatch('quizReports:generate', 'student_analysis')
 
-    // Wait for polling to start and make some progress
-    await sleep(50)
+    await waitFor(() => {
+      expect(postRequestMade).toBe(true)
+    })
 
-    expect(postRequestMade).toBe(true)
-    expect(progressRequestCount).toBeGreaterThan(0)
+    await waitFor(() => {
+      expect(progressRequestCount).toBeGreaterThan(0)
+    })
 
-    // Clean up any iframes that might have been created
     cleanupIframes()
   })
 
@@ -273,7 +264,10 @@ describe('quizReports:generate', function () {
     Dispatcher.dispatch('quizReports:generate', 'student_analysis')
 
     // Wait for all async operations to complete
-    await sleep(300)
+    await waitFor(() => {
+      const iframe = document.body.querySelector('iframe')
+      return iframe && iframe.src.includes('/files/1/download')
+    })
 
     const iframe = document.body.querySelector('iframe')
 
@@ -309,18 +303,13 @@ describe('quizReports:generate', function () {
     )
 
     subject.populate(payload, {track: true})
-    await sleep(10)
-    expect(progressRequestMade).toBe(true)
 
-    // The dispatcher returns a promise, so we can check if it rejects
-    try {
-      await new Promise((resolve, reject) => {
-        Dispatcher.dispatch('quizReports:generate', 'student_analysis').then(resolve).catch(reject)
-      })
-      // If we get here, the test should fail
-      expect(true).toBe(false)
-    } catch (error) {
-      expect(error.message).toContain('report is already being generated')
-    }
+    await waitFor(() => {
+      expect(progressRequestMade).toBe(true)
+    })
+
+    await expect(Dispatcher.dispatch('quizReports:generate', 'student_analysis')).rejects.toThrow(
+      'report is already being generated',
+    )
   })
 })

@@ -61,10 +61,10 @@ export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
             _id: '1',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
-              pageInfo:{
+              pageInfo: {
                 endCursor: null,
                 hasNextPage: false,
-                __typename: "PageInfo"
+                __typename: 'PageInfo',
               },
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
@@ -100,10 +100,10 @@ export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
             _id: '2',
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
-              pageInfo:{
+              pageInfo: {
                 endCursor: null,
                 hasNextPage: false,
-                __typename: "PageInfo"
+                __typename: 'PageInfo',
               },
               nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
                 __typename: 'LearningOutcomeGroup',
@@ -237,10 +237,10 @@ export const treeGroupMocks = ({
             parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
             childGroups: {
               __typename: 'LearningOutcomeGroupConnection',
-              pageInfo:{
+              pageInfo: {
                 endCursor: null,
                 hasNextPage: false,
-                __typename: "PageInfo"
+                __typename: 'PageInfo',
               },
               nodes: childGroups.map(cid => ({
                 __typename: 'LearningOutcomeGroup',
@@ -351,10 +351,10 @@ export const groupMocks = ({
           parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
-            pageInfo:{
+            pageInfo: {
               endCursor: null,
               hasNextPage: false,
-              __typename: "PageInfo"
+              __typename: 'PageInfo',
             },
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
@@ -1170,6 +1170,32 @@ export const groupDetailMocks = ({
               ],
               __typename: 'ContentTagConnection',
             },
+            __typename: 'LearningOutcomeGroup',
+          },
+        },
+      },
+    },
+    {
+      request: {
+        query: SEARCH_GROUP_OUTCOMES,
+        variables: {
+          id: groupId,
+          outcomeIsImported,
+          outcomesContextId: contextId,
+          outcomesContextType: contextType,
+          searchQuery,
+          targetGroupId,
+        },
+      },
+      result: {
+        data: {
+          group: {
+            _id: groupId,
+            description: `${groupDescription} 6`,
+            title,
+            outcomesCount: 1,
+            notImportedOutcomesCount,
+            outcomes: {},
             __typename: 'LearningOutcomeGroup',
           },
         },

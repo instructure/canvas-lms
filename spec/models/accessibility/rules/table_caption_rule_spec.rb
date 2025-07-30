@@ -58,4 +58,10 @@ RSpec.describe "TableCaptionRule", type: :feature do
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
   end
+
+  context "form" do
+    it "returns the proper form" do
+      expect(Accessibility::Rules::TableCaptionRule.form(nil).label).to eq("Table caption")
+    end
+  end
 end

@@ -80,7 +80,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
       Lti::AccountBindingService.call(account:,
                                       user: @current_user,
                                       registration: lti_registration,
-                                      workflow_state: workflow_state_param[:workflow_state]) => {developer_key_account_binding: binding}
+                                      workflow_state: workflow_state_param[:workflow_state]) => { developer_key_account_binding: binding }
     else
       binding = existing_binding || DeveloperKeyAccountBinding.new(create_params)
       binding.assign_attributes workflow_state_param

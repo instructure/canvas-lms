@@ -31,6 +31,7 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   INVALID_TYPE_MSG        = I18n.t("Submission must be a text entry type or file upload.")
   SHORT_ESSAY_MSG         = I18n.t("Submission must be at least 5 words.")
   MISSING_RATING_MSG      = I18n.t("Rubric is missing rating description.")
+  FILE_UPLOADS_DISABLED_MSG = I18n.t("Grading assistance is disabled for file uploads.")
 
   def self.validate_assignment(assignment:)
     assignment_issues = []
@@ -60,7 +61,7 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     submission.blank? ||
       submission.attempt.to_i < 1 ||
       (submission.submission_type == "online_text_entry" && submission.body.blank?) ||
-      (submission.submission_type == "online_upload" && !submission.extract_text_from_upload?)
+      (submission.submission_type == "online_upload" && submission.attachments.none?)
   end
 
   def self.contains_images?(submission)
@@ -82,9 +83,15 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     submission.word_count.nil? || submission.word_count < 5
   end
 
+  def self.file_uploads_feature_disabled?(submission)
+    submission.submission_type == "online_upload" &&
+      !Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
+  end
+
   CHECKS = {
     NO_SUBMISSION_MSG => ->(s) { no_submission?(s) },
     INVALID_TYPE_MSG => ->(s) { invalid_type?(s) },
+    FILE_UPLOADS_DISABLED_MSG => ->(s) { file_uploads_feature_disabled?(s) },
     INVALID_FILE_MSG => ->(s) { invalid_file?(s) },
     IMAGE_UPLOAD_MSG => ->(s) { contains_images?(s) },
     SHORT_ESSAY_MSG => ->(s) { short_essay?(s) }

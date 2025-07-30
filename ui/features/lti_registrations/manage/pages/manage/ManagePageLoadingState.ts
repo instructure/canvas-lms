@@ -133,12 +133,6 @@ export const mkUseManagePageState =
             // Only apply the result if the request is still relevant
             if (prev._type === 'reloading' && requested === prev.requested) {
               if (isSuccessful(result)) {
-                $.screenReaderFlashMessage(
-                  I18n.t(
-                    {one: '%{count} registration found', other: '%{count} registrations found'},
-                    {count: result.data.total},
-                  ),
-                )
                 return {
                   items: result.data,
                   _type: 'loaded',

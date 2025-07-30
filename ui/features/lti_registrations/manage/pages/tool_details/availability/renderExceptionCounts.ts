@@ -30,41 +30,33 @@ export const renderExceptionCounts = ({
   subaccount_count: number
 }) => {
   return [
-    child_control_count > 0
-      ? I18n.t(
-          'context_control_exception',
-          {
-            one: '1 exception',
-            other: '%{count} exceptions',
-          },
-          {
-            count: child_control_count,
-          },
-        )
-      : undefined,
-    subaccount_count > 0
-      ? I18n.t(
-          {
-            one: '1 child sub-account',
-            other: '%{count} child sub-accounts',
-          },
-          {
-            count: subaccount_count,
-          },
-        )
-      : undefined,
-    course_count > 0
-      ? I18n.t(
-          {
-            one: '1 child course',
-            other: '%{count} child courses',
-          },
-          {
-            count: course_count,
-          },
-        )
-      : undefined,
-  ]
-    .filter(text => text !== undefined)
-    .join(' · ')
+    I18n.t(
+      'context_control_exception',
+      {
+        one: '1 exception',
+        other: '%{count} exceptions',
+      },
+      {
+        count: child_control_count,
+      },
+    ),
+    I18n.t(
+      {
+        one: '1 child sub-account',
+        other: '%{count} child sub-accounts',
+      },
+      {
+        count: subaccount_count,
+      },
+    ),
+    I18n.t(
+      {
+        one: '1 child course',
+        other: '%{count} child courses',
+      },
+      {
+        count: course_count,
+      },
+    ),
+  ].join(' · ')
 }

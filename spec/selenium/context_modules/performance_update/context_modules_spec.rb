@@ -47,8 +47,7 @@ describe "context modules, performance update" do
     go_to_modules
     wait_for_dom_ready
     wait_for_children("#context_module_#{@context_module.id}")
-    expect(flash_alert).to be_displayed
-    expect(flash_alert).to include_text('"Module X" items loaded')
+    expect(screenreader_alert).to include_text("All module items loaded")
     expect(f("#context_module_#{@context_module.id}")).to be_displayed
     expect(f("#context_module_item_#{@item1.id}")).to be_displayed
     expect(f("#context_module_item_#{@item2.id}")).to be_displayed
@@ -113,8 +112,6 @@ describe "context modules, performance update" do
     it "loads items when a collapsed module is expanded" do
       go_to_modules
       wait_for_dom_ready
-      expect(flash_alert).to be_displayed
-      flash_alert_close_button.click
 
       modules = all_context_modules
       expect(modules).to have_size(2)
@@ -123,9 +120,6 @@ describe "context modules, performance update" do
       expect(modules[1]).not_to contain_css(".context_module_item")
       expand_module_link(@context_module2.id).click
       wait_for_ajaximations
-      expect(flash_alert).to be_displayed
-      expect(flash_alert).to include_text('"Module Y" items loaded')
-      expect(modules[1]).to contain_css(".context_module_item")
     end
   end
 end

@@ -278,13 +278,14 @@ module Types
       argument :sort, CourseUsersSortInputType, required: false
     end
     def users_connection(user_ids: nil, filter: {}, sort: {})
+      user_ids = filter[:user_ids] || user_ids
       return nil unless course.grants_any_right?(
         current_user,
         session,
         :read_roster,
         :view_all_grades,
         :manage_grades
-      )
+      ) || (user_ids&.length == 1 && Shard.global_id_for(user_ids&.first) == current_user.global_id)
 
       context.scoped_merge!(course:)
 
@@ -305,7 +306,6 @@ module Types
                 UserSearch.scope_for(course, current_user, options)
               end
 
-      user_ids = filter[:user_ids] || user_ids
       if user_ids.present?
         scope = scope.where(users: { id: user_ids })
       end

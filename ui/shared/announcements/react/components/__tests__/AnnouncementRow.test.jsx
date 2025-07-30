@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import AnnouncementRow from '../AnnouncementRow'
 
 const mockLockIconView = {
@@ -173,16 +173,25 @@ describe('AnnouncementRow', () => {
     expect(mockLockIconView.render).toHaveBeenCalled()
   })
 
-  it('renders reply button icon if user has reply permission', () => {
+  it('renders reply button icon if user has reply permission', async () => {
     renderAnnouncementRow({announcement: {permissions: {reply: true}}})
 
-    expect(screen.getByRole('link', {name: /reply/i})).toBeInTheDocument()
+    await waitFor(() => {
+      const replyText = screen.getByText('Reply')
+      expect(replyText).toBeInTheDocument()
+
+      // Verify it's within a link element
+      const linkElement = replyText.closest('a')
+      expect(linkElement).toBeInTheDocument()
+    })
   })
 
-  it('does not render reply button icon if user does not have reply permission', () => {
+  it('does not render reply button icon if user does not have reply permission', async () => {
     renderAnnouncementRow({announcement: {permissions: {reply: false}}})
 
-    expect(screen.queryByRole('link', {name: /reply/i})).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByText('Reply')).not.toBeInTheDocument()
+    })
   })
 
   it('removes non-text content from announcement message', () => {

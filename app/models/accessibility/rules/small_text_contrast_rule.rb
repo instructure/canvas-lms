@@ -29,22 +29,28 @@ module Accessibility
 
       def self.test(elem)
         tag_name = elem.tag_name.downcase
-        return true if %w[img br hr input select textarea button script style svg canvas iframe].include?(tag_name)
-        return true if elem.text_content.strip.empty?
+        return nil if %w[img br hr input select textarea button script style svg canvas iframe].include?(tag_name)
+        return nil if elem.text_content.strip.empty?
 
-        return true if elem.text_content.strip.length < 3
+        return nil if elem.text_content.strip.length < 3
 
         style_str = elem.attribute("style")&.value.to_s
-        return true if style_str.include?("display: none") || style_str.include?("visibility: hidden")
+        return nil if style_str.include?("display: none") || style_str.include?("visibility: hidden")
 
-        return true unless small_text?(style_str)
+        return nil unless small_text?(style_str)
 
         foreground = extract_color(style_str, "color") || "000000"
         background = extract_color(style_str, "background-color") || "FFFFFF"
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
-        contrast_ratio >= CONTRAST_THRESHOLD
+        if contrast_ratio < CONTRAST_THRESHOLD
+          I18n.t("Contrast ratio for small text is smaller than threshold %{value}.", { value: CONTRAST_THRESHOLD })
+        end
+      end
+
+      def self.display_name
+        I18n.t("Small text contrast")
       end
 
       def self.message
@@ -53,10 +59,6 @@ module Accessibility
 
       def self.why
         I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
-      end
-
-      def self.link_text
-        I18n.t("Learn more about small text contrast")
       end
 
       def self.small_text?(style_str)
@@ -103,19 +105,18 @@ module Accessibility
       def self.extract_color(style_str, property)
         return nil unless style_str
 
-        if style_str =~ /#{property}:\s*([^;]+)/
-          color = $1.strip
+        match = style_str.match(/(?:^|;)\s*#{Regexp.escape(property)}:\s*([^;]+)/)
+        return nil unless match
 
-          if color.start_with?("rgb")
-            return rgb_to_hex(color)
-          elsif color.start_with?("#")
-            return color.delete("#").upcase
-          else
-            return color.upcase
-          end
+        color = match[1].strip
+
+        if color.start_with?("rgb")
+          rgb_to_hex(color)
+        elsif color.start_with?("#")
+          color.delete_prefix("#").upcase
+        else
+          color.upcase
         end
-
-        nil
       end
 
       def self.rgb_to_hex(rgb)
@@ -126,21 +127,40 @@ module Accessibility
         "#000000"
       end
 
-      def self.form(_elem)
+      def self.form(elem)
+        style_str = elem.attribute("style")&.value.to_s
+        foreground = extract_color(style_str, "color") || "000000"
+        background = extract_color(style_str, "background-color") || "FFFFFF"
+
         Accessibility::Forms::ColorPickerField.new(
-          label: "Change color",
-          value: ""
+          title_label: I18n.t("Contrast Ratio"),
+          input_label: I18n.t("New Color"),
+          label: I18n.t("Change Color"),
+          options: ["normal"],
+          background_color: "##{background}",
+          undo_text: I18n.t("Color changed"),
+          value: "##{foreground}",
+          contrast_ratio: WCAGColorContrast.ratio(foreground, background)
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
         style_str = elem.attribute("style")&.value.to_s
         styles = style_str.split(";").to_h { |s| s.strip.split(":") }
 
         styles["color"] = value
 
         new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
+        return nil if new_style == style_str
+
         elem.set_attribute("style", new_style)
+
+        foreground = extract_color(new_style, "color") || "000000"
+        background = extract_color(style_str, "background-color") || "FFFFFF"
+
+        contrast_ratio = WCAGColorContrast.ratio(foreground, background)
+
+        raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
 
         elem
       end

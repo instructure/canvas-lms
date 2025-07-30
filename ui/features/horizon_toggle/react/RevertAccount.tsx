@@ -47,7 +47,7 @@ export const RevertAccount = ({accountId, isHorizonAccountLocked}: RevertAccount
 
       window.location.reload()
     } catch (e) {
-      showFlashError(I18n.t('Failed to revert sub-account. Please try again.'))
+      showFlashError(I18n.t('Failed to revert account. Please try again.'))
     }
   }, [accountId])
 
@@ -55,16 +55,16 @@ export const RevertAccount = ({accountId, isHorizonAccountLocked}: RevertAccount
     <View as="div">
       <Flex gap="large" margin="large 0 0 0" direction="column">
         <View>
-          <Heading level="h3">{I18n.t('Revert Sub Account')}</Heading>
+          <Heading level="h3">{I18n.t('Revert Account')}</Heading>
           <Text as="p">
             {I18n.t(
-              'By reverting, all Canvas Career features will be disabled. Reverting will result in the loss of features, including the simplified user interface along with, program management, AI-driven actionable insights, and more! These features will no longer be available after the sub account is reverted.',
+              'By reverting, all Canvas Career features will be disabled. Reverting will result in the loss of features, including the simplified user interface, program management, AI-driven actionable insights, and more! These features will no longer be available after the account is reverted.',
             )}
           </Text>
         </View>
         <Flex justifyItems="end">
           <Button color="primary" onClick={onSubmit} disabled={isHorizonAccountLocked}>
-            {I18n.t('Revert Sub Account')}
+            {I18n.t('Revert Account')}
           </Button>
         </Flex>
       </Flex>

@@ -83,9 +83,6 @@ class WikiPagesController < ApplicationController
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
         log_asset_access(["pages", @context], "pages", "other")
         js_env(ConditionalRelease::Service.env_for(@context))
-        js_env({
-                 NEW_PAGE_URL: course_new_page_url(@context)
-               })
         wiki_pages_js_env(@context)
         set_tutorial_js_env
         @padless = true

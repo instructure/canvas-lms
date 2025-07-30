@@ -19,8 +19,9 @@ import $ from 'jquery'
 
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
+import ready from '@instructure/ready'
 
-$(document).ready(() => {
+ready(() => {
   $(window)
     .resize(() => {
       const {top} = $('#file_content').offset()

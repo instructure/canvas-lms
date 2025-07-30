@@ -16,6 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import persistedQueries from './persistedQueries.yml'
+import manifest from './persistedQueries/manifest.json'
+import GetCourseStudentQuery from './persistedQueries/GetCourseStudentQuery.graphql'
+import GetModulesStudentQuery from './persistedQueries/GetModulesStudentQuery.graphql'
+import GetModuleItemsStudentQuery from './persistedQueries/GetModuleItemsStudentQuery.graphql'
+
+interface PersistedQuery {
+  anonymous_access_allowed: boolean
+  query: string
+}
+
+const queries: Record<string, string> = {
+  GetCourseStudentQuery,
+  GetModulesStudentQuery,
+  GetModuleItemsStudentQuery,
+}
+
+const persistedQueries: Record<string, PersistedQuery> = {}
+
+Object.entries(manifest).forEach(([queryName, metadata]) => {
+  persistedQueries[queryName] = {
+    ...metadata,
+    query: queries[queryName],
+  }
+})
 
 export default persistedQueries

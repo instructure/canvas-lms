@@ -27,8 +27,13 @@ import {useCourseStudent} from '../hooks/queriesStudent/useCourseStudent'
 import {useContextModule} from '../hooks/useModuleContext'
 import {Flex} from '@instructure/ui-flex'
 import {IconAssignmentLine, IconWarningLine} from '@instructure/ui-icons'
+import FeedbackBlock from './FeedbackBlock'
 
 const I18n = createI18nScope('context_modules_v2')
+
+declare const ENV: {
+  CONTEXT_MODULES_HEADER_PROPS: any
+}
 
 interface ModulePageActionHeaderStudentProps {
   onCollapseAll: () => void
@@ -118,18 +123,17 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
             </Flex>
           </View>
         ) : null}
-        {/* @ts-expect-error */}
+        <FeedbackBlock />
         {ENV.CONTEXT_MODULES_HEADER_PROPS && (
           <ContextModulesHeader
-            expandCollapseAll={{
-              onExpandCollapseAll: handleCollapseExpandClick,
-              anyModuleExpanded,
-              disabled,
-            }}
-            // @ts-expect-error
             {...ENV.CONTEXT_MODULES_HEADER_PROPS}
             overrides={{
               hideTitle: true,
+              expandCollapseAll: {
+                onExpandCollapseAll: handleCollapseExpandClick,
+                anyModuleExpanded,
+                disabled,
+              },
             }}
           />
         )}

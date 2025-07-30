@@ -20,6 +20,7 @@ import {ModuleItemContentType} from '../queries/useModuleItemContent'
 import {useContextModule} from '../useModuleContext'
 import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission, submitItemData} from './useInlineSubmission'
+import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
 
 type ExternalUrl = {
@@ -107,6 +108,7 @@ export function useAddModuleItem({
 }) {
   const [state, dispatch] = useReducer(reducer, initialState)
   const {courseId} = useContextModule()
+  const {defaultFolder} = useDefaultCourseFolder()
   const submitInlineItem = useInlineSubmission()
 
   const reset = () => dispatch({type: 'RESET'})
@@ -152,7 +154,7 @@ export function useAddModuleItem({
         newItemName: newItem.name,
         selectedAssignmentGroup: newItem.assignmentGroup,
         selectedFile: newItem.file,
-        selectedFolder: newItem.folder,
+        selectedFolder: newItem.folder || defaultFolder,
         itemData,
         onRequestClose,
       })

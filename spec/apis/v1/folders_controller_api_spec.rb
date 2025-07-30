@@ -1322,6 +1322,12 @@ describe "Folders API", type: :request do
       api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
     end
 
+    it "returns unauthorized if user is logged out" do
+      @user = nil
+      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 401)
+      expect(session[:return_to]).not_to be_nil
+    end
+
     it "returns X-Total-Items header with correct count" do
       api_call(:get, @folders_files_path, @folders_files_path_options, {})
       expect(response.headers["X-Total-Items"]).to eq("5")
@@ -1610,6 +1616,12 @@ describe "Folders API", type: :request do
         item["name"] || item["display_name"] || item["filename"]
       end
       expect(result_names).to eq ["course files", "file1.txt", "file2.txt", "file3.txt"]
+    end
+
+    it "returns unauthorized if user is logged out" do
+      @user = nil
+      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 401)
+      expect(session[:return_to]).not_to be_nil
     end
   end
 end

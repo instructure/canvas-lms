@@ -1230,4 +1230,56 @@ describe Types::SubmissionType do
       end
     end
   end
+
+  describe "provisionalGradesConnection" do
+    before(:once) do
+      @teacher1 = user_factory(active_all: true)
+      @teacher2 = user_factory(active_all: true)
+      @moderator = user_factory(active_all: true)
+      @student = user_factory(active_all: true)
+      @admin = account_admin_user(account: @account)
+
+      @course = course_factory(active_all: true)
+      @course.enroll_teacher(@teacher1, enrollment_state: "active")
+      @course.enroll_teacher(@teacher2, enrollment_state: "active")
+
+      @course.enroll_teacher(@moderator, enrollment_state: "active")
+      @course.enroll_student(@student, enrollment_state: "active")
+
+      @moderated_assignment = @course.assignments.create!(
+        name: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: @moderator
+      )
+      @moderated_assignment.create_moderation_grader(@teacher1, occupy_slot: true)
+      @moderated_assignment.create_moderation_grader(@teacher2, occupy_slot: true)
+      @assignment = @course.assignments.create!(name: "regular assignment")
+
+      @moderated_assignment.grade_student(@student, grader: @teacher1, provisional: true, score: 10)
+      @moderated_assignment.grade_student(@student, grader: @teacher2, provisional: true, score: 20)
+      @moderated_submission = @moderated_assignment.submissions.find_by!(user: @student)
+      @submission = @assignment.submissions.find_by!(user: @student)
+    end
+
+    it "returns nil for non-moderated assignments" do
+      submission_type = GraphQLTypeTester.new(@submission, current_user: @moderator)
+      expect(submission_type.resolve("provisionalGradesConnection { nodes { _id } }")).to be_nil
+    end
+
+    ["admin", "moderator"].each do |user_type|
+      it "returns all provisional grades for #{user_type}s" do
+        user = instance_variable_get("@#{user_type}")
+        submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: user)
+        expect(submission_type.resolve("provisionalGradesConnection { nodes { _id } }")).to eq(@moderated_assignment.provisional_grades.map { |x| x.id.to_s })
+      end
+    end
+
+    it "returns scored provisional grades for teachers" do
+      submission_type = GraphQLTypeTester.new(@moderated_submission, current_user: @teacher1)
+      expect(submission_type.resolve("provisionalGradesConnection { nodes { _id } }")).to eq(
+        @moderated_assignment.provisional_grades.where(scorer: @teacher1).map { |x| x.id.to_s }
+      )
+    end
+  end
 end

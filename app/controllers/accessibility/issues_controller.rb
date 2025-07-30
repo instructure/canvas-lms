@@ -33,8 +33,7 @@ module Accessibility
     end
 
     def update
-      content_data = JSON.parse(request.body.read)
-      response = Accessibility::Issue.new(context: @context).update_content(content_data)
+      response = Accessibility::Issue.new(context: @context).update_content(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
       render json: response[:json], status: response[:status]
     end
 

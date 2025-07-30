@@ -42,13 +42,13 @@ class FileTextExtractionService
           extract_docx
         else
           Rails.logger.warn("[LocalTextExtractor] Unsupported MIME type: #{attachment.mime_type}")
-          Result.new(nil, false)
+          Result.new("", false)
         end
       end
     end
   rescue => e
     Rails.logger.error("[LocalTextExtractor] Failed for attachment #{attachment.id}: #{e.message}")
-    Result.new(nil, false)
+    Result.new("", false)
   end
 
   private
@@ -65,7 +65,7 @@ class FileTextExtractionService
   end
 
   def extract_pdf
-    reader = PDF::Reader.new(attachment.full_filename)
+    reader = PDF::Reader.new(attachment.open)
     text = reader.pages.map(&:text).join("\n")
     has_images = reader.pages.any? do |page|
       page.xobjects&.any? { |_, stream| stream.hash[:Subtype] == :Image }
@@ -75,7 +75,7 @@ class FileTextExtractionService
   end
 
   def extract_docx
-    doc = Docx::Document.open(attachment.full_filename)
+    doc = Docx::Document.open(attachment.open)
     text = doc.text
 
     has_images = false

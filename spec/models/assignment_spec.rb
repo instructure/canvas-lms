@@ -798,65 +798,61 @@ describe Assignment do
     end
   end
 
-  describe "#anonymous_grader_identities_by_user_id" do
+  describe "#grader_identities" do
     before(:once) do
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: :active)
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
     end
 
-    it "includes users that have taken a grader slot" do
+    it "returns an empty array when moderated_grading? is false" do
+      @assignment.update!(moderated_grading: false)
+      expect(@assignment.grader_identities).to eq []
+    end
+
+    it "includes real user names" do
       @assignment.create_moderation_grader(@teacher, occupy_slot: true)
-      expect(@assignment.anonymous_grader_identities_by_user_id).to have_key @teacher.id
+      identities = @assignment.grader_identities
+      expect(identities.length).to eq 1
+      expect(identities.first[:name]).to eq @teacher.name
+      expect(identities.first[:user_id]).to eq @teacher.id
     end
 
-    it "assigns grader names based on the ordered anonymous IDs" do
-      second_teacher = User.create!
+    it "includes all graders who have taken slots in position order" do
+      second_teacher = User.create!(name: "Second Teacher")
+      third_teacher = User.create!(name: "Third Teacher")
       @course.enroll_teacher(second_teacher, enrollment_state: :active)
-      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "bbbbb", slot_taken: true)
-      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "aaaaa", slot_taken: true)
-      anonymous_name = @assignment.anonymous_grader_identities_by_user_id.dig(second_teacher.id, :name)
-      expect(anonymous_name).to eq "Grader 1"
-    end
+      @course.enroll_teacher(third_teacher, enrollment_state: :active)
 
-    it "excludes users that have not taken a grader slot" do
-      @assignment.create_moderation_grader(@teacher, occupy_slot: false)
-      expect(@assignment.anonymous_grader_identities_by_user_id).not_to have_key @teacher.id
-    end
+      # Create in non-sequential order to verify sorting
+      @assignment.moderation_graders.create!(user: third_teacher, anonymous_id: "anon3", slot_taken: true)
+      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "anon1", slot_taken: true)
+      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "anon2", slot_taken: true)
 
-    it "excludes users that do not have a moderation grader record for the assignment" do
-      expect(@assignment.anonymous_grader_identities_by_user_id).not_to have_key @teacher.id
+      identities = @assignment.grader_identities
+      expect(identities.length).to eq 3
+      expect(identities.map { |i| i[:user_id] }).to eq [@teacher.id, second_teacher.id, third_teacher.id]
     end
   end
 
-  describe "#anonymous_grader_identities_by_anonymous_id" do
+  describe "anonymous grader identity methods" do
     before(:once) do
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: :active)
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
+      @grader = @assignment.create_moderation_grader(@teacher, occupy_slot: true)
     end
 
-    it "includes users that have taken a grader slot" do
-      grader = @assignment.create_moderation_grader(@teacher, occupy_slot: true)
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).to have_key grader.anonymous_id
+    it "#anonymous_grader_identities_by_user_id integrates properly with the Assignment model and ModerationGrader" do
+      identities = @assignment.anonymous_grader_identities_by_user_id
+      expect(identities[@teacher.id][:id]).to eq @grader.anonymous_id
+      expect(identities[@teacher.id][:name]).to eq "Grader 1"
     end
 
-    it "assigns grader names based on the ordered anonymous IDs" do
-      second_teacher = User.create!
-      @course.enroll_teacher(second_teacher, enrollment_state: :active)
-      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "bbbbb", slot_taken: true)
-      grader = @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "aaaaa", slot_taken: true)
-      anonymous_name = @assignment.anonymous_grader_identities_by_anonymous_id.dig(grader.anonymous_id, :name)
-      expect(anonymous_name).to eq "Grader 1"
-    end
-
-    it "excludes users that have not taken a grader slot" do
-      grader = @assignment.create_moderation_grader(@teacher, occupy_slot: false)
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key grader.anonymous_id
-    end
-
-    it "excludes users that do not have a moderation grader record for the assignment" do
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key @teacher.id
+    it "#anonymous_grader_identities_by_anonymous_id integrates properly with the Assignment model and ModerationGrader" do
+      identities = @assignment.anonymous_grader_identities_by_anonymous_id
+      expect(identities[@grader.anonymous_id][:id]).to eq @grader.anonymous_id
+      expect(identities[@grader.anonymous_id][:name]).to eq "Grader 1"
     end
   end
 
@@ -2383,6 +2379,66 @@ describe Assignment do
         expect(representatives).not_to include @initial_student
       end
     end
+
+    context "filter SpeedGrader by student group" do
+      include GroupsCommon
+
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        @course.update!(filter_speed_grader_by_student_group: true)
+        @course.account.reload
+
+        @collab_student = student_in_course(active_all: true, name: "Collab Student").user
+        @non_collab_student = student_in_course(active_all: true, name: "Non Collab Student").user
+
+        collab_group_category = @course.group_categories.create!(name: "Collab Group Set")
+        @collab_group = @course.groups.create!(name: "Collab Group", group_category: collab_group_category)
+
+        non_collab_group_category = @course.group_categories.create!(name: "Non Collab Group Set", non_collaborative: true)
+        @non_collab_group = @course.groups.create!(name: "Non Collab Group", group_category: non_collab_group_category, non_collaborative: true)
+
+        @non_collab_group.add_user(@non_collab_student)
+        @collab_group.add_user(@collab_student)
+
+        @assignment = @course.assignments.create!(
+          title: "filtering assignment",
+          submission_types: "online_text_entry",
+          grading_type: "points",
+          points_possible: 10
+        )
+      end
+
+      it "returns collaborative groups_members when asked for" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            "filter_rows_by" => {
+              "student_group_id" => @collab_group.id,
+            }
+          }
+        }
+
+        # when representatives is requested by speedgrader, it passes ignore_student_visibility: true
+        representatives = @assignment.representatives(user: @teacher, group_id: @collab_group.id, ignore_student_visibility: true)
+        expect(representatives).to contain_exactly(@collab_student)
+      end
+
+      it "returns non-collaborative groups_members when asked for" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            "filter_rows_by" => {
+              "student_group_id" => @non_collab_group.id,
+            }
+          }
+        }
+
+        # when representatives is requested by speedgrader, it passes ignore_student_visibility: true
+        representatives = @assignment.representatives(user: @teacher, group_id: @non_collab_group.id, ignore_student_visibility: true)
+        expect(representatives).to contain_exactly(@non_collab_student)
+      end
+    end
   end
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
@@ -2612,6 +2668,26 @@ describe Assignment do
       it "returns nil for an empty string" do
         expect(@assignment.grade_to_score("")).to be_nil
       end
+    end
+  end
+
+  describe "#save_grade_to_submission" do
+    before(:once) do
+      setup_assignment_with_students
+    end
+
+    it "sets workflow_state to unsubmitted when score is nil and there's no attempt" do
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
+      expect(@submission.workflow_state).to eq("unsubmitted")
+    end
+
+    it "does not set workflow_state to unsubmitted when score is nil but there is an attempt" do
+      @assignment.submit_homework(@student, body: "attempt for #{@student.name}")
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
+
+      expect(@submission.workflow_state).to_not eq("unsubmitted")
     end
   end
 
@@ -6777,6 +6853,19 @@ describe Assignment do
       expect(subs.map(&:group_id).uniq).to eql([@group.id])
       expect(subs.map(&:submission_type).uniq).to eql(["online_text_entry"])
       expect(subs.map(&:body).uniq).to eql(["Some text for you"])
+    end
+
+    it "creates attachment associations for all students in the same group when file_association_access flag is enabled" do
+      attachment = attachment_model(context: @u1)
+      attachment.root_account.enable_feature!(:file_association_access)
+      body = "<a href='/users/#{@u1.id}/files/#{attachment.id}'>#{attachment.display_name}</a>"
+      @a.submit_homework(@u1, submission_type: "online_text_entry", body:)
+      @a.reload
+
+      sub1, sub2 = @a.all_submissions.where(user_id: [@u1.id, @u2.id])
+
+      expect(attachment.attachment_associations.count).to eq(2)
+      expect(attachment.attachment_associations.pluck(:context_id)).to match_array([sub1.id, sub2.id])
     end
 
     it "submits the homework for all students in the group if grading them individually" do

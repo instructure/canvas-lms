@@ -140,7 +140,8 @@ describe('InheritanceStateControl', () => {
     expect(checkedBtn.checked).toBe(false)
   })
 
-  it('updates the state when the RadioInput is clicked', () => {
+  it('updates the state when the RadioInput is clicked', async () => {
+    confirm.mockImplementation(() => Promise.resolve(true))
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -160,7 +161,7 @@ describe('InheritanceStateControl', () => {
 
     fireEvent.click(item)
 
-    waitFor(() => {
+    await waitFor(() => {
       const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
       expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
@@ -189,7 +190,8 @@ describe('InheritanceStateControl', () => {
 
     renderInheritanceStateControl(key, store)
 
-    const item = document.querySelector('input[type="checkbox"]:checked')
+    const item = screen.getByRole('checkbox')
+    expect(item.checked).toBe(true)
 
     fireEvent.click(item)
 

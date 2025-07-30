@@ -126,6 +126,19 @@ module Schemas::Lti::IMS
           { type: %w[string null], enum: [nil, *Lti::PrivacyLevelExpander::SUPPORTED_LEVELS] },
         ::Lti::IMS::Registration::TOOL_ID_EXTENSION => { type: %w[string null] },
         ::Lti::IMS::Registration::VENDOR_EXTENSION => { type: %w[string null] },
+        ::Lti::IMS::Registration::CONTENT_MIGRATION_EXTENSION => {
+          "type" => "object",
+          "required" => %w[
+            export_start_url
+            import_start_url
+          ].freeze,
+          "properties" => {
+            "export_start_url" => { "type" => "string", "format" => "uri" }.freeze,
+            "import_start_url" => { "type" => "string", "format" => "uri" }.freeze,
+            "export_format" => { type: %w[string null] },
+            "import_format" => { type: %w[string null] },
+          }
+        }
       }.freeze
     }.freeze
 

@@ -41,11 +41,7 @@ export default function PositiveFeedbackModal(props: Props) {
         shouldReturnFocus={true}
       >
         <Modal.Header>
-          <Heading>
-            <IconLikeLine />
-            &ensp;
-            {I18n.t('Feedback Received')}
-          </Heading>
+          <Heading>{I18n.t('Thanks for sharing')}</Heading>
           <CloseButton
             placement="end"
             offset="small"
@@ -53,11 +49,7 @@ export default function PositiveFeedbackModal(props: Props) {
             screenReaderLabel={I18n.t('Close')}
           />
         </Modal.Header>
-        <Modal.Body>
-          {I18n.t(
-            "Thank you for your feedback on our semantic search results! We've recorded your response and will use it to refine our algorithms, ensuring more accurate and relevant results tailored to your needs in the future.",
-          )}
-        </Modal.Body>
+        <Modal.Body>{I18n.t('Your feedback helps us improve smart search.')}</Modal.Body>
         <Modal.Footer>
           <Button data-testid="pf-close" onClick={props.onClose}>
             {I18n.t('Close')}

@@ -251,7 +251,7 @@ module Types
         MD
       end
 
-      define_method(field_name) do |apply_overrides:|
+      define_method(field_name) do |apply_overrides: true|
         load_association(:context).then do |course|
           if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
@@ -785,6 +785,21 @@ module Types
       end
 
       scope
+    end
+
+    field :grader_identities_connection, GraderIdentityType.connection_type, null: true do
+      description "Grader identities if moderated assignment"
+    end
+    def grader_identities_connection
+      return nil unless object.moderated_grading? &&
+                        # The current user is an admin, moderator
+                        (object.permits_moderation?(current_user) ||
+                        # or provisional grader
+                        object.moderation_graders.where(user: current_user).exists?)
+
+      Loaders::AssignmentLoaders::OrderedModerationGradersWithSlotTakenLoader.load(object.id).then do |graders|
+        AbstractAssignment.build_grader_identities(graders, anonymize: !object.can_view_other_grader_identities?(current_user))
+      end
     end
   end
 end

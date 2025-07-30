@@ -1405,16 +1405,16 @@ describe CoursesController do
       assert_unauthorized
     end
 
-    it "includes analytics 2 link if installed" do
-      tool = analytics_2_tool_factory
-      Account.default.enable_feature!(:analytics_2)
+    it "includes admin analytics link if installed" do
+      tool = admin_analytics_tool_factory(context: @course)
+      @course.enable_feature!(:analytics_2)
 
       get "show", params: { id: @course.id }
       expect(controller.course_custom_links).to include({
-                                                          text: "Analytics 2",
+                                                          text: "Admin Analytics",
                                                           url: "http://test.host/courses/#{@course.id}/external_tools/#{tool.id}?launch_type=course_navigation",
                                                           icon_class: "icon-analytics",
-                                                          tool_id: ContextExternalTool::ANALYTICS_2
+                                                          tool_id: ContextExternalTool::ADMIN_ANALYTICS
                                                         })
     end
 
@@ -2743,6 +2743,75 @@ describe CoursesController do
         json = response.parsed_body
         course = Course.find(json["id"])
         expect(course.attachment_associations).to be_empty
+      end
+    end
+
+    context "when course templates are enabled" do
+      def create_account_template
+        template = @account.courses.create!(name: "Template Course", template: true)
+        template.assignments.create!(title: "my assignment")
+        template.context_modules.create!(name: "Module 1")
+        template.context_modules.create!(name: "Module 2")
+        @account.update!(course_template: template)
+        template
+      end
+
+      it "does not apply an account's course template if :skip_course_template is true" do
+        create_account_template
+
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
+               },
+               skip_course_template: true
+             },
+             format: :json
+
+        expect(Course.last.content_migrations.length).to eq 0
+      end
+
+      it "applies an account's course template if :skip_course_template is false" do
+        create_account_template
+
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
+               },
+               skip_course_template: false
+             },
+             format: :json
+
+        expect(Course.last.content_migrations.length).to eq 1
+      end
+
+      it "applies an account's course template if :skip_course_template is missing" do
+        create_account_template
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
+               }
+             },
+             format: :json
+
+        expect(Course.last.content_migrations.length).to eq 1
       end
     end
   end
@@ -4911,7 +4980,6 @@ describe CoursesController do
     it "does not apply an account's course template" do
       template = course.account.courses.create!(name: "Template Course", template: true)
       template.assignments.create!(title: "my assignment")
-      course.root_account.enable_feature!(:course_templates)
       course.account.update!(course_template: template)
 
       post "copy_course", params: { course_id: course.id,

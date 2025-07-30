@@ -20,6 +20,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import '@testing-library/jest-dom'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
+import {act} from '@testing-library/react'
 
 describe('SetDefaultGradeDialog', () => {
   let assignment
@@ -33,6 +34,7 @@ describe('SetDefaultGradeDialog', () => {
       id: '2',
       name: 'an Assignment',
       points_possible: 10,
+      checkpoints: [],
     }
 
     // Set up DOM elements
@@ -116,10 +118,17 @@ describe('SetDefaultGradeDialog', () => {
 
   const getDialog = () => $dialog[0]
 
-  describe('gradeIsExcused', () => {
-    beforeEach(() => {
+  const showDialog = ({assignment}) => {
+    // Important to use act so evengtual errors from internal render() call pop up immediately!
+    act(() => {
       dialog = new SetDefaultGradeDialog({assignment})
       dialog.show()
+    })
+  }
+
+  describe('gradeIsExcused', () => {
+    beforeEach(() => {
+      showDialog({assignment})
     })
 
     it('returns true if grade is EX', () => {
@@ -138,8 +147,7 @@ describe('SetDefaultGradeDialog', () => {
 
   describe('show', () => {
     it('displays correct text for points grading type', () => {
-      dialog = new SetDefaultGradeDialog({assignment})
-      dialog.show()
+      showDialog({assignment})
       expect(getDialog().querySelector('#default_grade_description').textContent).toContain(
         'same grade',
       )
@@ -147,8 +155,7 @@ describe('SetDefaultGradeDialog', () => {
 
     it('displays correct text for percent grading type', () => {
       const percentAssignment = {...assignment, grading_type: 'percent'}
-      dialog = new SetDefaultGradeDialog({assignment: percentAssignment})
-      dialog.show()
+      showDialog({assignment: percentAssignment})
       expect(getDialog().querySelector('#default_grade_description').textContent).toContain(
         'same percent grade',
       )

@@ -27,10 +27,11 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('context.roster_user')
 
-$(document).ready(() => {
+ready(() => {
   $('.show_user_services_checkbox').change(function () {
     $.ajaxJSON(
       $('.profile_url').attr('href'),

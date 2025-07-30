@@ -60,6 +60,27 @@ const contentWithManyDueDates: ModuleItemContent = {
   },
 }
 
+const contentWithRedundantDueDates: ModuleItemContent = {
+  ...defaultContent,
+  assignmentOverrides: {
+    edges: [
+      {
+        cursor: 'cursor',
+        node: {
+          set: {
+            students: [
+              {
+                id: 'student_id_1',
+              },
+            ],
+          },
+          dueAt: currentDate,
+        },
+      },
+    ],
+  },
+}
+
 const setUp = (content: ModuleItemContent = defaultContent) => {
   return render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
@@ -92,6 +113,12 @@ describe('DueDateLabel', () => {
 
       expect(container.getByTestId('override-details')).toHaveTextContent('1 student')
       expect(container.getByTestId('override-details')).toHaveTextContent('1 section')
+    })
+
+    it('shows a single date when overrides are redundant', () => {
+      const container = setUp(contentWithRedundantDueDates)
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
     })
   })
 })

@@ -836,7 +836,7 @@ describe CalendarEventsApiController, type: :request do
         expect(e1json["can_manage_appointment_group"]).to be true
         expect(e1json["child_events"].size).to be 3
         e1json["child_events"].each do |e|
-          expect(e.keys).to match_array((expected_reservation_fields + ["user"]))
+          expect(e.keys).to match_array(expected_reservation_fields + ["user"])
           expect(student_ids).to include e["user"]["id"]
         end
 
@@ -847,7 +847,7 @@ describe CalendarEventsApiController, type: :request do
         expect(e1json["can_manage_appointment_group"]).to be true
         expect(e2json["child_events"].size).to be 3
         e2json["child_events"].each do |e|
-          expect(e.keys).to match_array((expected_reservation_fields + ["group"] - ["effective_context_code"]))
+          expect(e.keys).to match_array(expected_reservation_fields + ["group"] - ["effective_context_code"])
           expect(group_ids).to include e["group"]["id"]
           expect(group_student_ids).to include e["group"]["users"].first["id"]
         end
@@ -948,7 +948,7 @@ describe CalendarEventsApiController, type: :request do
           expect(ejson["child_events"].count { |e| e["url"] }).to be 1
           own_reservation = ejson["child_events"].select { |e| e["own_reservation"] }
           expect(own_reservation.size).to be 1
-          expect(own_reservation.first.keys).to match_array((expected_reservation_fields + ["own_reservation", "user"]))
+          expect(own_reservation.first.keys).to match_array(expected_reservation_fields + ["own_reservation", "user"])
         end
 
         it "returns own appointment_participant events in their effective contexts" do
@@ -1024,8 +1024,8 @@ describe CalendarEventsApiController, type: :request do
             expect(e["child_events"].size).to be 1 # can't see otherguy's stuff
             expect(e["available_slots"]).to be 2
           end
-          expect(json.first["child_events"].first.keys).to match_array((expected_reservation_fields + ["own_reservation", "user"]))
-          expect(json.last["child_events"].first.keys).to match_array((expected_reservation_fields + ["own_reservation", "group"] - ["effective_context_code"]))
+          expect(json.first["child_events"].first.keys).to match_array(expected_reservation_fields + ["own_reservation", "user"])
+          expect(json.last["child_events"].first.keys).to match_array(expected_reservation_fields + ["own_reservation", "group"] - ["effective_context_code"])
         end
       end
 
@@ -2630,7 +2630,7 @@ describe CalendarEventsApiController, type: :request do
         json = api_call(:get,
                         "/api/v1/calendar_events/#{child_event_id}",
                         { controller: "calendar_events_api", action: "show", id: child_event_id.to_s, format: "json" })
-        expect(json.keys).to match_array((expected_fields + ["effective_context_code"]))
+        expect(json.keys).to match_array(expected_fields + ["effective_context_code"])
         expect(json["title"]).to eql "event (#{@course.default_section.name})"
         expect(json["hidden"]).to be_falsey
       end

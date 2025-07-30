@@ -469,7 +469,7 @@ class ConversationParticipant < ActiveRecord::Base
     # (see above)
     if options[:recalculate_last_authored_at]
       my_latest = conversation.conversation_messages.human.by_user(user_id).first
-      self.last_authored_at = my_latest ? my_latest.created_at : nil
+      self.last_authored_at = my_latest&.created_at
     end
   end
 

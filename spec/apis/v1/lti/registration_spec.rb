@@ -75,6 +75,38 @@ describe Api::V1::Lti::Registration do
                                               })
     end
 
+    context "when created_by user has site admin read permission" do
+      before do
+        Account.site_admin.account_users.create!(user: registration.created_by)
+      end
+
+      it "returns 'Instructure' for created_by" do
+        expect(subject[:created_by]).to eq("Instructure")
+      end
+    end
+
+    context "when updated_by user has site admin read permission" do
+      before do
+        Account.site_admin.account_users.create!(user: registration.updated_by)
+      end
+
+      it "returns 'Instructure' for updated_by" do
+        expect(subject[:updated_by]).to eq("Instructure")
+      end
+    end
+
+    context "when registration is from site admin" do
+      let(:registration) { lti_registration_model(account: Account.site_admin) }
+
+      it "returns 'Instructure' for created_by" do
+        expect(subject[:created_by]).to eq("Instructure")
+      end
+
+      it "returns 'Instructure' for updated_by" do
+        expect(subject[:updated_by]).to eq("Instructure")
+      end
+    end
+
     it "includes nil icon_url by default" do
       expect(subject).to have_key(:icon_url)
       expect(subject[:icon_url]).to be_nil

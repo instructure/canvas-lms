@@ -231,6 +231,13 @@ module AssignmentsCommon
     option_element.click
   end
 
+  def create_file(file_name)
+    @course.attachments.create!(
+      uploaded_data: fixture_file_upload(file_name, "text/plain"),
+      filename: file_name
+    )
+  end
+
   def create_file_list
     {
       name: "/",

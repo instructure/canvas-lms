@@ -70,10 +70,9 @@ describe('FilesUsageBar', () => {
     const usageText = await screen.findByText(`500 KB of 1 MB used`)
     expect(usageText).toBeInTheDocument()
 
-    const progressBar = document.querySelector(
-      'progress[aria-valuetext="File Storage Quota Used 500 KB of 1 MB used"]',
-    )
-    expect(progressBar).toBeInTheDocument()
+    const progressBar = screen.getByRole('progressbar')
+    expect(progressBar).toHaveAttribute('aria-label', 'File Storage Quota Used')
+    expect(progressBar).toHaveAttribute('aria-valuetext', '500 KB of 1 MB used')
   })
 
   it('displays error message if quota fetch fails', async () => {

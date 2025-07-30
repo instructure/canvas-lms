@@ -19,7 +19,7 @@
 const {defaults} = require('jest-config')
 const {swc} = require('./ui-build/webpack/webpack.rules')
 
-const esModules = ['mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graphql-request', 'yaml'].join(
+const esModules = ['chai', 'mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graphql-request'].join(
   '|',
 )
 
@@ -120,7 +120,6 @@ module.exports = {
         },
       },
     ],
-    '\\.ya?ml$': 'jest-transform-yaml',
   },
   extensionsToTreatAsEsm: ['.jsx'],
   testEnvironmentOptions: {

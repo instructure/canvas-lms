@@ -20,7 +20,7 @@
 require_relative "../../common"
 require_relative "../pages/admin_account_page"
 require_relative "../pages/course_page"
-require_relative "../../../factories/analytics_2_tool_factory"
+require_relative "../../../factories/admin_analytics_tool_factory"
 
 describe "analytics in Canvas" do
   include_context "in-process server selenium tests"
@@ -59,7 +59,7 @@ describe "analytics in Canvas" do
       # Analytics1.0 is enabled for all tests by default
       @admin.account.update(allowed_services: "+analytics")
       # add the analytics 2 LTI to the account
-      analytics_2_tool_factory
+      admin_analytics_tool_factory
       @tool_id = @admin.account.context_external_tools.first.id
       # create a course, @teacher and student in course
       @course = course_with_teacher(
@@ -80,11 +80,11 @@ describe "analytics in Canvas" do
         user_session(@teacher)
       end
 
-      it "with FF enabled, displays Analytics 2 menu in course nav menu" do
+      it "with FF enabled, displays Admin Analytics menu in course nav menu" do
         @course.root_account.enable_feature!(:analytics_2)
         visit_course_home_page(@course.id)
 
-        expect(course_nav_menu.text).to include("Analytics 2")
+        expect(course_nav_menu.text).to include("Admin Analytics")
         expect(course_nav_analytics2_link.attribute("href")).to include("/courses/#{@course.id}/external_tools/#{@tool_id}")
         expect(course_nav_menu.text).not_to include("View Course Analytics")
       end
@@ -97,11 +97,11 @@ describe "analytics in Canvas" do
           @course.root_account.enable_feature!(:analytics_2)
         end
 
-        it "displays Analytics 2 link in manage user menu" do
+        it "displays Admin Analytics link in manage user menu" do
           visit_course_people_page(@course.id)
           manage_user_link(@student.name).click
 
-          expect(manage_user_options_list.text).to include("Analytics 2")
+          expect(manage_user_options_list.text).to include("Admin Analytics")
           expect(manage_user_analytics_2_link.attribute("href"))
             .to include("/courses/#{@course.id}/external_tools/#{@tool_id}?launch_type=student_context_card&student_id=#{@student.id}")
         end
@@ -119,7 +119,7 @@ describe "analytics in Canvas" do
           manage_user_link(@student.name).click
 
           expect(manage_user_options_list.text).to include("Analytics")
-          expect(manage_user_options_list.text).not_to include("Analytics 2")
+          expect(manage_user_options_list.text).not_to include("Admin Analytics")
           expect(manage_user_analytics_1_link.attribute("href")).to include("/courses/#{@course.id}/analytics/users/#{@student.id}")
         end
       end
@@ -141,7 +141,7 @@ describe "analytics in Canvas" do
     #   it "with FF enabled, displays Analytics 2 link on self profile page" do
     #     visit_course_people_page(@course.id, @student.id)
 
-    #     expect(user_profile_page_actions.text).to include('Analytics 2')
+    #     expect(user_profile_page_actions.text).to include('Admin Analytics')
     #     expect(user_profile_actions_analytics_2_link.attribute('href')).
     #     to include("/courses/#{@course.id}/external_tools/#{@tool_id}?launch_type=student_context_card&student_id=#{@student.id}")
     #   end
@@ -150,20 +150,6 @@ describe "analytics in Canvas" do
     describe "permission disabled for teacher role" do
       # no permissions are required for analytics 2 for course home page links
       # view_all_grades permission is required in analytics 2 for student tray and user analytics
-      context "with A2 FF enabled" do
-        before do
-          @course.root_account.enable_feature!(:analytics_2)
-          @course.account.role_overrides.create!(permission: :view_all_grades, role: teacher_role, enabled: false)
-          user_session(@teacher)
-        end
-
-        it "does not display any Analytics link on manage user menu" do
-          visit_course_people_page(@course.id)
-          manage_user_link(@student.name).click
-
-          expect(manage_user_options_list.text).not_to include("Analytics 2")
-        end
-      end
 
       context "with A2 FF disabled" do
         before do

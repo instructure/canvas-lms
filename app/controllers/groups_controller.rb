@@ -665,7 +665,7 @@ class GroupsController < ApplicationController
   # Modifies an existing group.  Note that to set an avatar image for the
   # group, you must first upload the image file to the group, and the use the
   # id in the response as the argument to this function.  See the
-  # {file:file_uploads.html File Upload Documentation} for details on the file
+  # {file:file.file_uploads.html File Upload Documentation} for details on the file
   # upload workflow.
   #
   # @argument name [String]
@@ -970,7 +970,7 @@ class GroupsController < ApplicationController
   # Upload a file to the group.
   #
   # This API endpoint is the first step in uploading a file to a group.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a group can upload files

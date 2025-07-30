@@ -377,15 +377,23 @@ export const Events = {
                 .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
-              removeCloseListener = onLtiClosePostMessage(placement_type, () => {
-                $('#resource_selection_dialog').dialog('close')
-              })
+              removeCloseListener = onLtiClosePostMessage(
+                () =>
+                  $dialog.find('iframe#resource_selection_iframe')[0] as
+                    | HTMLIFrameElement
+                    | null
+                    | undefined,
+                () => $('#resource_selection_dialog').dialog('close'),
+              )
               $dialog.parent().find('.ui-dialog-titlebar-close').focus()
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
             modal: true,
             zIndex: 1000,
+            create: () => {
+              $dialog.parent().attr('aria-modal', 'true')
+            },
           })
           .bind('dialogresize', function () {
             $(this)
@@ -512,6 +520,7 @@ export type SelectContentDialogOptions = {
   width?: number
   submit?: Function
   no_name_input?: boolean
+  ariaModal?: string
   close?: () => void
 }
 
@@ -576,6 +585,11 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
       },
       modal: true,
       zIndex: 1000,
+      create() {
+        if (options.ariaModal) {
+          $(this).closest('.ui-dialog').attr('aria-modal', options.ariaModal)
+        }
+      },
     })
     .fixDialogButtons()
 

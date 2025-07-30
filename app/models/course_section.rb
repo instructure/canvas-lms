@@ -334,16 +334,20 @@ class CourseSection < ActiveRecord::Base
     move_to_course(course, **)
   end
 
-  def uncrosslist(**)
+  def uncrosslist(**opts)
     return unless self.nonxlist_course_id
 
     if nonxlist_course.workflow_state == "deleted"
       nonxlist_course.workflow_state = "claimed"
       nonxlist_course.save!
+
+      if (user = opts[:updating_user]) && (source = opts[:source])
+        Auditors::Course.record_claimed(nonxlist_course, user, source:)
+      end
     end
     nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
-    move_to_course(nonxlist_course, **)
+    move_to_course(nonxlist_course, **opts)
   end
 
   def crosslisted?

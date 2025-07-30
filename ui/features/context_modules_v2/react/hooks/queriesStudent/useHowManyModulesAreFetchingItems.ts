@@ -19,21 +19,22 @@
 import {useEffect, useState} from 'react'
 import {useIsFetching} from '@tanstack/react-query'
 
-export function useHowManyModulesAreFetchingItems() {
+export function useHowManyModulesAreFetchingItems(teacherMode: boolean = false) {
   const [maxFetchingCount, setMaxFetchingCount] = useState(0)
   const [prevFetchCount, setPrevFetchCount] = useState(0)
-  const moduleFetchingCount = useIsFetching({queryKey: ['moduleItemsStudent']})
+  const [fetchComplete, setFetchComplete] = useState(false)
+  const moduleFetchingCount = useIsFetching({
+    queryKey: [teacherMode ? 'moduleItems' : 'moduleItemsStudent'],
+  })
 
   useEffect(() => {
     if (moduleFetchingCount > 0) {
+      setFetchComplete(false)
       if (prevFetchCount === 0) {
         setMaxFetchingCount(moduleFetchingCount)
       } else {
         setMaxFetchingCount(Math.max(maxFetchingCount, moduleFetchingCount))
       }
-    }
-    if (moduleFetchingCount === 0 && prevFetchCount === 0) {
-      setMaxFetchingCount(0)
     }
   }, [maxFetchingCount, moduleFetchingCount, prevFetchCount])
 
@@ -41,7 +42,11 @@ export function useHowManyModulesAreFetchingItems() {
     setPrevFetchCount(moduleFetchingCount)
   }, [moduleFetchingCount])
 
-  const fetchComplete = moduleFetchingCount === 0 && prevFetchCount > 0
+  useEffect(() => {
+    if (moduleFetchingCount === 0 && prevFetchCount > 0) {
+      setFetchComplete(true)
+    }
+  }, [moduleFetchingCount, prevFetchCount])
 
   return {
     moduleFetchingCount,

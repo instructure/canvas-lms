@@ -53,6 +53,50 @@ describe "files index page" do
         expect(files_usage_text.text).to include("25 MB of 50 MB used")
       end
 
+      it "loads correct column values on uploaded file", priority: "1" do
+        add_file(fixture_file_upload("example.pdf", "application/pdf"),
+                 @course,
+                 "example.pdf")
+        get "/courses/#{@course.id}/files"
+        time_current = format_time_only(@course.attachments.first.updated_at).strip
+        expect(table_item_by_name("example.pdf")).to be_displayed
+        expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
+        expect(get_item_content_files_table(1, 2)).to eq time_current
+        expect(get_item_content_files_table(1, 3)).to eq time_current
+        expect(get_item_content_files_table(1, 5)).to eq "194 KB"
+      end
+
+      it "can search for file, folder and file inside folder" do
+        search_term = "example"
+        course_folder = Folder.create!(name: "example_folder", context: @course)
+        file_inside_folder = attachment_model(content_type: "application/pdf", context: @course, display_name: "example_file_in_folder.pdf", folder: course_folder)
+        file_outside_folder = attachment_model(content_type: "application/pdf", context: @course, display_name: "example_file_at_root.pdf")
+        get "/courses/#{@course.id}/files"
+        search_input.send_keys(search_term)
+        search_button.click
+        expect(table_item_by_name(file_inside_folder.display_name)).to be_displayed
+        expect(table_item_by_name(course_folder.name)).to be_displayed
+        expect(table_item_by_name(file_outside_folder.display_name)).to be_displayed
+      end
+
+      it "displays a session expired overlay when user interacts after session timeout" do
+        add_file(fixture_file_upload("example.pdf", "application/pdf"),
+                 @course,
+                 "example.pdf")
+        get "/courses/#{@course.id}/files"
+
+        published_status_button.click
+        remove_user_session
+        edit_item_permissions(:unpublished) # attempt to interact after session timeout
+
+        expect(session_expired_overlay).to be_displayed
+        expect(redirect_to_login_button).to be_displayed
+        redirect_to_login_button.click
+        keep_trying_until do
+          expect(driver.current_url).to match %r{/login/canvas}
+        end
+      end
+
       context("with a large number of files") do
         before do
           26.times do |i|
@@ -104,19 +148,6 @@ describe "files index page" do
         end
       end
 
-      it "loads correct column values on uploaded file", priority: "1" do
-        add_file(fixture_file_upload("example.pdf", "application/pdf"),
-                 @course,
-                 "example.pdf")
-        get "/courses/#{@course.id}/files"
-        time_current = format_time_only(@course.attachments.first.updated_at).strip
-        expect(table_item_by_name("example.pdf")).to be_displayed
-        expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
-        expect(get_item_content_files_table(1, 2)).to eq time_current
-        expect(get_item_content_files_table(1, 3)).to eq time_current
-        expect(get_item_content_files_table(1, 5)).to eq "194 KB"
-      end
-
       context "from cog icon" do
         a_txt_file_name = "a_file.txt"
         b_txt_file_name = "b_file.txt"
@@ -148,7 +179,7 @@ describe "files index page" do
         end
       end
 
-      context "from cloud icon" do
+      context "Publish cloud icon Dialog" do
         before do
           add_file(fixture_file_upload(base_file_name, "application/pdf"),
                    @course,
@@ -169,6 +200,14 @@ describe "files index page" do
           published_status_button.click
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
+        end
+
+        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
+          published_status_button.click
+          wait_for_ajaximations
+          element = driver.switch_to.active_element
+          should_focus = permissions_dialog_close_button
+          expect(element).to eq(should_focus)
         end
       end
 
@@ -511,28 +550,6 @@ describe "files index page" do
         end
       end
 
-      context "Publish Cloud Dialog" do
-        before(:once) do
-          course_with_teacher(active_all: true)
-          add_file(fixture_file_upload("a_file.txt", "text/plain"),
-                   @course,
-                   "a_file.txt")
-        end
-
-        before do
-          user_session(@teacher)
-          get "/courses/#{@course.id}/files"
-        end
-
-        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
-          published_status_button.click
-          wait_for_ajaximations
-          element = driver.switch_to.active_element
-          should_focus = permissions_dialog_close_button
-          expect(element).to eq(should_focus)
-        end
-      end
-
       context "Directory Header" do
         it "sorts the files properly", priority: 2 do
           course_with_teacher_logged_in
@@ -561,15 +578,6 @@ describe "files index page" do
           get "/courses/#{@course.id}/files/folder/eh%3F"
           expect(breadcrumb).to contain_css("li", text: "eh?")
         end
-      end
-
-      it "Can search for files" do
-        folder = Folder.create!(name: "parent", context: @course)
-        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
-        get "/courses/#{@course.id}/files"
-        search_input.send_keys(file_attachment.display_name)
-        search_button.click
-        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end
 

@@ -35,18 +35,25 @@ interface Props {
 }
 
 export default function BestResults(props: Props) {
-  if (props.results.length === 0) {
-    const startOverMsg = I18n.t('Try a similar result below or %{startover_btn}', {
-      startover_btn: 'ZZZZ_STARTOVER',
-    })
-    const splitTranslated = startOverMsg.split('ZZZZ_STARTOVER')
-    return (
-      <>
-        <Flex direction="row" alignItems="start">
-          <Flex.Item shouldGrow>
-            <Heading variant="titleSection">
-              {I18n.t('No best matches for "%{searchTerm}"', {searchTerm: props.searchTerm})}
-            </Heading>
+  const startOverMsg = I18n.t('Try a similar result below or %{startover_btn}', {
+    startover_btn: 'ZZZZ_STARTOVER',
+  })
+  const splitTranslated = startOverMsg.split('ZZZZ_STARTOVER')
+  return (
+    <Flex direction="column" gap="sectionElements">
+      <Flex direction="row" alignItems="start">
+        <Flex.Item shouldGrow>
+          <Heading variant="titleSection">
+            {I18n.t(
+              {
+                zero: 'No results',
+                one: '1 result',
+                other: '%{count} results',
+              },
+              {count: props.results.length},
+            )}
+          </Heading>
+          {props.results.length < 1 && (
             <Text>
               {splitTranslated[0]}
               <Link as="button" onClick={props.resetSearch}>
@@ -54,28 +61,7 @@ export default function BestResults(props: Props) {
               </Link>
               {splitTranslated[1]}
             </Text>
-          </Flex.Item>
-          <Flex.Item>
-            <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />
-          </Flex.Item>
-        </Flex>
-      </>
-    )
-  }
-  return (
-    <Flex direction="column" gap="sectionElements" width="80%">
-      <Flex direction="row" alignItems="start">
-        <Flex.Item shouldGrow>
-          <Heading variant="titleSection">{I18n.t('Best matches')}</Heading>
-          <Text>
-            {I18n.t(
-              {
-                one: '1 result for "%{searchTerm}"',
-                other: '%{count} results for "%{searchTerm}"',
-              },
-              {count: props.results.length, searchTerm: props.searchTerm},
-            )}
-          </Text>
+          )}
         </Flex.Item>
         <Flex.Item>
           <Feedback courseId={props.courseId} searchTerm={props.searchTerm} />

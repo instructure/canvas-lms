@@ -425,6 +425,31 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   If true, the assignment has at least one graded submission
   """
   gradedSubmissionsExist: Boolean
+
+  """
+  Grader identities if moderated assignment
+  """
+  graderIdentitiesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): GraderIdentityConnection
   gradesPublished: Boolean
   gradesPublishedAt: String
   gradingPeriodId: String
@@ -704,6 +729,7 @@ type AssignmentConnection {
 
 input AssignmentCreate {
   abGuid: [String!]
+  assetProcessors: [LtiAssetProcessorCreateOrUpdate!]
   assignmentGroupId: ID
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   courseId: ID!
@@ -1082,6 +1108,7 @@ input AssignmentTargetSortOrder {
 
 input AssignmentUpdate {
   abGuid: [String!]
+  assetProcessors: [LtiAssetProcessorCreateOrUpdate!]
   assignmentGroupId: ID
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   dueAt: DateTime
@@ -4477,6 +4504,50 @@ enum GradeState {
 }
 
 """
+Represents a grader's identity in a moderated grading context.
+"""
+type GraderIdentity {
+  anonymousId: String!
+  name: String!
+  position: Int!
+}
+
+"""
+The connection type for GraderIdentity.
+"""
+type GraderIdentityConnection {
+  """
+  A list of edges.
+  """
+  edges: [GraderIdentityEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [GraderIdentity]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type GraderIdentityEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: GraderIdentity
+}
+
+"""
 Contains grade information for a course or grading period
 """
 type Grades {
@@ -5215,8 +5286,10 @@ type LtiAssetProcessor implements LegacyIDInterface {
   _id: ID!
   externalTool: ExternalTool
   iconOrToolIconUrl: String
+  iframe: LtiAssetProcessorIframe
   text: String
   title: String
+  window: LtiAssetProcessorWindowSettings
 }
 
 """
@@ -5239,6 +5312,24 @@ type LtiAssetProcessorConnection {
   pageInfo: PageInfo!
 }
 
+input LtiAssetProcessorCreateOrUpdate {
+  existingId: Int
+  newContentItem: LtiAssetProcessorDto
+}
+
+input LtiAssetProcessorDto {
+  contextExternalToolId: ID!
+  custom: StringMap
+  icon: LtiContentItemIcon
+  iframe: LtiContentItemIframe
+  report: LtiAssetProcessorReportSettings
+  text: String
+  thumbnail: LtiContentItemIcon
+  title: String
+  url: String
+  window: LtiAssetProcessorWindowSettingsInput
+}
+
 """
 An edge in a connection.
 """
@@ -5252,6 +5343,30 @@ type LtiAssetProcessorEdge {
   The item at the end of the edge.
   """
   node: LtiAssetProcessor
+}
+
+type LtiAssetProcessorIframe {
+  height: Int
+  width: Int
+}
+
+input LtiAssetProcessorReportSettings {
+  custom: StringMap
+  url: String
+}
+
+type LtiAssetProcessorWindowSettings {
+  height: Int
+  targetName: String
+  width: Int
+  windowFeatures: String
+}
+
+input LtiAssetProcessorWindowSettingsInput {
+  height: Int
+  targetName: String
+  width: Int
+  windowFeatures: String
 }
 
 type LtiAssetReport implements LegacyIDInterface {
@@ -5308,6 +5423,17 @@ type LtiAssetReportEdge {
   The item at the end of the edge.
   """
   node: LtiAssetReport
+}
+
+input LtiContentItemIcon {
+  height: Int
+  url: String!
+  width: Int
+}
+
+input LtiContentItemIframe {
+  height: Int
+  width: Int
 }
 
 """
@@ -5574,6 +5700,29 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   hasActiveOverrides: Boolean!
   id: ID!
   moduleItems: [ModuleItem!]
+  moduleItemsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: ModuleItemFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ModuleItemConnection
+  moduleItemsTotalCount: Int!
   name: String
   position: Int
   prerequisites: [ModulePrerequisite!]
@@ -5760,6 +5909,23 @@ type ModuleItemEdge {
   The item at the end of the edge.
   """
   node: ModuleItem
+}
+
+input ModuleItemFilter {
+  """
+  Filter by content type (Assignment, WikiPage, etc.)
+  """
+  contentType: String
+
+  """
+  Filter by published status
+  """
+  published: Boolean
+
+  """
+  Filter by title or content
+  """
+  searchTerm: String
 }
 
 """
@@ -7107,6 +7273,53 @@ enum ProgressState {
   running
 }
 
+type ProvisionalGrade implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  final: Boolean!
+  grade: String
+  score: Float
+  scorerAnonymousId: ID
+  selected: Boolean!
+}
+
+"""
+The connection type for ProvisionalGrade.
+"""
+type ProvisionalGradeConnection {
+  """
+  A list of edges.
+  """
+  edges: [ProvisionalGradeEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [ProvisionalGrade]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type ProvisionalGradeEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: ProvisionalGrade
+}
+
 type Query {
   account(
     """
@@ -8056,6 +8269,11 @@ type StreamSummaryItem {
 }
 
 """
+A hash with string keys and string values
+"""
+scalar StringMap
+
+"""
 basic information about a students activity in a course
 """
 type StudentSummaryAnalytics {
@@ -8285,6 +8503,27 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   This field is currently under development and its return value is subject to change.
   """
   previewUrl: String
+  provisionalGradesConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ProvisionalGradeConnection
   proxySubmitter: String
   proxySubmitterId: ID
   readState: String

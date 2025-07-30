@@ -56,8 +56,6 @@ describe "context modules", :ignore_js_errors do
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[0].text).to eq(@module_item1.title)
       expect(module_item_titles.count).to eq(2)
-      expect(flash_alert).to be_displayed
-      expect(flash_alert).to include_text('"module1" items loaded')
     end
 
     it "can collapse module that has been expanded" do
@@ -121,8 +119,7 @@ describe "context modules", :ignore_js_errors do
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
       expect(module_item_titles[3]).to be_displayed
-      expect(flash_alert).to be_displayed
-      expect(flash_alert).to include_text("Module items loaded")
+      expect(screenreader_alert).to include_text("All module items loaded")
     end
 
     it "collapses all modules" do
@@ -616,7 +613,7 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_progression_status_bar(@module1.id)).to be_displayed
-      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+      expect(module_progression_info_text(@module1.id)).to include("0 / 100")
     end
 
     it "includes a Required Items progress bar if there are Complete One items" do
@@ -625,7 +622,7 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_progression_status_bar(@module1.id)).to be_displayed
-      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+      expect(module_progression_info_text(@module1.id)).to include("0 / 100")
     end
 
     it "shows locked icon if it has a pre-requisite on a previous module" do

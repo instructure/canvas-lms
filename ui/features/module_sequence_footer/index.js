@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import '@canvas/module-sequence-footer'
+import ready from '@instructure/ready'
 
 import {renderModuleSequenceFooter} from './react/index'
 
-$(renderModuleSequenceFooter)
+ready(renderModuleSequenceFooter)

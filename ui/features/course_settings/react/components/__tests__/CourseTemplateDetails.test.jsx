@@ -16,8 +16,9 @@
  */
 
 import React from 'react'
-import fetchMock from 'fetch-mock'
 import {render, fireEvent, waitFor, getByText as getByTextFromElement} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import CourseTemplateDetails from '../CourseTemplateDetails'
 
 function accountFactory(n) {
@@ -39,6 +40,7 @@ const response4 = {template: true, templated_accounts: accountFactory(25)}
 
 describe('CourseTemplateDetails::', () => {
   const oldEnv = window.ENV
+  const server = setupServer()
 
   function setRoute(route) {
     window.ENV = {CONTEXT_BASE_URL: route}
@@ -47,15 +49,38 @@ describe('CourseTemplateDetails::', () => {
   const endpoint = base => `/api/v1${base}?include[]=templated_accounts`
 
   beforeAll(() => {
-    fetchMock.get(endpoint(route1), response1)
-    fetchMock.get(endpoint(route2), response2)
-    fetchMock.get(endpoint(route3), response3)
-    fetchMock.get(endpoint(route4), response4)
+    server.listen()
+    server.use(
+      http.get(/\/api\/v1\/courses\/\d+/, ({request}) => {
+        const url = new URL(request.url)
+        const courseId = url.pathname.split('/').pop()
+
+        if (url.searchParams.get('include[]') === 'templated_accounts') {
+          switch (courseId) {
+            case '1':
+              return HttpResponse.json(response1)
+            case '2':
+              return HttpResponse.json(response2)
+            case '3':
+              return HttpResponse.json(response3)
+            case '4':
+              return HttpResponse.json(response4)
+            default:
+              return new HttpResponse(null, {status: 404})
+          }
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
+  })
+
+  afterEach(() => {
+    // Don't reset handlers - our handlers should handle all routes correctly
   })
 
   afterAll(() => {
     window.ENV = oldEnv
-    fetchMock.restore()
+    server.close()
   })
 
   describe('before the API call responds', () => {

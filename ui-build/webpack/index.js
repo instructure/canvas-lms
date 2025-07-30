@@ -39,7 +39,7 @@ const {
   istanbul,
   instUIWorkaround,
   webpack5Workaround,
-  yaml,
+  graphql,
 } = require('./webpack.rules')
 
 const {
@@ -187,7 +187,7 @@ module.exports = {
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.jsx', '.ts', '.tsx', '.yaml', '.yml'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.graphql'],
   },
   module: {
     parser: {
@@ -208,7 +208,7 @@ module.exports = {
       fonts,
       ...swc,
       handlebars,
-      yaml,
+      graphql,
     ].filter(Boolean),
   },
 

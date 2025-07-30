@@ -386,13 +386,16 @@ describe "Wiki Pages" do
       @user.time_zone = "Alaska"
       @user.save!
       Time.use_zone("UTC") do
-        todo_date = Time.zone.now + 1
+        # Use a fixed time to avoid boundary issues (middle of the day, middle of the month)
+        # Use a time with minutes to avoid formatting ambiguity (6:30pm vs 6pm)
+        todo_date = Time.zone.parse("2024-07-15 18:30:00")
         @course.wiki_pages.create!(title: "todo", todo_date:)
         get "/courses/#{@course.id}/pages/todo"
         Time.use_zone("Alaska") do
-          expected_date = datetime_string(todo_date)
+          # The UI uses the date_at_time format which is "%b %-d at %l:%M%P"
+          # Convert UTC time to Alaska time before formatting
+          expected_date = todo_date.in_time_zone("Alaska").strftime("%b %-d at %l:%M%P").strip
           elm = find_by_test_id("friendly-date-time")
-          # expect text in the form of "To-Do Date: Jul 1 at 1:53pm"
           expect(elm).to include_text "To-Do Date: #{expected_date}"
         end
       end

@@ -20,21 +20,18 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UsersList from '../UsersList'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('Account Course User Search UsersList View', function () {
-  beforeEach(() => {
-    fetchMock.mock(
-      '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',
-      {
-        status: 200,
-        body: {},
-      },
-    )
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    fetchMock.restore()
+  beforeEach(() => {
+    server.use(http.get('/api/v1/users/1/enrollments', () => HttpResponse.json({})))
   })
 
   const usersProps = {

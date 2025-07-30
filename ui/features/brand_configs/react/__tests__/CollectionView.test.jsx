@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import Subject from '../CollectionView'
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 
@@ -113,15 +114,18 @@ const props = {
 }
 
 describe('CollectionView', () => {
-  const deleteURL = new RegExp('/api/v1/shared_brand_configs/(.+)')
+  const deleteURL = '/api/v1/shared_brand_configs'
+  const server = setupServer()
+
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    jest.clearAllMocks()
+  })
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    fetchMock.delete(deleteURL, {})
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
-    jest.clearAllMocks()
+    server.use(http.delete(/\/api\/v1\/shared_brand_configs\/(.+)/, () => HttpResponse.json({})))
   })
 
   it('renders', () => {
@@ -281,26 +285,38 @@ describe('CollectionView', () => {
   // brandConfig is deletable. Because we use getByText here, if that
   // becomes no longer true, this test will fail.
   it('makes the correct DELETE API call on a deletion', async () => {
+    let capturedId = null
+    server.use(
+      http.delete(/\/api\/v1\/shared_brand_configs\/(\d+)/, ({params}) => {
+        capturedId = parseInt(params[0], 10)
+        return HttpResponse.json({})
+      }),
+    )
     const {getByText, getByLabelText} = render(<Subject {...props} />)
     const deleteButton = getByText('Delete theme').closest('button')
     fireEvent.click(deleteButton)
     const deleteConfirmModal = getByLabelText('Delete Theme?')
     const confirmButton = within(deleteConfirmModal).getByText('Delete').closest('button')
     fireEvent.click(confirmButton)
-    await fetchMock.flush(false)
-    expect(fetchMock.done()).toBe(true)
-    const callMatch = fetchMock.lastCall(deleteURL)[0].match(deleteURL)
-    expect(parseInt(callMatch[1], 10)).toBe(DELETABLE_ID)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capturedId).toBe(DELETABLE_ID)
   })
 
   it('does not make any DELETE API call when the delete is canceled', async () => {
+    let requestMade = false
+    server.use(
+      http.delete(/\/api\/v1\/shared_brand_configs\/(\d+)/, () => {
+        requestMade = true
+        return HttpResponse.json({})
+      }),
+    )
     const {getByText, getByLabelText} = render(<Subject {...props} />)
     const deleteButton = getByText('Delete theme').closest('button')
     fireEvent.click(deleteButton)
     const deleteConfirmModal = getByLabelText('Delete Theme?')
     const confirmButton = within(deleteConfirmModal).getByText('Cancel').closest('button')
     fireEvent.click(confirmButton)
-    await fetchMock.flush(false)
-    expect(fetchMock.called(deleteURL)).toBe(false)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(requestMade).toBe(false)
   })
 })

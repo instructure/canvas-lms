@@ -25,49 +25,52 @@ module Accessibility
       VALID_SCOPES = %w[row col rowgroup colgroup].freeze
 
       def self.test(elem)
-        return true if elem.tag_name.downcase != "th"
+        return nil if elem.tag_name.downcase != "th"
 
-        elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
+        I18n.t("Table header shall have a valid scope associated with it.") unless elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
+      end
+
+      def self.display_name
+        I18n.t("Table header scope")
       end
 
       def self.message
-        "Table header cells should have the scope attribute correctly set to a valid scope value."
+        I18n.t("Table header cells should have the scope attribute correctly set to a valid scope value.")
       end
 
       def self.why
-        "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
+        I18n.t(
+          "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
           "Without this attribute, screen readers may not correctly associate header cells with data cells, " \
           "making tables difficult to navigate and understand."
-      end
-
-      def self.link_text
-        "Learn more about table header scope attributes"
-      end
-
-      def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Set header scope",
-          value: "None",
-          options: ["None", "Row", "Column", "Row group", "Column group"]
         )
       end
 
-      def self.fix(elem, value)
-        value_symbol = value.to_sym
+      # TODO: define undo text
+      def self.form(_elem)
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: I18n.t("Set header scope"),
+          undo_text: I18n.t("Table header scope fixed"),
+          value: I18n.t("Row"),
+          options: [I18n.t("Row"), I18n.t("Column"), I18n.t("Row group"), I18n.t("Column group")]
+        )
+      end
 
+      def self.fix!(elem, value)
         scope_lookup_table = {
-          Row: "row",
-          Column: "column",
-          "Row group": "rowgroup",
-          "Column group": "colgroup"
+          I18n.t("Row") => "row",
+          I18n.t("Column") => "column",
+          I18n.t("Row group") => "rowgroup",
+          I18n.t("Column group") => "colgroup"
         }
+        scope = scope_lookup_table[value]
+        if scope
+          return nil if elem["scope"] == scope
 
-        if value_symbol == :None
-          elem.remove_attribute("scope")
-        elsif scope_lookup_table.key?(value_symbol)
-          elem["scope"] = scope_lookup_table[value_symbol]
+          elem["scope"] = scope
+        else
+          raise StandardError, "Invalid scope value. Valid options are: #{VALID_SCOPES.join(", ")}." unless VALID_SCOPES.include?(value)
         end
-
         elem
       end
     end

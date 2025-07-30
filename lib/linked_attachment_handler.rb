@@ -33,8 +33,34 @@ module LinkedAttachmentHandler
       next unless saved_change_to_attribute?(field)
 
       context_concern = field if SPECIAL_CONCERN_FIELDS.include?(field)
-      associate_attachments_to_rce_object(send(field), saving_user, context_concern:)
+      associate_attachments_to_rce_object(send(field), actual_saving_user, context_concern:)
     end
+  end
+
+  # course/groups attachments cannot be copied over to another course/group so we would not allow
+  # cross-course attachment associations
+  def exclude_cross_course_attachment_association?(attachment)
+    # Only consider Course and Group contexts for cross-context rules
+    source_is_course_or_group = ["Course", "Group"].include?(attachment.context_type)
+    return false unless source_is_course_or_group
+
+    # where we're associating to
+    target_context_type, target_context_id = nil
+    if class_name == "Course" || class_name == "Group"
+      target_context_type = class_name
+      target_context_id = id
+    elsif respond_to?(:context_type) && ["Course", "Group"].include?(context_type)
+      target_context_type = context_type
+      target_context_id = context_id
+    else
+      return false
+    end
+
+    # Get global IDs for comparison due to sharding
+    source_global_id = Shard.global_id_for(attachment.context_id)
+    target_global_id = Shard.global_id_for(target_context_id)
+
+    attachment.context_type != target_context_type || source_global_id != target_global_id
   end
 
   # NB: context_concern is a virtual subdivision of context.
@@ -67,7 +93,7 @@ module LinkedAttachmentHandler
         all_attachment_associations = []
 
         Attachment.where(id: att_ids).find_each do |attachment|
-          next if !(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update)
+          next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
 
           shard.activate do
             all_attachment_associations << {
@@ -92,9 +118,17 @@ module LinkedAttachmentHandler
     root_account.feature_enabled?(:file_association_access)
   end
 
+  def actual_saving_user
+    saving_user
+  end
+
   module ClassMethods
     def html_fields
       raise NotImplementedError
+    end
+
+    def actual_saving_user_attr
+      :saving_user
     end
   end
 end

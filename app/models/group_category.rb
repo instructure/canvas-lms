@@ -258,7 +258,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def restore
-    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
+    groups.where(deleted_at: [(deleted_at - 10.minutes)..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
     self.deleted_at = nil
     save!
   end
@@ -592,16 +592,14 @@ class GroupCategory < ActiveRecord::Base
     sql = <<-SQL.squish
       SELECT
         SUM(
-          CASE#{" "}
-            WHEN (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted') = 0 THEN 1#{" "}
-            ELSE (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')#{" "}
-          END
+          (SELECT COUNT(id) FROM #{Group.quoted_table_name} WHERE group_category_id = parent.id AND workflow_state <> 'deleted')
         ) AS diff_tag_count
       FROM #{GroupCategory.quoted_table_name} parent
       WHERE#{" "}
         non_collaborative = true
         AND context_type = 'Course'
         AND context_id = #{context_id}
+        AND deleted_at IS null
     SQL
 
     ActiveRecord::Base.connection.execute(sql).first["diff_tag_count"].to_i

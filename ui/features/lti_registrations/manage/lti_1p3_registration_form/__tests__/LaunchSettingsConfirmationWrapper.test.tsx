@@ -128,6 +128,27 @@ describe('LaunchSettings', () => {
   })
 })
 
+it('renders a popover on hovering over the custom fields info button', async () => {
+  const config = mockInternalConfiguration({
+    redirect_uris: ['https://example.com/launch'],
+    domain: 'example.com',
+    public_jwk_url: 'https://example.com/jwks',
+  })
+  const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
+  render(
+    <LaunchSettingsConfirmationWrapper
+      internalConfig={config}
+      overlayStore={overlayStore}
+      onPreviousClicked={jest.fn()}
+      onNextClicked={jest.fn()}
+      reviewing={false}
+    />,
+  )
+
+  await userEvent.hover(document.getElementById('custom_fields_render_trigger')!)
+  expect(screen.getByText(/refer to the for more details\./i)).toBeVisible()
+})
+
 it('focuses invalid inputs if any fields are invalid', async () => {
   const config = mockInternalConfiguration({
     redirect_uris: ['https://example.com/launch'],

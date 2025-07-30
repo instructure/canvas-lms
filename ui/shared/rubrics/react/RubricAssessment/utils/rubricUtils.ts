@@ -36,7 +36,12 @@ export const escapeNewLineText = (text?: string) => {
   }
 }
 
-export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?: string) => {
+export const rangingFrom = (
+  ratings: RubricRating[],
+  index: number,
+  ratingOrder?: string,
+  includeZeroFrom?: boolean,
+) => {
   const previousRatingPoints = ratings[index - 1]?.points
   const previousPointModifier = getAdjustedDecimalRatingModifier(previousRatingPoints)
   const nextRatingPoints = ratings[index + 1]?.points
@@ -48,6 +53,10 @@ export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?
       return undefined
     }
 
+    if (includeZeroFrom && index === 0) {
+      return 0
+    }
+
     return index > 0
       ? roundToTwoDecimalPlaces(previousRatingPoints + previousPointModifier)
       : undefined
@@ -55,6 +64,10 @@ export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?
 
   if (currentRatingPoints === nextRatingPoints) {
     return undefined
+  }
+
+  if (includeZeroFrom && index === ratings.length - 1) {
+    return 0
   }
 
   return index < ratings.length - 1

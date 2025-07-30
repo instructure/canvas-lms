@@ -53,7 +53,7 @@ describe('Main', () => {
       isHorizonAccount: false,
     })
     expect(screen.getByText(/Canvas Career is a new LMS experience/)).toBeInTheDocument()
-    expect(screen.queryByText('Revert Sub Account')).not.toBeInTheDocument()
+    expect(screen.queryByText('Revert Account')).not.toBeInTheDocument()
   })
 
   it('renders RevertAccount when isHorizonAccount is true', () => {
@@ -62,7 +62,7 @@ describe('Main', () => {
       isHorizonAccount: true,
     })
     const revertButton = screen
-      .getAllByText('Revert Sub Account')
+      .getAllByText('Revert Account')
       .find(element => element.tagName === 'SPAN')
 
     expect(revertButton).not.toBeUndefined()

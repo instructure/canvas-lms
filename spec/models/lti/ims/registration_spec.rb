@@ -809,6 +809,30 @@ module Lti::IMS
         expect(subject.lti_version).to eq "1.3"
       end
 
+      context "when content_migration is configured" do
+        let(:lti_tool_configuration) do
+          {
+            :domain => "example.com",
+            :messages => [],
+            Lti::IMS::Registration::CONTENT_MIGRATION_EXTENSION => {
+              export_format: "json",
+              import_format: "json",
+              export_start_url: "https://example.com/api/v1/courses/export",
+              import_start_url: "https://example.com/api/v1/courses/import"
+            }
+          }
+        end
+
+        it "adds the content migration configuration to the correct config location" do
+          expect(subject.settings["content_migration"]).to eq({
+                                                                "export_format" => "json",
+                                                                "import_format" => "json",
+                                                                "export_start_url" => "https://example.com/api/v1/courses/export",
+                                                                "import_start_url" => "https://example.com/api/v1/courses/import"
+                                                              })
+        end
+      end
+
       context "when registration has unified_tool_id" do
         let(:unified_tool_id) { "tool_id" }
 

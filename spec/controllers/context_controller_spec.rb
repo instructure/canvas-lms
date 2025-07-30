@@ -685,7 +685,7 @@ describe ContextController do
   describe "GET 'roster_user_usage'" do
     before(:once) do
       page = @course.wiki_pages.create(title: "some page")
-      @asset_user_access_wiki = AssetUserAccess.create!(
+      AssetUserAccess.create!(
         { user_id: @student, asset_code: page.asset_string, context: @course, category: "pages" }
       )
     end
@@ -706,48 +706,6 @@ describe ContextController do
 
       expect(response).to be_successful
       expect(json_parse(response.body).length).to eq 1
-    end
-
-    context "bad discussion topic context" do
-      before do
-        @group = @course.groups.create!
-        @group.add_user(@student, "accepted")
-
-        @course_discussion_topic = DiscussionTopic.create!(context: @course)
-        @group_discussion_topic = DiscussionTopic.create!(context: @group)
-
-        course_asset = { code: @course_discussion_topic.asset_string, category: "topics" }
-        group_asset = { code: @group_discussion_topic.asset_string, category: "topics" }
-
-        @asset_user_access_1 = AssetUserAccess.log(@student, @course, course_asset)
-        @asset_user_access_2 = AssetUserAccess.log(@student, @course, group_asset)
-        @asset_user_access_3 = AssetUserAccess.log(@student, @group, course_asset)
-        @asset_user_access_4 = AssetUserAccess.log(@student, @group, group_asset)
-      end
-
-      context "html" do
-        it "filters out bad access records" do
-          user_session(@teacher)
-
-          get :roster_user_usage, params: { course_id: @course.id, user_id: @student.id }
-
-          expect(response).to be_successful
-          expect(assigns[:accesses])
-            .to contain_exactly(@asset_user_access_wiki, @asset_user_access_1, @asset_user_access_4)
-        end
-      end
-
-      context "json" do
-        it "filters out bad access records" do
-          user_session(@teacher)
-
-          get :roster_user_usage, params: { course_id: @course.id, user_id: @student.id }, format: :json
-
-          expect(response).to be_successful
-          expect(json_parse(response.body).pluck("asset_user_access").pluck("id"))
-            .to contain_exactly(@asset_user_access_wiki.id, @asset_user_access_1.id, @asset_user_access_4.id)
-        end
-      end
     end
   end
 end

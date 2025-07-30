@@ -267,7 +267,9 @@ Naming/MethodName:
   Severity: convention
 Naming/MethodParameterName:
   Severity: convention
-Naming/PredicateName:
+Naming/PredicateMethod:
+  Severity: convention
+Naming/PredicatePrefix:
   Severity: convention
 Naming/VariableName:
   Severity: convention
@@ -396,6 +398,9 @@ Style/ClassAndModuleChildren:
   AutoCorrect: false
 Style/ClassVars:
   Severity: convention
+Style/CollectionQuerying:
+  Severity: convention
+  AutoCorrect: false
 Style/CombinableLoops:
   Severity: convention
   AutoCorrect: false

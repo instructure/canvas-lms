@@ -802,7 +802,7 @@ module CanvasSanitize # :nodoc:
         next unless f.is_a?(String) || f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
-        send((field.to_s + "="), val)
+        send(field.to_s + "=", val)
       end
     end
   end # InstanceMethods

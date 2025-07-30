@@ -26,9 +26,12 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from './types'
+import {DateTime} from '@instructure/ui-i18n'
+import moment from 'moment'
 
 const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
+export const ALL_MODULES = '0'
 
 export const INDENT_LOOKUP: Record<number, string> = {
   0: `${pixelOffset * 0}px`,
@@ -184,6 +187,7 @@ export const validateModuleTeacherRenderRequirements = (prevProps: any, nextProp
     prevProps.hasActiveOverrides === nextProps.hasActiveOverrides &&
     prevProps.prerequisites === nextProps.prerequisites &&
     prevProps.completionRequirements === nextProps.completionRequirements &&
+    prevProps.unlockAt === nextProps.unlockAt &&
     prevProps.requirementCount === nextProps.requirementCount &&
     prevProps.lockAt === nextProps.lockAt
   )
@@ -206,4 +210,12 @@ export const filterRequirementsMet = (
       return idMatch && typeMatch && scoreMatch && percentageMatch
     }),
   )
+}
+
+export const isModuleUnlockAtDateInTheFuture = (unlockAtDate: string) => {
+  const TIMEZONE = ENV?.TIMEZONE || DateTime.browserTimeZone()
+  const unlockMoment = moment.tz(unlockAtDate, TIMEZONE)
+  const now = moment.tz(TIMEZONE)
+
+  return unlockMoment.isAfter(now)
 }

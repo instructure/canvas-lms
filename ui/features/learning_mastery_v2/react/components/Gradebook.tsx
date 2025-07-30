@@ -29,15 +29,20 @@ import {
   COLUMN_PADDING,
   CELL_HEIGHT,
 } from '../utils/constants'
-import {Student, Outcome, StudentRollupData} from '../types/rollup'
+import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
+import {GradebookPagination} from './pagination/GradebookPagination'
+import {Sorting} from '../types/shapes'
 
-interface GradebookProps {
+export interface GradebookProps {
   courseId: string
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
   gradebookFilters: string[]
   gradebookFilterHandler: (filter: string) => void
+  pagination?: PaginationType
+  setCurrentPage: (page: number) => void
+  sorting: Sorting
 }
 
 export const Gradebook: React.FC<GradebookProps> = ({
@@ -45,8 +50,9 @@ export const Gradebook: React.FC<GradebookProps> = ({
   students,
   outcomes,
   rollups,
-  gradebookFilters,
-  gradebookFilterHandler,
+  pagination,
+  setCurrentPage,
+  sorting,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -74,10 +80,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
       <Flex padding="medium 0 0 0">
         <Flex.Item>
           <View borderWidth="large 0 medium 0">
-            <StudentHeader
-              gradebookFilters={gradebookFilters}
-              gradebookFilterHandler={gradebookFilterHandler}
-            />
+            <StudentHeader sorting={sorting} />
           </View>
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
@@ -129,6 +132,9 @@ export const Gradebook: React.FC<GradebookProps> = ({
           <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
         </View>
       </View>
+      {pagination && pagination.totalPages > 1 && (
+        <GradebookPagination pagination={pagination} onPageChange={setCurrentPage} />
+      )}
     </>
   )
 }

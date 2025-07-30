@@ -2408,6 +2408,15 @@ describe AssignmentsApiController, type: :request do
       expect(json["post_to_sis"]).to be false
     end
 
+    it "creates attachment association when attachments are in description" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+      json = api_create_assignment_in_course(@course, { description: aa_test_data.base_html })
+      @assignment = Assignment.find(json["id"])
+      expect(aa_test_data.attachment1.attachment_associations.count).to eq 1
+      expect(aa_test_data.attachment1.attachment_associations.last.context_id).to eq @assignment.id
+      expect(aa_test_data.attachment1.attachment_associations.last.context_type).to eq "Assignment"
+    end
+
     it "accepts a value for post_to_sis" do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: false }
@@ -6899,6 +6908,27 @@ describe AssignmentsApiController, type: :request do
       tag = assignment.external_tool_tag
       expect(tag.content_id).to eq mh.id
       expect(tag.content_type).to eq "Lti::MessageHandler"
+    end
+
+    it "creates attachment association when attachments are in description with an update" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@teacher.account, @teacher)
+      api_call_as_user(
+        @teacher,
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+        {
+          controller: "assignments_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          id: @assignment.id.to_s
+        },
+        { assignment: { description: aa_test_data.base_html } }
+      )
+
+      expect(aa_test_data.attachment1.attachment_associations.count).to eq 1
+      expect(aa_test_data.attachment1.attachment_associations.last.context_id).to eq @assignment.id
+      expect(aa_test_data.attachment1.attachment_associations.last.context_type).to eq "Assignment"
     end
 
     it "sets the context external tool type" do

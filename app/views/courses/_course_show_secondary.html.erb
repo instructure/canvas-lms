@@ -80,6 +80,18 @@
       </a>
       <% end %>
 
+      <% if @context.feature_enabled?(:accessibility_tab_enable) %>
+        <a id="course_check_accessibility_btn" href="<%= context_url(@context, :controller => :accessibility, :action => :index) %>"
+           class="btn button-sidebar-wide accessibility_link <%= 'disabled' unless @accessibility_scan_enabled %>"
+           aria-disabled="<%= !@accessibility_scan_enabled %>"
+           <% unless @accessibility_scan_enabled %>
+           data-tooltip="bottom" title="<%= t(:accessibility_limit_exceeded, "The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).") %>"
+           onclick="return false;"
+           <% end %>>
+          <i class="icon-a11y"></i> <%= t('links.course_check_accessibility', %{Check Accessibility}) %>
+        </a>
+      <% end %>
+
       <% if @can_create_announcements && !@context.elementary_homeroom_course? %>
       <a class="btn button-sidebar-wide" href="<%= context_url(@context, :new_context_discussion_topic_url, :is_announcement => true) %>"><i class="icon-announcement"></i> <%= t('links.new_announcement', %{New Announcement}) %>
       </a>

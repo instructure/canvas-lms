@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, useRef, useCallback} from 'react'
+import React, {useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
@@ -25,9 +25,9 @@ import {AccountReport, reportRunning} from '@canvas/account_reports/types'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-const I18n = createI18nScope('account_reports')
+import {useQuery} from '@tanstack/react-query'
 
-const POLLING_INTERVAL = 3000
+const I18n = createI18nScope('account_reports')
 
 interface Props {
   accountId: string
@@ -36,8 +36,8 @@ interface Props {
 }
 
 export default function ReportProgress({accountId, reportRun, onStateChange}: Props) {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [canceling, setCanceling] = useState(false)
+  const [errored, setErrored] = useState(false)
 
   const cancelReport = async () => {
     setCanceling(true)
@@ -53,40 +53,36 @@ export default function ReportProgress({accountId, reportRun, onStateChange}: Pr
     }
   }
 
-  const stopPolling = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
-  }
-
-  const pollReportProgress = useCallback(async () => {
-    try {
+  const {error} = useQuery<AccountReport>({
+    queryKey: ['reportProgress', accountId, reportRun.report, reportRun.id],
+    queryFn: async ({queryKey}) => {
+      const [_key, accountId, reportName, reportId] = queryKey
       const {json} = await doFetchApi<AccountReport>({
-        path: `/api/v1/accounts/${accountId}/reports/${reportRun.report}/${reportRun.id}`,
+        path: `/api/v1/accounts/${accountId}/reports/${reportName}/${reportId}`,
       })
       onStateChange(json!)
-      if (reportRunning(json?.status)) {
-        timeoutRef.current = setTimeout(pollReportProgress, POLLING_INTERVAL)
-      }
-    } catch (error) {
-      showFlashError(I18n.t('Error fetching report progress'))(error as Error)
-      stopPolling()
-    }
-  }, [accountId, reportRun.report, reportRun.id, onStateChange])
-
-  useEffect(() => {
-    if (reportRunning(reportRun.status)) {
-      pollReportProgress()
-    }
-
-    return stopPolling
-  }, [reportRun.status, pollReportProgress])
+      return json!
+    },
+    enabled: !errored && reportRunning(reportRun.status),
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchInterval: query => {
+      // initially poll every 2 seconds, slowing down to once a minute for long-running reports
+      const n = query.state.data?.run_time
+      return n ? Math.min(2000 * 1.02 ** n, 60000) : false
+    },
+    refetchIntervalInBackground: false,
+  })
+  if (error && !errored) {
+    setErrored(true)
+    showFlashError(I18n.t('Error updating report progress'))(error as Error)
+  }
 
   return (
     <>
       <ProgressCircle
         size="x-small"
+        meterColor={errored ? 'danger' : 'info'}
         screenReaderLabel={I18n.t('Report progress')}
         valueNow={reportRun.progress}
         margin="0 small 0 0"
@@ -98,7 +94,7 @@ export default function ReportProgress({accountId, reportRun, onStateChange}: Pr
         margin="0 0 0 x-small"
         screenReaderLabel={I18n.t('Cancel report')}
         onClick={cancelReport}
-        interaction={canceling ? 'disabled' : 'enabled'}
+        interaction={canceling || errored ? 'disabled' : 'enabled'}
       >
         <IconXSolid />
       </IconButton>

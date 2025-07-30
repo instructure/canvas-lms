@@ -38,11 +38,13 @@ function PostGradesFrameModal({postGradesLtis, selectedLtiId, onClose}: PostGrad
     return postGradesLtis.filter(lti => lti.id === selectedLtiId)[0]?.data_url
   }, [postGradesLtis, selectedLtiId])
 
+  const iframeRef = React.useRef<HTMLIFrameElement>(null)
+
   useEffect(() => {
     if (onClose) {
-      return onLtiClosePostMessage('post_grades', onClose)
+      return onLtiClosePostMessage(() => iframeRef.current, onClose)
     }
-  }, [])
+  }, [onClose])
 
   return (
     <Modal
@@ -66,6 +68,7 @@ function PostGradesFrameModal({postGradesLtis, selectedLtiId, onClose}: PostGrad
         {baseUrl ? (
           <iframe
             src={baseUrl}
+            ref={iframeRef}
             className="post-grades-frame"
             style={{border: 'none', width: '100%', height: '75vh'}}
             title={I18n.t('Sync Grades')}

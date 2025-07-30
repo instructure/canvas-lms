@@ -132,7 +132,7 @@ export const i18nLtiPlacement = (placement: LtiPlacement): string =>
     assignment_edit: I18n.t('Assignment Edit'),
     assignment_selection: I18n.t('Assignment Selection'),
     assignment_view: I18n.t('Assignment View'),
-    ActivityAssetProcessor: I18n.t('Activity Asset Processor'),
+    ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
     similarity_detection: I18n.t('Similarity Detection'),
     assignment_menu: I18n.t('Assignment Menu'),
     assignment_index_menu: I18n.t('Assignments Index Menu'),

@@ -108,7 +108,7 @@ module AvatarHelper
     default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
     url = if avatars_enabled_for_user?(user, root_account:)
             user.avatar_url(nil,
-                            ((root_account && root_account.settings[:avatars]) || "enabled"),
+                            (root_account && root_account.settings[:avatars]) || "enabled",
                             default_avatar,
                             request,
                             use_fallback)

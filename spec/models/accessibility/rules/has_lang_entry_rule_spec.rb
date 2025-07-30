@@ -22,7 +22,7 @@ require "spec_helper"
 RSpec.describe Accessibility::Rules::HasLangEntryRule, type: :feature do
   def find_issues(elem, id)
     rule_class = self.class.described_class
-    if rule_class.test(elem)
+    if rule_class.test(elem).nil?
       []
     else
       [{
@@ -30,7 +30,6 @@ RSpec.describe Accessibility::Rules::HasLangEntryRule, type: :feature do
         message: rule_class.message,
         why: rule_class.why,
         link: rule_class.link,
-        link_text: rule_class.link_text,
         data: {
           id:
         }

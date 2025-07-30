@@ -372,6 +372,35 @@ describe OutcomeResultsController do
       end
     end
 
+    describe "retrieving outcome alignments" do
+      before do
+        assessment_question_bank_with_questions
+        @outcome.align(@bank, @bank.context, mastery_score: 0.7)
+
+        @quiz = @course.quizzes.create!(title: "a quiz")
+        @quiz.add_assessment_questions [@q1, @q2]
+
+        @submission = @quiz.generate_submission @student
+        @submission.quiz_data = @quiz.generate_quiz_data
+        @submission.mark_completed
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
+
+        user_session(@teacher)
+      end
+
+      it "returns question bank alignments" do
+        get "rollups",
+            params: { course_id: @course.id,
+                      include: ["alignments"] },
+            format: "json"
+        expect(response).to be_successful
+        json = parse_response(response)
+        alignments = json["linked"]["alignments"]
+        expect(alignments.length).to eq 2
+        expect(alignments.map { |a| a["name"] }).to include("Test Bank")
+      end
+    end
+
     it "validates aggregate_stat parameter" do
       user_session(@teacher)
       get "rollups",

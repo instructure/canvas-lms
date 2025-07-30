@@ -82,11 +82,11 @@ class AssignmentExternalTools extends React.Component {
   getLaunch(tool) {
     const url = tool.placements[this.props.placement].url
 
-    let query = `?borderless=true&url=${encodeURIComponent(url)}&placement=${this.props.placement}`
+    let query = `?display=borderless&url=${encodeURIComponent(url)}&placement=${this.props.placement}`
     if (this.props.assignmentId) {
       query += `&assignment_id=${this.props.assignmentId}`
     }
-    const endpoint = `/courses/${this.props.courseId}/external_tools/retrieve`
+    const endpoint = `/courses/${this.props.courseId}/external_tools/${tool.definition_id}`
 
     return endpoint + query
   }

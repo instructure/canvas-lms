@@ -240,6 +240,7 @@ class AccountNotificationsController < ApplicationController
     @notification = AccountNotification.new(account_notification_params)
     @notification.account = @account
     @notification.user = @current_user
+    @notification.saving_user = @current_user
     unless params[:account_notification_roles].nil?
       roles = []
 
@@ -321,13 +322,14 @@ class AccountNotificationsController < ApplicationController
   def update
     account_notification = @account.announcements.find(params[:id])
     if account_notification
-      notification_params = params.require(:account_notification)
-                                  .permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+      notification_params = account_notification_params
       account_notification.attributes = notification_params
 
       if value_to_boolean(notification_params[:send_message])
         account_notification.messages_sent_at = nil # reset if we're explicitly re-sending messages
       end
+
+      account_notification.saving_user = @current_user
 
       existing_roles = account_notification.account_notification_roles.map(&:role)
       requested_roles = roles_to_add(params[:account_notification_roles])
@@ -439,7 +441,10 @@ class AccountNotificationsController < ApplicationController
   end
 
   def account_notification_params
-    params.require(:account_notification)
-          .permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+    anparams = params.require(:account_notification)
+                     .permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+    anparams[:message] = process_incoming_html_content(anparams[:message])
+
+    anparams
   end
 end

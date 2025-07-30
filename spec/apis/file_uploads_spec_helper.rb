@@ -560,7 +560,7 @@ shared_examples_for "file uploads api with quotas" do
     progress_url = json["progress"]["url"]
     progress_id = json["progress"]["id"]
     attachment = Attachment.order(:id).last
-    expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, (" " * 2.megabytes)))
+    expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, " " * 2.megabytes))
     run_jobs
 
     json = api_call(:get, progress_url, { id: progress_id, controller: "progress", action: "show", format: "json" })

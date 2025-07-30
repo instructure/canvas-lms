@@ -3539,6 +3539,76 @@ describe GradebooksController do
         end
       end
     end
+
+    describe "selected_section_ids preference" do
+      let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "adds selected section IDs to the user's preference if they are not already present" do
+        section1 = @course.course_sections.first.id
+        section2 = (@course.course_sections.second || @course.course_sections.create!).id
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [section1, section2]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to match_array [section1.to_s, section2.to_s]
+        expect(course_settings["selected_view_options_filters"]).to include("sections")
+      end
+
+      it "removes already-selected section IDs from the user's preference (toggle behavior)" do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  "filter_rows_by" => { "section_ids" => [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [section1.to_s]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_empty
+      end
+
+      it 'clears the selected sections if passed the value "all"' do
+        section1 = @course.course_sections.first.id
+        @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                  filter_rows_by: { section_ids: [section1.to_s] }
+                                })
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: "all"
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).to be_nil
+      end
+
+      it "ignores invalid or non-active section IDs" do
+        invalid_id = "9999999"
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [invalid_id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(invalid_id)
+      end
+
+      it "ignores section IDs that don't belong to the course" do
+        other_course_section = Course.create!.course_sections.create!
+
+        post "speed_grader_settings", params: {
+          course_id: @course.id,
+          selected_section_ids: [other_course_section.id]
+        }
+
+        expect(course_settings.dig("filter_rows_by", "section_ids")).not_to include(other_course_section.id.to_s)
+      end
+    end
   end
 
   describe "POST 'save_assignment_order'" do

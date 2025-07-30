@@ -30,7 +30,7 @@ module CourseHomePage
   end
 
   def course_options_analytics2_link
-    fj(".course-options a:contains('Analytics 2')")
+    fj(".course-options a:contains('Admin Analytics')")
   end
 
   def course_options_analytics1_link
@@ -42,7 +42,7 @@ module CourseHomePage
   end
 
   def course_nav_analytics2_link
-    fj(".section a:contains('Analytics 2')")
+    fj(".section a:contains('Admin Analytics')")
   end
 
   def course_nav_analytics1_link
@@ -62,7 +62,7 @@ module CourseHomePage
   end
 
   def manage_user_analytics_2_link
-    fj(".al-options a:contains('Analytics 2')")
+    fj(".al-options a:contains('Admin Analytics')")
   end
 
   def manage_user_analytics_1_link
@@ -74,7 +74,7 @@ module CourseHomePage
   end
 
   def user_profile_actions_analytics_2_link
-    fj("#right_nav a:contains('Analytics 2')")
+    fj("#right_nav a:contains('Admin Analytics')")
   end
 
   def user_profile_actions_analytics_1_link

@@ -52,7 +52,7 @@ describe Api do
     end
 
     it "does not find a missing record" do
-      expect { @api.api_find(User, (User.all.map(&:id).max + 1)) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { @api.api_find(User, User.all.map(&:id).max + 1) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "finds an existing sis_id record" do

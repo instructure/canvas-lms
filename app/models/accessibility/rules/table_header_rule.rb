@@ -24,42 +24,45 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H51.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "table"
+        return nil if elem.tag_name != "table"
 
-        !elem.query_selector("th").nil?
+        I18n.t("Table shall have a header.") if elem.query_selector("th").nil?
+      end
+
+      def self.display_name
+        I18n.t("Table headers aren’t set up")
       end
 
       def self.message
-        "Tables should include header cells."
+        I18n.t("Tables should include a caption describing the contents of the table.")
       end
 
       def self.why
-        "Tables without headers are difficult for screen reader users to navigate and understand. " \
+        I18n.t(
+          "Tables without headers are difficult for screen reader users to navigate and understand. " \
           "Headers provide context for the data and allow screen readers to associate data cells with their headers."
-      end
-
-      def self.link_text
-        "Learn more about table headers"
-      end
-
-      def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Set table header",
-          value: "No headers",
-          options: ["None", "Header row", "Header column", "Header row and column"]
         )
       end
 
-      def self.fix(elem, value)
-        # Remove existing headers by converting <th> to <td>
+      def self.form(_elem)
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: I18n.t("Which part of the table should contain the headings?"),
+          undo_text: I18n.t("Table headings are now set up"),
+          value: I18n.t("The top row"),
+          options: [
+            I18n.t("The top row"),
+            I18n.t("The left column"),
+            I18n.t("Both")
+          ]
+        )
+      end
+
+      def self.fix!(elem, value)
         elem.query_selector_all("th").each do |th|
           th.name = "td"
         end
 
-        case value
-        when "None"
-          return elem
-        when "Header row", "Header row and column"
+        if [I18n.t("The top row"), I18n.t("Both")].include?(value)
           first_row = elem.query_selector("tr")
           first_row&.query_selector_all("td")&.each do |td|
             td.name = "th"
@@ -67,7 +70,7 @@ module Accessibility
           end
         end
 
-        if ["Header column", "Header row and column"].include?(value)
+        if [I18n.t("The left column"), I18n.t("Both")].include?(value)
           elem.query_selector_all("tr").each_with_index do |row, index|
             next if index == 0 # Skip the first row
 

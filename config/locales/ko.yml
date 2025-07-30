@@ -9685,6 +9685,7 @@ ko:
   notification: 
     account_notification_display: "전체 공지"
     added_to_conversation_description: "대화에 추가됨"
+    added_to_conversation_description_legend: "대화에 추가됨"
     added_to_conversation_display: "대화에 추가됨"
     all_submissions_description: |-
         *강사와 관리자에게만 해당:*
@@ -9692,6 +9693,9 @@ ko:
         과제 제출/다시 제출
     all_submissions_display: "모든 제출물"
     announcement_created_by_you_description: |-
+        * 내가 생성한 공지
+        * 내가 생성한 공지에 달린 답변
+    announcement_created_by_you_description_legend: |-
         * 내가 생성한 공지
         * 내가 생성한 공지에 달린 답변
     announcement_created_by_you_display: "내가 생성한 공지"
@@ -9702,10 +9706,13 @@ ko:
         약속 시간 슬롯으로 변경
     appointment_availability_display: "약속 가능 여부"
     appointment_cancelations_description: "약속 취소"
+    appointment_cancelations_description_legend: "약속 취소"
     appointment_cancelations_display: "약속 취소"
     appointment_signups_description: "달력에 있는 새 약속"
+    appointment_signups_description_legend: "달력에 있는 새 약속"
     appointment_signups_display: "약속 등록"
     calendar_description: "과목 달력에 있는 새 항목과 변경된 항목"
+    calendar_description_legend: "과목 달력에 있는 새 항목과 변경된 항목"
     calendar_display: 달력
     categories: 
       all_submissions: "모든 제출물"
@@ -9733,8 +9740,10 @@ ko:
       student_appointment_signups: "학생 약속 등록"
       submission_comment: "제출물 의견"
     conversation_created_description: "대화를 생성했습니다"
+    conversation_created_description_legend: "대화를 생성했습니다"
     conversation_created_display: "내가 생성한 대화"
     conversation_message_description: "새 받은 편지함 메시지"
+    conversation_message_description_legend: "새 받은 편지함 메시지"
     conversation_message_display: "대화 메시지"
     course_content_description: |-
         과목 내용으로 변경:
@@ -9748,12 +9757,15 @@ ko:
     discussion_post_description: "구독 중인 주제의 새 토론 게시물"
     discussion_post_display: "토론 게시물"
     due_date_description: "과제 기한 변경됨"
+    due_date_description_legend: "과제 기한 변경됨"
     due_date_display: 기한
     files_description: "과목에 새 파일 추가됨"
+    files_description_legend: "과목에 새 파일 추가됨"
     files_display: 파일
     grading_display: 평가
     grading_notify_include_grade: "평점 변경을 알릴 때 점수 포함"
     grading_policies_description: "과목 평가 정책 변경"
+    grading_policies_description_legend: "과목 평가 정책 변경"
     grading_policies_display: "평가 정책"
     invitation_description: |-
         초대장:
@@ -9776,6 +9788,7 @@ ko:
         * 수락/거부
     membership_update_display: "멤버쉽 업데이트"
     missing_description_description: "%{category} 알림에 대한 설명"
+    missing_description_description_legend: "%{category} 알림"
     missing_display_display: "%{category} 알림"
     names: 
       account_user_notification: "계정 사용자 알림"
@@ -9855,6 +9868,7 @@ ko:
     student_appointment_display: "학생 약속 등록"
     submission_comment_display: "제출물 의견"
     web_conference_recording_ready: "회의 녹화본이 준비되었습니다"
+    web_conference_recording_ready_legend: "회의 녹화본이 준비되었습니다"
   notification_preferences: 
     communication: 
       email: 

@@ -119,4 +119,28 @@ RSpec.describe Lti::Asset do
       end
     end
   end
+
+  describe "asset_reports association" do
+    let(:asset) { lti_asset_model }
+    let(:asset_processor) { lti_asset_processor_model(assignment: asset.submission.assignment) }
+
+    it "soft deletes dependent asset reports when deleted" do
+      3.times do |i|
+        lti_asset_report_model(
+          asset:,
+          asset_processor:,
+          report_type: "test_report_type_#{i}",
+          timestamp: Time.zone.now,
+          priority: Lti::AssetReport::PRIORITY_GOOD,
+          processing_progress: Lti::AssetReport::PROGRESS_PROCESSED
+        )
+      end
+
+      expect(asset.asset_reports.count).to eq 3
+
+      asset.destroy!
+
+      expect(asset.asset_reports.reload.pluck(:workflow_state)).to all(eq("deleted"))
+    end
+  end
 end

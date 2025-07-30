@@ -27,7 +27,7 @@ RSpec.describe Mutations::UpdateSubmissionSticker do
         updateSubmissionSticker(input: {
           anonymousId: "#{anonymous_id}",
           assignmentId: "#{assignment_id}",
-          #{omit_sticker ? "" : "sticker: #{sticker || "null"},"}
+          #{"sticker: #{sticker || "null"}," unless omit_sticker}
         }) {
           submission {
             sticker

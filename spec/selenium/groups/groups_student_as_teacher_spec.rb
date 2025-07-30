@@ -47,7 +47,7 @@ describe "student groups" do
       let(:students_in_group) { 4 }
 
       before do
-        create_student_group_as_a_teacher(group_name, (students_in_group - 1))
+        create_student_group_as_a_teacher(group_name, students_in_group - 1)
         get("/courses/#{@course.id}/groups")
       end
 

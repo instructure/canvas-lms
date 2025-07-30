@@ -17,7 +17,7 @@
  */
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {render, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
@@ -30,6 +30,7 @@ import {
   mockTools as tools,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -217,10 +218,29 @@ describe('AssetProcessorsAddModal', () => {
     expect(result.current.state.tag).toBe('toolLaunch')
     expect('tool' in result.current.state && result.current.state.tool).toBe(tools[0])
 
+    const {getByTitle, queryAllByTestId} = renderModal()
+    const iframe = (await waitFor(() =>
+      getByTitle('Configure new document processing app'),
+    )) as HTMLIFrameElement
+    const source = iframe.contentWindow as Window
+    // If we don't overwrite postMessage we get some strange internal error in jsdom's postMessage
+    jest.spyOn(source, 'postMessage').mockImplementation(() => {})
+
+    monitorLtiMessages()
+
     act(() => {
-      result.current.actions.close()
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {subject: 'lti.close'},
+          origin: window.location.origin,
+          source: iframe.contentWindow,
+        }),
+      )
     })
 
-    expect(result.current.state.tag).toBe('closed')
+    await waitFor(() => {
+      expect(result.current.state.tag).toBe('closed')
+    })
   })
 })

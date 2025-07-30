@@ -22,7 +22,6 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {RocketSVG} from '@instructure/canvas-media'
 import {useCourseFolders} from '../../hooks/queries/useCourseFolders'
 import {useContextModule} from '../../hooks/useModuleContext'
 import {useAssignmentGroups} from '../../hooks/queries/useAssignmentGroups'
@@ -94,11 +93,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
         itemType={itemType}
         onChange={onChange}
         setFile={setFile}
-        icon={<RocketSVG width="3em" height="3em" />}
-        folders={folders}
         shouldAllowMultiple={false}
-        selectedFolder={folder}
-        setSelectedFolder={setFolder}
       />
       {itemType === 'file' && (
         <View as="div" margin="medium 0 0 0">

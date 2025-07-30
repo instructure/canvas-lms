@@ -35,18 +35,12 @@ RSpec.describe "AdjacentLinksRule", type: :feature do
       end
     end
 
-    it "maintains resource-specific isolation between content types" do
-      input_html = '<div><a href="https://example.com">Link 1</a> <a href="https://example.com">Link 2</a></div>'
+    it "do not identifies adjecent links with different URLs" do
+      input_html = '<div><a href="https://example1.com">Link 1</a> <a href="https://example2.com">Link 2</a></div>'
 
-      page_issues = find_issues(:adjacent_links, input_html, "page-123")
-      assignment_issues = find_issues(:adjacent_links, input_html, "assignment-456")
-      file_issues = find_issues(:adjacent_links, input_html, "file-789")
+      issues = find_issues(:adjacent_links, input_html, "page-123")
 
-      if page_issues.any? && assignment_issues.any? && file_issues.any?
-        expect(page_issues.first[:data][:id]).to include("page-123")
-        expect(assignment_issues.first[:data][:id]).to include("assignment-456")
-        expect(file_issues.first[:data][:id]).to include("file-789")
-      end
+      expect(issues).to be_empty
     end
   end
 
@@ -57,6 +51,12 @@ RSpec.describe "AdjacentLinksRule", type: :feature do
 
       expect(fixed_html).to include('<a id="test-link" href="https://example.com">Link 1 Link 2</a>')
       expect(fixed_html).not_to include('<a id="test-link" href="https://example.com">Link 2</a>')
+    end
+  end
+
+  context "form" do
+    it "merges adjacent links with the same URL" do
+      expect(Accessibility::Rules::AdjacentLinksRule.form(nil).label).to eq("Merge links")
     end
   end
 end

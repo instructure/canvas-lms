@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useCallback} from 'react'
+import {Alert} from '@instructure/ui-alerts'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -250,10 +251,28 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
     }
   })
 
+  const blankConfigurationMessage = props.state.isInstructureTool
+    ? I18n.t(
+        'A configuration is not available for this tool. Please reach out to your CSM for more information on how to install it.',
+      )
+    : I18n.t(
+        'A configuration is not available for this tool. Please reach out to the tool provider for more information on how to install it.',
+      )
+
   return (
     <>
       <Header onClose={props.state.close} editing={!!props.state.existingRegistrationId} />
       <RegistrationModalBody>
+        {props.state.showBlankConfigurationMessage && (
+          <Alert
+            variant="info"
+            margin="0 0 medium"
+            hasShadow={false}
+            variantScreenReaderLabel="Information, "
+          >
+            {blankConfigurationMessage}
+          </Alert>
+        )}
         <View display="block" margin="0 0 medium 0">
           <RadioInputGroup
             description={I18n.t('Select LTI Version')}

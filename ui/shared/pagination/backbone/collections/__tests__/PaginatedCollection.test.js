@@ -53,7 +53,7 @@ describe('PaginatedCollection', () => {
 
   beforeAll(() => {
     server = setupServer()
-    server.listen()
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   afterEach(() => {

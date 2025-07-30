@@ -434,5 +434,16 @@ module Canvas::Plugins::DefaultPlugins
                                 max_query_directives: 5,
                               }
                             })
+
+    Canvas::Plugin.register("conditional_release_tuning", nil, {
+                              name: -> { t :name, "Mastery Path Tuning" },
+                              description: -> { t :description, "Mastery Path tuning" },
+                              author: "Instructure",
+                              author_website: "http://www.instructure.com",
+                              version: "1.0.0",
+                              settings_partial: "plugins/conditional_release_tuning_settings",
+                              settings: { priority: "low" },
+                              validator: "ConditionalReleaseTuningValidator",
+                            })
   end
 end

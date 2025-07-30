@@ -32,16 +32,24 @@ describe Lti::ContextControl do
     }
   end
   let(:course) { nil }
-  let(:deployment) { external_tool_1_3_model(context: account) }
+  let(:deployment) { registration.deployments.first }
   let(:registration) do
-    reg = lti_registration_model(account:)
-    reg.ims_registration = lti_ims_registration_model(account:, lti_registration: reg)
-    reg.developer_key = reg.ims_registration.developer_key
-    reg
+    lti_registration_with_tool(account: root_account)
   end
   let(:available) { true }
+  let(:delete_controls) { true }
+  let(:account) { root_account }
 
-  let_once(:account) { account_model }
+  let_once(:root_account) { account_model }
+
+  before do
+    # start with a blank slate
+    if delete_controls
+      registration&.context_controls&.each do |control|
+        control.suspend_callbacks { control.destroy_permanently! }
+      end
+    end
+  end
 
   describe "validations" do
     context "when both account and course are present" do
@@ -63,7 +71,7 @@ describe Lti::ContextControl do
 
     context "with only course" do
       let(:account) { nil }
-      let(:course) { course_model(account:) }
+      let(:course) { course_model(account: root_account) }
 
       it "is valid" do
         expect { create! }.not_to raise_error
@@ -93,18 +101,14 @@ describe Lti::ContextControl do
     end
 
     context "without deployment" do
-      let(:deployment) { nil }
-
       it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Deployment must exist/)
+        expect { create!(deployment: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Deployment must exist/)
       end
     end
 
     context "without registration" do
-      let(:registration) { nil }
-
       it "is invalid" do
-        expect { create! }.to raise_error(ActiveRecord::RecordInvalid, /Registration must exist/)
+        expect { create!(registration: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Registration must exist/)
       end
     end
 
@@ -135,6 +139,16 @@ describe Lti::ContextControl do
         expect { control.save! }.to raise_error(ActiveRecord::RecordInvalid, /cannot be changed/)
       end
     end
+
+    context "when context is outside deployment context chain" do
+      let(:account) { account_model(parent_account: root_account) }
+      let(:other_account) { account_model(parent_account: root_account) }
+      let(:deployment) { registration.new_external_tool(account) }
+
+      it "is invalid" do
+        expect { create!(account: other_account) }.to raise_error(ActiveRecord::RecordInvalid, /must belong to the deployment's context/)
+      end
+    end
   end
 
   describe "#destroy" do
@@ -155,13 +169,14 @@ describe Lti::ContextControl do
         deployment:
       )
     end
+    let(:delete_controls) { false }
 
     it "soft-deletes the control" do
       expect { subject }.to change { control.reload.workflow_state }.from("active").to("deleted")
     end
 
     context "when control is primary for deployment" do
-      let_once(:control) do
+      let(:control) do
         Lti::ContextControl.find_by(account: parent_account, registration:, deployment:)
       end
 
@@ -241,8 +256,6 @@ describe Lti::ContextControl do
 
     let(:control) { create! }
 
-    before { control }
-
     it "is set on create" do
       expect(control.path).to eq("a#{account.id}.")
     end
@@ -250,41 +263,42 @@ describe Lti::ContextControl do
     context "with nested contexts" do
       let(:account) { nil }
       let(:course) { course_model(account: account2) }
-      let(:account2) { account_model(parent_account:) }
-      let(:parent_account) { account_model }
+      let(:account2) { account_model(parent_account: root_account) }
 
       it "includes course and all accounts in chain" do
-        expect(control.path).to eq("a#{parent_account.id}.a#{account2.id}.c#{course.id}.")
-        expect(control.path).to eq(path_for(parent_account, account2, course))
+        expect(control.path).to eq("a#{root_account.id}.a#{account2.id}.c#{course.id}.")
+        expect(control.path).to eq(path_for(root_account, account2, course))
       end
     end
 
     context "when account hierarchy changes" do
-      let(:account) { account_model(parent_account:) }
-      let(:parent_account) { account_model }
-      let(:new_parent_account) { account_model }
+      let(:control) { create!(account: subaccount) }
+      let(:subaccount) { account_model(parent_account: account) }
+      let(:new_sub_account) { account_model(parent_account: account) }
+
+      before { control }
 
       it "updates the path" do
-        account.update!(parent_account: new_parent_account)
-        expect(control.reload.path).to eq(path_for(new_parent_account, account))
+        subaccount.update!(parent_account: new_sub_account)
+        expect(control.reload.path).to eq(path_for(account, new_sub_account, subaccount))
       end
 
       context "with sibling accounts" do
-        let(:sibling_account) { account_model(parent_account:) }
+        let(:sibling_account) { account_model(parent_account: account) }
 
         it "does not change sibling control path" do
           sibling_control = create!(account: sibling_account)
 
           expect do
-            account.update!(parent_account: new_parent_account)
+            subaccount.update!(parent_account: new_sub_account)
           end.not_to change { sibling_control.reload.path }
         end
       end
 
       context "when new parent account is at higher level" do
+        let(:control) { create!(account:) }
         let(:account) { account_model(parent_account:) }
         let(:parent_account) { account_model(parent_account: root_account) }
-        let(:root_account) { account_model }
 
         it "updates the path" do
           account.update!(parent_account: root_account)
@@ -293,9 +307,9 @@ describe Lti::ContextControl do
       end
 
       context "when new parent account is at lower level" do
+        let(:control) { create!(account:) }
         let(:account) { account_model(parent_account: root_account) }
         let(:parent_account) { account_model(parent_account: root_account) }
-        let(:root_account) { account_model }
 
         it "updates the path" do
           account.update!(parent_account:)
@@ -307,12 +321,12 @@ describe Lti::ContextControl do
     context "when course gets re-parented" do
       let(:account) { nil }
       let(:course) { course_model(account: parent_account) }
-      let(:parent_account) { account_model }
-      let(:new_parent_account) { account_model }
+      let(:parent_account) { account_model(parent_account: root_account) }
+      let(:new_parent_account) { account_model(parent_account: root_account) }
 
       it "updates the path" do
         course.update!(account: new_parent_account)
-        expect(control.reload.path).to eq(path_for(new_parent_account, course))
+        expect(control.reload.path).to eq(path_for(root_account, new_parent_account, course))
       end
 
       context "with sibling course" do
@@ -331,7 +345,6 @@ describe Lti::ContextControl do
         let(:account) { nil }
         let(:course) { course_model(account: parent_account) }
         let(:parent_account) { account_model(parent_account: root_account) }
-        let(:root_account) { account_model }
 
         it "updates the path" do
           course.update!(account: root_account)
@@ -343,7 +356,6 @@ describe Lti::ContextControl do
         let(:account) { nil }
         let(:course) { course_model(account: root_account) }
         let(:parent_account) { account_model(parent_account: root_account) }
-        let(:root_account) { account_model }
 
         it "updates the path" do
           course.update!(account: parent_account)
@@ -367,19 +379,11 @@ describe Lti::ContextControl do
   end
 
   describe ".deployment_ids_for_context" do
-    let_once(:dev_key) { create_dev_key_with_registration(root_account) }
-    let_once(:registration) { dev_key.lti_registration }
-    let_once(:tool) { registration.new_external_tool(root_account) }
-    let_once(:root_account) { account_model }
-    # This must always exist! TODO: when Paul's commit is merged, we can remove this,
-    # as CETs will always create a control set to available wherever they're installed at.
-    let_once(:root_control) { tool.context_controls.first }
+    let(:tool) { deployment }
+    let(:root_control) { tool.context_controls.first }
+    let(:delete_controls) { false }
 
-    def create_dev_key_with_registration(account)
-      lti_developer_key_model(account:).tap do |k|
-        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
-      end
-    end
+    before { tool }
 
     it "finds the deployment in the account" do
       expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to eq([tool.id])
@@ -453,12 +457,10 @@ describe Lti::ContextControl do
       end
 
       context "with multiple registrations across account hierarchy" do
-        let_once(:dev_key1) { create_dev_key_with_registration(root_account) }
-        let_once(:dev_key2) { create_dev_key_with_registration(root_account) }
-        let_once(:registration1) { dev_key1.lti_registration }
-        let_once(:registration2) { dev_key2.lti_registration }
-        let_once(:tool1) { registration1.new_external_tool(root_account) }
-        let_once(:tool2) { registration2.new_external_tool(root_account) }
+        let_once(:registration1) { lti_registration_with_tool(account: root_account) }
+        let_once(:registration2) { lti_registration_with_tool(account: root_account) }
+        let_once(:tool1) { registration1.deployments.first }
+        let_once(:tool2) { registration2.deployments.first }
 
         context "when registrations have different availability at different levels" do
           before(:once) do
@@ -555,36 +557,38 @@ describe Lti::ContextControl do
     end
 
     context "with multiple deployments associated with the same registration" do
-      let_once(:other_tool) { registration.new_external_tool(root_account) }
+      let(:subaccount) { account_model(parent_account: root_account) }
+      let(:other_tool) { registration.new_external_tool(subaccount) }
+
+      before { other_tool }
 
       it "returns both tools' ids" do
-        expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to match_array([tool.id, other_tool.id])
+        expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to match_array([tool.id, other_tool.id])
       end
 
       context "one tool is marked as unavailable" do
-        before(:once) do
+        before do
           root_control.update!(available: false)
         end
 
         it "only returns the other tool's id" do
-          expect(Lti::ContextControl.deployment_ids_for_context(root_account)).to eql([other_tool.id])
+          expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to eql([other_tool.id])
         end
       end
     end
   end
 
   describe ".nearest_control_for_registration" do
-    let_once(:root_account) { account_model }
-    let_once(:subaccount) { root_account.sub_accounts.create! }
-    let_once(:course) { course_model(account: subaccount) }
-    let_once(:tool) { registration.new_external_tool(root_account) }
-    let_once(:developer_key) do
-      lti_developer_key_model(account: root_account).tap do |k|
-        lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
-      end
+    let(:subaccount) { root_account.sub_accounts.create! }
+    let(:course) { course_model(account: subaccount) }
+    let(:root_account_control) { tool.context_controls.first }
+    let(:tool) { deployment }
+    let(:delete_controls) { false }
+
+    before do
+      course
+      tool
     end
-    let_once(:registration) { developer_key.lti_registration }
-    let_once(:root_account_control) { tool.context_controls.first }
 
     # Simple tests with control in specified context
     context "with direct context" do
@@ -617,7 +621,7 @@ describe Lti::ContextControl do
     end
 
     context "and the context's control is deleted" do
-      it "ignores the deleted control in a course and finds the subaccount control" do
+      it "ignores the deleted control in a course and finds the root account control" do
         tool.context_controls.create!(
           course:,
           available: false,
@@ -655,7 +659,7 @@ describe Lti::ContextControl do
       end
 
       context "with subaccount control" do
-        let_once(:subaccount_control) do
+        let(:subaccount_control) do
           Lti::ContextControl.create!(
             account: subaccount,
             available: true,

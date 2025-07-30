@@ -1198,7 +1198,8 @@ describe CoursesController, type: :request do
               "public_description" => "Nature is lethal but it doesn't hold a candle to man.",
               "course_format" => "online",
               "time_zone" => "America/Juneau",
-              "license" => "cc_by_sa"
+              "license" => "cc_by_sa",
+              "template" => false
             }
           }
           course_response = post_params["course"].merge({
@@ -1282,7 +1283,8 @@ describe CoursesController, type: :request do
               "sis_import_id" => nil,
               "public_description" => "Nature is lethal but it doesn't hold a candle to man.",
               "time_zone" => "America/Chicago",
-              "license" => "cc_by_sa"
+              "license" => "cc_by_sa",
+              "template" => false
             }
           }
           course_response = post_params["course"].merge({
@@ -1471,7 +1473,6 @@ describe CoursesController, type: :request do
           )
           template.assignments.create!(title: "my assignment")
 
-          @account.root_account.enable_feature!(:course_templates)
           @account.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @account.update!(course_template: template)
 
@@ -1822,8 +1823,6 @@ describe CoursesController, type: :request do
         end
 
         context "with course templates" do
-          before { @course.root_account.enable_feature!(:course_templates) }
-
           it "allows setting a template" do
             # can't do it if anyone is enrolled
             @course.enrollments.each(&:destroy)
@@ -4073,13 +4072,13 @@ describe CoursesController, type: :request do
           expect(json.first).to have_key "custom_links"
         end
 
-        context "analytics 2" do
+        context "admin analytics" do
           before :once do
-            @tool = analytics_2_tool_factory
-            Account.default.enable_feature!(:analytics_2)
+            @tool = admin_analytics_tool_factory
+            @course1.enable_feature!(:analytics_2)
           end
 
-          it "puts analytics 2 in custom links if installed" do
+          it "puts admin analytics in custom links if installed" do
             json = api_call_as_user(@ta,
                                     :get,
                                     "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
@@ -4090,26 +4089,13 @@ describe CoursesController, type: :request do
                                       include: %w[custom_links] })
             student1_json = json.find { |u| u["id"] == @student1.id }
             expect(student1_json["custom_links"]).to include({
-                                                               "text" => "Analytics 2",
+                                                               "text" => "Admin Analytics",
                                                                "url" => "http://www.example.com/courses/#{@course1.id}/external_tools/#{@tool.id}?launch_type=student_context_card&student_id=#{@student1.id}",
                                                                "icon_class" => "icon-analytics",
-                                                               "tool_id" => ContextExternalTool::ANALYTICS_2
+                                                               "tool_id" => ContextExternalTool::ADMIN_ANALYTICS
                                                              })
             ta_json = json.find { |u| u["id"] == @ta.id }
-            expect(ta_json["custom_links"].pluck("tool_id")).not_to include ContextExternalTool::ANALYTICS_2
-          end
-
-          it "respects tool permissions" do
-            json = api_call_as_user(@student1,
-                                    :get,
-                                    "/api/v1/courses/#{@course1.id}/users.json?include[]=custom_links",
-                                    { controller: "courses",
-                                      action: "users",
-                                      course_id: @course1.id.to_s,
-                                      format: "json",
-                                      include: %w[custom_links] })
-            student2_json = json.find { |u| u["id"] == @student2.id }
-            expect(student2_json["custom_links"].pluck("tool_id")).not_to include ContextExternalTool::ANALYTICS_2
+            expect(ta_json["custom_links"].pluck("tool_id")).not_to include ContextExternalTool::ADMIN_ANALYTICS
           end
         end
       end
@@ -4252,7 +4238,8 @@ describe CoursesController, type: :request do
                              "friendly_name" => nil,
                              "uuid" => @course1.uuid,
                              "blueprint" => false,
-                             "license" => nil
+                             "license" => nil,
+                             "template" => false
                            })
       end
 
@@ -4357,8 +4344,7 @@ describe CoursesController, type: :request do
         expect(json["tabs"].pluck("id")).to match_array(expected_tabs)
       end
 
-      it "includes template when feature enabled" do
-        @course1.root_account.enable_feature!(:course_templates)
+      it "includes template" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course1.id}.json",
                         { controller: "courses", action: "show", id: @course1.to_param, format: "json" })

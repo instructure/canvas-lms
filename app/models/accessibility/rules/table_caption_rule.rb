@@ -24,10 +24,15 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
 
       def self.test(elem)
-        return true if elem.tag_name.downcase != "table"
+        return nil if elem.tag_name.downcase != "table"
 
         caption = elem.query_selector("caption")
-        !!caption && caption.text_content.gsub(/\s/, "") != ""
+
+        I18n.t("Table caption should be present.") if !caption || caption.text_content.gsub(/\s/, "") == ""
+      end
+
+      def self.display_name
+        I18n.t("Missing table caption")
       end
 
       def self.message
@@ -36,10 +41,6 @@ module Accessibility
 
       def self.why
         I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
-      end
-
-      def self.link_text
-        I18n.t("Learn more about using captions with tables")
       end
 
       def self.prepend(parent, child)
@@ -52,14 +53,21 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::TextInputField.new(
-          label: "Change table caption",
-          value: ""
+          label: I18n.t("Table caption"),
+          undo_text: I18n.t("Caption added"),
+          value: "",
+          action: I18n.t("Add caption")
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
+        raise StandardError, "Caption cannot be empty." if value.blank?
+
         caption = elem.at_css("caption")
-        unless caption
+        if caption
+          return nil if (caption.content = value)
+
+        else
           caption = elem.document.create_element("caption")
           prepend(elem, caption)
         end

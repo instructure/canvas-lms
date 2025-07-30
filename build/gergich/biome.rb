@@ -59,7 +59,7 @@ class Gergich::Biome
 
       {
         path: file,
-        message: "[biome] #{title ? "#{title}: " : ""}#{message}",
+        message: "[biome] #{"#{title}: " if title}#{message}",
         position: if missing_info
                     start_line || 1
                   else

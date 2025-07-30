@@ -1493,6 +1493,7 @@ class Submission < ActiveRecord::Base
     return if @assignment_changed_not_sub
 
     if submission_type == "online_text_entry"
+      self.saving_user = user
       super
     else
       association_ids = attachment_associations.pluck(:attachment_id)
@@ -2231,9 +2232,18 @@ class Submission < ActiveRecord::Base
     strand = "conditional_release_grade_change:#{global_assignment_id}"
 
     progress = Progress.create!(context: self, tag: "conditional_release_handler")
+    priority = case Canvas::Plugin.find("conditional_release_tuning").settings[:priority]
+               when "high"
+                 Delayed::HIGH_PRIORITY
+               when "normal"
+                 Delayed::NORMAL_PRIORITY
+               else
+                 Delayed::LOW_PRIORITY
+               end
+
     progress.process_job(ConditionalRelease::OverrideHandler,
                          :handle_grade_change,
-                         { priority: Delayed::LOW_PRIORITY, strand: },
+                         { priority:, strand: },
                          self)
 
     assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)

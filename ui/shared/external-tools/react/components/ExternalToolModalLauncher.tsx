@@ -83,8 +83,7 @@ export default class ExternalToolModalLauncher extends React.Component<
         'onDeepLinkingResponse' in this.props ? this.props.onDeepLinkingResponse : undefined,
     })
 
-    const placement = 'tool' in this.props ? this.props.launchType : 'modal'
-    this.removeCloseListener = onLtiClosePostMessage(placement, this.props.onRequestClose)
+    this.removeCloseListener = onLtiClosePostMessage(() => this.iframe, this.props.onRequestClose)
   }
 
   componentWillUnmount() {

@@ -40,6 +40,8 @@ class Lti::ContextControl < ActiveRecord::Base
   validates :course_id, on: :update, if: -> { course_id.present? }, comparison: { equal_to: :course_id_was, message: t("cannot be changed") }
   validates :account_id, on: :update, if: -> { account_id.present? }, comparison: { equal_to: :account_id_was, message: t("cannot be changed") }
 
+  validate :context_belongs_to_deployment
+
   before_create :set_path
   before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
@@ -245,9 +247,29 @@ class Lti::ContextControl < ActiveRecord::Base
 
   def only_one_context?
     if account.present? && course.present?
-      errors.add(:context,  I18n.t("must have either an account or a course, not both"))
+      errors.add(:context, I18n.t("must have either an account or a course, not both"))
     elsif account.blank? && course.blank?
-      errors.add(:context,  I18n.t("must have either an account or a course"))
+      errors.add(:context, I18n.t("must have either an account or a course"))
+    end
+  end
+
+  def context_belongs_to_deployment
+    return unless (account_id || course_id) && deployment
+
+    if deployment.context_type == "Course"
+      # context can only be the course itself
+      unless course_id == deployment.context_id
+        errors.add(:context, I18n.t("must be the deployment's context"))
+      end
+    else
+      # context must be a child of the account at any level, or the account itself
+      valid_account_ids = Account.sub_account_ids_recursive(deployment.context_id)
+      valid_account_ids << deployment.context_id
+
+      context_id = account_id || course&.account_id
+      unless valid_account_ids.include?(context_id)
+        errors.add(:context, I18n.t("must belong to the deployment's context"))
+      end
     end
   end
 end

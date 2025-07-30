@@ -25,6 +25,7 @@ import difference from 'lodash/difference'
 import filter from 'lodash/filter'
 
 import Placement from './Placement'
+import {LtiPlacements} from '../../model/LtiPlacements'
 
 const I18n = createI18nScope('react_developer_keys')
 
@@ -48,6 +49,9 @@ export default class Placements extends React.Component {
   }
 
   placementDisplayName(p) {
+    if (p === LtiPlacements.ActivityAssetProcessor) {
+      return 'Assignment Document Processor'
+    }
     return p
       .split('_')
       .map(n => capitalizeFirstLetter(n))

@@ -185,6 +185,12 @@ export default class WikiPageEditView extends ValidatedFormView {
       json.edit_with_block_editor = true
     }
 
+    if (this.model.get('editor') === 'canvas_content_builder') {
+      // used by ui/shared/wiki/jst/WikiPageEdit.handlebars to render block_editor div
+      // that will be used as a mount point for the PageContentBlockBuilderEditor
+      json.edit_with_block_editor = true
+    }
+
     return json
   }
 
@@ -320,6 +326,10 @@ export default class WikiPageEditView extends ValidatedFormView {
           />
         </Suspense>,
       )
+    } else if (this.model.get('editor') === 'canvas_content_builder') {
+      const PageContentBlockBuilderEditor = lazy(() => import('@canvas/page-editor'))
+      const root = createRoot(document.getElementById('block_editor'))
+      root.render(<PageContentBlockBuilderEditor data={null} />)
     } else {
       RichContentEditor.loadNewEditor(
         this.$wikiPageBody,

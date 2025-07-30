@@ -42,6 +42,7 @@ class Lti::IMS::Registration < ApplicationRecord
   LAUNCH_HEIGHT_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/launch_height".freeze
   TOOL_ID_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/tool_id".freeze
   VENDOR_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/vendor".freeze
+  CONTENT_MIGRATION_EXTENSION = "#{CANVAS_EXTENSION_PREFIX}/content_migration".freeze
 
   validates :redirect_uris,
             :initiate_login_uri,
@@ -121,6 +122,7 @@ class Lti::IMS::Registration < ApplicationRecord
       launch_settings: {
         icon_url: registration.logo_uri,
         text: registration.client_name,
+        content_migration: config[CONTENT_MIGRATION_EXTENSION],
       }.compact
     }.compact.with_indifferent_access
   end
@@ -253,7 +255,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def scopes_are_valid
-    invalid_scopes = scopes - TokenScopes::LTI_SCOPES.keys
+    invalid_scopes = scopes - (TokenScopes::LTI_SCOPES.keys + TokenScopes::LTI_HIDDEN_SCOPES.keys)
     return if invalid_scopes.empty?
 
     errors.add(:scopes, "Invalid scopes: #{invalid_scopes.join(", ")}")

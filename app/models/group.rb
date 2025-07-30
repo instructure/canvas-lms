@@ -415,6 +415,8 @@ class Group < ActiveRecord::Base
   end
 
   def bulk_add_users_to_differentiation_tag(user_ids, options = {})
+    # filter out duplicate user_ids, a user can only be in a differentiation tag once
+    user_ids = user_ids.uniq
     return [] if user_ids.empty?
 
     old_group_memberships = group_memberships.where(user_id: user_ids).to_a
@@ -1024,12 +1026,13 @@ class Group < ActiveRecord::Base
       errors.add(:base, "Non-collaborative groups must belong to a course") unless context_type == "Course"
       errors.add(:base, "Non-collaborative groups cannot have a leader") if leader_id.present?
       errors.add(:base, "Non-collaborative groups must be private") if is_public
-      errors.add(:base, "Variant limit reached for tag") if new_record? && Group.active.where(group_category_id:).count >= 10
+      errors.add(:base, "Variant limit reached for tag") if new_record? && Group.active.non_collaborative.where(group_category_id:).count >= 10
       errors.add(:base, "You have reached the tag limit for this course") if new_record? && self.group_category.max_diff_tag_validation_count >= GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
     end
 
     if group_category && non_collaborative != group_category.non_collaborative
       errors.add(:base, "Group non_collaborative status must match its category")
+
     end
   end
 end

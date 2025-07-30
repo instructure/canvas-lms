@@ -19,6 +19,7 @@
 import {useState} from 'react'
 import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission} from './useInlineSubmission'
+import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 
 interface UseAddItemInlineProps {
   moduleId: string
@@ -27,8 +28,8 @@ interface UseAddItemInlineProps {
 
 export const useAddItemInline = ({moduleId, itemCount}: UseAddItemInlineProps) => {
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedFolder, setSelectedFolder] = useState('')
   const submitInlineItem = useInlineSubmission()
+  const {defaultFolder} = useDefaultCourseFolder()
 
   const handleSubmit = async (selectedFile?: File) => {
     setIsLoading(true)
@@ -49,13 +50,12 @@ export const useAddItemInline = ({moduleId, itemCount}: UseAddItemInlineProps) =
       itemType: 'file',
       newItemName: selectedFile.name,
       selectedFile,
-      selectedFolder,
+      selectedFolder: defaultFolder,
       itemData,
     })
   }
 
   return {
-    setSelectedFolder,
     handleSubmit,
     isLoading,
   }

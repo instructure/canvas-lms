@@ -9941,6 +9941,7 @@ el:
         subject: "<mrk mid=\"3635\" mtype=\"seg\">Ηχογράφηση Συνεδρίας μέσω Διαδικτύου Έτοιμη:</mrk> <mrk mid=\"3636\" mtype=\"seg\">%{name}</mrk>"
       twitter: 
         tweet: "<mrk mid=\"3637\" mtype=\"seg\">Ειδοποίηση Canvas - Η ηχογράφηση είναι έτοιμη:</mrk> <mrk mid=\"3638\" mtype=\"seg\">%{title}, %{name}</mrk>"
+  messages_64e7435f: Μηνύματα
   migrate_67c9f753: Μεταφορά
   migration: 
     announcement_type: Ανακοίνωση
@@ -10231,20 +10232,28 @@ el:
   notification: 
     account_notification_display: "Καθολικές Ανακοινώσεις"
     added_to_conversation_description: "Έχετε προστεθεί σε μια συνομιλία"
+    added_to_conversation_description_legend: "Έχετε προστεθεί σε μια συνομιλία"
     added_to_conversation_display: "Προστέθηκε στην Συνομιλία"
     all_submissions_display: "Όλες οι Υποβολές"
     announcement_created_by_you_description: |-
         * Ανακοινώσεις που δημιουργήθηκαν από εσάς
         * Απαντήσεις στις ανακοινώσεις που δημιουργήθηκαν από εσάς
+    announcement_created_by_you_description_legend: |-
+        * Ανακοινώσεις που δημιουργήθηκαν από εσάς
+        * Απαντήσεις στις ανακοινώσεις που δημιουργήθηκαν από εσάς
     announcement_created_by_you_display: "Ανακοίνωση που δημιουργήθηκε απο εσάς"
     announcement_description: "Νέα Ανακοίνωση στο μάθημά σας"
+    announcement_description_legend: "Νέα Ανακοίνωση στο μάθημά σας"
     announcement_display: Ανακοίνωση
     appointment_availability_display: "Διαθεσιμότητα Ραντεβού"
     appointment_cancelations_description: "Ακύρωση ραντεβού"
+    appointment_cancelations_description_legend: "Ακύρωση ραντεβού"
     appointment_cancelations_display: "Ακυρώσεις Ραντεβού"
     appointment_signups_description: "Νέο ραντεβού στο ημερολόγιό σας"
+    appointment_signups_description_legend: "Νέο ραντεβού στο ημερολόγιό σας"
     appointment_signups_display: "Εγγραφές σε Ραντεβού"
     calendar_description: "Νέα στοιχεία και στοιχεία που έχουν αλλάξει στο ημερολόγιο του μαθήματός σας"
+    calendar_description_legend: "Νέα στοιχεία και στοιχεία που έχουν αλλάξει στο ημερολόγιο του μαθήματός σας"
     calendar_display: Ημερολόγιο
     categories: 
       all_submissions: "Όλες οι Υποβολές"
@@ -10272,8 +10281,10 @@ el:
       student_appointment_signups: "Εγγραφές Σπουδαστή σε Ραντεβού"
       submission_comment: "Σχόλιο Υποβολής"
     conversation_created_description: "Δημιουργήσατε μια συνομιλία"
+    conversation_created_description_legend: "Δημιουργήσατε μια συνομιλία"
     conversation_created_display: "Συνομιλίες που Δημιουργήθηκαν Από Εμένα"
     conversation_message_description: "Νέα Εισερχόμενα Μηνύματα"
+    conversation_message_description_legend: "Νέα Εισερχόμενα Μηνύματα"
     conversation_message_display: "Μήνυμα Συνομιλίας"
     course_content_description: |-
         <mrk mid="2234" mtype="seg">Αλλαγή στο περιεχόμενο του μαθήματος:</mrk>
@@ -10287,11 +10298,14 @@ el:
     discussion_post_description: "Νέα δημοσίευση σε θέμα συζήτησης στο οποίο έχετε εγγραφεί"
     discussion_post_display: "Δημοσίευση σε Συζήτηση"
     due_date_description: "Αλλαγή της καταληκτικής ημερομηνίας της εργασίας"
+    due_date_description_legend: "Αλλαγή της καταληκτικής ημερομηνίας της εργασίας"
     due_date_display: "Καταληκτική Ημερομηνία"
     files_description: "Ένα νέο αρχείο προστέθηκε στο μάθημά σας"
+    files_description_legend: "Ένα νέο αρχείο προστέθηκε στο μάθημά σας"
     files_display: Αρχεία
     grading_display: Βαθμολογία
     grading_policies_description: "Αλλαγή της πολιτικής βαθμολόγησης του μαθήματος"
+    grading_policies_description_legend: "Αλλαγή της πολιτικής βαθμολόγησης του μαθήματος"
     grading_policies_display: "Πολιτικές Βαθμολόγησης"
     invitation_display: Πρόσκληση
     late_grading_description: |-
@@ -10306,6 +10320,7 @@ el:
         * έγινε δεκτή/απορρίφθηκε
     membership_update_display: "Ενημέρωση Συνδρομής"
     missing_description_description: "For %{category} ειδοποιήσεις"
+    missing_description_description_legend: "For %{category} ειδοποιήσεις"
     missing_display_display: "For %{category} ειδοποιήσεις"
     names: 
       account_user_notification: "Ειδοποίηση του Χρήστη του Λογαριασμού"
@@ -10397,8 +10412,10 @@ el:
         <mrk mid="2300" mtype="seg">Εγγραφή σπουδαστή στη συνάντηση</mrk>
     student_appointment_display: "Εγγραφές Σπουδαστή σε Ραντεβού"
     submission_comment_description: "Σχόλιο υποβολής εργασίας"
+    submission_comment_description_legend: "Σχόλιο υποβολής εργασίας"
     submission_comment_display: "Σχόλιο Υποβολής"
     web_conference_recording_ready: "Μια ηχογράφηση συνεδρίας είναι έτοιμη"
+    web_conference_recording_ready_legend: "Μια ηχογράφηση συνεδρίας είναι έτοιμη"
   notification_preferences: 
     communication: 
       email: 
@@ -10901,6 +10918,7 @@ el:
   pink_68ad45cb: Ροζ
   pinned_discussions_a55c0cea: "Καρφιτσωμένες Συζητήσεις"
   placements_5b5e056b: Τοποθετήσεις
+  plain_text_43999c94: "Απλό Κείμενο"
   plain_text_e3ab33aa: "Απλό κείμενο"
   play_media_comment_8614d30f: "Αναπαραγωγή Πολυμεσικού Σχολίου"
   playback: 
@@ -13708,6 +13726,7 @@ el:
       not_available_yet: "Θα λάβετε σύντομα ένα email πριν ξεκινήσει το μάθημα."
   self_registration_156392d6: Αυτο-εγγραφή
   self_sign_up_c8d23585: Αυτο-εγγραφή
+  send_a_reply_message_81d0600e: "Αποστολή απαντητικού μηνύματος"
   send_e3bd0ed0: Αποστολή
   sent_at_23cccc07: "Στάλθηκε στις"
   sent_f4ee89ec: Εστάλη!
@@ -15015,6 +15034,7 @@ el:
   there_was_a_problem_saving_the_grading_period_243bed6c: "Υπήρξε ένα πρόβλημα με την αποθήκευση της περιόδου βαθμολόγησης"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Υπήρξε ένα πρόβλημα με την αποθήκευση του κανονισμού βαθμολόγησης"
   there_was_an_error_in_processing_your_request_6513a49a: "Παρουσιάστηκε σφάλμα κατά την επεξεργασία του αιτήματός σας"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "<mrk mid=\"4790\" mtype=\"seg\">Παρουσιάστηκε σφάλμα κατά την αποστολή του email σας.</mrk> <mrk mid=\"4791\" mtype=\"seg\">Παρακαλώ επαναφορτώστε τη σελίδα και δοκιμάστε ξανά.</mrk>"
   there_was_an_error_setting_usage_rights_53739e1d: "Παρουσιάστηκε σφάλμα κατά τη ρύθμιση των δικαιωμάτων χρήσης."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Υπήρξε σφάλμα κατά την αναζήτησή σας, παρακαλώ δοκιμάστε ξανά με νέα αναζήτηση"
   there_were_errors_with_the_form_errors_ab5b559a: "<mrk mid=\"1165\" mtype=\"seg\">Παρουσιάστηκαν σφάλματα όπως φαίνεται παρακάτω:</mrk> <mrk mid=\"1166\" mtype=\"seg\">%{errors}</mrk>"
@@ -16211,6 +16231,7 @@ el:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "To προσαρμοσμένο θέμα σας έχει εφαρμοστεί επιτυχώς."
   your_email_address_f881e583: "Η ηλεκτρονική σας διεύθυνση"
   your_email_b5364bee: "Η ηλεκτρονική σας διεύθυνση"
+  your_email_is_being_delivered_8a1d77b8: "Το μήνυμά σας παραδίδεται."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       <mrk mid="5566" mtype="seg">Ο εκπαιδευτής κοινοποίησε αλλαγές στη βαθμολογία και σχόλια για το %{title}.</mrk> <mrk mid="5567" mtype="seg">Οι αλλαγές αυτές είναι τώρα ορατές.</mrk>
       

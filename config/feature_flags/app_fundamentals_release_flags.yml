@@ -5,11 +5,6 @@ default_recaptcha_registration_enable:
   display_name: Enable Recaptcha by default for self-registration
   description: Requires Recaptcha for self-registration by default
   applies_to: SiteAdmin
-course_templates:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Course Templates
-  description: Enables the Course Templates feature globally
 persist_inferred_authentication_providers:
   state: hidden
   applies_to: RootAccount

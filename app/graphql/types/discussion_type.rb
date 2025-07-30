@@ -361,7 +361,8 @@ module Types
 
     field :can_unpublish, Boolean, null: false
     def can_unpublish
-      object.can_unpublish?
+      # Use batch loader to avoid N+1 queries when checking multiple topics
+      Loaders::DiscussionTopicLoaders::CanUnpublishLoader.for(object.context).load(object.id)
     end
 
     field :can_reply_anonymously, Boolean, null: false
@@ -454,7 +455,7 @@ module Types
     end
 
     def sort_order
-      object.sanitized_sort_order.to_sym || DiscussionTopic::SortOrder::DEFAULT.to_sym
+      object.sanitized_sort_order.to_sym
     end
 
     field :participant, Types::DiscussionParticipantType, null: true

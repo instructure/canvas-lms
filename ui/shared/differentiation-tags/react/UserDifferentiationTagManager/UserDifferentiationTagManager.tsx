@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useRef, useEffect, useContext} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import {useDifferentiationTagCategoriesIndex} from '../hooks/useDifferentiationT
 import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/DifferentiationTagModalForm/DifferentiationTagModalManager'
 import {useAddTagMembership} from '../hooks/useAddTagMembership'
 import MessageBus from '@canvas/util/MessageBus'
-import $ from 'jquery'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -139,10 +139,11 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
   const selectedCount = allInCourse
     ? courseStudentCount - (userExceptions ? userExceptions.length : 0)
     : users.length
+  const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
 
-  const handleMenuSelection: HandleMenuSelection = (e, selected) => {
+  const handleMenuSelection: HandleMenuSelection = (_e, selected) => {
     if (!allInCourse && users.length === 0 && selected !== -1) {
-      $.flashError(I18n.t('Select one or more users first'))
+      setOnFailure(I18n.t('Select one or more users first'))
       return
     }
 
@@ -176,12 +177,15 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
   useEffect(() => {
     if (isSuccess) {
       MessageBus.trigger('reloadUsersTable', {})
-      $.flashMessage(I18n.t('Tag added successfully'))
+      // need to delay a little bit so that screenreaders can read the success message
+      setTimeout(() => {
+        setOnSuccess(I18n.t('Tag added successfully'), false)
+      }, 0)
     }
     if (isError) {
-      $.flashError(I18n.t('Error: %{error}', {error: errorAdd.message}))
+      setOnFailure(I18n.t('Error: %{error}', {error: errorAdd.message}))
     }
-  }, [isSuccess, isError])
+  }, [isSuccess, isError, setOnFailure, setOnSuccess, errorAdd])
 
   return (
     <>

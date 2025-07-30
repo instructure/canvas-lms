@@ -19,11 +19,18 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import StaffInfo from '../StaffInfo'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const CONVERSATIONS_URL = '/api/v1/conversations'
 
+const server = setupServer()
+
 describe('StaffInfo', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   const getProps = (overrides = {}) => ({
     id: '1',
     name: 'Mrs. Thompson',
@@ -112,14 +119,11 @@ describe('StaffInfo', () => {
     })
 
     describe('sending', () => {
-      afterEach(() => {
-        fetchMock.restore()
-      })
-
       it('shows spinner and disables buttons while sending', async () => {
-        fetchMock.post(
-          CONVERSATIONS_URL,
-          () => new Promise(resolve => setTimeout(() => resolve(200), 1000)),
+        server.use(
+          http.post(CONVERSATIONS_URL, () => {
+            return new Promise(resolve => setTimeout(() => resolve(HttpResponse.json({})), 1000))
+          }),
         )
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
@@ -132,7 +136,7 @@ describe('StaffInfo', () => {
       })
 
       it('shows success message if successful', async () => {
-        fetchMock.post(CONVERSATIONS_URL, 200)
+        server.use(http.post(CONVERSATIONS_URL, () => HttpResponse.json({})))
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
@@ -142,7 +146,7 @@ describe('StaffInfo', () => {
       })
 
       it('shows failure message if failed', async () => {
-        fetchMock.post(CONVERSATIONS_URL, 400)
+        server.use(http.post(CONVERSATIONS_URL, () => new HttpResponse(null, {status: 400})))
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
@@ -152,7 +156,7 @@ describe('StaffInfo', () => {
       })
 
       it('clears inputs after a successful send', async () => {
-        fetchMock.post(CONVERSATIONS_URL, 200)
+        server.use(http.post(CONVERSATIONS_URL, () => HttpResponse.json({})))
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
