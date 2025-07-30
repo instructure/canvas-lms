@@ -35,8 +35,12 @@ const I18n = createI18nScope('page_editor')
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlock title={I18n.t('Separator line')}>
+    <BaseBlock title={SeparatorLineBlock.craft.displayName}>
       <SeparatorLineBlockContent {...props} />
     </BaseBlock>
   )
+}
+
+SeparatorLineBlock.craft = {
+  displayName: I18n.t('Separator line') as string,
 }
