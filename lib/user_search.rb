@@ -19,6 +19,16 @@
 
 module UserSearch
   class << self
+    def validate_enrollment_types(enrollment_types)
+      enrollment_types.map do |e|
+        ce = e.camelize
+        ce += "Enrollment" unless ce.end_with?("Enrollment")
+        raise RequestError.new("Invalid enrollment type: #{e}", 400) unless Enrollment.readable_types.key?(ce)
+
+        ce
+      end
+    end
+
     def for_user_in_context(search_term, context, searcher, session = nil, options = {})
       search_term = search_term.to_s
       return User.none if search_term.strip.empty?
@@ -276,13 +286,7 @@ module UserSearch
             users_scope.where(enrollments: { role_id: role_ids }).distinct
           end
       elsif enrollment_types
-        enrollment_types = enrollment_types.map do |e|
-          ce = e.camelize
-          ce += "Enrollment" unless ce.end_with?("Enrollment")
-          raise RequestError.new("Invalid enrollment type: #{e}", 400) unless Enrollment.readable_types.key?(ce)
-
-          ce
-        end
+        enrollment_types = validate_enrollment_types(enrollment_types)
 
         if context.is_a?(Account)
           # for example, one user can have multiple teacher enrollments, but
