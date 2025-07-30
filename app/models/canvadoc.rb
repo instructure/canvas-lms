@@ -55,6 +55,7 @@ class Canvadoc < ActiveRecord::Base
 
   def submissions
     canvadocs_submissions
+      .where.associated(:submission)
       .preload(submission: :assignment)
       .map(&:submission)
   end
