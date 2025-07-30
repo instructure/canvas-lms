@@ -174,6 +174,14 @@ class OutcomeGroupsApiController < ApplicationController
     render json: groups.map { |group| outcome_group_json(group, @current_user, session) }
   end
 
+  def outcome_groups_tree
+    return unless can_read_outcomes
+
+    url = polymorphic_url [:api_v1, @context || :global, :outcome_groups]
+    groups = Api.paginate(context_outcome_groups, self, url)
+    render json: groups.map { |group| outcome_groups_tree_json(group, @current_user, session) }
+  end
+
   # @API Get all outcome links for context
   #
   # @argument outcome_style [Optional, String]

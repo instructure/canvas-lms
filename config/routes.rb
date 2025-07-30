@@ -2337,6 +2337,7 @@ CanvasRails::Application.routes.draw do
         prefix = ((context == "global") ? context : "#{context}s/:#{context}_id")
         unless context == "global"
           get "#{prefix}/outcome_groups", action: :index, as: "#{context}_outcome_groups"
+          get "#{prefix}/outcome_groups_tree", action: :outcome_groups_tree, as: "#{context}_outcome_groups_tree"
           get "#{prefix}/outcome_group_links", action: :link_index, as: "#{context}_outcome_group_links"
         end
         get "#{prefix}/root_outcome_group", action: :redirect, as: "#{context}_redirect"

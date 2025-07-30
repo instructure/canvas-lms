@@ -148,6 +148,70 @@ module Api::V1::Outcome
     outcome_links.map { |ol| outcome_link_json(ol, user, session, opts) }
   end
 
+  # Builds a hierarchical tree structure of outcome groups and their children
+  # (both subgroups and outcomes) starting from the given root outcome groups.
+  #
+  # root_outcome_groups - Array of LearningOutcomeGroup objects to build trees for
+  # user - Current user for permission checks
+  # session - Current session for permission checks
+  # opts - Options hash for customizing the output
+  #
+  # Returns an Array of hashes representing the hierarchical tree structure
+  def outcome_groups_tree_json(root_outcome_groups, user, session, opts = {})
+    Array(root_outcome_groups).map do |outcome_group|
+      outcome_group_tree_json(outcome_group, user, session, opts)
+    end
+  end
+
+  # Recursively builds a tree structure for a single outcome group and its children
+  def outcome_group_tree_json(outcome_group, user, session, opts = {})
+    # Start with the basic outcome group JSON
+    hash = outcome_group_json(outcome_group, user, session, :full)
+    hash["type"] = "group"
+    hash["children"] = []
+
+    # Get child outcome groups (subgroups) and recursively build their trees
+    child_groups = outcome_group.child_outcome_groups.active.order_by_title
+    child_groups.each do |child_group|
+      hash["children"] << outcome_group_tree_json(child_group, user, session, opts)
+    end
+
+    # Get child outcome links and convert them to outcome JSON
+    child_outcome_links = outcome_group.child_outcome_links.active.order_by_outcome_title
+                                       .preload(:learning_outcome_content)
+
+    # Prepare assessment data for outcomes
+    outcome_ids = child_outcome_links.map(&:content_id)
+    assessed_outcomes = if outcome_ids.present?
+                          LearningOutcomeResult.active.distinct
+                                               .where(learning_outcome_id: outcome_ids)
+                                               .pluck(:learning_outcome_id)
+                        else
+                          []
+                        end
+
+    child_outcome_links.each do |outcome_link|
+      outcome = outcome_link.learning_outcome_content
+      outcome_hash = outcome_json(outcome,
+                                  user,
+                                  session,
+                                  opts.merge(assessed_outcomes:,
+                                             context: outcome_group.context))
+
+      # Add can_unlink property for outcomes in the tree
+      can_manage = if outcome_link.context
+                     outcome_link.context.grants_right?(user, session, :manage_outcomes)
+                   else
+                     Account.site_admin.grants_right?(user, session, :manage_global_outcomes)
+                   end
+      outcome_hash["can_unlink"] = can_manage && outcome_link.can_destroy?
+
+      hash["children"] << outcome_hash
+    end
+
+    hash
+  end
+
   def outcome_link_json(outcome_link, user, session, opts = {})
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
