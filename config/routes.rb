@@ -1305,7 +1305,10 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/tokens/:id", action: :update
       delete "users/:user_id/tokens/:id", action: :destroy
     end
-    post "/auth/login", to: "token_generator#create_for_user"
+
+    scope(controller: :token_generator) do
+      post "/auth/login", action: :create_for_user, as: "create_for_user"
+    end
 
     scope(controller: :authentication_audit_api) do
       get "audit/authentication/logins/:login_id", action: :for_login, as: "audit_authentication_login"
