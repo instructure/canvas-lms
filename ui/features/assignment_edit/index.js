@@ -33,6 +33,7 @@ import '@canvas/grading-standards'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import renderEditAssignmentsApp from './react/index'
 import {renderEnhancedRubrics} from './react/AssignmentRubric'
+import {renderPeerReviewDetails} from './react/PeerReviewDetails'
 
 function loadBackboneComponents() {
   function maybeScrollToTarget() {
@@ -127,6 +128,7 @@ function loadBackboneComponents() {
       },
     })
     editHeaderView.render()
+    renderPeerReviewDetails(assignment)
     renderEnhancedRubrics()
   }
 }

@@ -916,7 +916,8 @@ class AssignmentsController < ApplicationController
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         ARCHIVED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:archived_grading_schemes),
         OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
-          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
+        PEER_REVIEW_ALLOCATION_AND_GRADING_ENABLED: @context.feature_enabled?(:peer_review_allocation_and_grading)
       }
 
       if @context.root_account.feature_enabled?(:instui_nav)
