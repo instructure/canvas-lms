@@ -4445,6 +4445,8 @@ describe CoursesController do
       auditor_rec = submission.auditor_grade_change_records.first
       expect(auditor_rec).to_not be_nil
       attachment = attachment_model
+      attachment.create_canvadoc
+      canvadocs_submission = attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id)
       OriginalityReport.create!(attachment:, originality_score: "1", submission: test_student.submissions.first)
       submission.canvadocs_annotation_contexts.create!(
         root_account: @course.root_account,
@@ -4454,6 +4456,7 @@ describe CoursesController do
       delete "reset_test_student", params: { course_id: @course.id }
       test_student.reload
       expect(test_student.submissions.size).to be_zero
+      expect { canvadocs_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Auditors::ActiveRecord::GradeChangeRecord.where(id: auditor_rec.id).count).to be_zero
     end
 
