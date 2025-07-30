@@ -21,11 +21,13 @@ import {SerializedNodes} from '@craftjs/core'
 import {AddBlockModal, useAddBlockModal} from './hooks/useAddBlockModal'
 import {InitialAddBlockHandler, useInitialAddBlockHandler} from './hooks/useInitialAddBlockHandler'
 import {SettingsTray, useSettingsTray} from './hooks/useSettingsTray'
+import {useEditorMode} from './hooks/useEditorMode'
 
 export type BlockContentEditorContextType = {
   addBlockModal: AddBlockModal
   initialAddBlockHandler: InitialAddBlockHandler
   settingsTray: SettingsTray
+  editor: ReturnType<typeof useEditorMode>
 }
 
 export type BlockContentEditorContextProps = {
@@ -42,6 +44,7 @@ export const BlockContentEditorContext = (
   const addBlockModal = useAddBlockModal()
   const settingsTray = useSettingsTray()
   const initialAddBlockHandler = useInitialAddBlockHandler(props.data?.['ROOT']?.nodes.length ?? 0)
+  const editor = useEditorMode()
 
   return (
     <Context.Provider
@@ -49,6 +52,7 @@ export const BlockContentEditorContext = (
         addBlockModal,
         initialAddBlockHandler,
         settingsTray,
+        editor,
       }}
     >
       {props.children}

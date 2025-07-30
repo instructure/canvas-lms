@@ -44,6 +44,10 @@ jest.mock('../../BlockContentEditorContext', () => ({
           shouldShow: true,
           setShouldShow: setShouldShowMock,
         },
+        editor: {
+          mode: 'default',
+          setMode: jest.fn(),
+        },
       }) as BlockContentEditorContextType,
   ),
 }))

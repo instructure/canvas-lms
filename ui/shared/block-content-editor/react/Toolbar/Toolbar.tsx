@@ -20,13 +20,36 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconEyeLine} from '@instructure/ui-icons'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
 const I18n = createI18nScope('page_editor')
 
+const PreviewButton = (props: {
+  active: boolean
+  onClick: () => void
+}) => {
+  return (
+    <IconButton
+      screenReaderLabel={I18n.t('preview')}
+      color={props.active ? 'primary' : 'secondary'}
+      renderIcon={<IconEyeLine />}
+      onClick={props.onClick}
+    />
+  )
+}
+
 export const Toolbar = () => {
+  const {
+    editor: {mode, setMode},
+  } = useBlockContentEditorContext()
+  const isPreviewMode = mode === 'preview'
+
   return (
     <Flex direction="row">
-      <IconButton screenReaderLabel={I18n.t('preview')} renderIcon={<IconEyeLine />} />
+      <PreviewButton
+        active={isPreviewMode}
+        onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
+      />
     </Flex>
   )
 }
