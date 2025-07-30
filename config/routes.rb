@@ -1310,6 +1310,11 @@ CanvasRails::Application.routes.draw do
       post "/auth/login", action: :create_for_user, as: "create_for_user"
     end
 
+    scope(controller: :question_banks) do
+      get "accounts/:account_id/question_banks", action: :index, as: "question_banks"
+      get "accounts/:account_id/question_banks/:question_bank_id", action: :questions, as: "question_banks_questions"
+    end
+
     scope(controller: :authentication_audit_api) do
       get "audit/authentication/logins/:login_id", action: :for_login, as: "audit_authentication_login"
       get "audit/authentication/accounts/:account_id", action: :for_account, as: "audit_authentication_account"
