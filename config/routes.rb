@@ -2718,6 +2718,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :gradebooks) do
       get "/courses/:course_id/gradebook/user_ids", action: "user_ids", as: "gradebook_user_ids"
+      get "/courses/:course_id/gradebook/grading_period_assignments", action: "grading_period_assignments", as: "grading_period_assignments"
       put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
       put "courses/:course_id/apply_score_to_ungraded_submissions", action: "apply_score_to_ungraded_submissions"
     end
