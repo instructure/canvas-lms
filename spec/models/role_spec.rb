@@ -342,4 +342,23 @@ describe Role do
       end
     end
   end
+
+  describe "enrollment_type_labels context passing" do
+    before :once do
+      account_model
+    end
+
+    it "passes the account as context to RoleOverride.enrollment_type_labels in .all_enrollment_roles_for_account" do
+      allow(RoleOverride).to receive(:enrollment_type_labels).and_call_original
+      Role.all_enrollment_roles_for_account(@account)
+      expect(RoleOverride).to have_received(:enrollment_type_labels).with(@account)
+    end
+
+    it "passes the account as context to RoleOverride.enrollment_type_labels in #label for course roles" do
+      allow(RoleOverride).to receive(:enrollment_type_labels).and_call_original
+      role = @account.roles.create!(name: "StudentEnrollment", base_role_type: "StudentEnrollment", workflow_state: "built_in", root_account_id: @account.resolved_root_account_id)
+      role.label
+      expect(RoleOverride).to have_received(:enrollment_type_labels).with(@account)
+    end
+  end
 end

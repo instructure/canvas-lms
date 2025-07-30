@@ -18,6 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../../lib/enrollment_types"
+require_relative "../services/canvas_career/label_overrides"
+
 class RoleOverride < ActiveRecord::Base
   extend RootAccountResolver
 
@@ -68,17 +71,11 @@ class RoleOverride < ActiveRecord::Base
     res
   end
 
-  ENROLLMENT_TYPE_LABELS =
-    [
-      # StudentViewEnrollment permissions will mirror StudentPermissions
-      { base_role_name: "StudentEnrollment", name: "StudentEnrollment", label: -> { t("roles.student", "Student") }, plural_label: -> { t("roles.students", "Students") } },
-      { base_role_name: "TeacherEnrollment", name: "TeacherEnrollment", label: -> { t("roles.teacher", "Teacher") }, plural_label: -> { t("roles.teachers", "Teachers") } },
-      { base_role_name: "TaEnrollment", name: "TaEnrollment", label: -> { t("roles.ta", "TA") }, plural_label: -> { t("roles.tas", "TAs") } },
-      { base_role_name: "DesignerEnrollment", name: "DesignerEnrollment", label: -> { t("roles.designer", "Designer") }, plural_label: -> { t("roles.designers", "Designers") } },
-      { base_role_name: "ObserverEnrollment", name: "ObserverEnrollment", label: -> { t("roles.observer", "Observer") }, plural_label: -> { t("roles.observers", "Observers") } }
-    ].freeze
-  def self.enrollment_type_labels
-    ENROLLMENT_TYPE_LABELS
+  ENROLLMENT_TYPE_DEFINITIONS = EnrollmentTypes::ENROLLMENT_TYPE_DEFINITIONS
+  ENROLLMENT_TYPES = EnrollmentTypes::ENROLLMENT_TYPES
+
+  def self.enrollment_type_labels(context = nil)
+    EnrollmentTypes.labels(context)
   end
 
   # Common set of granular permissions for checking rights against
@@ -131,7 +128,8 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.manageable_permissions(context, base_role_type = nil)
-    permissions = self.permissions.dup
+    permissions = Permissions.retrieve(context).dup
+
     permissions.reject! { |_k, p| p[:account_only] == :site_admin } unless context.site_admin?
     permissions.reject! { |_k, p| p[:account_only] == :root } unless context.root_account?
     permissions.reject! { |_k, p| p[:available_to].exclude?(base_role_type) } unless base_role_type.nil?
@@ -205,7 +203,7 @@ class RoleOverride < ActiveRecord::Base
                                             batch_object: account,
                                             batched_keys: [:account_chain, :role_overrides],
                                             skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides:)
+          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, false, preloaded_overrides:)
         end
       end
     end.freeze
