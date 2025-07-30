@@ -53,5 +53,83 @@ module CanvasCareer
         all.include?(value)
       end
     end
+
+    module Overrides
+      CAREER_ENROLLMENT_TYPE_OVERRIDES = {
+        "StudentEnrollment" => {
+          label: -> { I18n.t("#enrollment.roles.learner", default: "Learner") },
+          plural_label: -> { I18n.t("#enrollment.roles.learners", default: "Learners") }
+        },
+        "StudentViewEnrollment" => {
+          label: -> { I18n.t("#enrollment.roles.learner", default: "Learner") },
+          plural_label: -> { I18n.t("#enrollment.roles.learners", default: "Learners") }
+        },
+        "TeacherEnrollment" => {
+          label: -> { I18n.t("#enrollment.roles.instructor", default: "Instructor") },
+          plural_label: -> { I18n.t("#enrollment.roles.instructors", default: "Instructors") }
+        },
+        "TaEnrollment" => {
+          label: -> { I18n.t("#enrollment.roles.facilitator", default: "Facilitator") },
+          plural_label: -> { I18n.t("#enrollment.roles.facilitators", default: "Facilitators") }
+        }
+      }.freeze
+
+      CAREER_PERMISSION_LABEL_OVERRIDES = {
+        manage_students: {
+          label: -> { I18n.t("permissions.manage_learners_course", default: "Manage learners for the course") },
+          group_label: -> { I18n.t("permissions.users_learners", default: "Users - Learners") }
+        },
+        add_student_to_course: {
+          label: -> { I18n.t("permissions.add_learners_courses", default: "Add Learners to courses") },
+          group_label: -> { I18n.t("permissions.users_learners", default: "Users - Learners") }
+        },
+        remove_student_from_course: {
+          label: -> { I18n.t("permissions.remove_learners_courses", default: "Remove Learners from courses") },
+          group_label: -> { I18n.t("permissions.users_learners", default: "Users - Learners") }
+        },
+        add_teacher_to_course: {
+          label: -> { I18n.t("permissions.add_instructors_courses", default: "Add Instructors to courses") },
+          group_label: -> { I18n.t("permissions.users_instructors", default: "Users - Instructors") }
+        },
+        remove_teacher_from_course: {
+          label: -> { I18n.t("permissions.remove_instructors_courses", default: "Remove Instructors from courses") },
+          group_label: -> { I18n.t("permissions.users_instructors", default: "Users - Instructors") }
+        },
+        add_ta_to_course: {
+          label: -> { I18n.t("permissions.add_facilitators_courses", default: "Add Facilitators to courses") },
+          group_label: -> { I18n.t("permissions.users_facilitators", default: "Users - Facilitators") }
+        },
+        remove_ta_from_course: {
+          label: -> { I18n.t("permissions.remove_facilitators_courses", default: "Remove Facilitators from courses") },
+          group_label: -> { I18n.t("permissions.users_facilitators", default: "Users - Facilitators") }
+        },
+        view_group_pages: {
+          label: -> { I18n.t("permissions.view_group_pages_learner", default: "View the group pages of all learner groups") }
+        },
+        view_students_in_need: {
+          label: -> { I18n.t("permissions.learners_in_need", default: "Learners in Need of Attention") }
+        },
+        view_students_in_need_in_course: {
+          label: -> { I18n.t("permissions.intelligent_insights_learners_course", default: "Intelligent Insights - Learners in Need of Attention - Course Level") }
+        },
+        generate_observer_pairing_code: {
+          label: -> { I18n.t("permissions.users_generate_observer_codes", default: "Users - generate observer pairing codes for learners") }
+        },
+        proxy_assignment_submission: {
+          label: -> { I18n.t("permissions.instructors_submit_for_learners", default: "Instructors can submit on behalf of learners") }
+        },
+        create_collaborations: {
+          label: -> { I18n.t("permissions.create_learner_collaborations", default: "Create learner collaborations") }
+        }
+      }.freeze
+
+      def self.enrollment_type_overrides
+        CAREER_ENROLLMENT_TYPE_OVERRIDES
+      end
+
+      def self.permission_label_overrides
+        CAREER_PERMISSION_LABEL_OVERRIDES
+      end
+    end
   end
 end

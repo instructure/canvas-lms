@@ -178,7 +178,7 @@ class Role < ActiveRecord::Base
   def label
     if built_in?
       if course_role?
-        RoleOverride.enrollment_type_labels.detect { |label| label[:name] == name }[:label].call
+        RoleOverride.enrollment_type_labels(account || root_account).detect { |label| label[:name] == name }[:label].call
       elsif name == "AccountAdmin"
         RoleOverride::ACCOUNT_ADMIN_LABEL.call
       else
@@ -241,7 +241,7 @@ class Role < ActiveRecord::Base
   # ]
   def self.all_enrollment_roles_for_account(account, include_inactive = false)
     custom_roles = account.available_custom_course_roles(include_inactive)
-    RoleOverride.enrollment_type_labels.map do |br|
+    RoleOverride.enrollment_type_labels(account).map do |br|
       new = br.clone
       new[:id] = Role.get_built_in_role(br[:name], root_account_id: account.resolved_root_account_id).id
       new[:label] = br[:label].call

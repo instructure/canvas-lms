@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require_relative "../app/services/canvas_career/label_overrides"
+
 module Permissions
   # canvas-lms proper, plugins, etc. call Permissions.register to add
   # permissions to the system. all registrations must happen during app init;
@@ -61,14 +63,69 @@ module Permissions
   # Ensure that the permissions registry hash is frozen after the application
   # has been fully initialized, so that no further registrations can happen.
   # see: config/initializers/permissions_registry.rb
-  def self.retrieve
+  def self.retrieve(context = nil)
     @permissions ||= {}
+
+    # Apply Canvas Career overrides to individual permissions
+    if context
+      begin
+        label_overrides = CanvasCareer::LabelOverrides.permission_label_overrides(context)
+        if label_overrides.any?
+          permissions_with_overrides = @permissions.transform_values do |permission_def|
+            permission_key = @permissions.key(permission_def)
+            override = label_overrides[permission_key] || {}
+
+            if override.any?
+              new_permission_def = permission_def.dup
+              new_permission_def = new_permission_def.merge(label: override[:label]) if override[:label]
+              new_permission_def
+            else
+              permission_def
+            end
+          end
+          return permissions_with_overrides
+        end
+      rescue => e
+        Rails.logger.warn("Canvas Career permission overrides failed: #{e.message}")
+      end
+    end
 
     @permissions
   end
 
-  def self.permission_groups
-    PERMISSION_GROUPS
+  def self.permission_groups(context = nil)
+    base_groups = PERMISSION_GROUPS
+
+    # Apply Canvas Career overrides to permission groups
+    if context
+      begin
+        label_overrides = CanvasCareer::LabelOverrides.permission_label_overrides(context)
+        if label_overrides.any?
+          group_overrides = {}
+          retrieve(context).each do |perm_key, perm_def|
+            if perm_def[:group] && (override = label_overrides[perm_key]) && override[:group_label]
+              group_key = perm_def[:group]
+              group_overrides[group_key] = override[:group_label]
+            end
+          end
+
+          if group_overrides.any?
+            return base_groups.transform_values do |group_info|
+              group_key = base_groups.key(group_info)
+              if group_overrides[group_key]
+                group_info.merge(label: group_overrides[group_key])
+              else
+                group_info
+              end
+            end
+          end
+        end
+      rescue => e
+        Rails.logger.warn("Canvas Career permission group overrides failed: #{e.message}")
+      end
+    end
+
+    base_groups
   end
 
   def self.group_info(group)

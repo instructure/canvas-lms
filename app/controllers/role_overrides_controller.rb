@@ -175,6 +175,8 @@ class RoleOverridesController < ApplicationController
 
   include HorizonMode
 
+  OVERRIDE_VALUES = %w[checked unchecked].freeze
+
   before_action :load_canvas_career, only: [:index]
 
   before_action :require_role, only: %i[activate_role remove_role update show]
@@ -226,7 +228,7 @@ class RoleOverridesController < ApplicationController
         role_json(@context, role, @current_user, session, preloaded_overrides:)
       end
 
-      permission_groups = Permissions.permission_groups.transform_values do |group_info|
+      permission_groups = Permissions.permission_groups(@context).transform_values do |group_info|
         {
           label: group_info[:label].call,
           subtitle: group_info[:subtitle].call
@@ -379,7 +381,7 @@ class RoleOverridesController < ApplicationController
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
 
-    if (base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type })
+    if (base_role = RoleOverride.enrollment_type_labels(@context).find { |br| br[:base_role_name] == base_role_type })
       json["base_role_type_label"] = base_role[:label].call
     end
 
@@ -438,6 +440,31 @@ class RoleOverridesController < ApplicationController
       render json: role_json(@context, @role, @current_user, session)
     else
       render json: { message: t("no_role_found", "Role not found") }, status: :bad_request
+    end
+  end
+
+  def create
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      roles = if params[:account_roles] || @context == Account.site_admin
+                @context.available_account_roles(true)
+              else
+                @context.available_course_roles(true)
+              end
+      if params[:permissions]
+        RoleOverride.permissions.each_key do |key|
+          next unless params[:permissions][key]
+
+          roles.each do |role|
+            next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
+
+            override = settings[:override] == "checked" if OVERRIDE_VALUES.include?(settings[:override])
+            locked = settings[:locked] == "true" if settings[:locked]
+            RoleOverride.manage_role_override(@context, role, key.to_s, override:, locked:)
+          end
+        end
+      end
+      flash[:notice] = t "notices.saved", "Changes Saved Successfully."
+      redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
     end
   end
 
@@ -547,31 +574,6 @@ class RoleOverridesController < ApplicationController
       end
 
       render json: perms.map { |key, info| { key: }.merge(info) }
-    end
-  end
-
-  def create
-    if authorized_action(@context, @current_user, :manage_role_overrides)
-      roles = if params[:account_roles] || @context == Account.site_admin
-                @context.available_account_roles(true)
-              else
-                @context.available_course_roles(true)
-              end
-      if params[:permissions]
-        RoleOverride.permissions.each_key do |key|
-          next unless params[:permissions][key]
-
-          roles.each do |role|
-            next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
-
-            override = settings[:override] == "checked" if ["checked", "unchecked"].include?(settings[:override])
-            locked = settings[:locked] == "true" if settings[:locked]
-            RoleOverride.manage_role_override(@context, role, key.to_s, override:, locked:)
-          end
-        end
-      end
-      flash[:notice] = t "notices.saved", "Changes Saved Successfully."
-      redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
     end
   end
 
