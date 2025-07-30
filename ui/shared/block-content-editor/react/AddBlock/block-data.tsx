@@ -27,10 +27,9 @@ const I18n = createI18nScope('page_editor')
 type BlockFactory = {[key: string]: () => ReactElement}
 
 export const blockFactory = {
-  simpleText: () => <TextBlock title="" content="" />,
-  imageText: () => <p>image_text</p>,
-  image: () => <ImageBlock url="" altText="" />,
-  separatorLine: () => <SeparatorLineBlock thickness="small" />,
+  [TextBlock.name]: () => <TextBlock title="" content="" />,
+  [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
+  [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -46,17 +45,14 @@ export type BlockData = {
 export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Text'),
-    items: [
-      {itemName: I18n.t('Text Block'), id: 'simpleText'},
-      {itemName: I18n.t('Image + text'), id: 'imageText'},
-    ],
+    items: [{itemName: TextBlock.craft.displayName, id: TextBlock.name}],
   },
   {
     groupName: I18n.t('Image'),
-    items: [{itemName: I18n.t('Image'), id: 'image'}],
+    items: [{itemName: ImageBlock.craft.displayName, id: ImageBlock.name}],
   },
   {
     groupName: I18n.t('Divider'),
-    items: [{itemName: I18n.t('Separator line'), id: 'separatorLine'}],
+    items: [{itemName: SeparatorLineBlock.craft.displayName, id: SeparatorLineBlock.name}],
   },
 ]

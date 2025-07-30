@@ -60,8 +60,12 @@ const I18n = createI18nScope('page_editor')
 
 export const TextBlock = (props: TextBlockProps) => {
   return (
-    <BaseBlock title={I18n.t('Text Block')}>
+    <BaseBlock title={TextBlock.craft.displayName}>
       <TextBlockContent {...props} />
     </BaseBlock>
   )
+}
+
+TextBlock.craft = {
+  displayName: I18n.t('Text Block') as string,
 }

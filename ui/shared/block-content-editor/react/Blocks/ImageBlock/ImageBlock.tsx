@@ -68,8 +68,12 @@ export type ImageBlockProps = {
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlock title={I18n.t('Image Block')}>
+    <BaseBlock title={ImageBlock.craft.displayName}>
       <ImageBlockContent {...props} />
     </BaseBlock>
   )
+}
+
+ImageBlock.craft = {
+  displayName: I18n.t('Image Block') as string,
 }
