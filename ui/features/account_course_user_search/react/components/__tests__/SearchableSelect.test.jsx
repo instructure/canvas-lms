@@ -36,10 +36,11 @@ const options = [
     {'    four score and seven'}
   </Subject.Option>,
 ]
-function makeProps(isLoading) {
+
+function defaultProps() {
   return {
     id: 'device-under-test',
-    isLoading,
+    isLoading: false,
     onChange: jest.fn(),
     label: LABEL,
   }
@@ -59,9 +60,13 @@ describe('SearchableSelect', () => {
     if (ariaLive) ariaLive.remove()
   })
 
-  function renderSubject(isLoading = false) {
-    const subjectProps = makeProps(isLoading)
-    const results = render(<Subject {...subjectProps}>{options}</Subject>)
+  function renderSubject(otherProps = {}) {
+    const subjectProps = defaultProps()
+    const results = render(
+      <Subject {...subjectProps} {...otherProps}>
+        {options}
+      </Subject>,
+    )
     const input = results.getByLabelText(LABEL)
     return {subjectProps, input, ...results}
   }
@@ -74,13 +79,13 @@ describe('SearchableSelect', () => {
   })
 
   it('respects isLoading', () => {
-    const {input, getByText} = renderSubject(true)
+    const {input, getByText} = renderSubject({isLoading: true})
     fireEvent.click(input)
     expect(getByText(/Loading options/)).toBeInTheDocument()
   })
 
   it('renders a placeholder for the input', () => {
-    const {getByPlaceholderText} = renderSubject(false)
+    const {getByPlaceholderText} = renderSubject()
     expect(getByPlaceholderText('Begin typing to search')).toBeInTheDocument()
   })
 
@@ -109,6 +114,30 @@ describe('SearchableSelect', () => {
     expect(queryByText('four score and seven')).toBeNull()
   })
 
+  it('does matching only on initial text with matchAnywhere false', () => {
+    const {input, getByText} = renderSubject()
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'score'}})
+    expect(getByText('No matches to your search')).toBeInTheDocument()
+  })
+
+  it('ignores leading spaces when matching with matchAnywhere false', () => {
+    const {input, getByText} = renderSubject()
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'four score'}})
+    expect(getByText('four score and seven')).toBeInTheDocument()
+  })
+
+  it('matches anywhere in the options texts with matchAnywhere true', () => {
+    const {input, queryByText} = renderSubject({matchAnywhere: true})
+    fireEvent.click(input)
+    fireEvent.input(input, {target: {value: 'score'}})
+    expect(queryByText('one is lonely')).toBeNull()
+    expect(queryByText('two for real')).toBeNull()
+    expect(queryByText('three on a match')).toBeNull()
+    expect(queryByText('four score and seven')).toBeInTheDocument()
+  })
+
   it('shows a no matches message if nothing matches the typing', () => {
     const {input, getByText} = renderSubject()
     fireEvent.click(input)
@@ -117,7 +146,7 @@ describe('SearchableSelect', () => {
   })
 
   it('shows a no results message if no children are provided', () => {
-    const {getByText} = render(<Subject {...makeProps()} />)
+    const {getByText} = render(<Subject {...defaultProps()} />)
     expect(getByText('No results')).toBeInTheDocument()
   })
 
@@ -160,20 +189,6 @@ describe('SearchableSelect', () => {
       expect.objectContaining({id: '2'}),
     )
   })
-
-  it('does matching only on initial text', () => {
-    const {input, getByText} = renderSubject()
-    fireEvent.click(input)
-    fireEvent.input(input, {target: {value: 'score'}})
-    expect(getByText('No matches to your search')).toBeInTheDocument()
-  })
-
-  it('ignores leading spaces when matching', () => {
-    const {input, getByText} = renderSubject()
-    fireEvent.click(input)
-    fireEvent.input(input, {target: {value: 'four score'}})
-    expect(getByText('four score and seven')).toBeInTheDocument()
-  })
 })
 
 const groupOptions = [
@@ -210,7 +225,7 @@ describe('SearchableSelect::Groups', () => {
   })
 
   function renderSubject(otherProps = {}) {
-    const subjectProps = makeProps(false)
+    const subjectProps = defaultProps()
     const results = render(
       <Subject {...subjectProps} {...otherProps}>
         {groupOptions}
