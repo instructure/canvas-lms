@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module CaptchaValidation
+  protected
+
+  def valid_hostname?(parsed)
+    parsed["hostname"] == request.host
+  end
+
   private
 
   def validate_captcha
@@ -30,7 +36,7 @@ module CaptchaValidation
     if http_response && http_response.code == "200"
       parsed = JSON.parse(http_response.body)
       return parsed["error-codes"] unless parsed["success"]
-      return ["invalid-hostname"] unless parsed["hostname"] == request.host
+      return ["invalid-hostname"] unless valid_hostname?(parsed)
 
       nil
     else
