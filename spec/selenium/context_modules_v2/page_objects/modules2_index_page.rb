@@ -199,6 +199,10 @@ module Modules2IndexPage
     "#{module_header_selector(module_id)} progress"
   end
 
+  def modules_publish_modal_selector
+    "[data-testid='context-modules-publish-modal']"
+  end
+
   def option_list_options_selector(option_list_id)
     "##{option_list_id} [role='option']"
   end
@@ -261,6 +265,26 @@ module Modules2IndexPage
 
   def context_module_selector(module_id)
     "[data-module-id='#{module_id}']"
+  end
+
+  def context_module_item_selector(module_item_id)
+    "#context_module_item_#{module_item_id}"
+  end
+
+  def context_module_item_published_icon_selector(module_item_id)
+    "#{context_module_item_selector(module_item_id)} svg[name='IconPublish']"
+  end
+
+  def context_module_item_unpublished_icon_selector(module_item_id)
+    "#{context_module_item_selector(module_item_id)} svg[name='IconUnpublished']"
+  end
+
+  def context_module_published_icon_selector(module_id)
+    "#{context_module_selector(module_id)} svg[name='IconPublish']"
+  end
+
+  def context_module_unpublished_icon_selector(module_id)
+    "#{context_module_selector(module_id)} svg[name='IconUnpublished']"
   end
 
   def context_module_expand_toggle_selector(module_id)
@@ -441,6 +465,10 @@ module Modules2IndexPage
     f(module_item_url_icon_selector(module_item_id))
   end
 
+  def modules_publish_modal
+    f(modules_publish_modal_selector)
+  end
+
   def blueprint_lock_icon(module_item_id, locked: false)
     f(blueprint_lock_icon_selector(module_item_id, locked:))
   end
@@ -618,5 +646,38 @@ module Modules2IndexPage
 
   def add_item_modal_add_item_button
     fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
+  end
+
+  def expand_all_modules
+    expand_all_modules_button.click
+    wait_for_ajaximations
+  end
+
+  def modules_published_icon_state?(published: true)
+    @course.context_modules.all? do |context_module|
+      if published
+        f(context_module_published_icon_selector(context_module.id))
+      else
+        f(context_module_unpublished_icon_selector(context_module.id))
+      end
+    end
+  end
+
+  def module_items_published_icon_state?(published: true)
+    @course.context_modules.all? do |context_module|
+      context_module.content_tags.all? do |content_tag|
+        if published
+          f(context_module_item_published_icon_selector(content_tag.id))
+        else
+          f(context_module_item_unpublished_icon_selector(content_tag.id))
+        end
+      end
+    end
+  end
+
+  def wait_until_bulk_publish_action_finished
+    wait = Selenium::WebDriver::Wait.new(timeout: 5)
+
+    wait.until { !element_exists?(modules_publish_modal_selector) }
   end
 end

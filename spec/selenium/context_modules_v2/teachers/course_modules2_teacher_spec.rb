@@ -642,6 +642,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: true, items_published: true)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: true)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true)).to be true
       end
     end
 
@@ -658,6 +662,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: true, items_published: false)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: true)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false)).to be true
       end
     end
 
@@ -672,6 +680,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: false, items_published: false)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: false)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false)).to be true
       end
     end
 
@@ -686,6 +698,10 @@ describe "context modules", :ignore_js_errors do
         run_jobs
 
         verify_publication_state(@course.context_modules, module_published: false, items_published: true)
+        wait_until_bulk_publish_action_finished
+        expect(modules_published_icon_state?(published: false)).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true)).to be true
       end
     end
   end
