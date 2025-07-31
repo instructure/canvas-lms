@@ -191,6 +191,7 @@ const MessageListActionContainer = props => {
                 activeCourseFilterID={props.activeCourseFilterID}
                 onCourseFilterSelect={contextObject => {
                   props.onCourseFilterSelect(contextObject.contextID)
+                  props.setCourseNameFilter(contextObject.contextName)
                 }}
               />
             </Flex.Item>
@@ -274,6 +275,7 @@ MessageListActionContainer.propTypes = {
   activeCourseFilterID: PropTypes.string,
   canReply: PropTypes.bool,
   showComposeButton: PropTypes.bool,
+  setCourseNameFilter: PropTypes.func,
 }
 
 MessageListActionContainer.defaultProps = {
