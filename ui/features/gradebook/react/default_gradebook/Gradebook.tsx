@@ -4218,7 +4218,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       : '0'
   }
 
-  getGradingPeriod = (gradingPeriodId: string) => {
+  getGradingPeriod = (gradingPeriodId: string | null) => {
+    if (gradingPeriodId === null) return undefined
     return (this.gradingPeriodSet?.gradingPeriods || []).find(
       gradingPeriod => gradingPeriod.id === gradingPeriodId,
     )
