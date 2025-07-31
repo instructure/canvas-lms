@@ -216,6 +216,6 @@ describe('handleToolIconError', () => {
 
     handleToolIconError(tool)(event as unknown as Event & {target: {src: string}})
 
-    expect(event.target.src).toBe('/lti/tool_default_icon?name=T')
+    expect(event.target.src).toBe('/lti/tool_default_icon?name=Tool%201')
   })
 })
