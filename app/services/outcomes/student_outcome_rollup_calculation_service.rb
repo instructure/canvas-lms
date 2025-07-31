@@ -69,15 +69,39 @@ module Outcomes
     # Runs the full calculation and returns student outcome rollups.
     # @return [Array<Rollup>]
     def call
-      # Fetch both Canvas and Outcomes Service results
-      canvas_results = fetch_canvas_results
-      os_results     = fetch_outcomes_service_results
+      Utils::InstStatsdUtils::Timing.track("rollup.student.runtime") do |timing_meta|
+        rollups_created = 0
 
-      combined_results = combine_results(canvas_results, os_results)
-      return OutcomeRollup.none if combined_results.empty?
+        begin
+          # Fetch both Canvas and Outcomes Service results
+          canvas_results = fetch_canvas_results
+          os_results     = fetch_outcomes_service_results
 
-      student_rollups = generate_student_rollups(combined_results)
-      store_rollups(student_rollups)
+          combined_results = combine_results(canvas_results, os_results)
+          if combined_results.empty?
+            timing_meta.tags = { course_id: course.id }
+            InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
+            InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+            return OutcomeRollup.none
+          end
+
+          student_rollups = generate_student_rollups(combined_results)
+          stored_rollups = store_rollups(student_rollups)
+
+          rollups_created = stored_rollups.is_a?(ActiveRecord::Relation) ? stored_rollups.count : 0
+          timing_meta.tags = { course_id: course.id, records_processed: rollups_created }
+
+          InstStatsd::Statsd.distributed_increment("rollup.student.success", tags: { course_id: course.id })
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+
+          stored_rollups
+        rescue => e
+          timing_meta.tags = { course_id: course.id, error: true }
+          InstStatsd::Statsd.distributed_increment("rollup.student.error", tags: { course_id: course.id })
+          InstStatsd::Statsd.count("rollup.student.records_processed", rollups_created, tags: { course_id: course.id })
+          raise e
+        end
+      end
     end
 
     private
