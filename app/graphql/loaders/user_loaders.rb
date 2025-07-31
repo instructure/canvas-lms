@@ -57,5 +57,36 @@ module Loaders
         end
       end
     end
+
+    class DifferentiationTagsLoader < GraphQL::Batch::Loader
+      def initialize(current_user, course_id)
+        super()
+        @current_user = current_user
+        @course_id = course_id
+      end
+
+      def perform(user_ids)
+        course = Course.active.find_by(id: @course_id) if @course_id.present?
+
+        if course.present? &&
+           course.account.feature_enabled?(:assign_to_differentiation_tags) &&
+           course.account.allow_assign_to_differentiation_tags? &&
+           course.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+
+          tags_by_user_id = GroupMembership
+                            .active
+                            .where(user_id: user_ids)
+                            .joins(:group)
+                            .where.not(groups: { workflow_state: "deleted" })
+                            .where(groups: { context: course, non_collaborative: true })
+                            .group_by(&:user_id)
+        end
+
+        tags_by_user_id ||= {}
+        user_ids.each do |user_id|
+          fulfill(user_id, tags_by_user_id[user_id]) unless fulfilled?(user_id)
+        end
+      end
+    end
   end
 end

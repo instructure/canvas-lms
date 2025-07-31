@@ -25,6 +25,7 @@ import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_externa
 import {MathJaxDirective, Mathml} from './mathml'
 import {makeExternalLinkIcon} from './external_links'
 import getTranslations from '../getTranslations'
+import {createOverlay} from './youtube_overlay'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -173,6 +174,7 @@ export function enhanceUserContent(container = document, opts = {}) {
      * Contingency plan in case new instfs media links cause problems in rich content.
      */
     replaceInstFSLinksWithOldLinks,
+    showYoutubeAdOverlay,
   } = opts
 
   getTranslations(locale)
@@ -191,6 +193,17 @@ export function enhanceUserContent(container = document, opts = {}) {
     document
 
   const showFilePreviewEx = event => showFilePreview(event, {canvasOrigin, disableGooglePreviews})
+
+  if (showYoutubeAdOverlay) {
+    const youtubeIframes = content.querySelectorAll(
+      [
+        '.user_content:not(.enhanced) iframe[src*="youtube.com/embed/"]',
+        '.user_content:not(.enhanced) iframe[src*="youtube-nocookie.com/embed/"]',
+      ].join(', '),
+    )
+
+    createOverlay(youtubeIframes)
+  }
 
   content.querySelectorAll('.user_content:not(.enhanced)').forEach(elem => {
     elem.classList.add('unenhanced')

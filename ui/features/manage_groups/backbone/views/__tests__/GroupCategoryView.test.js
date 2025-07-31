@@ -50,7 +50,7 @@ describe('GroupCategoryView', () => {
     model = new Model({
       name: 'Test Group Category',
       role: 'student',
-      allows_multiple_memberships: false
+      allows_multiple_memberships: false,
     })
     model.resourceName = 'group_categories'
     model.constructor.prototype.resourceName = 'group_categories'
@@ -60,7 +60,7 @@ describe('GroupCategoryView', () => {
     model.fetch = jest.fn(options => options.success?.())
     model.present = () => ({
       ...model.attributes,
-      randomlyAssignStudentsInProgress: false
+      randomlyAssignStudentsInProgress: false,
     })
     model.groupsCount = () => groups.length
     model.unassignedUsersCount = () => unassignedUsers.length
@@ -77,9 +77,9 @@ describe('GroupCategoryView', () => {
 
   const progressMessage = (groups = 0, users = 0) => {
     const message = {
-      type: "import_groups",
+      type: 'import_groups',
       groups,
-      users
+      users,
     }
     return JSON.stringify(message)
   }
@@ -88,24 +88,27 @@ describe('GroupCategoryView', () => {
     it('displays an error message when importStatus is failed', () => {
       model.progressModel.set({
         workflow_state: 'failed',
-        message: progressMessage()
+        message: progressMessage(),
       })
       model.trigger('progressResolved')
       expect($.flashError).toHaveBeenCalledWith(
-        'Your groups could not be uploaded. Check formatting and try again.'
+        'Your groups could not be uploaded. Check formatting and try again.',
       )
       expect($.flashMessage).not.toHaveBeenCalled()
       expect(model.fetch).toHaveBeenCalled()
     })
 
     it('displays a success message when importStatus is completed', () => {
-      const successMessage = I18n.t("Your %{groups} groups and %{users} students were successfully uploaded", {
-        groups: 2,
-        users: 3
-      })
+      const successMessage = I18n.t(
+        'Your %{groups} groups and %{users} students were successfully uploaded',
+        {
+          groups: 2,
+          users: 3,
+        },
+      )
       model.progressModel.set({
         workflow_state: 'completed',
-        message: progressMessage(2, 3)
+        message: progressMessage(2, 3),
       })
       model.trigger('progressResolved')
       expect($.flashMessage).toHaveBeenCalledWith(successMessage)
@@ -115,7 +118,7 @@ describe('GroupCategoryView', () => {
 
     it('does not display any flash message for other import statuses', () => {
       model.progressModel.set({
-        workflow_state: 'running'
+        workflow_state: 'running',
       })
       model.trigger('progressResolved')
       expect($.flashMessage).not.toHaveBeenCalled()

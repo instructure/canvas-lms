@@ -560,14 +560,14 @@ class Notification < Switchman::UnshardedRecord
   def category_description
     case category
     when "Announcement"
-      t(:announcement_description, "New Announcement in your course")
+      t(:announcement_description_legend, "New Announcement in your course")
     when "Announcement Created By You"
-      mt(:announcement_created_by_you_description, <<~MD)
+      mt(:announcement_created_by_you_description_legend, <<~MD)
         * Announcements created by you
         * Replies to announcements you've created
       MD
     when "Course Content"
-      mt(:course_content_description, <<~MD)
+      mt(:course_content_description_legend, <<~MD)
         Change to course content:
 
         * Page content
@@ -575,50 +575,39 @@ class Notification < Switchman::UnshardedRecord
         * Assignment content
       MD
     when "Files"
-      t(:files_description, "New file added to your course")
+      t(:files_description_legend, "New file added to your course")
     when "Discussion"
-      t(:discussion_description, "New Discussion topic in your course")
+      t(:discussion_description_legend, "New Discussion topic in your course")
     when "DiscussionEntry"
-      t(:discussion_post_description, "New reply on a topic you're subscribed to")
+      t(:discussion_post_description_legend, "New reply on a topic you're subscribed to")
     # Remove the feature flag explanation when :react_discussions_post feature flag is removed
     when "DiscussionMention"
-      mt(:discussion_mention_description, <<~MD)
-        New Mention in a Discussion.
+      mt(:discussion_mention_description_legend, <<~MD)
+        New Mention in a Discussion
 
-        *Discussion Mentions are only available
-        for courses or accounts that have the
-        Discussions/Announcements Redesign
-        feature flag turned on.*
+        *(Discussion Mentions are only available for courses or accounts that have the Discussions/Announcements Redesign feature flag turned on)*
       MD
     when "ReportedReply"
-      t(:reported_reply_description, "New reported reply in a Discussion")
+      t(:reported_reply_description_legend, "New reported reply in a Discussion")
     when "Due Date"
-      t(:due_date_description, "Assignment due date change")
+      t(:due_date_description_legend, "Assignment due date change")
     when "Grading"
-      mt(:grading_description, <<~MD)
+      mt(:grading_description_legend, <<~MD)
         Includes:
 
         * Assignment/submission grade entered/changed
         * Grade weight changed
       MD
     when "Late Grading"
-      mt(:late_grading_description, <<~MD)
-        *Instructor and Admin only:*
-
-        Late assignment submission
-      MD
+      mt(:late_grading_description_legend, "*(Instructor and Admin only)* Late assignment submission")
     when "All Submissions"
-      mt(:all_submissions_description, <<~MD)
-        *Instructor and Admin only:*
-
-        Assignment (except quizzes) submission/resubmission
-      MD
+      mt(:all_submissions_description_legend, "*(Instructor and Admin only)* Assignment submission/resubmission, except quizzes")
     when "Submission Comment"
-      t(:submission_comment_description, "Assignment submission comment")
+      t(:submission_comment_description_legend, "Assignment submission comment")
     when "Grading Policies"
-      t(:grading_policies_description, "Course grading policy change")
+      t(:grading_policies_description_legend, "Course grading policy change")
     when "Invitation"
-      mt(:invitation_description, <<~MD)
+      mt(:invitation_description_legend, <<~MD)
         Invitation for:
 
         * Web conference
@@ -627,8 +616,8 @@ class Notification < Switchman::UnshardedRecord
         * Peer Review & reminder
       MD
     when "Other"
-      mt(:other_description, <<~MD)
-        *Instructor and Admin only:*
+      mt(:other_description_legend, <<~MD)
+        *(Instructor and Admin only)*
 
         * Course enrollment
         * Report generated
@@ -638,52 +627,38 @@ class Notification < Switchman::UnshardedRecord
         * New student group
       MD
     when "Calendar"
-      t(:calendar_description, "New and changed items on your course calendar")
+      t(:calendar_description_legend, "New and changed items on your course calendar")
     when "Student Appointment Signups"
-      mt(:student_appointment_description, <<~MD)
-        *Instructor and Admin only:*
-
-        Student appointment sign-up
-      MD
+      mt(:student_appointment_description_legend, "*(Instructor and Admin only)* Student appointment sign-up")
     when "Appointment Availability"
       t("New appointment timeslots are available for signup")
     when "Appointment Signups"
-      t(:appointment_signups_description, "New appointment on your calendar")
+      t(:appointment_signups_description_legend, "New appointment on your calendar")
     when "Appointment Cancelations"
-      t(:appointment_cancelations_description, "Appointment cancellation")
+      t(:appointment_cancelations_description_legend, "Appointment cancellation")
     when "Conversation Message"
-      t(:conversation_message_description, "New Inbox messages")
+      t(:conversation_message_description_legend, "New Inbox messages")
     when "Added To Conversation"
-      t(:added_to_conversation_description, "You are added to a conversation")
+      t(:added_to_conversation_description_legend, "You are added to a conversation")
     when "Conversation Created"
-      t(:conversation_created_description, "You created a conversation")
+      t(:conversation_created_description_legend, "You created a conversation")
     when "Recording Ready"
-      t(:web_conference_recording_ready, "A conference recording is ready")
+      t(:web_conference_recording_ready_legend, "A conference recording is ready")
     when "Membership Update"
-      mt(:membership_update_description, <<~MD)
-        *Admin only: pending enrollment activated*
+      mt(:membership_update_description_legend, <<~MD)
+        *(Admin only)*
 
-        * Group enrollment
-        * accepted/rejected
+        * pending enrollment activated
+        * Group enrollment accepted/rejected
       MD
     when "Blueprint"
-      mt(:blueprint_description, <<~MD)
-        *Instructor and Admin only:*
-
-        Content was synced from a blueprint course to associated courses
-      MD
+      mt(:blueprint_description_legend, "*(Instructor and Admin only)* Content was synced from a blueprint course to associated courses")
     when "Content Link Error"
-      mt(:content_link_error_description, <<~MD)
-        *Instructor and Admin only:*
-
-        Location and content of a failed link that a student has interacted with
-      MD
+      mt(:content_link_error_description_legend, "*(Instructor and Admin only)* Location and content of a failed link that a student has interacted with")
     when "Account Notification"
-      mt(:account_notification_description, <<~MD)
-        Institution-wide announcements (also displayed on Dashboard pages)
-      MD
+      mt(:account_notification_description_legend, "Institution-wide announcements (also displayed on Dashboard pages)")
     else
-      t(:missing_description_description, "For %{category} notifications", category:)
+      t(:missing_description_description_legend, "For %{category} notifications", category:)
     end
   end
 

@@ -119,7 +119,8 @@ class ContextModulesController < ApplicationController
         CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) && assign_to_tags,
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
-        PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
+        PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,
+        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -269,7 +270,6 @@ class ContextModulesController < ApplicationController
 
       js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
-      css_bundle :content_next, :context_modules2
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
@@ -320,13 +320,36 @@ class ContextModulesController < ApplicationController
           readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
         }
 
+        observer_enrollments = @context.observer_enrollments.for_user(@current_user).active_or_pending
+        is_observer = observer_enrollments.exists?
+        observed_students = if is_observer && @context.grants_right?(@current_user, session, :read_roster)
+                              observer_enrollments.includes(:associated_user).filter_map do |enrollment|
+                                associated_user = enrollment.associated_user
+                                if associated_user && enrollment.associated_user_id &&
+                                   @context.enrollments.where(user_id: associated_user.id, workflow_state: ["active", "completed"]).exists?
+                                  { id: associated_user.id.to_s, name: associated_user.name }
+                                end
+                              end
+                            else
+                              []
+                            end
+
+        modules_observer_info = {
+          isObserver: is_observer,
+          observedStudents: observed_students
+        }
+
         js_env(MODULES_PERMISSIONS: modules_permissions)
+        js_env(MODULES_OBSERVER_INFO: modules_observer_info)
 
         js_bundle :context_modules_v2
+        css_bundle :content_next, :context_modules2, :context_modules_v2
+
         render html: "", layout: true
       else
         # Load legacy modules page assets
         js_bundle :context_modules
+        css_bundle :content_next, :context_modules2
         render stream: can_stream_template?
       end
     end

@@ -44,7 +44,7 @@ describe('TagSelect', () => {
   it('shows the menu', () => {
     const {getByText} = renderComponent()
     const trigger = getByText('Apply Filters').closest('button')
-    
+
     trigger?.click()
     expect(getByText('Home')).toBeInTheDocument()
     expect(getByText('Resource')).toBeInTheDocument()

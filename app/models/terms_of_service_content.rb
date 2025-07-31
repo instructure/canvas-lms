@@ -47,6 +47,17 @@ class TermsOfServiceContent < ActiveRecord::Base
     end
   end
 
+  def access_for_attachment_association?(_user, _session, _association, _location_param)
+    true
+  end
+
+  def content
+    original = super
+    return original unless account && root_account.feature_enabled?(:file_association_access)
+
+    AttachmentLocationTagger.tag_url(original, asset_string)
+  end
+
   def ensure_terms_updated_at
     self.terms_updated_at ||= Time.now.utc
   end
@@ -55,10 +66,10 @@ class TermsOfServiceContent < ActiveRecord::Base
     self.terms_updated_at = Time.now.utc if content_changed?
   end
 
-  def self.ensure_content_for_account(account)
+  def self.ensure_content_for_account(account, saving_user)
     unique_constraint_retry do |retry_count|
       account.reload_terms_of_service_content if retry_count > 0
-      account.terms_of_service_content || account.create_terms_of_service_content!(content: "")
+      account.terms_of_service_content || account.create_terms_of_service_content!(content: "", saving_user:)
     end
   end
 

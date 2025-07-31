@@ -103,17 +103,15 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :files do
+    get "files/folder#{full_path_glob}" => "files#react_files", :format => false, :defaults => { format: "html" }
+    get "files/search" => "files#react_files", :format => false, :defaults => { format: "html" }
     resources :files, except: [:new] do
-      get "inline" => "files#text_show", :as => :text_inline
       get "download" => "files#show", :download => "1"
       get "download.:type" => "files#show", :as => :typed_download, :download => "1"
       get "preview" => "files#show", :preview => "1"
       post "inline_view" => "files#show", :inline => "1"
-      get "contents" => "files#attachment_content", :as => :attachment_content
       get "file_preview" => "file_previews#show"
       collection do
-        get "folder#{full_path_glob}" => "files#react_files", :format => false, :defaults => { format: "html" }
-        get "search" => "files#react_files", :format => false, :defaults => { format: "html" }
         get :quota
         post :reorder
       end
@@ -523,6 +521,7 @@ CanvasRails::Application.routes.draw do
     delete "test_student" => "courses#reset_test_student"
     get "content_migrations" => "content_migrations#index"
     get "link_validator" => "courses#link_validator", :as => :link_validator
+    get "youtube_migration" => "courses#youtube_migration", :as => :youtube_migration
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
@@ -543,8 +542,12 @@ CanvasRails::Application.routes.draw do
         resource :issues, only: [:create, :update], module: "accessibility"
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
+        post "generate" => "accessibility/generate#create"
+        post "scan" => "accessibility/scan#create"
       end
     end
+
+    resources :accessibility_resource_scans, only: [:index]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
@@ -1226,6 +1229,10 @@ CanvasRails::Application.routes.draw do
 
       get "courses/:course_id/link_validation", action: :link_validation, as: "course_link_validation"
       post "courses/:course_id/link_validation", action: :start_link_validation
+
+      get "courses/:course_id/youtube_migration/scan", action: :youtube_migration_scan, as: "course_youtube_migration_scan"
+      post "courses/:course_id/youtube_migration/scan", action: :start_youtube_migration_scan
+      post "courses/:course_id/youtube_migration/convert", action: :start_youtube_migration_convert
 
       post "courses/:course_id/reset_content", action: :reset_content
       get  "users/:user_id/courses", action: :user_index, as: "user_courses"
@@ -2035,6 +2042,7 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:registration_id/deployments/:deployment_id/context_search", action: :context_search, as: "lti_registration_context_search"
       get "accounts/:account_id/lti_registrations/:id", action: :show
+      get "accounts/:account_id/lti_registrations/:id/overlay_history", action: :overlay_history
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
       put "accounts/:account_id/lti_registrations/:id/reset", action: :reset
@@ -2050,12 +2058,12 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/context_controls") do
-      get "lti_registrations/:registration_id/controls", action: :index, as: :lti_context_controls_index
-      post "lti_registrations/:registration_id/controls", action: :create
-      post "lti_registrations/:registration_id/controls/bulk", action: :create_many
-      get "lti_registrations/:registration_id/controls/:id", action: :show
-      put "lti_registrations/:registration_id/controls/:id", action: :update
-      delete "lti_registrations/:registration_id/controls/:id", action: :delete
+      get "accounts/:account_id/lti_registrations/:registration_id/controls", action: :index, as: :lti_context_controls_index
+      post "accounts/:current_account_id/lti_registrations/:registration_id/controls", action: :create # avoid param name conflict
+      post "accounts/:account_id/lti_registrations/:registration_id/controls/bulk", action: :create_many
+      get "accounts/:account_id/lti_registrations/:registration_id/controls/:id", action: :show
+      put "accounts/:account_id/lti_registrations/:registration_id/controls/:id", action: :update
+      delete "accounts/:account_id/lti_registrations/:registration_id/controls/:id", action: :delete
     end
 
     scope(controller: "lti/resource_links") do
@@ -2431,6 +2439,7 @@ CanvasRails::Application.routes.draw do
       get "group_categories/:group_category_id/export", action: :export, as: "group_category_export", defaults: { format: :csv }
       post "group_categories/:group_category_id/assign_unassigned_members", action: "assign_unassigned_members", as: "group_category_assign_unassigned_members"
       post "courses/:course_id/group_categories/bulk_manage_differentiation_tag", action: :bulk_manage_differentiation_tag
+      post "courses/:course_id/group_categories/import_tags", action: :import_tags
     end
 
     scope(controller: :progress) do
@@ -2534,6 +2543,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/grading_standards/:grading_standard_id", action: :context_show
       post "accounts/:account_id/grading_standards", action: :create
       post "courses/:course_id/grading_standards", action: :create
+      delete "courses/:course_id/grading_standards/:grading_standard_id", action: :destroy
+      delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end
 
     get "/crocodoc_session", controller: "crocodoc_sessions", action: "show", as: :crocodoc_session

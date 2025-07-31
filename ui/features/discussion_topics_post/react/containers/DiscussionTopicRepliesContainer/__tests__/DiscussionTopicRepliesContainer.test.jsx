@@ -20,11 +20,15 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionTopicRepliesContainer} from '../DiscussionTopicRepliesContainer'
-import {fireEvent, render} from '@testing-library/react'
-import {getDiscussionEntryAllRootEntriesQueryMock} from '../../../../graphql/Mocks'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import {
+  getDiscussionEntryAllRootEntriesQueryMock,
+  updateDiscussionReadStateMock,
+} from '../../../../graphql/Mocks'
 import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../../graphql/Mutations'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -33,6 +37,19 @@ jest.mock('../../../utils', () => ({
 jest.mock('../../../utils/constants', () => ({
   ...jest.requireActual('../../../utils/constants'),
   AUTO_MARK_AS_READ_DELAY: 0,
+}))
+jest.mock('../../DiscussionThreadContainer/DiscussionThreadContainer', () => ({
+  __esModule: true,
+  DiscussionThreadContainer: ({markAsRead, discussionEntry}) => {
+    return (
+      <button
+        data-testid={`mark-as-read-${discussionEntry.id}`}
+        onClick={() => markAsRead(discussionEntry._id)}
+      >
+        Mark as read
+      </button>
+    )
+  },
 }))
 
 describe('DiscussionTopicRepliesContainer', () => {
@@ -60,6 +77,8 @@ describe('DiscussionTopicRepliesContainer', () => {
         discussionEntriesConnection: {
           nodes: [
             DiscussionEntry.mock({
+              id: '123',
+              _id: '456',
               entryParticipant: {read: false, forcedReadState: null, rating: false},
             }),
           ],
@@ -71,10 +90,10 @@ describe('DiscussionTopicRepliesContainer', () => {
     }
   }
 
-  const setup = (props, mocks) => {
+  const setup = (props, mocks, {setOnFailure = jest.fn(), setOnSuccess = jest.fn()} = {}) => {
     return render(
-      <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicRepliesContainer {...props} />
         </AlertManagerContext.Provider>
       </MockedProvider>,
@@ -104,5 +123,57 @@ describe('DiscussionTopicRepliesContainer', () => {
     props.discussionTopic.entriesTotalPages = 1
     const {queryByTestId} = setup(props)
     expect(queryByTestId('pagination')).toBeNull()
+  })
+
+  it('renders an error when UPDATE_DISCUSSION_ENTRIES_READ_STATE encounters an issue', async () => {
+    const setOnFailure = jest.fn()
+    const props = defaultProps()
+    const entry = props.discussionTopic.discussionEntriesConnection.nodes[0]
+
+    const mocks = [
+      {
+        request: {
+          query: UPDATE_DISCUSSION_ENTRIES_READ_STATE,
+          variables: {discussionEntryIds: [entry._id], read: true},
+        },
+        result: {
+          errors: [{message: 'A non-network error occurred'}],
+        },
+      },
+    ]
+
+    const {getByTestId} = setup(props, mocks, {setOnFailure})
+
+    fireEvent.click(getByTestId(`mark-as-read-${entry.id}`))
+
+    await waitFor(() => {
+      expect(setOnFailure).toHaveBeenCalledWith(
+        'There was an unexpected error while marking replies as read',
+      )
+    })
+  })
+
+  it('does not render error when UPDATE_DISCUSSION_ENTRIES_READ_STATE encounters a network issue', async () => {
+    const setOnFailure = jest.fn()
+    const props = defaultProps()
+    const entry = props.discussionTopic.discussionEntriesConnection.nodes[0]
+
+    const mocks = [
+      {
+        request: {
+          query: UPDATE_DISCUSSION_ENTRIES_READ_STATE,
+          variables: {discussionEntryIds: [entry._id], read: true},
+        },
+        error: new Error('A network error occurred'),
+      },
+    ]
+
+    const {getByTestId} = setup(props, mocks, {setOnFailure})
+
+    fireEvent.click(getByTestId(`mark-as-read-${entry.id}`))
+
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(setOnFailure).not.toHaveBeenCalled()
   })
 })

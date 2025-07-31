@@ -55,6 +55,7 @@ class OverrideListPresenter
     everyone = false
     section_count = 0
     group_count = 0
+    tag_count = 0
     student_count = 0
     mastery_paths = false
 
@@ -63,6 +64,7 @@ class OverrideListPresenter
         everyone = true if ["Course", nil].include?(option)
         section_count += 1 if option == "CourseSection"
         group_count += 1 if option == "Group"
+        tag_count += 1 if option == "Tag"
         if option&.include?("student")
           count = option[/\d+/]
           student_count += count.to_i if count
@@ -74,12 +76,13 @@ class OverrideListPresenter
         everyone = true if option == "everyone"
         section_count += 1 if /\Asection-\d+\z/.match?(option)
         group_count += 1 if /\Agroup-\d+\z/.match?(option)
+        tag_count += 1 if /\Atag-\d+\z/.match?(option)
         student_count += 1 if /\Astudent-\d+\z/.match?(option)
         mastery_paths = true if option == "mastery_paths"
       end
     end
 
-    have_multiple_due_dates = other_due_dates_exist || section_count > 0 || group_count > 0 || student_count > 0 || mastery_paths
+    have_multiple_due_dates = other_due_dates_exist || section_count > 0 || group_count > 0 || tag_count > 0 || student_count > 0 || mastery_paths
     result = []
     if everyone
       result << (have_multiple_due_dates ? I18n.t("overrides.everyone_else", "Everyone else") : I18n.t("overrides.everyone", "Everyone"))
@@ -91,6 +94,10 @@ class OverrideListPresenter
 
     if group_count > 0
       result << I18n.t(:group_count, { one: "%{count} Group", other: "%{count} Groups" }, count: group_count)
+    end
+
+    if tag_count > 0
+      result << I18n.t(:tag_count, { one: "%{count} Tag", other: "%{count} Tags" }, count: tag_count)
     end
 
     if student_count > 0
@@ -161,6 +168,7 @@ class OverrideListPresenter
     type_is_allowed = assignment.is_a?(Assignment) ? assignment.submission_types != "discussion_topic" : assignment.is_a?(Quizzes::Quiz)
     if type_is_allowed
       overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
+      overrides = convert_non_collaborative_groups_to_tags(overrides)
       overrides = assignment.merge_overrides_by_date(overrides)
       other_due_dates_exist = overrides.length > 1
       overrides.sort_by! { |card| [card[:due_at].nil? ? 1 : 0, card[:due_at]] }
@@ -183,6 +191,7 @@ class OverrideListPresenter
     return [] unless assignment
 
     overrides = assignment.dates_hash_visible_to_v2(user)
+    overrides = convert_non_collaborative_groups_to_tags_v2(overrides)
     overrides = assignment.merge_overrides_by_date_v2(overrides) if group_by_date
     other_due_dates_exist = overrides.length > 1
 
@@ -194,6 +203,43 @@ class OverrideListPresenter
       result[:due_at] = due_at(due_date)
       result[:due_for] = group_by_date ? formatted_due_for(due_date, other_due_dates_exist:) : due_for(due_date)
       result
+    end
+  end
+
+  def convert_non_collaborative_groups_to_tags(overrides)
+    all_group_ids = overrides.reduce([]) do |acc, override|
+      acc + override[:options].reduce([]) do |sub_acc, option|
+        # Groups are formatted as "group-<id>"
+        set_type, set_id = option.split("-")
+        next sub_acc unless set_type == "group"
+
+        sub_acc << set_id.to_i
+      end
+    end
+    # avoids N+1 queries when converting non_collaborative groups to "tag-<id>" format
+    tag_group_ids = Set.new(Group.non_collaborative.where(id: all_group_ids).pluck(:id))
+
+    # converts from "group-<id>" to "tag-<id>" for non-collaborative groups
+    overrides.map do |override|
+      override[:options] = override[:options].map do |option|
+        set_type, set_id = option.split("-")
+        if set_type == "group" && tag_group_ids.include?(set_id.to_i)
+          "tag-#{set_id}"
+        else
+          option
+        end
+      end
+      override
+    end
+  end
+
+  def convert_non_collaborative_groups_to_tags_v2(overrides)
+    all_group_ids = overrides.filter_map { |override| override[:set_id] if override[:set_type] == "Group" }
+    tag_group_ids = Set.new(Group.non_collaborative.where(id: all_group_ids).pluck(:id))
+
+    overrides.map do |override|
+      override[:set_type] = "Tag" if override[:set_type] == "Group" && tag_group_ids.include?(override[:set_id])
+      override
     end
   end
 end

@@ -185,7 +185,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       json.edit_with_block_editor = true
     }
 
-    if (this.model.get('editor') === 'canvas_content_builder') {
+    if (this.isBlockContentEditor()) {
       // used by ui/shared/wiki/jst/WikiPageEdit.handlebars to render block_editor div
       // that will be used as a mount point for the PageContentBlockBuilderEditor
       json.edit_with_block_editor = true
@@ -303,7 +303,20 @@ export default class WikiPageEditView extends ValidatedFormView {
         this.model.get('editor') !== 'rce'
     }
 
-    if (
+    if (this.isBlockContentEditor()) {
+      const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
+      import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
+        const root = createRoot(document.getElementById('block_editor'))
+        root.render(
+          <BlockContentEditor
+            data={data}
+            onInit={handler => {
+              this.blockEditorHandler = handler
+            }}
+          />,
+        )
+      })
+    } else if (
       (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) ||
       chose_block_editor
     ) {
@@ -326,10 +339,6 @@ export default class WikiPageEditView extends ValidatedFormView {
           />
         </Suspense>,
       )
-    } else if (this.model.get('editor') === 'canvas_content_builder') {
-      const PageContentBlockBuilderEditor = lazy(() => import('@canvas/page-editor'))
-      const root = createRoot(document.getElementById('block_editor'))
-      root.render(<PageContentBlockBuilderEditor data={null} />)
     } else {
       RichContentEditor.loadNewEditor(
         this.$wikiPageBody,
@@ -558,7 +567,10 @@ export default class WikiPageEditView extends ValidatedFormView {
         return
       }
     }
-    if (window.block_editor) {
+
+    if (this.isBlockContentEditor()) {
+      this.blockEditorData = this.blockEditorData = this.blockEditorHandler.getContent()
+    } else if (this.model.get('editor') === 'block_editor') {
       this.blockEditorData = window.block_editor().getBlocks()
     }
 
@@ -635,6 +647,12 @@ export default class WikiPageEditView extends ValidatedFormView {
       wiki_pages_path: this.wiki_pages_path,
     })
     return deleteDialog.open()
+  }
+
+  isBlockContentEditor() {
+    const editorFromQuery = new URLSearchParams(window.location.search).get('editor')
+    const editorFromModel = this.model.get('editor')
+    return editorFromModel === 'block_content_editor' || editorFromQuery === 'block_content_editor'
   }
 }
 WikiPageEditView.initClass()

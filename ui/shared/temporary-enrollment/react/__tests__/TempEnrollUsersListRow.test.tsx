@@ -150,7 +150,7 @@ describe('TempEnrollUsersListRow', () => {
 
     it('renders all tooltips when permissions true', async () => {
       const {findAllByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
-      expect((await findAllByTestId('user-list-row-tooltip'))).toHaveLength(2)
+      expect(await findAllByTestId('user-list-row-tooltip')).toHaveLength(2)
     })
 
     it('renders no tooltips when permissions are false', async () => {

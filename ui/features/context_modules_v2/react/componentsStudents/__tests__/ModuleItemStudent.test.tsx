@@ -29,13 +29,13 @@ const buildDefaultProps = (overrides = {}) => {
     _id: '1',
     url: 'https://canvas.instructure.com/courses/1/assignments/1',
     indent: 0,
+    title: 'Test Item',
     position: 0,
     requireSequentialProgress: false,
     index: 0,
     content: {
       id: '1',
       _id: '1',
-      title: 'Test Item',
       type: 'Assignment',
       url: 'https://canvas.instructure.com/courses/1/assignments/1',
     },
@@ -160,5 +160,124 @@ describe('ModuleItemStudent', () => {
 
     const titleElement = container.getByTestId('module-discussion-checkpoint')
     expect(titleElement).toBeInTheDocument()
+  })
+
+  it('renders Complete status when module is completed', () => {
+    const progression = {
+      completedAt: new Date().toISOString(),
+      currentPosition: 1,
+      locked: false,
+      requirementsMet: [
+        {
+          id: '1',
+          type: 'min_score',
+          minScore: 100,
+          minPercentage: 100,
+        },
+      ],
+      state: 'completed',
+      completed: true,
+    }
+
+    const container = setUp(
+      buildDefaultProps({
+        progression,
+        completionRequirements: [
+          {
+            id: '1',
+            type: 'min_score',
+            minScore: 100,
+            minPercentage: 100,
+          },
+        ],
+      }),
+    )
+
+    const statusIcon = container.getByTestId('module-item-status-icon')
+    expect(statusIcon).toBeInTheDocument()
+    expect(container.getByText('Complete')).toBeInTheDocument()
+  })
+
+  it('renders Missing status when submission is marked as missing', () => {
+    const dueDate = new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
+
+    const container = setUp(
+      buildDefaultProps({
+        content: {
+          id: '1',
+          _id: '1',
+          title: 'Test Item',
+          type: 'Assignment',
+          url: 'https://canvas.instructure.com/courses/1/assignments/1',
+          submissionsConnection: {
+            nodes: [
+              {
+                _id: 'submission-1',
+                cachedDueDate: dueDate.toISOString(),
+                missing: true,
+              },
+            ],
+          },
+        },
+      }),
+    )
+
+    const statusIcon = container.getByTestId('module-item-status-icon')
+    expect(statusIcon).toBeInTheDocument()
+    expect(container.getByText('Missing')).toBeInTheDocument()
+  })
+
+  it('prioritizes Complete status over Missing when module is completed', () => {
+    const dueDate = new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 day ago
+    const progression = {
+      completedAt: new Date().toISOString(),
+      currentPosition: 1,
+      locked: false,
+      requirementsMet: [
+        {
+          id: '1',
+          type: 'min_score',
+          minScore: 100,
+          minPercentage: 100,
+        },
+      ],
+      state: 'completed',
+      completed: true,
+    }
+
+    const container = setUp(
+      buildDefaultProps({
+        progression,
+        completionRequirements: [
+          {
+            id: '1',
+            type: 'min_score',
+            minScore: 100,
+            minPercentage: 100,
+          },
+        ],
+        content: {
+          id: '1',
+          _id: '1',
+          title: 'Test Item',
+          type: 'Assignment',
+          url: 'https://canvas.instructure.com/courses/1/assignments/1',
+          submissionsConnection: {
+            nodes: [
+              {
+                _id: 'submission-1',
+                cachedDueDate: dueDate.toISOString(),
+                missing: true,
+              },
+            ],
+          },
+        },
+      }),
+    )
+
+    const statusIcon = container.getByTestId('module-item-status-icon')
+    expect(statusIcon).toBeInTheDocument()
+    expect(container.getByText('Complete')).toBeInTheDocument()
+    expect(container.queryByText('Missing')).not.toBeInTheDocument()
   })
 })

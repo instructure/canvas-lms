@@ -172,8 +172,12 @@ class SubmissionSearch
   end
 
   def order_by_submission_status(search_scope:, direction:)
-    priorities = { not_graded: 1, resubmitted: 2, not_submitted: 3, graded: 4, other: 5 }
-    ComputedSubmissionColumnBuilder.add_submission_status_priority_column(search_scope, priorities) => { scope:, column: status_priority_column }
+    priorities = { not_graded: 1, resubmitted: 2, not_submitted: 3, graded: 4, not_gradeable: 5, other: 6 }
+    ComputedSubmissionColumnBuilder.add_submission_status_priority_column(
+      search_scope,
+      @searcher,
+      priorities
+    ) => { scope:, column: status_priority_column }
     scope.order(Arel.sql("#{status_priority_column} #{direction}"))
   end
 

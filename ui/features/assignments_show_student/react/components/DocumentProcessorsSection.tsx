@@ -20,15 +20,15 @@ import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import AssetReportStatus from '@canvas/lti/react/AssetReportStatus'
-import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
+import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 import {
   filterReports,
   filterReportsByAttempt,
   shouldRenderAssetProcessorData,
-} from '@canvas/lti/react/AssetProcessorHelper'
+} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {Submission} from '../../assignments_show_student.d'
 
 const I18n = createI18nScope('assignments_2_student_content')

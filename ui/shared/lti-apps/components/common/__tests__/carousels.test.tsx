@@ -45,7 +45,14 @@ describe('Carousels render as expected', () => {
   })
 
   it('ImageCarousel renders as expected', () => {
-    render(<ImageCarouselModal isModalOpen={true} setModalOpen={() => {}} screenshots={product[0].screenshots} productName={product[0].name} />)
+    render(
+      <ImageCarouselModal
+        isModalOpen={true}
+        setModalOpen={() => {}}
+        screenshots={product[0].screenshots}
+        productName={product[0].name}
+      />,
+    )
 
     const displayedImage = document.querySelector('img') as HTMLImageElement
     expect(displayedImage.src).toContain('greatimage')

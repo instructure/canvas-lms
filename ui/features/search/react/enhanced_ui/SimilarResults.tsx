@@ -36,7 +36,9 @@ export default function SimilarResults(props: Props) {
   return (
     <Flex gap="sectionElements" direction="column">
       <Flex.Item>
-        <Heading variant="titleSection">{I18n.t('You may also be interested in')}</Heading>
+        <Heading variant="titleSection" level="h2">
+          {I18n.t('You may also be interested in')}
+        </Heading>
       </Flex.Item>
       {props.results.map((result, index) => (
         <ResultCard

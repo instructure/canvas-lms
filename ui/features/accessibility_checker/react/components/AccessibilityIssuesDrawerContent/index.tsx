@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, Ref, useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {Ref, useCallback, useEffect, useRef, useState, useContext, useMemo} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -26,18 +26,29 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {useShallow} from 'zustand/react/shallow'
+import {FormFieldMessage} from '@instructure/ui-form-field'
 
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useDebouncedCallback} from 'use-debounce'
-
+import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
-import {AccessibilityIssue, ContentItem, FormType, FormValue} from '../../types'
+import {AccessibilityIssue, ContentItem, ContentTypeToKey, FormType, FormValue} from '../../types'
+import {stripQueryString} from '../../utils'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
+import {
+  useAccessibilityCheckerStore,
+  defaultNextResource,
+  NextResource,
+} from '../../stores/AccessibilityCheckerStore'
+
+import SuccessView from './SuccessView'
+import {useNextResource} from '../../hooks/useNextResource'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -62,24 +73,59 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
 }: AccessibilityIssuesDrawerContentProps) => {
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const [currentIssueIndex, setCurrentIssueIndex] = useState(0)
+  const context = useContext(AccessibilityCheckerContext)
+  const {setSelectedItem} = context
   const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
-  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string>('')
+  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>()
+  const [accessibilityIssues, setAccessibilityIssues, tableData, setTableData] =
+    useAccessibilityCheckerStore(
+      useShallow(state => [
+        state.accessibilityIssues,
+        state.setAccessibilityIssues,
+        state.tableData,
+        state.setTableData,
+      ]),
+    )
+
+  const {getNextResource, updateCountPropertyForItem, getAccessibilityIssuesByItem} =
+    useNextResource()
+  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
+  const setOrderedTableData = useAccessibilityCheckerStore(
+    useShallow(state => state.setOrderedTableData),
+  )
+  const nextResource = useAccessibilityCheckerStore(useShallow(state => state.nextResource))
+  const setNextResource = useAccessibilityCheckerStore(useShallow(state => state.setNextResource))
 
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
-  const formRef: Ref<FormHandle> = createRef<FormHandle>()
+  const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
   const regionRef = useRef<HTMLDivElement | null>(null)
 
   // This debounces the preview update to prevent excessive API calls when the user is typing.
   const updatePreview = useDebouncedCallback((formValue: FormValue) => {
-    previewRef.current?.update(formValue)
+    previewRef.current?.update(
+      formValue,
+      () => {
+        setFormError(null)
+        setAssertiveAlertMessage(null)
+        setIsRemediated(true)
+      },
+      error => {
+        if (error) {
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
+        setIsRemediated(false)
+      },
+    )
   }, 1000)
-  const currentIssue = issues[currentIssueIndex]
+  const current = {resource: item, issues: issues, issue: issues[currentIssueIndex]}
 
   const isApplyButtonHidden = useMemo(
-    () => [FormType.CheckboxTextInput].includes(currentIssue?.form?.type),
-    [currentIssue],
+    () => [FormType.CheckboxTextInput].includes(current.issue?.form?.type),
+    [current.issue],
   )
 
   const handleNext = useCallback(() => {
@@ -90,89 +136,223 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     setCurrentIssueIndex(prev => Math.max(prev - 1, 0))
   }, [])
 
+  const handleNextResource = useCallback(() => {
+    if (!nextResource) return
+    const nextItem = nextResource.item
+    if (!nextItem) return
+    setSelectedItem(nextItem)
+    if (orderedTableData) {
+      const newNextResource = getNextResource(orderedTableData, nextItem)
+      if (newNextResource) {
+        setNextResource(newNextResource)
+      }
+    }
+  }, [nextResource, orderedTableData, setSelectedItem, setNextResource])
   const handleApply = useCallback(() => {
     setIsFormLocked(true)
     const formValue = formRef.current?.getValue()
     previewRef.current?.update(
       formValue,
       () => {
-        setAssertiveAlertMessage(currentIssue.form.undoText || I18n.t('Issue fixed'))
+        setFormError(null)
+        setAssertiveAlertMessage(current.issue.form.undoText || I18n.t('Issue fixed'))
         setIsRemediated(true)
         setIsFormLocked(false)
       },
-      () => {
-        setAssertiveAlertMessage(I18n.t('Error applying issue'))
+      error => {
+        if (error) {
+          formRef.current?.focus()
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
         setIsRemediated(false)
         setIsFormLocked(false)
       },
     )
-  }, [formRef, previewRef])
+  }, [formRef, previewRef, current.issue])
 
   const handleUndo = useCallback(() => {
     setIsFormLocked(true)
     previewRef.current?.reload(
       () => {
+        setFormError(null)
         setAssertiveAlertMessage(I18n.t('Issue undone'))
         setIsRemediated(false)
         setIsFormLocked(false)
       },
-      () => {
-        setAssertiveAlertMessage(I18n.t('Error undoing issue'))
+      error => {
+        if (error) {
+          formRef.current?.focus()
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
         setIsRemediated(true)
         setIsFormLocked(false)
       },
     )
-  }, [previewRef])
+  }, [formRef, previewRef])
+
+  const updateTableData = useCallback(
+    (updatedIssues: AccessibilityIssue[]) => {
+      if (!tableData) return
+      const updatedTableData = tableData.map(contentItem => {
+        if (contentItem.id === item.id && contentItem.type === item.type) {
+          return {...contentItem, count: updatedIssues.length}
+        }
+        return contentItem
+      })
+      setTableData(updatedTableData)
+    },
+    [tableData, item, setTableData],
+  )
+
+  const updateAccessibilityIssues = useCallback(
+    (updatedIssues: AccessibilityIssue[]) => {
+      if (!accessibilityIssues) return
+
+      const key = ContentTypeToKey[item.type]
+      const collection = accessibilityIssues[key]
+      const target = collection?.[item.id]
+
+      if (!target) return
+
+      const updated = {
+        ...accessibilityIssues,
+        [key]: {
+          ...collection,
+          [item.id]: {
+            ...target,
+            issues: updatedIssues,
+            count: updatedIssues.length,
+          },
+        },
+      }
+
+      setAccessibilityIssues(updated)
+    },
+    [accessibilityIssues, item.id, item.type, setAccessibilityIssues],
+  )
 
   const handleSaveAndNext = useCallback(() => {
-    if (!currentIssue) return
+    if (!current.issue) return
 
-    const issueId = currentIssue.id
+    const issueId = current.issue.id
     const formValue = formRef.current?.getValue()
 
     setIsRequestInFlight(true)
     doFetchApi({
-      path: window.location.href + '/issues',
+      path: stripQueryString(window.location.href) + '/issues',
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        content_type: item.type,
-        content_id: item.id,
-        rule: currentIssue.ruleId,
-        path: currentIssue.path,
+        content_type: current.resource.type,
+        content_id: current.resource.id,
+        rule: current.issue.ruleId,
+        path: current.issue.path,
         value: formValue,
       }),
     })
       .then(() => {
         const updatedIssues = issues.filter(issue => issue.id !== issueId)
         setIssues(updatedIssues)
+        if (orderedTableData) {
+          const updatedOrderedTableData = updateCountPropertyForItem(
+            orderedTableData,
+            current.resource,
+          )
+          setOrderedTableData(updatedOrderedTableData)
+          if (nextResource) {
+            const nextItem: ContentItem = orderedTableData[nextResource.index]
+            if (nextItem) {
+              if (accessibilityIssues) {
+                nextItem.issues = getAccessibilityIssuesByItem(accessibilityIssues, nextItem)
+              }
+              const updatedNextResource: NextResource = {index: nextResource.index, item: nextItem}
+              setNextResource(updatedNextResource)
+            }
+          }
+        }
+        updateTableData(updatedIssues)
+        updateAccessibilityIssues(updatedIssues)
         setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
       })
       .catch(err => console.error('Error saving accessibility issue. Error is: ' + err.message))
       .finally(() => setIsRequestInFlight(false))
-  }, [currentIssue, formRef, item.id, item.type, issues])
+  }, [
+    current.issue,
+    formRef,
+    current.resource.id,
+    current.resource.type,
+    issues,
+    updateTableData,
+    updateAccessibilityIssues,
+    accessibilityIssues,
+    orderedTableData,
+    nextResource,
+  ])
+
+  const handleApplyAndSaveAndNext = useCallback(() => {
+    setIsFormLocked(true)
+    const formValue = formRef.current?.getValue()
+    previewRef.current?.update(
+      formValue,
+      () => {
+        setFormError(null)
+        setAssertiveAlertMessage(null)
+        setIsRemediated(true)
+        setIsFormLocked(false)
+        handleSaveAndNext()
+      },
+      error => {
+        if (error) {
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
+        setIsRemediated(false)
+        setIsFormLocked(false)
+      },
+    )
+  }, [handleSaveAndNext, formRef, previewRef])
 
   const applyButtonText = useMemo(() => {
-    if (!currentIssue) return null
+    if (!current.issue) return null
     if (
-      currentIssue.form.type === FormType.Button ||
-      currentIssue.form.type === FormType.ColorPicker
+      current.issue.form.type === FormType.Button ||
+      current.issue.form.type === FormType.ColorPicker
     )
-      return currentIssue.form.label
-    return currentIssue.form.action || I18n.t('Apply')
-  }, [currentIssue])
+      return current.issue.form.label
+    return current.issue.form.action || I18n.t('Apply')
+  }, [current.issue])
+
+  const handleClearError = useCallback(() => {
+    setFormError(null)
+  }, [])
 
   useEffect(() => {
     setIsRemediated(false)
-  }, [currentIssue])
+    setIsFormLocked(false)
+    setAssertiveAlertMessage(null)
+    setFormError(null)
+  }, [current.issue])
 
-  // TODO: This is a temporary fix to prevent the component from crashing when there are no issues.
-  if (!currentIssue) return null
+  if (!current.issue)
+    return (
+      <SuccessView
+        title={current.resource.title}
+        nextResource={nextResource || defaultNextResource}
+        onClose={onClose}
+        handleNext={handleNext}
+        handlePrevious={handlePrevious}
+        handleNextResource={handleNextResource}
+        assertiveAlertMessage={assertiveAlertMessage || ''}
+        getLiveRegion={getLiveRegion}
+      />
+    )
 
   if (isRequestInFlight) return renderSpinner()
 
   return (
-    <>
+    <View position="fixed" overflowY="auto">
       <Flex as="div" direction="column" height="100vh" width="100%">
         <Flex.Item
           as="header"
@@ -182,7 +362,9 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           }}
         >
           <View>
-            <Heading level="h2">{item.title}</Heading>
+            <Heading level="h2" variant="titleCardRegular">
+              {current.resource.title}
+            </Heading>
             <CloseButton
               placement="end"
               data-testid="close-button"
@@ -192,13 +374,13 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
             />
           </View>
           <View>
-            <Text size="large" as="h3">
+            <Text size="large" variant="descriptionPage" as="h3">
               {I18n.t('Issue %{current}/%{total}: %{message}', {
                 current: currentIssueIndex + 1,
                 total: issues.length,
-                message: currentIssue.displayName,
+                message: current.issue.displayName,
               })}{' '}
-              <WhyMattersPopover issue={currentIssue} />
+              <WhyMattersPopover issue={current.issue} />
             </Text>
           </View>
         </Flex.Item>
@@ -206,54 +388,73 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           <Flex justifyItems="space-between">
             <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
             <Flex gap="small">
-              <Link href={item.url} variant="standalone">
+              <Link href={current.resource.url} variant="standalone">
                 {I18n.t('Open Page')}
               </Link>
-              <Link href={item.editUrl} variant="standalone">
+              <Link href={current.resource.editUrl} variant="standalone">
                 {I18n.t('Edit Page')}
               </Link>
             </Flex>
           </Flex>
           <View as="div" margin="medium 0">
-            <Preview ref={previewRef} issue={currentIssue} itemId={item.id} itemType={item.type} />
+            <Preview
+              ref={previewRef}
+              issue={current.issue}
+              itemId={current.resource.id}
+              itemType={current.resource.type}
+            />
           </View>
           <View as="section" margin="medium 0">
             <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
             <br aria-hidden={true} />
-            <Text weight="weightRegular">{currentIssue.message}</Text>
+            <Text weight="weightRegular">{current.issue.message}</Text>
           </View>
           <View as="section" margin="medium 0">
-            <Form ref={formRef} issue={currentIssue} onReload={updatePreview} />
+            <Form
+              ref={formRef}
+              issue={current.issue}
+              error={formError}
+              onReload={updatePreview}
+              onClearError={handleClearError}
+            />
           </View>
           {!isApplyButtonHidden && (
             <View as="section" margin="medium 0">
               <ApplyButton
                 onApply={handleApply}
                 onUndo={handleUndo}
-                undoMessage={currentIssue.form.undoText}
+                undoMessage={current.issue.form.undoText}
                 isApplied={isRemediated}
                 isLoading={isFormLocked}
               >
                 {applyButtonText}
               </ApplyButton>
+              {formError && current.issue.form.type === FormType.Button && (
+                <View as="div" margin="x-small 0">
+                  <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                </View>
+              )}
             </View>
           )}
         </Flex.Item>
         <Flex.Item as="footer">
           <AccessibilityIssuesDrawerFooter
+            nextButtonName={I18n.t('Save & Next')}
             onNext={handleNext}
             onBack={handlePrevious}
-            onSaveAndNext={handleSaveAndNext || handleApply}
+            onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
             isBackDisabled={currentIssueIndex === 0 || isFormLocked}
             isNextDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
-            isSaveAndNextDisabled={(!isRemediated && !isApplyButtonHidden) || isFormLocked}
+            isSaveAndNextDisabled={
+              (!isRemediated && !isApplyButtonHidden) || isFormLocked || !!formError
+            }
           />
         </Flex.Item>
       </Flex>
       <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
-        {assertiveAlertMessage}
+        {assertiveAlertMessage || ''}
       </Alert>
-    </>
+    </View>
   )
 }
 

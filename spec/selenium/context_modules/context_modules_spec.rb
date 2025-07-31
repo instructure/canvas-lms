@@ -19,6 +19,7 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "../helpers/announcements_common"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
 
@@ -27,6 +28,7 @@ describe "context modules" do
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
+  include AnnouncementsCommon
 
   context "adds existing items to modules" do
     before(:once) do
@@ -225,14 +227,13 @@ describe "context modules" do
     end
 
     it "edits available/until dates on a ungraded discussion in a module", priority: "2" do
-      skip "Will be fixed in VICE-5209"
       available_from = 2.days.from_now
       available_until = 4.days.from_now
       @discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion")
       @mod.add_item(type: "discussion_topic", id: @discussion.id)
       go_to_modules
       fln("Non-graded Published Discussion").click
-      f(".edit-btn").click
+      click_edit_btn
       replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(available_from), tab_out: true)
       replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(available_until), tab_out: true)
       expect_new_page_load { f(".form-actions button[type=submit]").click }
@@ -709,34 +710,28 @@ describe "context modules" do
       validate_selector_displayed(".item-group-container")
     end
 
-    context "when :react_discussions_post ff is ON" do
+    context "when visiting a graded discussion in a module" do
       before do
-        Account.default.enable_feature!(:react_discussions_post)
+        @module = public_course.context_modules.create!(name: "module 1")
+        @assignment = @course.assignments.create!(name: "assignemnt")
+        @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
+        @module.add_item(type: "discussion_topic", id: @discussion.id)
       end
 
-      context "when visiting a graded discussion in a module" do
-        before do
-          @module = public_course.context_modules.create!(name: "module 1")
-          @assignment = @course.assignments.create!(name: "assignemnt")
-          @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
-          @module.add_item(type: "discussion_topic", id: @discussion.id)
-        end
+      it "redirects unauthenticated users to login page" do
+        get "/courses/#{public_course.id}/modules"
+        f("a[title='Graded Discussion']").click
+        expect(f("#pseudonym_session_unique_id")).to be_present
+      end
 
-        it "redirects unauthenticated users to login page" do
-          get "/courses/#{public_course.id}/modules"
-          f("a[title='Graded Discussion']").click
-          expect(f("#pseudonym_session_unique_id")).to be_present
-        end
-
-        it "lets users with access see the discussion" do
-          student = user_factory(active_all: true, active_state: "active")
-          public_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
-          user_session student
-          get "/courses/#{public_course.id}/modules"
-          f("a[title='Graded Discussion']").click
-          wait_for_ajaximations
-          expect(fj("[data-testid='discussion-topic-container']:contains('Graded Discussion')")).to be_present
-        end
+      it "lets users with access see the discussion" do
+        student = user_factory(active_all: true, active_state: "active")
+        public_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+        user_session student
+        get "/courses/#{public_course.id}/modules"
+        f("a[title='Graded Discussion']").click
+        wait_for_ajaximations
+        expect(fj("[data-testid='discussion-topic-container']:contains('Graded Discussion')")).to be_present
       end
     end
   end

@@ -17,6 +17,7 @@
  */
 
 import {REPLY_TO_TOPIC, REPLY_TO_ENTRY} from './constants'
+import {attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor} from './assetProcessorGraphqlTypes'
 
 const prepareOverride = (
   overrideDueDate,
@@ -366,6 +367,7 @@ export const prepareAssignmentPayload = (
   isCheckpoints,
   existingAssignment,
   suppressedAssignment,
+  assetProcessors,
 ) => {
   /*
   Return null if the assignment is not graded and there is no existing assignment.
@@ -396,6 +398,9 @@ export const prepareAssignmentPayload = (
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
     suppressAssignment: suppressedAssignment,
+    assetProcessors: assetProcessors.map(
+      attachedAssetProcessorGraphqlMutationFromStateAttachedProcessor,
+    ),
   }
   if (abGuid) {
     payload = {

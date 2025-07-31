@@ -96,7 +96,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 aria-expanded={expanded}
               />
             </Flex.Item>
-            <Flex.Item padding="0 0 x-small 0">
+            <Flex.Item padding="0 0 x-small 0" shouldGrow shouldShrink>
               <Flex direction="column" as="div" margin="none">
                 <Flex.Item margin="none">
                   <Heading level="h2">
@@ -108,7 +108,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 {(unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt)) ||
                 prerequisites?.length ? (
                   <Flex.Item margin="none">
-                    <Flex gap="xx-small" alignItems="center">
+                    <Flex gap="xx-small" alignItems="center" wrap="wrap">
                       {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
                         <Flex.Item>
                           <ModuleHeaderUnlockAt unlockAt={unlockAt} />

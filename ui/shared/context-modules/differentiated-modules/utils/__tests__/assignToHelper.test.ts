@@ -276,6 +276,44 @@ describe('assitnToHelper', () => {
       expect(generateDateDetailsPayload(cards, true, [])).toEqual(expectedPayload)
     })
 
+    it('includes previous/new tag(s) in payload if hasModuleOverrides is false', () => {
+      const cards: ItemAssignToCardSpec[] = [
+        {
+          overrideId: undefined,
+          isValid: true,
+          hasAssignees: true,
+          defaultOptions: ['tag-1'] as string[],
+          selectedAssigneeIds: ['tag-1', 'tag-2'] as string[],
+        } as ItemAssignToCardSpec,
+      ]
+      const expectedPayload = <DateDetailsPayload>{
+        assignment_overrides: [
+          {
+            id: undefined,
+            lock_at: undefined,
+            group_id: '1',
+            due_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            unassign_item: false,
+            unlock_at: undefined,
+          },
+          {
+            id: undefined,
+            lock_at: undefined,
+            group_id: '2',
+            due_at: undefined,
+            reply_to_topic_due_at: undefined,
+            required_replies_due_at: undefined,
+            unassign_item: false,
+            unlock_at: undefined,
+          },
+        ] as unknown as DateDetailsOverride[],
+        only_visible_to_overrides: true,
+      }
+      expect(generateDateDetailsPayload(cards, false, [])).toEqual(expectedPayload)
+    })
+
     it('includes an unassigned override for any deleted module assignees', () => {
       const cards: ItemAssignToCardSpec[] = [
         {

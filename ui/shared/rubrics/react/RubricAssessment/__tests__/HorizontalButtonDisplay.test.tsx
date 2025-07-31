@@ -51,6 +51,7 @@ describe('HorizontalButtonDisplay', () => {
     onSelectRating: jest.fn(),
     criterionUseRange: false,
     isSelfAssessment: false,
+    hidePoints: false,
   }
 
   afterEach(() => {
@@ -109,5 +110,15 @@ describe('HorizontalButtonDisplay', () => {
 
     const ratingDetails = screen.getByTestId('rating-details-2')
     expect(ratingDetails).toHaveTextContent('3 pts')
+  })
+
+  it('does not show points when hidePoints is true', () => {
+    render(<HorizontalButtonDisplay {...defaultProps} selectedRatingId="1" hidePoints={true} />)
+
+    const ratingDetails = screen.getByTestId('rating-details-1')
+    expect(ratingDetails).toBeInTheDocument()
+    expect(ratingDetails).toHaveTextContent('Full Marks')
+    expect(ratingDetails).toHaveTextContent('Student demonstrates excellent understanding')
+    expect(ratingDetails).not.toHaveTextContent('5 pts')
   })
 })

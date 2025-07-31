@@ -234,7 +234,7 @@ module Importers
         rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
         rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
         if rubric
-          assoc = rubric.associate_with(item, context, purpose: "grading", skip_updating_points_possible: true)
+          assoc = rubric.associate_with(item, context, purpose: "grading", skip_updating_points_possible: true, skip_updating_rubric_association_count: true)
           assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
           assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
           assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
@@ -245,6 +245,7 @@ module Importers
             assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
           end
           assoc.skip_updating_points_possible = true
+          assoc.skip_updating_rubric_association_count = true
           assoc.save
 
           item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"

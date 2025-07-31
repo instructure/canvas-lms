@@ -79,6 +79,12 @@ module Types
       it will return all rubric assessments for the current submission
       or submission history.
     MD
+    argument :include_provisional_assessments, Boolean, <<~MD, required: false, default_value: false
+      When true, provisional rubric assessments that the current user has permission to see will be returned.
+      The Moderator has permission to see all provisional rubric assessments.
+      Provisional Graders only have permission to view their own provisional rubric assessments.
+      Default behavior is to omit provisional assessments entirely.
+    MD
   end
 
   class SubmissionCommentsSortOrderType < Types::BaseEnum
@@ -162,28 +168,62 @@ module Interfaces::SubmissionInterface
     submission.attempt || 0 # Nil in database, make it 0 here for easier api
   end
 
-  field :comments_connection, Types::SubmissionCommentType.connection_type, null: true do
+  field :comments_connection, Types::SubmissionCommentType.connection_type, null: false do
     argument :filter, Types::SubmissionCommentFilterInputType, required: false, default_value: {}
     argument :sort_order,
              Types::SubmissionCommentsSortOrderType,
              required: false,
              default_value: nil
     argument :include_draft_comments, Boolean, required: false, default_value: false
+    argument :include_provisional_comments, Boolean, <<~MD, required: false, default_value: false
+      When true, provisional comments that the current user has permission to see will be returned.
+      The Moderator has permission to see all provisional comments.
+      Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
+      Otherwise, Provisional Graders can only see their own comments.
+      Students cannot see provisional comments.
+    MD
   end
-  def comments_connection(filter:, sort_order:, include_draft_comments:)
+  def comments_connection(filter:, sort_order:, include_draft_comments:, include_provisional_comments:)
     filter = filter.to_h
     filter => all_comments:, for_attempt:, peer_review:
 
+    # Preload provisional comments if needed
+    provisional_comments_promise = if include_provisional_comments
+                                     Loaders::AssociationLoader
+                                       .for(Submission, :provisional_grades)
+                                       .load(submission)
+                                       .then do |provisional_grades|
+                                         if provisional_grades.present?
+                                           SubmissionComment
+                                             .where(provisional_grade_id: provisional_grades.map(&:id))
+                                             .preload(:author, :provisional_grade)
+                                             .then do |provisional_comments|
+                                               provisional_comments
+                                             end
+                                         else
+                                           Promise.resolve([])
+                                         end
+                                       end
+                                   else
+                                     Promise.resolve([])
+                                   end
+
     load_association(:assignment).then do
       load_association(:submission_comments).then do
-        comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
+        provisional_comments_promise.then do |provisional_comments|
+          comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
 
-        comments = comments.select { |comment| comment.attempt.in?(attempt_filter(for_attempt)) } unless all_comments
-        comments = comments.select { |comment| comment.author == current_user } if peer_review && !all_comments
-        comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
-        comments.reverse! if sort_order.to_s.casecmp("desc").zero?
+          if include_provisional_comments
+            comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
+          end
 
-        comments.select { |comment| comment.grants_right?(current_user, :read) }
+          comments = comments.select { |comment| comment.attempt.in?(attempt_filter(for_attempt)) } unless all_comments
+          comments = comments.select { |comment| comment.author == current_user } if peer_review && !all_comments
+          comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
+          comments.reverse! if sort_order.to_s.casecmp("desc").zero?
+
+          comments.select { |comment| comment.grants_right?(current_user, :read) }
+        end
       end
     end
   end
@@ -476,7 +516,7 @@ module Interfaces::SubmissionInterface
     end
   end
 
-  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: true do
+  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: false do
     argument :filter,
              Types::SubmissionRubricAssessmentFilterInputType,
              required: false,
@@ -485,6 +525,7 @@ module Interfaces::SubmissionInterface
   def rubric_assessments_connection(filter:)
     filter = filter.to_h
     target_attempt = filter[:for_all_attempts] ? nil : (filter[:for_attempt] || object.attempt)
+    include_provisional = filter.fetch(:include_provisional_assessments, false)
 
     Promise
       .all([load_association(:assignment), load_association(:rubric_assessments)])
@@ -506,6 +547,29 @@ module Interfaces::SubmissionInterface
               .load_many(assessments_needing_versions_loaded)
           end
 
+        provisional_loader_promise = if include_provisional
+                                       Loaders::AssociationLoader
+                                         .for(Submission, :provisional_grades)
+                                         .load(submission)
+                                         .then do |provisional_grades|
+                                           if provisional_grades.present?
+                                             RubricAssessment
+                                               .where(
+                                                 artifact_type: "ModeratedGrading::ProvisionalGrade",
+                                                 artifact_id: provisional_grades.map(&:id)
+                                               )
+                                               .preload(:rubric_association, :assessor, :user)
+                                               .then do |provisional_rubric_assessments|
+                                                 provisional_rubric_assessments
+                                               end
+                                           else
+                                             Promise.resolve(nil)
+                                           end
+                                         end
+                                     else
+                                       Promise.resolve(nil)
+                                     end
+
         Promise
           .all(
             [
@@ -515,10 +579,19 @@ module Interfaces::SubmissionInterface
                 .load(submission.assignment),
               Loaders::AssociationLoader
                 .for(RubricAssessment, :rubric_association)
-                .load_many(submission.rubric_assessments)
+                .load_many(submission.rubric_assessments),
+              provisional_loader_promise
             ]
           )
-          .then { submission.visible_rubric_assessments_for(current_user, attempt: target_attempt) }
+          .then do |results|
+            provisional_assessments = results.last || []
+            submission.visible_rubric_assessments_for(
+              current_user,
+              attempt: target_attempt,
+              include_provisional:,
+              provisional_assessments:
+            )
+          end
       end
   end
 

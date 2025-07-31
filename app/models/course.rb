@@ -289,6 +289,9 @@ class Course < ActiveRecord::Base
   has_many :course_paces
   has_many :blackout_dates, as: :context, inverse_of: :context
   has_many :favorites, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :course
+
+  has_many :accessibility_resource_scans, dependent: :destroy
 
   prepend Profile::Association
 
@@ -367,6 +370,9 @@ class Course < ActiveRecord::Base
   # A hard limit on the number of graders (excluding the moderator) a moderated
   # assignment can have.
   MODERATED_GRADING_GRADER_LIMIT = 10
+
+  # Maximum number of resources that can be scanned for accessibility issues
+  MAX_ACCESSIBILITY_SCAN_RESOURCES = 1000
 
   # using a lambda for setting name to avoid caching the translated string when the model is loaded
   # (in case selected language changes)
@@ -1594,6 +1600,10 @@ class Course < ActiveRecord::Base
 
   def attachment_associations_enabled?
     root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+  end
+
+  def access_for_attachment_association?(user, session, _association, location_param)
+    location_param.start_with?("course_syllabus_") && grants_right?(user, session, :read_syllabus)
   end
 
   def home_page
@@ -3465,17 +3475,6 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if feature_enabled?(:accessibility_tab_enable)
-      default_tabs.insert(1,
-                          {
-                            id: TAB_ACCESSIBILITY,
-                            label: t("#tabs.accessibility", "Accessibility"),
-                            css_class: "accessibility",
-                            href: :course_accessibility_index_path,
-                            visibility: "admins"
-                          })
-    end
-
     if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,
                           {
@@ -3493,6 +3492,17 @@ class Course < ActiveRecord::Base
                             css_class: "course_paces",
                             href: :course_course_pacing_path
                           })
+    end
+
+    if feature_enabled?(:accessibility_tab_enable)
+      # Add Accessibility tab at the end of the tabs (except for Settings tab)
+      default_tabs.push({
+                          id: TAB_ACCESSIBILITY,
+                          label: t("#tabs.accessibility", "Accessibility"),
+                          css_class: "accessibility",
+                          href: :course_accessibility_index_path,
+                          visibility: "admins"
+                        })
     end
 
     # Remove already cached tabs for Horizon courses
@@ -4573,6 +4583,16 @@ class Course < ActiveRecord::Base
     end
 
     false
+  end
+
+  # Accessibility scan limit check
+  def exceeds_accessibility_scan_limit?
+    # TODO: add caching with proper invalidation
+    wiki_page_count = wiki_pages.not_deleted.count
+    assignment_count = assignments.active.count
+
+    total = wiki_page_count + assignment_count
+    total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 
   private

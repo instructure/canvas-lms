@@ -74,9 +74,10 @@ module Outcomes
       os_results     = fetch_outcomes_service_results
 
       combined_results = combine_results(canvas_results, os_results)
-      return [] if combined_results.empty?
+      return OutcomeRollup.none if combined_results.empty?
 
-      generate_student_rollups(combined_results)
+      student_rollups = generate_student_rollups(combined_results)
+      store_rollups(student_rollups)
     end
 
     private
@@ -157,10 +158,86 @@ module Outcomes
       end
     end
 
-    # @param rollups [Array<OutcomeRollup>]
+    # @param rollups [Array<Rollup>]
     def store_rollups(rollups)
-      # Convert rollups to OutcomeRollup record then store
-      # TODO: upsert OutcomeRollup records
+      # Validate that we have exactly one student's rollups
+      case rollups.size
+      when 0
+        # Student has been removed from all outcomes, mark all as deleted
+        delete_all_student_rollups
+        return OutcomeRollup.none
+      when 1
+        student_rollup = rollups.first
+        # When a student has no outcome scores, it means they have no scored outcomes
+        if student_rollup.scores.blank?
+          delete_all_student_rollups
+          return OutcomeRollup.none
+        end
+      else
+        raise ArgumentError, "Expected rollups for exactly one student, got #{rollups.size} students"
+      end
+
+      rows = build_rollup_rows(student_rollup)
+      outcome_ids = student_rollup.scores.map { |s| s.outcome.id }
+
+      upserted_ids = []
+      OutcomeRollup.transaction do
+        # If a student has been removed from assignments associated with an outcome
+        # They should have those OutcomeRollups marked as deleted
+        if outcome_ids.any?
+          OutcomeRollup.where(
+            course_id: course.id,
+            user_id: student.id,
+            workflow_state: "active"
+          ).where.not(outcome_id: outcome_ids)
+                       .update_all(workflow_state: "deleted")
+        end
+
+        # Upsert in batches to avoid oversized statements
+        rows.each_slice(500) do |batch|
+          result = OutcomeRollup.upsert_all(
+            batch,
+            unique_by: %i[course_id user_id outcome_id],
+            update_only: %i[calculation_method aggregate_score last_calculated_at workflow_state],
+            returning: %w[id]
+          )
+          # Collect generated or updated ids
+          batch_ids = result.map { |row| row["id"] }
+          upserted_ids.concat(batch_ids)
+        end
+      end
+
+      # Reload persisted records to ensure ActiveRecord objects
+      OutcomeRollup.where(id: upserted_ids)
+    end
+
+    def build_rollup_rows(rollup)
+      rollup.scores.filter_map do |score|
+        # Skip scores that are nil (e.g., from n_mastery calculations with insufficient attempts)
+        next if score.score.nil?
+
+        {
+          root_account_id: course.root_account_id,
+          course_id: course.id,
+          user_id: student.id,
+          outcome_id: score.outcome.id,
+          calculation_method: score.outcome.calculation_method,
+          aggregate_score: score.score,
+          workflow_state: "active",
+          last_calculated_at: Time.current,
+        }
+      end
+    end
+
+    # Helper method to delete all active rollups for the student
+    def delete_all_student_rollups
+      OutcomeRollup.where(
+        course_id: course.id,
+        user_id: student.id,
+        workflow_state: "active"
+      ).update_all(
+        workflow_state: "deleted"
+      )
     end
   end
 end

@@ -28,7 +28,7 @@ module Accessibility
 
         caption = elem.query_selector("caption")
 
-        I18n.t("Table caption should be present.") if !caption || caption.text_content.gsub(/\s/, "") == ""
+        I18n.t("Table caption should be present.") if !caption || caption.text.gsub(/\s/, "") == ""
       end
 
       def self.display_name
@@ -56,8 +56,62 @@ module Accessibility
           label: I18n.t("Table caption"),
           undo_text: I18n.t("Caption added"),
           value: "",
-          action: I18n.t("Add caption")
+          action: I18n.t("Add caption"),
+          can_generate_fix: true,
+          generate_button_label: I18n.t("Generate caption")
         )
+      end
+
+      def self.generate_fix(elem)
+        llm_config = LLMConfigs.config_for("table_caption_generate")
+        unless llm_config
+          raise "LLM configuration not found for: table_caption_generate"
+        end
+
+        unless elem.tag_name.downcase == "table"
+          raise "HTML fragment is not a table."
+        end
+
+        table_preview = extract_table_preview(elem)
+
+        # Convert Nokogiri element to HTML string
+        table_html = table_preview.to_html
+
+        prompt, = llm_config.generate_prompt_and_options(substitutions: {
+                                                           HTML_TABLE: table_html,
+                                                         })
+
+        response = InstLLMHelper.client(llm_config.model_id).chat(
+          [{ role: "user", content: prompt }]
+        )
+        response.message[:content]
+      rescue => e
+        Rails.logger.error("Error generating table caption: #{e.message}")
+        Rails.logger.error e.backtrace.join("\n")
+        nil
+      end
+
+      def self.extract_table_preview(elem, rows_count = 5)
+        return nil unless elem.name.downcase == "table"
+
+        # Clone the table to avoid modifying the original
+        table = elem.dup
+
+        # Find all body rows (not in thead)
+        data_rows = []
+        table.css("tr").each do |row|
+          # Skip header rows (in thead or containing th elements when there's no thead)
+          next if row.parent && row.parent.name == "thead"
+
+          data_rows << row
+        end
+
+        # Keep only the first rows_count rows
+        rows_to_remove = data_rows[rows_count..]
+        rows_to_remove&.each(&:remove) if rows_to_remove&.any?
+
+        # Return the preview table
+        table
       end
 
       def self.fix!(elem, value)

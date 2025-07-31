@@ -22,7 +22,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {FilePreviewModal} from './FilePreviewModal'
 import {type File, type Folder} from '../../../interfaces/File'
 import {getIcon, getName} from '../../../utils/fileFolderUtils'
 import {generateUrlPath} from '../../../utils/folderUtils'
@@ -33,32 +32,15 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('files_v2')
 interface NameLinkProps {
   item: File | Folder
-  collection: (File | Folder)[]
   isStacked: boolean
+  onPreviewFile?: (file: File) => void
 }
 
-const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const location = useLocation()
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const previewId = searchParams.get('preview')
-    if (previewId === item.id) {
-      setIsModalOpen(true)
-    } else {
-      setIsModalOpen(false)
-    }
-  }, [location.search, item.id])
-
+const NameLink = ({item, isStacked, onPreviewFile}: NameLinkProps) => {
   const handleLinkClick = (e: React.MouseEvent) => {
     if (isFile) {
       e.preventDefault()
-      setIsModalOpen(true)
-      const searchParams = new URLSearchParams(location.search)
-      searchParams.set('preview', item.id)
-      navigate(`?${searchParams.toString()}`, {replace: true})
+      onPreviewFile?.(item as File)
     } else if (item.locked_for_user) {
       e.preventDefault()
       showFlashError(
@@ -67,17 +49,6 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
         }),
       )()
     }
-  }
-
-  const backToUrl = useMemo(() => {
-    const searchParams = new URLSearchParams(location.search)
-    searchParams.delete('preview')
-    return `${location.pathname}?${searchParams.toString()}`
-  }, [location.pathname, location.search])
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    navigate(backToUrl, {replace: true})
   }
 
   const isFile = 'display_name' in item
@@ -109,22 +80,6 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
     )
   }
 
-  const renderFilePreviewModal = () => {
-    if (!isFile) return null
-
-    const fileCollection = collection?.filter((item): item is File => 'display_name' in item)
-    if (!fileCollection?.length) return null
-
-    return (
-      <FilePreviewModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        item={item as File}
-        collection={fileCollection}
-      />
-    )
-  }
-
   const urlPath = () => {
     if (isFile) {
       return generatePreviewUrlPath(item as File)
@@ -134,29 +89,21 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   }
 
   return (
-    <>
-      <Link to={urlPath()} data-testid={name} onClick={handleLinkClick}>
-        {isStacked ? (
-          <>
-            {renderIconComponent()}
+    <Link to={urlPath()} data-testid={name} onClick={handleLinkClick}>
+      {isStacked ? (
+        <>
+          {renderIconComponent()}
+          {renderTextComponent()}
+        </>
+      ) : (
+        <Flex>
+          <Flex.Item margin="0 0 x-small 0">{renderIconComponent()}</Flex.Item>
+          <Flex.Item margin="0 0 0 small" shouldShrink={true} shouldGrow={false} overflowX="hidden">
             {renderTextComponent()}
-          </>
-        ) : (
-          <Flex>
-            <Flex.Item margin="0 0 x-small 0">{renderIconComponent()}</Flex.Item>
-            <Flex.Item
-              margin="0 0 0 small"
-              shouldShrink={true}
-              shouldGrow={false}
-              overflowX="hidden"
-            >
-              {renderTextComponent()}
-            </Flex.Item>
-          </Flex>
-        )}
-      </Link>
-      {renderFilePreviewModal()}
-    </>
+          </Flex.Item>
+        </Flex>
+      )}
+    </Link>
   )
 }
 

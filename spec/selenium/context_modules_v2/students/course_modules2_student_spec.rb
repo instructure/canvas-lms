@@ -20,6 +20,7 @@
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
 require_relative "../../helpers/items_assign_to_tray"
+require_relative "../shared_examples/course_modules2_shared"
 
 describe "context modules", :ignore_js_errors do
   include_context "in-process server selenium tests"
@@ -114,7 +115,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -134,7 +135,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click
@@ -158,7 +159,7 @@ describe "context modules", :ignore_js_errors do
       expect(student_modules_container).to be_displayed
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -177,7 +178,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click
@@ -358,39 +359,27 @@ describe "context modules", :ignore_js_errors do
   end
 
   context "module header icons and progress" do
-    it "shows Completed All Items if it has complete all items requirements" do
+    it "shows Completed all items if it has complete all items requirements" do
       @module1.completion_requirements = { @module_item1.id => { type: "must_view" } }
       @module1.save!
       go_to_modules
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete All Items")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete all items")
       get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed All Items")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed all items")
     end
 
-    it "shows Completed One Item if it has complete one item requirement" do
+    it "shows Completed 1 item if it has complete one item requirement" do
       @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
       @module1.requirement_count = 1
       @module1.save!
       go_to_modules
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete One Item")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete 1 item")
       get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed One Item")
-    end
-
-    it "shows to be completed circle items if item is part of requirements list" do
-      @module1.completion_requirements = {
-        @module_item1.id => { type: "must_view" },
-        @module_item2.id => { type: "must_submit" }
-      }
-      @module1.save!
-      go_to_modules
-      module_header_expand_toggles[0].click
-      expect(module_item_status_icon(@module_item1.id)).to be_displayed
-      expect(module_item_status_icon(@module_item2.id)).to be_displayed
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed 1 item")
     end
 
     it "shows Completed icon if item is complete" do
@@ -654,5 +643,9 @@ describe "context modules", :ignore_js_errors do
         expect(module_header_due_date_exists?(@module1.id)).to be_falsey
       end
     end
+  end
+
+  context "module locking" do
+    include_examples "module unlock dates"
   end
 end

@@ -20,7 +20,10 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {clickOrFail} from '../../__tests__/interactionHelpers'
 import {ToolDetailsInner} from '../ToolDetails'
-import {mockRegistrationWithAllInformation, mockSiteAdminRegistration} from '../../manage/__tests__/helpers'
+import {
+  mockRegistrationWithAllInformation,
+  mockSiteAdminRegistration,
+} from '../../manage/__tests__/helpers'
 import {BrowserRouter} from 'react-router-dom'
 import fetchMock from 'fetch-mock'
 
@@ -41,7 +44,7 @@ describe('ToolDetailsInner', () => {
             stale={stale}
             refreshRegistration={refresh}
           />
-        </BrowserRouter>
+        </BrowserRouter>,
       ),
     }
   }
@@ -56,7 +59,7 @@ describe('ToolDetailsInner', () => {
   it('calls the delete API endpoint when the delete button is clicked', async () => {
     fetchMock.delete('/api/v1/accounts/1/lti_registrations/1', {
       __type: 'Success',
-      data: {}
+      data: {},
     })
 
     const {wrapper} = renderToolDetailsInner()
@@ -70,7 +73,7 @@ describe('ToolDetailsInner', () => {
     const responseHeaders = response[1]
     expect(responseUrl).toBe('/api/v1/accounts/1/lti_registrations/1')
     expect(responseHeaders).toMatchObject({
-      method: 'DELETE'
+      method: 'DELETE',
     })
   })
 
@@ -93,10 +96,9 @@ describe('ToolDetailsInner', () => {
           stale={stale}
           refreshRegistration={refresh}
         />
-      </BrowserRouter>
+      </BrowserRouter>,
     )
     const deleteButton = await wrapper.getByTestId('delete-app')
     expect(deleteButton).toHaveAttribute('disabled')
   })
 })
-

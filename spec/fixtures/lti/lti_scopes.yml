@@ -27,19 +27,19 @@
 
 ### 1EdTech PNS, Asset Processor and associated services ###
 - scope: https://purl.imsglobal.org/spec/lti/scope/noticehandlers
-  description: Can register event notice handlers using the Platform Notification Service
+  description: Can register to be notified when Document Processor Assignment is submitted to
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/asset.readonly
-  description: Can fetch assets from the platform using the Asset Service
+  description: Can retrieve submissions from Document Processor Assignments
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/report
-  description: Can create reports using the Asset Report Service
+  description: Can send reports for Document Processor Assignments
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/eula/user
-  description: Can update or remove the tool's EULA accepted flag
+  description: Can track if EULA has been accepted
 
 - scope: https://purl.imsglobal.org/spec/lti/scope/eula/deployment
-  description: Can update or remove the tool's EULA requirement flag
+  description: Can reset EULA acceptance status
 
 ### Documented Canvas extensions ###
 - scope: https://canvas.instructure.com/lti/page_content/show

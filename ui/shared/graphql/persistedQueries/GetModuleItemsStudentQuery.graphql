@@ -5,6 +5,8 @@ query GetModuleItemsStudentQuery($moduleId: ID!) {
         _id
         id
         url
+        title
+        newTab
         indent
         position
         content {
@@ -32,6 +34,7 @@ query GetModuleItemsStudentQuery($moduleId: ID!) {
             lockAt
             todoDate
             discussionType
+            graded
             published
             replyToEntryRequiredCount
             submissionsConnection(filter: { includeUnsubmitted: true }) {
@@ -89,6 +92,11 @@ query GetModuleItemsStudentQuery($moduleId: ID!) {
           }
           ... on ModuleExternalTool {
             title
+            type: __typename
+            url
+            published
+          }
+          ... on ExternalTool {
             type: __typename
             url
             published

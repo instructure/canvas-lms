@@ -77,11 +77,11 @@ class TokenScopes
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
 
     # PNS + Asset Processor
-    LTI_PNS_SCOPE => I18n.t("Can register event notice handlers using the Platform Notification Service."),
-    LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can fetch assets from the platform using the Asset Service."),
-    LTI_ASSET_REPORT_SCOPE => I18n.t("Can create reports using the Asset Report Service."),
-    LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can update or remove the tool's EULA requirement flag."),
-    LTI_EULA_USER_SCOPE => I18n.t("Can update or remove the tool's EULA accepted flag."),
+    LTI_PNS_SCOPE => I18n.t("Can register to be notified when Document Processor Assignment is submitted to."),
+    LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can retrieve submissions from Document Processor Assignments."),
+    LTI_ASSET_REPORT_SCOPE => I18n.t("Can send reports for Document Processor Assignments."),
+    LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can reset EULA acceptance status."),
+    LTI_EULA_USER_SCOPE => I18n.t("Can track if EULA has been accepted."),
 
     # Canvas Extensions
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),

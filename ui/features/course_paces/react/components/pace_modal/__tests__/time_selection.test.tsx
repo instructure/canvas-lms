@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import { screen, fireEvent } from '@testing-library/react'
+import {screen, fireEvent} from '@testing-library/react'
 import {renderConnected} from '../../../__tests__/utils'
 import '@testing-library/jest-dom'
 import TimeSelection from '../TimeSelection'
-import { PRIMARY_PACE, STUDENT_PACE } from '../../../__tests__/fixtures'
-import { CoursePace, Pace } from 'features/course_paces/react/types'
+import {PRIMARY_PACE, STUDENT_PACE} from '../../../__tests__/fixtures'
+import {CoursePace, Pace} from 'features/course_paces/react/types'
 import keycode from 'keycode'
 
 const responsiveSize = 'small'
@@ -47,7 +47,7 @@ describe('Pace Modal TimeSelection', () => {
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     expect(screen.getByLabelText('Start Date')).toHaveValue('September 1, 2021')
   })
@@ -58,79 +58,79 @@ describe('Pace Modal TimeSelection', () => {
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     expect(screen.getByLabelText('End Date')).toHaveValue('November 30, 2021')
   })
 
   it('updates the end date when incrementing weeks', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const weeksInput = getByTestId('weeks-number-input')
-    fireEvent.keyDown(weeksInput, { keyCode: keycode.codes.up })
+    fireEvent.keyDown(weeksInput, {keyCode: keycode.codes.up})
 
     expect(screen.getByLabelText('End Date')).toHaveValue('December 7, 2021')
   })
 
   it('updates the end date when decrementing weeks', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const weeksInput = getByTestId('weeks-number-input')
-    fireEvent.keyDown(weeksInput, { keyCode: keycode.codes.down })
+    fireEvent.keyDown(weeksInput, {keyCode: keycode.codes.down})
 
     expect(screen.getByLabelText('End Date')).toHaveValue('November 23, 2021')
   })
 
   it('updates the end date when incrementing days', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const weeksInput = getByTestId('days-number-input')
-    fireEvent.keyDown(weeksInput, { keyCode: keycode.codes.up })
+    fireEvent.keyDown(weeksInput, {keyCode: keycode.codes.up})
 
     expect(screen.getByLabelText('End Date')).toHaveValue('December 1, 2021')
   })
 
   it('updates the end date when decrementing days', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const weeksInput = getByTestId('days-number-input')
-    fireEvent.keyDown(weeksInput, { keyCode: keycode.codes.down })
+    fireEvent.keyDown(weeksInput, {keyCode: keycode.codes.down})
 
     expect(screen.getByLabelText('End Date')).toHaveValue('November 29, 2021')
   })
 
   it('updates time to complete when start date is changed', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const dateText = '2021-09-16'
     const startDateInput = getByTestId('start-date-input')
 
-    fireEvent.change(startDateInput, { target: { value: dateText } })
+    fireEvent.change(startDateInput, {target: {value: dateText}})
     fireEvent.blur(startDateInput)
 
     const weeksInput = getByTestId('weeks-number-input')
@@ -139,17 +139,17 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('updates time to complete when end date is changed', () => {
-    const { getByTestId } = renderConnected(
+    const {getByTestId} = renderConnected(
       <TimeSelection
         coursePace={coursePace}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
     const dateText = '2021-12-23'
     const endDateInput = getByTestId('end-date-input')
 
-    fireEvent.change(endDateInput, { target: { value: dateText } })
+    fireEvent.change(endDateInput, {target: {value: dateText}})
     fireEvent.blur(endDateInput)
 
     const weeksInput = getByTestId('weeks-number-input')
@@ -158,12 +158,12 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('Start date input is not available for Student Pace', () => {
-    const { queryByTestId } = renderConnected(
+    const {queryByTestId} = renderConnected(
       <TimeSelection
         coursePace={STUDENT_PACE}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
 
     const startDateInput = queryByTestId('start-date-input')
@@ -172,12 +172,12 @@ describe('Pace Modal TimeSelection', () => {
   })
 
   it('Start date Label is shown for Student Pace', () => {
-    const { queryByTestId } = renderConnected(
+    const {queryByTestId} = renderConnected(
       <TimeSelection
         coursePace={STUDENT_PACE}
         appliedPace={appliedPace}
         responsiveSize={responsiveSize}
-      />
+      />,
     )
 
     const startDateLabel = queryByTestId('start-date-label')

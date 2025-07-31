@@ -34,6 +34,7 @@ class Mutations::UpdateLearningOutcomeGroup < Mutations::BaseMutation
 
     check_user_permissions
 
+    @outcome_group.saving_user = current_user
     if @outcome_group.update(attributes(input))
       if input[:parent_outcome_group_id] && input[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
         new_parent_group = get_parent_group(input[:parent_outcome_group_id])

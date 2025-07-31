@@ -21,9 +21,10 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
   type CheckboxTreeNode,
-  type ItemType, SwitchState,
+  type ItemType,
+  SwitchState,
   TreeSelector,
-  type TreeSelectorProps
+  type TreeSelectorProps,
 } from '../TreeSelector'
 
 const defaultProps: TreeSelectorProps = {
@@ -642,7 +643,7 @@ describe('TreeSelector', () => {
             'parent-item-1': {
               ...contextModulesProps.checkboxTreeNodes['parent-item-1'],
               childrenIds: [],
-              importAsOneModuleItemState
+              importAsOneModuleItemState,
             },
           },
           onChange: jest.fn(),
@@ -653,21 +654,29 @@ describe('TreeSelector', () => {
         const component = renderComponent(getProps('disabled'))
         await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
         expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
-        expect(component.getByText('Selection is disabled, as the parent is not selected as a standalone module import item.')).toBeInTheDocument()
+        expect(
+          component.getByText(
+            'Selection is disabled, as the parent is not selected as a standalone module import item.',
+          ),
+        ).toBeInTheDocument()
       })
 
       it('should render normal text for switch on', async () => {
         const component = renderComponent(getProps('on'))
         await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
         expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
-        expect(component.getByText('If not selected, this item will be imported as one module item.')).toBeInTheDocument()
+        expect(
+          component.getByText('If not selected, this item will be imported as one module item.'),
+        ).toBeInTheDocument()
       })
 
       it('should render normal text for switch off', async () => {
         const component = renderComponent(getProps('off'))
         await userEvent.click(component.getByTestId('checkbox-parent-item-1'))
         expect(component.getByText('Import as a standalone module')).toBeInTheDocument()
-        expect(component.getByText('If not selected, this item will be imported as one module item.')).toBeInTheDocument()
+        expect(
+          component.getByText('If not selected, this item will be imported as one module item.'),
+        ).toBeInTheDocument()
       })
     })
   })

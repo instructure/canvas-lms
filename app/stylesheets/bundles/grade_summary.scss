@@ -784,13 +784,17 @@ $outcome-border: 1px solid #BCC2CA;
   border-collapse: collapse;
  }
 
- #grades_summary tr.sub_assignment_row > td {
+#grades_summary tr.sub_assignment_row > td {
   border-bottom: none;
   cursor: default;
- }
+}
 
- #grades_summary tr.last_sub_assignment_row {
+#grades_summary tr.last_sub_assignment_row {
   border-bottom: 1px solid;
   border-color: #E8EAEC;
   border-collapse: collapse;
- }
+}
+
+#asset_processors_header {
+  white-space: nowrap;
+}

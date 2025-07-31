@@ -72,50 +72,6 @@ describe "files index page" do
         expect(content).to include_text('<script>alert("Hi");<_script>')
       end
 
-      it "moves a folder using cog menu", priority: "1" do
-        # Place the new folder into the base folder
-        folder_to_move = "moved folder name"
-        Folder.create!(name: folder_to_move, context: @course)
-        get "/courses/#{@course.id}/files"
-        move_file_from(2, :kebab_menu)
-        expect(alert).to include_text("#{folder_to_move} successfully moved to #{folder_name}")
-        table_item_by_name(@base_folder.name).click
-        expect(get_item_content_files_table(1, 1)).to include(folder_to_move)
-      end
-
-      it "moves multiple folder using toolbar menu", priority: "1" do
-        # Move the folders out of the base folder
-        folder_to_move1 = "move-this-folder1"
-        folder_to_move2 = "move-this-folder2"
-        @folder_to_move1 = Folder.create!(name: folder_to_move1, parent_folder: @base_folder, context: @course)
-        @folder_to_move2 = Folder.create!(name: folder_to_move2, parent_folder: @base_folder, context: @course)
-        get "/courses/#{@course.id}/files/folder/base%20folder"
-        get_row_header_files_table(1).click # select first folder
-        get_row_header_files_table(2).click # select second folder
-        toolbox_menu_button("more-button").click
-        toolbox_menu_button("move-button").click
-        move_folder_form_selector_root(@course.name).click # move all selected to root
-        move_folder_move_button.click
-        get "/courses/#{@course.id}/files"
-        expect(get_item_content_files_table(2, 1)).to include(folder_to_move1)
-        expect(get_item_content_files_table(3, 1)).to include(folder_to_move2)
-      end
-
-      it "moves a folder and a file using toolbar menu", priority: "1" do
-        # Place the new items into the base folder
-        folder_to_move = "move-this-folder"
-        file_name = "move-this-file.pdf"
-        Folder.create!(name: folder_to_move, context: @course)
-        attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
-        get "/courses/#{@course.id}/files"
-        get_row_header_files_table(3).click # select the file
-        move_file_from(2, :toolbar_menu)
-        expect(alert).to include_text("#{folder_to_move} successfully moved to #{folder_name}")
-        get "/courses/#{@course.id}/files/folder/base%20folder"
-        expect(get_item_content_files_table(1, 1)).to include(folder_to_move)
-        expect(get_item_content_files_table(2, 1)).to include(file_name)
-      end
-
       it "deletes a folder using cog menu", priority: "1" do
         delete_file_from(1, :kebab_menu)
         expect(content).not_to contain_link(folder_name)
@@ -198,6 +154,89 @@ describe "files index page" do
         toolbox_menu_button("edit-permissions-button").click
         edit_item_permissions(:published)
         all_item_published?
+      end
+
+      context "Move dialog" do
+        before do
+          @folder_to_move_name = "move-this-folder"
+          Folder.create!(name: @folder_to_move_name, context: @course)
+        end
+
+        it "moves a folder using cog menu", priority: "1" do
+          # Place the new folder into the base folder
+          get "/courses/#{@course.id}/files"
+          move_file_from(2, :kebab_menu)
+          expect(alert).to include_text("#{@folder_to_move_name} successfully moved to #{folder_name}")
+          table_item_by_name(@base_folder.name).click
+          expect(get_item_content_files_table(1, 1)).to include(@folder_to_move_name)
+        end
+
+        it "moves multiple folder using toolbar menu", priority: "1" do
+          # Move the folders out of the base folder
+          folder_to_move1 = "1move-first-folder"
+          folder_to_move2 = "2move-second-folder"
+          @folder_to_move1 = Folder.create!(name: folder_to_move1, parent_folder: @base_folder, context: @course)
+          @folder_to_move2 = Folder.create!(name: folder_to_move2, parent_folder: @base_folder, context: @course)
+
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          get_row_header_files_table(1).click # select first folder
+          get_row_header_files_table(2).click # select second folder
+          toolbox_menu_button("more-button").click
+          toolbox_menu_button("move-button").click
+          move_folder_form_selector_root(@course.name).click # move all selected to root
+          move_folder_move_button.click
+
+          get "/courses/#{@course.id}/files"
+          expect(get_item_content_files_table(1, 1)).to include(folder_to_move1)
+          expect(get_item_content_files_table(2, 1)).to include(folder_to_move2)
+        end
+
+        it "moves a folder and a file using toolbar menu", priority: "1" do
+          # Place the new items into the base folder
+          file_name = "move-this-file.pdf"
+          attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
+          get "/courses/#{@course.id}/files"
+
+          get_row_header_files_table(3).click # select the file
+          move_file_from(2, :toolbar_menu)
+          expect(alert).to include_text("#{@folder_to_move_name} successfully moved to #{folder_name}")
+          expect(alert).to include_text("#{file_name} successfully moved to #{folder_name}")
+
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to include(@folder_to_move_name)
+          expect(get_item_content_files_table(2, 1)).to include(file_name)
+        end
+
+        it "moves a folder using drag and drop", priority: "1" do
+          # Place the new folder into the base folder
+          get "/courses/#{@course.id}/files"
+          folder_to_drag = get_table_row_item(2)
+          destination_folder = get_table_row_item(1)
+          drag_and_drop_element(folder_to_drag, destination_folder)
+          expect(alert).to include_text("#{@folder_to_move_name} successfully moved to #{folder_name}")
+
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to include(@folder_to_move_name)
+        end
+
+        it "moves a folder and a file using drag and drop", priority: "1" do
+          file_name = "move-this-file.pdf"
+          attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
+
+          get "/courses/#{@course.id}/files"
+          get_row_header_files_table(2).click # select a folder
+          get_row_header_files_table(3).click # select a file
+
+          destination_folder = get_table_row_item(1)
+          items_to_move = get_table_row_item(2)
+          drag_and_drop_element(items_to_move, destination_folder)
+          expect(alert).to include_text("#{@folder_to_move_name} successfully moved to #{folder_name}")
+          expect(alert).to include_text("#{file_name} successfully moved to #{folder_name}")
+
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to include(@folder_to_move_name)
+          expect(get_item_content_files_table(2, 1)).to include(file_name)
+        end
       end
 
       context "Usage Rights" do

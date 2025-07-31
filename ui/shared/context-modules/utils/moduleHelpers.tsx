@@ -66,7 +66,7 @@ export function addModuleElement(
       .addClass('publish-module-link')
       .removeClass('unpublish-module-link')
     $module.addClass('unpublished_module')
-    $module.find('h2').html(data.context_module.name)
+    $module.find('h2').text(data.context_module.name)
   }
 
   $('#no_context_modules_message').slideUp()
@@ -141,7 +141,7 @@ export function addEmptyModuleUI(module: HTMLElement) {
 
   showMoveContentsLink(module, false)
   const moduleId = module.dataset.moduleId
-  const moduleName = module.getAttribute('aria-label')
+  const moduleName = getModuleAriaLabel(module)
   if (!moduleId || !moduleName) return
 
   let module_dnd = module.querySelector('.module_dnd') as HTMLElementWithRoot
@@ -186,6 +186,10 @@ export function updateModuleFileDrop(module: HTMLElement) {
     return
   }
   removeEmptyModuleUI(module)
+}
+
+export function getModuleAriaLabel(module: HTMLElement) {
+  return module.getAttribute('aria-label')
 }
 
 export const MODULE_ITEM_LIST =

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forwardRef, useEffect, useImperativeHandle, useState} from 'react'
+import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -26,13 +26,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {AccessibilityIssue, ContentItemType, FormValue, PreviewResponse} from '../../types'
+import {stripQueryString} from '../../utils'
 
 const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
 const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
 
 export interface PreviewHandle {
-  update: (formValue: FormValue, onSuccess?: () => void, onError?: () => void) => void
-  reload: (onSuccess?: () => void, onError?: () => void) => void
+  update: (formValue: FormValue, onSuccess?: () => void, onError?: (error?: string) => void) => void
+  reload: (onSuccess?: () => void, onError?: (error?: string) => void) => void
 }
 
 interface PreviewProps {
@@ -87,78 +88,101 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const performGetRequest = (onSuccess?: () => void, onError?: (error?: Error) => void) => {
-    const params = new URLSearchParams({
-      content_type: itemType,
-      content_id: String(itemId),
-    })
-    setIsLoading(true)
-    doFetchApi<PreviewResponse>({
-      path: `${window.location.href}/preview?${params.toString()}`,
-      method: 'GET',
-    })
-      .then(result => result.json)
-      .then(resultJson => {
-        setContentResponse(resultJson || null)
+  const handleApiRequest = useCallback(
+    async (
+      apiCall: () => Promise<{json?: PreviewResponse}>,
+      errorMessage: string,
+      onSuccess?: () => void,
+      onError?: (error?: string) => void,
+    ) => {
+      setIsLoading(true)
+      try {
+        const result = await apiCall()
+        setContentResponse(result.json || null)
         setError(null)
         onSuccess?.()
-      })
-      .catch(error => {
-        setError(I18n.t('Error loading preview for accessibility issue'))
-        onError?.(error)
-      })
-      .finally(() => setIsLoading(false))
-  }
+      } catch (error: any) {
+        let responseError = error?.message || error?.toString()
+        if (error?.response?.json) {
+          try {
+            const json = await error.response.json()
+            responseError = json.error || json.message || responseError
+          } catch {
+            responseError = await error.response.text()
+          }
+        }
+        onError?.(responseError)
+        setError(errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [],
+  )
 
-  const performPostRequest = (
-    formValue: FormValue,
-    onSuccess?: () => void,
-    onError?: (error?: Error) => void,
-  ) => {
-    setIsLoading(true)
-    doFetchApi<PreviewResponse>({
-      path: window.location.href + '/preview',
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        content_id: itemId,
+  const performGetRequest = useCallback(
+    async (onSuccess?: () => void, onError?: (error?: string) => void) => {
+      const params = new URLSearchParams({
         content_type: itemType,
-        rule: issue.ruleId,
-        path: issue.path,
-        value: formValue,
-      }),
-    })
-      .then(result => result.json)
-      .then(resultJson => {
-        setContentResponse(resultJson || null)
-        setError(null)
-        onSuccess?.()
+        content_id: String(itemId),
       })
-      .catch(error => {
-        setError(I18n.t('Error updating preview for accessibility issue'))
-        onError?.(error)
-      })
-      .finally(() => setIsLoading(false))
-  }
+
+      await handleApiRequest(
+        () =>
+          doFetchApi<PreviewResponse>({
+            path: `${stripQueryString(window.location.href)}/preview?${params.toString()}`,
+            method: 'GET',
+          }),
+        I18n.t('Error loading preview for accessibility issue'),
+        onSuccess,
+        onError,
+      )
+    },
+    [handleApiRequest, itemId, itemType],
+  )
+
+  const performPostRequest = useCallback(
+    async (formValue: FormValue, onSuccess?: () => void, onError?: (error?: string) => void) => {
+      await handleApiRequest(
+        () =>
+          doFetchApi<PreviewResponse>({
+            path: `${stripQueryString(window.location.href)}/preview`,
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              content_id: itemId,
+              content_type: itemType,
+              rule: issue.ruleId,
+              path: issue.path,
+              value: formValue,
+            }),
+          }),
+        I18n.t('Error updating preview for accessibility issue'),
+        onSuccess,
+        onError,
+      )
+    },
+    [handleApiRequest, itemId, itemType, issue.path, issue.ruleId],
+  )
 
   useImperativeHandle(ref, () => ({
-    reload: (onSuccess?: () => void, onError?: (error?: Error) => void) => {
-      performGetRequest(onSuccess, onError)
-    },
-    update: (formValue: FormValue, onSuccess?: () => void, onError?: (error?: Error) => void) => {
-      performPostRequest(formValue, onSuccess, onError)
-    },
+    reload: performGetRequest,
+    update: performPostRequest,
   }))
 
   useEffect(() => {
     performGetRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [issue.id, itemId])
+  }, [itemId])
 
   if (isLoading) {
     return (
       <View as="div" textAlign="center" width="100%">
-        <Spinner renderTitle={I18n.t('Loading preview...')} size="small" />
+        <Spinner
+          data-testid="spinner-loader"
+          renderTitle={I18n.t('Loading preview...')}
+          size="small"
+        />
       </View>
     )
   }

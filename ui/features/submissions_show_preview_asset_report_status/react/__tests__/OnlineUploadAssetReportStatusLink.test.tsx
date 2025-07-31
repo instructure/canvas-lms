@@ -19,7 +19,7 @@
 import OnlineUploadAssetReportStatusLink, {
   ASSET_REPORT_MODAL_EVENT,
 } from '../OnlineUploadAssetReportStatusLink'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {render, screen} from '@testing-library/react'
 
 describe('OnlineUploadAssetReportStatusLink', () => {

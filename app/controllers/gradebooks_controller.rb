@@ -20,6 +20,7 @@
 
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
+  include AssetProcessorStudentHelper
   include GradebooksHelper
   include SubmissionCommentsHelper
   include KalturaHelper
@@ -131,6 +132,8 @@ class GradebooksController < ApplicationController
                       excused: submission.excused?,
                       score: submission.score,
                       workflow_state: submission.workflow_state,
+                      asset_processors: asset_processors(assignment: submission.assignment),
+                      asset_reports: asset_reports(submission:)
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end

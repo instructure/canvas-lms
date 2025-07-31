@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import {AccessibilityIssue, FormType} from '../../../../types'
 import Form, {FormHandle} from '../index'
+import userEvent from '@testing-library/user-event'
+import user from '@canvas/users/react/proptypes/user'
 
 describe('Form', () => {
   const createMockIssue = (formType: FormType, formValue?: string): AccessibilityIssue => ({
@@ -34,10 +36,15 @@ describe('Form', () => {
       type: formType,
       label: 'Test label',
       value: formValue,
+      options: ['Option A', 'Option B'],
+      checkboxLabel: 'Test checkbox label',
+      checkboxSubtext: 'Test checkbox subtext',
+      inputDescription: 'Test input description',
+      inputMaxLength: 120,
     },
   })
 
-  describe('getValue method for other FormTypes', () => {
+  describe('getValue method', () => {
     it('returns current value for FormType.TextInput', () => {
       const mockIssue = createMockIssue(FormType.TextInput, 'initial-value')
       const ref = React.createRef<FormHandle>()
@@ -81,6 +88,57 @@ describe('Form', () => {
       render(<Form issue={mockIssue} ref={ref} />)
 
       expect(ref.current?.getValue()).toBe('true')
+    })
+  })
+
+  describe('calls onClearError when the form value changes', () => {
+    it('for FormType.TextInput', async () => {
+      const onClearError = jest.fn()
+      const mockIssue = createMockIssue(FormType.TextInput, 'initial-value')
+      const ref = React.createRef<FormHandle>()
+
+      render(<Form issue={mockIssue} ref={ref} onClearError={onClearError} error="Test error" />)
+      const input = screen.getByTestId('text-input-form')
+      await userEvent.type(input, 'test value')
+      expect(onClearError).toHaveBeenCalled()
+    })
+
+    it('for FormType.RadioInputGroup', async () => {
+      const onClearError = jest.fn()
+      const mockIssue = createMockIssue(FormType.RadioInputGroup, 'selected-option')
+      const ref = React.createRef<FormHandle>()
+
+      render(<Form issue={mockIssue} ref={ref} onClearError={onClearError} error="Test error" />)
+
+      const optionBRadio = screen.getByTestId('radio-Option B')
+      await userEvent.click(optionBRadio)
+
+      expect(onClearError).toHaveBeenCalled()
+    })
+
+    it('for FormType.ColorPicker', async () => {
+      const onClearError = jest.fn()
+      const mockIssue = createMockIssue(FormType.ColorPicker, '#ff0000')
+      const ref = React.createRef<FormHandle>()
+
+      render(<Form issue={mockIssue} ref={ref} onClearError={onClearError} error="Test error" />)
+
+      const input = screen.getByLabelText(/new color/i)
+      await userEvent.clear(input)
+      await userEvent.type(input, '#ff0000')
+
+      expect(onClearError).toHaveBeenCalled()
+    })
+
+    it('for FormType.CheckboxTextInput', async () => {
+      const onClearError = jest.fn()
+      const mockIssue = createMockIssue(FormType.CheckboxTextInput, 'checkbox-text-value')
+      const ref = React.createRef<FormHandle>()
+
+      render(<Form issue={mockIssue} ref={ref} onClearError={onClearError} error="Test error" />)
+      const input = screen.getByTestId('checkbox-text-input-form')
+      await userEvent.type(input, 'test value')
+      expect(onClearError).toHaveBeenCalled()
     })
   })
 })

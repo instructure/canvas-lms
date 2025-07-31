@@ -39,7 +39,7 @@ Object.defineProperty(window, 'matchMedia', {
 describe('LtiConfigurationDetail renders as expected', () => {
   it('Component renders as expected', () => {
     const {getByText} = render(
-      <LtiConfigurationDetail integrationData={canvas_lti_configurations[0]} badges={[]} />
+      <LtiConfigurationDetail integrationData={canvas_lti_configurations[0]} badges={[]} />,
     )
     expect(getByText('great product!')).toBeInTheDocument()
     expect(getByText('this is a piece of placement data')).toBeInTheDocument()

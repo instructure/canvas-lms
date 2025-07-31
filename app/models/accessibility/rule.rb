@@ -63,6 +63,15 @@ module Accessibility
         {}
       end
 
+      # Generates a fix for the issue in the content, to be used in the
+      # correction form
+      # @param _elem [Nokogiri::XML::Element] The element in the content to fix
+      # @return [String] The generated fix, or nil if generation is not supported
+      # @throws [StandardError] if the fix cannot be generated for a reason
+      def generate_fix(_elem)
+        nil
+      end
+
       # Fixes the issue in content, changing it in-place
       # @param _elem [Nokogiri::XML::Element] The element in the content to fix
       # @param _value [String] The value received back from the correction form

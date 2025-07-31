@@ -416,6 +416,7 @@ export default (AssignmentListItemView = (function () {
       let modules
       let data = this.model.toView()
       data.canManage = this.canManage()
+      data.isTeacher = this.isTeacher()
       if (!data.canManage) {
         data = this._setJSONForGrade(data)
       }
@@ -818,6 +819,10 @@ export default (AssignmentListItemView = (function () {
         !submission_types.includes('not_graded') &&
         !submission_types.includes('wiki_page')
       )
+    }
+
+    isTeacher() {
+      return ENV?.current_user_roles && ENV?.current_user_roles.includes('teacher')
     }
 
     gradeStrings(grade) {

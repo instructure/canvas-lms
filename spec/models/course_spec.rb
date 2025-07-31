@@ -2800,6 +2800,18 @@ describe Course do
         @course.disable_feature!(:canvas_k6_theme)
       end
 
+      it "returns Accessibility tab if feature flag is enabled for teachers" do
+        @course.enable_feature!(:accessibility_tab_enable)
+        tabs = @course.tabs_available(@user)
+
+        # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
+        settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+        accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
+        expect(accessibility_tab_index).to eq(settings_tab_index - 1)
+      ensure
+        @course.disable_feature!(:accessibility_tab_enable)
+      end
+
       it "defaults tab configuration to an empty array" do
         course = Course.new
         expect(course.tab_configuration).to eq []
@@ -8556,6 +8568,44 @@ describe Course do
       migration_id = CC::CCHelper.create_key(source_page, global: true)
       copied_course.wiki_pages.create!(title: "My Page", migration_id:)
       expect(Course.copied_asset("page_#{source_page.id}")).to include(copied_course)
+    end
+  end
+
+  describe "accessibility scanning" do
+    let(:course) { course_model }
+
+    describe "#exceeds_accessibility_scan_limit?" do
+      before do
+        allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
+        allow(course.assignments).to receive(:active).and_return(double(count: assignment_count))
+      end
+
+      context "when total resources exceed limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 600 }
+
+        it "returns true" do
+          expect(course.exceeds_accessibility_scan_limit?).to be true
+        end
+      end
+
+      context "when total resources are within limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 400 }
+
+        it "returns false" do
+          expect(course.exceeds_accessibility_scan_limit?).to be false
+        end
+      end
+
+      context "when total resources equal limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 500 }
+
+        it "returns false" do
+          expect(course.exceeds_accessibility_scan_limit?).to be false
+        end
+      end
     end
   end
 end

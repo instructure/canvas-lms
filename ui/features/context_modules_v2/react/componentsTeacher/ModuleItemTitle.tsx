@@ -27,10 +27,11 @@ import {ModuleItemContent} from '../utils/types'
 interface ModuleItemTitleProps {
   content: ModuleItemContent
   url: string
+  title: string
   onClick?: () => void
 }
 
-const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}) => {
+const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, title, onClick}) => {
   const titleText = useMemo(() => {
     if (content?.type === 'ExternalUrl') {
       return (
@@ -41,7 +42,7 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}
                 weight={content?.newTab ? 'normal' : 'bold'}
                 color={content?.newTab ? 'brand' : 'primary'}
               >
-                {content?.title || 'Untitled Item'}
+                {title || 'Untitled Item'}
               </Text>
             </Link>
           </Flex.Item>
@@ -55,7 +56,7 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}
     } else if (content?.type === 'SubHeader') {
       return (
         <Text weight="bold" color="primary" data-testid="subheader-title-text">
-          {content?.title || 'Untitled Item'}
+          {title || 'Untitled Item'}
         </Text>
       )
     } else {
@@ -67,12 +68,12 @@ const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}
           data-testid="module-item-title-link"
         >
           <Text weight="bold" color="primary">
-            {content?.title || 'Untitled Item'}
+            {title || 'Untitled Item'}
           </Text>
         </Link>
       )
     }
-  }, [content, url, onClick])
+  }, [content, url, onClick, title])
 
   return (
     <View as="div" padding="xx-small">

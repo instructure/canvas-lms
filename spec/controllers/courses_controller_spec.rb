@@ -4445,6 +4445,8 @@ describe CoursesController do
       auditor_rec = submission.auditor_grade_change_records.first
       expect(auditor_rec).to_not be_nil
       attachment = attachment_model
+      attachment.create_canvadoc
+      canvadocs_submission = attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id)
       OriginalityReport.create!(attachment:, originality_score: "1", submission: test_student.submissions.first)
       submission.canvadocs_annotation_contexts.create!(
         root_account: @course.root_account,
@@ -4454,6 +4456,7 @@ describe CoursesController do
       delete "reset_test_student", params: { course_id: @course.id }
       test_student.reload
       expect(test_student.submissions.size).to be_zero
+      expect { canvadocs_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
       expect(Auditors::ActiveRecord::GradeChangeRecord.where(id: auditor_rec.id).count).to be_zero
     end
 
@@ -5125,6 +5128,191 @@ describe CoursesController do
       expect(RequestCache).to receive(:clear).exactly(3).times
       post "enrollment_invitation", params: { course_id: @course.id, accept: "1", invitation: enrollment.uuid }
       expect(response).to redirect_to(course_url(@course))
+    end
+  end
+
+  describe "youtube_migration" do
+    before :once do
+      course_with_teacher(name: "youtube migrator teacher", active_all: true)
+    end
+
+    RSpec.shared_examples "youtube migration protection" do
+      before do
+        user_session(@user)
+      end
+
+      context "when ff is on" do
+        before do
+          @course.root_account.enable_feature!(:youtube_migration)
+        end
+
+        it "should return ok status" do
+          subject
+          expect(response).to be_successful
+        end
+
+        context "when there is no session" do
+          before do
+            remove_user_session
+          end
+
+          it "should forces login" do
+            subject
+            expect(response).to be_redirect
+          end
+        end
+      end
+
+      context "when ff is off" do
+        before do
+          @course.root_account.disable_feature!(:youtube_migration)
+        end
+
+        it "should return not_found status" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+    end
+
+    describe "render ui" do
+      subject { get :youtube_migration, params: { course_id: @course.id } }
+
+      include_examples "youtube migration protection"
+    end
+
+    describe "get last scan" do
+      subject { get :youtube_migration_scan, params: { course_id: @course.id } }
+
+      include_examples "youtube migration protection"
+    end
+
+    describe "post a new scan" do
+      subject { post :start_youtube_migration_scan, params: { course_id: @course.id } }
+
+      include_examples "youtube migration protection"
+    end
+
+    describe "post a new convert" do
+      subject { post :start_youtube_migration_convert, params: { course_id: @course.id, scan_id:, embed: } }
+
+      let(:service) { instance_double(YoutubeMigrationService) }
+      let(:scan_id) { "1" }
+      let(:embed) do
+        {
+          field: :body,
+          id: 123,
+          path: "/videos/123",
+          resource_type: "WikiPage",
+          src: "https://youtube.com/video123",
+          resource_group_key: "key"
+        }
+      end
+      let(:progress) { double("Progress", id: 1) }
+
+      before do
+        allow(YoutubeMigrationService).to receive(:new).with(@course).and_return(service)
+        allow(service).to receive(:convert_embed).with(scan_id, embed).and_return(progress)
+      end
+
+      include_examples "youtube migration protection"
+    end
+  end
+
+  context "attachments to syllabus body with location tagging" do
+    def file_params(atta)
+      {
+        course_id: @course.id,
+        id: atta.id,
+        download: 1,
+        location: "course_syllabus_#{@course.id}"
+      }
+    end
+
+    before do
+      course_with_teacher_and_student_enrolled
+      @account = @course.account
+      @unrelated_user = user_factory
+      @account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      @aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @course)
+
+      @course.syllabus_body = @aa_test_data.base_html
+      @course.saving_user = @teacher
+      @course.public_syllabus = false
+      @course.files_visibility = "course"
+      @course.save!
+
+      @old_controller = @controller
+      @controller = FilesController.new
+    end
+
+    after do
+      @controller = @old_controller
+    end
+
+    context "with a private syllabus" do
+      it "fetches the attachment for an enrolled student" do
+        user_session(@student)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "fetches the attachment for the teacher" do
+        user_session(@teacher)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "does not fetch the attachment for an unrelated user" do
+        user_session(@unrelated_user)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "does not fetch the attachment for an anonymous user" do
+        remove_user_session
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "with a public syllabus" do
+      before do
+        @course.public_syllabus = true
+        @course.save!
+      end
+
+      context "for attached files" do
+        it "fetches the attachment for unrelated user" do
+          user_session(@unrelated_user)
+          get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+          expect(response).to have_http_status(:found)
+          expect(response.headers["location"]).to include("download_frd")
+        end
+
+        it "fetches the attachment for anonymous users" do
+          remove_user_session
+          get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+          expect(response).to have_http_status(:found)
+          expect(response.headers["location"]).to include("download_frd")
+        end
+      end
+
+      context "for unrelated attachments" do
+        it "does not fetch unrelated attachment for unrelated user" do
+          user_session(@unrelated_user)
+          get "show", params: file_params(@aa_test_data.attachment2), format: "json"
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it "does not fetch unrelated attachment for anonymous" do
+          remove_user_session
+          get "show", params: file_params(@aa_test_data.attachment2), format: "json"
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
     end
   end
 end

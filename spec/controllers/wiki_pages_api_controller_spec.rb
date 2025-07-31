@@ -81,14 +81,16 @@ describe WikiPagesApiController, type: :request do
       expect(att_occurences.values).to all eq 1
     end
 
-    it "updates with removed attachments" do
+    it "updates with removed attachments should keep the associations" do
       wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
       @wiki_page = WikiPage.find(wiki_response["page_id"])
       update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.removed_html })
       id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
 
-      expect(id_occurences).to be_empty
-      expect(att_occurences).to be_empty
+      expect(id_occurences.keys).to match_array [wiki_response["page_id"]]
+      expect(id_occurences.values).to all eq 1
+      expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
+      expect(att_occurences.values).to all eq 1
     end
   end
 

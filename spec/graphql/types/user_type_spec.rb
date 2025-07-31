@@ -747,6 +747,33 @@ describe Types::UserType do
     end
   end
 
+  context "differentiation_tags_connection" do
+    def resolve_user_type(course_id = @course.id)
+      user_type.resolve(%|differentiationTagsConnection(courseId: "#{course_id}") { edges { node { group { _id name } } } }|)
+    end
+
+    it "calls the DifferentiationTagsLoader" do
+      loader_instance = double("loader instance")
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::DifferentiationTagsLoader)
+        .to receive(:for)
+        .and_return(loader_instance)
+
+      resolve_user_type
+    end
+
+    it "passes correct parameters to the the DifferentiationTagsLoader" do
+      loader_instance = double("loader instance")
+      expect(loader_instance).to receive(:load).with(@student.id).and_return([])
+      expect(Loaders::UserLoaders::DifferentiationTagsLoader)
+        .to receive(:for)
+        .with(@teacher, @course.id.to_s)
+        .and_return(loader_instance)
+
+      resolve_user_type
+    end
+  end
+
   context "conversations" do
     it "returns conversations for the user" do
       c = conversation(@student, @teacher)

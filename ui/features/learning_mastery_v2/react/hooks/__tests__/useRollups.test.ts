@@ -18,19 +18,12 @@
 
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useRollups from '../useRollups'
 import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
 
 jest.useFakeTimers()
 
-jest.mock('@canvas/axios', () => ({
-  get: jest.fn(),
-}))
-
-jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
-}))
+jest.mock('@canvas/axios')
 
 describe('useRollups', () => {
   const mockedUsers = [
@@ -171,7 +164,9 @@ describe('useRollups', () => {
         useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
       )
       await act(async () => jest.runAllTimers())
-      const {students, outcomes, rollups, gradebookFilters} = result.current
+      const {isLoading, error, students, outcomes, rollups, gradebookFilters} = result.current
+      expect(isLoading).toEqual(false)
+      expect(error).toEqual(null)
       expect(axios.get).toHaveBeenCalled()
       expect(students).toEqual(mockedUsers)
       expect(outcomes).toEqual(mockedOutcomes)
@@ -232,14 +227,36 @@ describe('useRollups', () => {
       expect(axios.get).toHaveBeenCalledWith('/api/v1/courses/1/outcome_rollups', params)
     })
 
-    it('renders a flashAlert if the request fails', async () => {
-      ;(axios.get as jest.Mock).mockRejectedValue({})
-      renderHook(() => useRollups({courseId: '1', accountMasteryScalesEnabled: false}))
-      await act(async () => jest.runAllTimers())
-      expect(axios.get).toHaveBeenCalled()
-      expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'Error loading rollups',
-        type: 'error',
+    const ERROR_MESSAGE_TEST_CASES = [
+      {
+        description: 'empty error response',
+        errorResponse: {},
+        expectedErrorMessage: 'Error loading rollups',
+      },
+      {
+        description: 'Axios error response',
+        errorResponse: (() => {
+          const error = new axios.AxiosError()
+          error.message = 'Error loading rollups Axios'
+          return error
+        })(),
+        expectedErrorMessage: 'Error loading rollups Axios',
+      },
+    ]
+
+    ERROR_MESSAGE_TEST_CASES.forEach(testCase => {
+      it(`returns error message on failed request of ${testCase.description}`, async () => {
+        const axiosError = new axios.AxiosError()
+        axiosError.message = 'Network Error'
+        ;(axios.get as jest.Mock).mockRejectedValue(testCase.errorResponse)
+        const {result} = renderHook(() =>
+          useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
+        )
+        await act(async () => jest.runAllTimers())
+        const {isLoading, error} = result.current
+        expect(axios.get).toHaveBeenCalled()
+        expect(error).toEqual(testCase.expectedErrorMessage)
+        expect(isLoading).toEqual(false)
       })
     })
   })

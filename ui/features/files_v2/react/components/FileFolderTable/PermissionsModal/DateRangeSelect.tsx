@@ -93,6 +93,7 @@ export const DateRangeSelect = ({
             isRequired={true}
             showMessages={false}
             timezone={ENV.TIMEZONE}
+            allowNonStepInput={true}
           />
         </View>
       )}
@@ -115,6 +116,7 @@ export const DateRangeSelect = ({
             isRequired={true}
             showMessages={false}
             timezone={ENV.TIMEZONE}
+            allowNonStepInput={true}
           />
         </View>
       )}

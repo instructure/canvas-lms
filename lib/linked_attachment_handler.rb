@@ -63,6 +63,14 @@ module LinkedAttachmentHandler
     attachment.context_type != target_context_type || source_global_id != target_global_id
   end
 
+  def keep_associations?(attachment, session, user)
+    if instance_of?(::WikiPage) || !attachment.grants_right?(user, session, :delete)
+      return true
+    end
+
+    false
+  end
+
   # NB: context_concern is a virtual subdivision of context.
   # It is on purpose not a field name as it more denotes a sub-concern of
   # the context model, not necessarily an exact field.
@@ -79,31 +87,32 @@ module LinkedAttachmentHandler
 
     to_delete = currently_has - global_ids
     to_create = global_ids - currently_has
+    to_process = to_create + to_delete
 
-    return if (to_create + to_delete).none?
+    return if to_process.none?
     return unless attachment_associations_enabled?
     raise "User is required to update attachment links" if user.blank? && !skip_user_verification
 
-    if to_delete.any?
-      attachment_associations.where(context_concern:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
-    end
-
-    if to_create.any?
-      to_create.each_slice(1000) do |att_ids|
+    if to_process.any?
+      to_process.each_slice(1000) do |att_ids|
         all_attachment_associations = []
 
         Attachment.where(id: att_ids).find_each do |attachment|
-          next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
+          if to_delete.any? && to_delete.include?(Shard.global_id_for(attachment.id))
+            to_delete.delete(Shard.global_id_for(attachment.id)) if keep_associations?(attachment, session, user)
+          else
+            next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
 
-          shard.activate do
-            all_attachment_associations << {
-              context_type: class_name,
-              context_id: id,
-              attachment_id: attachment.id,
-              user_id: user&.id,
-              context_concern:,
-              root_account_id:,
-            }
+            shard.activate do
+              all_attachment_associations << {
+                context_type: class_name,
+                context_id: id,
+                attachment_id: attachment.id,
+                user_id: user&.id,
+                context_concern:,
+                root_account_id: actual_root_account_id,
+              }
+            end
           end
         end
 
@@ -111,6 +120,10 @@ module LinkedAttachmentHandler
           AttachmentAssociation.insert_all(all_attachment_associations)
         end
       end
+    end
+
+    if to_delete.any?
+      attachment_associations.where(context_concern:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
     end
   end
 
@@ -120,6 +133,14 @@ module LinkedAttachmentHandler
 
   def actual_saving_user
     saving_user
+  end
+
+  def access_for_attachment_association?(user, session, _association, _location_param)
+    grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
+  end
+
+  def actual_root_account_id
+    root_account_id
   end
 
   module ClassMethods

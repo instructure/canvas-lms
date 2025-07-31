@@ -20,10 +20,7 @@ import React from 'react'
 import {render, within} from '@testing-library/react'
 import UserLink from '../UserLink'
 import {mockEnrollment} from '../../../../graphql/Mocks'
-import {
-  PENDING_ENROLLMENT,
-  INACTIVE_ENROLLMENT
-} from '../../../../util/constants'
+import {PENDING_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../../util/constants'
 
 describe('UserLink', () => {
   const defaultProps = {
@@ -38,7 +35,10 @@ describe('UserLink', () => {
   describe('user details', () => {
     it('renders the link with the correct href', () => {
       const {getByTestId} = render(<UserLink {...defaultProps} />)
-      expect(getByTestId(`link-user-${defaultProps.uid}`)).toHaveAttribute('href', defaultProps.htmlUrl)
+      expect(getByTestId(`link-user-${defaultProps.uid}`)).toHaveAttribute(
+        'href',
+        defaultProps.htmlUrl,
+      )
     })
 
     it('renders the avatar with the correct src and name initials', () => {
@@ -53,7 +53,7 @@ describe('UserLink', () => {
     })
 
     it('renders the name with pronouns if provided', () => {
-      const {getByText, getByTestId} = render(<UserLink {...defaultProps} pronouns='he/him' />)
+      const {getByText, getByTestId} = render(<UserLink {...defaultProps} pronouns="he/him" />)
       expect(getByTestId(`name-user-${defaultProps.uid}`)).toHaveTextContent(defaultProps.name)
       expect(getByTestId(`pronouns-user-${defaultProps.uid}`)).toBeInTheDocument()
       expect(getByText('(he/him)')).toBeInTheDocument()
@@ -82,9 +82,11 @@ describe('UserLink', () => {
     it('prioritizes pending over inactive state', () => {
       const pendingAndInactiveEnrollment = [
         mockEnrollment({enrollmentState: PENDING_ENROLLMENT}),
-        mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+        mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT}),
       ]
-      const {getByText, queryByText} = render(<UserLink {...defaultProps} enrollments={pendingAndInactiveEnrollment} />)
+      const {getByText, queryByText} = render(
+        <UserLink {...defaultProps} enrollments={pendingAndInactiveEnrollment} />,
+      )
       expect(getByText('Pending')).toBeInTheDocument()
       expect(queryByText('Inactive')).not.toBeInTheDocument()
     })

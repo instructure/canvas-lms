@@ -164,6 +164,9 @@ module Importers
             migration.update_import_progress(80)
           end
 
+          Importers::RubricImporter.process_rubric_association_count(data)
+          migration.update_import_progress(83)
+
           module_id = migration.migration_settings[:insert_into_module_id].presence
           unless module_id && course.context_modules.where(id: module_id).exists? # we're importing into a module so don't create new ones
             Importers::ContextModuleImporter.process_migration(data, migration)

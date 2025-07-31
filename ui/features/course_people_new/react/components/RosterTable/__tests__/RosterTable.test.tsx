@@ -24,7 +24,7 @@ import {
   DEFAULT_SORT_DIRECTION,
   DEFAULT_SORT_FIELD,
   INACTIVE_ENROLLMENT,
-  PENDING_ENROLLMENT
+  PENDING_ENROLLMENT,
 } from '../../../../util/constants'
 import useCoursePeopleQuery from '../../../hooks/useCoursePeopleQuery'
 import {mockUser, mockEnrollment} from '../../../../graphql/Mocks'
@@ -35,17 +35,17 @@ jest.mock('../../../hooks/useCoursePeopleContext')
 const mockUsers = [
   mockUser({
     userId: '1',
-    userName: 'Student One'
+    userName: 'Student One',
   }),
   mockUser({
     userId: '2',
     userName: 'Student Two',
-    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT}),
   }),
   mockUser({
     userId: '3',
     userName: 'Student Three',
-    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT}),
   }),
 ]
 
@@ -65,7 +65,7 @@ const defaultProps = {
   users: mockUsers,
   handleSort: () => {},
   sortField: DEFAULT_SORT_FIELD,
-  sortDirection: DEFAULT_SORT_DIRECTION
+  sortDirection: DEFAULT_SORT_DIRECTION,
 }
 
 describe('RosterTable', () => {
@@ -73,12 +73,14 @@ describe('RosterTable', () => {
   const renderComponent = () => render(<RosterTable {...defaultProps} />)
 
   beforeEach(() => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: mockUsers,
       isLoading: false,
-      error: null
+      error: null,
     })
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(
+      useCoursePeopleContextMocks,
+    )
     renderComponent()
   })
 

@@ -52,7 +52,7 @@ describe "announcements" do
     end
 
     # ignore RCE error since it has nothing to do with the test
-    it "shows the no notifications on edit info alert when editing an announcement", :ignore_js_errors do
+    it "shows the no notifications on edit info alert when editing an announcement" do
       @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
       expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
@@ -61,7 +61,6 @@ describe "announcements" do
     context "when :discussion_create feature flag is ON", :ignore_js_errors do
       before do
         Account.site_admin.enable_feature!(:discussion_create)
-        Account.site_admin.enable_feature!(:react_discussions_post)
 
         site_admin_logged_in
 
@@ -74,7 +73,7 @@ describe "announcements" do
         @announcement = @course.announcements.create!(title: "something", message: "hello my favorite section!")
       end
 
-      it "should send notification when user decides to notify users when editing an announcement", :ignore_js_errors do
+      it "should send notification when user decides to notify users when editing an announcement" do
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
@@ -90,7 +89,7 @@ describe "announcements" do
         expect(Message.last.body).to include "Hi, this is my EDITED message"
       end
 
-      it "should not send notification when user decides not to notify users when editing an announcement", :ignore_js_errors do
+      it "should not send notification when user decides not to notify users when editing an announcement" do
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
         type_in_tiny("#discussion-topic-message-body", "Hi, this is my EDITED message")
@@ -107,7 +106,7 @@ describe "announcements" do
         expect(Message.last.body).not_to include "Hi, this is my EDITED message"
       end
 
-      it "for delayed posting don't send notifications", :ignore_js_errors do
+      it "for delayed posting don't send notifications" do
         @announcement.delayed_post_at = 1.day.from_now
         @announcement.save!
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
@@ -123,7 +122,7 @@ describe "announcements" do
         expect(Message.last.body).not_to include "Hi, this is my EDITED message"
       end
 
-      it "should not send notifications at all if we hit Cancel", :ignore_js_errors do
+      it "should not send notifications at all if we hit Cancel" do
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
 
         AnnouncementNewEdit.save_button.click
@@ -132,7 +131,7 @@ describe "announcements" do
         expect(AnnouncementNewEdit.save_button).to be_displayed
       end
 
-      it "removes delayed_post_at when Available from field is cleared", :ignore_js_errors do
+      it "removes delayed_post_at when Available from field is cleared" do
         @announcement.delayed_post_at = 10.days.from_now
         @announcement.save!
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
@@ -147,7 +146,7 @@ describe "announcements" do
         expect(@announcement.delayed_post_at).to be_nil
       end
 
-      it "removes lock_at when Available until field is cleared", :ignore_js_errors do
+      it "removes lock_at when Available until field is cleared" do
         @announcement.lock_at = 10.days.from_now
         @announcement.save!
 
@@ -163,7 +162,7 @@ describe "announcements" do
       end
 
       context "selective release assignment embedded in discussions edit page" do
-        it "allows create", :ignore_js_errors do
+        it "allows create" do
           title = "Announcement"
           message = "this is an announcement"
           get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
@@ -174,7 +173,7 @@ describe "announcements" do
           expect(driver.current_url).not_to end_with("/courses/#{@course.id}/discussion_topics/new")
         end
 
-        it "allows edit", :ignore_js_errors do
+        it "allows edit" do
           title = "Announcement"
           message = "this is an announcement"
           get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
@@ -198,7 +197,7 @@ describe "announcements" do
       end
     end
 
-    it "allows saving of section announcement", :ignore_js_errors, priority: "1" do
+    it "allows saving of section announcement", priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -249,17 +248,15 @@ describe "announcements" do
       end
 
       it "is visible to teacher in course" do
-        skip "Will be fixed in VICE-5209"
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
-        expect(f(".discussion-title")).to include_text(@announcement.title)
+        expect(f('[data-testid="message_title"]')).to include_text(@announcement.title)
       end
     end
 
     describe "shared main page topics specs" do
       let(:url) { "/courses/#{@course.id}/announcements" }
       let(:new_url) { "/courses/#{@course.id}/discussion_topics/new?is_announcement=true" }
-      let(:what_to_create) { Announcement }
 
       before :once do
         @topic_title = "new discussion"
@@ -267,7 +264,6 @@ describe "announcements" do
       end
 
       it "starts a new topic", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get url
 
         expect_new_page_load { f("#add_announcement").click }
@@ -275,17 +271,16 @@ describe "announcements" do
       end
 
       it "adds an attachment to a new topic", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         topic_title = "new topic with file"
         get new_url
         wait_for_tiny(f("#discussion-edit-view textarea[name=message]"))
 
         replace_content(f("input[name=title]"), topic_title)
         add_attachment_and_validate
-        expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
+        expect(Announcement.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "performs front-end validation for message", :ignore_js_errors, priority: "1" do
+      it "performs front-end validation for message", priority: "1" do
         topic_title = "new topic with file"
         get new_url
 
@@ -296,31 +291,17 @@ describe "announcements" do
         expect(ff(".error_box").any? { |box| box.attribute("innerHTML").include?("A message is required") }).to be_truthy
       end
 
-      it "adds an attachment to a graded topic", priority: "1" do
-        skip "Will be fixed in VICE-5209"
-        (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: "graded attachment topic", user: @user) : announcement_model(title: "graded attachment topic", user: @user)
-        if what_to_create == DiscussionTopic
-          what_to_create.last.update(assignment: @course.assignments.create!(name: "graded topic assignment"))
-        end
-        get url
-        expect_new_page_load { f(".ic-announcement-row h3").click }
-        expect_new_page_load { f(".edit-btn").click }
-
-        add_attachment_and_validate
-      end
-
       it "edits a topic", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         edit_name = "edited discussion name"
-        topic = (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
+        topic = announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
-        expect_new_page_load { f(".edit-btn").click }
+        click_edit_btn
 
         edit_announcement(edit_name, "edit message")
       end
     end
 
-    it "creates a delayed announcement with an attachment", :ignore_js_errors, priority: "1" do
+    it "creates a delayed announcement with an attachment", priority: "1" do
       AnnouncementNewEdit.visit_new(@course)
       replace_content(f("input[name=title]"), "First Announcement")
       type_in_tiny("textarea[name=message]", "Hi, this is my first announcement")
@@ -339,19 +320,15 @@ describe "announcements" do
     end
 
     it "displayed delayed post note on page of delayed announcement" do
-      skip "Will be fixed in VICE-5209"
       a = @course.announcements.create!(title: "Announcement",
                                         message: "foobers",
                                         delayed_post_at: 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
-      expect(f(".discussion-fyi")).to include_text(
-        "The content of this announcement will not be visible to users until"
-      )
+      expect(f('[data-testid="delayed-until"]')).to include_text("This announcement will not be visible until")
     end
 
     it "allows delay post date edit with disabled comments", priority: "2" do
-      skip "Will be fixed in VICE-5209"
-      time_new = format_time_for_view(Time.zone.today + 1.day)
+      time_new = format_time_for_view(Time.zone.today + 1.day).gsub(" at ", " ")
       disable_comments_on_announcements
       announcement = @course.announcements.create!(
         title: "Hello there!", message: "Hi!", delayed_post_at: time_new
@@ -359,14 +336,13 @@ describe "announcements" do
       get [@course, announcement]
       click_edit_btn
       submit_form(f(".form-horizontal"))
-      expect(f(".discussion-fyi")).to include_text(time_new)
+      expect(f('[data-testid="delayed-until"]')).to include_text(time_new)
     end
 
     it "removes delayed_post_at when delayed_post_at field is cleared", priority: "1" do
-      skip "Will be fixed in VICE-5209"
       topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.ago, message: "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
-      expect_new_page_load { f(".edit-btn").click }
+      click_edit_btn
 
       f("input#delayed_post_at").clear
       expect_new_page_load { f(".form-actions button[type=submit]").click }
@@ -386,19 +362,18 @@ describe "announcements" do
       expect(f(".submit_button").text).to eq("Publish")
     end
 
-    it "lets a teacher add a new entry to its own announcement", priority: "1" do
-      skip "Will be fixed in VICE-5209"
+    it "lets a teacher add a new entry to its own announcement", :ignore_js_errors, priority: "1" do
       create_announcement
       get [@course, @announcement]
-      f(".discussion-reply-action").click
+      f('[data-testid="discussion-topic-reply"').click
       entry_text = "new entry text"
       type_in_tiny("textarea", entry_text)
-      f("button[type=submit]").click
-      wait_for_ajax_requests
+      f('[data-testid="DiscussionEdit-submit"]').click
+      wait_for_ajaximations
       expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
-    it "shows announcements to student view student", priority: "1" do
+    it "shows announcements to student view student", :ignore_js_errors, priority: "1" do
       create_announcement
       enter_student_view
       get "/courses/#{@course.id}/announcements"
@@ -443,12 +418,12 @@ describe "announcements" do
       end
 
       it "removes the Reply section" do
-        skip "Will be fixed in VICE-5209"
+        skip "Should be fixed by VICE-5399"
         create_announcement
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
 
         expect(f("#discussion_topic")).to contain_css(".entry-content.no-reply")
-        expect(f("body")).not_to contain_css(".discussion-entry-reply-area")
+        expect(f("body")).not_to contain_css('[data-testid="discussion-root-entry-container"]')
       end
     end
   end

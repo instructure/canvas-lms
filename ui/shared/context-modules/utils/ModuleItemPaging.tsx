@@ -31,12 +31,14 @@ type ModuleItemPagingProps = {
   isLoading: boolean
   paginationData?: PaginationData
   onPageChange?: (page: number, moduleId: ModuleId) => void
+  moduleName?: string
 }
 export const ModuleItemPaging = ({
   moduleId,
   isLoading,
   paginationData,
   onPageChange,
+  moduleName,
 }: ModuleItemPagingProps) => {
   const renderPagination = () => {
     if (paginationData && paginationData.totalPages > 1 && onPageChange) {
@@ -46,6 +48,7 @@ export const ModuleItemPaging = ({
           <Pagination
             data-testid={`module-${moduleId}-pagination`}
             as="nav"
+            aria-label={`${moduleName} Pagination`}
             margin="none"
             variant="compact"
             labelNext={I18n.t('Next Page')}
@@ -53,6 +56,7 @@ export const ModuleItemPaging = ({
             currentPage={currentPage}
             totalPageNumber={totalPages}
             onPageChange={(page: number) => onPageChange(page, moduleId)}
+            screenReaderLabelPageButton={currentPage => `${moduleName} Page ${currentPage}`}
           />
         </View>
       )

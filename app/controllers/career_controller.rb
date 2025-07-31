@@ -28,9 +28,10 @@ class CareerController < ApplicationController
     return redirect_to(root_path) if app == CanvasCareer::Constants::App::ACADEMIC
 
     env = {
-      FEATURES: features_env
+      FEATURES: features_env,
     }
     js_env(CANVAS_CAREER: env)
+    js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
 
     config = CanvasCareer::Config.new(@domain_root_account)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
@@ -51,14 +52,7 @@ class CareerController < ApplicationController
 
   def features_env
     %i[
-      horizon_crm_integration
-      horizon_leader_dashboards
-      horizon_admin_dashboards
-      horizon_roles_and_permissions
-      horizon_agent
-      horizon_content_library
       horizon_program_management
-      horizon_skill_management
     ].index_with { |feature| @domain_root_account.feature_enabled?(feature) }
   end
 end

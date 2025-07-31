@@ -213,12 +213,13 @@ create_external_apps_side_tray_overrides:
       state: allowed_on
 
 use_dyslexic_font:
-  state: hidden
+  state: allowed
   display_name: Use a dyslexia friendly font
   description: |-
     When enabled, this setting replaces the default font in Canvas with OpenDyslexic,
     an open source font created to help increase readability for readers with dyslexia.
   applies_to: User
+
 
 wiki_page_mastery_path_no_assignment_group:
   state: hidden
@@ -243,3 +244,10 @@ blueprint_support_sync_for_folder_movement_to_root_folder:
       state: allowed_on
     development:
       state: allowed_on
+
+widget_dashboard:
+  state: hidden
+  display_name: Widget Dashboard
+  description: |-
+    When enabled, this allows learners to add, remove, and rearrange dashboard widgets.
+  applies_to: RootAccount

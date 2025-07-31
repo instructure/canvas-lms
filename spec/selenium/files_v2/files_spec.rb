@@ -21,7 +21,7 @@ require_relative "pages/files_page"
 require_relative "../helpers/files_common"
 require_relative "../helpers/public_courses_context"
 
-describe "files index page" do
+describe "files index page", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include FilesPage
   include FilesCommon
@@ -202,6 +202,12 @@ describe "files index page" do
           expect(link_only_status_button).to be_present
         end
 
+        it "makes file available to student within given timeframe", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:available_with_timeline)
+          expect(restricted_status_button).to be_displayed
+        end
+
         it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
           published_status_button.click
           wait_for_ajaximations
@@ -242,6 +248,14 @@ describe "files index page" do
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
+        end
+
+        it "makes file available to student within given timeframe from toolbar", priority: "1" do
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
+          edit_item_permissions(:available_with_timeline)
+          expect(restricted_status_button).to be_displayed
+          expect(permission_tooltip.attribute("innerText")).to include(/Available from [A-Za-z]{3} 15 at 12am until [A-Za-z]{3} 25 at 12am/)
         end
 
         it "deletes file from toolbar", priority: "1" do
@@ -292,12 +306,12 @@ describe "files index page" do
         b_txt_file_name = "b_file.txt"
         mp3_file_name = "292.mp3"
         before do
-          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
-                   @course,
-                   a_txt_file_name)
-          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
-                   @course,
-                   b_txt_file_name)
+          @file_a = add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                             @course,
+                             a_txt_file_name)
+          @file_b = add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                             @course,
+                             b_txt_file_name)
           add_file(fixture_file_upload(mp3_file_name, "audio/mpeg"),
                    @course,
                    mp3_file_name)
@@ -321,6 +335,50 @@ describe "files index page" do
           expect(preview_file_header).to include_text(a_txt_file_name)
           preview_close_button.click
           expect(breadcrumb).to contain_css("li", text: "Sub")
+        end
+
+        context "URL-based preview" do
+          it "opens preview modal when URL contains preview parameter" do
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            expect(preview_modal).to be_displayed
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+          end
+
+          it "updates URL when navigating between files in preview" do
+            # First load the files page to ensure files are in the collection
+            get "/courses/#{@course.id}/files"
+            wait_for_ajaximations
+
+            # Then navigate to the preview
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            preview_next_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_b.id}")
+            expect(preview_file_header).to include_text("b_file.txt")
+
+            preview_previous_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+            expect(preview_file_header).to include_text("a_file.txt")
+          end
+
+          it "shows error state for file from different course context" do
+            current_course = @course
+            other_course = course_factory(active_all: true)
+            other_file = add_file(fixture_file_upload("a_file.txt", "text/plain"), other_course, "a_file.txt")
+
+            get "/courses/#{current_course.id}/files?preview=#{other_file.id}"
+
+            expect(preview_modal).to be_displayed
+            expect(file_not_found).to be_displayed
+            expect(file_not_found).to include_text("File Not Found")
+          end
         end
 
         context "with media file" do
@@ -537,6 +595,15 @@ describe "files index page" do
           expect(rename_change_button).to be_displayed
         end
 
+        it "moves a file into folder with drag and drop", priority: "2" do
+          file_to_move_element = get_table_row_item(2)
+          folder_move_to = get_table_row_item(1)
+          drag_and_drop_element(file_to_move_element, folder_move_to)
+          expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
+        end
+
         context "Search Results" do
           it "search and move a file" do
             search_input.send_keys(txt_files[0])
@@ -595,6 +662,17 @@ describe "files index page" do
         file_attachment.publish!
         get "/courses/#{@course.id}/files"
         expect(content).not_to contain_css(files_usage_text_selector)
+      end
+
+      it "can open file preview via URL parameter" do
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "student_file.pdf")
+        file_attachment.publish!
+
+        get "/courses/#{@course.id}/files?preview=#{file_attachment.id}"
+        wait_for_ajaximations
+
+        expect(preview_file_header).to include_text("student_file.pdf")
+        expect(preview_modal).to be_displayed
       end
     end
   end

@@ -66,6 +66,12 @@ module Types
     field :indent, Integer, null: true
     delegate :indent, to: :object
 
+    field :new_tab, Boolean, null: true
+    delegate :new_tab, to: :object
+
+    field :title, String, null: true
+    delegate :title, to: :object
+
     field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
     def next_resolver
       Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
@@ -148,6 +154,11 @@ module Types
       Loaders::AssociationLoader.for(ContentTag, :estimated_duration).load(content_tag).then do |estimated_duration|
         estimated_duration&.duration&.iso8601
       end
+    end
+
+    field :master_course_restrictions, Types::ModuleItemMasterCourseRestrictionType, null: true, description: "Restrictions from master courses for this module item", camelize: true
+    def master_course_restrictions
+      Loaders::ModuleItemMasterCourseRestrictionsLoader.for(current_user).load(content_tag)
     end
   end
 end

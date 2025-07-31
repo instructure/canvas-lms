@@ -26,6 +26,7 @@ import EditEventView from '../EditEventView'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
@@ -33,7 +34,21 @@ jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', ()
 }))
 
 const defaultTZ = 'Asia/Tokyo'
-const server = setupServer()
+const server = setupServer(
+  // Add default handler for the course API endpoint to resolve MSW warnings
+  http.get('*/api/v1/courses/:courseId', ({params}) => {
+    return HttpResponse.json({
+      id: params.courseId,
+      name: `Course ${params.courseId}`,
+      course_code: `COURSE${params.courseId}`,
+      workflow_state: 'available',
+      term: {
+        id: '1',
+        name: 'Default Term',
+      },
+    })
+  }),
+)
 
 describe('EditEventView', () => {
   beforeAll(() => {
@@ -46,12 +61,12 @@ describe('EditEventView', () => {
   })
 
   beforeEach(() => {
-    window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
+    fakeENV.setup({FEATURES: {}, TIMEZONE: 'Asia/Tokyo'})
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
   })
 
   afterEach(() => {
-    window.ENV = null
+    fakeENV.teardown()
     jest.clearAllMocks()
     server.resetHandlers()
   })
@@ -188,7 +203,7 @@ describe('EditEventView', () => {
     })
 
     it('is shown in a k5 subject', async () => {
-      window.ENV.K5_SUBJECT_COURSE = true
+      fakeENV.setup({FEATURES: {}, TIMEZONE: 'Asia/Tokyo', K5_SUBJECT_COURSE: true})
       render()
       await waitForRender()
       expect(
@@ -197,7 +212,7 @@ describe('EditEventView', () => {
     })
 
     it('is shown in a k5 homeroom', async () => {
-      window.ENV.K5_HOMEROOM_COURSE = true
+      fakeENV.setup({FEATURES: {}, TIMEZONE: 'Asia/Tokyo', K5_HOMEROOM_COURSE: true})
       render()
       await waitForRender()
       expect(
@@ -206,7 +221,7 @@ describe('EditEventView', () => {
     })
 
     it('is shown in a k5 account', async () => {
-      window.ENV.K5_ACCOUNT = true
+      fakeENV.setup({FEATURES: {}, TIMEZONE: 'Asia/Tokyo', K5_ACCOUNT: true})
       render()
       await waitForRender()
       expect(
@@ -215,7 +230,7 @@ describe('EditEventView', () => {
     })
 
     it('is shown and checked in a k5 subject with event already marked as important', async () => {
-      window.ENV.K5_SUBJECT_COURSE = true
+      fakeENV.setup({FEATURES: {}, TIMEZONE: 'Asia/Tokyo', K5_SUBJECT_COURSE: true})
       render({important_dates: true})
       await waitForRender()
       const checkbox = within(document.body).getByLabelText('Mark as Important Date', {
@@ -238,13 +253,13 @@ describe('EditEventView', () => {
     }
 
     it('is not shown when account level blackout dates are disabled', () => {
-      window.ENV.FEATURES = {account_level_blackout_dates: false}
+      fakeENV.setup({FEATURES: {account_level_blackout_dates: false}, TIMEZONE: 'Asia/Tokyo'})
       render()
       expect(within(document.body).queryByText('Add to Course Pacing blackout dates')).toBeNull()
     })
 
     it('is shown when account level blackout dates are enabled', async () => {
-      window.ENV.FEATURES = {account_level_blackout_dates: true}
+      fakeENV.setup({FEATURES: {account_level_blackout_dates: true}, TIMEZONE: 'Asia/Tokyo'})
       render({context_type: 'course', course_pacing_enabled: 'true'})
       await waitForRender()
       expect(
@@ -255,7 +270,7 @@ describe('EditEventView', () => {
     })
 
     it('erases and renders irrelevant fields when checked', async () => {
-      window.ENV.FEATURES = {account_level_blackout_dates: true}
+      fakeENV.setup({FEATURES: {account_level_blackout_dates: true}, TIMEZONE: 'Asia/Tokyo'})
       render({
         context_type: 'course',
         course_pacing_enabled: 'true',

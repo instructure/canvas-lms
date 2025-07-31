@@ -24,11 +24,31 @@ describe('editItemHandlers', () => {
       const itemData = {
         title: 'Testing',
         indentation: 3,
+        newTab: true,
       }
       const result = prepareItemData(itemData)
       expect(result).toEqual({
         'content_tag[title]': 'Testing',
         'content_tag[indent]': 3,
+        'content_tag[new_tab]': 1,
+        new_tab: 0,
+        graded: 0,
+        _method: 'PUT',
+      })
+    })
+
+    it('should prepare item data for url field', () => {
+      const itemData = {
+        title: '',
+        indentation: 0,
+        url: 'https://example.com',
+      }
+      const result = prepareItemData(itemData)
+      expect(result).toEqual({
+        'content_tag[title]': '',
+        'content_tag[indent]': 0,
+        'content_tag[url]': 'https://example.com',
+        'content_tag[new_tab]': 0,
         new_tab: 0,
         graded: 0,
         _method: 'PUT',
@@ -46,6 +66,7 @@ describe('editItemHandlers', () => {
       expect(result).toEqual({
         'content_tag[title]': '',
         'content_tag[indent]': 0,
+        'content_tag[new_tab]': 0,
         new_tab: 0,
         graded: 0,
         _method: 'PUT',

@@ -19,17 +19,19 @@
 import React from 'react'
 
 import fakeENV from '@canvas/test-utils/fakeENV'
-import { renderConnected } from '../../../../__tests__/utils'
-import { screen, fireEvent } from '@testing-library/react'
-import { actions as uiActions } from '../../../../actions/ui'
+import {renderConnected} from '../../../../__tests__/utils'
+import {screen, fireEvent} from '@testing-library/react'
+import {actions as uiActions} from '../../../../actions/ui'
 import WeightedAssignmentsTray from './../WeightedAssignmentsTray'
-import { StoreState } from '../../../../types'
-import { BLACKOUT_DATES, DEFAULT_STORE_STATE, PRIMARY_PACE } from '../../../../__tests__/fixtures'
+import {StoreState} from '../../../../types'
+import {BLACKOUT_DATES, DEFAULT_STORE_STATE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
 
 jest.mock('../../../../actions/ui', () => ({
   ...jest.requireActual('../../../../actions/ui'),
   actions: {
-    hideWeightedAssignmentsTray: jest.fn().mockReturnValue({ type: 'UI/HIDE_WEIGHTING_ASSIGNMENTS_MODAL', payload: {} }),
+    hideWeightedAssignmentsTray: jest
+      .fn()
+      .mockReturnValue({type: 'UI/HIDE_WEIGHTING_ASSIGNMENTS_MODAL', payload: {}}),
   },
 }))
 
@@ -38,9 +40,9 @@ const defaultStoreState: StoreState = {
   original: {
     coursePace: {
       ...PRIMARY_PACE,
-      workflow_state: 'unpublished'
+      workflow_state: 'unpublished',
     },
-    blackoutDates: BLACKOUT_DATES
+    blackoutDates: BLACKOUT_DATES,
   },
   ui: {
     ...DEFAULT_STORE_STATE.ui,
@@ -48,7 +50,7 @@ const defaultStoreState: StoreState = {
   },
 }
 
-type durationItemType = "assignment" | "quiz" | "discussion" | "page"
+type durationItemType = 'assignment' | 'quiz' | 'discussion' | 'page'
 
 beforeEach(() => {
   fakeENV.setup({
@@ -65,45 +67,53 @@ describe('WeightedAssignmentsTray', () => {
 
       const currentValue = PRIMARY_PACE.assignments_weighting[item] || 0
 
-      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue(currentValue.toString())
+      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue(
+        currentValue.toString(),
+      )
     })
 
     it('increments the duration values', () => {
       renderConnected(<WeightedAssignmentsTray />, defaultStoreState)
 
-      const incrementButton = screen.getByTestId(`duration-${item}`)
+      const incrementButton = screen
+        .getByTestId(`duration-${item}`)
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
       fireEvent.mouseDown(incrementButton)
 
       const currentValue = PRIMARY_PACE.assignments_weighting[item] || 0
-      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue((currentValue + 1).toString())
+      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue(
+        (currentValue + 1).toString(),
+      )
     })
 
     it('decrements the duration values', () => {
       renderConnected(<WeightedAssignmentsTray />, defaultStoreState)
 
-      const incrementButton = screen.getByTestId(`duration-${item}`)
+      const incrementButton = screen
+        .getByTestId(`duration-${item}`)
         .querySelector('svg[name="IconArrowOpenDown"]')
         ?.closest('button') as HTMLButtonElement
       fireEvent.mouseDown(incrementButton)
 
       const currentValue = PRIMARY_PACE.assignments_weighting[item] || 0
 
-      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue((currentValue - 1).toString())
+      expect(screen.getByTestId(`duration-${item}`).querySelector('input')).toHaveValue(
+        (currentValue - 1).toString(),
+      )
     })
   }
 
   describe('Duration items inputs', () => {
-    runTests("assignment")
-    runTests("quiz")
-    runTests("discussion")
-    runTests("page")
+    runTests('assignment')
+    runTests('quiz')
+    runTests('discussion')
+    runTests('page')
   })
 
   describe('weighted assignments validations', () => {
     it('should close the tray when the close button is clicked', () => {
-      const { getByText } = renderConnected(<WeightedAssignmentsTray />, defaultStoreState)
+      const {getByText} = renderConnected(<WeightedAssignmentsTray />, defaultStoreState)
       const cancelButton = getByText('Cancel').closest('button') as HTMLButtonElement
       fireEvent.click(cancelButton)
 
@@ -124,7 +134,7 @@ describe('WeightedAssignmentsTray', () => {
           },
         },
       }
-      const { getByTestId } = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
       const incrementButton = getByTestId('duration-assignment')
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
@@ -151,13 +161,15 @@ describe('WeightedAssignmentsTray', () => {
           end_date: '2021-12-17',
         },
       }
-      const { getByTestId } = renderConnected(<WeightedAssignmentsTray />, storeState)
+      const {getByTestId} = renderConnected(<WeightedAssignmentsTray />, storeState)
       const incrementButton = getByTestId('duration-assignment')
         .querySelector('svg[name="IconArrowOpenUp"]')
         ?.closest('button') as HTMLButtonElement
       fireEvent.mouseDown(incrementButton)
 
-      const applyButton = getByTestId('weighted-assignments-apply-button').closest('button') as HTMLButtonElement
+      const applyButton = getByTestId('weighted-assignments-apply-button').closest(
+        'button',
+      ) as HTMLButtonElement
       fireEvent.click(applyButton)
 
       const validationMessage = screen.getByTestId('validation-message')

@@ -79,18 +79,6 @@ discussion_create:
     discussion create/edit page
   applies_to: RootAccount
 
-bbb_modal_update:
-  state: hidden
-  display_name: BBB Modal Update
-  description: |-
-    This update offers enhanced feature functionality for
-    Big Blue Button Conferences. Users will now be able to enable
-    the Waiting Room in their conference settings, they'll be able
-    to add a scheduled conference to their calendar from within a conference,
-    and they'll be able to update/sync conference attendees as new attendees are
-    added or removed.
-  applies_to: SiteAdmin
-
 react_inbox_labels:
   state: hidden
   display_name: Enable Labels on the new Inbox page
@@ -189,3 +177,22 @@ disallow_threaded_replies_manage:
   display_name: Manage Disallow Threaded Replies in Discussions
   description: |-
     This feature flag controls the visibility of the alert that allows teachers to manage threaded replies for each discussion topic on the Discussions Index page, this will override the Dissalow Threaded Replies Fix Alert.
+
+
+discussion_pin_post:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Pin Post
+  description: |-
+    This feature flag controls the ability to pin posts on the Discussions page.
+  shadow: true
+
+create_conversation_graphql_rate_limit:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Rate Limit for Create Conversation GraphQL Mutation
+  description: |-
+    This feature flag enables a rate limit for the Create Conversation GraphQL mutation.
+    Assigns different scores for different user groups like students, teachers, etc.
+    Once the score reaches a certain threshold, the user will be rate limited for a period of time.
+

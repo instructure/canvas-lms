@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import GroupRuleInput, { GroupRuleInputProps } from '../GroupRuleInput'
+import {render, screen, fireEvent} from '@testing-library/react'
+import GroupRuleInput, {GroupRuleInputProps} from '../GroupRuleInput'
 
 const setup = (props?: Partial<GroupRuleInputProps>) => {
   const defaultProps: GroupRuleInputProps = {
@@ -26,31 +26,31 @@ const setup = (props?: Partial<GroupRuleInputProps>) => {
     type: 'drop_lowest',
     initialValue: '5',
     onBlur: jest.fn(),
-    onChange: jest.fn()
+    onChange: jest.fn(),
   }
   return render(<GroupRuleInput {...defaultProps} {...props} />)
 }
 
 describe('GroupRuleInput', () => {
   test('sets initial value correctly', () => {
-    setup({ initialValue: '3' })
+    setup({initialValue: '3'})
     const input = screen.getByTestId('ag_1_drop_lowest') as HTMLInputElement
     expect(input.value).toBe('3')
   })
 
   test('calls onChange when input value changes', () => {
     const onChangeMock = jest.fn()
-    setup({ onChange: onChangeMock })
+    setup({onChange: onChangeMock})
     const input = screen.getByTestId('ag_1_drop_lowest') as HTMLInputElement
 
-    fireEvent.change(input, { target: { value: '10' } })
+    fireEvent.change(input, {target: {value: '10'}})
     expect(onChangeMock).toHaveBeenCalled()
     expect(input.value).toBe('10')
   })
 
   test('calls onBlur when input loses focus', () => {
     const onBlurMock = jest.fn()
-    setup({ onBlur: onBlurMock })
+    setup({onBlur: onBlurMock})
     const input = screen.getByTestId('ag_1_drop_lowest')
 
     fireEvent.blur(input)

@@ -18,41 +18,92 @@
 
 import React from 'react'
 import {render, fireEvent, screen} from '@testing-library/react'
-import EditItemModal from '../EditItemModal'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import EditItemModal, {type EditItemModalProps} from '../EditItemModal'
 
-jest.mock('@canvas/query')
+const buildDefaultProps = (overrides: Partial<EditItemModalProps> = {}): EditItemModalProps => ({
+  isOpen: true,
+  onRequestClose: jest.fn(),
+  itemName: 'Test Item',
+  itemType: 'assignment',
+  itemIndent: 1,
+  itemId: '123',
+  courseId: '1',
+  moduleId: '1',
+  ...overrides,
+})
 
-describe('EditItemModal', () => {
-  const defaultProps = {
-    isOpen: true,
-    onRequestClose: jest.fn(),
-    itemName: 'Test Item',
-    itemIndent: 1,
-    itemId: '123',
-    courseId: '1',
-    moduleId: '1',
+const setUp = (props: EditItemModalProps, courseId = 'test-course-id') => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  })
+
+  const contextProps = {
+    ...contextModuleDefaultProps,
+    courseId,
+    moduleGroupMenuTools: [],
+    moduleMenuModalTools: [],
+    moduleMenuTools: [],
+    moduleIndexMenuModalTools: [],
   }
 
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ContextModuleProvider {...contextProps}>
+        <EditItemModal {...props} />
+      </ContextModuleProvider>
+    </QueryClientProvider>,
+  )
+}
+
+const server = setupServer()
+
+describe('EditItemModal', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    // @ts-expect-error
+    window.ENV = {
+      TIMEZONE: 'UTC',
+    }
+
+    server.use(
+      http.post('/courses/:courseId/modules/items/:itemId', () => {
+        return HttpResponse.json({
+          id: '123',
+          title: 'Updated Item',
+          indent: 1,
+        })
+      }),
+    )
   })
 
   it('renders with initial values', () => {
-    render(<EditItemModal {...defaultProps} />)
+    const {getByLabelText} = setUp(buildDefaultProps())
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Test Item')
-    expect(screen.getByLabelText('Indent')).toHaveValue('Indent 1 level')
+    expect(getByLabelText('Title')).toHaveValue('Test Item')
+    expect(getByLabelText('Indent')).toHaveValue('Indent 1 level')
   })
 
   it('updates title when typing', () => {
-    render(<EditItemModal {...defaultProps} />)
+    setUp(buildDefaultProps())
     const titleInput = screen.getByTestId('edit-modal-title')
     fireEvent.change(titleInput, {target: {value: 'New Title'}})
     expect(titleInput).toHaveValue('New Title')
   })
 
   it('updates indent when changed', () => {
-    render(<EditItemModal {...defaultProps} />)
+    setUp(buildDefaultProps())
 
     const indentSelect = screen.getByRole('combobox', {name: 'Indent'})
     fireEvent.click(indentSelect)
@@ -61,8 +112,94 @@ describe('EditItemModal', () => {
   })
 
   it('calls onRequestClose when Cancel is clicked', () => {
-    render(<EditItemModal {...defaultProps} />)
+    const props = buildDefaultProps()
+    setUp(props)
     fireEvent.click(screen.getByText('Cancel'))
-    expect(defaultProps.onRequestClose).toHaveBeenCalled()
+    expect(props.onRequestClose).toHaveBeenCalled()
+  })
+
+  describe('Master Course Restriction', () => {
+    it('should disable title input when master course restriction of "all" is true', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: true,
+          content: false,
+          availabilityDates: null,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).toBeDisabled()
+    })
+
+    it('should disable title input when master course restriction of "content" is true', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: null,
+          content: true,
+          availabilityDates: null,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).toBeDisabled()
+    })
+
+    it('should not disable title input when master course restriction of "content" is falsey', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: null,
+          content: null,
+          availabilityDates: true,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).not.toBeDisabled()
+    })
+
+    it('should not disable title input when master course restrictions are missing', () => {
+      const props = buildDefaultProps()
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).not.toBeDisabled()
+    })
+  })
+
+  describe('External URL types', () => {
+    const defaultProps = buildDefaultProps({
+      itemType: 'external',
+      itemURL: 'http://example.com',
+      itemNewTab: true,
+    })
+
+    it('renders external URL field when itemType is external', () => {
+      setUp(defaultProps)
+      expect(screen.getByLabelText('URL')).toBeInTheDocument()
+    })
+
+    it('renders new Tab field when itemType is external', () => {
+      setUp(defaultProps)
+      expect(screen.getByLabelText('Load in a new tab')).toBeInTheDocument()
+    })
+
+    it('does not render external URL fields when itemType is not external', () => {
+      setUp(buildDefaultProps())
+      expect(screen.queryByLabelText('URL')).not.toBeInTheDocument()
+    })
+
+    it('does not render new Tab fields when itemType is not external', () => {
+      setUp(buildDefaultProps())
+      expect(screen.queryByLabelText('Load in a new tab')).not.toBeInTheDocument()
+    })
   })
 })

@@ -214,9 +214,18 @@ describe "course copy" do
 
       get "/courses/#{@course.id}/copy"
 
+      NewCourseCopyPage.date_adjust_checkbox.click
       replace_and_proceed(NewCourseCopyPage.course_start_date_input, "2012-08-05")
       replace_and_proceed(NewCourseCopyPage.course_end_date_input, "2012-11-15")
-      NewCourseCopyPage.date_adjust_checkbox.click
+
+      expect(NewCourseCopyPage.new_start_date_input.attribute("value")).to include("Aug 5, 2012")
+      expect(NewCourseCopyPage.new_end_date_input.attribute("value")).to include("Nov 15, 2012")
+
+      replace_and_proceed(NewCourseCopyPage.new_start_date_input, "2012-01-05")
+      replace_and_proceed(NewCourseCopyPage.new_end_date_input, "2012-06-15")
+
+      expect(NewCourseCopyPage.course_start_date_input.attribute("value")).to include("Jan 5, 2012")
+      expect(NewCourseCopyPage.course_end_date_input.attribute("value")).to include("Jun 15, 2012")
 
       expect_new_page_load { NewCourseCopyPage.create_course_button.click }
       wait_for_ajaximations
@@ -230,8 +239,8 @@ describe "course copy" do
       expected = {
         "old_start_date" => "Jul 7, 2012",
         "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012",
-        "new_end_date" => "Nov 15, 2012"
+        "new_start_date" => "Jan 5, 2012",
+        "new_end_date" => "Jun 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)

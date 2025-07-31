@@ -207,6 +207,38 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "does not set only_visible_to_overrides to true when assigning ungraded group discussion to groups" do
+      discussion = @course.discussion_topics.create!(title: "ungraded group discussion",
+                                                     unlock_at: "2022-01-05T12:00:00Z",
+                                                     lock_at: "2022-03-05T12:00:00Z")
+      category = @course.group_categories.create(name: "ungraded topic groups")
+      discussion.update!(group_category_id: category.id)
+      group1 = category.groups.create!(name: "Group 1", context: @course)
+      group2 = category.groups.create!(name: "Group 2", context: @course)
+
+      expect(discussion.only_visible_to_overrides).to be false
+
+      put :update, params: {
+        course_id: @course.id,
+        discussion_topic_id: discussion.id,
+        only_visible_to_overrides: true,
+        assignment_overrides: [
+          { group_id: group1.id, unlock_at: "2022-01-01T00:00:00Z" },
+          { group_id: group2.id, unlock_at: "2022-01-02T00:00:00Z" }
+        ]
+      }
+
+      discussion.reload
+      expect(discussion.only_visible_to_overrides).to be false
+      expect(discussion.assignment_overrides.active.count).to eq 2
+
+      group_override_1 = discussion.assignment_overrides.active.find_by(set: group1)
+      group_override_2 = discussion.assignment_overrides.active.find_by(set: group2)
+
+      expect(group_override_1).to be_present
+      expect(group_override_2).to be_present
+    end
+
     it "returns date details for an ungraded discussion with a section visibility" do
       discussion = @course.discussion_topics.create!(title: "ungraded topic",
                                                      unlock_at: "2022-01-05T12:00:00Z",
@@ -662,6 +694,32 @@ describe LearningObjectDatesController do
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_successful
       expect(json_parse["overrides"]).to eq []
+    end
+
+    it "prefers the section name over the override title" do
+      section = @course.course_sections.create!(name: "Old Section Name")
+      @override.set = section
+      @override.save!
+      section.update_column(:name, "New Section Name")
+      section.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse["overrides"][0]["title"]).to eq section.name
+    end
+
+    it "prefers the group name over the override title" do
+      category = @course.group_categories.create(name: "Group Category")
+      @assignment.update!(group_category_id: category.id)
+      category.create_groups(2)
+      group = category.groups.first
+      group.update_column(:name, "Old Group Name")
+      @override.set = group
+      @override.save!
+      group.update_column(:name, "New Group Name")
+      group.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse["overrides"][0]["title"]).to eq group.name
     end
 
     it "returns unauthorized for students" do

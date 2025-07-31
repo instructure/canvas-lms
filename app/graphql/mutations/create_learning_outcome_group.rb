@@ -34,6 +34,7 @@ class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
     check_user_permissions
 
     @child_outcome_group = @outcome_group.child_outcome_groups.build(attributes(input))
+    @child_outcome_group.saving_user = current_user
     if @child_outcome_group.save
       { learning_outcome_group: @child_outcome_group }
     else

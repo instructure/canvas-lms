@@ -19,6 +19,7 @@
 import {MemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
 import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {mockRegistrationWithAllInformation} from '../../manage/__tests__/helpers'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export type RenderArgs = {
   registration?: LtiRegistrationWithAllInformation
@@ -29,22 +30,25 @@ export const renderWithRouter = ({
   registration = mockRegistrationWithAllInformation({n: 'foo', i: 1}),
   child,
 }: RenderArgs) => {
+  const queryClient = new QueryClient()
   return (
-    <MemoryRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Outlet
-              context={{
-                registration,
-              }}
-            />
-          }
-        >
-          <Route index element={child} />
-        </Route>
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Outlet
+                context={{
+                  registration,
+                }}
+              />
+            }
+          >
+            <Route index element={child} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   )
 }

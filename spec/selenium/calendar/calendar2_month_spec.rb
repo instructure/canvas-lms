@@ -354,7 +354,6 @@ describe "calendar2" do
       end
 
       it "loads discussion page when click on title in discussion checkpoint info modal", :ignore_js_errors do
-        skip "Will be fixed in VICE-5209"
         @course.account.enable_feature!(:discussion_checkpoints)
         due_at = Time.zone.now.utc + 1.day
         title = "graded discussion with checkpoints"
@@ -365,7 +364,7 @@ describe "calendar2" do
         quick_jump_to_date(format_date_for_view(due_at))
         f(".fc-event").click
         expect_new_page_load { hover_and_click ".view_event_link" }
-        expect(find("h1")).to include_text(title)
+        expect(find('[data-testid="message_title"]')).to include_text(title)
       end
 
       context "discussion checkpoint titles" do
@@ -772,8 +771,7 @@ describe "calendar2" do
         expect(find(".fc-title").css_value("text-decoration")).to include("line-through")
       end
 
-      it "strikethroughs completed graded discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "strikethroughs completed graded discussion", :ignore_js_errors, priority: "1" do
         date_due = Time.zone.now.utc + 2.days
         reply = "Replying to discussion"
 
@@ -782,9 +780,11 @@ describe "calendar2" do
         @pub_graded_discussion_due.save!
 
         get "/courses/#{@course.id}/discussion_topics/#{@pub_graded_discussion_due.id}"
-        find(".discussion-reply-action").click
-        type_in_tiny(".reply-textarea", reply)
-        find(".btn.btn-primary").click
+        find('[data-testid="discussion-topic-reply"]').click
+        wait_for_ajaximations
+        wait_for_rce
+        type_in_tiny("textarea", reply)
+        f('[data-testid="DiscussionEdit-submit"]').click
         wait_for_ajaximations
         get "/calendar2"
 

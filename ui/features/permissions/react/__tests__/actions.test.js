@@ -19,6 +19,7 @@ import $ from 'jquery'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import {waitFor} from '@testing-library/react'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import actions from '../actions'
 
@@ -27,6 +28,14 @@ import {PERMISSIONS, ROLES} from './examples'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 import '@canvas/rails-flash-notifications'
+
+beforeEach(() => {
+  fakeENV.setup()
+})
+
+afterEach(() => {
+  fakeENV.teardown()
+})
 
 it('searchPermissions dispatches updatePermissionsSearch', done => {
   const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
@@ -177,21 +186,29 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
 
-/* eslint-disable promise/no-callback-in-promise */
 describe('api actions', () => {
   const server = setupServer()
 
-  beforeAll(() => server.listen())
+  beforeAll(() => server.listen({onUnhandledRequest: 'error'}))
   beforeEach(() => {
-    window.ENV = {}
+    fakeENV.setup()
     window.ENV.flashAlertTimeout = 5
+    jest.useRealTimers()
   })
-  afterEach(() => server.resetHandlers())
+  afterEach(() => {
+    server.resetHandlers()
+    jest.clearAllMocks()
+    jest.clearAllTimers()
+    jest.useFakeTimers()
+    fakeENV.teardown()
+  })
   afterAll(() => server.close())
 
   it('updateRoleName dispatches updateRole', async () => {
+    let requestReceived = false
     server.use(
       http.put('/api/v1/accounts/1/roles/:id', () => {
+        requestReceived = true
         return HttpResponse.json({
           id: '9',
           role: 'steven',
@@ -208,22 +225,30 @@ describe('api actions', () => {
     actions.updateRoleName('1', 'steven', 'StudentRoll')(mockDispatch, getState)
 
     await waitFor(() => {
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'UPDATE_ROLE',
-        payload: {
-          id: '9',
-          role: 'steven',
-          label: 'steven',
-          base_role_type: 'StudentEnrollment',
-          workflow_state: 'active',
-        },
-      })
+      expect(requestReceived).toBe(true)
+    })
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalled()
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: 'UPDATE_ROLE',
+      payload: {
+        id: '9',
+        role: 'steven',
+        label: 'steven',
+        base_role_type: 'StudentEnrollment',
+        workflow_state: 'active',
+      },
     })
   })
 
   it('createNewRole dispatches addNewRole', async () => {
+    let requestReceived = false
     server.use(
       http.post('/api/v1/accounts/1/roles', () => {
+        requestReceived = true
         return HttpResponse.json({
           id: '9',
           role: 'steven',
@@ -235,49 +260,56 @@ describe('api actions', () => {
     )
 
     const mockDispatch = jest.fn()
-    const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
+    const state = {contextId: 1, permissions: PERMISSIONS, roles: [], selectedRoles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
 
     await waitFor(() => {
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'ADD_NEW_ROLE',
-        payload: {
-          id: '9',
-          role: 'steven',
-          label: 'steven',
+      expect(requestReceived).toBe(true)
+    })
+
+    await waitFor(() => {
+      expect(mockDispatch).toHaveBeenCalledTimes(7)
+    })
+
+    // Check all dispatched actions
+    const expectedStartDispatch = {
+      type: 'ADD_TRAY_SAVING_START',
+    }
+    const expectedAddNewRoleDispatch = {
+      type: 'ADD_NEW_ROLE',
+      payload: {
+        id: '9',
+        role: 'steven',
+        label: 'steven',
+        base_role_type: 'StudentEnrollment',
+        workflow_state: 'active',
+      },
+    }
+    const expectedDisplayRoleTrayDispatch = {
+      type: 'DISPLAY_ROLE_TRAY',
+      payload: {
+        role: {
           base_role_type: 'StudentEnrollment',
+          id: '9',
+          label: 'steven',
+          role: 'steven',
           workflow_state: 'active',
         },
-      })
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'DISPLAY_ROLE_TRAY',
-        payload: {
-          role: {
-            base_role_type: 'StudentEnrollment',
-            id: '9',
-            label: 'steven',
-            role: 'steven',
-            workflow_state: 'active',
-          },
-        },
-      })
-      const expectedStartDispatch = {
-        type: 'ADD_TRAY_SAVING_START',
-      }
-      const expectedDisplayAddSuccessDispatch = {
-        type: 'ADD_TRAY_SAVING_SUCCESS',
-      }
+      },
+    }
+    const expectedDisplayAddSuccessDispatch = {
+      type: 'ADD_TRAY_SAVING_SUCCESS',
+    }
+    const expectedHideDispatch = {
+      type: 'HIDE_ALL_TRAYS',
+    }
 
-      const expectedHideDispatch = {
-        type: 'HIDE_ALL_TRAYS',
-      }
-
-      expect(mockDispatch).toHaveBeenCalledTimes(6)
-      expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
-      expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
-      expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
-    })
+    expect(mockDispatch).toHaveBeenCalledWith(expectedStartDispatch)
+    expect(mockDispatch).toHaveBeenCalledWith(expectedAddNewRoleDispatch)
+    expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayRoleTrayDispatch)
+    expect(mockDispatch).toHaveBeenCalledWith(expectedDisplayAddSuccessDispatch)
+    expect(mockDispatch).toHaveBeenCalledWith(expectedHideDispatch)
   })
 
   it('createNewRole dispatches addTraySavingFail', async () => {
@@ -285,11 +317,9 @@ describe('api actions', () => {
       http.post('/api/v1/accounts/1/roles', () => {
         return HttpResponse.json(
           {
-            id: '9',
-            role: 'steven',
-            label: 'steven',
-            base_role_type: 'StudentEnrollment',
-            workflow_state: 'active',
+            errors: {
+              base: ['Invalid role'],
+            },
           },
           {status: 400},
         )
@@ -297,7 +327,7 @@ describe('api actions', () => {
     )
 
     const mockDispatch = jest.fn()
-    const state = {contextId: 1, permissions: PERMISSIONS, roles: []}
+    const state = {contextId: 1, permissions: PERMISSIONS, roles: [], selectedRoles: []}
     const getState = () => state
     actions.createNewRole('steven', 'StudentRoll')(mockDispatch, getState)
 
@@ -373,12 +403,14 @@ describe('api actions', () => {
     })(dispatchMock, () => state)
 
     await waitFor(() => {
-      expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
-      expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
-      expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
-      expect(dispatchMock).toHaveBeenCalledWith(expectedApiUnbusyDispatch)
       expect(dispatchMock).toHaveBeenCalledTimes(4)
     })
+
+    // Check all dispatched actions without assuming order
+    expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
+    expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
+    expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
+    expect(dispatchMock).toHaveBeenCalledWith(expectedApiUnbusyDispatch)
   })
 
   it('deleteRole action dispatches delete and calls success callback if good', async () => {
@@ -427,5 +459,3 @@ describe('api actions', () => {
     })
   })
 })
-
-/* eslint-enable promise/no-callback-in-promise */

@@ -81,19 +81,19 @@ module DiscussionsCommon
   end
 
   def edit_topic(discussion_name, message)
-    wait_for_tiny(f("textarea[name=message]"))
+    wait_for_rce
     replace_content(f("input[name=title]"), discussion_name)
     type_in_tiny("textarea[name=message]", message)
     expect_new_page_load { submit_form(".form-actions") }
-    expect(f("#discussion_topic .discussion-title").text).to eq discussion_name
+    expect(f('[data-testid="message_title"]')).to include_text(discussion_name)
   end
 
   def edit_entry(entry, text)
     wait_for_ajaximations
-    click_entry_option(entry, ".al-options li:nth-of-type(2) a")
+    click_entry_option(entry, ".discussion-thread-menuitem-edit")
     wait_for_ajaximations
     type_in_tiny "textarea", text
-    move_to_click(".edit_html_done")
+    f('[data-testid="DiscussionEdit-submit"]').click
     wait_for_ajaximations
     validate_entry_text(entry, text)
   end
@@ -118,30 +118,30 @@ module DiscussionsCommon
   end
 
   def add_reply(message = "message!", attachment = nil)
-    @last_entry ||= f("#discussion_topic")
-    @last_entry.find_element(:css, ".discussion-reply-action").click
+    @last_entry ||= f('[data-testid="discussion-topic-container"]')
+    @last_entry.find_element(:css, '[data-testid="discussion-topic-reply"]').click
     wait_for_ajaximations
     type_in_tiny "textarea", message
 
     if attachment.present?
       _filename, fullpath, _data = get_file(attachment)
-      scroll_to(@last_entry.find_element(:css, ".discussion-reply-add-attachment"))
-      @last_entry.find_element(:css, ".discussion-reply-add-attachment").click
+      scroll_to(@last_entry.find_element(:css, '[data-testid="attach-btn"]'))
+      @last_entry.find_element(:css, '[data-testid="attach-btn"]').click
       wait_for_ajaximations
-      @last_entry.find_element(:css, ".discussion-reply-attachments input").send_keys(fullpath)
+      @last_entry.find_element(:css, '[data-testid="attachment-input"]').send_keys(fullpath)
     end
-    fj('button:contains("Post Reply"):visible').click
-    wait_for(method: nil, timeout: 5) { f("#discussion_subentries .discussion_entry").displayed? }
+    f('[data-testid="DiscussionEdit-submit"]').click
+    wait_for(method: nil, timeout: 5) { f('[data-testid="discussion-entry-container"]').displayed? }
     id = DiscussionEntry.last.id
-    @last_entry = f "#entry-#{id}"
+    @last_entry = f("[data-entry-id='#{id}']")
   end
 
   def get_all_replies
-    ff("#discussion_subentries .discussion_entry")
+    ff('[data-testid="discussion-entry-container"]')
   end
 
   def validate_entry_text(discussion_entry, text)
-    expect(f("#entry-#{discussion_entry.id}").text).to include(text)
+    expect(f("[data-entry-id='#{discussion_entry.id}']").text).to include(text)
   end
 
   def check_entry_option(discussion_entry, menu_item_selector)
@@ -154,15 +154,13 @@ module DiscussionsCommon
   end
 
   def click_entry_option(discussion_entry, menu_item_selector)
-    li_selector = "#entry-#{discussion_entry.id}"
-    wait_for(method: nil, timeout: 2) { fj(li_selector).displayed? }
-    menu_button = fj("#{li_selector} .al-trigger")
+    entry_selector = "[data-entry-id='#{discussion_entry.id}']"
+    wait_for(method: nil, timeout: 2) { f(entry_selector).displayed? }
+    menu_button = f(entry_selector.to_s + ' [data-testid="thread-actions-menu"]')
     scroll_to(menu_button)
     menu_button.click
     wait_for_ajaximations
-    menu_item = fj("#{li_selector} #{menu_item_selector}")
-    wait_for(method: nil, timeout: 2) { fj(menu_item).displayed? }
-    force_click("#{li_selector} #{menu_item_selector}")
+    f(menu_item_selector).click
   end
 
   def click_topic_option(topic_selector, menu_item_selector)
@@ -215,7 +213,7 @@ module DiscussionsCommon
     replace_content(f("input[name=title]"), title)
     type_in_tiny("textarea[name=message]", message)
     expect_new_page_load { submit_form(".form-actions") }
-    expect(f("#discussion_topic .discussion-title")).to include_text(title)
+    expect(f('[data-testid="message_title"]')).to include_text(title)
   end
 
   def topic_index_element(topic)

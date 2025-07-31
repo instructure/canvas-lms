@@ -517,6 +517,12 @@ class UsersController < ApplicationController
   end
 
   def user_dashboard
+    if !k5_user? && !@current_user.non_student_enrollment? && @domain_root_account.feature_enabled?(:widget_dashboard)
+      # things needed only for widget dashboard (students only)
+      js_bundle :widget_dashboard
+      return render html: "", layout: true
+    end
+
     # Use the legacy to do list for non-students until it is ready for other roles
     if planner_enabled? && !@current_user.non_student_enrollment?
       css_bundle :react_todo_sidebar

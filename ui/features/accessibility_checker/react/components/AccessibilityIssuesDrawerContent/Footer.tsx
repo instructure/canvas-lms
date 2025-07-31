@@ -25,6 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('accessibility_checker')
 
 interface Props {
+  nextButtonName: string
   onNext: () => void
   onSaveAndNext: () => void
   onBack?: () => void
@@ -34,6 +35,7 @@ interface Props {
 }
 
 const Footer: React.FC<Props> = ({
+  nextButtonName,
   onNext,
   onSaveAndNext,
   onBack,
@@ -62,7 +64,7 @@ const Footer: React.FC<Props> = ({
             color="primary"
             disabled={isSaveAndNextDisabled}
           >
-            {I18n.t('Save & Next')}
+            {nextButtonName}
           </Button>
         </Flex.Item>
       </Flex>

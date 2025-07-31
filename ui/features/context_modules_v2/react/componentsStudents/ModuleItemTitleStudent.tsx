@@ -25,6 +25,7 @@ import {View} from '@instructure/ui-view'
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemTitleStudentProps {
+  title: string
   content: ModuleItemContent
   progression?: ModuleProgression
   position?: number
@@ -36,6 +37,7 @@ export interface ModuleItemTitleStudentProps {
 const missingTitleText = I18n.t('Untitled Item')
 
 const ModuleItemTitleStudent = ({
+  title,
   content,
   progression,
   position,
@@ -53,8 +55,8 @@ const ModuleItemTitleStudent = ({
     ) {
       return (
         <View as="div" padding="xx-small">
-          <Text weight="light" color="secondary" data-testid="module-item-title-locked">
-            {content?.title || missingTitleText}
+          <Text weight="bold" color="secondary" data-testid="module-item-title-locked">
+            {title || missingTitleText}
           </Text>
         </View>
       )
@@ -64,7 +66,7 @@ const ModuleItemTitleStudent = ({
       return (
         <View as="div" padding="xx-small">
           <Text weight="bold" color="primary" data-testid="subheader-title-text">
-            {content?.title || missingTitleText}
+            {title || missingTitleText}
           </Text>
         </View>
       )
@@ -74,7 +76,7 @@ const ModuleItemTitleStudent = ({
       <View as="div" padding="xx-small">
         <Link href={url} variant="standalone" onClick={onClick}>
           <Text weight="bold" color="primary" data-testid="module-item-title">
-            {content?.title || missingTitleText}
+            {title || missingTitleText}
           </Text>
         </Link>
       </View>

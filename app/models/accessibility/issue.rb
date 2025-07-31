@@ -24,7 +24,6 @@ module Accessibility
     include AssignmentIssues
     include AttachmentIssues
     include ContentChecker
-    include AccessibilityHelper
 
     attr_reader :context
 
@@ -33,7 +32,7 @@ module Accessibility
     end
 
     def generate
-      skip_scan = exceeds_accessibility_scan_limit?
+      skip_scan = @context.exceeds_accessibility_scan_limit?
       {
         pages: generate_wiki_page_resources(skip_scan:),
         assignments: generate_assignment_resources(skip_scan:),
@@ -42,6 +41,19 @@ module Accessibility
         attachments: {},
         last_checked: Time.zone.now.strftime("%b %-d, %Y"),
         accessibility_scan_disabled: skip_scan
+      }
+    end
+
+    def search(query)
+      data = generate
+      return data if query.blank?
+
+      {
+        pages: filter_resources(data[:pages], query),
+        assignments: filter_resources(data[:assignments], query),
+        attachments: filter_resources(data[:attachments], query),
+        last_checked: data[:last_checked],
+        accessibility_scan_disabled: data[:accessibility_scan_disabled]
       }
     end
 
@@ -59,7 +71,20 @@ module Accessibility
       html_fixer.fix_preview
     end
 
+    def generate_fix(rule, content_type, content_id, path, value)
+      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
+      return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
+
+      html_fixer.generate_fix
+    end
+
     private
+
+    def filter_resources(resources, query)
+      resources.values&.select do |resource|
+        resource.values&.any? { |value| value.to_s.downcase.include?(query.downcase) }
+      end
+    end
 
     def error_response(message, status)
       { json: { error: message }, status: }

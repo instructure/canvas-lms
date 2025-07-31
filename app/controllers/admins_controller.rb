@@ -95,7 +95,8 @@ class AdminsController < ApplicationController
 
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route).reject { |admin| admin.user.nil? }
-      render json: admins.collect { |admin| admin_json(admin, @current_user, session) }
+      includes = Array(params[:include])
+      render json: admins.collect { |admin| admin_json(admin, @current_user, session, includes) }
     end
   end
 

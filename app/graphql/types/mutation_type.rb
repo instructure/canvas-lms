@@ -88,6 +88,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
   field :move_outcome_links, mutation: Mutations::MoveOutcomeLinks
   field :post_draft_submission_comment, mutation: Mutations::PostDraftSubmissionComment
+  field :restore_deleted_discussion_entry, mutation: Mutations::RestoreDeletedDiscussionEntry
   field :save_rubric_assessment, mutation: Mutations::SaveRubricAssessment
   field :set_friendly_description, mutation: Mutations::SetFriendlyDescription
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion

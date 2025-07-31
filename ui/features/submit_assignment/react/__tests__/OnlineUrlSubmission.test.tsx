@@ -46,7 +46,7 @@ describe('OnlineUrlSubmission', () => {
     const {findByTestId, getByText} = render(
       <OnlineUrlSubmission
         {...getProps({getShouldShowUrlError: jest.fn().mockReturnValue(true)})}
-      />
+      />,
     )
     const urlInput = await findByTestId('online-url-input')
     fireEvent.focus(urlInput)
@@ -56,7 +56,12 @@ describe('OnlineUrlSubmission', () => {
   it('clears errors when input is being changed', async () => {
     const setShouldShowUrlErrorMock = jest.fn()
     const {findByTestId, getByText, queryByText} = render(
-      <OnlineUrlSubmission {...getProps({getShouldShowUrlError: jest.fn().mockReturnValue(true), setShouldShowUrlError: setShouldShowUrlErrorMock})} />
+      <OnlineUrlSubmission
+        {...getProps({
+          getShouldShowUrlError: jest.fn().mockReturnValue(true),
+          setShouldShowUrlError: setShouldShowUrlErrorMock,
+        })}
+      />,
     )
     const urlInput = await findByTestId('online-url-input')
     fireEvent.input(urlInput, {target: {value: 'invalid url'}})
@@ -70,7 +75,7 @@ describe('OnlineUrlSubmission', () => {
   it('clears errors on blur if the input is empty', async () => {
     const setShouldShowUrlErrorMock = jest.fn()
     const {findByTestId, queryByText} = render(
-      <OnlineUrlSubmission {...getProps({setShouldShowUrlError: setShouldShowUrlErrorMock})} />
+      <OnlineUrlSubmission {...getProps({setShouldShowUrlError: setShouldShowUrlErrorMock})} />,
     )
     const urlInput = await findByTestId('online-url-input')
     fireEvent.focus(urlInput)

@@ -24,6 +24,7 @@ class AccessibilityIssue < ActiveRecord::Base
 
   belongs_to :course
   belongs_to :updated_by, class_name: "User", optional: true
+  belongs_to :accessibility_resource_scan
 
   enum :workflow_state, %i[active resolved dismissed], validate: true
 

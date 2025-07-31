@@ -17,9 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
-
-RSpec.describe Accessibility::Rules::HasLangEntryRule, type: :feature do
+describe Accessibility::Rules::HasLangEntryRule do
   def find_issues(elem, id)
     rule_class = self.class.described_class
     if rule_class.test(elem).nil?

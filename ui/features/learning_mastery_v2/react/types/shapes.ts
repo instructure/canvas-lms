@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SortOrder} from '../utils/constants'
+import {SortBy, SortOrder} from '../utils/constants'
 
 export interface Sorting {
   sortOrder: SortOrder
   setSortOrder: (sortOrder: SortOrder) => void
+  sortBy: SortBy
+  setSortBy: (sortBy: SortBy) => void
 }

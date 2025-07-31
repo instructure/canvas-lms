@@ -59,6 +59,7 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :editor, class_name: "User"
   belongs_to :root_account, class_name: "Account"
+  belongs_to :pinned_by, class_name: "User"
   has_one :external_feed_entry, as: :asset
   has_many :attachment_associations, as: :context, inverse_of: :context
 
@@ -78,6 +79,12 @@ class DiscussionEntry < ActiveRecord::Base
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create
   validate :must_be_reply_to_same_discussion, on: :create
+
+  module PinningTypes
+    THREAD = "thread"
+    REPLY = "reply"
+    TYPES = [THREAD, REPLY].freeze
+  end
 
   def self.sanitize_config
     CanvasSanitize::SANITIZE.dup.tap do |cfg|
@@ -345,6 +352,22 @@ class DiscussionEntry < ActiveRecord::Base
         DiscussionTopicParticipant.where(discussion_topic_id:, user_id: users)
                                   .update_all("unread_entry_count = unread_entry_count - 1")
       end
+    end
+  end
+
+  def increment_unread_counts_after_restore
+    transaction do
+      # get a list of users who have not read the entry yet
+      DiscussionTopicParticipant.where(discussion_topic_id:)
+                                .where.not(user_id: discussion_entry_participants.read.pluck(:user_id))
+                                .update_all("unread_entry_count = unread_entry_count + 1")
+      # users = discussion_topic.discussion_topic_participants
+      #                         .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
+      # # increment unread_entry_count for topic participants
+      # if users.present?
+      #   DiscussionTopicParticipant.where(discussion_topic_id:, user_id: users)
+      #                             .update_all("unread_entry_count = unread_entry_count + 1")
+      # end
     end
   end
 
@@ -794,5 +817,10 @@ class DiscussionEntry < ActiveRecord::Base
     return self if parent_entry.nil?
 
     parent_entry.highest_level_parent_or_self
+  end
+
+  def restore
+    update(workflow_state: "active", deleted_at: nil)
+    increment_unread_counts_after_restore
   end
 end

@@ -30,8 +30,16 @@ module Modules2IndexPage
     "button[aria-label='Collapse All Modules']"
   end
 
+  def completion_requirement_selector
+    "[data-testid='completion-requirement']"
+  end
+
   def copy_to_button_selector
     "button:contains('Copy')"
+  end
+
+  def close_copy_tray_button_selector
+    "[data-testid='confirm-action-secondary-button']"
   end
 
   def copy_to_tray_course_select_selector
@@ -70,6 +78,14 @@ module Modules2IndexPage
     "[data-testid='module-action-menu_#{module_id}']"
   end
 
+  def module_action_menu_deletetion_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}-deletion']"
+  end
+
+  def module_action_menu_copy_selector(module_id)
+    "[data-testid='module-action-menu_#{module_id}-copy']"
+  end
+
   def module_file_drop_selector(module_id)
     "[data-module-id='#{module_id}'] [data-testid='module-file-drop']"
   end
@@ -98,6 +114,10 @@ module Modules2IndexPage
     "#{module_header_selector(module_id)} [data-testid='module-header-prerequisites']"
   end
 
+  def module_header_will_unlock_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-unlock-at-date']"
+  end
+
   def module_header_selector(module_id)
     "#context_module_#{module_id}"
   end
@@ -123,7 +143,11 @@ module Modules2IndexPage
   end
 
   def module_item_header_selector(module_item_id)
-    "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-titl-text']"
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-title-text']"
+  end
+
+  def module_item_text_header_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='document-icon']"
   end
 
   def module_item_indent_selector(module_item_id)
@@ -136,6 +160,10 @@ module Modules2IndexPage
 
   def module_item_quiz_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='quiz-icon']"
+  end
+
+  def module_item_attachment_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='attachment-icon']"
   end
 
   def module_item_status_icon_selector(module_item_id)
@@ -154,6 +182,15 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
 
+  def blueprint_lock_icon_selector(module_item_id, locked: false)
+    selector = locked ? "[data-testid='lock-icon-locked']" : "[data-testid='lock-icon-unlock']"
+    "#{module_item_by_id_selector(module_item_id)} #{selector}"
+  end
+
+  def module_prerequisite_selector
+    "[data-testid='module-header-prerequisites']"
+  end
+
   def module_progression_status_bar_selector(module_id)
     "#{module_header_selector(module_id)} [data-testid='module-progression-status-bar']"
   end
@@ -168,6 +205,42 @@ module Modules2IndexPage
 
   def page_body
     f("body")
+  end
+
+  def progress_button_selector
+    "#context-modules-header-view-progress-button"
+  end
+
+  def publish_all_continue_button_selector
+    "#publish_all_continue_button"
+  end
+
+  def publish_modules_only_continue_button_selector
+    "#publish_module_only_continue_button"
+  end
+
+  def unpublish_all_continue_button_selector
+    "#unpublish_all_continue_button"
+  end
+
+  def publish_all_menu_selector
+    "#context-modules-publish-menu button"
+  end
+
+  def publish_all_modules_and_items_selector
+    "#publish_all_menu_item"
+  end
+
+  def publish_modules_only_selector
+    "#publish_module_only_menu_item"
+  end
+
+  def unpublish_all_modules_and_items_selector
+    "#unpublish_all_menu_item"
+  end
+
+  def unpublish_modules_only_selector
+    "#unpublish_module_only_menu_item"
   end
 
   def send_to_modal_input_selector
@@ -200,6 +273,10 @@ module Modules2IndexPage
 
   #------------------------------ Elements ------------------------------
 
+  def completion_requirement
+    f(completion_requirement_selector)
+  end
+
   def context_module(module_id)
     f(context_module_selector(module_id))
   end
@@ -222,6 +299,10 @@ module Modules2IndexPage
 
   def copy_button
     fj(copy_to_button_selector)
+  end
+
+  def close_copy_to_tray_button
+    fj(close_copy_tray_button_selector)
   end
 
   def copy_to_tray_course_select
@@ -250,6 +331,14 @@ module Modules2IndexPage
 
   def module_action_menu(module_id)
     f(module_action_menu_selector(module_id))
+  end
+
+  def module_action_menu_deletetion(module_id)
+    f(module_action_menu_deletetion_selector(module_id))
+  end
+
+  def module_action_menu_copy(module_id)
+    f(module_action_menu_copy_selector(module_id))
   end
 
   def module_file_drop_element(module_id)
@@ -282,6 +371,10 @@ module Modules2IndexPage
 
   def module_header_prerequisites(module_id)
     f(module_header_prerequisites_selector(module_id))
+  end
+
+  def module_header_will_unlock_label(module_id)
+    f(module_header_will_unlock_selector(module_id))
   end
 
   def module_item_action_menu
@@ -324,6 +417,14 @@ module Modules2IndexPage
     f(module_item_quiz_icon_selector(module_item_id))
   end
 
+  def module_item_attachment_icon(module_item_id)
+    f(module_item_attachment_icon_selector(module_item_id))
+  end
+
+  def module_item_text_header_icon(module_item_id)
+    f(module_item_text_header_icon_selector(module_item_id))
+  end
+
   def module_item_status_icon(module_item_id)
     f(module_item_status_icon_selector(module_item_id))
   end
@@ -340,6 +441,14 @@ module Modules2IndexPage
     f(module_item_url_icon_selector(module_item_id))
   end
 
+  def blueprint_lock_icon(module_item_id, locked: false)
+    f(blueprint_lock_icon_selector(module_item_id, locked:))
+  end
+
+  def module_prerequisite
+    f(module_prerequisite_selector)
+  end
+
   def module_progression_info(module_id)
     f(module_progression_info_selector(module_id))
   end
@@ -354,6 +463,42 @@ module Modules2IndexPage
 
   def option_list_course_option(option_list_id, course_name)
     fj(course_option_selector(option_list_id, course_name))
+  end
+
+  def progress_button
+    f(progress_button_selector)
+  end
+
+  def publish_all_continue_button
+    f(publish_all_continue_button_selector)
+  end
+
+  def publish_module_only_continue_button
+    f(publish_modules_only_continue_button_selector)
+  end
+
+  def unpublish_all_continue_button
+    f(unpublish_all_continue_button_selector)
+  end
+
+  def publish_all_menu
+    f(publish_all_menu_selector)
+  end
+
+  def publish_all_modules_and_items
+    f(publish_all_modules_and_items_selector)
+  end
+
+  def publish_modules_only
+    f(publish_modules_only_selector)
+  end
+
+  def unpublish_all_modules_and_items
+    f(unpublish_all_modules_and_items_selector)
+  end
+
+  def unpublish_modules_only
+    f(unpublish_modules_only_selector)
   end
 
   def send_to_form_selected_elements
@@ -398,18 +543,29 @@ module Modules2IndexPage
     student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.quizzes.create!(title: "some quiz")
     @quiz.publish!
+    @quiz2 = @course.quizzes.create!(title: "some quiz 2")
+    @quiz2.publish!
     @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")
     @assignment2 = @course.assignments.create!(title: "assignment 2",
                                                submission_types: "online_text_entry",
                                                points_possible: 10)
     @assignment3 = @course.assignments.create!(title: "assignment 3", submission_types: "online_text_entry")
+    @assignment4 = @course.assignments.create!(title: "assignment 4", submission_types: "online_text_entry")
+    @discussion = @course.discussion_topics.create!(title: "Discussion title", message: "Testing")
+    @wiki_page = @course.wiki_pages.create!(title: "Wiki", body: "Testing")
 
     @module1 = @course.context_modules.create!(name: "module1")
     @module2 = @course.context_modules.create!(name: "module2")
+    @module3 = @course.context_modules.create!(name: "module3")
     @module_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
     @module_item2 = @module1.add_item({ id: @assignment2.id, type: "assignment" })
     @module_item3 = @module2.add_item({ id: @assignment3.id, type: "assignment" })
     @module_item4 = @module2.add_item({ id: @quiz.id, type: "quiz" })
+
+    @module_item5 = @module3.add_item({ id: @quiz2.id, type: "quiz" })
+    @module_item6 = @module3.add_item({ id: @assignment4.id, type: "assignment" })
+    @module_item7 = @module3.add_item({ id: @discussion.id, type: "discussion_topic" })
+    @module_item8 = @module3.add_item({ id: @wiki_page.id, type: "page" })
 
     @course.reload
   end
@@ -446,5 +602,21 @@ module Modules2IndexPage
 
   def visit_course(course)
     get "/courses/#{course.id}"
+  end
+
+  def add_item_button(module_id)
+    fj("button:contains('Add Item')", context_module_selector(module_id))
+  end
+
+  def new_item_type_select_selector
+    "[data-testid='add-item-type-selector']"
+  end
+
+  def add_existing_item_select_selector
+    "[data-testid='add-item-content-select']"
+  end
+
+  def add_item_modal_add_item_button
+    fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
   end
 end

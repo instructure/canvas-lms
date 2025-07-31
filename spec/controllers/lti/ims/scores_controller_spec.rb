@@ -1188,6 +1188,28 @@ module Lti::IMS
         it_behaves_like "a successful scores request"
       end
 
+      context "with different activityProgress values" do
+        %w[Initialized Started InProgress].each do |activity_progress|
+          context "when activityProgress is #{activity_progress}" do
+            let(:params_overrides) do
+              super().merge(activityProgress: activity_progress, gradingProgress: "PendingManual")
+            end
+
+            it "does not mark result as needing review for non-final activity progress" do
+              send_request
+              result.reload
+              expect(result.needs_review?).to be false
+              expect(result.submission.needs_review?).to be false
+            end
+
+            it "does not set submission workflow_state to pending_review" do
+              send_request
+              expect(result.reload.submission.workflow_state).not_to eq("pending_review")
+            end
+          end
+        end
+      end
+
       context "with invalid params" do
         shared_examples_for "a bad request" do
           it "does not process request" do
@@ -1369,6 +1391,107 @@ module Lti::IMS
             expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
             expect(response).to have_http_status :unprocessable_entity
             expect(response.body).to include "This assignment is still unpublished"
+          end
+        end
+      end
+
+      context "race condition scenarios" do
+        let(:original_score) { 3 }
+        let(:original_maximum) { 5 }
+        let(:new_score) { 4 }
+
+        describe "simultaneous result.update! calls causing inconsistent data" do
+          def setup_controller(test_user, test_line_item, params_hash)
+            controller = Lti::IMS::ScoresController.new
+
+            # Set up the controller with necessary context
+            controller.instance_variable_set(:@current_user, test_user)
+            controller.instance_variable_set(:@domain_root_account, Account.default)
+            controller.instance_variable_set(:@context, course)
+
+            # Mock request and params for this controller
+            allow(controller).to receive_messages(
+              params: ActionController::Parameters.new(params_hash.merge({
+                                                                           controller: "lti/ims/scores",
+                                                                           action: "create"
+                                                                         })),
+              lti_result_show_url: "https://example.com/results/#{test_line_item.id}",
+              render: nil,
+              tool:
+            )
+
+            controller
+          end
+
+          it "reproduces race condition with concurrent scores endpoint calls" do
+            test_line_item = line_item_model(course:)
+            test_user = student_in_course(course:, active_all: true).user
+            test_submission = test_line_item.assignment.find_or_create_submission(test_user)
+
+            result = Lti::Result.create!(
+              line_item: test_line_item,
+              user: test_user,
+              submission: test_submission,
+              result_score: original_score,
+              result_maximum: original_maximum,
+              activity_progress: "Completed",
+              grading_progress: "FullyGraded",
+              created_at: Time.zone.now,
+              updated_at: Time.zone.now
+            )
+            result_id = result.id
+
+            base_params = {
+              course_id: course.id,
+              line_item_id: test_line_item.id,
+              userId: test_user.id,
+              activityProgress: "Completed",
+              timestamp: Time.zone.now.iso8601(3)
+            }
+
+            thread1_params = base_params.merge(gradingProgress: "Pending")
+            thread2_params = base_params.merge(
+              gradingProgress: "FullyGraded",
+              scoreGiven: new_score,
+              scoreMaximum: original_maximum
+            )
+
+            # Use threads to simulate concurrent endpoint calls
+            threads = []
+            exceptions = []
+
+            # Initial state (score_given=3, score_maximum=5)
+            # Thread 1 delay
+            # Thread 2 load result record
+            # Thread 1 load result record
+            # Thread 1 updates result record (score_given=nil, score_maximum=nil)
+            # Thread 2 updates result records  (score_given=4, score_maximum=5 but will not be updated treated as unchanged)
+            # Final state (score_given=4, score_maximum=nil) and that is invalid
+            threads << Thread.new do
+              # Small delay so thread2 could load the result record before thread1 updates it
+              sleep(0.1)
+              controller1 = setup_controller(test_user, test_line_item, thread1_params)
+              controller1.create
+            rescue => e
+              exceptions << { thread: 1, exception: e }
+            end
+
+            # Thread 2: Update with new score
+            threads << Thread.new do
+              controller2 = setup_controller(test_user, test_line_item, thread2_params)
+              # simulate loading the result record on a before_action
+              controller2.send(:result)
+              # Wait for 1st thread to do result update
+              sleep(0.2)
+              controller2.create
+            rescue => e
+              exceptions << { thread: 2, exception: e }
+            end
+
+            threads.each(&:join)
+
+            expect(exceptions).to be_empty
+            expect(Lti::Result.find(result_id).reload.valid?).to be true
           end
         end
       end

@@ -23,7 +23,6 @@ describe "Discussion Insight" do
 
   context "when Discussion Insight is enabled" do
     before :once do
-      Account.site_admin.enable_feature!(:react_discussions_post)
       Account.default.enable_feature!(:discussion_insights)
     end
 
@@ -108,7 +107,6 @@ describe "Discussion Insight" do
 
   context "when Discussion Insight is disabled" do
     before :once do
-      Account.site_admin.enable_feature!(:react_discussions_post)
       Account.default.disable_feature!(:discussion_insights)
     end
 

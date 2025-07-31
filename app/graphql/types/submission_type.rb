@@ -88,7 +88,7 @@ module Types
       end
     end
 
-    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
+    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: false do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
       argument :order_by, SubmissionHistoryOrderInputType, required: false
     end
@@ -128,9 +128,12 @@ module Types
           null: true
     def lti_asset_reports_connection
       load_association(:root_account).then do |root_account|
-        if root_account.feature_enabled?(:lti_asset_processor) &&
-           object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+        next unless root_account.feature_enabled?(:lti_asset_processor)
+
+        if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
           Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
+        elsif object.user_can_read_grade?(current_user)
+          Loaders::SubmissionLtiAssetReportsStudentLoader.load(object.id)
         end
       end
     end
@@ -158,8 +161,8 @@ module Types
       end
     end
 
-    field :auto_grade_submission_errors, [String], null: false, description: "Issues related to the submission"
-    def auto_grade_submission_errors
+    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission"
+    def auto_grade_submission_issues
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
     end
 

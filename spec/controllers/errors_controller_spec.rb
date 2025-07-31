@@ -103,6 +103,36 @@ describe ErrorsController do
       expect(ErrorReport.order(:id).last.data["user_roles"]).to eq("user,student")
     end
 
+    context "user_roles normalization during creation" do
+      it "normalizes array user_roles to comma-separated string" do
+        post :create,
+             params: {
+               error: {
+                 subject: "test error",
+                 user_roles: ["student", "teacher"]
+               }
+             },
+             format: :json
+
+        created_report = ErrorReport.take
+        expect(created_report.data["user_roles"]).to eq("student,teacher")
+      end
+
+      it "normalizes hash user_roles to comma-separated string" do
+        post :create,
+             params: {
+               error: {
+                 subject: "test error",
+                 user_roles: { "primary" => "student", "secondary" => "admin" }
+               }
+             },
+             format: :json
+
+        created_report = ErrorReport.take
+        expect(created_report.data["user_roles"]).to eq("student,admin")
+      end
+    end
+
     it "records the real user if they are in student view" do
       authenticate_user!
       svs = course_factory.student_view_student

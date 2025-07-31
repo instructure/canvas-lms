@@ -155,6 +155,7 @@
             <th scope="col"><%= t('headers.submitted', "Submitted") %></th>
             <th scope="col" class="status"><%= t('Status') %></th>
             <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
+            <th scope="col" id="asset_processors_header"> <!-- React content --></th>
             <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
             <th scope="col"><span class="screenreader-only"><%= t('headers.submission_progress_status', "Submission Progress Status") %></span></th>
           </tr>
@@ -299,6 +300,7 @@
                     </div>
                   </div>
                 </td>
+                <td class="asset_processors_cell" data-assignment-id="<%= assignment.id %>" data-submission-id="<%= submission&.id %>"></td>
                 <td class="details">
                   <% if !assignment.special_class %>
                   <a href="#"
@@ -360,7 +362,7 @@
                     aria-label="<%= t('Read comments') %>"
                     aria-haspopup="true"
                     aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
-                    <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
+                    <% if assignment_presenter.has_comments? %>
                       aria-expanded="false"
                       role="button"
                     <% else %>
@@ -683,7 +685,7 @@
               </tr>
               <tr id="comments_thread_<%= assignment.id %>" class="comments comments_thread <%= 'assignment_graded' if assignment_presenter.graded? %>" style="display: none;">
                 <td colspan="6">
-                  <% if !assignment_presenter.hide_grade_from_student? && assignment_presenter.has_comments? %>
+                  <% if assignment_presenter.has_comments? %>
                       <table class="score_details_table ic-Table ic-Table--condensed">
                         <thead>
                           <tr>

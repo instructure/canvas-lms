@@ -492,6 +492,21 @@ describe "Outcomes API", type: :request do
                                                        })
       end
 
+      it "updates attachment associations" do
+        aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+        api_call(:put,
+                 "/api/v1/outcomes/#{@outcome.id}",
+                 { controller: "outcomes_api",
+                   action: "update",
+                   id: @outcome.id.to_s,
+                   format: "json" },
+                 { title: "Updated Outcome",
+                   description: aa_test_data.added_html })
+        @outcome.reload
+        attachment_ids = @outcome.attachment_associations.pluck(:attachment_id)
+        expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+      end
+
       it "leaves alone fields not provided" do
         api_call(:put,
                  "/api/v1/outcomes/#{@outcome.id}",

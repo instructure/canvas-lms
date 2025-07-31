@@ -145,7 +145,7 @@ describe "quiz edit page assign to" do
       expect(override.set_type).to eq("Group")
       expect(override.title).to eq(@diff_tag1.name)
 
-      due_at_row = retrieve_quiz_due_date_table_row("1 Group")
+      due_at_row = retrieve_quiz_due_date_table_row("1 Tag")
       expect(due_at_row).not_to be_nil
       expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
       expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")

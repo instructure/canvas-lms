@@ -15,8 +15,8 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    base64 (0.2.0)
-    diff-lcs (1.6.1)
+    base64 (0.3.0)
+    diff-lcs (1.6.2)
     logger (1.7.0)
     mime-types (3.6.2)
       logger

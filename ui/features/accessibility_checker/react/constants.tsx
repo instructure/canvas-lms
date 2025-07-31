@@ -33,6 +33,10 @@ export const severityColors: Record<Severity, string> = {
   Low: '#F06E26', // orange30
 }
 
+export const LIMIT_EXCEEDED_MESSAGE = I18n.t(
+  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).',
+)
+
 export const IssuesTableColumns = {
   ResourceName: 'resource-name-header',
   Issues: 'issues-header',

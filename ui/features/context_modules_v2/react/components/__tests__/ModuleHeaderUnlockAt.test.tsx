@@ -17,33 +17,83 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
-import ModuleHeaderUnlockAt from '../ModuleHeaderUnlockAt'
+import {render} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import ModuleHeaderUnlockAt, {ModuleHeaderUnlockAtProps} from '../ModuleHeaderUnlockAt'
+import {format} from '@instructure/moment-utils'
 import moment from 'moment'
 
-jest.mock('@canvas/datetime/react/components/FriendlyDatetime', () => (props: any) => (
-  <div data-testid={props['data-testid']}>
-    {props.prefix} {props.dateTime}
-  </div>
-))
+const unlockAtFormat = '%b %-d at %l:%M%P'
+
+const server = setupServer()
+
+const setUp = (props: ModuleHeaderUnlockAtProps, courseId = 'test-course-id') => {
+  const contextProps = {
+    ...contextModuleDefaultProps,
+    courseId,
+    moduleGroupMenuTools: [],
+    moduleMenuModalTools: [],
+    moduleMenuTools: [],
+    moduleIndexMenuModalTools: [],
+  }
+
+  return render(
+    <ContextModuleProvider {...contextProps}>
+      <ModuleHeaderUnlockAt {...props} />
+    </ContextModuleProvider>,
+  )
+}
+
+const buildDefaultProps = (
+  overrides: Partial<ModuleHeaderUnlockAtProps> = {},
+): ModuleHeaderUnlockAtProps => ({
+  unlockAt: null,
+  ...overrides,
+})
+
+beforeEach(() => {
+  // @ts-expect-error
+  window.ENV = {
+    TIMEZONE: 'UTC',
+  }
+})
 
 describe('ModuleHeaderUnlockAt', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
   it('renders when unlockAt is in the future', () => {
     const futureDate = moment().add(1, 'day').toISOString()
-    render(<ModuleHeaderUnlockAt unlockAt={futureDate} />)
+    setUp(buildDefaultProps({unlockAt: futureDate}))
 
-    expect(screen.getByTestId('module-unlock-at-date')).toBeInTheDocument()
-    expect(screen.getByText(/Will unlock/)).toBeInTheDocument()
+    const formattedDate = format(futureDate, unlockAtFormat)
+    const {container} = render(<ModuleHeaderUnlockAt unlockAt={futureDate} />)
+
+    const desktopElement = container.querySelector(
+      '[data-testid="module-unlock-at-date"] .visible-desktop',
+    )
+    const mobileElement = container.querySelector(
+      '[data-testid="module-unlock-at-date"] .hidden-desktop',
+    )
+
+    expect(desktopElement).toBeInTheDocument()
+    expect(mobileElement).toBeInTheDocument()
+
+    const desktopText = desktopElement?.textContent
+    const mobileText = mobileElement?.textContent
+    expect(desktopText).toMatch(`Will unlock ${formattedDate}`)
+    expect(mobileText).toMatch(`Unlocked ${formattedDate}`)
   })
 
   it('returns null when unlockAt is null', () => {
-    const {container} = render(<ModuleHeaderUnlockAt unlockAt={null} />)
+    const {container} = setUp(buildDefaultProps({unlockAt: null}))
     expect(container).toBeEmptyDOMElement()
   })
 
   it('returns null when unlockAt is in the past', () => {
     const pastDate = moment().subtract(1, 'day').toISOString()
-    const {container} = render(<ModuleHeaderUnlockAt unlockAt={pastDate} />)
+    const {container} = setUp(buildDefaultProps({unlockAt: pastDate}))
     expect(container).toBeEmptyDOMElement()
   })
 })

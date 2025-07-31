@@ -159,7 +159,7 @@ shared_examples "context modules for students" do
     end
 
     it "validates that a student can't get to locked external items", priority: "1" do
-      external_tool = @course.context_external_tools.create!(url: "http://example.com/ims/lti",
+      external_tool = @course.context_external_tools.create!(url: "http://localhost:3000/ims/lti",
                                                              consumer_key: "asdf",
                                                              shared_secret: "hjkl",
                                                              name: "external tool")
@@ -167,7 +167,7 @@ shared_examples "context modules for students" do
       @module_2.reload
       tag_1 = @module_2.add_item(id: external_tool.id, type: "external_tool", url: external_tool.url)
       tag_2 = @module_2.add_item(type: "external_url",
-                                 url: "http://example.com/lolcats",
+                                 url: "http://localhost:3000/lolcats",
                                  title: "pls view",
                                  indent: 1)
 
@@ -253,12 +253,11 @@ shared_examples "context modules for students" do
     end
 
     it "does not show the description of a discussion locked by module", priority: "1" do
-      skip "Will be fixed in VICE-5209"
       module1 = @course.context_modules.create! name: "a_locked_mod", unlock_at: 1.day.from_now
       discussion = @course.discussion_topics.create!(title: "discussion", message: "discussion description")
       module1.add_item type: "discussion_topic", id: discussion.id
       get "/courses/#{@course.id}/discussion_topics/#{discussion.id}?module_item_id=#{ContentTag.last.id}"
-      expect(f(".entry-content")).not_to contain_css(".discussion-section .message")
+      expect(f('[data-testid="discussion-topic-container"]')).not_to include_text("discussion description")
     end
 
     it "allows a student view student to progress through module content" do
@@ -330,7 +329,6 @@ shared_examples "context modules for students" do
       end
 
       before :once do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         Account.site_admin.enable_feature!(:discussion_create)
       end
 
@@ -358,10 +356,10 @@ shared_examples "context modules for students" do
       it "shows the right nav when an item is in modules multiple times", custom_timeout: 30 do
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
-        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
+        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://localhost:3000/1")
         @after1.publish!
         @atag2 = @module_2.add_item(id: @assignment.id, type: "assignment")
-        @after2 = @module_2.add_item(type: "external_url", title: "url2", url: "http://example.com/2")
+        @after2 = @module_2.add_item(type: "external_url", title: "url2", url: "http://localhost:3000/2")
         @after2.publish!
 
         get_page_with_footer("/courses/#{@course.id}/modules/items/#{@atag1.id}")
@@ -388,7 +386,7 @@ shared_examples "context modules for students" do
       it "shows the nav when going straight to the item if there's only one tag", custom_timeout: 25 do
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
-        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
+        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://localhost:3000/1")
         @after1.publish!
 
         get_page_with_footer("/courses/#{@course.id}/assignments/#{@assignment.id}")
@@ -473,7 +471,7 @@ shared_examples "context modules for students" do
         signing_secret: "signing-secret-vp04BNqApwdwUYPUI"
       )
       tool = @course.context_external_tools.create!(name: "a",
-                                                    url: "example.com",
+                                                    url: "http://localhost:3000/",
                                                     consumer_key: "12345",
                                                     shared_secret: "secret")
       @assignment = @course.assignments.create!
@@ -695,7 +693,6 @@ shared_examples "context modules for students" do
     end
 
     it "marks locked but visible assignments/quizzes/discussions as read" do
-      skip "Will be fixed in VICE-5209"
       # setting lock_at in the past will cause assignments/quizzes/discussions to still be visible
       # they just can't be submitted to anymore
 
@@ -716,7 +713,7 @@ shared_examples "context modules for students" do
       get "/courses/#{@course.id}/assignments/#{asmt.id}"
       expect(f("#assignment_show")).to include_text("This assignment was locked")
       get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-      expect(f("#discussion_topic")).to include_text("This topic was locked")
+      expect(f('[data-testid="discussion-topic-container"]')).to include_text("This topic is closed for comments")
       get "/courses/#{@course.id}/quizzes/#{quiz.id}"
       expect(f(".lock_explanation")).to include_text("This quiz was locked")
 

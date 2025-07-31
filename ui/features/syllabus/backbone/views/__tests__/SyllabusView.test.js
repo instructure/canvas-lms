@@ -178,6 +178,53 @@ describe('SyllabusView', () => {
     })
   })
 
+  describe('discussion checkpoints title rendering', () => {
+    beforeEach(() => {
+      view.can_read = true
+      view.is_valid_user = true
+      view.is_public_course = true
+      view.can_participate = true
+    })
+
+    const getCheckpointEvent = subAssignmentTag => {
+      const jsonData = view.toJSON()
+
+      return jsonData.dates
+        .flatMap(date => date.events)
+        .find(
+          event =>
+            event.type === 'sub_assignment' &&
+            event.json?.sub_assignment?.sub_assignment_tag === subAssignmentTag,
+        )
+    }
+
+    it('renders "Reply to Topic" checkpoint title correctly without duplication', () => {
+      const replyToTopicEvent = getCheckpointEvent('reply_to_topic')
+
+      expect(replyToTopicEvent).toBeDefined()
+      expect(replyToTopicEvent.title).toBe('Graded Discussion with Checkpoints 1 Reply to Topic')
+
+      // "Reply to Topic" text should not be duplicated
+      expect(replyToTopicEvent.title).toMatch(/Reply to Topic$/)
+      expect(replyToTopicEvent.title).not.toMatch(/Reply to Topic.*Reply to Topic/)
+    })
+
+    it('renders "Reply to Entry" checkpoint title correctly without duplication', () => {
+      const replyToEntryEvent = getCheckpointEvent('reply_to_entry')
+
+      expect(replyToEntryEvent).toBeDefined()
+      expect(replyToEntryEvent.title).toBe(
+        'Graded Discussion with Checkpoints 1 Required Replies (3)',
+      )
+
+      // "Required Replies (x)" text should not be duplicated
+      expect(replyToEntryEvent.title).toMatch(/Required Replies.*\(\d+\)/)
+      expect(replyToEntryEvent.title).not.toMatch(
+        /Required Replies.*\(\d+\).*Required Replies.*\(\d+\)/,
+      )
+    })
+  })
+
   describe('mini calendar', () => {
     beforeEach(() => {
       view.can_read = true

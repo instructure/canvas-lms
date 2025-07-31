@@ -174,4 +174,13 @@ describe('RadioInputGroupForm', () => {
       expect(thirdRadio).not.toBeChecked()
     })
   })
+
+  it('displays the error message when an error is provided', () => {
+    const propsWithError = {
+      ...defaultProps,
+      error: 'Error message',
+    }
+    render(<RadioInputGroupForm {...propsWithError} />)
+    expect(screen.getByText('Error message')).toBeInTheDocument()
+  })
 })

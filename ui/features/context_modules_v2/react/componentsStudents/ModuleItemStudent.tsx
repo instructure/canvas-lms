@@ -19,7 +19,7 @@
 import React, {useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
+import {filterRequirementsMet, getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
 import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../utils/types'
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
@@ -27,6 +27,7 @@ import ModuleItemTitleStudent from './ModuleItemTitleStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
+  title: string
   url: string
   indent: number
   position: number
@@ -41,6 +42,7 @@ export interface ModuleItemStudentProps {
 
 const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   _id,
+  title,
   url,
   indent,
   position,
@@ -56,8 +58,31 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   const itemTypeText = useMemo(() => (content ? getItemTypeText(content) : null), [content])
   const itemLeftMargin = useMemo(() => INDENT_LOOKUP[indent ?? 0], [indent])
 
+  const requirementsMet = useMemo(() => progression?.requirementsMet || [], [progression])
+
+  const completionRequirement = useMemo(
+    () => completionRequirements?.find(req => req.id === _id),
+    [completionRequirements, _id],
+  )
+
+  const filteredRequirementsMet = useMemo(() => {
+    return filterRequirementsMet(requirementsMet, completionRequirements ?? []).some(
+      req => req.id === _id,
+    )
+  }, [requirementsMet, completionRequirements, _id])
+
+  const isCompleted = useMemo(
+    () => filteredRequirementsMet && !!completionRequirement,
+    [filteredRequirementsMet, completionRequirement],
+  )
+
   // Early return after hooks
   if (!content) return null
+
+  const cr = completionRequirement
+  if (cr) {
+    cr.completed = isCompleted
+  }
 
   return (
     <View
@@ -85,6 +110,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               {/* Item Title */}
               <Flex.Item shouldGrow={true}>
                 <ModuleItemTitleStudent
+                  title={title}
                   content={content}
                   url={url}
                   onClick={onClick}
@@ -103,7 +129,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
                         content={content}
                         itemIcon={itemIcon}
                         itemTypeText={itemTypeText}
-                        completionRequirement={completionRequirements?.find(req => req.id === _id)}
+                        completionRequirement={cr}
                         checkpoints={content.checkpoints}
                         replyToEntryRequiredCount={content.replyToEntryRequiredCount}
                       />
@@ -116,13 +142,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
         </Flex.Item>
         {content.type !== 'SubHeader' && (
           <Flex.Item margin={smallScreen ? 'x-small 0 0 0' : '0 0 0 small'}>
-            <ModuleItemStatusIcon
-              itemId={_id || ''}
-              moduleCompleted={progression?.completed || false}
-              completionRequirements={completionRequirements}
-              requirementsMet={progression?.requirementsMet || []}
-              content={content}
-            />
+            <ModuleItemStatusIcon moduleCompleted={isCompleted} content={content} />
           </Flex.Item>
         )}
       </Flex>

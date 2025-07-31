@@ -2262,6 +2262,10 @@ class DiscussionTopic < ActiveRecord::Base
     participant_expanded
   end
 
+  def graded?
+    assignment_id.present?
+  end
+
   private
 
   def enough_replies_for_checkpoint?(reply_to_entries)

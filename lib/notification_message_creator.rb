@@ -386,7 +386,11 @@ class NotificationMessageCreator
             break_this_loop = true
             # else <no conditions; we're addressing the entire partition>
           end
-          scope.update_all(workflow_state: "cancelled") if Message.connection.table_exists?(start_partition)
+
+          if Message.connection.table_exists?(start_partition)
+            effected_record_count = scope.update_all(workflow_state: "cancelled")
+            InstStatsd::Statsd.count("cancelled_duplicated_messages", effected_record_count)
+          end
 
           break if break_this_loop
 

@@ -19,10 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import UserMenu, {type UserMenuProps} from '../UserMenu'
-import {
-  OBSERVER_ENROLLMENT,
-  INACTIVE_ENROLLMENT
-} from '../../../../util/constants'
+import {OBSERVER_ENROLLMENT, INACTIVE_ENROLLMENT} from '../../../../util/constants'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import type {CoursePeopleContextType} from '../../../../types'
 import {mockEnrollment} from '../../../../graphql/Mocks'
@@ -44,17 +41,17 @@ const defaultProps: UserMenuProps = {
   onReactivateUser: jest.fn(),
   onDeactivateUser: jest.fn(),
   onRemoveUser: jest.fn(),
-  onCustomLinkSelect: jest.fn()
+  onCustomLinkSelect: jest.fn(),
 }
 
 const defaultContext: Partial<CoursePeopleContextType> = {
   activeGranularEnrollmentPermissions: ['StudentEnrollment'],
-  courseConcluded: false
+  courseConcluded: false,
 }
 
 const customLinks = [
   {_id: '1', url: '/custom/1', text: 'Custom Link 1', icon_class: 'icon-custom-1'},
-  {_id: '2', url: '/custom/2', text: 'Custom Link 2', icon_class: 'icon-custom-2'}
+  {_id: '2', url: '/custom/2', text: 'Custom Link 2', icon_class: 'icon-custom-2'},
 ]
 
 const menuButton = `options-menu-user-${defaultProps.uid}`
@@ -75,7 +72,7 @@ const renderUserMenu = (props: Partial<UserMenuProps> = {}) => {
 
 describe('UserMenu', () => {
   beforeEach(() => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContext)
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(defaultContext)
   })
 
   afterEach(() => {
@@ -102,9 +99,13 @@ describe('UserMenu', () => {
 
   describe('Menu Items Visibility', () => {
     it('shows reactivate user for inactive enrollments', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentState: INACTIVE_ENROLLMENT
-      })]}
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentState: INACTIVE_ENROLLMENT,
+          }),
+        ],
+      }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
 
@@ -113,9 +114,13 @@ describe('UserMenu', () => {
     })
 
     it('shows link students for observers', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentType: OBSERVER_ENROLLMENT
-      })]}
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+          }),
+        ],
+      }
       const {getByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
 
@@ -123,9 +128,9 @@ describe('UserMenu', () => {
     })
 
     it('shows resend invitation based on active granular enrollment permissions', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContext,
-        activeGranularEnrollmentPermissions: ['TeacherEnrollment']
+        activeGranularEnrollmentPermissions: ['TeacherEnrollment'],
       })
       const {getByTestId, queryByTestId} = renderUserMenu()
       fireEvent.click(getByTestId(menuButton))
@@ -134,9 +139,13 @@ describe('UserMenu', () => {
     })
 
     it('hides resend invitation for inactive enrollments', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentState: INACTIVE_ENROLLMENT
-      })]}
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentState: INACTIVE_ENROLLMENT,
+          }),
+        ],
+      }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
 
@@ -144,9 +153,9 @@ describe('UserMenu', () => {
     })
 
     it('hides edit roles and link students when course is concluded', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...defaultContext,
-        courseConcluded: true
+        courseConcluded: true,
       })
       const {getByTestId, queryByTestId} = renderUserMenu()
       fireEvent.click(getByTestId(menuButton))
@@ -164,10 +173,14 @@ describe('UserMenu', () => {
     })
 
     it('hides edit roles for observers with linked students', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentType: OBSERVER_ENROLLMENT,
-        hasAssociatedUser: true
-      })]}
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+            hasAssociatedUser: true,
+          }),
+        ],
+      }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
 
@@ -175,9 +188,13 @@ describe('UserMenu', () => {
     })
 
     it('hides edit sections for inactive enrollments', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentState: INACTIVE_ENROLLMENT,
-      })]}
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentState: INACTIVE_ENROLLMENT,
+          }),
+        ],
+      }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
 
@@ -185,8 +202,12 @@ describe('UserMenu', () => {
     })
 
     it('hides edit sections if no editable enrollments', () => {
-      const props = {enrollments: [mockEnrollment({
-        enrollmentType: OBSERVER_ENROLLMENT})]
+      const props = {
+        enrollments: [
+          mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+          }),
+        ],
       }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
@@ -197,9 +218,11 @@ describe('UserMenu', () => {
     it('hides reactivate option when canRemoveUsers is false', () => {
       const props = {
         canRemoveUsers: false,
-        enrollments: [mockEnrollment({
-          enrollmentState: INACTIVE_ENROLLMENT
-        })]
+        enrollments: [
+          mockEnrollment({
+            enrollmentState: INACTIVE_ENROLLMENT,
+          }),
+        ],
       }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
@@ -211,9 +234,11 @@ describe('UserMenu', () => {
     it('hides resend invigation, edit sections, edit roles and link student when canManage is false', () => {
       const props = {
         canManage: false,
-        enrollments: [mockEnrollment({
-          enrollmentType: OBSERVER_ENROLLMENT
-        })]
+        enrollments: [
+          mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+          }),
+        ],
       }
       const {getByTestId, queryByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
@@ -246,9 +271,11 @@ describe('UserMenu', () => {
 
     it('calls onLinkStudents handler when link to students is clicked', () => {
       const props = {
-        enrollments: [mockEnrollment({
-          enrollmentType: OBSERVER_ENROLLMENT
-        })]
+        enrollments: [
+          mockEnrollment({
+            enrollmentType: OBSERVER_ENROLLMENT,
+          }),
+        ],
       }
       const {getByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))
@@ -275,9 +302,11 @@ describe('UserMenu', () => {
 
     it('calls onReactivateUser handler when reactivate user is clicked', () => {
       const props = {
-        enrollments: [mockEnrollment({
-          enrollmentState: INACTIVE_ENROLLMENT
-        })]
+        enrollments: [
+          mockEnrollment({
+            enrollmentState: INACTIVE_ENROLLMENT,
+          }),
+        ],
       }
       const {getByTestId} = renderUserMenu(props)
       fireEvent.click(getByTestId(menuButton))

@@ -35,7 +35,8 @@ describe "quiz LTI assignments" do
       consumer_key: "test123",
       shared_secret: "test123",
       tool_id: "Quizzes 2",
-      url: "http://example.com/launch"
+      # Avoid actually going to the network at all.
+      url: "http://localhost:3000/quizzes_next"
     )
   end
 

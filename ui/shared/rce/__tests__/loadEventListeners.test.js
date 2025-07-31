@@ -69,7 +69,7 @@ describe('loadEventListeners', () => {
   afterAll(() => {
     window.alert.restore && window.alert.restore()
     window.getComputedStyle.restore && window.getComputedStyle.restore()
-    console.log.restore && console.log.restore()  
+    console.log.restore && console.log.restore()
   })
   afterEach(() => {
     jest.restoreAllMocks()

@@ -110,8 +110,8 @@ module Lti
     # Create a new deployment for the specified LTI registration for the given context.
     # If no context is specified, the deployment will be created in the root account.
     #
-    # @param for_subaccount_id [Integer] (optional) If provided, the deployment will be created in the specified subaccount.
-    # @param for_course_id [Integer] (optional) If provided, the deployment will be created in the specified course.
+    # @argument for_subaccount_id [Integer] (optional) If provided, the deployment will be created in the specified subaccount.
+    # @argument for_course_id [Integer] (optional) If provided, the deployment will be created in the specified course.
     #
     # @returns Lti::Deployment
     #
@@ -131,6 +131,10 @@ module Lti
                 else
                   @context
                 end
+
+      unless @context == context || context.root_account_id == @context.id
+        return render json: { error: "Context must belong to the current root account" }, status: :not_found
+      end
 
       lti_registration = Lti::Registration.find(params[:registration_id])
       deployment = lti_registration.new_external_tool(context, current_user: @current_user)
@@ -206,7 +210,7 @@ module Lti
     private
 
     def deployment
-      @deployment ||= ContextExternalTool.find_by(id: params[:id], lti_registration_id: params[:registration_id])
+      @deployment ||= ContextExternalTool.find_by(id: params[:id], lti_registration_id: params[:registration_id], root_account_id: @context.id)
       raise ActiveRecord::RecordNotFound unless @deployment
 
       @deployment

@@ -98,6 +98,50 @@ describe('enhanceUserContent()', () => {
     })
   })
 
+  describe('youtube ad warning overlay', () => {
+    describe.each([
+      ['<iframe id="youtube_embed_iframe" src="https://www.youtube.com/embed/example_video_id" />'],
+      [
+        '<iframe id="youtube_embed_iframe" src="https://www.youtube-nocookie.com/embed/example_video_id" />',
+      ],
+    ])('overlay for iframe: %s', iframeFromYoutube => {
+      it('put the overlay when feature is turned on', async () => {
+        subject(iframeFromYoutube)
+
+        enhanceUserContent(document, {showYoutubeAdOverlay: true})
+
+        expect(
+          document.querySelector('[data-test-id="youtube-migration-container"]'),
+        ).toBeInTheDocument()
+      })
+
+      it('does not put the overlay when feature is turned off', async () => {
+        subject(iframeFromYoutube)
+
+        enhanceUserContent(document, {showYoutubeAdOverlay: false})
+
+        expect(
+          document.querySelector('[data-test-id="youtube-migration-container"]'),
+        ).not.toBeInTheDocument()
+      })
+    })
+
+    describe('no overlay for iframe if it does not match for query criteria', () => {
+      const iframeFromYoutube =
+        '<iframe id="youtube_embed_iframe" src="https://www.youtube-no-match.com/embed/example_video_id" />'
+
+      it('does not put the overlay when feature is turned off', async () => {
+        subject(iframeFromYoutube)
+
+        enhanceUserContent(document, {showYoutubeAdOverlay: true})
+
+        expect(
+          document.querySelector('[data-test-id="youtube-migration-container"]'),
+        ).not.toBeInTheDocument()
+      })
+    })
+  })
+
   describe('file path matching', () => {
     beforeEach(() => {
       jest.clearAllMocks()
@@ -369,7 +413,7 @@ describe('enhanceUserContent()', () => {
         <a id="link5" href="https://example.com">Regular Link 3</a>
       `)
       enhanceUserContent()
-      expect(document.querySelectorAll("a.external")).toHaveLength(4)
+      expect(document.querySelectorAll('a.external')).toHaveLength(4)
     })
   })
 

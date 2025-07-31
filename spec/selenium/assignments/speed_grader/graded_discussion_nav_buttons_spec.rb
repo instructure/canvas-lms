@@ -24,7 +24,6 @@ describe "Screenreader Gradebook grading" do
   context "checkpoints" do
     before do
       Account.site_admin.enable_feature! :discussion_checkpoints
-      Account.site_admin.enable_feature!(:react_discussions_post)
 
       @teacher = course_with_teacher_logged_in(active_course: true, active_all: true, name: "teacher").user
       @student1 = student_in_course(course: @course, name: "student", active_all: true).user

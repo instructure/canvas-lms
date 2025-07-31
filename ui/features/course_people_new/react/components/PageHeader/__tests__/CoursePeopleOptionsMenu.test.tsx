@@ -44,7 +44,7 @@ const useCoursePeopleContextMocks = {
 
 describe('CoursePeopleOptionsMenu', () => {
   beforeEach(() => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
   })
 
   it('renders More Options menu button', () => {
@@ -55,7 +55,9 @@ describe('CoursePeopleOptionsMenu', () => {
   })
 
   it('does not render More Options menu button if user does not have permissions to see at least one of the menu options', () => {
-    (useCoursePeopleContext as jest.Mock).mockReturnValueOnce(getCoursePeopleContext({defaultContext: true}))
+    ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce(
+      getCoursePeopleContext({defaultContext: true}),
+    )
     const {queryByTestId} = render(<CoursePeopleOptionsMenu />)
     expect(queryByTestId('course-people-options-menu-button')).not.toBeInTheDocument()
   })
@@ -70,7 +72,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canReadRoster is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canReadRoster: false,
       })
@@ -98,7 +100,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canAllowCourseAdminActions is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canAllowCourseAdminActions: false,
       })
@@ -108,7 +110,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canManageStudents is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canManageStudents: false,
       })
@@ -118,7 +120,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canReadPriorRoster is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canReadPriorRoster: false,
       })
@@ -146,7 +148,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when userIsInstructor is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         userIsInstructor: false,
       })
@@ -156,7 +158,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canReadReports is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canReadReports: false,
       })
@@ -166,7 +168,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canViewAllGrades is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canViewAllGrades: false,
       })
@@ -194,7 +196,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canReadRoster is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canReadRoster: false,
       })
@@ -222,7 +224,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when selfRegistration is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         selfRegistration: false,
       })
@@ -232,7 +234,7 @@ describe('CoursePeopleOptionsMenu', () => {
     })
 
     it('does not render option when canGenerateObserverPairingCode is false', async () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValueOnce({
         ...useCoursePeopleContextMocks,
         canGenerateObserverPairingCode: false,
       })

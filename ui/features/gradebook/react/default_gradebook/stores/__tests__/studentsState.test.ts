@@ -29,6 +29,7 @@ import {
   Submission,
 } from '../graphql/submissions/getSubmissions'
 import {numberToLetters} from '../graphql/buildGraphQLQuery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Helper function to validate student data loading
 const verifyStudentDataLoaded = () => {
@@ -168,6 +169,8 @@ describe('Gradebook > fetchStudentIds', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
+    jest.useRealTimers()
     capturedRequests.length = 0
     exampleData_ = {
       studentIds: ['1101', '1102', '1103'],
@@ -177,6 +180,8 @@ describe('Gradebook > fetchStudentIds', () => {
   afterEach(() => {
     server.resetHandlers()
     store.setState(initialState, true)
+    jest.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {
@@ -205,6 +210,8 @@ describe('Gradebook > fetchStudentIds', () => {
 
     describe('when student ids have been prefetched', () => {
       beforeEach(() => {
+        fakeENV.setup()
+        jest.useRealTimers()
         const jsonString = JSON.stringify({user_ids: exampleData_.studentIds})
         const response = new Response(jsonString)
         setPrefetchedXHR('user_ids', Promise.resolve(response))
@@ -212,6 +219,8 @@ describe('Gradebook > fetchStudentIds', () => {
 
       afterEach(() => {
         clearPrefetchedXHRs()
+        jest.useFakeTimers()
+        fakeENV.teardown()
       })
 
       test('does not send a request for student ids', async () => {
@@ -237,11 +246,15 @@ describe('Gradebook > fetchStudentIds', () => {
 
 describe('#loadStudentData()', () => {
   beforeEach(() => {
+    fakeENV.setup()
+    jest.useRealTimers()
     store.setState({loadCompositeStudentData: jest.fn(), loadGraphqlStudentData: jest.fn()})
   })
 
   afterEach(() => {
     store.setState(initialState, true)
+    jest.useFakeTimers()
+    fakeENV.teardown()
   })
 
   it('calls loadCompositeStudentData if useGraphQL is false', async () => {
@@ -265,6 +278,8 @@ describe('#loadCompositeStudentData()', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
+    jest.useRealTimers()
     const performanceControls = new PerformanceControls({
       studentsChunkSize: 2,
       submissionsChunkSize: 2,
@@ -306,6 +321,8 @@ describe('#loadCompositeStudentData()', () => {
   afterEach(() => {
     server.resetHandlers()
     store.setState(initialState, true)
+    jest.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {
@@ -327,6 +344,8 @@ describe('#loadGraphqlStudentData()', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
+    jest.useRealTimers()
     ;(getUsers as jest.Mock).mockImplementation((params: {after?: string}) => {
       const firstPage = mockUsers.slice(0, 2)
       const secondPage = mockUsers.slice(2, 3)
@@ -400,6 +419,8 @@ describe('#loadGraphqlStudentData()', () => {
     jest.resetAllMocks()
     server.resetHandlers()
     store.setState(initialState, true)
+    jest.useFakeTimers()
+    fakeENV.teardown()
   })
 
   afterAll(() => {

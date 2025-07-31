@@ -24,7 +24,7 @@ import {ModuleItemLoadingData} from './ModuleItemLoadingData'
 import {ModuleItemsLoadingSpinner} from './ModuleItemsLoadingSpinner'
 import {ModuleItemsStore} from './ModuleItemsStore'
 import {moduleFromId} from './showAllOrLess'
-import {updateModuleFileDrop} from './moduleHelpers'
+import {getModuleAriaLabel, updateModuleFileDrop} from './moduleHelpers'
 import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 
 const BATCH_SIZE = 6
@@ -94,6 +94,7 @@ class ModuleItemsLazyLoader {
             isLoading={false}
             paginationData={paginationData}
             onPageChange={this.onPageChange}
+            moduleName={this.getModuleName(module)}
           />,
         )
       } else {
@@ -144,6 +145,7 @@ class ModuleItemsLazyLoader {
             isLoading={true}
             paginationData={paginationData}
             onPageChange={this.onPageChange}
+            moduleName={this.getModuleName(module)}
           />,
         )
       } else {
@@ -213,6 +215,10 @@ class ModuleItemsLazyLoader {
         }),
       )
     }
+  }
+
+  private getModuleName(module: HTMLElement) {
+    return getModuleAriaLabel(module) || ''
   }
 }
 

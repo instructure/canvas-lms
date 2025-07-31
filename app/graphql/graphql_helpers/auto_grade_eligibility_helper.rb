@@ -25,36 +25,47 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     "application/x-docx"
   ].freeze
 
-  NO_SUBMISSION_MSG       = I18n.t("No essay submission found.")
-  IMAGE_UPLOAD_MSG        = I18n.t("There are images embedded in the file that can not be parsed.")
-  INVALID_FILE_MSG        = I18n.t("Only PDF and DOCX files are supported.")
-  INVALID_TYPE_MSG        = I18n.t("Submission must be a text entry type or file upload.")
-  SHORT_ESSAY_MSG         = I18n.t("Submission must be at least 5 words.")
-  MISSING_RATING_MSG      = I18n.t("Rubric is missing rating description.")
-  FILE_UPLOADS_DISABLED_MSG = I18n.t("Grading assistance is disabled for file uploads.")
+  NO_SUBMISSION_MSG               = I18n.t("No essay submission found.")
+  IMAGE_UPLOAD_MSG                = I18n.t("Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission.")
+  INVALID_FILE_MSG                = I18n.t("Only PDF and DOCX files are supported.")
+  INVALID_TYPE_MSG                = I18n.t("Submission must be a text entry type or file upload.")
+  SHORT_ESSAY_MSG                 = I18n.t("Submission must be at least 5 words.")
+  MISSING_RATING_MSG              = I18n.t("Rubric is missing rating description.")
+  FILE_UPLOADS_DISABLED_MSG       = I18n.t("Grading assistance is disabled for file uploads.")
+  GRADING_ASSISTANCE_DISABLED_MSG = I18n.t("Grading assistance is not available right now.")
+  NO_RUBRIC_MSG                   = I18n.t("No rubric is attached to this assignment.")
+  RATING_DESCRIPTION_MISSING_MSG  = I18n.t("Rubric is missing rating description.")
+
+  def self.missing_rubric?(assignment)
+    assignment&.rubric.nil?
+  end
+
+  def self.rubric_missing_ratings?(assignment)
+    rubric = assignment&.rubric
+    return false unless rubric
+
+    rubric.data.any? do |data_entry|
+      data_entry[:ratings].any? { |rating| rating[:long_description].blank? }
+    end
+  end
+
+  def self.grading_assistance_disabled?
+    !CedarClient.enabled?
+  end
+
+  ASSIGNMENT_CHECKS = [
+    { level: "error", message: GRADING_ASSISTANCE_DISABLED_MSG, check: ->(_) { grading_assistance_disabled? } },
+    { level: "error", message: NO_RUBRIC_MSG,                   check: ->(a) { missing_rubric?(a) } },
+    { level: "error", message: RATING_DESCRIPTION_MISSING_MSG,  check: ->(a) { rubric_missing_ratings?(a) } }
+  ].freeze
 
   def self.validate_assignment(assignment:)
-    assignment_issues = []
-    rubric = assignment&.rubric_association&.rubric
-
-    unless CedarClient.enabled?
-      assignment_issues << I18n.t("Grading Assistance is not available right now.")
-    end
-
-    if rubric.nil?
-      assignment_issues << I18n.t("No rubric is attached to this assignment.")
-    else
-      all_present = rubric.data.all? do |data_entry|
-        data_entry[:ratings].all? do |rating|
-          rating[:long_description].present?
-        end
-      end
-      unless all_present
-        assignment_issues << I18n.t("Rubric is missing rating description.")
+    ASSIGNMENT_CHECKS.each do |entry|
+      if entry[:check].call(assignment)
+        return { level: entry[:level], message: entry[:message] }
       end
     end
-
-    assignment_issues
+    nil
   end
 
   def self.no_submission?(submission)
@@ -65,7 +76,7 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
   end
 
   def self.contains_images?(submission)
-    submission.submission_type == "online_upload" && submission.attachment_contains_images
+    submission.contains_images
   end
 
   def self.invalid_file?(submission)
@@ -88,26 +99,21 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
       !Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
   end
 
-  CHECKS = {
-    NO_SUBMISSION_MSG => ->(s) { no_submission?(s) },
-    INVALID_TYPE_MSG => ->(s) { invalid_type?(s) },
-    FILE_UPLOADS_DISABLED_MSG => ->(s) { file_uploads_feature_disabled?(s) },
-    INVALID_FILE_MSG => ->(s) { invalid_file?(s) },
-    IMAGE_UPLOAD_MSG => ->(s) { contains_images?(s) },
-    SHORT_ESSAY_MSG => ->(s) { short_essay?(s) }
-  }.freeze
+  SUBMISSION_CHECKS = [
+    { level: "error", message: NO_SUBMISSION_MSG,          check: ->(s) { no_submission?(s) } },
+    { level: "error", message: INVALID_TYPE_MSG,           check: ->(s) { invalid_type?(s) } },
+    { level: "error", message: FILE_UPLOADS_DISABLED_MSG,  check: ->(s) { file_uploads_feature_disabled?(s) } },
+    { level: "error", message: INVALID_FILE_MSG,           check: ->(s) { invalid_file?(s) } },
+    { level: "warning", message: IMAGE_UPLOAD_MSG,         check: ->(s) { contains_images?(s) } },
+    { level: "error", message: SHORT_ESSAY_MSG,            check: ->(s) { short_essay?(s) } }
+  ].freeze
 
   def self.validate_submission(submission:)
-    CHECKS.each do |msg, check|
-      return [msg] if check.call(submission)
+    SUBMISSION_CHECKS.each do |entry|
+      if entry[:check].call(submission)
+        return { level: entry[:level], message: entry[:message] }
+      end
     end
-    []
-  end
-
-  def self.contains_rce_file_link?(html_body)
-    return false if html_body.blank?
-
-    doc = Nokogiri::HTML.fragment(html_body)
-    doc.css("a.instructure_file_link").any? || doc.css("a[data-api-returntype=\"File\"]").any?
+    nil
   end
 end

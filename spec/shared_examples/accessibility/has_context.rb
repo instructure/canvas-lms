@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_examples "has a single accessibility context" do
+RSpec.shared_examples "it has a single accessibility context" do
   let(:error_message) { "Exactly one context must be present" }
 
   context "validations" do
@@ -127,6 +127,80 @@ RSpec.shared_examples "has a single accessibility context" do
           expect { subject.context = invalid_context }.to(
             raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
           )
+        end
+      end
+    end
+
+    describe "#context_id_and_type" do
+      context "when the context is a wiki_page" do
+        let(:wiki_page) { wiki_page_model }
+
+        it "returns the wiki_page ID and type" do
+          subject.wiki_page = wiki_page
+          expect(subject.context_id_and_type).to eq([wiki_page.id, "WikiPage"])
+        end
+      end
+
+      context "when the context is an assignment" do
+        let(:assignment) { assignment_model }
+
+        it "returns the assignment ID and type" do
+          subject.assignment = assignment
+          expect(subject.context_id_and_type).to eq([assignment.id, "Assignment"])
+        end
+      end
+
+      context "when the context is an attachment" do
+        let(:attachment) { attachment_model }
+
+        it "returns the attachment ID and type" do
+          subject.attachment = attachment
+          expect(subject.context_id_and_type).to eq([attachment.id, "Attachment"])
+        end
+      end
+
+      context "when no context is present" do
+        it "returns [nil, nil]" do
+          expect(subject.context_id_and_type).to eq([nil, nil])
+        end
+      end
+    end
+
+    describe "#context_url" do
+      let(:course_id) { 1 }
+
+      before { allow(subject).to receive(:course_id).and_return(course_id) }
+
+      context "when the context is a wiki_page" do
+        let(:wiki_page) { wiki_page_model }
+
+        it "returns the correct wiki_page URL" do
+          subject.wiki_page = wiki_page
+          expect(subject.context_url).to eq("/courses/#{subject.course_id}/pages/#{wiki_page.id}")
+        end
+      end
+
+      context "when the context is an assignment" do
+        let(:assignment) { assignment_model }
+
+        it "returns the correct assignment URL" do
+          subject.assignment = assignment
+          expect(subject.context_url).to eq("/courses/#{subject.course_id}/assignments/#{assignment.id}")
+        end
+      end
+
+      context "when the context is an attachment" do
+        let(:attachment) { attachment_model }
+
+        it "returns the correct attachment URL" do
+          subject.attachment = attachment
+          expect(subject.context_url).to eq("/courses/#{subject.course_id}/files?preview=#{attachment.id}")
+        end
+      end
+
+      context "when no context is present" do
+        it "returns nil" do
+          expect(subject.context_url).to be_nil
         end
       end
     end

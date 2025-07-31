@@ -404,6 +404,11 @@ class LearningObjectDatesController < ApplicationController
 
   def update_ungraded_object(object, params)
     overrides = params.delete :assignment_overrides
+
+    if object.is_a?(DiscussionTopic) && object.group_category_id.present? && overrides&.all? { |override| override[:group_id].present? }
+      params.delete(:only_visible_to_overrides)
+    end
+
     batch = prepare_assignment_overrides_for_batch_update(object, overrides, @current_user) if overrides
     object.transaction do
       object.update!(params)

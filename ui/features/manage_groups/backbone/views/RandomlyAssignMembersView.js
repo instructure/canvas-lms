@@ -26,12 +26,15 @@ import groupHasSubmissions from '../../groupHasSubmissions'
 
 const I18n = createI18nScope('groups')
 
+const DEFAULT_DIALOG_HEIGHT = 260
+const DIALOG_EXPANDED_HEIGHT = 330
+
 export default class RandomlyAssignMembersView extends DialogFormView {
   static initClass() {
     this.prototype.defaults = {
       title: I18n.t('randomly_assigning_members', 'Randomly Assigning Students'),
       width: 450,
-      height: 250,
+      height: DEFAULT_DIALOG_HEIGHT,
     }
 
     this.prototype.template = template
@@ -43,6 +46,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
     this.prototype.events = {
       'click .dialog_closer': 'close',
       'click .randomly-assign-members-confirm': 'randomlyAssignMembers',
+      'change input[name=group_by_section]': 'toggleSectionInfo',
     }
 
     this.prototype.els = {'input[name=group_by_section]': '$group_by_section'}
@@ -93,6 +97,19 @@ export default class RandomlyAssignMembersView extends DialogFormView {
       })
     } else {
       return this.model.assignUnassignedMembers(this.getFormData().group_by_section === '1')
+    }
+  }
+
+  toggleSectionInfo(e) {
+    const $infoBox = this.$('#group-by-section-info')
+    if (e.target.checked) {
+      $infoBox.show()
+      // Increase dialog height to accommodate the info box
+      this.$el.dialog('option', 'height', DIALOG_EXPANDED_HEIGHT)
+    } else {
+      $infoBox.hide()
+      // Reset dialog height to original size
+      this.$el.dialog('option', 'height', DEFAULT_DIALOG_HEIGHT)
     }
   }
 

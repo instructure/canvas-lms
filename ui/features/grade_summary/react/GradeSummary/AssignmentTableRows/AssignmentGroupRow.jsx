@@ -88,6 +88,7 @@ export const assignmentGroupRow = (
               }`}
         </Text>
       </Table.Cell>
+      <Table.Cell>{/* Document processors */}</Table.Cell>
     </Table.Row>
   )
 }

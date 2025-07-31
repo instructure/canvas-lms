@@ -20,6 +20,8 @@
 module Accessibility
   module Rules
     class ListStructureRule < Accessibility::Rule
+      include Accessibility::NokogiriMethods
+
       self.id = "list-structure"
       self.link = "https://www.w3.org/TR/2016/NOTE-WCAG20-TECHS-20161007/H48"
 
@@ -42,7 +44,6 @@ module Accessibility
             return true if regex.match?(child.content)
           end
         end
-
         false
       end
 
@@ -86,7 +87,7 @@ module Accessibility
       end
 
       def self.message
-        I18n.t("Lists should be formatted as lists.")
+        I18n.t("This looks like a list but isn't formatted as one.")
       end
 
       def self.why
@@ -96,7 +97,7 @@ module Accessibility
       # TODO: define undo text
       def self.form(_elem)
         Accessibility::Forms::Button.new(
-          label: I18n.t("Format as list"),
+          label: I18n.t("Reformat"),
           undo_text: I18n.t("List structure fixed"),
           value: "false"
         )
@@ -127,8 +128,13 @@ module Accessibility
         match_data = LIST_LIKE_REGEX.match(list_elems.first.content)
         is_ordered = !!match_data&.captures&.first
         start_index = is_ordered ? match_data.captures.first : nil
+
         list_tag = is_ordered ? "ol" : "ul"
+
         list_container = elem.document.create_element(list_tag)
+        helper = new
+        helper.extend_nokogiri_element(list_container)
+
         list_container["start"] = start_index if is_ordered && start_index =~ /^\d+$/ && start_index.to_i > 1
 
         # Add <li> for each list-like element
@@ -139,11 +145,15 @@ module Accessibility
               next if text.empty?
 
               li = elem.document.create_element("li")
+              helper.extend_nokogiri_element(li)
+
               li.content = text
               list_container.add_child(li)
             end
           else
             li = elem.document.create_element("li")
+            helper.extend_nokogiri_element(li)
+
             le.children.each do |child|
               strip_list_marker_from_node(child)
               li.add_child(child)
@@ -154,7 +164,8 @@ module Accessibility
 
         first_elem.add_previous_sibling(list_container)
         list_elems.each(&:unlink)
-        first_elem
+
+        list_container
       end
     end
   end

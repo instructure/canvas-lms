@@ -79,7 +79,9 @@ export default function SmartSearchFilters(props: Props) {
       height="100vh"
     >
       <Flex justifyItems="space-between">
-        <Heading variant="titleSection">{I18n.t('Filters')}</Heading>
+        <Heading variant="titleSection" level="h2">
+          {I18n.t('Filters')}
+        </Heading>
         <CloseButton
           onClick={props.handleCloseTray}
           screenReaderLabel={I18n.t('Close filters tray')}
@@ -87,7 +89,9 @@ export default function SmartSearchFilters(props: Props) {
       </Flex>
       <Flex.Item shouldGrow shouldShrink>
         <Flex direction="column" gap="inputFields" padding="sectionElements space8">
-          <Heading variant="titleCardRegular">{I18n.t('Sources')}</Heading>
+          <Heading variant="titleCardRegular" level="h3">
+            {I18n.t('Sources')}
+          </Heading>
           <CheckboxGroup
             name="sources"
             onChange={handleCheckboxChange}

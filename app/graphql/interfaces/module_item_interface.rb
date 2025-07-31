@@ -33,7 +33,20 @@ module Interfaces::ModuleItemInterface
   field :can_duplicate, Boolean, null: true
   def can_duplicate
     if object.respond_to?(:can_duplicate?)
-      object.can_duplicate?
+      if object.is_a?(Assignment)
+        # Use loader to batch load external_tool_tag associations
+        Loaders::AssignmentExternalToolTagLoader.for.load(object.id).then do |external_tool_tag|
+          # Set the association target to prevent re-querying
+          if external_tool_tag
+            object.association(:external_tool_tag).target = external_tool_tag
+          else
+            object.association(:external_tool_tag).loaded!
+          end
+          object.can_duplicate?
+        end
+      else
+        object.can_duplicate?
+      end
     else
       object.is_a?(DiscussionTopic) || object.is_a?(WikiPage)
     end
@@ -111,7 +124,17 @@ module Interfaces::ModuleItemInterface
     elsif object.is_a?(DiscussionTopic)
       Loaders::DiscussionTopicLoaders::CanUnpublishLoader.for(object.context).load(object.id)
     elsif object.respond_to?(:can_unpublish?)
-      object.can_unpublish?
+      if object.is_a?(Assignment)
+        # Use loader to batch load submission existence check
+        Loaders::AssignmentHasSubmissionsLoader.for.load(object.id).then do |has_submissions|
+          # Set cache for both methods that check submission existence
+          object.instance_variable_set(:@has_student_submissions, has_submissions)
+          object.instance_variable_set(:@has_submitted_submissions, has_submissions)
+          object.can_unpublish?
+        end
+      else
+        object.can_unpublish?
+      end
     else
       true
     end

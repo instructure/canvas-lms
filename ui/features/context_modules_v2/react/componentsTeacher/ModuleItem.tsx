@@ -28,6 +28,7 @@ import ModuleItemTitle from './ModuleItemTitle'
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
 import {
   ModuleItemContent,
+  ModuleItemMasterCourseRestrictionType,
   MasteryPathsData,
   ModuleAction,
   CompletionRequirement,
@@ -37,11 +38,14 @@ export interface ModuleItemProps {
   id: string
   _id: string
   url: string
+  title: string
+  newTab?: boolean
   indent: number
   moduleId: string
   moduleTitle?: string
   index: number
   content: ModuleItemContent
+  masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   onClick?: () => void
   published?: boolean
   canUnpublish?: boolean
@@ -60,10 +64,13 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   _id,
   id,
   url,
+  title,
+  newTab,
   moduleId,
   moduleTitle = '',
   indent,
   content,
+  masterCourseRestrictions,
   onClick,
   completionRequirements,
   published,
@@ -128,7 +135,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                 <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
                   {/* Item Title */}
                   <Flex.Item shouldGrow={true}>
-                    <ModuleItemTitle content={content} url={url} onClick={onClick} />
+                    <ModuleItemTitle content={content} url={url} title={title} onClick={onClick} />
                   </Flex.Item>
                   {/* Due Date and Points Possible */}
                   <Flex.Item>
@@ -149,8 +156,11 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             moduleTitle={moduleTitle}
             itemId={_id}
             id={id}
+            title={title}
+            newTab={newTab}
             indent={indent}
             content={content}
+            masterCourseRestrictions={masterCourseRestrictions}
             published={published || false}
             canBeUnpublished={canUnpublish || false}
             masteryPathsData={masteryPathsData}

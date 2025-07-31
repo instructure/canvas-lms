@@ -372,6 +372,26 @@
                   <% end %>
                 <% end %>
 
+                <% if @account.root_account.feature_enabled?(:course_pace_enable_from_account_setting) %>
+                  <%= settings.fields_for :enable_course_paces do |r| %>
+                    <% hash = @account.enable_course_paces %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                        <%= r.label :value, t("Course pacing allowed") %>
+                      </td>
+                    </tr>
+                    <% unless disabled %>
+                      <tr>
+                        <td colspan="2" class="sub_checkbox">
+                          <%= r.check_box :locked, :checked => hash[:locked] %>
+                          <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  <% end %>
+                <% end %>
+
                 <%= settings.fields_for :enable_offline_web_export do |r| %>
                   <% hash = @account.enable_offline_web_export %>
                   <% disabled = hash[:locked] && hash[:inherited] %>
@@ -1384,7 +1404,7 @@ acknowledge that you have read and agreed to the
                     <%= announcement.subject %>
                   </h2>
                   <span class="notification_message">
-                    <%= user_content(announcement.message) %>
+                    <%= user_content(announcement.message, location: announcement.asset_string) %>
                   </span>
                   <% if can_do(@account, @current_user, :manage_alerts) %>
                     <div class="ic-notification__admin-actions">

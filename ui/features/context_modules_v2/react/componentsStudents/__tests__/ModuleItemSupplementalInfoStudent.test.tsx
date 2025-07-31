@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ModuleItemSupplementalInfoStudent from '../ModuleItemSupplementalInfoStudent'
 import {CompletionRequirement, ModuleItemContent} from '../../utils/types'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 type DefaultPropsOverrides = {
   completionRequirement?: Partial<CompletionRequirement>
@@ -40,7 +41,6 @@ const buildDefaultProps = (overrides: DefaultPropsOverrides = {}) => {
 
   const defaultContent: ModuleItemContent = {
     _id: '1',
-    title: 'Test Item',
     pointsPossible: 100,
     submissionsConnection: {
       nodes: [
@@ -50,6 +50,7 @@ const buildDefaultProps = (overrides: DefaultPropsOverrides = {}) => {
         },
       ],
     },
+    type: 'Assignment',
     ...overrides.content,
   }
 
@@ -65,14 +66,20 @@ const setUp = (
   content: ModuleItemContent,
   itemIcon?: React.ReactNode,
   itemTypeText?: string,
+  restrictQuantitativeData?: boolean,
 ) => {
   return render(
-    <ModuleItemSupplementalInfoStudent
-      completionRequirement={completionRequirement}
-      content={content}
-      itemIcon={itemIcon}
-      itemTypeText={itemTypeText}
-    />,
+    <ContextModuleProvider
+      {...contextModuleDefaultProps}
+      restrictQuantitativeData={restrictQuantitativeData ?? false}
+    >
+      <ModuleItemSupplementalInfoStudent
+        completionRequirement={completionRequirement}
+        content={content}
+        itemIcon={itemIcon}
+        itemTypeText={itemTypeText}
+      />
+    </ContextModuleProvider>,
   )
 }
 
@@ -85,15 +92,17 @@ describe('ModuleItemSupplementalInfoStudent', () => {
     // Check for the due date using data-testid instead of specific date format
     expect(container.getByTestId('due-date')).toBeInTheDocument()
     expect(container.getByText('100 pts')).toBeInTheDocument()
-    expect(container.getByText('Submit')).toBeInTheDocument()
+    expect(container.getByText('Submit assignment')).toBeInTheDocument()
   })
 
   it('should render null when nothing is provided', () => {
     const {container} = render(
-      <ModuleItemSupplementalInfoStudent
-        content={null as any}
-        completionRequirement={null as any}
-      />,
+      <ContextModuleProvider {...contextModuleDefaultProps}>
+        <ModuleItemSupplementalInfoStudent
+          content={null as any}
+          completionRequirement={null as any}
+        />
+      </ContextModuleProvider>,
     )
     expect(container).toBeEmptyDOMElement()
   })
@@ -113,7 +122,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       expect(container.container).toBeInTheDocument()
       expect(container.queryByText(testDate.toLocaleDateString())).not.toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Score at least 100.0')).toBeInTheDocument()
+      expect(container.getByText('Score at least 100.0 points')).toBeInTheDocument()
     })
 
     it('should render completion requirement for min_percentage', () => {
@@ -157,7 +166,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       const container = setUp(props.completionRequirement, props.content)
       expect(container.container).toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Submit')).toBeInTheDocument()
+      expect(container.getByText('Submit assignment')).toBeInTheDocument()
     })
 
     it('should render completion requirement for must_mark_done', () => {
@@ -172,7 +181,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       const container = setUp(props.completionRequirement, props.content)
       expect(container.container).toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Mark done')).toBeInTheDocument()
+      expect(container.getByText('Mark as done')).toBeInTheDocument()
     })
   })
 
@@ -195,6 +204,157 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       // Both should not be present since we're not rendering them
       expect(container.queryByTestId('item-icon')).not.toBeInTheDocument()
       expect(container.queryByText('discussion')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('restrict quantitative data', () => {
+    it('should show points when restrictQuantitativeData is false', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        false,
+      )
+
+      expect(container.getByText('100 pts')).toBeInTheDocument()
+    })
+
+    it('should hide points when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
+    })
+
+    it('should show points when restrictQuantitativeData is undefined (defaults to false)', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByText('100 pts')).toBeInTheDocument()
+    })
+
+    it('should still show due date when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
+    })
+
+    it('should still show completion requirements when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.getByText('Submit assignment')).toBeInTheDocument()
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('ungraded discussion todo dates', () => {
+    const testDate = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString()
+
+    it('should render todo date for ungraded discussion with todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: false,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByTestId('todo-date')).toBeInTheDocument()
+      // Verify that the component contains the todo date text somewhere
+      expect(container.container.innerHTML).toContain('Due: ')
+    })
+
+    it('should render due date for graded discussion with cachedDueDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: true,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: testDate}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.container.innerHTML).toContain('Due: ')
+    })
+
+    it('should not render todo date for graded discussion even with todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: true,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByText(/Due:/)).not.toBeInTheDocument()
+    })
+
+    it('should not render todo date for ungraded discussion without todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: false,
+          todoDate: undefined,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+      expect(container.queryByTestId('todo-date')).not.toBeInTheDocument()
+    })
+
+    it('should not render todo date for non-discussion items', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Assignment',
+          graded: false,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByText(/Due:/)).not.toBeInTheDocument()
     })
   })
 })

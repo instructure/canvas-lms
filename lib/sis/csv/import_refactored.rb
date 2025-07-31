@@ -52,8 +52,11 @@ module SIS
                      enrollment
                      admin
                      group_category
+                     differentiation_tag_set
                      group
+                     differentiation_tag
                      group_membership
+                     differentiation_tag_membership
                      grade_publishing_results
                      user_observer].freeze
 

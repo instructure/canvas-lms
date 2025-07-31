@@ -116,7 +116,7 @@ module Importers
 
     def self.process_rubric_association(context, migration, item)
       associate_with = context
-      opts = {}
+      opts = { skip_updating_rubric_association_count: true }
 
       if context.is_a?(Course) && migration.migration_settings[:associate_with_assignment_id].present?
         assignment = context.assignments.where(id: migration.migration_settings[:associate_with_assignment_id]).first
@@ -141,6 +141,12 @@ module Importers
       else
         item.associate_with(associate_with, context, opts)
       end
+    end
+
+    def self.process_rubric_association_count(data)
+      migration_ids = (data["rubrics"] || []).pluck("migration_id")
+      rubrics = Rubric.where(migration_id: migration_ids)
+      rubrics.each(&:update_association_count)
     end
 
     def self.track_metrics(migration)

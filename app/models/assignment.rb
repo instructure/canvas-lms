@@ -19,6 +19,8 @@
 #
 
 class Assignment < AbstractAssignment
+  include Accessibility::Scannable
+
   # Later versions of Rails try to read the attribute when setting an error for that attribute. In order to maintain
   # backwards compatibility with error consumers, create a fake attribute :custom_params so it doesn't error out.
   attr_reader :custom_params

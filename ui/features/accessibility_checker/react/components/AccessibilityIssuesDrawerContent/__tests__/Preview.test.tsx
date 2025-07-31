@@ -56,9 +56,14 @@ describe('Preview', () => {
 
   describe('initial render and loading', () => {
     it('shows loading spinner initially', () => {
+      const mockResponse: PreviewResponse = {
+        content: '<div>Test content</div>',
+        path: '//div',
+      }
+
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve({content: '<div>Test content</div>', path: '//div'}),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -74,7 +79,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -109,7 +114,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -127,7 +132,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -147,7 +152,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -167,7 +172,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       const ref = React.createRef<PreviewHandle>()
@@ -187,7 +192,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       const ref = React.createRef<PreviewHandle>()
@@ -224,7 +229,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       const ref = React.createRef<PreviewHandle>()
@@ -249,7 +254,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       const ref = React.createRef<PreviewHandle>()
@@ -295,7 +300,7 @@ describe('Preview', () => {
   })
 
   describe('component props', () => {
-    it('re-renders when issue changes', async () => {
+    it('renders one time when issue changes', async () => {
       const mockResponse: PreviewResponse = {
         content: '<div>Test content</div>',
         path: '//div',
@@ -303,7 +308,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       const {rerender} = render(<Preview {...defaultProps} />)
@@ -322,7 +327,7 @@ describe('Preview', () => {
 
       // Should call API again with new issue
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
+        expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -378,7 +383,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -403,7 +408,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -422,7 +427,7 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValue({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
       render(<Preview {...defaultProps} />)
@@ -440,7 +445,8 @@ describe('Preview', () => {
       // First call fails
       mockDoFetchApi.mockRejectedValueOnce({})
 
-      const {rerender} = render(<Preview {...defaultProps} />)
+      const ref = React.createRef<PreviewHandle>()
+      render(<Preview {...defaultProps} ref={ref} />)
 
       await waitFor(() => {
         expect(
@@ -456,21 +462,45 @@ describe('Preview', () => {
 
       // @ts-expect-error
       mockDoFetchApi.mockResolvedValueOnce({
-        json: Promise.resolve(mockResponse),
+        json: mockResponse,
       })
 
-      const newIssue: AccessibilityIssue = {
-        ...mockIssue,
-        id: '2',
-      }
-
-      rerender(<Preview {...defaultProps} issue={newIssue} />)
+      ref.current?.update({value: 'a'})
 
       await waitFor(() => {
         expect(
           screen.queryByText('Error loading preview for accessibility issue'),
         ).not.toBeInTheDocument()
       })
+    })
+  })
+
+  it('clears error when itemId changes', async () => {
+    const mockResponse: PreviewResponse = {
+      content: '<div>Test content</div>',
+      path: '//div',
+    }
+
+    // First call fails
+    mockDoFetchApi.mockRejectedValueOnce({})
+
+    const {rerender} = render(<Preview {...defaultProps} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Error loading preview for accessibility issue')).toBeInTheDocument()
+    })
+
+    // @ts-expect-error
+    mockDoFetchApi.mockResolvedValueOnce({
+      json: mockResponse,
+    })
+
+    rerender(<Preview {...defaultProps} itemId={2} />)
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Error loading preview for accessibility issue'),
+      ).not.toBeInTheDocument()
     })
   })
 })

@@ -132,7 +132,7 @@ class WikiPagesController < ApplicationController
 
   def new
     GuardRail.activate(:secondary) do
-      unless @context.account.feature_enabled?(:canvas_content_builder)
+      unless @context.account.feature_enabled?(:block_content_editor)
         return render_unauthorized_action
       end
       unless authorized_action(@context.wiki, @current_user, :update)
@@ -187,9 +187,9 @@ class WikiPagesController < ApplicationController
 
   def determine_editor_feature(context)
     is_block_editor_enabled = context.account.feature_enabled?(:block_editor)
-    is_canvas_content_builder_enabled = context.account.feature_enabled?(:canvas_content_builder)
+    is_block_content_editor = context.account.feature_enabled?(:block_content_editor)
 
-    return :canvas_content_builder if is_canvas_content_builder_enabled
+    return :block_content_editor if is_block_content_editor
     return :block_editor if is_block_editor_enabled
 
     nil

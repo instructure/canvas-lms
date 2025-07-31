@@ -37,16 +37,19 @@ module Accessibility
       def initialize(checkbox_label:,
                      input_label:,
                      undo_text:,
+                     can_generate_fix:,
+                     generate_button_label:,
                      checkbox_subtext: nil,
                      input_description: nil,
                      input_max_length: nil,
                      value: nil)
-        super(label: input_label, undo_text:)
+        super(label: input_label, undo_text:, can_generate_fix:)
         @checkbox_label = checkbox_label
         @checkbox_subtext = checkbox_subtext
         @input_description = input_description
         @input_max_length = input_max_length
         @value = value
+        @generate_button_label = generate_button_label
       end
 
       def field_type
@@ -60,6 +63,7 @@ module Accessibility
           input_description: @input_description,
           input_max_length: @input_max_length,
           value: @value,
+          generate_button_label: @generate_button_label
         }.compact)
       end
     end

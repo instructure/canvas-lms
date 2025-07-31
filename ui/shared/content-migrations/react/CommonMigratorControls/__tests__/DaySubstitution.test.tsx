@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import {render} from '@testing-library/react'
 import DaySubstitution from '../DaySubstitution'
-import { DaySub } from '../types'
+import {DaySub} from '../types'
 
-const mockSubstitution: DaySub = { id: 1, from: 0, to: 1 }
+const mockSubstitution: DaySub = {id: 1, from: 0, to: 1}
 
 const mockOnChangeSubstitution = jest.fn()
 const mockOnRemoveSubstitution = jest.fn()
@@ -35,7 +35,7 @@ const renderComponent = (overrideProps?: any) =>
       onChangeSubstitution={mockOnChangeSubstitution}
       onRemoveSubstitution={mockOnRemoveSubstitution}
       {...overrideProps}
-    />
+    />,
   )
 
 describe('DaySubstitution', () => {
@@ -58,11 +58,13 @@ describe('DaySubstitution', () => {
   it('renders the component with remove button', () => {
     const {container} = renderComponent()
 
-    expect(container.querySelector(`#remove-substitution-${mockSubstitution.id}`)).toBeInTheDocument()
+    expect(
+      container.querySelector(`#remove-substitution-${mockSubstitution.id}`),
+    ).toBeInTheDocument()
   })
 
   it('renders remove button with text for mobile view', () => {
-    const {getByText} = renderComponent({ isMobileView: true })
+    const {getByText} = renderComponent({isMobileView: true})
 
     expect(getByText('Remove substitution')).toBeInTheDocument()
   })
@@ -76,7 +78,11 @@ describe('DaySubstitution', () => {
     const optionMonday = getByText('Monday')
     optionMonday.click()
 
-    expect(mockOnChangeSubstitution).toHaveBeenCalledWith(mockSubstitution.id, { id: "Mon", value: 1 }, 'from')
+    expect(mockOnChangeSubstitution).toHaveBeenCalledWith(
+      mockSubstitution.id,
+      {id: 'Mon', value: 1},
+      'from',
+    )
   })
 
   it('calls onChangeSubstitution move to is updated', async () => {
@@ -88,19 +94,25 @@ describe('DaySubstitution', () => {
     const optionTuesday = getByText('Tuesday')
     optionTuesday.click()
 
-    expect(mockOnChangeSubstitution).toHaveBeenCalledWith(mockSubstitution.id, { id: "Tue", value: 2 }, 'to')
+    expect(mockOnChangeSubstitution).toHaveBeenCalledWith(
+      mockSubstitution.id,
+      {id: 'Tue', value: 2},
+      'to',
+    )
   })
 
   it('calls onRemoveSubstitution when the remove button is clicked', async () => {
     const {container} = renderComponent()
 
-    const removeButton = container.querySelector(`#remove-substitution-${mockSubstitution.id}`) as HTMLButtonElement
+    const removeButton = container.querySelector(
+      `#remove-substitution-${mockSubstitution.id}`,
+    ) as HTMLButtonElement
     removeButton!.click()
     expect(mockOnRemoveSubstitution).toHaveBeenCalledWith(mockSubstitution)
   })
 
   it('disables the select and button when disabled prop is true', () => {
-    const {getByLabelText, container} = renderComponent({ disabled: true })
+    const {getByLabelText, container} = renderComponent({disabled: true})
 
     expect(getByLabelText('Move from')).toBeDisabled()
     expect(getByLabelText('Move to')).toBeDisabled()

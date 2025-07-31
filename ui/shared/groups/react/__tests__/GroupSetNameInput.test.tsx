@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import GroupSetNameInput, {GroupSetNameInputProps} from '../GroupSetNameInput'
 
 describe('GroupSetNameInput', () => {
   const setup = (props?: Partial<GroupSetNameInputProps>) => {
     const defaultProps: GroupSetNameInputProps = {
-      id: "1",
+      id: '1',
       initialValue: 'Test Group',
       getShouldShowEmptyNameError: jest.fn(() => true),
-      setShouldShowEmptyNameError: jest.fn()
+      setShouldShowEmptyNameError: jest.fn(),
     }
     return <GroupSetNameInput {...defaultProps} {...props} />
   }
@@ -44,7 +44,7 @@ describe('GroupSetNameInput', () => {
   it('updates value on input change', () => {
     const {getByTestId} = render(setup())
     const input = getByTestId('category_1_name')
-    fireEvent.change(input, { target: { value: 'New Group Name' } })
+    fireEvent.change(input, {target: {value: 'New Group Name'}})
     expect(input).toHaveValue('New Group Name')
   })
 
@@ -59,7 +59,7 @@ describe('GroupSetNameInput', () => {
   it('shows an error when name exceeds 255 characters', () => {
     const {getByTestId, getByText} = render(setup())
     const input = getByTestId('category_1_name')
-    fireEvent.change(input, { target: { value: 'a'.repeat(256) } })
+    fireEvent.change(input, {target: {value: 'a'.repeat(256)}})
     fireEvent.blur(input)
     expect(getByText('Name must be 255 characters or less')).toBeInTheDocument()
   })

@@ -22,7 +22,7 @@ import ModulesList from './componentsTeacher/ModulesList'
 
 const ModulesContainer: React.FC = () => {
   return (
-    <View as="div" data-testid="modules-rewrite-container">
+    <View as="div" data-testid="modules-rewrite-container" className="modules-rewrite-container">
       <ModulesList />
       <div id="differentiated-modules-mount-point" />
     </View>
