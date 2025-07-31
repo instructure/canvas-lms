@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BlockContentPreviewLayout} from './BlockContentPreviewLayout'
-import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
-import {usePreviewMode} from './usePreviewMode'
+import SVGWrapper from '@canvas/svg-wrapper'
+import {Flex} from '@instructure/ui-flex'
+import React from 'react'
 
-export const BlockContentPreview = () => {
-  const {previewMode, setPreviewMode} = usePreviewMode()
+export const BlockContentPreviewSelectorBarIcon = (props: {
+  svgPath: React.ReactNode
+  title: string
+}) => {
   return (
-    <BlockContentPreviewLayout
-      selectorbar={
-        <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
-      }
-      preview={<div>Preview mode: {previewMode}</div>}
-    />
+    <Flex direction="column" alignItems="center" gap="xxx-small">
+      <SVGWrapper fillColor="black" url={props.svgPath} />
+      <span>{props.title}</span>
+    </Flex>
   )
 }

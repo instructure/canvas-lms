@@ -16,18 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BlockContentPreviewLayout} from './BlockContentPreviewLayout'
-import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
-import {usePreviewMode} from './usePreviewMode'
+import {useState} from 'react'
 
-export const BlockContentPreview = () => {
-  const {previewMode, setPreviewMode} = usePreviewMode()
-  return (
-    <BlockContentPreviewLayout
-      selectorbar={
-        <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
-      }
-      preview={<div>Preview mode: {previewMode}</div>}
-    />
-  )
+export type PreviewMode = 'desktop' | 'tablet' | 'mobile'
+
+export const usePreviewMode = () => {
+  const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop')
+  return {previewMode, setPreviewMode}
 }

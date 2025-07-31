@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BlockContentPreviewLayout} from './BlockContentPreviewLayout'
-import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
-import {usePreviewMode} from './usePreviewMode'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 
-export const BlockContentPreview = () => {
-  const {previewMode, setPreviewMode} = usePreviewMode()
+export const BlockContentPreviewLayout = (props: {
+  selectorbar: React.ReactNode
+  preview: React.ReactNode
+}) => {
   return (
-    <BlockContentPreviewLayout
-      selectorbar={
-        <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
-      }
-      preview={<div>Preview mode: {previewMode}</div>}
-    />
+    <View background="secondary" padding="medium large" height="100%">
+      <Flex direction="column">
+        {props.selectorbar}
+        {props.preview}
+      </Flex>
+    </View>
   )
 }
