@@ -38,8 +38,10 @@ class YoutubeMigrationService
   ].freeze
   SCAN_TAG = "youtube_embed_scan"
   CONVERT_TAG = "youtube_embed_convert"
+  STUDIO_LTI_TOOL_DOMAIN = "arc.instructure.com"
 
   class EmbedNotFoundError < StandardError; end
+  class StudioToolNotFoundError < StandardError; end
 
   def self.last_youtube_embed_scan_progress_by_course(course)
     Progress.where(tag: SCAN_TAG, context: course).last
@@ -82,16 +84,39 @@ class YoutubeMigrationService
     # TODO: validate if we can find the progress otherwise throw an error
     # TODO: validate if type is supported SUPPORTED_RESOURCES
     # TODO: validate if resource_group_key after split up by "|" is valid
-    scan_progress = YoutubeMigrationService.find_scan(course, scan_id)
     message = YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
     # TODO: Something will listen on this creation
     convert_progress = Progress.create!(tag: CONVERT_TAG, context: course, message:, results: { original_embed: embed })
-    delete_embed_from_scan(scan_progress, embed)
+    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, {}, course.id, scan_id, embed)
     convert_progress
-  rescue
-    report_id = Canvas::Errors.capture_exception(:youtube_embed_scan, $ERROR_INFO)[:error_report]
-    convert_progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
-    convert_progress
+  end
+
+  def self.perform_conversion(progress, course_id, scan_id, embed)
+    course = Course.find(course_id)
+    service = new(course)
+    scan_progress = YoutubeMigrationService.find_scan(course, scan_id)
+
+    studio_tool = service.find_studio_tool
+    if studio_tool.nil?
+      progress.set_results({
+                             error: "Studio LTI tool not found for account",
+                             completed_at: Time.now.utc
+                           })
+      return
+    end
+
+    studio_embed_html = service.convert_youtube_to_studio(embed, studio_tool)
+    service.update_resource_content(embed, studio_embed_html)
+
+    service.delete_embed_from_scan(scan_progress, embed)
+    progress.set_results({
+                           success: true,
+                           studio_tool_id: studio_tool.id,
+                           completed_at: Time.now.utc
+                         })
+  rescue => e
+    report_id = Canvas::Errors.capture_exception(:youtube_embed_convert, e)[:error_report]
+    progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
   end
 
   def scan_course_for_embeds
@@ -111,7 +136,7 @@ class YoutubeMigrationService
       add_resource_with_embeds(resources_with_embeds, common_hash, embeds, errors)
     end
 
-    course.quizzes.active.find_each do |quiz|
+    course.quizzes.active.preload(:quiz_questions).except(:order).find_each do |quiz|
       common_hash = {
         name: quiz.title,
         id: quiz.id,
@@ -137,7 +162,7 @@ class YoutubeMigrationService
       add_resource_with_embeds(resources_with_embeds, common_hash, embeds, errors)
     end
 
-    course.assessment_questions.active.preload(:assessment_question_bank).find_each do |assessment_question|
+    course.assessment_questions.active.preload(:assessment_question_bank).except(:order).find_each do |assessment_question|
       next if assessment_question.assessment_question_bank.deleted?
 
       common_hash = {
@@ -158,7 +183,7 @@ class YoutubeMigrationService
       add_resource_with_embeds(resources_with_embeds, common_hash, embeds, errors)
     end
 
-    course.discussion_topics.active.each do |topic|
+    course.discussion_topics.active.except(:order).find_each do |topic|
       common_hash = {
         name: topic.title,
         id: topic.id,
@@ -195,7 +220,7 @@ class YoutubeMigrationService
       add_resource_with_embeds(resources_with_embeds, common_hash, embeds, errors)
     end
 
-    course.assignments.active.find_each do |assignment|
+    course.assignments.active.except(:order).find_each do |assignment|
       next if assignment.submission_types.include?("online_quiz") ||
               assignment.submission_types.include?("discussion_topic") ||
               assignment.submission_types.include?("external_tool")
@@ -233,7 +258,111 @@ class YoutubeMigrationService
     resources_with_embeds
   end
 
-  private
+  def find_studio_tool
+    account = course.account
+    account.context_external_tools.active.find_by(domain: STUDIO_LTI_TOOL_DOMAIN)
+  end
+
+  def convert_youtube_to_studio(embed, studio_tool)
+    studio_url_domain = studio_tool.url
+    uri = URI.parse(studio_url_domain)
+    studio_url = "#{uri.scheme}://#{uri.host}"
+
+    account = course.account
+    token = CanvasSecurity::ServicesJwt.generate({ sub: account.uuid }, false, encrypt: false)
+    headers = { "Authorization" => "Bearer #{token}" }
+
+    body = {
+      "url" => embed[:src],
+      "course_id" => course.id,
+      "course_name" => course.name
+    }
+
+    api_url = "#{studio_url}/api/internal/youtube_embed"
+
+    response = CanvasHttp.post(api_url, headers, body: body.to_json, content_type: "application/json")
+
+    if response.is_a?(Net::HTTPSuccess)
+      response_data = JSON.parse(response.body)
+      generate_studio_iframe_html(response_data, embed)
+    else
+      raise "Studio API request failed with status: #{response.code}. Response: #{response.body}"
+    end
+  end
+
+  def generate_studio_iframe_html(studio_response, original_embed = nil)
+    studio_embed_url = studio_response["embed_url"] || studio_response["url"]
+    launch_url = "/courses/#{course.id}/external_tools/retrieve?display=borderless&url=#{CGI.escape(studio_embed_url)}"
+    video_title = studio_response["title"] || "Studio Video"
+
+    width = original_embed&.dig(:width) || "560"
+    height = original_embed&.dig(:height) || "315"
+
+    <<~HTML.strip
+      <iframe class="lti-embed"
+              style="width: #{width}px; height: #{height}px;"
+              title="#{video_title}"
+              src="#{launch_url}"
+              width="#{width}"
+              height="#{height}"
+              allowfullscreen="allowfullscreen"
+              webkitallowfullscreen="webkitallowfullscreen"
+              mozallowfullscreen="mozallowfullscreen"
+              allow="geolocation *; microphone *; camera *; midi *; encrypted-media *; autoplay *; clipboard-write *; display-capture *"
+              data-studio-resizable="false"
+              data-studio-tray-enabled="false"
+              data-studio-convertible-to-link="true">
+      </iframe>
+    HTML
+  end
+
+  def update_resource_content(embed, new_html)
+    resource_type = embed[:resource_type]
+    resource_id = embed[:id]
+    embed[:field]
+
+    case resource_type
+    when "WikiPage"
+      page = course.wiki_pages.find(resource_id)
+      page.body = replace_youtube_embed_in_html(page.body, embed, new_html)
+      page.save!
+    when "Assignment"
+      assignment = course.assignments.find(resource_id)
+      assignment.description = replace_youtube_embed_in_html(assignment.description, embed, new_html)
+      assignment.save!
+    when "DiscussionTopic"
+      topic = course.discussion_topics.find(resource_id)
+      topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
+      topic.save!
+    when "CalendarEvent"
+      event = course.calendar_events.find(resource_id)
+      event.description = replace_youtube_embed_in_html(event.description, embed, new_html)
+      event.save!
+    when "Course"
+      course.syllabus_body = replace_youtube_embed_in_html(course.syllabus_body, embed, new_html)
+      course.save!
+    else
+      raise "Unsupported resource type for conversion: #{resource_type}"
+    end
+  end
+
+  def replace_youtube_embed_in_html(html, embed, new_html)
+    return html if html.blank?
+
+    doc = Nokogiri::HTML::DocumentFragment.parse(html)
+    iframe = find_youtube_iframe_by_src(doc, embed[:src])
+
+    if iframe
+      new_iframe = Nokogiri::HTML::DocumentFragment.parse(new_html).children.first
+      iframe.replace(new_iframe)
+    end
+
+    doc.to_html
+  end
+
+  def find_youtube_iframe_by_src(doc, src)
+    doc.css("iframe").find { |iframe| iframe["src"] == src }
+  end
 
   def add_resource_with_embeds(resources_with_embeds, common_hash, embeds, errors)
     key = YoutubeMigrationService.generate_resource_key(common_hash[:type], common_hash[:id])
