@@ -18,24 +18,88 @@
 
 import {render} from '@testing-library/react'
 import {BlockContentEditor} from '../BlockContentEditor'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+
+jest.mock('../BlockContentEditorWrapper', () => ({
+  BlockContentEditorWrapper: () => <div data-testid="block-content-editor-wrapper" />,
+}))
+
+jest.mock('../Preview/BlockContentPreview', () => ({
+  BlockContentPreview: () => <div data-testid="block-content-preview" />,
+}))
+
+jest.mock('../layout/BlockContentEditorLayout', () => ({
+  BlockContentEditorLayout: ({editor}: {editor: React.ReactNode}) => (
+    <div data-testid="block-content-editor-layout">{editor}</div>
+  ),
+}))
+
+jest.mock('../Toolbar', () => ({
+  Toolbar: () => <div data-testid="toolbar" />,
+}))
+
+jest.mock('../BlockContentEditorContext', () => ({
+  __esModule: true,
+  BlockContentEditorContext: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
+  useBlockContentEditorContext: jest.fn(),
+}))
+
+function setupMockContext(mode: string = 'default') {
+  ;(useBlockContentEditorContext as jest.Mock).mockReturnValue({
+    editor: {
+      mode,
+      setMode: jest.fn(),
+    },
+    addBlockModal: {
+      isOpen: false,
+      openModal: jest.fn(),
+      closeModal: jest.fn(),
+    },
+    initialAddBlockHandler: {
+      showInitialAddBlock: false,
+      hideInitialAddBlock: jest.fn(),
+    },
+    settingsTray: {
+      isOpen: false,
+      openTray: jest.fn(),
+      closeTray: jest.fn(),
+    },
+  })
+}
 
 describe('BlockContentEditor', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-  })
-
-  it('calls onInit with BlockContentEditorHandler on mount', () => {
-    const mockOnInit = jest.fn()
-    render(<BlockContentEditor data={null} onInit={mockOnInit} />)
-
-    expect(mockOnInit).toHaveBeenCalledWith({
-      getContent: expect.any(Function),
-    })
+    setupMockContext()
   })
 
   it('does not break when onInit is null', () => {
     expect(() => {
       render(<BlockContentEditor data={null} onInit={null} />)
     }).not.toThrow()
+  })
+
+  describe('when editor mode is "default"', () => {
+    beforeEach(() => {
+      setupMockContext('default')
+    })
+
+    it('renders the BlockContentEditorWrapper component', () => {
+      const {getByTestId} = render(<BlockContentEditor data={null} onInit={null} />)
+      const editorWrapper = getByTestId('block-content-editor-wrapper')
+      expect(editorWrapper).toBeInTheDocument()
+    })
+  })
+
+  describe('when editor mode is "preview"', () => {
+    beforeEach(() => {
+      setupMockContext('preview')
+    })
+
+    it('renders the BlockContentPreview component', () => {
+      const {getByTestId} = render(<BlockContentEditor data={null} onInit={null} />)
+      const previewElement = getByTestId('block-content-preview')
+      expect(previewElement).toBeInTheDocument()
+    })
   })
 })

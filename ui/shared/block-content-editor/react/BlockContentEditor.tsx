@@ -17,11 +17,32 @@
  */
 
 import {SerializedNodes} from '@craftjs/core'
-import {BlockContentEditorContext} from './BlockContentEditorContext'
+import {BlockContentEditorContext, useBlockContentEditorContext} from './BlockContentEditorContext'
 import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
 import {Toolbar} from './Toolbar'
 import {PageEditorHandler} from './hooks/useBlockContentEditorIntegration'
 import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
+import {BlockContentPreview} from './Preview/BlockContentPreview'
+import {EditorMode} from './hooks/useEditorMode'
+
+const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
+  switch (mode) {
+    case 'default':
+      return <BlockContentEditorWrapper isEditMode={true} {...props} />
+    case 'preview':
+      return <BlockContentPreview />
+    default:
+      throw new Error(`Unsupported editor mode: ${mode}`)
+  }
+}
+
+const BlockContentEditorContent = (props: BlockContentEditorProps) => {
+  const {
+    editor: {mode},
+  } = useBlockContentEditorContext()
+  const editor = getEditorForMode(mode, props)
+  return <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+}
 
 export type BlockContentEditorProps = {
   data: SerializedNodes | null
@@ -29,11 +50,9 @@ export type BlockContentEditorProps = {
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
-  const editor = <BlockContentEditorWrapper isEditMode={true} {...props} />
-
   return (
     <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+      <BlockContentEditorContent {...props} />
     </BlockContentEditorContext>
   )
 }
