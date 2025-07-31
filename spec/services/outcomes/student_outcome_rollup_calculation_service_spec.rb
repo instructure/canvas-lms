@@ -23,6 +23,10 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
   let(:course) { course_model }
   let(:student) { user_model }
 
+  before do
+    course.enroll_student(student, enrollment_state: "active")
+  end
+
   describe ".calculate_for_student" do
     let(:delay_mock) { double("delay") }
 
@@ -56,15 +60,14 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     end
 
     it "calls calculate_for_student for each student in the course" do
-      # Create a list of expected parameters using map
-      expected_params = students.map do |student|
-        { course_id: course.id, student_id: student.id }
-      end
+      # Get all enrolled student IDs to account for any existing enrollments
+      enrolled_student_ids = course.students.pluck(:id)
 
-      # Expect calculate_for_student to be called exactly once for each student
-      expected_params.each do |params|
-        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
-          .with(params).once
+      # Expect calculate_for_student to be called exactly once for each enrolled student
+      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+        .exactly(enrolled_student_ids.count).times do |args|
+        expect(args[:course_id]).to eq(course.id)
+        expect(enrolled_student_ids).to include(args[:student_id])
       end
 
       Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
@@ -97,6 +100,31 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     it "loads the course and student after initialization" do
       expect(subject.course).to eq(course)
       expect(subject.student).to eq(student)
+    end
+
+    it "raises ArgumentError when course_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(#{student.id}\)/)
+    end
+
+    it "raises ArgumentError when student_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when both course_id and student_id are invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when student is not enrolled in the course" do
+      other_student = user_model
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: other_student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(#{other_student.id}\)/)
     end
   end
 
