@@ -628,6 +628,80 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "module publish menu" do
+    context "'Publish module and all items' button" do
+      it "publishes the module and all its items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_publish_with_all_items.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: true, items_published: true)
+        expect(modules_published_icon_state?(published: true, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Publish module only' button" do
+      it "publishes the module but not its items" do
+        prepare_unpublished_modules(@course.context_modules)
+
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_publish.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: true, items_published: false)
+        expect(modules_published_icon_state?(published: true, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Unpublish module and all items' button" do
+      it "unpublishes the module and all its items" do
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_unpublish_with_all_items.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: false, items_published: false)
+        expect(modules_published_icon_state?(published: false, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: false, modules: [@module1])).to be true
+      end
+    end
+
+    context "'Unpublish module only' button" do
+      it "unpublishes the module but not its items" do
+        go_to_modules
+        wait_for_ajaximations
+        module_publish_menu(@module1.id).click
+
+        module_unpublish.click
+
+        wait_for_ajaximations
+
+        verify_publication_state([@module1], module_published: false, items_published: true)
+        expect(modules_published_icon_state?(published: false, modules: [@module1])).to be true
+        expand_all_modules
+        expect(module_items_published_icon_state?(published: true, modules: [@module1])).to be true
+      end
+    end
+  end
+
   context "publish all menu" do
     context "'Publish all modules and items' button" do
       it "publishes all modules and items" do
