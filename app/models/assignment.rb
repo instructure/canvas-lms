@@ -26,6 +26,8 @@ class Assignment < AbstractAssignment
   attr_reader :custom_params
   attr_accessor :question_count
 
+  has_one :peer_review_sub_assignment, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment, dependent: :destroy
+
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
 
@@ -163,6 +165,7 @@ class Assignment < AbstractAssignment
 
   def before_soft_delete
     sub_assignments.destroy_all
+    peer_review_sub_assignment&.destroy
   end
 
   def governs_submittable?
