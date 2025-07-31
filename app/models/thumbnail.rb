@@ -57,16 +57,21 @@ class Thumbnail < ActiveRecord::Base
     self.namespace = attachment.namespace
   end
 
-  def local_storage_path(user: nil, ttl: nil)
+  def local_storage_path(user: nil, ttl: nil, location: nil)
     path = "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}"
-    path = "#{path}/#{uuid}" unless attachment.root_account.feature_enabled?(:file_association_access)
+    if attachment.root_account.feature_enabled?(:file_association_access)
+      path = "#{path}?location=#{location}" if location
+    else
+      path = "#{path}/#{uuid}"
+    end
     path
   end
 
   delegate :bucket, to: :attachment
 
-  def cached_s3_url
-    @cached_s3_url = authenticated_s3_url(expires_in: 144.hours)
+  def cached_s3_url(options: {})
+    opts = options.merge(expires_in: 144.hours)
+    @cached_s3_url = authenticated_s3_url(opts)
   end
 
   before_save :assign_uuid

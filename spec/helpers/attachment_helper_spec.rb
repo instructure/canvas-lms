@@ -76,6 +76,143 @@ describe AttachmentHelper do
     end
   end
 
+  describe "#access_via_location?" do
+    let(:attachment) { @att }
+    let(:user) { @student }
+    let(:access_type) { :read }
+
+    context "when location parameter is not present" do
+      it "returns false" do
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+    end
+
+    context "when location parameter is present but access_type is not :read or :download" do
+      before do
+        allow(self).to receive(:params).and_return({ location: "some_location" })
+      end
+
+      it "returns false for :update access type" do
+        expect(access_via_location?(attachment, user, :update)).to be false
+      end
+
+      it "returns false for :delete access type" do
+        expect(access_via_location?(attachment, user, :delete)).to be false
+      end
+    end
+
+    context "when location parameter is present and access_type is :read" do
+      let(:access_type) { :read }
+
+      context "with avatar_ location" do
+        let(:avatar_user) { user_factory }
+        let(:avatar_user_id) { Shard.short_id_for(avatar_user.global_id) }
+
+        before do
+          allow(self).to receive(:params).and_return({ location: "avatar_#{avatar_user_id}" })
+        end
+
+        it "returns true when user allows avatar access" do
+          allow(User).to receive(:find_by).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when user does not allow avatar access" do
+          allow(User).to receive(:find_by).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+
+        it "returns false when user is not found" do
+          allow(self).to receive(:params).and_return({ location: "avatar_1~999999" })
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+
+        it "handles nil user gracefully" do
+          allow(User).to receive(:find_by).and_return(nil)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+
+      context "with non-avatar location" do
+        let(:location) { "some_other_location" }
+        let(:session) { {} }
+
+        before do
+          allow(self).to receive_messages(params: { location: }, session:)
+        end
+
+        it "returns true when AttachmentAssociation.verify_access returns true" do
+          allow(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when AttachmentAssociation.verify_access returns false" do
+          allow(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+    end
+
+    context "when location parameter is present and access_type is :download" do
+      let(:access_type) { :download }
+
+      context "with avatar_ location" do
+        let(:avatar_user) { user_factory }
+
+        before do
+          allow(self).to receive(:params).and_return({ location: "avatar_#{avatar_user.id}" })
+        end
+
+        it "returns true when user allows avatar access" do
+          allow(User).to receive(:find_by).with(id: avatar_user.id.to_s).and_return(avatar_user)
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+
+        it "returns false when user does not allow avatar access" do
+          allow(avatar_user).to receive(:allow_avatar_access?).with(attachment).and_return(false)
+          expect(access_via_location?(attachment, user, access_type)).to be false
+        end
+      end
+
+      context "with non-avatar location" do
+        let(:location) { "submission_123" }
+        let(:session) { { user_id: user.id } }
+
+        before do
+          allow(self).to receive_messages(params: { location: }, session:)
+        end
+
+        it "delegates to AttachmentAssociation.verify_access with correct parameters" do
+          expect(AttachmentAssociation).to receive(:verify_access)
+            .with(location, attachment, user, session)
+            .and_return(true)
+          expect(access_via_location?(attachment, user, access_type)).to be true
+        end
+      end
+    end
+
+    context "edge cases" do
+      let(:access_type) { :read }
+
+      it "handles avatar location with non-numeric user id" do
+        allow(self).to receive(:params).and_return({ location: "avatar_abc" })
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+
+      it "handles avatar location with empty user id" do
+        allow(self).to receive(:params).and_return({ location: "avatar_" })
+        expect(access_via_location?(attachment, user, access_type)).to be false
+      end
+    end
+  end
+
   describe "#doc_preview_json" do
     subject { doc_preview_json(attachment, locked_for_user:) }
 
