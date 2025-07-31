@@ -190,6 +190,8 @@ export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 
 export const LtiPlacementsWithIcons = [
   LtiPlacements.AssignmentIndexMenu,
+  LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
   LtiPlacements.CourseHomeSubNavigation,
   LtiPlacements.CourseSettingsSubNavigation,
   LtiPlacements.DiscussionTopicIndexMenu,
@@ -203,6 +205,8 @@ export const LtiPlacementsWithIcons = [
 export const LtiPlacementsWithDefaultIcon = [
   LtiPlacements.EditorButton,
   LtiPlacements.TopNavigation,
+  LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
 ] as const
 
 /**
