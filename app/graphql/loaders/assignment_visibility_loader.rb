@@ -20,25 +20,21 @@
 #
 class Loaders::AssignmentVisibilityLoader < GraphQL::Batch::Loader
   def perform(assignment_ids)
-    # 1. Fetch Assignment id and course_id pairs
-    assignment_course_pairs = Assignment.where(id: assignment_ids).pluck(:id, :context_id)
+    assignments_by_course_id = Assignment.where(id: assignment_ids).group_by(&:context_id)
 
-    # 2. Group assignments by course_id
-    assignments_by_course = assignment_course_pairs.group_by(&:last).transform_values do |pairs|
-      pairs.map(&:first)
-    end
+    courses_by_id = Course.where(id: assignments_by_course_id.keys).index_by(&:id)
 
-    # 3. Call visibility calculation for each course and merge results
     data = {}
-    assignments_by_course.each do |course_id, course_assignment_ids|
-      course_visibility_data = AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(
-        course_id:,
-        assignment_ids: course_assignment_ids
+    assignments_by_course_id.each do |course_id, assignments|
+      course = courses_by_id[course_id]
+
+      course_visibility_data = AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(
+        course,
+        assignments
       )
       data.merge!(course_visibility_data)
     end
 
-    # 4. Fulfill each assignment with its visibility data
     assignment_ids.each do |id|
       fulfill(id, data.fetch(id, []))
     end

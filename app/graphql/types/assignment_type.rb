@@ -353,7 +353,9 @@ module Types
     end
     field :muted, Boolean, null: true
 
-    field :assignment_visibility, [ID], null: true
+    field :assignment_visibility, [ID], null: true do
+      description "Returns empty array if visible to everyone"
+    end
     def assignment_visibility
       return unless object.course.grants_any_right?(current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
