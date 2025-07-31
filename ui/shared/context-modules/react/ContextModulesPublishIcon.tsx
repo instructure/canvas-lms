@@ -103,6 +103,7 @@ const ContextModulesPublishIcon = ({
         show={isPublishing ? false : undefined}
         trigger={
           <IconButton
+            data-testid="module-publish-menu"
             withBorder={false}
             screenReaderLabel={I18n.t('%{moduleName} module publish options, %{publishedStatus}', {
               moduleName,
@@ -113,16 +114,16 @@ const ContextModulesPublishIcon = ({
           </IconButton>
         }
       >
-        <MenuItem onClick={publishAll}>
+        <MenuItem data-testid="module-publish-with-all-items" onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module and all items')}
         </MenuItem>
-        <MenuItem onClick={publishModuleOnly}>
+        <MenuItem data-testid="module-publish" onClick={publishModuleOnly}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module only')}
         </MenuItem>
-        <MenuItem onClick={unpublishAll}>
+        <MenuItem data-testid="module-unpublish-with-all-items" onClick={unpublishAll}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module and all items')}
         </MenuItem>
-        <MenuItem onClick={unpublishModuleOnly}>
+        <MenuItem data-testid="module-unpublish" onClick={unpublishModuleOnly}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module only')}
         </MenuItem>
       </Menu>

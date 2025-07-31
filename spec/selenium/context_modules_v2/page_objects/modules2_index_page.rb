@@ -199,6 +199,26 @@ module Modules2IndexPage
     "#{module_header_selector(module_id)} progress"
   end
 
+  def module_publish_menu_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-publish-menu']"
+  end
+
+  def module_publish_with_all_items_selector
+    "[data-testid='module-publish-with-all-items']"
+  end
+
+  def module_publish_selector
+    "[data-testid='module-publish']"
+  end
+
+  def module_unpublish_with_all_items_selector
+    "[data-testid='module-unpublish-with-all-items']"
+  end
+
+  def module_unpublish_selector
+    "[data-testid='module-unpublish']"
+  end
+
   def modules_publish_modal_selector
     "[data-testid='context-modules-publish-modal']"
   end
@@ -529,6 +549,26 @@ module Modules2IndexPage
     f(unpublish_modules_only_selector)
   end
 
+  def module_publish_menu(module_id)
+    f(module_publish_menu_selector(module_id))
+  end
+
+  def module_publish_with_all_items
+    f(module_publish_with_all_items_selector)
+  end
+
+  def module_publish
+    f(module_publish_selector)
+  end
+
+  def module_unpublish_with_all_items
+    f(module_unpublish_with_all_items_selector)
+  end
+
+  def module_unpublish
+    f(module_unpublish_selector)
+  end
+
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
   end
@@ -653,8 +693,8 @@ module Modules2IndexPage
     wait_for_ajaximations
   end
 
-  def modules_published_icon_state?(published: true)
-    @course.context_modules.all? do |context_module|
+  def modules_published_icon_state?(published: true, modules: nil)
+    (modules || @course.context_modules).all? do |context_module|
       if published
         f(context_module_published_icon_selector(context_module.id))
       else
@@ -663,8 +703,8 @@ module Modules2IndexPage
     end
   end
 
-  def module_items_published_icon_state?(published: true)
-    @course.context_modules.all? do |context_module|
+  def module_items_published_icon_state?(published: true, modules: nil)
+    (modules || @course.context_modules).all? do |context_module|
       context_module.content_tags.all? do |content_tag|
         if published
           f(context_module_item_published_icon_selector(content_tag.id))
