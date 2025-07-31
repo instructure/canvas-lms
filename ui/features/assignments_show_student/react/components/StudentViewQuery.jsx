@@ -29,7 +29,6 @@ import {useQuery} from '@apollo/client'
 import React from 'react'
 import {string} from 'prop-types'
 import StudentContent from './StudentContent'
-import {SubmissionProvider} from '../context/SubmissionContext'
 import SubmissionHistoriesQuery from './SubmissionHistoriesQuery'
 import {transformRubricData} from '../helpers/RubricHelpers'
 
@@ -102,11 +101,7 @@ const LoggedInStudentViewQuery = props => {
   const dataWithEnv = JSON.parse(JSON.stringify(data))
   dataWithEnv.assignment.env = getAssignmentEnvVariables()
   dataWithEnv.assignment.rubric = transformRubricData(dataWithEnv.assignment.rubric)
-  return (
-    <SubmissionProvider assignmentId={props.assignmentLid} submissionId={props.submissionID}>
-      <SubmissionHistoriesQuery initialQueryData={dataWithEnv} />
-    </SubmissionProvider>
-  )
+  return <SubmissionHistoriesQuery initialQueryData={dataWithEnv} />
 }
 
 const LoggedOutStudentViewQuery = props => {
