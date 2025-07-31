@@ -223,7 +223,7 @@ export type Assignment = Readonly<{
   original_lti_resource_link_id: null | string
   original_quiz_id: null | string
   peer_reviews: boolean
-  points_possible: number
+  points_possible: number | null
   position: number
   post_to_sis: boolean
   published: boolean

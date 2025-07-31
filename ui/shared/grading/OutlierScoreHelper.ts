@@ -36,10 +36,10 @@ export function isUnusuallyHigh(score, pointsPossible) {
 export default class OutlierScoreHelper {
   score: number | null
 
-  pointsPossible: number
+  pointsPossible: number | null
 
   // @ts-expect-error
-  constructor(score?: number | null, pointsPossible: number) {
+  constructor(score?: number | null, pointsPossible: number | null) {
     // @ts-expect-error
     this.score = score
     this.pointsPossible = pointsPossible
