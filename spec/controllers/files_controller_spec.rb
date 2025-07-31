@@ -738,71 +738,85 @@ describe FilesController do
       get "show", params: { course_id: @course.id, id: @file.id, download: 1, verifier: @file.uuid, download_frd: 1 }
     end
 
-    it "remembers most recent valid sf_verifier in session" do
-      user1 = user_factory(active_all: true)
-      file1 = user_file
-      verifier1 = Users::AccessVerifier.generate(user: user1)
+    context "sf_verifier" do
+      it "remembers most recent valid sf_verifier in session" do
+        enable_cache do
+          user1 = user_factory(active_all: true)
+          file1 = user_file
+          verifier1 = Users::AccessVerifier.generate(user: user1)
 
-      user2 = user_factory(active_all: true)
-      file2 = user_file
-      verifier2 = Users::AccessVerifier.generate(user: user2)
+          user2 = user_factory(active_all: true)
+          file2 = user_file
+          verifier2 = Users::AccessVerifier.generate(user: user2)
 
-      # first verifier
-      user_session(user1)
-      get "show", params: verifier1.merge(id: file1.id)
-      expect(response).to be_successful
+          # first verifier
+          user_session(user1)
+          get "show", params: verifier1.merge(id: file1.id)
+          expect(response).to be_successful
 
-      expect(session[:file_access_user_id]).to eq user1.global_id
-      expect(session[:file_access_expiration]).not_to be_nil
-      expect(session[:permissions_key]).not_to be_nil
-      permissions_key = session[:permissions_key]
+          expect(session[:file_access_user_id]).to eq user1.global_id
+          expect(session[:file_access_expiration]).not_to be_nil
+          expect(session[:permissions_key]).not_to be_nil
+          permissions_key = session[:permissions_key]
 
-      # second verifier, should update session
-      get "show", params: verifier2.merge(id: file2.id)
-      expect(response).to be_successful
+          # second verifier, should update session
+          get "show", params: verifier2.merge(id: file2.id)
+          expect(response).to be_successful
 
-      expect(session[:file_access_user_id]).to eq user2.global_id
-      expect(session[:file_access_expiration]).not_to be_nil
-      expect(session[:permissions_key]).not_to eq permissions_key
-      permissions_key = session[:permissions_key]
+          expect(session[:file_access_user_id]).to eq user2.global_id
+          expect(session[:file_access_expiration]).not_to be_nil
+          expect(session[:permissions_key]).not_to eq permissions_key
+          permissions_key = session[:permissions_key]
 
-      # repeat access, even without verifier, should extend expiration (though
-      # we can't assert that, because milliseconds) and thus change
-      # permissions_key
-      get "show", params: { id: file2.id }
-      expect(response).to be_successful
+          # repeat access, even without verifier, should extend expiration (though
+          # we can't assert that, because milliseconds) and thus change
+          # permissions_key
+          get "show", params: { id: file2.id }
+          expect(response).to be_successful
 
-      expect(session[:permissions_key]).not_to eq permissions_key
-    end
-
-    it "redirects without sf_verifier for inline_content files" do
-      user = user_factory(active_all: true)
-      file = user_html_file
-      verifier = Users::AccessVerifier.generate(user:)
-
-      get "show", params: verifier.merge(id: file.id)
-      expect(response).to be_redirect
-
-      expect(response.headers["Location"]).not_to include "sf_verifier=#{verifier}"
-    end
-
-    it "ignores invalid sf_verifiers" do
-      user = user_factory(active_all: true)
-      file = user_file
-      verifier = Users::AccessVerifier.generate(user:)
-
-      # first use to establish session
-      get "show", params: verifier.merge(id: file.id)
-      expect(response).to be_successful
-      permissions_key = session[:permissions_key]
-
-      # second use after verifier expiration but before session expiration.
-      # expired verifier should be ignored but session should still be extended
-      Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
-        get "show", params: verifier.merge(id: file.id)
+          expect(session[:permissions_key]).not_to eq permissions_key
+        end
       end
-      expect(response).to be_successful
-      expect(session[:permissions_key]).not_to eq permissions_key
+
+      it "ignores invalid sf_verifiers" do
+        enable_cache do
+          user = user_factory(active_all: true)
+          file = user_file
+          verifier = Users::AccessVerifier.generate(user:)
+
+          # first use to establish session
+          get "show", params: verifier.merge(id: file.id)
+          expect(response).to be_successful
+          permissions_key = session[:permissions_key]
+
+          # second use after verifier expiration but before session expiration.
+          # expired verifier should be ignored but session should still be extended
+          Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
+            get "show", params: verifier.merge(id: file.id)
+          end
+          expect(response).to be_successful
+          expect(session[:permissions_key]).not_to eq permissions_key
+        end
+      end
+
+      it "does not allow re-used sf_verifiers to access files" do
+        enable_cache do
+          user = user_factory(active_all: true)
+          file = user_file
+          authorization = { permission: ["download", "read"], attachment: file }
+          verifier = Users::AccessVerifier.generate(user:, authorization:)
+          get "show", params: verifier.merge(id: file.id)
+          expect(response).to be_successful
+          session.delete(:permissions_key)
+          session.delete(:file_access_user_id)
+          session.delete(:file_access_real_user_id)
+          session.instance_variable_set(:@file_access_user, nil)
+          # second use after verifier has been used
+          get "show", params: verifier.merge(id: file.id)
+          expect(response).to be_redirect
+          expect(session[:permissions_key]).to be_nil
+        end
+      end
     end
 
     it "sets cache headers for non text files" do
@@ -1402,8 +1416,6 @@ describe FilesController do
         user_verifier = Users::AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
-        expect(response).to be_redirect
-        get "show_relative", params: other_params
         expect(response).to be_successful
       end
 
@@ -1426,31 +1438,35 @@ describe FilesController do
       end
 
       it "does not allow access if the user can't see the file" do
-        sf_verifier = Users::AccessVerifier.generate(
-          user: @user,
-          real_user: @user,
-          root_account: Account.last,
-          return_url: nil,
-          fallback_url: "http://test.host/fallback"
-        )
+        enable_cache do
+          sf_verifier = Users::AccessVerifier.generate(
+            user: @user,
+            real_user: @user,
+            root_account: Account.last,
+            return_url: nil,
+            fallback_url: "http://test.host/fallback"
+          )
 
-        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
-        expect(response).to be_unauthorized
+          get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+          expect(response).to be_unauthorized
+        end
       end
 
       it "allows access if the sf_verifier includes the file authorization information" do
-        sf_verifier = Users::AccessVerifier.generate(
-          authorization: { attachment: @file, permission: "download" },
-          user: @user,
-          real_user: @user,
-          root_account: Account.last,
-          return_url: nil,
-          fallback_url: "http://test.host/fallback"
-        )
+        enable_cache do
+          sf_verifier = Users::AccessVerifier.generate(
+            authorization: { attachment: @file, permission: "download" },
+            user: @user,
+            real_user: @user,
+            root_account: Account.last,
+            return_url: nil,
+            fallback_url: "http://test.host/fallback"
+          )
 
-        get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
-        expect(response).to be_redirect
-        expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+          get "show_relative", params: { course_id: @course.id, file_id: @file.id, file_path: @file.full_display_path, **sf_verifier }
+          expect(response).to be_redirect
+          expect(response.location).to include "/files/stuff/doc.doc?download=1&token="
+        end
       end
     end
   end

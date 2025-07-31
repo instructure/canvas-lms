@@ -44,60 +44,76 @@ module Users
       end
 
       it "success on an issued verifier" do
-        verifier = Users::AccessVerifier.generate(user:)
-        expect { Users::AccessVerifier.validate(verifier) }.not_to raise_exception
+        enable_cache do
+          verifier = Users::AccessVerifier.generate(user:)
+          expect { Users::AccessVerifier.validate(verifier) }.not_to raise_exception
+        end
       end
 
       it "returns verified user claim on success" do
-        verifier = Users::AccessVerifier.generate(user:)
-        verified = Users::AccessVerifier.validate(verifier)
-        expect(verified).to have_key(:user)
-        expect(verified[:user]).to eql(user)
+        enable_cache do
+          verifier = Users::AccessVerifier.generate(user:)
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:user)
+          expect(verified[:user]).to eql(user)
+        end
       end
 
       it "returns verified real user claim on success" do
-        real_user = user_model
-        verifier = Users::AccessVerifier.generate(user:, real_user:)
-        verified = Users::AccessVerifier.validate(verifier)
-        expect(verified).to have_key(:real_user)
-        expect(verified[:real_user]).to eql(real_user)
+        enable_cache do
+          real_user = user_model
+          verifier = Users::AccessVerifier.generate(user:, real_user:)
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:real_user)
+          expect(verified[:real_user]).to eql(real_user)
+        end
       end
 
       it "returns verified developer key claim on success" do
-        developer_key = DeveloperKey.create!
-        verifier = Users::AccessVerifier.generate(user:, developer_key:)
-        verified = Users::AccessVerifier.validate(verifier)
-        expect(verified).to have_key(:developer_key)
-        expect(verified[:developer_key]).to eql(developer_key)
+        enable_cache do
+          developer_key = DeveloperKey.create!
+          verifier = Users::AccessVerifier.generate(user:, developer_key:)
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:developer_key)
+          expect(verified[:developer_key]).to eql(developer_key)
+        end
       end
 
       it "returns verified root account claim on success" do
-        account = Account.default
-        verifier = Users::AccessVerifier.generate(user:, root_account: account)
-        verified = Users::AccessVerifier.validate(verifier)
-        expect(verified).to have_key(:root_account)
-        expect(verified[:root_account]).to eql(account)
+        enable_cache do
+          account = Account.default
+          verifier = Users::AccessVerifier.generate(user:, root_account: account)
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:root_account)
+          expect(verified[:root_account]).to eql(account)
+        end
       end
 
       it "returns verified oauth host claim on success" do
-        host = "oauth-host"
-        verifier = Users::AccessVerifier.generate(user:, oauth_host: host)
-        verified = Users::AccessVerifier.validate(verifier)
-        expect(verified).to have_key(:oauth_host)
-        expect(verified[:oauth_host]).to eql(host)
+        enable_cache do
+          host = "oauth-host"
+          verifier = Users::AccessVerifier.generate(user:, oauth_host: host)
+          verified = Users::AccessVerifier.validate(verifier)
+          expect(verified).to have_key(:oauth_host)
+          expect(verified[:oauth_host]).to eql(host)
+        end
       end
 
       it "raises InvalidVerifier if too old" do
-        verifier = Users::AccessVerifier.generate(user:)
-        Timecop.freeze(10.minutes.from_now) do
-          expect { Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
+        enable_cache do
+          verifier = Users::AccessVerifier.generate(user:)
+          Timecop.freeze(10.minutes.from_now) do
+            expect { Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
+          end
         end
       end
 
       it "raises InvalidVerifier if tampered with user" do
-        verifier = Users::AccessVerifier.generate(user:)
-        tampered = verifier.merge(sf_verifier: "tampered")
-        expect { Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
+        enable_cache do
+          verifier = Users::AccessVerifier.generate(user:)
+          tampered = verifier.merge(sf_verifier: "tampered")
+          expect { Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
+        end
       end
     end
   end

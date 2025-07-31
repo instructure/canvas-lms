@@ -2549,7 +2549,7 @@ class ApplicationController < ActionController::Base
       # i don't know if we really need this but in case these expired tokens are a client caching issue,
       # let's throw an extra param in the fallback so we hopefully don't infinite loop
       fallback_url += (query.present? ? "&" : "?") + "fallback_ts=#{Time.now.to_i}"
-      authorization ||= { attachment: } if Account.site_admin.feature_enabled?(:safe_files_token)
+      authorization ||= { attachment: }
       opts = generate_access_verifier(return_url:, fallback_url:, authorization:)
       opts[:verifier] = verifier if verifier.present?
 
