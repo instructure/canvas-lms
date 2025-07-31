@@ -1525,4 +1525,11 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "include_masquerade_stylesheets" do
+    it "returns a stylesheet link tag for user_masquerade" do
+      expect(include_masquerade_stylesheets).to include("user_masquerade")
+      expect(include_masquerade_stylesheets).to include("stylesheet")
+    end
+  end
 end

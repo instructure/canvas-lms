@@ -337,6 +337,10 @@ module ApplicationHelper
     stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
+  def include_masquerade_stylesheets
+    stylesheet_link_tag css_url_for(:user_masquerade), media: "all"
+  end
+
   def embedded_chat_quicklaunch_params
     {
       user_id: @current_user.id,

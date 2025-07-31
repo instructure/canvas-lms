@@ -94,6 +94,12 @@ describe CareerController do
           get :show, params: { course_id: @course.id }
           expect(response).to render_template("layouts/bare")
         end
+
+        it "assigns @include_masquerade_layout to true" do
+          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER)
+          get :show, params: { course_id: @course.id }
+          expect(assigns(:include_masquerade_layout)).to be(true)
+        end
       end
 
       context "when ExperienceResolver returns CAREER_LEARNER" do
