@@ -191,19 +191,12 @@ module Lti::IMS
 
       if download_asset.text_entry?
         text_entry = download_asset.submission.body_for_attempt(download_asset.submission_attempt)
-        send_data(
-          text_entry,
-          disposition: "attachment",
-          type: "text/html"
-        )
+        send_data(text_entry, disposition: "attachment", type: "text/html")
       else
         attachment = download_asset&.attachment
         # Set for sf_verifier token generation
         @advantage_token_developer_key = developer_key
-        @attachment_authorization = {
-          attachment:,
-          permission: "download"
-        }
+        @attachment_authorization = { attachment:, permission: "download" }
         render_or_redirect_to_stored_file(attachment:)
       end
     end
