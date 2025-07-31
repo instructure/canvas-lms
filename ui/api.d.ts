@@ -65,7 +65,7 @@ export type Student = Readonly<{
   group_ids: string[]
   id: string
   integration_id: null | string
-  login_id: string
+  login_id: string | null
   short_name: string
   sis_import_id: null | string
   sis_user_id: null | string
