@@ -77,6 +77,7 @@ describe('MessageListActionContainer', () => {
             onReplyAll={jest.fn()}
             onForward={jest.fn()}
             onSelectMailbox={jest.fn()}
+            setCourseNameFilter={jest.fn()}
             {...overrideProps}
           />
         </AlertManagerContext.Provider>
