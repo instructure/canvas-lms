@@ -39,7 +39,7 @@ export const LtiPlacements = {
    */
   AccountNavigation: 'account_navigation',
   /**
-   * Similar to account_navigation, but for allows for better analytics
+   * Similar to account_navigation, but allows for better analytics
    * of what tools use this type of placement.
    */
   AnalyticsHub: 'analytics_hub',
