@@ -944,6 +944,7 @@ export function renderLtiAssetReports(
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
+  const studentId = isAnonymous ? `anonymous:${submission.anonymous_id}` : submission.user_id
   if (
     historicalSubmission.attempt &&
     (historicalSubmission.submission_type === 'online_text_entry' ||
@@ -953,7 +954,7 @@ export function renderLtiAssetReports(
       versionedAttachments: historicalSubmission?.versioned_attachments,
       reports: submission.lti_asset_reports,
       assetProcessors: jsonData.lti_asset_processors,
-      studentId: submission.user_id,
+      studentId,
       attempt: historicalSubmission.attempt.toString(),
       submissionType: historicalSubmission.submission_type,
     }
