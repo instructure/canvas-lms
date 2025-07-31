@@ -159,7 +159,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:annotation_context] = annotation_context_id
       end
       attachment.submit_to_canvadocs(1, **opts) unless attachment.canvadoc_available?
-      attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission.id) if submission
+      attachment.canvadoc.canvadocs_submissions.find_or_create_by(submission_id: submission) if submission
 
       url = attachment.canvadoc.session_url(opts.merge(user_session_params))
       # For the purposes of reporting student viewership, we only

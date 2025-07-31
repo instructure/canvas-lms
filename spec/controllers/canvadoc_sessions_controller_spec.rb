@@ -235,6 +235,31 @@ describe CanvadocSessionsController do
       expect(@attachment1.canvadoc.canvadocs_submissions.where(submission_id: @submission)).to exist
     end
 
+    describe "cross-shard" do
+      specs_require_sharding
+
+      it "creates a CanvadocsSubmission for a cross-shard Canvadoc if needed" do
+        xstudent = nil
+        xatt = nil
+        @shard1.activate do
+          xstudent = user_factory(active_all: true)
+          student_in_course(active_all: true, user: xstudent, course: @course)
+          xatt = attachment_model(content_type: "application/pdf", user: xstudent)
+          xatt.create_canvadoc!
+        end
+        sub = @assignment.submission_for_student(xstudent)
+
+        blob = {
+          attachment_id: xatt.global_id,
+          user_id: @teacher.global_id,
+          submission_id: sub.id,
+          type: "canvadoc"
+        }
+        get :show, params: { blob: blob.to_json, hmac: Canvas::Security.hmac_sha1(blob.to_json) }
+        expect(xatt.canvadoc.canvadocs_submissions.where(submission_id: sub.global_id)).to exist
+      end
+    end
+
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
       expect_any_instance_of(Attachment).not_to receive(:submit_to_canvadocs)
