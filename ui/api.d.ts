@@ -425,7 +425,7 @@ export type Submission = Readonly<{
   entered_score: null | number
   grade_matches_current_submission: boolean
   gradeLocked: boolean
-  grading_period_id: string
+  grading_period_id: string | null
   grading_type: GradingType
   has_originality_report: boolean
   has_postable_comments: boolean
@@ -449,7 +449,6 @@ export type Submission = Readonly<{
   sub_assignment_submissions?: SubAssignmentSubmission[]
 }> & {
   assignedAssessments?: AssignedAssessments[]
-  attempt?: number
   excused: boolean
   external_tool_url?: string
   grade: string | null
