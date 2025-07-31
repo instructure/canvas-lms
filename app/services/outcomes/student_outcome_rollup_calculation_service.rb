@@ -62,8 +62,10 @@ module Outcomes
     # @param student_id [Integer] the student_id for whom to calculate rollups
     def initialize(course_id:, student_id:)
       super()
-      @course  = Course.find(course_id)
-      @student = User.find(student_id)
+      @course = Course.find(course_id)
+      @student = @course.students.find(student_id)
+    rescue ActiveRecord::RecordNotFound => e
+      raise ArgumentError, "Invalid course_id (#{course_id}) or student_id (#{student_id}): #{e.message}"
     end
 
     # Runs the full calculation and returns student outcome rollups.
@@ -139,18 +141,13 @@ module Outcomes
       outcomes = course.linked_learning_outcomes
       return [] if outcomes.blank?
 
-      begin
-        os_results_json = find_outcomes_service_outcome_results(
-          users: [student],
-          context: course,
-          outcomes:,
-          assignments: new_quiz_assignments
-        )
-        return [] if os_results_json.blank?
-      rescue => e
-        Rails.logger.error("Failed to fetch outcomes service results: #{e.message}")
-        raise e
-      end
+      os_results_json = find_outcomes_service_outcome_results(
+        users: [student],
+        context: course,
+        outcomes:,
+        assignments: new_quiz_assignments
+      )
+      return [] if os_results_json.blank?
 
       handle_outcomes_service_results(
         os_results_json,
