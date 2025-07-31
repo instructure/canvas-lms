@@ -1675,7 +1675,7 @@ class FilesController < ApplicationController
       end
     end
 
-    thumb_opts = params.slice(:size)
+    thumb_opts = params.slice(:size, :location)
     thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
     url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
@@ -1694,7 +1694,9 @@ class FilesController < ApplicationController
 
       raise ActiveRecord::RecordNotFound unless thumbnail
 
-      return render_unauthorized_action unless authorized_action(thumbnail, @current_user, :download)
+      attachment = thumbnail.attachment
+
+      return render_unauthorized_action unless access_allowed(attachment:, user: @current_user, access_type: :download)
 
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
     end

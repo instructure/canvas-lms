@@ -182,8 +182,14 @@ module AttachmentHelper
   end
 
   def access_via_location?(attachment, user, access_type)
-    if params[:location] && [:read, :download].include?(access_type)
-      return AttachmentAssociation.verify_access(params[:location], attachment, user, session)
+    location = params[:location]
+    if location && [:read, :download].include?(access_type)
+      if location.start_with?("avatar_")
+        avatar_user = User.find_by(id: location.split("_").last)
+        return avatar_user&.allow_avatar_access?(attachment) || false
+      else
+        return AttachmentAssociation.verify_access(location, attachment, user, session)
+      end
     end
 
     false

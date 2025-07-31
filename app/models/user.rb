@@ -1713,13 +1713,56 @@ class User < ActiveRecord::Base
     avatar_setting ||= "enabled"
     fallback = use_fallback ? self.class.avatar_fallback_url(fallback, request) : nil
     if avatar_setting == "enabled" || (avatar_setting == "enabled_pending" && avatar_approved?) || (avatar_setting == "sis_only")
-      @avatar_url ||= avatar_image_url
+      @avatar_url ||= avatar_location(avatar_image_url)
     end
     @avatar_url ||= fallback if avatar_image_source == "no_pic"
     if (avatar_setting == "enabled") && (avatar_image_source == "gravatar")
       @avatar_url ||= gravatar_url(size, fallback, request)
     end
     @avatar_url ||= fallback
+  end
+
+  def avatar_location(image_url)
+    url = image_url
+    if associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) } &&
+       %w[attachment external].include?(avatar_image_source)
+      uri = URI.parse(image_url)
+      attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+      if attachment_id
+        params = URI.decode_www_form(uri.query || "")
+        params << ["location", "avatar_#{id}"]
+        uri.query = URI.encode_www_form(params)
+        url = uri.to_s
+      end
+    end
+    url
+  end
+
+  # returns the attachment id specified in the path, or nil if there is no match
+  def get_attachment_id_from_known_avatar_paths(uri_path)
+    md = %r{/images/thumbnails/(\d+(?:~\d+)?)$}.match(uri_path)
+    md ||= %r{/files/(\d+(?:~\d+)?)/download$}.match(uri_path)
+    Shard.integral_id_for(md[1]) if md
+  end
+  private :get_attachment_id_from_known_avatar_paths
+
+  def allow_avatar_access?(attachment)
+    return false unless attachment
+    return false unless %w[attachment external].include?(avatar_image_source)
+
+    avatar_attachment == attachment && avatar_attachment.grants_any_right?(self, :read, :download)
+  end
+
+  # Returns the Attachment record for the file in user's avatar, or nil if the user does not have an avatar. It does no
+  # permission checking, it just goes and finds the attachment.
+  def avatar_attachment
+    return nil unless %w[attachment external].include?(avatar_image_source) && avatar_image_url
+
+    uri = URI.parse(avatar_image_url)
+    attachment_id = get_attachment_id_from_known_avatar_paths(uri.path)
+    return nil unless attachment_id
+
+    Attachment.find_by(id: attachment_id)
   end
 
   def avatar_path
