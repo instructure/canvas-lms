@@ -25,7 +25,7 @@ const I18n = createI18nScope('gradebook')
 type SecondaryDetailLineProps = {
   assignment: {
     anonymizeStudents: boolean
-    pointsPossible?: number
+    pointsPossible?: number | null
     published: boolean
     postManually?: boolean
   }
