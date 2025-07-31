@@ -623,6 +623,68 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     end
   end
 
+  describe "instrumentation metrics" do
+    subject { Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: student.id) }
+
+    let(:course) { course_model }
+    let(:student) { user_model }
+    let(:outcome) { outcome_model(context: course) }
+    let(:assignment) { assignment_model(context: course) }
+    let(:alignment) { outcome.align(assignment, course) }
+
+    before do
+      outcome.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome.calculation_method = "highest"
+      outcome.save!
+    end
+
+    it "records all metrics on successful execution" do
+      LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3,
+        possible: 5
+      )
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
+    end
+
+    it "records metrics on error" do
+      allow(subject).to receive(:fetch_canvas_results).and_raise(StandardError, "Database error")
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      expect { subject.call }.to raise_error(StandardError, "Database error")
+    end
+
+    it "records metrics for empty results" do
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
+    end
+  end
+
   describe "edge cases" do
     subject { Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: student.id) }
 
