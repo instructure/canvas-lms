@@ -32,11 +32,13 @@ const I18n = createI18nScope('canvascareer')
 ready(() => {
   const body = document.querySelector('body')
   const mountPoint = document.createElement('div')
+  const fixed_bottom = document.querySelector('#fixed_bottom')
 
   mountPoint.id = 'canvascareer'
   mountPoint.style.height = '100vh'
-  mountPoint.style.width = '100vw'
+  mountPoint.style.width = '100%'
   mountPoint.style.position = 'relative'
+  mountPoint.style.paddingBottom = fixed_bottom ? `${fixed_bottom.offsetHeight - 5}px` : '0'
 
   // Modifying the DOM to add the mount point
   body.prepend(mountPoint)
