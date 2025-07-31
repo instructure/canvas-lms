@@ -21,7 +21,6 @@ import {MockedProvider} from '@apollo/client/testing'
 import {render, fireEvent} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import StudentContent from '../StudentContent'
-import {withSubmissionContext} from '../../test-utils/submission-context'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import store from '../stores'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
@@ -99,10 +98,7 @@ describe('Assignment Student Content View', () => {
 
       return render(
         <MockedProvider>
-          {withSubmissionContext(<StudentContent {...props} />, {
-            assignmentId: '1',
-            submissionId: '1',
-          })}
+          <StudentContent {...props} />
         </MockedProvider>,
       )
     }
