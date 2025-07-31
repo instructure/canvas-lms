@@ -705,16 +705,17 @@ class FilesController < ApplicationController
         return
       end
 
+      @access_allowed = []
+      @attachment_authorization ||= {}
+      @attachment_authorization[:attachment] = @attachment
+      @attachment_authorization[:permission] = @access_allowed
       if access_allowed(attachment: @attachment, user: @current_user, access_type: :read)
+        @access_allowed << :read
         @attachment.ensure_media_object
 
         if params[:download]
-          if access_allowed(
-            attachment: @attachment,
-            user: @current_user,
-            access_type: :download,
-            no_error_on_failure: true
-          )
+          if access_allowed(attachment: @attachment, user: @current_user, access_type: :download, no_error_on_failure: true)
+            @access_allowed << :download
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)
@@ -784,12 +785,9 @@ class FilesController < ApplicationController
 
         json[:attachment][:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
 
-        if access_allowed(
-          attachment: @attachment,
-          user: @current_user,
-          access_type: :download,
-          no_error_on_failure: true
-        )
+        if access_allowed(attachment: @attachment, user: @current_user, access_type: :download, no_error_on_failure: true)
+          @access_allowed ||= []
+          @access_allowed << :download
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
           # some form.

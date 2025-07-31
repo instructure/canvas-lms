@@ -89,8 +89,10 @@ module Users
         root_account:,
         oauth_host: claims[:oauth_host],
         return_url: claims[:return_url],
-        fallback_url: claims[:fallback_url]
-      }
+        fallback_url: claims[:fallback_url],
+        attachment_id: claims[:attachment_id],
+        permission: claims[:permission],
+      }.with_indifferent_access
     rescue Canvas::Security::InvalidToken
       raise InvalidVerifier
     end
