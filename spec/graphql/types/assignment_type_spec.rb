@@ -41,8 +41,8 @@ describe Types::AssignmentType do
   let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
   let(:assignment_visibility) do
-    AssignmentVisibility::AssignmentVisibilityService.users_with_visibility_by_assignment(
-      course_id: course.id, user_ids: [student.id], assignment_ids: [assignment.id]
+    AssignmentVisibility::AssignmentVisibilityService.assignments_with_user_visibilities(
+      course, [assignment]
     )[assignment.id].map(&:to_s)
   end
 
