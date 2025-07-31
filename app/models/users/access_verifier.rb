@@ -26,6 +26,9 @@ module Users
     class InvalidVerifier < RuntimeError
     end
 
+    class JtiReused < RuntimeError
+    end
+
     def self.generate(claims)
       return {} unless claims[:user]
 
@@ -45,6 +48,8 @@ module Users
       jwt_claims.merge!(claims.slice(:oauth_host, :return_url, :fallback_url))
 
       expires = TTL_MINUTES.minutes.from_now
+      jwt_claims[:jti] = SecureRandom.uuid if Account.site_admin.feature_enabled?(:safe_files_jti)
+      Rails.cache.write("sf_verifier:#{jwt_claims[:jti]}", true, expires_at: expires)
       key = nil # use default key
       { sf_verifier: Canvas::Security.create_jwt(jwt_claims, expires, key, :HS512) }
     end
@@ -53,6 +58,7 @@ module Users
       return {} if fields[:sf_verifier].blank?
 
       claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
+      raise JtiReused if claims[:jti].present? && !Rails.cache.delete("sf_verifier:#{claims[:jti]}")
 
       if claims[:attachment_id].present?
         attachment_id = fields[:attachment_id] || fields[:file_id] || fields[:id]
