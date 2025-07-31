@@ -26,6 +26,7 @@ import {Prettify} from './utilities/Prettify'
 import {BlockContentEditorProps} from './BlockContentEditor'
 import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
 import {BlockContentEditorHandlerIntegration} from './BlockContentEditorHandlerIntegration'
+import {ButtonBlock} from './Blocks/ButtonBlock'
 
 export type BlockContentEditorWrapperProps = Prettify<
   Omit<BlockContentEditorProps, 'mode'> & {
@@ -38,6 +39,7 @@ export const BlockContentEditorWrapper = (props: BlockContentEditorWrapperProps)
     TextBlock,
     ImageBlock,
     SeparatorLineBlock,
+    ButtonBlock,
   }
 
   return (

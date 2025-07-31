@@ -21,6 +21,7 @@ import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
+import {ButtonBlock} from '../Blocks/ButtonBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -30,6 +31,7 @@ export const blockFactory = {
   [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
+  [ButtonBlock.name]: () => <ButtonBlock settings={{}} />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -54,5 +56,9 @@ export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Divider'),
     items: [{itemName: SeparatorLineBlock.craft.displayName, id: SeparatorLineBlock.name}],
+  },
+  {
+    groupName: I18n.t('Interactive element'),
+    items: [{itemName: ButtonBlock.craft.displayName, id: ButtonBlock.name}],
   },
 ]
