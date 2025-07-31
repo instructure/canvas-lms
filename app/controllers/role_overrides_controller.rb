@@ -217,6 +217,174 @@ class RoleOverridesController < ApplicationController
     end
   end
 
+  # @API Get permissions matrix
+  # Returns the complete permissions matrix data for an account, including all roles and their permissions.
+  # This endpoint provides the data needed to render the permissions management interface.
+  #
+  # @argument account_id [Required, String]
+  #   The id of the account to retrieve permissions for.
+  #
+  # @argument include_inactive [Boolean]
+  #   If true, includes inactive roles in the response.
+  #
+  # @argument show_inherited [Boolean]
+  #   If true, includes roles inherited from parent accounts.
+  #
+  # @returns [Object]
+  #   Returns an object containing:
+  #   - roles: Array of role objects with their permissions
+  #   - permissions: Array of permission groups with their permissions
+  #   - context: Account context information
+  def permissions_matrix
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      include_inactive = value_to_boolean(params[:include_inactive])
+      show_inherited = value_to_boolean(params[:show_inherited])
+
+      # Get account roles
+      account_roles = show_inherited ? @context.available_account_roles(include_inactive) : @context.available_account_roles(include_inactive)
+      preloaded_account_overrides = RoleOverride.preload_overrides(@context, account_roles)
+      account_role_data = account_roles.map do |role|
+        role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_account_overrides)
+      end
+
+      # Get course roles
+      course_roles = show_inherited ? @context.available_course_roles(include_inactive) : @context.available_course_roles(include_inactive)
+      preloaded_course_overrides = RoleOverride.preload_overrides(@context, course_roles)
+      course_role_data = course_roles.map do |role|
+        role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_course_overrides)
+      end
+
+      # Get permissions data
+      account_permissions_data = account_permissions(@context)
+      course_permissions_data = course_permissions(@context)
+
+      # Create permissions matrix data
+      matrix_data = {
+        roles: {
+          account_roles: account_role_data,
+          course_roles: course_role_data
+        },
+        permissions: {
+          account_permissions: account_permissions_data,
+          course_permissions: course_permissions_data
+        },
+        context: {
+          account_id: @context.id,
+          account_name: @context.name,
+          is_site_admin: @context.site_admin?,
+          account_enable_alerts: @context.settings[:enable_alerts]
+        },
+        meta: {
+          include_inactive: include_inactive,
+          show_inherited: show_inherited,
+          generated_at: Time.current.iso8601
+        }
+      }
+
+      render json: matrix_data
+    end
+  end
+
+  # @API Get permissions matrix table
+  # Returns the permissions matrix data in a flattened table format suitable for rendering
+  # the permissions management interface as a table/grid.
+  #
+  # @argument account_id [Required, String]
+  #   The id of the account to retrieve permissions for.
+  #
+  # @argument include_inactive [Boolean]
+  #   If true, includes inactive roles in the response.
+  #
+  # @argument show_inherited [Boolean]
+  #   If true, includes roles inherited from parent accounts.
+  #
+  # @returns [Object]
+  #   Returns an object containing:
+  #   - roles: Array of role objects
+  #   - permissions: Array of permission objects with role permissions matrix
+  #   - context: Account context information
+  def permissions_matrix_table
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      include_inactive = value_to_boolean(params[:include_inactive])
+      show_inherited = value_to_boolean(params[:show_inherited])
+
+      # Get all roles
+      account_roles = show_inherited ? @context.available_account_roles(include_inactive) : @context.available_account_roles(include_inactive)
+      course_roles = show_inherited ? @context.available_course_roles(include_inactive) : @context.available_course_roles(include_inactive)
+      all_roles = account_roles + course_roles
+      
+      preloaded_overrides = RoleOverride.preload_overrides(@context, all_roles)
+      
+      # Create roles data
+      roles_data = all_roles.map do |role|
+        {
+          id: role.id,
+          name: role.name,
+          label: role.label,
+          base_role_type: role.base_role_type,
+          workflow_state: role.workflow_state,
+          is_account_role: role.account_role?,
+          context_type: role.account_role? ? 'Account' : 'Course'
+        }
+      end
+
+      # Get all permissions
+      all_permissions = []
+      RoleOverride.manageable_permissions(@context).each do |permission_name, permission_config|
+        permission_data = {
+          permission_name: permission_name,
+          label: permission_config.key?(:label_v2) ? permission_config[:label_v2].call : permission_config[:label].call,
+          group: permission_config[:group],
+          group_label: permission_config[:group_label]&.call,
+          available_to: permission_config[:available_to],
+          account_only: permission_config[:account_only]
+        }
+        all_permissions << permission_data
+      end
+
+      # Create permissions matrix
+      permissions_matrix = all_permissions.map do |permission|
+        role_permissions = {}
+        
+        all_roles.each do |role|
+          perm = RoleOverride.permission_for(@context, permission[:permission_name], role, @context, true, preloaded_overrides: preloaded_overrides)
+          role_permissions[role.id] = {
+            enabled: !!perm[:enabled],
+            locked: perm[:locked] || false,
+            readonly: perm[:readonly] || false,
+            explicit: perm[:explicit] || false,
+            applies_to_self: perm[:enabled]&.include?(:self) || false,
+            applies_to_descendants: perm[:enabled]&.include?(:descendants) || false
+          }
+        end
+
+        {
+          permission: permission,
+          role_permissions: role_permissions
+        }
+      end
+
+      # Create table data
+      table_data = {
+        roles: roles_data,
+        permissions: permissions_matrix,
+        context: {
+          account_id: @context.id,
+          account_name: @context.name,
+          is_site_admin: @context.site_admin?,
+          account_enable_alerts: @context.settings[:enable_alerts]
+        },
+        meta: {
+          include_inactive: include_inactive,
+          show_inherited: show_inherited,
+          generated_at: Time.current.iso8601
+        }
+      }
+
+      render json: table_data
+    end
+  end
+
   include Api::V1::Role
 
   # @API Create a new role

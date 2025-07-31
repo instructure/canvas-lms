@@ -1821,6 +1821,8 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/roles/:id", action: :update
       delete "accounts/:account_id/roles/:id", action: :remove_role
       get "accounts/:account_id/permissions/:permission", action: :check_account_permission
+      get "accounts/:account_id/permissions_matrix", action: :permissions_matrix, as: "account_permissions_matrix"
+      get "accounts/:account_id/permissions_matrix_table", action: :permissions_matrix_table, as: "account_permissions_matrix_table"
     end
 
     scope(controller: :account_reports) do
