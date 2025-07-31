@@ -146,9 +146,19 @@ export const DiscussionThreadContainer = props => {
 
   useEffect(() => {
     if (props.discussionEntry._id === props.highlightEntryId) {
+      window.postMessage({
+        subject: 'SG.handleHighlightedEntryChange',
+        entryTimestamp: props.discussionEntry.createdAt,
+        payload: {
+          highlightedEntryId: props.discussionEntry._id,
+        },
+      })
       window.top.postMessage({
         subject: 'SG.handleHighlightedEntryChange',
         entryTimestamp: props.discussionEntry.createdAt,
+        payload: {
+          highlightedEntryId: props.discussionEntry._id,
+        },
       })
     }
   }, [props.highlightEntryId])
