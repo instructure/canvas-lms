@@ -9,7 +9,7 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   fi
 
   # when modifying Dockerfile, Dockerfile.jenkins, or Dockerfile.production, Dockerfile.template must also be modified.
-  ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
+  ruby build/dockerfile_writer.rb --env development --compose-file inst-cli/docker-compose/docker-compose.local.dev.yml --in build/Dockerfile.template --out Dockerfile
   ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
   ruby build/dockerfile_writer.rb --env production --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.production
   if ! git diff --exit-code Dockerfile; then
