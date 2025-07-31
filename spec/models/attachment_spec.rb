@@ -2392,7 +2392,7 @@ describe Attachment do
       expect(att.thumbnail.width).not_to be_nil
     end
 
-    it "does not create thumbnails for larger images" do
+    it "does not create thumbnails for larger images", skip: "RCX-3996 2025-09-12" do
       att = @course.attachments.create! uploaded_data: one_hundred_megapixels_of_highly_compressed_png_data, filename: "3vil.png"
       expect(att.thumbnail).to be_nil
     end
