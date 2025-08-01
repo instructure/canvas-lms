@@ -1102,8 +1102,8 @@ describe "Common Cartridge exporting" do
         doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
         expect(doc).to be_present
 
-        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_present
-        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_present
       end
 
       context "selectively exporting the tool" do
@@ -1119,10 +1119,10 @@ describe "Common Cartridge exporting" do
           doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
           expect(doc).to be_present
 
-          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")
+          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")
           expect(first_tool).to be_present
           expect(first_tool.at_css("deployment_migration_id").text).to eq mig_id(tool)
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_nil
         end
       end
 
@@ -1150,8 +1150,8 @@ describe "Common Cartridge exporting" do
           doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
           expect(doc).to be_present
 
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_nil
-          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.primary_context_control)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.primary_context_control)}]")).to be_nil
           tool_node = doc.at_css("lti_context_control[identifier=#{mig_id(account_level_tool.context_controls.find_by(course:))}]")
           expect(tool_node).to be_present
           expect(tool_node.at_css("deployment_migration_id")).to be_nil

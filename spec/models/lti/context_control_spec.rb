@@ -380,7 +380,7 @@ describe Lti::ContextControl do
 
   describe ".deployment_ids_for_context" do
     let(:tool) { deployment }
-    let(:root_control) { tool.context_controls.first }
+    let(:root_control) { tool.primary_context_control }
     let(:delete_controls) { false }
 
     before { tool }
@@ -581,7 +581,7 @@ describe Lti::ContextControl do
   describe ".nearest_control_for_registration" do
     let(:subaccount) { root_account.sub_accounts.create! }
     let(:course) { course_model(account: subaccount) }
-    let(:root_account_control) { tool.context_controls.first }
+    let(:root_account_control) { tool.primary_context_control }
     let(:tool) { deployment }
     let(:delete_controls) { false }
 
