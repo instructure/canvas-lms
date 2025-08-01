@@ -48,7 +48,7 @@ import {
   ModuleItemMasterCourseRestrictionType,
 } from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
-import {mapContentSelection} from '../utils/utils'
+import {mapContentSelection, mapContentTypeForSharing} from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
 import EditItemModal from './EditItemModal'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -292,7 +292,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
             sourceCourseId={courseId}
             courseId={courseId}
             contentShare={{
-              content_type: content?.type?.toLowerCase() || '',
+              content_type: mapContentTypeForSharing(content?.type || ''),
               content_id: content?._id,
             }}
             onDismiss={() => {

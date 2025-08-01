@@ -126,6 +126,18 @@ export const mapContentSelection = (id: string, contentType: string) => {
   return {modules: [id]}
 }
 
+export const mapContentTypeForSharing = (contentType: string): string => {
+  const lowerType = contentType.toLowerCase()
+
+  const typeMap: Record<string, string> = {
+    discussion: 'discussion_topic',
+    file: 'attachment',
+    page: 'wiki_page',
+  }
+
+  return typeMap[lowerType] || lowerType
+}
+
 export const validateModuleStudentRenderRequirements = (prevProps: any, nextProps: any) => {
   return (
     prevProps.id === nextProps.id &&
