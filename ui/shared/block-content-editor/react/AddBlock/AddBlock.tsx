@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlock = () => {
   const {addBlockModal, initialAddBlockHandler} = useBlockContentEditorContext()

@@ -24,7 +24,7 @@ import {Modal} from '@instructure/ui-modal'
 import {AddBlockModalBody} from './AddBlockModalBody'
 import {ReactElement, useState} from 'react'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlockModal = (props: {
   open: boolean

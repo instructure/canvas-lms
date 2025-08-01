@@ -22,7 +22,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import {PreviewMode} from './usePreviewMode'
 import {BlockContentPreviewSelectorBarIcon} from './BlockContentPreviewSelectorBarIcon'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const BlockContentPreviewSelectorBar = (props: {
   activeTab: PreviewMode

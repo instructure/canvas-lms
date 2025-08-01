@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconEyeLine} from '@instructure/ui-icons'
 import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 const PreviewButton = (props: {
   active: boolean
