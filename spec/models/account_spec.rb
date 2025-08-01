@@ -3289,4 +3289,65 @@ describe Account do
       end
     end
   end
+
+  describe "denormalize_horizon_account_if_changed" do
+    let(:root_account) { Account.create! }
+    let(:sub_account) { Account.create!(parent_account: root_account) }
+
+    it "does nothing when settings haven't changed" do
+      expect(root_account).not_to receive(:save!)
+      sub_account.denormalize_horizon_account_if_changed
+    end
+
+    it "does nothing when horizon_account settings haven't changed" do
+      sub_account.settings = { horizon_account: { value: true, locked: true } }
+      sub_account.save!
+
+      sub_account.settings[:unrelated_setting] = "updated"
+
+      expect(root_account).not_to receive(:save!)
+      sub_account.denormalize_horizon_account_if_changed
+    end
+
+    it "adds account id to horizon_account_ids when enabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).to include(sub_account.id)
+      expect(sub_account.reload.settings[:horizon_account][:locked]).to be true
+    end
+
+    it "removes account id from horizon_account_ids when disabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).to include(sub_account.id)
+
+      sub_account.horizon_account = false
+      sub_account.save!
+
+      expect(root_account.reload.settings[:horizon_account_ids]).not_to include(sub_account.id)
+      expect(sub_account.reload.settings[:horizon_account][:locked]).to be false
+    end
+
+    it "sets horizon_course to false on associated courses when disabled" do
+      sub_account.horizon_account = true
+      sub_account.save!
+
+      course = Course.create!(account: sub_account)
+      course.update!(horizon_course: true)
+
+      sub_account.horizon_account = false
+      sub_account.save!
+
+      expect(course.reload.horizon_course).to be false
+    end
+
+    it "doesn't save root_account if this is the root account" do
+      root_account.horizon_account = true
+
+      expect(root_account).not_to receive(:save!)
+      root_account.denormalize_horizon_account_if_changed
+    end
+  end
 end

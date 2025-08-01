@@ -322,6 +322,7 @@ class AccountsController < ApplicationController
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
   EPORTFOLIO_MODERATION_PER_PAGE = 100
+  HORIZON_MAX_ACCOUNTS = 100
 
   # @API List accounts
   # A paginated list of accounts that the current user can view or manage.
@@ -1051,7 +1052,14 @@ class AccountsController < ApplicationController
             K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font))
 
             enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
-            @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
+            unless enable_horizon.nil?
+              existing_account_ids = @account.root_account.settings[:horizon_account_ids] || []
+              if value_to_boolean(enable_horizon) && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
+                @account.errors.add(:horizon_account, t("You cannot enable horizon_account on more than %{max_accounts} accounts", max_accounts: HORIZON_MAX_ACCOUNTS))
+              else
+                @account.horizon_account = value_to_boolean(enable_horizon)
+              end
+            end
 
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
