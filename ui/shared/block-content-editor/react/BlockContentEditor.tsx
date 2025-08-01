@@ -20,10 +20,10 @@ import {SerializedNodes} from '@craftjs/core'
 import {BlockContentEditorContext, useBlockContentEditorContext} from './BlockContentEditorContext'
 import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
 import {Toolbar} from './Toolbar'
-import {PageEditorHandler} from './hooks/useBlockContentEditorIntegration'
 import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
 import {BlockContentPreview} from './Preview/BlockContentPreview'
 import {EditorMode} from './hooks/useEditorMode'
+import {BlockContentEditorHandler} from './BlockContentEditorHandlerIntegration'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
@@ -46,7 +46,7 @@ const BlockContentEditorContent = (props: BlockContentEditorProps) => {
 
 export type BlockContentEditorProps = {
   data: SerializedNodes | null
-  onInit: ((handler: PageEditorHandler) => void) | null
+  onInit: ((handler: BlockContentEditorHandler) => void) | null
 }
 
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
