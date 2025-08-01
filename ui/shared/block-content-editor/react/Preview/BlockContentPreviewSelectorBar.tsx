@@ -32,6 +32,7 @@ export const BlockContentPreviewSelectorBar = (props: {
     <BlockContentPreviewSelectorBarIcon
       svgPath="/images/block-content-editor/preview_mode_desktop_menu_icon.svg"
       title={I18n.t('Desktop')}
+      selected={props.activeTab === 'desktop'}
     />
   )
 
@@ -39,6 +40,7 @@ export const BlockContentPreviewSelectorBar = (props: {
     <BlockContentPreviewSelectorBarIcon
       svgPath="/images/block-content-editor/preview_mode_tablet_menu_icon.svg"
       title={I18n.t('Tablet')}
+      selected={props.activeTab === 'tablet'}
     />
   )
 
@@ -46,6 +48,7 @@ export const BlockContentPreviewSelectorBar = (props: {
     <BlockContentPreviewSelectorBarIcon
       svgPath="/images/block-content-editor/preview_mode_mobile_menu_icon.svg"
       title={I18n.t('Mobile')}
+      selected={props.activeTab === 'mobile'}
     />
   )
 

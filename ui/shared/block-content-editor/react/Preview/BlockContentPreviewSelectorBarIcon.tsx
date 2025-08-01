@@ -18,16 +18,55 @@
 
 import SVGWrapper from '@canvas/svg-wrapper'
 import {Flex} from '@instructure/ui-flex'
-import React from 'react'
+import React, {Component} from 'react'
+import {withStyle, WithStyleProps} from '@instructure/emotion'
+import type {Theme} from '@instructure/ui-themes'
+import {Text} from '@instructure/ui-text'
 
-export const BlockContentPreviewSelectorBarIcon = (props: {
+type BarIconStyleProps = {
+  selectedColor: string
+  secondaryColor: string
+}
+
+type BarIconOwnProps = {
   svgPath: React.ReactNode
   title: string
-}) => {
-  return (
-    <Flex direction="column" alignItems="center" gap="xxx-small">
-      <SVGWrapper fillColor="black" url={props.svgPath} />
-      <span>{props.title}</span>
-    </Flex>
-  )
+  selected: boolean
 }
+
+export type BarIconProps = BarIconOwnProps & WithStyleProps<BarIconStyleProps, BarIconStyleProps>
+
+class BarIcon extends Component<BarIconProps> {
+  componentDidMount() {
+    this.props.makeStyles!()
+  }
+
+  render() {
+    const {selectedColor, secondaryColor} = this.props.styles!
+    return (
+      <Flex direction="column" alignItems="center" gap="xxx-small">
+        <SVGWrapper
+          fillColor={this.props.selected ? selectedColor : secondaryColor}
+          url={this.props.svgPath}
+        />
+        <Text color={this.props.selected ? 'brand' : 'primary'}>{this.props.title}</Text>
+      </Flex>
+    )
+  }
+}
+
+const generateStyles = (componentTheme: BarIconStyleProps) =>
+  ({
+    ...componentTheme,
+  }) as BarIconStyleProps
+
+const generateComponentTheme = (theme: Theme) =>
+  ({
+    selectedColor: theme['ic-brand-primary']!,
+    secondaryColor: theme['ic-brand-font-color-dark']!,
+  }) as BarIconStyleProps
+
+export const BlockContentPreviewSelectorBarIcon = withStyle(
+  generateStyles,
+  generateComponentTheme,
+)(BarIcon) as React.ComponentType<BarIconProps>
