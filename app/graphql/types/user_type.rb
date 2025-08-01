@@ -569,14 +569,19 @@ module Types
       argument :query, String, <<~MD, required: false
         Only include comments that match the query string.
       MD
+      argument :assignment_id, ID, required: false
+      argument :course_id, ID, required: false
       argument :limit, Integer, required: false
     end
-    def comment_bank_items_connection(query: nil, limit: nil)
+    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil, limit: nil)
       return unless object == current_user
 
       comments = current_user.comment_bank_items.shard(object)
 
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
+      comments = comments.where(course_id:) if course_id.present?
+      comments = comments.where(assignment_id:) if assignment_id.present?
+
       # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
       # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
       # and use the 'first' argument on the connection instead of 'limit'.
