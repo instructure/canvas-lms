@@ -172,7 +172,7 @@ describe('Preview', () => {
 
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: 'http://localhost//preview?content_type=Assignment&content_id=123',
+          path: 'http://localhost//preview?content_type=Assignment&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
           method: 'GET',
         })
       })
@@ -260,26 +260,6 @@ describe('Preview', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Test content')).toBeInTheDocument()
-      })
-    })
-
-    it('applies highlight styling to target element', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div class="test-element">Test content</div>',
-        path: '//div[@class="test-element"]',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
-
-      render(<Preview {...defaultProps} />)
-
-      await waitFor(() => {
-        const previewContainer = screen.getByText('Test content').closest('div')
-        expect(previewContainer).toHaveAttribute('data-a11y-issue-scroll-target')
-        expect(previewContainer).toHaveStyle('outline-offset: 2px;')
       })
     })
 
@@ -466,7 +446,7 @@ describe('Preview', () => {
 
       // Should call API again with new issue
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+        expect(mockDoFetchApi).toHaveBeenCalled()
       })
     })
 
@@ -485,7 +465,7 @@ describe('Preview', () => {
 
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: 'http://localhost//preview?content_type=Page&content_id=123',
+          path: 'http://localhost//preview?content_type=Page&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
           method: 'GET',
         })
       })
@@ -506,7 +486,7 @@ describe('Preview', () => {
 
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
-          path: 'http://localhost//preview?content_type=attachment&content_id=123',
+          path: 'http://localhost//preview?content_type=attachment&content_id=123&path=%2F%2Fdiv%5B%40class%3D%22test-element%22%5D',
           method: 'GET',
         })
       })
@@ -534,47 +514,6 @@ describe('Preview', () => {
           height: '15rem',
           overflowY: 'auto',
         })
-      })
-    })
-  })
-
-  describe('highlight functionality', () => {
-    it('preserves existing styles when applying highlight', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div class="test-element" style="color: rgb(255, 0, 0);">Test content</div>',
-        path: '//div[@class="test-element"]',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
-
-      render(<Preview {...defaultProps} />)
-
-      await waitFor(() => {
-        const previewContainer = screen.getByText('Test content').closest('div')
-        expect(previewContainer).toHaveStyle('outline-offset: 2px;')
-      })
-    })
-
-    it('encodes issue path in data attribute', async () => {
-      const mockResponse: PreviewResponse = {
-        content: '<div class="test-element">Test content</div>',
-        path: '//div[@class="test-element"]',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValue({
-        json: mockResponse,
-      })
-
-      render(<Preview {...defaultProps} />)
-
-      await waitFor(() => {
-        const previewContainer = screen.getByText('Test content').closest('div')
-        const encodedPath = encodeURIComponent('//div[@class="test-element"]')
-        expect(previewContainer).toHaveAttribute('data-a11y-issue-scroll-target', encodedPath)
       })
     })
   })

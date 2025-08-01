@@ -43,9 +43,15 @@ module Accessibility
         end
       end
 
-      def preview_fix
+      def preview_fix(element_only: false)
         html_content = resource.send(target_attribute)
-        fixed_content, fixed_path, error = fix_content(html_content, rule, path, value)
+
+        if element_only
+          fixed_content, fixed_path, error = fix_content_element(html_content, rule, path, value)
+        else
+          fixed_content, fixed_path, error = fix_content(html_content, rule, path, value)
+        end
+
         if error.nil?
           { json: { content: fixed_content, path: fixed_path }, status: :ok }
         else
@@ -81,21 +87,26 @@ module Accessibility
       private
 
       def fix_content(html_content, rule, path, fix_value)
+        fix_content_base(html_content, rule, path, fix_value, full_document: true)
+      end
+
+      def fix_content_element(html_content, rule, path, fix_value)
+        fix_content_base(html_content, rule, path, fix_value, full_document: false)
+      end
+
+      def fix_content_base(html_content, rule, path, fix_value, full_document:)
         doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
         extend_nokogiri_with_dom_adapter(doc)
 
         begin
           element = doc.at_xpath(path)
-          if element
-            changed = rule.fix!(element, fix_value)
-            error = nil
-            unless changed.nil?
-              error = rule.test(changed)
-            end
-            [doc.to_html, element_path(element), error]
-          else
-            raise "Element not found for path: #{path}"
-          end
+          raise "Element not found for path: #{path}" unless element
+
+          changed = rule.fix!(element, fix_value)
+          error = changed.nil? ? nil : rule.test(changed)
+
+          content = full_document ? doc.to_html : changed.to_html
+          [content, element_path(changed), error]
         rescue => e
           Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.class.id})"
           Rails.logger.error e.backtrace.join("\n")

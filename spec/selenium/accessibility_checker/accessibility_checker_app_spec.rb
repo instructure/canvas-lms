@@ -237,11 +237,12 @@ describe "Accessibility Checker App UI", skip: "temporarily skipping due to flak
           color_picker_form_input.send_keys(:control, "a")
           color_picker_form_input.send_keys(new_color[:hex])
           apply_button.click
-          expect(issue_preview("> p > span").css_value("color")).to eq(new_color[:rgba])
+
+          expect(issue_preview(" span").css_value("color")).to eq(new_color[:rgba])
           undo_button.click
-          expect(issue_preview("> p > span").css_value("color")).to eq(base_color[:rgba])
+          expect(issue_preview(" span").css_value("color")).to eq(base_color[:rgba])
           apply_button.click
-          expect(issue_preview("> p > span").css_value("color")).to eq(new_color[:rgba])
+          expect(issue_preview(" span").css_value("color")).to eq(new_color[:rgba])
           save_button.click
           expect(wiki_page.reload.body).to include "color: ##{new_color[:hex]}"
         end

@@ -77,42 +77,6 @@ const PreviewOverlay = ({isLoading, error}: PreviewOverlayProps) => {
   return null
 }
 
-const applyHighlight = (previewResponse: PreviewResponse | null, issue: AccessibilityIssue) => {
-  if (!previewResponse) return ''
-
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(previewResponse.content, 'text/html')
-
-  try {
-    const target = doc.evaluate(
-      previewResponse.path || issue.path || '',
-      doc.body,
-      null,
-      XPathResult.FIRST_ORDERED_NODE_TYPE,
-      null,
-    ).singleNodeValue
-
-    if (target instanceof Element) {
-      const newStyle = `${target.getAttribute('style') || ''}; ${SELECTOR_STYLE}`
-      target.setAttribute('style', newStyle)
-      target.setAttribute(A11Y_ISSUE_ATTR_NAME, encodeURIComponent(issue.path))
-      setTimeout(() => {
-        document
-          .querySelector(`[${A11Y_ISSUE_ATTR_NAME}="${encodeURIComponent(issue.path)}"]`)
-          ?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest',
-          })
-      }, 0)
-    }
-  } catch (err) {
-    console.log('Failed to evaluate XPath:', previewResponse.path, err)
-  }
-
-  return doc.body.innerHTML
-}
-
 const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = forwardRef<
   PreviewHandle,
   PreviewProps
@@ -158,6 +122,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
       const params = new URLSearchParams({
         content_type: getAsContentItemType(itemType)!,
         content_id: String(resourceId),
+        ...(issue.path && {path: issue.path}),
       })
 
       await handleApiRequest(
@@ -171,7 +136,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         onError,
       )
     },
-    [handleApiRequest, resourceId, itemType],
+    [handleApiRequest, resourceId, itemType, issue.path],
   )
 
   const performPostRequest = useCallback(
@@ -206,7 +171,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   useEffect(() => {
     performGetRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceId])
+  }, [resourceId, issue.id])
 
   return (
     <View as="div" position="relative" id="a11y-issue-preview-container">
@@ -218,7 +183,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         height="15rem"
         overflowY="auto"
         padding="x-small x-small x-small x-small"
-        dangerouslySetInnerHTML={{__html: applyHighlight(contentResponse, issue)}}
+        dangerouslySetInnerHTML={{__html: contentResponse?.content || ''}}
       />
     </View>
   )
