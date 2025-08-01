@@ -5495,6 +5495,7 @@ hu:
       update_assignment_points: "Feladat pontjainak módosítása az értékelőtáblához illeszkedően? "
   change_section_to_sectionname_6e947e90: "Szekció módosítása erre: %{sectionName}"
   change_sis_ids_3a47154d: "SIS ID-k megváltoztatása"
+  change_text_color_1aecb912: "Módosítsa a szöveg színét"
   change_to_b757d327: "módosítás erre:"
   change_visibility_of_account_calendars_fd03fbb8: "A fióknaptárak láthatóságának módosítása"
   changed_item_1d16a85f: "Módosított elem"
@@ -13035,6 +13036,7 @@ hu:
   info_8f47054a: Infó
   info_panel_displayed_51d481cc: "Infopanel megjelenítve"
   info_panel_hidden_bf7c3b7b: "Infopanel elrejtve"
+  information_7f11072: Információ
   information_816d9fa5: információ
   information_icon_8a514faa: Információikon
   inherit_content_security_policy_94aff861: "Tartalombiztonsági házirend öröklése"
