@@ -22,6 +22,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {mapContentTypeForSharing} from './utils'
 import type {ItemType, IconType} from '@canvas/context-modules/differentiated-modules/react/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
@@ -59,8 +60,9 @@ export const getItemType = (contentType?: string): ItemType => {
 
   if (type.includes('assignment')) return 'assignment'
   if (type.includes('quiz')) return 'quiz'
-  if (type.includes('discussion')) return 'discussion_topic'
-  if (type.includes('wiki') || type.includes('page')) return 'wiki_page'
+  if (type.includes('discussion')) return mapContentTypeForSharing('discussion') as ItemType
+  if (type.includes('wiki') || type.includes('page'))
+    return mapContentTypeForSharing('page') as ItemType
 
   return 'wiki_page'
 }
