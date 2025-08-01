@@ -57,6 +57,7 @@ export const ZInternalBaseLaunchSettings = z.object({
   use_tray: z.boolean().optional().nullable(),
   eula: z
     .object({
+      enabled: z.boolean(),
       target_link_uri: z.string().optional(),
       custom_fields: z.record(z.string()).optional(),
     })
