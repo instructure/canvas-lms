@@ -38,18 +38,39 @@ jest.mock('@instructure/canvas-theme', () => ({
 }))
 
 describe('HighlightBlock', () => {
+  const defaultSettings = {
+    displayIcon: 'warning',
+  }
+
   it('should render with Highlight title', () => {
-    renderBlock(HighlightBlock, {content: 'Test content'})
+    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
     const title = screen.getByText('Highlight')
 
     expect(title).toBeInTheDocument()
   })
 
   it('should render the content', () => {
-    renderBlock(HighlightBlock, {content: 'Test highlight content'})
+    renderBlock(HighlightBlock, {content: 'Test highlight content', settings: defaultSettings})
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toBeInTheDocument()
     expect(highlightBlock).toHaveTextContent('Test highlight content')
+  })
+
+  it('should display the icon by default', () => {
+    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    const icon = screen.getByTestId('highlight-icon')
+
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('should not display the icon when displayIcon is false', () => {
+    renderBlock(HighlightBlock, {
+      content: 'Test content',
+      settings: {...defaultSettings, displayIcon: null},
+    })
+    const icon = screen.queryByTestId('highlight-icon')
+
+    expect(icon).not.toBeInTheDocument()
   })
 })

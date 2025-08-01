@@ -16,10 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useNode} from '@craftjs/core'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {type HighlightBlockProps} from './HighlightBlock'
+import {Checkbox} from '@instructure/ui-checkbox'
 
-const HighlightBlockSettings = () => {
-  return <p>Highlight Block Settings</p>
+const I18n = createI18nScope('block_content_editor')
+
+export const HighlightBlockSettings = () => {
+  const {
+    actions: {setProp},
+    settings,
+  } = useNode(node => ({
+    settings: node.data.props.settings,
+  }))
+
+  return (
+    <View as="div">
+      <Checkbox
+        label={I18n.t('Display icon')}
+        variant="toggle"
+        checked={settings.displayIcon === 'warning'}
+        onChange={e =>
+          setProp((props: HighlightBlockProps) => {
+            props.settings.displayIcon = e.target.checked ? 'warning' : null
+          })
+        }
+      />
+    </View>
+  )
 }
-
-export {HighlightBlockSettings}
