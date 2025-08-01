@@ -214,7 +214,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     })
 
     const props = {
-      userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit,
+      userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit ?? false,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS?.usage_rights_required,
       fileName: content?.displayName,
     }
