@@ -157,7 +157,7 @@ describe Lti::ContextControlsController, type: :request do
 
     context "with deployments" do
       let(:deployment) { registration.deployments.first }
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
       let(:course) { course_model(account:) }
       let(:subaccount) { account_model(parent_account: account) }
       let(:course_deployment) { deployment_for(course) }
@@ -335,7 +335,7 @@ describe Lti::ContextControlsController, type: :request do
     subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/#{control.id}" }
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
 
     it "is successful" do
       subject
@@ -898,7 +898,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:control) { deployment.primary_context_control }
     let(:params) { { available: false } }
     # control_id and registration_id are specified here so that it's easy to create
     # an id variable for a control or registration that doesn't exist.
@@ -972,7 +972,7 @@ describe Lti::ContextControlsController, type: :request do
     end
 
     context "with the deployment's primary control" do
-      let(:control) { deployment.context_controls.first }
+      let(:control) { deployment.primary_context_control }
 
       it "returns a 422" do
         subject

@@ -225,7 +225,7 @@ describe Lti::ToolFinder do
       end
 
       it "raises RecordNotFound if there is an unavailable context control for the account" do
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect { Lti::ToolFinder.from_id!(deployment.id, @root_account) }.to raise_error(ActiveRecord::RecordNotFound)
       end
@@ -266,7 +266,7 @@ describe Lti::ToolFinder do
       it "is unaffected by context controls if the lti_registrations_next flag is off" do
         @root_account.disable_feature!(:lti_registrations_next)
 
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect(Lti::ToolFinder.from_id!(deployment.id, @root_account)).to eq(deployment)
         expect(Lti::ToolFinder.from_id!(deployment.id, @account)).to eq(deployment)
@@ -356,7 +356,7 @@ describe Lti::ToolFinder do
       end
 
       it "returns nil if there is an unavailable context control for the account" do
-        deployment.context_controls.first.update(available: false)
+        deployment.primary_context_control.update(available: false)
 
         expect(Lti::ToolFinder.from_id(deployment.id, @root_account)).to be_nil
       end
@@ -490,7 +490,7 @@ describe Lti::ToolFinder do
         end
 
         it "finds the tool with an unavailable CC" do
-          lti_1_3_tool.context_controls.first.update!(available: false)
+          lti_1_3_tool.primary_context_control.update!(available: false)
           expect(subject).to eq(lti_1_3_tool)
         end
       end
@@ -502,7 +502,7 @@ describe Lti::ToolFinder do
 
         context "and the LTI 1.3 tool is unavailable" do
           before do
-            lti_1_3_tool.context_controls.first.update!(available: false)
+            lti_1_3_tool.primary_context_control.update!(available: false)
           end
 
           it { is_expected.to eq tool }
@@ -518,7 +518,7 @@ describe Lti::ToolFinder do
 
           context "and the original LTI 1.3 tool is unavailable" do
             before do
-              lti_1_3_tool.context_controls.first.update!(available: false)
+              lti_1_3_tool.primary_context_control.update!(available: false)
             end
 
             it "returns the duplicate tool instead" do
