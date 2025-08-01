@@ -16,31 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useRef} from 'react'
-import {QueryMethods, SerializedNodes} from '@craftjs/core'
+import {QueryMethods, SerializedNodes, useEditor} from '@craftjs/core'
 import {QueryCallbacksFor} from '@craftjs/utils'
+import {useEffect, useRef} from 'react'
 
-export interface PageEditorHandler {
+export interface BlockContentEditorHandler {
   getContent: () => {
     blocks: SerializedNodes
   }
 }
 
-export const useBlockContentEditorIntegration = (
-  onInit: ((handler: PageEditorHandler) => void) | null,
-) => {
+export const BlockContentEditorHandlerIntegration = (props: {
+  onInit: ((handler: BlockContentEditorHandler) => void) | null
+}) => {
+  const {query} = useEditor()
+
   const queryRef = useRef<QueryCallbacksFor<typeof QueryMethods> | null>(null)
+  queryRef.current = query
 
   useEffect(() => {
-    const handler: PageEditorHandler = {
+    const handler: BlockContentEditorHandler = {
       getContent: () => ({
         blocks: queryRef.current ? JSON.parse(queryRef.current.serialize()) : null,
       }),
     }
-    onInit?.(handler)
-  }, [onInit])
+    props.onInit?.(handler)
+  }, [props.onInit])
 
-  return useCallback((query: QueryCallbacksFor<typeof QueryMethods>) => {
-    queryRef.current = query
-  }, [])
+  return null
 }
