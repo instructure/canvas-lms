@@ -497,3 +497,10 @@ grading_assistance_file_uploads:
   display_name: Grading Assistance File Uploads
   description: Enables support for uploading files as part of the AI-assisted grading tool in the Modernized Speedgrader.
   shadow: true
+comment_bank_per_assignment:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Filter Comment Bank Items by Assignment
+  description: |
+      Allows the comment bank items in the modernized speedgrader to be limited to the current assignment and course
+      being graded.

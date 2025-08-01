@@ -7713,6 +7713,22 @@ describe Assignment do
               singleton: "refresh_content_participation_counts:#{@assignment.context.global_id}")
       @assignment.destroy
     end
+
+    it "destroys associated comment bank items" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      user = User.create!(name: "Test User")
+      @course.enroll_teacher(user)
+      comment_bank_item = CommentBankItem.create!(
+        course: @course,
+        user:,
+        assignment:,
+        comment: "Test comment"
+      )
+
+      expect(comment_bank_item.reload.workflow_state).to eq "active"
+      assignment.destroy
+      expect(comment_bank_item.reload.workflow_state).to eq "deleted"
+    end
   end
 
   describe "#too_many_qs_versions" do
@@ -8454,6 +8470,24 @@ describe Assignment do
               singleton: "refresh_content_participation_counts:#{assignment.context.global_id}")
         .once
       assignment.restore
+    end
+
+    it "restores associated comment bank items" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      user = User.create!(name: "Test User")
+      @course.enroll_teacher(user)
+      comment_bank_item = CommentBankItem.create!(
+        course: @course,
+        user:,
+        assignment:,
+        comment: "Test comment"
+      )
+
+      assignment.destroy
+      expect(comment_bank_item.reload.workflow_state).to eq "deleted"
+
+      assignment.restore
+      expect(comment_bank_item.reload.workflow_state).to eq "active"
     end
   end
 

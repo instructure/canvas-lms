@@ -93,6 +93,7 @@ ready(() => {
         discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
         multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
         ltiAssetProcessor: window.ENV.FEATURES.lti_asset_processor ?? false,
+        commentBankPerAssignmentEnabled: window.ENV.COMMENT_BANK_PER_ASSIGNMENT_ENABLED ?? false,
       },
     }
   }

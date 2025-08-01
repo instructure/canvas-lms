@@ -1096,6 +1096,7 @@ class GradebooksController < ApplicationController
         DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
         MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled,
         gradebook_section_filter_id: multiselect_filters_enabled ? gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids") : gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id"),
+        COMMENT_BANK_PER_ASSIGNMENT_ENABLED: Account.site_admin.feature_enabled?(:comment_bank_per_assignment),
       }
       js_env(env)
 
