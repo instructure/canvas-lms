@@ -1734,6 +1734,30 @@ describe AssignmentsApiController, type: :request do
       expect(uri.path).to eq "/api/v1/courses/#{@course.id}/external_tools/sessionless_launch"
       expect(uri.query).to include("assignment_id=")
     end
+
+    it "does not generate N+1 queries in assignment_context_modules" do
+      # Create assignments that would trigger the assignment_context_modules method
+      assignments = []
+      3.times do |i|
+        assignments << @course.assignments.create!(title: "Assignment #{i}")
+      end
+
+      # Track N+1 queries to the association tables that were causing the issue
+      n1_query_count = 0
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        if /FROM\s+["`]?(quizzes|discussion_topics|wiki_pages)["`]?\s+WHERE.*assignment_id.*LIMIT\s+1/i.match?(payload[:sql])
+          n1_query_count += 1
+        end
+      end
+
+      # Make the API call that would trigger assignment_context_modules
+      api_get_assignments_index_from_course(@course)
+
+      # Verify no N+1 queries occurred
+      expect(n1_query_count).to eq(0)
+
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
