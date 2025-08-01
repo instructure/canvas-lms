@@ -27,6 +27,7 @@ export interface Checkpoint {
   dueAt?: string
   name?: string
   tag?: string
+  assignmentOverrides?: AssignmentOverrideGraphQLResult
 }
 
 export interface StandardizedDateHash {
