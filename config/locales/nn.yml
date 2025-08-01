@@ -6057,6 +6057,7 @@ nn:
       update_assignment_points: "Vil du endre oppgåvepoeng slik at dei samsvarer med vurderingsskjemaet?"
   change_section_to_sectionname_6e947e90: "Endre seksjon til %{sectionName}"
   change_sis_ids_3a47154d: "Endre SIS-ID-ar"
+  change_text_color_1aecb912: "Endre tekstfarge"
   change_to_b757d327: "endre til"
   change_visibility_of_account_calendars_fd03fbb8: "Endre synlegheit av kontokalendrar"
   changed_item_1d16a85f: "Endra element"
