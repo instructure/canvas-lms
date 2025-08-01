@@ -257,6 +257,7 @@ describe CanvadocSessionsController do
         }
         get :show, params: { blob: blob.to_json, hmac: Canvas::Security.hmac_sha1(blob.to_json) }
         expect(xatt.canvadoc.canvadocs_submissions.where(submission_id: sub.global_id)).to exist
+        expect(xatt.canvadoc.submissions).to include sub
       end
     end
 
