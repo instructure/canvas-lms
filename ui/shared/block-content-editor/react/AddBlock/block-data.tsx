@@ -22,7 +22,7 @@ import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 type BlockFactory = {[key: string]: () => ReactElement}
 

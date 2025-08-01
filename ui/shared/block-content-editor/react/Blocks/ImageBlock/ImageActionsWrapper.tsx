@@ -21,7 +21,7 @@ import {PropsWithChildren} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconUploadLine} from '@instructure/ui-icons'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const ImageActionsWrapper = (
   props: PropsWithChildren<{

@@ -23,7 +23,7 @@ import {uid} from '@instructure/uid'
 import {TextInput} from '@instructure/ui-text-input'
 import {type TextBlockProps} from './TextBlock'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const TextBlockEdit = (
   props: TextBlockProps & {

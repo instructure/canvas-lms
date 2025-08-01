@@ -27,7 +27,7 @@ import {ImageBlockAddButton} from './ImageBlockAddButton'
 import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 import {ImageBlockSettings} from './ImageBlockSettings'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 const ImageBlockContent = (props: ImageBlockProps) => {
   const renderMode = useGetRenderMode()

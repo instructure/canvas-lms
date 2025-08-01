@@ -32,7 +32,7 @@ export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
   return <View as="hr" data-testid="separator-line" borderWidth={borderWidth} />
 }
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
