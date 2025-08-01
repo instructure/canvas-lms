@@ -2812,6 +2812,85 @@ describe Course do
         @course.disable_feature!(:accessibility_tab_enable)
       end
 
+      describe "TAB_YOUTUBE_MIGRATION" do
+        before do
+          @course.root_account.enable_feature!(:youtube_migration)
+          # Create Studio integration external tool
+          @course.root_account.context_external_tools.create!(
+            name: "Studio",
+            domain: "arc.instructure.com",
+            consumer_key: "key",
+            shared_secret: "secret"
+          )
+        end
+
+        after do
+          @course.root_account.disable_feature!(:youtube_migration)
+        end
+
+        it "includes YouTube migration tab when feature flag is enabled and user has permissions" do
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).not_to be_nil
+          expect(youtube_tab[:label]).to eq("YouTube Migration")
+          expect(youtube_tab[:css_class]).to eq("youtube_migration")
+          expect(youtube_tab[:href]).to eq(:course_youtube_migration_path)
+        end
+
+        it "positions YouTube migration tab before Settings tab" do
+          tabs = @course.tabs_available(@user)
+          settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+          youtube_tab_index = tabs.pluck(:id).index(Course::TAB_YOUTUBE_MIGRATION)
+
+          expect(youtube_tab_index).not_to be_nil
+          expect(settings_tab_index).not_to be_nil
+          expect(youtube_tab_index).to eq(settings_tab_index - 1)
+        end
+
+        it "does not include YouTube migration tab when feature flag is disabled" do
+          @course.root_account.disable_feature!(:youtube_migration)
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).to be_nil
+        end
+
+        it "does not include YouTube migration tab when user lacks permissions" do
+          # Remove manage course content permissions from teacher role
+          @course.account.role_overrides.create!(
+            role: teacher_role,
+            permission: "manage_course_content_add",
+            enabled: false
+          )
+          @course.account.role_overrides.create!(
+            role: teacher_role,
+            permission: "manage_course_content_edit",
+            enabled: false
+          )
+          @course.account.role_overrides.create!(
+            role: teacher_role,
+            permission: "manage_course_content_delete",
+            enabled: false
+          )
+
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).to be_nil
+        end
+
+        it "does not include YouTube migration tab when Studio integration is not available" do
+          # Remove the Studio external tool
+          @course.root_account.context_external_tools.where(domain: "arc.instructure.com").destroy_all
+
+          tabs = @course.tabs_available(@user)
+          youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
+
+          expect(youtube_tab).to be_nil
+        end
+      end
+
       it "defaults tab configuration to an empty array" do
         course = Course.new
         expect(course.tab_configuration).to eq []
@@ -3208,6 +3287,21 @@ describe Course do
           @course.save!
           tabs = @course.tabs_available(@user).pluck(:id)
           expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
+      end
+
+      describe "TAB_YOUTUBE_MIGRATION" do
+        it "is not included for students even when feature flag is enabled and Studio integration exists" do
+          @course.root_account.enable_feature!(:youtube_migration)
+          @course.root_account.context_external_tools.create!(
+            name: "Studio",
+            domain: "arc.instructure.com",
+            consumer_key: "key",
+            shared_secret: "secret"
+          )
+
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_YOUTUBE_MIGRATION)
         end
       end
 
