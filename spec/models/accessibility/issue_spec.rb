@@ -276,7 +276,7 @@ describe Accessibility::Issue do
         )
         expect(response).to eq(
           {
-            json: { content: "<div><h2>Page Title</h2></div>", path: "./div/h2" },
+            json: { content: "<h2>Page Title</h2>", path: "./div/h2" },
             status: :ok
           }
         )
@@ -297,7 +297,7 @@ describe Accessibility::Issue do
         )
         expect(response).to eq(
           {
-            json: { content: "<div><h2>Assignment Title</h2></div>", path: "./div/h2" },
+            json: { content: "<h2>Assignment Title</h2>", path: "./div/h2" },
             status: :ok
           }
         )

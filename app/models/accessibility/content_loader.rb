@@ -37,5 +37,19 @@ module Accessibility
       end
       { json: { error: "Resource '#{@type}' with id '#{@id}' was not found." }, status: :not_found }
     end
+
+    def extract_element_from_content(path)
+      full_content = content
+      return full_content unless full_content[:status] == :ok && path
+
+      doc = Nokogiri::HTML5.fragment(full_content[:json][:content])
+      element = doc.at_xpath(path)
+
+      if element
+        { json: { content: element.to_html }, status: :ok }
+      else
+        { json: { error: "Element not found" }, status: :not_found }
+      end
+    end
   end
 end
