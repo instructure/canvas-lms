@@ -54,10 +54,10 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
+    # NOTE: submissions may be cross-shard, so we can't filter via join here
     canvadocs_submissions
-      .where.associated(:submission)
       .preload(submission: :assignment)
-      .map(&:submission)
+      .filter_map(&:submission)
   end
 
   def document_id
