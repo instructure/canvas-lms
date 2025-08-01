@@ -307,6 +307,7 @@ export type SiteAdminFeatureId =
   | 'files_a11y_rewrite_toggle'
   | 'files_a11y_rewrite'
   | 'youtube_migration'
+  | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
