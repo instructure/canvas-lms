@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {arrayOf, bool, func, object, shape, string} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
@@ -44,6 +44,8 @@ export default function UsersListRow({
   roles,
   includeDeletedUsers,
 }) {
+  const [openModal, setOpenModal] = useState(false)
+
   let userLink = `/accounts/${accountId}/users/${user.id}`
   if (includeDeletedUsers && !user.login_id)
     userLink += `?include_deleted_users=${includeDeletedUsers}`
@@ -103,18 +105,14 @@ export default function UsersListRow({
           </Tooltip>
         )}
         {permissions.can_edit_users && (
-          <CreateOrUpdateUserModal
-            createOrUpdate="update"
-            url={`/accounts/${accountId}/users/${user.id}`}
-            user={user}
-            afterSave={handleSubmitEditUserForm}
-          >
+          <>
             <span>
               <Tooltip
                 data-testid="user-list-row-tooltip"
                 renderTip={I18n.t('Edit %{name}', {name: user.name})}
               >
                 <IconButton
+                  onClick={() => setOpenModal(true)}
                   withBorder={false}
                   withBackground={false}
                   size="small"
@@ -124,7 +122,15 @@ export default function UsersListRow({
                 </IconButton>
               </Tooltip>
             </span>
-          </CreateOrUpdateUserModal>
+            <CreateOrUpdateUserModal
+              open={openModal}
+              onClose={() => setOpenModal(false)}
+              createOrUpdate="update"
+              url={`/accounts/${accountId}/users/${user.id}`}
+              user={user}
+              afterSave={handleSubmitEditUserForm}
+            />
+          </>
         )}
         {permissions.can_create_dsr && (
           <CreateDSRModal accountId={accountId} user={user} afterSave={handleSubmitEditUserForm}>
@@ -154,7 +160,13 @@ export default function UsersListRow({
 
 UsersListRow.propTypes = {
   accountId: string.isRequired,
-  user: CreateOrUpdateUserModal.propTypes.user.isRequired,
+  user: shape({
+    name: string.isRequired,
+    sortable_name: string,
+    short_name: string,
+    email: string,
+    time_zone: string,
+  }).isRequired,
   handleSubmitEditUserForm: func.isRequired,
   permissions: object.isRequired,
   roles: arrayOf(
