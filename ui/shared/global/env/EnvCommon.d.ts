@@ -307,6 +307,7 @@ export type SiteAdminFeatureId =
   | 'files_a11y_rewrite_toggle'
   | 'files_a11y_rewrite'
   | 'youtube_migration'
+  | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
   | 'standardize_assignment_date_formatting'
 /**
