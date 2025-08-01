@@ -29,6 +29,7 @@ module CanvasCareer
       @career_subaccount = @root_account.sub_accounts.create!
       @career_subaccount.horizon_account = true
       @career_subaccount.save!
+      @root_account.reload
 
       @course_academic = course_model(account: @root_account)
       @course_career = course_model(account: @career_subaccount)
@@ -154,6 +155,12 @@ module CanvasCareer
           expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
         end
 
+        it "returns CAREER_LEARNER if no enrollments but career is enabled on the root account" do
+          @root_account.horizon_account = true
+          @root_account.save!
+          expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNER
+        end
+
         context "as a learner" do
           it "returns ACADEMIC when user is enrolled in only academic courses" do
             @course_academic.enroll_student(@user, enrollment_state: "active")
@@ -185,6 +192,14 @@ module CanvasCareer
             allow(@config).to receive(:learner_app_launch_url).and_return(nil)
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
           end
+
+          it "returns CAREER_LEARNER when user has no enrollments and career is enabled on the root account, even if they prefer academic experience (due to previous enrollments)" do
+            @root_account.horizon_account = true
+            @root_account.save!
+            @root_account.reload
+            allow(@user_preference).to receive(:prefers_academic?).and_return(true)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNER
+          end
         end
 
         context "as a learning provider" do
@@ -201,6 +216,21 @@ module CanvasCareer
 
           it "returns CAREER_LEARNING_PROVIDER when user is enrolled in only career courses" do
             @course_career.enroll_teacher(@user, enrollment_state: "active")
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
+          end
+
+          it "returns CAREER_LEARNING_PROVIDER when user is an admin on a career account" do
+            @career_subaccount.account_users.create!(user: @user)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
+          end
+
+          it "returns CAREER_LEARNING_PROVIDER when user is an admin on a child of a career account" do
+            @career_subaccount.horizon_account = false
+            @career_subaccount.save!
+            @root_account.reload
+            @root_account.horizon_account = true
+            @root_account.save!
+            @career_subaccount.account_users.create!(user: @user)
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
           end
 
@@ -235,6 +265,13 @@ module CanvasCareer
           end
 
           it "returns CAREER_LEARNING_PROVIDER when preferring learning provider role and career experience" do
+            allow(@user_preference).to receive_messages(prefers_learning_provider?: true, prefers_career?: true)
+            expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
+          end
+
+          it "returns CAREER_LEARNING_PROVIDER when preferring learning provider role and career experience and user is an admin" do
+            @course_career.teacher_enrollments.destroy_all
+            @career_subaccount.account_users.create!(user: @user)
             allow(@user_preference).to receive_messages(prefers_learning_provider?: true, prefers_career?: true)
             expect(ExperienceResolver.new(@user, nil, @root_account, @session).resolve).to eq Constants::App::CAREER_LEARNING_PROVIDER
           end
@@ -279,6 +316,11 @@ module CanvasCareer
         expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to eq [Constants::App::CAREER_LEARNING_PROVIDER]
       end
 
+      it "returns only CAREER_LEARNING_PROVIDER when there's only career learning provider account users" do
+        @career_subaccount.account_users.create!(user: @user)
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to eq [Constants::App::CAREER_LEARNING_PROVIDER]
+      end
+
       it "returns ACADEMIC and CAREER_LEARNER when there's academic and career learner enrollments" do
         @course_career.enroll_student(@user, enrollment_state: "active")
         @course_academic.enroll_student(@user, enrollment_state: "active")
@@ -306,6 +348,15 @@ module CanvasCareer
         )
       end
 
+      it "returns CAREER_LEARNER and CAREER_LEARNING_PROVIDER when there's career learner enrollments and career learning provider account users" do
+        @career_subaccount.account_users.create!(user: @user)
+        @course_career.enroll_student(@user, enrollment_state: "active")
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
+          Constants::App::CAREER_LEARNER,
+          Constants::App::CAREER_LEARNING_PROVIDER
+        )
+      end
+
       it "returns ACADEMIC, CAREER_LEARNER and CAREER_LEARNING_PROVIDER when there's academic, career learner and career learning provider enrollments" do
         @course_career.enroll_teacher(@user, enrollment_state: "active")
         @course_career.enroll_student(@user, enrollment_state: "active")
@@ -313,6 +364,24 @@ module CanvasCareer
         expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
           Constants::App::ACADEMIC,
           Constants::App::CAREER_LEARNER,
+          Constants::App::CAREER_LEARNING_PROVIDER
+        )
+      end
+
+      it "doesn't include CAREER_LEARNING_PROVIDER if account users are on academic account" do
+        @root_account.account_users.create!(user: @user)
+        @course_career.enroll_student(@user, enrollment_state: "active")
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
+          Constants::App::ACADEMIC,
+          Constants::App::CAREER_LEARNER
+        )
+      end
+
+      it "returns ACADEMIC and CAREER_LEARNING_PROVIDER when there's academic and career learning provider account users" do
+        @root_account.account_users.create!(user: @user)
+        @career_subaccount.account_users.create!(user: @user)
+        expect(ExperienceResolver.new(@user, nil, @root_account, @session).available_apps).to contain_exactly(
+          Constants::App::ACADEMIC,
           Constants::App::CAREER_LEARNING_PROVIDER
         )
       end
