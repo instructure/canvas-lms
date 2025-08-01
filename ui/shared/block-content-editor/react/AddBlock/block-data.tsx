@@ -40,7 +40,14 @@ export const blockFactory = {
       settings={{alignment: 'left', layout: 'horizontal', isFullWidth: false, buttons: [{id: 1}]}}
     />
   ),
-  [HighlightBlock.name]: () => <HighlightBlock content="" />,
+  [HighlightBlock.name]: () => (
+    <HighlightBlock
+      content=""
+      settings={{
+        displayIcon: 'warning',
+      }}
+    />
+  ),
   imageText: () => <p>image_text</p>,
   video: () => <p>video</p>,
 } as const satisfies BlockFactory

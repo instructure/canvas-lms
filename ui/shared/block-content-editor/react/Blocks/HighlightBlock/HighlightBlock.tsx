@@ -29,6 +29,9 @@ import {HighlightBlockLayout} from './HighlightBlockLayout'
 
 export type HighlightBlockProps = {
   content: string
+  settings: {
+    displayIcon: string | null
+  }
 }
 
 export const HighlightBlockContent = (props: HighlightBlockProps) => {
@@ -38,8 +41,8 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
   const [content, setContent] = useState(props.content)
 
   const handleSave = useCallback(() => {
-    save({content})
-  }, [content, save])
+    save({content, settings: props.settings})
+  }, [content, props.settings, save])
 
   useEffect(() => {
     if (isEditPreviewMode) {
@@ -47,25 +50,37 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
     }
   }, [isEditPreviewMode, handleSave])
 
-  const icon = (
-    <IconWarningLine size="medium" style={{color: colors.additionalPrimitives.ocean30}} />
-  )
+  const getIcon = () => {
+    switch (props.settings.displayIcon) {
+      case 'warning':
+        return (
+          <IconWarningLine size="medium" style={{color: colors.additionalPrimitives.ocean30}} />
+        )
+      default:
+        return null
+    }
+  }
 
-  const contentSlot = isEditMode ? (
-    <TextArea
-      label={''}
-      placeholder={I18n.t('Start typing...')}
-      value={content}
-      onChange={e => setContent(e.target.value)}
-      resize="vertical"
-    />
-  ) : (
-    <Text variant="contentImportant">{content || I18n.t('Click to edit')}</Text>
-  )
+  let contentSlot
+  if (isEditMode) {
+    contentSlot = (
+      <TextArea
+        label={''}
+        placeholder={I18n.t('Start typing...')}
+        value={content}
+        onChange={e => setContent(e.target.value)}
+        resize="vertical"
+      />
+    )
+  } else if (isEditPreviewMode) {
+    contentSlot = <Text variant="contentImportant">{content || I18n.t('Click to edit')}</Text>
+  } else {
+    contentSlot = <Text variant="contentImportant">{content}</Text>
+  }
 
   return (
     <HighlightBlockLayout
-      icon={icon}
+      icon={getIcon()}
       content={contentSlot}
       backgroundColor={colors.additionalPrimitives.ocean12}
       textColor={colors.ui.textDescription}
