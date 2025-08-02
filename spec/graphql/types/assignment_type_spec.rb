@@ -1798,4 +1798,67 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "N+1 query prevention" do
+    it "prevents N+1 queries when accessing assignment overrides and dates" do
+      # Create assignments with context modules
+      module1 = course.context_modules.create!(name: "Module 1")
+      assignments = []
+      5.times do |i|
+        assignment = course.assignments.create!(title: "Assignment #{i}")
+        assignment.context_module_tags.create!(context_module: module1, context: course, tag_type: "context_module")
+        assignments << assignment
+      end
+
+      # Create some overrides
+      module1.assignment_overrides.create!
+
+      # Build GraphQL query that accesses fields that could cause N+1 queries
+      query = <<~GQL
+        query {
+          course(id: "#{course.id}") {
+            assignmentsConnection {
+              nodes {
+                id
+                visibleToEveryone
+                assignmentOverrides {
+                  nodes {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      GQL
+
+      # Track N+1 queries to module_ids/assignment_context_modules
+      module_query_count = 0
+      override_query_count = 0
+
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        # Check for module_ids N+1 queries
+        if /FROM\s+["`]?context_modules["`]?\s+WHERE.*context_modules\.workflow_state.*context_modules\.id.*IN.*SELECT.*context_module_id/i.match?(payload[:sql])
+          module_query_count += 1
+        end
+        # Check for assignment override N+1 queries
+        if /FROM\s+["`]?assignment_overrides["`]?\s+WHERE.*assignment_overrides\.assignment_id.*LIMIT\s+1/i.match?(payload[:sql])
+          override_query_count += 1
+        end
+      end
+
+      # Execute the GraphQL query
+      result = CanvasSchema.execute(query, context: { current_user: teacher, request: ActionDispatch::TestRequest.create })
+
+      # Should be bulk loading, not N+1 queries
+      expect(module_query_count).to be <= 1
+      expect(override_query_count).to be <= 1
+
+      # Verify the query succeeded
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "course", "assignmentsConnection", "nodes")).to be_present
+
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+  end
 end

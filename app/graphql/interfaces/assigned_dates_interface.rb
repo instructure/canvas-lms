@@ -38,10 +38,14 @@ module Interfaces
       if object.is_a?(DiscussionTopic)
         return nil unless object.graded?
 
-        return object.assignment&.dates_hash_visible_to_v2(current_user)
+        return Loaders::DatesOverridableLoader.for.load(object.assignment).then do |preloaded_assignment|
+          preloaded_assignment&.dates_hash_visible_to_v2(current_user)
+        end
       end
 
-      object.dates_hash_visible_to_v2(current_user)
+      Loaders::DatesOverridableLoader.for.load(object).then do |preloaded_object|
+        preloaded_object.dates_hash_visible_to_v2(current_user)
+      end
     end
   end
 end

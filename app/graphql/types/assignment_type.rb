@@ -562,6 +562,9 @@ module Types
           Boolean,
           "specifies all other variables that can determine visiblity.",
           null: false
+    def visible_to_everyone
+      Loaders::DatesOverridableLoader.for.load(assignment).then(&:visible_to_everyone)
+    end
 
     field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides
@@ -569,7 +572,9 @@ module Types
       # overrides... there's also the totally different method found in
       # assignment_overrides_json. they may not return the same results?
       # ¯\_(ツ)_/¯
-      AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
+      Loaders::DatesOverridableLoader.for.load(assignment).then do |preloaded_assignment|
+        AssignmentOverrideApplicator.overrides_for_assignment_and_user(preloaded_assignment, current_user)
+      end
     end
 
     field :has_group_category,
