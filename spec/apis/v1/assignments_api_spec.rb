@@ -1758,6 +1758,38 @@ describe AssignmentsApiController, type: :request do
 
       ActiveSupport::Notifications.unsubscribe(subscriber)
     end
+
+    it "does not generate N+1 queries in module override preloading" do
+      # Create assignments with context modules to trigger module override lookups
+      module1 = @course.context_modules.create!(name: "Module 1")
+      module2 = @course.context_modules.create!(name: "Module 2")
+
+      assignments = []
+      3.times do |i|
+        assignment = @course.assignments.create!(title: "Assignment #{i}")
+        assignment.context_module_tags.create!(context_module: module1, context: @course, tag_type: "context_module")
+        assignments << assignment
+      end
+
+      # Create some overrides to make module override queries happen
+      module1.assignment_overrides.create!
+      module2.assignment_overrides.create!
+
+      # Track N+1 queries to context modules lookup
+      module_query_count = 0
+      subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+        if /FROM\s+["`]?context_modules["`]?\s+WHERE.*context_modules\.workflow_state.*context_modules\.id.*IN.*SELECT.*context_module_id/i.match?(payload[:sql])
+          module_query_count += 1
+        end
+      end
+
+      # Make the API call that would trigger module override preloading
+      api_get_assignments_index_from_course(@course)
+
+      # Should only be 1 query for bulk loading, not N queries
+      expect(module_query_count).to be <= 1
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
   end
 
   describe "GET /users/:user_id/courses/:course_id/assignments (#user_index)" do
