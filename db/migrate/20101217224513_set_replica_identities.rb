@@ -35,6 +35,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :course_account_associations
     set_replica_identity :course_pace_module_items
     set_replica_identity :course_paces
+    set_replica_identity :course_reports
     set_replica_identity :course_sections
     set_replica_identity :courses
     set_replica_identity :custom_grade_statuses
@@ -51,6 +52,7 @@ class SetReplicaIdentities < ActiveRecord::Migration[7.0]
     set_replica_identity :enrollment_states
     set_replica_identity :enrollment_terms
     set_replica_identity :enrollments
+    set_replica_identity :estimated_durations
     set_replica_identity :favorites
     set_replica_identity :folders
     set_replica_identity :group_categories
