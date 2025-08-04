@@ -32,7 +32,7 @@ export type HighlightBlockProps = {
 }
 
 export const HighlightBlockContent = (props: HighlightBlockProps) => {
-  const renderMode = useGetRenderMode()
+  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
   const save = useSave<typeof HighlightBlock>()
 
   const [content, setContent] = useState(props.content)
@@ -42,27 +42,26 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
   }, [content, save])
 
   useEffect(() => {
-    if (renderMode === 'editPreview') {
+    if (isEditPreviewMode) {
       handleSave()
     }
-  }, [renderMode, handleSave])
+  }, [isEditPreviewMode, handleSave])
 
   const icon = (
     <IconWarningLine size="medium" style={{color: colors.additionalPrimitives.ocean30}} />
   )
 
-  const contentSlot =
-    renderMode === 'edit' ? (
-      <TextArea
-        label={''}
-        placeholder={I18n.t('Start typing...')}
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        resize="vertical"
-      />
-    ) : (
-      <Text variant="contentImportant">{content || I18n.t('Click to edit')}</Text>
-    )
+  const contentSlot = isEditMode ? (
+    <TextArea
+      label={''}
+      placeholder={I18n.t('Start typing...')}
+      value={content}
+      onChange={e => setContent(e.target.value)}
+      resize="vertical"
+    />
+  ) : (
+    <Text variant="contentImportant">{content || I18n.t('Click to edit')}</Text>
+  )
 
   return (
     <HighlightBlockLayout

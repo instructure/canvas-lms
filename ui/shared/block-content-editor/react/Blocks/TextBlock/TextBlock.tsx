@@ -33,22 +33,22 @@ export type TextBlockProps = {
 }
 
 export const TextBlockContent = (props: TextBlockProps) => {
-  const renderMode = useGetRenderMode()
+  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
   const save = useSave<typeof TextBlock>()
 
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
   useEffect(() => {
-    if (renderMode === 'editPreview') {
+    if (isEditPreviewMode) {
       save({
         title,
         content,
       })
     }
-  }, [renderMode, title, content, save])
+  }, [isEditPreviewMode, title, content, save])
 
-  return renderMode === 'edit' ? (
+  return isEditMode ? (
     <TextBlockEdit
       title={title}
       content={content}

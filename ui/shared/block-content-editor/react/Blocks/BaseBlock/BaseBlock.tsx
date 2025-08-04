@@ -27,11 +27,11 @@ const BaseBlockContent = (
     setIsEditMode: (isEditMode: boolean) => void
   },
 ) => {
-  const renderMode = useGetRenderMode()
-  return renderMode === 'view' ? (
+  const {isViewMode, isEditMode} = useGetRenderMode()
+  return isViewMode ? (
     <BaseBlockViewLayout>{props.children}</BaseBlockViewLayout>
   ) : (
-    <BaseBlockEditWrapper {...props} isEditMode={renderMode === 'edit'} />
+    <BaseBlockEditWrapper {...props} isEditMode={isEditMode} />
   )
 }
 
