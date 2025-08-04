@@ -951,6 +951,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :context_type, limit: 255
       t.references :root_account
       t.timestamps null: false, default: -> { "now()" }
+      t.references :user, foreign_key: true
 
       t.index [:context_id, :context_type], name: "attachment_associations_a_id_a_type"
     end
@@ -1549,6 +1550,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :unified_tool_id, limit: 255
       t.boolean :unified_tool_id_needs_update, default: false, null: false
       t.timestamp :unified_tool_id_last_updated_at, precision: 6
+      t.references :lti_registration, index: { where: "lti_registration_id IS NOT NULL" }
 
       t.replica_identity_index
       t.index [:context_id, :context_type]
@@ -1719,6 +1721,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, null: false, foreign_key: { to_table: :accounts }, index: false
       t.string :migration_id
       t.string :selected_days_to_skip, array: true, default: %w[sat sun], null: false
+      t.text :assignments_weighting
+      t.integer :time_to_complete_calendar_days
 
       t.replica_identity_index
       t.index :course_id, unique: true, where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'", name: "course_paces_unique_primary_plan_index"
@@ -2093,6 +2097,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps null: false, default: -> { "now()" }
       t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::DESC
       t.boolean :expanded, null: false, default: false
+      t.boolean :summary_enabled, null: false, default: false
 
       t.replica_identity_index
       t.index [:discussion_topic_id, :user_id], name: "index_topic_participant_on_topic_id_and_user_id", unique: true
@@ -2798,14 +2803,14 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :lti_assets do |t|
       t.uuid :uuid, null: false, index: { unique: true }
-      t.references :attachment, null: false, foreign_key: true
-      t.references :submission, null: false, foreign_key: true
-      t.index %i[attachment_id submission_id], unique: true
+      t.references :attachment, null: false
+      t.references :submission, foreign_key: true
       t.string :workflow_state, limit: 255, null: false, default: "active"
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
+      t.index %i[attachment_id submission_id], unique: true, where: "submission_id IS NOT NULL"
     end
 
     create_table :lti_asset_processors do |t|
@@ -4473,6 +4478,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :custom_grade_status, foreign_key: true, index: { where: "custom_grade_status_id IS NOT NULL" }
       t.string :sticker, limit: 255
       t.integer :body_word_count
+      t.string :lti_id, limit: 255
 
       t.index [:assignment_id, :submission_type]
       t.index [:user_id, :assignment_id], unique: true
