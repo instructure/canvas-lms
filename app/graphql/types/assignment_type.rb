@@ -372,7 +372,7 @@ module Types
 
     field :rubric, RubricType, null: true
     def rubric
-      load_association(:rubric)
+      assignment.active_rubric_association? ? load_association(:rubric) : nil
     end
 
     field :rubric_association, RubricAssociationType, null: true

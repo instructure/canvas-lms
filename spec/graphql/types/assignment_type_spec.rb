@@ -186,6 +186,7 @@ describe Types::AssignmentType do
 
     it "is not returned if the association is soft-deleted" do
       @rubric_association.destroy!
+      expect(assignment_type.resolve("rubric { _id }")).to be_nil
       expect(assignment_type.resolve("rubricAssociation { _id }")).to be_nil
     end
   end
