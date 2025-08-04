@@ -793,4 +793,7 @@ export type YoutubeScanResultReport = Readonly<{
   resources: Array<YoutubeScanResource>
   total_count: number | null
   id: number
+  page: number
+  per_page: number
+  total_pages: number
 }>
