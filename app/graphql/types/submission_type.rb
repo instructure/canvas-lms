@@ -166,6 +166,12 @@ module Types
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
     end
 
+    field :auto_grade_submission_errors, [String], null: false, description: "Errors related to the submission"
+    def auto_grade_submission_errors
+      issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
+      issues ? [issues[:message]] : []
+    end
+
     field :provisional_grades_connection, Types::ProvisionalGradeType.connection_type, null: true
     def provisional_grades_connection
       load_association(:assignment).then do
