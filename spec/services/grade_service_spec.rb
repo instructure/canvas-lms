@@ -50,7 +50,7 @@ RSpec.describe GradeService do
 
   # Mock response from Cedar AI that includes all criteria
   let(:mock_cedar_response) do
-    [
+    Struct.new(:response, keyword_init: true).new(response: [
       {
         "rubric_category" => "Content",
         "reasoning" => "Well developed ideas",
@@ -61,7 +61,7 @@ RSpec.describe GradeService do
         "reasoning" => "Flawless grammar",
         "criterion" => "Excellent grammar"
       }
-    ]
+    ].to_json)
   end
 
   # Setup CedarClient mock for all tests
@@ -70,18 +70,7 @@ RSpec.describe GradeService do
 
     stub_const("CedarClient", Class.new do
       def self.prompt(*)
-        [
-          {
-            "rubric_category" => "Content",
-            "reasoning" => "Well developed ideas",
-            "criterion" => "Meets requirements"
-          },
-          {
-            "rubric_category" => "Grammar",
-            "reasoning" => "Flawless grammar",
-            "criterion" => "Excellent grammar"
-          }
-        ].to_json
+        mock_cedar_response
       end
     end)
   end
@@ -98,7 +87,7 @@ RSpec.describe GradeService do
         feature_slug: "grading-assistance",
         root_account_uuid: "mock-root",
         current_user:
-      ).and_return(mock_cedar_response.to_json)
+      ).and_return(mock_cedar_response)
 
       result = described_class.new(
         assignment:,
@@ -153,14 +142,14 @@ RSpec.describe GradeService do
     context "when Cedar returns partial criteria" do
       before do
         allow(CedarClient).to receive(:prompt).and_return(
-          [
+          Struct.new(:response, keyword_init: true).new(response: [
             {
               "rubric_category" => "Content",
               "reasoning" => "Well developed ideas",
               "criterion" => "Meets requirements"
             }
             # Grammar is missing from response, but this is a valid partial response
-          ].to_json
+          ].to_json)
         )
       end
 
@@ -182,7 +171,7 @@ RSpec.describe GradeService do
     context "when Cedar returns invalid criteria" do
       before do
         allow(CedarClient).to receive(:prompt).and_return(
-          [
+          Struct.new(:response, keyword_init: true).new(response: [
             {
               "rubric_category" => "Invalid Category", # This category doesn't exist in our rubric
               "reasoning" => "Some reasoning",
@@ -193,7 +182,7 @@ RSpec.describe GradeService do
               "reasoning" => "Well developed ideas",
               "criterion" => "Meets requirements"
             }
-          ].to_json
+          ].to_json)
         )
       end
 

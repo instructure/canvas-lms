@@ -60,7 +60,7 @@ class CommentsService
         feature_slug: "grading-comments-assistance",
         root_account_uuid: @root_account_uuid,
         current_user: @current_user
-      )
+      ).response
 
       guidance_list = safe_parse_json_array(response)
       guidance = guidance_list.to_h { |g| [g["criterion"], g["guidance"]] }

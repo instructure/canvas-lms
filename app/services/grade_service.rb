@@ -75,7 +75,7 @@ class GradeService
         feature_slug: "grading-assistance",
         root_account_uuid: @root_account_uuid,
         current_user: @current_user
-      )
+      ).response
 
       body = safe_parse_json_array(response)
       parsed_result = filter_repeating_keys(body)
