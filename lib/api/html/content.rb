@@ -40,10 +40,10 @@ module Api
         content.modified_html
       end
 
-      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
+      def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, is_native_mobile_app: false, rewrite_api_urls: true)
         return html if html.blank?
 
-        new(html, account, include_mobile:, rewrite_api_urls:)
+        new(html, account, include_mobile:, is_native_mobile_app:, rewrite_api_urls:)
           .rewritten_html(url_helper)
       end
 
@@ -72,10 +72,11 @@ module Api
         end
       end
 
-      def initialize(html_string, account = nil, include_mobile: false, rewrite_api_urls: true, host: nil, port: nil)
+      def initialize(html_string, account = nil, include_mobile: false, is_native_mobile_app: false, rewrite_api_urls: true, host: nil, port: nil)
         @account = account
         @html = html_string
         @include_mobile = include_mobile
+        @is_native_mobile_app = is_native_mobile_app
         @rewrite_api_urls = rewrite_api_urls
         @host = host
         @port = port
@@ -161,6 +162,7 @@ module Api
         end
 
         add_css_and_js_overrides
+        add_youtube_banner_if_needed
         parsed_html.to_s
       end
 
@@ -170,6 +172,19 @@ module Api
 
         overrides = @account.effective_brand_config.css_and_js_overrides
         self.class.add_overrides_to_html(parsed_html, overrides)
+
+        parsed_html
+      end
+
+      def add_youtube_banner_if_needed
+        return parsed_html unless @is_native_mobile_app
+        return parsed_html unless Account.site_admin.feature_enabled?(:youtube_overlay)
+
+        html_string = parsed_html.to_s
+        updated_html = YoutubeBannerInjectionService.inject_banner_if_needed(html_string, mobile_device: true)
+        if updated_html != html_string
+          @parsed_html = Nokogiri::HTML5.fragment(updated_html, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        end
 
         parsed_html
       end

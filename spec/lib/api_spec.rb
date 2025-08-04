@@ -1287,4 +1287,107 @@ describe Api do
       expect(url).to eq "http://www.example.com/courses/{courses.id}/assignments/1%7D"
     end
   end
+
+  context "api_user_content with YouTube banner injection" do
+    let(:test_controller) do
+      Class.new(ApplicationController) do
+        include Api
+        attr_accessor :current_user, :context, :domain_root_account, :include_mobile, :native_app_user_agent
+
+        def initialize
+          @current_user = nil
+          @context = nil
+          @domain_root_account = nil
+          @include_mobile = false
+          @native_app_user_agent = nil
+          super
+        end
+
+        def request
+          @request ||= Struct.new(:user_agent, :host_with_port, :ssl?) do
+            def initialize(user_agent, host_with_port = "example.com", ssl: false)
+              super(user_agent, host_with_port, ssl)
+            end
+          end.new(@native_app_user_agent)
+        end
+      end
+    end
+
+    let(:controller) { test_controller.new }
+    let(:course) { course_model }
+    let(:user) { user_model }
+
+    let(:html_with_youtube) do
+      '<p>Check out this video:</p><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315" lazy="true" loading="lazy"></iframe>'
+    end
+
+    let(:html_without_youtube) do
+      "<p>This is regular content without any videos.</p>"
+    end
+
+    before do
+      controller.current_user = user
+      controller.context = course
+      controller.domain_root_account = Account.default
+    end
+
+    context "when accessed from native mobile app" do
+      before do
+        controller.native_app_user_agent = "iosTeacher/1.0" # Simulate Canvas iOS Teacher app
+      end
+
+      it "injects YouTube banner when YouTube embeds are present" do
+        result = controller.api_user_content(html_with_youtube)
+
+        expect(result).to include("This page has embedded YouTube content that may display advertisements.")
+        expect(result).to include(html_with_youtube)
+      end
+
+      it "does not inject banner when no YouTube embeds are present" do
+        result = controller.api_user_content(html_without_youtube)
+
+        expect(result).not_to include("This page has embedded YouTube content that may display advertisements.")
+        expect(result).to include(html_without_youtube)
+      end
+    end
+
+    context "when accessed from web browser" do
+      before do
+        controller.native_app_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" # Regular web browser
+      end
+
+      it "does not inject YouTube banner even when YouTube embeds are present" do
+        result = controller.api_user_content(html_with_youtube)
+
+        expect(result).not_to include("This page has embedded YouTube content that may display advertisements.")
+        expect(result).to include(html_with_youtube)
+      end
+    end
+
+    context "when mobile_device? method is not available" do
+      let(:controller_without_mobile) do
+        Class.new do
+          include Api
+          attr_accessor :current_user, :context, :domain_root_account
+
+          def initialize
+            @current_user = nil
+            @context = nil
+            @domain_root_account = nil
+          end
+        end.new
+      end
+
+      it "does not inject banner and does not raise error" do
+        controller_without_mobile.current_user = user
+        controller_without_mobile.context = course
+        controller_without_mobile.domain_root_account = Account.default
+
+        result = controller_without_mobile.api_user_content(html_with_youtube)
+
+        expect(result).not_to include("YouTube Content Detected")
+        expect(result).to include(html_with_youtube)
+      end
+    end
+  end
 end
