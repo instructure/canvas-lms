@@ -769,6 +769,12 @@ module Types
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
     end
 
+    field :auto_grade_assignment_errors, [String], null: false, description: "Errors related to the assignment"
+    def auto_grade_assignment_errors
+      issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+      issues ? [issues[:message]] : []
+    end
+
     field :is_new_quiz, Boolean, null: false, description: "Assignment is connected to a New Quiz"
     def is_new_quiz
       assignment.quiz_lti?
