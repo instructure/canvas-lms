@@ -200,7 +200,7 @@ export const saveRubric = async (
         id: rubricAssociationId,
         association_id: assignmentId ?? accountId ?? courseId,
         association_type: associationType,
-        purpose: assignmentId ? 'grading' : undefined,
+        purpose: assignmentId ? 'grading' : 'bookmark',
         hide_points: hidePoints ? 1 : 0,
         hide_outcome_results: hideOutcomeResults ? 1 : 0,
         hide_score_total: hideScoreTotal ? 1 : 0,
