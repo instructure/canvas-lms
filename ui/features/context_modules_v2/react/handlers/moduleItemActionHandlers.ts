@@ -294,14 +294,8 @@ export const handleRemove = (
   }
 }
 
-export const handleMasteryPaths = (
-  masteryPathsData: MasteryPathsData | null,
-  _id: string,
-  setIsMenuOpen?: (isOpen: boolean) => void,
-) => {
-  if (masteryPathsData?.isTrigger && _id) {
-    window.location.href = `${ENV.CONTEXT_URL_ROOT}/modules/items/${_id}/edit_mastery_paths`
-  }
+export const handleMasteryPaths = (_id: string, setIsMenuOpen?: (isOpen: boolean) => void) => {
+  window.location.href = `${ENV.CONTEXT_URL_ROOT}/modules/items/${_id}/edit_mastery_paths`
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
