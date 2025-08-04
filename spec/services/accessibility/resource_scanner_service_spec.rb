@@ -51,7 +51,7 @@ describe Accessibility::ResourceScannerService do
 
     context "when the scan is queued" do
       before do
-        accessibility_resource_scan_model(course:, wiki_page:, workflow_state: "queued")
+        accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued")
       end
 
       it "does not enqueue another scan" do
@@ -62,7 +62,7 @@ describe Accessibility::ResourceScannerService do
     end
 
     context "when the scan is completed" do
-      let!(:scan) { accessibility_resource_scan_model(course:, wiki_page:, workflow_state: "completed") }
+      let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "completed") }
 
       it "re-enqueues the scan" do
         described_class.call(resource: wiki_page)
@@ -83,7 +83,7 @@ describe Accessibility::ResourceScannerService do
   end
 
   describe "#scan_resource" do
-    let!(:scan) { accessibility_resource_scan_model(course:, wiki_page:, workflow_state: "queued") }
+    let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued") }
 
     it "updates the scan to in progress" do
       expect_any_instance_of(AccessibilityResourceScan).to receive(:in_progress!)
@@ -94,7 +94,7 @@ describe Accessibility::ResourceScannerService do
     context "when the scan completes successfully" do
       context "when there are existing AccessibilityIssue records" do
         let(:existing_issue) do
-          accessibility_issue_model(course:, wiki_page:)
+          accessibility_issue_model(course:, context: wiki_page)
         end
 
         it "deletes the existing records" do
@@ -184,7 +184,7 @@ describe Accessibility::ResourceScannerService do
         subject { described_class.new(resource: assignment) }
 
         let(:assignment) { assignment_model(course:) }
-        let!(:scan) { accessibility_resource_scan_model(course:, assignment:) }
+        let!(:scan) { accessibility_resource_scan_model(course:, context: assignment) }
 
         before do
           assignment.update!(description: "a" * (Accessibility::ResourceScannerService::MAX_HTML_SIZE + 1))
@@ -204,7 +204,7 @@ describe Accessibility::ResourceScannerService do
         subject { described_class.new(resource: attachment) }
 
         let(:attachment) { attachment_model(course:, content_type: "application/pdf") }
-        let!(:scan) { accessibility_resource_scan_model(course:, attachment:) }
+        let!(:scan) { accessibility_resource_scan_model(course:, context: attachment) }
 
         before do
           allow(attachment).to receive(:size).and_return(Accessibility::ResourceScannerService::MAX_PDF_SIZE + 1)

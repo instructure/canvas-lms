@@ -19,14 +19,9 @@
 
 module Accessibility
   class GenerateController < ApplicationController
-    include Api::V1::Course
-    include Api::V1::Assignment
-    include Api::V1::Attachment
-    include Api::V1::WikiPage
-
     before_action :require_context
     before_action :require_user
-    before_action :validate_allowed
+    before_action :check_authorized_action
 
     def create
       InstLLMHelper.with_rate_limit(user: @current_user, llm_config: LLMConfigs.config_for("alt_text_generate")) do
@@ -39,7 +34,7 @@ module Accessibility
 
     private
 
-    def validate_allowed
+    def check_authorized_action
       return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
 
       authorized_action(@context, @current_user, [:read, :update])

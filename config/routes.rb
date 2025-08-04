@@ -548,6 +548,7 @@ CanvasRails::Application.routes.draw do
     end
 
     resources :accessibility_resource_scans, only: [:index]
+    resources :accessibility_issues, only: [:update]
   end
 
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
