@@ -248,6 +248,25 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index :archived_at, where: "archived_at IS NOT NULL"
     end
 
+    create_table :course_reports do |t|
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.references :course, foreign_key: true, null: false
+      t.references :user, foreign_key: true, null: false
+      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL" }
+
+      t.string :workflow_state, default: "created", null: false
+      t.string :report_type, null: false
+      t.text :parameters
+      t.text :message
+      t.integer :job_ids, array: true, default: [], null: false
+
+      t.timestamp :start_at
+      t.timestamp :end_at
+      t.timestamps
+
+      t.replica_identity_index
+    end
+
     create_table :sis_batches do |t|
       t.references :account, null: false, index: false
       t.timestamp :ended_at
@@ -295,7 +314,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :short_name, limit: 255
       t.timestamp :deleted_at
       t.boolean :show_user_services, default: true
-      t.integer :page_views_count, default: 0
       t.integer :reminder_time_for_due_dates, default: 172_800
       t.integer :reminder_time_for_grading, default: 0
       t.bigint :storage_quota
@@ -2298,6 +2316,31 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.index :created_at, name: "error_reports_created_at"
     end
 
+    create_table :estimated_durations do |t|
+      t.interval :duration
+      t.references :discussion_topic, foreign_key: true, index: { where: "discussion_topic_id IS NOT NULL", unique: true }
+      t.references :assignment, foreign_key: true, index: { where: "assignment_id IS NOT NULL", unique: true }
+      t.references :attachment, foreign_key: true, index: { where: "attachment_id IS NOT NULL", unique: true }
+      t.references :quiz, foreign_key: true, index: { where: "quiz_id IS NOT NULL", unique: true }
+      t.references :wiki_page, foreign_key: true, index: { where: "wiki_page_id IS NOT NULL", unique: true }
+      t.references :content_tag, foreign_key: true, index: { where: "content_tag_id IS NOT NULL", unique: true }
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.timestamps
+
+      t.check_constraint <<~SQL.squish, name: "check_that_exactly_one_foreign_key_is_present"
+        (
+          (discussion_topic_id IS NOT NULL)::int +
+          (assignment_id IS NOT NULL)::int +
+          (attachment_id IS NOT NULL)::int +
+          (quiz_id IS NOT NULL)::int +
+          (wiki_page_id IS NOT NULL)::int +
+          (content_tag_id IS NOT NULL)::int
+        ) = 1
+      SQL
+
+      t.replica_identity_index
+    end
+
     create_table :event_stream_failures do |t|
       t.string :operation, null: false, limit: 255
       t.string :event_stream, null: false, limit: 255
@@ -2802,7 +2845,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
-      t.check_constraint <<~SQL.squish, name: "score_maximum_present_if_score_given_present"
+      t.check_constraint <<~SQL.squish, name: "chk_score_maximum_present_if_score_given_present"
         (score_maximum IS NOT NULL) OR (score_given IS NULL)
       SQL
 
@@ -3047,7 +3090,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
 
     create_table :lti_tool_configurations do |t|
       t.references :developer_key, null: false, foreign_key: true, index: { unique: true }
-      t.jsonb :settings, null: false
       t.timestamps precision: nil
       t.string :disabled_placements, array: true, default: []
       t.string :privacy_level
@@ -4914,143 +4956,6 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
     end
 
     change_column :schema_migrations, :version, :string, limit: 255
-
-    execute(<<~SQL.squish)
-      CREATE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      WHERE a.workflow_state NOT IN ('deleted','unpublished')
-        AND COALESCE(a.only_visible_to_overrides, 'false') = 'false'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON a.id = ao.assignment_id
-        AND ao.set_type = 'ADHOC'
-      INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON ao.id = aos.assignment_override_id
-        AND aos.user_id = e.user_id
-      WHERE ao.workflow_state = 'active'
-        AND aos.workflow_state <> 'deleted'
-        AND a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON a.id = ao.assignment_id
-        AND ao.set_type = 'Group'
-      INNER JOIN #{Group.quoted_table_name} g
-        ON g.id = ao.set_id
-      INNER JOIN #{GroupMembership.quoted_table_name} gm
-        ON gm.group_id = g.id
-        AND gm.user_id = e.user_id
-      WHERE gm.workflow_state <> 'deleted'
-        AND g.workflow_state <> 'deleted'
-        AND ao.workflow_state = 'active'
-        AND a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT a.id as assignment_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Assignment.quoted_table_name} a
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = a.context_id
-        AND a.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON e.course_section_id = ao.set_id
-        AND ao.set_type = 'CourseSection'
-        AND ao.assignment_id = a.id
-      WHERE a.workflow_state NOT IN ('deleted','unpublished')
-        AND a.only_visible_to_overrides = 'true'
-        AND ao.workflow_state = 'active'
-    SQL
-
-    execute(<<~SQL.squish)
-      CREATE VIEW #{connection.quote_table_name("quiz_student_visibilities")} AS
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      WHERE q.workflow_state NOT IN ('deleted','unpublished')
-        AND COALESCE(q.only_visible_to_overrides, 'false') = 'false'
-
-      UNION
-
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON q.id = ao.quiz_id
-        AND ao.set_type = 'ADHOC'
-      INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
-        ON ao.id = aos.assignment_override_id
-        AND aos.user_id = e.user_id
-      WHERE ao.workflow_state = 'active'
-        AND aos.workflow_state <> 'deleted'
-        AND q.workflow_state NOT IN ('deleted','unpublished')
-        AND q.only_visible_to_overrides = 'true'
-
-      UNION
-
-      SELECT DISTINCT q.id as quiz_id,
-        e.user_id as user_id,
-        e.course_id as course_id
-      FROM #{Quizzes::Quiz.quoted_table_name} q
-      JOIN #{Enrollment.quoted_table_name} e
-        ON e.course_id = q.context_id
-        AND q.context_type = 'Course'
-        AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
-      INNER JOIN #{AssignmentOverride.quoted_table_name} ao
-        ON e.course_section_id = ao.set_id
-        AND ao.set_type = 'CourseSection'
-        AND ao.quiz_id = q.id
-      WHERE q.workflow_state NOT IN ('deleted','unpublished')
-        AND q.only_visible_to_overrides = 'true'
-        AND ao.workflow_state = 'active'
-    SQL
   end
 
   def readonly_user_exists?
