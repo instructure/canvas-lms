@@ -48,10 +48,11 @@ RSpec.describe CommentsService, type: :service do
   before do
     stub_const("CedarClient", Class.new do
       def self.prompt(*)
-        [
+        res = [
           { "criterion" => "Content", "guidance" => "Add more specific examples to support your points." },
           { "criterion" => "Grammar", "guidance" => "Review your essay for subject-verb agreement and punctuation." }
         ].to_json
+        Struct.new(:response, keyword_init: true).new(response: res)
       end
     end)
   end
@@ -68,7 +69,7 @@ RSpec.describe CommentsService, type: :service do
     it "raises CedarAIGraderError on invalid JSON response" do
       stub_const("CedarClient", Class.new do
         def self.prompt(*)
-          "not-json"
+          Struct.new(:response, keyword_init: true).new(response: "not-json")
         end
       end)
 
