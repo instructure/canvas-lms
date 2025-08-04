@@ -131,12 +131,23 @@ function afterDocumentReady() {
   }
 }
 
+const RCE_HTML_EDITOR_CLASS = 'RceHtmlEditor'
 function setupMathML() {
   const features = {
     new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
     explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
   }
   const config = {locale: ENV?.LOCALE || 'en'}
+
+  function isRceHtmlEditor(node: Node): boolean {
+    const element = node as Element
+    if (
+      element.closest(`.${RCE_HTML_EDITOR_CLASS}`) !== null ||
+      element.firstElementChild?.classList.contains(RCE_HTML_EDITOR_CLASS)
+    )
+      return true
+    return false
+  }
 
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
@@ -182,6 +193,7 @@ function setupMathML() {
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
           if (node.nodeType !== Node.ELEMENT_NODE) continue
+          if (isRceHtmlEditor(node)) continue
           const processNewMathEvent = new CustomEvent(Mathml.processNewMathEventName, {
             detail: {target: node, features, config},
           })
