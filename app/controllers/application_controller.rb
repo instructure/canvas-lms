@@ -3015,6 +3015,12 @@ class ApplicationController < ActionController::Base
     session[:browser_supported]
   end
 
+  def native_app?
+    ios_agents = /iosTeacher|iosParent|iCanvas/i
+    android_agents = /candroid|androidParent|androidTeacher/i
+    request.user_agent.to_s =~ ios_agents || request.user_agent.to_s =~ android_agents
+  end
+
   def mobile_device?
     params[:mobile] || request.user_agent.to_s =~ /ipod|iphone|ipad|Android/i
   end

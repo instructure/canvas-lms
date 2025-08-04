@@ -666,11 +666,14 @@ module Api
                                     target_shard:)
     account = Context.get_account(context) || @domain_root_account
     include_mobile = !(respond_to?(:in_app?, true) && in_app?)
+    # Native mobile apps are detected via User-Agent strings
+    is_native_mobile_app = respond_to?(:native_app?, true) && native_app?
     Html::Content.rewrite_outgoing(
       html,
       account,
       url_helper,
       include_mobile:,
+      is_native_mobile_app:,
       rewrite_api_urls: options[:rewrite_api_urls]
     )
   end

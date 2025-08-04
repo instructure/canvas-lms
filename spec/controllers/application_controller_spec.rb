@@ -2116,6 +2116,121 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "#native_app?" do
+    context "with iOS Canvas apps" do
+      it "detects Canvas iOS Teacher app" do
+        controller.request.user_agent = "iosTeacher/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas iOS Teacher app with version" do
+        controller.request.user_agent = "iosTeacher/2.1.0 (iOS 15.0; iPhone)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas iOS Parent app" do
+        controller.request.user_agent = "iosParent/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas iOS Parent app with version" do
+        controller.request.user_agent = "iosParent/3.2.1 (iOS 16.0; iPad)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects iCanvas app" do
+        controller.request.user_agent = "iCanvas/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects iCanvas app with version" do
+        controller.request.user_agent = "iCanvas/4.0.0 (iOS 14.0; iPhone)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+    end
+
+    context "with Android Canvas apps" do
+      it "detects Canvas Android Student app" do
+        controller.request.user_agent = "candroid/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas Android Student app with version" do
+        controller.request.user_agent = "candroid/2.5.0 (Android 12; Samsung Galaxy)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas Android Parent app" do
+        controller.request.user_agent = "androidParent/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas Android Parent app with version" do
+        controller.request.user_agent = "androidParent/1.5.0 (Android 13; Pixel 6)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas Android Teacher app" do
+        controller.request.user_agent = "androidTeacher/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects Canvas Android Teacher app with version" do
+        controller.request.user_agent = "androidTeacher/3.1.0 (Android 11; OnePlus 9)"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+    end
+
+    context "with case insensitive matching" do
+      it "detects apps with mixed case" do
+        controller.request.user_agent = "IOSTeacher/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects apps with all caps" do
+        controller.request.user_agent = "CANDROID/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+
+      it "detects apps with lowercase" do
+        controller.request.user_agent = "iosparent/1.0"
+        expect(controller.send(:native_app?)).to be_truthy
+      end
+    end
+
+    context "with non-Canvas apps" do
+      it "does not detect regular mobile Safari" do
+        controller.request.user_agent = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1"
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+
+      it "does not detect Chrome mobile" do
+        controller.request.user_agent = "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/96.0.4664.45 Mobile Safari/537.36"
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+
+      it "does not detect desktop Chrome" do
+        controller.request.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/96.0.4664.110 Safari/537.36"
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+
+      it "does not detect Firefox" do
+        controller.request.user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:95.0) Gecko/20100101 Firefox/95.0"
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+
+      it "returns false for nil user agent" do
+        controller.request.user_agent = nil
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+
+      it "returns false for empty user agent" do
+        controller.request.user_agent = ""
+        expect(controller.send(:native_app?)).to be_falsy
+      end
+    end
+  end
+
   describe "#get_all_pertinent_contexts" do
     it "doesn't show unpublished courses to students" do
       student = user_factory(active_all: true)
