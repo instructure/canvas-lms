@@ -258,7 +258,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :report_type, null: false
       t.text :parameters
       t.text :message
-      t.integer :job_ids, array: true, default: [], null: false
+      t.bigint :job_ids, array: true, default: [], null: false
 
       t.timestamp :start_at
       t.timestamp :end_at
@@ -411,6 +411,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :domain_specific, default: false, null: false
       t.boolean :send_message, default: false, null: false
       t.timestamp :messages_sent_at
+      t.string :workflow_state, default: "active", null: false, limit: 255
 
       t.index %i[account_id end_at start_at], name: "index_account_notifications_by_account_and_timespan"
     end
@@ -420,6 +421,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :role,
                    foreign_key: true,
                    index: { where: "role_id IS NOT NULL", name: "index_account_notification_roles_only_on_role_id" }
+      t.string :workflow_state, default: "active", null: false, limit: 255
 
       t.index [:account_notification_id, :role_id],
               unique: true,
@@ -945,6 +947,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
         EXECUTE PROCEDURE #{connection.quote_table_name("attachment_before_insert_verify_active_folder__tr_fn")}()
     SQL
 
+    create_enum :enum_attachment_associations_field_name, ["syllabus_body"]
     create_table :attachment_associations do |t|
       t.references :attachment
       t.bigint :context_id
@@ -952,6 +955,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account
       t.timestamps null: false, default: -> { "now()" }
       t.references :user, foreign_key: true
+      t.enum :field_name, enum_type: "#{Shard.current.name}.enum_attachment_associations_field_name"
 
       t.index [:context_id, :context_type], name: "attachment_associations_a_id_a_type"
     end
@@ -1551,6 +1555,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :unified_tool_id_needs_update, default: false, null: false
       t.timestamp :unified_tool_id_last_updated_at, precision: 6
       t.references :lti_registration, index: { where: "lti_registration_id IS NOT NULL" }
+      t.boolean :asset_processor_eula_required
 
       t.replica_identity_index
       t.index [:context_id, :context_type]
@@ -2075,6 +2080,41 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       end
     end
 
+    create_table :discussion_topic_insights do |t|
+      t.references :discussion_topic, foreign_key: true, index: false, null: false
+      t.references :user, foreign_key: true, null: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :workflow_state, null: false, default: "created"
+      t.timestamps
+
+      t.replica_identity_index
+      t.index %i[discussion_topic_id created_at], order: { created_at: :desc }, name: "index_discussion_topic_insights_latest"
+    end
+
+    create_table :discussion_topic_insight_entries do |t|
+      t.references :discussion_topic_insight, foreign_key: true, null: false, index: { name: "idx_on_discussion_topic_insight_id_d7375ce0ba" }
+      t.references :discussion_topic, foreign_key: true, index: false, null: false
+      t.references :discussion_entry, foreign_key: true, null: false
+      t.references :discussion_entry_version, foreign_key: true, null: false, index: { name: "idx_on_discussion_entry_version_id_7c6cf01a1b" }
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.string :locale, null: false, limit: 255
+      t.string :dynamic_content_hash, null: false, limit: 64
+
+      t.jsonb :ai_evaluation, null: false, default: {}
+
+      t.references :ai_evaluation_human_reviewer, foreign_key: { to_table: :users }, index: { name: "idx_on_ai_evaluation_human_reviewer_id_51e74ff825" }
+      t.boolean :ai_evaluation_human_feedback_liked, null: false, default: false
+      t.boolean :ai_evaluation_human_feedback_disliked, null: false, default: false
+      t.string :ai_evaluation_human_feedback_notes, null: false, default: "", limit: 1024
+
+      t.timestamps
+
+      t.replica_identity_index
+      t.index %i[discussion_topic_id discussion_entry_id dynamic_content_hash], unique: true, name: "index_discussion_topic_insight_entries_lookup"
+      t.index %i[discussion_topic_id locale discussion_entry_id created_at], order: { created_at: :desc }, name: "index_discussion_topic_insight_entries_latest"
+    end
+
     create_table :discussion_topic_materialized_views, id: false do |t|
       t.primary_keys [:discussion_topic_id]
 
@@ -2095,8 +2135,8 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.boolean :subscribed
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
       t.timestamps null: false, default: -> { "now()" }
-      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::DESC
-      t.boolean :expanded, null: false, default: false
+      t.string :sort_order, null: false, default: DiscussionTopic::SortOrder::INHERIT
+      t.boolean :expanded
       t.boolean :summary_enabled, null: false, default: false
 
       t.replica_identity_index
@@ -2808,6 +2848,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.string :workflow_state, limit: 255, null: false, default: "active"
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.string :sha256_checksum, limit: 64
 
       t.replica_identity_index
       t.index %i[attachment_id submission_id], unique: true, where: "submission_id IS NOT NULL"
@@ -2829,6 +2870,21 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
 
       t.replica_identity_index
+    end
+
+    create_table :lti_asset_processor_eula_acceptances do |t|
+      t.references :user, null: false, foreign_key: true
+      t.boolean :accepted, default: false, null: false
+      t.timestamp :timestamp, null: false
+      t.references :context_external_tool, null: false, foreign_key: true, index: { name: "idx_on_context_external_tool_id_236cb0425a" }
+
+      t.string :workflow_state, limit: 255, null: false, default: "active"
+      t.timestamps
+
+      t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+
+      t.replica_identity_index
+      t.index %i[user_id context_external_tool_id], where: "workflow_state = 'active'", name: "idx_on_user_id_context_external_tool_id_bee0622bb7"
     end
 
     create_table :lti_asset_reports do |t|
@@ -2973,6 +3029,7 @@ class InitCanvasDb < ActiveRecord::Migration[7.0]
       t.jsonb :diff, null: false
       t.timestamps
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
+      t.boolean :caused_by_reset, default: false, null: false
 
       t.replica_identity_index
     end
