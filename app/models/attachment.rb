@@ -1134,8 +1134,12 @@ class Attachment < ActiveRecord::Base
 
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
-      to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.where(thumbnail: geometry).first
-      to_use || create_dynamic_thumbnail(geometry)
+      if association(:thumbnails).loaded?
+        thumbnails.detect { |t| t.thumbnail == geometry }
+      else
+        to_use = thumbnails.where(thumbnail: geometry).first
+        to_use || create_dynamic_thumbnail(geometry)
+      end
     end
   end
 
@@ -1280,7 +1284,15 @@ class Attachment < ActiveRecord::Base
   end
 
   def thumbnail
-    super || root_attachment.try(:thumbnail)
+    # Use preloaded thumbnails when available to avoid N+1 queries in GraphQL
+    if association(:thumbnails).loaded?
+      # Find the thumb in the preloaded association
+      # If thumbnails are preloaded, trust that data completely and avoid calling
+      # super or root_attachment.thumbnail as both can trigger N+1 queries
+      thumbnails.detect { |t| t.thumbnail == "thumb" }
+    else
+      super || root_attachment.try(:thumbnail)
+    end
   end
 
   def content_directory

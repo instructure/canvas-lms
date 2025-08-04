@@ -117,6 +117,30 @@ describe Types::FileType do
     ).to be true
   end
 
+  it "prevents N+1 queries when loading thumbnail URLs for multiple files" do
+    # Create multiple files
+    files = Array.new(5) do |i|
+      attachment_with_context(course, uploaded_data: stub_png_data, content_type: "image/png", filename: "test#{i}.png")
+    end
+
+    # Count queries that match any thumbnail queries
+    query_count = 0
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |_name, _start, _finish, _id, payload|
+      query_count += 1 if /SELECT.*thumbnails/.match?(payload[:sql])
+    end
+
+    # Test the ThumbnailLoader directly using GraphQL::Batch
+    GraphQL::Batch.batch do
+      files.each do |file|
+        Loaders::ThumbnailLoader.for.load(file).then(&:thumbnail)
+      end
+    end
+
+    # Should have at most 1 bulk query instead of N individual queries
+    expect(query_count).to be <= 1
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+  end
+
   describe "url" do
     let(:file) { attachment_with_context(course, uploaded_data: stub_png_data, content_type: "image/png") }
     let(:type_tester) { GraphQLTypeTester.new(file, current_user: @student) }
