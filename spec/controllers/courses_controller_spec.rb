@@ -5185,6 +5185,111 @@ describe CoursesController do
       subject { get :youtube_migration_scan, params: { course_id: @course.id } }
 
       include_examples "youtube migration protection"
+
+      context "when ff is on" do
+        before do
+          @course.root_account.enable_feature!(:youtube_migration)
+          user_session(@user)
+        end
+
+        context "with no existing progress" do
+          it "returns empty results with default pagination" do
+            allow(YoutubeMigrationService).to receive(:last_youtube_embed_scan_progress_by_course).with(@course).and_return(nil)
+
+            subject
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["id"]).to be_nil
+            expect(json["resources"]).to eq([])
+            expect(json["total_count"]).to eq(0)
+            expect(json["total_pages"]).to eq(0)
+          end
+        end
+
+        context "with existing progress" do
+          let(:progress) do
+            double("Progress",
+                   id: 123,
+                   workflow_state: "completed",
+                   results: {
+                     resources: {
+                       "WikiPage|1" => { name: "Page 1", type: "WikiPage", embeds: [], count: 1 },
+                       "WikiPage|2" => { name: "Page 2", type: "WikiPage", embeds: [], count: 2 },
+                       "WikiPage|3" => { name: "Page 3", type: "WikiPage", embeds: [], count: 1 },
+                       "WikiPage|4" => { name: "Page 4", type: "WikiPage", embeds: [], count: 3 },
+                       "WikiPage|5" => { name: "Page 5", type: "WikiPage", embeds: [], count: 1 }
+                     },
+                     total_count: 8
+                   })
+          end
+
+          before do
+            allow(YoutubeMigrationService).to receive(:last_youtube_embed_scan_progress_by_course).with(@course).and_return(progress)
+          end
+
+          it "returns first page with default pagination" do
+            subject
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["id"]).to eq(123)
+            expect(json["resources"].length).to eq(5)
+            expect(json["total_count"]).to eq(8)
+            expect(json["total_pages"]).to eq(1)
+          end
+
+          it "handles pagination parameters" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 1, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(2)
+            expect(json["page"]).to eq(1)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "handles second page" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 2, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(2)
+            expect(json["page"]).to eq(2)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "handles last page with remaining items" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 3, per_page: 2 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["resources"].length).to eq(1)
+            expect(json["page"]).to eq(3)
+            expect(json["per_page"]).to eq(2)
+            expect(json["total_pages"]).to eq(3)
+          end
+
+          it "validates pagination parameters" do
+            get :youtube_migration_scan, params: { course_id: @course.id, page: 0, per_page: -1 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["page"]).to eq(1)
+            expect(json["per_page"]).to eq(1)
+          end
+
+          it "limits per_page to maximum 100" do
+            get :youtube_migration_scan, params: { course_id: @course.id, per_page: 200 }
+
+            expect(response).to be_successful
+            json = response.parsed_body
+            expect(json["per_page"]).to eq(100)
+          end
+        end
+      end
     end
 
     describe "post a new scan" do

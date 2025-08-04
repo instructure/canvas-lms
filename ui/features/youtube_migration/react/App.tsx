@@ -44,6 +44,7 @@ import {Link} from '@instructure/ui-link'
 import {IconAssignmentLine, IconDiscussionLine, IconDocumentLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
+import Paginator from '@canvas/instui-bindings/react/Paginator'
 
 export interface AppProps {
   courseId: string
@@ -494,6 +495,10 @@ const LastScanResultView: React.FC<{
   handleCourseScan: () => void
   isRequestLoading: boolean
   handleCourseScanReload: () => void
+  currentPage: number
+  perPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }> = ({
   resources,
   handleCourseScan,
@@ -502,6 +507,10 @@ const LastScanResultView: React.FC<{
   courseId,
   scanId,
   handleCourseScanReload,
+  currentPage,
+  perPage,
+  totalPages,
+  onPageChange,
 }) => {
   const [showModal, setShowModal] = useState(false)
   const [modalYoutubeEmbeds, setYoutubeModalEmbeds] = useState<Array<YoutubeEmbed>>([])
@@ -611,6 +620,11 @@ const LastScanResultView: React.FC<{
           </Table.Body>
         </Table>
       </View>
+      {totalPages > 1 && (
+        <View as="div" margin="medium 0" textAlign="center">
+          <Paginator page={currentPage} pageCount={totalPages} loadPage={onPageChange} />
+        </View>
+      )}
     </Wrapper>
   )
 }
@@ -669,9 +683,12 @@ const youtubeScanQuery = async ({
   signal,
   queryKey,
 }: QueryFunctionContext): Promise<YoutubeScanResultReport | undefined> => {
-  const [, , courseId] = queryKey
+  const [, , courseId, page, perPage] = queryKey
   const fetchOpts = {signal}
-  const path = `/api/v1/courses/${courseId}/youtube_migration/scan`
+  const params = new URLSearchParams()
+  if (page) params.append('page', page.toString())
+  if (perPage) params.append('per_page', perPage.toString())
+  const path = `/api/v1/courses/${courseId}/youtube_migration/scan?${params.toString()}`
 
   const {json} = await doFetchApi<YoutubeScanResultReport>({path, fetchOpts})
 
@@ -699,8 +716,13 @@ const onErrorCallbackForScan = () => {
   )()
 }
 
-const onSuccessCallbackForScan = (courseId: string, queryClient: QueryClient) => {
-  queryClient.setQueryData(['youtubeMigration', 'queryLastScan', courseId], {
+const onSuccessCallbackForScan = (
+  courseId: string,
+  queryClient: QueryClient,
+  resetPagination: () => void,
+) => {
+  resetPagination()
+  queryClient.setQueryData(['youtubeMigration', 'queryLastScan', courseId, 1, 25], {
     workflow_state: YoutubeScanWorkflowState.Queued,
   })
 }
@@ -710,16 +732,27 @@ export const App: React.FC<AppProps> = ({courseId}) => {
   const queryClient = useQueryClient()
   // TODO: until tsc not fails because it can't find mutation.isLoading
   const [isMutationLoading, setIsMutationLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
 
   const {isLoading, isError, data, refetch} = useQuery({
-    queryKey: ['youtubeMigration', 'queryLastScan', courseId],
+    queryKey: ['youtubeMigration', 'queryLastScan', courseId, currentPage, perPage],
     queryFn: youtubeScanQuery,
   })
+
+  const resetPagination = () => {
+    setCurrentPage(1)
+    setPerPage(25)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
 
   const mutation = useMutation({
     mutationKey: ['youtubeMigration', 'createScan', courseId],
     mutationFn: createYoutubeScanMutation,
-    onSuccess: () => onSuccessCallbackForScan(courseId, queryClient),
+    onSuccess: () => onSuccessCallbackForScan(courseId, queryClient, resetPagination),
     onError: onErrorCallbackForScan,
     onSettled: () => setIsMutationLoading(false),
   })
@@ -815,6 +848,10 @@ export const App: React.FC<AppProps> = ({courseId}) => {
         courseId={courseId}
         scanId={data.id}
         handleCourseScanReload={handleCourseScanReload}
+        currentPage={data.page || currentPage}
+        perPage={data.per_page || perPage}
+        totalPages={data.total_pages || 1}
+        onPageChange={handlePageChange}
       />
     )
   }
