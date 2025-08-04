@@ -28,12 +28,12 @@ export type ButtonBlockProps = {
 }
 
 export const ButtonBlockContent = (props: ButtonBlockProps) => {
-  const renderMode = useGetRenderMode()
-  if (renderMode === 'edit') {
+  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
+  if (isEditMode) {
     return <ButtonBlockEdit settings={props.settings} />
   }
 
-  if (renderMode === 'editPreview') {
+  if (isEditPreviewMode) {
     return <ButtonBlockEditPreview settings={props.settings} />
   }
 

@@ -40,19 +40,19 @@ describe('ButtonBlock', () => {
   })
 
   it('renders ButtonBlockEdit in edit mode', () => {
-    useGetRenderModeMock.mockReturnValue('edit')
+    useGetRenderModeMock.mockReturnValue({isEditMode: true})
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockEditPreview in editPreview mode', () => {
-    useGetRenderModeMock.mockReturnValue('editPreview')
+    useGetRenderModeMock.mockReturnValue({isEditPreviewMode: true})
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-edit-preview')).toBeInTheDocument()
   })
 
   it('renders ButtonBlockView in view mode', () => {
-    useGetRenderModeMock.mockReturnValue('view')
+    useGetRenderModeMock.mockReturnValue({isViewMode: true})
     renderBlock(ButtonBlock, defaultProps)
     expect(screen.getByTestId('button-block-view')).toBeInTheDocument()
   })

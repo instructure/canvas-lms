@@ -30,8 +30,7 @@ import {ImageBlockSettings} from './ImageBlockSettings'
 const I18n = createI18nScope('block_content_editor')
 
 const ImageBlockContent = (props: ImageBlockProps) => {
-  const renderMode = useGetRenderMode()
-  const isEditMode = renderMode === 'edit'
+  const {isEditMode} = useGetRenderMode()
   const [isOpen, setIsOpen] = useState(false)
   const save = useSave<typeof ImageBlock>()
   const closeModal = () => setIsOpen(false)
