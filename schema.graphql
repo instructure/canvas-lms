@@ -416,6 +416,11 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   assignmentVisibility: [ID!]
 
   """
+  Errors related to the assignment
+  """
+  autoGradeAssignmentErrors: [String!]!
+
+  """
   Issues related to the assignment
   """
   autoGradeAssignmentIssues: EligibilityIssue
@@ -8577,6 +8582,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     """
     last: Int
   ): AuditEventConnection
+
+  """
+  Errors related to the submission
+  """
+  autoGradeSubmissionErrors: [String!]!
 
   """
   Issues related to the submission

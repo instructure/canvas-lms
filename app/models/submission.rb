@@ -3613,6 +3613,7 @@ class Submission < ActiveRecord::Base
     return false if html_body.blank?
 
     normalized_html = html_body.gsub('\"', '"')
-    normalized_html.match?(/<(img|a)[^>]+(data-api-returntype="File"|class="instructure_file_link")[^>]*>/)
+    decoded_html = CGI.unescapeHTML(normalized_html)
+    decoded_html.match?(/<(img|a)[^>]+(data-api-returntype="File"|class="instructure_file_link")[^>]*>/)
   end
 end
