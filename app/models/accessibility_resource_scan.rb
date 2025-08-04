@@ -32,4 +32,8 @@ class AccessibilityResourceScan < ActiveRecord::Base
   validates :wiki_page_id, uniqueness: true, allow_nil: true
   validates :assignment_id, uniqueness: true, allow_nil: true
   validates :attachment_id, uniqueness: true, allow_nil: true
+
+  def update_issue_count!
+    update!(issue_count: accessibility_issues.active.count)
+  end
 end

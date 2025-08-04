@@ -26,7 +26,7 @@ RSpec.describe Accessibility::GenerateController do
     let(:accessibility_issue_instance) { instance_double(Accessibility::Issue) }
 
     before do
-      allow(controller).to receive_messages(require_context: true, require_user: true, validate_allowed: true)
+      allow(controller).to receive_messages(require_context: true, require_user: true, check_authorized_action: true)
       controller.instance_variable_set(:@context, course)
       controller.instance_variable_set(:@current_user, user)
 
@@ -156,7 +156,7 @@ RSpec.describe Accessibility::GenerateController do
     end
   end
 
-  describe "#validate_allowed" do
+  describe "#check_authorized_action" do
     let!(:course) { Course.create! }
     let!(:user) { User.create! }
 
@@ -171,7 +171,7 @@ RSpec.describe Accessibility::GenerateController do
 
       expect(controller).to receive(:render_unauthorized_action)
 
-      controller.send(:validate_allowed)
+      controller.send(:check_authorized_action)
     end
 
     it "calls authorized_action if tab is enabled" do
@@ -179,7 +179,7 @@ RSpec.describe Accessibility::GenerateController do
 
       expect(controller).to receive(:authorized_action).with(course, user, [:read, :update]).and_return(true)
 
-      controller.send(:validate_allowed)
+      controller.send(:check_authorized_action)
     end
   end
 end

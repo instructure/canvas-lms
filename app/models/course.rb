@@ -292,6 +292,7 @@ class Course < ActiveRecord::Base
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :course
 
   has_many :accessibility_resource_scans, dependent: :destroy
+  has_many :accessibility_issues, dependent: :destroy
 
   prepend Profile::Association
 
