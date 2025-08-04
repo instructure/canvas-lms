@@ -233,6 +233,33 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "mastery paths" do
+    before do
+      @item = @module1.content_tags[0]
+    end
+
+    context "when mastery path is not already set" do
+      before do
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, rules_for: [])
+      end
+
+      it "navigates to mastery paths edit page when Add Mastery Paths is clicked" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@item.id).click
+        wait_for_ajaximations
+
+        module_item_action_menu_link("Add Mastery Paths").click
+        wait_for_ajaximations
+
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments/#{@item.content_id}/edit")
+        expect(driver.current_url).to include("#mastery-paths-editor")
+      end
+    end
+  end
+
   context "course home page" do
     before do
       @course.default_view = "modules"

@@ -192,8 +192,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [moduleId, itemId, content, courseId, setIsMenuOpen])
 
   const handleMasteryPathsRef = useCallback(() => {
-    handleMasteryPaths(masteryPathsData, itemId, setIsMenuOpen)
-  }, [masteryPathsData, itemId, setIsMenuOpen])
+    handleMasteryPaths(itemId, setIsMenuOpen)
+  }, [itemId, setIsMenuOpen])
 
   const publishIconOnClickRef = useCallback(() => {
     handlePublishToggle(moduleId, itemId, title, content, canBeUnpublished, queryClient, courseId)
