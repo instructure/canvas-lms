@@ -106,9 +106,19 @@ describe Lti::ContextControl do
       end
     end
 
-    context "without registration" do
+    context "without deployment link to registration" do
+      before do
+        deployment.lti_registration = nil
+      end
+
       it "is invalid" do
         expect { create!(registration: nil) }.to raise_error(ActiveRecord::RecordInvalid, /Registration must exist/)
+      end
+    end
+
+    context "without registration" do
+      it "uses deployment to find registration" do
+        expect { create!(registration: nil) }.not_to raise_error
       end
     end
 
@@ -574,6 +584,46 @@ describe Lti::ContextControl do
         it "only returns the other tool's id" do
           expect(Lti::ContextControl.deployment_ids_for_context(subaccount)).to eql([other_tool.id])
         end
+      end
+    end
+  end
+
+  describe ".primary_controls_for" do
+    subject { described_class.primary_controls_for(deployments:) }
+
+    let(:deployment) { registration.deployments.first }
+    let(:delete_controls) { false }
+    let(:subdeployment) { registration.new_external_tool(subaccount) }
+    let(:subaccount) { account_model(parent_account: root_account) }
+    let(:course) { course_model(account: subaccount) }
+    let(:course_deployment) { registration.new_external_tool(course) }
+    let(:other_control) { Lti::ContextControl.create!(course:, registration:, deployment: subdeployment, available: true) }
+
+    let(:deployments) { [deployment, subdeployment, course_deployment] }
+
+    before do
+      other_control
+    end
+
+    it "returns primary controls for each deployment" do
+      controls = subject
+
+      expect(controls.size).to eq(3)
+      expect(controls.map(&:deployment_id)).to match_array(deployments.map(&:id))
+      expect(controls.map(&:account_id)).to match_array([root_account.id, subaccount.id, nil])
+      expect(controls.map(&:course_id)).to match_array([nil, nil, course.id])
+    end
+
+    context "with ids" do
+      let(:deployments) { [deployment.id, subdeployment.id, course_deployment.id] }
+
+      it "still returns primary controls for each deployment" do
+        controls = subject
+
+        expect(controls.size).to eq(3)
+        expect(controls.map(&:deployment_id)).to match_array(deployments)
+        expect(controls.map(&:account_id)).to match_array([root_account.id, subaccount.id, nil])
+        expect(controls.map(&:course_id)).to match_array([nil, nil, course.id])
       end
     end
   end
