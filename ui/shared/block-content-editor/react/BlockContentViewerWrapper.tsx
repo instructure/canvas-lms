@@ -16,24 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Element, Frame} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
-import {SettingsTrayRenderer} from './SettingsTray'
-import {BlockContentEditorProps} from './BlockContentEditor'
-import {BlockContentEditorHandlerIntegration} from './BlockContentEditorHandlerIntegration'
+import {Editor, Frame} from '@craftjs/core'
 import {components} from './block-content-editor-components'
+import {BlockContentViewerProps} from './BlockContentViewer'
 
-export const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
+export const BlockContentViewerWrapper = (props: BlockContentViewerProps) => {
   return (
-    <Editor enabled={true} resolver={components}>
-      <BlockContentEditorHandlerIntegration onInit={props.onInit} />
-      <AddBlockModalRenderer />
-      <SettingsTrayRenderer />
-      <AddBlock />
-      <Frame data={props.data ?? undefined}>
-        <Element is="div"></Element>
-      </Frame>
+    <Editor enabled={false} resolver={components}>
+      <Frame data={props.data ?? undefined} />
     </Editor>
   )
 }

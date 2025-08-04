@@ -24,11 +24,12 @@ import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
 import {BlockContentPreview} from './Preview/BlockContentPreview'
 import {EditorMode} from './hooks/useEditorMode'
 import {BlockContentEditorHandler} from './BlockContentEditorHandlerIntegration'
+import {BlockContentViewerProps} from './BlockContentViewer'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
     case 'default':
-      return <BlockContentEditorWrapper isEditMode={true} {...props} />
+      return <BlockContentEditorWrapper {...props} />
     case 'preview':
       return <BlockContentPreview />
     default:
@@ -44,8 +45,7 @@ const BlockContentEditorContent = (props: BlockContentEditorProps) => {
   return <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
 }
 
-export type BlockContentEditorProps = {
-  data: SerializedNodes | null
+export type BlockContentEditorProps = BlockContentViewerProps & {
   onInit: ((handler: BlockContentEditorHandler) => void) | null
 }
 
