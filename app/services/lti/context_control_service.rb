@@ -49,11 +49,20 @@ module Lti
         restore_deleted_control(control, control_params)
       end
 
-      if control.save
-        control
-      else
-        raise Lti::ContextControlErrors, control.errors
+      anchor_control = build_anchor_control(
+        control_params[:deployment_id],
+        control_params[:account_id],
+        control_params[:course_id]
+      )
+
+      Lti::ContextControl.transaction do
+        control.save!
+        anchor_control&.save!
       end
+
+      control
+    rescue ActiveRecord::RecordInvalid => e
+      raise Lti::ContextControlErrors, control.errors || e
     end
 
     def self.unique_check_attrs
@@ -68,6 +77,153 @@ module Lti
     def self.restore_deleted_control(control, control_params)
       restore_params = control_params.slice(:available, :updated_by, :updated_by_id, :workflow_state)
       control.assign_attributes(restore_params)
+    end
+
+    # Given parameters which will be used to create an Lti::ContextControl,
+    # determine if an "anchor" control is needed and return the parameters
+    # needed to create it.
+    #
+    # An "anchor" control helps show the user where a deeply nested control lives in
+    # the account hierarchy, and is one subaccount level below the account where
+    # the deployment lives.
+    #
+    # A wrapper around build_anchor_controls that constructs the data needed
+    # for only a single control.
+    #
+    # @param deployment_id [Integer] the ID of the deployment for which the anchor control is being created
+    # @param account_id [Integer, nil] the ID of the account for which the control is being created
+    # @param course_id [Integer, nil] the ID of the course for which the control is being created
+    #
+    # @return [Lti::ContextControl, nil] an Lti::ContextControl if an anchor control is needed, otherwise nil
+    #
+    # @raise [ArgumentError] if both account_id and course_id are nil
+    #
+    def self.build_anchor_control(deployment_id, account_id, course_id)
+      if account_id.nil? && course_id.nil?
+        # this will raise further down the line, ignore it here
+        return nil
+      end
+
+      deployment_account_ids = {}
+      deployment_course_ids = {}
+      course_account_ids = {}
+      account_chains = {}
+
+      deployment = ContextExternalTool.find(deployment_id)
+      if deployment.context_type == "Course"
+        deployment_course_ids[deployment.id] = deployment.context_id
+      elsif deployment.context_type == "Account"
+        deployment_account_ids[deployment.id] = deployment.context_id
+      end
+
+      if course_id
+        course_account_id = Course.find(course_id).account_id
+        course_account_ids[course_id] = course_account_id
+        account_chains[course_account_id] = Account.account_chain_ids(course_account_id)
+      else
+        account_chains[account_id] = Account.account_chain_ids(account_id)
+      end
+
+      anchor_controls = build_anchor_controls(
+        controls: [{ account_id:, deployment_id:, course_id: }],
+        account_chains:,
+        course_account_ids:,
+        deployments: [deployment_id],
+        deployment_account_ids:,
+        deployment_course_ids:
+      )
+      return nil if anchor_controls.blank?
+
+      anchor_params = anchor_controls.first
+      return nil if Lti::ContextControl.where(**anchor_params.slice(:account_id, :deployment_id, :course_id)).exists?
+
+      Lti::ContextControl.new(**anchor_params)
+    end
+
+    # Given a list of parameters meant to build Lti::ContextControls,
+    # find those that need an "anchor" control and build the parameters for each.
+    #
+    # An "anchor" control helps show the user where a deeply nested control lives in
+    # the account hierarchy, and is one subaccount level below the account where
+    # the deployment lives.
+    #
+    # This method takes preloaded data to avoid N+1 queries.
+    # @param controls [Array<Hash>] list of JSON representations of Lti::ContextControls
+    # @param account_chains [Hash] map from account ID to its account chain. example:
+    #   { 1 => [1, 2, 3], 2 => [2, 3], 3 => [3] }
+    # @param course_account_ids [Hash] map from course ID to its account ID. example:
+    #   { 1 => 2, 2 => 3 }
+    # @param deployments [Array<Integer>] list of all deployment IDs being used in `controls`
+    # @param deployment_account_ids [Hash] map from deployment ID to its account ID. example:
+    #   { 1 => 2, 2 => 3 }
+    # @param deployment_course_ids [Hash] map from deployment ID to its course ID. example:
+    #   { 1 => 2, 2 => 3 }
+    # @param cached_paths [Hash] map from account or course ID to its path. example:
+    #   { "a1" => "a1.", "a2" => "a1.a2.", "c1" => "a1.c1." }
+    #
+    # @return [Array<Hash>] list of anchor controls to be created. JSON representation of Lti::ContextControl.
+    def self.build_anchor_controls(controls:, account_chains:, course_account_ids:, deployments:, deployment_account_ids:, deployment_course_ids:, cached_paths: {})
+      deployment_availabilities = Lti::ContextControl.primary_controls_for(deployments:).pluck(:deployment_id, :available).to_h
+      new_primary_controls = controls.select { |c| deployment_account_ids[c[:deployment_id]] == c[:account_id] }
+
+      deployment_availabilities.merge!(new_primary_controls.to_h { |c| [c[:deployment_id], c[:available]] })
+
+      # avoid creating anchor controls if they will be created already here
+      possible_account_controls = controls.filter_map do |c|
+        next nil if c[:account_id].nil?
+
+        [[c[:account_id], c[:deployment_id]], true]
+      end.to_h
+
+      controls.filter_map do |c|
+        if deployment_course_ids.key?(c[:deployment_id])
+          # course-level deployments never need an anchor control
+          next nil
+        end
+
+        deployment_account_id = deployment_account_ids[c[:deployment_id]]
+        if deployment_account_id == c[:account_id]
+          # primary controls never need an anchor control
+          next nil
+        end
+
+        course_account_id = course_account_ids[c[:course_id]]
+        if deployment_account_id == course_account_id
+          # control is for course only one level below deployment context
+          next nil
+        end
+
+        account_id = c[:account_id] || course_account_id
+        account_chain = account_chains[account_id]
+        deployment_index = account_chain.index(deployment_account_id)
+        if deployment_index.nil?
+          # control context is not a child of deployment context,
+          # which will raise a validation error later
+          next nil
+        end
+
+        anchor_account_id = account_chain[deployment_index - 1]
+        if c[:account_id].present? && anchor_account_id == c[:account_id]
+          # control is for account only one level below deployment context
+          next nil
+        end
+
+        if possible_account_controls.key?([anchor_account_id, c[:deployment_id]])
+          # anchor control will already be created here
+          next nil
+        end
+
+        parent_availability = deployment_availabilities.key?(c[:deployment_id]) ? deployment_availabilities[c[:deployment_id]] : true
+        path = cached_paths["a#{anchor_account_id}"] || Lti::ContextControl.calculate_path_for_account_ids(Account.account_chain_ids(anchor_account_id))
+
+        {
+          **c,
+          course_id: nil,
+          account_id: anchor_account_id,
+          available: parent_availability,
+          path:,
+        }
+      end
     end
 
     # Calculate attributes in bulk for a collection of Lti::ContextControls.
