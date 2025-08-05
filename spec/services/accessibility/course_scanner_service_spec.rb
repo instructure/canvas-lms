@@ -45,6 +45,27 @@ describe Accessibility::CourseScannerService do
       allow(Accessibility::ResourceScannerService).to receive(:call)
     end
 
+    context "when the course exceeds the accessibility scan size limit" do
+      before do
+        allow_any_instance_of(Course).to receive(:exceeds_accessibility_scan_limit?).and_return(true)
+        wiki_page_model(course:)
+      end
+
+      it "logs a warning" do
+        expect(Rails.logger).to receive(:warn).with(
+          "[A11Y Scan] Skipped scanning the course #{course.name} (ID: #{course.id}) due to exceeding the size limit."
+        )
+
+        subject.scan_course
+      end
+
+      it "does not scan resources" do
+        expect(Accessibility::ResourceScannerService).not_to receive(:call)
+
+        subject.scan_course
+      end
+    end
+
     context "when scanning wiki pages" do
       let!(:wiki_page1) { wiki_page_model(course:) }
       let!(:wiki_page2) { wiki_page_model(course:) }
