@@ -20,5 +20,5 @@ import {ButtonBlockProps} from './ButtonBlock'
 import {ButtonDisplay} from './ButtonDisplay'
 
 export const ButtonBlockEdit = (props: ButtonBlockProps) => {
-  return <ButtonDisplay dataTestId="button-block-edit" />
+  return <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} />
 }

@@ -18,15 +18,18 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {SingleButton} from './SingleButton'
+import {ButtonBlockProps} from './ButtonBlock'
 
-type ButtonDisplayProps = {
+type ButtonDisplayProps = ButtonBlockProps & {
   dataTestId: string
 }
 
-export const ButtonDisplay = ({dataTestId}: ButtonDisplayProps) => {
+export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
   return (
     <Flex data-testid={dataTestId}>
-      <SingleButton />
+      {settings.buttons.map(button => (
+        <SingleButton key={button.id} />
+      ))}
     </Flex>
   )
 }
