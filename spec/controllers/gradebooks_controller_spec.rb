@@ -1956,13 +1956,6 @@ describe GradebooksController do
               expect(returned_section_ids).to contain_exactly(@section_2.id)
             end
           end
-
-          describe "with the :limit_section_visibility_in_lmgb FF disabled" do
-            it "includes all course sections" do
-              get :show, params: { course_id: @course.id }
-              expect(returned_section_ids).to match_array([@section_2.id, @course.default_section.id])
-            end
-          end
         end
 
         describe "IMPROVED_LMGB" do
@@ -1978,22 +1971,6 @@ describe GradebooksController do
             get :show, params: { course_id: @course.id }
             gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
             expect(gradebook_env[:IMPROVED_LMGB]).to be true
-          end
-        end
-
-        describe "Outcomes Friendly Description" do
-          it "is false if the feature flag is off" do
-            Account.site_admin.disable_feature! :outcomes_friendly_description
-            get :show, params: { course_id: @course.id }
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
-          end
-
-          it "is true if the feature flag is on" do
-            Account.site_admin.enable_feature! :outcomes_friendly_description
-            get :show, params: { course_id: @course.id }
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
           end
         end
 
@@ -3221,22 +3198,10 @@ describe GradebooksController do
         expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be true
       end
 
-      it "sets filter_speed_grader_by_student_group_feature_enabled to false when disabled" do
-        @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
-        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be false
-      end
-
       it "sets show_comment_library to true when enabled" do
         @course.root_account.enable_feature!(:assignment_comment_library)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be true
-      end
-
-      it "sets show_comment_library to false when disabled" do
-        @course.root_account.disable_feature!(:assignment_comment_library)
-        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-        expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be false
       end
 
       it "sets outcomes keys" do
