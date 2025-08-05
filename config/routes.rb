@@ -486,7 +486,6 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get "blackout_dates" => "blackout_dates#index"
     get "course_pacing" => "course_paces#index"
 
     post "collapse_all_modules" => "context_modules#toggle_collapse_all"
@@ -841,8 +840,6 @@ CanvasRails::Application.routes.draw do
     get "apps/manage", controller: "lti/registrations", action: :index, as: "lti_manage_registrations"
 
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
-
-    get "blackout_dates" => "blackout_dates#index"
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
