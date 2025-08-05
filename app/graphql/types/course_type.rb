@@ -245,10 +245,20 @@ module Types
       raise GraphQL::ExecutionError, "assignment not found"
     end
 
-    field :modules_connection, ModuleType.connection_type, null: true
-    def modules_connection
-      course.modules_visible_to(current_user)
-            .order("name")
+    field :modules_connection, ModuleType.connection_type, null: true do
+      argument :filter,
+               Types::ModuleFilterInputType,
+               required: false,
+               description: "Filter modules by various criteria"
+    end
+    def modules_connection(filter: nil)
+      scope = course.modules_visible_to(current_user)
+
+      if filter
+        scope = apply_module_filters(scope, filter)
+      end
+
+      scope.order("name")
     end
 
     field :rubrics_connection, RubricType.connection_type, null: true
@@ -626,6 +636,62 @@ module Types
       return nil unless course.grants_right?(current_user, :read)
 
       course
+    end
+
+    private
+
+    def apply_module_filters(scope, filter)
+      if filter[:completion_status]
+        # Handle unauthenticated users viewing public courses
+        if current_user.nil?
+          # Unauthenticated users cannot view other users' progress
+          if filter[:user_id]
+            raise GraphQL::ExecutionError, "Authentication required to view other users' module progress"
+          end
+
+          # For unauthenticated users, only "incomplete" filter returns modules
+          # All other filters return empty since they have no progress
+          case filter[:completion_status]
+          when "incomplete"
+            return scope # All modules are incomplete for unauthenticated users
+          else
+            return scope.none # No completed/in_progress/not_started modules
+          end
+        end
+
+        target_user = if filter[:user_id]
+                        User.find(filter[:user_id])
+                      else
+                        current_user
+                      end
+
+        # Check permissions before applying filter
+        unless can_view_user_module_progress?(target_user)
+          raise GraphQL::ExecutionError, "Not authorized to view this user's module progress"
+        end
+
+        scope = Modules::FilterByCompletion.new(
+          scope,
+          filter[:completion_status],
+          target_user,
+          current_user,
+          course
+        ).filter
+      end
+
+      scope
+    end
+
+    def can_view_user_module_progress?(user)
+      # Users can always view their own progress
+      return true if user.id == current_user.id
+
+      # Check if current user has permission to view other users' progress
+      can_view_grades = course.grants_any_right?(current_user, :manage_grades, :view_all_grades)
+      is_observer_of_user = course.observer_enrollments.active.where(user: current_user).exists? &&
+                            current_user.as_observer_observation_links.active.where(user_id: user.id, root_account: course.root_account).exists?
+
+      can_view_grades || is_observer_of_user
     end
   end
 end
