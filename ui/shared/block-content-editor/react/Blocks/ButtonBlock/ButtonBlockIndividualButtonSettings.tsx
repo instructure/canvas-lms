@@ -16,31 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
-import {useNode} from '@craftjs/core'
-import {ButtonBlockIndividualButtonSettings} from './ButtonBlockIndividualButtonSettings'
-import {ButtonBlockProps, ButtonData} from './ButtonBlock'
+import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
+import {ButtonData} from './ButtonBlock'
 
-export const ButtonBlockSettings = () => {
-  const {
-    actions: {setProp},
-    buttons,
-  } = useNode(node => ({
-    buttons: node.data.props.settings.buttons,
-  }))
+export type ButtonBlockIndividualButtonSettingsProps = {
+  initialButtons: ButtonData[]
+  onButtonsChange: (buttons: ButtonData[]) => void
+}
 
-  const handleButtonsChange = (buttons: ButtonData[]) => {
-    setProp((props: ButtonBlockProps) => {
-      props.settings.buttons = buttons
-    })
+export const ButtonBlockIndividualButtonSettings = ({
+  initialButtons: initialButtons,
+  onButtonsChange,
+}: ButtonBlockIndividualButtonSettingsProps) => {
+  const addButton = () => {
+    const newButton = {
+      id: initialButtons.length + 1,
+    }
+    onButtonsChange([...initialButtons, newButton])
   }
-
   return (
-    <View as="div">
-      <ButtonBlockIndividualButtonSettings
-        initialButtons={buttons}
-        onButtonsChange={handleButtonsChange}
-      />
-    </View>
+    <Flex direction="column">
+      <Button onClick={addButton}>Add Button</Button>
+    </Flex>
   )
 }

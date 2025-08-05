@@ -23,8 +23,14 @@ import {ButtonBlockEditPreview} from './ButtonBlockEditPreview'
 import {ButtonBlockView} from './ButtonBlockView'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
 
+export type ButtonData = {
+  id: number
+}
+
 export type ButtonBlockProps = {
-  settings: object
+  settings: {
+    buttons: ButtonData[]
+  }
 }
 
 export const ButtonBlockContent = (props: ButtonBlockProps) => {
