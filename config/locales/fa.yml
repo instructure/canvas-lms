@@ -20660,6 +20660,7 @@ fa:
   require_completion_by_end_date_bd154e32: "نیاز به تکمیل تا تاریخ پایان"
   require_completion_by_specified_end_date_ed742ecb: "نیاز به تکمیل تا تاریخ پایان مشخص شده"
   require_group_members_to_be_in_the_same_section_7f6c36af: "باید اعضای گروه در بخش یکسانی باشند"
+  require_peer_reviews_9b5199d4: "نیازمند بازبینی های گروهی"
   require_respondus_lockdown_browser_31425b3a: "نیازمند مرورگر Respondus LockDown"
   require_usage_rights_for_uploaded_files_4507865b: "لازم دانستن حقوق استفاده برای فایل های بارگذاری شده"
   required_5f7ef8c0: لازم
