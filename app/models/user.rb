@@ -273,6 +273,18 @@ class User < ActiveRecord::Base
   has_many :quiz_migration_alerts, dependent: :destroy
   has_many :custom_data, class_name: "CustomData"
 
+  has_many :assessor_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessor_id",
+           dependent: :destroy,
+           inverse_of: :assessor
+
+  has_many :assessee_allocation_rules,
+           class_name: "AllocationRule",
+           foreign_key: "assessee_id",
+           dependent: :destroy,
+           inverse_of: :assessee
+
   belongs_to :otp_communication_channel, class_name: "CommunicationChannel"
 
   belongs_to :merged_into_user, class_name: "User"
