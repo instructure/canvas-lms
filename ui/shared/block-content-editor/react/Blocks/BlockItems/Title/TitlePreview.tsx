@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './base-block-layout.css'
-import {PropsWithChildren} from 'react'
-import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
 
-export const BaseBlockViewLayout = (props: PropsWithChildren) => {
+export type TitlePreviewProps = {
+  color: string
+  text: string
+}
+
+export const TitlePreview = ({color, text}: TitlePreviewProps) => {
   return (
-    <View as="div" padding="paddingCardLarge">
-      {props.children}
-    </View>
+    <Heading variant="titleSection" color={color as 'primary' | 'secondary'}>
+      {text}
+    </Heading>
   )
 }
