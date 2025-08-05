@@ -17105,6 +17105,7 @@ tr:
   request_id_1499afb0: "İstek ID'si"
   require_an_access_code_600e06e8: "Erişim kodu gereklidir"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Grup üyeleri aynı bölümden olsun"
+  require_peer_reviews_9b5199d4: "Akran Değerlendirmesi Gerekli"
   require_respondus_lockdown_browser_31425b3a: "Respondus LockDown Tarayıcı Gerekli Olsun"
   require_usage_rights_for_uploaded_files_4507865b: "Yüklenen Dosyalar için Kullanım Hakkı İste"
   required_5f7ef8c0: Zorunlu
