@@ -21309,6 +21309,7 @@ hu:
   require_completion_by_end_date_was_turned_on_and_s_756fc89c: "A Befejezés végdátumig történő befejezés megkövetelése be lett kapcsolva, és %{date}értékre lett beállítva."
   require_group_members_to_be_in_the_same_section_7f6c36af: "A csoporttagoknak azonos szekcióban kell lenniük"
   require_number_characters_0_9_82a543cc: "Szám karakterek szükségesek (0...9)"
+  require_peer_reviews_9b5199d4: "Társértékelést igényel"
   require_respondus_lockdown_browser_31425b3a: "A Respondus LockDown böngésző használata kötelező"
   require_symbol_characters_ie_usd_5bf9ffcc: "Szimbólum karakterek szükségesek (pl.: ! @ # $ %)"
   require_usage_rights_for_uploaded_files_4507865b: "A felhasználási jogok szükségesek a feltöltött fájlokhoz"
