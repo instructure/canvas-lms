@@ -293,6 +293,7 @@ class Course < ActiveRecord::Base
 
   has_many :accessibility_resource_scans, dependent: :destroy
   has_many :accessibility_issues, dependent: :destroy
+  has_many :allocation_rules, dependent: :destroy
 
   prepend Profile::Association
 

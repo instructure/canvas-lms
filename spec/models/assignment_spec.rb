@@ -12702,6 +12702,48 @@ describe Assignment do
     end
   end
 
+  describe "#delete_allocation_rules" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10, peer_reviews: true)
+      @student1 = user_factory
+      @student2 = user_factory
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
+    end
+
+    it "deletes all allocation rules associated with the assignment" do
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor_id: @student1.id,
+        assessee_id: @student2.id
+      )
+
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor_id: @student2.id,
+        assessee_id: @student1.id
+      )
+
+      expect { @assignment.update!(peer_reviews: false) }
+        .to change { AllocationRule.where(assignment: @assignment).pluck(:workflow_state).uniq }.from(["active"]).to(["deleted"])
+    end
+
+    it "is not triggered when peer_reviews changes from false to true" do
+      assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10, peer_reviews: false)
+
+      expect(assignment).not_to receive(:delete_allocation_rules)
+      assignment.update!(peer_reviews: true)
+    end
+
+    it "is not triggered when peer_reviews stays the same" do
+      expect(@assignment).not_to receive(:delete_allocation_rules)
+      @assignment.update!(title: "Updated Title")
+    end
+  end
+
   it_behaves_like "an accessibility scannable resource" do
     let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
