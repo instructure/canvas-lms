@@ -8702,4 +8702,114 @@ describe Course do
       end
     end
   end
+
+  describe "#has_studio_integration?" do
+    let(:course) { course_factory }
+    let(:root_account_tool) do
+      course.root_account.context_external_tools.create!(
+        name: "Instructure Studio",
+        domain: "arc.instructure.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+    let(:account_tool) do
+      course.account.context_external_tools.create!(
+        name: "Instructure Studio",
+        domain: "arc.instructure.com",
+        consumer_key: "key",
+        shared_secret: "secret"
+      )
+    end
+
+    context "when root account has studio.instructure.com external tool" do
+      before do
+        root_account_tool
+      end
+
+      it "returns true" do
+        expect(course.has_studio_integration?).to be true
+      end
+
+      context "and also has account tool" do
+        before do
+          account_tool
+        end
+
+        it "returns true" do
+          expect(course.has_studio_integration?).to be true
+        end
+      end
+    end
+
+    context "when account has arc.instructure.com external tool" do
+      before do
+        account_tool
+      end
+
+      it "returns true" do
+        expect(course.has_studio_integration?).to be true
+      end
+    end
+
+    context "when both root account and account have studio tools" do
+      before do
+        root_account_tool
+        account_tool
+      end
+
+      it "returns true" do
+        expect(course.has_studio_integration?).to be true
+      end
+    end
+
+    context "when external tools exist but are inactive" do
+      before do
+        root_account_tool.update!(workflow_state: "deleted")
+        account_tool.update!(workflow_state: "deleted")
+      end
+
+      it "returns false" do
+        expect(course.has_studio_integration?).to be false
+      end
+    end
+
+    context "when external tools have different domains" do
+      before do
+        root_account_tool.update!(domain: "other.instructure.com")
+        account_tool.update!(domain: "example.com")
+      end
+
+      it "returns false" do
+        expect(course.has_studio_integration?).to be false
+      end
+    end
+
+    context "when no external tools exist" do
+      it "returns false" do
+        expect(course.has_studio_integration?).to be false
+      end
+    end
+
+    context "with mixed case domains" do
+      before do
+        root_account_tool.update!(domain: "Arc.Instructure.com")
+        account_tool.update!(domain: "ARC.INSTRUCTURE.COM")
+      end
+
+      it "returns false for case mismatch" do
+        expect(course.has_studio_integration?).to be false
+      end
+    end
+
+    context "when only subdomain matches" do
+      before do
+        root_account_tool.update!(domain: "test.arc.instructure.com")
+      end
+
+      it "returns false for subdomain" do
+        expect(course.has_studio_integration?).to be false
+      end
+    end
+  end
 end

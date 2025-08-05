@@ -4609,7 +4609,9 @@ class Course < ActiveRecord::Base
   end
 
   def has_studio_integration?
-    account.context_external_tools.active.where(domain: "arc.instructure.com").exists?
+    domain = "arc.instructure.com"
+    root_account.context_external_tools.active.where(domain:).exists? ||
+      account.context_external_tools.active.where(domain:).exists?
   end
 
   private

@@ -449,23 +449,107 @@ RSpec.describe YoutubeMigrationService do
   end
 
   describe "#find_studio_tool" do
-    it "finds Studio tool by domain" do
-      result = service.find_studio_tool
-      expect(result).to eq(studio_tool)
+    let(:course_studio_tool) do
+      external_tool_model(
+        context: sub_account,
+        opts: {
+          domain: "arc.instructure.com",
+          url: "https://arc.instructure.com",
+          consumer_key: "course_key",
+          shared_secret: "course_secret",
+          name: "Course Studio"
+        }
+      )
     end
 
-    it "returns nil if Studio tool not found" do
-      studio_tool.destroy
+    context "when Studio tool exists in root account" do
+      it "finds Studio tool by domain" do
+        result = service.find_studio_tool
+        expect(result).to eq(studio_tool)
+      end
 
-      result = service.find_studio_tool
-      expect(result).to be_nil
+      it "returns nil if Studio tool not found" do
+        studio_tool.destroy
+
+        result = service.find_studio_tool
+        expect(result).to be_nil
+      end
+
+      it "does not return disabled tools" do
+        studio_tool.update(workflow_state: "disabled")
+
+        result = service.find_studio_tool
+        expect(result).to be_nil
+      end
     end
 
-    it "does not return disabled tools" do
-      studio_tool.update(workflow_state: "disabled")
+    context "when Studio tool exists in course account" do
+      let(:sub_account) { account_model(parent_account: root_account) }
+      let(:sub_course) { course_model(account: sub_account) }
+      let(:sub_service) { described_class.new(sub_course) }
 
-      result = service.find_studio_tool
-      expect(result).to be_nil
+      before do
+        # Remove root account tool to test course account tool
+        studio_tool.destroy
+        course_studio_tool
+      end
+
+      it "finds Studio tool in course account" do
+        result = sub_service.find_studio_tool
+        expect(result).to eq(course_studio_tool)
+      end
+
+      it "does not return disabled course account tools" do
+        course_studio_tool.update(workflow_state: "disabled")
+
+        result = sub_service.find_studio_tool
+        expect(result).to be_nil
+      end
+    end
+
+    context "when Studio tools exist in both root account and course account" do
+      let(:sub_account) { account_model(parent_account: root_account) }
+      let(:sub_course) { course_model(account: sub_account) }
+      let(:sub_service) { described_class.new(sub_course) }
+
+      before do
+        course_studio_tool
+      end
+
+      it "prioritizes root account tool over course account tool" do
+        result = sub_service.find_studio_tool
+        expect(result).to eq(studio_tool)
+        expect(result).not_to eq(course_studio_tool)
+      end
+
+      it "falls back to course account tool if root account tool is disabled" do
+        studio_tool.update(workflow_state: "disabled")
+
+        result = sub_service.find_studio_tool
+        expect(result).to eq(course_studio_tool)
+      end
+    end
+
+    context "when tools exist but have different domains" do
+      before do
+        studio_tool.update(domain: "other.instructure.com")
+      end
+
+      it "returns nil for tools with wrong domain" do
+        result = service.find_studio_tool
+        expect(result).to be_nil
+      end
+    end
+
+    context "when no external tools exist" do
+      before do
+        studio_tool.destroy
+      end
+
+      it "returns nil when no tools exist" do
+        result = service.find_studio_tool
+        expect(result).to be_nil
+      end
     end
   end
 
