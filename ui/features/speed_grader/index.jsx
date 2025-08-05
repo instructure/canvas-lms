@@ -92,6 +92,7 @@ ready(() => {
           window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
         discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
         multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
+        ltiAssetProcessor: window.ENV.FEATURES.lti_asset_processor ?? false,
       },
     }
   }
