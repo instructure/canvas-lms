@@ -336,10 +336,23 @@ class ContextModulesController < ApplicationController
           canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
         }
 
-        modules_observer_info = observer_module_info
+        # Only set observer options if user has observer data
+        if @current_user
+          observed_users_list = observed_users(@current_user, session, @context.id)
+          if observed_users_list.present?
+            js_env({ OBSERVER_OPTIONS: {
+                     OBSERVED_USERS_LIST: observed_users_list,
+                     CAN_ADD_OBSERVEE: @current_user
+                                        .profile
+                                        .tabs_available(@current_user, root_account: @domain_root_account)
+                                        .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                   } })
+          end
+        end
 
         js_env(MODULES_PERMISSIONS: modules_permissions)
-        js_env(MODULES_OBSERVER_INFO: modules_observer_info)
+        js_env(MODULES_OBSERVER_INFO: observer_module_info)
+
         js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
 
         js_bundle :context_modules_v2
