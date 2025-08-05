@@ -82,5 +82,9 @@ export interface EnvContextModules {
     observedStudent: {id: string; name: string} | null
     courseName: string
   }
+  OBSERVER_OPTIONS?: {
+    OBSERVED_USERS_LIST: Array<{id: string; name: string; avatar_url?: string | null}>
+    CAN_ADD_OBSERVEE: boolean
+  }
   CONTEXT_MODULES_HEADER_PROPS?: any
 }
