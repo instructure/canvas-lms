@@ -16,49 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './image-block.css'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
-import {ImageActionsWrapper} from './ImageActionsWrapper'
-import {useState} from 'react'
 import {useSave} from '../BaseBlock/useSave'
-import {ImageBlockUploadModal} from './ImageBlockUploadModal'
-import {ImageBlockAddButton} from './ImageBlockAddButton'
-import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 import {ImageBlockSettings} from './ImageBlockSettings'
+import {ImageEdit, ImagePreview} from '../BlockItems/Image'
 
 const I18n = createI18nScope('block_content_editor')
 
-const ImageBlockContent = (props: ImageBlockProps) => {
+const ImageContainer = (props: ImageBlockProps) => {
   const {isEditMode} = useGetRenderMode()
-  const [isOpen, setIsOpen] = useState(false)
   const save = useSave<typeof ImageBlock>()
-  const closeModal = () => setIsOpen(false)
-  const onSelected = (url: string, altText: string) => {
-    closeModal()
-    save({
-      url,
-      altText,
-    })
-  }
 
-  const image = props.url ? <img src={props.url} alt={props.altText} /> : undefined
-  return (
-    <>
-      {isEditMode && (
-        <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
-      )}
-
-      <ImageActionsWrapper
-        showActions={isEditMode && !!image}
-        onUploadClick={() => setIsOpen(true)}
-      >
-        {isEditMode
-          ? (image ?? <ImageBlockAddButton onClick={() => setIsOpen(true)} />)
-          : (image ?? <ImageBlockDefaultPreviewImage />)}
-      </ImageActionsWrapper>
-    </>
-  )
+  return isEditMode ? <ImageEdit {...props} save={save} /> : <ImagePreview {...props} />
 }
 
 export type ImageBlockProps = {
@@ -69,7 +39,7 @@ export type ImageBlockProps = {
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
     <BaseBlock title={ImageBlock.craft.displayName}>
-      <ImageBlockContent {...props} />
+      <ImageContainer {...props} />
     </BaseBlock>
   )
 }
