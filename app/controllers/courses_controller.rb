@@ -4038,7 +4038,7 @@ class CoursesController < ApplicationController
   def youtube_migration
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4053,7 +4053,7 @@ class CoursesController < ApplicationController
   def youtube_migration_scan
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4096,7 +4096,7 @@ class CoursesController < ApplicationController
   def start_youtube_migration_scan
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4110,7 +4110,7 @@ class CoursesController < ApplicationController
   def start_youtube_migration_convert
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
