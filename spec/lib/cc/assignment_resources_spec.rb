@@ -123,5 +123,24 @@ describe CC::AssignmentResources do
         end
       end
     end
+
+    context "with deleted similarity detection tool" do
+      before do
+        AssignmentConfigurationToolLookup.create!(
+          assignment:,
+          tool_type: "Lti::MessageHandler",
+          tool_id: 0
+        )
+        allow(assignment).to receive(:tool_settings_tool).and_return(nil)
+      end
+
+      context "when feature flag is enabled" do
+        before { Account.site_admin.enable_feature!(:exclude_deleted_lti2_tools_on_assignment_export) }
+
+        it "does not set similarity_detection_tool tag" do
+          expect(subject.at("similarity_detection_tool")).to be_nil
+        end
+      end
+    end
   end
 end
