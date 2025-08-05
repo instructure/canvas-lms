@@ -56,7 +56,7 @@ export function PostMessage({...props}) {
   let heading = 'h2'
 
   if (props.discussionEntry) {
-    const depth = Math.min(props.discussionEntry.depth + 2, 5)
+    const depth = Math.min((props.discussionEntry.depth || 0) + 2, 5)
     heading = 'h' + depth.toString()
   }
 

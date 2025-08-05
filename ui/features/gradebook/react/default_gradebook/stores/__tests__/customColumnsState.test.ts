@@ -46,7 +46,13 @@ const exampleCustomColumns: CustomColumn[] = [
 
 describe('customColumnsState', () => {
   const url = '/api/v1/courses/*/custom_gradebook_columns'
-  const server = setupServer()
+  const dataUrl = '/api/v1/courses/*/custom_gradebook_columns/*/data'
+  const server = setupServer(
+    // Default handler for custom column data requests
+    http.get(dataUrl, () => {
+      return HttpResponse.json([])
+    }),
+  )
   const capturedRequests: any[] = []
 
   function getRequests() {
