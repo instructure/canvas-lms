@@ -22755,6 +22755,7 @@ nn:
   require_completion_by_end_date_was_turned_on_and_s_756fc89c: "Krev fullføring ved sluttdato vart slått på og satt til %{date}."
   require_completion_by_specified_end_date_ed742ecb: "Krev fullføring ved spesifikk sluttdato"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Gruppemedlemmar må vere i same seksjon"
+  require_peer_reviews_9b5199d4: "Krev fagfellevurderingar"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
   require_signed_token_for_oembed_64883303: "Krev signert token for oEmbed"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
