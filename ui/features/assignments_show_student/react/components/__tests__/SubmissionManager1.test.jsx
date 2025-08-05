@@ -209,6 +209,29 @@ describe('SubmissionManager', () => {
     expect(screen.getByRole('button', {name: 'Submit Assignment'})).toBeInTheDocument()
   })
 
+  it('renders the submit button when an extra attempt is allowed', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Assignment: {
+        submissionTypes: ['online_text_entry'],
+        allowedAttempts: 1,
+      },
+      Submission: {
+        attempt: 2,
+        extraAttempts: 1,
+        state: 'unsubmitted',
+      },
+    })
+
+    renderInContext(
+      {latestSubmission: props.submission},
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>,
+    )
+
+    expect(screen.getByRole('button', {name: 'Submit Assignment'})).toBeInTheDocument()
+  })
+
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
