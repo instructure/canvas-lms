@@ -97,6 +97,12 @@ k20_course_readiness_criteria_set_preview:
   display_name: Intelligent Insights - Course Readiness - Criteria Set Preview
   description:
     k20_course_readiness_criteria_set_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Preview feature.
+k20_course_readiness_course_nav_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Course Nav Criteria
+  description:
+    k20_course_readiness_course_nav_criteria: Enables the Intelligent Insights - Course Readiness - Course Nav Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
