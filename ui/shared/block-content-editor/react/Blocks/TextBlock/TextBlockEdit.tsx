@@ -18,12 +18,10 @@
 
 import {useRef} from 'react'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {uid} from '@instructure/uid'
-import {TextInput} from '@instructure/ui-text-input'
 import {type TextBlockProps} from './TextBlock'
-
-const I18n = createI18nScope('block_content_editor')
+import {Flex} from '@instructure/ui-flex'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 
 export const TextBlockEdit = (
   props: TextBlockProps & {
@@ -34,14 +32,9 @@ export const TextBlockEdit = (
   const rceRef = useRef(null)
 
   return (
-    <>
+    <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && (
-        <TextInput
-          renderLabel={I18n.t('Block title')}
-          placeholder={I18n.t('Start typing...')}
-          value={props.title}
-          onChange={e => props.onTitleChange(e.target.value)}
-        />
+        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
       )}
       <CanvasRce
         ref={rceRef}
@@ -55,6 +48,6 @@ export const TextBlockEdit = (
         }}
         height={300}
       />
-    </>
+    </Flex>
   )
 }

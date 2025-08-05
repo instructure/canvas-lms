@@ -17,8 +17,9 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Heading} from '@instructure/ui-heading'
 import {type TextBlockProps} from './TextBlock'
+import {TitlePreview} from '../BlockItems/Title/TitlePreview'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -30,14 +31,13 @@ export const TextBlockEditPreview = (props: TextBlockProps) => {
     ? props.content
     : `<p style="color: '#9EA6AD'">${I18n.t('Type to add body')}</p>`
 
+  const title = isTitleDefined ? props.title : I18n.t('Type to add block title')
+  const color = isTitleDefined ? 'primary' : 'secondary'
+
   return (
-    <>
-      {props.settings.includeBlockTitle && (
-        <Heading variant="titleSection" color={isTitleDefined ? 'primary' : 'secondary'}>
-          {isTitleDefined ? props.title : I18n.t('Type to add block title')}
-        </Heading>
-      )}
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && <TitlePreview color={color} text={title} />}
       <div dangerouslySetInnerHTML={{__html: content}}></div>
-    </>
+    </Flex>
   )
 }

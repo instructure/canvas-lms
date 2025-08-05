@@ -16,14 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './base-block-layout.css'
-import {PropsWithChildren} from 'react'
-import {View} from '@instructure/ui-view'
+import {TextInput} from '@instructure/ui-text-input'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ChangeEvent} from 'react'
 
-export const BaseBlockViewLayout = (props: PropsWithChildren) => {
+const I18n = createI18nScope('block_content_editor')
+
+export type TitleEditProps = {
+  title: string
+  onTitleChange: (newTitle: string) => void
+}
+
+export const TitleEdit = ({title, onTitleChange}: TitleEditProps) => {
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => onTitleChange(event.target.value)
+
   return (
-    <View as="div" padding="paddingCardLarge">
-      {props.children}
-    </View>
+    <TextInput
+      renderLabel={I18n.t('Block title')}
+      placeholder={I18n.t('Start typing...')}
+      value={title}
+      onChange={handleOnChange}
+    />
   )
 }
