@@ -85,6 +85,17 @@ disallow_null_custom_variables:
       state: allowed_on
     ci:
       state: allowed_on
+exclude_deleted_lti2_tools_on_assignment_export:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Exclude deleted LTI 2.0 similarity check tools on assignment export
+  description: |-
+    If enabled, deleted LTI 2.0 similarity check tools will be excluded from the assignment export.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 external_tool_drawer:
   state: hidden
   applies_to: RootAccount
