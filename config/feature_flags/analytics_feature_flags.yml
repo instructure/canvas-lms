@@ -91,6 +91,12 @@ k20_course_readiness_homepage_criteria:
   display_name: Intelligent Insights - Course Readiness - Homepage Criteria
   description:
     k20_course_readiness_homepage_criteria: Enables the Intelligent Insights - Course Readiness - Homepage Criteria feature.
+k20_course_readiness_criteria_set_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Criteria Set Preview
+  description:
+    k20_course_readiness_criteria_set_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Preview feature.
   root_opt_in: true
   beta: true
   shadow: true
