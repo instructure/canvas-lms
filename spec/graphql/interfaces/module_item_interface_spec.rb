@@ -97,6 +97,105 @@ RSpec.describe Interfaces::ModuleItemInterface do
     end
   end
 
+  describe "can_manage_assign_to field" do
+    let(:assignment_query) do
+      <<~GQL
+        query {
+          course(id: "#{@course.id}") {
+            assignmentsConnection {
+              nodes {
+                id
+                canManageAssignTo
+              }
+            }
+          }
+        }
+      GQL
+    end
+
+    let(:quiz_query) do
+      <<~GQL
+        query {
+          course(id: "#{@course.id}") {
+            quizzesConnection {
+              nodes {
+                id
+                canManageAssignTo
+              }
+            }
+          }
+        }
+      GQL
+    end
+
+    let(:discussion_query) do
+      <<~GQL
+        query {
+          course(id: "#{@course.id}") {
+            discussionsConnection {
+              nodes {
+                id
+                canManageAssignTo
+              }
+            }
+          }
+        }
+      GQL
+    end
+
+    let(:page_query) do
+      <<~GQL
+        query {
+          course(id: "#{@course.id}") {
+            pagesConnection {
+              nodes {
+                id
+                canManageAssignTo
+              }
+            }
+          }
+        }
+      GQL
+    end
+
+    it "returns true for differentiable types" do
+      @course.quizzes.create!
+      @course.wiki_pages.create!(title: "test page")
+      @course.discussion_topics.create!
+
+      assignments = CanvasSchema.execute(assignment_query, context:).dig("data", "course", "assignmentsConnection", "nodes")
+      quizzes = CanvasSchema.execute(quiz_query, context:).dig("data", "course", "quizzesConnection", "nodes")
+      discussions = CanvasSchema.execute(discussion_query, context:).dig("data", "course", "discussionsConnection", "nodes")
+      pages = CanvasSchema.execute(page_query, context:).dig("data", "course", "pagesConnection", "nodes")
+
+      assignments.each do |assignment|
+        expect(assignment["canManageAssignTo"]).to be true
+      end
+      quizzes.each do |quiz|
+        expect(quiz["canManageAssignTo"]).to be true
+      end
+      discussions.each do |discussion|
+        expect(discussion["canManageAssignTo"]).to be true
+      end
+      pages.each do |page|
+        expect(page["canManageAssignTo"]).to be true
+      end
+    end
+
+    it "returns false for ungraded group discussions" do
+      group = @course.group_categories.create!(name: "Ungraded Group Category")
+      ungraded_discussion = @course.discussion_topics.create!(title: "Ungraded Discussion", group_category_id: nil)
+      ungraded_group_discussion = @course.discussion_topics.create!(title: "Ungraded Group Discussion", group_category_id: group.id)
+      result = CanvasSchema.execute(discussion_query, context:)
+      discussions = result.dig("data", "course", "discussionsConnection", "nodes")
+
+      ungraded_group_discussion_result = discussions.find { |d| d["id"] == CanvasSchema.id_from_object(ungraded_group_discussion, Types::DiscussionType, context) }
+      expect(ungraded_group_discussion_result["canManageAssignTo"]).to be false
+      ungraded_discussion_result = discussions.find { |d| d["id"] == CanvasSchema.id_from_object(ungraded_discussion, Types::DiscussionType, context) }
+      expect(ungraded_discussion_result["canManageAssignTo"]).to be true
+    end
+  end
+
   describe "can_unpublish field" do
     let(:query) do
       <<~GQL

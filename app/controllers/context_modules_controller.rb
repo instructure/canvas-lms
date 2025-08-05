@@ -328,7 +328,8 @@ class ContextModulesController < ApplicationController
           canDelete: @can_delete,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
-          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
+          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),
+          canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
         }
 
         modules_observer_info = observer_module_info

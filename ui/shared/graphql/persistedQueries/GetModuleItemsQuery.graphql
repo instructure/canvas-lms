@@ -36,6 +36,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
+                canManageAssignTo
                 assignmentOverrides(first: 100) {
                   edges {
                     cursor
@@ -94,6 +95,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
+                canManageAssignTo
                 graded
                 replyToEntryRequiredCount
                 submissionsConnection(filter: { includeUnsubmitted: true }) {
@@ -178,6 +180,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 type: __typename
                 isLockedByMasterCourse
                 canDuplicate
+                canManageAssignTo
                 graded
               }
               ... on Quiz {
@@ -189,6 +192,7 @@ query GetModuleItemsQuery($moduleId: ID!, $cursor: String, $first: Int) {
                 canUnpublish
                 isLockedByMasterCourse
                 canDuplicate
+                canManageAssignTo
                 graded
                 assignedToDates {
                   id

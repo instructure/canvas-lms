@@ -62,6 +62,7 @@ export type ModuleItemContent = {
   published?: boolean
   canUnpublish?: boolean
   canDuplicate?: boolean
+  canManageAssignTo?: boolean
   dueAt?: string
   lockAt?: string
   unlockAt?: string

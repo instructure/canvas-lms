@@ -47,6 +47,7 @@ export interface EnvContextModules {
         canDelete: boolean
         canViewUnpublished: boolean
         canDirectShare: boolean
+        canManageSpeedGrader: boolean
       }
     | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
