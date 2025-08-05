@@ -4602,7 +4602,6 @@ class Course < ActiveRecord::Base
 
   # Accessibility scan limit check
   def exceeds_accessibility_scan_limit?
-    # TODO: add caching with proper invalidation
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.count
 

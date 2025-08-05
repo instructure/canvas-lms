@@ -28,6 +28,13 @@ class Accessibility::CourseScannerService < ApplicationService
   end
 
   def scan_course
+    if @course.exceeds_accessibility_scan_limit?
+      Rails.logger.warn(
+        "[A11Y Scan] Skipped scanning the course #{@course.name} (ID: #{@course.id}) due to exceeding the size limit."
+      )
+      return
+    end
+
     @course.wiki_pages.not_deleted.find_each do |resource|
       Accessibility::ResourceScannerService.call(resource:)
     end
