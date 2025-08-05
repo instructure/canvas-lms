@@ -23,7 +23,6 @@ module CanvasCareer
     before :once do
       @root_account = Account.default
       @root_account.enable_feature!(:horizon_course_setting)
-      @root_account.enable_feature!(:horizon_learning_provider_app_for_accounts)
       @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
       @root_account.enable_feature!(:horizon_learning_provider_app_on_contextless_routes)
 
@@ -62,12 +61,6 @@ module CanvasCareer
         it "returns ACADEMIC for admins accessing non-horizon accounts" do
           account_admin_user(user: @user, account: @career_subaccount)
           expect(ExperienceResolver.new(@user, @root_account, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
-        end
-
-        it "returns ACADEMIC for admins in horizon accounts without LP feature flag" do
-          account_admin_user(user: @user, account: @career_subaccount)
-          @root_account.disable_feature!(:horizon_learning_provider_app_for_accounts)
-          expect(ExperienceResolver.new(@user, @career_subaccount, @root_account, @session).resolve).to eq Constants::App::ACADEMIC
         end
 
         it "returns ACADEMIC for non-admin users in horizon accounts" do

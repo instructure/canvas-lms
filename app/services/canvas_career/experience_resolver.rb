@@ -78,9 +78,7 @@ module CanvasCareer
       return false unless config.learning_provider_app_launch_url.present?
 
       if @context.is_a?(Account)
-        horizon_account? &&
-          @domain_root_account.feature_enabled?(:horizon_learning_provider_app_for_accounts) &&
-          learning_provider_in_context?
+        horizon_account? && learning_provider_in_context?
       elsif @context.is_a?(Course)
         horizon_course? &&
           @domain_root_account.feature_enabled?(:horizon_learning_provider_app_for_courses) &&
