@@ -79,6 +79,15 @@ k20_course_readiness_broken_links_criteria:
   root_opt_in: true
   beta: true
   shadow: true
+k20_course_readiness_lti_apps_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - LTI Apps Criteria
+  description:
+    k20_course_readiness_lti_apps_criteria: Enables the Intelligent Insights - Course Readiness - LTI Apps Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_students_in_need_of_attention:
   state: hidden
   applies_to: Account
