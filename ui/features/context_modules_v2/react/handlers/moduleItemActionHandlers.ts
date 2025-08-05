@@ -81,8 +81,7 @@ export const handleSpeedGrader = (
 ) => {
   if (
     content?.type?.toLowerCase().includes('assignment') ||
-    content?.type?.toLowerCase().includes('quiz') ||
-    content?.type?.toLowerCase().includes('discussion')
+    content?.type?.toLowerCase().includes('quiz')
   ) {
     window.location.href = `/courses/${courseId}/gradebook/speed_grader?assignment_id=${content._id}`
   }

@@ -264,6 +264,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
           <ModuleItemActionMenu
             itemType={content?.type || ''}
+            content={content}
             canDuplicate={content?.canDuplicate || false}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}

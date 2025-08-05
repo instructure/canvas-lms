@@ -36,6 +36,7 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
+import type {ModuleItemContent} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -43,6 +44,7 @@ const basicContentTypes = ['SubHeader', 'ExternalUrl']
 
 export interface ModuleItemActionMenuProps {
   itemType: string
+  content: ModuleItemContent
   canDuplicate: boolean
   isMenuOpen: boolean
   setIsMenuOpen: (isOpen: boolean) => void
@@ -68,6 +70,7 @@ export interface ModuleItemActionMenuProps {
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   itemType,
+  content,
   canDuplicate,
   isMenuOpen,
   setIsMenuOpen,
@@ -92,10 +95,15 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const {permissions} = useContextModule()
   const canEdit = permissions?.canEdit
   const canAdd = permissions?.canAdd
+  const canManageSpeedGrader = permissions?.canManageSpeedGrader
   const canDirectShare = permissions?.canDirectShare
 
   const isNotSpecialType = !isBasic && !isFile && !isExternalTool
-  const showSpeedGrader = canEdit && isNotSpecialType
+  const showSpeedGrader =
+    canManageSpeedGrader &&
+    (itemType === 'Assignment' || itemType === 'Quiz') &&
+    !!content?.published
+  const showAssignTo = !!content?.canManageAssignTo
   const showDirectShare = canDirectShare && isNotSpecialType
 
   const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
@@ -134,7 +142,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
         I18n.t('SpeedGrader'),
       )}
       {renderMenuItem(
-        showSpeedGrader,
+        showAssignTo,
         handleAssignTo,
         <IconPermissionsSolid />,
         I18n.t('Assign To...'),

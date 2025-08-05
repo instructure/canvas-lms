@@ -157,6 +157,7 @@ export const contextModuleDefaultProps = {
     canViewUnpublished: true,
     canDirectShare: true,
     readAsAdmin: true,
+    canManageSpeedGrader: true,
   },
   NEW_QUIZZES_BY_DEFAULT: false,
   DEFAULT_POST_TO_SIS: false,
