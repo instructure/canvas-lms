@@ -335,10 +335,6 @@ describe "outcomes" do
         end
 
         describe "with friendly_description enabled" do
-          before do
-            enable_friendly_description
-          end
-
           it "creates an outcome with a friendly description present" do
             get outcome_url
             create_outcome_with_friendly_desc("Outcome", "Standard Desc", "Friendly Desc")

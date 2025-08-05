@@ -237,17 +237,6 @@ describe Outcomes::LearningOutcomeGroupChildren do
               end
             end
           end
-
-          context "when Outcome Alignment Summary with NQ FF is disabled" do
-            before do
-              course.disable_feature!(:outcome_alignment_summary_with_new_quizzes)
-            end
-
-            it "returns the total outcomes only aligned in Canvas based on filter argument" do
-              expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 1
-              expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 2
-            end
-          end
         end
       end
 
