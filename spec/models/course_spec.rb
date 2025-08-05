@@ -2814,7 +2814,7 @@ describe Course do
 
       describe "TAB_YOUTUBE_MIGRATION" do
         before do
-          @course.root_account.enable_feature!(:youtube_migration)
+          @course.enable_feature!(:youtube_migration)
           # Create Studio integration external tool
           @course.root_account.context_external_tools.create!(
             name: "Studio",
@@ -2825,7 +2825,7 @@ describe Course do
         end
 
         after do
-          @course.root_account.disable_feature!(:youtube_migration)
+          @course.disable_feature!(:youtube_migration)
         end
 
         it "includes YouTube migration tab when feature flag is enabled and user has permissions" do
@@ -2849,7 +2849,7 @@ describe Course do
         end
 
         it "does not include YouTube migration tab when feature flag is disabled" do
-          @course.root_account.disable_feature!(:youtube_migration)
+          @course.disable_feature!(:youtube_migration)
           tabs = @course.tabs_available(@user)
           youtube_tab = tabs.find { |t| t[:id] == Course::TAB_YOUTUBE_MIGRATION }
 
@@ -3292,7 +3292,7 @@ describe Course do
 
       describe "TAB_YOUTUBE_MIGRATION" do
         it "is not included for students even when feature flag is enabled and Studio integration exists" do
-          @course.root_account.enable_feature!(:youtube_migration)
+          @course.enable_feature!(:youtube_migration)
           @course.root_account.context_external_tools.create!(
             name: "Studio",
             domain: "arc.instructure.com",

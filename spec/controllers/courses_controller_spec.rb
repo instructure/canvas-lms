@@ -5143,7 +5143,7 @@ describe CoursesController do
 
       context "when ff is on" do
         before do
-          @course.root_account.enable_feature!(:youtube_migration)
+          @course.enable_feature!(:youtube_migration)
         end
 
         it "should return ok status" do
@@ -5165,7 +5165,7 @@ describe CoursesController do
 
       context "when ff is off" do
         before do
-          @course.root_account.disable_feature!(:youtube_migration)
+          @course.disable_feature!(:youtube_migration)
         end
 
         it "should return not_found status" do
@@ -5188,7 +5188,7 @@ describe CoursesController do
 
       context "when ff is on" do
         before do
-          @course.root_account.enable_feature!(:youtube_migration)
+          @course.enable_feature!(:youtube_migration)
           user_session(@user)
         end
 
