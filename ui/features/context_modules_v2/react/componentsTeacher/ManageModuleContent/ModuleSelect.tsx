@@ -49,6 +49,7 @@ const ModuleSelect: React.FC<ModuleSelectProps> = ({
         assistiveText={I18n.t('Select a destination module')}
         value={selectedModule}
         onChange={onModuleChange}
+        data-testid="select_module_listbox"
       >
         {modules
           .filter(module => moduleAction === 'move_module_item' || module._id !== sourceModuleId)

@@ -262,7 +262,14 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
   const getTitle = useMemo(() => getTrayTitle(moduleAction || null), [moduleAction])
 
   return (
-    <Tray label={getTitle} open={isOpen} onDismiss={onClose} placement="end" size="small">
+    <Tray
+      label={getTitle}
+      open={isOpen}
+      onDismiss={onClose}
+      placement="end"
+      size="small"
+      data-testid="manage-module-content-tray"
+    >
       <View as="div" padding="medium">
         <View as="div" textAlign="end">
           <CloseButton
