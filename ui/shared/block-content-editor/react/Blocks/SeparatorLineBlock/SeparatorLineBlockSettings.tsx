@@ -16,6 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useNode} from '@craftjs/core'
+import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {SeparatorLineBlockProps} from './SeparatorLineBlock'
+
+const I18n = createI18nScope('block_content_editor')
+
 export const SeparatorLineBlockSettings = () => {
-  return <p>Separator Line Block Settings</p>
+  const {
+    actions: {setProp},
+    settings,
+  } = useNode(node => ({
+    settings: node.data.props.settings,
+  }))
+
+  const handleSeparatorColorChange = (value: string) => {
+    setProp((props: SeparatorLineBlockProps) => {
+      props.settings.separatorColor = value
+    })
+  }
+
+  return (
+    <View as="div" padding="small">
+      <ColorPickerWrapper
+        label={I18n.t('Separator')}
+        value={settings.separatorColor}
+        baseColor={'#ffffff'} // Temporary base color
+        onChange={handleSeparatorColorChange}
+        baseColorLabel={I18n.t('Background')}
+      />
+    </View>
+  )
 }

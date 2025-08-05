@@ -23,6 +23,7 @@ import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
+import {colors} from '@instructure/canvas-theme'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -31,7 +32,9 @@ type BlockFactory = {[key: string]: () => ReactElement}
 export const blockFactory = {
   [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
-  [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
+  [SeparatorLineBlock.name]: () => (
+    <SeparatorLineBlock thickness="small" settings={{separatorColor: colors.ui.lineDivider}} />
+  ),
   [ButtonBlock.name]: () => (
     <ButtonBlock settings={{alignment: 'left', layout: 'horizontal', buttons: [{id: 1}]}} />
   ),
