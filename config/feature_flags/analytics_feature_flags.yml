@@ -57,7 +57,7 @@ k20_course_readiness_due_date_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Due Date Criteria
   description:
-    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature and accompanying permission.
+    k20_course_readiness_due_date_criteria: Enables the Intelligent Insights - Course Readiness - Due Date Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -66,7 +66,7 @@ k20_course_readiness_gradebook_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Gradebook Criteria
   description:
-    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature and accompanying permission.
+    k20_course_readiness_gradebook_criteria: Enables the Intelligent Insights - Course Readiness - Gradebook Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -75,7 +75,7 @@ k20_course_readiness_broken_links_criteria:
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Broken Links Criteria
   description:
-    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature and accompanying permission.
+    k20_course_readiness_broken_links_criteria: Enables the Intelligent Insights - Course Readiness - Broken Links Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
@@ -103,6 +103,12 @@ k20_course_readiness_course_nav_criteria:
   display_name: Intelligent Insights - Course Readiness - Course Nav Criteria
   description:
     k20_course_readiness_course_nav_criteria: Enables the Intelligent Insights - Course Readiness - Course Nav Criteria feature.
+k20_course_readiness_rubric_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Rubric Criteria
+  description:
+    k20_course_readiness_rubric_criteria: Enables the Intelligent Insights - Course Readiness - Rubric Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
