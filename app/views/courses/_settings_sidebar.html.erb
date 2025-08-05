@@ -21,7 +21,7 @@
 %>
 <% blueprint_subscription ||= nil %>
 <% show_publish_controls ||= false %>
-<% show_youtube_migration ||= @context&.root_account&.feature_enabled?(:youtube_migration) || false %>
+<% show_youtube_migration ||= @context&.feature_enabled?(:youtube_migration) || false %>
 <% if blueprint_subscription %>
   <script>
     function gotoBlueprintInfo() {

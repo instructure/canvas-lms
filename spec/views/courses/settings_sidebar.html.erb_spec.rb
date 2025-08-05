@@ -124,7 +124,7 @@ describe "courses/_settings_sidebar" do
 
     context "when ff is enabled" do
       before do
-        @course.root_account.enable_feature!(:youtube_migration)
+        @course.enable_feature!(:youtube_migration)
       end
 
       it "should render the button" do
@@ -136,7 +136,7 @@ describe "courses/_settings_sidebar" do
 
     context "when ff is disabled" do
       before do
-        @course.root_account.disable_feature!(:youtube_migration)
+        @course.disable_feature!(:youtube_migration)
       end
 
       it "should render the button" do

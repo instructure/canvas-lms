@@ -3700,7 +3700,7 @@ class Course < ActiveRecord::Base
       end
 
       # Add YouTube migration tab before Settings if conditions are met
-      if root_account.feature_enabled?(:youtube_migration) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && has_studio_integration?
+      if feature_enabled?(:youtube_migration) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && has_studio_integration?
         settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
         settings_index ||= tabs.length
         tabs.insert(settings_index, {
