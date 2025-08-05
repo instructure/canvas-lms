@@ -115,7 +115,7 @@
     "aphrodite": "^2",
     "axios": "^1.11.0",
     "bloody-offset": "0.0.0",
-    "crypto-es": "^2.0.4",
+    "crypto-es": "^2.1.0",
     "classnames": "^2.2.5",
     "format-message": "^6",
     "format-message-generate-id": "^6",
