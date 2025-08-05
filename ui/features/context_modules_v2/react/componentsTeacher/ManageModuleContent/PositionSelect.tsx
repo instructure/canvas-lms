@@ -62,6 +62,7 @@ const PositionSelect: React.FC<PositionSelectProps> = ({
           assistiveText={I18n.t('Select position')}
           value={selectedPosition}
           onChange={onPositionChange}
+          data-testid="select_position_listbox"
         >
           <SimpleSelect.Option id="top" value="top">
             {I18n.t('At the top')}

@@ -62,7 +62,7 @@ describe "context modules", :ignore_js_errors do
     expect(item_indent).to match("padding: 0px 0px 0px 40px;")
   end
 
-  context "modules action menu" do
+  context "module items action menu" do
     before do
       # Create a module with at least one item of each type
       module_setup
@@ -229,6 +229,52 @@ describe "context modules", :ignore_js_errors do
         copy_and_expect(@assignment_item, "assignments")
         copy_and_expect(@discussion_item, "discussion_topics")
         copy_and_expect(@page_item, "wiki_pages")
+      end
+    end
+
+    context "move module item kebab form" do
+      it "shows move item tray and close it" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+
+        manage_module_item_button(@module1.content_tags.first.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(f("body")).to contain_css(move_item_tray_selector)
+        expect(cancel_tray_button).to be_displayed
+        cancel_tray_button.click
+        expect(f("body")).not_to contain_css(move_item_tray_selector)
+
+        manage_module_item_button(@module1.content_tags.first.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(f("body")).to contain_css(move_item_tray_selector)
+        expect(close_tray_button).to be_displayed
+        close_tray_button.click
+        expect(f("body")).not_to contain_css(move_item_tray_selector)
+      end
+
+      it "moves module item to another module" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        moved_item = @module.content_tags.first
+        manage_module_item_button(moved_item.id).click
+        module_item_action_menu_link("Move to...").click
+        expect(move_item_tray_select_modules_listbox).to be_displayed
+        move_item_tray_select_modules_listbox.click
+
+        option_list_id = move_item_tray_select_modules_listbox.attribute("aria-controls")
+        option_list_course_option(option_list_id, @module1.name).click
+        move_item_tray_place_contents_listbox.click
+        place_item_at_bottom_option.click
+        submit_move_to_button.click
+        wait_for_ajaximations
+
+        item_titles_list = module_item_title_links.map(&:text)
+        expect(@module1.content_tags.last.title).to include(moved_item.title)
+        expect(item_titles_list.count(moved_item.title)).to eq(1)
       end
     end
   end

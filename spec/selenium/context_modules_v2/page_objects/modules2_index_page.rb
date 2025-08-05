@@ -315,6 +315,9 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
   end
 
+  def move_item_tray_selector
+    "[data-testid='manage-module-content-tray']"
+  end
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -595,6 +598,30 @@ module Modules2IndexPage
 
   def screenreader_alert
     f("#flash_screenreader_holder")
+  end
+
+  def move_item_tray_select_modules_listbox
+    f("[data-testid='select_module_listbox']")
+  end
+
+  def move_item_tray_place_contents_listbox
+    f("[data-testid='select_position_listbox']")
+  end
+
+  def place_item_at_bottom_option
+    fj("[role='option']:contains('At the bottom')")
+  end
+
+  def cancel_tray_button
+    fxpath("//button[.//span[text()='Cancel']]")
+  end
+
+  def submit_move_to_button
+    fxpath("//button[.//span[text()='Move']]")
+  end
+
+  def close_tray_button
+    fxpath("//button[.//span[text()='Close']]")
   end
 
   #------------------------------ Actions -------------------------------
