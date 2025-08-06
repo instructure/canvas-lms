@@ -19,8 +19,6 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
-    self.ignored_columns += ["settings"]
-
     belongs_to :developer_key
     belongs_to :lti_registration, class_name: "Lti::Registration", inverse_of: :manual_configuration, optional: true
 
