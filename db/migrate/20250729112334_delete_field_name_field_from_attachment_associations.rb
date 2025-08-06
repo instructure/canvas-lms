@@ -23,6 +23,11 @@ class DeleteFieldNameFieldFromAttachmentAssociations < ActiveRecord::Migration[7
 
   def change
     remove_column :attachment_associations, :field_name, if_exists: true # rubocop:disable Migration/RemoveColumn,Rails/ReversibleMigration
-    drop_enum :enum_attachment_associations_field_name, if_exists: true
+    begin
+      drop_enum :enum_attachment_associations_field_name, if_exists: true
+    rescue ActiveRecord::StatementInvalid => e
+      # ignore; some other shard is still using this enum and will drop it later
+      raise unless e.cause.is_a?(PG::DependentObjectsStillExist)
+    end
   end
 end
