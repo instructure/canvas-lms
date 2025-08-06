@@ -109,12 +109,12 @@ class ExternalContentController < ApplicationController
   end
 
   def oembed_retrieve
-    begin
+    content_item = InstrumentTLSCiphers.without_tls_metrics do
       res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
-      content_item = Lti::ContentItemConverter.convert_oembed(data)
+      Lti::ContentItemConverter.convert_oembed(data)
     rescue
-      content_item = {}
+      {}
     end
     render json: [content_item]
   end

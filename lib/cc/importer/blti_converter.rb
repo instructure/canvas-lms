@@ -141,11 +141,13 @@ module CC::Importer
     end
 
     def retrieve_and_convert_blti_url(url)
-      response = CanvasHttp.get(url, redirect_limit: 10)
-      config_xml = response.body
-      convert_blti_xml(config_xml)
-    rescue Timeout::Error
-      raise CCImportError, I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out")
+      InstrumentTLSCiphers.without_tls_metrics do
+        response = CanvasHttp.get(url, redirect_limit: 10)
+        config_xml = response.body
+        convert_blti_xml(config_xml)
+      rescue Timeout::Error
+        raise CCImportError, I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out")
+      end
     end
 
     def get_custom_properties(node)

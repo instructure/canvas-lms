@@ -2518,45 +2518,47 @@ class Attachment < ActiveRecord::Base
   def self.clone_url_as_attachment(url, opts = {})
     _, uri = CanvasHttp.validate_url(url, check_host: true)
 
-    CanvasHttp.get(url) do |http_response|
-      if http_response.code.to_i == 200
-        tmpfile = CanvasHttp.tempfile_for_uri(uri)
-        # net/http doesn't make this very obvious, but read_body can take any
-        # object that responds to << as the destination of the body, and it'll
-        # stream in chunks rather than reading the whole body into memory (as
-        # long as you use the block form of http.request, which
-        # CanvasHttp.get does)
-        http_response.read_body(tmpfile)
-        tmpfile.rewind
-        attachment = opts[:attachment] || Attachment.new(filename: File.basename(uri.path))
-        attachment.filename ||= File.basename(uri.path)
-        Attachments::Storage.store_for_attachment(attachment, tmpfile)
-        if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
-          # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
-          attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != "unknown/unknown"
-                                      attachment.content_type_was
-                                    else
-                                      http_response.content_type
-                                    end
-        end
-        return attachment
-      else
-        # Grab the first part of the body for error reporting
-        # Just read the first chunk of the body in case it's huge
-        body_head = nil
-
-        begin
-          http_response.read_body do |chunk|
-            body_head = "#{chunk}..." if chunk.present?
-            break
+    InstrumentTLSCiphers.without_tls_metrics do
+      CanvasHttp.get(url) do |http_response|
+        if http_response.code.to_i == 200
+          tmpfile = CanvasHttp.tempfile_for_uri(uri)
+          # net/http doesn't make this very obvious, but read_body can take any
+          # object that responds to << as the destination of the body, and it'll
+          # stream in chunks rather than reading the whole body into memory (as
+          # long as you use the block form of http.request, which
+          # CanvasHttp.get does)
+          http_response.read_body(tmpfile)
+          tmpfile.rewind
+          attachment = opts[:attachment] || Attachment.new(filename: File.basename(uri.path))
+          attachment.filename ||= File.basename(uri.path)
+          Attachments::Storage.store_for_attachment(attachment, tmpfile)
+          if attachment.content_type.blank? || attachment.content_type == "unknown/unknown"
+            # uploaded_data= clobbers the content_type set in preflight; if it was given, prefer it to the HTTP response
+            attachment.content_type = if attachment.content_type_was.present? && attachment.content_type_was != "unknown/unknown"
+                                        attachment.content_type_was
+                                      else
+                                        http_response.content_type
+                                      end
           end
-        rescue
-          # If an error occured reading the body, don't worry
-          # about attempting to report it
+          return attachment
+        else
+          # Grab the first part of the body for error reporting
+          # Just read the first chunk of the body in case it's huge
           body_head = nil
-        end
 
-        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
+          begin
+            http_response.read_body do |chunk|
+              body_head = "#{chunk}..." if chunk.present?
+              break
+            end
+          rescue
+            # If an error occured reading the body, don't worry
+            # about attempting to report it
+            body_head = nil
+          end
+
+          raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
+        end
       end
     end
   end
