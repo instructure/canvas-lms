@@ -132,7 +132,8 @@ module Api::V1::Assignment
       include_planner_override: false,
       include_can_edit: false,
       include_webhook_info: false,
-      include_assessment_requests: false
+      include_assessment_requests: false,
+      include_peer_review: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -636,6 +637,18 @@ module Api::V1::Assignment
                    prepared_create[:assignment].save!
                    :created
                  end
+    end
+
+    if [:created, :ok].include?(response) &&
+       prepared_create[:assignment].peer_reviews &&
+       prepared_create[:assignment].context.feature_enabled?(:peer_review_allocation_and_grading)
+
+      begin
+        create_api_peer_review_sub_assignment(prepared_create[:assignment], assignment_params[:peer_review])
+      rescue
+        prepared_create[:assignment].destroy
+        return :peer_review_error
+      end
     end
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
@@ -1447,5 +1460,18 @@ module Api::V1::Assignment
       end
       json[:available] = assessment_request.available?
     end
+  end
+
+  def create_api_peer_review_sub_assignment(parent_assignment, params)
+    unless params.nil?
+      points_possible = params[:points_possible] if params[:points_possible].present?
+      grading_type = params[:grading_type] if params[:grading_type].present?
+      due_at = params[:due_at] if params[:due_at].present?
+      unlock_at = params[:unlock_at] if params[:unlock_at].present?
+      lock_at = params[:lock_at] if params[:lock_at].present?
+    end
+
+    PeerReview::PeerReviewCreatorService.call(parent_assignment:, points_possible:, grading_type:, due_at:, unlock_at:, lock_at:)
+    parent_assignment.association(:peer_review_sub_assignment).reload
   end
 end

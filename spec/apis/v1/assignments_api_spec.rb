@@ -2526,6 +2526,584 @@ describe AssignmentsApiController, type: :request do
       expect(Assignment.count).to eq 1
     end
 
+    context "create_api_assignment: peer review sub assignment creation logic" do
+      before do
+        @course.enable_feature!(:peer_review_allocation_and_grading)
+        @group = @course.assignment_groups.create!(name: "test group")
+      end
+
+      def build_peer_review_assignment(options = {})
+        assignment = @course.assignments.build(title: options[:title] || "Test Assignment", peer_reviews: options.fetch(:peer_reviews, true))
+        params_hash = {}
+        params_hash[:peer_review] = options[:peer_review_params] unless options[:peer_review_params].nil?
+        assignment_params = ActionController::Parameters.new(params_hash)
+        [assignment, assignment_params]
+      end
+
+      def call_create_assignment_api(assignment, assignment_params)
+        controller = AssignmentsApiController.new
+        controller.extend(Api::V1::Assignment)
+        controller.send(:create_api_assignment, assignment, assignment_params, @teacher, @course)
+      end
+
+      def mock_and_call_create_api_assignment(assignment, assignment_params, mock_options = {})
+        prepare_options = { assignment:, valid: true }
+        prepare_options.merge!(mock_options[:prepare_options]) if mock_options[:prepare_options]
+
+        allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+          .and_return(prepare_options)
+
+        if prepare_options[:overrides]
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_assignment_with_overrides)
+            .and_return(mock_options[:assignment_creation_return] || :ok)
+        else
+          allow(assignment).to receive(:save!).and_return(true)
+        end
+
+        allow(SubmissionLifecycleManager).to receive(:recompute)
+
+        mock_options[:additional_mocks]&.call
+
+        call_create_assignment_api(assignment, assignment_params)
+      end
+
+      describe "prerequisites validation" do
+        describe "assignment creation response validation" do
+          it "calls create_api_peer_review_sub_assignment when response is :created" do
+            assignment, assignment_params = build_peer_review_assignment
+
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+              .with(assignment, assignment_params[:peer_review])
+
+            mock_and_call_create_api_assignment(assignment, assignment_params)
+          end
+
+          it "calls create_api_peer_review_sub_assignment when response is :ok" do
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50, grading_type: "points" })
+
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+              .with(assignment, assignment_params[:peer_review])
+
+            mock_and_call_create_api_assignment(assignment, assignment_params, {
+                                                  prepare_options: { overrides: [] }
+                                                })
+          end
+
+          it "does not call create_api_peer_review_sub_assignment when response is :forbidden" do
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
+            allow_any_instance_of(Api::V1::Assignment).to receive(:grading_periods_allow_submittable_create?)
+              .and_return(false)
+
+            result = call_create_assignment_api(assignment, assignment_params)
+            expect(result).to eq(:forbidden)
+          end
+
+          it "does not call create_api_peer_review_sub_assignment when response is false" do
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
+            allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+              .and_return({ valid: false })
+
+            result = call_create_assignment_api(assignment, assignment_params)
+            expect(result).to be false
+          end
+        end
+
+        describe "peer_reviews validation" do
+          it "calls create_api_peer_review_sub_assignment when peer_reviews is true" do
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+              .with(assignment, assignment_params[:peer_review])
+
+            mock_and_call_create_api_assignment(assignment, assignment_params)
+          end
+
+          it "does not call create_api_peer_review_sub_assignment when peer_reviews is false" do
+            assignment, assignment_params = build_peer_review_assignment(peer_reviews: false, peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
+
+            mock_and_call_create_api_assignment(assignment, assignment_params, {
+                                                  prepare_options: { assignment:, valid: true }
+                                                })
+          end
+
+          it "does not call create_api_peer_review_sub_assignment when peer_reviews is nil" do
+            assignment, assignment_params = build_peer_review_assignment(peer_reviews: nil, peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
+
+            mock_and_call_create_api_assignment(assignment, assignment_params)
+          end
+        end
+
+        describe "feature flag validation" do
+          it "calls create_api_peer_review_sub_assignment when feature is enabled" do
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+              .with(assignment, assignment_params[:peer_review])
+
+            mock_and_call_create_api_assignment(assignment, assignment_params)
+          end
+
+          it "does not call create_api_peer_review_sub_assignment when feature is disabled" do
+            @course.disable_feature!(:peer_review_allocation_and_grading)
+            assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+            expect_any_instance_of(Api::V1::Assignment).not_to receive(:create_api_peer_review_sub_assignment)
+
+            mock_and_call_create_api_assignment(assignment, assignment_params, {
+                                                  prepare_options: { assignment:, valid: true }
+                                                })
+          end
+        end
+      end
+
+      describe "parameter passing" do
+        it "passes peer_review parameters correctly" do
+          peer_review_params = {
+            points_possible: 75,
+            grading_type: "letter_grade",
+            due_at: 2.weeks.from_now,
+            unlock_at: 1.day.from_now,
+            lock_at: 3.weeks.from_now
+          }
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params:)
+
+          expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .with(assignment, assignment_params[:peer_review])
+
+          mock_and_call_create_api_assignment(assignment, assignment_params)
+        end
+
+        it "passes nil peer_review parameters when not provided" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: nil)
+
+          expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .with(assignment, nil)
+
+          mock_and_call_create_api_assignment(assignment, assignment_params)
+        end
+      end
+
+      describe "execution order" do
+        it "calls create_api_peer_review_sub_assignment after successful assignment save" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          call_order = []
+          additional_mocks = proc do
+            allow(assignment).to receive(:save!) do
+              call_order << :assignment_saved
+              true
+            end
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment) do
+              call_order << :peer_review_created
+            end
+            allow(SubmissionLifecycleManager).to receive(:recompute) do
+              call_order << :lifecycle_recompute
+            end
+          end
+
+          mock_and_call_create_api_assignment(assignment, assignment_params, {
+                                                additional_mocks:,
+                                                prepare_options: { assignment:, valid: true }
+                                              })
+
+          expect(call_order).to eq(%i[assignment_saved peer_review_created lifecycle_recompute])
+        end
+
+        it "calls create_api_peer_review_sub_assignment after successful assignment creation with overrides" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          call_order = []
+          additional_mocks = proc do
+            allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_assignment_with_overrides) do
+              call_order << :assignment_with_overrides_created
+              :ok
+            end
+            expect_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment) do
+              call_order << :peer_review_created
+            end
+            allow(SubmissionLifecycleManager).to receive(:recompute) do
+              call_order << :lifecycle_recompute
+            end
+          end
+
+          mock_and_call_create_api_assignment(assignment, assignment_params, {
+                                                additional_mocks:,
+                                                prepare_options: { assignment:, valid: true, overrides: [double("override")] }
+                                              })
+
+          expect(call_order).to eq(%i[assignment_with_overrides_created peer_review_created lifecycle_recompute])
+        end
+      end
+
+      describe "error handling" do
+        it "destroy assignment when peer review creation fails" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true })
+          allow(assignment).to receive(:save!).and_return(true)
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_raise(PeerReview::PeerReviewError.new("Peer review creation failed"))
+
+          expect(assignment).to receive(:destroy)
+
+          result = call_create_assignment_api(assignment, assignment_params)
+          expect(result).to eq(:peer_review_error)
+        end
+
+        it "does not destroy assignment when peer review creation succeeds" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true })
+          allow(assignment).to receive(:save!).and_return(true)
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_return(true)
+
+          expect(assignment).not_to receive(:destroy)
+
+          result = call_create_assignment_api(assignment, assignment_params)
+          expect(result).to eq(:created)
+        end
+
+        it "handles different types of peer review errors" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true })
+          allow(assignment).to receive(:save!).and_return(true)
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_raise(PeerReview::PeerReviewError.new("Generic peer review error"))
+
+          expect(assignment).to receive(:destroy)
+
+          result = call_create_assignment_api(assignment, assignment_params)
+          expect(result).to eq(:peer_review_error)
+        end
+
+        it "returns :peer_review_error status when there are peer review errors" do
+          assignment, assignment_params = build_peer_review_assignment(peer_review_params: { points_possible: 50 })
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:prepare_assignment_create_or_update)
+            .and_return({ assignment:, valid: true })
+          allow(assignment).to receive(:save!).and_return(true)
+          allow(assignment).to receive(:destroy)
+          allow(SubmissionLifecycleManager).to receive(:recompute)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_raise(PeerReview::PeerReviewError.new("Peer review creation failed"))
+
+          result = call_create_assignment_api(assignment, assignment_params)
+          expect(result).to eq(:peer_review_error)
+        end
+
+        it "returns error message via HTTP API when peer review sub assignment creation fails" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+
+          allow_any_instance_of(Api::V1::Assignment).to receive(:create_api_peer_review_sub_assignment)
+            .and_raise(PeerReview::PeerReviewError.new("Peer review sub assignment creation failed"))
+
+          json = api_call(:post,
+                          "/api/v1/courses/#{@course.id}/assignments",
+                          {
+                            controller: "assignments_api",
+                            action: "create",
+                            format: "json",
+                            course_id: @course.id.to_s
+                          },
+                          {
+                            assignment: {
+                              name: "Assignment with peer review error",
+                              peer_reviews: true
+                            }
+                          },
+                          {},
+                          { expected_status: 400 })
+
+          expect(json["errors"]).to eq("Failed to create assignment due to failure to create peer review sub assignment")
+        end
+      end
+    end
+
+    describe "#create_api_peer_review_sub_assignment" do
+      let(:course) { course_model }
+      let(:parent_assignment) { assignment_model(context: course, name: "Parent Assignment") }
+      let(:test_object) { Object.new.extend(Api::V1::Assignment) }
+
+      before do
+        course.enable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      context "with valid parameters" do
+        it "calls PeerReviewCreatorService with all provided parameters" do
+          params = {
+            points_possible: 50,
+            grading_type: "points",
+            due_at: 1.week.from_now,
+            unlock_at: 1.day.from_now,
+            lock_at: 2.weeks.from_now
+          }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: 50,
+            grading_type: "points",
+            due_at: params[:due_at],
+            unlock_at: params[:unlock_at],
+            lock_at: params[:lock_at]
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "calls PeerReviewCreatorService with only the provided parameters" do
+          params = { points_possible: 25 }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: 25,
+            grading_type: nil,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "handles empty parameters gracefully" do
+          params = {}
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: nil,
+            grading_type: nil,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "handles nil parameters gracefully" do
+          params = nil
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: nil,
+            grading_type: nil,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "ignores blank parameter values" do
+          params = {
+            points_possible: "",
+            grading_type: "",
+            due_at: "",
+            unlock_at: "",
+            lock_at: ""
+          }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: nil,
+            grading_type: nil,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "handles mixed parameters - with and without values" do
+          params = {
+            points_possible: 30,
+            grading_type: "",
+            due_at: 1.week.from_now,
+            unlock_at: "",
+            lock_at: nil
+          }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: 30,
+            grading_type: nil,
+            due_at: params[:due_at],
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+      end
+
+      context "parameter passing" do
+        it "passes through points_possible values" do
+          params = { points_possible: 100 }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: 100,
+            grading_type: nil,
+            due_at: nil,
+            unlock_at: nil,
+            lock_at: nil
+          ).and_return(double("peer_review_sub_assignment"))
+
+          allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "passes through grading_type values" do
+          %w[points percent letter_grade pass_fail gpa_scale].each do |grading_type|
+            params = { grading_type: }
+
+            expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+              parent_assignment:,
+              points_possible: nil,
+              grading_type:,
+              due_at: nil,
+              unlock_at: nil,
+              lock_at: nil
+            ).and_return(double("peer_review_sub_assignment"))
+
+            allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+          end
+        end
+
+        it "passes through date objects for date parameters" do
+          due_date = Time.zone.parse("2025-12-31 23:59:59")
+          unlock_date = Time.zone.parse("2025-12-01 00:00:00")
+          lock_date = Time.zone.parse("2026-01-15 23:59:59")
+
+          params = {
+            due_at: due_date,
+            unlock_at: unlock_date,
+            lock_at: lock_date
+          }
+
+          expect(PeerReview::PeerReviewCreatorService).to receive(:call).with(
+            parent_assignment:,
+            points_possible: nil,
+            grading_type: nil,
+            due_at: due_date,
+            unlock_at: unlock_date,
+            lock_at: lock_date
+          ).and_return(double("peer_review_sub_assignment"))
+
+          allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+      end
+
+      context "association reloading" do
+        it "always reloads the peer_review_sub_assignment association after service call" do
+          params = { points_possible: 40 }
+          mock_sub_assignment = double("peer_review_sub_assignment")
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_return(mock_sub_assignment)
+          expect(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+        end
+
+        it "does not reload association when service raises an error" do
+          params = { points_possible: 40 }
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call).and_raise(StandardError.new("Service error"))
+          expect(parent_assignment.association(:peer_review_sub_assignment)).not_to receive(:reload)
+
+          expect do
+            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+          end.to raise_error(StandardError, "Service error")
+        end
+      end
+
+      context "error handling" do
+        it "propagates PeerReview::PeerReviewError from service" do
+          params = { points_possible: 50 }
+          error_message = "Cannot create peer review sub assignment"
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call)
+            .and_raise(PeerReview::PeerReviewError.new(error_message))
+          allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          expect do
+            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+          end.to raise_error(PeerReview::PeerReviewError, error_message)
+        end
+
+        it "propagates other errors from service" do
+          params = { points_possible: 50 }
+          error_message = "Database connection failed"
+
+          allow(PeerReview::PeerReviewCreatorService).to receive(:call)
+            .and_raise(ActiveRecord::ConnectionNotEstablished.new(error_message))
+          allow(parent_assignment.association(:peer_review_sub_assignment)).to receive(:reload)
+
+          expect do
+            test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+          end.to raise_error(ActiveRecord::ConnectionNotEstablished, error_message)
+        end
+      end
+
+      context "integration behavior" do
+        it "successfully creates peer review sub assignment with real service call" do
+          params = {
+            points_possible: 25,
+            grading_type: "points",
+            due_at: 1.week.from_now
+          }
+
+          # Don't mock the service to test real integration
+          test_object.send(:create_api_peer_review_sub_assignment, parent_assignment, params)
+
+          # Verify the sub assignment was created
+          parent_assignment.reload
+          expect(parent_assignment.peer_review_sub_assignment).to be_present
+          expect(parent_assignment.peer_review_sub_assignment.points_possible).to eq(25)
+          expect(parent_assignment.peer_review_sub_assignment.grading_type).to eq("points")
+        end
+      end
+    end
+
     it "does not allow assignment titles longer than 255 characters" do
       name_too_long = "a" * 256
 
