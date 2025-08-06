@@ -308,6 +308,7 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
   const props = {
     allowHidingGradesOrComments,
     allowPostingGradesOrComments,
+    allowManageGrades: ENV.MANAGE_GRADES,
     hasGradesOrPostableComments,
     onHideGrades,
     onPostGrades,
