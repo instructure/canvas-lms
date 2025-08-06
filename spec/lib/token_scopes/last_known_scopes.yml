@@ -2303,8 +2303,6 @@
   path: '/api/v1/users/:user_id/logins'
 - verb: DELETE
   path: '/api/v1/users/:user_id/logins/:id'
-- verb: POST
-  path: '/api/v1/users/:user_id/logins/:id/migrate_login_attribute'
 - verb: GET
   path: '/api/v1/users/:user_id/missing_submissions'
 - verb: GET
