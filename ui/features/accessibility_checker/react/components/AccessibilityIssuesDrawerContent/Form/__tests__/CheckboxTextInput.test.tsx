@@ -228,6 +228,9 @@ describe('CheckboxTextInput', () => {
       },
     }
 
+    // Mock console.error to suppress expected error output
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
     // Mock API failure
     ;(doFetchApi as jest.Mock).mockImplementation(options => {
       // Test that the path contains "/generate"
@@ -254,8 +257,14 @@ describe('CheckboxTextInput', () => {
       expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
     })
 
+    // Verify that console.error was called with the expected error
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Error generating text input:', expect.any(Error))
+
     // Verify that onChangeValue was not called (since the API failed)
     expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
+
+    // Restore console.error
+    consoleErrorSpy.mockRestore()
   })
 
   it('does not call onReload on initial mount', () => {

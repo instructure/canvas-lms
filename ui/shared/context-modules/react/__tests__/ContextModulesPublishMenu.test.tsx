@@ -90,9 +90,9 @@ describe('ContextModulesPublishMenu', () => {
     )
     mockUpdateModulePendingPublishedStates.mockImplementation(() => {})
     mockMonitorProgress.mockImplementation(() => {})
-    mockBatchUpdateAllModulesApiCall.mockImplementation(() => {})
+    mockBatchUpdateAllModulesApiCall.mockImplementation(() => Promise.resolve())
     mockCancelProgressAction.mockImplementation(() => {})
-    mockFetchAllItemPublishedStates.mockImplementation(() => {})
+    mockFetchAllItemPublishedStates.mockImplementation(() => Promise.resolve())
   })
 
   afterEach(() => {

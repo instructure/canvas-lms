@@ -83,6 +83,11 @@ describe('UserRestore', () => {
   })
 
   test('responds with a deferred object', function () {
+    server.use(
+      http.put('*/api/v1/accounts/*/users/*/restore', () => HttpResponse.json({}, {status: 404})),
+    )
+
+    userRestore.set('id', user_id)
     const dfd = userRestore.restore()
     expect($.isFunction(dfd.done)).toBeTruthy()
   })

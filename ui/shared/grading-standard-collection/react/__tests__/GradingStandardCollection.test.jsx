@@ -20,6 +20,7 @@ import React from 'react'
 import {render, screen, within} from '@testing-library/react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeEnv from '@canvas/test-utils/fakeENV'
 import GradingStandardCollection from '../index'
 
 // Mock jQuery and its plugins
@@ -55,7 +56,7 @@ describe('GradingStandardCollection', () => {
   ]
 
   beforeEach(() => {
-    window.ENV = {
+    fakeEnv.setup({
       current_user_roles: ['admin', 'teacher'],
       GRADING_STANDARDS_URL: '/courses/1/grading_standards',
       DEFAULT_GRADING_STANDARD_DATA: [
@@ -66,7 +67,7 @@ describe('GradingStandardCollection', () => {
         ['F', 0],
       ],
       context_asset_string: 'course_1',
-    }
+    })
 
     // Setup server handler for default case
     server.use(
@@ -95,7 +96,7 @@ describe('GradingStandardCollection', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-    delete window.ENV
+    fakeEnv.teardown()
   })
 
   it('shows empty state when no standards exist', async () => {
@@ -138,7 +139,19 @@ describe('GradingStandardCollection', () => {
   })
 
   it('disables add button for student role', async () => {
-    window.ENV.current_user_roles = ['student']
+    fakeEnv.teardown()
+    fakeEnv.setup({
+      current_user_roles: ['student'],
+      GRADING_STANDARDS_URL: '/courses/1/grading_standards',
+      DEFAULT_GRADING_STANDARD_DATA: [
+        ['A', 0.94],
+        ['B', 0.84],
+        ['C', 0.74],
+        ['D', 0.64],
+        ['F', 0],
+      ],
+      context_asset_string: 'course_1',
+    })
     render(<GradingStandardCollection />)
     const addButton = screen.getByRole('button', {name: /add grading scheme/i})
     expect(addButton).toHaveClass('disabled')
