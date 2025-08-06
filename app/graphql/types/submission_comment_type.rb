@@ -49,6 +49,7 @@ module Types
     field :submission_id, ID, null: false
 
     field :author, Types::UserType, null: true
+    field :author_visible_name, Types::HtmlEncodedStringType, null: true
     field :media_comment_id, String, null: true
 
     field :comment, String, null: true
@@ -75,7 +76,27 @@ module Types
                     load_association(:submission).then do |submission|
                       Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
                     end
-                  ]).then { object.author if object.grants_right?(current_user, :read_author) }
+                  ]).then { object.author if !object.submission.assignment.moderated_grading? && object.grants_right?(current_user, :read_author) }
+    end
+
+    def author_visible_name
+      Promise.all([
+                    load_association(:author),
+                    load_association(:submission).then do |submission|
+                      Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+                    end
+                  ]).then do |results|
+        assignment = results[1]
+
+        preload_promises = []
+        if assignment.moderated_grading?
+          preload_promises << Loaders::AssociationLoader.for(Assignment, :moderation_graders).load(assignment)
+        end
+
+        Promise.all(preload_promises).then do
+          object.author_visible_name(current_user)
+        end
+      end
     end
 
     field :attachments, [Types::FileType], null: false

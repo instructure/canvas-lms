@@ -8962,6 +8962,7 @@ type SubmissionComment implements LegacyIDInterface & Timestamped {
   attachments: [File!]!
   attempt: Int!
   author: User
+  authorVisibleName: HtmlEncodedString
   canReply: Boolean
   comment: String
   course: Course
