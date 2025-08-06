@@ -23,7 +23,6 @@ export const MODULES_ARE_PAGINATED = !!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATE
 export const STUDENT = 'student'
 export const TEACHER = 'teacher'
 export const MODULE_ITEMS = 'moduleItems'
-export const MODULE_ITEMS_COUNT = 'moduleItemsCount'
 export const MODULE_ITEMS_STUDENT = 'moduleItemsStudent'
 export const MODULES = 'modules'
 export const MODULE_ITEMS_QUERY_MAP: Record<string, string> = {

@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {QueryClient} from '@tanstack/react-query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {MODULE_ITEMS, MODULES, MODULE_ITEMS_COUNT} from '../utils/constants'
+import {MODULE_ITEMS, MODULES} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -81,7 +81,6 @@ export const handleDuplicate = (
       )
       queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
-      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))

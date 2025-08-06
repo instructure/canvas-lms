@@ -17,7 +17,7 @@
  */
 
 import type React from 'react'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
 import type {ModuleItem} from '../utils/types'
@@ -29,7 +29,7 @@ import {ErrorBoundary} from '@sentry/react'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import {useModuleItemsTotalCount} from '../hooks/queries/useModuleItemsTotalCount'
+import {useModules} from '../hooks/queries/useModules'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -61,18 +61,27 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     totalPages: number
   }>()
 
-  const {totalCount, isFetching} = useModuleItemsTotalCount(moduleId)
-  const isEmptyModule = !(totalCount || isFetching)
+  const contextModule: any = useContextModule()
+  const {courseId} = contextModule
+  const setModuleCursorState: (updater: any) => void = useMemo(
+    () =>
+      typeof contextModule.setModuleCursorState === 'function'
+        ? contextModule.setModuleCursorState
+        : () => {},
+    [contextModule.setModuleCursorState],
+  )
+
+  const {getModuleItemsTotalCount} = useModules(courseId, view)
+  const totalCount = getModuleItemsTotalCount(moduleId) || 0
+  const isEmptyModule = totalCount === 0
   const cursor = getCursor(pageIndex)
   const moduleItemsResult = useModuleItems(moduleId, cursor, isExpanded, view)
-  const contextModule: any = useContextModule()
-  const setModuleCursorState: (updater: any) => void =
-    typeof contextModule.setModuleCursorState === 'function'
-      ? contextModule.setModuleCursorState
-      : () => {}
 
   const totalPages = Number.isFinite(totalCount) ? Math.ceil(totalCount / PAGE_SIZE) : 0
-  const moduleItems = moduleItemsResult.data?.moduleItems || []
+  const moduleItems = useMemo(
+    () => moduleItemsResult.data?.moduleItems || [],
+    [moduleItemsResult.data?.moduleItems],
+  )
   const isLoading = moduleItemsResult.isLoading
   const error = moduleItemsResult.error
 
@@ -134,7 +143,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       {content}
       <Flex as="div" justifyItems="center" alignItems="center" margin="small 0 0 0">
         <PaginatedNavigation
-          isLoading={isLoading || isFetching}
+          isLoading={isLoading}
           currentPage={pageIndex}
           onPageChange={handlePageChange}
           visiblePageInfo={visiblePageInfo}

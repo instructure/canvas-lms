@@ -24,7 +24,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {QueryClient} from '@tanstack/react-query'
 import type {ModuleItemContent, MasteryPathsData, ModuleAction} from '../utils/types'
 import React from 'react'
-import {MODULE_ITEMS, MODULE_ITEMS_COUNT, MOVE_MODULE_ITEM} from '../utils/constants'
+import {MODULE_ITEMS, MODULES, MOVE_MODULE_ITEM} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -137,7 +137,7 @@ export const handleDuplicate = (
     .then(() => {
       showFlashSuccess(I18n.t('Item duplicated successfully'))
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
-      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, id]})
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate item'))
@@ -285,7 +285,7 @@ export const handleRemove = (
           }),
         )
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
-        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, moduleId]})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove item'))

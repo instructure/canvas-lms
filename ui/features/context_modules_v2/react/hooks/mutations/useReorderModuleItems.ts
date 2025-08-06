@@ -19,7 +19,7 @@
 import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useMutation} from '@tanstack/react-query'
-import {MODULE_ITEMS, MODULE_ITEMS_COUNT} from '../../utils/constants'
+import {MODULE_ITEMS, MODULES} from '../../utils/constants'
 
 interface ReorderItemsParams {
   courseId: string
@@ -42,15 +42,14 @@ export const useReorderModuleItems = () => {
       return json
     },
     onSuccess: (_data, variables) => {
-      const {moduleId, oldModuleId} = variables
+      const {moduleId, oldModuleId, courseId} = variables
       if (moduleId === oldModuleId) {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId]})
       }
 
       if (moduleId !== oldModuleId) {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId]})
-        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, oldModuleId]})
-        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, moduleId]})
+        queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       }
     },
   })
