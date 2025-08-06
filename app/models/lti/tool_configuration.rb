@@ -89,14 +89,16 @@ module Lti
     end
 
     def self.retrieve_and_extract_configuration(url)
-      response = CanvasHttp.get(url)
+      InstrumentTLSCiphers.without_tls_metrics do
+        response = CanvasHttp.get(url)
 
-      raise_error(:configuration_url, 'Content type must be "application/json"') unless response["content-type"].include? "application/json"
-      raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
+        raise_error(:configuration_url, 'Content type must be "application/json"') unless response["content-type"].include? "application/json"
+        raise_error(:configuration_url, response.message) unless response.is_a? Net::HTTPSuccess
 
-      JSON.parse(response.body).with_indifferent_access
-    rescue Timeout::Error
-      raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
+        JSON.parse(response.body).with_indifferent_access
+      rescue Timeout::Error
+        raise_error(:configuration_url, "Could not retrieve settings, the server response timed out.")
+      end
     end
 
     private
