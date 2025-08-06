@@ -16,28 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {type TextBlockProps} from './TextBlock'
 import {TitlePreview} from '../BlockItems/Title/TitlePreview'
+import {TextPreview} from '../BlockItems/Text/TextPreview'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = createI18nScope('block_content_editor')
-
 export const TextBlockEditPreview = (props: TextBlockProps) => {
-  const isTitleDefined = props.title.trim().length > 0
-  const isContentDefined = props.content.trim().length > 0
-
-  const content = isContentDefined
-    ? props.content
-    : `<p style="color: '#9EA6AD'">${I18n.t('Type to add body')}</p>`
-
-  const title = isTitleDefined ? props.title : I18n.t('Type to add block title')
-  const color = isTitleDefined ? 'primary' : 'secondary'
-
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && <TitlePreview color={color} text={title} />}
-      <div dangerouslySetInnerHTML={{__html: content}}></div>
+      {props.settings.includeBlockTitle && <TitlePreview title={props.title} />}
+      <TextPreview content={props.content} />
     </Flex>
   )
 }

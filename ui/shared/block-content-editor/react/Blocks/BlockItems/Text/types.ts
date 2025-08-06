@@ -16,23 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type TextBlockProps} from './TextBlock'
-import {Flex} from '@instructure/ui-flex'
-import {TitleEdit} from '../BlockItems/Title/TitleEdit'
-import {TextEdit} from '../BlockItems/Text/TextEdit'
+export type TextData = {
+  content: string
+}
 
-export const TextBlockEdit = (
-  props: TextBlockProps & {
-    onTitleChange: (newTitle: string) => void
-    onContentChange: (newContent: string) => void
-  },
-) => {
-  return (
-    <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
-      )}
-      <TextEdit content={props.content} onContentChange={props.onContentChange} height={300} />
-    </Flex>
-  )
+export type TextPreviewProps = TextData
+export type TextViewProps = TextData
+
+export type TextEditProps = TextData & {
+  onContentChange: (content: string) => void
+  height: number
 }
