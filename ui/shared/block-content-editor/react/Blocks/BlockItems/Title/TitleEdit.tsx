@@ -19,13 +19,9 @@
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ChangeEvent} from 'react'
+import {TitleEditProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
-
-export type TitleEditProps = {
-  title: string
-  onTitleChange: (newTitle: string) => void
-}
 
 export const TitleEdit = ({title, onTitleChange}: TitleEditProps) => {
   const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => onTitleChange(event.target.value)

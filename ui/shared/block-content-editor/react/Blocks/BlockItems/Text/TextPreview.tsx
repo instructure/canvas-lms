@@ -16,23 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type TextBlockProps} from './TextBlock'
-import {Flex} from '@instructure/ui-flex'
-import {TitleEdit} from '../BlockItems/Title/TitleEdit'
-import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {TextPreviewProps} from './types'
+import {Text} from '@instructure/ui-text'
 
-export const TextBlockEdit = (
-  props: TextBlockProps & {
-    onTitleChange: (newTitle: string) => void
-    onContentChange: (newContent: string) => void
-  },
-) => {
-  return (
-    <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && (
-        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
-      )}
-      <TextEdit content={props.content} onContentChange={props.onContentChange} height={300} />
-    </Flex>
+const I18n = createI18nScope('block_content_editor')
+
+export const TextPreview = (props: TextPreviewProps) => {
+  const isContentDefined = props.content.trim().length > 0
+
+  return isContentDefined ? (
+    <div dangerouslySetInnerHTML={{__html: props.content}}></div>
+  ) : (
+    <Text as="p" color="secondary" variant="content">
+      {I18n.t('Click to edit')}
+    </Text>
   )
 }
