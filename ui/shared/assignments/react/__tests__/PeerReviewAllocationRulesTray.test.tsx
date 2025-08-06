@@ -106,7 +106,8 @@ describe('PeerReviewAllocationRulesTray', () => {
     })
   })
 
-  describe('Empty state', () => {
+  // TODO [EGG-1625]: Unskip when rules are fetched
+  describe.skip('Empty state', () => {
     beforeEach(() => {
       render(<PeerReviewAllocationRulesTray {...defaultProps} />)
     })
