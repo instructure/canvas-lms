@@ -24,10 +24,25 @@ type ButtonDisplayProps = ButtonBlockProps & {
   dataTestId: string
 }
 
+const alignmentMap = {
+  left: 'start',
+  center: 'center',
+  right: 'end',
+} as const
+
 export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
+  const {buttons, alignment} = settings
+
+  const justifyItems = alignmentMap[alignment]
   return (
-    <Flex data-testid={dataTestId}>
-      {settings.buttons.map(button => (
+    <Flex
+      data-testid={dataTestId}
+      direction="row"
+      justifyItems={justifyItems}
+      width="100%"
+      wrap="wrap"
+    >
+      {buttons.map(button => (
         <SingleButton key={button.id} />
       ))}
     </Flex>

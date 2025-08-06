@@ -19,15 +19,24 @@
 import {View} from '@instructure/ui-view'
 import {useNode} from '@craftjs/core'
 import {ButtonBlockIndividualButtonSettings} from './ButtonBlockIndividualButtonSettings'
-import {ButtonBlockProps, ButtonData} from './ButtonBlock'
+import {ButtonBlockGeneralButtonSettings} from './ButtonBlockGeneralButtonSettings'
+import {ButtonBlockProps, ButtonData, ButtonAlignment} from './ButtonBlock'
 
 export const ButtonBlockSettings = () => {
   const {
     actions: {setProp},
+    alignment,
     buttons,
   } = useNode(node => ({
+    alignment: node.data.props.settings.alignment,
     buttons: node.data.props.settings.buttons,
   }))
+
+  const handleAlignmentChange = (alignment: ButtonAlignment) => {
+    setProp((props: ButtonBlockProps) => {
+      props.settings.alignment = alignment
+    })
+  }
 
   const handleButtonsChange = (buttons: ButtonData[]) => {
     setProp((props: ButtonBlockProps) => {
@@ -37,6 +46,11 @@ export const ButtonBlockSettings = () => {
 
   return (
     <View as="div">
+      <ButtonBlockGeneralButtonSettings
+        alignment={alignment}
+        onAlignmentChange={handleAlignmentChange}
+      />
+
       <ButtonBlockIndividualButtonSettings
         initialButtons={buttons}
         onButtonsChange={handleButtonsChange}

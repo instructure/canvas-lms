@@ -32,7 +32,7 @@ export const blockFactory = {
   [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
-  [ButtonBlock.name]: () => <ButtonBlock settings={{buttons: [{id: 1}]}} />,
+  [ButtonBlock.name]: () => <ButtonBlock settings={{alignment: 'left', buttons: [{id: 1}]}} />,
   [HighlightBlock.name]: () => <HighlightBlock content="" />,
   imageText: () => <p>image_text</p>,
   video: () => <p>video</p>,
