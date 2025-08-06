@@ -16,18 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Editor, Frame} from '@craftjs/core'
 import {BlockContentPreviewLayout} from './BlockContentPreviewLayout'
 import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
 import {usePreviewMode} from './usePreviewMode'
+import {components} from '../block-content-editor-components'
+import {useGetSerializedNodes} from '../hooks/useGetSerializedNodes'
 
 export const BlockContentPreview = () => {
   const {previewMode, setPreviewMode} = usePreviewMode()
+  const data = useGetSerializedNodes()
+
   return (
     <BlockContentPreviewLayout
       selectorbar={
         <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
       }
-      preview={<div>Preview mode: {previewMode}</div>}
+      preview={
+        <Editor enabled={false} resolver={components}>
+          <Frame data={data} />
+        </Editor>
+      }
     />
   )
 }

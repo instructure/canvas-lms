@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame} from '@craftjs/core'
-import {components} from './block-content-editor-components'
-import {BlockContentViewerProps} from './BlockContentViewer'
+import {useEditor} from '@craftjs/core'
 
-export const BlockContentViewerWrapper = (props: BlockContentViewerProps) => {
-  return (
-    <Editor enabled={false} resolver={components}>
-      <Frame data={props.data ?? undefined} />
-    </Editor>
-  )
+export const useGetSerializedNodes = () => {
+  const {
+    query: {getSerializedNodes},
+  } = useEditor()
+  return getSerializedNodes()
 }

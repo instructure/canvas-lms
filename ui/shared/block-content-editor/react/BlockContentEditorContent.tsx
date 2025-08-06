@@ -16,24 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Element, Frame} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
+import {BlockContentEditorHandlerIntegration} from './BlockContentEditorHandlerIntegration'
+import {Element, Frame} from '@craftjs/core'
 import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {SettingsTrayRenderer} from './SettingsTray'
+import {AddBlock} from './AddBlock'
+import {useGetSerializedNodes} from './hooks/useGetSerializedNodes'
 import {BlockContentEditorProps} from './BlockContentEditor'
-import {BlockContentEditorHandlerIntegration} from './BlockContentEditorHandlerIntegration'
-import {components} from './block-content-editor-components'
 
-export const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
+export const BlockContentEditorContent = (props: BlockContentEditorProps) => {
+  const editorData = useGetSerializedNodes()
+  const frameData = editorData['ROOT'] ? editorData : props.data
+
   return (
-    <Editor enabled={true} resolver={components}>
+    <>
       <BlockContentEditorHandlerIntegration onInit={props.onInit} />
       <AddBlockModalRenderer />
       <SettingsTrayRenderer />
       <AddBlock />
-      <Frame data={props.data ?? undefined}>
+      <Frame data={frameData ?? undefined}>
         <Element is="div"></Element>
       </Frame>
-    </Editor>
+    </>
   )
 }
