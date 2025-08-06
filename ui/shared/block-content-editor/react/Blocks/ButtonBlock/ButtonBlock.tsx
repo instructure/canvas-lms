@@ -24,6 +24,7 @@ import {ButtonBlockView} from './ButtonBlockView'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
+export type ButtonLayout = 'horizontal' | 'vertical'
 
 export type ButtonData = {
   id: number
@@ -33,6 +34,7 @@ export type ButtonBlockProps = {
   settings: {
     buttons: ButtonData[]
     alignment: ButtonAlignment
+    layout: ButtonLayout
   }
 }
 

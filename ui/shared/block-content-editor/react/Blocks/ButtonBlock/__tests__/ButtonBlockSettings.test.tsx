@@ -38,6 +38,7 @@ jest.mock('../ButtonBlockGeneralButtonSettings', () => ({
 
 const defaultButtons = [{id: 1}, {id: 2}]
 const defaultAlignment = 'left'
+const defaultLayout = 'horizontal'
 
 describe('ButtonBlockSettings', () => {
   beforeEach(() => {
@@ -46,15 +47,19 @@ describe('ButtonBlockSettings', () => {
       actions: {setProp: mockSetProp},
       buttons: defaultButtons,
       alignment: defaultAlignment,
+      layout: defaultLayout,
     })
   })
 
-  const assertSetPropCallback = (expectedProperty: 'buttons' | 'alignment', expectedValue: any) => {
+  const assertSetPropCallback = (
+    expectedProperty: 'buttons' | 'alignment' | 'layout',
+    expectedValue: any,
+  ) => {
     expect(mockSetProp).toHaveBeenCalledTimes(1)
 
     const setPropCallback = mockSetProp.mock.calls[0][0]
     const mockProps = {
-      settings: {alignment: defaultAlignment, buttons: defaultButtons},
+      settings: {alignment: defaultAlignment, layout: defaultLayout, buttons: defaultButtons},
     }
     setPropCallback(mockProps)
     expect(mockProps.settings[expectedProperty]).toEqual(expectedValue)
@@ -83,7 +88,9 @@ describe('ButtonBlockSettings', () => {
       render(<ButtonBlockSettings />)
       expect(mockGeneralButtonSettings).toHaveBeenCalledWith({
         alignment: defaultAlignment,
+        layout: defaultLayout,
         onAlignmentChange: expect.any(Function),
+        onLayoutChange: expect.any(Function),
       })
     })
 
@@ -93,6 +100,14 @@ describe('ButtonBlockSettings', () => {
       const newAlignment = 'center'
       onAlignmentChange(newAlignment)
       assertSetPropCallback('alignment', newAlignment)
+    })
+
+    it('calls setProp when layout changes', () => {
+      render(<ButtonBlockSettings />)
+      const {onLayoutChange} = mockGeneralButtonSettings.mock.calls[0][0]
+      const newLayout = 'vertical'
+      onLayoutChange(newLayout)
+      assertSetPropCallback('layout', newLayout)
     })
   })
 })
