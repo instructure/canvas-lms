@@ -2067,10 +2067,7 @@ class AbstractAssignment < ActiveRecord::Base
     end
     can :attach_submission_comment_files
 
-    given do |user, session|
-      context.grants_right?(user, session, :read_as_admin) &&
-        context.grants_right?(user, session, :read_course_content)
-    end
+    given { |user, session| can_read_assignment?(user, session) }
     can :read
 
     given { |user, session| context.grants_right?(user, session, :manage_grades) }
@@ -2101,6 +2098,14 @@ class AbstractAssignment < ActiveRecord::Base
       context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :manage_assign_to
+  end
+
+  def can_read_assignment?(user, session = nil)
+    read_assignment = context.grants_right?(user, session, :read)
+    read_course_content = context.is_a?(Course) ? (context.grants_right?(user, session, :read_course_content) || read_assignment) : true
+    return true if unpublished? && context.grants_right?(user, session, :view_unpublished_items) && read_course_content
+
+    published? && read_assignment
   end
 
   def user_can_update?(user, session = nil)
