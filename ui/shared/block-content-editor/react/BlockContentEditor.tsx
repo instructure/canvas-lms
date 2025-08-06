@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SerializedNodes} from '@craftjs/core'
 import {BlockContentEditorContext, useBlockContentEditorContext} from './BlockContentEditorContext'
 import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
 import {Toolbar} from './Toolbar'
-import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
 import {BlockContentPreview} from './Preview/BlockContentPreview'
 import {EditorMode} from './hooks/useEditorMode'
 import {BlockContentEditorHandler} from './BlockContentEditorHandlerIntegration'
 import {BlockContentViewerProps} from './BlockContentViewer'
+import {Editor} from '@craftjs/core'
+import {components} from './block-content-editor-components'
+import {BlockContentEditorContent} from './BlockContentEditorContent'
 
 const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   switch (mode) {
     case 'default':
-      return <BlockContentEditorWrapper {...props} />
+      return <BlockContentEditorContent {...props} />
     case 'preview':
       return <BlockContentPreview />
     default:
@@ -37,12 +38,16 @@ const getEditorForMode = (mode: EditorMode, props: BlockContentEditorProps) => {
   }
 }
 
-const BlockContentEditorContent = (props: BlockContentEditorProps) => {
+const BlockContentEditorWrapper = (props: BlockContentEditorProps) => {
   const {
     editor: {mode},
   } = useBlockContentEditorContext()
   const editor = getEditorForMode(mode, props)
-  return <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+  return (
+    <Editor enabled={mode === 'default'} resolver={components}>
+      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+    </Editor>
+  )
 }
 
 export type BlockContentEditorProps = BlockContentViewerProps & {
@@ -52,7 +57,7 @@ export type BlockContentEditorProps = BlockContentViewerProps & {
 export const BlockContentEditor = (props: BlockContentEditorProps) => {
   return (
     <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorContent {...props} />
+      <BlockContentEditorWrapper {...props} />
     </BlockContentEditorContext>
   )
 }

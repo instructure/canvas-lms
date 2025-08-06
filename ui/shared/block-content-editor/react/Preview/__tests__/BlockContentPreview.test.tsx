@@ -20,6 +20,10 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {BlockContentPreview} from '../BlockContentPreview'
 
+jest.mock('../../hooks/useGetSerializedNodes', () => ({
+  useGetSerializedNodes: jest.fn(),
+}))
+
 const renderPreview = () => {
   return render(<BlockContentPreview />)
 }

@@ -22,10 +22,7 @@ import {useBlockContext} from './BaseBlockContext'
 export type RenderMode = 'edit' | 'editPreview' | 'view'
 
 export const useGetRenderMode = () => {
-  const {
-    query: {getOptions},
-  } = useEditor()
-  const isViewMode = !getOptions().enabled
+  const {isViewMode} = useEditor(e => ({isViewMode: !e.options.enabled}))
   const {isEditMode} = useBlockContext()
 
   let mode: RenderMode = isEditMode ? 'edit' : 'editPreview'
