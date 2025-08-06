@@ -22,7 +22,7 @@ import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission, submitItemData} from './useInlineSubmission'
 import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
-import {useModuleItemsTotalCount} from '../queries/useModuleItemsTotalCount'
+import {useModules} from '../queries/useModules'
 
 type ExternalUrl = {
   url: string
@@ -109,7 +109,8 @@ export function useAddModuleItem({
   const {courseId} = useContextModule()
   const {defaultFolder} = useDefaultCourseFolder()
   const submitInlineItem = useInlineSubmission()
-  const {totalCount} = useModuleItemsTotalCount(moduleId)
+  const {getModuleItemsTotalCount} = useModules(courseId)
+  const totalCount = getModuleItemsTotalCount(moduleId) || 0
 
   const reset = () => dispatch({type: 'RESET'})
 

@@ -22,7 +22,8 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
 import type {ModuleItem} from '../../utils/types'
-import {PAGE_SIZE, MODULE_ITEMS, MODULE_ITEMS_COUNT} from '../../utils/constants'
+import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 const generateItems = (count: number): ModuleItem[] =>
   Array.from({length: count}, (_, i) => ({
@@ -63,7 +64,26 @@ const defaultProps = (): Omit<ModuleItemListSmartProps, 'renderList'> => ({
   isPaginated: true,
 })
 
-const renderWithClient = (ui: React.ReactElement, cursor: string | null = null) => {
+const createModulePage = (itemCount: number = 25) => ({
+  pageInfo: {
+    hasNextPage: false,
+    endCursor: null,
+  },
+  modules: [
+    {
+      _id: 'mod123',
+      moduleItemsTotalCount: itemCount,
+    },
+  ],
+  getModuleItemsTotalCount: (moduleId: string) => (moduleId === 'mod123' ? itemCount : 0),
+  isFetching: false,
+})
+
+const renderWithClient = (
+  ui: React.ReactElement,
+  itemCount: number = 25,
+  cursor: string | null = null,
+) => {
   const client = new QueryClient({
     defaultOptions: {
       queries: {
@@ -77,15 +97,30 @@ const renderWithClient = (ui: React.ReactElement, cursor: string | null = null) 
     moduleItems: generateItems(PAGE_SIZE),
   })
 
-  client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], 25)
+  const modulePage = createModulePage(itemCount)
 
-  return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>)
+  const modulesData = {
+    pages: [modulePage],
+    pageParams: [null],
+    getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+    isFetching: false,
+  }
+
+  client.setQueryData([MODULES, 'course123'], modulesData)
+
+  return render(
+    <QueryClientProvider client={client}>
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+        {ui}
+      </ContextModuleProvider>
+    </QueryClientProvider>,
+  )
 }
 
 describe('ModuleItemListSmart', () => {
   it('renders paginated items and shows pagination UI when needed', async () => {
     const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
-    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />)
+    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />, itemCount)
 
     expect(await screen.findByTestId('item-list')).toBeInTheDocument()
 
@@ -107,18 +142,38 @@ describe('ModuleItemListSmart', () => {
       },
     }))
 
-    const client = new QueryClient()
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: Infinity,
+        },
+      },
+    })
     const user = userEvent.setup()
+
+    // Set up module items for both pages
     client.setQueryData([MODULE_ITEMS, 'mod123', null], {
       moduleItems: firstPageItems,
     })
     client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
       moduleItems: secondPageItems,
     })
-    client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], itemCount)
+
+    const modulePage = createModulePage(itemCount)
+
+    client.setQueryData([MODULES, 'course123'], {
+      pages: [modulePage],
+      pageParams: [null],
+      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+      isFetching: false,
+    })
+
     render(
       <QueryClientProvider client={client}>
-        <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+          <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+        </ContextModuleProvider>
       </QueryClientProvider>,
     )
 
@@ -139,11 +194,42 @@ describe('ModuleItemListSmart', () => {
     })
   })
 
-  it('renders all items when pagination is not needed', () => {
-    renderWithClient(
-      <ModuleItemListSmart {...defaultProps()} isPaginated={false} renderList={renderList} />,
+  it('renders all items when pagination is not needed', async () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: Infinity,
+        },
+      },
+    })
+
+    // Set up data for the non-paginated query
+    client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+      moduleItems: generateItems(PAGE_SIZE),
+      pageInfo: {hasNextPage: false, endCursor: null},
+    })
+
+    const modulePage = createModulePage(PAGE_SIZE)
+
+    const modulesData = {
+      pages: [modulePage],
+      pageParams: [null],
+      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+      isFetching: false,
+    }
+
+    client.setQueryData([MODULES, 'course123'], modulesData)
+
+    render(
+      <QueryClientProvider client={client}>
+        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+          <ModuleItemListSmart {...defaultProps()} isPaginated={false} renderList={renderList} />
+        </ContextModuleProvider>
+      </QueryClientProvider>,
     )
-    const list = screen.getByTestId('item-list')
+
+    const list = await screen.findByTestId('item-list')
     expect(list.children).toHaveLength(PAGE_SIZE)
     expect(screen.queryByTestId('pagination-info-text')).not.toBeInTheDocument()
   })
@@ -155,7 +241,10 @@ describe('ModuleItemListSmart', () => {
     const renderListThatThrows = ({moduleItems}: {moduleItems: ModuleItem[]}) => {
       return <BadList moduleItems={moduleItems} />
     }
-    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />)
+    renderWithClient(
+      <ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />,
+      PAGE_SIZE,
+    )
     const alertText = await screen.findByText('An unexpected error occurred.')
     expect(alertText).toBeInTheDocument()
   })
@@ -173,7 +262,16 @@ describe('ModuleItemListSmart', () => {
     const delayedResolve = <T,>(value: T) =>
       new Promise<T>(resolve => setTimeout(() => resolve(value), 50))
 
-    client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], 25)
+    // Set up modules data
+    const modulePage = createModulePage(25)
+
+    client.setQueryData([MODULES, 'course123'], {
+      pages: [modulePage],
+      pageParams: [null],
+      getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
+      isFetching: false,
+    })
+
     client.setQueryDefaults([MODULE_ITEMS, 'mod123', null], {
       queryFn: () =>
         delayedResolve({
@@ -183,7 +281,9 @@ describe('ModuleItemListSmart', () => {
 
     render(
       <QueryClientProvider client={client}>
-        <ModuleItemListSmart {...defaultProps()} renderList={renderList} />
+        <ContextModuleProvider {...contextModuleDefaultProps} courseId="course123">
+          <ModuleItemListSmart {...defaultProps()} renderList={renderList} />
+        </ContextModuleProvider>
       </QueryClientProvider>,
     )
 
