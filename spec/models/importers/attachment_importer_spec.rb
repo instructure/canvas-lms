@@ -176,7 +176,7 @@ module Importers
         expect(folder.reload.workflow_state).to eq "hidden"
       end
 
-      it "re-activates deleted files that are imported" do
+      it "re-activates deleted files that are imported if they are media objects" do
         MediaObject.create!(media_id: "maybe")
         attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"), context: @course, media_entry_id: "maybe")
 
@@ -231,6 +231,63 @@ module Importers
           Importers::AttachmentImporter.process_migration(data, @migration)
           expect(@migration.reload.migration_issues.pluck(:description)).to include("Import Error: File - \"bar\"")
         end
+      end
+    end
+
+    describe "#import_from_migration file_state logic" do
+      let(:migration_id) { "xyz123" }
+      let(:usage_rights_map) { {} }
+      let(:uploaded_data) { stub_file_data("test.png", "abc", "image/png") }
+
+      before do
+        course_model
+        @migration = @course.content_migrations.create!
+        @attachment = attachment_model(context: @course, uploaded_data:)
+        @attachment.update!(migration_id:)
+      end
+
+      def import(hash_overrides = {})
+        Importers::AttachmentImporter.send(
+          :import_from_migration,
+          {
+            id: @attachment.id,
+            migration_id:,
+            display_name: "Test File"
+          }.merge(hash_overrides),
+          @course,
+          @migration,
+          nil,
+          usage_rights_map
+        )
+      end
+
+      it "sets file_state to 'hidden' when hash[:hidden] is true" do
+        @attachment.update!(file_state: "available", media_entry_id: nil)
+
+        result = import(hidden: true)
+        expect(result.file_state).to eq("hidden")
+      end
+
+      it "sets file_state to 'available' when media_entry_id is present" do
+        @attachment.update!(file_state: "deleted", media_entry_id: "media123")
+
+        result = import(hidden: false)
+        expect(result.file_state).to eq("available")
+      end
+
+      it "does not set file_state to 'available' when media_entry_id is missing and FF is enabled" do
+        @course.root_account.enable_feature!(:skip_reactivating_deleted_attachments)
+        @attachment.update!(file_state: "deleted")
+
+        result = import(hidden: false)
+        expect(result.file_state).to eq("deleted")
+      end
+
+      it "retains file_state when neither hidden nor media_entry_id is present" do
+        @attachment.update!(file_state: "available", media_entry_id: nil)
+
+        result = import
+        expect(result.file_state).to eq("available")
       end
     end
   end
