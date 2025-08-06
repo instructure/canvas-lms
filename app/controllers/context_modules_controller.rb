@@ -151,11 +151,11 @@ class ContextModulesController < ApplicationController
         tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(@current_user).count }
         module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
         module_perf_page_size = Setting.get("module_perf_page_size", 10).to_i
-        is_paginated = tags_count > module_perf_threshold
-        page_size = is_paginated ? module_perf_page_size : module_perf_threshold
+        modules_are_paginated = tags_count > module_perf_threshold
+        page_size = modules_are_paginated ? module_perf_page_size : module_perf_threshold
 
         hash[:MODULE_FEATURES][:PAGE_SIZE] = page_size
-        hash[:MODULE_FEATURES][:IS_PAGINATED] = is_paginated
+        hash[:MODULE_FEATURES][:MODULES_ARE_PAGINATED] = modules_are_paginated
       end
 
       append_default_due_time_js_env(@context, hash)

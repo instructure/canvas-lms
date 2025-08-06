@@ -22,7 +22,7 @@ import ModuleHeader from '../componentsTeacher/ModuleHeader'
 import ModuleItemList from '../componentsTeacher/ModuleItemList'
 import ModuleItemListSmart from '../components/ModuleItemListSmart'
 import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
-import {TEACHER} from '../utils/constants'
+import {TEACHER, MODULES_ARE_PAGINATED} from '../utils/constants'
 
 export interface ModuleProps {
   id: string
@@ -114,6 +114,7 @@ const Module: React.FC<ModuleProps> = ({
               moduleId={id}
               view={TEACHER}
               isExpanded={isExpanded}
+              isPaginated={MODULES_ARE_PAGINATED}
               renderList={({moduleItems, isEmpty, error}) => (
                 <ModuleItemList
                   moduleId={id}

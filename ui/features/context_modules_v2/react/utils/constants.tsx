@@ -18,7 +18,7 @@
 import persistedQueries from '@canvas/graphql/persistedQueries'
 
 export const PAGE_SIZE = ENV.MODULE_FEATURES?.PAGE_SIZE || 10
-export const IS_PAGINATED = !!ENV.MODULE_FEATURES?.IS_PAGINATED
+export const MODULES_ARE_PAGINATED = !!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATED
 
 export const STUDENT = 'student'
 export const TEACHER = 'teacher'

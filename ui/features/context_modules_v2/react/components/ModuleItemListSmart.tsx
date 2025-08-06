@@ -21,7 +21,7 @@ import {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
 import type {ModuleItem} from '../utils/types'
-import {PAGE_SIZE, IS_PAGINATED} from '../utils/constants'
+import {PAGE_SIZE} from '../utils/constants'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
@@ -37,6 +37,7 @@ export interface ModuleItemListSmartProps {
   moduleId: string
   isExpanded: boolean
   view: string
+  isPaginated: boolean
   renderList: (params: {
     moduleItems: ModuleItem[]
     isEmpty?: boolean
@@ -49,6 +50,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   isExpanded,
   view,
   renderList,
+  isPaginated,
 }) => {
   const [pageIndex, setPageIndex] = useState<number>(1)
   const [visibleItems, setVisibleItems] = useState<ModuleItem[]>([])
@@ -69,7 +71,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       ? contextModule.setModuleCursorState
       : () => {}
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+  const totalPages = Number.isFinite(totalCount) ? Math.ceil(totalCount / PAGE_SIZE) : 0
   const moduleItems = moduleItemsResult.data?.moduleItems || []
   const isLoading = moduleItemsResult.isLoading
   const error = moduleItemsResult.error
@@ -79,31 +81,31 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   }
 
   useEffect(() => {
-    if (!isLoading) {
-      setVisibleItems(moduleItems)
-      const pageCount = moduleItems.length || 0
-      const startItem = (pageIndex - 1) * PAGE_SIZE + 1
-      const endItem = Math.min(totalCount, pageCount + startItem - 1)
+    if (isLoading) return
 
-      setVisiblePageInfo({
-        start: startItem,
-        end: endItem,
-        total: totalCount,
-        totalPages: totalPages,
-      })
-    }
+    setVisibleItems(moduleItems)
+    const pageCount = moduleItems.length || 0
+    const startItem = (pageIndex - 1) * PAGE_SIZE + 1
+    const endItem = Math.min(totalCount, pageCount + startItem - 1)
+
+    setVisiblePageInfo({
+      start: startItem,
+      end: endItem,
+      total: totalCount,
+      totalPages: totalPages,
+    })
   }, [isLoading, moduleItems, pageIndex, totalCount])
 
   useEffect(() => {
-    if (pageIndex > totalPages) {
-      const newPage = Math.max(1, totalPages)
-      if (newPage !== pageIndex) {
-        setPageIndex(newPage)
-        setModuleCursorState((prev: any) => ({
-          ...prev,
-          [moduleId]: getCursor(newPage),
-        }))
-      }
+    if (pageIndex <= totalPages || !totalPages) return
+
+    const newPage = Math.max(1, totalPages)
+    if (newPage !== pageIndex) {
+      setPageIndex(newPage)
+      setModuleCursorState((prev: any) => ({
+        ...prev,
+        [moduleId]: getCursor(newPage),
+      }))
     }
   }, [pageIndex, totalPages, moduleId, setModuleCursorState])
 
@@ -125,7 +127,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     </ErrorBoundary>
   )
 
-  if (!IS_PAGINATED || totalPages <= 1) return content
+  if (!isPaginated || totalPages <= 1) return content
 
   return visiblePageInfo && !isEmptyModule ? (
     <View as="div">

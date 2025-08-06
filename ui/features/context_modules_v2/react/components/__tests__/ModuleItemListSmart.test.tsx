@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
 import type {ModuleItem} from '../../utils/types'
-import {PAGE_SIZE, MODULE_ITEMS} from '../../utils/constants'
+import {PAGE_SIZE, MODULE_ITEMS, MODULE_ITEMS_COUNT} from '../../utils/constants'
 
 const generateItems = (count: number): ModuleItem[] =>
   Array.from({length: count}, (_, i) => ({
@@ -60,58 +60,92 @@ const defaultProps = (): Omit<ModuleItemListSmartProps, 'renderList'> => ({
   moduleId: 'mod123',
   isExpanded: true,
   view: 'teacher',
+  isPaginated: true,
 })
 
-const renderWithClient = (
-  ui: React.ReactElement,
-  itemCount: number,
-  cursor: string | null = null,
-) => {
-  const client = new QueryClient()
+const renderWithClient = (ui: React.ReactElement, cursor: string | null = null) => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: Infinity,
+      },
+    },
+  })
 
   client.setQueryData([MODULE_ITEMS, 'mod123', cursor], {
     moduleItems: generateItems(PAGE_SIZE),
   })
 
-  const modulePage = {
-    pageInfo: {
-      hasNextPage: false,
-      endCursor: null,
-    },
-    modules: [
-      {
-        _id: 'mod123',
-        moduleItemsTotalCount: itemCount,
-      },
-    ],
-    getModuleItemsTotalCount: (moduleId: string) => (moduleId === 'mod123' ? itemCount : 0),
-    isFetching: false,
-  }
-
-  client.setQueryData(['modules', 'course123'], {
-    pages: [modulePage],
-    pageParams: [null],
-    getModuleItemsTotalCount: modulePage.getModuleItemsTotalCount,
-    isFetching: false,
-  })
+  client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], 25)
 
   return render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>)
 }
 
 describe('ModuleItemListSmart', () => {
-  // TODO: finish writing test for
-  // renders paginated items and shows pagination UI when needed
-  // shows loading spinner when data is loading
-  // navigates to the next page and updates visible items
+  it('renders paginated items and shows pagination UI when needed', async () => {
+    const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
+    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />)
+
+    expect(await screen.findByTestId('item-list')).toBeInTheDocument()
+
+    await waitFor(() => {
+      const summary = screen.getByTestId('pagination-info-text')
+      expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
+    })
+  })
+
+  it('navigates to the next page and updates visible items', async () => {
+    const itemCount = PAGE_SIZE * 2
+    const firstPageItems = generateItems(PAGE_SIZE)
+    const secondPageItems = generateItems(PAGE_SIZE).map((item, i) => ({
+      ...item,
+      id: `item-${i + PAGE_SIZE}`,
+      content: {
+        ...item.content,
+        title: `Content ${i + PAGE_SIZE}`,
+      },
+    }))
+
+    const client = new QueryClient()
+    const user = userEvent.setup()
+    client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+      moduleItems: firstPageItems,
+    })
+    client.setQueryData([MODULE_ITEMS, 'mod123', btoa(String(PAGE_SIZE))], {
+      moduleItems: secondPageItems,
+    })
+    client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], itemCount)
+    render(
+      <QueryClientProvider client={client}>
+        <ModuleItemListSmart {...defaultProps()} isPaginated={true} renderList={renderList} />
+      </QueryClientProvider>,
+    )
+
+    expect(await screen.findByText('Content 0')).toBeInTheDocument()
+    expect(
+      await screen.findByText(`Showing 1-${PAGE_SIZE} of ${itemCount} items`),
+    ).toBeInTheDocument()
+
+    const pageTwoButton = screen.queryByText('2')?.closest('button')
+    expect(pageTwoButton).toBeInTheDocument()
+    await user.click(pageTwoButton!)
+
+    await waitFor(() => {
+      expect(screen.getByText(`Content ${PAGE_SIZE}`)).toBeInTheDocument()
+      expect(
+        screen.getByText(`Showing ${PAGE_SIZE + 1}-${PAGE_SIZE * 2} of ${itemCount} items`),
+      ).toBeInTheDocument()
+    })
+  })
+
   it('renders all items when pagination is not needed', () => {
-    const nonPaginatedCount = PAGE_SIZE
     renderWithClient(
-      <ModuleItemListSmart {...defaultProps()} renderList={renderList} />,
-      nonPaginatedCount,
+      <ModuleItemListSmart {...defaultProps()} isPaginated={false} renderList={renderList} />,
     )
     const list = screen.getByTestId('item-list')
     expect(list.children).toHaveLength(PAGE_SIZE)
-    expect(screen.queryByText(/Showing \d+-\d+ of \d+/)).not.toBeInTheDocument()
+    expect(screen.queryByTestId('pagination-info-text')).not.toBeInTheDocument()
   })
 
   it('renders error fallback if renderList throws', async () => {
@@ -121,11 +155,40 @@ describe('ModuleItemListSmart', () => {
     const renderListThatThrows = ({moduleItems}: {moduleItems: ModuleItem[]}) => {
       return <BadList moduleItems={moduleItems} />
     }
-    renderWithClient(
-      <ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />,
-      PAGE_SIZE,
-    )
+    renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />)
     const alertText = await screen.findByText('An unexpected error occurred.')
     expect(alertText).toBeInTheDocument()
+  })
+
+  it('shows loading spinner when data is loading', async () => {
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          staleTime: 0,
+        },
+      },
+    })
+
+    const delayedResolve = <T,>(value: T) =>
+      new Promise<T>(resolve => setTimeout(() => resolve(value), 50))
+
+    client.setQueryData([MODULE_ITEMS_COUNT, 'mod123'], 25)
+    client.setQueryDefaults([MODULE_ITEMS, 'mod123', null], {
+      queryFn: () =>
+        delayedResolve({
+          moduleItems: generateItems(PAGE_SIZE),
+        }),
+    })
+
+    render(
+      <QueryClientProvider client={client}>
+        <ModuleItemListSmart {...defaultProps()} renderList={renderList} />
+      </QueryClientProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText(/Loading module items/i)).toBeInTheDocument()
+    })
   })
 })
