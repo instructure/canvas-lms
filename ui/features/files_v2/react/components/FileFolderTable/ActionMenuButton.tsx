@@ -31,7 +31,7 @@ import {DeleteModal} from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
 import {getName, isFile, isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 import {
   IconMoreLine,
@@ -172,7 +172,7 @@ const ActionMenuButton = ({
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
-  const isAccessRestricted = filesEnv.userFileAccessRestricted
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   const filteredItems = useMemo(
     () =>

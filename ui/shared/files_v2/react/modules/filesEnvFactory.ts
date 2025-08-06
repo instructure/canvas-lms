@@ -22,6 +22,10 @@ import {windowPathname} from '@canvas/util/globalUtils'
 
 declare const ENV: {
   FILES_CONTEXTS?: FileContext[]
+  FEATURES?: {
+    restrict_student_access?: boolean
+  }
+  current_user_roles?: string[]
 }
 
 const buildContextsDictionary = (contexts: FileContext[]) => {
@@ -42,6 +46,9 @@ export const createFilesEnv = (customFilesContexts?: FileContext[]): FilesEnv =>
   const baseUrl = showingAllContexts
     ? '/files'
     : `/${fileContexts[0]?.contextType}/${fileContexts[0]?.contextId}/files`
+
+  const userFileAccessRestricted =
+    ENV?.FEATURES?.restrict_student_access && (ENV?.current_user_roles || []).includes('student')
 
   function contextFor(folder: {contextType: string; contextId: string}) {
     const pluralAssetString = `${folder.contextType}s_${folder.contextId}`.toLowerCase()
@@ -66,5 +73,6 @@ export const createFilesEnv = (customFilesContexts?: FileContext[]): FilesEnv =>
     baseUrl,
     contextFor,
     userHasPermission,
+    userFileAccessRestricted,
   }
 }

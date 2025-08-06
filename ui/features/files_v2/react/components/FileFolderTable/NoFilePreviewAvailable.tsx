@@ -26,10 +26,10 @@ import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {File} from '../../../interfaces/File'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
-const isAccessRestricted = filesEnv.userFileAccessRestricted
+const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
 const NoFilePreviewAvailable = ({item}: {item: File}) => (
   <Flex height="100%" alignItems="center" justifyItems="center" id="file-preview">
