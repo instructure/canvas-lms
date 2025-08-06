@@ -121,7 +121,7 @@ describe "Importing Learning Outcomes" do
 
   it "change calculation method, calculation int and rubric criterion" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
-    expect(existing_outcome.calculation_method).to eq "decaying_average"
+    expect(existing_outcome.calculation_method).to eq "standard_decaying_average"
     expect(existing_outcome.calculation_int).to eq 65
     expect(existing_outcome.data).to be_nil
     identifier = existing_outcome.migration_id

@@ -130,6 +130,10 @@ outcomes_new_decaying_average_calculation:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 archive_outcomes:
   state: hidden
   applies_to: SiteAdmin
