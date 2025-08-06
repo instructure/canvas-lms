@@ -535,19 +535,15 @@ class EnrollmentsApiController < ApplicationController
         send(:"api_v1_#{endpoint_scope}_enrollments_url")
       )
 
-      ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
-
       include_group_ids = Array(params[:include]).include?("group_ids")
       includes = [:user] + Array(params[:include])
       user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
 
-      render json: enrollments.map { |e|
-        enrollment_json(e,
-                        @current_user,
-                        session,
-                        includes:,
-                        opts: { grading_period: })
-      }
+      render json: enrollments_json(enrollments,
+                                    @current_user,
+                                    session,
+                                    includes:,
+                                    opts: { grading_period: })
     end
   end
 

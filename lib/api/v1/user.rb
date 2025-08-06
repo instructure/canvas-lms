@@ -273,6 +273,28 @@ module Api::V1::User
     end
   end
 
+  def enrollments_json(enrollments, user, session, includes: [], opts: {}, excludes: [])
+    ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
+    # for Enrollment#find_score
+    ActiveRecord::Associations.preload(enrollments, :scores)
+    # for Enrollment#enrollment_state
+    ActiveRecord::Associations.preload(enrollments, :enrollment_state)
+    # for associated_user
+    if includes.include?("observed_users")
+      ActiveRecord::Associations.preload(enrollments, :associated_user)
+    end
+    # for User#profile
+    if @domain_root_account&.enable_profiles?
+      ActiveRecord::Associations.preload(enrollments, user: :profile)
+    end
+    # for Enrollment#temporary_enrollment_source_user
+    if includes.include?("temporary_enrollment_providers")
+      ActiveRecord::Associations.preload(enrollments, :temporary_enrollment_pairing)
+    end
+
+    enrollments.map { |e| enrollment_json(e, user, session, includes:, opts:) }
+  end
+
   API_ENROLLMENT_JSON_OPTS = %i[id
                                 root_account_id
                                 user_id

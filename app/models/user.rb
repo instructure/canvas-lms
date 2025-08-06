@@ -557,19 +557,25 @@ class User < ActiveRecord::Base
   after_save :self_enroll_if_necessary
 
   def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
+    # check if the enrollment_scope uses enrollment_states (ex. any scope ending in _by_date)
+    needs_enrollment_state_join = enrollment_scope.joins_values.include?(:enrollment_state)
+
     if associated_user && associated_user != self
       join = :observer_enrollments
       scope = Course.active.joins(join)
-                    .merge(enrollment_scope.except(:joins))
-                    .where(enrollments: { associated_user_id: associated_user.id })
+      scope = scope.joins(join => :enrollment_state) if needs_enrollment_state_join
+      scope = scope.merge(enrollment_scope.except(:joins))
+                   .where(enrollments: { associated_user_id: associated_user.id })
     else
       join = (associated_user == self) ? :enrollments_excluding_linked_observers : :all_enrollments
-      scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
+      scope = Course.active.joins(join)
+      scope = scope.joins(join => :enrollment_state) if needs_enrollment_state_join
+      scope = scope.merge(enrollment_scope.except(:joins)).distinct
     end
 
     unless include_completed_courses
-      scope = scope.joins(join => :enrollment_state)
-                   .where(enrollment_states: { restricted_access: false })
+      scope = scope.joins(join => :enrollment_state) unless needs_enrollment_state_join
+      scope = scope.where(enrollment_states: { restricted_access: false })
                    .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
     end
     scope
@@ -584,11 +590,11 @@ class User < ActiveRecord::Base
   end
 
   def concluded_courses
-    courses_for_enrollments(enrollments.concluded)
+    courses_for_enrollments(enrollments.completed_by_date)
   end
 
   def current_and_concluded_courses
-    courses_for_enrollments(enrollments.current_and_concluded)
+    courses_for_enrollments(enrollments.active_or_completed_by_date)
   end
 
   # Returns course IDs for truly current enrollments, filtered the same way as the dashboard
@@ -1390,7 +1396,7 @@ class User < ActiveRecord::Base
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
     # the right then look at the concluded courses.
-    enrollments_to_check ||= enrollments.current_and_concluded
+    enrollments_to_check ||= enrollments.active_or_completed_by_date
 
     shards = associated_shards & user.associated_shards
     # search the current shard first
@@ -2522,20 +2528,18 @@ class User < ActiveRecord::Base
   end
 
   def participating_current_and_concluded_course_ids
-    cached_course_ids("current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access
-    end
+    cached_course_ids("current_and_concluded", &:not_inactive_by_date_ignoring_access)
   end
 
   def participating_student_current_and_concluded_course_ids
     cached_course_ids("student_current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w[StudentEnrollment StudentViewEnrollment])
+      enrollments.not_inactive_by_date_ignoring_access.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
   def participating_student_current_and_unrestricted_concluded_course_ids
     cached_course_ids("student_current_and_concluded") do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
+      enrollments.not_inactive_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
@@ -2553,7 +2557,7 @@ class User < ActiveRecord::Base
 
   def participating_instructor_course_with_concluded_ids
     cached_course_ids("participating_instructor_with_concluded") do |enrollments|
-      enrollments.of_instructor_type.current_and_concluded.not_inactive_by_date
+      enrollments.of_instructor_type.not_inactive_by_date
     end
   end
 
