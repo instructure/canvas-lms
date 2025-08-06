@@ -619,6 +619,14 @@ module Modules2IndexPage
     f(module_unpublish_selector)
   end
 
+  def module_pagination_container(module_id)
+    f("#{context_module_selector(module_id)} #{pagination_container_selector}")
+  end
+
+  def module_pagination_buttons(module_id)
+    ff("#{context_module_selector(module_id)} #{pagination_page_buttons_selector}")
+  end
+
   def pagination_info_text
     f(pagination_info_text_selector).text
   end

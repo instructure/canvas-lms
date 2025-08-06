@@ -55,4 +55,24 @@ describe "context modules pagination - student view", :ignore_js_errors do
     wait_for_ajaximations
     expect(pagination_info_text_includes?("Showing 11-20 of 150 items")).to be true
   end
+
+  context "with many paged modules" do
+    before :once do
+      @second_module = create_module_with_many_files(course: @course, count: 11)
+      @third_module = create_module_with_many_files(course: @course, count: 10)
+
+      Setting.set("module_perf_threshold", -1)
+    end
+
+    it "keeps the paged module in the viewport upon paging" do
+      go_to_modules
+      wait_for_ajaximations
+      expand_all_modules
+      scroll_into_view(module_pagination_container(@second_module.id))
+      module_pagination_buttons(@second_module.id)[-1].click
+      wait_for_ajaximations
+
+      expect_element_in_viewport(context_module_selector(@second_module.id))
+    end
+  end
 end
