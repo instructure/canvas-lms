@@ -60,6 +60,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     total: number
     totalPages: number
   }>()
+  const [onPageLoaded, setOnPageLoaded] = useState(() => () => {})
 
   const contextModule: any = useContextModule()
   const {courseId} = contextModule
@@ -103,6 +104,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       total: totalCount,
       totalPages: totalPages,
     })
+    onPageLoaded()
   }, [isLoading, moduleItems, pageIndex, totalCount])
 
   useEffect(() => {
@@ -124,6 +126,10 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       ...prev,
       [moduleId]: getCursor(page),
     }))
+    setOnPageLoaded(() => () => {
+      document.activeElement?.closest('.context_module')?.scrollIntoView({block: 'nearest'})
+      setOnPageLoaded(() => () => {})
+    })
   }
 
   const content = (
