@@ -85,6 +85,12 @@ k20_course_readiness_lti_apps_criteria:
   display_name: Intelligent Insights - Course Readiness - LTI Apps Criteria
   description:
     k20_course_readiness_lti_apps_criteria: Enables the Intelligent Insights - Course Readiness - LTI Apps Criteria feature.
+k20_course_readiness_homepage_criteria:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Course Readiness - Homepage Criteria
+  description:
+    k20_course_readiness_homepage_criteria: Enables the Intelligent Insights - Course Readiness - Homepage Criteria feature.
   root_opt_in: true
   beta: true
   shadow: true
