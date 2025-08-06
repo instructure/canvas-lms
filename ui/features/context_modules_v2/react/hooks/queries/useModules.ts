@@ -89,14 +89,7 @@ export function useModules(courseId: string, view: string = 'teacher') {
     staleTime: 15 * 60 * 1000,
   })
 
-  const getModuleItemsTotalCount = (moduleId: string): number | null => {
-    const allModules = queryResult.data?.pages.flatMap(page => page.modules) ?? []
-    const module = allModules.find(m => m.id === moduleId || m._id === moduleId)
-    return module?.moduleItemsTotalCount ?? null
-  }
-
   return {
     ...queryResult,
-    getModuleItemsTotalCount,
   }
 }

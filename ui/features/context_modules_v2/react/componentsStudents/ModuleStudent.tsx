@@ -29,7 +29,7 @@ import {
   Prerequisite,
 } from '../utils/types'
 import ModuleItemListSmart from '../components/ModuleItemListSmart'
-import {STUDENT} from '../utils/constants'
+import {STUDENT, MODULES_ARE_PAGINATED} from '../utils/constants'
 
 export interface ModuleStudentProps {
   id: string
@@ -117,6 +117,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                     moduleId={id}
                     view={STUDENT}
                     isExpanded={isExpanded}
+                    isPaginated={MODULES_ARE_PAGINATED}
                     renderList={({moduleItems, isEmpty, error}) => (
                       <ModuleItemListStudent
                         moduleItems={moduleItems}
