@@ -749,11 +749,20 @@ RSpec.describe SubmissionComment do
         let(:course) { Course.create! }
         let(:assignment) { course.assignments.create!(title: "hi") }
         let(:ta) { course.enroll_ta(User.create!, active_all: true).user }
+        let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
         let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
         let(:submission) { assignment.submission_for_student(student) }
         let(:comment) do
           assignment.update_submission(student, commenter: student, comment: "ok")
           submission.submission_comments.first
+        end
+        let(:ta_comment) do
+          assignment.update_submission(student, commenter: ta, comment: "ta comment")
+          submission.submission_comments.second
+        end
+        let(:teacher_comment) do
+          assignment.update_submission(student, commenter: teacher, comment: "teacher comment")
+          submission.submission_comments.third
         end
 
         it "submitter comments can be read by an instructor with default permissions" do
@@ -774,6 +783,12 @@ RSpec.describe SubmissionComment do
 
           it "allows students to read the author of their own comments" do
             expect(comment.grants_right?(student, :read_author)).to be true
+          end
+
+          it "allows teachers to read the author of their own comments and other graders" do
+            expect(comment.grants_right?(teacher, :read_author)).to be false
+            expect(ta_comment.grants_right?(teacher, :read_author)).to be true
+            expect(teacher_comment.grants_right?(teacher, :read_author)).to be true
           end
         end
       end
