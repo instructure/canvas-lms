@@ -40,9 +40,9 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn().mockReturnValue(() => {}),
 }))
 
-jest.mock('@canvas/util/globalUtils', () => ({
-  assignLocation: jest.fn(),
-}))
+// jest.mock('@canvas/util/globalUtils', () => ({
+//   assignLocation: jest.fn(),
+// }))
 
 jest.mock('../../../../utils/downloadUtils', () => ({
   downloadZip: jest.fn(),

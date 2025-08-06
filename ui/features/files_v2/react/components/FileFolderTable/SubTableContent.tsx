@@ -25,7 +25,7 @@ import {NoResultsFound} from './NoResultsFound'
 import {FileUploadDrop} from '../shared/FileUploadDrop'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,7 +46,7 @@ const SubTableContent = ({
   handleFileDropRef,
 }: SubTableContentProps) => {
   const {currentFolder, contextId, contextType} = useFileManagement()
-  const isAccessRestricted = filesEnv.userFileAccessRestricted
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   if (isLoading) {
     return (
