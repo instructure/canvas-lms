@@ -17,7 +17,7 @@
  */
 
 import {screen} from '@testing-library/react'
-import {ButtonBlock, ButtonBlockProps, ButtonData} from '../ButtonBlock'
+import {ButtonBlock, ButtonBlockProps} from '../ButtonBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 
 jest.mock('../../../BlockContentEditorContext', () => ({
@@ -31,7 +31,7 @@ jest.mock('../../BaseBlock/useGetRenderMode', () => ({
 }))
 
 const defaultProps: ButtonBlockProps = {
-  settings: {buttons: [{id: 1}]},
+  settings: {alignment: 'left', buttons: [{id: 1}]},
 }
 
 describe('ButtonBlock', () => {

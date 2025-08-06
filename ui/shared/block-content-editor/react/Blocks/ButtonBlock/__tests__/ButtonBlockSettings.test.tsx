@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {ButtonBlockSettings} from '../ButtonBlockSettings'
 
 const mockSetProp = jest.fn()
@@ -26,65 +26,73 @@ jest.mock('@craftjs/core', () => ({
   useNode: (selector: any) => mockUseNode(selector),
 }))
 
+const mockIndividualButtonSettings = jest.fn()
 jest.mock('../ButtonBlockIndividualButtonSettings', () => ({
-  ButtonBlockIndividualButtonSettings: ({initialButtons, onButtonsChange}: any) => (
-    <div data-testid="button-block-individual-settings">
-      {initialButtons.map((button: any) => (
-        <div key={button.id}>Button-{button.id}</div>
-      ))}
-      <button
-        onClick={() => {
-          onButtonsChange([{id: 11}, {id: 12}, {id: 13}])
-        }}
-      >
-        Change buttons
-      </button>
-    </div>
-  ),
+  ButtonBlockIndividualButtonSettings: (props: any) => mockIndividualButtonSettings(props),
 }))
+
+const mockGeneralButtonSettings = jest.fn()
+jest.mock('../ButtonBlockGeneralButtonSettings', () => ({
+  ButtonBlockGeneralButtonSettings: (props: any) => mockGeneralButtonSettings(props),
+}))
+
+const defaultButtons = [{id: 1}, {id: 2}]
+const defaultAlignment = 'left'
 
 describe('ButtonBlockSettings', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUseNode.mockReturnValue({
       actions: {setProp: mockSetProp},
-      buttons: [{id: 1}, {id: 2}],
+      buttons: defaultButtons,
+      alignment: defaultAlignment,
     })
   })
 
-  const assertSetPropCallback = (expectedProperty: 'buttons', expectedValue: any) => {
+  const assertSetPropCallback = (expectedProperty: 'buttons' | 'alignment', expectedValue: any) => {
     expect(mockSetProp).toHaveBeenCalledTimes(1)
 
     const setPropCallback = mockSetProp.mock.calls[0][0]
     const mockProps = {
-      settings: {buttons: [{id: 1}]},
+      settings: {alignment: defaultAlignment, buttons: defaultButtons},
     }
     setPropCallback(mockProps)
     expect(mockProps.settings[expectedProperty]).toEqual(expectedValue)
   }
 
   describe('Individual button settings', () => {
-    describe('rendering', () => {
-      it('renders component', () => {
-        render(<ButtonBlockSettings />)
-        expect(screen.getByTestId('button-block-individual-settings')).toBeInTheDocument()
-      })
-
-      it('passes button props', () => {
-        render(<ButtonBlockSettings />)
-        const buttons = screen.getAllByText(/Button-\d+/)
-        expect(buttons).toHaveLength(2)
-        expect(buttons[0]).toHaveTextContent('Button-1')
-        expect(buttons[1]).toHaveTextContent('Button-2')
+    it('passes correct props', () => {
+      render(<ButtonBlockSettings />)
+      expect(mockIndividualButtonSettings).toHaveBeenCalledWith({
+        initialButtons: defaultButtons,
+        onButtonsChange: expect.any(Function),
       })
     })
 
-    describe('event handlers', () => {
-      it('calls setProp when buttons change', () => {
-        render(<ButtonBlockSettings />)
-        fireEvent.click(screen.getByText('Change buttons'))
-        assertSetPropCallback('buttons', [{id: 11}, {id: 12}, {id: 13}])
+    it('calls setProp when buttons change', () => {
+      render(<ButtonBlockSettings />)
+      const {onButtonsChange} = mockIndividualButtonSettings.mock.calls[0][0]
+      const newButtons = [{id: 11}, {id: 12}, {id: 13}]
+      onButtonsChange(newButtons)
+      assertSetPropCallback('buttons', newButtons)
+    })
+  })
+
+  describe('General button settings', () => {
+    it('passes correct props', () => {
+      render(<ButtonBlockSettings />)
+      expect(mockGeneralButtonSettings).toHaveBeenCalledWith({
+        alignment: defaultAlignment,
+        onAlignmentChange: expect.any(Function),
       })
+    })
+
+    it('calls setProp when alignment changes', () => {
+      render(<ButtonBlockSettings />)
+      const {onAlignmentChange} = mockGeneralButtonSettings.mock.calls[0][0]
+      const newAlignment = 'center'
+      onAlignmentChange(newAlignment)
+      assertSetPropCallback('alignment', newAlignment)
     })
   })
 })

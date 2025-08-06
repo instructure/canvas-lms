@@ -23,6 +23,8 @@ import {ButtonBlockEditPreview} from './ButtonBlockEditPreview'
 import {ButtonBlockView} from './ButtonBlockView'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
 
+export type ButtonAlignment = 'left' | 'center' | 'right'
+
 export type ButtonData = {
   id: number
 }
@@ -30,6 +32,7 @@ export type ButtonData = {
 export type ButtonBlockProps = {
   settings: {
     buttons: ButtonData[]
+    alignment: ButtonAlignment
   }
 }
 
