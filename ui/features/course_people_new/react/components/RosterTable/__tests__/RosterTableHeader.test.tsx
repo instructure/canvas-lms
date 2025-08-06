@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {Table} from '@instructure/ui-table'
 import RosterTableHeader from '../RosterTableHeader'
 import useCoursePeopleContext from '../../../hooks/useCoursePeopleContext'
 import {DEFAULT_SORT_FIELD, DEFAULT_SORT_DIRECTION} from '../../../../util/constants'
@@ -54,9 +55,17 @@ describe('RosterTableHeader', () => {
     jest.clearAllMocks()
   })
 
+  const renderWithTable = (props = {}) => {
+    return render(
+      <Table caption="Test table">
+        <RosterTableHeader {...defaultProps} {...props} />
+      </Table>,
+    )
+  }
+
   describe('rendering', () => {
     it('renders all columns when user has all permissions', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-select-all')).toBeInTheDocument()
       expect(getByTestId('header-name')).toHaveTextContent(/name/i)
       expect(getByTestId('header-sis_id')).toHaveTextContent(/sis id/i)
@@ -70,7 +79,7 @@ describe('RosterTableHeader', () => {
     })
 
     it('renders select all checkbox when canManageDifferentiationTags is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-select-all')).toBeInTheDocument()
     })
   })
@@ -81,7 +90,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         canViewLoginIdColumn: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-login_id')).not.toBeInTheDocument()
     })
 
@@ -90,7 +99,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         canViewSisIdColumn: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-sis_id')).not.toBeInTheDocument()
     })
 
@@ -99,7 +108,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         hideSectionsOnCourseUsersPage: true,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-section')).not.toBeInTheDocument()
     })
 
@@ -108,7 +117,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         canReadReports: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-lastActivity')).not.toBeInTheDocument()
       expect(queryByTestId('header-totalActivity')).not.toBeInTheDocument()
     })
@@ -118,7 +127,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         allowAssignToDifferentiationTags: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-select-all')).not.toBeInTheDocument()
     })
 
@@ -127,7 +136,7 @@ describe('RosterTableHeader', () => {
         ...defaultContextValues,
         canManageDifferentiationTags: false,
       })
-      const {queryByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {queryByTestId} = renderWithTable()
       expect(queryByTestId('header-select-all')).not.toBeInTheDocument()
     })
   })
@@ -135,19 +144,19 @@ describe('RosterTableHeader', () => {
   describe('sorting', () => {
     it('calls handleSort when clicking a sortable column', async () => {
       const handleSort = jest.fn()
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} handleSort={handleSort} />)
+      const {getByTestId} = renderWithTable({handleSort})
       const nameHeader = getByTestId('header-name')
       await user.click(within(nameHeader).getByRole('button', {hidden: true}))
       expect(handleSort).toHaveBeenCalledWith(expect.any(Object), {id: 'name'})
     })
 
     it('shows correct sort direction for active column', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByTestId} = renderWithTable()
       expect(getByTestId('header-name')).toHaveAttribute('aria-sort', 'ascending')
     })
 
     it('shows no sort direction for inactive columns', () => {
-      const {getByRole} = render(<RosterTableHeader {...defaultProps} />)
+      const {getByRole} = renderWithTable()
       const roleHeader = Array.from(getByRole('row', {hidden: true}).querySelectorAll('th')).find(
         cell => cell.textContent?.includes('Role'),
       )
@@ -158,21 +167,19 @@ describe('RosterTableHeader', () => {
   describe('select all checkbox', () => {
     it('calls handleSelectAll when clicked', async () => {
       const handleSelectAll = jest.fn()
-      const {getByTestId} = render(
-        <RosterTableHeader {...defaultProps} handleSelectAll={handleSelectAll} />,
-      )
+      const {getByTestId} = renderWithTable({handleSelectAll})
       await user.click(getByTestId('header-select-all'))
       expect(handleSelectAll).toHaveBeenCalledWith(false)
     })
 
     it('shows indeterminate state when someSelected is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} someSelected={true} />)
+      const {getByTestId} = renderWithTable({someSelected: true})
       const checkbox = getByTestId('header-select-all') as HTMLInputElement
       expect(checkbox.indeterminate).toBe(true)
     })
 
     it('shows checked state when allSelected is true', () => {
-      const {getByTestId} = render(<RosterTableHeader {...defaultProps} allSelected={true} />)
+      const {getByTestId} = renderWithTable({allSelected: true})
       const checkbox = getByTestId('header-select-all') as HTMLInputElement
       expect(checkbox.checked).toBe(true)
     })

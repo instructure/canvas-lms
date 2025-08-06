@@ -151,6 +151,18 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/courses\/\d+\/assignments\/\d+/, [])
   fetchMock.get(/\/api\/v1\/courses\/\d+\/settings/, {})
   fetchMock.get(/\/api\/v1\/courses\/\d+\/sections/, [])
+  // Mock GraphQL endpoint for differentiated modules
+  fetchMock.post('http://localhost/api/graphql', {
+    data: {
+      legacyNode: {
+        id: '1',
+        name: 'Test Course',
+        enrollmentsConnection: {
+          edges: [],
+        },
+      },
+    },
+  })
 })
 
 afterEach(() => {
