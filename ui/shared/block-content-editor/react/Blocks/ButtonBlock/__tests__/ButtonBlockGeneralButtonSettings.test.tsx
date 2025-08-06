@@ -24,7 +24,9 @@ import {
 
 const defaultProps: ButtonBlockGeneralButtonSettingsProps = {
   alignment: 'left',
+  layout: 'horizontal',
   onAlignmentChange: jest.fn(),
+  onLayoutChange: jest.fn(),
 }
 
 describe('ButtonBlockGeneralButtonSettings', () => {
@@ -41,6 +43,14 @@ describe('ButtonBlockGeneralButtonSettings', () => {
       expect(screen.getByLabelText('Middle aligned')).toBeInTheDocument()
       expect(screen.getByLabelText('Right aligned')).toBeInTheDocument()
     })
+
+    it('renders all layout options', () => {
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} />)
+
+      expect(screen.getByText('Button Layout')).toBeInTheDocument()
+      expect(screen.getByLabelText('Horizontal')).toBeInTheDocument()
+      expect(screen.getByLabelText('Vertical')).toBeInTheDocument()
+    })
   })
 
   describe('state selection', () => {
@@ -50,6 +60,13 @@ describe('ButtonBlockGeneralButtonSettings', () => {
       expect(screen.getByLabelText('Middle aligned')).toBeChecked()
       expect(screen.getByLabelText('Left aligned')).not.toBeChecked()
       expect(screen.getByLabelText('Right aligned')).not.toBeChecked()
+    })
+
+    it('selects the correct layout option', () => {
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} layout="vertical" />)
+
+      expect(screen.getByLabelText('Vertical')).toBeChecked()
+      expect(screen.getByLabelText('Horizontal')).not.toBeChecked()
     })
   })
 
@@ -66,6 +83,15 @@ describe('ButtonBlockGeneralButtonSettings', () => {
       fireEvent.click(screen.getByLabelText('Right aligned'))
 
       expect(onAlignmentChange).toHaveBeenCalledWith('right')
+    })
+
+    it('calls onLayoutChange when layout option is selected', () => {
+      const onLayoutChange = jest.fn()
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} onLayoutChange={onLayoutChange} />)
+
+      fireEvent.click(screen.getByLabelText('Vertical'))
+
+      expect(onLayoutChange).toHaveBeenCalledWith('vertical')
     })
   })
 })

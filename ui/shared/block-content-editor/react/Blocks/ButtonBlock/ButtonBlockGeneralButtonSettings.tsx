@@ -17,7 +17,7 @@
  */
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ButtonAlignment} from './ButtonBlock'
+import {ButtonAlignment, ButtonLayout} from './ButtonBlock'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 
 const I18n = createI18nScope('block_content_editor')
@@ -28,14 +28,23 @@ const ALIGNMENT_OPTIONS: {label: string; value: ButtonAlignment}[] = [
   {label: I18n.t('Right aligned'), value: 'right'},
 ]
 
+const LAYOUT_OPTIONS: {label: string; value: ButtonLayout}[] = [
+  {label: I18n.t('Horizontal'), value: 'horizontal'},
+  {label: I18n.t('Vertical'), value: 'vertical'},
+]
+
 export type ButtonBlockGeneralButtonSettingsProps = {
   alignment: ButtonAlignment
+  layout: ButtonLayout
   onAlignmentChange: (alignment: ButtonAlignment) => void
+  onLayoutChange: (layout: ButtonLayout) => void
 }
 
 export const ButtonBlockGeneralButtonSettings = ({
   alignment,
+  layout,
   onAlignmentChange,
+  onLayoutChange,
 }: ButtonBlockGeneralButtonSettingsProps) => {
   return (
     <Flex direction="column" gap="medium" padding="small">
@@ -46,6 +55,17 @@ export const ButtonBlockGeneralButtonSettings = ({
         onChange={(_event, value) => onAlignmentChange(value as ButtonAlignment)}
       >
         {ALIGNMENT_OPTIONS.map(option => (
+          <RadioInput key={option.value} label={option.label} value={option.value} />
+        ))}
+      </RadioInputGroup>
+
+      <RadioInputGroup
+        name="button-block-general-button-settings-layout"
+        description={I18n.t('Button Layout')}
+        value={layout}
+        onChange={(_event, value) => onLayoutChange(value as ButtonLayout)}
+      >
+        {LAYOUT_OPTIONS.map(option => (
           <RadioInput key={option.value} label={option.label} value={option.value} />
         ))}
       </RadioInputGroup>
