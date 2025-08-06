@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import AllocationRuleCard, {AllocationRuleType} from './AllocationRuleCard'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -76,7 +77,34 @@ const PeerReviewAllocationRulesTray = ({
   closeTray: () => void
 }): React.ReactElement => {
   const trayLabel = I18n.t('Allocation Rules')
-  const [rules, setRules] = useState([]) // TODO: Replace with data fetched in EGG-1589
+  // TODO: Replace with data fetched in EGG-1589
+  // const [rules, setRules] = useState([])
+  const rules: AllocationRuleType[] = [
+    {
+      id: '1',
+      reviewer: {id: '1', name: 'Student 1'},
+      reviewee: {id: '2', name: 'Student 2'},
+      mustReview: true,
+      reviewPermitted: true,
+      appliesToReviewer: true,
+    },
+    {
+      id: '2',
+      reviewer: {id: '3', name: 'Student 3'},
+      reviewee: {id: '2', name: 'Student 2'},
+      mustReview: true,
+      reviewPermitted: false,
+      appliesToReviewer: false,
+    },
+    {
+      id: '3',
+      reviewer: {id: '3', name: 'Student with an extremely long name that should wrap properly'},
+      reviewee: {id: '2', name: 'Student with a very long name'},
+      mustReview: false,
+      reviewPermitted: true,
+      appliesToReviewer: true,
+    },
+  ]
 
   return (
     <View data-testid="allocation-rules-tray">
@@ -117,7 +145,15 @@ const PeerReviewAllocationRulesTray = ({
           <Flex.Item as="div" padding="x-small medium">
             <Button color="primary">{I18n.t('+ Rule')}</Button>
           </Flex.Item>
-          {rules.length === 0 && <EmptyState />}
+          {rules.length === 0 ? (
+            <EmptyState />
+          ) : (
+            rules.map(rule => (
+              <Flex.Item as="div" padding="x-small medium" key={rule.id}>
+                <AllocationRuleCard rule={rule} />
+              </Flex.Item>
+            ))
+          )}
         </Flex>
       </Tray>
     </View>
