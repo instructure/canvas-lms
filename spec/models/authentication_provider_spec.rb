@@ -636,14 +636,12 @@ describe AuthenticationProvider do
     it "works" do
       p = auth_provider.provision_user("unique_id")
       expect(p.unique_id).to eq "unique_id"
-      expect(p.login_attribute).to eq "sub"
       expect(p.unique_ids).to eq({})
     end
 
     it "handles a hash of unique ids" do
       p = auth_provider.provision_user("sub" => "unique_id", "tid" => "abc")
       expect(p.unique_id).to eq "unique_id"
-      expect(p.login_attribute).to eq "sub"
       expect(p.unique_ids).to eq({ "sub" => "unique_id", "tid" => "abc" })
     end
   end

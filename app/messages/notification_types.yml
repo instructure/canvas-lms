@@ -266,8 +266,6 @@
       delay_for: 0
     - name: Manually Created Access Token Created
       delay_for: 0
-    - name: Account Verification
-      delay_for: 0
     - name: Access Token Created On Behalf Of User
       delay_for: 0
     - name: Access Token Deleted
