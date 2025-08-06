@@ -1589,7 +1589,7 @@ describe "Outcome Groups API", type: :request do
                                                          { points: 0, description: "Does Not Meet Expectations" }
                                                        ]
                                                      })
-      expect(@outcome.calculation_method).to eq("decaying_average")
+      expect(@outcome.calculation_method).to eq("standard_decaying_average")
       expect(@outcome.calculation_int).to be 65
     end
 

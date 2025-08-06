@@ -49,6 +49,7 @@ describe "Outcomes API", type: :request do
       "description" => presets[:description] || outcome.description,
       "assessed" => presets[:assessed] || outcome.assessed?,
       "calculation_method" => presets[:calculation_method] || outcome.calculation_method,
+      "calculation_int" => presets[:calculation_int] || outcome.calculation_int,
       "mastery_points" => outcome.mastery_points,
       "points_possible" => outcome.points_possible,
       "ratings" => outcome.rubric_criterion[:ratings].map(&:stringify_keys)
@@ -236,7 +237,7 @@ describe "Outcomes API", type: :request do
                              "context_id" => @account.id,
                              "context_type" => "Account",
                              "calculation_int" => 65,
-                             "calculation_method" => "decaying_average",
+                             "calculation_method" => "standard_decaying_average",
                              "title" => @outcome.title,
                              "display_name" => nil,
                              "friendly_description" => nil,
@@ -283,40 +284,13 @@ describe "Outcomes API", type: :request do
                              "can_edit" => true,
                              "has_updateable_rubrics" => false,
                              "description" => @outcome.description,
-                             "points_possible" => 5,
-                             "mastery_points" => 3,
+                             "points_possible" => 5.0,
+                             "mastery_points" => 3.0,
                              "calculation_int" => 65,
-                             "calculation_method" => "decaying_average",
+                             "calculation_method" => "standard_decaying_average",
                              "assessed" => false,
                              "ratings" => @outcome.rubric_criterion[:ratings].map(&:stringify_keys)
                            })
-      end
-
-      it "reports calculation methods that are nil as highest so old outcomes continue to behave the same before we added a calculation_method" do
-        criterion = {
-          mastery_points: 3,
-          ratings: [
-            { points: 5, description: "Exceeds Expectations" },
-            { points: 3, description: "Meets Expectations" },
-            { points: 0, description: "Does Not Meet Expectations" }
-          ]
-        }
-
-        @outcome.rubric_criterion = criterion
-        @outcome.save!
-
-        # The order here is intentional.  We don't want to trigger the before_save callback on LearningOutcome
-        # because it will take away our nil calculation_method.  The nil is required in order to
-        # simulate pre-existing learning outcome records that have nil calculation_methods
-        @outcome.update_column(:calculation_method, nil)
-
-        json = api_call(:get,
-                        "/api/v1/outcomes/#{@outcome.id}",
-                        controller: "outcomes_api",
-                        action: "show",
-                        id: @outcome.id.to_s,
-                        format: "json")
-        expect(json).to eq(outcome_json(@outcome, { calculation_method: "highest", can_edit: true }))
       end
 
       it "reports as assessed if assessments exist in any aligned course" do
@@ -537,7 +511,7 @@ describe "Outcomes API", type: :request do
                              "context_id" => @account.id,
                              "context_type" => "Account",
                              "calculation_int" => 65,
-                             "calculation_method" => "decaying_average",
+                             "calculation_method" => "standard_decaying_average",
                              "vendor_guid" => "vendorguid9000",
                              "title" => "New Title",
                              "display_name" => nil,
@@ -668,7 +642,7 @@ describe "Outcomes API", type: :request do
           end
         end
 
-        it "sets a default calculation_method of 'decaying_average' if the record is being re-saved (previously created)" do
+        it "sets a default calculation_method of 'standard_decaying_average' if the record is being re-saved (previously created)" do
           # The order here is intentional.  We don't want to trigger any callbacks on LearningOutcome
           # because it will take away our nil calculation_method.  The nil is required in order to
           # simulate pre-existing learning outcome records that have nil calculation_methods
@@ -686,7 +660,7 @@ describe "Outcomes API", type: :request do
                      calculation_method: nil })
 
           @outcome.reload
-          expect(@outcome.calculation_method).to eq("decaying_average")
+          expect(@outcome.calculation_method).to eq("standard_decaying_average")
         end
 
         it "returns a sensible error message for an incorrect calculation_method" do
@@ -836,7 +810,7 @@ describe "Outcomes API", type: :request do
                                "context_id" => @account.id,
                                "context_type" => "Account",
                                "calculation_int" => 65,
-                               "calculation_method" => "decaying_average",
+                               "calculation_method" => "standard_decaying_average",
                                "title" => @outcome.title,
                                "display_name" => nil,
                                "friendly_description" => nil,
@@ -1471,7 +1445,9 @@ describe "Outcomes API", type: :request do
                             { expected_status: 200 })
 
             @outcome.reload
-            expect(json).to eq(outcome_json)
+            outcome_json_copy = outcome_json.dup
+            outcome_json_copy.delete("calculation_int")
+            expect(json).to eq(outcome_json_copy)
             expect(@outcome.calculation_method).to eq("highest")
           end
 
