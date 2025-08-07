@@ -585,6 +585,131 @@ describe "context modules", :ignore_js_errors do
       @empty_module = @course.context_modules.create!(name: "Multi File Module")
     end
 
+    context "when adding a quiz" do
+      # Quiz LTI is used when creating new quizzes when quizzes_next flag is enabled
+      # and Quiz LTI is added to the course
+      it "new quiz engine enabled and Quiz LTI added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        # A quiz with new Quiz engine is created and found in Module Item list
+        expect(new_quiz_icon.count).to eq(1)
+      end
+
+      it "new quiz engine enabled but Quiz LTI is not added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.enable_feature! :quizzes_next
+        @course.enable_feature! :quizzes_next
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        # A quiz with classic Quiz engine is created and found in Module Item list
+        expect(classic_quiz_icon.count).to eq(1)
+      end
+
+      it "new quiz engine disabled but Quiz LTI is added" do
+        @course.root_account.settings[:provision] = { "lti" => "lti url" }
+        @course.root_account.save!
+        @course.root_account.disable_feature! :quizzes_next
+        @course.disable_feature! :quizzes_next
+
+        @course.context_external_tools.create!(
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
+        )
+
+        go_to_modules
+        wait_for_ajaximations
+
+        # Expand the module to see its items
+        context_module_expand_toggle(@empty_module.id).click
+        wait_for_ajaximations
+
+        add_item_button(@empty_module.id).click
+        wait_for_ajaximations
+
+        # Select External Tool from the dropdown
+        click_INSTUI_Select_option(new_item_type_select_selector, "Quiz")
+        wait_for_ajaximations
+
+        tab_create_item.click
+
+        # Fill in the quiz details
+        new_item_name = "New Quizz"
+
+        replace_content(create_learning_object_name_input, new_item_name)
+
+        # Click Add Item
+        add_item_modal_add_item_button.click
+        wait_for_ajaximations
+
+        # A quiz with classic Quiz engine is created and found in Module Item list
+        expect(classic_quiz_icon.count).to eq(1)
+      end
+    end
+
     context "when adding an external tool" do
       before do
         @external_tool = @course.context_external_tools.create!(

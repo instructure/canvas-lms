@@ -357,6 +357,23 @@ module Modules2IndexPage
   def external_tool_page_name_input_selector
     "[data-testid='external_item_page_name']"
   end
+
+  def tab_create_item_selector
+    "#tab-create-item-form"
+  end
+
+  def create_learning_object_name_input_selector
+    "[data-testid='create-learning-object-name-input']"
+  end
+
+  def new_quiz_icon_selector
+    "[data-testid='new-quiz-icon']"
+  end
+
+  def classic_quiz_icon_selector
+    "[data-testid='quiz-icon']"
+  end
+
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -701,6 +718,22 @@ module Modules2IndexPage
 
   def close_tray_button
     fxpath("//button[.//span[text()='Close']]")
+  end
+
+  def tab_create_item
+    f(tab_create_item_selector)
+  end
+
+  def create_learning_object_name_input
+    f(create_learning_object_name_input_selector)
+  end
+
+  def new_quiz_icon
+    ff(new_quiz_icon_selector)
+  end
+
+  def classic_quiz_icon
+    ff(classic_quiz_icon_selector)
   end
 
   #------------------------------ Actions -------------------------------

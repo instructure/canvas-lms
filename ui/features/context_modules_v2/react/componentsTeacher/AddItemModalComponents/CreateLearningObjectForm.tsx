@@ -77,6 +77,7 @@ export const CreateLearningObjectForm: React.FC<CreateLearningObjectFormProps> =
           required
           isRequired={true}
           messages={nameError ? [{text: nameError, type: 'newError'}] : []}
+          data-testid="create-learning-object-name-input"
         />
       )}
       {itemType === 'quiz' && (

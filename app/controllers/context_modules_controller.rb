@@ -107,6 +107,8 @@ class ContextModulesController < ApplicationController
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
 
+      new_quizzes_enabled = NewQuizzesFeaturesHelper.new_quizzes_enabled?(@context)
+
       hash = {
         course_id: @context.id,
         CONTEXT_URL_ROOT: polymorphic_path([@context]),
@@ -121,7 +123,9 @@ class ContextModulesController < ApplicationController
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
         PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,
-        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
+        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false,
+        NEW_QUIZZES_ENABLED: new_quizzes_enabled,
+        NEW_QUIZZES_BY_DEFAULT: new_quizzes_enabled && @context.feature_enabled?(:new_quizzes_by_default)
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)

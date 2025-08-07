@@ -40,7 +40,7 @@ export const submitItemData = async (
 }
 
 export const useInlineSubmission = () => {
-  const {courseId, NEW_QUIZZES_BY_DEFAULT, DEFAULT_POST_TO_SIS} = useContextModule()
+  const {courseId, quizEngine, DEFAULT_POST_TO_SIS} = useContextModule()
 
   return async function ({
     moduleId,
@@ -67,7 +67,7 @@ export const useInlineSubmission = () => {
         courseId,
         newItemName,
         selectedAssignmentGroup,
-        NEW_QUIZZES_BY_DEFAULT,
+        quizEngine,
         DEFAULT_POST_TO_SIS,
       ] as const
 

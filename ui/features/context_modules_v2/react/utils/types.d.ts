@@ -387,3 +387,5 @@ interface PaginatedNavigationGraphQLResult {
   legacyNode?: LegacyNodeModuleItemsConnection
   errors?: GraphQLError[]
 }
+
+export type QuizEngine = 'new' | 'classic'
