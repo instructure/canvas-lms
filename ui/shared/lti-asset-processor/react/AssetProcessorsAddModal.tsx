@@ -145,34 +145,37 @@ function AssetProcessorsAddModalBodyToolList({
 }: {toolList: LtiLaunchDefinition[]; type: AssetProcessorType}) {
   const {launchTool} = useAssetProcessorsAddModalState(s => s.actions)
 
-  // Make tool list 800px as that is the default tool size in
-  // launch_definitions (from context_external_tool.rb#extension_default_value)
+  // With the default tool size in launch_definitions (from context_external_tool.rb#extension_default_value)
+  // make tool list width 800px and the height 523px as calculated from
+  // 400px from tool + 60px from "Configure..." heading + 63px modal.footer
   return (
-    <Flex direction="column" width={800}>
-      <Flex.Item padding="small">
-        <Text weight="bold" size="medium">
-          {I18n.t('Choose the document processing app that you wish to add to this assignment.')}
-        </Text>
-      </Flex.Item>
-      {toolList.map((tool, index) => {
-        const placementData = getPlacementDataForType(tool, type)
-        return (
-          <Flex.Item key={index}>
-            <AssetProcessorsCard
-              icon={{
-                url: placementData?.icon_url,
-                toolName: placementData?.tool_name_for_default_icon || tool.name,
-                toolId: tool.definition_id,
-              }}
-              title={placementData?.title || tool.name}
-              description={tool.description}
-              margin="small"
-              onClick={() => launchTool(tool)}
-            />
-          </Flex.Item>
-        )
-      })}
-    </Flex>
+    <View as="div" padding="0" width="800px" height="523px" overflowY="auto">
+      <Flex direction="column">
+        <Flex.Item padding="small">
+          <Text weight="bold" size="medium">
+            {I18n.t('Choose the document processing app that you wish to add to this assignment.')}
+          </Text>
+        </Flex.Item>
+        {toolList.map((tool, index) => {
+          const placementData = getPlacementDataForType(tool, type)
+          return (
+            <Flex.Item key={index}>
+              <AssetProcessorsCard
+                icon={{
+                  url: placementData?.icon_url,
+                  toolName: placementData?.tool_name_for_default_icon || tool.name,
+                  toolId: tool.definition_id,
+                }}
+                title={placementData?.title || tool.name}
+                description={tool.description}
+                margin="small"
+                onClick={() => launchTool(tool)}
+              />
+            </Flex.Item>
+          )
+        })}
+      </Flex>
+    </View>
   )
 }
 
