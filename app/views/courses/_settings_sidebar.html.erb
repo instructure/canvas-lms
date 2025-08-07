@@ -124,12 +124,6 @@
       <i class="icon-link"></i><%= t('Validate Links in Content') %>
     <% end %>
 
-    <% if show_youtube_migration %>
-      <%= link_to context_url(@context, :course_youtube_migration_url), :class => 'Button Button--link Button--link--has-divider Button--course-settings youtube_migration' do %>
-        <i class="icon-media"></i><%= t('Replace YouTube Embed') %>
-      <% end %>
-    <% end %>
-
     <% if blueprint_subscription %>
       <%= link_to "#", :onclick => 'gotoBlueprintInfo()', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
         <i class="icon-blueprint"></i><%= t('Blueprint Information') %>

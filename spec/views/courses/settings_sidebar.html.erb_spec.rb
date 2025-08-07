@@ -114,36 +114,4 @@ describe "courses/_settings_sidebar" do
       end
     end
   end
-
-  describe "Youtube migration button" do
-    before do
-      view_context(@course, @user)
-      assign(:current_user, @user)
-      @controller.instance_variable_set(:@context, @course)
-    end
-
-    context "when ff is enabled" do
-      before do
-        @course.enable_feature!(:youtube_migration)
-      end
-
-      it "should render the button" do
-        render
-        doc = Nokogiri::HTML5(response.body)
-        expect(doc.css(".youtube_migration").size).to eq 1
-      end
-    end
-
-    context "when ff is disabled" do
-      before do
-        @course.disable_feature!(:youtube_migration)
-      end
-
-      it "should render the button" do
-        render
-        doc = Nokogiri::HTML5(response.body)
-        expect(doc.css(".youtube_migration").size).to eq 0
-      end
-    end
-  end
 end
