@@ -51,6 +51,7 @@ export type DoFetchApiOpts = {
   body?: string | FormData | object
   fetchOpts?: RequestInit
   signal?: AbortSignal
+  includeCSRFToken?: boolean
 }
 
 export type DoFetchApiResults<T> = {
@@ -77,13 +78,17 @@ export default async function doFetchApi<T = unknown>({
   body,
   signal,
   fetchOpts = {}, // do not specify headers in fetchOpts.headers ... use headers instead
+  includeCSRFToken = true,
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
   const {credentials, headers: defaultHeaders} = defaultFetchOptions()
   const suppliedHeaders = new Headers(headers)
   const fetchHeaders = new Headers(defaultHeaders)
 
   suppliedHeaders.forEach((v, k) => fetchHeaders.set(k, v))
-  fetchHeaders.set('X-CSRF-Token', getCookie('_csrf_token'))
+
+  if (!includeCSRFToken) {
+    fetchHeaders.delete('X-CSRF-Token')
+  }
 
   // properly encode and set the content type if a body was given
   if (body) {
