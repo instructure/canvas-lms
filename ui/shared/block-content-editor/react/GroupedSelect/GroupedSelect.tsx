@@ -20,6 +20,7 @@ import {useEffect, useState} from 'react'
 import {BlockData, BlockTypes} from '../AddBlock/block-data'
 import {GroupedSelectLayout} from './GroupedSelectLayout'
 import {GroupedSelectEntry} from './GroupedSelectEntry'
+import {useKeyboardNav} from './useKeyboardNav'
 
 export const GroupedSelect = (props: {
   data: BlockData[]
@@ -28,10 +29,23 @@ export const GroupedSelect = (props: {
   const [selectedGroup, setSelectedGroup] = useState<string>(props.data[0].groupName)
   const [selectedItem, setSelectedItem] = useState<BlockTypes>(props.data[0].items[0].id)
 
-  const handleItemClick = (id: BlockTypes) => {
+  const handleGroupChange = (group: BlockData) => {
+    setSelectedGroup(group.groupName)
+    handleItemChange(group.items[0].id)
+  }
+
+  const handleItemChange = (id: BlockTypes) => {
     setSelectedItem(id)
     props.onChange(id)
   }
+
+  const {handleKeyDown, elementsRef} = useKeyboardNav(
+    props.data,
+    selectedItem,
+    selectedGroup,
+    handleGroupChange,
+    handleItemChange,
+  )
 
   useEffect(() => {
     props.onChange(selectedItem)
@@ -39,15 +53,18 @@ export const GroupedSelect = (props: {
 
   return (
     <GroupedSelectLayout
+      onKeyDown={handleKeyDown}
       groups={props.data.map(group => (
         <GroupedSelectEntry
           key={group.groupName}
           variant="group"
           title={group.groupName}
           active={group.groupName === selectedGroup}
+          ref={(el: HTMLDivElement | null) => {
+            elementsRef.current.set(group.groupName, el)
+          }}
           onClick={() => {
-            setSelectedGroup(group.groupName)
-            handleItemClick(group.items[0].id)
+            handleGroupChange(group)
           }}
         />
       ))}
@@ -59,8 +76,11 @@ export const GroupedSelect = (props: {
             variant="item"
             title={item.itemName}
             active={selectedItem === item.id}
+            ref={(el: HTMLDivElement | null) => {
+              elementsRef.current.set(item.id, el)
+            }}
             onClick={() => {
-              handleItemClick(item.id)
+              handleItemChange(item.id)
             }}
           />
         ))}

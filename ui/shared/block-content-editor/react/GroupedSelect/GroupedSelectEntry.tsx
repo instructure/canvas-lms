@@ -18,23 +18,40 @@
 
 import './grouped-select.css'
 import {Text} from '@instructure/ui-text'
+import {forwardRef} from 'react'
 import {View} from '@instructure/ui-view'
 
-export const GroupedSelectEntry = (props: {
-  variant: 'item' | 'group'
-  title: string
-  active: boolean
-  onClick: () => void
-}) => {
+export const GroupedSelectEntry = forwardRef<
+  HTMLDivElement,
+  {
+    variant: 'item' | 'group'
+    title: string
+    active: boolean
+    onClick: () => void
+  }
+>((props, ref) => {
   const isItem = props.variant === 'item'
   const className = isItem ? 'grouped-select-item' : 'grouped-select-group'
+  const role = isItem ? 'option' : 'listbox'
+  const handleElementRef = (element: Element | null) => {
+    if (typeof ref === 'function') {
+      ref(element as HTMLDivElement | null)
+    } else if (ref && 'current' in ref) {
+      ref.current = element as HTMLDivElement | null
+    }
+  }
+
   return (
     <View
       as="div"
+      elementRef={handleElementRef}
+      role={role}
+      tabIndex={props.active ? 0 : -1}
+      aria-selected={props.active}
       className={`${className} ${props.active ? 'selected' : ''}`}
       onClick={props.onClick}
     >
       <Text variant="content">{props.title}</Text>
     </View>
   )
-}
+})
