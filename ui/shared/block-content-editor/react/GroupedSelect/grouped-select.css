@@ -2,7 +2,9 @@
 .grouped-select-item {
   padding: 8px;
   cursor: pointer;
+  border-radius: 4px;
 }
+
 .grouped-select-group:not(:last-child),
 .grouped-select-item:not(:last-child) {
   margin-bottom: 4px;
@@ -24,7 +26,6 @@
 .grouped-select-item {
   height: 40px;
   border: solid 1px transparent;
-  border-radius: 4px;
 }
 
 .grouped-select-item.selected {
