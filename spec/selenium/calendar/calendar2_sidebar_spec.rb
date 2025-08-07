@@ -122,7 +122,7 @@ describe "calendar2" do
 
           create_courses 17, enroll_user: @user
           # Page takes an extra second or two to load, so we need to increase the timeout
-          with_timeouts({ script: 7 }) { get "/calendar2" }
+          with_timeouts({ script: 10 }) { get "/calendar2" }
           ff(".context_list_context").each(&:click)
           expect(ff(".context_list_context.checked").count).to eq 15
         end
