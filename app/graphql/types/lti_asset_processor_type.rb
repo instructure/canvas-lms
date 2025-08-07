@@ -23,7 +23,7 @@ module Types
   class LtiAssetProcessorType < ApplicationObjectType
     implements Interfaces::LegacyIDInterface
 
-    field :external_tool, Types::ExternalToolType, null: true
+    field :external_tool, Types::ExternalToolType, null: false
     def external_tool
       load_association(:context_external_tool)
     end

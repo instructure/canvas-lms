@@ -63,7 +63,7 @@ module Types
       object.login_or_launch_url
     end
 
-    field :name, String, null: true
+    field :name, String, null: false
 
     field :description, String, null: true
 
