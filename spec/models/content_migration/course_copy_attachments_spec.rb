@@ -43,6 +43,7 @@ describe ContentMigration do
       att = Attachment.create!(filename: "dummy.txt", uploaded_data: StringIO.new("fakety"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
 
       @copy_from.syllabus_body = "<a href='/courses/#{@copy_from.id}/files/#{att.id}/download?wrap=1'>link</a>"
+      @copy_from.saving_user = @user
       @copy_from.save!
 
       run_course_copy

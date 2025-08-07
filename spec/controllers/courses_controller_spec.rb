@@ -2761,22 +2761,6 @@ describe CoursesController do
       end
     end
 
-    context "with disable_file_verifiers_in_public_syllabus disabled" do
-      before do
-        @account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
-      end
-
-      it "does not create attachment_associations when files are linked in the syllabus" do
-        attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
-
-        expect(response).to be_successful
-        json = response.parsed_body
-        course = Course.find(json["id"])
-        expect(course.attachment_associations).to be_empty
-      end
-    end
-
     context "when course templates are enabled" do
       def create_account_template
         template = @account.courses.create!(name: "Template Course", template: true)
