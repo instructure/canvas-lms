@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
 import type {ModuleItem} from '../../utils/types'
-import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
+import {PAGE_SIZE, MODULE_ITEMS, MODULES, SHOW_ALL_PAGE_SIZE} from '../../utils/constants'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 const generateItems = (count: number): ModuleItem[] =>
@@ -205,7 +205,7 @@ describe('ModuleItemListSmart', () => {
     })
 
     // Set up data for the non-paginated query
-    client.setQueryData([MODULE_ITEMS, 'mod123', null], {
+    client.setQueryData(['MODULE_ITEMS_ALL', 'mod123', 'teacher', SHOW_ALL_PAGE_SIZE], {
       moduleItems: generateItems(PAGE_SIZE),
       pageInfo: {hasNextPage: false, endCursor: null},
     })

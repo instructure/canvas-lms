@@ -60,6 +60,7 @@ export const handlePublishToggle = async (
     )
 
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+    queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
   } catch (error) {
     showFlashError(
       I18n.t('Failed to change published state for %{title}', {
@@ -137,6 +138,7 @@ export const handleDuplicate = (
     .then(() => {
       showFlashSuccess(I18n.t('Item duplicated successfully'))
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', id]})
       queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     })
     .catch(() => {
@@ -205,6 +207,7 @@ export const updateIndent = async (
     showFlashSuccess(I18n.t('Item indentation updated'))
 
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+    queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
   } catch (error) {
     showFlashError(I18n.t('Failed to update item indentation'))
     console.error('Error updating indent:', error)
@@ -285,6 +288,7 @@ export const handleRemove = (
           }),
         )
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
         queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       })
       .catch(() => {

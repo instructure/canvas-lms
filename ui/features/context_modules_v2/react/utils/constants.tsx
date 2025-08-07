@@ -17,6 +17,9 @@
  */
 import persistedQueries from '@canvas/graphql/persistedQueries'
 
+export const SHOW_ALL_PAGE_SIZE = 100
+
+// Backward compatibility - these will be deprecated
 export const PAGE_SIZE = ENV.MODULE_FEATURES?.PAGE_SIZE || 10
 export const MODULES_ARE_PAGINATED = !!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATED
 

@@ -279,7 +279,9 @@ const ManageModuleContentTray: React.FC<ManageModuleContentTrayProps> = ({
 
       if (moduleAction != MOVE_MODULE) {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, sourceModuleId]})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', sourceModuleId]})
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, selectedModule]})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', selectedModule]})
         queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       }
       onClose()

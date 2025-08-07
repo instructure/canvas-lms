@@ -20,7 +20,6 @@ import React, {Suspense, lazy} from 'react'
 import {ExternalTool} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
-import {PAGE_SIZE} from '../utils/constants'
 
 const ContentTypeExternalToolTray = lazy(
   () => import('@canvas/trays/react/ContentTypeExternalToolTray'),

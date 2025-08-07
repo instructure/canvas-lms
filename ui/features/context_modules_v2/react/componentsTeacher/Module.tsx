@@ -22,7 +22,9 @@ import ModuleHeader from '../componentsTeacher/ModuleHeader'
 import ModuleItemList from '../componentsTeacher/ModuleItemList'
 import ModuleItemListSmart from '../components/ModuleItemListSmart'
 import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
-import {TEACHER, MODULES_ARE_PAGINATED} from '../utils/constants'
+import {TEACHER} from '../utils/constants'
+import {useShowAllState} from '../hooks/useShowAllState'
+import {useContextModule} from '../hooks/useModuleContext'
 
 export interface ModuleProps {
   id: string
@@ -60,12 +62,19 @@ const Module: React.FC<ModuleProps> = ({
   setSourceModule,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
+  const [showAll, setShowAll] = useShowAllState(id)
+  const {modulesArePaginated} = useContextModule()
+
   const toggleExpanded = () => {
     const newExpandedState = !isExpanded
     setIsExpanded(newExpandedState)
     if (onToggleExpand) {
       onToggleExpand(id)
     }
+  }
+
+  const handleToggleShowAll = () => {
+    setShowAll(prev => !prev)
   }
 
   useEffect(() => {
@@ -103,6 +112,8 @@ const Module: React.FC<ModuleProps> = ({
             unlockAt={unlockAt}
             dragHandleProps={dragHandleProps}
             hasActiveOverrides={hasActiveOverrides}
+            showAll={showAll}
+            onToggleShowAll={handleToggleShowAll}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}
@@ -114,7 +125,7 @@ const Module: React.FC<ModuleProps> = ({
               moduleId={id}
               view={TEACHER}
               isExpanded={isExpanded}
-              isPaginated={MODULES_ARE_PAGINATED}
+              isPaginated={modulesArePaginated && !showAll}
               renderList={({moduleItems, isEmpty, error}) => (
                 <ModuleItemList
                   moduleId={id}

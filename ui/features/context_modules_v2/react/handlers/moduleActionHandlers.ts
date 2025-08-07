@@ -31,6 +31,7 @@ export const handlePublishComplete = (
 ) => {
   queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
   queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+  queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
 }
 
 export const handleDelete = (
@@ -81,6 +82,7 @@ export const handleDuplicate = (
       )
       queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate module'))

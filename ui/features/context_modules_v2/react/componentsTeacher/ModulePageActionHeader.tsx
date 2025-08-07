@@ -53,6 +53,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     // invalidate all queries that start with 'moduleItems' in their query key
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS]})
+    queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL']})
   }, [courseId])
 
   const handleAddModule = useCallback(() => {
