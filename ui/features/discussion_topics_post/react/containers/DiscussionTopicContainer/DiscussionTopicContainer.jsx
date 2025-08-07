@@ -62,6 +62,7 @@ import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKey
 import {SummarizeButton} from './SummarizeButton'
 import {DiscussionInsightsButton} from './DiscussionInsightsButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import AssignmentAssetProcessorEula from '@canvas/assignments/react/AssignmentAssetProcessorEula'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -398,6 +399,7 @@ export const DiscussionTopicContainer = ({
             discussionTopic={props.discussionTopic}
             userHasEntry={userHasEntry()}
           />
+          <AssignmentAssetProcessorEula launches={ENV.ASSET_PROCESSOR_EULA_LAUNCH_URLS} />
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
