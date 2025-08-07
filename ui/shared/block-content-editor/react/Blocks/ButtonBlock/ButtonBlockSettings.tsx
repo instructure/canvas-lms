@@ -27,10 +27,12 @@ export const ButtonBlockSettings = () => {
     actions: {setProp},
     alignment,
     layout,
+    isFullWidth,
     buttons,
   } = useNode(node => ({
     alignment: node.data.props.settings.alignment,
     layout: node.data.props.settings.layout,
+    isFullWidth: node.data.props.settings.isFullWidth,
     buttons: node.data.props.settings.buttons,
   }))
 
@@ -46,6 +48,12 @@ export const ButtonBlockSettings = () => {
     })
   }
 
+  const handleIsFullWidthChange = (isFullWidth: boolean) => {
+    setProp((props: ButtonBlockProps) => {
+      props.settings.isFullWidth = isFullWidth
+    })
+  }
+
   const handleButtonsChange = (buttons: ButtonData[]) => {
     setProp((props: ButtonBlockProps) => {
       props.settings.buttons = buttons
@@ -57,8 +65,10 @@ export const ButtonBlockSettings = () => {
       <ButtonBlockGeneralButtonSettings
         alignment={alignment}
         layout={layout}
+        isFullWidth={isFullWidth}
         onAlignmentChange={handleAlignmentChange}
         onLayoutChange={handleLayoutChange}
+        onIsFullWidthChange={handleIsFullWidthChange}
       />
 
       <ButtonBlockIndividualButtonSettings

@@ -36,7 +36,9 @@ export const blockFactory = {
     <SeparatorLineBlock thickness="small" settings={{separatorColor: colors.ui.lineDivider}} />
   ),
   [ButtonBlock.name]: () => (
-    <ButtonBlock settings={{alignment: 'left', layout: 'horizontal', buttons: [{id: 1}]}} />
+    <ButtonBlock
+      settings={{alignment: 'left', layout: 'horizontal', isFullWidth: false, buttons: [{id: 1}]}}
+    />
   ),
   [HighlightBlock.name]: () => <HighlightBlock content="" />,
   imageText: () => <p>image_text</p>,

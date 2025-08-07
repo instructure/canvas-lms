@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Flex} from '@instructure/ui-flex'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ButtonAlignment, ButtonLayout} from './ButtonBlock'
-import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -36,15 +37,19 @@ const LAYOUT_OPTIONS: {label: string; value: ButtonLayout}[] = [
 export type ButtonBlockGeneralButtonSettingsProps = {
   alignment: ButtonAlignment
   layout: ButtonLayout
+  isFullWidth: boolean
   onAlignmentChange: (alignment: ButtonAlignment) => void
   onLayoutChange: (layout: ButtonLayout) => void
+  onIsFullWidthChange: (isFullWidth: boolean) => void
 }
 
 export const ButtonBlockGeneralButtonSettings = ({
   alignment,
   layout,
+  isFullWidth,
   onAlignmentChange,
   onLayoutChange,
+  onIsFullWidthChange,
 }: ButtonBlockGeneralButtonSettingsProps) => {
   return (
     <Flex direction="column" gap="medium" padding="small">
@@ -69,6 +74,13 @@ export const ButtonBlockGeneralButtonSettings = ({
           <RadioInput key={option.value} label={option.label} value={option.value} />
         ))}
       </RadioInputGroup>
+
+      <Checkbox
+        variant="toggle"
+        label={I18n.t('Full width buttons')}
+        checked={isFullWidth}
+        onChange={() => onIsFullWidthChange(!isFullWidth)}
+      />
     </Flex>
   )
 }

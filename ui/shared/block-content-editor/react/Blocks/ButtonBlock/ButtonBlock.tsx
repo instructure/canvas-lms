@@ -35,6 +35,7 @@ export type ButtonBlockProps = {
     buttons: ButtonData[]
     alignment: ButtonAlignment
     layout: ButtonLayout
+    isFullWidth: boolean
   }
 }
 
