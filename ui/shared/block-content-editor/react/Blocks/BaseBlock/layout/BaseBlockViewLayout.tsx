@@ -18,12 +18,12 @@
 
 import './base-block-layout.css'
 import {PropsWithChildren} from 'react'
-import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 
 export const BaseBlockViewLayout = (props: PropsWithChildren) => {
   return (
-    <View as="div" padding="paddingCardLarge">
+    <Flex direction="column" padding="paddingCardLarge">
       {props.children}
-    </View>
+    </Flex>
   )
 }
