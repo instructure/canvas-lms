@@ -55,7 +55,7 @@ const Translations: Capability = {
       return
     }
     try {
-      const {json} = await doFetchApi({path: ENV.LOCALE_TRANSLATION_FILE})
+      const {json} = await doFetchApi({path: ENV.LOCALE_TRANSLATION_FILE, includeCSRFToken: false})
       if (typeof json === 'object' && json !== null) {
         registerTranslations(ENV.LOCALE || navigator.language || 'en', json)
       }
