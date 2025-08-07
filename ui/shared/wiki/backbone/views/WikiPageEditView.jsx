@@ -66,7 +66,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     })
 
     this.prototype.template = template
-    this.prototype.className = 'form-horizontal edit-form validated-form-view'
+    this.prototype.className = 'form-horizontal-wiki-page edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
     this.prototype.disablingDfd = new $.Deferred()
     this.prototype.attributes = {

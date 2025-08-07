@@ -592,7 +592,9 @@ input.search-query {
 
 .form-search,
 .form-inline,
-.form-horizontal {
+.form-horizontal,
+.form-horizontal-wiki-page,
+.form-horizontal-quiz {
   input,
   textarea,
   select,
@@ -656,7 +658,9 @@ legend + .control-group {
 // Horizontal-specific styles
 // --------------------------
 
-.form-horizontal {
+.form-horizontal,
+.form-horizontal-wiki-page,
+.form-horizontal-quiz {
   // Increase spacing between groups
   .control-group {
     margin-bottom: $baseLineHeight;
@@ -732,7 +736,8 @@ legend + .control-group {
 }
 
 @include desktop-only {
-  .form-horizontal .responsive-control-group {
+  .form-horizontal .responsive-control-group,
+  .form-horizontal-wiki-page .responsive-control-group {
     margin-bottom: $baseLineHeight;
   }
 
@@ -746,11 +751,13 @@ legend + .control-group {
 }
 
 @include mobile-only {
-  .form-horizontal .responsive-control-group {
+  .form-horizontal .responsive-control-group,
+  .form-horizontal-wiki-page .responsive-control-group {
     flex-direction: column;
   }
 
-  .form-horizontal .responsive-control-group .control-label {
+  .form-horizontal .responsive-control-group .control-label,
+  .form-horizontal-wiki-page .responsive-control-group .control-label{
     flex-basis: inherit;  // undo cascade
     float: inherit;  // undo cascade
     padding-#{direction(right)}: inherit;
