@@ -33,7 +33,7 @@ module SeleniumDriverSetup
     implicit_wait: 0,
     # except finding elements
     finder: CONFIG[:finder_timeout_seconds] || 5,
-    script: CONFIG[:script_timeout_seconds] || 5,
+    script: CONFIG[:script_timeout_seconds] || 10,
   }.freeze
 
   # If you have some really slow UI, you can temporarily override
