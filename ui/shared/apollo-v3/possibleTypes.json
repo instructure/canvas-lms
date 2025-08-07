@@ -49,7 +49,6 @@
     "DiscussionEntry",
     "DiscussionEntryDraft",
     "DiscussionEntryVersion",
-    "EligibilityIssue",
     "ExternalTool",
     "ExternalUrl",
     "File",
