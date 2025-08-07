@@ -40,6 +40,13 @@ module Translation
     DISABLED = nil
   end
 
+  module TranslationSlugs
+    DEFAULT = "content-translation"
+    INBOX = "inbox"
+    DISCUSSION = "discussion"
+    TYPES = TranslationSlugs.constants.map { |c| TranslationSlugs.const_get(c) }
+  end
+
   class << self
     # The languages are imported from https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
     # TODO: Currently we don't support dialects(trim_locale function) because the currently implemented
@@ -100,6 +107,10 @@ module Translation
         raise TextTooLongError
       end
 
+      unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
+        options[:feature_slug] = TranslationSlugs::DEFAULT
+      end
+
       translation_client(flags).translate_text(text:, tgt_lang:, options:)
     end
 
@@ -108,6 +119,10 @@ module Translation
 
       if html_string.length >= CHARACTER_LIMIT
         raise TextTooLongError
+      end
+
+      unless options[:feature_slug] && TranslationSlugs::TYPES.include?(options[:feature_slug])
+        options[:feature_slug] = TranslationSlugs::DEFAULT
       end
 
       translation_client(flags).translate_html(html_string:, tgt_lang:, options:)

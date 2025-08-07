@@ -26,9 +26,8 @@ module Translation
       return nil unless available?
       return nil if tgt_lang.nil?
 
-      type = options[:type]
       root_account_uuid = options[:root_account_uuid]
-      feature_slug = options.fetch(:feature_slug, "content-translation")
+      feature_slug = options.fetch(:feature_slug)
       current_user = options.fetch(:current_user)
       raise "Missing current user" unless current_user
 
@@ -41,7 +40,7 @@ module Translation
       )
 
       check_same_language(translation_response.source_language, tgt_lang)
-      collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type:)
+      collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
       translation_response.translation
     end
 
@@ -50,8 +49,7 @@ module Translation
       return nil if tgt_lang.nil?
 
       root_account_uuid = options[:root_account_uuid]
-      feature_slug = options.fetch(:feature_slug, "content-translation")
-      type = options[:type]
+      feature_slug = options.fetch(:feature_slug)
       current_user = options.fetch(:current_user)
       raise "Missing current user" unless current_user
 
@@ -64,7 +62,7 @@ module Translation
       )
 
       check_same_language(translation_response.source_language, tgt_lang)
-      collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type:)
+      collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type: feature_slug)
       translation_response.translation
     end
 
