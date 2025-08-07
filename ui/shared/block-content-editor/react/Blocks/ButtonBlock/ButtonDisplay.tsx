@@ -31,11 +31,11 @@ const alignmentMap = {
 } as const
 
 export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
-  const {buttons, alignment, layout} = settings
+  const {buttons, alignment, layout, isFullWidth} = settings
 
   const flexDirection = layout === 'vertical' ? 'column' : 'row'
-  const justifyItems = layout === 'horizontal' ? alignmentMap[alignment] : undefined
-  const alignItems = layout === 'vertical' ? alignmentMap[alignment] : undefined
+  const justifyItems = !isFullWidth && layout === 'horizontal' ? alignmentMap[alignment] : undefined
+  const alignItems = !isFullWidth && layout === 'vertical' ? alignmentMap[alignment] : undefined
 
   return (
     <Flex
@@ -45,9 +45,12 @@ export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
       alignItems={alignItems}
       width="100%"
       wrap="wrap"
+      gap="small"
     >
       {buttons.map(button => (
-        <SingleButton key={button.id} />
+        <Flex.Item key={button.id} shouldGrow={isFullWidth} overflowX="visible" overflowY="visible">
+          <SingleButton isFullWidth={isFullWidth} />
+        </Flex.Item>
       ))}
     </Flex>
   )

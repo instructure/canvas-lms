@@ -39,6 +39,7 @@ jest.mock('../ButtonBlockGeneralButtonSettings', () => ({
 const defaultButtons = [{id: 1}, {id: 2}]
 const defaultAlignment = 'left'
 const defaultLayout = 'horizontal'
+const defaultIsFullWidth = false
 
 describe('ButtonBlockSettings', () => {
   beforeEach(() => {
@@ -48,18 +49,24 @@ describe('ButtonBlockSettings', () => {
       buttons: defaultButtons,
       alignment: defaultAlignment,
       layout: defaultLayout,
+      isFullWidth: defaultIsFullWidth,
     })
   })
 
   const assertSetPropCallback = (
-    expectedProperty: 'buttons' | 'alignment' | 'layout',
+    expectedProperty: 'buttons' | 'alignment' | 'layout' | 'isFullWidth',
     expectedValue: any,
   ) => {
     expect(mockSetProp).toHaveBeenCalledTimes(1)
 
     const setPropCallback = mockSetProp.mock.calls[0][0]
     const mockProps = {
-      settings: {alignment: defaultAlignment, layout: defaultLayout, buttons: defaultButtons},
+      settings: {
+        alignment: defaultAlignment,
+        layout: defaultLayout,
+        isFullWidth: defaultIsFullWidth,
+        buttons: defaultButtons,
+      },
     }
     setPropCallback(mockProps)
     expect(mockProps.settings[expectedProperty]).toEqual(expectedValue)
@@ -89,8 +96,10 @@ describe('ButtonBlockSettings', () => {
       expect(mockGeneralButtonSettings).toHaveBeenCalledWith({
         alignment: defaultAlignment,
         layout: defaultLayout,
+        isFullWidth: defaultIsFullWidth,
         onAlignmentChange: expect.any(Function),
         onLayoutChange: expect.any(Function),
+        onIsFullWidthChange: expect.any(Function),
       })
     })
 
@@ -108,6 +117,14 @@ describe('ButtonBlockSettings', () => {
       const newLayout = 'vertical'
       onLayoutChange(newLayout)
       assertSetPropCallback('layout', newLayout)
+    })
+
+    it('calls setProp when isFullWidth changes', () => {
+      render(<ButtonBlockSettings />)
+      const {onIsFullWidthChange} = mockGeneralButtonSettings.mock.calls[0][0]
+      const newIsFullWidth = true
+      onIsFullWidthChange(newIsFullWidth)
+      assertSetPropCallback('isFullWidth', newIsFullWidth)
     })
   })
 })

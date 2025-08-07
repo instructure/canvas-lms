@@ -25,8 +25,10 @@ import {
 const defaultProps: ButtonBlockGeneralButtonSettingsProps = {
   alignment: 'left',
   layout: 'horizontal',
+  isFullWidth: false,
   onAlignmentChange: jest.fn(),
   onLayoutChange: jest.fn(),
+  onIsFullWidthChange: jest.fn(),
 }
 
 describe('ButtonBlockGeneralButtonSettings', () => {
@@ -51,6 +53,12 @@ describe('ButtonBlockGeneralButtonSettings', () => {
       expect(screen.getByLabelText('Horizontal')).toBeInTheDocument()
       expect(screen.getByLabelText('Vertical')).toBeInTheDocument()
     })
+
+    it('renders full width checkbox', () => {
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} />)
+
+      expect(screen.getByLabelText('Full width buttons')).toBeInTheDocument()
+    })
   })
 
   describe('state selection', () => {
@@ -67,6 +75,12 @@ describe('ButtonBlockGeneralButtonSettings', () => {
 
       expect(screen.getByLabelText('Vertical')).toBeChecked()
       expect(screen.getByLabelText('Horizontal')).not.toBeChecked()
+    })
+
+    it('shows full width checkbox as checked when isFullWidth is true', () => {
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} isFullWidth={true} />)
+
+      expect(screen.getByLabelText('Full width buttons')).toBeChecked()
     })
   })
 
@@ -92,6 +106,20 @@ describe('ButtonBlockGeneralButtonSettings', () => {
       fireEvent.click(screen.getByLabelText('Vertical'))
 
       expect(onLayoutChange).toHaveBeenCalledWith('vertical')
+    })
+
+    it('calls onIsFullWidthChange when checkbox is changed', () => {
+      const onIsFullWidthChange = jest.fn()
+      render(
+        <ButtonBlockGeneralButtonSettings
+          {...defaultProps}
+          onIsFullWidthChange={onIsFullWidthChange}
+        />,
+      )
+
+      fireEvent.click(screen.getByLabelText('Full width buttons'))
+
+      expect(onIsFullWidthChange).toHaveBeenCalledWith(true)
     })
   })
 })

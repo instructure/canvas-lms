@@ -18,10 +18,12 @@
 
 import {Button} from '@instructure/ui-buttons'
 
-type SingleButtonProps = object
+type SingleButtonProps = {
+  isFullWidth: boolean
+}
 
 export const SingleButton = (props: SingleButtonProps) => {
   const buttonText = 'Button'
 
-  return <Button>{buttonText}</Button>
+  return <Button display={props.isFullWidth ? 'block' : 'inline-block'}>{buttonText}</Button>
 }
