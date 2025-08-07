@@ -85,24 +85,45 @@ k20_course_readiness_lti_apps_criteria:
   display_name: Intelligent Insights - Course Readiness - LTI Apps Criteria
   description:
     k20_course_readiness_lti_apps_criteria: Enables the Intelligent Insights - Course Readiness - LTI Apps Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_course_readiness_homepage_criteria:
   state: hidden
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Homepage Criteria
   description:
     k20_course_readiness_homepage_criteria: Enables the Intelligent Insights - Course Readiness - Homepage Criteria feature.
-k20_course_readiness_criteria_set_preview:
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_course_readiness_criteria_set_results_preview:
   state: hidden
   applies_to: Account
-  display_name: Intelligent Insights - Course Readiness - Criteria Set Preview
+  display_name: Intelligent Insights - Course Readiness - Criteria Set Results Preview
   description:
-    k20_course_readiness_criteria_set_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Preview feature.
+    k20_course_readiness_criteria_set_results_preview: Enables the Intelligent Insights - Course Readiness - Criteria Set Results Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
+k20_criteria_set_preview:
+  state: hidden
+  applies_to: Account
+  display_name: Intelligent Insights - Criteria Set Preview
+  description:
+    k20_criteria_set_preview: Enables the Intelligent Insights - Criteria Set Preview feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_course_readiness_course_nav_criteria:
   state: hidden
   applies_to: Account
   display_name: Intelligent Insights - Course Readiness - Course Nav Criteria
   description:
     k20_course_readiness_course_nav_criteria: Enables the Intelligent Insights - Course Readiness - Course Nav Criteria feature.
+  root_opt_in: true
+  beta: true
+  shadow: true
 k20_course_readiness_rubric_criteria:
   state: hidden
   applies_to: Account
