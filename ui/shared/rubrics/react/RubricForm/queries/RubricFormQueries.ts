@@ -47,6 +47,7 @@ const RUBRIC_QUERY = gql`
       workflowState
       pointsPossible
       unassessed
+      canUpdateRubric
       criteria {
         id: _id
         ratings {
@@ -93,6 +94,7 @@ export type RubricQueryResponse = Pick<
   unassessed: boolean
   hasRubricAssociations: boolean
   rubricAssociationForContext?: RubricAssociationQueryResponse
+  canUpdateRubric: boolean
 }
 
 type FetchRubricResponse = {
@@ -116,7 +118,7 @@ export const fetchRubric = async ({
 
 export type SaveRubricResponse = {
   rubric: Rubric & {canUpdate?: boolean; association_count?: number}
-  rubricAssociation: RubricAssociation
+  rubricAssociation?: RubricAssociation
 }
 export const saveRubric = async (
   rubric: RubricFormProps,
@@ -225,7 +227,9 @@ export const saveRubric = async (
       canUpdate: savedRubric.permissions?.update,
       association_count: savedRubric.association_count,
     },
-    rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
+    rubricAssociation: rubric_association
+      ? mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association)
+      : undefined,
   }
 }
 

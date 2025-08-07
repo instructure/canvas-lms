@@ -35,6 +35,7 @@ export type RubricUnderscoreType = {
   points_possible: number
   unassessed?: boolean
   workflow_state: string
+  can_update?: boolean
 }
 
 type RubricUnderscoreCriteria = {
@@ -126,6 +127,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     id: rubric.id,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
+    canUpdateRubric: rubric.can_update,
   }
 }
 

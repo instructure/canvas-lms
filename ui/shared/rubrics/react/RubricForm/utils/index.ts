@@ -42,6 +42,7 @@ export const translateRubricQueryResponse = (fields: RubricQueryResponse): Rubri
     hideOutcomeResults: fields.rubricAssociationForContext?.hideOutcomeResults ?? false,
     hideScoreTotal: fields.rubricAssociationForContext?.hideScoreTotal ?? false,
     useForGrading: fields.rubricAssociationForContext?.useForGrading ?? false,
+    canUpdateRubric: fields.canUpdateRubric ?? false,
   }
 }
 
@@ -65,6 +66,7 @@ export const translateRubricData = (
     hideScoreTotal: rubricAssociation.hideScoreTotal ?? false,
     useForGrading: rubricAssociation.useForGrading ?? false,
     rubricAssociationId: rubricAssociation.id,
+    canUpdateRubric: rubric.canUpdateRubric ?? false,
   }
 }
 
@@ -135,6 +137,7 @@ export const defaultRubricForm: RubricFormProps = {
   hideOutcomeResults: false,
   hideScoreTotal: false,
   useForGrading: false,
+  canUpdateRubric: false,
 }
 
 export const hasRubricChanged = (formData: RubricFormProps, rubric: Rubric): boolean => {

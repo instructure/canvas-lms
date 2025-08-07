@@ -28,6 +28,7 @@ export type Rubric = {
   title: string
   workflowState?: string
   unassessed?: boolean
+  canUpdateRubric?: boolean
   hasRubricAssociations?: boolean
 }
 

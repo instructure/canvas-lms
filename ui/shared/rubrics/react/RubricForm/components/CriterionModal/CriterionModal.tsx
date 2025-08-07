@@ -49,7 +49,6 @@ export type CriterionModalProps = {
   hidePoints: boolean
   isFullWidth: boolean
   isOpen: boolean
-  unassessed: boolean
   freeFormCriterionComments: boolean
   onSave: (criterion: RubricCriterion) => void
   onDismiss: () => void
@@ -60,7 +59,6 @@ export const CriterionModal = ({
   hidePoints,
   isFullWidth,
   isOpen,
-  unassessed,
   freeFormCriterionComments,
   onDismiss,
   onSave,
@@ -300,17 +298,14 @@ export const CriterionModal = ({
           <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
             <Flex wrap="wrap" gap="small">
               <Flex.Item shouldGrow>
-                {unassessed &&
-                  criterionUseRangeEnabled &&
-                  !hidePoints &&
-                  !freeFormCriterionComments && (
-                    <Checkbox
-                      label={I18n.t('Enable Range')}
-                      checked={criterionUseRange}
-                      onChange={e => setCriterionUseRange(e.target.checked)}
-                      data-testid="enable-range-checkbox"
-                    />
-                  )}
+                {criterionUseRangeEnabled && !hidePoints && !freeFormCriterionComments && (
+                  <Checkbox
+                    label={I18n.t('Enable Range')}
+                    checked={criterionUseRange}
+                    onChange={e => setCriterionUseRange(e.target.checked)}
+                    data-testid="enable-range-checkbox"
+                  />
+                )}
                 {freeFormCriterionComments && (
                   <View
                     as="span"
@@ -398,7 +393,6 @@ export const CriterionModal = ({
                 criterionUseRange={criterionUseRange}
                 dragging={dragging}
                 hidePoints={hidePoints}
-                unassessed={unassessed}
                 ratingInputRefs={ratingInputRefs}
               />
             </>
