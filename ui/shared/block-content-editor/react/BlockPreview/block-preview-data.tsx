@@ -26,7 +26,7 @@ import {SeparatorLineBlockPreview} from './SeparatorLineBlockPreview'
 import {TextBlock} from '../Blocks/TextBlock'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
-import {ButtonBlock} from '@canvas/block-editor/react/components/user/blocks/ButtonBlock'
+import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
 
 export const previewFactory = {
