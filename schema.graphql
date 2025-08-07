@@ -4166,11 +4166,7 @@ enum DraftableSubmissionType {
   student_annotation
 }
 
-type EligibilityIssue implements LegacyIDInterface {
-  """
-  legacy canvas id
-  """
-  _id: ID!
+type EligibilityIssue {
   level: String!
   message: String!
 }
