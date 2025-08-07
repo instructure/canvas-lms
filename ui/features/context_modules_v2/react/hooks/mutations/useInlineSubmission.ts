@@ -30,6 +30,7 @@ export const submitItemData = async (
     const response = await submitModuleItem(courseId, moduleId, itemData)
     if (response) {
       queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
       queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       onRequestClose?.()
     }

@@ -99,6 +99,7 @@ const EditItemModal = (props: EditItemModalProps) => {
       .then(response => {
         if (response) {
           queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId], exact: false})
+          queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId], exact: false})
         }
       })
       .catch(_error => {

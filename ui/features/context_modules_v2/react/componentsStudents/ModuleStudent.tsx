@@ -29,7 +29,9 @@ import {
   Prerequisite,
 } from '../utils/types'
 import ModuleItemListSmart from '../components/ModuleItemListSmart'
-import {STUDENT, MODULES_ARE_PAGINATED} from '../utils/constants'
+import {STUDENT} from '../utils/constants'
+import {useShowAllState} from '../hooks/useShowAllState'
+import {useContextModule} from '../hooks/useModuleContext'
 
 export interface ModuleStudentProps {
   id: string
@@ -59,6 +61,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
+  const [showAll, setShowAll] = useShowAllState(id)
+  const {modulesArePaginated} = useContextModule()
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
@@ -66,6 +70,10 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
     if (onToggleExpand) {
       onToggleExpand(moduleId)
     }
+  }
+
+  const handleToggleShowAll = () => {
+    setShowAll(prev => !prev)
   }
 
   useEffect(() => {
@@ -109,6 +117,8 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                   unlockAt={unlockAt}
                   submissionStatistics={submissionStatistics}
                   smallScreen={smallScreen}
+                  showAll={showAll}
+                  onToggleShowAll={handleToggleShowAll}
                 />
               </Flex.Item>
               {isExpanded && (
@@ -117,7 +127,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                     moduleId={id}
                     view={STUDENT}
                     isExpanded={isExpanded}
-                    isPaginated={MODULES_ARE_PAGINATED}
+                    isPaginated={modulesArePaginated && !showAll}
                     renderList={({moduleItems, isEmpty, error}) => (
                       <ModuleItemListStudent
                         moduleItems={moduleItems}

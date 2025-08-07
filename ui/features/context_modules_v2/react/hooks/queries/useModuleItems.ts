@@ -41,6 +41,7 @@ export async function getModuleItems(
   moduleId: string,
   cursor: string | null,
   view: string = 'teacher',
+  pageSize: number = PAGE_SIZE,
 ): Promise<PaginatedNavigationResponse> {
   const persistedQuery = MODULE_ITEMS_QUERY_MAP[view]
   const query = gql`${persistedQuery}`
@@ -49,7 +50,7 @@ export async function getModuleItems(
     const initialResult = await executeQuery<PaginatedNavigationGraphQLResult>(query, {
       moduleId,
       cursor: cursor,
-      first: PAGE_SIZE,
+      first: pageSize,
     })
 
     if (initialResult.errors) {

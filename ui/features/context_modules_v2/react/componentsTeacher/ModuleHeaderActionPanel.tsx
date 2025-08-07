@@ -19,7 +19,7 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconButton} from '@instructure/ui-buttons'
+import {IconButton, Button} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ContextModulesPublishIcon from '@canvas/context-modules/react/ContextModulesPublishIcon'
@@ -31,6 +31,7 @@ import {handlePublishComplete} from '../handlers/moduleActionHandlers'
 import {Pill} from '@instructure/ui-pill'
 import {Prerequisite, CompletionRequirement, ModuleAction} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
+import {useModules} from '../hooks/queries/useModules'
 import AddItemModal from './AddItemModalComponents/AddItemModal'
 import ViewAssignTo from './ViewAssignToTrayComponents/ViewAssignTo'
 
@@ -45,6 +46,8 @@ interface ModuleHeaderActionPanelProps {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   hasActiveOverrides: boolean
+  showAll?: boolean
+  onToggleShowAll?: (id: string) => void
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
@@ -59,6 +62,8 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   completionRequirements,
   requirementCount = null,
   hasActiveOverrides,
+  showAll = false,
+  onToggleShowAll,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
   setSourceModule,
@@ -68,7 +73,9 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isAddItemOpen, setIsAddItemOpen] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
-  const {courseId} = useContextModule()
+  const {courseId, modulesArePaginated, pageSize} = useContextModule()
+  const {getModuleItemsTotalCount} = useModules(courseId, 'teacher')
+  const totalCount = getModuleItemsTotalCount(id) || 0
 
   useEffect(() => {
     setIsPublishing(false)
@@ -77,6 +84,12 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   const onPublishCompleteRef = useCallback(() => {
     handlePublishComplete(queryClient, id, courseId)
   }, [id, courseId])
+
+  const handleToggleShowAll = useCallback(() => {
+    if (onToggleShowAll) {
+      onToggleShowAll(id)
+    }
+  }, [id, onToggleShowAll])
 
   return (
     <>
@@ -88,6 +101,24 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
                 {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
               </Text>
             </Pill>
+          </Flex.Item>
+        )}
+        {expanded && modulesArePaginated && (totalCount || 0) > pageSize && (
+          <Flex.Item>
+            <Button
+              size="small"
+              display="inline-block"
+              onClick={handleToggleShowAll}
+              data-testid="show-all-toggle"
+              color="secondary"
+              themeOverride={{
+                borderWidth: '0',
+              }}
+            >
+              {showAll
+                ? I18n.t('Show Less')
+                : I18n.t('Show All (%{count})', {count: totalCount || 0})}
+            </Button>
           </Flex.Item>
         )}
         <Flex.Item>

@@ -84,6 +84,8 @@ ready(() => {
                 ? ENV.MODULE_TOOLS.module_index_menu_modal
                 : []
             }
+            modulesArePaginated={!!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATED}
+            pageSize={ENV.MODULE_FEATURES?.PAGE_SIZE || 10}
           >
             {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
               <ModulesContainer />

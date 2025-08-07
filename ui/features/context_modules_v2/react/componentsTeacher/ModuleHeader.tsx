@@ -47,6 +47,8 @@ interface ModuleHeaderProps {
   unlockAt: string | null
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   hasActiveOverrides: boolean
+  showAll?: boolean
+  onToggleShowAll?: (id: string) => void
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
@@ -64,6 +66,8 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   unlockAt,
   dragHandleProps,
   hasActiveOverrides,
+  showAll = false,
+  onToggleShowAll,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
   setSourceModule,
@@ -158,6 +162,8 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
             hasActiveOverrides={hasActiveOverrides}
+            showAll={showAll}
+            onToggleShowAll={onToggleShowAll}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
             setSourceModule={setSourceModule}

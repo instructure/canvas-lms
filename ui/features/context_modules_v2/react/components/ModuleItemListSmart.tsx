@@ -21,8 +21,9 @@ import {useState, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
 import type {ModuleItem} from '../utils/types'
-import {PAGE_SIZE} from '../utils/constants'
-import {useModuleItems} from '../hooks/queries/useModuleItems'
+import {SHOW_ALL_PAGE_SIZE} from '../utils/constants'
+import {useModuleItems, getModuleItems} from '../hooks/queries/useModuleItems'
+import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {ErrorBoundary} from '@sentry/react'
@@ -30,6 +31,7 @@ import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
+import {usePageState} from '../hooks/usePageState'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -52,7 +54,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   renderList,
   isPaginated,
 }) => {
-  const [pageIndex, setPageIndex] = useState<number>(1)
+  const [pageIndex, setPageIndex] = usePageState(moduleId)
   const [visibleItems, setVisibleItems] = useState<ModuleItem[]>([])
   const [visiblePageInfo, setVisiblePageInfo] = useState<{
     start: number
@@ -63,7 +65,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   const [onPageLoaded, setOnPageLoaded] = useState(() => () => {})
 
   const contextModule: any = useContextModule()
-  const {courseId} = contextModule
+  const {courseId, pageSize} = contextModule
   const setModuleCursorState: (updater: any) => void = useMemo(
     () =>
       typeof contextModule.setModuleCursorState === 'function'
@@ -76,9 +78,33 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   const totalCount = getModuleItemsTotalCount(moduleId) || 0
   const isEmptyModule = totalCount === 0
   const cursor = getCursor(pageIndex)
-  const moduleItemsResult = useModuleItems(moduleId, cursor, isExpanded, view)
 
-  const totalPages = Number.isFinite(totalCount) ? Math.ceil(totalCount / PAGE_SIZE) : 0
+  // Always call both hooks to avoid conditional hook calls
+  const paginatedResult = useModuleItems(moduleId, cursor, isExpanded, view)
+  const allItemsResult = useQuery({
+    queryKey: ['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE],
+    queryFn: async () => {
+      const allItems: ModuleItem[] = []
+      let currentCursor: string | null = null
+      let hasMore = true
+
+      while (hasMore) {
+        const result = await getModuleItems(moduleId, currentCursor, view, SHOW_ALL_PAGE_SIZE)
+        allItems.push(...result.moduleItems)
+        hasMore = result.pageInfo.hasNextPage
+        currentCursor = result.pageInfo.endCursor
+      }
+
+      return {moduleItems: allItems, pageInfo: {hasNextPage: false, endCursor: null}}
+    },
+    enabled: isExpanded && !isPaginated,
+    staleTime: 15 * 60 * 1000,
+  })
+
+  // Use the appropriate result based on pagination mode
+  const moduleItemsResult = isPaginated ? paginatedResult : allItemsResult
+
+  const totalPages = Number.isFinite(totalCount) ? Math.ceil(totalCount / pageSize) : 0
   const moduleItems = useMemo(
     () => moduleItemsResult.data?.moduleItems || [],
     [moduleItemsResult.data?.moduleItems],
@@ -87,7 +113,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   const error = moduleItemsResult.error
 
   function getCursor(page: number): string | null {
-    return page > 1 ? btoa(String((page - 1) * PAGE_SIZE)) : null
+    return page > 1 ? btoa(String((page - 1) * pageSize)) : null
   }
 
   useEffect(() => {
@@ -95,7 +121,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
 
     setVisibleItems(moduleItems)
     const pageCount = moduleItems.length || 0
-    const startItem = (pageIndex - 1) * PAGE_SIZE + 1
+    const startItem = (pageIndex - 1) * pageSize + 1
     const endItem = Math.min(totalCount, pageCount + startItem - 1)
 
     setVisiblePageInfo({
@@ -105,7 +131,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       totalPages: totalPages,
     })
     onPageLoaded()
-  }, [isLoading, moduleItems, pageIndex, totalCount])
+  }, [isLoading, moduleItems, pageIndex, totalCount, totalPages])
 
   useEffect(() => {
     if (pageIndex <= totalPages || !totalPages) return
@@ -118,7 +144,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
         [moduleId]: getCursor(newPage),
       }))
     }
-  }, [pageIndex, totalPages, moduleId, setModuleCursorState])
+  }, [pageIndex, totalPages, moduleId, setModuleCursorState, setPageIndex])
 
   const handlePageChange = (page: number) => {
     setPageIndex(page)

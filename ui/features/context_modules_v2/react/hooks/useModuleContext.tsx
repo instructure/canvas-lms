@@ -40,6 +40,8 @@ const ContextModule = createContext<{
   setState: (state: Record<string, any>) => void
   moduleCursorState: ModuleCursorState
   setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+  modulesArePaginated: boolean
+  pageSize: number
 }>(
   {} as {
     courseId: string
@@ -62,6 +64,8 @@ const ContextModule = createContext<{
     setState: (state: Record<string, any>) => void
     moduleCursorState: ModuleCursorState
     setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
+    modulesArePaginated: boolean
+    pageSize: number
   },
 )
 
@@ -82,6 +86,8 @@ export const ContextModuleProvider = ({
   moduleGroupMenuTools,
   moduleMenuTools,
   moduleIndexMenuModalTools,
+  modulesArePaginated,
+  pageSize,
 }: {
   children: React.ReactNode
   courseId: string
@@ -108,6 +114,8 @@ export const ContextModuleProvider = ({
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
+  modulesArePaginated?: boolean
+  pageSize?: number
 }) => {
   const [state, setState] = useState({})
   const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
@@ -135,6 +143,8 @@ export const ContextModuleProvider = ({
         setState,
         moduleCursorState,
         setModuleCursorState,
+        modulesArePaginated: modulesArePaginated ?? false,
+        pageSize: pageSize ?? 10,
       }}
     >
       {children}
@@ -175,4 +185,6 @@ export const contextModuleDefaultProps = {
   setState: () => {},
   moduleCursorState: {},
   setModuleCursorState: () => {},
+  modulesArePaginated: false,
+  pageSize: 10,
 }

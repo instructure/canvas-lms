@@ -45,10 +45,12 @@ export const useReorderModuleItems = () => {
       const {moduleId, oldModuleId, courseId} = variables
       if (moduleId === oldModuleId) {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId]})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId]})
       }
 
       if (moduleId !== oldModuleId) {
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId]})
+        queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId]})
         queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       }
     },
