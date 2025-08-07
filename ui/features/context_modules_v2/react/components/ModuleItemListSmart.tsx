@@ -123,10 +123,16 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     }
   }, [error, isLoading, totalCount])
 
+  // Update visible items when data changes
+  useEffect(() => {
+    if (!isLoading) {
+      setVisibleItems(moduleItems)
+    }
+  }, [isLoading, moduleItems])
+
   useEffect(() => {
     if (isLoading) return
 
-    setVisibleItems(moduleItems)
     const pageCount = moduleItems.length || 0
     const startItem = (pageIndex - 1) * pageSize + 1
     const endItem = Math.min(totalCount, pageCount + startItem - 1)
@@ -165,7 +171,8 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     })
   }
 
-  const content = (
+  // Render paginated mode
+  const paginatedContent = (
     <ErrorBoundary fallback={<Alert variant="error">An unexpected error occurred.</Alert>}>
       {renderList({
         moduleItems: !isLoading ? moduleItems : visibleItems,
@@ -175,12 +182,15 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
     </ErrorBoundary>
   )
 
-  if (!isPaginated || totalPages <= 1) return content
+  if (!isPaginated || totalPages <= 1) {
+    return paginatedContent
+  }
 
   return visiblePageInfo && !isEmptyModule ? (
     <View as="div">
-      {content}
-      <Flex as="div" justifyItems="center" alignItems="center">
+      {paginatedContent}
+
+      <Flex as="div" justifyItems="center" alignItems="center" margin="small 0 0 0">
         <PaginatedNavigation
           isLoading={isLoading}
           currentPage={pageIndex}

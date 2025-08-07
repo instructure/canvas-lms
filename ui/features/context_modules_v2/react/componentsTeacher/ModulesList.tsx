@@ -30,7 +30,7 @@ import {
 } from '../handlers/modulePageActionHandlers'
 import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
-import {useReorderModuleItems} from '../hooks/mutations/useReorderModuleItems'
+import {useReorderModuleItemsGQL} from '../hooks/mutations/useReorderModuleItemsGQL'
 import {useReorderModules} from '../hooks/mutations/useReorderModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {useContextModule} from '../hooks/useModuleContext'
@@ -44,7 +44,7 @@ import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
-import {TEACHER, STUDENT, MODULE_ITEMS} from '../utils/constants'
+import {TEACHER, STUDENT, MODULE_ITEMS, PAGE_SIZE, SHOW_ALL_PAGE_SIZE} from '../utils/constants'
 import {IconModuleSolid} from '@instructure/ui-icons'
 import {handleAddModule} from '../handlers/moduleActionHandlers'
 import CreateNewModule from '../components/CreateNewModule'
@@ -61,7 +61,7 @@ const ModulesList: React.FC = () => {
     moduleCursorState,
     setModuleCursorState,
   } = useContextModule()
-  const reorderItemsMutation = useReorderModuleItems()
+  const reorderItemsMutation = useReorderModuleItemsGQL()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
   const {maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
@@ -202,37 +202,72 @@ const ModulesList: React.FC = () => {
   ) => {
     const dragCursor = moduleCursorState[dragModuleId]
     const hoverCursor = moduleCursorState[hoverModuleId]
+    const view = TEACHER // Always use TEACHER view since DnD is only available in teacher view
 
-    const sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
+    // In "show all" mode, prioritize the complete data over paginated data
+    let sourceModuleData = queryClient.getQueryData([
+      'MODULE_ITEMS_ALL',
+      dragModuleId,
+      view,
+      SHOW_ALL_PAGE_SIZE,
+    ]) as {
       moduleItems: ModuleItem[]
     }
 
-    if (!sourceModuleData?.moduleItems?.length) return
+    // Fallback to paginated cache if show all not available
+    if (!sourceModuleData?.moduleItems?.length) {
+      sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
+        moduleItems: ModuleItem[]
+      }
+    }
 
     // Get the item being moved
     const movedItem = sourceModuleData.moduleItems[dragIndex]
     if (!movedItem) return
 
     // Helper to update cache and call the mutation
-    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: ModuleItem[]) => {
+    const updateAndMutate = (
+      moduleId: string,
+      oldModuleId: string,
+      updatedItems: ModuleItem[],
+      targetPosition?: number,
+    ) => {
       // Update cache
       const cursor = moduleCursorState[moduleId]
 
-      queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
-        ...(moduleId === dragModuleId
-          ? sourceModuleData
-          : queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])),
-        moduleItems: updatedItems,
-      })
+      // Try to update paginated cache first
+      const paginatedData = queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])
+      if (paginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
+          ...(moduleId === dragModuleId ? sourceModuleData : paginatedData),
+          moduleItems: updatedItems,
+        })
+      }
+
+      // Also try to update "show all" cache if it exists with correct key
+      const showAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        moduleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (showAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...(moduleId === dragModuleId ? sourceModuleData : showAllData),
+          moduleItems: updatedItems,
+        })
+      }
 
       // Get item IDs and call mutation if needed
       const itemIds = getItemIds(updatedItems)
+
       if (itemIds.length > 0) {
         reorderItemsMutation.mutate({
           courseId,
           moduleId,
+          itemIds,
           oldModuleId,
-          order: itemIds,
+          targetPosition,
         })
       }
     }
@@ -250,15 +285,28 @@ const ModulesList: React.FC = () => {
       updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
       // For cross-module movement
     } else {
-      const destModuleData = queryClient.getQueryData([
-        MODULE_ITEMS,
-        hoverModuleId,
-        hoverCursor,
-      ]) as {
+      // Try to get destination data from either paginated cache or "show all" cache
+      let destModuleData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, hoverCursor]) as {
         moduleItems: ModuleItem[]
       }
 
+      // If not found in paginated cache, try the "show all" cache with correct key
+      if (!destModuleData?.moduleItems) {
+        destModuleData = queryClient.getQueryData([
+          'MODULE_ITEMS_ALL',
+          hoverModuleId,
+          view,
+          SHOW_ALL_PAGE_SIZE,
+        ]) as {
+          moduleItems: ModuleItem[]
+        }
+      }
+
       if (!destModuleData?.moduleItems) return
+
+      // Calculate absolute target position for cross-module moves
+      // For cross-module moves, we want to place the item at the precise drop location
+      const absoluteTargetPosition = hoverIndex + 1
 
       // Prepare source module update (remove the item)
       const updatedSourceItems = updateIndexes(
@@ -275,9 +323,66 @@ const ModulesList: React.FC = () => {
       updatedDestItems.splice(hoverIndex, 0, updatedItem)
       const updatedDestWithIndexes = updateIndexes(updatedDestItems)
 
-      // Update both caches and call mutations
-      updateAndMutate(dragModuleId, dragModuleId, updatedSourceItems)
-      updateAndMutate(hoverModuleId, dragModuleId, updatedDestWithIndexes)
+      // Update source module cache (optimistic update only)
+      const sourceCursor = moduleCursorState[dragModuleId]
+      const sourcePaginatedData = queryClient.getQueryData([
+        MODULE_ITEMS,
+        dragModuleId,
+        sourceCursor,
+      ])
+      if (sourcePaginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, dragModuleId, sourceCursor], {
+          ...sourcePaginatedData,
+          moduleItems: updatedSourceItems,
+        })
+      }
+      const sourceShowAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        dragModuleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (sourceShowAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', dragModuleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...sourceShowAllData,
+          moduleItems: updatedSourceItems,
+        })
+      }
+
+      // Update destination module cache
+      const destCursor = moduleCursorState[hoverModuleId]
+      const destPaginatedData = queryClient.getQueryData([MODULE_ITEMS, hoverModuleId, destCursor])
+      if (destPaginatedData) {
+        queryClient.setQueryData([MODULE_ITEMS, hoverModuleId, destCursor], {
+          ...destPaginatedData,
+          moduleItems: updatedDestWithIndexes,
+        })
+      }
+      const destShowAllData = queryClient.getQueryData([
+        'MODULE_ITEMS_ALL',
+        hoverModuleId,
+        view,
+        SHOW_ALL_PAGE_SIZE,
+      ])
+      if (destShowAllData) {
+        queryClient.setQueryData(['MODULE_ITEMS_ALL', hoverModuleId, view, SHOW_ALL_PAGE_SIZE], {
+          ...destShowAllData,
+          moduleItems: updatedDestWithIndexes,
+        })
+      }
+
+      // For cross-module moves, send only the moved item ID
+      const movedItemIds = [movedItem._id].filter(Boolean)
+
+      if (movedItemIds.length > 0) {
+        reorderItemsMutation.mutate({
+          courseId,
+          moduleId: hoverModuleId,
+          itemIds: movedItemIds,
+          oldModuleId: dragModuleId,
+          targetPosition: absoluteTargetPosition,
+        })
+      }
     }
   }
 
