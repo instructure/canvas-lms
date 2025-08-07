@@ -22,11 +22,9 @@ require_relative "../api_spec_helper"
 require_relative "../locked_examples"
 require "webmock/rspec"
 
-RSpec.configure do |config|
-  config.include ApplicationHelper
-end
-
 describe "Files API", type: :request do
+  include ApplicationHelper
+
   before :once do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
   end
