@@ -3122,6 +3122,29 @@ describe GradebooksController do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
       end
+
+      it "includes MANAGE_GRADES in js_env for platform speedgrader" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be true
+      end
+
+      it "sets MANAGE_GRADES to false for users without manage_grades permission" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+
+        # Create a user with only view_all_grades permission
+        ta = User.create!
+        @course.enroll_ta(ta)
+        role = ta.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :manage_grades, enabled: false, role:)
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: true, role:)
+
+        user_session(ta)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be false
+      end
     end
 
     it "falls back to classic speedgrader when the platform speedgrader launch URL is not configured" do

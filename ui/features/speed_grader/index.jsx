@@ -70,7 +70,10 @@ ready(() => {
         lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
         ltiIframeAllowances: iframeAllowances(),
         pendo,
-        permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
+        permissions: {
+          canViewAuditTrail: window.ENV.can_view_audit_trail ?? false,
+          canManageGrades: window.ENV.MANAGE_GRADES ?? false,
+        },
         gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
       },
