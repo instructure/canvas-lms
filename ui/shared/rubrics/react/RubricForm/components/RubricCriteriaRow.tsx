@@ -48,7 +48,6 @@ type RubricCriteriaRowProps = {
   freeFormCriterionComments: boolean
   hidePoints: boolean
   rowIndex: number
-  unassessed: boolean
   isGenerated?: boolean
   nextIsGenerated?: boolean
   onDeleteCriterion: () => void
@@ -61,7 +60,6 @@ export const RubricCriteriaRow = ({
   freeFormCriterionComments,
   hidePoints,
   rowIndex,
-  unassessed,
   isGenerated,
   nextIsGenerated,
   onDeleteCriterion,
@@ -233,41 +231,37 @@ export const RubricCriteriaRow = ({
                   </Tooltip>
                 </View>
 
-                {unassessed && (
-                  <View as="span" margin="0 0 0 medium">
-                    <Tooltip renderTip={I18n.t('Delete Criterion')}>
-                      <IconButton
-                        withBackground={false}
-                        withBorder={false}
-                        screenReaderLabel={I18n.t('Delete Criterion')}
-                        onClick={onDeleteCriterion}
-                        size="small"
-                        themeOverride={{smallHeight: '18px'}}
-                        data-testid="rubric-criteria-row-delete-button"
-                      >
-                        <IconTrashLine />
-                      </IconButton>
-                    </Tooltip>
-                  </View>
-                )}
+                <View as="span" margin="0 0 0 medium">
+                  <Tooltip renderTip={I18n.t('Delete Criterion')}>
+                    <IconButton
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('Delete Criterion')}
+                      onClick={onDeleteCriterion}
+                      size="small"
+                      themeOverride={{smallHeight: '18px'}}
+                      data-testid="rubric-criteria-row-delete-button"
+                    >
+                      <IconTrashLine />
+                    </IconButton>
+                  </Tooltip>
+                </View>
 
-                {unassessed && (
-                  <View as="span" margin="0 0 0 medium">
-                    <Tooltip renderTip={I18n.t('Duplicate Criterion')}>
-                      <IconButton
-                        withBackground={false}
-                        withBorder={false}
-                        screenReaderLabel={I18n.t('Duplicate Criterion')}
-                        onClick={onDuplicateCriterion}
-                        size="small"
-                        themeOverride={{smallHeight: '18px'}}
-                        data-testid="rubric-criteria-row-duplicate-button"
-                      >
-                        <IconDuplicateLine />
-                      </IconButton>
-                    </Tooltip>
-                  </View>
-                )}
+                <View as="span" margin="0 0 0 medium">
+                  <Tooltip renderTip={I18n.t('Duplicate Criterion')}>
+                    <IconButton
+                      withBackground={false}
+                      withBorder={false}
+                      screenReaderLabel={I18n.t('Duplicate Criterion')}
+                      onClick={onDuplicateCriterion}
+                      size="small"
+                      themeOverride={{smallHeight: '18px'}}
+                      data-testid="rubric-criteria-row-duplicate-button"
+                    >
+                      <IconDuplicateLine />
+                    </IconButton>
+                  </Tooltip>
+                </View>
               </Flex.Item>
             </Flex>
             {!freeFormCriterionComments && (

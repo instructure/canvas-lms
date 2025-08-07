@@ -31,6 +31,7 @@ export type GenerateCriteriaFormProps = {
 
 export type RubricFormProps = {
   id?: string
+  canUpdateRubric: boolean
   title: string
   hasRubricAssociations: boolean
   accountId?: string
@@ -74,5 +75,4 @@ export type RatingRowProps = {
   setPointsInputText: (value: string | number) => void
   showRemoveButton: boolean
   onRemove: () => void
-  unassessed: boolean
 }

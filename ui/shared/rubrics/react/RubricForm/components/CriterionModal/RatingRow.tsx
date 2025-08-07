@@ -35,7 +35,6 @@ type RatingRowProps = {
   ratingInputRefs: React.MutableRefObject<HTMLInputElement[]>
   scale: number
   showRemoveButton: boolean
-  unassessed: boolean
   onChange: (rating: RubricRating) => void
   onRemove: () => void
   onPointsBlur: () => void
@@ -53,7 +52,6 @@ export const RatingRow = ({
   ratingInputRefs,
   scale,
   showRemoveButton,
-  unassessed,
   onChange,
   onRemove,
   onPointsBlur,
@@ -83,7 +81,6 @@ export const RatingRow = ({
     ratingInputRefs,
     scale,
     showRemoveButton,
-    unassessed,
     onPointsBlur,
     setRatingForm,
     setPointsInputText,

@@ -92,7 +92,7 @@ export const fetchRubric = async (id?: string): Promise<RubricQueryResponse | nu
 
 export type SaveRubricResponse = {
   rubric: Rubric & {association_count?: number}
-  rubricAssociation: RubricAssociation
+  rubricAssociation?: RubricAssociation
 }
 export const saveRubric = async (
   rubric: RubricFormProps,

@@ -61,7 +61,6 @@ export const RubricCriteriaContainer = ({
                         freeFormCriterionComments={rubricForm.freeFormCriterionComments}
                         hidePoints={rubricForm.hidePoints}
                         rowIndex={index + 1}
-                        unassessed={rubricForm.unassessed}
                         isGenerated={criterion.isGenerated}
                         nextIsGenerated={rubricForm.criteria[index + 1]?.isGenerated}
                         onDeleteCriterion={() => deleteCriterion(criterion)}
@@ -76,13 +75,11 @@ export const RubricCriteriaContainer = ({
             }}
           </Droppable>
         </DragAndDrop>
-        {rubricForm.unassessed && (
-          <NewCriteriaRow
-            rowIndex={rubricForm.criteria.length + 1}
-            onEditCriterion={() => openCriterionModal()}
-            onAddOutcome={() => openOutcomeDialog()}
-          />
-        )}
+        <NewCriteriaRow
+          rowIndex={rubricForm.criteria.length + 1}
+          onEditCriterion={() => openCriterionModal()}
+          onAddOutcome={() => openOutcomeDialog()}
+        />
       </View>
     </Flex.Item>
   )
