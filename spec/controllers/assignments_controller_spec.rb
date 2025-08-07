@@ -2187,6 +2187,7 @@ describe AssignmentsController do
           <p><iframe style="width: 300px; height: 225px; display: inline-block;" title="Video player for cat_hugs.mp4" data-media-type="video" src="/media_attachments_iframe/#{@video.id}" loading="lazy" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="#{@video.media_entry_id}"></iframe></p>
           <p><a class="instructure_file_link auto_open" title="Link" href="/courses/#{@course.id}/files/#{@doc.id}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc.display_name}</a></p>
         HTML
+        @course.saving_user = @teacher
         @course.save!
       end
 

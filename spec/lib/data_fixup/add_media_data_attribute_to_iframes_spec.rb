@@ -104,7 +104,7 @@ describe DataFixup::AddMediaDataAttributeToIframes do
       att = Attachment.create! context: course, filename: "whatever.flv", display_name: "whatever.flv", content_type: "video/avi"
       record_body = "<iframe src=\"/media_attachments_iframe/#{att.id}\"></iframe>"
       another_course = course_model
-      another_course.update! syllabus_body: record_body
+      another_course.update! syllabus_body: record_body, saving_user: @user
       assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
       assessment_question_bank = another_course.assessment_question_banks.create!
       assessment_question = assessment_question_bank.assessment_questions.create! question_data: { "question_text" => record_body }

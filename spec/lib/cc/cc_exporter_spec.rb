@@ -790,6 +790,7 @@ describe "Common Cartridge exporting" do
       @att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
       link_thing = %(<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>)
       @course.syllabus_body = link_thing
+      @course.saving_user = @user
       @course.save!
       @ag = @course.assignment_groups.create!(name: "group1")
       @asmnt = @course.assignments.create!(title: "Assignment 1",
