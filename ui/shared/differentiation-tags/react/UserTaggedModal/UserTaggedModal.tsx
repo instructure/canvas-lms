@@ -61,9 +61,14 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
     mutate({groupId: selectedTagId, userId, refetch})
     setIsWarningModalOpen(false)
   }
+
+  const modalCloseButton = () => {
+    return document.querySelector('#modal-close-button button') as HTMLElement
+  }
   useEffect(() => {
     if (userTagList && userTagList?.length === 0) {
       MessageBus.trigger('removeUserTagIcon', {userId})
+      modalCloseButton()?.focus()
     }
     if (isSuccess && userTagList && userTagList?.length > 0) {
       delete tagRefs.current[selectedTagId]
@@ -85,6 +90,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
           <Heading>{I18n.t('%{name} is tagged as', {name: userName})}</Heading>
           <CloseButton
             data-testid="modal-close-button"
+            id="modal-close-button"
             placement="end"
             offset="small"
             onClick={() => onClose(userId, userName)}
@@ -103,19 +109,6 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
             width="100%"
             height={shouldLimitModalHeight ? '8rem' : 'auto'}
           >
-            {isSuccess && (
-              <Alert
-                variant="success"
-                renderCloseButtonLabel={I18n.t('Close')}
-                timeout={5000}
-                liveRegion={() =>
-                  document.getElementById('flash_screenreader_holder') as HTMLElement
-                }
-                liveRegionPoliteness="assertive"
-              >
-                {I18n.t('Tag removed successfully')}
-              </Alert>
-            )}
             {isError && (
               <Alert
                 variant="error"
