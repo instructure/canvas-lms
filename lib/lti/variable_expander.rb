@@ -1380,7 +1380,7 @@ module Lti
     #   ```
     #   false
     #   ```
-    register_expansion "Canvas.user.prefersDyslexiaFont",
+    register_expansion "Canvas.user.prefersDyslexicFont",
                        [],
                        -> { @current_user.prefers_dyslexic_font? ? "true" : "false" },
                        USER_GUARD
