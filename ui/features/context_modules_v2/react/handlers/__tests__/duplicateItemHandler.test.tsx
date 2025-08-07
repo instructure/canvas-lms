@@ -45,7 +45,7 @@ const baseProviderProps = {
   isMasterCourse: false,
   isChildCourse: false,
   permissions: contextModuleDefaultProps.permissions,
-  NEW_QUIZZES_BY_DEFAULT: contextModuleDefaultProps.NEW_QUIZZES_BY_DEFAULT,
+  NEW_QUIZZES_ENABLED: contextModuleDefaultProps.NEW_QUIZZES_ENABLED,
   DEFAULT_POST_TO_SIS: contextModuleDefaultProps.DEFAULT_POST_TO_SIS,
   teacherViewEnabled: true,
   studentViewEnabled: true,

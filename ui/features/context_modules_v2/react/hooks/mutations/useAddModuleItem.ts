@@ -106,8 +106,9 @@ export function useAddModuleItem({
   inputValue: string
 }) {
   const [state, dispatch] = useReducer(reducer, initialState)
-  const {courseId} = useContextModule()
+  const {courseId, quizEngine} = useContextModule()
   const {defaultFolder} = useDefaultCourseFolder()
+
   const submitInlineItem = useInlineSubmission()
   const {getModuleItemsTotalCount} = useModules(courseId)
   const totalCount = getModuleItemsTotalCount(moduleId) || 0
@@ -131,6 +132,7 @@ export function useAddModuleItem({
       type: itemType,
       itemCount: totalCount,
       indentation,
+      quizEngine,
       selectedTabIndex: tabIndex,
       textHeaderValue: textHeader,
       externalUrlName: external.name,
