@@ -165,6 +165,50 @@ describe Translation do
       expect { described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags) }.to raise_error(Translation::TextTooLongError)
     end
 
+    it "provides default feature_slug if not received from parameters" do
+      client = instance_double("TranslationClient")
+      allow(described_class).to receive(:translation_client).and_return(client)
+      allow(client).to receive(:available?).and_return(true)
+
+      expect(client).to receive(:translate_text).with(
+        text:,
+        tgt_lang: "es",
+        options: hash_including(
+          current_user:,
+          feature_slug: "content-translation"
+        )
+      )
+
+      described_class.translate_text(
+        text:,
+        tgt_lang: "es",
+        flags: translation_flags,
+        options: { current_user: }
+      )
+    end
+
+    it "provides default feature_slug if the given one is unknown" do
+      client = instance_double("TranslationClient")
+      allow(described_class).to receive(:translation_client).and_return(client)
+      allow(client).to receive(:available?).and_return(true)
+
+      expect(client).to receive(:translate_text).with(
+        text:,
+        tgt_lang: "es",
+        options: hash_including(
+          current_user:,
+          feature_slug: "content-translation"
+        )
+      )
+
+      described_class.translate_text(
+        text:,
+        tgt_lang: "es",
+        flags: translation_flags,
+        options: { current_user:, feature_slug: "unknown-feature" }
+      )
+    end
+
     context "when target language is identical to detected source language" do
       it "raises SameLanguageTranslationError" do
         expect { described_class.translate_text(text: "Hello world", tgt_lang: "en", flags: translation_flags, options: { feature_slug: "inbox", current_user: }) }.to raise_error(Translation::SameLanguageTranslationError)
@@ -202,6 +246,50 @@ describe Translation do
 
     it "translates text when tgt_lang is provided" do
       expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "discussion", current_user: })).to eq("<p>Hola, mundo!</p>")
+    end
+
+    it "provides default feature_slug if not received from parameters" do
+      client = instance_double("TranslationClient")
+      allow(described_class).to receive(:translation_client).and_return(client)
+      allow(client).to receive(:available?).and_return(true)
+
+      expect(client).to receive(:translate_html).with(
+        html_string: html,
+        tgt_lang: "es",
+        options: hash_including(
+          current_user:,
+          feature_slug: "content-translation"
+        )
+      )
+
+      described_class.translate_html(
+        html_string: html,
+        tgt_lang: "es",
+        flags: translation_flags,
+        options: { current_user: }
+      )
+    end
+
+    it "provides default feature_slug if the given one is unknown" do
+      client = instance_double("TranslationClient")
+      allow(described_class).to receive(:translation_client).and_return(client)
+      allow(client).to receive(:available?).and_return(true)
+
+      expect(client).to receive(:translate_html).with(
+        html_string: html,
+        tgt_lang: "es",
+        options: hash_including(
+          current_user:,
+          feature_slug: "content-translation"
+        )
+      )
+
+      described_class.translate_html(
+        html_string: html,
+        tgt_lang: "es",
+        flags: translation_flags,
+        options: { current_user:, feature_slug: "unknown-feature" }
+      )
     end
 
     it "raises TextTooLongError if html_string is too long" do

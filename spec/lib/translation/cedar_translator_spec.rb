@@ -70,6 +70,16 @@ describe Translation::CedarTranslator do
       it "returns the translated text" do
         expect(translator.translate_text(text:, tgt_lang:, options:)).to eq("Hola, mundo!")
       end
+
+      it "collects translation stats" do
+        allow(translator).to receive(:collect_translation_stats)
+        translator.translate_text(text:, tgt_lang:, options:)
+        expect(translator).to have_received(:collect_translation_stats).with(
+          src_lang: "en",
+          tgt_lang:,
+          type: "discussion"
+        )
+      end
     end
 
     context "when not available" do
@@ -118,6 +128,16 @@ describe Translation::CedarTranslator do
 
       it "returns the translated html" do
         expect(translator.translate_html(html_string:, tgt_lang:, options:)).to eq("<p>Hola, mundo!</p>")
+      end
+
+      it "collects translation stats" do
+        allow(translator).to receive(:collect_translation_stats)
+        translator.translate_html(html_string:, tgt_lang:, options:)
+        expect(translator).to have_received(:collect_translation_stats).with(
+          src_lang: "en",
+          tgt_lang:,
+          type: "discussion"
+        )
       end
     end
 
