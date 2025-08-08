@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
@@ -29,22 +29,15 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {IssuesTableColumns, IssuesTableColumnHeaders} from '../../constants'
-import {ContentItem} from '../../types'
-import {getSortingFunction, parseScansToContentItems} from '../../utils/apiData'
+import {AccessibilityResourceScan} from '../../types'
 import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
-import {useAccessibilityCheckerStore, TableSortState} from '../../stores/AccessibilityCheckerStore'
-import {
-  useAccessibilityScansStore,
-  TableSortState as TableSortStateN,
-  USE_ACCESSIBILITY_SCANS_STORE,
-} from '../../stores/AccessibilityScansStore'
-import {useAccessibilityFetchUtils} from '../../hooks/useAccessibilityFetchUtils'
+import {useAccessibilityScansStore, TableSortState} from '../../stores/AccessibilityScansStore'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 
 const I18n = createI18nScope('accessibility_checker')
 
 type Props = {
-  onRowClick?: (item: ContentItem) => void
+  onRowClick?: (item: AccessibilityResourceScan) => void
 }
 
 const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentTheme => ({
@@ -54,8 +47,8 @@ const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentThem
 const getNewTableSortState = (
   _event: React.SyntheticEvent,
   param: {id: TableColHeaderProps['id']},
-  existingSortState?: TableSortState | TableSortStateN | null,
-): TableSortState | TableSortStateN => {
+  existingSortState?: TableSortState | null,
+): TableSortState => {
   let sortDirection: TableSortState['sortDirection'] = ReverseOrderingFirst.includes(param.id)
     ? 'descending'
     : 'ascending'
@@ -85,24 +78,24 @@ const getNewTableSortState = (
 }
 
 const renderTableData = (
-  tableData?: ContentItem[] | null,
+  scans?: AccessibilityResourceScan[] | null,
   error?: string | null,
-  onRowClick?: (item: ContentItem) => void,
+  onRowClick?: (item: AccessibilityResourceScan) => void,
 ) => {
   if (error) return
 
   return (
     <>
-      {tableData?.length === 0 || !tableData ? (
+      {scans?.length === 0 || !scans ? (
         <Table.Row data-testid="no-issues-row">
           <Table.Cell colSpan={5} textAlign="center">
             <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
           </Table.Cell>
         </Table.Row>
       ) : (
-        tableData.map(item => (
+        scans.map(item => (
           <AccessibilityIssuesTableRow
-            key={`${item.type}-${item.id}`}
+            key={`${item.resourceType}-${item.id}`}
             item={item}
             onRowClick={onRowClick}
           />
@@ -129,81 +122,30 @@ const renderLoading = () => {
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
 export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
-  const {updateQueryParamPage, updateQueryParamTableSortState} = useAccessibilityFetchUtils()
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
 
-  const [error, loading, page, pageSize, tableData, tableSortState] = useAccessibilityCheckerStore(
-    useShallow(state => [
-      state.error,
-      state.loading,
-      state.page,
-      state.pageSize,
-      state.tableData,
-      state.tableSortState,
-    ]),
-  )
-  const [setPage, setTableSortState] = useAccessibilityCheckerStore(
-    useShallow(state => [state.setPage, state.setTableSortState]),
-  )
-
-  const [errorN, loadingN, pageN, pageSizeN, accessibilityScans, tableSortStateN] =
+  const [error, loading, page, pageCount, accessibilityScans, tableSortState] =
     useAccessibilityScansStore(
       useShallow(state => [
         state.error,
         state.loading,
         state.page,
-        state.pageSize,
+        state.pageCount,
         state.accessibilityScans,
         state.tableSortState,
       ]),
     )
 
-  const issuesData = useMemo(() => {
-    if (USE_ACCESSIBILITY_SCANS_STORE) {
-      return accessibilityScans ? parseScansToContentItems(accessibilityScans) : []
-    }
-    return tableData
-  }, [accessibilityScans, tableData])
-
-  const isLoading = USE_ACCESSIBILITY_SCANS_STORE ? loadingN : loading
-
-  const setOrderedTableData = useAccessibilityCheckerStore(
-    useShallow(state => state.setOrderedTableData),
-  )
-  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
-
   const handleSort = useCallback(
     (_event: React.SyntheticEvent, param: {id: TableColHeaderProps['id']}) => {
       const newState: Partial<TableSortState> = getNewTableSortState(_event, param, tableSortState)
-
-      setPage(0)
-      updateQueryParamPage(0)
-      setTableSortState(newState)
-      updateQueryParamTableSortState(newState)
-    },
-    [
-      tableSortState,
-      setPage,
-      setTableSortState,
-      updateQueryParamPage,
-      updateQueryParamTableSortState,
-    ],
-  )
-
-  const _handleSortN = useCallback(
-    (_event: React.SyntheticEvent, param: {id: TableColHeaderProps['id']}) => {
-      const newState: Partial<TableSortStateN> = getNewTableSortState(
-        _event,
-        param,
-        tableSortStateN,
-      )
 
       doFetchAccessibilityScanData({
         tableSortState: newState,
         page: 1,
       })
     },
-    [tableSortStateN, doFetchAccessibilityScanData],
+    [tableSortState, doFetchAccessibilityScanData],
   )
 
   const getCurrentSortDirection = useCallback(
@@ -216,33 +158,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
     [tableSortState],
   )
 
-  // The new API won't need this effect, as the data will be sorted on the backend
-  useEffect(() => {
-    const newOrderedTableData: ContentItem[] = [...(issuesData || [])]
-
-    if (tableSortState && tableSortState.sortId) {
-      if (
-        tableSortState.sortDirection === 'ascending' ||
-        tableSortState.sortDirection === 'descending'
-      ) {
-        const sortFn = getSortingFunction(tableSortState.sortId, tableSortState!.sortDirection)
-        newOrderedTableData.sort(sortFn)
-      }
-    }
-    setOrderedTableData(newOrderedTableData)
-  }, [issuesData, tableSortState, setOrderedTableData])
-
-  const pageCount = (pageSize && Math.ceil((issuesData ?? []).length / pageSize)) || 1
-
   const handlePageChange = useCallback(
-    (nextPage: number) => {
-      setPage(nextPage - 1)
-      updateQueryParamPage(nextPage - 1)
-    },
-    [setPage, updateQueryParamPage],
-  )
-
-  const _handlePageChangeN = useCallback(
     (nextPage: number) => {
       doFetchAccessibilityScanData({
         page: nextPage,
@@ -250,15 +166,6 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
     },
     [doFetchAccessibilityScanData],
   )
-
-  // TODO Remove, once we are dealing with paginated and sorted data from the backend
-  const pseudoPaginatedData = useMemo(() => {
-    const startIndex = page * pageSize
-    const endIndex = startIndex + pageSize
-    const paginatedData = (orderedTableData || []).slice(startIndex, endIndex)
-
-    return paginatedData
-  }, [page, pageSize, orderedTableData])
 
   return (
     <View width="100%">
@@ -298,14 +205,14 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {isLoading && (
+            {loading && (
               <Table.Row data-testid="loading-row">
                 <Table.Cell colSpan={5} textAlign="center">
                   {renderLoading()}
                 </Table.Cell>
               </Table.Row>
             )}
-            {renderTableData(pseudoPaginatedData, error, onRowClick)}
+            {renderTableData(accessibilityScans, error, onRowClick)}
           </Table.Body>
         </Table>
       </View>
@@ -318,7 +225,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
             labelNext={I18n.t('Next Page')}
             labelPrev={I18n.t('Previous Page')}
             margin="small"
-            currentPage={page + 1}
+            currentPage={page}
             onPageChange={handlePageChange}
             totalPageNumber={pageCount}
           />

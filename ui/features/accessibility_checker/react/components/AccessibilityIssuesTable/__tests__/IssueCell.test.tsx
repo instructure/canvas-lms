@@ -19,35 +19,37 @@
 import {render, screen} from '@testing-library/react'
 
 import {IssueCell} from '../IssueCell'
-import {ContentItem} from '../../../types'
+import {AccessibilityIssue, AccessibilityResourceScan} from '../../../types'
 
 describe('IssueCell', () => {
   describe('renders pill', () => {
     it('with correct number', () => {
-      render(<IssueCell item={{count: 5} as ContentItem} />)
+      render(<IssueCell item={{issueCount: 5} as AccessibilityResourceScan} />)
       expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('5')
     })
 
     it('with correct number if exceeds limit', () => {
-      render(<IssueCell item={{count: 2000} as ContentItem} />)
+      render(<IssueCell item={{issueCount: 2000} as AccessibilityResourceScan} />)
       expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('99+')
     })
 
     describe('and button', () => {
       it('renders', () => {
         const handleClick = jest.fn()
-        render(<IssueCell item={{count: 5} as ContentItem} onClick={handleClick} />)
+        render(
+          <IssueCell item={{issueCount: 5} as AccessibilityResourceScan} onClick={handleClick} />,
+        )
         expect(screen.getByTestId('issue-remediation-button')).toBeInTheDocument()
       })
 
       it('does not render', () => {
-        render(<IssueCell item={{count: 5} as ContentItem} />)
+        render(<IssueCell item={{issueCount: 5} as AccessibilityResourceScan} />)
         expect(screen.queryByTestId('issue-remediation-button')).not.toBeInTheDocument()
       })
 
       it('calls onClick', () => {
         const handleClick = jest.fn()
-        const item = {count: 5} as ContentItem
+        const item = {issueCount: 5} as AccessibilityResourceScan
         render(<IssueCell item={item} onClick={handleClick} />)
         screen.getByTestId('issue-remediation-button').click()
         expect(handleClick).toHaveBeenCalledWith(expect.objectContaining(item))
@@ -56,17 +58,21 @@ describe('IssueCell', () => {
   })
 
   it('renders no issues text', () => {
-    render(<IssueCell item={{count: 0} as ContentItem} />)
+    render(<IssueCell item={{issueCount: 0} as AccessibilityResourceScan} />)
     expect(screen.getByText(/No issues/i)).toBeInTheDocument()
   })
 
   it('renders unknown text', () => {
-    render(<IssueCell item={{count: -1, issues: undefined} as ContentItem} />)
+    render(<IssueCell item={{issueCount: -1, issues: undefined} as AccessibilityResourceScan} />)
     expect(screen.getByText(/Unknown/i)).toBeInTheDocument()
   })
 
   it('renders spinner and loading text', () => {
-    render(<IssueCell item={{count: -1, issues: []} as any} />)
+    render(
+      <IssueCell
+        item={{issueCount: -1, issues: [] as AccessibilityIssue[]} as AccessibilityResourceScan}
+      />,
+    )
     expect(screen.getByText(/Checking/i)).toBeInTheDocument()
   })
 })

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import {AccessibilityIssue, ContentItemType, FormValue, PreviewResponse} from '../../../types'
+import {AccessibilityIssue, FormValue, PreviewResponse, ResourceType} from '../../../types'
 import Preview, {PreviewHandle} from '../Preview'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -45,8 +45,8 @@ describe('Preview', () => {
 
   const defaultProps = {
     issue: mockIssue,
-    itemId: 123,
-    itemType: 'Assignment' as ContentItemType,
+    resourceId: 123,
+    itemType: ResourceType.Assignment,
   }
 
   beforeEach(() => {
@@ -474,7 +474,7 @@ describe('Preview', () => {
         json: Promise.resolve(mockResponse),
       })
 
-      render(<Preview {...defaultProps} itemType={ContentItemType.WikiPage} />)
+      render(<Preview {...defaultProps} itemType={ResourceType.WikiPage} />)
 
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
@@ -495,7 +495,7 @@ describe('Preview', () => {
         json: Promise.resolve(mockResponse),
       })
 
-      render(<Preview {...defaultProps} itemType={ContentItemType.Attachment} />)
+      render(<Preview {...defaultProps} itemType={ResourceType.Attachment} />)
 
       await waitFor(() => {
         expect(mockDoFetchApi).toHaveBeenCalledWith({
@@ -625,7 +625,7 @@ describe('Preview', () => {
       json: mockResponse,
     })
 
-    rerender(<Preview {...defaultProps} itemId={2} />)
+    rerender(<Preview {...defaultProps} resourceId={2} />)
 
     await waitFor(() => {
       expect(

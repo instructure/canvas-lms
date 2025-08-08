@@ -23,7 +23,7 @@ import {
   defaultStateToFetch,
   NewStateToFetch,
   TableSortState,
-} from '../stores/AccessibilityCheckerStore'
+} from '../stores/AccessibilityScansStore'
 
 /**
  * Use only with the AccessibilityScansStore!

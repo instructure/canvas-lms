@@ -28,11 +28,11 @@ import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
-import React from 'react'
+import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
 
 // Create a fully typed mock context
 const mockContextValue: AccessibilityCheckerContextType = {
-  selectedItem: {
+  selectedItem: getAsAccessibilityResourceScan({
     id: 123,
     type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
     title: 'Mock Page',
@@ -41,7 +41,7 @@ const mockContextValue: AccessibilityCheckerContextType = {
     count: 0,
     url: 'http://example.com',
     editUrl: 'http://example.com/edit',
-  },
+  }),
   setSelectedItem: jest.fn(),
   isTrayOpen: false,
   setIsTrayOpen: jest.fn(),

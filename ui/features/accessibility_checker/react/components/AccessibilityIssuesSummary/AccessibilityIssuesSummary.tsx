@@ -15,41 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useMemo} from 'react'
+import {useMemo} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
-import {
-  USE_ACCESSIBILITY_SCANS_STORE,
-  useAccessibilityScansStore,
-} from '../../stores/AccessibilityScansStore'
+import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
 import {calculateTotalIssuesCount, parseAccessibilityScans} from '../../utils/apiData'
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
 import {AccessibilityData} from '../../types'
 
 export const AccessibilityIssuesSummary = () => {
-  const [accessibilityIssues, loading] = useAccessibilityCheckerStore(
-    useShallow(state => [state.accessibilityIssues, state.loading]),
-  )
-  const [accessibilityScans, loadingN] = useAccessibilityScansStore(
+  const [accessibilityScans, loading] = useAccessibilityScansStore(
     useShallow(state => [state.accessibilityScans, state.loading]),
   )
 
   const issues = useMemo(() => {
-    if (USE_ACCESSIBILITY_SCANS_STORE) {
-      return accessibilityScans
-        ? parseAccessibilityScans(accessibilityScans)
-        : ({} as AccessibilityData)
-    }
-    return accessibilityIssues
-  }, [accessibilityScans, accessibilityIssues])
+    return accessibilityScans
+      ? parseAccessibilityScans(accessibilityScans)
+      : ({} as AccessibilityData)
+  }, [accessibilityScans])
 
-  const isLoading = USE_ACCESSIBILITY_SCANS_STORE ? loadingN : loading
-
-  if (window.ENV.SCAN_DISABLED === true || isLoading) return null
+  if (window.ENV.SCAN_DISABLED === true || loading) return null
 
   return (
     <Flex
@@ -60,12 +48,12 @@ export const AccessibilityIssuesSummary = () => {
     >
       <Flex.Item>
         <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesCounter count={calculateTotalIssuesCount(issues)} />
+          <IssuesCounter count={calculateTotalIssuesCount(accessibilityScans)} />
         </View>
       </Flex.Item>
       <Flex.Item shouldGrow shouldShrink>
         <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
-          <IssuesByTypeChart accessibilityIssues={issues} isLoading={isLoading} />
+          <IssuesByTypeChart accessibilityIssues={issues} isLoading={loading} />
         </View>
       </Flex.Item>
     </Flex>

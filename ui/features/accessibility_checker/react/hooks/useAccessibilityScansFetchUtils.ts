@@ -59,6 +59,20 @@ const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, an
   return params
 }
 
+const getPageCountFromResponse = (data: DoFetchApiResults<AccessibilityResourceScan[]>): number => {
+  const links =
+    data?.response?.headers
+      ?.get('link')
+      ?.split(',')
+      .map(link => link.trim()) || []
+
+  const lastLink = links.find(link => link.includes('rel="last"'))
+  const lastLinkQuery = lastLink ? new URLSearchParams(lastLink.split('?')[1]) : null
+  const pageCount = Number.parseInt(lastLinkQuery?.get('page') || '1', 10) ?? 1
+
+  return pageCount
+}
+
 export const useAccessibilityScansFetchUtils = () => {
   const [page, pageSize, tableSortState, search] = useAccessibilityScansStore(
     useShallow(state => [state.page, state.pageSize, state.tableSortState, state.search]),
@@ -68,6 +82,7 @@ export const useAccessibilityScansFetchUtils = () => {
     setError,
     setLoading,
     setPage,
+    setPageCount,
     setPageSize,
     setSearch,
     setTableSortState,
@@ -77,6 +92,7 @@ export const useAccessibilityScansFetchUtils = () => {
       state.setError,
       state.setLoading,
       state.setPage,
+      state.setPageCount,
       state.setPageSize,
       state.setSearch,
       state.setTableSortState,
@@ -116,9 +132,13 @@ export const useAccessibilityScansFetchUtils = () => {
           params,
           method: 'GET',
         })
+
+        const pageCount = getPageCountFromResponse(data)
+
         const accessibilityScans = convertKeysToCamelCase(data.json) as AccessibilityResourceScan[]
         setAccessibilityScans(accessibilityScans)
         setPage(newStateToFetch.page!)
+        setPageCount(pageCount)
         setPageSize(newStateToFetch.pageSize!)
         setSearch(newStateToFetch.search!)
         setTableSortState(newStateToFetch.tableSortState!)
@@ -139,6 +159,7 @@ export const useAccessibilityScansFetchUtils = () => {
       setError,
       setLoading,
       setPage,
+      setPageCount,
       setPageSize,
       setSearch,
       setTableSortState,

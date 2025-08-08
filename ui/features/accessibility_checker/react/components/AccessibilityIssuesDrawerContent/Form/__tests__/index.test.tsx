@@ -21,7 +21,6 @@ import {render, screen} from '@testing-library/react'
 import {AccessibilityIssue, FormType} from '../../../../types'
 import Form, {FormHandle} from '../index'
 import userEvent from '@testing-library/user-event'
-import user from '@canvas/users/react/proptypes/user'
 
 describe('Form', () => {
   const createMockIssue = (formType: FormType, formValue?: string): AccessibilityIssue => ({

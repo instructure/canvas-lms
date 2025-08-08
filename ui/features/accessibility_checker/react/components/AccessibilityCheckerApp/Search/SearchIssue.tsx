@@ -27,7 +27,8 @@ const I18n = createI18nScope('accessibility_checker')
 interface SearchIssueProps {
   onSearchChange: (value: string) => void
 }
-const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
+
+export const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
   const [search, setSearch] = useState<string | undefined>()
 
   useEffect(() => {
@@ -62,5 +63,3 @@ const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
     />
   )
 }
-
-export default SearchIssue

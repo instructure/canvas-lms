@@ -24,6 +24,11 @@ import {AccessibilityResourceScan, Filters, ParsedFilters} from '../types'
 
 export const USE_ACCESSIBILITY_SCANS_STORE = false
 
+export type NextResource = {
+  index: number
+  item?: AccessibilityResourceScan | null
+}
+
 export type TableSortState = {
   sortId?: string | null
   sortDirection?: TableColHeaderProps['sortDirection'] | null
@@ -37,12 +42,9 @@ export type NewStateToFetch = {
   filters?: ParsedFilters | null
 }
 
-/**
- * tableData: ContentItem[] | null - will reintroduce such, only if needed for local state management
- * accessibilityScanDisabled: boolean - removed due to getting that value in js_env from the API
- */
-export type AccessibilityCheckerState = {
+export type AccessibilityScansState = {
   page: number
+  pageCount: number
   pageSize: number
   totalCount: number
   loading?: boolean
@@ -51,10 +53,12 @@ export type AccessibilityCheckerState = {
   tableSortState?: TableSortState | null
   search?: string | null
   filters?: Filters | null
+  nextResource: NextResource
 }
 
-export type AccessibilityCheckerActions = {
+export type AccessibilityScansActions = {
   setPage: (page: number) => void
+  setPageCount: (pageCount: number) => void
   setPageSize: (pageSize: number) => void
   setTotalCount: (totalCount: number) => void
   setLoading: (loading: boolean) => void
@@ -63,10 +67,14 @@ export type AccessibilityCheckerActions = {
   setTableSortState: (tableSortState: TableSortState | null) => void
   setSearch: (search: string | null) => void
   setFilters: (filters: Filters | null) => void
+  setNextResource: (nextResource: NextResource) => void
 }
 
-export const initialState: AccessibilityCheckerState = {
-  page: 0,
+export const defaultNextResource: NextResource = {index: -1, item: null}
+
+export const initialState: AccessibilityScansState = {
+  page: 1,
+  pageCount: 1,
   pageSize: 10,
   totalCount: 0,
   loading: true,
@@ -75,24 +83,26 @@ export const initialState: AccessibilityCheckerState = {
   tableSortState: null,
   search: null,
   filters: null,
+  nextResource: defaultNextResource,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {
-  page: 0,
+  page: 1,
   pageSize: 10,
-  tableSortState: {} as TableSortState,
+  tableSortState: null,
   search: null,
   filters: null,
 }
 
 export const useAccessibilityScansStore = create<
-  AccessibilityCheckerState & AccessibilityCheckerActions
+  AccessibilityScansState & AccessibilityScansActions
 >()(
   devtools(
     set => ({
       ...initialState,
 
       setPage: page => set({page}),
+      setPageCount: pageCount => set({pageCount}),
       setPageSize: pageSize => set({pageSize}),
       setTotalCount: totalCount => set({totalCount}),
       setLoading: loading => set({loading}),
@@ -101,6 +111,7 @@ export const useAccessibilityScansStore = create<
       setTableSortState: tableSortState => set({tableSortState}),
       setSearch: search => set({search}),
       setFilters: filters => set({filters}),
+      setNextResource: nextResource => set({nextResource}),
     }),
     {
       name: 'AccessibilityScansStore',

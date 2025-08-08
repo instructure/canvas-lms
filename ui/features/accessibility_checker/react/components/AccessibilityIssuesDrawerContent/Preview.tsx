@@ -26,7 +26,8 @@ import {Mask} from '@instructure/ui-overlays'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-import {AccessibilityIssue, ContentItemType, FormValue, PreviewResponse} from '../../types'
+import {AccessibilityIssue, FormValue, PreviewResponse, ResourceType} from '../../types'
+import {getAsContentItemType} from '../../utils/apiData'
 import {stripQueryString} from '../../utils/query'
 
 const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
@@ -39,8 +40,8 @@ export interface PreviewHandle {
 
 interface PreviewProps {
   issue: AccessibilityIssue
-  itemId: number
-  itemType: ContentItemType
+  resourceId: number
+  itemType: ResourceType
 }
 
 interface PreviewOverlayProps {
@@ -115,7 +116,7 @@ const applyHighlight = (previewResponse: PreviewResponse | null, issue: Accessib
 const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = forwardRef<
   PreviewHandle,
   PreviewProps
->(({issue, itemId, itemType}: PreviewProps, ref) => {
+>(({issue, resourceId, itemType}: PreviewProps, ref) => {
   const [contentResponse, setContentResponse] = useState<PreviewResponse | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -155,8 +156,8 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   const performGetRequest = useCallback(
     async (onSuccess?: () => void, onError?: (error?: string) => void) => {
       const params = new URLSearchParams({
-        content_type: itemType,
-        content_id: String(itemId),
+        content_type: getAsContentItemType(itemType)!,
+        content_id: String(resourceId),
       })
 
       await handleApiRequest(
@@ -170,7 +171,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         onError,
       )
     },
-    [handleApiRequest, itemId, itemType],
+    [handleApiRequest, resourceId, itemType],
   )
 
   const performPostRequest = useCallback(
@@ -182,8 +183,8 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-              content_id: itemId,
-              content_type: itemType,
+              content_id: resourceId,
+              content_type: getAsContentItemType(itemType),
               rule: issue.ruleId,
               path: issue.path,
               value: formValue,
@@ -194,7 +195,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         onError,
       )
     },
-    [handleApiRequest, itemId, itemType, issue.path, issue.ruleId],
+    [handleApiRequest, resourceId, itemType, issue.path, issue.ruleId],
   )
 
   useImperativeHandle(ref, () => ({
@@ -205,7 +206,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   useEffect(() => {
     performGetRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [itemId])
+  }, [resourceId])
 
   return (
     <View as="div" position="relative" id="a11y-issue-preview-container">
