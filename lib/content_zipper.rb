@@ -69,8 +69,8 @@ class ContentZipper
     @assignment = assignment
     @context    = assignment.context
 
-    filename = assignment_zip_filename(assignment)
-    @user = user = zip_attachment.user
+    filename    = assignment_zip_filename(assignment)
+    user        = zip_attachment.user
 
     # It is possible to get this far if an assignment allows the
     # downloadable submissions below as well as those that can't be
@@ -87,8 +87,6 @@ class ContentZipper
                                                  submission_type: downloadable_submissions)
     end
 
-    @tempfiles = []
-
     make_zip_tmpdir(filename) do |zip_name|
       @logger.debug("creating #{zip_name}")
       Zip::File.open(zip_name, Zip::File::CREATE) do |zipfile|
@@ -100,11 +98,6 @@ class ContentZipper
           add_submission(submission, students, zipfile)
           update_progress(zip_attachment, index, count)
         end
-      end
-
-      @tempfiles.each do |tempfile|
-        tempfile.close
-        tempfile.unlink
       end
 
       @logger.debug("added #{submissions.size} submissions")
@@ -334,20 +327,7 @@ class ContentZipper
     handle = nil
     begin
       handle = attachment.open
-      handle.rewind if handle.respond_to?(:rewind)
-
-      tempfile = Tempfile.new([File.basename(filename), File.extname(filename)])
-      tempfile.binmode
-      IO.copy_stream(handle, tempfile)
-      tempfile.flush
-      tempfile.rewind
-
-      entry = Zip::Entry.new(zipfile.name, filename)
-      Time.use_zone(@user&.time_zone || Time.zone) do
-        entry.time = Zip::DOSTime.from_time(Time.now.utc)
-      end
-      zipfile.add(entry, tempfile.path)
-      mark_successful!
+      zipfile.get_output_stream(filename) { |zos| Zip::IOExtras.copy_stream(zos, handle) }
     rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
       Canvas::Errors.capture_exception(:content_export, e, :warn)
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
@@ -427,22 +407,8 @@ class ContentZipper
     content = ERB.new(content).result(binding)
 
     if content
-      tempfile = Tempfile.new([File.basename(filename, ".html"), ".html"])
-      begin
-        tempfile.write(content)
-        tempfile.flush
-        tempfile.rewind
-
-        entry = Zip::Entry.new(zipfile.name, filename)
-        Time.use_zone(@user&.time_zone || Time.zone) do
-          entry.time = Zip::DOSTime.from_time(Time.now.utc)
-        end
-
-        zipfile.add(entry, tempfile.path)
-        @tempfiles << tempfile
-
-        mark_successful!
-      end
+      zipfile.get_output_stream(filename) { |f| f.puts content }
+      mark_successful!
     end
   end
 
