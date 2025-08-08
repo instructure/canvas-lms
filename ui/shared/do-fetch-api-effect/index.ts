@@ -87,6 +87,9 @@ export default async function doFetchApi<T = unknown>({
   suppliedHeaders.forEach((v, k) => fetchHeaders.set(k, v))
 
   if (!includeCSRFToken) {
+    // If we are not including the CSRF token, we need to remove it from the headers
+    // and also remove the X-Requested-With header because it forces an OPTIONS request
+    fetchHeaders.delete('X-Requested-With')
     fetchHeaders.delete('X-CSRF-Token')
   }
 
