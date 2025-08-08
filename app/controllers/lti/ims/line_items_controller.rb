@@ -22,7 +22,7 @@ module Lti
     # @API Line Items
     #
     # Line Item API for
-    # 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
+    # 1EdTech (IMS) <a href="file.assignment_tools.html">Assignment and Grade Services</a>.
     #
     # @model LineItem
     #     {
