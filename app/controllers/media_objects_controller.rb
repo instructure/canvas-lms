@@ -182,7 +182,7 @@ class MediaObjectsController < ApplicationController
   end
 
   # @API Update Media Object
-  #
+  # Updates the title of a media object.
   # @argument user_entered_title [String] The new title.
   #
   def update_media_object

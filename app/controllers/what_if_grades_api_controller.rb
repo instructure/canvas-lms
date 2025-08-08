@@ -235,7 +235,7 @@ class WhatIfGradesApiController < ApplicationController
   end
 
   # @API Reset the what-if scores for the current user for an entire course and recalculate grades
-  #
+  # Resets all what-if scores for a student in a course and recalculates grades.
   # @returns {"grades": [Grades]}
   def reset_for_student_course
     course = @domain_root_account.all_courses.active.find(params[:course_id])

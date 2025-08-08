@@ -804,7 +804,7 @@ class EnrollmentsApiController < ApplicationController
   end
 
   # @API Enroll multiple users to one or more courses
-  #
+  # Enrolls multiple users in one or more courses in a single operation.
   # @argument user_ids[] [Required, Integer]
   #   The user IDs to enroll in the courses.
   #
