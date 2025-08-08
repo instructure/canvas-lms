@@ -52,7 +52,7 @@ export const ButtonBlockGeneralButtonSettings = ({
   onIsFullWidthChange,
 }: ButtonBlockGeneralButtonSettingsProps) => {
   return (
-    <Flex direction="column" gap="medium" padding="small">
+    <Flex direction="column" gap="medium">
       <RadioInputGroup
         name="button-block-general-button-settings-alignment"
         description={I18n.t('Alignment')}
