@@ -17,10 +17,11 @@
  */
 
 import {useNode} from '@craftjs/core'
-import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type HighlightBlockProps} from './HighlightBlock'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,7 +34,7 @@ export const HighlightBlockSettings = () => {
   }))
 
   return (
-    <View as="div">
+    <Flex direction="column" gap="medium" padding="small">
       <Checkbox
         label={I18n.t('Display icon')}
         variant="toggle"
@@ -44,6 +45,28 @@ export const HighlightBlockSettings = () => {
           })
         }
       />
-    </View>
+      <ColorPickerWrapper
+        label={I18n.t('Highlight')}
+        value={settings.highlightColor}
+        baseColor={settings.textColor} // Temporary base color
+        baseColorLabel={I18n.t('Text')}
+        onChange={color =>
+          setProp((props: HighlightBlockProps) => {
+            props.settings.highlightColor = color
+          })
+        }
+      />
+      <ColorPickerWrapper
+        label={I18n.t('Text')}
+        value={settings.textColor}
+        baseColor={settings.highlightColor}
+        baseColorLabel={I18n.t('Highlight')}
+        onChange={color =>
+          setProp((props: HighlightBlockProps) => {
+            props.settings.textColor = color
+          })
+        }
+      />
+    </Flex>
   )
 }
