@@ -36,3 +36,4 @@ export type ImageTextBlockBase = ImageTextData & ImageTextSettings & TitleData
 export type ImageTextBlockProps = ImageTextBlockBase
 export type ImageTextBlockEditProps = ImageTextBlockBase & ImageTextEditHandlers
 export type ImageTextBlockPreviewProps = ImageTextBlockBase
+export type ImageTextBlockViewProps = ImageTextBlockBase
