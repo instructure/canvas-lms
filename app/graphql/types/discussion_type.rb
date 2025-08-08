@@ -463,5 +463,12 @@ module Types
     def participant
       object.participant(current_user) || object.update_or_create_participant(current_user:)
     end
+
+    field :pinned_entries, [Types::DiscussionEntryType], null: true
+    def pinned_entries
+      return [] unless object.context.feature_enabled?(:discussion_pin_post)
+
+      object.pinned_entries
+    end
   end
 end

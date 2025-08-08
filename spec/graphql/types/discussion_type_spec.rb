@@ -1217,4 +1217,27 @@ describe Types::DiscussionType do
       end
     end
   end
+
+  describe "pinned entries" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:discussion) { @course.discussion_topics.create!(title: "Topic with pinned entries") }
+    let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
+
+    it "return pinned entries" do
+      Account.site_admin.enable_feature!(:discussion_pin_post)
+      entry = discussion.discussion_entries.create!(message: "This is it", pinned_by: @teacher, pin_type: "reply")
+
+      expect(discussion_type.resolve("pinnedEntries { _id }")).to eq([entry.id.to_s])
+    end
+
+    it "return an empty array when the feature is disabled" do
+      Account.site_admin.disable_feature!(:discussion_pin_post)
+      discussion.discussion_entries.create!(message: "This is it", pinned_by: @teacher, pin_type: "reply")
+
+      expect(discussion_type.resolve("pinnedEntries { _id }")).to eq([])
+    end
+  end
 end
