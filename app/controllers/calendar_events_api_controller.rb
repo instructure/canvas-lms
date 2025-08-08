@@ -642,7 +642,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   # @API Get a single calendar event or assignment
-  #
+  # Returns detailed information about a specific calendar event or assignment.
   # @returns CalendarEvent
 
   def show

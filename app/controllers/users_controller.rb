@@ -2921,7 +2921,7 @@ class UsersController < ApplicationController
   end
 
   # @API Get a users most recently graded submissions
-  #
+  # Returns a list of the user's most recently graded submissions.
   # @example_request
   #     curl https://<canvas>/api/v1/users/<user_id>/graded_submissions \
   #          -X POST \

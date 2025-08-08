@@ -664,7 +664,7 @@ class AccountsController < ApplicationController
   end
 
   # @API Get the manually-created courses sub-account for the domain root account
-  #
+  # Returns the sub-account that contains manually created courses for the domain root account.
   # @returns Account
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account

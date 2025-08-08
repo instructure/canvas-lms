@@ -525,7 +525,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   # @API Delete a quiz
-  #
+  # Deletes a quiz and returns the deleted quiz object.
   # @returns Quiz
   def destroy
     if authorized_action(@quiz, @current_user, :delete)
