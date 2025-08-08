@@ -309,7 +309,6 @@ export type SiteAdminFeatureId =
   | 'youtube_migration'
   | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
-  | 'accessibility_tab_enable'
   | 'scheduled_feedback_releases'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

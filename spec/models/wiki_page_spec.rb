@@ -1591,7 +1591,8 @@ describe WikiPage do
   end
 
   it_behaves_like "an accessibility scannable resource" do
-    let(:valid_attributes) { { title: "Test Page", course: course_model } }
+    let(:course) { course_model }
+    let(:valid_attributes) { { title: "Test Page", course: } }
     let(:relevant_attributes_for_scan) { { body: "<p>Lorem ipsum</p>" } }
   end
 end

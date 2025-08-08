@@ -12745,7 +12745,8 @@ describe Assignment do
   end
 
   it_behaves_like "an accessibility scannable resource" do
-    let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
+    let(:course) { course_model }
+    let(:valid_attributes) { { title: "Test Assignment", course: } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
   end
 

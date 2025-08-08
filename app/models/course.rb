@@ -3497,7 +3497,7 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    if feature_enabled?(:accessibility_tab_enable)
+    if root_account.enable_content_a11y_checker?
       # Add Accessibility tab at the end of the tabs (except for Settings tab)
       default_tabs.push({
                           id: TAB_ACCESSIBILITY,

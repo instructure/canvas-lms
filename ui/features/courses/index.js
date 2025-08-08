@@ -39,7 +39,7 @@ ready(() => {
     addFavoriteClickListener()
   }
 
-  if (ENV?.FEATURES?.accessibility_tab_enable) {
+  if (ENV?.SETTINGS?.enable_content_a11y_checker) {
     renderAccessibilityCells()
   }
 })
