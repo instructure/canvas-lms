@@ -40,6 +40,8 @@ jest.mock('@instructure/canvas-theme', () => ({
 describe('HighlightBlock', () => {
   const defaultSettings = {
     displayIcon: 'warning',
+    highlightColor: '#E8F4FD',
+    textColor: '#2D3B45',
   }
 
   it('should render with Highlight title', () => {
@@ -64,7 +66,7 @@ describe('HighlightBlock', () => {
     expect(icon).toBeInTheDocument()
   })
 
-  it('should not display the icon when displayIcon is false', () => {
+  it('should not display the icon when displayIcon is null', () => {
     renderBlock(HighlightBlock, {
       content: 'Test content',
       settings: {...defaultSettings, displayIcon: null},
@@ -72,5 +74,65 @@ describe('HighlightBlock', () => {
     const icon = screen.queryByTestId('highlight-icon')
 
     expect(icon).not.toBeInTheDocument()
+  })
+
+  it('should apply the correct highlight color', () => {
+    const highlightColor = '#ffeb3b'
+    renderBlock(HighlightBlock, {
+      content: 'Test content',
+      settings: {...defaultSettings, highlightColor},
+    })
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle(`background-color: ${highlightColor}`)
+  })
+
+  it('should apply default highlight color if none is provided', () => {
+    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle('background-color: #E8F4FD')
+  })
+
+  it('should apply the default text color', () => {
+    renderBlock(HighlightBlock, {content: 'Test content', settings: defaultSettings})
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle('color: #2D3B45')
+  })
+
+  it('should show placeholder text in edit preview mode when content is empty', () => {
+    renderBlock(HighlightBlock, {content: '', settings: defaultSettings})
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveTextContent('Click to edit')
+  })
+
+  it('should apply the correct text color', () => {
+    const textColor = '#FF0000'
+    renderBlock(HighlightBlock, {
+      content: 'Test content',
+      settings: {...defaultSettings, textColor},
+    })
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle(`color: ${textColor}`)
+  })
+
+  it('should apply both custom highlight and text colors', () => {
+    const customHighlightColor = '#FFFACD'
+    const customTextColor = '#4B0082'
+    renderBlock(HighlightBlock, {
+      content: 'Both custom colors test',
+      settings: {
+        ...defaultSettings,
+        highlightColor: customHighlightColor,
+        textColor: customTextColor,
+      },
+    })
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle(`background-color: ${customHighlightColor}`)
+    expect(highlightBlock).toHaveStyle(`color: ${customTextColor}`)
   })
 })

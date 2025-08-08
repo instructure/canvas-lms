@@ -21,7 +21,6 @@ import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useSave} from '../BaseBlock/useSave'
 import {HighlightBlockSettings} from './HighlightBlockSettings'
-import {colors} from '@instructure/canvas-theme'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
@@ -31,6 +30,8 @@ export type HighlightBlockProps = {
   content: string
   settings: {
     displayIcon: string | null
+    highlightColor: string
+    textColor: string
   }
 }
 
@@ -53,9 +54,7 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
   const getIcon = () => {
     switch (props.settings.displayIcon) {
       case 'warning':
-        return (
-          <IconWarningLine size="medium" style={{color: colors.additionalPrimitives.ocean30}} />
-        )
+        return <IconWarningLine size="medium" style={{color: props.settings.textColor}} />
       default:
         return null
     }
@@ -82,8 +81,8 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
     <HighlightBlockLayout
       icon={getIcon()}
       content={contentSlot}
-      backgroundColor={colors.additionalPrimitives.ocean12}
-      textColor={colors.ui.textDescription}
+      backgroundColor={props.settings.highlightColor}
+      textColor={props.settings.textColor}
     />
   )
 }

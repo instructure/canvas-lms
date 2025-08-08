@@ -46,6 +46,8 @@ export const blockFactory = {
       content=""
       settings={{
         displayIcon: 'warning',
+        highlightColor: colors.additionalPrimitives.ocean12,
+        textColor: colors.ui.textDescription,
       }}
     />
   ),
