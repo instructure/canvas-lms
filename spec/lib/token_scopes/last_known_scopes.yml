@@ -2357,6 +2357,12 @@
   path: '/api/v1/users/:user_id/observers/:observer_id'
 - verb: GET
   path: '/api/v1/users/:user_id/page_views'
+- verb: POST
+  path: '/api/v1/users/:user_id/page_views/query'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id'
+- verb: GET
+  path: '/api/v1/users/:user_id/page_views/query/:query_id/results'
 - verb: GET
   path: '/api/v1/users/:user_id/planner/items'
 - verb: GET
