@@ -524,6 +524,14 @@ class UsersController < ApplicationController
     if !k5_user? && !@current_user.non_student_enrollment? && @domain_root_account.feature_enabled?(:widget_dashboard)
       # things needed only for widget dashboard (students only)
       js_bundle :widget_dashboard
+      css_bundle :dashboard_card
+      js_env({
+               PREFERENCES: {
+                 dashboard_view: @current_user.dashboard_view(@domain_root_account),
+                 hide_dashcard_color_overlays: @current_user.preferences[:hide_dashcard_color_overlays],
+                 custom_colors: @current_user.custom_colors
+               }
+             })
       return render html: "", layout: true
     end
 

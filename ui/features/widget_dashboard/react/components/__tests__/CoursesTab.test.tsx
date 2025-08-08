@@ -38,16 +38,6 @@ describe('CoursesTab', () => {
     expect(getByTestId('courses-tab-heading')).toBeInTheDocument()
   })
 
-  it('should display course description text', () => {
-    const {getByText} = setUp(buildDefaultProps())
-    expect(getByText(/Here you can view and navigate to your enrolled courses/)).toBeInTheDocument()
-  })
-
-  it('should show coming soon message', () => {
-    const {getByText} = setUp(buildDefaultProps())
-    expect(getByText(/Course navigation and quick access features coming soon/)).toBeInTheDocument()
-  })
-
   it('should have proper structure with InstUI components', () => {
     const {getByText} = setUp(buildDefaultProps())
     const container = getByText('Courses').closest('div')
