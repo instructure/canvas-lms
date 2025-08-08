@@ -40,6 +40,18 @@ const defaultProps: ImageTextBlockProps = {
   },
 }
 
+const editMode = {
+  isEditMode: true,
+  isEditPreviewMode: false,
+  isViewMode: false,
+}
+
+const previewMode = {
+  isEditMode: false,
+  isEditPreviewMode: true,
+  isViewMode: false,
+}
+
 describe('ImageTextBlock', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -47,12 +59,23 @@ describe('ImageTextBlock', () => {
 
   describe('when block in edit mode', () => {
     beforeEach(() => {
-      useGetRenderModeMock.mockReturnValue({isEditMode: true})
+      useGetRenderModeMock.mockReturnValue(editMode)
     })
 
     it('does render in edit mode', () => {
       const component = renderBlock(ImageTextBlock, defaultProps)
       expect(component.getByTestId('imagetext-block-edit')).toBeInTheDocument()
+    })
+  })
+
+  describe('when block in preview mode', () => {
+    beforeEach(() => {
+      useGetRenderModeMock.mockReturnValue(previewMode)
+    })
+
+    it('does render in preview mode', () => {
+      const component = renderBlock(ImageTextBlock, defaultProps)
+      expect(component.getByTestId('imagetext-block-preview')).toBeInTheDocument()
     })
   })
 })
