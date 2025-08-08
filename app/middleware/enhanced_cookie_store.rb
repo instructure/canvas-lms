@@ -17,35 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# The superclass is at actionpack-5.2.4.1/lib/action_dispatch/middleware/session and this childclass overrides a few key
-# methods to make the session cookie work with SameSite=none key as well as a backup legacy key as documented as an idea
-# at https://web.dev/samesite-cookie-recipes/#handling-incompatible-clients We can probably go back to default after
-# iOS12 is gone from the earth.
-class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieStore
-  def initialize(app, options = {})
-    super
-    @legacy_key = options[:legacy_key]
-  end
-
-  def set_cookie(request, _session_id, cookie)
-    if cookie[:same_site]
-      legacy_cookie = cookie.dup
-      legacy_cookie[:same_site] = nil
-      cookie_jar(request)[@legacy_key] = legacy_cookie
-    end
-    cookie_jar(request)[@key] = cookie
-  end
-
-  def get_cookie(req)
-    super
-    cookie_jar(req)[@key] || cookie_jar(req)[@legacy_key]
-  end
-
-  # TODO: When we remove this samesite transition thing,
-  # we probably still want to keep this useful logging
-  # for diagnosing auth issues quickly.  Maybe rename the
-  # store something else and keep it, dropping the
-  # cookie accessor wrappers.
+class EnhancedCookieStore < ActionDispatch::Session::EncryptedCookieStore
   def unmarshal(data, options = {})
     unmarshalled_data = nil
     begin
