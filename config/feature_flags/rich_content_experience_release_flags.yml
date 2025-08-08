@@ -288,6 +288,18 @@ youtube_migration:
   description: |-
     Turn on YouTube Content Migration feature. Adding the scanning ability and the convert option on YouTube embeddings.
 
+youtube_migration_high_priority:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: YouTube content migration high priority
+  description: |-
+    Set the priority of YouTube content migration conversion jobs to high for faster processing. When disabled, jobs run at low priority.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 youtube_overlay:
   applies_to: SiteAdmin
   state: hidden
