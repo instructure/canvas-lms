@@ -18,9 +18,13 @@
 
 import {View} from '@instructure/ui-view'
 import {useNode} from '@craftjs/core'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ButtonBlockIndividualButtonSettings} from './ButtonBlockIndividualButtonSettings'
 import {ButtonBlockGeneralButtonSettings} from './ButtonBlockGeneralButtonSettings'
 import {ButtonBlockProps, ButtonData, ButtonAlignment, ButtonLayout} from './ButtonBlock'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const ButtonBlockSettings = () => {
   const {
@@ -62,19 +66,35 @@ export const ButtonBlockSettings = () => {
 
   return (
     <View as="div">
-      <ButtonBlockGeneralButtonSettings
-        alignment={alignment}
-        layout={layout}
-        isFullWidth={isFullWidth}
-        onAlignmentChange={handleAlignmentChange}
-        onLayoutChange={handleLayoutChange}
-        onIsFullWidthChange={handleIsFullWidthChange}
-      />
+      <SettingsSectionToggle
+        title={I18n.t('General button settings')}
+        collapsedLabel={I18n.t('Expand general button settings')}
+        expandedLabel={I18n.t('Collapse general button settings')}
+        defaultExpanded={true}
+        includeSeparator={true}
+      >
+        <ButtonBlockGeneralButtonSettings
+          alignment={alignment}
+          layout={layout}
+          isFullWidth={isFullWidth}
+          onAlignmentChange={handleAlignmentChange}
+          onLayoutChange={handleLayoutChange}
+          onIsFullWidthChange={handleIsFullWidthChange}
+        />
+      </SettingsSectionToggle>
 
-      <ButtonBlockIndividualButtonSettings
-        initialButtons={buttons}
-        onButtonsChange={handleButtonsChange}
-      />
+      <SettingsSectionToggle
+        title={I18n.t('Individual button settings')}
+        collapsedLabel={I18n.t('Expand individual button settings')}
+        expandedLabel={I18n.t('Collapse individual button settings')}
+        defaultExpanded={true}
+        includeSeparator={false}
+      >
+        <ButtonBlockIndividualButtonSettings
+          initialButtons={buttons}
+          onButtonsChange={handleButtonsChange}
+        />
+      </SettingsSectionToggle>
     </View>
   )
 }
