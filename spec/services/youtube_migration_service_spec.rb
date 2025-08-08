@@ -82,6 +82,16 @@ RSpec.describe YoutubeMigrationService do
       expect(progress.context).to eq(course)
     end
 
+    it "uses n_strand for job processing" do
+      expect_any_instance_of(Progress).to receive(:process_job) do |_progress, klass, method, opts|
+        expect(klass).to eq(described_class)
+        expect(method).to eq(:scan)
+        expect(opts[:n_strand]).to eq("youtube_embed_scan_#{course.global_id}")
+      end
+
+      described_class.queue_scan_course_for_embeds(course)
+    end
+
     it "returns existing progress if one is already running" do
       existing_progress = Progress.create!(
         tag: "youtube_embed_scan",
@@ -139,7 +149,17 @@ RSpec.describe YoutubeMigrationService do
       Progress.create!(
         tag: "youtube_embed_scan",
         context: course,
-        workflow_state: "completed"
+        workflow_state: "completed",
+        results: {
+          resources: {
+            "WikiPage|#{wiki_page.id}" => {
+              name: "Test Page",
+              embeds: [youtube_embed],
+              count: 1
+            }
+          },
+          total_count: 1
+        }
       )
     end
 
@@ -181,6 +201,226 @@ RSpec.describe YoutubeMigrationService do
         end
 
         service.convert_embed(scan_progress.id, youtube_embed)
+      end
+    end
+
+    it "uses n_strand for job processing" do
+      expect_any_instance_of(Progress).to receive(:process_job) do |_progress, klass, method, opts, *_args|
+        expect(klass).to eq(YoutubeMigrationService)
+        expect(method).to eq(:perform_conversion)
+        expect(opts[:n_strand]).to match(/youtube_embed_convert_/)
+      end
+
+      service.convert_embed(scan_progress.id, youtube_embed)
+    end
+
+    context "validation errors" do
+      it "raises error when scan does not exist" do
+        expect { service.convert_embed(999_999, youtube_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Scan not found/)
+      end
+
+      it "raises error when embed does not exist in scan" do
+        non_existent_embed = youtube_embed.merge(src: "https://www.youtube.com/embed/nonexistent")
+        expect { service.convert_embed(scan_progress.id, non_existent_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Embed not found in scan/)
+      end
+
+      it "raises error for unsupported resource type" do
+        invalid_embed = youtube_embed.merge(resource_type: "UnsupportedResource")
+        expect { service.convert_embed(scan_progress.id, invalid_embed) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Unsupported resource type/)
+      end
+
+      it "raises error for invalid resource group key" do
+        invalid_embed = youtube_embed.merge(resource_group_key: "invalid_key")
+        expect { service.convert_embed(scan_progress.id, invalid_embed) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error when resource does not exist" do
+        non_existent_embed = youtube_embed.merge(id: 999_999)
+        scan_progress.update!(
+          results: {
+            resources: {
+              "WikiPage|999_999" => {
+                name: "Non-existent Page",
+                embeds: [non_existent_embed],
+                count: 1
+              }
+            },
+            total_count: 1
+          }
+        )
+        expect { service.convert_embed(scan_progress.id, non_existent_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Resource not found/)
+      end
+    end
+  end
+
+  describe "validation methods" do
+    let(:scan_progress) do
+      Progress.create!(
+        tag: "youtube_embed_scan",
+        context: course,
+        workflow_state: "completed",
+        results: {
+          resources: {
+            "WikiPage|#{wiki_page.id}" => {
+              name: "Test Page",
+              embeds: [youtube_embed],
+              count: 1
+            }
+          },
+          total_count: 1
+        }
+      )
+    end
+
+    describe "#validate_scan_exists!" do
+      it "returns scan when it exists" do
+        result = service.validate_scan_exists!(scan_progress.id)
+        expect(result).to eq(scan_progress)
+      end
+
+      it "raises error when scan does not exist" do
+        expect { service.validate_scan_exists!(999_999) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Scan not found/)
+      end
+    end
+
+    describe "#validate_embed_exists_in_scan!" do
+      it "passes when embed exists in scan" do
+        expect { service.validate_embed_exists_in_scan!(scan_progress.id, youtube_embed) }
+          .not_to raise_error
+      end
+
+      it "raises error when embed not in scan" do
+        different_embed = youtube_embed.merge(src: "https://www.youtube.com/embed/different")
+        expect { service.validate_embed_exists_in_scan!(scan_progress.id, different_embed) }
+          .to raise_error(YoutubeMigrationService::EmbedNotFoundError, /Embed not found in scan/)
+      end
+
+      it "returns early when scan has no results" do
+        empty_scan = Progress.create!(tag: "youtube_embed_scan", context: course, results: {})
+        expect { service.validate_embed_exists_in_scan!(empty_scan.id, youtube_embed) }
+          .not_to raise_error
+      end
+    end
+
+    describe "#validate_supported_resource!" do
+      it "passes for supported resource types" do
+        YoutubeMigrationService::SUPPORTED_RESOURCES.each do |resource_type|
+          expect { service.validate_supported_resource!(resource_type) }
+            .not_to raise_error
+        end
+      end
+
+      it "raises error for unsupported resource type" do
+        expect { service.validate_supported_resource!("InvalidResource") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Unsupported resource type/)
+      end
+    end
+
+    describe "#validate_resource_group_key!" do
+      it "passes for valid resource group key" do
+        expect { service.validate_resource_group_key!("WikiPage|123") }
+          .not_to raise_error
+      end
+
+      it "raises error for key without pipe separator" do
+        expect { service.validate_resource_group_key!("InvalidKey") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error for key with empty parts" do
+        expect { service.validate_resource_group_key!("|123") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+        expect { service.validate_resource_group_key!("WikiPage|") }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+
+      it "raises error for nil key" do
+        expect { service.validate_resource_group_key!(nil) }
+          .to raise_error(YoutubeMigrationService::UnsupportedResourceTypeError, /Invalid resource group key/)
+      end
+    end
+
+    describe "#validate_resource_exists!" do
+      it "passes when WikiPage exists" do
+        expect { service.validate_resource_exists!("WikiPage", wiki_page.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Assignment exists" do
+        assignment = assignment_model(course:)
+        expect { service.validate_resource_exists!("Assignment", assignment.id) }
+          .not_to raise_error
+      end
+
+      it "passes when DiscussionTopic exists" do
+        topic = discussion_topic_model(context: course)
+        expect { service.validate_resource_exists!("DiscussionTopic", topic.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Announcement exists" do
+        announcement = announcement_model(context: course)
+        expect { service.validate_resource_exists!("Announcement", announcement.id) }
+          .not_to raise_error
+      end
+
+      it "passes when DiscussionEntry exists" do
+        topic = discussion_topic_model(context: course)
+        entry = topic.discussion_entries.create!(message: "Test", user: user_model)
+        expect { service.validate_resource_exists!("DiscussionEntry", entry.id) }
+          .not_to raise_error
+      end
+
+      it "passes when CalendarEvent exists" do
+        event = course.calendar_events.create!(title: "Event", start_at: Time.zone.now)
+        expect { service.validate_resource_exists!("CalendarEvent", event.id) }
+          .not_to raise_error
+      end
+
+      it "passes when Quiz exists" do
+        quiz = course.quizzes.create!(title: "Quiz")
+        expect { service.validate_resource_exists!("Quizzes::Quiz", quiz.id) }
+          .not_to raise_error
+      end
+
+      it "passes when QuizQuestion exists" do
+        quiz = course.quizzes.create!(title: "Quiz")
+        question = quiz.quiz_questions.create!(question_data: { question_text: "Question" })
+        expect { service.validate_resource_exists!("Quizzes::QuizQuestion", question.id) }
+          .not_to raise_error
+      end
+
+      it "passes when AssessmentQuestion exists" do
+        bank = course.assessment_question_banks.create!(title: "Bank")
+        question = bank.assessment_questions.create!(question_data: { question_text: "Question" })
+        expect { service.validate_resource_exists!("AssessmentQuestion", question.id) }
+          .not_to raise_error
+      end
+
+      it "passes for CourseSyllabus when course id matches" do
+        expect { service.validate_resource_exists!("CourseSyllabus", course.id) }
+          .not_to raise_error
+      end
+
+      it "raises error for CourseSyllabus when course id does not match" do
+        expect { service.validate_resource_exists!("CourseSyllabus", 999_999) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Course not found/)
+      end
+
+      it "raises error when resource does not exist" do
+        expect { service.validate_resource_exists!("WikiPage", 999_999) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Resource not found/)
+      end
+
+      it "raises error for unhandled resource type" do
+        expect { service.validate_resource_exists!("UnhandledType", 123) }
+          .to raise_error(YoutubeMigrationService::ResourceNotFoundError, /Cannot validate existence/)
       end
     end
   end

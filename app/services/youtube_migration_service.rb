@@ -28,7 +28,8 @@ class YoutubeMigrationService
     DiscussionEntry.name,
     CalendarEvent.name,
     Assignment.name,
-    "CourseSyllabus"
+    "CourseSyllabus",
+    Course.name
   ].freeze
   QUESTION_RCE_FIELDS = %i[
     question_text
@@ -42,6 +43,8 @@ class YoutubeMigrationService
   STUDIO_LTI_TOOL_DOMAIN = "arc.instructure.com"
 
   class EmbedNotFoundError < StandardError; end
+  class UnsupportedResourceTypeError < StandardError; end
+  class ResourceNotFoundError < StandardError; end
   class StudioToolNotFoundError < StandardError; end
 
   def self.last_youtube_embed_scan_progress_by_course(course)
@@ -57,7 +60,9 @@ class YoutubeMigrationService
     return progress if progress && (progress.pending? || progress.running?)
 
     progress = Progress.create!(tag: SCAN_TAG, context: course)
-    progress.process_job(self, :scan, {}) # TODO: use n_strand to make sure not monopolize the workpool
+    # Use n_strand to make sure not monopolize the workpool
+    n_strand = "youtube_embed_scan_#{course.global_id}"
+    progress.process_job(self, :scan, { n_strand: })
     progress
   end
 
@@ -81,16 +86,87 @@ class YoutubeMigrationService
     self.course = course
   end
 
+  def validate_scan_exists!(scan_id)
+    YoutubeMigrationService.find_scan(course, scan_id)
+  rescue ActiveRecord::RecordNotFound
+    raise EmbedNotFoundError, "Scan not found for id: #{scan_id}"
+  end
+
+  def validate_embed_exists_in_scan!(scan_id, embed)
+    scan = YoutubeMigrationService.find_scan(course, scan_id)
+    resource_group_key = embed[:resource_group_key] || YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
+
+    return if scan.results.blank? || scan.results[:resources].blank?
+
+    resource = scan.results[:resources][resource_group_key]
+    raise EmbedNotFoundError, "Resource not found in scan for key: #{resource_group_key}" if resource.blank?
+
+    embed_exists = resource[:embeds].any? do |scan_embed|
+      scan_embed[:src] == embed[:src] &&
+        scan_embed[:field] == embed[:field] &&
+        scan_embed[:resource_type] == embed[:resource_type]
+    end
+
+    raise EmbedNotFoundError, "Embed not found in scan for resource: #{resource_group_key}" unless embed_exists
+  end
+
+  def validate_supported_resource!(resource_type)
+    unless SUPPORTED_RESOURCES.include?(resource_type)
+      raise UnsupportedResourceTypeError, "Unsupported resource type: #{resource_type}"
+    end
+  end
+
+  def validate_resource_group_key!(resource_group_key)
+    parts = resource_group_key.to_s.split("|")
+    if parts.size != 2 || parts.any?(&:blank?)
+      raise UnsupportedResourceTypeError, "Invalid resource group key: #{resource_group_key}"
+    end
+  end
+
+  def validate_resource_exists!(resource_type, resource_id)
+    case resource_type
+    when "WikiPage"
+      course.wiki_pages.find(resource_id)
+    when "Assignment"
+      course.assignments.find(resource_id)
+    when "DiscussionTopic", "Announcement"
+      course.discussion_topics.find(resource_id)
+    when "DiscussionEntry"
+      DiscussionEntry.find(resource_id)
+    when "CalendarEvent"
+      course.calendar_events.find(resource_id)
+    when "Quizzes::Quiz"
+      course.quizzes.find(resource_id)
+    when "Quizzes::QuizQuestion"
+      Quizzes::QuizQuestion.find(resource_id)
+    when "AssessmentQuestion"
+      AssessmentQuestion.find(resource_id)
+    when "CourseSyllabus", "Course"
+      # For syllabus, the resource_id is the course id
+      raise ResourceNotFoundError, "Course not found" unless course.id == resource_id
+    else
+      raise ResourceNotFoundError, "Cannot validate existence for resource type: #{resource_type}"
+    end
+  rescue ActiveRecord::RecordNotFound
+    raise ResourceNotFoundError, "Resource not found for type: #{resource_type}, id: #{resource_id}"
+  end
+
   def convert_embed(scan_id, embed)
-    # TODO: validate if we can find the progress otherwise throw an error
-    # TODO: validate if type is supported SUPPORTED_RESOURCES
-    # TODO: validate if resource_group_key after split up by "|" is valid
+    validate_scan_exists!(scan_id)
+    validate_supported_resource!(embed[:resource_type])
+
+    resource_group_key = embed[:resource_group_key] || YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
+    validate_resource_group_key!(resource_group_key)
+    validate_embed_exists_in_scan!(scan_id, embed)
+    validate_resource_exists!(embed[:resource_type], embed[:id])
+
     message = YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
     # TODO: Something will listen on this creation
     convert_progress = Progress.create!(tag: CONVERT_TAG, context: course, message:, results: { original_embed: embed })
 
     job_priority = Account.site_admin.feature_enabled?(:youtube_migration_high_priority) ? Delayed::HIGH_PRIORITY : Delayed::LOW_PRIORITY
-    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, { priority: job_priority }, course.id, scan_id, embed)
+    n_strand = "youtube_embed_convert_#{course.global_id}_#{resource_group_key}"
+    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, { n_strand:, priority: job_priority }, course.id, scan_id, embed)
     convert_progress
   end
 
