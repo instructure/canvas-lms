@@ -641,14 +641,7 @@ const HeaderView: React.FC<{
         </Heading>
         <Text>
           {I18n.t(
-            'This tool helps you identify YouTube videos in your course that may display ads. Each row shows a Canvas Page, Module, or Discussion where one or more YouTube video were found. When you visit these pages, you’ll see a ‘Remove Ads’ button to convert videos to an ad-free experience.',
-          )}
-        </Text>
-        <br />
-        <br />
-        <Text>
-          {I18n.t(
-            'The videos remain as links, so no extra storage is used. You can rescan the course anytime with the ‘Scan’ button.',
+            'This tool helps you identify YouTube videos in your course that may display ads. Each row shows a Canvas Page, Module, or Discussion where one or more YouTube videos were found. After migration, videos will be added to the course collection and remain as links, so no extra storage will be used. You can rescan the course anytime with the ‘Scan’ button.',
           )}
         </Text>
       </Flex.Item>
