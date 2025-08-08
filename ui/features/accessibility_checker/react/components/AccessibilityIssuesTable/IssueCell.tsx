@@ -27,14 +27,14 @@ import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {ContentItem} from '../../types'
+import {AccessibilityResourceScan, ResourceWorkflowState, ScanWorkflowState} from '../../types'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('accessibility_checker')
 
 interface IssueCellProps {
-  item: ContentItem
-  onClick?: (item: ContentItem) => void
+  item: AccessibilityResourceScan
+  onClick?: (item: AccessibilityResourceScan) => void
 }
 
 const MAX_COUNT = 100
@@ -59,7 +59,7 @@ const IssuePillAndButton = ({item, onClick}: IssueCellProps) => {
           variant="danger"
           countUntil={MAX_COUNT}
           themeOverride={badgeThemeOverride}
-          count={item.count}
+          count={item.issueCount}
           formatOverflowText={(_count: number, countUntil: number) => `${countUntil - 1}+`}
           formatOutput={formattedCount => {
             const altText =
@@ -123,9 +123,9 @@ const LoadingIssuesText = () => (
 
 export const IssueCell: React.FC<IssueCellProps> = (props: IssueCellProps) => {
   const {item} = props
-  if (item.count > 0) {
+  if (item.issueCount > 0) {
     return <IssuePillAndButton {...props} />
-  } else if (item.count === 0) {
+  } else if (item.issueCount === 0) {
     return <NoIssuesText />
     // TODO: Handle the case when it is not scanned yet
   } else if (item.issues === undefined) {

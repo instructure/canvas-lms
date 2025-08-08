@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ContentItemType, Severity} from './types'
+import {Severity} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('accessibility_checker')
-
-export const TypeToKeyMap: Record<ContentItemType, 'pages' | 'assignments' | 'attachments'> = {
-  [ContentItemType.WikiPage]: 'pages',
-  [ContentItemType.Assignment]: 'assignments',
-  [ContentItemType.Attachment]: 'attachments',
-}
 
 export const severityColors: Record<Severity, string> = {
   High: '#9B181C', // Red82

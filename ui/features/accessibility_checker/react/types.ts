@@ -16,17 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export interface HasId {
+  id: number
+}
+
 export enum ContentItemType {
   WikiPage = 'Page',
   Assignment = 'Assignment',
   Attachment = 'attachment',
 }
 
-export const ContentTypeToKey = {
+/* export const ContentTypeToKey = {
   [ContentItemType.WikiPage]: 'pages',
   [ContentItemType.Assignment]: 'assignments',
   [ContentItemType.Attachment]: 'attachments',
-} as const
+} as const */
 
 export enum FormType {
   TextInput = 'textinput',
@@ -55,10 +59,6 @@ export interface IssueForm {
   inputMaxLength?: number
 }
 
-export interface AccessibilityScanData {
-  accessibilityIssues: AccessibilityResourceScan[]
-}
-
 export enum ScanWorkflowState {
   Queued = 'queued',
   InProgress = 'in_progress',
@@ -71,10 +71,16 @@ export enum ResourceWorkflowState {
   Published = 'published',
 }
 
-export interface AccessibilityResourceScan {
+export enum ResourceType {
+  WikiPage = 'WikiPage',
+  Assignment = 'Assignment',
+  Attachment = 'Attachment',
+}
+
+export interface AccessibilityResourceScan extends HasId {
   id: number
   resourceId: number
-  resourceType: string
+  resourceType: ResourceType
   resourceName: string
   resourceWorkflowState: ResourceWorkflowState
   resourceUpdatedAt: string
@@ -105,9 +111,9 @@ export interface AccessibilityData {
   accessibilityScanDisabled?: boolean
 }
 
-export interface ContentItem {
+export interface ContentItem extends HasId {
   id: number
-  type: ContentItemType
+  type: ResourceType // Was ContentItemType
   title: string
   published: boolean
   updatedAt: string

@@ -33,7 +33,6 @@ import {
   IssuesTableHeaderApiNames,
 } from '../../constants'
 
-// Mock the doFetchApi function
 jest.mock('@canvas/do-fetch-api-effect')
 
 describe('useAccessibilityScanFetchUtils', () => {
@@ -91,6 +90,29 @@ describe('useAccessibilityScanFetchUtils', () => {
     expect(storeResult.current.search).toBe(defaultStateToFetch.search)
   })
 
+  it('should set pageCount based on API response headers', async () => {
+    const {result: storeResult} = renderHook(() => useAccessibilityScansStore())
+    const {result} = renderHook(() => useAccessibilityScansFetchUtils())
+    ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
+      json: [],
+      response: {
+        headers: new Headers({
+          link:
+            '</courses/1/accessibility_resource_scans?page=1&per_page=10>; rel="current",' +
+            '</courses/1/accessibility_resource_scans?page=2&per_page=10>; rel="next",' +
+            '</courses/1/accessibility_resource_scans?page=1&per_page=10>; rel="first",' +
+            '</courses/1/accessibility_resource_scans?page=5&per_page=10>; rel="last"', // PageCount calculated from last link
+        }),
+      },
+    })
+
+    await act(async () => {
+      await result.current.doFetchAccessibilityScanData({})
+    })
+
+    expect(storeResult.current.pageCount).toBe(5)
+  })
+
   it('should make a fetch attempt based on a non-empty newStateToFetch object, and update the store', async () => {
     const {result: storeResult} = renderHook(() => useAccessibilityScansStore())
     const {result} = renderHook(() => useAccessibilityScansFetchUtils())
@@ -115,13 +137,16 @@ describe('useAccessibilityScanFetchUtils', () => {
       }),
     )
 
+    expect(storeResult.current.error).toBeNull()
+    expect(storeResult.current.loading).toBe(false)
+
     expect(storeResult.current.page).toBe(testNewStateToFetch.page)
     expect(storeResult.current.pageSize).toBe(testNewStateToFetch.pageSize)
     expect(storeResult.current.tableSortState).toEqual(testNewStateToFetch.tableSortState)
     expect(storeResult.current.search).toBe(testNewStateToFetch.search)
   })
 
-  it('should not update fetch params in the store if the fetch fails', async () => {
+  it('should only save the error message in the store if the fetch fails', async () => {
     const {result: storeResult} = renderHook(() => useAccessibilityScansStore())
     const {result} = renderHook(() => useAccessibilityScansFetchUtils())
     ;(doFetchApi as jest.Mock).mockRejectedValueOnce(new Error('Fetch failed'))
@@ -145,11 +170,12 @@ describe('useAccessibilityScanFetchUtils', () => {
       }),
     )
 
+    expect(storeResult.current.error).toEqual(API_FETCH_ERROR_MESSAGE_PREFIX + 'Fetch failed')
+    expect(storeResult.current.loading).toBe(false)
+
     expect(storeResult.current.page).toBe(initialState.page)
     expect(storeResult.current.pageSize).toBe(initialState.pageSize)
     expect(storeResult.current.tableSortState).toEqual(initialState.tableSortState)
     expect(storeResult.current.search).toBe(initialState.search)
-    expect(storeResult.current.error).toEqual(API_FETCH_ERROR_MESSAGE_PREFIX + 'Fetch failed')
-    expect(storeResult.current.loading).toBe(false)
   })
 })

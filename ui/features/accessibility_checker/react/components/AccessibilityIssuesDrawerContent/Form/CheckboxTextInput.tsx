@@ -24,22 +24,24 @@ import React, {
   useCallback,
   useContext,
 } from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {FormComponentHandle, FormComponentProps} from '.'
 import {Button} from '@instructure/ui-buttons'
 import {IconAiSolid} from '@instructure/ui-icons'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GenerateResponse} from '../../../types'
+import {Spinner} from '@instructure/ui-spinner'
+import {Alert} from '@instructure/ui-alerts'
+
 import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
 import type {AccessibilityCheckerContextType} from '../../../contexts/AccessibilityCheckerContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Spinner} from '@instructure/ui-spinner'
+import {GenerateResponse} from '../../../types'
+import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
-import {Alert} from '@instructure/ui-alerts'
+import {FormComponentHandle, FormComponentProps} from '.'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -112,8 +114,8 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             rule: issue.ruleId,
             path: issue.path,
             value: value,
-            content_id: selectedItem?.id,
-            content_type: selectedItem?.type,
+            content_id: selectedItem?.resourceId,
+            content_type: getAsContentItemType(selectedItem?.resourceType),
           }),
         })
           .then(result => {

@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {createElement} from 'react'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React from 'react'
-import TextInputForm from '../TextInput'
-import {FormType} from '../../../../types'
+
 import {
   AccessibilityCheckerContext,
   type AccessibilityCheckerContextType,
 } from '../../../../contexts/AccessibilityCheckerContext'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {FormType} from '../../../../types'
+import {getAsAccessibilityResourceScan} from '../../../../utils/apiData'
+import TextInputForm from '../TextInput'
 
 // Mock the Button component to handle ai-primary color
 jest.mock('@instructure/ui-buttons', () => {
@@ -39,7 +41,7 @@ jest.mock('@instructure/ui-buttons', () => {
         ...props,
         color: props.color === 'ai-primary' ? 'primary' : props.color,
       }
-      return React.createElement(originalModule.Button, testProps)
+      return createElement(originalModule.Button, testProps)
     },
   }
 })
@@ -70,7 +72,7 @@ describe('TextInputForm', () => {
 
   // Create a fully typed mock context
   const mockContextValue: AccessibilityCheckerContextType = {
-    selectedItem: {
+    selectedItem: getAsAccessibilityResourceScan({
       id: 123,
       type: 'Page' as any, // Using string literal that matches ContentItemType.WikiPage
       title: 'Mock Page',
@@ -79,7 +81,7 @@ describe('TextInputForm', () => {
       count: 0,
       url: 'http://example.com',
       editUrl: 'http://example.com/edit',
-    },
+    }),
     setSelectedItem: jest.fn(),
     isTrayOpen: false,
     setIsTrayOpen: jest.fn(),

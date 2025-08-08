@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {forwardRef, useImperativeHandle, useRef, useState, useContext} from 'react'
-import {TextInput} from '@instructure/ui-text-input'
+import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import {IconAiSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {IconAiSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
+import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
+import {GenerateResponse} from '../../../types'
+import {getAsContentItemType} from '../../../utils/apiData'
 import {stripQueryString} from '../../../utils/query'
 import {FormComponentProps, FormComponentHandle} from '.'
-import {GenerateResponse} from '../../../types'
-import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -56,8 +58,8 @@ const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormCompo
             rule: issue.ruleId,
             path: issue.path,
             value: value,
-            content_id: selectedItem?.id,
-            content_type: selectedItem?.type,
+            content_id: selectedItem?.resourceId,
+            content_type: getAsContentItemType(selectedItem?.resourceType),
           }),
         })
           .then(result => {
