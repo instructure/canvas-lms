@@ -301,6 +301,7 @@ class ApplicationController < ActionController::Base
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
             can_add_pronouns: @domain_root_account&.can_add_pronouns?,
             show_sections_in_course_tray: @domain_root_account&.show_sections_in_course_tray?,
+            enable_content_a11y_checker: @domain_root_account&.enable_content_a11y_checker?,
             suppress_assignments: @domain_root_account&.suppress_assignments?
           },
           RAILS_ENVIRONMENT: Canvas.environment
@@ -465,7 +466,6 @@ class ApplicationController < ActionController::Base
     hide_legacy_course_analytics
     scheduled_feedback_releases
     youtube_overlay
-    accessibility_tab_enable
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

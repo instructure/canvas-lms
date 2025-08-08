@@ -281,7 +281,7 @@ describe CoursesController do
 
       context "on accessibility column" do
         before do
-          skip("Flaky spec needs fixed in LMA-226") unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+          skip("Flaky spec needs fixed in LMA-226") unless @course1.root_account.enable_content_a11y_checker?
 
           # For accessibility column
           wiki_page = wiki_page_model(course: @course1)

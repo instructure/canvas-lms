@@ -392,13 +392,15 @@ RSpec.describe ApplicationController do
                               uuid: "bleh",
                               salesforce_id: "blah",
                               horizon_domain: nil,
-                              suppress_assignments?: false)
+                              suppress_assignments?: false,
+                              enable_content_a11y_checker?: true)
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
         expect(controller.js_env[:SETTINGS][:open_registration]).to be_truthy
         expect(controller.js_env[:SETTINGS][:can_add_pronouns]).to be_truthy
         expect(controller.js_env[:SETTINGS][:show_sections_in_course_tray]).to be_truthy
+        expect(controller.js_env[:SETTINGS][:enable_content_a11y_checker]).to be_truthy
         expect(controller.js_env[:KILL_JOY]).to be_falsey
       end
 
@@ -415,6 +417,7 @@ RSpec.describe ApplicationController do
                               uuid: "blah",
                               salesforce_id: "bleh",
                               horizon_domain: nil,
+                              enable_content_a11y_checker?: false,
                               suppress_assignments?: false)
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")

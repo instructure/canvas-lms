@@ -184,10 +184,10 @@ class Account < ActiveRecord::Base
   after_update :clear_special_account_cache_if_special
 
   after_update :clear_cached_short_name, if: :saved_change_to_name?
-
   after_update :log_rqd_setting_enable_or_disable
-
   after_create :create_default_objects
+
+  after_commit :enqueue_a11y_scan_if_enabled, on: :update
 
   serialize :settings, type: Hash
   include TimeZoneHelper
@@ -338,7 +338,8 @@ class Account < ActiveRecord::Base
   add_setting :show_scheduler, boolean: true, root_only: true, default: false
   add_setting :enable_profiles, boolean: true, root_only: true, default: false
   add_setting :enable_turnitin, boolean: true, default: false
-  add_setting :suppress_assignments, boolean: true, default: false, root_only: true
+  add_setting :enable_content_a11y_checker, boolean: true, root_only: true, default: false
+  add_setting :suppress_assignments, boolean: true, root_only: true, default: false
   add_setting :mfa_settings, root_only: true
   add_setting :mobile_qr_login_is_enabled, boolean: true, root_only: true, default: true
   add_setting :admins_can_change_passwords, boolean: true, root_only: true, default: false
@@ -2854,5 +2855,16 @@ class Account < ActiveRecord::Base
 
     # If this is the root account, it'll be saved shortly since this is called as a before_save
     root_account.save! unless root_account?
+  end
+
+  def enqueue_a11y_scan_if_enabled
+    return unless root_account?
+    return unless saved_change_to_settings?
+    return unless enable_content_a11y_checker?
+
+    old_settings, = saved_change_to_settings
+    return if old_settings[:enable_content_a11y_checker]
+
+    Accessibility::RootAccountScannerService.call(account: self)
   end
 end

@@ -2286,7 +2286,7 @@ class CoursesController < ApplicationController
         end
 
         @accessibility_scan_enabled =
-          @context.feature_enabled?(:accessibility_tab_enable) ? !@context.exceeds_accessibility_scan_limit? : false
+          @context.root_account.enable_content_a11y_checker? ? !@context.exceeds_accessibility_scan_limit? : false
       end
 
       return if check_for_xlist
