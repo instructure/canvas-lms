@@ -24,6 +24,7 @@ import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
 import {colors} from '@instructure/canvas-theme'
+import {ImageTextBlock} from '../Blocks/ImageTextBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -48,7 +49,9 @@ export const blockFactory = {
       }}
     />
   ),
-  imageText: () => <p>image_text</p>,
+  [ImageTextBlock.name]: () => (
+    <ImageTextBlock url="" altText="" title="" content="" settings={{includeBlockTitle: true}} />
+  ),
   video: () => <p>video</p>,
 } as const satisfies BlockFactory
 
@@ -68,14 +71,14 @@ export const blockData: BlockData[] = [
     items: [
       {itemName: TextBlock.craft.displayName, id: TextBlock.name},
       {itemName: HighlightBlock.craft.displayName, id: HighlightBlock.name},
-      {itemName: I18n.t('Image + text'), id: 'imageText'},
+      {itemName: ImageTextBlock.craft.displayName, id: ImageTextBlock.name},
     ],
   },
   {
     groupName: I18n.t('Image'),
     items: [
       {itemName: ImageBlock.craft.displayName, id: ImageBlock.name},
-      {itemName: I18n.t('Image + text'), id: 'imageText'},
+      {itemName: ImageTextBlock.craft.displayName, id: ImageTextBlock.name},
     ],
   },
   {

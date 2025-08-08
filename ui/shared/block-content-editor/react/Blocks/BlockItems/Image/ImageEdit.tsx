@@ -27,13 +27,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const ImageEdit = ({save, url, altText}: ImageEditProps) => {
+export const ImageEdit = ({onImageChange, url, altText}: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
   const onSelected = (url: string, altText: string) => {
     closeModal()
-    save({
+    onImageChange({
       url,
       altText,
     })

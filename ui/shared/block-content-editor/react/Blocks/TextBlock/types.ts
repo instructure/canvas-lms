@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonBlock} from './Blocks/ButtonBlock'
-import {HighlightBlock} from './Blocks/HighlightBlock'
-import {ImageBlock} from './Blocks/ImageBlock'
-import {ImageTextBlock} from './Blocks/ImageTextBlock'
-import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {TextData} from '../BlockItems/Text/types'
+import {TitleData} from '../BlockItems/Title/types'
 
-export const components = {
-  TextBlock,
-  ImageBlock,
-  SeparatorLineBlock,
-  ButtonBlock,
-  HighlightBlock,
-  ImageTextBlock,
+export type TextSettings = {
+  settings: {
+    includeBlockTitle: boolean
+  }
 }
+export type TextBlockEditHandlers = {
+  onTitleChange: (newTitle: string) => void
+  onContentChange: (newContent: string) => void
+}
+
+export type TextBlockBase = TextData & TitleData & TextSettings
+export type TextBlockEditProps = TextBlockBase & TextBlockEditHandlers
+export type TextBlockPreviewProps = TextBlockBase
+export type TextBlockProps = TextBlockBase
