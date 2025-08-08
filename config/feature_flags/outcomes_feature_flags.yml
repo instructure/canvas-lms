@@ -102,6 +102,10 @@ outcome_service_results_to_canvas:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcome_average_calculation:
   state: allowed_on
   applies_to: RootAccount

@@ -90,8 +90,10 @@ describe Outcomes::ResultAnalytics do
 
     it "returns nil if session user is a student and there are more than 1 users sent in the opts" do
       opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
+      allow_any_instance_of(ContentMigration).to receive(:outcome_has_alignments?).and_return false
+      allow_any_instance_of(Outcomes::ResultAnalytics).to receive(:get_lmgb_results).and_return([])
       results = ra.find_outcomes_service_outcome_results(opts)
-      expect(results).to be_nil
+      expect(results).to be_empty
     end
 
     describe "#handle_outcomes_service_results" do
