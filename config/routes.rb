@@ -1901,7 +1901,13 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/authentication_providers/:id/restore", action: :restore, as: "account_restore_ap"
     end
 
-    get "users/:user_id/page_views", controller: :page_views, action: :index, as: "user_page_views"
+    scope(controller: :page_views) do
+      get "users/:user_id/page_views", action: :index, as: "user_page_views"
+      post "users/:user_id/page_views/query", action: :query, as: "user_page_views_enqueue_query"
+      get "users/:user_id/page_views/query/:query_id", action: :poll_query, as: "page_views_poll_query_status"
+      get "users/:user_id/page_views/query/:query_id/results", action: :query_results, as: "page_views_get_query_results"
+    end
+
     get "users/:user_id/profile", controller: :profile, action: :settings
     get "users/:user_id/avatars", controller: :profile, action: :profile_pics
 
