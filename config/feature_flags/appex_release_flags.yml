@@ -33,7 +33,7 @@ login_registration_ui_identity:
     production:
       state: hidden
 force_login_after_logout:
-  state: allowed
+  state: hidden
   applies_to: RootAccount
   display_name: Force Login After Delegated Logout
   description:
