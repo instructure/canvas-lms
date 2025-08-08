@@ -20,7 +20,7 @@ import {useNode} from '@craftjs/core'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {type TextBlockProps} from './TextBlock'
+import {TextBlockProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 

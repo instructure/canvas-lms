@@ -21,19 +21,21 @@ import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
 import {ImageEdit, ImagePreview} from '../BlockItems/Image'
+import {ImageData} from '../BlockItems/Image/types'
+import {ImageBlockProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
 const ImageContainer = (props: ImageBlockProps) => {
   const {isEditMode} = useGetRenderMode()
   const save = useSave<typeof ImageBlock>()
+  const onImageChange = (data: ImageData) => save(data)
 
-  return isEditMode ? <ImageEdit {...props} save={save} /> : <ImagePreview {...props} />
-}
-
-export type ImageBlockProps = {
-  url: string | undefined
-  altText: string | undefined
+  return isEditMode ? (
+    <ImageEdit {...props} onImageChange={onImageChange} />
+  ) : (
+    <ImagePreview {...props} />
+  )
 }
 
 export const ImageBlock = (props: ImageBlockProps) => {

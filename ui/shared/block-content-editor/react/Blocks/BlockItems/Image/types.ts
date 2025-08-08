@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-type ImageProps = {
+export type ImageData = {
   url: string | undefined
   altText: string | undefined
 }
-
-export type ImageEditProps = ImageProps & {save: (data: {url: string; altText: string}) => void}
-export type ImagePreviewProps = ImageProps
+export type ImageEditProps = ImageData & {onImageChange: (data: ImageData) => void}
+export type ImagePreviewProps = ImageData

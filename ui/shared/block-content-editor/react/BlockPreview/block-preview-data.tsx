@@ -28,6 +28,7 @@ import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
+import {ImageTextBlock} from '../Blocks/ImageTextBlock'
 
 export const previewFactory = {
   [TextBlock.name]: () => <TextBlockPreview />,
@@ -35,6 +36,6 @@ export const previewFactory = {
   [ImageBlock.name]: () => <ImageBlockPreview />,
   video: () => <VideoBlockPreview />,
   [ButtonBlock.name]: () => <ButtonBlockPreview />,
-  imageText: () => <ImageTextBlockPreview />,
+  [ImageTextBlock.name]: () => <ImageTextBlockPreview />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlockPreview />,
 }

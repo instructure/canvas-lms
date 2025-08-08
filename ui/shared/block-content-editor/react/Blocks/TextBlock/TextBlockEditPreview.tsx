@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type TextBlockProps} from './TextBlock'
+import {TextBlockPreviewProps} from './types'
 import {TitlePreview} from '../BlockItems/Title/TitlePreview'
 import {TextPreview} from '../BlockItems/Text/TextPreview'
 import {Flex} from '@instructure/ui-flex'
 
-export const TextBlockEditPreview = (props: TextBlockProps) => {
+export const TextBlockEditPreview = (props: TextBlockPreviewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && <TitlePreview title={props.title} />}

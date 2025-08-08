@@ -23,14 +23,7 @@ import {TextBlockEditPreview} from './TextBlockEditPreview'
 import {TextBlockSettings} from './TextBlockSettings'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
-
-export type TextBlockProps = {
-  title: string
-  content: string
-  settings: {
-    includeBlockTitle: boolean
-  }
-}
+import {TextBlockProps} from './types'
 
 export const TextBlockContent = (props: TextBlockProps) => {
   const {isEditMode, isEditPreviewMode} = useGetRenderMode()
