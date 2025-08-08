@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccessibilityResourceScansController < ApplicationController
+  include AccessibilityFilters
+
   before_action :require_context
   before_action :require_user
   before_action :check_authorized_action
@@ -34,7 +36,7 @@ class AccessibilityResourceScansController < ApplicationController
             .where(course_id: @context.id)
 
     scans = apply_sorting(scans)
-    scans = apply_filters(scans) if params[:filters].present?
+    scans = apply_accessibility_filters(scans, params[:filters]) if params[:filters].present?
 
     base_url = course_accessibility_resource_scans_path(@context)
     paginated = Api.paginate(scans, self, base_url)
@@ -77,51 +79,6 @@ class AccessibilityResourceScansController < ApplicationController
                    end
 
     relation.order(order_clause)
-  end
-
-  # Apply filtering to the supplied ActiveRecord::Relation of AccessibilityResourceScan
-  # based on a JSON-encoded `filters` param. Filters include rule types, resource types,
-  # workflow states, issue workflow states, and a date range.
-  #
-  # Invalid or missing filters are ignored. All conditions are combined with AND logic.
-  #
-  # @param relation [ActiveRecord::Relation<AccessibilityResourceScan>] the base query
-  # @return [ActiveRecord::Relation<AccessibilityResourceScan>]
-  def apply_filters(relation)
-    filters = params[:filters]
-    rule_types      = filters[:ruleTypes]
-    resource_types  = filters[:artifactTypes]
-    workflow_states = filters[:workflowStates]
-    from_date = begin
-      Time.zone.parse(filters[:fromDate])
-    rescue
-      nil
-    end
-    to_date = begin
-      Time.zone.parse(filters[:toDate])
-    rescue
-      nil
-    end
-
-    if rule_types.present?
-      relation = relation.joins(:accessibility_issues)
-                         .where(accessibility_issues: { rule_type: rule_types })
-                         .distinct
-    end
-
-    if resource_types.present?
-      conditions = []
-      conditions << "accessibility_resource_scans.wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
-      conditions << "accessibility_resource_scans.assignment_id IS NOT NULL" if resource_types.include?("assignment")
-      conditions << "accessibility_resource_scans.attachment_id IS NOT NULL" if resource_types.include?("attachment")
-      relation = relation.where(conditions.join(" OR ")) if conditions.any?
-    end
-
-    relation = relation.where(resource_workflow_state: workflow_states) if workflow_states.present?
-    relation = relation.where(resource_updated_at: from_date..) if from_date.present?
-    relation = relation.where(resource_updated_at: ..to_date) if to_date.present?
-
-    relation
   end
 
   # Returns a hash representation of the scan, for JSON rendering.

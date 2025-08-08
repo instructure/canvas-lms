@@ -543,6 +543,7 @@ CanvasRails::Application.routes.draw do
         get "preview" => "accessibility/preview#show"
         post "generate" => "accessibility/generate#create"
         post "scan" => "accessibility/scan#create"
+        get "issue_summary" => "accessibility/issue_summary#show"
       end
     end
 
