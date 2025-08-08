@@ -237,9 +237,9 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   </pre>
 
   <p>If scope=/auth/userinfo was specified in the
-  <a href=file.oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request (ex: when using Canvas as an authentication service)
+  <a href="file.oauth_endpoints.html#get-login-oauth2-auth">GET login/oauth2/auth</a> request (ex: when using Canvas as an authentication service)
   then the response that results from
-  <a href=file.oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:</p>
+  <a href="file.oauth_endpoints.html#post-login-oauth2-token">POST login/oauth2/token</a> would be:</p>
 
   <pre class="example code prettyprint">
   {
