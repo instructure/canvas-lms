@@ -157,6 +157,32 @@ RSpec.describe YoutubeMigrationService do
       expect(stored_embed["id"]).to eq(youtube_embed[:id])
       expect(stored_embed["resource_type"]).to eq(youtube_embed[:resource_type])
     end
+
+    context "with feature flag for high priority" do
+      it "uses high priority when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:youtube_migration_high_priority)
+
+        expect_any_instance_of(Progress).to receive(:process_job) do |_instance, klass, method, opts, *_args|
+          expect(klass).to eq(YoutubeMigrationService)
+          expect(method).to eq(:perform_conversion)
+          expect(opts[:priority]).to eq(Delayed::HIGH_PRIORITY)
+        end
+
+        service.convert_embed(scan_progress.id, youtube_embed)
+      end
+
+      it "uses low priority when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:youtube_migration_high_priority)
+
+        expect_any_instance_of(Progress).to receive(:process_job) do |_instance, klass, method, opts, *_args|
+          expect(klass).to eq(YoutubeMigrationService)
+          expect(method).to eq(:perform_conversion)
+          expect(opts[:priority]).to eq(Delayed::LOW_PRIORITY)
+        end
+
+        service.convert_embed(scan_progress.id, youtube_embed)
+      end
+    end
   end
 
   describe "#perform_conversion" do
