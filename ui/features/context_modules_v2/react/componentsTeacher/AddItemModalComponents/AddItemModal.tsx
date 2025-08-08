@@ -64,6 +64,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [searchText, setSearchText] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [debouncedSearchText, setDebouncedSearchText] = useState<string>('')
+  const [createFormName, setCreateFormName] = useState('')
+  const [createFormNameError, setCreateFormNameError] = useState<string | null>(null)
 
   const {courseId} = useContextModule()
 
@@ -123,8 +125,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     setItemType('assignment')
     setSearchText('')
     setInputValue('')
+    setCreateFormName('')
+    setCreateFormNameError(null)
     reset()
   }
+
+  const isCreateTabSelected =
+    ['assignment', 'quiz', 'file', 'page', 'discussion'].includes(itemType) && state.tabIndex === 1
 
   const itemTypeLabel = useMemo(() => {
     switch (itemType) {
@@ -188,6 +195,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       onDismiss={onRequestClose}
       onSubmit={(e: React.FormEvent) => {
         e.preventDefault()
+        if (isCreateTabSelected) {
+          if (!createFormName.trim()) {
+            setCreateFormNameError(I18n.t('Name is required'))
+            return
+          }
+        }
+        setCreateFormNameError(null)
         handleSubmit()
       }}
       onExited={handleExited}
@@ -218,9 +232,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       >
         {['assignment', 'quiz', 'file', 'page', 'discussion'].includes(itemType) && (
           <Tabs
-            onRequestTabChange={(_event, tabData) =>
+            onRequestTabChange={(_event, tabData) => {
               dispatch({type: 'SET_TAB_INDEX', value: tabData.index})
-            }
+              setCreateFormNameError(null)
+            }}
           >
             <Tabs.Panel
               id="add-item-form"
@@ -236,12 +251,21 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             >
               <CreateLearningObjectForm
                 itemType={itemType}
+                setName={setCreateFormName}
+                name={createFormName}
                 onChange={(field, value) => {
                   const validFields = ['name', 'assignmentGroup', 'file', 'folder']
+                  if (field === 'name') {
+                    setCreateFormName(value)
+                    if (createFormNameError && value.trim()) {
+                      setCreateFormNameError(null)
+                    }
+                  }
                   if (validFields.includes(field)) {
                     dispatch({type: 'SET_NEW_ITEM', field: field as keyof NewItem, value})
                   }
                 }}
+                nameError={createFormNameError}
               />
             </Tabs.Panel>
           </Tabs>
