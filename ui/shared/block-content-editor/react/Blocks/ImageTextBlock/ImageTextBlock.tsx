@@ -26,6 +26,7 @@ import {ImageTextBlockProps} from './types'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageData} from '../BlockItems/Image/types'
 import {useEffect, useState} from 'react'
+import {ImageTextBlockView} from '@canvas/block-content-editor/react/Blocks/ImageTextBlock/ImageTextBlockView'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -56,38 +57,26 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
     setAltText(imageData.altText)
   }
 
+  const dataProps = {
+    settings: props.settings,
+    title,
+    content,
+    url,
+    altText,
+  }
+
   return (
     <Flex direction="column" gap="mediumSmall">
       {isEditMode && (
         <ImageTextBlockEdit
-          settings={props.settings}
-          title={title}
-          content={content}
-          url={url}
-          altText={altText}
+          {...dataProps}
           onTitleChange={onTitleChange}
           onContentChange={onContentChange}
           onImageChange={onImageChange}
         />
       )}
-      {isEditPreviewMode && (
-        <ImageTextBlockPreview
-          settings={props.settings}
-          title={title}
-          content={content}
-          url={url}
-          altText={altText}
-        />
-      )}
-      {isViewMode && (
-        <ImageTextBlockPreview
-          settings={props.settings}
-          title={title}
-          content={content}
-          url={url}
-          altText={altText}
-        />
-      )}
+      {isEditPreviewMode && <ImageTextBlockPreview {...dataProps} />}
+      {isViewMode && <ImageTextBlockView {...dataProps} />}
     </Flex>
   )
 }

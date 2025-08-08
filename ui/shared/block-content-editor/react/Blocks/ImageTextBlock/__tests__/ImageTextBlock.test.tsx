@@ -52,6 +52,12 @@ const previewMode = {
   isViewMode: false,
 }
 
+const viewMode = {
+  isEditMode: false,
+  isEditPreviewMode: false,
+  isViewMode: true,
+}
+
 describe('ImageTextBlock', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -76,6 +82,17 @@ describe('ImageTextBlock', () => {
     it('does render in preview mode', () => {
       const component = renderBlock(ImageTextBlock, defaultProps)
       expect(component.getByTestId('imagetext-block-preview')).toBeInTheDocument()
+    })
+  })
+
+  describe('when block in view mode', () => {
+    beforeEach(() => {
+      useGetRenderModeMock.mockReturnValue(viewMode)
+    })
+
+    it('does render in view mode', () => {
+      const component = renderBlock(ImageTextBlock, defaultProps)
+      expect(component.getByTestId('imagetext-block-view')).toBeInTheDocument()
     })
   })
 })
