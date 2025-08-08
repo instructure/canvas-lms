@@ -400,7 +400,7 @@ module Types
       argument :filter, Types::UserGroupMembershipsFilterInputType, required: false
     end
     def group_memberships(filter: {})
-      Loaders::UserLoaders::GroupMembershipsLoader.for(filter:).load(object.id)
+      Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: current_user, filter:).load(object.id)
     end
 
     field :differentiation_tags_connection, GroupMembershipType.connection_type, null: true do

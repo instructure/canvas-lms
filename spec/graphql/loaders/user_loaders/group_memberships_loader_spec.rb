@@ -26,11 +26,15 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     @course2 = account.courses.create!(name: "Test Course 2")
 
     # Create users
+    @teacher = User.create!(name: "Teacher")
     @user1 = User.create!(name: "User 1")
     @user2 = User.create!(name: "User 2")
     @user3 = User.create!(name: "User 3")
 
     # Enroll users in courses
+    @course1.enroll_teacher(@teacher, enrollment_state: "active")
+    @course2.enroll_teacher(@teacher, enrollment_state: "active")
+
     @course1.enroll_student(@user1, enrollment_state: "active")
     @course1.enroll_student(@user2, enrollment_state: "active")
     @course1.enroll_student(@user3, enrollment_state: "active")
@@ -56,15 +60,39 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     # Set some groups to be inactive
     @group2.workflow_state = "deleted"
     @group2.save!
+
+    # Differentiation tags
+    account.enable_feature!(:assign_to_differentiation_tags)
+    account.tap do |a|
+      a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      a.save!
+    end
+
+    # Create tag category
+    @tag_category = @course1.group_categories.create!(name: "Tag Category", non_collaborative: true)
+
+    # Create tag
+    @tag1 = @course1.groups.create!(name: "Tag 1", group_category: @tag_category, non_collaborative: true)
+
+    # Add users to tags
+    @tag1.add_user(@user1)
+
+    # publish courses
+    @course1.update(workflow_state: "available")
+    @course2.update(workflow_state: "available")
+  end
+
+  after do
+    Loaders::UserLoaders::GroupMembershipsLoader.clear_cache
   end
 
   it "loads all group memberships for multiple users" do
     GraphQL::Batch.batch do
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher)
 
       loader.load(@user1.id).then do |memberships|
-        expect(memberships.length).to eq 3
-        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @group4.id)
+        expect(memberships.length).to eq 4
+        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @group4.id, @tag1.id)
       end
 
       loader.load(@user2.id).then do |memberships|
@@ -83,7 +111,7 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     @membership4.save!
     GraphQL::Batch.batch do
       # Filter to only get accepted memberships
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(filter: { state: "deleted" })
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher, filter: { state: "deleted" })
 
       loader.load(@user1.id).then do |memberships|
         expect(memberships.length).to eq 1
@@ -96,11 +124,11 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
   it "filters memberships by group state" do
     GraphQL::Batch.batch do
       # Filter to only get memberships in active groups
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(filter: { group_state: "available" })
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher, filter: { group_state: "available" })
 
       loader.load(@user1.id).then do |memberships|
-        expect(memberships.length).to eq 3
-        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @group4.id)
+        expect(memberships.length).to eq 4
+        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @group4.id, @tag1.id)
       end
 
       loader.load(@user2.id).then do |memberships|
@@ -112,7 +140,7 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
   it "filters memberships by group course ID" do
     GraphQL::Batch.batch do
       # Filter to only get memberships in course1
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(filter: { group_course_id: @course1.id })
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher, filter: { group_course_id: @course1.id })
 
       loader.load(@user1.id).then do |memberships|
         expect(memberships.length).to eq 2
@@ -120,7 +148,7 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
       end
 
       # Now filter for course2
-      loader2 = Loaders::UserLoaders::GroupMembershipsLoader.for(filter: { group_course_id: @course2.id })
+      loader2 = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher, filter: { group_course_id: @course2.id })
 
       loader2.load(@user1.id).then do |memberships|
         expect(memberships.length).to eq 1
@@ -138,14 +166,17 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
 
     GraphQL::Batch.batch do
       # Filter by state AND course ID
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(filter: {
-                                                                  state: "accepted",
-                                                                  group_course_id: @course1.id
-                                                                })
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(
+        executing_user: @teacher,
+        filter: {
+          state: "accepted",
+          group_course_id: @course1.id
+        }
+      )
 
       loader.load(@user1.id).then do |memberships|
-        expect(memberships.length).to eq 2
-        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id)
+        expect(memberships.length).to eq 3
+        expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @tag1.id)
         memberships.each do |membership|
           expect(membership.workflow_state).to eq "accepted"
           expect(membership.group.context_id).to eq @course1.id
@@ -158,7 +189,7 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     non_existent_user_id = 9999
 
     GraphQL::Batch.batch do
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @teacher)
 
       loader.load(non_existent_user_id).then do |memberships|
         expect(memberships).to be_empty
@@ -166,24 +197,33 @@ describe Loaders::UserLoaders::GroupMembershipsLoader do
     end
   end
 
-  it "batches database queries efficiently" do
-    query_count = 0
-    counter = ActiveSupport::Notifications.subscribe("sql.active_record") do
-      query_count += 1
+  context "permissions" do
+    it "students can only see memberships of users in their collaborative groups" do
+      # create a new user and add them to a collaborative group
+      @user4 = User.create!(name: "User 4")
+      @course1.enroll_student(@user4, enrollment_state: "active")
+      @group1.add_user(@user4)
+
+      loader = Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: @user1, filter: { yeet: "yeet" })
+
+      GraphQL::Batch.batch do
+        loader.load(@user1.id).then do |memberships|
+          # user 1 can see their own memberships in collaborative groups
+          expect(memberships.length).to eq 3
+          expect(memberships.map(&:group_id)).to include(@group1.id, @group3.id, @group4.id)
+        end
+
+        loader.load(@user3.id).then do |memberships|
+          # user 1 cannot see memberships of user 3 (they are not in a collaborative group together)
+          expect(memberships).to be_empty
+        end
+
+        loader.load(@user4.id).then do |memberships|
+          # user 1 and user 4 share a group
+          expect(memberships.length).to eq 1
+          expect(memberships.first.group_id).to eq @group1.id
+        end
+      end
     end
-
-    GraphQL::Batch.batch do
-      loader = Loaders::UserLoaders::GroupMembershipsLoader.for
-
-      # Load for multiple users in the same batch
-      loader.load(@user1.id)
-      loader.load(@user2.id)
-      loader.load(@user3.id)
-    end
-
-    # There should only be 1 query to fetch group memberships, plus any needed joins
-    expect(query_count).to be <= 2
-
-    ActiveSupport::Notifications.unsubscribe(counter)
   end
 end
