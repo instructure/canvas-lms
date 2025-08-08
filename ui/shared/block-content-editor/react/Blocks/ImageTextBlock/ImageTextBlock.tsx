@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ImageBlockSettings} from './ImageTextBlockSettings'
 import {Flex} from '@instructure/ui-flex'
 import {ImageTextBlockEdit} from './ImageTextBlockEdit'
+import {ImageTextBlockPreview} from './ImageTextBlockPreview'
 import {ImageTextBlockProps} from './types'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageData} from '../BlockItems/Image/types'
@@ -29,7 +30,7 @@ import {useEffect, useState} from 'react'
 const I18n = createI18nScope('block_content_editor')
 
 const ImageTextContent = (props: ImageTextBlockProps) => {
-  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
+  const {isEditMode, isEditPreviewMode, isViewMode} = useGetRenderMode()
   const save = useSave<typeof ImageTextBlock>()
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
@@ -57,7 +58,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
 
   return (
     <Flex direction="column" gap="mediumSmall">
-      {isEditMode ? (
+      {isEditMode && (
         <ImageTextBlockEdit
           settings={props.settings}
           title={title}
@@ -68,8 +69,24 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
           onContentChange={onContentChange}
           onImageChange={onImageChange}
         />
-      ) : (
-        <>View mode</>
+      )}
+      {isEditPreviewMode && (
+        <ImageTextBlockPreview
+          settings={props.settings}
+          title={title}
+          content={content}
+          url={url}
+          altText={altText}
+        />
+      )}
+      {isViewMode && (
+        <ImageTextBlockPreview
+          settings={props.settings}
+          title={title}
+          content={content}
+          url={url}
+          altText={altText}
+        />
       )}
     </Flex>
   )
