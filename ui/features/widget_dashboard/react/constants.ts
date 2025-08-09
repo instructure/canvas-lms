@@ -20,3 +20,20 @@ export const TAB_IDS = {
   DASHBOARD: 'dashboard',
   COURSES: 'courses',
 } as const
+
+export const WIDGET_TYPES = {
+  COURSE_WORK_SUMMARY: 'course_work_summary',
+} as const
+
+export const DEFAULT_WIDGET_CONFIG = {
+  columns: 3,
+  widgets: [
+    {
+      id: 'course-work-widget',
+      type: WIDGET_TYPES.COURSE_WORK_SUMMARY,
+      position: {col: 1, row: 1},
+      size: {width: 2, height: 1},
+      title: "Today's course work",
+    },
+  ],
+}

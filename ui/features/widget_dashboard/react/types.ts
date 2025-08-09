@@ -24,3 +24,44 @@ export interface DashboardTab {
   id: TabId
   label: string
 }
+
+export interface WidgetPosition {
+  col: number
+  row: number
+}
+
+export interface WidgetSize {
+  width: number
+  height: number
+}
+
+export interface Widget {
+  id: string
+  type: string
+  position: WidgetPosition
+  size: WidgetSize
+  title: string
+}
+
+export interface WidgetConfig {
+  columns: number
+  widgets: Widget[]
+}
+
+export interface CourseWorkSummary {
+  due: number
+  missing: number
+  submitted: number
+}
+
+export interface CourseOption {
+  id: string
+  name: string
+}
+
+export interface DateRangeOption {
+  id: string
+  label: string
+  startDate: Date
+  endDate: Date
+}

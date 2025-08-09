@@ -28,7 +28,7 @@ const WidgetDashboardContainer: React.FC = () => {
   return (
     <View as="div" padding="large">
       <Heading level="h1" margin="0 0 medium">
-        {I18n.t('Widget Dashboard')}
+        {I18n.t('Dashboard')}
       </Heading>
       <DashboardTabs />
     </View>
