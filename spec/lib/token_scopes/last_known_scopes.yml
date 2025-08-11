@@ -1483,6 +1483,8 @@
   path: '/api/v1/courses/:course_id/web_zip_exports/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/what_if_grades/reset'
+- verb: GET
+  path: '/api/v1/courses/:course_id/youtube_migration/conversion_status'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/convert'
 - verb: GET

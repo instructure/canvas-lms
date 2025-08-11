@@ -1228,6 +1228,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/youtube_migration/scan", action: :youtube_migration_scan, as: "course_youtube_migration_scan"
       post "courses/:course_id/youtube_migration/scan", action: :start_youtube_migration_scan
       post "courses/:course_id/youtube_migration/convert", action: :start_youtube_migration_convert
+      get "courses/:course_id/youtube_migration/conversion_status", action: :youtube_migration_conversion_status
 
       post "courses/:course_id/reset_content", action: :reset_content
       get  "users/:user_id/courses", action: :user_index, as: "user_courses"
