@@ -32,10 +32,7 @@ export const AddButton = (props: {
       shape="circle"
       color="primary"
       screenReaderLabel={I18n.t('Add a block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      onClick={props.onClicked}
     >
       <IconAddSolid />
     </IconButton>
