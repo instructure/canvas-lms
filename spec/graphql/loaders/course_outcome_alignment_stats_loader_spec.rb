@@ -19,8 +19,11 @@
 #
 
 require_relative "../../outcome_alignments_spec_helper"
+require "feature_flag_helper"
 
 describe Loaders::CourseOutcomeAlignmentStatsLoader do
+  include FeatureFlagHelper
+
   context "with only direct alignments" do
     before :once do
       outcome_alignment_stats_model
@@ -36,8 +39,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     end
 
     it "returns nil if outcome alignment summary FF is disabled" do
-      @course.account.disable_feature!(:improved_outcomes_management)
-
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
       GraphQL::Batch.batch do
         Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |alignment_stats|
           expect(alignment_stats).to be_nil

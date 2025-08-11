@@ -19,8 +19,11 @@
 #
 
 require_relative "../../outcome_alignments_spec_helper"
+require "feature_flag_helper"
 
 describe Outcomes::LearningOutcomeGroupChildren do
+  include FeatureFlagHelper
+
   subject { described_class.new(context) }
 
   # rubocop:disable RSpec/LetSetup
@@ -123,7 +126,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
     end
 
     it "doesnt caches the total outcomes if FF is off" do
-      context.root_account.disable_feature! :improved_outcomes_management
+      mock_feature_flag_on_account(:improved_outcomes_management, false)
+
       enable_cache do
         expect(ContentTag).to receive(:active).and_call_original.exactly(3).times
         expect(subject.total_outcomes(g0.id)).to eq 12
@@ -206,7 +210,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         end
 
         it "returns the total outcomes without filtering if the FF is disabled" do
-          course.account.disable_feature!(:improved_outcomes_management)
+          mock_feature_flag_on_account(:improved_outcomes_management, false)
           expect(subject.total_outcomes(cg0.id, { filter: "WITH_ALIGNMENTS" })).to eq 3
           expect(subject.total_outcomes(cg0.id, { filter: "NO_ALIGNMENTS" })).to eq 3
         end
@@ -608,7 +612,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       end
 
       it "doesn't filter when the FF is disabled" do
-        course.account.disable_feature!(:improved_outcomes_management)
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
+
         outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
                           .map { |o| o.learning_outcome_content.id }
         expect(outcomes).to eql([o3.id, o4.id, o8.id])

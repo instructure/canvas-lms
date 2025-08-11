@@ -46,6 +46,10 @@ improved_outcomes_management:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 assignment_comment_library:
   type: setting
   state: hidden
