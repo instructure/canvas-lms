@@ -16,27 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {ImageTextBlockProps} from './types'
-import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {ImageTextBlockSettings} from '../ImageTextBlockSettings'
+import {renderBlock} from '../../__tests__/render-helper'
+import {fireEvent} from '@testing-library/react'
 
-export const ImageTextBlockSettings = () => {
-  const {
-    actions: {setProp},
-    includeBlockTitle,
-  } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-  }))
+const getSettings = (settings: object) => ({
+  settings: {...settings},
+})
 
-  const handleIncludeBlockTitleChange = () => {
-    setProp((props: ImageTextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
+describe('ImageTextBlockSettings', () => {
+  describe('include title', () => {
+    it('integrates, changing the state', () => {
+      const component = renderBlock(ImageTextBlockSettings, getSettings({includeBlockTitle: false}))
+      const checkbox = component.getByLabelText(/Include block title/i)
+      expect(checkbox).not.toBeChecked()
+      fireEvent.click(checkbox)
+      expect(checkbox).toBeChecked()
     })
-  }
-
-  return (
-    <>
-      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
-    </>
-  )
-}
+  })
+})

@@ -16,27 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {ImageTextBlockProps} from './types'
-import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
-
-export const ImageTextBlockSettings = () => {
-  const {
-    actions: {setProp},
-    includeBlockTitle,
-  } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-  }))
-
-  const handleIncludeBlockTitleChange = () => {
-    setProp((props: ImageTextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
-    })
-  }
-
-  return (
-    <>
-      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
-    </>
-  )
+export type SettingsIncludeTitleProps = {
+  checked: boolean
+  onChange: () => void
 }
