@@ -40,6 +40,11 @@ module SectionTabHelper
     *RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
   ].freeze
 
+  # if a tab depends on a Course FF, it should be included here so that the cache is busted
+  FLAGS_FOR_CACHE_KEY = [
+    :smart_search
+  ].freeze
+
   def available_section_tabs
     @available_section_tabs ||=
       AvailableSectionTabs.new(@context, @current_user, @domain_root_account, session).to_a
@@ -137,8 +142,13 @@ module SectionTabHelper
         "section_tabs_hash",
         I18n.locale
       ]
-      if context.is_a?(Course) && context.elementary_homeroom_course?
-        k << "homeroom_course"
+      # need to include FF for courses in order to bust the cache
+      if context.is_a?(Course)
+        flag_states = FLAGS_FOR_CACHE_KEY.map { |flag| context.feature_enabled?(flag) }
+        k.concat(flag_states)
+        if context.elementary_homeroom_course?
+          k << "homeroom_course"
+        end
       end
 
       k.cache_key
