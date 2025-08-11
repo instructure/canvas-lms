@@ -20,7 +20,6 @@ import React, {useState, useEffect, useCallback, memo, useMemo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
 import ModulePageActionHeader from './ModulePageActionHeader'
 import Module from './Module'
 import {DragDropContext, Droppable, Draggable, DropResult} from 'react-beautiful-dnd'
@@ -394,7 +393,7 @@ const ModulesList: React.FC = () => {
                     disabled={isDisabled}
                   />
                 ) : null}
-                <Flex direction="column" gap="small">
+                <View className="context_module_list">
                   {data?.pages[0]?.modules.length === 0 ? (
                     <CreateNewModule courseId={courseId} data={data} />
                   ) : (
@@ -422,6 +421,7 @@ const ModulesList: React.FC = () => {
                               <MemoizedModule
                                 id={module._id}
                                 name={module.name}
+                                position={module.position}
                                 published={module.published}
                                 prerequisites={module.prerequisites}
                                 completionRequirements={module.completionRequirements}
@@ -441,7 +441,7 @@ const ModulesList: React.FC = () => {
                         </Draggable>
                       ))
                   )}
-                </Flex>
+                </View>
                 {provided.placeholder}
               </div>
             )}

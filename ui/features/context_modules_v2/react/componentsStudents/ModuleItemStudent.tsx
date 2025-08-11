@@ -87,12 +87,14 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   return (
     <View
       as="div"
+      className="context_module_item"
       padding="paddingCardMedium"
       background="primary"
       borderWidth="0"
       borderRadius="large"
       overflowX="hidden"
       data-item-id={_id}
+      data-position={position}
       margin="paddingCardMedium"
       minHeight="5.125rem"
       display="flex"

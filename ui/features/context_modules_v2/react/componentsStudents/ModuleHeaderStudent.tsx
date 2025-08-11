@@ -213,6 +213,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
         <Flex.Item>
           <IconButton
             data-testid="module-header-expand-toggle"
+            id={`module-header-expand-toggle-${id}`}
             size="small"
             withBorder={false}
             screenReaderLabel={screenReaderLabel}

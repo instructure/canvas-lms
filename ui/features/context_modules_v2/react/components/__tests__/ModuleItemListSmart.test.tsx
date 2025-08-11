@@ -234,19 +234,41 @@ describe('ModuleItemListSmart', () => {
     expect(screen.queryByTestId('pagination-info-text')).not.toBeInTheDocument()
   })
 
-  it('renders error fallback if renderList throws', async () => {
-    const BadList: React.FC<{moduleItems: ModuleItem[]}> = () => {
-      throw new Error('render failure')
-    }
-    const renderListThatThrows = ({moduleItems}: {moduleItems: ModuleItem[]}) => {
-      return <BadList moduleItems={moduleItems} />
-    }
-    renderWithClient(
-      <ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />,
-      PAGE_SIZE,
-    )
-    const alertText = await screen.findByText('An unexpected error occurred.')
-    expect(alertText).toBeInTheDocument()
+  describe('Error handling', () => {
+    // this supresses the error message React emits to the console when BadList throws the exception
+    let errorListener: (event: ErrorEvent) => void
+    let originalError: any
+    beforeEach(() => {
+      originalError = window.onerror
+      window.onerror = () => {
+        return true
+      }
+
+      errorListener = event => {
+        event.preventDefault()
+      }
+      window.addEventListener('error', errorListener)
+    })
+
+    afterEach(() => {
+      window.onerror = originalError
+      window.removeEventListener('error', errorListener)
+    })
+
+    it('renders error fallback if renderList throws', async () => {
+      const BadList: React.FC<{moduleItems: ModuleItem[]}> = () => {
+        throw new Error('render failure')
+      }
+      const renderListThatThrows = ({moduleItems}: {moduleItems: ModuleItem[]}) => {
+        return <BadList moduleItems={moduleItems} />
+      }
+      renderWithClient(
+        <ModuleItemListSmart {...defaultProps()} renderList={renderListThatThrows} />,
+        PAGE_SIZE,
+      )
+      const alertText = await screen.findByText('An unexpected error occurred.')
+      expect(alertText).toBeInTheDocument()
+    })
   })
 
   it('shows loading spinner when data is loading', async () => {
