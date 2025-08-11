@@ -16,27 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNode} from '@craftjs/core'
-import {ImageTextBlockProps} from './types'
-import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {View} from '@instructure/ui-view'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {SettingsIncludeTitleProps} from './types'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const ImageTextBlockSettings = () => {
-  const {
-    actions: {setProp},
-    includeBlockTitle,
-  } = useNode(node => ({
-    includeBlockTitle: node.data.props.settings.includeBlockTitle,
-  }))
+const I18n = createI18nScope('block_content_editor')
 
-  const handleIncludeBlockTitleChange = () => {
-    setProp((props: ImageTextBlockProps) => {
-      props.settings.includeBlockTitle = !includeBlockTitle
-    })
-  }
-
+export const SettingsIncludeTitle = ({checked, onChange}: SettingsIncludeTitleProps) => {
   return (
-    <>
-      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
-    </>
+    <View as="div" padding="small">
+      <Checkbox
+        variant="toggle"
+        label={I18n.t('Include block title')}
+        checked={checked}
+        onChange={onChange}
+      />
+    </View>
   )
 }

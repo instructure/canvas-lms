@@ -18,7 +18,7 @@
 
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ImageBlockSettings} from './ImageTextBlockSettings'
+import {ImageTextBlockSettings} from './ImageTextBlockSettings'
 import {Flex} from '@instructure/ui-flex'
 import {ImageTextBlockEdit} from './ImageTextBlockEdit'
 import {ImageTextBlockEditPreview} from './ImageTextBlockEditPreview'
@@ -26,7 +26,7 @@ import {ImageTextBlockProps} from './types'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageData} from '../BlockItems/Image/types'
 import {useEffect, useState} from 'react'
-import {ImageTextBlockView} from '@canvas/block-content-editor/react/Blocks/ImageTextBlock/ImageTextBlockView'
+import {ImageTextBlockView} from './ImageTextBlockView'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -92,6 +92,6 @@ export const ImageTextBlock = (props: ImageTextBlockProps) => {
 ImageTextBlock.craft = {
   displayName: I18n.t('Image + text block') as string,
   related: {
-    settings: ImageBlockSettings,
+    settings: ImageTextBlockSettings,
   },
 }

@@ -17,12 +17,8 @@
  */
 
 import {useNode} from '@craftjs/core'
-import {View} from '@instructure/ui-view'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockProps} from './types'
-
-const I18n = createI18nScope('block_content_editor')
+import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 
 export const TextBlockSettings = () => {
   const {
@@ -32,20 +28,15 @@ export const TextBlockSettings = () => {
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
   }))
 
-  const handleIncludeBlockTitleChange = (includeBlockTitle: boolean) => {
+  const handleIncludeBlockTitleChange = () => {
     setProp((props: TextBlockProps) => {
-      props.settings.includeBlockTitle = includeBlockTitle
+      props.settings.includeBlockTitle = !includeBlockTitle
     })
   }
 
   return (
-    <View as="div" padding="small">
-      <Checkbox
-        variant="toggle"
-        label={I18n.t('Include block title')}
-        checked={includeBlockTitle}
-        onChange={() => handleIncludeBlockTitleChange(!includeBlockTitle)}
-      />
-    </View>
+    <>
+      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+    </>
   )
 }
