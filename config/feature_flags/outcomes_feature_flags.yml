@@ -163,3 +163,9 @@ improved_outcome_report_generation:
       state: on
     ci:
       state: on
+outcomes_rollup_propagation:
+  state: hidden
+  display_name: Outcomes Rollup Propagation
+  description: Controls whether background jobs populate the rollup table. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true
