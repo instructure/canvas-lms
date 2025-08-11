@@ -5365,6 +5365,139 @@ describe CoursesController do
 
       include_examples "youtube migration protection"
     end
+
+    describe "get conversion status" do
+      subject { get :youtube_migration_conversion_status, params: { course_id: @course.id, resource_type:, resource_id: } }
+
+      let(:resource_type) { "WikiPage" }
+      let(:resource_id) { 123 }
+
+      before do
+        @course.account.enable_feature!(:youtube_migration)
+      end
+
+      context "when not authorized" do
+        before do
+          user_session(user_factory)
+        end
+
+        it "returns unauthorized" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when authorized" do
+        before do
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        context "with no active conversions" do
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with active conversions" do
+          let(:embed_data) do
+            {
+              "field" => "body",
+              "id" => 123,
+              "path" => "/videos/123",
+              "resource_type" => "WikiPage",
+              "src" => "https://youtube.com/video123"
+            }
+          end
+          let!(:progress) do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "running",
+              results: { "original_embed" => embed_data }
+            )
+          end
+
+          it "returns active conversions for the resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"].length).to eq(1)
+            expect(json["conversions"][0]["id"]).to eq(progress.id)
+            expect(json["conversions"][0]["workflow_state"]).to eq("running")
+            expect(json["conversions"][0]["original_embed"]).to eq(embed_data)
+          end
+        end
+
+        context "with completed conversions" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "completed",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "does not return completed conversions" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with conversions for different resources" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "Assignment|456",
+              workflow_state: "running",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "only returns conversions for the requested resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "without resource parameters" do
+          subject { get :youtube_migration_conversion_status, params: { course_id: @course.id } }
+
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "returns not found" do
+          subject
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
   end
 
   context "attachments to syllabus body with location tagging" do

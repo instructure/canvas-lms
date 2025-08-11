@@ -779,6 +779,7 @@ export type YoutubeEmbed = Readonly<{
 }>
 
 export type YoutubeScanResource = Readonly<{
+  id: number
   name: string
   type: string
   content_url: string
