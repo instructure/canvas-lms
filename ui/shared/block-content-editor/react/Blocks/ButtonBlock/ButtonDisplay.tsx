@@ -49,7 +49,7 @@ export const ButtonDisplay = ({settings, dataTestId}: ButtonDisplayProps) => {
     >
       {buttons.map(button => (
         <Flex.Item key={button.id} shouldGrow={isFullWidth} overflowX="visible" overflowY="visible">
-          <SingleButton isFullWidth={isFullWidth} />
+          <SingleButton isFullWidth={isFullWidth} button={button} />
         </Flex.Item>
       ))}
     </Flex>
