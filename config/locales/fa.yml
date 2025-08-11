@@ -21797,6 +21797,7 @@ fa:
       nonfavorited_tooltip: "برای افزودن به منوی درس ها، کلیک کنید."
       published_course: بله
       published_course_tooltip: "این درس منتشر شده است"
+      unknown: نامعلوم
       unpublished_course: خیر
       unpublished_course_tooltip: "این درس منتشر نشده است. دانشجویان برای دسترسی باید با استاد درس تماس بگیرند."
     custom_search_results: 
