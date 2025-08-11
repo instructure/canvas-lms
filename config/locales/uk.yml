@@ -16147,6 +16147,7 @@ uk:
       nonfavorited_tooltip: "Натисніть для додавання до меню курсів."
       published_course: Так
       published_course_tooltip: "Цей курс опублікован."
+      unknown: Невідомий
       unpublished_course: Ні
       unpublished_course_tooltip: "Цей курс ще не опублікован. Студенти повинні зв'язатися з інструктором курсу для доступу."
     dashboard_invitation: 
