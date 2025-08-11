@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageBlockSettings} from './ImageBlockSettings'
-import {ImageEdit, ImagePreview} from '../BlockItems/Image'
+import {ImageEdit, ImageView} from '../BlockItems/Image'
 import {ImageData} from '../BlockItems/Image/types'
 import {ImageBlockProps} from './types'
 
@@ -34,7 +34,7 @@ const ImageContainer = (props: ImageBlockProps) => {
   return isEditMode ? (
     <ImageEdit {...props} onImageChange={onImageChange} />
   ) : (
-    <ImagePreview {...props} />
+    <ImageView {...props} />
   )
 }
 

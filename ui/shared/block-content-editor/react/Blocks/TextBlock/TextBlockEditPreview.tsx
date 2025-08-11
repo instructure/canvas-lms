@@ -17,15 +17,15 @@
  */
 
 import {TextBlockPreviewProps} from './types'
-import {TitlePreview} from '../BlockItems/Title/TitlePreview'
-import {TextPreview} from '../BlockItems/Text/TextPreview'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 import {Flex} from '@instructure/ui-flex'
 
 export const TextBlockEditPreview = (props: TextBlockPreviewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && <TitlePreview title={props.title} />}
-      <TextPreview content={props.content} />
+      {props.settings.includeBlockTitle && <TitleEditPreview title={props.title} />}
+      <TextEditPreview content={props.content} />
     </Flex>
   )
 }

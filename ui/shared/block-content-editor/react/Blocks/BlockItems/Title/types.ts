@@ -21,7 +21,7 @@ export type TitleData = {
 }
 
 export type TitleViewProps = TitleData
-export type TitlePreviewProps = TitleData
+export type TitleEditPreviewProps = TitleData
 export type TitleEditProps = TitleData & {
   onTitleChange: (newTitle: string) => void
 }

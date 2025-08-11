@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ImageTextBlockPreviewProps} from './types'
-import {TitlePreview} from '../BlockItems/Title/TitlePreview'
+import {ImageTextBlockEditPreviewProps} from './types'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
-import {ImagePreview} from '../BlockItems/Image'
-import {TextPreview} from '../BlockItems/Text/TextPreview'
+import {ImageView} from '../BlockItems/Image'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
 
-export const ImageTextBlockPreview = ({
+export const ImageTextBlockEditPreview = ({
   title,
   altText,
   content,
   url,
   settings,
-}: ImageTextBlockPreviewProps) => {
+}: ImageTextBlockEditPreviewProps) => {
   return (
     <>
-      {settings.includeBlockTitle && <TitlePreview title={title} />}
-      <Flex direction="row" data-testid="imagetext-block-preview">
+      {settings.includeBlockTitle && <TitleEditPreview title={title} />}
+      <Flex direction="row" data-testid="imagetext-block-editpreview">
         <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
-          <ImagePreview url={url} altText={altText} />
+          <ImageView url={url} altText={altText} />
         </Flex.Item>
         <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextPreview content={content} />
+          <TextEditPreview content={content} />
         </Flex.Item>
       </Flex>
     </>

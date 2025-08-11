@@ -81,7 +81,7 @@ describe('ImageTextBlock', () => {
 
     it('does render in preview mode', () => {
       const component = renderBlock(ImageTextBlock, defaultProps)
-      expect(component.getByTestId('imagetext-block-preview')).toBeInTheDocument()
+      expect(component.getByTestId('imagetext-block-editpreview')).toBeInTheDocument()
     })
   })
 
