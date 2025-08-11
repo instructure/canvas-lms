@@ -22567,6 +22567,7 @@ hu:
       nonfavorited_tooltip: "Kattintson a kurzus menüjébe való hozzáadáshoz."
       published_course: Igen
       published_course_tooltip: "A kurzus publikálva lett."
+      unknown: Ismeretlen
       unpublished_course: Nem
       unpublished_course_tooltip: "A kurzus még nincs publikálva. A hallgatóknak a hozzáféréshez fel kell venniük a kapcsolatot a kurzus oktatójával. "
     dashboard_invitation: 

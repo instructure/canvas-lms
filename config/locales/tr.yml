@@ -17883,6 +17883,7 @@ tr:
       nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
       published_course: Evet
       published_course_tooltip: "Bu ders yayınlandı."
+      unknown: Bilinmiyor
       unpublished_course: Hayır
       unpublished_course_tooltip: "Bu ders yayınlanmadı. Erişim için öğrencilerin dersin eğitmeni ile iletişime geçmeleri gerekmektedir."
     custom_search_results: 

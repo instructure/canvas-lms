@@ -15413,6 +15413,7 @@ hy:
     current_enrollment: 
       favorited_tooltip: "Սեղմեք դասընթացների մենյուից հանելու համար"
       nonfavorited_tooltip: "Սեղմեք դասընթացների մենյուում ավելացնելու համար"
+      unknown: "Անհայտ է"
       unpublished_course_tooltip: "Այս դասընթացը հրապարակված չէ: Ունկնդիրները պետք է դիմեն դասավանդողին հասանելիություն ստանալու համար:"
     custom_search_results: 
       links: 
