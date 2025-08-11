@@ -24108,6 +24108,7 @@ nn:
       nonfavorited_tooltip: "Klikk for å legge til emnemenyen."
       published_course: Ja
       published_course_tooltip: "Emnet er publisert."
+      unknown: Ukjent
       unpublished_course: Nei
       unpublished_course_tooltip: "Dette emnet er ikkje publisert. Studentane bør kontakte faglærar for tilgang."
     dashboard_invitation: 
