@@ -17902,6 +17902,7 @@ he:
       nonfavorited_tooltip: "הקלקה כדי להוסיף לתפריט הקורסים"
       published_course: כן
       published_course_tooltip: "קורס זה פורסם"
+      unknown: "לא מוכר"
       unpublished_course: לא
       unpublished_course_tooltip: "הקורס הזה לא פורסם. תלמידים צריכים ליצור קשר עם מנחה הקורס כדי להכנס."
     dashboard_invitation: 
