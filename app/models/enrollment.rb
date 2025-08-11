@@ -463,6 +463,8 @@ class Enrollment < ActiveRecord::Base
       # Only remove differentiation tag memberships if the enrollment is being deleted/rejected
       next unless is_deleted
 
+      next if other_section_enrollment_exists?
+
       membership = tag.group_memberships.where(user_id:).first
       membership&.destroy
     end
