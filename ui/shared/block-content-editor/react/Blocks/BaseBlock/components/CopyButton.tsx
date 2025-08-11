@@ -29,8 +29,6 @@ export const CopyButton = (props: {
     <IconButton
       data-testid="copy-block-button"
       data-copybutton
-      withBackground={false}
-      withBorder={false}
       screenReaderLabel={I18n.t('Duplicate block')}
       onClick={props.onClicked}
     >

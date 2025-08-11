@@ -16,23 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {PropsWithChildren} from 'react'
+import {View} from '@instructure/ui-view'
 
-const I18n = createI18nScope('block_content_editor')
+export type BackgroundColorApplierProps = PropsWithChildren<{
+  backgroundColor: string
+}>
 
-export const RemoveButton = (props: {
-  onClicked: () => void
-}) => {
+export const BackgroundColorApplier = ({
+  backgroundColor,
+  children,
+}: BackgroundColorApplierProps) => {
   return (
-    <IconButton
-      data-testid="remove-block-button"
-      data-removebutton
-      screenReaderLabel={I18n.t('Remove block')}
-      onClick={props.onClicked}
-    >
-      <IconTrashLine />
-    </IconButton>
+    <View as="div" background="primary" themeOverride={{backgroundPrimary: backgroundColor}}>
+      {children}
+    </View>
   )
 }
