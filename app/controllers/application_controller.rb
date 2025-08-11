@@ -463,6 +463,7 @@ class ApplicationController < ActionController::Base
     files_a11y_rewrite
     rce_a11y_resize
     hide_legacy_course_analytics
+    scheduled_feedback_releases
     standardize_assignment_date_formatting
     youtube_overlay
     accessibility_tab_enable
