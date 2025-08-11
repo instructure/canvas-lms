@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect, useRef} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -36,6 +36,8 @@ export interface TagCategoryCardProps {
   onEditCategory: (id: number) => void
   onDeleteFocusFallback?: () => void
   focusElRef?: React.MutableRefObject<(HTMLElement | null)[]>
+  newlyCreatedCategoryId: number | null
+  onEditButtonBlur: () => void
 }
 
 function TagCategoryCard({
@@ -43,12 +45,29 @@ function TagCategoryCard({
   onEditCategory,
   onDeleteFocusFallback,
   focusElRef,
+  newlyCreatedCategoryId,
+  onEditButtonBlur,
 }: TagCategoryCardProps) {
   const {name, groups = []} = category
 
   const deleteMutation = useDeleteDifferentiationTagCategory()
   const [isWarningModalOpen, setIsWarningModalOpen] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const editButtonRef = useRef<HTMLButtonElement | null>(null)
+
+  useEffect(() => {
+    if (newlyCreatedCategoryId === category.id && editButtonRef.current) {
+      const editButton = editButtonRef.current
+      editButton.focus()
+
+      const handleBlur = () => onEditButtonBlur()
+      editButton.addEventListener('blur', handleBlur)
+
+      return () => {
+        editButton.removeEventListener('blur', handleBlur)
+      }
+    }
+  }, [newlyCreatedCategoryId, category.id, onEditButtonBlur])
 
   const mode = useMemo(() => {
     if (groups.length === 0) {
@@ -155,6 +174,13 @@ function TagCategoryCard({
               screenReaderLabel={I18n.t('Edit')}
               onClick={handleEdit}
               aria-label={I18n.t('Edit tag set: %{name}', {name})}
+              elementRef={el => {
+                editButtonRef.current = el as HTMLButtonElement | null
+                editButtonRef.current?.setAttribute(
+                  'data-testid',
+                  `edit-button-tag-cat-${category.id}`,
+                )
+              }}
             >
               <IconEditLine />
             </IconButton>

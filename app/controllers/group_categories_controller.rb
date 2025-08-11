@@ -418,7 +418,7 @@ class GroupCategoriesController < ApplicationController
       end
     end
 
-    render json: results.merge(group_category: @group_category)
+    render json: results.merge(group_category: @group_category.attributes)
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.message }, status: :bad_request
   rescue ActiveRecord::RecordNotFound => e

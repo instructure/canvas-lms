@@ -71,10 +71,12 @@ export type DifferentiationTagModalFormProps = {
   mode: ModalMode
   categories?: DifferentiationTagCategory[]
   courseId: number
+  onCreationSuccess?: (newCategoryID: number) => void
 }
 
 export default function DifferentiationTagModalForm(props: DifferentiationTagModalFormProps) {
-  const {isOpen, onClose, mode, categories, differentiationTagSet, courseId} = props
+  const {isOpen, onClose, mode, categories, differentiationTagSet, courseId, onCreationSuccess} =
+    props
 
   const {mutateAsync: bulkManageDifferentiationTags} = useBulkManageDifferentiationTags()
 
@@ -380,7 +382,7 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
         deleteOps = oldTags.filter(o => !newIds.includes(o.id)).map(o => ({id: o.id}))
       }
 
-      await bulkManageDifferentiationTags({
+      const result = await bulkManageDifferentiationTags({
         courseId,
         groupCategoryId,
         groupCategoryName,
@@ -390,6 +392,10 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
           delete: deleteOps,
         },
       })
+
+      if (result && mode === CREATE_MODE && !groupCategoryId && onCreationSuccess) {
+        onCreationSuccess(result.group_category.id)
+      }
 
       // If mutation succeeds, close the modal
       handleClose()
@@ -461,7 +467,13 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
   }, [tags, categories])
 
   return (
-    <Modal open={isOpen} onDismiss={handleClose} size="small" label={modeConfig[mode].title}>
+    <Modal
+      open={isOpen}
+      onDismiss={handleClose}
+      size="small"
+      label={modeConfig[mode].title}
+      shouldReturnFocus={mode === CREATE_MODE ? false : true}
+    >
       <Modal.Header>
         <CloseButton
           placement="end"
