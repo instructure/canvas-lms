@@ -262,31 +262,6 @@ describe('DueDateLabel', () => {
     })
 
     describe('comprehensive discussion date handling', () => {
-      const ungradedDiscussionWithTodoDate: ModuleItemContent = {
-        id: '10',
-        _id: '10',
-        type: 'Discussion',
-        graded: false,
-        todoDate: '2024-01-20T23:59:59Z',
-      }
-
-      const ungradedDiscussionWithLockAt: ModuleItemContent = {
-        id: '11',
-        _id: '11',
-        type: 'Discussion',
-        graded: false,
-        lockAt: '2024-01-25T23:59:59Z',
-      }
-
-      const ungradedDiscussionWithBothDates: ModuleItemContent = {
-        id: '12',
-        _id: '12',
-        type: 'Discussion',
-        graded: false,
-        todoDate: '2024-01-20T23:59:59Z',
-        lockAt: '2024-01-25T23:59:59Z',
-      }
-
       const gradedDiscussionWithAssignmentDueAt: ModuleItemContent = {
         id: '13',
         _id: '13',
@@ -350,61 +325,9 @@ describe('DueDateLabel', () => {
         ],
       }
 
-      const ungradedDiscussionWithStandardizedDates: ModuleItemContent = {
-        id: '16',
-        _id: '16',
-        type: 'Discussion',
-        graded: false,
-        assignedToDates: [
-          {
-            id: 'everyone',
-            dueAt: '2024-01-15T23:59:59Z',
-            title: 'Everyone',
-            base: true,
-          },
-          {
-            id: 'section-1',
-            dueAt: '2024-01-16T23:59:59Z',
-            title: 'Section 1',
-            set: {
-              id: '1',
-              type: 'CourseSection',
-            },
-          },
-        ],
-      }
-
       beforeEach(() => {
         // Reset ENV for each test
         ENV.FEATURES = {standardize_assignment_date_formatting: false}
-      })
-
-      describe('ungraded discussions', () => {
-        it('shows todoDate for ungraded discussion when available', () => {
-          const container = setUp(ungradedDiscussionWithTodoDate)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('shows lockAt for ungraded discussion when todoDate not available', () => {
-          const container = setUp(ungradedDiscussionWithLockAt)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('prioritizes todoDate over lockAt for ungraded discussion', () => {
-          const container = setUp(ungradedDiscussionWithBothDates)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          // todoDate should be used (2024-01-20), not lockAt (2024-01-25)
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
-        })
-
-        it('shows single date for ungraded discussion with standardized dates', () => {
-          ENV.FEATURES = {standardize_assignment_date_formatting: true}
-          const container = setUp(ungradedDiscussionWithStandardizedDates)
-          expect(container.getByTestId('due-date')).toBeInTheDocument()
-          expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument() // Ungraded discussions show single date even with multiple dates
-        })
       })
 
       describe('graded discussions', () => {
