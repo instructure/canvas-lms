@@ -20,7 +20,6 @@ import React, {useState, useEffect, useCallback, memo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Flex} from '@instructure/ui-flex'
 import ModuleStudent from './ModuleStudent'
 import ModulePageActionHeaderStudent from './ModulePageActionHeaderStudent'
 import {handleCollapseAll, handleExpandAll} from '../handlers/modulePageActionHandlers'
@@ -164,6 +163,8 @@ const ModulesListStudent: React.FC = () => {
     [expandedModules, debouncedToggleCollapse],
   )
 
+  const hasNoModules = (data?.pages[0]?.modules.length || 0) === 0
+
   return (
     <View as="div" margin="medium">
       <ModulePageActionHeaderStudent
@@ -194,9 +195,9 @@ const ModulesListStudent: React.FC = () => {
           <Text color="danger">{I18n.t('Error loading modules')}</Text>
         </View>
       ) : (
-        <Flex direction="column" gap="small">
-          {data?.pages[0]?.modules.length === 0 ? (
-            <View as="div" textAlign="center" padding="large">
+        <View as="div" className="context_module_list">
+          {hasNoModules ? (
+            <View as="div" textAlign="center" padding="large" className="no_modules">
               <Text>{I18n.t('No modules found')}</Text>
             </View>
           ) : (
@@ -208,6 +209,7 @@ const ModulesListStudent: React.FC = () => {
                   id={module._id}
                   name={module.name}
                   completionRequirements={module.completionRequirements}
+                  position={module.position}
                   prerequisites={module.prerequisites}
                   requireSequentialProgress={module.requireSequentialProgress}
                   progression={module.progression}
@@ -219,7 +221,7 @@ const ModulesListStudent: React.FC = () => {
                 />
               ))
           )}
-        </Flex>
+        </View>
       )}
       {hasNextPage && (
         <View as="div" padding="medium" textAlign="center">

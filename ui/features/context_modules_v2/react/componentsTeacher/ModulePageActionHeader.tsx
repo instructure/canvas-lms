@@ -18,13 +18,11 @@
 
 import React, {useCallback} from 'react'
 import {queryClient} from '@canvas/query'
-import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
-import {useModules} from '../hooks/queries/useModules'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
-import {ModulesPageIconLegend} from './ModulesPageIconLegend'
 import {handleAddModule} from '../handlers/moduleActionHandlers'
+import {ModulesPageLegend} from '../components/ModulesPageLegend'
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
@@ -40,7 +38,6 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   disabled = false,
 }) => {
   const {courseId} = useContextModule()
-  const {data} = useModules(courseId)
 
   const handleCollapseExpandClick = useCallback(() => {
     if (anyModuleExpanded) {
@@ -71,7 +68,10 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
         },
         handleAddModule: handleAddModule,
         renderIconLegend: () => (
-          <ModulesPageIconLegend is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS} />
+          <ModulesPageLegend
+            is_student={false}
+            is_blueprint_course={!!ENV.MASTER_COURSE_SETTINGS}
+          />
         ),
       }}
     />

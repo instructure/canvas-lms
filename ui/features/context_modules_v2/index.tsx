@@ -29,12 +29,14 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {ContextModuleProvider} from './react/hooks/useModuleContext'
+import {handleShortcutKey} from './react/utils/KBNavigator'
 
 const I18n = createI18nScope('context_modules_v2')
 
 ready(() => {
   const ENV = window.ENV as GlobalEnv
   const container = document.getElementById('content')
+  container?.addEventListener('keydown', handleShortcutKey)
 
   if (!ENV.course_id) {
     console.error(I18n.t('Course ID is required'))

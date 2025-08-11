@@ -47,6 +47,7 @@ export interface ModuleItemProps {
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   onClick?: () => void
+  position?: number
   published?: boolean
   canUnpublish?: boolean
   dragHandleProps?: any // For react-beautiful-dnd
@@ -73,6 +74,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   masterCourseRestrictions,
   onClick,
   completionRequirements,
+  position,
   published,
   canUnpublish,
   dragHandleProps,
@@ -108,12 +110,14 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
 
   return (
     <View
-      id={`context_module_item_${_id}`}
       as="div"
+      id={`context_module_item_${_id}`}
+      className="context_module_item"
       padding="small medium small xxx-small"
       background="transparent"
       overflowX="hidden"
       data-item-id={_id}
+      data-position={position}
     >
       <Flex wrap="wrap">
         <Flex.Item margin="0 small 0 0">

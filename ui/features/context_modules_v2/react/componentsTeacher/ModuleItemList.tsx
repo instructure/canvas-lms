@@ -133,6 +133,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                             moduleTitle={moduleTitle}
                             index={index}
                             id={item.id}
+                            position={item.position}
                             published={!!item.published}
                             canUnpublish={item.content?.canUnpublish ?? true}
                             completionRequirements={completionRequirements}

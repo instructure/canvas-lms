@@ -144,7 +144,8 @@ export const validateModuleStudentRenderRequirements = (prevProps: any, nextProp
     prevProps.id === nextProps.id &&
     prevProps.expanded === nextProps.expanded &&
     prevProps.name === nextProps.name &&
-    prevProps.completionRequirements === nextProps.completionRequirements
+    prevProps.completionRequirements === nextProps.completionRequirements &&
+    prevProps.position === nextProps.position
   )
 }
 
@@ -285,7 +286,8 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.title === nextProps.title &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
-    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
+    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
+    prevProps.position === nextProps.position
 
   if (!basicPropsEqual) return false
 
