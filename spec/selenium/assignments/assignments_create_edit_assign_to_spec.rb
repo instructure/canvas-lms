@@ -545,6 +545,30 @@ describe "due date validations", :ignore_js_errors do
 
       expect(assign_to_date_and_time[0].text).not_to include("Due date cannot be before course start")
     end
+
+    it "allows ad-hoc dates that are outside of course date range" do
+      @course.update!(start_at: 2.months.ago.to_date, conclude_at: 1.month.ago.to_date, restrict_enrollments_to_course_dates: true)
+      AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
+      wait_for(method: nil, timeout: 5) { f("#assignment_name").displayed? }
+
+      AssignmentCreateEditPage.replace_assignment_name("new test assignment")
+      AssignmentCreateEditPage.enter_points_possible("100")
+      AssignmentCreateEditPage.select_text_entry_submission_type
+
+      click_add_assign_to_card
+      select_module_item_assignee(1, @student1.name)
+      update_due_date(1, "12/31/2022")
+      update_due_time(1, "5:00 PM")
+      update_available_date(1, "12/27/2022")
+      update_available_time(1, "8:00 AM")
+      update_until_date(1, "1/7/2023")
+      update_until_time(1, "9:00 PM")
+
+      AssignmentCreateEditPage.save_assignment
+
+      assignment = Assignment.last
+      expect(assignment.assignment_overrides.last.assignment_override_students.count).to eq(1)
+    end
   end
 
   context "differentiation tags" do
