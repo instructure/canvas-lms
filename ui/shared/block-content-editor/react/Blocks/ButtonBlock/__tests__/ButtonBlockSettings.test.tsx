@@ -36,7 +36,10 @@ jest.mock('../ButtonBlockGeneralButtonSettings', () => ({
   ButtonBlockGeneralButtonSettings: (props: any) => mockGeneralButtonSettings(props),
 }))
 
-const defaultButtons = [{id: 1}, {id: 2}]
+const defaultButtons = [
+  {id: 1, text: 'Button1'},
+  {id: 2, text: 'Button2'},
+]
 const defaultAlignment = 'left'
 const defaultLayout = 'horizontal'
 const defaultIsFullWidth = false

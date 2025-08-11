@@ -28,6 +28,7 @@ export type ButtonLayout = 'horizontal' | 'vertical'
 
 export type ButtonData = {
   id: number
+  text: string
 }
 
 export type ButtonBlockProps = {

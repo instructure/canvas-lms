@@ -38,7 +38,12 @@ export const blockFactory = {
   ),
   [ButtonBlock.name]: () => (
     <ButtonBlock
-      settings={{alignment: 'left', layout: 'horizontal', isFullWidth: false, buttons: [{id: 1}]}}
+      settings={{
+        alignment: 'left',
+        layout: 'horizontal',
+        isFullWidth: false,
+        buttons: [{id: 1, text: ''}],
+      }}
     />
   ),
   [HighlightBlock.name]: () => (
