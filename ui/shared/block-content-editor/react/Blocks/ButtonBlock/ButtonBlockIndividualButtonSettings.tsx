@@ -70,7 +70,7 @@ export const ButtonBlockIndividualButtonSettings = ({
       <TextInput
         renderLabel={I18n.t('Button text')}
         value={button.text}
-        onChange={(e, value) => updateButton(button.id, {text: value})}
+        onChange={(_e, value) => updateButton(button.id, {text: value})}
         placeholder={I18n.t('Button')}
       />
     </Flex>

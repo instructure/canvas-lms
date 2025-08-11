@@ -16,9 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Flex} from '@instructure/ui-flex'
+import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {ButtonBlockProps} from './ButtonBlock'
 import {ButtonDisplay} from './ButtonDisplay'
 
-export const ButtonBlockEdit = (props: ButtonBlockProps) => {
-  return <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} />
+export type ButtonBlockEditProps = ButtonBlockProps & {
+  onTitleChange: (title: string) => void
+}
+
+export const ButtonBlockEdit = (props: ButtonBlockEditProps) => {
+  return (
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && (
+        <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
+      )}
+      <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} title={props.title} />
+    </Flex>
+  )
 }

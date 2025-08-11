@@ -24,22 +24,31 @@ import {ButtonBlockGeneralButtonSettings} from './ButtonBlockGeneralButtonSettin
 import {ButtonBlockColorSettings} from './ButtonBlockColorSettings'
 import {ButtonBlockProps, ButtonData, ButtonAlignment, ButtonLayout} from './ButtonBlock'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 
 const I18n = createI18nScope('block_content_editor')
 
 export const ButtonBlockSettings = () => {
   const {
     actions: {setProp},
+    includeBlockTitle,
     alignment,
     layout,
     isFullWidth,
     buttons,
   } = useNode(node => ({
+    includeBlockTitle: node.data.props.settings.includeBlockTitle,
     alignment: node.data.props.settings.alignment,
     layout: node.data.props.settings.layout,
     isFullWidth: node.data.props.settings.isFullWidth,
     buttons: node.data.props.settings.buttons,
   }))
+
+  const handleIncludeBlockTitleChange = () => {
+    setProp((props: ButtonBlockProps) => {
+      props.settings.includeBlockTitle = !includeBlockTitle
+    })
+  }
 
   const handleAlignmentChange = (alignment: ButtonAlignment) => {
     setProp((props: ButtonBlockProps) => {
@@ -67,6 +76,8 @@ export const ButtonBlockSettings = () => {
 
   return (
     <View as="div">
+      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}

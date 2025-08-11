@@ -50,12 +50,14 @@ export const blockFactory = {
   [ButtonBlock.name]: () => (
     <ButtonBlock
       settings={{
+        includeBlockTitle: true,
         alignment: 'left',
         layout: 'horizontal',
         isFullWidth: false,
         buttons: [{id: 1, text: ''}],
         backgroundColor: defaultBackgroundColor,
       }}
+      title=""
     />
   ),
   [HighlightBlock.name]: () => (
