@@ -46,7 +46,7 @@ module CallStackUtils
       # for our custom matchers/validators/finders/etc., prune their lines
       # from the top of the stack so that you get a pretty/useful error
       # message and backtrace
-      if /\A(RSpec::|Selenium::WebDriver::Error::|SeleniumExtensions::|GreatExpectations::)/.match?(exception_class_name)
+      if /\A(RSpec::|Selenium::WebDriver::Error::|SeleniumExtensions::)/.match?(exception_class_name)
         CallStackUtils.prune_backtrace! bt
       end
       bt
