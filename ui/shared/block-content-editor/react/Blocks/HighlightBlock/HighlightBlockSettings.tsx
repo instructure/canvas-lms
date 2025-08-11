@@ -35,6 +35,17 @@ export const HighlightBlockSettings = () => {
 
   return (
     <Flex direction="column" gap="medium" padding="small">
+      <ColorPickerWrapper
+        label={I18n.t('Background')}
+        value={settings.backgroundColor}
+        baseColor={settings.highlightColor}
+        baseColorLabel={I18n.t('Highlight')}
+        onChange={color =>
+          setProp((props: HighlightBlockProps) => {
+            props.settings.backgroundColor = color
+          })
+        }
+      />
       <Checkbox
         label={I18n.t('Display icon')}
         variant="toggle"
@@ -48,7 +59,7 @@ export const HighlightBlockSettings = () => {
       <ColorPickerWrapper
         label={I18n.t('Highlight')}
         value={settings.highlightColor}
-        baseColor={settings.textColor} // Temporary base color
+        baseColor={settings.textColor}
         baseColorLabel={I18n.t('Text')}
         onChange={color =>
           setProp((props: HighlightBlockProps) => {

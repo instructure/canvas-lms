@@ -32,6 +32,7 @@ export type HighlightBlockProps = {
     displayIcon: string | null
     highlightColor: string
     textColor: string
+    backgroundColor: string
   }
 }
 
@@ -91,7 +92,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const HighlightBlock = (props: HighlightBlockProps) => {
   return (
-    <BaseBlock title={HighlightBlock.craft.displayName}>
+    <BaseBlock
+      title={HighlightBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+    >
       <HighlightBlockContent {...props} />
     </BaseBlock>
   )

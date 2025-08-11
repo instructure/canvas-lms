@@ -19,11 +19,18 @@
 import './base-block-layout.css'
 import {PropsWithChildren} from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {BackgroundColorApplier} from '../components/BackgroundColorApplier'
 
-export const BaseBlockViewLayout = (props: PropsWithChildren) => {
+export type BaseBlockViewLayoutProps = PropsWithChildren<{
+  backgroundColor?: string
+}>
+
+export const BaseBlockViewLayout = ({backgroundColor, children}: BaseBlockViewLayoutProps) => {
   return (
-    <Flex direction="column" padding="paddingCardLarge">
-      {props.children}
-    </Flex>
+    <BackgroundColorApplier backgroundColor={backgroundColor || 'white'}>
+      <Flex direction="column" padding="paddingCardLarge">
+        {children}
+      </Flex>
+    </BackgroundColorApplier>
   )
 }

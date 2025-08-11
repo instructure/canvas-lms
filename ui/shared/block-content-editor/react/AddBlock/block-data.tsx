@@ -53,6 +53,7 @@ export const blockFactory = {
         displayIcon: 'warning',
         highlightColor: colors.additionalPrimitives.ocean12,
         textColor: colors.ui.textDescription,
+        backgroundColor: colors.primitives.white,
       }}
     />
   ),

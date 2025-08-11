@@ -29,8 +29,6 @@ export const EditButton = (props: {
     <IconButton
       data-testid="edit-block-button"
       data-copybutton
-      withBackground={false}
-      withBorder={false}
       screenReaderLabel={I18n.t('Edit block')}
       onClick={e => {
         e.stopPropagation()

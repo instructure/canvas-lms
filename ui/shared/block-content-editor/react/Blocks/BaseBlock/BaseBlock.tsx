@@ -29,7 +29,9 @@ const BaseBlockContent = (
 ) => {
   const {isViewMode, isEditMode} = useGetRenderMode()
   return isViewMode ? (
-    <BaseBlockViewLayout>{props.children}</BaseBlockViewLayout>
+    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
+      {props.children}
+    </BaseBlockViewLayout>
   ) : (
     <BaseBlockEditWrapper {...props} isEditMode={isEditMode} />
   )
@@ -38,6 +40,7 @@ const BaseBlockContent = (
 export const BaseBlock = (
   props: PropsWithChildren<{
     title: string
+    backgroundColor?: string
   }>,
 ) => {
   const [isEditMode, setIsEditMode] = useState(false)

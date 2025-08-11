@@ -42,6 +42,7 @@ describe('HighlightBlock', () => {
     displayIcon: 'warning',
     highlightColor: '#E8F4FD',
     textColor: '#2D3B45',
+    backgroundColor: '#E8F4FD',
   }
 
   it('should render with Highlight title', () => {
@@ -117,6 +118,17 @@ describe('HighlightBlock', () => {
     const highlightBlock = screen.getByTestId('highlight-block')
 
     expect(highlightBlock).toHaveStyle(`color: ${textColor}`)
+  })
+
+  it('should use different highlight colors', () => {
+    const customHighlightColor = '#FFE4E1'
+    renderBlock(HighlightBlock, {
+      content: 'Different background test',
+      settings: {...defaultSettings, highlightColor: customHighlightColor},
+    })
+    const highlightBlock = screen.getByTestId('highlight-block')
+
+    expect(highlightBlock).toHaveStyle(`background-color: ${customHighlightColor}`)
   })
 
   it('should apply both custom highlight and text colors', () => {
