@@ -166,6 +166,7 @@ def runRspecqSuite() {
     sh(script: 'docker compose exec -T -e ENABLE_AXE_SELENIUM \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
+                                       -e RSPECQ_WORKER_LIVENESS_SEC \
                                        -e JOB_NAME \
                                        -e COVERAGE \
                                        -e BUILD_NAME \
