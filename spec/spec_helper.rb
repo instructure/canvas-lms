@@ -109,7 +109,6 @@ TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 Setting.reset_cache!
 BlankSlateProtection.install!
-GreatExpectations.install!
 
 ActionView::TestCase::TestController.view_paths = ApplicationController.view_paths
 ActionView::Base.streaming_completion_on_exception = "</html>"
