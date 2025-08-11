@@ -86,13 +86,6 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
     if (content?.type === 'Discussion' && content?.assignment?.dueAt) {
       return content.assignment.dueAt
     }
-    // For ungraded discussions, check todoDate first, then lockAt
-    if (content?.type === 'Discussion' && content?.todoDate) {
-      return content.todoDate
-    }
-    if (content?.type === 'Discussion' && content?.lockAt) {
-      return content.lockAt
-    }
     // For other content types, use the direct dueAt
     return content?.dueAt
   }
@@ -198,14 +191,14 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
 
   // Handle standardized dates first
   if (useStandardizedDates) {
-    if (assignedToDates.length === 1 || isUngradedDiscussion) {
+    if (assignedToDates.length === 1) {
       const singleDate = assignedToDates[0]
       return (
         <Text size="x-small">
           <FriendlyDatetime
             data-testid="due-date"
             format={I18n.t('#date.formats.medium')}
-            dateTime={singleDate.dueAt || content?.lockAt || content?.todoDate || null}
+            dateTime={singleDate.dueAt || null}
             alwaysUseSpecifiedFormat={true}
           />
         </Text>
@@ -224,13 +217,9 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
   }
 
   // Handle legacy date logic
-  const hasDueOrLockDate =
-    baseDueDate ||
-    content?.lockAt ||
-    content?.todoDate ||
-    assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+  const hasDueDate = baseDueDate || assignmentOverrides?.edges?.some(({node}) => node.dueAt)
 
-  if (!hasDueOrLockDate) {
+  if (!hasDueDate) {
     return null
   }
 
@@ -260,11 +249,9 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
   }
 
   // Show "Multiple Due Dates" if there are multiple unique dates (Canvas requirement)
-  const hasMultipleDates = allDueDates.size > 1 && !isUngradedDiscussion
+  const hasMultipleDates = allDueDates.size > 1
 
-  // Determine what to show
   if (allDueDates.size === 0) {
-    // No dates at all
     if (hasOverrides) {
       // Has overrides but no dates - show "No Due Date"
       return <Text size="x-small">{I18n.t('No Due Date')}</Text>
@@ -285,7 +272,7 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
     )
   } else {
     // Single override or single date - get the actual date from the Set
-    const singleDate = Array.from(allDueDates)[0] || content?.lockAt || content?.todoDate
+    const singleDate = Array.from(allDueDates)[0]
     return (
       <Text size="x-small">
         <FriendlyDatetime

@@ -280,22 +280,6 @@ describe('ModuleItemSupplementalInfo', () => {
   })
 
   describe('discussion date handling integration', () => {
-    const ungradedDiscussionWithTodoDate: ModuleItemContent = {
-      id: '22',
-      type: 'Discussion',
-      graded: false,
-      todoDate: '2024-01-20T23:59:59Z',
-      pointsPossible: 5,
-    }
-
-    const ungradedDiscussionWithLockAt: ModuleItemContent = {
-      id: '23',
-      type: 'Discussion',
-      graded: false,
-      lockAt: '2024-01-25T23:59:59Z',
-      pointsPossible: 5,
-    }
-
     const gradedDiscussionWithAssignmentDueAt: ModuleItemContent = {
       id: '24',
       type: 'Discussion',
@@ -390,33 +374,6 @@ describe('ModuleItemSupplementalInfo', () => {
     beforeEach(() => {
       // Reset ENV for each test
       ENV.FEATURES = {standardize_assignment_date_formatting: false}
-    })
-
-    describe('ungraded discussion date handling', () => {
-      it('displays todoDate for ungraded discussion', () => {
-        const container = setUp(ungradedDiscussionWithTodoDate, null)
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
-        expect(container.getByText('5 pts')).toBeInTheDocument()
-        expect(container.getAllByText('|')).toHaveLength(1) // One separator between date and points
-      })
-
-      it('displays lockAt for ungraded discussion without todoDate', () => {
-        const container = setUp(ungradedDiscussionWithLockAt, null)
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
-        expect(container.getByText('5 pts')).toBeInTheDocument()
-        expect(container.getAllByText('|')).toHaveLength(1)
-      })
-
-      it('prioritizes todoDate over lockAt in ungraded discussion', () => {
-        const discussionWithBothDates = {
-          ...ungradedDiscussionWithTodoDate,
-          lockAt: '2024-01-25T23:59:59Z',
-        }
-        const container = setUp(discussionWithBothDates, null)
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
-        // Should show the todoDate (Jan 20), not lockAt (Jan 25)
-        expect(container.getAllByText('|')).toHaveLength(1)
-      })
     })
 
     describe('graded discussion date handling', () => {
@@ -562,7 +519,7 @@ describe('ModuleItemSupplementalInfo', () => {
         const discussionNoDates = {
           id: '32',
           type: 'Discussion' as const,
-          graded: false,
+          graded: true,
           pointsPossible: 8,
         }
         const container = setUp(discussionNoDates, completionReq)
@@ -571,29 +528,6 @@ describe('ModuleItemSupplementalInfo', () => {
 
         // Should have separator: points | completion
         expect(container.getAllByText('|')).toHaveLength(1)
-      })
-    })
-
-    describe('discussion type detection', () => {
-      it('properly detects and handles Discussion type', () => {
-        const container = setUp(ungradedDiscussionWithTodoDate, null)
-        // Should use todoDate for ungraded discussion
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
-      })
-
-      it('properly detects and handles graded Discussion type', () => {
-        const container = setUp(gradedDiscussionWithAssignmentDueAt, null)
-        // Should use assignment.dueAt for graded discussion
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
-      })
-
-      it('handles Discussion type with mixed case', () => {
-        const mixedCaseDiscussion = {
-          ...ungradedDiscussionWithTodoDate,
-          type: 'Discussion' as const,
-        }
-        const container = setUp(mixedCaseDiscussion, null)
-        expect(container.getByTestId('due-date')).toBeInTheDocument()
       })
     })
   })

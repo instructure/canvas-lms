@@ -116,15 +116,13 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
         content?.type === 'Discussion' && content?.assignment?.dueAt
           ? content.assignment.dueAt
           : content?.dueAt
-      const hasDueOrLockDate =
+      const hasDueDate =
         baseDueDate ||
-        content?.lockAt ||
-        content?.todoDate ||
         content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt) ||
         content?.assignment?.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
 
       // Show dates if we have standardized dates OR legacy dates
-      const shouldShowDates = hasStandardizedDates || hasDueOrLockDate
+      const shouldShowDates = hasStandardizedDates || hasDueDate
 
       if (shouldShowDates) {
         const dateComponent = <DueDateLabel content={content} contentTagId={contentTagId} />
