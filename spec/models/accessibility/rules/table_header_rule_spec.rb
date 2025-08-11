@@ -78,13 +78,13 @@ describe Accessibility::Rules::TableHeaderRule do
 
   describe ".display_name" do
     it "returns the correct display name" do
-      expect(described_class.display_name).to eq(I18n.t("Table headers aren’t set up"))
+      expect(described_class.new.display_name).to eq(I18n.t("Table headers aren’t set up"))
     end
   end
 
   describe ".message" do
     it "returns the correct message" do
-      expect(described_class.message).to eq(I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells."))
+      expect(described_class.new.message).to eq(I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells."))
     end
   end
 
@@ -95,7 +95,7 @@ describe Accessibility::Rules::TableHeaderRule do
         "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
         "Setting row and column headers makes your table clear and accessible for all learners." \
       )
-      expect(described_class.why).to eq(expected_message)
+      expect(described_class.new.why).to eq(expected_message)
     end
   end
 end

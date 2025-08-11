@@ -63,7 +63,7 @@ describe Accessibility::Rules::ImgAltRule do
     it "returns a TextInputWithCheckboxField with correct configuration" do
       input_html = '<div><img src="image.jpg"></div>'
       elem = Nokogiri::HTML.fragment(input_html).css("img").first
-      form = Accessibility::Rules::ImgAltRule.form(elem)
+      form = Accessibility::Rules::ImgAltRule.new.form(elem)
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
       expect(form.value).to eq("")
@@ -86,7 +86,7 @@ describe Accessibility::Rules::ImgAltRule do
         .and_return(generated_alt)
 
       # Call the method with our image element
-      result = Accessibility::Rules::ImgAltRule.generate_fix(img_element)
+      result = Accessibility::Rules::ImgAltRule.new.generate_fix(img_element)
 
       # Verify the result is what our mock returned
       expect(result).to eq(generated_alt)

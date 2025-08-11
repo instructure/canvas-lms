@@ -58,19 +58,19 @@ describe Accessibility::Rules::ParagraphsForHeadingsRule do
     end
 
     it "change to paragraph button must be in the form" do
-      expect(Accessibility::Rules::ParagraphsForHeadingsRule.form(nil).label).to eq("Change to paragraph")
+      expect(Accessibility::Rules::ParagraphsForHeadingsRule.new.form(nil).label).to eq("Change to paragraph")
     end
   end
 
   describe ".display_name" do
     it "returns the correct display name" do
-      expect(described_class.display_name).to eq(I18n.t("Heading is too long"))
+      expect(described_class.new.display_name).to eq(I18n.t("Heading is too long"))
     end
   end
 
   describe ".message" do
     it "returns the correct message" do
-      expect(described_class.message).to eq(I18n.t("This heading is very long. Is it meant to be a paragraph?"))
+      expect(described_class.new.message).to eq(I18n.t("This heading is very long. Is it meant to be a paragraph?"))
     end
   end
 
@@ -82,7 +82,7 @@ describe Accessibility::Rules::ParagraphsForHeadingsRule do
         "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
         "short, specific, and meaningful, not full sentences or paragraphs."
       )
-      expect(described_class.why).to eq(expected_message)
+      expect(described_class.new.why).to eq(expected_message)
     end
   end
 end

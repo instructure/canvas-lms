@@ -68,16 +68,16 @@ describe Accessibility::Rules::HeadingsStartAtH2Rule do
   end
 
   context "metadata methods" do
-    let(:rule_class) { Accessibility::Rules::HeadingsStartAtH2Rule }
+    let(:rule) { Accessibility::Rules::HeadingsStartAtH2Rule.new }
 
     it "returns the correct display name" do
       expected_display_name = "Heading levels should start at level 2"
-      expect(rule_class.display_name).to eq(expected_display_name)
+      expect(rule.display_name).to eq(expected_display_name)
     end
 
     it "returns the expected message" do
       expected_message = "Heading levels in your content should start at level 2 (H2), because there's already a Heading 1 on the page it's displayed on."
-      expect(rule_class.message).to eq(expected_message)
+      expect(rule.message).to eq(expected_message)
     end
 
     it "returns the explanatory 'why' text" do
@@ -88,11 +88,11 @@ describe Accessibility::Rules::HeadingsStartAtH2Rule do
         "(like H2, H3, etc.) ensures your course is clear, organized, and accessible to everyone. " \
         "Each page on Canvas already has a main title (H1), so your content should start with an " \
         "H2 to keep the structure clear."
-      expect(rule_class.why).to eq(expected_why)
+      expect(rule.why).to eq(expected_why)
     end
 
     it "returns a properly configured form" do
-      form = rule_class.form(nil)
+      form = rule.form(nil)
 
       expect(form).to be_a(Accessibility::Forms::RadioInputGroupField)
       expect(form.label).to include("How would you like to proceed?")
