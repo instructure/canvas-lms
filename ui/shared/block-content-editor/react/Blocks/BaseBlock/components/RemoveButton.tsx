@@ -32,10 +32,7 @@ export const RemoveButton = (props: {
       withBackground={false}
       withBorder={false}
       screenReaderLabel={I18n.t('Remove block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      onClick={props.onClicked}
     >
       <IconTrashLine />
     </IconButton>
