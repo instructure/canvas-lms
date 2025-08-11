@@ -311,6 +311,7 @@ export type SiteAdminFeatureId =
   | 'hide_legacy_course_analytics'
   | 'standardize_assignment_date_formatting'
   | 'accessibility_tab_enable'
+  | 'scheduled_feedback_releases'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
