@@ -12736,6 +12736,8 @@ ko:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
+    current_enrollment: 
+      unknown: "알 수 없음"
     custom_search_results: 
       links: 
         search_for_resources: "이 페이지에 관련한 공개 리소스 검색"
