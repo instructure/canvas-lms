@@ -278,6 +278,29 @@ describe "context modules", :ignore_js_errors do
         expect(item_titles_list.count(moved_item.title)).to eq(1)
       end
     end
+
+    context "duplicate module item" do
+      before :once do
+        @dup_assignment = @course.assignments.create!(title: "Dup me", submission_types: "online_text_entry")
+        @dup_item = @module1.add_item(type: "assignment", id: @dup_assignment.id)
+      end
+
+      it "duplicates the module item (UI shows new row and DB count increases)" do
+        go_to_modules
+        wait_for_ajaximations
+
+        context_module_expand_toggle(@module1.id).click
+        wait_for_ajaximations
+
+        ui_count_before = module_item_title_links.length
+        manage_module_item_button(@dup_item.id).click
+        module_item_action_menu_link("Duplicate").click
+        wait_for_ajaximations
+
+        expect(module_item_title_links.length).to eq(ui_count_before + 1)
+        expect(module_item_title_links.last.text).to eq("Dup me Copy")
+      end
+    end
   end
 
   context "mastery paths" do
