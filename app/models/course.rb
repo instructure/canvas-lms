@@ -3278,6 +3278,7 @@ class Course < ActiveRecord::Base
   TAB_SEARCH = 21
   TAB_ACCESSIBILITY = 22
   TAB_ITEM_BANKS = 23
+  TAB_YOUTUBE_MIGRATION = 24
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3695,6 +3696,18 @@ class Course < ActiveRecord::Base
             # can't do any of the additional things required
             (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
+      end
+
+      # Add YouTube migration tab before Settings if conditions are met
+      if feature_enabled?(:youtube_migration) && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && has_studio_integration?
+        settings_index = tabs.index { |t| t[:id] == TAB_SETTINGS }
+        settings_index ||= tabs.length
+        tabs.insert(settings_index, {
+                      id: TAB_YOUTUBE_MIGRATION,
+                      label: t("#tabs.youtube_migration", "YouTube Migration"),
+                      css_class: "youtube_migration",
+                      href: :course_youtube_migration_path
+                    })
       end
 
       tabs
@@ -4593,6 +4606,12 @@ class Course < ActiveRecord::Base
 
     total = wiki_page_count + assignment_count
     total > MAX_ACCESSIBILITY_SCAN_RESOURCES
+  end
+
+  def has_studio_integration?
+    domain = "arc.instructure.com"
+    root_account.context_external_tools.active.where(domain:).exists? ||
+      account.context_external_tools.active.where(domain:).exists?
   end
 
   private

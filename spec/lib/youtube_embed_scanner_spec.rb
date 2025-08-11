@@ -52,8 +52,8 @@ describe YoutubeEmbedScanner do
       HTML
       result = described_class.embeds_from_html(html)
       expect(result).to match_array([
-                                      { path: "/html/body/iframe[1]", src: "#{youtube_embed}abc" },
-                                      { path: "/html/body/iframe[2]", src: "#{youtube_embed}def" }
+                                      { path: "/html/body/iframe[1]", src: "#{youtube_embed}abc", width: nil, height: nil },
+                                      { path: "/html/body/iframe[2]", src: "#{youtube_embed}def", width: nil, height: nil }
                                     ])
     end
 
@@ -63,7 +63,7 @@ describe YoutubeEmbedScanner do
       HTML
       result = described_class.embeds_from_html(html)
       expect(result).to match_array([
-                                      { path: "/html/body/iframe", src: "#{nocookie_embed}xyz" }
+                                      { path: "/html/body/iframe", src: "#{nocookie_embed}xyz", width: nil, height: nil }
                                     ])
     end
 
@@ -75,8 +75,20 @@ describe YoutubeEmbedScanner do
       HTML
       result = described_class.embeds_from_html(html)
       expect(result).to match_array([
-                                      { path: "/html/body/iframe[1]", src: "#{youtube_embed}abc" },
-                                      { path: "/html/body/iframe[2]", src: "#{nocookie_embed}xyz" }
+                                      { path: "/html/body/iframe[1]", src: "#{youtube_embed}abc", width: nil, height: nil },
+                                      { path: "/html/body/iframe[2]", src: "#{nocookie_embed}xyz", width: nil, height: nil }
+                                    ])
+    end
+
+    it "extracts width and height attributes when present" do
+      html = <<~HTML
+        <iframe src="#{youtube_embed}abc" width="560" height="315"></iframe>
+        <iframe src="#{nocookie_embed}xyz" width="800" height="600"></iframe>
+      HTML
+      result = described_class.embeds_from_html(html)
+      expect(result).to match_array([
+                                      { path: "/html/body/iframe[1]", src: "#{youtube_embed}abc", width: "560", height: "315" },
+                                      { path: "/html/body/iframe[2]", src: "#{nocookie_embed}xyz", width: "800", height: "600" }
                                     ])
     end
 

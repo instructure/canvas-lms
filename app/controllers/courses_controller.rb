@@ -4038,7 +4038,7 @@ class CoursesController < ApplicationController
   def youtube_migration
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4053,7 +4053,7 @@ class CoursesController < ApplicationController
   def youtube_migration_scan
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4062,15 +4062,32 @@ class CoursesController < ApplicationController
     progress = YoutubeMigrationService.last_youtube_embed_scan_progress_by_course(@context)
 
     unless progress
-      render json: { id: nil, workflow_state: nil, resources: [], total_count: 0 }, status: :ok
+      render json: { id: nil, workflow_state: nil, resources: [], total_count: 0, page: 1, per_page: 25, total_pages: 0 }, status: :ok
       return
     end
+
+    page = params[:page]&.to_i || 1
+    per_page = params[:per_page]&.to_i || 25
+
+    page = [page, 1].max
+    per_page = [per_page, 1].max.clamp(1, 100) # Limit per_page to max 100
+    all_resources = progress.results&.dig(:resources)&.values || []
+    total_count = progress.results&.dig(:total_count) || 0
+    total_pages = (all_resources.length.to_f / per_page).ceil
+
+    # Calculate pagination
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page - 1
+    paginated_resources = all_resources[start_index..end_index] || []
 
     json = {
       id: progress.id,
       workflow_state: progress.workflow_state,
-      resources: progress.results&.dig(:resources)&.values || [],
-      total_count: progress.results&.dig(:total_count) || 0
+      resources: paginated_resources,
+      total_count:,
+      page:,
+      per_page:,
+      total_pages:
     }
 
     render json:, status: :ok
@@ -4079,7 +4096,7 @@ class CoursesController < ApplicationController
   def start_youtube_migration_scan
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 
@@ -4093,7 +4110,7 @@ class CoursesController < ApplicationController
   def start_youtube_migration_convert
     get_context
 
-    unless @context.root_account.feature_enabled?(:youtube_migration)
+    unless @context.feature_enabled?(:youtube_migration)
       return render status: :not_found, template: "shared/errors/404_message"
     end
 

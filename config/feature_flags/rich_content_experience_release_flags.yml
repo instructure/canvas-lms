@@ -285,7 +285,7 @@ standardize_assignment_date_formatting:
       state: allowed_on
 
 youtube_migration:
-  applies_to: RootAccount
+  applies_to: Course
   state: hidden
   display_name: YouTube content migration
   description: |-

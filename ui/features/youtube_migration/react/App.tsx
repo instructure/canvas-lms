@@ -43,6 +43,8 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Link} from '@instructure/ui-link'
 import {IconAssignmentLine, IconDiscussionLine, IconDocumentLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
+import {type CanvasProgress} from '@canvas/progress/ProgressHelpers'
+import Paginator from '@canvas/instui-bindings/react/Paginator'
 
 export interface AppProps {
   courseId: string
@@ -235,10 +237,10 @@ const createYoutubeConvertMutation = async ({
   embed,
   embedIndex,
 }: {courseId: string; scanId: number; embed: YoutubeEmbed; embedIndex: number}): Promise<{
-  result: YoutubeScanResultReport
+  progress: CanvasProgress
   embedIndex: number
 }> => {
-  const {json, response} = await doFetchApi<YoutubeScanResultReport>({
+  const {json, response} = await doFetchApi<CanvasProgress>({
     path: `/api/v1/courses/${courseId}/youtube_migration/convert`,
     method: 'POST',
     body: {embed, scan_id: scanId},
@@ -248,22 +250,7 @@ const createYoutubeConvertMutation = async ({
     throw new Error(I18n.t('Failed to convert'))
   }
 
-  return {result: json, embedIndex}
-}
-
-const onSuccessCallbackForConvert = (
-  convertHappened: () => void,
-  handleEmbedConverted: (embedIndex: number, convertStatus: ConvertStatus) => void,
-  embedIndex: number,
-) => {
-  convertHappened()
-  handleEmbedConverted(embedIndex, ConvertStatus.Converted)
-}
-
-const onErrorCallbackForConvert = () => {
-  showFlashError(
-    I18n.t('Something went wrong during convert the YouTube video. Reload the page and try again.'),
-  )()
+  return {progress: json, embedIndex}
 }
 
 enum ConvertStatus {
@@ -292,17 +279,103 @@ const EmbedsModal: React.FC<{
   const isConvertHappened = useRef(false)
   const [youtubeEmbedsState, setYoutubeEmbedsState] =
     useState<Array<YoutubeEmbed & {convertStatus?: ConvertStatus}>>(youtubeEmbeds)
+  const activePolls = useRef<Map<number, number>>(new Map())
 
   useEffect(() => {
     setYoutubeEmbedsState(youtubeEmbeds)
   }, [setYoutubeEmbedsState, youtubeEmbeds])
 
+  useEffect(() => {
+    const polls = activePolls.current
+    return () => {
+      polls.forEach(timeoutId => clearTimeout(timeoutId))
+      polls.clear()
+    }
+  }, [])
+
+  const handleEmbedConvertStatus = useCallback(
+    (embedIndex: number, convertStatus: ConvertStatus) => {
+      if (convertStatus === ConvertStatus.Converted || convertStatus === ConvertStatus.Failed) {
+        const timeoutId = activePolls.current.get(embedIndex)
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+          activePolls.current.delete(embedIndex)
+        }
+      }
+
+      setYoutubeEmbedsState(prevEmbeds =>
+        prevEmbeds.map((embed, index) =>
+          index === embedIndex ? {...embed, convertStatus} : embed,
+        ),
+      )
+    },
+    [],
+  )
+
+  const startProgressPolling = useCallback(
+    (progressId: string, embedIndex: number) => {
+      const existingTimeoutId = activePolls.current.get(embedIndex)
+      if (existingTimeoutId) {
+        clearTimeout(existingTimeoutId)
+      }
+
+      const pollProgress = async () => {
+        try {
+          const {json} = await doFetchApi<CanvasProgress>({
+            path: `/api/v1/progress/${progressId}`,
+          })
+
+          const progress = json!
+
+          if (progress.workflow_state === 'completed') {
+            if (progress.results && progress.results.success === true) {
+              handleEmbedConvertStatus(embedIndex, ConvertStatus.Converted)
+            } else {
+              handleEmbedConvertStatus(embedIndex, ConvertStatus.Failed)
+              const errorMessage =
+                progress.results?.error || I18n.t('Conversion failed with unknown error')
+              showFlashError(errorMessage)()
+            }
+          } else if (progress.workflow_state === 'failed') {
+            handleEmbedConvertStatus(embedIndex, ConvertStatus.Failed)
+            showFlashError(progress.results?.error || I18n.t('Conversion failed'))()
+          } else if (
+            progress.workflow_state === 'queued' ||
+            progress.workflow_state === 'running'
+          ) {
+            // Continue polling
+            const timeoutId = window.setTimeout(pollProgress, 2000)
+            activePolls.current.set(embedIndex, timeoutId)
+          }
+        } catch (_error) {
+          handleEmbedConvertStatus(embedIndex, ConvertStatus.Failed)
+          showFlashError(I18n.t('Failed to check conversion progress'))()
+        }
+      }
+
+      pollProgress()
+    },
+    [handleEmbedConvertStatus],
+  )
+
   const mutation = useMutation({
     mutationKey: ['youtubeMigration', 'createConvert', courseId],
     mutationFn: createYoutubeConvertMutation,
-    onSuccess: ({embedIndex}) =>
-      onSuccessCallbackForConvert(convertHappened, handleEmbedConvertStatus, embedIndex),
-    onError: onErrorCallbackForConvert, // TODO handle convert failed
+    onSuccess: ({progress, embedIndex}) => {
+      convertHappened()
+      handleEmbedConvertStatus(embedIndex, ConvertStatus.Converting)
+      startProgressPolling(progress.id, embedIndex)
+    },
+    onError: (_error, variables) => {
+      if (variables?.embedIndex !== undefined) {
+        handleEmbedConvertStatus(variables.embedIndex, ConvertStatus.Failed)
+      }
+      showFlashError(
+        I18n.t(
+          'Something went wrong during convert the YouTube video. Reload the page and try again.',
+        ),
+      )()
+    },
   })
 
   const handleEmbedConvert = (courseId: string, embed: YoutubeEmbed, index: number) => {
@@ -310,13 +383,20 @@ const EmbedsModal: React.FC<{
     mutation.mutate({courseId, scanId, embed, embedIndex: index})
   }
 
-  const handleEmbedConvertStatus = (embedIndex: number, convertStatus: ConvertStatus) => {
-    setYoutubeEmbedsState(prevEmbeds =>
-      prevEmbeds.map((embed, index) => (index === embedIndex ? {...embed, convertStatus} : embed)),
-    )
-  }
-
   const handleModalClose = () => {
+    // Stop all active polling when modal closes
+    const polls = activePolls.current
+    polls.forEach(timeoutId => clearTimeout(timeoutId))
+    polls.clear()
+
+    // Reset all convert button states to allow retry when modal reopens
+    setYoutubeEmbedsState(prevEmbeds =>
+      prevEmbeds.map(embed => ({
+        ...embed,
+        convertStatus: undefined,
+      })),
+    )
+
     if (isConvertHappened.current) {
       handleOnClose()
     }
@@ -331,7 +411,9 @@ const EmbedsModal: React.FC<{
     if (convertStatus === ConvertStatus.Converted) {
       return I18n.t('Converted')
     } else if (convertStatus === ConvertStatus.Converting) {
-      return I18n.t('Converting')
+      return I18n.t('Converting...')
+    } else if (convertStatus === ConvertStatus.Failed) {
+      return I18n.t('Failed - Retry')
     }
     return I18n.t('Convert')
   }
@@ -341,7 +423,7 @@ const EmbedsModal: React.FC<{
       open={showModal}
       onDismiss={closeModalFunction}
       size="auto"
-      label="Hello World"
+      label={I18n.t('YouTube Embeds Review')}
       shouldCloseOnDocumentClick
       onClose={handleModalClose}
     >
@@ -381,6 +463,13 @@ const EmbedsModal: React.FC<{
                     embed.convertStatus === ConvertStatus.Converting
                   }
                 >
+                  {embed.convertStatus === ConvertStatus.Converting && (
+                    <Spinner
+                      renderTitle={() => I18n.t('Converting')}
+                      size="x-small"
+                      margin="0 small 0 0"
+                    />
+                  )}
                   {getConvertButtonText(embed.convertStatus)}
                 </Button>
               </Flex.Item>
@@ -406,6 +495,10 @@ const LastScanResultView: React.FC<{
   handleCourseScan: () => void
   isRequestLoading: boolean
   handleCourseScanReload: () => void
+  currentPage: number
+  perPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }> = ({
   resources,
   handleCourseScan,
@@ -414,6 +507,10 @@ const LastScanResultView: React.FC<{
   courseId,
   scanId,
   handleCourseScanReload,
+  currentPage,
+  perPage,
+  totalPages,
+  onPageChange,
 }) => {
   const [showModal, setShowModal] = useState(false)
   const [modalYoutubeEmbeds, setYoutubeModalEmbeds] = useState<Array<YoutubeEmbed>>([])
@@ -523,6 +620,11 @@ const LastScanResultView: React.FC<{
           </Table.Body>
         </Table>
       </View>
+      {totalPages > 1 && (
+        <View as="div" margin="medium 0" textAlign="center">
+          <Paginator page={currentPage} pageCount={totalPages} loadPage={onPageChange} />
+        </View>
+      )}
     </Wrapper>
   )
 }
@@ -581,9 +683,12 @@ const youtubeScanQuery = async ({
   signal,
   queryKey,
 }: QueryFunctionContext): Promise<YoutubeScanResultReport | undefined> => {
-  const [, , courseId] = queryKey
+  const [, , courseId, page, perPage] = queryKey
   const fetchOpts = {signal}
-  const path = `/api/v1/courses/${courseId}/youtube_migration/scan`
+  const params = new URLSearchParams()
+  if (page) params.append('page', page.toString())
+  if (perPage) params.append('per_page', perPage.toString())
+  const path = `/api/v1/courses/${courseId}/youtube_migration/scan?${params.toString()}`
 
   const {json} = await doFetchApi<YoutubeScanResultReport>({path, fetchOpts})
 
@@ -611,8 +716,13 @@ const onErrorCallbackForScan = () => {
   )()
 }
 
-const onSuccessCallbackForScan = (courseId: string, queryClient: QueryClient) => {
-  queryClient.setQueryData(['youtubeMigration', 'queryLastScan', courseId], {
+const onSuccessCallbackForScan = (
+  courseId: string,
+  queryClient: QueryClient,
+  resetPagination: () => void,
+) => {
+  resetPagination()
+  queryClient.setQueryData(['youtubeMigration', 'queryLastScan', courseId, 1, 25], {
     workflow_state: YoutubeScanWorkflowState.Queued,
   })
 }
@@ -622,16 +732,27 @@ export const App: React.FC<AppProps> = ({courseId}) => {
   const queryClient = useQueryClient()
   // TODO: until tsc not fails because it can't find mutation.isLoading
   const [isMutationLoading, setIsMutationLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [perPage, setPerPage] = useState(25)
 
   const {isLoading, isError, data, refetch} = useQuery({
-    queryKey: ['youtubeMigration', 'queryLastScan', courseId],
+    queryKey: ['youtubeMigration', 'queryLastScan', courseId, currentPage, perPage],
     queryFn: youtubeScanQuery,
   })
+
+  const resetPagination = () => {
+    setCurrentPage(1)
+    setPerPage(25)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
 
   const mutation = useMutation({
     mutationKey: ['youtubeMigration', 'createScan', courseId],
     mutationFn: createYoutubeScanMutation,
-    onSuccess: () => onSuccessCallbackForScan(courseId, queryClient),
+    onSuccess: () => onSuccessCallbackForScan(courseId, queryClient, resetPagination),
     onError: onErrorCallbackForScan,
     onSettled: () => setIsMutationLoading(false),
   })
@@ -727,6 +848,10 @@ export const App: React.FC<AppProps> = ({courseId}) => {
         courseId={courseId}
         scanId={data.id}
         handleCourseScanReload={handleCourseScanReload}
+        currentPage={data.page || currentPage}
+        perPage={data.per_page || perPage}
+        totalPages={data.total_pages || 1}
+        onPageChange={handlePageChange}
       />
     )
   }
