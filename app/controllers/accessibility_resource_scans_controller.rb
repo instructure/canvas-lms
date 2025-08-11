@@ -158,7 +158,7 @@ class AccessibilityResourceScansController < ApplicationController
       message: rule&.message,
       why: rule&.why,
       path: issue.node_path,
-      issue_url: rule&.link,
+      issue_url: rule&.class&.link,
       form: issue.metadata["form"]
     }
   end

@@ -23,7 +23,9 @@ module Accessibility
       self.id = "table-caption"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         return nil if elem.tag_name.downcase != "table"
 
         caption = elem.query_selector("caption")
@@ -31,27 +33,7 @@ module Accessibility
         I18n.t("Table caption should be present.") if !caption || caption.text.gsub(/\s/, "") == ""
       end
 
-      def self.display_name
-        I18n.t("Missing table caption")
-      end
-
-      def self.message
-        I18n.t("Tables should include a caption describing the contents of the table.")
-      end
-
-      def self.why
-        I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
-      end
-
-      def self.prepend(parent, child)
-        if parent.first_element_child
-          parent.first_element_child.add_previous_sibling(child)
-        else
-          parent.add_child(child)
-        end
-      end
-
-      def self.form(_elem)
+      def form(_elem)
         Accessibility::Forms::TextInputField.new(
           label: I18n.t("Table caption"),
           undo_text: I18n.t("Caption added"),
@@ -62,7 +44,7 @@ module Accessibility
         )
       end
 
-      def self.generate_fix(elem)
+      def generate_fix(elem)
         llm_config = LLMConfigs.config_for("table_caption_generate")
         unless llm_config
           raise "LLM configuration not found for: table_caption_generate"
@@ -72,7 +54,7 @@ module Accessibility
           raise "HTML fragment is not a table."
         end
 
-        table_preview = extract_table_preview(elem)
+        table_preview = self.class.extract_table_preview(elem)
 
         # Convert Nokogiri element to HTML string
         table_html = table_preview.to_html
@@ -89,6 +71,43 @@ module Accessibility
         Rails.logger.error("Error generating table caption: #{e.message}")
         Rails.logger.error e.backtrace.join("\n")
         nil
+      end
+
+      def fix!(elem, value)
+        raise StandardError, "Caption cannot be empty." if value.blank?
+
+        caption = elem.at_css("caption")
+        if caption
+          return nil if (caption.content = value)
+
+        else
+          caption = elem.document.create_element("caption")
+          self.class.prepend(elem, caption)
+        end
+        caption.content = value
+        elem
+      end
+
+      def display_name
+        I18n.t("Missing table caption")
+      end
+
+      def message
+        I18n.t("Tables should include a caption describing the contents of the table.")
+      end
+
+      def why
+        I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
+      end
+
+      # Helper methods
+
+      def self.prepend(parent, child)
+        if parent.first_element_child
+          parent.first_element_child.add_previous_sibling(child)
+        else
+          parent.add_child(child)
+        end
       end
 
       def self.extract_table_preview(elem, rows_count = 5)
@@ -112,21 +131,6 @@ module Accessibility
 
         # Return the preview table
         table
-      end
-
-      def self.fix!(elem, value)
-        raise StandardError, "Caption cannot be empty." if value.blank?
-
-        caption = elem.at_css("caption")
-        if caption
-          return nil if (caption.content = value)
-
-        else
-          caption = elem.document.create_element("caption")
-          prepend(elem, caption)
-        end
-        caption.content = value
-        elem
       end
     end
   end

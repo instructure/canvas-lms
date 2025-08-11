@@ -32,16 +32,16 @@ module Accessibility
 
             issues = []
 
-            Rule.registry.each_value do |rule_class|
+            Rule.registry.each_value do |rule|
               doc.children.each do |node|
                 next unless node.is_a?(Nokogiri::XML::Element)
 
                 walk_dom_tree(node) do |element|
-                  next if rule_class.test(element).nil?
+                  next if rule.test(element).nil?
 
-                  issues << build_issue(rule_class, element: element.name, form: rule_class.form(element).to_h, path: element_path(element))
+                  issues << build_issue(rule, element: element.name, form: rule.form(element).to_h, path: element_path(element))
                 rescue => e
-                  log_rule_error(rule_class, element, e)
+                  log_rule_error(rule, element, e)
                 end
               end
             end

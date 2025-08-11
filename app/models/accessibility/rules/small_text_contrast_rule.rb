@@ -22,14 +22,16 @@ module Accessibility
     class SmallTextContrastRule < Accessibility::Rule
       extend Accessibility::CssAttributesHelper
 
-      self.id = "small-text-contrast"
-      self.link = "https://www.w3.org/TR/WCAG21/#contrast-minimum"
-
       CONTRAST_THRESHOLD = 4.5
       SMALL_TEXT_MAX_SIZE_PX = 18.5
       SMALL_TEXT_MAX_SIZE_BOLD_PX = 14.0
 
-      def self.test(elem)
+      self.id = "small-text-contrast"
+      self.link = "https://www.w3.org/TR/WCAG21/#contrast-minimum"
+
+      # Accessibility::Rule methods
+
+      def test(elem)
         tag_name = elem.tag_name.downcase
         return nil if %w[img br hr input select textarea button script style svg canvas iframe].include?(tag_name)
         return nil if elem.text_content.strip.empty?
@@ -39,10 +41,10 @@ module Accessibility
         style_str = elem.attribute("style")&.value.to_s
         return nil if style_str.include?("display: none") || style_str.include?("visibility: hidden")
 
-        return nil unless small_text?(style_str)
+        return nil unless self.class.small_text?(style_str)
 
-        foreground = extract_color(style_str, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = self.class.extract_color(style_str, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
@@ -51,35 +53,10 @@ module Accessibility
         end
       end
 
-      def self.display_name
-        I18n.t("Small text contrast")
-      end
-
-      def self.message
-        I18n.t("Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.")
-      end
-
-      def self.why
-        I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
-      end
-
-      def self.small_text?(style_str)
-        font_size = extract_font_size(style_str) || 16
-        font_weight = extract_font_weight(style_str) || "normal"
-
-        is_bold = %w[bold bolder 700 800 900].include?(font_weight.to_s.downcase)
-
-        font_size < if is_bold
-                      SMALL_TEXT_MAX_SIZE_BOLD_PX
-                    else
-                      SMALL_TEXT_MAX_SIZE_PX
-                    end
-      end
-
-      def self.form(elem)
+      def form(elem)
         style_str = elem.attribute("style")&.value.to_s
-        foreground = extract_color(style_str, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = self.class.extract_color(style_str, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
 
         Accessibility::Forms::ColorPickerField.new(
           title_label: I18n.t("Contrast Ratio"),
@@ -93,7 +70,7 @@ module Accessibility
         )
       end
 
-      def self.fix!(elem, value)
+      def fix!(elem, value)
         style_str = elem.attribute("style")&.value.to_s
         styles = style_str.split(";").to_h { |s| s.strip.split(":") }
 
@@ -104,14 +81,41 @@ module Accessibility
 
         elem.set_attribute("style", new_style)
 
-        foreground = extract_color(new_style, "color") || "000000"
-        background = extract_color(style_str, "background-color") || "FFFFFF"
+        foreground = self.class.extract_color(new_style, "color") || "000000"
+        background = self.class.extract_color(style_str, "background-color") || "FFFFFF"
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
         raise StandardError, "Insufficient contrast ratio (#{contrast_ratio})." if contrast_ratio < CONTRAST_THRESHOLD
 
         elem
+      end
+
+      def display_name
+        I18n.t("Small text contrast")
+      end
+
+      def message
+        I18n.t("Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.")
+      end
+
+      def why
+        I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
+      end
+
+      # Helper methods
+
+      def self.small_text?(style_str)
+        font_size = extract_font_size(style_str) || 16
+        font_weight = extract_font_weight(style_str) || "normal"
+
+        is_bold = %w[bold bolder 700 800 900].include?(font_weight.to_s.downcase)
+
+        font_size < if is_bold
+                      SMALL_TEXT_MAX_SIZE_BOLD_PX
+                    else
+                      SMALL_TEXT_MAX_SIZE_PX
+                    end
       end
     end
   end

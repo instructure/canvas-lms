@@ -23,22 +23,24 @@ module Accessibility
       self.id = "has-lang-entry"
       self.link = "https://www.w3.org/WAI/WCAG21/Techniques/pdf/PDF19"
 
-      def self.test(elem)
+      # Accessibility::Rule methods
+
+      def test(elem)
         info = elem.info || {}
 
         # Language can be stored in different fields depending on the PDF creator
         I18n.t("PDF does not contain language.") if info.values_at(:Lang, :Language, "Lang", "Language").none?
       end
 
-      def self.display_name
+      def display_name
         I18n.t("Language missing")
       end
 
-      def self.message
+      def message
         I18n.t("PDF language is not specified in the document properties.")
       end
 
-      def self.why
+      def why
         I18n.t(
           "The objective of this technique is to specify the language of a passage, phrase, " \
           "or word using the /Lang entry to provide information in the PDF document that user " \

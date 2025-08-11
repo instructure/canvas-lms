@@ -97,7 +97,7 @@ module Accessibility
             raise "Element not found for path: #{path}"
           end
         rescue => e
-          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
+          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.class.id})"
           Rails.logger.error e.backtrace.join("\n")
           [html_content, nil, e.message]
         end

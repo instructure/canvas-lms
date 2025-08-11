@@ -42,7 +42,7 @@ describe Accessibility::Rules::TableCaptionRule do
       expect(caption).to receive(:text).and_return("Valid Caption")
       expect(caption).not_to receive(:text_content)
 
-      Accessibility::Rules::TableCaptionRule.test(elem)
+      Accessibility::Rules::TableCaptionRule.new.test(elem)
     end
 
     it "maintains resource-specific isolation between content types" do
@@ -82,7 +82,7 @@ describe Accessibility::Rules::TableCaptionRule do
 
   context "form" do
     it "returns the proper form" do
-      expect(Accessibility::Rules::TableCaptionRule.form(nil).label).to eq("Table caption")
+      expect(Accessibility::Rules::TableCaptionRule.new.form(nil).label).to eq("Table caption")
     end
   end
 
@@ -127,7 +127,7 @@ describe Accessibility::Rules::TableCaptionRule do
       it "logs the error and returns nil" do
         expect(Rails.logger).to receive(:error).with(anything)
 
-        result = Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        result = Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
         expect(result).to be_nil
       end
     end
@@ -143,7 +143,7 @@ describe Accessibility::Rules::TableCaptionRule do
       it "logs the error and returns nil" do
         expect(Rails.logger).to receive(:error).with(anything)
 
-        result = Accessibility::Rules::TableCaptionRule.generate_fix(non_table_element)
+        result = Accessibility::Rules::TableCaptionRule.new.generate_fix(non_table_element)
         expect(result).to be_nil
       end
     end
@@ -154,7 +154,7 @@ describe Accessibility::Rules::TableCaptionRule do
       end
 
       it "returns the generated caption content" do
-        result = Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        result = Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
         expect(result).to eq("Generated table caption describing the data")
       end
 
@@ -167,7 +167,7 @@ describe Accessibility::Rules::TableCaptionRule do
           .with([{ role: "user", content: "Generated prompt" }])
           .and_return(mock_llm_response)
 
-        Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
       end
 
       it "uses extract_table_preview to limit table size" do
@@ -175,7 +175,7 @@ describe Accessibility::Rules::TableCaptionRule do
           .with(table_element)
           .and_call_original
 
-        Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
       end
     end
 
@@ -187,7 +187,7 @@ describe Accessibility::Rules::TableCaptionRule do
       it "logs the error and returns nil" do
         expect(Rails.logger).to receive(:error).with(anything)
 
-        result = Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        result = Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
         expect(result).to be_nil
       end
 
@@ -196,7 +196,7 @@ describe Accessibility::Rules::TableCaptionRule do
 
         expect(Rails.logger).to receive(:error).with(anything)
 
-        result = Accessibility::Rules::TableCaptionRule.generate_fix(table_element)
+        result = Accessibility::Rules::TableCaptionRule.new.generate_fix(table_element)
         expect(result).to be_nil
       end
     end
