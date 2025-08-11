@@ -587,7 +587,7 @@ describe GroupCategoriesController do
         expect(response).to be_successful
         body = response.parsed_body
 
-        expect(body["group_category"]["group_category"]["name"]).to eq new_name
+        expect(body["group_category"]["name"]).to eq new_name
         expect(@non_collaborative_category.reload.name).to eq new_name
       end
 

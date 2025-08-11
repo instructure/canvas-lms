@@ -21,7 +21,7 @@ import {Tray} from '@instructure/ui-tray'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconDownloadLine, IconExternalLinkLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconUploadLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -153,10 +153,19 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | undefined>(undefined)
   const [currentPage, setCurrentPage] = useState(1)
+  const [newlyCreatedCategoryId, setNewlyCreatedCategoryId] = useState<number | null>(null)
   const itemsPerPage = 4
   const addTagRef = useRef<HTMLElement | null>(null)
   const focusElRef = useRef<(HTMLElement | null)[]>([])
   const [focusIndex, setFocusIndex] = useState<number | null>(null)
+
+  const handleCreationSuccess = (newCategoryID: number) => {
+    setNewlyCreatedCategoryId(newCategoryID)
+    if (searchTerm.length === 0) {
+      const newPage = Math.ceil((differentiationTagCategories.length + 1) / itemsPerPage)
+      setCurrentPage(newPage)
+    }
+  }
 
   const setAddTagRef = useCallback((el: Element | null) => {
     if (el instanceof HTMLElement) {
@@ -362,9 +371,11 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
                 if (el instanceof HTMLElement) el.focus()
               })()
         }
+        newlyCreatedCategoryId={newlyCreatedCategoryId}
+        onEditButtonBlur={() => setNewlyCreatedCategoryId(null)}
       />
     ))
-  }, [paginatedCategories, handleEditCategory, focusElRef])
+  }, [paginatedCategories, handleEditCategory, focusElRef, newlyCreatedCategoryId])
 
   const handlePageChange = useCallback((newPage: number) => {
     setCurrentPage(newPage)
@@ -533,6 +544,7 @@ export default function DifferentiationTagTray(props: DifferentiationTagTrayProp
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
         differentiationTagCategoryId={selectedCategoryId}
+        onCreationSuccess={handleCreationSuccess}
       />
     </View>
   )
