@@ -32,12 +32,14 @@ jest.mock('../../BaseBlock/useGetRenderMode', () => ({
 
 const defaultProps: ButtonBlockProps = {
   settings: {
+    includeBlockTitle: false,
     alignment: 'left',
     layout: 'horizontal',
     isFullWidth: false,
     buttons: [{id: 1, text: ''}],
     backgroundColor: '#FF0000',
   },
+  title: '',
 }
 
 describe('ButtonBlock', () => {
