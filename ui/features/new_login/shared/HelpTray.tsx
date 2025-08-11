@@ -50,7 +50,22 @@ const HelpTray = () => {
       <View as="div" padding="medium">
         <Flex direction="column" gap="medium">
           <Flex alignItems="center" justifyItems="space-between">
-            <Flex.Item>{helpLink?.text && <Heading>{helpLink.text}</Heading>}</Flex.Item>
+            {helpLink?.text && (
+              <Flex.Item padding="0 space36 0 0">
+                <Heading>
+                  <span
+                    style={{
+                      overflowWrap: 'anywhere',
+                      wordBreak: 'break-word',
+                      hyphens: 'auto',
+                    }}
+                  >
+                    {helpLink.text}
+                  </span>
+                </Heading>
+              </Flex.Item>
+            )}
+
             <Flex.Item>
               <CloseButton
                 data-testid="close-help-tray-button"
