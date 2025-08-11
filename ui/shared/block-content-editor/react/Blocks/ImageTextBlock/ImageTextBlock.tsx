@@ -21,7 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ImageBlockSettings} from './ImageTextBlockSettings'
 import {Flex} from '@instructure/ui-flex'
 import {ImageTextBlockEdit} from './ImageTextBlockEdit'
-import {ImageTextBlockPreview} from './ImageTextBlockPreview'
+import {ImageTextBlockEditPreview} from './ImageTextBlockEditPreview'
 import {ImageTextBlockProps} from './types'
 import {useSave} from '../BaseBlock/useSave'
 import {ImageData} from '../BlockItems/Image/types'
@@ -75,7 +75,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
           onImageChange={onImageChange}
         />
       )}
-      {isEditPreviewMode && <ImageTextBlockPreview {...dataProps} />}
+      {isEditPreviewMode && <ImageTextBlockEditPreview {...dataProps} />}
       {isViewMode && <ImageTextBlockView {...dataProps} />}
     </Flex>
   )

@@ -21,4 +21,4 @@ export type ImageData = {
   altText: string | undefined
 }
 export type ImageEditProps = ImageData & {onImageChange: (data: ImageData) => void}
-export type ImagePreviewProps = ImageData
+export type ImageViewProps = ImageData

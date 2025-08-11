@@ -19,7 +19,7 @@
 import {ImageTextBlockViewProps} from './types'
 import {TitleView} from '../BlockItems/Title/TitleView'
 import {Flex} from '@instructure/ui-flex'
-import {ImagePreview} from '../BlockItems/Image'
+import {ImageView} from '../BlockItems/Image'
 import {TextView} from '../BlockItems/Text/TextView'
 
 export const ImageTextBlockView = ({
@@ -34,7 +34,7 @@ export const ImageTextBlockView = ({
       {settings.includeBlockTitle && <TitleView title={title} />}
       <Flex direction="row" data-testid="imagetext-block-view">
         <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
-          <ImagePreview url={url} altText={altText} />
+          <ImageView url={url} altText={altText} />
         </Flex.Item>
         <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
           <TextView content={content} />

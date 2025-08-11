@@ -17,9 +17,9 @@
  */
 
 import './image-block.css'
-import {ImagePreviewProps} from './types'
+import {ImageViewProps} from './types'
 import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 
-export const ImagePreview = ({url, altText}: ImagePreviewProps) => {
+export const ImageView = ({url, altText}: ImageViewProps) => {
   return url ? <img src={url} alt={altText} /> : <ImageBlockDefaultPreviewImage />
 }

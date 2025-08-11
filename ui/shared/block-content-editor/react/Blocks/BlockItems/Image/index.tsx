@@ -17,5 +17,5 @@
  */
 
 export * from './ImageEdit'
-export * from './ImagePreview'
+export * from './ImageView'
 export type {ImageEditProps} from './types'

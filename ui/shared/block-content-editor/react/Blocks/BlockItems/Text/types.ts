@@ -20,7 +20,7 @@ export type TextData = {
   content: string
 }
 
-export type TextPreviewProps = TextData
+export type TextEditPreviewProps = TextData
 export type TextViewProps = TextData
 
 export type TextEditProps = TextData & {
