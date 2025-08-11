@@ -198,9 +198,6 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
   return contentPropsEqual
 }
 
-// Performance thresholds for module rendering optimizations
-export const LARGE_MODULE_THRESHOLD = 50
-
 // Optimized shallow comparison for completion requirements
 const compareCompletionRequirements = (prev: any[], next: any[]): boolean => {
   if (!prev && !next) return true

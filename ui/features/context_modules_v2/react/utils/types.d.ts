@@ -43,6 +43,16 @@ export interface StandardizedDateHash {
   }
 }
 
+// Add new menu actions here (e.g., 'delete', 'sendTo', 'copyTo')
+type MenuAction = 'duplicate'
+
+type PerModuleState<T> = Record<ModuleId, T>
+
+type MenuItemActionState = {
+  type: MenuAction
+  state: boolean
+}
+
 export type ModuleItemContent = {
   id?: string
   _id?: string

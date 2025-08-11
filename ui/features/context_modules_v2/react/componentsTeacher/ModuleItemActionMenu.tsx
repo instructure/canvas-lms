@@ -43,6 +43,7 @@ const I18n = createI18nScope('context_modules_v2')
 const basicContentTypes = ['SubHeader', 'ExternalUrl']
 
 export interface ModuleItemActionMenuProps {
+  moduleId: string
   itemType: string
   content: ModuleItemContent
   canDuplicate: boolean
@@ -69,6 +70,7 @@ export interface ModuleItemActionMenuProps {
 }
 
 const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
+  moduleId,
   itemType,
   content,
   canDuplicate,
@@ -91,8 +93,8 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const isBasic = basicContentTypes.includes(itemType)
   const isFile = itemType === 'File'
   const isExternalTool = itemType === 'ExternalTool'
-
-  const {permissions} = useContextModule()
+  const {permissions, menuItemLoadingState} = useContextModule()
+  const isModuleLoading = !!menuItemLoadingState?.[moduleId]?.state
   const canEdit = permissions?.canEdit
   const canAdd = permissions?.canAdd
   const canManageSpeedGrader = permissions?.canManageSpeedGrader
@@ -109,7 +111,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   const renderMenuItem = (condition: boolean, handler: () => void, icon: any, label: string) => {
     if (!condition) return null
     return (
-      <Menu.Item onClick={handler}>
+      <Menu.Item onClick={isModuleLoading ? undefined : handler} disabled={isModuleLoading}>
         <Flex>
           <Flex.Item>{icon}</Flex.Item>
           <Flex.Item margin="0 0 0 x-small">{label}</Flex.Item>

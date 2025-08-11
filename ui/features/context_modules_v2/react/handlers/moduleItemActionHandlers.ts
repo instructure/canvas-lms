@@ -22,7 +22,12 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {getItemType, renderItemAssignToManager} from '../utils/assignToUtils'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {QueryClient} from '@tanstack/react-query'
-import type {ModuleItemContent, MasteryPathsData, ModuleAction} from '../utils/types'
+import type {
+  ModuleItemContent,
+  ModuleAction,
+  PerModuleState,
+  MenuItemActionState,
+} from '../utils/types'
 import React from 'react'
 import {MODULE_ITEMS, MODULES, MOVE_MODULE_ITEM} from '../utils/constants'
 
@@ -129,8 +134,13 @@ export const handleDuplicate = (
   itemId: string,
   queryClient: QueryClient,
   courseId: string,
+  setMenuItemLoadingState: React.Dispatch<
+    React.SetStateAction<PerModuleState<MenuItemActionState>>
+  >,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
+  setMenuItemLoadingState(prev => ({...prev, [id]: {type: 'duplicate', state: true}}))
+
   doFetchApi({
     path: `/api/v1/courses/${courseId}/modules/items/${itemId}/duplicate`,
     method: 'POST',
@@ -144,6 +154,8 @@ export const handleDuplicate = (
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate item'))
     })
+    .finally(() => setMenuItemLoadingState(({[id]: _, ...rest}) => rest))
+
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }

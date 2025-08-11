@@ -98,7 +98,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isEditItemOpen, setIsEditItemOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
-  const {courseId, isMasterCourse, isChildCourse} = useContextModule()
+  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -141,7 +141,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [content, courseId, setIsMenuOpen, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
-    handleDuplicate(moduleId, itemId, queryClient, courseId, setIsMenuOpen)
+    handleDuplicate(moduleId, itemId, queryClient, courseId, setMenuItemLoadingState, setIsMenuOpen)
   }, [moduleId, itemId, courseId, setIsMenuOpen])
 
   const handleMoveToRef = useCallback(() => {
@@ -263,6 +263,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         {/* Kebab Menu */}
         <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
           <ModuleItemActionMenu
+            moduleId={moduleId}
             itemType={content?.type || ''}
             content={content}
             canDuplicate={content?.canDuplicate || false}

@@ -29,6 +29,8 @@ import type {
   ModuleAction,
 } from '../utils/types'
 import {validateModuleItemTeacherRenderRequirements} from '../utils/utils'
+import {useContextModule} from '../hooks/useModuleContext'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -59,6 +61,10 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
   setSourceModule,
   isEmpty,
 }) => {
+  const {menuItemLoadingState} = useContextModule()
+  const loadingState = menuItemLoadingState?.[moduleId]
+  const isDuplicateLoading = loadingState?.state && loadingState?.type == 'duplicate'
+
   return (
     <View as="div" overflowX="hidden">
       <Droppable droppableId={moduleId} type="MODULE_ITEM">
@@ -75,15 +81,30 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
               overflowX: 'hidden',
             }}
           >
-            {error ? (
+            {!!isDuplicateLoading && (
+              <View as="div" textAlign="center" padding="medium">
+                <Spinner
+                  renderTitle={I18n.t('Duplicating module item…')}
+                  size="small"
+                  margin="0 small 0 0"
+                />
+                <Text size="small" color="secondary">
+                  {I18n.t('Duplicating module item…')}
+                </Text>
+              </View>
+            )}
+            {error && (
               <View as="div" textAlign="center" padding="medium">
                 <Text color="danger">{I18n.t('Error loading module items')}</Text>
               </View>
-            ) : isEmpty ? (
+            )}
+            {isEmpty && !error && (
               <View as="div" textAlign="center" padding="medium">
                 <AddItemInline moduleId={moduleId} itemCount={0} />
               </View>
-            ) : (
+            )}
+            {!error &&
+              !isEmpty &&
               moduleItems.map((item, index) => (
                 <Draggable key={`${item.id}-${index}`} draggableId={item.id} index={index}>
                   {(dragProvided, dragSnapshot) => (
@@ -126,8 +147,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                     </div>
                   )}
                 </Draggable>
-              ))
-            )}
+              ))}
             {provided.placeholder}
           </div>
         )}

@@ -17,7 +17,13 @@
  */
 
 import {createContext, useContext, useState} from 'react'
-import {ExternalTool, ModuleCursorState} from '../utils/types'
+import {
+  ExternalTool,
+  ModuleCursorState,
+  MenuAction,
+  MenuItemActionState,
+  PerModuleState,
+} from '../utils/types'
 
 const ContextModule = createContext<{
   courseId: string
@@ -36,8 +42,8 @@ const ContextModule = createContext<{
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
   moduleIndexMenuModalTools: ExternalTool[]
-  state: Record<string, any>
-  setState: (state: Record<string, any>) => void
+  menuItemLoadingState: PerModuleState<MenuItemActionState>
+  setMenuItemLoadingState: React.Dispatch<React.SetStateAction<PerModuleState<MenuItemActionState>>>
   moduleCursorState: ModuleCursorState
   setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
   modulesArePaginated: boolean
@@ -60,8 +66,10 @@ const ContextModule = createContext<{
     moduleGroupMenuTools: ExternalTool[]
     moduleMenuTools: ExternalTool[]
     moduleIndexMenuModalTools: ExternalTool[]
-    state: Record<string, any>
-    setState: (state: Record<string, any>) => void
+    menuItemLoadingState: PerModuleState<MenuItemActionState>
+    setMenuItemLoadingState: React.Dispatch<
+      React.SetStateAction<PerModuleState<MenuItemActionState>>
+    >
     moduleCursorState: ModuleCursorState
     setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
     modulesArePaginated: boolean
@@ -117,7 +125,9 @@ export const ContextModuleProvider = ({
   modulesArePaginated?: boolean
   pageSize?: number
 }) => {
-  const [state, setState] = useState({})
+  const [menuItemLoadingState, setMenuItemLoadingState] = useState<
+    PerModuleState<MenuItemActionState>
+  >({})
   const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
 
   return (
@@ -139,8 +149,8 @@ export const ContextModuleProvider = ({
         moduleGroupMenuTools,
         moduleMenuTools,
         moduleIndexMenuModalTools,
-        state,
-        setState,
+        menuItemLoadingState,
+        setMenuItemLoadingState,
         moduleCursorState,
         setModuleCursorState,
         modulesArePaginated: modulesArePaginated ?? false,
@@ -181,8 +191,8 @@ export const contextModuleDefaultProps = {
   moduleGroupMenuTools: [],
   moduleMenuTools: [],
   moduleIndexMenuModalTools: [],
-  state: {},
-  setState: () => {},
+  menuItemLoadingState: {},
+  setMenuItemLoadingState: () => {},
   moduleCursorState: {},
   setModuleCursorState: () => {},
   modulesArePaginated: false,

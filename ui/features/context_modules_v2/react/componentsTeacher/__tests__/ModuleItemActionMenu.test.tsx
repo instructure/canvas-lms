@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
@@ -26,6 +25,7 @@ const setUp = (itemType: string = 'Assignment', content: ModuleItemContent = {})
   const container = render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemActionMenu
+        moduleId=""
         itemType={itemType}
         content={content}
         canDuplicate={true}
