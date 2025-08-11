@@ -19,8 +19,11 @@
 #
 
 require_relative "../apis/api_spec_helper"
+require "feature_flag_helper"
 
 describe OutcomeResultsController do
+  include FeatureFlagHelper
+
   def context_outcome(context)
     @outcome_group = context.root_outcome_group
     @outcome = context.created_learning_outcomes.create!(title: "outcome")
@@ -1405,7 +1408,7 @@ describe OutcomeResultsController do
 
       context "outcomes_friendly_description disabled" do
         before do
-          Account.site_admin.disable_feature!(:outcomes_friendly_description)
+          mock_feature_flag_on_account(:outcomes_friendly_description, false)
         end
 
         it "returns outcomes without friendlly_description" do
@@ -1417,7 +1420,8 @@ describe OutcomeResultsController do
 
       context "outcomes_friendly_description enabled, but improved_outcomes_management disabled" do
         before do
-          @course.root_account.disable_feature!(:improved_outcomes_management)
+          mock_feature_flag_on_account(:outcomes_friendly_description, true)
+          mock_feature_flag_on_account(:improved_outcomes_management, false)
         end
 
         it "returns outcomes without friendlly_description" do

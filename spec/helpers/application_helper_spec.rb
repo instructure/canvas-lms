@@ -19,8 +19,10 @@
 #
 
 require "nokogiri"
+require "feature_flag_helper"
 
 describe ApplicationHelper do
+  include FeatureFlagHelper
   include ERB::Util
 
   alias_method :content_tag_without_nil_return, :content_tag
@@ -1445,7 +1447,7 @@ describe ApplicationHelper do
 
     context "when improved_outcomes_management FF is disabled" do
       it "sets improved_outcomes_management key in js_env to false" do
-        @course.root_account.disable_feature! :improved_outcomes_management
+        mock_feature_flag_on_account(:improved_outcomes_management, false)
         helper.improved_outcomes_management_js_env
         expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
         expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
