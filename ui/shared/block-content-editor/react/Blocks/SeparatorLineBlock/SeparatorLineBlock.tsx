@@ -26,6 +26,7 @@ export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
   settings: {
     separatorColor: string
+    backgroundColor: string
   }
 }
 
@@ -49,7 +50,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlock title={SeparatorLineBlock.craft.displayName}>
+    <BaseBlock
+      title={SeparatorLineBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+    >
       <SeparatorLineBlockContent {...props} />
     </BaseBlock>
   )
