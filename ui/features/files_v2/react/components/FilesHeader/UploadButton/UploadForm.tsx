@@ -55,16 +55,18 @@ export const UploadForm = ({
         />
         <Heading>{I18n.t('Upload file')}</Heading>
       </Modal.Header>
-      <Modal.Body as={Flex}>
-        <Flex.Item width="100%" padding="medium" height="50vh">
-          <FileUploadDrop
-            contextId={contextId}
-            contextType={contextType}
-            currentFolder={currentFolder}
-            onClose={onClose}
-            fileDropHeight={'100%'}
-          />
-        </Flex.Item>
+      <Modal.Body>
+        <Flex>
+          <Flex.Item width="100%" height="50vh">
+            <FileUploadDrop
+              contextId={contextId}
+              contextType={contextType}
+              currentFolder={currentFolder}
+              onClose={onClose}
+              fileDropHeight={'100%'}
+            />
+          </Flex.Item>
+        </Flex>
       </Modal.Body>
       <Modal.Footer>
         <Button data-testid="upload-cancel-button" onClick={onClose}>

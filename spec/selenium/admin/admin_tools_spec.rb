@@ -168,7 +168,7 @@ describe "admin_tools" do
           dialog = f("[aria-label='Generate Activity for #{@student.name}'")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from the beginning of time to now")
           # Search with begin date and end date - should show time actually being used
           perform_view_user_search(@student.id)
@@ -177,7 +177,7 @@ describe "admin_tools" do
           replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001")
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 12:00 AM to Mar 9, 2001, 12:00 AM")
           # Search with begin date/time and end date/time - should use and show given time
           perform_view_user_search(@student.id)
@@ -188,7 +188,7 @@ describe "admin_tools" do
           replace_and_proceed(dialog.find_element(:css, "[data-testid='to-time']"), "3:00 PM", { tab_out: true })
           dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          expect(f("#commMessagesPane h2:nth-of-type(2)").text).to include("Notifications sent to #{@student.name}")
+          expect(f("#commMessagesPane h3").text).to include("Notifications sent to #{@student.name}")
           expect(f(%(#commMessagesPane div[data-testid="message-list-description"])).text).to include("Displaying from Mar 3, 2001, 1:15 PM to Mar 9, 2001, 3:00 PM")
         end
 
