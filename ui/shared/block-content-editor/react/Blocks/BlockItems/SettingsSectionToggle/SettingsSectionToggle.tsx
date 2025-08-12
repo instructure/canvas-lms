@@ -43,6 +43,7 @@ export const SettingsSectionToggle = ({
       <ToggleGroup
         defaultExpanded={defaultExpanded}
         border={false}
+        transition={false}
         toggleLabel={isExpanded => (isExpanded ? expandedLabel : collapsedLabel)}
         summary={<Text variant="contentImportant">{title}</Text>}
         data-settingssectiontoggle
