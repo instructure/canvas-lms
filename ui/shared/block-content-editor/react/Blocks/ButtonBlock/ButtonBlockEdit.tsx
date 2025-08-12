@@ -27,7 +27,11 @@ export const ButtonBlockEdit = (props: ButtonBlockEditProps) => {
       {props.settings.includeBlockTitle && (
         <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
       )}
-      <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} />
+      <ButtonDisplay
+        dataTestId="button-block-edit"
+        settings={props.settings}
+        onButtonClick={() => {}}
+      />
     </Flex>
   )
 }

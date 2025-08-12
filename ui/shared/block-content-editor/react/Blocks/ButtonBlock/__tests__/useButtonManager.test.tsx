@@ -23,6 +23,8 @@ import {ButtonData} from '../types'
 const createButton = (id: number, text: string = ''): ButtonData => ({
   id,
   text,
+  url: '',
+  linkOpenMode: 'new-tab',
 })
 
 const MAX_BUTTONS = 5

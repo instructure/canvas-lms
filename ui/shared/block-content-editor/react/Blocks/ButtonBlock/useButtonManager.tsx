@@ -25,6 +25,8 @@ const MIN_BUTTONS = 1
 export const createEmptyButton = (buttonId: number): ButtonData => ({
   id: buttonId,
   text: '',
+  url: '',
+  linkOpenMode: 'new-tab',
 })
 
 export const useButtonManager = (

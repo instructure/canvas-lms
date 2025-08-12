@@ -22,8 +22,23 @@ import {SingleButtonProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const SingleButton = (props: SingleButtonProps) => {
-  const buttonText = props.button.text?.trim() || I18n.t('Button')
+export const SingleButton = ({button, isFullWidth, onButtonClick}: SingleButtonProps) => {
+  const buttonText = button.text.trim() || I18n.t('Button')
 
-  return <Button display={props.isFullWidth ? 'block' : 'inline-block'}>{buttonText}</Button>
+  const url = button.url.trim()
+  const shouldUseLink = !onButtonClick && url
+  const isNewTabLink = button.linkOpenMode === 'new-tab'
+  const href = shouldUseLink ? url : undefined
+
+  return (
+    <Button
+      display={isFullWidth ? 'block' : 'inline-block'}
+      href={href}
+      target={href && isNewTabLink ? '_blank' : undefined}
+      rel={href && isNewTabLink ? 'noopener noreferrer' : undefined}
+      data-singlebutton
+    >
+      {buttonText}
+    </Button>
+  )
 }
