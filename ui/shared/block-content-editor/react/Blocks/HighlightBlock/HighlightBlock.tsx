@@ -92,9 +92,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const HighlightBlock = (props: HighlightBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlock<typeof HighlightBlock>
       title={HighlightBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
+      statefulProps={{content: props.content}}
     >
       <HighlightBlockContent {...props} />
     </BaseBlock>
