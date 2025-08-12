@@ -22,9 +22,12 @@ import FiltersPopover from '../FiltersPopover'
 import {issueTypeOptions} from '../../../../constants'
 
 describe('FiltersPopover', () => {
-  const mockOnFilterChange = jest.fn()
-
   let liveRegion = null
+  const mockOnFilterChange = jest.fn()
+  const defaultProps = {
+    onFilterChange: mockOnFilterChange,
+    appliedFilters: [],
+  }
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
       liveRegion = document.createElement('div')
@@ -39,20 +42,20 @@ describe('FiltersPopover', () => {
   })
 
   it('renders the FiltersPopover button', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     expect(button).toBeInTheDocument()
   })
 
   it('opens the popover when the button is clicked', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
     expect(screen.getByTestId('filters-popover-header')).toBeInTheDocument()
   })
 
   it('closes the popover when the Close button is clicked', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
     const closeButton = screen.getByText('Close Filter Popover')
@@ -61,22 +64,22 @@ describe('FiltersPopover', () => {
   })
 
   it('calls onFilterChange with the selected filters when the popover is closed', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
     const closeButton = screen.getByText('Close Filter Popover')
     fireEvent.click(closeButton)
     expect(mockOnFilterChange).toHaveBeenCalledWith({
-      ruleTypes: ['all'],
-      artifactTypes: ['all'],
-      workflowStates: ['all'],
+      ruleTypes: [{label: 'all', value: 'all'}],
+      artifactTypes: [{label: 'all', value: 'all'}],
+      workflowStates: [{label: 'all', value: 'all'}],
       fromDate: null,
       toDate: null,
     })
   })
 
   it('resets the filters when the Reset button is clicked', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
     const resetButton = screen.getByTestId('reset-button')
@@ -85,7 +88,7 @@ describe('FiltersPopover', () => {
   })
 
   it('updates the selected filters when dropdowns are changed', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
 
@@ -95,7 +98,7 @@ describe('FiltersPopover', () => {
   })
 
   it('updates the date range when date inputs are changed', () => {
-    render(<FiltersPopover onFilterChange={mockOnFilterChange} />)
+    render(<FiltersPopover {...defaultProps} />)
     const button = screen.getByTestId('filters-popover-button')
     fireEvent.click(button)
 

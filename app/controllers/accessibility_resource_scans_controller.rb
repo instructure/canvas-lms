@@ -111,9 +111,9 @@ class AccessibilityResourceScansController < ApplicationController
 
     if resource_types.present?
       conditions = []
-      conditions << "wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
-      conditions << "assignment_id IS NOT NULL" if resource_types.include?("assignment")
-      conditions << "attachment_id IS NOT NULL" if resource_types.include?("attachment")
+      conditions << "accessibility_resource_scans.wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
+      conditions << "accessibility_resource_scans.assignment_id IS NOT NULL" if resource_types.include?("assignment")
+      conditions << "accessibility_resource_scans.attachment_id IS NOT NULL" if resource_types.include?("attachment")
       relation = relation.where(conditions.join(" OR ")) if conditions.any?
     end
 

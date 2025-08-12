@@ -155,17 +155,30 @@ export type GenerateResponse = {
   value?: string
 }
 
+export type FilterOption = {
+  label: string
+  value: string
+}
+
 export type Filters = {
-  ruleTypes?: string[]
-  artifactTypes?: string[]
-  workflowStates?: string[]
-  fromDate?: Date | null
-  toDate?: Date | null
+  ruleTypes?: FilterOption[]
+  artifactTypes?: FilterOption[]
+  workflowStates?: FilterOption[]
+  fromDate?: FilterOption | null
+  toDate?: FilterOption | null
 }
 
 export type FilterDateKeys = 'fromDate' | 'toDate'
 
-export type ParsedFilters = Omit<Partial<Filters>, FilterDateKeys> & {
+export type ParsedFilters = {
+  ruleTypes?: string[]
+  artifactTypes?: string[]
+  workflowStates?: string[]
   fromDate?: string
   toDate?: string
+}
+
+export interface AppliedFilter {
+  key: keyof Filters
+  option: FilterOption
 }
