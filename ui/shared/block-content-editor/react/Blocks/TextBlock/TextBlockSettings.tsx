@@ -19,13 +19,20 @@
 import {useNode} from '@craftjs/core'
 import {TextBlockProps} from './types'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('block_content_editor')
 
 export const TextBlockSettings = () => {
   const {
     actions: {setProp},
     includeBlockTitle,
+    backgroundColor,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
+    backgroundColor: node.data.props.settings.backgroundColor,
   }))
 
   const handleIncludeBlockTitleChange = () => {
@@ -34,9 +41,30 @@ export const TextBlockSettings = () => {
     })
   }
 
+  const handleBackgroundColorChange = (color: string) => {
+    setProp((props: TextBlockProps) => {
+      props.settings.backgroundColor = color
+    })
+  }
+
   return (
     <>
       <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={false}
+        includeSeparator={true}
+      >
+        <ColorPickerWrapper
+          label={I18n.t('Background')}
+          value={backgroundColor}
+          baseColor="#000000" // Temporary base color
+          baseColorLabel={I18n.t('Text')}
+          onChange={handleBackgroundColorChange}
+        />
+      </SettingsSectionToggle>
     </>
   )
 }

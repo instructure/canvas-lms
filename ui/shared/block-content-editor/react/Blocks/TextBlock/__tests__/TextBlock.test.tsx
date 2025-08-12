@@ -29,7 +29,7 @@ describe('TextBlock', () => {
     renderBlock(TextBlock, {
       title: 'Test Title',
       content: 'Test Content',
-      settings: {includeBlockTitle: true},
+      settings: {includeBlockTitle: true, backgroundColor: '#ff0000'},
     })
     expect(true).toBe(true)
   })
