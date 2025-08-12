@@ -21,6 +21,7 @@ import {useNode} from '@craftjs/core'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ButtonBlockIndividualButtonSettings} from './ButtonBlockIndividualButtonSettings'
 import {ButtonBlockGeneralButtonSettings} from './ButtonBlockGeneralButtonSettings'
+import {ButtonBlockColorSettings} from './ButtonBlockColorSettings'
 import {ButtonBlockProps, ButtonData, ButtonAlignment, ButtonLayout} from './ButtonBlock'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 
@@ -66,6 +67,15 @@ export const ButtonBlockSettings = () => {
 
   return (
     <View as="div">
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={false}
+        includeSeparator={true}
+      >
+        <ButtonBlockColorSettings />
+      </SettingsSectionToggle>
       <SettingsSectionToggle
         title={I18n.t('General button settings')}
         collapsedLabel={I18n.t('Expand general button settings')}

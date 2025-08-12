@@ -30,6 +30,8 @@ const I18n = createI18nScope('block_content_editor')
 
 type BlockFactory = {[key: string]: () => ReactElement}
 
+const defaultBackgroundColor = colors.primitives.white
+
 export const blockFactory = {
   [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
@@ -43,6 +45,7 @@ export const blockFactory = {
         layout: 'horizontal',
         isFullWidth: false,
         buttons: [{id: 1, text: ''}],
+        backgroundColor: defaultBackgroundColor,
       }}
     />
   ),
@@ -53,7 +56,7 @@ export const blockFactory = {
         displayIcon: 'warning',
         highlightColor: colors.additionalPrimitives.ocean12,
         textColor: colors.ui.textDescription,
-        backgroundColor: colors.primitives.white,
+        backgroundColor: defaultBackgroundColor,
       }}
     />
   ),
