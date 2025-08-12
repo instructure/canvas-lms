@@ -267,20 +267,13 @@ export const MessageDetailContainer = props => {
   // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
   useEffect(() => {
     if (lastMessageItem && hasMoreMenuData) {
-      const observer = new IntersectionObserver(
-        ([menuItem]) => {
-          if (menuItem.isIntersecting) {
-            observer.unobserve(lastMessageItem)
-            setLastMessageItem(null)
-            fetchMoreMenuData()
-          }
-        },
-        {
-          root: null,
-          rootMargin: '0px',
-          threshold: 0.4,
-        },
-      )
+      const observer = new IntersectionObserver(([menuItem]) => {
+        if (menuItem.isIntersecting) {
+          observer.unobserve(lastMessageItem)
+          setLastMessageItem(null)
+          fetchMoreMenuData()
+        }
+      })
 
       if (lastMessageItem) {
         observer.observe(lastMessageItem)
