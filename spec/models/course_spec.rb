@@ -2891,6 +2891,51 @@ describe Course do
         end
       end
 
+      describe "TAB_SEARCH" do
+        before do
+          allow(SmartSearch).to receive(:bedrock_client).and_return(double)
+          @course.root_account.set_feature_flag!(:smart_search, "on")
+          @course.set_feature_flag!(:smart_search, "off")
+        end
+
+        after do
+          @course.tab_configuration = []
+        end
+
+        it "does not include Search tab when course feature flag is off" do
+          tabs = @course.tabs_available(@user)
+          search_tab = tabs.find { |t| t[:id] == Course::TAB_SEARCH }
+
+          expect(search_tab).to be_nil
+        end
+
+        it "includes Search tab when course feature flag is on" do
+          @course.set_feature_flag!(:smart_search, "on")
+          @course.tab_configuration = []
+          tabs = @course.tabs_available(@user)
+          search_tab = tabs.find { |t| t[:id] == Course::TAB_SEARCH }
+
+          expect(search_tab).not_to be_nil
+          expect(tabs.index(search_tab)).to eq(1)
+        end
+
+        it "search tab renders below home tab when tab configuration is not empty" do
+          @course.set_feature_flag!(:smart_search, "on")
+          @course.tab_configuration = [
+            { id: Course::TAB_HOME },
+            { id: Course::TAB_ANNOUNCEMENTS },
+            { id: Course::TAB_MODULES },
+            { id: Course::TAB_GRADES },
+            { id: Course::TAB_SETTINGS },
+            { id: Course::TAB_GROUPS },
+          ]
+
+          tabs = @course.tabs_available(@user)
+          search_tab = tabs.find { |t| t[:id] == Course::TAB_SEARCH }
+          expect(tabs.index(search_tab)).to eq(1)
+        end
+      end
+
       it "defaults tab configuration to an empty array" do
         course = Course.new
         expect(course.tab_configuration).to eq []

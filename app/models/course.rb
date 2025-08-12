@@ -3552,6 +3552,11 @@ class Course < ActiveRecord::Base
         schedule_tab = default_tabs.detect { |t| t[:id] == TAB_SCHEDULE }
         tabs.insert(1, default_tabs.delete(schedule_tab)) if schedule_tab && !tabs.empty?
       end
+
+      # since TAB_SEARCH is added dynamically, we don't need an extra smart search check
+      smart_search_tab = default_tabs.detect { |t| t[:id] == TAB_SEARCH }
+      tabs.insert(1, default_tabs.delete(smart_search_tab)) if smart_search_tab && !tabs.empty?
+
       tabs += default_tabs
       tabs += external_tabs
 
