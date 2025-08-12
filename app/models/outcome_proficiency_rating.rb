@@ -20,6 +20,7 @@
 
 class OutcomeProficiencyRating < ApplicationRecord
   include Canvas::SoftDeletable
+  include CanvasOutcomesHelper
   extend RootAccountResolver
 
   belongs_to :outcome_proficiency, inverse_of: :outcome_proficiency_ratings
@@ -28,6 +29,7 @@ class OutcomeProficiencyRating < ApplicationRecord
   validates :points, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :color, presence: true, format: /\A([A-Fa-f0-9]{6})\z/i
   resolves_root_account through: :outcome_proficiency
+  after_commit :rollup_calculation, on: :update, if: :rollup_relevant_changes?
 
   def destroy
     if marked_for_destruction?
@@ -43,6 +45,24 @@ class OutcomeProficiencyRating < ApplicationRecord
       h["points"] = points
       h["mastery"] = mastery
       h["color"] = color
+    end
+  end
+
+  def rollup_relevant_changes?
+    saved_changes.keys.intersect?(%w[points mastery])
+  end
+
+  def rollup_calculation
+    return unless outcome_proficiency&.context.is_a?(Course)
+
+    begin
+      enqueue_rollup_calculation(course_id: outcome_proficiency.context.id)
+    rescue => e
+      Canvas::Errors.capture_exception(:outcome_rollup_callback, e, {
+                                         course_id: outcome_proficiency.context.id,
+                                         outcome_proficiency_rating_id: id,
+                                         points:
+                                       })
     end
   end
 end
