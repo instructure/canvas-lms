@@ -50,6 +50,9 @@
 <% if @assignment.present? && !@assignment.quiz_lti? && can_do(@assignment, @current_user, :update) %>
   <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
     <div id="enhanced-rubric-assignment-edit-mount-point"></div>
+    <% unless @current_user_submission&.has_submission? && @domain_root_account&.feature_enabled?(:lti_before_assignment_results) %>
+      <div id="assignment_external_tools"></div>
+    <% end %>
   <% else %>
     <div class="content-box">
       <a
