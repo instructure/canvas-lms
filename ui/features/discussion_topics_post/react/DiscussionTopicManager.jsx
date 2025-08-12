@@ -480,40 +480,47 @@ const DiscussionTopicManager = props => {
             mobile: {
               viewPortWidth: '100vw',
               padding: 'medium x-small 0',
+              height: '100vh',
             },
             desktop: {
               viewPortWidth: '480px',
               padding: 'medium medium 0 small',
+              height: `calc(100vh - ${props.navbarHeight}px)`,
             },
           }}
           render={responsiveProps => {
             return (
-              <DrawerLayout
-                onOverlayTrayChange={isOverlayed => {
-                  setSplitScreenViewOverlayed(isOverlayed)
-                }}
-              >
-                {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
-                  <Mask onClick={() => closeView()} />
-                )}
-                <DrawerLayout.Content
-                  // please keep in mind that this id is used for determining
-                  // the width of StickyToolbarWrapper upon window resize
-                  id="discussion-drawer-layout"
-                  label="Splitscreen View Content"
-                  themeOverride={{
-                    overflowY: 'unset',
+              <View height={responsiveProps.height} display="block">
+                <DrawerLayout
+                  onOverlayTrayChange={isOverlayed => {
+                    setSplitScreenViewOverlayed(isOverlayed)
                   }}
                 >
-                  <View
-                    display="block"
-                    padding={responsiveProps.padding}
-                    overflowX="auto"
-                    overflowY="auto"
-                    id="module_sequence_footer_container"
+                  {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
+                    <Mask onClick={() => closeView()} />
+                  )}
+                  <DrawerLayout.Content
+                    // please keep in mind that this id is used for determining
+                    // the width of StickyToolbarWrapper upon window resize
+                    id="discussion-drawer-layout"
+                    label="Splitscreen View Content"
                   >
-                    {ENV?.FEATURES?.discussion_checkpoints && isSpeedGraderInTopUrl ? (
-                      <StickyToolbarWrapper>
+                    <View
+                      display="block"
+                      padding={responsiveProps.padding}
+                      id="module_sequence_footer_container"
+                    >
+                      {ENV?.FEATURES?.discussion_checkpoints && isSpeedGraderInTopUrl ? (
+                        <StickyToolbarWrapper>
+                          <DiscussionTopicToolbarContainer
+                            discussionTopic={discussionTopicQuery.data.legacyNode}
+                            setUserSplitScreenPreference={setUserSplitScreenPreference}
+                            userSplitScreenPreference={userSplitScreenPreference}
+                            closeView={closeView}
+                            breakpoints={props.breakpoints}
+                          />
+                        </StickyToolbarWrapper>
+                      ) : (
                         <DiscussionTopicToolbarContainer
                           discussionTopic={discussionTopicQuery.data.legacyNode}
                           setUserSplitScreenPreference={setUserSplitScreenPreference}
@@ -521,115 +528,107 @@ const DiscussionTopicManager = props => {
                           closeView={closeView}
                           breakpoints={props.breakpoints}
                         />
-                      </StickyToolbarWrapper>
-                    ) : (
-                      <DiscussionTopicToolbarContainer
+                      )}
+                      {showTranslationControl && ENV.ai_translation_improvements && (
+                        <DiscussionTranslationModuleContainer
+                          isAnnouncement={discussionTopicQuery.data.legacyNode?.isAnnouncement}
+                        />
+                      )}
+                      {showTranslationControl && !ENV.ai_translation_improvements && (
+                        <TranslationControls />
+                      )}
+                      <DiscussionTopicContainer
                         discussionTopic={discussionTopicQuery.data.legacyNode}
-                        setUserSplitScreenPreference={setUserSplitScreenPreference}
-                        userSplitScreenPreference={userSplitScreenPreference}
-                        closeView={closeView}
-                        breakpoints={props.breakpoints}
+                        expandedTopicReply={expandedTopicReply}
+                        setExpandedTopicReply={setExpandedTopicReply}
+                        createDiscussionEntry={(message, file, isAnonymousAuthor) => {
+                          createDiscussionEntry({
+                            variables: {
+                              discussionTopicId: ENV.discussion_topic_id,
+                              message,
+                              fileId: file?._id,
+                              isAnonymousAuthor,
+                            },
+                            optimisticResponse: getOptimisticResponse({
+                              message,
+                              attachment: file,
+                              isAnonymous:
+                                isAnonymousAuthor &&
+                                !!discussionTopicQuery.data.legacyNode.anonymousState &&
+                                discussionTopicQuery.data.legacyNode.canReplyAnonymously,
+                            }),
+                          })
+                          setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
+                        }}
+                        isHighlighted={isTopicHighlighted}
+                        replyToTopicSubmission={replyToTopicSubmission}
+                        replyToEntrySubmission={replyToEntrySubmission}
+                        isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
+                        setIsSummaryEnabled={setIsSummaryEnabled}
+                        isSubmitting={isSubmitting}
                       />
-                    )}
-                    {showTranslationControl && ENV.ai_translation_improvements && (
-                      <DiscussionTranslationModuleContainer
-                        isAnnouncement={discussionTopicQuery.data.legacyNode?.isAnnouncement}
-                      />
-                    )}
-                    {showTranslationControl && !ENV.ai_translation_improvements && (
-                      <TranslationControls />
-                    )}
-                    <DiscussionTopicContainer
-                      discussionTopic={discussionTopicQuery.data.legacyNode}
-                      expandedTopicReply={expandedTopicReply}
-                      setExpandedTopicReply={setExpandedTopicReply}
-                      createDiscussionEntry={(message, file, isAnonymousAuthor) => {
-                        createDiscussionEntry({
-                          variables: {
-                            discussionTopicId: ENV.discussion_topic_id,
-                            message,
-                            fileId: file?._id,
-                            isAnonymousAuthor,
-                          },
-                          optimisticResponse: getOptimisticResponse({
-                            message,
-                            attachment: file,
-                            isAnonymous:
-                              isAnonymousAuthor &&
-                              !!discussionTopicQuery.data.legacyNode.anonymousState &&
-                              discussionTopicQuery.data.legacyNode.canReplyAnonymously,
-                          }),
-                        })
-                        setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
-                      }}
-                      isHighlighted={isTopicHighlighted}
-                      replyToTopicSubmission={replyToTopicSubmission}
-                      replyToEntrySubmission={replyToEntrySubmission}
-                      isSummaryEnabled={ENV.user_can_summarize && isSummaryEnabled}
-                      setIsSummaryEnabled={setIsSummaryEnabled}
-                      isSubmitting={isSubmitting}
-                    />
 
-                    {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
-                      .length === 0 &&
-                    (searchTerm || filter === 'unread') ? (
-                      <NoResultsFound />
-                    ) : (
-                      discussionTopicQuery.data.legacyNode.availableForUser && (
-                        <DiscussionTopicRepliesContainer
+                      {discussionTopicQuery.data.legacyNode.discussionEntriesConnection.nodes
+                        .length === 0 &&
+                      (searchTerm || filter === 'unread') ? (
+                        <NoResultsFound />
+                      ) : (
+                        discussionTopicQuery.data.legacyNode.availableForUser && (
+                          <DiscussionTopicRepliesContainer
+                            discussionTopic={discussionTopicQuery.data.legacyNode}
+                            onOpenSplitView={(
+                              discussionEntryId,
+                              withRCE,
+                              relativeId,
+                              highlightId,
+                            ) => {
+                              setHighlightEntryId(highlightId)
+                              openSplitScreenView(discussionEntryId, withRCE, relativeId)
+                            }}
+                            goToTopic={goToTopic}
+                            highlightEntryId={highlightEntryId}
+                            setHighlightEntryId={setHighlightEntryId}
+                            isSearchResults={!!searchTerm}
+                            userSplitScreenPreference={userSplitScreenPreference}
+                            refetchDiscussionEntries={discussionTopicQuery.refetch}
+                          />
+                        )
+                      )}
+                    </View>
+                  </DrawerLayout.Content>
+                  <DrawerLayout.Tray
+                    id="DrawerLayoutTray"
+                    label="Splitscreen View Tray"
+                    open={isSplitScreenViewOpen}
+                    placement="end"
+                    onEntered={() => setIsTrayFinishedOpening(true)}
+                    onDismiss={() => closeView()}
+                    data-testid="drawer-layout-tray"
+                    shouldCloseOnDocumentClick={false}
+                  >
+                    {threadParentEntryId && (
+                      <View as="div" maxWidth={responsiveProps.viewPortWidth}>
+                        <SplitScreenViewContainer
+                          relativeEntryId={relativeEntryId}
                           discussionTopic={discussionTopicQuery.data.legacyNode}
-                          onOpenSplitView={(
-                            discussionEntryId,
-                            withRCE,
-                            relativeId,
-                            highlightId,
-                          ) => {
-                            setHighlightEntryId(highlightId)
-                            openSplitScreenView(discussionEntryId, withRCE, relativeId)
-                          }}
+                          discussionEntryId={threadParentEntryId}
+                          open={isSplitScreenViewOpen}
+                          RCEOpen={editorExpanded}
+                          setRCEOpen={setEditorExpanded}
+                          onClose={closeView}
+                          onOpenSplitScreenView={openSplitScreenView}
                           goToTopic={goToTopic}
                           highlightEntryId={highlightEntryId}
                           setHighlightEntryId={setHighlightEntryId}
-                          isSearchResults={!!searchTerm}
-                          userSplitScreenPreference={userSplitScreenPreference}
-                          refetchDiscussionEntries={discussionTopicQuery.refetch}
+                          isTrayFinishedOpening={isTrayFinishedOpening}
+                          setReplyToTopicSubmission={setReplyToTopicSubmission}
+                          setReplyToEntrySubmission={setReplyToEntrySubmission}
                         />
-                      )
+                      </View>
                     )}
-                  </View>
-                </DrawerLayout.Content>
-                <DrawerLayout.Tray
-                  id="DrawerLayoutTray"
-                  label="Splitscreen View Tray"
-                  open={isSplitScreenViewOpen}
-                  placement="end"
-                  onEntered={() => setIsTrayFinishedOpening(true)}
-                  onDismiss={() => closeView()}
-                  data-testid="drawer-layout-tray"
-                  shouldCloseOnDocumentClick={false}
-                >
-                  {threadParentEntryId && (
-                    <View as="div" maxWidth={responsiveProps.viewPortWidth}>
-                      <SplitScreenViewContainer
-                        relativeEntryId={relativeEntryId}
-                        discussionTopic={discussionTopicQuery.data.legacyNode}
-                        discussionEntryId={threadParentEntryId}
-                        open={isSplitScreenViewOpen}
-                        RCEOpen={editorExpanded}
-                        setRCEOpen={setEditorExpanded}
-                        onClose={closeView}
-                        onOpenSplitScreenView={openSplitScreenView}
-                        goToTopic={goToTopic}
-                        highlightEntryId={highlightEntryId}
-                        setHighlightEntryId={setHighlightEntryId}
-                        isTrayFinishedOpening={isTrayFinishedOpening}
-                        setReplyToTopicSubmission={setReplyToTopicSubmission}
-                        setReplyToEntrySubmission={setReplyToEntrySubmission}
-                      />
-                    </View>
-                  )}
-                </DrawerLayout.Tray>
-              </DrawerLayout>
+                  </DrawerLayout.Tray>
+                </DrawerLayout>
+              </View>
             )
           }}
         />
@@ -641,6 +640,7 @@ const DiscussionTopicManager = props => {
 DiscussionTopicManager.propTypes = {
   discussionTopicId: PropTypes.string.isRequired,
   breakpoints: breakpointsShape,
+  navbarHeight: PropTypes.number,
 }
 
 export default WithBreakpoints(DiscussionTopicManager)
