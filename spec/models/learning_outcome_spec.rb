@@ -1643,4 +1643,173 @@ describe LearningOutcome do
       expect(o4.fetch_outcome_copies.count).to eq 4
     end
   end
+
+  describe "rollup calculation integration" do
+    let_once(:course) { course_model }
+    let_once(:account) { account_model }
+
+    describe "#rollup_relevant_changes?" do
+      it "returns true when calculation_method changes" do
+        outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+        outcome.update!(calculation_method: "latest")
+        expect(outcome.rollup_relevant_changes?).to be true
+      end
+
+      it "returns true when calculation_int changes" do
+        outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+        outcome.update!(calculation_int: 75)
+        expect(outcome.rollup_relevant_changes?).to be true
+      end
+    end
+
+    describe "#rollup_calculation" do
+      context "with course context" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "enqueues rollup calculation for the course when calculation_method changes" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          outcome.update!(calculation_method: "latest")
+        end
+
+        it "enqueues rollup calculation for the course when calculation_int changes" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "decaying_average", calculation_int: 65)
+          expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+            .with(course_id: course.id)
+
+          outcome.update!(calculation_int: 75)
+        end
+      end
+
+      context "with account context" do
+        it "does not enqueue rollup calculation for account-level changes" do
+          outcome = account.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          outcome.update!(calculation_method: "latest")
+        end
+      end
+
+      context "with feature flag disabled" do
+        before do
+          Account.site_admin.disable_feature!(:outcomes_rollup_propagation)
+        end
+
+        it "does not enqueue rollup calculation when feature flag is disabled" do
+          outcome = course.created_learning_outcomes.create!(title: "Test Outcome", calculation_method: "highest")
+
+          expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+          outcome.update!(calculation_method: "latest")
+        end
+      end
+    end
+
+    describe "rubric criterion changes" do
+      before do
+        Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+      end
+
+      it "enqueues rollup calculation when rubric criterion ratings change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [
+                { description: "Excellent", points: 4 },
+                { description: "Good", points: 3 }
+              ],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [
+                { description: "Excellent", points: 5 },
+                { description: "Good", points: 3 },
+                { description: "Fair", points: 2 }
+              ],
+              mastery_points: 3,
+              points_possible: 5
+            }
+          }
+        )
+      end
+
+      it "enqueues rollup calculation when mastery_points change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 4,
+              points_possible: 4
+            }
+          }
+        )
+      end
+
+      it "enqueues rollup calculation when points_possible change" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 4
+            }
+          }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        outcome.update!(
+          data: {
+            rubric_criterion: {
+              ratings: [{ description: "Good", points: 4 }],
+              mastery_points: 3,
+              points_possible: 5
+            }
+          }
+        )
+      end
+
+      it "does not enqueue rollup when non-criterion data changes" do
+        outcome = course.created_learning_outcomes.create!(
+          title: "Test Outcome",
+          data: { other_field: "value" }
+        )
+
+        expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+        outcome.update!(data: { other_field: "new_value" })
+      end
+    end
+  end
 end
