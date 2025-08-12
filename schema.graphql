@@ -8051,6 +8051,7 @@ type Rubric implements LegacyIDInterface & Node {
   """
   _id: ID!
   buttonDisplay: String!
+  canUpdateRubric: Boolean!
 
   """
   The different criteria that makes up this rubric
