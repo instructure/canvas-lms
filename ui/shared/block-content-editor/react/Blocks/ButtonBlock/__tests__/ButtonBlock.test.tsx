@@ -36,6 +36,7 @@ const defaultProps: ButtonBlockProps = {
     layout: 'horizontal',
     isFullWidth: false,
     buttons: [{id: 1, text: ''}],
+    backgroundColor: '#FF0000',
   },
 }
 

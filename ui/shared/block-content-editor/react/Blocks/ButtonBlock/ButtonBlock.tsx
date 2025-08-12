@@ -37,6 +37,7 @@ export type ButtonBlockProps = {
     alignment: ButtonAlignment
     layout: ButtonLayout
     isFullWidth: boolean
+    backgroundColor: string
   }
 }
 
@@ -57,7 +58,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const ButtonBlock = (props: ButtonBlockProps) => {
   return (
-    <BaseBlock title={ButtonBlock.craft.displayName}>
+    <BaseBlock
+      title={ButtonBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+    >
       <ButtonBlockContent {...props} />
     </BaseBlock>
   )
