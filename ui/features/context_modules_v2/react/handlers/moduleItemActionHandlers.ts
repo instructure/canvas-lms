@@ -287,6 +287,7 @@ export const handleRemove = (
   queryClient: QueryClient,
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
+  onAfterSuccess?: () => void,
 ) => {
   if (window.confirm(I18n.t('Are you sure you want to remove this item from the module?'))) {
     doFetchApi({
@@ -302,6 +303,9 @@ export const handleRemove = (
         queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
         queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
         queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+      })
+      .then(() => {
+        if (onAfterSuccess) onAfterSuccess()
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove item'))

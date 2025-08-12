@@ -999,5 +999,26 @@ describe "context modules", :ignore_js_errors do
         expect(module_items_published_icon_state?(published: true)).to be true
       end
     end
+
+    context "module item deletion" do
+      it "focuses on the next item when a module item is deleted" do
+        go_to_modules
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        first_module_item = @module3.content_tags[0]
+        second_module_item = @module3.content_tags[1]
+
+        manage_module_item_button(first_module_item.id).click
+        module_item_action_menu_link("Remove").click
+
+        alert = driver.switch_to.alert
+        expect(alert).not_to be_nil
+        alert.accept
+
+        wait_for_ajaximations
+        expect(module_item_title_by_id(second_module_item.id)).to eq(driver.switch_to.active_element)
+      end
+    end
   end
 end

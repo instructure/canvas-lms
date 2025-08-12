@@ -284,6 +284,7 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.index === nextProps.index &&
     prevProps.indent === nextProps.indent &&
     prevProps.title === nextProps.title &&
+    prevProps.focusTargetItemId === nextProps.focusTargetItemId &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
     prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
@@ -358,4 +359,15 @@ export const isModuleUnlockAtDateInTheFuture = (unlockAtDate: string) => {
   const now = moment.tz(TIMEZONE)
 
   return unlockMoment.isAfter(now)
+}
+
+export function focusModuleItemTitleLinkById(id?: string, preventScroll = false) {
+  if (!id) return
+
+  const selector = `[data-testid="module-item-title-link"][data-module-item-id="${id}"]`
+  const el = document.querySelector<HTMLElement>(selector)
+
+  if (el && typeof el.focus === 'function') {
+    el.focus({preventScroll})
+  }
 }
