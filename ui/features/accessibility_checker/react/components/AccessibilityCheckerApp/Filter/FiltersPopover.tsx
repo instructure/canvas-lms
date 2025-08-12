@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton, Button} from '@instructure/ui-buttons'
+import {Badge} from '@instructure/ui-badge'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import {Flex} from '@instructure/ui-flex'
 import {IconFilterLine} from '@instructure/ui-icons'
@@ -28,24 +29,44 @@ import FilterDropDown from './FilterDropDown'
 import {Popover} from '@instructure/ui-popover'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {artifactTypeOptions, issueTypeOptions, stateOptions} from '../../../constants'
-import {Filters} from '../../../types'
+import {AppliedFilter, FilterOption, Filters} from '../../../types'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import {getFilters} from '../../../utils/filter'
 
 const I18n = createI18nScope('accessibility_checker')
 
 interface FiltersPopoverProps {
   onFilterChange: (filters: null | Filters) => void
+  appliedFilters?: AppliedFilter[]
 }
 
-const FiltersPopover: React.FC<FiltersPopoverProps> = ({onFilterChange}: FiltersPopoverProps) => {
+const FiltersPopover: React.FC<FiltersPopoverProps> = ({
+  onFilterChange,
+  appliedFilters = [],
+}: FiltersPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedIssues, setSelectedIssues] = useState<string[]>(['all'])
-  const [selectedArtifactType, setSelectedArtifactType] = useState<string[]>(['all'])
-  const [selectedState, setSelectedState] = useState<string[]>(['all'])
-  const [fromDate, setFromDate] = useState<Date | null>(null)
-  const [toDate, setToDate] = useState<Date | null>(null)
+  const [selectedIssues, setSelectedIssues] = useState<FilterOption[]>([
+    {label: 'all', value: 'all'},
+  ])
+  const [selectedArtifactType, setSelectedArtifactType] = useState<FilterOption[]>([
+    {label: 'all', value: 'all'},
+  ])
+  const [selectedState, setSelectedState] = useState<FilterOption[]>([{label: 'all', value: 'all'}])
+  const [fromDate, setFromDate] = useState<FilterOption | null>(null)
+  const [toDate, setToDate] = useState<FilterOption | null>(null)
+  const [filterCount, setFilterCount] = useState(0)
 
   const dateFormatter = useDateTimeFormat('date.formats.medium_with_weekday')
+
+  useEffect(() => {
+    const filters = getFilters(appliedFilters)
+    setSelectedIssues(filters.ruleTypes || [{label: 'all', value: 'all'}])
+    setSelectedArtifactType(filters.artifactTypes || [{label: 'all', value: 'all'}])
+    setSelectedState(filters.workflowStates || [{label: 'all', value: 'all'}])
+    setFromDate(filters.fromDate || null)
+    setToDate(filters.toDate || null)
+    setFilterCount(appliedFilters.length)
+  }, [appliedFilters])
 
   const getFilterSelections = (): Filters => {
     return {
@@ -58,18 +79,33 @@ const FiltersPopover: React.FC<FiltersPopoverProps> = ({onFilterChange}: Filters
   }
 
   const handleReset = () => {
-    setSelectedIssues(['all'])
-    setSelectedArtifactType(['all'])
-    setSelectedState(['all'])
+    setSelectedIssues([{label: 'all', value: 'all'}])
+    setSelectedArtifactType([{label: 'all', value: 'all'}])
+    setSelectedState([{label: 'all', value: 'all'}])
     setFromDate(null)
     setToDate(null)
+    setFilterCount(0)
     onFilterChange(null)
     setIsOpen(false)
   }
 
   const handleClose = () => {
-    onFilterChange(getFilterSelections())
+    const filters = getFilterSelections()
+    setFilterCount(appliedFilters.length)
+    onFilterChange(filters)
     setIsOpen(false)
+  }
+
+  const handleDateChange = (
+    date: Date | null,
+    setDate: (date: FilterOption | null) => void,
+    label: string,
+  ) => {
+    if (date) {
+      setDate({label: `${label}: ${dateFormatter(date)}`, value: date.toISOString()})
+    } else {
+      setDate(null)
+    }
   }
 
   return (
@@ -83,14 +119,16 @@ const FiltersPopover: React.FC<FiltersPopoverProps> = ({onFilterChange}: Filters
       shouldReturnFocus
       mountNode={() => document.body}
       renderTrigger={(triggerProps: Record<string, any>) => (
-        <Button
-          {...triggerProps}
-          data-testid="filters-popover-button"
-          onClick={() => setIsOpen(true)}
-          renderIcon={<IconFilterLine />}
-        >
-          {I18n.t('Filters')}
-        </Button>
+        <Badge count={filterCount}>
+          <Button
+            {...triggerProps}
+            data-testid="filters-popover-button"
+            onClick={() => setIsOpen(true)}
+            renderIcon={<IconFilterLine />}
+          >
+            {I18n.t('Filters')}
+          </Button>
+        </Badge>
       )}
     >
       <View as="div" padding="medium" width="22rem">
@@ -131,20 +169,20 @@ const FiltersPopover: React.FC<FiltersPopoverProps> = ({onFilterChange}: Filters
             <CanvasDateInput2
               placeholder={I18n.t('From')}
               width="100%"
-              selectedDate={fromDate?.toISOString() ?? null}
+              selectedDate={fromDate?.value ?? null}
               formatDate={dateFormatter}
               interaction="enabled"
               renderLabel={I18n.t('From')}
-              onSelectedDateChange={setFromDate}
+              onSelectedDateChange={date => handleDateChange(date, setFromDate, I18n.t('From'))}
             />
             <CanvasDateInput2
               placeholder={I18n.t('To')}
               width="100%"
-              selectedDate={toDate?.toISOString() ?? null}
+              selectedDate={toDate?.value ?? null}
               interaction="enabled"
               formatDate={dateFormatter}
               renderLabel={I18n.t('To')}
-              onSelectedDateChange={setToDate}
+              onSelectedDateChange={date => handleDateChange(date, setToDate, I18n.t('To'))}
             />
           </Flex>
         </Flex>

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext} from 'react'
+import {useCallback, useContext, useMemo} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -34,6 +34,9 @@ import {SearchIssue} from './Search/SearchIssue'
 import {useDeepCompareEffect} from './useDeepCompareEffect'
 import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
 import {findById} from '../../utils/apiData'
+
+import AppliedFilters from './Filter/AppliedFilters'
+import {getAppliedFilters} from '../../utils/filter'
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
@@ -55,6 +58,8 @@ export const AccessibilityCheckerApp: React.FC = () => {
       state.setSearch,
     ]),
   )
+
+  const appliedFilters = useMemo(() => getAppliedFilters(filters || {}), [filters])
 
   const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
 
@@ -108,11 +113,14 @@ export const AccessibilityCheckerApp: React.FC = () => {
         <Flex.Item width="100%">
           <Flex justifyItems="space-between" gap="small">
             <SearchIssue onSearchChange={handleSearchChange} />
-            <FiltersPopover onFilterChange={setFilters} />
+            <FiltersPopover appliedFilters={appliedFilters} onFilterChange={setFilters} />
           </Flex>
         </Flex.Item>
       </Flex>
-      <AccessibilityIssuesSummary />
+      <AppliedFilters appliedFilters={appliedFilters} setFilters={setFilters} />
+      <View as="div" margin={appliedFilters.length === 0 ? 'medium 0' : 'small 0'}>
+        <AccessibilityIssuesSummary />
+      </View>
       <AccessibilityIssuesTable onRowClick={handleRowClick} />
     </View>
   )
