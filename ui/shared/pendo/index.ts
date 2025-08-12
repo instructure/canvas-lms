@@ -22,7 +22,9 @@ export async function initializePendo() {
   if (!whenPendoReady) {
     const result = init()
     if (!result) {
-      throw new Error('Pendo not initialized: PENDO_APP_ID missing')
+      console.info('Pendo not initialized: PENDO_APP_ID missing')
+      whenPendoReady = Promise.resolve(null)
+      return whenPendoReady
     }
 
     whenPendoReady = result.catch(error => {
