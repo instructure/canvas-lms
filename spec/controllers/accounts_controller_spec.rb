@@ -1270,6 +1270,52 @@ describe AccountsController do
         expect(@root.reload.default_due_time).to eq({ value: "22:00:00" })
       end
     end
+
+    context "when the account is a horizon account" do
+      before :once do
+        account_with_admin
+
+        @root_account = @account
+        @root_account.enable_feature!(:horizon_course_setting)
+        @root_account.enable_feature!(:horizon_learning_provider_app_for_courses)
+        @root_account.enable_feature!(:horizon_learning_provider_app_on_contextless_routes)
+
+        @career_subaccount = @root_account.sub_accounts.create!
+        @career_subaccount.horizon_account = true
+        @career_subaccount.save!
+        @root_account.reload
+      end
+
+      before do
+        user_session(@admin)
+      end
+
+      it "redirects to settings with horizon-specific query parameters" do
+        post "update", params: { id: @career_subaccount.id, account: { settings: { default_due_time: { value: "22:00" } } } }
+
+        expected_params = { content_only: "true", instui_theme: "career", force_classic: "true" }
+        expect(response).to redirect_to(account_settings_url(@career_subaccount, expected_params))
+      end
+    end
+
+    context "when the account is NOT a horizon account" do
+      before do
+        account_with_admin
+        @root = @account
+        @subaccount = account_model(parent_account: @account)
+      end
+
+      before do
+        user_session(@admin)
+      end
+
+      it "redirects to settings without any extra query parameters" do
+        post "update", params: { id: @subaccount.id, account: { settings: { default_due_time: { value: "22:00" } } } }
+
+        expect(response).to redirect_to(account_settings_url(@subaccount))
+        expect(URI.parse(response.location).query).to be_nil
+      end
+    end
   end
 
   describe "#acceptable_use_policy" do
