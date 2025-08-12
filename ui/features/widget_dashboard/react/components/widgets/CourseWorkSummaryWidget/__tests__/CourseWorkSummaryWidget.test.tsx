@@ -22,6 +22,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 import CourseWorkSummaryWidget from '../CourseWorkSummaryWidget'
+import type {BaseWidgetProps, Widget} from '../../../../types'
 
 const mockCoursesData = [
   {
@@ -40,14 +41,24 @@ const mockStatisticsData = {
   submissionsSubmittedCount: 8,
 }
 
-type Props = Record<string, never>
+const mockWidget: Widget = {
+  id: 'course-work-widget',
+  type: 'course_work_summary',
+  position: {col: 1, row: 1},
+  size: {width: 2, height: 1},
+  title: "Today's course work",
+}
 
-const buildDefaultProps = (overrides = {}): Props => {
-  const defaultProps: Props = {}
+type Props = BaseWidgetProps
+
+const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): Props => {
+  const defaultProps: Props = {
+    widget: mockWidget,
+  }
   return {...defaultProps, ...overrides}
 }
 
-const setup = (props: Props = {}) => {
+const setup = (props: Props = buildDefaultProps()) => {
   // Set up Canvas ENV
   const originalEnv = window.ENV
   window.ENV = {
@@ -264,7 +275,7 @@ describe('CourseWorkSummaryWidget', () => {
 
     const renderResult = render(
       <QueryClientProvider client={queryClient}>
-        <CourseWorkSummaryWidget />
+        <CourseWorkSummaryWidget {...buildDefaultProps()} />
       </QueryClientProvider>,
     )
 

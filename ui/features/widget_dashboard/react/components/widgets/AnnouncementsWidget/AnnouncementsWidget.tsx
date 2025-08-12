@@ -17,19 +17,15 @@
  */
 
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {View} from '@instructure/ui-view'
-import {DEFAULT_WIDGET_CONFIG} from '../constants'
-import WidgetGrid from './WidgetGrid'
+import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import type {BaseWidgetProps} from '../../../types'
 
-const I18n = createI18nScope('widget_dashboard')
-
-const DashboardTab: React.FC = () => {
+const AnnouncementsWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   return (
-    <View as="div" data-testid="dashboard-tab-content">
-      <WidgetGrid config={DEFAULT_WIDGET_CONFIG} />
-    </View>
+    <TemplateWidget widget={widget}>
+      <div>Announcements Widget</div>
+    </TemplateWidget>
   )
 }
 
-export default DashboardTab
+export default AnnouncementsWidget

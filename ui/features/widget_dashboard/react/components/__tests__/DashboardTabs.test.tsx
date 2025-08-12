@@ -277,7 +277,7 @@ describe('DashboardTabs', () => {
 
     await waitFor(() => {
       expect(getByTestId('dashboard-tab-content')).toBeInTheDocument()
-      expect(getByTestId('course-work-summary-widget')).toBeInTheDocument()
+      expect(getByTestId('widget-course-work-widget')).toBeInTheDocument()
       expect(getByText("Today's course work")).toBeInTheDocument()
     })
 

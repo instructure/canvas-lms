@@ -17,19 +17,29 @@
  */
 
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {View} from '@instructure/ui-view'
-import {DEFAULT_WIDGET_CONFIG} from '../constants'
-import WidgetGrid from './WidgetGrid'
+import {render, screen, fireEvent} from '@testing-library/react'
+import CourseGradesWidget from '../CourseGradesWidget'
+import type {BaseWidgetProps, Widget} from '../../../../types'
 
-const I18n = createI18nScope('widget_dashboard')
-
-const DashboardTab: React.FC = () => {
-  return (
-    <View as="div" data-testid="dashboard-tab-content">
-      <WidgetGrid config={DEFAULT_WIDGET_CONFIG} />
-    </View>
-  )
+const mockWidget: Widget = {
+  id: 'test-course-grades-widget',
+  type: 'course_grades',
+  position: {col: 1, row: 1},
+  size: {width: 1, height: 1},
+  title: 'Course Grades',
 }
 
-export default DashboardTab
+const buildDefaultProps = (overrides: Partial<BaseWidgetProps> = {}): BaseWidgetProps => {
+  return {
+    widget: mockWidget,
+    ...overrides,
+  }
+}
+
+describe('CourseGradesWidget', () => {
+  it('renders basic widget', () => {
+    render(<CourseGradesWidget {...buildDefaultProps()} />)
+
+    expect(screen.getByText('Course Grades Widget')).toBeInTheDocument()
+  })
+})

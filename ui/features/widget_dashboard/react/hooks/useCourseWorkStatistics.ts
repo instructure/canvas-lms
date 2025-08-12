@@ -74,11 +74,10 @@ const USER_COURSE_STATISTICS_QUERY = gql`
   }
 `
 
-async function fetchCourseStatistics({
+async function fetchAllCourseStatistics({
   startDate,
   endDate,
-  courseId,
-}: CourseWorkStatisticsParams): Promise<CourseWorkSummary> {
+}: Omit<CourseWorkStatisticsParams, 'courseId'>): Promise<UserEnrollment[]> {
   // Get current user ID from ENV
   const currentUserId = window.ENV?.current_user_id
   if (!currentUserId) {
@@ -104,53 +103,64 @@ async function fetchCourseStatistics({
 
     if (!result.legacyNode.enrollments) {
       // User has no enrollments - this is a valid state
-      return {due: 0, missing: 0, submitted: 0}
+      return []
     }
 
-    // Filter by specific course if courseId is provided
-    const enrollments = courseId
-      ? result.legacyNode.enrollments.filter(enrollment => enrollment.course._id === courseId)
-      : result.legacyNode.enrollments
-
-    // Sum up statistics from all relevant courses
-    const summary = enrollments.reduce(
-      (acc, enrollment) => {
-        const stats = enrollment.course.submissionStatistics
-        if (stats) {
-          // All counts are date-filtered
-          acc.due += stats.submissionsDueCount
-          acc.missing += stats.missingSubmissionsCount
-          acc.submitted += stats.submissionsSubmittedCount
-        }
-        return acc
-      },
-      {due: 0, missing: 0, submitted: 0},
-    )
-
-    return summary
+    return result.legacyNode.enrollments
   } catch (error) {
     console.error('Failed to fetch course statistics:', error)
     throw error
   }
 }
 
+function calculateSummaryFromEnrollments(
+  enrollments: UserEnrollment[],
+  courseId?: string,
+): CourseWorkSummary {
+  // Filter by specific course if courseId is provided
+  const filteredEnrollments = courseId
+    ? enrollments.filter(enrollment => enrollment.course._id === courseId)
+    : enrollments
+
+  // Sum up statistics from all relevant courses
+  const summary = filteredEnrollments.reduce(
+    (acc, enrollment) => {
+      const stats = enrollment.course.submissionStatistics
+      if (stats) {
+        // All counts are date-filtered
+        acc.due += stats.submissionsDueCount
+        acc.missing += stats.missingSubmissionsCount
+        acc.submitted += stats.submissionsSubmittedCount
+      }
+      return acc
+    },
+    {due: 0, missing: 0, submitted: 0},
+  )
+
+  return summary
+}
+
 export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
   const currentUserId = window.ENV?.current_user_id
 
+  // Only include date range in query key, not courseId
   const queryKey = [
     'courseStatistics',
     currentUserId,
     params.startDate.toISOString(),
     params.endDate.toISOString(),
-    params.courseId || 'all',
   ]
 
   return useQuery({
     queryKey,
-    queryFn: () => fetchCourseStatistics(params),
+    queryFn: () => fetchAllCourseStatistics({startDate: params.startDate, endDate: params.endDate}),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     retry: false, // Disable retry for tests
     enabled: !!currentUserId, // Only run if user is logged in
+    select: (enrollments: UserEnrollment[]) => {
+      // Calculate summary based on selected course
+      return calculateSummaryFromEnrollments(enrollments, params.courseId)
+    },
   })
 }

@@ -16,4 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default} from './CourseWorkSummaryWidget'
+import React from 'react'
+import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import type {BaseWidgetProps} from '../../../types'
+
+const CourseWorkWidget: React.FC<BaseWidgetProps> = ({widget}) => {
+  return (
+    <TemplateWidget widget={widget}>
+      <div>Course Work Widget</div>
+    </TemplateWidget>
+  )
+}
+
+export default CourseWorkWidget
