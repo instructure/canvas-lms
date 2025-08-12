@@ -17,17 +17,23 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {PreviewButton} from './PreviewButton'
+import {RedoButton} from './RedoButton'
+import {UndoButton} from './UndoButton'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
+import {useEditHistory} from '../hooks/useEditHistory'
 
 export const Toolbar = () => {
   const {
     editor: {mode, setMode},
   } = useBlockContentEditorContext()
+  const {undo, redo, canUndo, canRedo} = useEditHistory()
   const isPreviewMode = mode === 'preview'
 
   return (
     <Flex direction="column">
+      <UndoButton active={canUndo} onClick={undo} />
+      <RedoButton active={canRedo} onClick={redo} />
       <PreviewButton
         active={isPreviewMode}
         onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}

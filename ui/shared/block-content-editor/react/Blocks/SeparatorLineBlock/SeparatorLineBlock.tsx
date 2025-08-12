@@ -50,9 +50,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlock<typeof SeparatorLineBlock>
       title={SeparatorLineBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
+      statefulProps={{}}
     >
       <SeparatorLineBlockContent {...props} />
     </BaseBlock>

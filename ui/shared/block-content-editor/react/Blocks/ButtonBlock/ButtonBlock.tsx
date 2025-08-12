@@ -52,9 +52,10 @@ const I18n = createI18nScope('block_content_editor')
 
 export const ButtonBlock = (props: ButtonBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlock<typeof ButtonBlock>
       title={ButtonBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
+      statefulProps={{title: props.title}}
     >
       <ButtonBlockContent {...props} />
     </BaseBlock>

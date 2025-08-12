@@ -83,9 +83,15 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
 
 export const ImageTextBlock = (props: ImageTextBlockProps) => {
   return (
-    <BaseBlock
+    <BaseBlock<typeof ImageTextBlock>
       title={ImageTextBlock.craft.displayName}
       backgroundColor={props.settings.backgroundColor}
+      statefulProps={{
+        title: props.title,
+        content: props.content,
+        url: props.url,
+        altText: props.altText,
+      }}
     >
       <ImageTextContent {...props} />
     </BaseBlock>

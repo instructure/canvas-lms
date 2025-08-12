@@ -40,7 +40,7 @@ const ImageContainer = (props: ImageBlockProps) => {
 
 export const ImageBlock = (props: ImageBlockProps) => {
   return (
-    <BaseBlock title={ImageBlock.craft.displayName}>
+    <BaseBlock title={ImageBlock.craft.displayName} statefulProps={{}}>
       <ImageContainer {...props} />
     </BaseBlock>
   )
