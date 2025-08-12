@@ -26,10 +26,13 @@ export const TitleEditPreview = (props: TitleEditPreviewProps) => {
   const isTitleDefined = props.title.trim().length > 0
 
   const title = isTitleDefined ? props.title : I18n.t('Click to edit')
-  const color = isTitleDefined ? 'primary' : 'secondary'
 
   return (
-    <Heading variant="titleSection" color={color as 'primary' | 'secondary'}>
+    <Heading
+      variant="titleSection"
+      color="primary"
+      themeOverride={{primaryColor: props.contentColor}}
+    >
       {title}
     </Heading>
   )

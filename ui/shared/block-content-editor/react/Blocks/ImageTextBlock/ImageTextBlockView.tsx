@@ -31,13 +31,13 @@ export const ImageTextBlockView = ({
 }: ImageTextBlockViewProps) => {
   return (
     <>
-      {settings.includeBlockTitle && <TitleView title={title} />}
+      {settings.includeBlockTitle && <TitleView contentColor={settings.textColor} title={title} />}
       <Flex direction="row" data-testid="imagetext-block-view">
         <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
           <ImageView url={url} altText={altText} />
         </Flex.Item>
         <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextView content={content} />
+          <TextView contentColor={settings.textColor} content={content} />
         </Flex.Item>
       </Flex>
     </>

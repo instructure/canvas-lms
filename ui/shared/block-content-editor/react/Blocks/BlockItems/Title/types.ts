@@ -19,9 +19,12 @@
 export type TitleData = {
   title: string
 }
+export type TitleColor = {
+  contentColor?: string
+}
 
-export type TitleViewProps = TitleData
-export type TitleEditPreviewProps = TitleData
+export type TitleViewProps = TitleData & TitleColor
+export type TitleEditPreviewProps = TitleData & TitleColor
 export type TitleEditProps = TitleData & {
   onTitleChange: (newTitle: string) => void
 }

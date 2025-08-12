@@ -72,7 +72,17 @@ export const blockFactory = {
     />
   ),
   [ImageTextBlock.name]: () => (
-    <ImageTextBlock url="" altText="" title="" content="" settings={{includeBlockTitle: true}} />
+    <ImageTextBlock
+      url=""
+      altText=""
+      title=""
+      content=""
+      settings={{
+        includeBlockTitle: true,
+        backgroundColor: defaultBackgroundColor,
+        textColor: colors.ui.textDescription,
+      }}
+    />
   ),
   video: () => <p>video</p>,
 } as const satisfies BlockFactory

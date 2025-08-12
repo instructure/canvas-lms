@@ -20,11 +20,12 @@ import {Heading} from '@instructure/ui-heading'
 import {TitleViewProps} from './types'
 
 export const TitleView = (props: TitleViewProps) => {
-  const isTitleDefined = props.title.trim().length > 0
-  const color = isTitleDefined ? 'primary' : 'secondary'
-
   return (
-    <Heading variant="titleSection" color={color as 'primary' | 'secondary'}>
+    <Heading
+      variant="titleSection"
+      color="primary"
+      themeOverride={{primaryColor: props.contentColor}}
+    >
       {props.title}
     </Heading>
   )
