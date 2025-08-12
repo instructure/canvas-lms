@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useMemo, useEffect} from 'react'
+import {useRef, useMemo, useEffect, useCallback} from 'react'
 import {BlockData, BlockTypes} from '../AddBlock/block-data'
 
 export const useKeyboardNav = (
@@ -34,29 +34,53 @@ export const useKeyboardNav = (
     [data, selectedGroup],
   )
 
+  const updateTabIndexes = useCallback(() => {
+    elementsRef.current.forEach(element => {
+      if (element) {
+        element.setAttribute('tabIndex', '-1')
+      }
+    })
+    elementsRef.current.get(selectedGroup)?.setAttribute('tabIndex', '0')
+    elementsRef.current.get(selectedItem)?.setAttribute('tabIndex', '0')
+  }, [selectedGroup, selectedItem])
+
+  const updateFocus = (column: number, row: number) => {
+    focusedPositionRef.current = {column, row}
+
+    const focusedElement = elementsRef.current.get(
+      column === 0 ? data[row].groupName : selectedGroupItems[row].id,
+    )
+
+    if (focusedElement) {
+      focusedElement.setAttribute('tabIndex', '0')
+      focusedElement.focus()
+    }
+  }
+
   useEffect(() => {
     for (const [key, value] of elementsRef.current.entries()) {
       if (value === null) {
         elementsRef.current.delete(key)
       }
     }
-  }, [selectedGroup])
 
-  const updateFocus = (column: number, row: number) => {
-    focusedPositionRef.current = {column, row}
-    elementsRef.current
-      .get(column === 0 ? data[row].groupName : selectedGroupItems[row].id)
-      ?.focus()
-  }
+    updateTabIndexes()
+  }, [elementsRef, updateTabIndexes])
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const {column, row} = focusedPositionRef.current
-    event.preventDefault()
-    if (event.key === 'Enter' || event.key === ' ') {
+
+    // Sometimes first column TAB navigation jump to X button, force left navigation to selected item
+    if (event.key === 'Tab' && !event.shiftKey && column === 0) {
+      elementsRef.current.get(selectedItem)?.focus()
+      event.preventDefault()
+    } else if (event.key === 'Enter' || event.key === ' ') {
       if (column === 0) {
         onGroupChange(data[row])
+        updateFocus(0, row)
       } else {
         onItemChange(selectedGroupItems[row].id)
+        updateFocus(1, row)
       }
     } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
       if (event.key === 'ArrowRight' && column === 0) {
@@ -67,6 +91,7 @@ export const useKeyboardNav = (
         updateFocus(0, newRow)
       }
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
       const columnLength = column === 0 ? data.length : selectedGroupItems.length
       const newRow =
         event.key === 'ArrowDown' ? Math.min(row + 1, columnLength - 1) : Math.max(row - 1, 0)
@@ -74,8 +99,23 @@ export const useKeyboardNav = (
     }
   }
 
+  const overrideFocus = (column: number, row: number) => {
+    focusedPositionRef.current = {column, row}
+  }
+
+  const handleBlur = (event: React.FocusEvent) => {
+    if (
+      event.target !== elementsRef.current.get(selectedGroup) &&
+      event.target !== elementsRef.current.get(selectedItem)
+    ) {
+      event.target.setAttribute('tabIndex', '-1')
+    }
+  }
+
   return {
     handleKeyDown,
     elementsRef,
+    overrideFocus,
+    handleBlur,
   }
 }

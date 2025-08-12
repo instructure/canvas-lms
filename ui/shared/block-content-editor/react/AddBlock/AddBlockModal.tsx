@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {AddBlockModalBody} from './AddBlockModalBody'
-import {ReactElement, useState} from 'react'
+import React, {ReactElement, useState, useRef} from 'react'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -32,6 +32,7 @@ export const AddBlockModal = (props: {
   onAddBlock: (block: ReactElement) => void
 }) => {
   const [selectedBlock, setSelectedBlock] = useState<ReactElement>()
+  const closeButtonRef = useRef<Element | null>(null)
 
   return (
     <Modal
@@ -39,6 +40,7 @@ export const AddBlockModal = (props: {
       size="large"
       open={props.open}
       onDismiss={props.onDismiss}
+      defaultFocusElement={() => closeButtonRef.current}
     >
       <Modal.Header>
         <Flex justifyItems="space-between">

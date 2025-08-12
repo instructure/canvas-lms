@@ -23,9 +23,10 @@ export const GroupedSelectLayout = (props: {
   groups: ReactNode
   items: ReactNode
   onKeyDown: (event: React.KeyboardEvent) => void
+  onBlur?: (event: React.FocusEvent) => void
 }) => {
   return (
-    <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown}>
+    <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown} onBlur={props.onBlur}>
       <Flex.Item direction="column" size="200px">
         {props.groups}
       </Flex.Item>

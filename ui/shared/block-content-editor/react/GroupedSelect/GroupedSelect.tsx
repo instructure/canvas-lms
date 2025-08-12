@@ -39,7 +39,20 @@ export const GroupedSelect = (props: {
     props.onChange(id)
   }
 
-  const {handleKeyDown, elementsRef} = useKeyboardNav(
+  const handleGroupFocus = (groupName: string) => {
+    const groupIndex = props.data.findIndex(group => group.groupName === groupName) || 0
+    overrideFocus(0, groupIndex)
+  }
+
+  const handleItemFocus = (id: BlockTypes) => {
+    const itemIndex =
+      props.data
+        .find(group => group.groupName === selectedGroup)
+        ?.items.findIndex(item => item.id === id) || 0
+    overrideFocus(1, itemIndex)
+  }
+
+  const {handleKeyDown, elementsRef, overrideFocus, handleBlur} = useKeyboardNav(
     props.data,
     selectedItem,
     selectedGroup,
@@ -54,6 +67,7 @@ export const GroupedSelect = (props: {
   return (
     <GroupedSelectLayout
       onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
       groups={props.data.map(group => (
         <GroupedSelectEntry
           key={group.groupName}
@@ -66,6 +80,7 @@ export const GroupedSelect = (props: {
           onClick={() => {
             handleGroupChange(group)
           }}
+          onFocus={() => handleGroupFocus(group.groupName)}
         />
       ))}
       items={props.data
@@ -82,6 +97,7 @@ export const GroupedSelect = (props: {
             onClick={() => {
               handleItemChange(item.id)
             }}
+            onFocus={() => handleItemFocus(item.id)}
           />
         ))}
     />
