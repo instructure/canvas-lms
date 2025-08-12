@@ -142,6 +142,10 @@ module Modules2IndexPage
     "[data-item-id='#{module_item_id}']"
   end
 
+  def module_item_title_by_id_selector(module_item_id)
+    "[data-testid='module-item-title-link'][data-module-item-id='#{module_item_id}']"
+  end
+
   def module_item_discussion_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='discussion-icon']"
   end
@@ -485,6 +489,10 @@ module Modules2IndexPage
 
   def module_item_by_id(module_item_id)
     f(module_item_by_id_selector(module_item_id))
+  end
+
+  def module_item_title_by_id(module_item_id)
+    f(module_item_title_by_id_selector(module_item_id))
   end
 
   def module_item_discussion_icon(module_item_id)

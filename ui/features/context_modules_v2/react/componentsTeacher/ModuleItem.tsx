@@ -51,6 +51,7 @@ export interface ModuleItemProps {
   published?: boolean
   canUnpublish?: boolean
   dragHandleProps?: any // For react-beautiful-dnd
+  focusTargetItemId?: string
   onEdit?: (id: string) => void
   onDuplicate?: (id: string) => void
   onRemove?: (id: string) => void
@@ -78,6 +79,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   published,
   canUnpublish,
   dragHandleProps,
+  focusTargetItemId,
   setModuleAction,
   setSelectedModuleItem,
   setIsManageModuleContentTrayOpen,
@@ -139,7 +141,13 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                 <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
                   {/* Item Title */}
                   <Flex.Item shouldGrow={true}>
-                    <ModuleItemTitle content={content} url={url} title={title} onClick={onClick} />
+                    <ModuleItemTitle
+                      moduleItemId={_id}
+                      content={content}
+                      url={url}
+                      title={title}
+                      onClick={onClick}
+                    />
                   </Flex.Item>
                   {/* Due Date and Points Possible */}
                   <Flex.Item>
@@ -168,6 +176,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             published={published || false}
             canBeUnpublished={canUnpublish || false}
             masteryPathsData={masteryPathsData}
+            focusTargetItemId={focusTargetItemId}
             setModuleAction={setModuleAction}
             setSelectedModuleItem={setSelectedModuleItem}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}

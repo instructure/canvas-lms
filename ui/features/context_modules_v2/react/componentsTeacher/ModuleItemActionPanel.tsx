@@ -48,7 +48,11 @@ import {
   ModuleItemMasterCourseRestrictionType,
 } from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
-import {mapContentSelection, mapContentTypeForSharing} from '../utils/utils'
+import {
+  focusModuleItemTitleLinkById,
+  mapContentSelection,
+  mapContentTypeForSharing,
+} from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
 import EditItemModal from './EditItemModal'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -68,6 +72,7 @@ interface ModuleItemActionPanelProps {
   published: boolean
   canBeUnpublished: boolean
   masteryPathsData: MasteryPathsData | null
+  focusTargetItemId?: string
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
   setIsManageModuleContentTrayOpen?: (isOpen: boolean) => void
@@ -87,6 +92,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   published,
   canBeUnpublished,
   masteryPathsData,
+  focusTargetItemId,
   setModuleAction,
   setSelectedModuleItem,
   setIsManageModuleContentTrayOpen,
@@ -188,8 +194,10 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [setIsDirectShareCourseOpen, setIsMenuOpen])
 
   const handleRemoveRef = useCallback(() => {
-    handleRemove(moduleId, itemId, title, queryClient, courseId, setIsMenuOpen)
-  }, [moduleId, itemId, content, courseId, setIsMenuOpen])
+    handleRemove(moduleId, itemId, title, queryClient, courseId, setIsMenuOpen, () =>
+      focusModuleItemTitleLinkById(focusTargetItemId),
+    )
+  }, [moduleId, itemId, content, courseId, setIsMenuOpen, focusTargetItemId])
 
   const handleMasteryPathsRef = useCallback(() => {
     handleMasteryPaths(itemId, setIsMenuOpen)
