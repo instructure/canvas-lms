@@ -24,7 +24,7 @@ import ReactDOM from 'react-dom'
 import DiscussionTopicKeyboardShortcutModal from './react/KeyboardShortcuts/DiscussionTopicKeyboardShortcutModal'
 import {Portal} from '@instructure/ui-portal'
 
-function DiscussionPageLayout() {
+function DiscussionPageLayout({navbarHeight}) {
   return (
     <>
       {!window.ENV.disable_keyboard_shortcuts && (
@@ -36,7 +36,10 @@ function DiscussionPageLayout() {
       )}
       <Portal open={true} mountNode={document.getElementById('content')}>
         <div id="discussion-redesign-layout" className="discussion-redesign-layout">
-          <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />
+          <DiscussionTopicsPost
+            discussionTopicId={ENV.discussion_topic_id}
+            navbarHeight={navbarHeight}
+          />
         </div>
       </Portal>
     </>
@@ -60,7 +63,7 @@ const renderFooter = () => {
 }
 
 export const adjustFooter = () => {
-  const masqueradeBar = document.getElementById('masquerade_bar');
+  const masqueradeBar = document.getElementById('masquerade_bar')
   const container = $('#module_sequence_footer_container')
   const footer = $('#module_sequence_footer')
 
@@ -71,20 +74,23 @@ export const adjustFooter = () => {
 
     footer.css('width', `calc(${containerWidth} - ${containerRightPosition})`) // width with padding
     footer.css('right', `${containerRightPosition}`)
-    footer.css('bottom',  masqueradeBarHeight)
+    footer.css('bottom', masqueradeBarHeight)
   }
 }
 
 ready(() => {
-  setTimeout(() => {
-    ReactDOM.render(<DiscussionPageLayout />, document.getElementById('content'))
-  })
-
   document.querySelector('body')?.classList.add('full-width')
   document.querySelector('div.ic-Layout-contentMain')?.classList.remove('ic-Layout-contentMain')
-  document
-    .querySelector('.ic-app-nav-toggle-and-crumbs.no-print')
-    ?.setAttribute('style', 'margin: 0 0 0 24px')
+  const navbar = document.querySelector('.ic-app-nav-toggle-and-crumbs.no-print')
+  navbar?.setAttribute('style', 'margin: 0 0 0 24px')
+  const navbarHeight = navbar?.getBoundingClientRect().height ?? 72
+
+  setTimeout(() => {
+    ReactDOM.render(
+      <DiscussionPageLayout navbarHeight={navbarHeight} />,
+      document.getElementById('content'),
+    )
+  })
 
   const urlParams = new URLSearchParams(window.location.search)
   if (ENV.SEQUENCE != null && !urlParams.get('embed')) {
