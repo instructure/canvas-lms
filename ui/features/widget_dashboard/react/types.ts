@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {TAB_IDS} from './constants'
 
 export type TabId = (typeof TAB_IDS)[keyof typeof TAB_IDS]
@@ -65,3 +66,18 @@ export interface DateRangeOption {
   startDate: Date
   endDate: Date
 }
+
+export interface BaseWidgetProps {
+  widget: Widget
+  isLoading?: boolean
+  error?: string | null
+  onRetry?: () => void
+}
+
+export interface WidgetRenderer {
+  component: React.ComponentType<BaseWidgetProps>
+  displayName: string
+  description: string
+}
+
+export type WidgetRegistry = Record<string, WidgetRenderer>

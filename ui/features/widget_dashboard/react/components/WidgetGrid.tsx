@@ -17,10 +17,14 @@
  */
 
 import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
 import type {Widget, WidgetConfig} from '../types'
-import {WIDGET_TYPES} from '../constants'
-import CourseWorkSummaryWidget from './widgets/CourseWorkSummaryWidget'
+import {getWidget} from './WidgetRegistry'
+
+const I18n = createI18nScope('widget_dashboard')
 
 interface WidgetGridProps {
   config: WidgetConfig
@@ -28,12 +32,16 @@ interface WidgetGridProps {
 
 const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
   const renderWidget = (widget: Widget) => {
-    switch (widget.type) {
-      case WIDGET_TYPES.COURSE_WORK_SUMMARY:
-        return <CourseWorkSummaryWidget />
-      default:
-        return null
+    const widgetRenderer = getWidget(widget.type)
+
+    if (!widgetRenderer) {
+      return (
+        <Text color="danger">{I18n.t('Unknown widget type: %{type}', {type: widget.type})}</Text>
+      )
     }
+
+    const WidgetComponent = widgetRenderer.component
+    return <WidgetComponent widget={widget} />
   }
 
   const calculateGridColumn = (widget: Widget) => {
@@ -48,28 +56,39 @@ const WidgetGrid: React.FC<WidgetGridProps> = ({config}) => {
     return `${startRow} / ${endRow + 1}`
   }
 
+  const maxRows =
+    config.widgets.length > 0
+      ? Math.max(...config.widgets.map(widget => widget.position.row + widget.size.height - 1))
+      : 1
+
+  const renderWidgetInView = (widget: Widget) => (
+    <div
+      key={widget.id}
+      data-testid={`widget-container-${widget.id}`}
+      style={{
+        gridColumn: calculateGridColumn(widget),
+        gridRow: calculateGridRow(widget),
+      }}
+    >
+      <View height="100%" style={{overflow: 'hidden'}}>
+        {renderWidget(widget)}
+      </View>
+    </div>
+  )
+
   return (
     <div
+      data-testid="widget-grid"
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${config.columns}, 1fr)`,
+        gridTemplateRows: `repeat(${maxRows}, 20rem)`,
         gap: '1rem',
         width: '100%',
+        overflow: 'visible',
       }}
-      data-testid="widget-grid"
     >
-      {config.widgets.map(widget => (
-        <div
-          key={widget.id}
-          style={{
-            gridColumn: calculateGridColumn(widget),
-            gridRow: calculateGridRow(widget),
-          }}
-          data-testid={`widget-${widget.id}`}
-        >
-          {renderWidget(widget)}
-        </div>
-      ))}
+      {config.widgets.map(widget => renderWidgetInView(widget))}
     </div>
   )
 }

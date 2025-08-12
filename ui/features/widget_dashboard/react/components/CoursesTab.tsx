@@ -57,14 +57,11 @@ const CoursesTab: React.FC = () => {
   useEffect(() => {
     if (dashboardCards.length > 0 && containerRef.current) {
       try {
-        // Initialize the color store with course asset strings - this is crucial!
         const courseAssetStrings = dashboardCards.map(card => card.assetString)
         DashboardCardBackgroundStore.setDefaultColors(courseAssetStrings)
 
-        // Create the dashboard cards using the same function as the original dashboard
         const dashboardCardsElement = createDashboardCards(dashboardCards, DashboardCard, {})
 
-        // Clear and append to container
         containerRef.current.innerHTML = ''
         if (React.isValidElement(dashboardCardsElement)) {
           import('react-dom/client').then(({createRoot}) => {

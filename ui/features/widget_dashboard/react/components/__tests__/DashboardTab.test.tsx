@@ -162,7 +162,7 @@ describe('DashboardTab', () => {
 
     await waitFor(() => {
       expect(getByTestId('widget-grid')).toBeInTheDocument()
-      expect(getByTestId('course-work-summary-widget')).toBeInTheDocument()
+      expect(getByTestId('widget-course-work-widget')).toBeInTheDocument()
     })
 
     cleanup()

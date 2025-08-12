@@ -18,22 +18,20 @@
 
 import React, {useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
-import type {CourseOption, DateRangeOption} from '../../../types'
+import TemplateWidget from '../TemplateWidget/TemplateWidget'
+import StatisticsCard from './StatisticsCard'
+import type {CourseOption, DateRangeOption, BaseWidgetProps} from '../../../types'
 import {useCourseWorkStatistics} from '../../../hooks/useCourseWorkStatistics'
 import {useUserCourses} from '../../../hooks/useUserCourses'
 
 const I18n = createI18nScope('widget_dashboard')
 
-const CourseWorkSummaryWidget: React.FC = () => {
+const CourseWorkSummaryWidget: React.FC<BaseWidgetProps> = ({widget}) => {
   const [selectedCourse, setSelectedCourse] = useState<string>('all')
   const [selectedDateRange, setSelectedDateRange] = useState<string>('next_3_days')
 
@@ -86,9 +84,9 @@ const CourseWorkSummaryWidget: React.FC = () => {
 
   const courseId = useMemo(() => {
     if (selectedCourse === 'all') {
-      return undefined // Let API return all courses
+      return undefined
     }
-    return selectedCourse.replace('course_', '') // Remove course_ prefix if present
+    return selectedCourse.replace('course_', '')
   }, [selectedCourse])
 
   const {
@@ -119,7 +117,6 @@ const CourseWorkSummaryWidget: React.FC = () => {
     }
   }
 
-  // Generate single tooltip message with all three descriptions
   const tooltipMessage = useMemo(() => {
     const selectedOption = dateRangeOptions.find(option => option.id === selectedDateRange)
     const rangeLabel = selectedOption?.label || 'selected date range'
@@ -133,118 +130,98 @@ const CourseWorkSummaryWidget: React.FC = () => {
     )
   }, [selectedDateRange, dateRangeOptions])
 
-  // Simple statistics card component without individual tooltips
-  const StatisticsCard: React.FC<{
-    count: number
-    label: string
-    backgroundColor: string
-  }> = ({count, label, backgroundColor}) => (
-    <Flex.Item shouldGrow={true}>
-      <View
-        as="div"
-        padding="medium"
-        borderRadius="medium"
-        background="primary"
-        textAlign="center"
-        themeOverride={{
-          backgroundPrimary: backgroundColor,
-        }}
-      >
-        <Text size="x-large" weight="bold">
-          {count}
-        </Text>
-        <View as="div" margin="x-small 0 0">
-          <Text size="small">{label}</Text>
-        </View>
-      </View>
-    </Flex.Item>
+  const statisticsData = useMemo(
+    () => [
+      {
+        key: 'due',
+        count: summary.due,
+        label: I18n.t('Due'),
+        backgroundColor: '#E0EBF5',
+      },
+      {
+        key: 'missing',
+        count: summary.missing,
+        label: I18n.t('Missing'),
+        backgroundColor: '#FCE4E5',
+      },
+      {
+        key: 'submitted',
+        count: summary.submitted,
+        label: I18n.t('Submitted'),
+        backgroundColor: '#DCEEE4',
+      },
+    ],
+    [summary],
   )
 
   return (
-    <View
-      as="div"
-      padding="medium"
-      shadow="above"
-      borderRadius="medium"
-      background="primary"
-      data-testid="course-work-summary-widget"
+    <TemplateWidget
+      widget={widget}
+      isLoading={isLoading}
+      error={error ? I18n.t('Failed to load course work data. Please try again.') : null}
+      loadingText={I18n.t('Loading course work data...')}
+      headerActions={
+        <Tooltip renderTip={tooltipMessage} placement="top">
+          <IconButton
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Information about course work counts')}
+          >
+            <IconInfoLine size="x-small" />
+          </IconButton>
+        </Tooltip>
+      }
     >
-      <Flex direction="column" gap="small">
-        <Flex direction="row" alignItems="center" gap="x-small">
-          <Heading level="h3" margin="0">
-            {I18n.t("Today's course work")}
-          </Heading>
-          <Tooltip renderTip={tooltipMessage} placement="top">
-            <IconButton
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              screenReaderLabel={I18n.t('Information about course work counts')}
-            >
-              <IconInfoLine size="x-small" />
-            </IconButton>
-          </Tooltip>
-        </Flex>
+      <Flex direction="column" gap="x-small">
+        <Flex.Item overflowY="hidden">
+          <Flex gap="small" wrap="wrap" padding="xx-small">
+            <Flex.Item>
+              <SimpleSelect
+                renderLabel={I18n.t('Course')}
+                value={selectedCourse}
+                onChange={handleCourseChange}
+                width="12rem"
+              >
+                {courseOptions.map(option => (
+                  <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+                    {option.name}
+                  </SimpleSelect.Option>
+                ))}
+              </SimpleSelect>
+            </Flex.Item>
 
-        <Flex gap="small" wrap="wrap">
-          <Flex.Item shouldGrow={false}>
-            <SimpleSelect
-              renderLabel={I18n.t('Course')}
-              value={selectedCourse}
-              onChange={handleCourseChange}
-              width="12rem"
-            >
-              {courseOptions.map(option => (
-                <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                  {option.name}
-                </SimpleSelect.Option>
-              ))}
-            </SimpleSelect>
-          </Flex.Item>
-
-          <Flex.Item shouldGrow={false}>
-            <SimpleSelect
-              renderLabel={I18n.t('Date Range')}
-              value={selectedDateRange}
-              onChange={handleDateRangeChange}
-              width="12rem"
-            >
-              {dateRangeOptions.map(option => (
-                <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
-                  {option.label}
-                </SimpleSelect.Option>
-              ))}
-            </SimpleSelect>
-          </Flex.Item>
-        </Flex>
-
-        {isLoading ? (
-          <View as="div" textAlign="center" margin="medium 0">
-            <Spinner renderTitle={I18n.t('Loading course work data...')} size="medium" />
-          </View>
-        ) : error ? (
-          <View as="div" textAlign="center" margin="medium 0">
-            <Text color="danger">
-              {I18n.t('Failed to load course work data. Please try again.')}
-            </Text>
-          </View>
-        ) : (
-          <Flex gap="medium" margin="medium 0 0">
-            <StatisticsCard count={summary.due} label={I18n.t('Due')} backgroundColor="#E0EBF5" />
-            <StatisticsCard
-              count={summary.missing}
-              label={I18n.t('Missing')}
-              backgroundColor="#FCE4E5"
-            />
-            <StatisticsCard
-              count={summary.submitted}
-              label={I18n.t('Submitted')}
-              backgroundColor="#DCEEE4"
-            />
+            <Flex.Item>
+              <SimpleSelect
+                renderLabel={I18n.t('Date Range')}
+                value={selectedDateRange}
+                onChange={handleDateRangeChange}
+                width="12rem"
+              >
+                {dateRangeOptions.map(option => (
+                  <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>
+                    {option.label}
+                  </SimpleSelect.Option>
+                ))}
+              </SimpleSelect>
+            </Flex.Item>
           </Flex>
-        )}
+        </Flex.Item>
+        <Flex.Item shouldGrow>
+          <Flex gap="small" margin="small 0 0 xx-small">
+            {statisticsData.map(stat => (
+              <Flex.Item key={stat.key} shouldGrow shouldShrink>
+                <StatisticsCard
+                  count={stat.count}
+                  label={stat.label}
+                  backgroundColor={stat.backgroundColor}
+                />
+              </Flex.Item>
+            ))}
+          </Flex>
+        </Flex.Item>
       </Flex>
-    </View>
+    </TemplateWidget>
   )
 }
 
