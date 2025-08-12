@@ -37,7 +37,7 @@ const defaultProps: ButtonBlockProps = {
     alignment: 'left',
     layout: 'horizontal',
     isFullWidth: false,
-    buttons: [{id: 1, text: ''}],
+    buttons: [{id: 1, text: '', url: '', linkOpenMode: 'new-tab'}],
     backgroundColor: '#FF0000',
   },
   title: '',

@@ -20,10 +20,13 @@ import {TitleData} from '../BlockItems/Title/types'
 
 export type ButtonAlignment = 'left' | 'center' | 'right'
 export type ButtonLayout = 'horizontal' | 'vertical'
+export type ButtonLinkOpenMode = 'new-tab' | 'same-tab'
 
 export type ButtonData = {
   id: number
   text: string
+  url: string
+  linkOpenMode: ButtonLinkOpenMode
 }
 
 export type ButtonBlockSettings = {
@@ -47,6 +50,7 @@ export type ButtonBlockEditProps = ButtonBlockBase & {
 
 export type ButtonDisplayProps = ButtonBlockSettings & {
   dataTestId: string
+  onButtonClick?: (buttonId: number) => void
 }
 
 export type ButtonBlockIndividualButtonSettingsProps = {
@@ -66,4 +70,5 @@ export type ButtonBlockGeneralButtonSettingsProps = {
 export type SingleButtonProps = {
   button: ButtonData
   isFullWidth: boolean
+  onButtonClick?: (buttonId: number) => void
 }

@@ -54,7 +54,7 @@ export const blockFactory = {
         alignment: 'left',
         layout: 'horizontal',
         isFullWidth: false,
-        buttons: [{id: 1, text: ''}],
+        buttons: [{id: 1, text: '', url: '', linkOpenMode: 'new-tab'}],
         backgroundColor: defaultBackgroundColor,
       }}
       title=""

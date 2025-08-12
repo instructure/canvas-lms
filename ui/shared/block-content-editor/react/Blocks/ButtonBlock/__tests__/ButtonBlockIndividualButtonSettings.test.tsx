@@ -20,13 +20,16 @@ import {render, screen, fireEvent, act} from '@testing-library/react'
 import {ButtonBlockIndividualButtonSettings} from '../ButtonBlockIndividualButtonSettings'
 import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from '../types'
 
-const createEmptyButton = (id: number, text: string = ''): ButtonData => ({
+const createButton = (id: number, options: Partial<ButtonData> = {}): ButtonData => ({
   id,
-  text,
+  text: '',
+  url: '',
+  linkOpenMode: 'new-tab',
+  ...options,
 })
 
 const defaultProps: ButtonBlockIndividualButtonSettingsProps = {
-  initialButtons: [createEmptyButton(1, 'Button 1'), createEmptyButton(2, 'Button 2')],
+  initialButtons: [createButton(1, {text: 'Button 1'}), createButton(2, {text: 'Button 2'})],
   onButtonsChange: jest.fn(),
 }
 
@@ -100,9 +103,9 @@ describe('ButtonBlockIndividualButtonSettings', () => {
 
       expect(screen.getByTestId('button-settings-toggle-3')).toBeVisible()
       expect(buttonsChanged).toHaveBeenCalledWith([
-        {id: 1, text: 'Button 1'},
-        {id: 2, text: 'Button 2'},
-        {id: 3, text: ''},
+        createButton(1, {text: 'Button 1'}),
+        createButton(2, {text: 'Button 2'}),
+        createButton(3),
       ])
     })
 
@@ -117,7 +120,7 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       })
 
       expect(screen.queryByTestId('button-settings-toggle-1')).not.toBeInTheDocument()
-      expect(buttonsChanged).toHaveBeenCalledWith([{id: 2, text: 'Button 2'}])
+      expect(buttonsChanged).toHaveBeenCalledWith([createButton(2, {text: 'Button 2'})])
     })
 
     it('updates button text', () => {
@@ -133,8 +136,43 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       })
 
       expect(buttonsChanged).toHaveBeenCalledWith([
-        {id: 1, text: 'Updated Button 1'},
-        {id: 2, text: 'Button 2'},
+        createButton(1, {text: 'Updated Button 1'}),
+        createButton(2, {text: 'Button 2'}),
+      ])
+    })
+
+    it('updates button url', () => {
+      const buttonsChanged = jest.fn()
+      render(
+        <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
+      )
+
+      clickToggleButton(1)
+      const buttonUrlInput = screen.getByRole('textbox', {name: /url/i})
+      act(() => {
+        fireEvent.change(buttonUrlInput, {target: {value: 'https://example.com'}})
+      })
+
+      expect(buttonsChanged).toHaveBeenCalledWith([
+        createButton(1, {text: 'Button 1', url: 'https://example.com'}),
+        createButton(2, {text: 'Button 2'}),
+      ])
+    })
+
+    it('updates button linkOpenMode', () => {
+      const buttonsChanged = jest.fn()
+      render(
+        <ButtonBlockIndividualButtonSettings {...defaultProps} onButtonsChange={buttonsChanged} />,
+      )
+
+      clickToggleButton(1)
+
+      fireEvent.click(screen.getByLabelText(/how to open link/i))
+      fireEvent.click(screen.getByText(/open in the current tab/i))
+
+      expect(buttonsChanged).toHaveBeenCalledWith([
+        createButton(1, {text: 'Button 1', linkOpenMode: 'same-tab'}),
+        createButton(2, {text: 'Button 2'}),
       ])
     })
   })

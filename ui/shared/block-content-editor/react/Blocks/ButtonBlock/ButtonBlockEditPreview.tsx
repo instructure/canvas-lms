@@ -25,7 +25,11 @@ export const ButtonBlockEditPreview = (props: ButtonBlockEditPreviewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && <TitleEditPreview title={props.title} />}
-      <ButtonDisplay dataTestId="button-block-edit-preview" settings={props.settings} />
+      <ButtonDisplay
+        dataTestId="button-block-edit-preview"
+        settings={props.settings}
+        onButtonClick={() => {}}
+      />
     </Flex>
   )
 }
