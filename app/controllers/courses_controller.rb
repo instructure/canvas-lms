@@ -1231,7 +1231,7 @@ class CoursesController < ApplicationController
                                enrollment_scope.active_or_pending
                              end
 
-          enrollment_types = UserSearch.validate_enrollment_types(search_params[:enrollment_type]) if search_params[:enrollment_type].present?
+          enrollment_types = UserSearch.validate_enrollment_types(Array(search_params[:enrollment_type])) if search_params[:enrollment_type].present?
 
           enrollment_scope = enrollment_scope.where(type: enrollment_types) if enrollment_types.present?
           enrollments_by_user = enrollment_scope.group_by(&:user_id)
