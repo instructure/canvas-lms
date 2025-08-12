@@ -26,8 +26,6 @@ import {updateModuleItem, itemContentKey} from '../jquery/utils'
 import RelockModulesDialog from '@canvas/relock-modules-dialog'
 import type {
   CanvasId,
-  DoFetchModuleResponse,
-  DoFetchModuleItemsResponse,
   KeyedModuleItems,
   ModuleItem,
   ModuleItemStateData,
@@ -38,12 +36,23 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules_utils_publishmoduleitemhelper')
 
-export function publishModule(
-  courseId: CanvasId,
-  moduleId: CanvasId,
-  skipItems: boolean,
-  onPublishComplete: () => void = () => {},
-) {
+interface PublishingModuleProps {
+  courseId: CanvasId
+  moduleId: CanvasId
+  onPublishComplete?: () => void
+  setIsPublishing?: (isPublishing: boolean) => void
+  moduleIsPublished?: boolean
+  skipItems: boolean
+}
+
+export function publishModule({
+  courseId,
+  moduleId,
+  onPublishComplete = () => {},
+  setIsPublishing,
+  moduleIsPublished,
+  skipItems,
+}: PublishingModuleProps) {
   const loadingMessage = skipItems
     ? I18n.t('Publishing module')
     : I18n.t('Publishing module and items')
@@ -59,15 +68,19 @@ export function publishModule(
     loadingMessage,
     successMessage,
     onPublishComplete,
+    setIsPublishing,
+    moduleIsPublished,
   )
 }
 
-export function unpublishModule(
-  courseId: CanvasId,
-  moduleId: CanvasId,
-  skipItems: boolean,
-  onPublishComplete: () => void = () => {},
-) {
+export function unpublishModule({
+  courseId,
+  moduleId,
+  onPublishComplete = () => {},
+  setIsPublishing,
+  moduleIsPublished,
+  skipItems,
+}: PublishingModuleProps) {
   const loadingMessage = skipItems
     ? I18n.t('Unpublishing module')
     : I18n.t('Unpublishing module and items')
@@ -82,6 +95,8 @@ export function unpublishModule(
     loadingMessage,
     successMessage,
     onPublishComplete,
+    setIsPublishing,
+    moduleIsPublished,
   )
 }
 
@@ -93,10 +108,13 @@ export function batchUpdateOneModuleApiCall(
   loadingMessage: string,
   successMessage: string,
   onPublishComplete?: () => void,
+  setIsPublishing?: (isPublishing: boolean) => void,
+  moduleIsPublished?: boolean,
 ) {
   const path = `/api/v1/courses/${courseId}/modules/${moduleId}`
 
-  const published = getModulePublishState(moduleId)
+  const published = moduleIsPublished || getModulePublishState(moduleId)
+  setIsPublishing?.(true)
   exportFuncs.renderContextModulesPublishIcon(courseId, moduleId, published, true, loadingMessage)
   exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, true)
   exportFuncs.disableContextModulesPublishMenu(true)
@@ -144,6 +162,9 @@ export function batchUpdateOneModuleApiCall(
             false,
             loadingMessage,
           )
+          if (published === newPublishedState) {
+            setIsPublishing?.(false)
+          }
         })
     })
     .catch((error: Error) => {
@@ -152,6 +173,7 @@ export function batchUpdateOneModuleApiCall(
         err: error,
         type: 'error',
       })
+      setIsPublishing?.(false)
       exportFuncs.updateModuleItemsPublishedStates(moduleId, undefined, false)
     })
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback} from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
@@ -67,7 +67,12 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
   const [isAddItemOpen, setIsAddItemOpen] = useState(false)
+  const [isPublishing, setIsPublishing] = useState(false)
   const {courseId} = useContextModule()
+
+  useEffect(() => {
+    setIsPublishing(false)
+  }, [published])
 
   const onPublishCompleteRef = useCallback(() => {
     handlePublishComplete(queryClient, id, courseId)
@@ -91,7 +96,8 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             moduleId={id}
             moduleName={name}
             published={published}
-            isPublishing={false}
+            isPublishing={isPublishing}
+            setIsPublishing={setIsPublishing}
             onPublishComplete={onPublishCompleteRef}
           />
         </Flex.Item>
