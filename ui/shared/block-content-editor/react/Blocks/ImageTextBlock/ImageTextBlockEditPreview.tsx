@@ -31,13 +31,15 @@ export const ImageTextBlockEditPreview = ({
 }: ImageTextBlockEditPreviewProps) => {
   return (
     <>
-      {settings.includeBlockTitle && <TitleEditPreview title={title} />}
+      {settings.includeBlockTitle && (
+        <TitleEditPreview contentColor={settings.textColor} title={title} />
+      )}
       <Flex direction="row" data-testid="imagetext-block-editpreview">
         <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
           <ImageView url={url} altText={altText} />
         </Flex.Item>
         <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextEditPreview content={content} />
+          <TextEditPreview contentColor={settings.textColor} content={content} />
         </Flex.Item>
       </Flex>
     </>

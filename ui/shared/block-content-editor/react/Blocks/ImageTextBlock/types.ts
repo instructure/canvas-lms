@@ -23,6 +23,8 @@ import {TitleData} from '../BlockItems/Title/types'
 export type ImageTextSettings = {
   settings: {
     includeBlockTitle: boolean
+    backgroundColor: string
+    textColor: string
   }
 }
 export type ImageTextData = TextData & ImageData

@@ -37,6 +37,8 @@ const defaultProps: ImageTextBlockProps = {
   altText: '',
   settings: {
     includeBlockTitle: false,
+    backgroundColor: '',
+    textColor: '',
   },
 }
 
