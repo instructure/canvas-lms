@@ -16,22 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
-import {PreviewButton} from './PreviewButton'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconEyeLine} from '@instructure/ui-icons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-export const Toolbar = () => {
-  const {
-    editor: {mode, setMode},
-  } = useBlockContentEditorContext()
-  const isPreviewMode = mode === 'preview'
+const I18n = createI18nScope('block_content_editor')
 
+export const PreviewButton = (props: {
+  active: boolean
+  onClick: () => void
+}) => {
   return (
-    <Flex direction="column">
-      <PreviewButton
-        active={isPreviewMode}
-        onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
-      />
-    </Flex>
+    <IconButton
+      screenReaderLabel={I18n.t('preview')}
+      color={props.active ? 'primary' : 'secondary'}
+      renderIcon={<IconEyeLine />}
+      onClick={props.onClick}
+    />
   )
 }
