@@ -28,7 +28,7 @@ const I18n = createI18nScope('widget_dashboard')
 interface SubmissionStatistics {
   submissionsDueCount: number
   missingSubmissionsCount: number
-  submittedSubmissionsCount: number
+  submissionsSubmittedCount: number
 }
 
 interface UserEnrollment {
@@ -65,7 +65,7 @@ const USER_COURSE_STATISTICS_QUERY = gql`
             submissionStatistics {
               submissionsDueCount(startDate: $startDate, endDate: $endDate)
               missingSubmissionsCount
-              submittedSubmissionsCount
+              submissionsSubmittedCount
             }
           }
         }
@@ -117,10 +117,10 @@ async function fetchCourseStatistics({
       (acc, enrollment) => {
         const stats = enrollment.course.submissionStatistics
         if (stats) {
-          // Only "due" count is date-filtered, missing/submitted are totals
+          // All counts are date-filtered
           acc.due += stats.submissionsDueCount
           acc.missing += stats.missingSubmissionsCount
-          acc.submitted += stats.submittedSubmissionsCount
+          acc.submitted += stats.submissionsSubmittedCount
         }
         return acc
       },

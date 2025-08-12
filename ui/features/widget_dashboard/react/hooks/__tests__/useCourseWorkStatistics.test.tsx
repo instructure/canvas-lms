@@ -27,7 +27,7 @@ import {useCourseWorkStatistics} from '../useCourseWorkStatistics'
 const mockStatisticsData = {
   submissionsDueCount: 5,
   missingSubmissionsCount: 2,
-  submittedSubmissionsCount: 8,
+  submissionsSubmittedCount: 8,
 }
 
 const mockGqlResponse = {
@@ -143,7 +143,7 @@ describe('useCourseWorkStatistics', () => {
       expect(result.current.data).toEqual({
         due: mockStatisticsData.submissionsDueCount,
         missing: mockStatisticsData.missingSubmissionsCount,
-        submitted: mockStatisticsData.submittedSubmissionsCount,
+        submitted: mockStatisticsData.submissionsSubmittedCount,
       })
       expect(result.current.error).toBeNull()
     })
@@ -174,7 +174,7 @@ describe('useCourseWorkStatistics', () => {
       expect(result.current.data).toEqual({
         due: mockStatisticsData.submissionsDueCount,
         missing: mockStatisticsData.missingSubmissionsCount,
-        submitted: mockStatisticsData.submittedSubmissionsCount,
+        submitted: mockStatisticsData.submissionsSubmittedCount,
       })
     })
 
@@ -284,7 +284,7 @@ describe('useCourseWorkStatistics', () => {
     const zeroStatsData = {
       submissionsDueCount: 0,
       missingSubmissionsCount: 0,
-      submittedSubmissionsCount: 0,
+      submissionsSubmittedCount: 0,
     }
 
     const zeroStatsResponse = {
