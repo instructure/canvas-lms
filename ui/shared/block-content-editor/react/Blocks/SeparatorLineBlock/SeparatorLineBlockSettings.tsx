@@ -21,6 +21,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {SeparatorLineBlockProps} from './SeparatorLineBlock'
+import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -38,12 +39,33 @@ export const SeparatorLineBlockSettings = () => {
     })
   }
 
+  const handleBackgroundColorChange = (value: string) => {
+    setProp((props: SeparatorLineBlockProps) => {
+      props.settings.backgroundColor = value
+    })
+  }
+
   return (
     <View as="div" padding="small">
+      <SettingsSectionToggle
+        title={I18n.t('Color settings')}
+        collapsedLabel={I18n.t('Expand color settings')}
+        expandedLabel={I18n.t('Collapse color settings')}
+        defaultExpanded={true}
+        includeSeparator={true}
+      >
+        <ColorPickerWrapper
+          label={I18n.t('Background')}
+          value={settings.backgroundColor}
+          baseColor={settings.separatorColor}
+          onChange={handleBackgroundColorChange}
+          baseColorLabel={I18n.t('Background')}
+        />
+      </SettingsSectionToggle>
       <ColorPickerWrapper
         label={I18n.t('Separator')}
         value={settings.separatorColor}
-        baseColor={'#ffffff'} // Temporary base color
+        baseColor={settings.backgroundColor}
         onChange={handleSeparatorColorChange}
         baseColorLabel={I18n.t('Background')}
       />

@@ -42,7 +42,10 @@ export const blockFactory = {
   ),
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => (
-    <SeparatorLineBlock thickness="small" settings={{separatorColor: colors.ui.lineDivider}} />
+    <SeparatorLineBlock
+      thickness="small"
+      settings={{separatorColor: colors.ui.lineDivider, backgroundColor: defaultBackgroundColor}}
+    />
   ),
   [ButtonBlock.name]: () => (
     <ButtonBlock
