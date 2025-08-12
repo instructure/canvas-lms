@@ -25,6 +25,7 @@ describe "youtube migration", :ignore_js_errors do
     let(:youtube_src) { "https://www.youtube.com/embed/example_video_id" }
     let(:youtube_body) { "<iframe src=\"#{youtube_src}\"</iframe>" }
     let(:wiki_page) { @course.wiki_pages.create!(title: "Foo", body: youtube_body) }
+    let(:feature_flag) { :youtube_overlay }
 
     before do
       stub_rcs_config
@@ -33,7 +34,7 @@ describe "youtube migration", :ignore_js_errors do
     shared_examples "overlay visibility" do
       context "when FF is off" do
         before do
-          @course.root_account.disable_feature!(:youtube_migration)
+          Account.site_admin.disable_feature!(feature_flag)
         end
 
         it "should not show overlay" do
@@ -46,7 +47,7 @@ describe "youtube migration", :ignore_js_errors do
 
       context "when FF is on" do
         before do
-          @course.root_account.enable_feature!(:youtube_migration)
+          Account.site_admin.enable_feature!(feature_flag)
         end
 
         it "should show overlay" do

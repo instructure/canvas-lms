@@ -460,6 +460,7 @@ class ApplicationController < ActionController::Base
     files_a11y_rewrite
     rce_a11y_resize
     hide_legacy_course_analytics
+    youtube_overlay
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

@@ -13809,6 +13809,7 @@ el:
     current_enrollment: 
       favorited_tooltip: "Κάντε κλικ για αφαίρεση από το μενού μαθημάτων."
       nonfavorited_tooltip: "Κάντε κλικ για προσθήκη στο μενού μαθημάτων."
+      unknown: Άγνωστο
       unpublished_course: "μη δημοσιευμένο"
       unpublished_course_tooltip: "<mrk mid=\"1820\" mtype=\"seg\">Αυτό το μάθημα δεν έχει δημοσιευθεί.</mrk> <mrk mid=\"1821\" mtype=\"seg\">Οι σπουδαστές θα πρέπει να επικοινωνήσουν με τον εκπαιδευτή του μαθήματος για πρόσβαση.</mrk>"
     dashboard_invitation: 
