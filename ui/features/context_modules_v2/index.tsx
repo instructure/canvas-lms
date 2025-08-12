@@ -34,12 +34,15 @@ const I18n = createI18nScope('context_modules_v2')
 
 ready(() => {
   const ENV = window.ENV as GlobalEnv
-
   const container = document.getElementById('content')
 
   if (!ENV.course_id) {
     console.error(I18n.t('Course ID is required'))
     return
+  }
+
+  if (ENV.PAGE_TITLE) {
+    document.title = ENV.PAGE_TITLE
   }
 
   if (container) {

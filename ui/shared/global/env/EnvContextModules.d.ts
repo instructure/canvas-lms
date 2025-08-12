@@ -23,6 +23,7 @@
  */
 export interface EnvContextModules {
   course_id: string
+  PAGE_TITLE: string | null
   CONTEXT_URL_ROOT: string
   ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: boolean
   CONTENT_MIGRATIONS_EXPIRE_DAYS: number

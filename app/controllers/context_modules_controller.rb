@@ -336,6 +336,7 @@ class ContextModulesController < ApplicationController
 
         js_env(MODULES_PERMISSIONS: modules_permissions)
         js_env(MODULES_OBSERVER_INFO: modules_observer_info)
+        js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2
