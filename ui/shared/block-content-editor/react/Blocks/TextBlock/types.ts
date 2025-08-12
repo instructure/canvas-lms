@@ -22,6 +22,7 @@ import {TitleData} from '../BlockItems/Title/types'
 export type TextSettings = {
   settings: {
     includeBlockTitle: boolean
+    backgroundColor: string
   }
 }
 export type TextBlockEditHandlers = {

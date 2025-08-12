@@ -58,7 +58,7 @@ const I18n = createI18nScope('block_content_editor')
 
 export const TextBlock = (props: TextBlockProps) => {
   return (
-    <BaseBlock title={TextBlock.craft.displayName}>
+    <BaseBlock title={TextBlock.craft.displayName} backgroundColor={props.settings.backgroundColor}>
       <TextBlockContent {...props} />
     </BaseBlock>
   )

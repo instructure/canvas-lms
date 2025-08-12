@@ -33,7 +33,13 @@ type BlockFactory = {[key: string]: () => ReactElement}
 const defaultBackgroundColor = colors.primitives.white
 
 export const blockFactory = {
-  [TextBlock.name]: () => <TextBlock title="" content="" settings={{includeBlockTitle: true}} />,
+  [TextBlock.name]: () => (
+    <TextBlock
+      title=""
+      content=""
+      settings={{includeBlockTitle: true, backgroundColor: defaultBackgroundColor}}
+    />
+  ),
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => (
     <SeparatorLineBlock thickness="small" settings={{separatorColor: colors.ui.lineDivider}} />
