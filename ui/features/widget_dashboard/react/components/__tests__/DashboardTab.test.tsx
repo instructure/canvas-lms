@@ -59,7 +59,7 @@ const mockStatisticsData = {
             submissionStatistics: {
               submissionsDueCount: 3,
               missingSubmissionsCount: 1,
-              submittedSubmissionsCount: 5,
+              submissionsSubmittedCount: 5,
             },
           },
         },
@@ -70,7 +70,7 @@ const mockStatisticsData = {
             submissionStatistics: {
               submissionsDueCount: 2,
               missingSubmissionsCount: 0,
-              submittedSubmissionsCount: 3,
+              submissionsSubmittedCount: 3,
             },
           },
         },

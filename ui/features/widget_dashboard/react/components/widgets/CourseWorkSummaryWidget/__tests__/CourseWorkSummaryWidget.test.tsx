@@ -37,7 +37,7 @@ const mockCoursesData = [
 const mockStatisticsData = {
   submissionsDueCount: 5,
   missingSubmissionsCount: 2,
-  submittedSubmissionsCount: 8,
+  submissionsSubmittedCount: 8,
 }
 
 type Props = Record<string, never>
@@ -224,7 +224,7 @@ describe('CourseWorkSummaryWidget', () => {
                     submissionStatistics: {
                       submissionsDueCount: 0,
                       missingSubmissionsCount: 0,
-                      submittedSubmissionsCount: 0,
+                      submissionsSubmittedCount: 0,
                     },
                   },
                 },

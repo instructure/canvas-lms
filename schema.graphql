@@ -425,6 +425,7 @@ type Assignment implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   """
   autoGradeAssignmentIssues: EligibilityIssue
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
   canUnpublish: Boolean
 
   """
@@ -3563,6 +3564,7 @@ type Discussion implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   availableForUser: Boolean!
   canDuplicate: Boolean
   canGroup: Boolean
+  canManageAssignTo: Boolean
   canReplyAnonymously: Boolean!
   canUnpublish: Boolean!
 
@@ -3682,6 +3684,7 @@ type Discussion implements AssignedDates & LegacyIDInterface & ModuleItemInterfa
   onlyVisibleToOverrides: Boolean
   participant: DiscussionParticipant
   permissions: DiscussionPermissions
+  pinnedEntries: [DiscussionEntry!]
   podcastEnabled: Boolean
   podcastHasStudentPosts: Boolean
   pointsPossible: Float
@@ -4318,6 +4321,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Placement
   """
   _id: ID!
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -4426,6 +4430,7 @@ type ExternalUrl implements LegacyIDInterface & ModuleItemInterface & Timestampe
   """
   _id: ID!
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -4454,6 +4459,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   _id: ID!
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -5950,6 +5956,7 @@ type ModuleExternalTool implements LegacyIDInterface & ModuleItemInterface & Tim
   """
   _id: ID!
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -6120,6 +6127,7 @@ An item that can be in context modules
 """
 interface ModuleItemInterface {
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -7140,6 +7148,7 @@ type Page implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   """
   _id: ID!
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -7826,6 +7835,7 @@ type Quiz implements AssignedDates & LegacyIDInterface & ModuleItemInterface & N
   """
   assignedToDates: [DateHash!]
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -8639,6 +8649,7 @@ type SubAssignmentSubmission {
 
 type SubHeader implements ModuleItemInterface {
   canDuplicate: Boolean
+  canManageAssignTo: Boolean
 
   """
   Whether the module item can be unpublished
@@ -9609,7 +9620,11 @@ enum SubmissionState {
 
 type SubmissionStatistics {
   missingSubmissionsCount: Int!
+  submissionsDueCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
   submissionsDueThisWeekCount: Int!
+  submissionsOverdueCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
+  submissionsSubmittedCount(endDate: ISO8601DateTime, startDate: ISO8601DateTime): Int!
+  submittedSubmissionsCount: Int!
 }
 
 enum SubmissionStatusTagType {
