@@ -173,7 +173,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   return visiblePageInfo && !isEmptyModule ? (
     <View as="div">
       {content}
-      <Flex as="div" justifyItems="center" alignItems="center" margin="small 0 0 0">
+      <Flex as="div" justifyItems="center" alignItems="center">
         <PaginatedNavigation
           isLoading={isLoading}
           currentPage={pageIndex}
