@@ -55,9 +55,12 @@ module CanvasCareer
     private
 
     def preferred_experience
-      return Constants::Experience::ACADEMIC if @session[EXPERIENCE_PREFERENCE_SESSION_KEY] == Constants::Experience::ACADEMIC
+      return Constants::Experience::CAREER if @session[EXPERIENCE_PREFERENCE_SESSION_KEY] == Constants::Experience::CAREER
 
-      Constants::Experience::CAREER
+      # Default to Academic to avoid being disruptive to users with both experiences who are used to Academic.
+      # This won't affect institutions with Career at the root account or users who are only associated with
+      # Career since they won't have the option to switch anyway.
+      Constants::Experience::ACADEMIC
     end
 
     def preferred_role
