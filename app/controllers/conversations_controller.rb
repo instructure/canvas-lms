@@ -142,6 +142,11 @@
 #           "description": "If requested, this field will be included and contain a url to retrieve the user's avatar.",
 #           "example": "https://canvas.instructure.com/images/messages/avatar-50.png",
 #           "type": "string"
+#         },
+#         "uuid": {
+#           "description": "The Canvas UUID for the participant.",
+#           "example": "W9GQIcdoDTqwX8mxIunDQQVL6WZTaGmpa5xovmCB",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -179,9 +184,10 @@ class ConversationsController < ApplicationController
   #
   # @argument filter[] [String, course_id|group_id|user_id]
   #   When set, only return conversations for the specified courses, groups
-  #   or users. The id should be prefixed with its type, e.g. "user_123" or
-  #   "course_456". Can be an array (by setting "filter[]") or single value
-  #   (by setting "filter")
+  #   or users. The id should be prefixed with its type, e.g. "user_123",
+  #  "uuid:W9GQIcdoDTqwX8mxIunDQQVL6WZTaGmpa5xovmCB", or "course_456".
+  #  For users, you can use either their numeric ID or UUID prefixed with "uuid:".
+  #  Can be an array (by setting "filter[]") or single value (by setting "filter")
   #
   # @argument filter_mode ["and"|"or", default "or"]
   #   When filter[] contains multiple filters, combine them with this mode,
@@ -197,8 +203,9 @@ class ConversationsController < ApplicationController
   #   paged conversation data, and "conversation_ids" which will contain the
   #   ids of all conversations under this scope/filter in the same order.
   #
-  # @argument include[] [Optional, String, "participant_avatars"]
-  #   "participant_avatars":: Optionally include an "avatar_url" key for each user participanting in the conversation
+  # @argument include[] [Optional, String, "participant_avatars"|"uuid"]
+  #   "participant_avatars":: Optionally include an "avatar_url" key for each user participating in the conversation
+  #   "uuid":: Optionally include an "uuid" key for each user participating in the conversation
   #
   # @response_field id The unique identifier for the conversation.
   # @response_field subject The subject of the conversation.
@@ -229,7 +236,8 @@ class ConversationsController < ApplicationController
   # @response_field participants Array of users (id, name, full_name) participating in
   #   the conversation. Includes current user. If `include[]=participant_avatars`
   #   was passed as an argument, each user in the array will also have an
-  #   "avatar_url" field
+  #   "avatar_url" field. If `include[]=uuid` was passed as an argument,
+  #   each user in the array will also have an "uuid" field
   # @response_field visible Boolean, indicates whether the conversation is
   #   visible under the current scope and filter. This attribute is always
   #   true in the index API response, and is primarily useful in create/update
@@ -275,6 +283,7 @@ class ConversationsController < ApplicationController
                                                  @current_user,
                                                  session,
                                                  include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
+                                                 include_participant_uuid: include_participant_uuid?,
                                                  include_participant_contexts: false,
                                                  visible: true,
                                                  include_context_name: true,
@@ -334,10 +343,11 @@ class ConversationsController < ApplicationController
   # reused.
   #
   # @argument recipients[] [Required, String]
-  #   An array of recipient ids. These may be user ids or course/group ids
-  #   prefixed with "course_" or "group_" respectively, e.g.
-  #   recipients[]=1&recipients[]=2&recipients[]=course_3. If the course/group
-  #   has over 100 enrollments, 'bulk_message' and 'group_conversation' must be
+  #   An array of recipient ids. These may be user ids
+  #  (either numeric IDs or UUIDs prefixed with "uuid:"),
+  #   or course/group ids prefixed with "course_" or "group_" respectively, e.g.
+  #   recipients[]=1&recipients[]=uuid:W9GQIcdoDTqwX8mxIunDQQVL6WZTaGmpa5xovmCBx&recipients[]=course_3.
+  #   If the course/group has over 100 enrollments, 'bulk_message' and 'group_conversation' must be
   #   set to true.
   #
   # @argument subject [String]
@@ -387,6 +397,9 @@ class ConversationsController < ApplicationController
   # @argument context_code [String]
   #   The course or group that is the context for this conversation. Same format
   #   as courses or groups in the recipients argument.
+  #
+  # @argument include[] [Optional, String, "uuid"]
+  #   "uuid":: Optionally include an "uuid" key for each user participating in the conversation
   def create
     return render_error("recipients", "blank") if params[:recipients].blank?
     return render_error("recipients", "invalid") if @recipients.blank?
@@ -478,7 +491,7 @@ class ConversationsController < ApplicationController
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
         visibility_map = infer_visibility(conversations)
-        render json: conversations.map { |c| conversation_json(c, @current_user, session, include_participant_avatars: false, include_participant_contexts: false, visible: visibility_map[c.conversation_id]) }, status: :created
+        render json: conversations.map { |c| conversation_json(c, @current_user, session, include_participant_avatars: false, include_participant_uuid: include_participant_uuid?, include_participant_contexts: false, visible: visibility_map[c.conversation_id]) }, status: :created
       else
         @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type:, context_id:)
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
@@ -498,7 +511,7 @@ class ConversationsController < ApplicationController
           InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.legacy")
         end
         InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", @recipients.count)
-        render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, messages: [message])], status: :created
+        render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, include_participant_uuid: include_participant_uuid?, messages: [message])], status: :created
       end
     end
   rescue ActiveRecord::RecordInvalid => e
@@ -661,6 +674,7 @@ class ConversationsController < ApplicationController
                                    session,
                                    include_participant_contexts: value_to_boolean(params.fetch(:include_participant_contexts, true)),
                                    include_indirect_participants: true,
+                                   include_participant_uuid: include_participant_uuid?,
                                    messages:,
                                    submissions: [],
                                    include_beta: params[:include_beta],
@@ -718,7 +732,7 @@ class ConversationsController < ApplicationController
       InstStatsd::Statsd.distributed_increment("inbox.conversation.starred.legacy") if ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && !prev_conversation_state.starred
       InstStatsd::Statsd.distributed_increment("inbox.conversation.unstarred.legacy") if !ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && prev_conversation_state.starred
       InstStatsd::Statsd.distributed_increment("inbox.conversation.unread.legacy") if params.require(:conversation)["workflow_state"] == "unread" && prev_conversation_state.workflow_state == "read"
-      render json: conversation_json(@conversation, @current_user, session)
+      render json: conversation_json(@conversation, @current_user, session, include_participant_uuid: include_participant_uuid?)
     else
       render json: @conversation.errors, status: :bad_request
     end
@@ -752,7 +766,7 @@ class ConversationsController < ApplicationController
   #   }
   def destroy
     @conversation.remove_messages(:all)
-    render json: conversation_json(@conversation, @current_user, session, visible: false)
+    render json: conversation_json(@conversation, @current_user, session, visible: false, include_participant_uuid: include_participant_uuid?)
   end
 
   # internal api
@@ -870,7 +884,7 @@ class ConversationsController < ApplicationController
     if @recipients.present?
       if @conversation.conversation.can_add_participants?(@recipients)
         @conversation.add_participants(@recipients, tags: @tags, root_account_id: @domain_root_account.id)
-        render json: conversation_json(@conversation.reload, @current_user, session, messages: [@conversation.messages.first])
+        render json: conversation_json(@conversation.reload, @current_user, session, messages: [@conversation.messages.first], include_participant_uuid: include_participant_uuid?)
       else
         render_error("recipients", "too many participants for group conversation")
       end
@@ -970,7 +984,7 @@ class ConversationsController < ApplicationController
       InstStatsd::Statsd.distributed_increment("inbox.message.sent.attachment.legacy")
     end
     InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", message[:recipients_count])
-    render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]
+    render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]], include_participant_uuid: include_participant_uuid?), status: message[:status]
   rescue ConversationsHelper::RepliesLockedForUser
     render_unauthorized_action
   rescue ConversationsHelper::Error => e
@@ -1004,7 +1018,7 @@ class ConversationsController < ApplicationController
       if @conversation.conversation_message_participants.where.not(workflow_state: "deleted").empty?
         @conversation.update_attribute(:last_message_at, nil)
       end
-      render json: conversation_json(@conversation, @current_user, session)
+      render json: conversation_json(@conversation, @current_user, session, include_participant_uuid: include_participant_uuid?)
     end
   end
 
@@ -1184,6 +1198,10 @@ class ConversationsController < ApplicationController
     else
       api_request?
     end
+  end
+
+  def include_participant_uuid?
+    Array(params[:include]).include?("uuid")
   end
 
   # TODO: API v2: default to false, like we do in the UI

@@ -40,7 +40,7 @@ module Api::V1::Conversation
 
   def conversation_json(conversation, current_user, session, options = {})
     options = {
-      include_participant_contexts: true
+      include_participant_contexts: true,
     }.merge(options)
     result = conversation.as_json(options)
     participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
@@ -135,6 +135,11 @@ module Api::V1::Conversation
       ActiveRecord::Associations.preload(users, { pseudonym: :account }) # for avatar_url
     end
 
+    if options[:include_participant_uuid]
+      uuid_map = User.where(id: users.map(&:id)).pluck(:id, :uuid).to_h
+      options[:uuid_map] = uuid_map
+    end
+
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
@@ -146,6 +151,10 @@ module Api::V1::Conversation
       full_name: user.name,
       pronouns: user.pronouns
     }
+
+    if options[:include_participant_uuid]
+      result[:uuid] = options[:uuid_map][user.id]
+    end
 
     if options[:include_participant_contexts]
       result[:common_courses] = current_user.address_book.common_courses(user)
