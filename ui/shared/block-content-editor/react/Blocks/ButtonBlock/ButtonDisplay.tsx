@@ -18,11 +18,7 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {SingleButton} from './SingleButton'
-import {ButtonBlockProps} from './ButtonBlock'
-
-type ButtonDisplayProps = ButtonBlockProps & {
-  dataTestId: string
-}
+import {ButtonDisplayProps} from './types'
 
 const alignmentMap = {
   left: 'start',

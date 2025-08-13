@@ -25,21 +25,11 @@ import {View} from '@instructure/ui-view'
 import {IconTrashLine, IconAddLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import './individual-button-settings.css'
-import {ButtonData} from './ButtonBlock'
+import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from './types'
 import {useButtonManager} from './useButtonManager'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 
 const I18n = createI18nScope('block_content_editor')
-
-export type ButtonBlockIndividualButtonSettingsProps = {
-  initialButtons: ButtonData[]
-  onButtonsChange: (buttons: ButtonData[]) => void
-}
-
-const createEmptyButton = (buttonId: number): ButtonData => ({
-  id: buttonId,
-  text: '',
-})
 
 export const ButtonBlockIndividualButtonSettings = ({
   initialButtons,
@@ -47,11 +37,7 @@ export const ButtonBlockIndividualButtonSettings = ({
 }: ButtonBlockIndividualButtonSettingsProps) => {
   const [expandedButtonId, setExpandedButtonId] = useState<number | null>(null)
   const {buttons, addButton, removeButton, updateButton, canAddButton, canDeleteButton} =
-    useButtonManager(initialButtons, createEmptyButton)
-
-  useEffect(() => {
-    onButtonsChange(buttons)
-  }, [buttons, onButtonsChange])
+    useButtonManager(initialButtons, onButtonsChange)
 
   const handleButtonToggle = useCallback((buttonId: number) => {
     setExpandedButtonId(prevId => (prevId === buttonId ? null : buttonId))

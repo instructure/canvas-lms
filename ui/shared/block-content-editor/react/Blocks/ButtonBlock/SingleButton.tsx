@@ -18,14 +18,9 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ButtonData} from './ButtonBlock'
+import {SingleButtonProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
-
-type SingleButtonProps = {
-  button: ButtonData
-  isFullWidth: boolean
-}
 
 export const SingleButton = (props: SingleButtonProps) => {
   const buttonText = props.button.text?.trim() || I18n.t('Button')

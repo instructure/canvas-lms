@@ -17,7 +17,8 @@
  */
 
 import {screen} from '@testing-library/react'
-import {ButtonBlock, ButtonBlockProps} from '../ButtonBlock'
+import {ButtonBlock} from '../ButtonBlock'
+import {ButtonBlockProps} from '../types'
 import {renderBlock} from '../../__tests__/render-helper'
 
 jest.mock('../../../BlockContentEditorContext', () => ({

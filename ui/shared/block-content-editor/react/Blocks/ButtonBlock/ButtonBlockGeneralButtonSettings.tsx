@@ -19,7 +19,7 @@ import {Flex} from '@instructure/ui-flex'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ButtonAlignment, ButtonLayout} from './ButtonBlock'
+import {ButtonAlignment, ButtonLayout, ButtonBlockGeneralButtonSettingsProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -33,15 +33,6 @@ const LAYOUT_OPTIONS: {label: string; value: ButtonLayout}[] = [
   {label: I18n.t('Horizontal'), value: 'horizontal'},
   {label: I18n.t('Vertical'), value: 'vertical'},
 ]
-
-export type ButtonBlockGeneralButtonSettingsProps = {
-  alignment: ButtonAlignment
-  layout: ButtonLayout
-  isFullWidth: boolean
-  onAlignmentChange: (alignment: ButtonAlignment) => void
-  onLayoutChange: (layout: ButtonLayout) => void
-  onIsFullWidthChange: (isFullWidth: boolean) => void
-}
 
 export const ButtonBlockGeneralButtonSettings = ({
   alignment,

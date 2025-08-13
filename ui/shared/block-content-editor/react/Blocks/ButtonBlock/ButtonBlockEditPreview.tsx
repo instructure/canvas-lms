@@ -18,18 +18,14 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
-import {ButtonBlockProps} from './ButtonBlock'
+import {ButtonBlockEditPreviewProps} from './types'
 import {ButtonDisplay} from './ButtonDisplay'
 
-export const ButtonBlockEditPreview = (props: ButtonBlockProps) => {
+export const ButtonBlockEditPreview = (props: ButtonBlockEditPreviewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && <TitleEditPreview title={props.title} />}
-      <ButtonDisplay
-        dataTestId="button-block-edit-preview"
-        settings={props.settings}
-        title={props.title}
-      />
+      <ButtonDisplay dataTestId="button-block-edit-preview" settings={props.settings} />
     </Flex>
   )
 }

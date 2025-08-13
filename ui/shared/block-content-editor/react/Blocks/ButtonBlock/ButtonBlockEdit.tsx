@@ -18,12 +18,8 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
-import {ButtonBlockProps} from './ButtonBlock'
+import {ButtonBlockEditProps} from './types'
 import {ButtonDisplay} from './ButtonDisplay'
-
-export type ButtonBlockEditProps = ButtonBlockProps & {
-  onTitleChange: (title: string) => void
-}
 
 export const ButtonBlockEdit = (props: ButtonBlockEditProps) => {
   return (
@@ -31,7 +27,7 @@ export const ButtonBlockEdit = (props: ButtonBlockEditProps) => {
       {props.settings.includeBlockTitle && (
         <TitleEdit title={props.title} onTitleChange={props.onTitleChange} />
       )}
-      <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} title={props.title} />
+      <ButtonDisplay dataTestId="button-block-edit" settings={props.settings} />
     </Flex>
   )
 }
