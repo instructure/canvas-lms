@@ -28,8 +28,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {InsightEntry, useInsight} from '../../hooks/useFetchInsights'
 import {formatDate} from '../../utils'
 import useInsightStore from '../../hooks/useInsightStore'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import NewActivityInfo from '../NewActivityInfo/NewActivityInfo'
+import {IconEyeLine, IconMoveDownBottomLine, IconSpeedGraderLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('discussion_insights')
 
@@ -84,6 +86,7 @@ const DiscussionInsights: React.FC = () => {
   const context = useInsightStore(state => state.context)
   const contextId = useInsightStore(state => state.contextId)
   const discussionId = useInsightStore(state => state.discussionId)
+  const SPEEDGRADER_URL_TEMPLATE = useInsightStore(state => state.SPEEDGRADER_URL_TEMPLATE)
 
   const setEntries = useInsightStore(state => state.setEntries)
   const openEvaluationModal = useInsightStore(state => state.openEvaluationModal)
@@ -142,6 +145,19 @@ const DiscussionInsights: React.FC = () => {
     openEvaluationModal(entry.id, entry.relevance_human_feedback_notes)
   }
 
+  const handleSpeedGrader = (entry: InsightEntry) => {
+    const speedGraderUrl = SPEEDGRADER_URL_TEMPLATE?.replace(
+      /%3Astudent_id/,
+      String(entry.student_id),
+    ).concat(`&entry_id=${entry.id}`)
+    window.open(speedGraderUrl, '_blank')
+  }
+
+  const handleGoToOriginalReply = (entry: InsightEntry) => {
+    const replyUrl = `/courses/${contextId}/discussion_topics/${discussionId}?entry_id=${entry.entry_id}`
+    window.open(replyUrl, '_blank')
+  }
+
   const filteredEntries = useMemo(() => {
     if (!entries) return []
 
@@ -175,9 +191,43 @@ const DiscussionInsights: React.FC = () => {
     notes: item.relevance_ai_evaluation_notes,
     date: formatDate(new Date(item.entry_updated_at)),
     actions: (
-      <Button size="small" data-testid="viewOriginalReply" onClick={() => handleSeeReply(item)}>
-        {I18n.t('See Reply')}
-      </Button>
+      <Flex gap="x-small" justifyItems="center">
+        <IconButton
+          size="small"
+          data-testid="viewOriginalReply"
+          screenReaderLabel="See reply"
+          onClick={() => handleSeeReply(item)}
+          withBackground={false}
+          withBorder={false}
+          color="primary"
+        >
+          <IconEyeLine />
+        </IconButton>
+        {SPEEDGRADER_URL_TEMPLATE != null && (
+          <IconButton
+            size="small"
+            data-testid="viewSpeedGraderReply"
+            screenReaderLabel="See in SpeedGrader"
+            onClick={() => handleSpeedGrader(item)}
+            withBackground={false}
+            withBorder={false}
+            color="primary"
+          >
+            <IconSpeedGraderLine />
+          </IconButton>
+        )}
+        <IconButton
+          size="small"
+          data-testid="goToOriginalReply"
+          screenReaderLabel="Go to original reply"
+          onClick={() => handleGoToOriginalReply(item)}
+          withBackground={false}
+          withBorder={false}
+          color="primary"
+        >
+          <IconMoveDownBottomLine />
+        </IconButton>
+      </Flex>
     ),
   }))
 
