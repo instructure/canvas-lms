@@ -84,12 +84,22 @@ it('Show an error in the modal if the pairing code fails to generate', async () 
 
 it('Shows the loading spinner while the pairing code is being generated', async () => {
   const user = userEvent.setup()
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', async () => {
+      // Add a delay to ensure the loading state is visible
+      await new Promise(resolve => setTimeout(resolve, 100))
+      return HttpResponse.json({code: '1234'})
+    }),
+  )
+
   render(<GeneratePairingCode {...defaultProps} />)
 
   const button = screen.getByRole('button', {name: 'Pair with Observer'})
   await user.click(button)
 
-  expect(screen.getByText('Generating pairing code...')).toBeInTheDocument()
+  // Check for the spinner title which is accessible to screen readers
+  expect(screen.getByTitle('Generating pairing code')).toBeInTheDocument()
 })
 
 it('clicking the close button will close the modal', async () => {

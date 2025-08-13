@@ -27,6 +27,12 @@ import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// Mock globalUtils to prevent navigation errors in tests
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  assignLocation: jest.fn(),
+}))
+
 const readOnlyConfig = {
   download: true,
   editName: false,
