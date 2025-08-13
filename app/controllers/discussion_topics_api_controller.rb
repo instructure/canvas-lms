@@ -310,6 +310,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     if DiscussionTopicInsight::TERMINAL_WORKFLOW_STATES.include?(insight.workflow_state)
       data[:needs_processing] = insight.needs_processing?
+      # The needs_processing in the root is obsolete. The reason it's still here is to maintain backward compatibility
+      # with speedgrader's current behaviour. Once the latest speedgrader is deployed, we can remove this.
+
+      data[:student_ids_needs_processing] = insight.student_ids_needs_processing
     end
 
     render(json: data)

@@ -659,7 +659,7 @@ describe DiscussionTopicsApiController do
       get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_successful
-      expect(response.parsed_body).to eq({ "workflow_state" => "failed", "needs_processing" => true })
+      expect(response.parsed_body).to eq({ "workflow_state" => "failed", "needs_processing" => true, "student_ids_needs_processing" => [student.id.to_s] })
     end
 
     it "returns completed insight" do
@@ -670,7 +670,7 @@ describe DiscussionTopicsApiController do
       get "insight", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id }, format: "json"
 
       expect(response).to be_successful
-      expect(response.parsed_body).to eq({ "workflow_state" => "completed", "needs_processing" => false })
+      expect(response.parsed_body).to eq({ "workflow_state" => "completed", "needs_processing" => false, "student_ids_needs_processing" => [] })
     end
   end
 
