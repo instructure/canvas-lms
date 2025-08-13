@@ -61,6 +61,14 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
     }
   }
 
+  const PreviewMode = ({children}: {children: React.ReactNode}) => {
+    return (
+      <Text variant="contentImportant">
+        <span style={{whiteSpace: 'break-spaces'}}>{children}</span>
+      </Text>
+    )
+  }
+
   let contentSlot
   if (isEditMode) {
     contentSlot = (
@@ -73,9 +81,9 @@ export const HighlightBlockContent = (props: HighlightBlockProps) => {
       />
     )
   } else if (isEditPreviewMode) {
-    contentSlot = <Text variant="contentImportant">{content || I18n.t('Click to edit')}</Text>
+    contentSlot = <PreviewMode>{content || I18n.t('Click to edit')}</PreviewMode>
   } else {
-    contentSlot = <Text variant="contentImportant">{content}</Text>
+    contentSlot = <PreviewMode>{content}</PreviewMode>
   }
 
   return (
