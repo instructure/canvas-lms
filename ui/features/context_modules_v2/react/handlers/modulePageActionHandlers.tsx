@@ -101,7 +101,7 @@ const requirementTypeMap: Record<string, string> = {
 }
 
 const getModuleItemsFromAvailableSources = (
-  providedModuleItems: ModuleItem[],
+  providedModuleItems: Partial<ModuleItem>[],
   currentModule?: any,
 ): any[] => {
   if (providedModuleItems.length > 0) {
@@ -174,9 +174,8 @@ export const handleOpeningModuleUpdateTray = (
   courseId: string,
   moduleId?: string,
   moduleName?: string,
-  prerequisites?: {id: string; name: string; type: string}[],
   openTab: 'settings' | 'assign-to' = 'settings',
-  providedModuleItems: ModuleItem[] = [],
+  providedModuleItems: Partial<ModuleItem>[] = [],
 ) => {
   const moduleElement = document.createElement('div')
   moduleElement.id = moduleId ? `context_module_${moduleId}` : 'context_module_new'
@@ -195,6 +194,7 @@ export const handleOpeningModuleUpdateTray = (
     ? data?.pages.flatMap(page => page.modules).find(module => module._id === moduleId)
     : undefined
 
+  const prerequisites = currentModule?.prerequisites || []
   const rawModuleItems = getModuleItemsFromAvailableSources(providedModuleItems, currentModule)
   const moduleItems = transformModuleItemsForTray(rawModuleItems)
   const requirementCount = currentModule?.requirementCount === 1 ? 'one' : 'all'

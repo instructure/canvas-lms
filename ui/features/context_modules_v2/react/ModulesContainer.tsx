@@ -19,6 +19,7 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import ModulesList from './componentsTeacher/ModulesList'
+import './handlers/modulePageCommandEventHandlers'
 
 const ModulesContainer: React.FC = () => {
   return (
