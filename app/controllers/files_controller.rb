@@ -896,10 +896,13 @@ class FilesController < ApplicationController
       Canvas::LiveEvents.asset_access(@attachment, "files", nil, nil) if @current_user.blank?
     end
 
+    options = {}
+    options[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
     render_or_redirect_to_stored_file(
       attachment:,
       verifier: params[:verifier],
-      inline:
+      inline:,
+      options:
     )
   end
   protected :send_stored_file
@@ -1641,7 +1644,8 @@ class FilesController < ApplicationController
     if !url || no_cache
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
-      url = authenticated_thumbnail_url(attachment, thumb_opts)
+      thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+      url = authenticated_thumbnail_url(attachment, options: thumb_opts)
       if url
         instfs = attachment.instfs_hosted?
         # only cache for half the time because of use_consistent_iat
@@ -1672,7 +1676,9 @@ class FilesController < ApplicationController
       end
     end
 
-    url = authenticated_thumbnail_url(attachment, params.slice(:size)) if attachment && authed
+    thumb_opts = params.slice(:size)
+    thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+    url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
     if url && attachment.instfs_hosted? && file_location_mode?
       render_file_location(url)
     else

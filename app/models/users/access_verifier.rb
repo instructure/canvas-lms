@@ -82,16 +82,14 @@ module Users
         raise InvalidVerifier unless root_account
       end
 
-      oauth_host = claims[:oauth_host]
-      return_url = claims[:return_url]
-
       {
         user:,
         real_user:,
         developer_key:,
         root_account:,
-        oauth_host:,
-        return_url:
+        oauth_host: claims[:oauth_host],
+        return_url: claims[:return_url],
+        fallback_url: claims[:fallback_url]
       }
     rescue Canvas::Security::InvalidToken
       raise InvalidVerifier
