@@ -109,6 +109,48 @@ describe DiscussionTopicInsight do
     end
   end
 
+  describe "#student_ids_needs_processing" do
+    before do
+      @insight = @discussion_topic.insights.create!(
+        user: @user,
+        workflow_state: "completed"
+      )
+    end
+
+    it "returns student_id of student who have unprocessed active entries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student)
+
+      expect(@insight.student_ids_needs_processing).to eq([@student.id.to_s])
+    end
+
+    it "does not return student_id of student who have unprocessed deleted entries" do
+      @discussion_topic.discussion_entries.create!(message: "message", user: @student, workflow_state: "deleted")
+
+      expect(@insight.student_ids_needs_processing).to eq([])
+    end
+
+    it "returns student_id of student who has processed entries that have been deleted" do
+      entry = @discussion_topic.discussion_entries.create!(message: "message", user: @student, workflow_state: "deleted")
+      @insight.entries.create!(
+        discussion_topic: @discussion_topic,
+        discussion_entry: entry,
+        discussion_entry_version: entry.discussion_entry_versions.first,
+        locale: "en",
+        dynamic_content_hash: "hash",
+        ai_evaluation: {
+          "relevance_classification" => "relevant",
+          "confidence" => 3,
+          "notes" => "notes"
+        },
+        ai_evaluation_human_feedback_liked: false,
+        ai_evaluation_human_feedback_disliked: false,
+        ai_evaluation_human_feedback_notes: ""
+      )
+
+      expect(@insight.student_ids_needs_processing).to eq([@student.id.to_s])
+    end
+  end
+
   describe "#generate" do
     before do
       @insight = @discussion_topic.insights.create!(
