@@ -161,12 +161,6 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
           </Button>
         </Flex.Item>
       </Flex>
-      <SurveyLinkBox
-        text={I18n.t('What do you think of *Discussion Translate*?', {
-          wrappers: [`<strong>$1</strong>`],
-        })}
-        marginTop="medium"
-      />
     </View>
   )
 }
