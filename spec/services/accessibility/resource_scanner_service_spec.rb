@@ -85,6 +85,10 @@ describe Accessibility::ResourceScannerService do
   describe "#scan_resource" do
     let!(:scan) { accessibility_resource_scan_model(course:, context: wiki_page, workflow_state: "queued") }
 
+    before do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    end
+
     it "updates the scan to in progress" do
       expect_any_instance_of(AccessibilityResourceScan).to receive(:in_progress!)
 
@@ -167,6 +171,19 @@ describe Accessibility::ResourceScannerService do
 
         expect(scan.reload.workflow_state).to eq("completed")
       end
+
+      it "logs the correct Datadog metrics for a completed scan" do
+        subject.scan_resource(scan:)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resources_scanned",
+          tags: { course_id: scan.course_id }
+        )
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.pages_scanned",
+          tags: { course_id: scan.course_id }
+        )
+      end
     end
 
     context "when the scan fails" do
@@ -184,6 +201,21 @@ describe Accessibility::ResourceScannerService do
         subject.scan_resource(scan:)
 
         expect(scan.reload.error_message).to eq("Failure")
+      end
+
+      it "logs the correct Datadog metrics for a failed scan" do
+        allow(subject).to receive(:scan_resource_for_issues).and_raise(StandardError, "Failure")
+
+        subject.scan_resource(scan:)
+
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resources_scanned",
+          tags: { course_id: scan.course_id }
+        )
+        expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+          "accessibility.resource_scan_failed",
+          tags: { course_id: scan.course_id, scan_id: scan.id }
+        )
       end
     end
 
