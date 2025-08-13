@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import InheritedTable from '../InheritedTable'
 import 'jquery-migrate'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('InheritedTable', () => {
   let container
@@ -29,12 +30,20 @@ describe('InheritedTable', () => {
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
+
+    fakeENV.setup({
+      ...fakeENV.ENV,
+      FEATURES: {
+        lti_link_to_apps_from_developer_keys: false,
+      },
+    })
   })
 
   afterEach(() => {
     container.remove()
     window.ENV = {}
     jest.clearAllMocks()
+    fakeENV.teardown()
   })
 
   const idFor = n => `1000000000000${n}`
