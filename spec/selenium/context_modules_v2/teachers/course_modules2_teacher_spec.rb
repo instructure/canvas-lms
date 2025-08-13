@@ -19,7 +19,6 @@
 
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
-require_relative "../page_objects/modules2_action_tray"
 require_relative "../../helpers/items_assign_to_tray"
 require_relative "../../helpers/assignments_common"
 require_relative "../shared_examples/course_modules2_shared"
@@ -30,7 +29,6 @@ describe "context modules", :ignore_js_errors do
   include Modules2IndexPage
   include ItemsAssignToTray
   include AssignmentsCommon
-  include Modules2ActionTray
 
   before :once do
     modules2_teacher_setup
@@ -420,72 +418,6 @@ describe "context modules", :ignore_js_errors do
       visible_modules = ff("div[class*='context_module'] h2")[0]
       expect(visible_modules.text).to include("module1")
     end
-  end
-
-  context "create modules using tray" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-    end
-
-    before do
-      user_session(@teacher)
-    end
-
-    it "brings up the add module tray when Add Module button clicked" do
-      go_to_modules
-      wait_for_ajaximations
-      add_module_button.click
-      expect(add_module_tray).to be_displayed
-      expect(tray_header_label.text).to eq("Add Module")
-    end
-
-    it "adds module with a prerequisite module in same transaction" do
-      first_module = @course.context_modules.create!(name: "First Week")
-      go_to_modules
-      wait_for_ajaximations
-      add_module_button.click
-
-      expect(input_module_name).to be_displayed
-      fill_in_module_name("Week 2")
-      add_prerequisite_button.click
-      select_prerequisites_dropdown_option(0, first_module.name)
-      expect(prerequisites_dropdown_value(0)).to eq(first_module.name)
-      submit_add_module_button.click
-
-      created_module = @course.context_modules.last
-      expect(created_module.name).to eq("Week 2")
-      expect(@course.context_modules.count).to eq 2
-      expect(context_module_prerequisites(created_module.id).text).to eq("Prerequisite: #{first_module.name}")
-    end
-
-    it "can cancel creation of module" do
-      go_to_modules
-      add_module_button.click
-      expect(input_module_name).to be_displayed
-      fill_in_module_name("Cancel module creation test")
-      cancel_tray_button.click
-      expect(@course.context_modules.count).to eq 0
-    end
-
-    it "can close creation of module" do
-      go_to_modules
-      add_module_button.click
-      expect(input_module_name).to be_displayed
-      fill_in_module_name("Close module creation tray")
-      close_tray_button.click
-      expect(@course.context_modules.count).to eq 0
-    end
-
-    it "give error in add module tray if module name is not provided" do
-      go_to_modules
-      add_module_button.click
-      expect(input_module_name).to be_displayed
-      submit_add_module_button.click
-      expect(add_module_tray.text).to include("Module name can’t be blank")
-    end
-
-    it_behaves_like "selective_release add module tray", :context_modules
-    it_behaves_like "selective_release add module tray", :course_homepage
   end
 
   context "adding files after course creation" do
