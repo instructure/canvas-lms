@@ -61,6 +61,65 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to_not include(@student)
   end
 
+  it "only sends page updated notifications to students assigned to the page" do
+    course_with_teacher(active_all: true)
+    student1 = student_in_course(active_all: true).user
+    student2 = student_in_course(active_all: true).user
+
+    notification = Notification.create(name: "Updated Wiki Page", category: "TestImmediately")
+    NotificationPolicy.create(notification:, communication_channel: student1.communication_channel, frequency: "immediately")
+    NotificationPolicy.create(notification:, communication_channel: student2.communication_channel, frequency: "immediately")
+
+    page = @course.wiki_pages.create!(title: "Selective Page", body: "Initial content")
+    page.only_visible_to_overrides = true
+    page.save!
+
+    override = page.assignment_overrides.create!
+    override.assignment_override_students.create!(user: student1)
+
+    page.created_at = 3.days.ago
+    page.save!
+    page.notify_of_update = true
+    page.update!(body: "Updated content")
+
+    recipients = page.messages_sent["Updated Wiki Page"].map(&:user)
+    expect(recipients).to include(student1)
+    expect(recipients).not_to include(student2)
+  end
+
+  it "only sends page updated notifications to students in sections assigned to the page" do
+    course_with_teacher(active_all: true)
+
+    section1 = @course.course_sections.create!(name: "Section 1")
+    section2 = @course.course_sections.create!(name: "Section 2")
+
+    student1 = user_factory(active_all: true)
+    @course.enroll_user(student1, "StudentEnrollment", section: section1, enrollment_state: "active", limit_privileges_to_course_section: true)
+
+    student2 = user_factory(active_all: true)
+    @course.enroll_user(student2, "StudentEnrollment", section: section2, enrollment_state: "active", limit_privileges_to_course_section: true)
+
+    notification = Notification.create(name: "Updated Wiki Page", category: "TestImmediately")
+    NotificationPolicy.create(notification:, communication_channel: student1.communication_channel, frequency: "immediately")
+    NotificationPolicy.create(notification:, communication_channel: student2.communication_channel, frequency: "immediately")
+
+    page = @course.wiki_pages.create!(title: "Section Page", body: "Initial content")
+    page.only_visible_to_overrides = true
+    page.save!
+
+    page.assignment_overrides.create!(set_type: "CourseSection", set_id: section1.id)
+
+    page.created_at = 3.days.ago
+    page.save!
+    page.notify_of_update = true
+    page.update!(body: "Updated content")
+
+    # Only student1 in section1 should receive the notification
+    recipients = page.messages_sent["Updated Wiki Page"].map(&:user)
+    expect(recipients).to include(student1)
+    expect(recipients).not_to include(student2)
+  end
+
   describe "duplicate manages titles properly" do
     it "works on assignment" do
       course_with_teacher(active_all: true)
