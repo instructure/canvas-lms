@@ -4712,6 +4712,34 @@ describe CoursesController do
         ]
       )
     end
+
+    describe "filters by enrollment types" do
+      it "when requested with a string" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: "Student"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: ["Student", "Teacher"]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(3)
+      end
+    end
   end
 
   describe "#content_share_users" do
