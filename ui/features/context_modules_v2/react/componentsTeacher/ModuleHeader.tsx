@@ -178,7 +178,6 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
             name={name}
             expanded={expanded}
             published={published}
-            prerequisites={prerequisites}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || undefined}
             hasActiveOverrides={hasActiveOverrides}

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {dispatchCommandEvent} from '../handlers/modulePageCommandEventHandlers'
+
 type ElemType = {
   type: 'modulelist' | 'module' | 'item' | undefined
   elem: HTMLElement
@@ -179,13 +181,33 @@ class KBNavigator {
   }
 
   // TODO: the selectors here are a bit dodgy
-  handleEdit(_type: ElemType): boolean {
-    // TODO: implement
+  handleEdit(type: ElemType): boolean {
+    const courseId = ENV.course_id
+    if (!courseId) return false
+    if (type.type === 'module') {
+      const moduleId = type.elem.getAttribute('data-module-id')
+      if (!moduleId) return false
+      dispatchCommandEvent('edit', courseId, moduleId)
+      return true
+    }
+    if (type.type === 'item') {
+      const moduleItemId = type.elem.getAttribute('data-item-id')
+      if (!moduleItemId) return false
+      dispatchCommandEvent('edit', courseId, undefined, moduleItemId)
+      return true
+    }
     return false
   }
 
-  handleDelete(_type: ElemType): boolean {
-    // TODO: implement
+  handleDelete(type: ElemType): boolean {
+    const courseId = ENV.course_id
+    if (!courseId) return false
+    if (type.type === 'module') {
+      const moduleId = type.elem.getAttribute('data-module-id')
+      if (!moduleId) return false
+      dispatchCommandEvent('delete', courseId, moduleId)
+      return true
+    }
     return false
   }
 
@@ -199,9 +221,11 @@ class KBNavigator {
     return false
   }
 
-  handleNew(type: ElemType): boolean {
-    // TODO: implement
-    return false
+  handleNew(_type: ElemType): boolean {
+    const courseId = ENV.course_id
+    if (!courseId) return false
+    dispatchCommandEvent('new', courseId)
+    return true
   }
 
   handleHelp(): boolean {

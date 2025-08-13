@@ -389,3 +389,26 @@ interface PaginatedNavigationGraphQLResult {
 }
 
 export type QuizEngine = 'new' | 'classic'
+
+export type ModuleKBActionEvent = 'module-action'
+export type ModuleKBAction = 'edit' | 'delete' | 'new'
+export type ModuleItemKBAction = 'edit' | 'delete' | 'indent' | 'outdent'
+export interface ModuleActionEventDetail {
+  action: ModuleKBAction | ModuleItemKBAction
+  courseId: string
+  moduleId?: string
+  moduleItemId?: string
+}
+
+declare global {
+  interface Document {
+    addEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+    removeEventListener(
+      type: ModuleKBActionEvent,
+      listener: (event: CustomEvent<ModuleActionEventDetail>) => void,
+    ): void
+  }
+}
