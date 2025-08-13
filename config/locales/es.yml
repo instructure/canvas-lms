@@ -22584,8 +22584,8 @@ es:
   mon_8f18082a: Lun
   monday_432ff613: Lunes
   mongolian_5467c6a8: Mongol
-  monitor_b908967: Rastreador
-  monitor_c42db0fb: rastreador
+  monitor_b908967: Monitorear
+  monitor_c42db0fb: monitorear
   month_4b83b95f: Mes
   month_s_5c17590e: Mes(es)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} comenzando en %{time}"
