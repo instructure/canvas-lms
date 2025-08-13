@@ -99,10 +99,12 @@ export const RubricForm = ({
   onSaveRubric,
   onCancel,
 }: RubricFormComponentProp) => {
+  const defaultAssociationType = assignmentId ? 'Assignment' : accountId ? 'Account' : 'Course'
   const [rubricForm, setRubricForm] = useState<RubricFormProps>({
     ...defaultRubricForm,
     accountId,
     courseId,
+    associationType: defaultAssociationType,
   })
   const [validationErrors, setValidationErrors] = useState<RubricFormValidationProps>({})
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()

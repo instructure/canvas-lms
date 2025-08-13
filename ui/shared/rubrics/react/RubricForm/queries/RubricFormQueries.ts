@@ -35,6 +35,8 @@ const RUBRIC_QUERY = gql`
       title
       hasRubricAssociations
       rubricAssociationForContext {
+        associationId
+        associationType
         hidePoints
         hideScoreTotal
         hideOutcomeResults
@@ -73,6 +75,8 @@ const RUBRIC_QUERY = gql`
 `
 
 export type RubricAssociationQueryResponse = {
+  associationId: string
+  associationType: 'Assignment' | 'Account' | 'Course'
   hidePoints: boolean
   hideScoreTotal: boolean
   hideOutcomeResults: boolean
@@ -140,12 +144,12 @@ export const saveRubric = async (
     rubricAssociationId,
   } = rubric
 
-  const associationType = assignmentId ? 'Assignment' : accountId ? 'Account' : 'Course'
-
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   let url = `${urlPrefix}/rubrics/${id ?? ''}`
 
-  if (associationType === 'Assignment') {
+  const isAssignment = rubric.associationType === 'Assignment'
+
+  if (isAssignment) {
     url = `${url}?rubric_association_id=${rubricAssociationId}`
   }
   const method = id ? 'PATCH' : 'POST'
@@ -201,8 +205,8 @@ export const saveRubric = async (
       rubric_association: {
         id: rubricAssociationId,
         association_id: assignmentId ?? accountId ?? courseId,
-        association_type: associationType,
-        purpose: assignmentId ? 'grading' : 'bookmark',
+        association_type: rubric.associationType,
+        purpose: rubric.associationType === 'Assignment' ? 'grading' : 'bookmark',
         hide_points: hidePoints ? 1 : 0,
         hide_outcome_results: hideOutcomeResults ? 1 : 0,
         hide_score_total: hideScoreTotal ? 1 : 0,

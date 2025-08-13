@@ -28,6 +28,7 @@ import {isEqual} from 'lodash'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
+    associationType: fields.rubricAssociationForContext?.associationType ?? 'Assignment',
     id: fields.id,
     title: fields.title ?? '',
     hasRubricAssociations: fields.hasRubricAssociations ?? false,
@@ -66,6 +67,7 @@ export const translateRubricData = (
     hideScoreTotal: rubricAssociation.hideScoreTotal ?? false,
     useForGrading: rubricAssociation.useForGrading ?? false,
     rubricAssociationId: rubricAssociation.id,
+    associationType: rubricAssociation.associationType,
     canUpdateRubric: rubric.canUpdateRubric ?? false,
   }
 }
@@ -138,6 +140,7 @@ export const defaultRubricForm: RubricFormProps = {
   hideScoreTotal: false,
   useForGrading: false,
   canUpdateRubric: false,
+  associationType: 'Assignment',
 }
 
 export const hasRubricChanged = (formData: RubricFormProps, rubric: Rubric): boolean => {
