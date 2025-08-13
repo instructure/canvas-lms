@@ -21,6 +21,7 @@
 require_relative "../../../spec_helper"
 
 RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
+  let!(:lti_student) { user_model }
   let(:developer_key) do
     dk = DeveloperKey.new(
       scopes: ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers", TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],
@@ -44,9 +45,9 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
   let(:iso_timestamp) { Time.now.utc.iso8601 }
   let(:activity_id) { "activity_id" }
   let(:submission_lti_id) { "submission_id:1" }
-  let(:for_user_id) { "for_user_id" }
+  let(:for_user_id) { lti_student.id }
   let(:notice_event_timestamp) { iso_timestamp }
-  let(:custom) { { myparam: "$Canvas.account.id" } }
+  let(:custom) { { myparam: "$Canvas.account.id", groupId: "$CourseGroup.id" } }
   let(:assignment) { assignment_model }
   let(:asset_report_url) { "https://example.com/asset_processor_service" }
   let(:param_hash) do
@@ -55,6 +56,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
       assignment:,
       for_user_id:,
       notice_event_timestamp:,
+      user: lti_student,
       assets: [{
         title: "title",
         size: "size",
@@ -128,7 +130,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
 
       expect(notice_message).to eq({ jwt: "signed_jwt" })
       expect(LtiAdvantage::Messages::JwtMessage).to have_received(:create_jws).with(
-        {
+        hash_including(
           "aud" => developer_key.global_id.to_s,
           "azp" => developer_key.global_id.to_s,
           "exp" => now.to_i + 3600,
@@ -146,7 +148,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
             }],
             scope: ["https://purl.imsglobal.org/spec/lti/scope/asset.readonly"]
           },
-          "https://purl.imsglobal.org/spec/lti/claim/custom" => { myparam: Account.default.id }.with_indifferent_access,
+          "https://purl.imsglobal.org/spec/lti/claim/custom" => { myparam: Account.default.id, groupId: "" }.with_indifferent_access,
           "https://purl.imsglobal.org/spec/lti/claim/context" => {
             "id" => assignment.context.lti_context_id,
             "title" => "value for name",
@@ -154,7 +156,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
             "type" => ["http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"]
           },
           "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => tool.deployment_id.to_s,
-          "https://purl.imsglobal.org/spec/lti/claim/for_user" => { user_id: "for_user_id" },
+          "https://purl.imsglobal.org/spec/lti/claim/for_user" => { user_id: for_user_id },
           "https://purl.imsglobal.org/spec/lti/claim/submission" => { id: "submission_id:1" },
           "https://purl.imsglobal.org/spec/lti/claim/notice" => {
             "id" => "random_uuid",
@@ -165,7 +167,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
           "iat" => now.to_i,
           "iss" => "https://canvas.instructure.com",
           "nonce" => "random_uuid",
-          "https://purl.imsglobal.org/spec/lti/claim/roles" => ["http://purl.imsglobal.org/vocab/lis/v2/system/person#None"],
+          "https://purl.imsglobal.org/spec/lti/claim/roles" => ["http://purl.imsglobal.org/vocab/lis/v2/system/person#User"],
           "https://purl.imsglobal.org/spec/lti/claim/assetreport" => {
             scope: ["https://purl.imsglobal.org/spec/lti/scope/report"],
             report_url: "https://example.com/asset_processor_service",
@@ -178,7 +180,8 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
             "scope" => ["https://purl.imsglobal.org/spec/lti/scope/eula/user", "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"],
             "url" => "https://example.com/eula"
           },
-        },
+          "sub" => kind_of(String)
+        ),
         anything
       )
     end

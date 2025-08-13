@@ -1741,7 +1741,23 @@ module Lti
                        ASSIGNMENT_GUARD
 
     # Returns the Canvas id of the group the current user is in if launching
+    # from a group assignment otherwise empty string
+    #
+    # @example
+    #   ```
+    #   481
+    #   ```
+    register_expansion "CourseGroup.id",
+                       [],
+                       -> { (@assignment.group_category && (@assignment.group_category.groups & @current_user.groups).first&.id) || "" },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD
+
+    # Returns the Canvas id of the group the current user is in if launching
     # from a group assignment.
+    #
+    # This is similar to `CourseGroup.id` but unlike that this returns
+    # `$com.instructure.Group.id` for non group assignments and not an empty string
     #
     # @example
     #   ```
