@@ -40,6 +40,13 @@ module Types
       object.discussion_topic.sort_order_for_user(current_user).to_sym
     end
 
+    field :preferred_language, Types::PreferredLanguageType, null: true
+    def preferred_language
+      return nil unless Translation::CedarTranslator.languages.pluck(:id).include?(object.preferred_language)
+
+      object.preferred_language
+    end
+
     field :summary_enabled, Boolean, null: true
     field :workflow_state, String, null: false
     field :has_unread_pinned_entry, Boolean, null: true
