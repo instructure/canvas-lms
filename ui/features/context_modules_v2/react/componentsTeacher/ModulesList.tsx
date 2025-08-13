@@ -79,11 +79,15 @@ const ModulesList: React.FC = () => {
   const [teacherViewValue, setTeacherViewValue] = useState(ALL_MODULES)
   const [studentViewValue, setStudentViewValue] = useState(ALL_MODULES)
   const {data: courseStudentData} = useCourseTeacher(courseId || '')
-  const [isDisabled, setIsDisabled] = useState(true)
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [isExpanding, setIsExpanding] = useState(false)
 
   useEffect(() => {
-    setIsDisabled(moduleFetchingCount > 0)
-  }, [moduleFetchingCount])
+    if (isExpanding) {
+      setIsDisabled(!fetchComplete)
+      setIsExpanding(!fetchComplete)
+    }
+  }, [isExpanding, fetchComplete])
 
   useEffect(() => {
     if ((!teacherViewEnabled && !studentViewEnabled) || !courseStudentData) return
@@ -320,6 +324,7 @@ const ModulesList: React.FC = () => {
   }, [data, setExpandedModules, handleToggleAllCollapse])
 
   const handleExpandAllRef = useCallback(() => {
+    setIsExpanding(true)
     // Update UI immediately
     handleExpandAll(data, setExpandedModules)
     // Persist to database
