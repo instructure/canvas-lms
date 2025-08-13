@@ -51,11 +51,13 @@ const defaultProps = (props = {}) => ({
 })
 
 const server = setupServer(
-  http.post(getApiUrl(`/group/${learningOutcomeGroupId}`), ({request}) => {
+  // Handle POST requests with query parameters
+  http.post(getApiUrl(`group/${learningOutcomeGroupId}`), ({request}) => {
     const url = new URL(request.url)
     if (url.searchParams.get('import_type') === 'instructure_csv') {
       return HttpResponse.json({id: learningOutcomeGroupId})
     }
+    return new HttpResponse(null, {status: 404})
   }),
   http.get(getApiUrl(`outcome_imports/${learningOutcomeGroupId}/created_group_ids`), () =>
     HttpResponse.json([]),
