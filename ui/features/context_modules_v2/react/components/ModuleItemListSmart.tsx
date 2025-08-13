@@ -28,6 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {ErrorBoundary} from '@sentry/react'
 import {Flex} from '@instructure/ui-flex'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
@@ -117,6 +118,27 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   }
 
   useEffect(() => {
+    if (!isLoading && totalCount > 0) {
+      setTimeout(() => {
+        if (error) {
+          showFlashAlert({
+            message: I18n.t('Failed loading module items'),
+            type: 'error',
+            srOnly: false,
+          })
+        } else {
+          showFlashAlert({
+            message: I18n.t('All module items loaded'),
+            type: 'success',
+            srOnly: true,
+            politeness: 'assertive',
+          })
+        }
+      }, 300)
+    }
+  }, [error, isLoading, totalCount])
+
+  useEffect(() => {
     if (isLoading) return
 
     setVisibleItems(moduleItems)
@@ -131,7 +153,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
       totalPages: totalPages,
     })
     onPageLoaded()
-  }, [isLoading, moduleItems, pageIndex, totalCount, totalPages])
+  }, [isLoading, moduleItems, onPageLoaded, pageIndex, pageSize, totalCount, totalPages])
 
   useEffect(() => {
     if (pageIndex <= totalPages || !totalPages) return
