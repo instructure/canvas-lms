@@ -186,9 +186,23 @@ class DeveloperKeysApp extends React.Component {
 
     return (
       <div>
-        <View as="div" margin="0 0 small 0" padding="none">
+        <View as="div" margin="none" padding="none">
           <Heading level="h1">{I18n.t('Developer Keys')}</Heading>
         </View>
+        <Alert margin="large 0" variant="info" hasShadow={false}>
+          <Text
+            dangerouslySetInnerHTML={{
+              __html: I18n.t(
+                'LTI tool management is now live in *Canvas Apps*! Changes sync between both pages as we develop more features for Apps. From now on, Apps is the primary home for LTI tools.',
+                {
+                  wrappers: [
+                    `<a data-pendo='dev-key-apps-link' target='_blank' href='/accounts/${window.ENV.ACCOUNT_ID}/apps/manage' style='text-decoration: underline'>$1</a>`,
+                  ],
+                },
+              ),
+            }}
+          />
+        </Alert>
         <Tabs
           onRequestTabChange={this.changeTab.bind(this)}
           shouldFocusOnRender={this.state.focusTab}
