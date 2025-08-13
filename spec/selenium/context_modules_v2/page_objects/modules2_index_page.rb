@@ -338,10 +338,6 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
   end
 
-  def context_module_prerequisites_selector(module_id)
-    "#{context_module_selector(module_id)} [data-testid='module-header-prerequisites']"
-  end
-
   def move_item_tray_selector
     "[data-testid='manage-module-content-tray']"
   end
@@ -521,10 +517,6 @@ module Modules2IndexPage
 
   def module_item_title_links
     ff(module_item_title_link_selector)
-  end
-
-  def context_module_prerequisites(module_id)
-    f(context_module_prerequisites_selector(module_id))
   end
 
   def module_item_url_icon(module_item_id)

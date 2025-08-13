@@ -164,32 +164,3 @@ shared_examples_for "module collapse and expand" do |context|
     expect(module_header_expand_toggles.last.text).to include("Expand module")
   end
 end
-
-shared_examples_for "selective_release add module tray" do |context|
-  include ContextModulesCommon
-  include Modules2IndexPage
-  include Modules2ActionTray
-
-  before do
-    case context
-    when :context_modules
-      @mod_course = @course
-      @mod_url = "/courses/#{@mod_course.id}/modules"
-    when :course_homepage
-      @mod_course = @course
-      @mod_url = "/courses/#{@mod_course.id}"
-    end
-  end
-
-  it "adds module with module tray after add module button is clicked" do
-    get @mod_url
-    add_module_button.click
-    expect(input_module_name).to be_displayed
-    fill_in_module_name("Week 1")
-    submit_add_module_button.click
-
-    created_module = @course.context_modules.last
-    expect(created_module.name).to eq("Week 1")
-    expect(@course.context_modules.count).to eq 1
-  end
-end
