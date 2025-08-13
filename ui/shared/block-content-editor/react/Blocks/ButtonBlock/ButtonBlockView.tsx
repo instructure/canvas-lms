@@ -18,14 +18,14 @@
 
 import {Flex} from '@instructure/ui-flex'
 import {TitleView} from '../BlockItems/Title/TitleView'
-import {ButtonBlockProps} from './ButtonBlock'
+import {ButtonBlockViewProps} from './types'
 import {ButtonDisplay} from './ButtonDisplay'
 
-export const ButtonBlockView = (props: ButtonBlockProps) => {
+export const ButtonBlockView = (props: ButtonBlockViewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
       {props.settings.includeBlockTitle && <TitleView title={props.title} />}
-      <ButtonDisplay dataTestId="button-block-view" settings={props.settings} title={props.title} />
+      <ButtonDisplay dataTestId="button-block-view" settings={props.settings} />
     </Flex>
   )
 }

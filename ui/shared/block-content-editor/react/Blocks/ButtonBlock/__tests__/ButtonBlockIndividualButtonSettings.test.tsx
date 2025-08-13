@@ -17,11 +17,8 @@
  */
 
 import {render, screen, fireEvent, act} from '@testing-library/react'
-import {
-  ButtonBlockIndividualButtonSettings,
-  ButtonBlockIndividualButtonSettingsProps,
-} from '../ButtonBlockIndividualButtonSettings'
-import {ButtonData} from '../ButtonBlock'
+import {ButtonBlockIndividualButtonSettings} from '../ButtonBlockIndividualButtonSettings'
+import {ButtonData, ButtonBlockIndividualButtonSettingsProps} from '../types'
 
 const createEmptyButton = (id: number, text: string = ''): ButtonData => ({
   id,

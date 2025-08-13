@@ -20,7 +20,7 @@ import {Flex} from '@instructure/ui-flex'
 import {useNode} from '@craftjs/core'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
-import {ButtonBlockProps} from './ButtonBlock'
+import {ButtonBlockProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 

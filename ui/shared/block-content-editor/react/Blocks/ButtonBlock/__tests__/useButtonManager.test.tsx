@@ -18,9 +18,9 @@
 
 import {renderHook, act} from '@testing-library/react-hooks'
 import {useButtonManager} from '../useButtonManager'
-import {ButtonData} from '../ButtonBlock'
+import {ButtonData} from '../types'
 
-const createEmptyButton = (id: number, text: string = ''): ButtonData => ({
+const createButton = (id: number, text: string = ''): ButtonData => ({
   id,
   text,
 })
@@ -29,37 +29,38 @@ const MAX_BUTTONS = 5
 const MIN_BUTTONS = 1
 
 describe('useButtonManager', () => {
+  const mockOnChange = jest.fn()
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
   describe('initialization', () => {
     it('initializes with given buttons', () => {
-      const {result} = renderHook(() =>
-        useButtonManager([createEmptyButton(1, 'A')], createEmptyButton),
-      )
+      const {result} = renderHook(() => useButtonManager([createButton(1, 'A')], mockOnChange))
       expect(result.current.buttons).toHaveLength(1)
       expect(result.current.buttons[0].text).toBe('A')
       expect(result.current.buttons[0].id).toBe(1)
     })
 
     it('initializes without given buttons', () => {
-      const {result} = renderHook(() => useButtonManager([], createEmptyButton))
+      const {result} = renderHook(() => useButtonManager([], mockOnChange))
       expect(result.current.buttons).toHaveLength(0)
     })
   })
 
   describe('addButton', () => {
     it('adds a button', () => {
-      const {result} = renderHook(() => useButtonManager([createEmptyButton(1)], createEmptyButton))
+      const {result} = renderHook(() => useButtonManager([createButton(1)], mockOnChange))
       act(() => {
         result.current.addButton()
       })
       expect(result.current.buttons).toHaveLength(2)
+      expect(mockOnChange).toHaveBeenCalledWith(result.current.buttons)
     })
 
     it('adds a button up to MAX_BUTTONS', () => {
-      const {result} = renderHook(() => useButtonManager([createEmptyButton(1)], createEmptyButton))
+      const {result} = renderHook(() => useButtonManager([createButton(1)], mockOnChange))
       for (let i = 0; i < MAX_BUTTONS + 1; i++) {
         act(() => {
           result.current.addButton()
@@ -73,18 +74,19 @@ describe('useButtonManager', () => {
   describe('removeButton', () => {
     it('removes a button', () => {
       const {result} = renderHook(() =>
-        useButtonManager([createEmptyButton(1), createEmptyButton(2)], createEmptyButton),
+        useButtonManager([createButton(1), createButton(2)], mockOnChange),
       )
       expect(result.current.buttons).toHaveLength(2)
       act(() => {
         result.current.removeButton(1)
       })
       expect(result.current.buttons).toHaveLength(1)
+      expect(mockOnChange).toHaveBeenCalledWith(result.current.buttons)
     })
 
     it('doesn not remove below MIN_BUTTONS', () => {
       const {result} = renderHook(() =>
-        useButtonManager([createEmptyButton(1), createEmptyButton(2)], createEmptyButton),
+        useButtonManager([createButton(1), createButton(2)], mockOnChange),
       )
 
       act(() => {
@@ -101,15 +103,16 @@ describe('useButtonManager', () => {
 
   describe('updateButton', () => {
     it('updates a button', () => {
-      const {result} = renderHook(() => useButtonManager([createEmptyButton(1)], createEmptyButton))
+      const {result} = renderHook(() => useButtonManager([createButton(1)], mockOnChange))
       act(() => {
         result.current.updateButton(1, {text: 'Updated'})
       })
       expect(result.current.buttons[0].text).toBe('Updated')
+      expect(mockOnChange).toHaveBeenCalledWith(result.current.buttons)
     })
 
     it('does not update non-existent button', () => {
-      const {result} = renderHook(() => useButtonManager([createEmptyButton(1)], createEmptyButton))
+      const {result} = renderHook(() => useButtonManager([createButton(1)], mockOnChange))
       act(() => {
         result.current.updateButton(2, {text: 'Does not exist'})
       })

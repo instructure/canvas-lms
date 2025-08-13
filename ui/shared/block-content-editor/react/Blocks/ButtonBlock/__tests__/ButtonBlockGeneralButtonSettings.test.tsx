@@ -17,10 +17,8 @@
  */
 
 import {render, screen, fireEvent} from '@testing-library/react'
-import {
-  ButtonBlockGeneralButtonSettings,
-  ButtonBlockGeneralButtonSettingsProps,
-} from '../ButtonBlockGeneralButtonSettings'
+import {ButtonBlockGeneralButtonSettings} from '../ButtonBlockGeneralButtonSettings'
+import {ButtonBlockGeneralButtonSettingsProps} from '../types'
 
 const defaultProps: ButtonBlockGeneralButtonSettingsProps = {
   alignment: 'left',

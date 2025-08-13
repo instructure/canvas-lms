@@ -24,26 +24,7 @@ import {ButtonBlockEditPreview} from './ButtonBlockEditPreview'
 import {ButtonBlockView} from './ButtonBlockView'
 import {ButtonBlockSettings} from './ButtonBlockSettings'
 import {useSave} from '../BaseBlock/useSave'
-
-export type ButtonAlignment = 'left' | 'center' | 'right'
-export type ButtonLayout = 'horizontal' | 'vertical'
-
-export type ButtonData = {
-  id: number
-  text: string
-}
-
-export type ButtonBlockProps = {
-  settings: {
-    buttons: ButtonData[]
-    includeBlockTitle: boolean
-    alignment: ButtonAlignment
-    layout: ButtonLayout
-    isFullWidth: boolean
-    backgroundColor: string
-  }
-  title: string
-}
+import {ButtonBlockProps} from './types'
 
 export const ButtonBlockContent = (props: ButtonBlockProps) => {
   const {isEditMode, isEditPreviewMode} = useGetRenderMode()

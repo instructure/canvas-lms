@@ -16,18 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useRef, useCallback} from 'react'
-import {ButtonData} from './ButtonBlock'
+import {useState, useRef, useCallback, useEffect} from 'react'
+import {ButtonData} from './types'
 
 const MAX_BUTTONS = 5
 const MIN_BUTTONS = 1
 
+export const createEmptyButton = (buttonId: number): ButtonData => ({
+  id: buttonId,
+  text: '',
+})
+
 export const useButtonManager = (
   initialButtons: ButtonData[],
-  createEmptyButton: (buttonNumber: number) => ButtonData,
+  onButtonsChange: (buttons: ButtonData[]) => void,
 ) => {
   const [buttons, setButtons] = useState<ButtonData[]>(initialButtons.slice(0, MAX_BUTTONS))
   const nextIdRef = useRef(Math.max(0, ...initialButtons.map(b => b.id)) + 1)
+
+  useEffect(() => {
+    onButtonsChange(buttons)
+  }, [buttons, onButtonsChange])
 
   const addButton = useCallback(() => {
     if (buttons.length < MAX_BUTTONS) {
@@ -35,7 +44,7 @@ export const useButtonManager = (
       setButtons(prev => [...prev, createEmptyButton(newId)])
       nextIdRef.current += 1
     }
-  }, [buttons.length, createEmptyButton])
+  }, [buttons.length])
 
   const removeButton = useCallback(
     (buttonId: number) => {
