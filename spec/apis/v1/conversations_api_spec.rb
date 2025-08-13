@@ -142,6 +142,50 @@ describe ConversationsController, type: :request do
       end
     end
 
+    it "properly responds to include[]=uuid" do
+      conversation(@bob, workflow_state: "read")
+
+      json = api_call(:get,
+                      "/api/v1/conversations.json",
+                      { controller: "conversations",
+                        action: "index",
+                        format: "json",
+                        include: ["uuid"] })
+      json.each do |conversation|
+        expect(conversation["participants"]).to all(have_key("uuid"))
+      end
+    end
+
+    context "uuid in participants" do
+      before do
+        @conversation = conversation(@bob, workflow_state: "read")
+      end
+
+      it "includes correct uuid when requested" do
+        json = api_call(:get,
+                        "/api/v1/conversations",
+                        { controller: "conversations",
+                          action: "index",
+                          format: "json",
+                          include: ["uuid"] })
+
+        participant = json.first["participants"].find { |p| p["id"] == @bob.id }
+        expect(participant["uuid"]).to eq @bob.uuid
+      end
+
+      it "excludes uuid when not requested" do
+        json = api_call(:get,
+                        "/api/v1/conversations",
+                        { controller: "conversations",
+                          action: "index",
+                          format: "json" })
+
+        json.first["participants"].each do |participant|
+          expect(participant).not_to have_key("uuid")
+        end
+      end
+    end
+
     it "ignores include[]=participant_avatars if there are too many participants" do
       conversation(@bob, workflow_state: "read")
 
@@ -630,6 +674,27 @@ describe ConversationsController, type: :request do
             ]
           }
         ]
+      end
+
+      context "participant uuid" do
+        it "returns correct uuid when requested" do
+          json = api_call(:post,
+                          "/api/v1/conversations",
+                          { controller: "conversations", action: "create", format: "json", include: ["uuid"] },
+                          { recipients: [@bob.id], body: "test", context_code: "course_#{@course.id}" })
+          participant = json.first["participants"].find { |p| p["id"] == @bob.id }
+          expect(participant["uuid"]).to eq @bob.uuid
+        end
+
+        it "excludes uuid when not requested" do
+          json = api_call(:post,
+                          "/api/v1/conversations",
+                          { controller: "conversations", action: "create", format: "json" },
+                          { recipients: [@bob.id], body: "test", context_code: "course_#{@course.id}" })
+          json.first["participants"].each do |participant|
+            expect(participant).not_to have_key("uuid")
+          end
+        end
       end
 
       it "adds a context to a private conversation" do

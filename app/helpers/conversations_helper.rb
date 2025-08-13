@@ -147,6 +147,8 @@ module ConversationsHelper
       params[:recipients] = recipients if defined?(params)
     end
 
+    recipients = convert_uuid_recipients_to_regular_recipients(recipients)
+
     # unrecognized context codes are ignored
     if AddressBook.valid_context?(context_code)
       context = AddressBook.load_context(context_code)
@@ -185,6 +187,26 @@ module ConversationsHelper
     @recipients = known.uniq(&:id)
     @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
     @recipients
+  end
+
+  def convert_uuid_recipients_to_regular_recipients(recipients)
+    uuids = uuids_for(recipients)
+    return recipients if uuids.empty?
+
+    uuid_to_id = User.where(uuid: uuids).pluck(:uuid, :id).to_h
+    recipients.map do |r|
+      if r.is_a?(String) && r.start_with?("uuid:")
+        uuid = r.sub("uuid:", "")
+        uuid_to_id[uuid] || r
+      else
+        r
+      end
+    end
+  end
+
+  def uuids_for(recipients)
+    recipients
+      .filter_map { |r| (r.is_a?(String) && r.start_with?("uuid:")) ? r.sub("uuid:", "") : nil }
   end
 
   def get_invalid_recipients(context, recipients, current_user)
