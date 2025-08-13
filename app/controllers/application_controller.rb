@@ -477,6 +477,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_page
     lti_registrations_usage_data
     lti_registrations_usage_tab
+    lti_link_to_apps_from_developer_keys
     lti_asset_processor
     lti_asset_processor_discussions
     buttons_and_icons_root_account
