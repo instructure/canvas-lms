@@ -33,6 +33,8 @@ export type Rubric = {
 }
 
 export type RubricAssociation = {
+  associationType: 'Assignment' | 'Account' | 'Course'
+  associationId: string
   hidePoints: boolean
   hideScoreTotal: boolean
   useForGrading: boolean

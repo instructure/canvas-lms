@@ -8159,6 +8159,8 @@ type RubricAssociation implements LegacyIDInterface {
   legacy canvas id
   """
   _id: ID!
+  associationId: String!
+  associationType: String!
   hideOutcomeResults: Boolean!
   hidePoints: Boolean!
   hideScoreTotal: Boolean!
