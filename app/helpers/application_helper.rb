@@ -1351,7 +1351,6 @@ module ApplicationHelper
   end
 
   def authenticated_url_options(attachment, options: {})
-    options[:original_url] = request.original_url
     options[:fallback_url] ||= request.original_url
     options[:tenant_auth] = attachment.instfs_tenant_auth if attachment&.instfs_tenant_auth.present?
     options
