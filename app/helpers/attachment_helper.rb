@@ -191,7 +191,7 @@ module AttachmentHelper
     false
   end
 
-  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
+  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false, options: {})
     can_proxy = inline && attachment.can_be_proxied?
     must_proxy = inline && csp_enforced? && attachment.mime_class == "html"
     direct = attachment.stored_locally? || can_proxy || must_proxy
@@ -199,9 +199,9 @@ module AttachmentHelper
     # up here to preempt files domain redirect
     if attachment.instfs_hosted? && file_location_mode? && !direct
       url = if inline
-              authenticated_inline_url(attachment)
+              authenticated_inline_url(attachment, options:)
             else
-              authenticated_download_url(attachment)
+              authenticated_download_url(attachment, options:)
             end
       render_file_location(url)
       return
@@ -225,9 +225,9 @@ module AttachmentHelper
     elsif must_proxy
       render 400, text: I18n.t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
-      redirect_to authenticated_inline_url(attachment)
+      redirect_to authenticated_inline_url(attachment, options:)
     else
-      redirect_to authenticated_download_url(attachment)
+      redirect_to authenticated_download_url(attachment, options:)
     end
   end
 

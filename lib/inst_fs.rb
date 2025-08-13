@@ -411,6 +411,7 @@ module InstFS
       claims[:tenant_auth] = @token.tenant_auth if @token&.tenant_auth.present?
       original_url = parse_original_url(options[:original_url])
       claims[:original_url] = original_url if original_url.present?
+      claims[:fallback_url] = options[:fallback_url] if options[:fallback_url].present?
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
