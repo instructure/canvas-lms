@@ -127,6 +127,7 @@ describe('ModuleItemListSmart', () => {
     await waitFor(() => {
       const summary = screen.getByTestId('pagination-info-text')
       expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
+      expect(screen.getByText('All module items loaded')).toBeInTheDocument() // screenreader alert
     })
   })
 
