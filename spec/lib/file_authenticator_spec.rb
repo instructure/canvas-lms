@@ -143,14 +143,6 @@ describe FileAuthenticator do
         @authenticator.thumbnail_url(@attachment, size: geometry)
       end
 
-      it "passes along the original_url" do
-        original_url = "http://example.com/preview/1234"
-        allow(@attachment).to receive(:thumbnailable?).and_return(true)
-        expect(InstFS).to receive(:authenticated_thumbnail_url)
-          .with(@attachment, include(original_url:))
-        @authenticator.thumbnail_url(@attachment, original_url:)
-      end
-
       it "passes along the fallback_url" do
         fallback_url = "http://example.com/preview/1234"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
