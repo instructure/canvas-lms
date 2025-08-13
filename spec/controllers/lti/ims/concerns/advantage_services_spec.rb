@@ -49,4 +49,17 @@ describe Lti::IMS::Concerns::AdvantageServices do
       )
     end
   end
+
+  describe "meta headers" do
+    it "adds dk meta header with developer_key.global_id when developer_key is present" do
+      registration = lti_registration_with_tool
+      dk = registration.developer_key
+      controller = controller_class.new
+
+      allow(controller).to receive(:developer_key).and_return(dk)
+      expect(RequestContext::Generator).to receive(:add_meta_header).with("dk", dk.global_id)
+
+      controller.send(:verify_developer_key)
+    end
+  end
 end

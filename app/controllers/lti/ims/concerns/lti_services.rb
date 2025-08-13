@@ -68,6 +68,7 @@ module Lti::IMS::Concerns
     end
 
     def verify_developer_key
+      RequestContext::Generator.add_meta_header("dk", developer_key.global_id) if developer_key.present?
       unless developer_key&.active?
         render_error("Unknown or inactive Developer Key", :unauthorized)
       end
