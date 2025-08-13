@@ -4271,6 +4271,7 @@ type DiscussionParticipant {
   expanded: Boolean
   hasUnreadPinnedEntry: Boolean
   id: ID!
+  preferredLanguage: PreferredLanguageType
   read: Boolean!
   showPinnedEntries: Boolean
   sortOrder: DiscussionSortOrderType
@@ -7856,6 +7857,61 @@ type PostPolicyEdge {
 }
 
 """
+The preferred language for the translation, currently supporting only Cedar languages.
+"""
+enum PreferredLanguageType {
+  """
+  Catalan
+  """
+  CA
+
+  """
+  German
+  """
+  DE
+
+  """
+  English
+  """
+  EN
+
+  """
+  Spanish
+  """
+  ES
+
+  """
+  French
+  """
+  FR
+
+  """
+  Dutch
+  """
+  NL
+
+  """
+  Portuguese (Brazil)
+  """
+  PT_BR
+
+  """
+  Russian
+  """
+  RU
+
+  """
+  Swedish
+  """
+  SV
+
+  """
+  Chinese (Simplified)
+  """
+  ZH_HANS
+}
+
+"""
 Customized proficiency rating
 """
 type ProficiencyRating implements LegacyIDInterface {
@@ -10532,6 +10588,7 @@ input UpdateDiscussionTopicParticipantInput {
   discussionTopicId: ID!
   expanded: Boolean
   hasUnreadPinnedEntry: Boolean
+  preferredLanguage: PreferredLanguageType
   showPinnedEntries: Boolean
   sortOrder: DiscussionSortOrderType
   summaryEnabled: Boolean

@@ -21,6 +21,7 @@ require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
   let(:discussion_type) { GraphQLTypeTester.new(@topic, current_user: @student) }
+  let(:current_user) { @student }
 
   before(:once) do
     course_with_teacher(active_all: true)
@@ -38,7 +39,8 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
     expanded: nil,
     summary_enabled: nil,
     has_unread_pinned_entry: nil,
-    show_pinned_entries: nil
+    show_pinned_entries: nil,
+    preferred_language: nil
   )
     <<~GQL
       mutation {
@@ -49,6 +51,7 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
           #{"hasUnreadPinnedEntry: #{has_unread_pinned_entry}" unless has_unread_pinned_entry.nil?}
           #{"showPinnedEntries: #{show_pinned_entries}" unless show_pinned_entries.nil?}
           #{"summaryEnabled: #{summary_enabled}" unless summary_enabled.nil?}
+          #{"preferredLanguage: #{preferred_language}" unless preferred_language.nil?}
         }) {
           discussionTopic {
             id
@@ -58,6 +61,7 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
               summaryEnabled
               hasUnreadPinnedEntry
               showPinnedEntries
+              preferredLanguage
              }
           }
           errors {
@@ -141,5 +145,33 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
     expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:showPinnedEntries]).to be(false)
     result = run_mutation(discussion_topic_id: @topic.id, show_pinned_entries: true)
     expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:showPinnedEntries]).to be(true)
+  end
+
+  it "updates a discussion topic participant's preferred language" do
+    topic_participant = @topic.discussion_topic_participants.where({ user: current_user }).first
+
+    result = run_mutation(discussion_topic_id: @topic.id, preferred_language: :EN)
+    topic_participant.reload
+
+    expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:preferredLanguage]).to eq("EN")
+    expect(topic_participant.preferred_language).to eq("en")
+
+    result = run_mutation(discussion_topic_id: @topic.id, preferred_language: :FR)
+    topic_participant.reload
+
+    expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:preferredLanguage]).to eq("FR")
+    expect(topic_participant.preferred_language).to eq("fr")
+
+    result = run_mutation(discussion_topic_id: @topic.id, preferred_language: :NOT_VALID)
+    topic_participant.reload
+
+    expect(result[:errors]).not_to be_empty
+    expect(topic_participant.preferred_language).to eq("fr")
+
+    result = run_mutation(discussion_topic_id: @topic.id, preferred_language: "null")
+    topic_participant.reload
+
+    expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:preferredLanguage]).to be_nil
+    expect(topic_participant.preferred_language).to be_nil
   end
 end

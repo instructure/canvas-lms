@@ -29,6 +29,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   after_save :check_planner_cache
 
   validates :discussion_topic_id, :user_id, :workflow_state, :unread_entry_count, presence: true
+  validates :preferred_language, inclusion: { in: Translation::CedarTranslator.languages.pluck(:id) }, allow_nil: true
 
   # keeps track of the read state for the initial discussion topic text
   workflow do

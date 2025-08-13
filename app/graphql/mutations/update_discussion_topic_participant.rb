@@ -25,6 +25,7 @@ class Mutations::UpdateDiscussionTopicParticipant < Mutations::BaseMutation
   argument :expanded, Boolean, required: false
   argument :has_unread_pinned_entry, Boolean, required: false
   argument :show_pinned_entries, Boolean, required: false
+  argument :preferred_language, Types::PreferredLanguageType, required: false
   argument :sort_order, Types::DiscussionSortOrderType, required: false
   argument :summary_enabled, Boolean, required: false
   field :discussion_topic, Types::DiscussionType, null: false
