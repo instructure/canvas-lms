@@ -29,7 +29,7 @@ export const TextEdit = ({content, height, onContentChange}: TextEditProps) => {
       ref={rceRef}
       autosave={false}
       textareaId={uid('rceblock')}
-      variant="text-block"
+      variant="block-content-editor"
       defaultContent={content}
       onContentChange={onContentChange}
       editorOptions={{
