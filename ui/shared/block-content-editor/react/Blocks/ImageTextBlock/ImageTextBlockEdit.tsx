@@ -18,9 +18,10 @@
 
 import {ImageTextBlockEditProps} from './types'
 import {TitleEdit} from '../BlockItems/Title/TitleEdit'
-import {Flex} from '@instructure/ui-flex'
 import {ImageEdit} from '../BlockItems/Image'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
+import {ImageTextBlockLayout} from './ImageTextBlockLayout'
+import {View} from '@instructure/ui-view'
 
 export const ImageTextBlockEdit = ({
   title,
@@ -33,16 +34,14 @@ export const ImageTextBlockEdit = ({
   settings,
 }: ImageTextBlockEditProps) => {
   return (
-    <>
-      {settings.includeBlockTitle && <TitleEdit title={title} onTitleChange={onTitleChange} />}
-      <Flex direction="row" data-testid="imagetext-block-edit">
-        <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
-          <ImageEdit onImageChange={onImageChange} url={url} altText={altText} />
-        </Flex.Item>
-        <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextEdit content={content} onContentChange={onContentChange} height={300} />
-        </Flex.Item>
-      </Flex>
-    </>
+    <ImageTextBlockLayout
+      titleComponent={<TitleEdit title={title} onTitleChange={onTitleChange} />}
+      imageComponent={<ImageEdit onImageChange={onImageChange} url={url} altText={altText} />}
+      textComponent={<TextEdit content={content} onContentChange={onContentChange} height={300} />}
+      includeBlockTitle={settings.includeBlockTitle}
+      arrangement={settings.arrangement}
+      textToImageRatio={settings.textToImageRatio}
+      dataTestId="imagetext-block-edit"
+    />
   )
 }
