@@ -94,6 +94,7 @@ describe('SettingsUploadImage', () => {
       url: '',
       altText: '',
       fileName: '',
+      decorativeImage: false,
     })
   })
 

@@ -16,11 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type ImageData = {
+type ImageMetadata = {
   url?: string
   altText?: string
+  caption?: string
+  altTextAsCaption?: boolean
+  decorativeImage?: boolean
+}
+
+type ImageFileData = {
   fileName?: string
 }
+
+export type ImageData = ImageMetadata & ImageFileData
+
 export type ImageChangeHandler = {
   onImageChange: (data: ImageData) => void
 }

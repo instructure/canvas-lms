@@ -24,19 +24,23 @@ import {ImageTextBlockLayout} from './ImageTextBlockLayout'
 
 export const ImageTextBlockEditPreview = ({
   title,
-  altText,
   content,
   url,
-  settings,
+  altText,
+  decorativeImage,
+  textColor,
+  arrangement,
+  textToImageRatio,
+  includeBlockTitle,
 }: ImageTextBlockEditPreviewProps) => {
   return (
     <ImageTextBlockLayout
-      titleComponent={<TitleEditPreview contentColor={settings.textColor} title={title} />}
-      imageComponent={<ImageView url={url} altText={altText} />}
-      textComponent={<TextEditPreview contentColor={settings.textColor} content={content} />}
-      includeBlockTitle={settings.includeBlockTitle}
-      arrangement={settings.arrangement}
-      textToImageRatio={settings.textToImageRatio}
+      titleComponent={<TitleEditPreview contentColor={textColor} title={title} />}
+      imageComponent={<ImageView url={url} altText={altText} decorativeImage={decorativeImage} />}
+      textComponent={<TextEditPreview contentColor={textColor} content={content} />}
+      includeBlockTitle={includeBlockTitle}
+      arrangement={arrangement}
+      textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-editpreview"
     />
   )

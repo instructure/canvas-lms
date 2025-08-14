@@ -27,14 +27,14 @@ import {ImageBlockProps} from './types'
 const I18n = createI18nScope('block_content_editor')
 
 const ImageContainer = (props: ImageBlockProps) => {
-  const {isEditMode} = useGetRenderMode()
+  const {isEditMode, isViewMode, isEditPreviewMode} = useGetRenderMode()
   const save = useSave<typeof ImageBlock>()
   const onImageChange = (data: ImageData) => save(data)
 
   return isEditMode ? (
     <ImageEdit {...props} onImageChange={onImageChange} />
   ) : (
-    <ImageView {...props} />
+    (isEditPreviewMode || isViewMode) && <ImageView {...props} />
   )
 }
 

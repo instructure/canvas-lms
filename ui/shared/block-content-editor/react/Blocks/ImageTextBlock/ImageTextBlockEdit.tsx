@@ -24,22 +24,36 @@ import {ImageTextBlockLayout} from './ImageTextBlockLayout'
 
 export const ImageTextBlockEdit = ({
   title,
-  altText,
   content,
-  url,
   onContentChange,
   onTitleChange,
   onImageChange,
-  settings,
+  url,
+  altText,
+  decorativeImage,
+  arrangement,
+  textToImageRatio,
+  includeBlockTitle,
+  caption,
+  altTextAsCaption,
 }: ImageTextBlockEditProps) => {
   return (
     <ImageTextBlockLayout
       titleComponent={<TitleEdit title={title} onTitleChange={onTitleChange} />}
-      imageComponent={<ImageEdit onImageChange={onImageChange} url={url} altText={altText} />}
+      imageComponent={
+        <ImageEdit
+          onImageChange={onImageChange}
+          url={url}
+          altText={altText}
+          caption={caption}
+          altTextAsCaption={altTextAsCaption}
+          decorativeImage={decorativeImage}
+        />
+      }
       textComponent={<TextEdit content={content} onContentChange={onContentChange} height={300} />}
-      includeBlockTitle={settings.includeBlockTitle}
-      arrangement={settings.arrangement}
-      textToImageRatio={settings.textToImageRatio}
+      includeBlockTitle={includeBlockTitle}
+      arrangement={arrangement}
+      textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-edit"
     />
   )

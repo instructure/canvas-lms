@@ -26,7 +26,13 @@ jest.mock('../../../BlockContentEditorContext', () => ({
 
 describe('ImageBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(ImageBlock, {url: '', altText: ''})
+    renderBlock(ImageBlock, {
+      url: 'https://example.com/image.jpg',
+      altText: 'Example Image',
+      caption: 'This is an example image.',
+      altTextAsCaption: false,
+      decorativeImage: false,
+    })
     expect(true).toBe(true)
   })
 })

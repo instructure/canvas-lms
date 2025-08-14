@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './ImageEdit'
-export * from './ImageView'
-export * from './ImageCaption'
-export type {ImageEditProps} from './types'
+import React from 'react'
+import {Text} from '@instructure/ui-text'
+
+export const ImageCaption = ({children}: React.PropsWithChildren) => {
+  return (
+    <Text variant="contentQuote" color="secondary">
+      {children}
+    </Text>
+  )
+}

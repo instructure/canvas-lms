@@ -75,8 +75,9 @@ export const handleImageSubmit = async (
   storeProps: StoreProp,
 ) => {
   const altText = getAltText(uploadData)
+  const decorativeImage = uploadData?.imageOptions?.isDecorativeImage
   const url = await getUrl(selectedPanel, uploadData, storeProps)
-  return {url, altText}
+  return {url, altText, decorativeImage}
 }
 
 const getAltText = (uploadData: UploadData) => {

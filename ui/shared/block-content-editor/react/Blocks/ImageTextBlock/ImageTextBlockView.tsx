@@ -24,19 +24,23 @@ import {ImageTextBlockLayout} from './ImageTextBlockLayout'
 
 export const ImageTextBlockView = ({
   title,
-  altText,
   content,
   url,
-  settings,
+  altText,
+  decorativeImage,
+  textColor,
+  includeBlockTitle,
+  arrangement,
+  textToImageRatio,
 }: ImageTextBlockViewProps) => {
   return (
     <ImageTextBlockLayout
-      titleComponent={<TitleView contentColor={settings.textColor} title={title} />}
-      imageComponent={<ImageView url={url} altText={altText} />}
-      textComponent={<TextView contentColor={settings.textColor} content={content} />}
-      includeBlockTitle={settings.includeBlockTitle}
-      arrangement={settings.arrangement}
-      textToImageRatio={settings.textToImageRatio}
+      titleComponent={<TitleView contentColor={textColor} title={title} />}
+      imageComponent={<ImageView url={url} altText={altText} decorativeImage={decorativeImage} />}
+      textComponent={<TextView contentColor={textColor} content={content} />}
+      includeBlockTitle={includeBlockTitle}
+      arrangement={arrangement}
+      textToImageRatio={textToImageRatio}
       dataTestId="imagetext-block-view"
     />
   )
