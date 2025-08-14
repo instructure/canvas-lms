@@ -30,7 +30,7 @@ export type ImageTextSettings = {
     textColor: string
     arrangement: ArrangementOption
     textToImageRatio: TextToImageRatioOption
-  }
+  } & ImageData
 }
 export type ImageTextData = TextData & ImageData
 export type ImageTextEditHandlers = {

@@ -87,4 +87,22 @@ describe('ImageTextBlockSettings', () => {
       expect(radioButton).toBeChecked()
     })
   })
+
+  describe('image upload', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(
+        ImageTextBlockSettings,
+        getSettings({
+          url: 'https://example.com/image.jpg',
+          altText: 'Sample image',
+          fileName: 'my-image.jpg',
+        }),
+      )
+
+      expect(component.getByText('my-image.jpg')).toBeInTheDocument()
+      await userEvent.click(component.getByTestId('remove-image-button'))
+      expect(component.getByText('Upload image')).toBeInTheDocument()
+      expect(component.queryByText('my-image.jpg')).not.toBeInTheDocument()
+    })
+  })
 })

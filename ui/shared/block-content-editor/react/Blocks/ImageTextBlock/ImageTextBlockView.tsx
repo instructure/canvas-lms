@@ -21,7 +21,6 @@ import {TitleView} from '../BlockItems/Title/TitleView'
 import {ImageView} from '../BlockItems/Image'
 import {TextView} from '../BlockItems/Text/TextView'
 import {ImageTextBlockLayout} from './ImageTextBlockLayout'
-import {View} from '@instructure/ui-view'
 
 export const ImageTextBlockView = ({
   title,

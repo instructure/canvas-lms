@@ -41,6 +41,9 @@ const defaultProps: ImageTextBlockProps = {
     textColor: '',
     arrangement: 'left',
     textToImageRatio: '1:1',
+    url: undefined,
+    altText: undefined,
+    fileName: undefined,
   },
 }
 
