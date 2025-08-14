@@ -6692,6 +6692,7 @@ fa:
       add: "افزودن ماژول"
       add_item: "افزودن مورد به %{module}"
       add_prerequisite: "افزودن پیش نیاز به %{module}"
+      course_modules: "Course modules"
       edit: "ویرایش تنظیمات ماژول"
       edit_item: "ویرایش اطلاعات مورد"
     tool_sequence_footer: 
