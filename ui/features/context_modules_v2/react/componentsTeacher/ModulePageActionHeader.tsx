@@ -58,6 +58,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     <ContextModulesHeader
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
+        hasModules: (data?.pages[0]?.modules.length ?? 0) > 0,
         publishMenu: {
           onPublishComplete: handlePublishComplete,
         },
