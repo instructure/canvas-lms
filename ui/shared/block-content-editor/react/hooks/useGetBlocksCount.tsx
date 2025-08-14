@@ -16,19 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
 import {useGetRootNode} from './useGetRootNode'
-import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
-export const useHandleNodesCountChange = () => {
-  const getRootNode = useGetRootNode()
-  const {initialAddBlockHandler} = useBlockContentEditorContext()
+export type BlocksCount = {
+  blocksCount: number
+}
 
-  const handleNodesCountChange = useCallback(() => {
-    const rootNode = getRootNode()
-    const rootNodesCount = rootNode ? rootNode.data.nodes.length : 0
-    initialAddBlockHandler.setShouldShow(rootNodesCount === 0)
-  }, [getRootNode, initialAddBlockHandler])
+export const useGetBlocksCount = (): BlocksCount => {
+  const {rootNode: root} = useGetRootNode()
+  const blocksCount = root?.data?.nodes?.length ?? 0
 
-  return handleNodesCountChange
+  return {
+    blocksCount,
+  }
 }

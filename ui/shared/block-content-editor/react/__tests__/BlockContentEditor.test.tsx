@@ -57,10 +57,6 @@ function setupMockContext(mode: string = 'default') {
       openModal: jest.fn(),
       closeModal: jest.fn(),
     },
-    initialAddBlockHandler: {
-      showInitialAddBlock: false,
-      hideInitialAddBlock: jest.fn(),
-    },
     settingsTray: {
       isOpen: false,
       openTray: jest.fn(),

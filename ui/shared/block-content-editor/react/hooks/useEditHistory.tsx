@@ -17,7 +17,6 @@
  */
 
 import {useEditor} from '@craftjs/core'
-import {useHandleNodesCountChange} from './useHandleNodesCountChange'
 
 export const useEditHistory = () => {
   const {
@@ -29,16 +28,12 @@ export const useEditHistory = () => {
     canRedo: query.history.canRedo(),
   }))
 
-  const handleNodesCountChange = useHandleNodesCountChange()
-
   const undo = () => {
     history.undo()
-    handleNodesCountChange()
   }
 
   const redo = () => {
     history.redo()
-    handleNodesCountChange()
   }
 
   return {
