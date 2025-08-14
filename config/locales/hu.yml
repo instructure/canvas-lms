@@ -6832,6 +6832,7 @@ hu:
       add: "Modul hozzáadása"
       add_item: "Elem hozzáadása ide: %{module}"
       add_prerequisite: "Előfeltétel hozzáadása ehhez: %{module}"
+      course_modules: Modulok
       edit: "Modulbeállítások szerkesztése"
       edit_item: "Elem részleteinek szerkesztése"
     tool_sequence_footer: 
