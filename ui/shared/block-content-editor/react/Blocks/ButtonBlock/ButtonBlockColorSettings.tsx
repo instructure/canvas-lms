@@ -17,36 +17,38 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import {useNode} from '@craftjs/core'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
-import {ButtonBlockProps} from './types'
+import {ButtonBlockColorSettingsProps} from './types'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const ButtonBlockColorSettings = () => {
-  const {
-    actions: {setProp},
-    backgroundColor,
-  } = useNode(node => ({
-    backgroundColor: node.data.props.settings.backgroundColor,
-  }))
-
-  const handleBackgroundColorChange = (color: string) => {
-    setProp((props: ButtonBlockProps) => {
-      props.settings.backgroundColor = color
-    })
-  }
-
+export const ButtonBlockColorSettings = ({
+  includeBlockTitle,
+  backgroundColor,
+  textColor,
+  onBackgroundColorChange,
+  onTextColorChange,
+}: ButtonBlockColorSettingsProps) => {
   return (
-    <Flex direction="column" gap="small">
+    <Flex direction="column" gap="medium">
       <ColorPickerWrapper
         label={I18n.t('Background')}
         value={backgroundColor}
-        baseColor="#FFFFFF" // Temporary base color
+        baseColor={textColor}
         baseColorLabel={I18n.t('Text')}
-        onChange={handleBackgroundColorChange}
+        onChange={onBackgroundColorChange}
       />
+
+      {includeBlockTitle && (
+        <ColorPickerWrapper
+          label={I18n.t('Text')}
+          value={textColor}
+          baseColor={backgroundColor}
+          baseColorLabel={I18n.t('Background')}
+          onChange={onTextColorChange}
+        />
+      )}
     </Flex>
   )
 }

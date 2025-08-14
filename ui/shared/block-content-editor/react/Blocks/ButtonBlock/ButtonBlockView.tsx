@@ -24,7 +24,9 @@ import {ButtonDisplay} from './ButtonDisplay'
 export const ButtonBlockView = (props: ButtonBlockViewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && <TitleView title={props.title} />}
+      {props.settings.includeBlockTitle && (
+        <TitleView title={props.title} contentColor={props.settings.textColor} />
+      )}
       <ButtonDisplay dataTestId="button-block-view" settings={props.settings} />
     </Flex>
   )

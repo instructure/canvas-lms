@@ -37,6 +37,7 @@ export type ButtonBlockSettings = {
     layout: ButtonLayout
     isFullWidth: boolean
     backgroundColor: string
+    textColor: string
   }
 }
 
@@ -65,6 +66,14 @@ export type ButtonBlockGeneralButtonSettingsProps = {
   onAlignmentChange: (alignment: ButtonAlignment) => void
   onLayoutChange: (layout: ButtonLayout) => void
   onIsFullWidthChange: (isFullWidth: boolean) => void
+}
+
+export type ButtonBlockColorSettingsProps = {
+  includeBlockTitle: boolean
+  backgroundColor: string
+  textColor: string
+  onBackgroundColorChange: (color: string) => void
+  onTextColorChange: (color: string) => void
 }
 
 export type SingleButtonProps = {

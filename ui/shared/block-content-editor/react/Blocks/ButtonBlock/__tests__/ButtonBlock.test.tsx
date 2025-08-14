@@ -39,6 +39,7 @@ const defaultProps: ButtonBlockProps = {
     isFullWidth: false,
     buttons: [{id: 1, text: '', url: '', linkOpenMode: 'new-tab'}],
     backgroundColor: '#FF0000',
+    textColor: '#000000',
   },
   title: '',
 }
