@@ -16,7 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './ImageEdit'
-export * from './ImageView'
-export * from './ImageCaption'
-export type {ImageEditProps} from './types'
+export type SettingsImageProps = {
+  altText?: string
+  caption?: string
+  decorativeImage?: boolean
+  altTextAsCaption?: boolean
+  onCaptionChange: (caption: string) => void
+  onAltTextChange: (altText: string) => void
+  onAltTextAsCaptionChange: (checked: boolean) => void
+  onDecorativeImageChange: (checked: boolean) => void
+}

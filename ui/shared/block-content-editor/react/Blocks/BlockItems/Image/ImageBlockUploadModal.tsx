@@ -30,7 +30,7 @@ import {
 
 export const ImageBlockUploadModal = (props: {
   open: boolean
-  onSelected: (url: string, alt: string, fileName?: string) => void
+  onSelected: (url: string, alt: string, decorativeImage: boolean, fileName?: string) => void
   onDismiss: () => void
 }) => {
   const [isUploading, setIsUploading] = useState(false)
@@ -43,14 +43,18 @@ export const ImageBlockUploadModal = (props: {
     storeProps: StoreProp,
   ) => {
     setIsUploading(true)
-    const {url, altText} = await handleImageSubmit(selectedPanel, uploadData, storeProps)
+    const {url, altText, decorativeImage} = await handleImageSubmit(
+      selectedPanel,
+      uploadData,
+      storeProps,
+    )
     let fileName = undefined
     if (selectedPanel !== 'URL') {
       const metaData = await loadFileMetaData(url)
       fileName = metaData?.attachment.display_name
     }
     setIsUploading(false)
-    props.onSelected(url, altText, fileName)
+    props.onSelected(url, altText, decorativeImage, fileName)
   }
 
   return props.open ? (

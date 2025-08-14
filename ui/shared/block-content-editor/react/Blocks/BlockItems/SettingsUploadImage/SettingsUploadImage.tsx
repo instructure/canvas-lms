@@ -33,12 +33,18 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
 
-  const onSelected = (url: string, altText: string, fileName?: string) => {
+  const onSelected = (
+    url: string,
+    altText: string,
+    decorativeImage: boolean,
+    fileName?: string,
+  ) => {
     closeModal()
     onImageChange({
       url,
       altText,
       fileName,
+      decorativeImage,
     })
   }
 
@@ -47,6 +53,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
       url: '',
       altText: '',
       fileName: '',
+      decorativeImage: false,
     })
   }
 

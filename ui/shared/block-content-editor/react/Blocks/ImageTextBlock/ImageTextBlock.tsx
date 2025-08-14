@@ -79,26 +79,52 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
     setFileName(imageData.fileName)
   }
 
-  const dataProps = {
-    settings: props.settings,
-    title,
-    content,
-    url,
-    altText,
-  }
-
   return (
     <Flex direction="column" gap="mediumSmall">
       {isEditMode && (
         <ImageTextBlockEdit
-          {...dataProps}
+          title={title}
+          content={content}
+          url={url}
+          altText={altText}
+          includeBlockTitle={props.settings.includeBlockTitle}
+          textColor={props.settings.textColor}
+          arrangement={props.settings.arrangement}
+          textToImageRatio={props.settings.textToImageRatio}
+          decorativeImage={props.settings.decorativeImage}
+          altTextAsCaption={props.settings.altTextAsCaption}
+          caption={props.settings.caption}
           onTitleChange={onTitleChange}
           onContentChange={onContentChange}
           onImageChange={onImageChange}
         />
       )}
-      {isEditPreviewMode && <ImageTextBlockEditPreview {...dataProps} />}
-      {isViewMode && <ImageTextBlockView {...dataProps} />}
+      {isEditPreviewMode && (
+        <ImageTextBlockEditPreview
+          title={title}
+          content={content}
+          url={url}
+          altText={altText}
+          decorativeImage={props.settings.decorativeImage}
+          textColor={props.settings.textColor}
+          arrangement={props.settings.arrangement}
+          textToImageRatio={props.settings.textToImageRatio}
+          includeBlockTitle={props.settings.includeBlockTitle}
+        />
+      )}
+      {isViewMode && (
+        <ImageTextBlockView
+          title={title}
+          content={content}
+          url={url}
+          altText={altText}
+          decorativeImage={props.settings.decorativeImage}
+          textColor={props.settings.textColor}
+          arrangement={props.settings.arrangement}
+          textToImageRatio={props.settings.textToImageRatio}
+          includeBlockTitle={props.settings.includeBlockTitle}
+        />
+      )}
     </Flex>
   )
 }

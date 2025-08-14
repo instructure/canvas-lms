@@ -22,21 +22,42 @@ import {ImageBlockUploadModal} from './ImageBlockUploadModal'
 import {ImageBlockAddButton} from './ImageBlockAddButton'
 import {ImageEditProps} from './types'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconUploadLine} from '@instructure/ui-icons'
+import {IconEditLine, IconUploadLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Flex} from '@instructure/ui-flex'
+import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
+import {useNode} from '@craftjs/core'
+import {ImageCaption} from './ImageCaption'
 
 const I18n = createI18nScope('block_content_editor')
 
-export const ImageEdit = ({onImageChange, url, altText}: ImageEditProps) => {
+export const ImageEdit = ({
+  onImageChange,
+  url,
+  altText,
+  caption,
+  altTextAsCaption,
+}: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const {settingsTray} = useBlockContentEditorContext()
+  const {id} = useNode()
+
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
-  const onSelected = (url: string, altText: string, fileName?: string) => {
+  const onSelected = (
+    url: string,
+    altText: string,
+    decorativeImage: boolean,
+    fileName?: string,
+  ) => {
     closeModal()
+    const imageCaption = altTextAsCaption ? altText : caption
     onImageChange({
       url,
-      altText,
+      altText: decorativeImage ? '' : altText,
+      caption: decorativeImage ? '' : imageCaption,
       fileName,
+      decorativeImage,
     })
   }
 
@@ -61,6 +82,17 @@ export const ImageEdit = ({onImageChange, url, altText}: ImageEditProps) => {
           <ImageBlockAddButton onClick={() => setIsOpen(true)} />
         )}
       </div>
+      <Flex direction="row" gap="x-small">
+        <ImageCaption>{caption || I18n.t('Image caption')}</ImageCaption>
+        <IconButton
+          data-testid="edit-block-image"
+          screenReaderLabel={I18n.t('Edit block')}
+          onClick={() => settingsTray.open(id)}
+          size="small"
+        >
+          <IconEditLine fontSize="small" />
+        </IconButton>
+      </Flex>
     </>
   )
 }

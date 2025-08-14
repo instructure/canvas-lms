@@ -30,6 +30,9 @@ export type ImageTextSettings = {
     textColor: string
     arrangement: ArrangementOption
     textToImageRatio: TextToImageRatioOption
+    decorativeImage: boolean
+    caption: string
+    altTextAsCaption: boolean
   } & ImageData
 }
 export type ImageTextData = TextData & ImageData
@@ -48,8 +51,33 @@ export type ImageTextBlockLayoutProps = {
   dataTestId?: string
 }
 
-export type ImageTextBlockBase = ImageTextData & ImageTextSettings & TitleData
-export type ImageTextBlockProps = ImageTextBlockBase
-export type ImageTextBlockEditProps = ImageTextBlockBase & ImageTextEditHandlers
-export type ImageTextBlockEditPreviewProps = ImageTextBlockBase
-export type ImageTextBlockViewProps = ImageTextBlockBase
+export type ImageTextBlockProps = ImageTextData & TitleData & ImageTextSettings
+export type ImageTextBlockEditProps = TitleData &
+  ImageTextEditHandlers &
+  ImageData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+  }
+export type ImageTextBlockEditPreviewProps = TitleData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+    decorativeImage: boolean
+    url?: string
+    altText?: string
+  }
+export type ImageTextBlockViewProps = TitleData &
+  TextData & {
+    includeBlockTitle: boolean
+    textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
+    decorativeImage: boolean
+    url?: string
+    altText?: string
+  }
