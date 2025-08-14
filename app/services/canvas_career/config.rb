@@ -48,6 +48,10 @@ module CanvasCareer
       @root_account.horizon_redirect_url(path)
     end
 
+    def theme_url
+      config["theme_url"]
+    end
+
     # These values are passed to the frontend; they should not contain any secrets!
     def public_app_config(request)
       config["public_app_config"].tap do |c|
