@@ -1686,7 +1686,7 @@ fr-CA:
         can_add_pronouns: "Activer les pronoms personnels"
         can_change_pronouns: "Autoriser les utilisateurs à changer leurs pronoms dans Canvas"
         canvadocs_prefer_office_online: "Préfère le visualiseur de fichier Office 365"
-        course_template_id: "Le modèle de cours sélectionné sera utilisé pour tous les nouveaux cours"
+        course_template_id: "Le Gabarit de cours sélectionné sera utilisé pour tous les nouveaux cours"
         decimal_separator_label: "Séparateur décimal"
         default_language: "Langue par défaut"
         default_time_zone: "Fuseau horaire par défaut"
@@ -2597,7 +2597,7 @@ fr-CA:
       Ajoute un paramètre de compte pour sélectionner la police classique (Lato) ou élémentaire (Balsamiq Sans) dans Canvas pour les comptes
       Elementary.
   adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Ajoute un sélecteur d’émoji qui permet aux élèves et aux enseignants d’ajouter des émojis à leurs commentaires lors de l’envoi de leurs tâches."
-  adds_an_option_that_allows_teachers_and_students_t_12911b21: "Ajout d’une option permettant aux enseignants et aux étudiants de recevoir des notifications de nouveaux éléments pour le contenu synchronisé à partir du modèle de cours."
+  adds_an_option_that_allows_teachers_and_students_t_12911b21: "Ajout d’une option permettant aux enseignants et aux étudiants de recevoir des notifications de nouveaux éléments pour le contenu synchronisé à partir du Cours projet."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Ajoute les liens d’analyse sur le menu de paramètres de l'utilisateur."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Ajoute l’analyse à une carte de contexte de l’étudiant."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Ajoute une banque de commentaires pour les commentaires d’affectation dans speedgrader"
@@ -2995,7 +2995,7 @@ fr-CA:
   allows_an_account_administrator_to_manage_the_impa_71112028: "Permet à un administrateur de compte de gérer l’intégration du service Impact."
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permet aux évaluateurs de consulter le plateau d’audit d'évaluation dans SpeedGrader pour les tâches modérées ou anonymes."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Permet d’exporter les paramètres d’un cours modèle et de les copier dans un autre cours modèle"
-  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Permet aux cours modèle de suivre les modifications apportées à l’ID de ressource des tâches."
+  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Permet aux Cours projet de suivre les modifications apportées à l’ID de ressource des tâches."
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Permet à Canvas d’envoyer des fichiers iWork à docviewer."
   allows_controlling_whether_the_course_pacing_featu_850ffd8a: "Permet de contrôler si la fonction de rythme du cours est activée à partir d’un paramètre du compte."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permet de publier les pages de cours selon un calendrier"
@@ -3294,7 +3294,7 @@ fr-CA:
   allows_user_to_delete_differentiated_tags_30770c90: "Permet à l’utilisateur de supprimer des étiquettes différenciées"
   allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Permet à l’utilisateur de supprimer des banques de questions dans un compte ou un cours."
   allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Permet à l’utilisateur de supprimer des questionnaires dans un cours."
-  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Permet à l’utilisateur de désigner un cours comme un Cours modèle."
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Permet à l’utilisateur de désigner un cours comme un Cours projet."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Permet à l’utilisateur de désigner un cours comme un Cours modèle. Permet à l’utilisateur de gérer les paramètres de Cours modèle dans les paramètres de cours. Permet à l’utilisateur d’ajouter les cours associés."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       Permet à l’utilisateur de désigner un cours comme un Cours modèle. Permet à l’utilisateur de gérer les paramètres du Cours modèle dans les paramètres du cours.
@@ -3318,18 +3318,18 @@ fr-CA:
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Permet à l'utilisateur de modifier les détails de la tâche sur les discussions individuelles. Modules : Permet à l'utilisateur d'ajouter de nouvelles tâches à un module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Permet à l'utilisateur de modifier les détails de la tâche sur les discussions individuelles."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Modèle sur les discussions individuelles."
-  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Modèle sur les paramètres individuels si l'utilisateur est inscrit à un cours de maîtrise de Modèle."
-  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Modèle sur les discussions individuelles."
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Cours projet sur les paramètres individuels si l'utilisateur est inscrit à un cours de maîtrise de Modèle."
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Cours projet sur les discussions individuelles."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Permet à l'utilisateur de modifier les paramètres de verrouillage de contenu de Modèle sur les paramètres individuels si l'utilisateur est inscrit à un cours de maîtrise de Modèle."
-  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Permet à l’utilisateur de modifier les paramètres de verrouillage du cours modèle dans la page d’index des pages et pour une page individuelle dans un cours modèle principal."
-  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Permet à l’utilisateur de modifier les paramètres de verrouillage de Modèle sur les pages dans un cours modèle principal."
-  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle dans la page d'index des pages dans un cours modèle principal."
+  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Permet à l’utilisateur de modifier les paramètres de verrouillage du Cours projet dans la page d’index des pages et pour une page individuelle dans un Cours projet principal."
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Permet à l’utilisateur de modifier les paramètres de verrouillage de Cours projet sur les pages dans un Cours projet principal."
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Cours projet dans la page d'index des pages dans un Cours projet principal."
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur la page d'index des pages dans un cours de maîtrise de Modèle."
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur les pages d’index des tâches et questionnaires
       dans un cours de maîtrise de Modèle.
   allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Permet à l’utilisateur de modifier les paramètres de verrouillage de Modèle sur les pages d’index des tâches et questionnaires dans un cours Modèle principal."
-  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur la page d’index de Discussions dans un cours Modèle principal."
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Cours projet sur la page d’index de Discussions dans un Cours projet principal."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur la page d’index de Discussions dans un cours de maîtrise de Modèle."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Permet à l'utilisateur de modifier les paramètres de verrouillage de Modèle sur la page Fichiers dans un cours de maîtrise de Modèle."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Permet à l’utilisateur de modifier les paramètres de verrouillage de Modèle sur les pages d’index des tâches et questionnaires dans un cours de maîtrise de Modèle."
@@ -3370,7 +3370,7 @@ fr-CA:
   allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Permet à l’utilisateur d’activer et de modifier le coefficient de pondération des groupes de tâches dans un cours."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permet à l’utilisateur d’exporter le carnet de notes vers un fichier CSV (valeurs séparées par des virgules). Permet à l’utilisateur d’accéder au carnet de notes de la maîtrise d’apprentissage (si activé)."
   allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Permet à l’utilisateur d’exporter le carnet de notes vers un fichier CSV (valeurs séparées par des virgules)."
-  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Permet à l’utilisateur de filtrer les cours modèles en tant que niveau du compte. Permet à l’utilisateur d’ajouter les cours associés."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Permet à l’utilisateur de filtrer les Cours projet en tant que niveau du compte. Permet à l’utilisateur d’ajouter les cours associés."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permet à l’utilisateur de filtrer les cours modèle en tant que niveau du compte. Permet à l’utilisateur d’ajouter les cours associés."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Permet à l'utilisateur de filtrer les cours modèle en tant que niveau du compte.
@@ -3394,7 +3394,7 @@ fr-CA:
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Permet à l'utilisateur d’Aimer des publications de discussion lorsque la case à cocher « Seulement les correcteurs peuvent Aimer » est sélectionnée."
   allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Permet à l’utilisateur de verrouiller/déverrouiller des annonces sélectionnées individuellement ou en bloc."
   allows_user_to_manage_assignment_settings_35d94690: "Permet à l’utilisateur de gérer les paramètres de tâche."
-  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Permet à l’utilisateur de gérer les paramètres de Cours modèle dans les paramètres de cours."
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Permet à l’utilisateur de gérer les paramètres de Cours projet dans les paramètres de cours."
   allows_user_to_manage_differentiated_tags_301647dd: "Permet à l’utilisateur de gérer des étiquettes différenciées"
   allows_user_to_manage_differentiated_tags_88fe12ca: "Permet à l’utilisateur de gérer des étiquettes différenciées."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Permet à l'utilisateur de gérer les options de la fonction dans les paramètres du compte."
@@ -3425,7 +3425,7 @@ fr-CA:
   allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Permet à l’utilisateur d’attribuer de manière aléatoire les utilisateurs à un groupe de cours."
   allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Permet à l’utilisateur d’attribuer de manière aléatoire des utilisateurs à un compte ou à un groupe de cours."
   allows_user_to_regenerate_access_tokens_on_behalf__10b03152: "Permet à l’utilisateur de régénérer des jetons d’accès au nom d’un autre utilisateur."
-  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Permet à l’utilisateur de supprimer un cours comme modèle de cours dans les paramètres du cours."
+  allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Permet à l’utilisateur de supprimer un cours comme Gabarit de cours dans les paramètres du cours."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Permet à l’utilisateur de supprimer un cours comme modèle de cours dans les paramètres du cours. Permet à l’utilisateur de définir un compte pour ne pas utiliser un modèle."
   allows_user_to_remove_a_student_s_section_enrollme_78d1916e: "Permet à l’utilisateur de supprimer l’inscription ou le rôle depuis la section d’un étudiant."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Permet à l’utilisateur de retirer et de fusionner les utilisateurs dans un compte."
@@ -3475,7 +3475,7 @@ fr-CA:
   allows_user_to_see_the_list_of_courses_in_the_acco_5fa0142f: "Permet à l'utilisateur de voir la liste de cours dans le compte."
   allows_user_to_see_the_list_of_recently_started_an_f6d3fe6: "Permet à l’utilisateur de voir la liste des cours récemment démarrés/terminés dans les statistiques de compte."
   allows_user_to_see_the_list_of_recently_started_en_1012704d: "Permet à l'utilisateur de voir la liste des cours récemment démarrés/terminés dans les statistiques de compte."
-  allows_user_to_select_a_course_as_a_course_templat_547e203f: "Permet à l’utilisateur de sélectionner un cours comme modèle de cours dans les paramètres du cours."
+  allows_user_to_select_a_course_as_a_course_templat_547e203f: "Permet à l’utilisateur de sélectionner un cours comme Gabarit de cours dans les paramètres du cours."
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "Permet à l'utilisateur de sélectionner la note finale pour les tâches modérées."
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "Permet à l'utilisateur d'envoyer un message dans Conversations sans sélectionner un cours."
   allows_user_to_send_a_message_to_all_in_course_nam_29ffb3b1: "Permet à l’utilisateur d’envoyer un message à « Tous dans [course name] ». Permet à l’utilisateur d’envoyer un message à « Tous dans [course group] »."
@@ -3507,7 +3507,7 @@ fr-CA:
       Permet à l’utilisateur de synchroniser des Cours modèles. Permet à l’utilisateur de voir l’historique de la synchronisation du modèle. Permet à l’utilisateur de voir et gérer les cours dans le compte. Permet à l’utilisateur d’afficher le bouton Liste de vérification de la configuration du cours.
               Permet à l’utilisateur d’accéder à l’onglet Navigation dans les paramètres du cours. Permet à l’utilisateur de modifier l’image, le nom, le code du cours, le fuseau horaire, le sous-compte, la durée du cours et d’autres options dans l’onglet Détails du cours.
               Permet à l’utilisateur d’accéder aux boutons Vue de l’étudiant (étudiant test), Copier ce cours, Réinitialiser le contenu du cours et Supprimer définitivement le cours. Permet à l’utilisateur de voir les cartes de contexte de l’étudiant dans les réponses d’annonces et de discussions.
-  allows_user_to_sync_blueprint_courses_db4fcc03: "Permet à l’utilisateur de synchroniser des Cours modèles."
+  allows_user_to_sync_blueprint_courses_db4fcc03: "Permet à l’utilisateur de synchroniser des Cours projet."
   allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Permet à l’utilisateur de mettre à jour l’inscription ou le rôle depuis la section d’un étudiant."
   allows_user_to_update_access_tokens_on_behalf_of_a_7694f244: "Permet à l’utilisateur de mettre à jour les jetons d’accès au nom d’un autre utilisateur."
   allows_user_to_update_modules_edit_module_settings_1f5cf0ae: "Permet à l’utilisateur de mettre à jour les modules (modifier les paramètres du module, publier, annuler la publication, modifier par lots)."
@@ -3564,7 +3564,7 @@ fr-CA:
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Permet à l'utilisateur de voir et de gérer les trimestres pour le compte."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Permet à l'utilisateur de voir et de gérer l’onglet « Paramètres et Notifications » dans les paramètres du compte."
   allows_user_to_view_and_modify_login_information_f_78f3a544: "Permet à l’utilisateur de voir et de modifier les informations de connexion d’un utilisateur."
-  allows_user_to_view_blueprint_sync_history_d545cb7d: "Permet à l’utilisateur de voir l’historique de la synchronisation du modèle."
+  allows_user_to_view_blueprint_sync_history_d545cb7d: "Permet à l’utilisateur de voir l’historique de la synchronisation du Cours projet."
   allows_user_to_view_canvas_insights_f4f7ba8b: "Permet à l’utilisateur de voir les Canvas Insights."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Permet à l'utilisateur de voir les boutons « Choisir la page d'accueil » et la « Liste de vérification de la configuration du cours » dans la page d'accueil."
   allows_user_to_view_course_activity_information_fo_e420113b: "Permet à l'utilisateur de voir les informations d’activité du cours pour le compte."
@@ -3628,7 +3628,7 @@ fr-CA:
       Permet à l'utilisateur de rechercher dans les journaux de changement de notation par correcteur ou étudiant dans les outils d'administration
   allows_user_to_view_login_logout_activity_of_users_e11dd2de: "Permet à l’utilisateur de voir l’activité de connexion/déconnexion des utilisateurs dans les outils d’administration."
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: "Permet à l’utilisateur de voir l’activité de connexion/déconnexion des utilisateurs dans les outils d’administration. Permet à l’utilisateur de rechercher dans les journaux de changement de notation par correcteur ou étudiant dans les outils d’administration (Non disponible au niveau sous-compte.)"
-  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Permet à l’utilisateur de voir les noms des modèles de cours dans le compte racine."
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Permet à l’utilisateur de voir les noms des Gabarits de cours dans le compte racine."
   allows_user_to_view_or_retrieve_a_list_of_assignme_8ff6b0ec: "Permet à l’utilisateur d’afficher ou de récupérer une liste de dates d’interdiction de tâches."
   allows_user_to_view_page_history_and_set_front_pag_c2321326: "Permet à l’utilisateur de voir l’historique de la page et de définir la page principale."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
@@ -5812,15 +5812,15 @@ fr-CA:
   blockeditortemplate_ab3546f0: "Modèle d’éditeur de blocs"
   blocks_52104e62: Blocs
   blue_daf8fea9: Bleu
-  blueprint_5cca2ef: Modèle
-  blueprint_course_associations_72c9609: "Associations de modèle de cours"
-  blueprint_course_e16ed131: "Cours modèle"
+  blueprint_5cca2ef: "Cours projet"
+  blueprint_course_associations_72c9609: "Associations de Cours projet"
+  blueprint_course_e16ed131: "Cours projet"
   blueprint_course_id_9ee357fb: blueprint_course_id
-  blueprint_course_information_term_course_10d5cf30: "Information de cours modèle : %{term} - %{course}"
+  blueprint_course_information_term_course_10d5cf30: "Information de Cours projet : %{term} - %{course}"
   blueprint_course_sync_finished_80cd9509: "Synchronisation du cours modèle terminée"
   blueprint_course_sync_in_progress_a1e2622b: "Synchronisation du cours modèle en cours..."
-  blueprint_courses_9dd321b8: "Cours modèles"
-  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cours modèle - ajouter / modifier / associer / supprimer"
+  blueprint_courses_9dd321b8: "Cours projet"
+  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Cours projet - ajouter / modifier / associer / supprimer"
   blueprint_courses_are_an_account_level_feature_opt_3388f731: "Les Cours modèle sont une option de fonction du niveau du compte.\n\n\n\
       \x20     Pour modifier les paramètres de verrouillage du modèle de la page d'index de Discussions, « Cours - ajouter/modifier/supprimer » et « Discussions - Modérer » doivent également être activés. "
   blueprint_courses_are_an_account_level_feature_opt_e1f9ec2d: "Les Cours modèle sont une option de fonction du niveau du compte. Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions - Modérer » doivent également être activés. "
@@ -5872,22 +5872,22 @@ fr-CA:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       Cours modèles doit être activé pour un compte par l’administrateur. Pour modifier les paramètres de verrouillage sur la page d’index des pages, Pages – mettre à jour, Cours modèle – ajouter, modifier, associer, supprimer et gérer les cours : Admin – gérer/mettre à jour.
               Toutefois, si ces autorisations supplémentaires sont activées, mais que l’autorisation Pages - Mettre à jour n’est pas activée, l’utilisateur peut quand même ajuster les paramètres de verrouillage de contenu sur des pages individuelles dans un Cours modèle maître.
-  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Cours modèle doit être activé pour un compte par l’administrateur."
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Cours projet doit être activé pour un compte par l’administrateur."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Cours modèle doit être activé pour un compte par l'administrateur.
       Les rôles de Cours peuvent uniquement gérer le contenu dans les cours modèle s'ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur.
       Si ce paramètre est désactivé, et « Discussions - voir » est activé, un utilisateur peut toujours régler les paramètres de blocage du contenu sur des discussions individuelles dans un cours modèle maître.
-  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Cours modèle doit être activé pour un compte par l’administrateur."
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Cours projet doit être activé pour un compte par l’administrateur."
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Cours modèle doit être activé pour un compte par l’administrateur. Les rôles de Cours peuvent uniquement gérer du contenu dans les cours modèle s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur. Pour modifier les paramètres de verrouillage du modèle depuis la page d’index de Discussions, « Discussions - Modérer » doit également être activé."
-  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Cours modèle doit être activé pour un compte par l’administrateur. Les rôles de Cours peuvent uniquement gérer le contenu dans les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur."
-  blueprint_information_95dcef55: "Information du modèle"
+  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Cours projet doit être activé pour un compte par l’administrateur. Les rôles de Cours peuvent uniquement gérer le contenu dans les Cours projet s’ils sont ajoutés au Cours projet comme rôle d’enseignant, d’AE ou de concepteur."
+  blueprint_information_95dcef55: "Information du Cours projet"
   blueprint_item_notifications_a8d8575d: "Notifications d’éléments de Modèle"
-  blueprint_locking_is_only_available_for_published__c8c97e3f: "Le verrouillage du modèle est uniquement disponible pour les rythmes publiés"
-  blueprint_locking_is_only_available_for_the_course_68ec4266: "Le verrouillage du modèle n’est disponible que pour le rythme du niveau de cours"
-  blueprint_resource_id_support_ae48c0b9: "Prise en charge de l’ID de ressource de modèle"
-  blueprint_settings_233e909a: "Paramètres de modèle"
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "Le verrouillage du Cours projet est uniquement disponible pour les rythmes publiés"
+  blueprint_locking_is_only_available_for_the_course_68ec4266: "Le verrouillage du Cours projet n’est disponible que pour le rythme du niveau de cours"
+  blueprint_resource_id_support_ae48c0b9: "Prise en charge de l’ID de ressource de Cours projet"
+  blueprint_settings_233e909a: "Paramètres de Cours projet"
   blueprint_support_sync_for_folder_movement_to_root_d04a29ae: "Synchronisation de la prise en charge de Blueprint pour le déplacement de dossiers vers le dossier racine"
-  blueprint_sync_90d0dfd5: "Synchronisation du modèle"
+  blueprint_sync_90d0dfd5: "Synchronisation du Cours projet"
   bmp_e297149c: bmp
   body_9f663faf: Corps
   body_f48fe5cd: "Corps :"
@@ -6732,8 +6732,8 @@ fr-CA:
   cannot_get_block_custom_templates_5012259: "Impossible d’obtenir les modèles de blocs personnalisés"
   cannot_give_outcomes_extra_credit_696208f0: "Impossible de donner des crédits supplémentaires aux acquis."
   cannot_grade_at_this_time_489744b0: "Impossible d’attribuer une note en ce moment"
-  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Vous ne pouvez pas avoir un modèle de cours avec des observateurs"
-  cannot_have_a_blueprint_course_with_students_248e3e76: "Vous ne pouvez pas avoir un modèle de cours avec des étudiants"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Vous ne pouvez pas avoir un Cours projet avec des observateurs"
+  cannot_have_a_blueprint_course_with_students_248e3e76: "Vous ne pouvez pas avoir un Cours projet avec des étudiants"
   cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Ne peut pas avoir de noms de ligne en double ou vides. Corrigez les noms et essayez de cliquer à nouveau sur « Enregistrer »."
   cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Ne peut pas avoir de plages négatives ou supérieures à 100. Corrigez les plages et essayez de cliquer à nouveau sur « Enregistrer »."
   cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Ne peut pas avoir de plages qui se chevauchent ou qui sont vides. Corrigez les plages et essayez de cliquer à nouveau sur « Enregistrer »."
@@ -8230,7 +8230,7 @@ fr-CA:
         default_select_folder: "Sélectionner le dossier"
         upload_to: "Téléverser vers"
       import_blueprint_settings: 
-        checkbox_label: "Importer les paramètres du cours modèle"
+        checkbox_label: "Importer les paramètres du Cours projet"
       import_quizzes_next_view: 
         convert_to_nq_help_text: "Les banques de questions existantes et les questionnaires classiques seront importés en tant que banques de questions et nouveaux questionnaires.%{p_p}Pour en apprendre plus, veuillez contacter votre administrateur système ou visitez"
         convert_to_nq_help_title: "Convertir les questionnaires"
@@ -8886,7 +8886,7 @@ fr-CA:
   copy_9748f9f: Copie
   copy_announcement_title_9d23ddde: "Copier l’annonce %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Copier la tâche %{name} à un autre cours"
-  copy_blueprint_course_settings_31a97e96: "Copier les paramètres du cours modèle"
+  copy_blueprint_course_settings_31a97e96: "Copier les paramètres du Cours projet"
   copy_client_id_8f4da3e2: "Copier l’identifiant du client"
   copy_content_615608a7: "Copier le contenu"
   copy_course_8788a831: "Copier le cours"
@@ -9647,7 +9647,7 @@ fr-CA:
       storage_quota: "Quota de stockage"
       syllabus_body: syllabus_body
       tab_configuration: "Configuration d’onglet"
-      template_course_id: "ID de cours modèle"
+      template_course_id: "ID de Cours projet"
       turnitin_comments: "Commentaires Turnitin"
       updated_at: "Actualisé à"
       uuid: UUID
@@ -9729,11 +9729,11 @@ fr-CA:
   course_results_updated_df9d1c95: "Résultats de cours mis à jour."
   course_role_role_type_119c2f64: "Rôle de cours : %{role_type}"
   course_roles_1314f962: "Rôles du cours"
-  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Les rôles de Cours peuvent uniquement gérer les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur."
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Les rôles de Cours peuvent uniquement gérer les Cours projet s’ils sont ajoutés au Cours projet comme rôle d’enseignant, d’AE ou de concepteur."
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Les rôles de Cours peuvent uniquement gérer les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur. Pour accéder à la barre latérale des Cours modèles, « Cours — ajouter/modifier/supprimer » doit être activé. Pour ajouter un cours associé, « Cours — voir la liste » et « Cours — ajouter/modifier/supprimer » doivent également être activés. Pour modifier les paramètres de verrouillage sur tout type d’objet de Modèle, « Cours — ajouter/modifier/supprimer » doit être activé."
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "Les rôles de Cours peuvent uniquement gérer les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur. Pour gérer les cours associés, « Cours — voir la liste » et « Gérer Cours — ajouter » doivent également être activés. Pour modifier les paramètres de verrouillage des fichiers, Gérer les cours : « Admin - gérer/mettre à jour » et « Fichiers de cours - modifier » doivent également être activés. Pour modifier les paramètres de verrouillage des questionnaires, Gérer les cours : « Administrateur - gérer/mettre à jour » et « Tâches et questionnaires — ajouter/modifier/supprimer » doit également être activées."
-  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Les rôles de Cours peuvent uniquement gérer le contenu dans les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur."
-  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Les rôles de Cours peuvent uniquement gérer du contenu dans les cours modèles s’ils sont ajoutés au cours modèle comme rôle d’enseignant, d’AE ou de concepteur."
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Les rôles de Cours peuvent uniquement gérer le contenu dans les Cours projet s’ils sont ajoutés au Cours projet comme rôle d’enseignant, d’AE ou de concepteur."
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Les rôles de Cours peuvent uniquement gérer du contenu dans les Cours projet s’ils sont ajoutés au Cours projet comme rôle d’enseignant, d’AE ou de concepteur."
   course_roles_d2d5d666: "Rôles du cours"
   course_roster_78f70e97: "Liste d'étudiants"
   course_rubrics_881dcf0: "Rubriques du cours"
@@ -9831,13 +9831,13 @@ fr-CA:
   course_syllabus_report_johnson_county_cc_32ed83a6: "Rapport sur les syllabus de cours - Johnson County CC"
   course_syllabus_report_molloy_19e0a3b0: "Rapport sur les syllabus de cours - Molloy"
   course_tag_conversion_progress_e3fba0d: "Progression de la conversion des balises de cours"
-  course_template_84f504be: "Modèle de formation"
-  course_template_must_be_in_the_same_root_account_4cfdb933: "Le modèle de cours doit être dans le même compte racine"
-  course_template_must_be_marked_as_a_template_5292f500: "Le modèle de cours doit être marqué comme modèle"
-  course_templates_create_eb00e263: "Modèles de cours - créer"
+  course_template_84f504be: "Gabarit de cours"
+  course_template_must_be_in_the_same_root_account_4cfdb933: "Le Gabarit de cours doit être dans le même compte racine"
+  course_template_must_be_marked_as_a_template_5292f500: "Le Gabarit de cours doit être marqué comme modèle"
+  course_templates_create_eb00e263: "Gabarit de cours - créer"
   course_templates_ddd579e6: "Modèles de formation"
-  course_templates_delete_5ec47e1f: "Modèles de cours - supprimer"
-  course_templates_edit_fd44b74c: "Modèles de cours - modifier"
+  course_templates_delete_5ec47e1f: "Gabarit de cours - supprimer"
+  course_templates_edit_fd44b74c: "Gabarit de cours - modifier"
   course_to_do_26919792: "%{course} À FAIRE"
   course_usage_report_2e9d9da9: "Rapport d’utilisation du cours"
   course_usage_report_florida_southwestern_8c7c1a6d: "Rapport d'utilisation des cours - Florida Southwestern"
@@ -10145,7 +10145,7 @@ fr-CA:
         allow_student_organized_groups: "Laisser les étudiants organiser leurs propres groupes"
         banner_image: "Image de bannière large"
         blueprint: "Activer le cours comme cours modèle"
-        blueprint_course: "Cours modèle"
+        blueprint_course: "Cours projet"
         card_image: "Image de carte"
         conclude_at: "Se termine à"
         conditional_release: "Parcours conditionnel aux résultats"
@@ -10162,7 +10162,7 @@ fr-CA:
         course_section_name: "Ajouter une nouvelle section"
         course_status_published: "Le cours est publié"
         course_status_unpublished: "Publication du cours annulée"
-        course_template: "Modèle de formation"
+        course_template: "Gabarit de cours"
         course_visibility: Visibilité
         custom_course_visibility: Personnaliser
         default_due_time: "Heure d’échéance par défaut"
@@ -10404,7 +10404,7 @@ fr-CA:
   courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "Les cours ne peuvent pas être créés sur le compte site_admin."
   courses_change_visibility_9150ff1b: "Cours - modifier la visibilité"
   courses_conclude_7bf4ce68: "Cours — terminer"
-  courses_course_templates_5a3fbafd: "Cours — Modèles de formation"
+  courses_course_templates_5a3fbafd: "Cours — Gabarit de cours"
   courses_delete_20c9beb2: "Cours - supprimer"
   courses_delete_archive_b885ce82: "Cours - supprimer/archiver"
   courses_edit_cbace938: "Cours - modifier"
@@ -12638,8 +12638,8 @@ fr-CA:
   enable_cbcd2eef: "Activer "
   enable_close_e8001638: "Activer et fermer"
   enable_content_security_policy_8bd0b492: "Activer Politique de sécurité du contenu"
-  enable_course_as_a_blueprint_course_8515ffd5: "Activer le cours comme cours modèle"
-  enable_course_as_a_course_template_5299afb6: "Activer le cours comme modèle de formation"
+  enable_course_as_a_blueprint_course_8515ffd5: "Activer le cours comme Cours projet"
+  enable_course_as_a_course_template_5299afb6: "Activer le cours comme Gabarit de cours"
   enable_dashboard_images_for_courses_5af458b0: "Autoriser les images du tableau de bord pour les cours"
   enable_distributed_internal_analytics_29e76618: "Activer l’analyse interne distribuée"
   enable_dynamic_peer_review_allocation_and_separate_44f7e8d: "Permettez l’attribution dynamique d’examens par les pairs et séparez les dates d’échéance et la notation pour une expérience d’examen rationalisée et flexible."
@@ -13962,7 +13962,7 @@ fr-CA:
   failed_to_duplicate_module_fef36468: "Échec de la duplication du module"
   failed_to_execute_search_41865f85: "Échec de l’exécution de la recherche"
   failed_to_execute_search_e1557799: "Échec de l’exécution de la recherche : "
-  failed_to_export_blueprint_course_settings_1ced8c6: "Échec de l’exportation des paramètres du cours modèle"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Échec de l’exportation des paramètres du Cours projet"
   failed_to_export_context_info_acb07497: "Échec de l’exportation des informations contextuelles"
   failed_to_export_course_paces_e17583ba: "Échec de l’exportation des rythmes du cours"
   failed_to_export_pace_plans_9832daac: "Échec de l’exportation des plans Pace"
@@ -16371,7 +16371,7 @@ fr-CA:
   hide_all_details_61d7ebb: "Masquer tous les détails"
   hide_all_recipients_1ca02da6: "Masquer tous les destinataires"
   hide_assignment_group_totals_f4fb8660: "Masquer les totaux des groupes d’évaluation"
-  hide_blueprint_lock_icon_on_child_course_modules_p_547f016e: "Masquer l’icône de verrouillage du Modèle sur la page des modules du cours dépendant"
+  hide_blueprint_lock_icon_on_child_course_modules_p_547f016e: "Masquer l’icône de verrouillage du Cours projet sur la page des modules du cours dépendant"
   hide_correct_answers_at_2421b0aa: "Masquer les réponses correctes à"
   hide_correct_answers_at_b1a59408: "Masquer les réponses correctes à"
   hide_count_missing_items_d0f25329: 
@@ -16561,7 +16561,7 @@ fr-CA:
   how_would_you_like_to_proceed_966271c2: "Comment souhaitez-vous procéder?"
   howard_assignment_scores_96556db2: "Scores des tâches de Howard"
   howard_assignments_report_f3254802: "Rapport des tâches de Howard"
-  however_if_these_additional_permissions_are_enable_35d3082c: "Toutefois, si ces autorisations supplémentaires sont activées, mais que l’autorisation Pages - Mettre à jour n’est pas activée, l’utilisateur peut quand même ajuster les paramètres de verrouillage de contenu sur des pages individuelles dans un Cours modèle principal."
+  however_if_these_additional_permissions_are_enable_35d3082c: "Toutefois, si ces autorisations supplémentaires sont activées, mais que l’autorisation Pages - Mettre à jour n’est pas activée, l’utilisateur peut quand même ajuster les paramètres de verrouillage de contenu sur des pages individuelles dans un Cours projet principal."
   html5_media_recorder_in_rce_bb59b78f: "« HTML5 Media Recorder » dans RCE"
   html_ca108e72: HTML
   html_editor_fb2ab713: "Éditeur HTML"
@@ -16658,7 +16658,7 @@ fr-CA:
       pour configurer rapidement la tâche pour l'outil
   if_any_of_these_permissions_are_granted_to_a_user__ee6962c0: "Si l’une de ces autorisations est accordée à un rôle d’utilisateur, ce rôle sera en mesure de visualiser et d’accéder aux données relatives aux étiquettes de différenciation."
   if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "Si « Cours modèle - ajouter/modifier/associer/supprimer » et « Cours - gérer/mettre à jour » sont activées, mais que « Tâches et questionnaires – modifier » n’est pas activé, les paramètres de verrouillage de Modèle pour une tâche peuvent être gérés à partir de la page des détails de la tâche."
-  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Si « Cours modèle - ajouter/modifier/associer/supprimer » et « Cours - gérer » sont activés, mais que « Tâches et questionnaires – modifier » n’est pas activé, les paramètres de verrouillage de Modèle pour une tâche peuvent être gérés à partir de la page des détails de la tâche."
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Si « Cours projet - ajouter/modifier/associer/supprimer » et « Cours - gérer » sont activés, mais que « Tâches et questionnaires – modifier » n’est pas activé, les paramètres de verrouillage de Modèle pour une tâche peuvent être gérés à partir de la page des détails de la tâche."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Si « Notation - Modifier » et « Notation - Voir toutes les notes » sont désactivés, le carnet de notes sera masqué de la Navigation du cours."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Si « Notation - Modifier » et « Notation — Voir toutes les notes » sont désactivés, le Carnet de notes sera masqué de la Navigation du cours."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Si « Notation - Modifier » et « Notation - Voir toutes les notes » sont désactivés, le carnet de notes sera masqué de la Navigation du cours."
@@ -16670,7 +16670,7 @@ fr-CA:
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Si « Cours - ajouter/modifier/supprimer » et « Cours - annuler la suppression » sont également activés, un utilisateur de niveau compte pourra restaurer les cours supprimés dans « Outils d'administration »."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "Si « Cours - ajouter » est activé et « Cours - voir la liste » est désactivé, les utilisateurs peuvent ajouter un nouveau cours avec le bouton « Ajouter un nouveau cours » dans les paramètres du compte."
   if_courses_manage_and_courses_undelete_are_also_en_9047d4b3: "Si « Cours - gérer » et « Cours - annuler la suppression » sont également activés, un utilisateur de niveau compte pourra restaurer les cours supprimés dans « Outils d’administration »."
-  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Si « Cours - gérer » est activé, mais que « Cours modèle - ajouter/modifier/associer/supprimer » n’est pas activé, les utilisateurs peuvent toujours synchroniser les Cours modèles et consulter l’historique des synchronisations."
+  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Si « Cours - gérer » est activé, mais que « Cours projet - ajouter/modifier/associer/supprimer » n’est pas activé, les utilisateurs peuvent toujours synchroniser les Cours projet et consulter l’historique des synchronisations."
   if_courses_manage_update_and_courses_undelete_are__670ab844: "Si « Administrateur - gérer/mettre à jour » et « Cours - annuler la suppression » sont également activés, un utilisateur de niveau compte pourra restaurer les cours supprimés dans « Outils d’administration »."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Si désactivée, la page des Acquis sera seulement accessible en lecture seule et masque le bouton Gérer les rubriques. L'utilisateur peut toujours accéder aux rubriques des tâches individuelles par le biais des tâches."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Si désactivé, l'utilisateur peut toujours voir et télécharger des fichiers dans un fichier zip."
@@ -16803,7 +16803,7 @@ fr-CA:
       et qu'il peut visualiser la tâche. Cette option peut être utilisée pour mettre en évidence l’emplacement des outils qui requièrent une action après l’envoi d’une tâche
       .
   if_enabled_the_blueprint_lock_icon_will_be_hidden__a4687633: |-
-      Si cette option est a’tivée, l'icône de verrouillage du modèle sera masquée sur la page des modules. Il s’agit d’un hack de performance qui ne devrait être utilisé
+      Si cette option est a’tivée, l'icône de verrouillage du Cours projet sera masquée sur la page des modules. Il s’agit d’un hack de performance qui ne devrait être utilisé
       que pour les clients ayant un grand no’bre d'éléments de contenu (plus de 2000) dans un cours.
   if_enabled_the_course_copy_page_will_use_instui_co_1443e18f: "Si cette option est activée, la page de copie du cours utilisera les composants InstUI."
   if_enabled_the_course_import_page_will_use_instui__84bad313: "Si cette option est activée, la page d’importation de cours utilisera les composants InstUI"
@@ -16983,7 +16983,7 @@ fr-CA:
   if_the_open_registration_account_setting_is_enable_e7f97cf0: "Si le paramètre d’ouverture de compte d’inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter des enseignants à un cours depuis la page des Personnes par l’intermédiaire d’adresse de courriel ou d’ID de connexion même si l’enseignant ne dispose pas déjà d’un compte Canvas."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Si le paramètre d’ouverture de compte d’inscription est activé, les utilisateurs disposant de cette autorisation peuvent ajouter les étudiants/observateurs à un cours par l’intermédiaire d’adresse de courriel ou ID de connexion même si l’étudiant/observateur ne dispose pas déjà d’un compte Canvas."
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Si l’option demandant aux utilisateurs de publier des messages avant de voir les réponses est sélectionnée dans une discussion, les utilisateurs doivent publier une réponse pour voir tous les messages sauf si « Discussions - modérée » est également activé."
-  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Si « Pages — Mise à jour autorisation » est désactivé, l’utilisateur peut toujours régler les paramètres de blocage du contenu sur des pages individuelles dans un cours modèle principal."
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Si « Pages — Mise à jour autorisation » est désactivé, l’utilisateur peut toujours régler les paramètres de blocage du contenu sur des pages individuelles dans un Cours projet principal."
   if_the_provider_can_configure_valid_post_logout_re_898ae9cf: "Si le fournisseur peut configurer une version valide de `post_logout_redirect_uris`, utilisez %{post_logout_redirect_uri}."
   if_the_wrong_separator_is_used_e_g_1_5_instead_of__7d22ab16: "Si le séparateur utilisé n’est pas le bon (par exemple, 1.5 au lieu de 1,5), les réponses des élèves risquent d’être jugées incorrectes."
   if_there_are_replies_checkpoints_cannot_be_enabled_b086feb8: "S’il y a des réponses, les points de contrôle ne peuvent pas être activés."
@@ -17024,7 +17024,7 @@ fr-CA:
       Pour ajouter des utilisateurs aux cours par l’intermédiaire de l’ID SIS, « Utilisateurs - ajouter/retirer les étudiants du cours » ou « Utilisateurs - ajouter/retirer les enseignants, les concepteurs de cours, ou les AE des cours » doit également être activé.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Si cette autorisation est activée, les utilisateurs n’ont pas besoin d’activer l’autorisation « Données SIS — lecture ». L’autorisation du compte surclasse l’autorisation du cours."
   if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Si cette autorisation n’est pas activée, les utilisateurs peuvent consulter les banques d’éléments créées par eux, partagées avec eux à partir d’un autre utilisateur, ou partagées indirectement par le cours où ils sont inscrits avec un rôle d’instructeur."
-  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Si ce paramètre est désactivé, et « Discussions — voir » est activé, un utilisateur peut toujours régler les paramètres de blocage du contenu sur des discussions individuelles dans un cours modèle maître."
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Si ce paramètre est désactivé, et « Discussions — voir » est activé, un utilisateur peut toujours régler les paramètres de blocage du contenu sur des discussions individuelles dans un Cours projet maître."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Si vrai, l’envoi sérialisé sera utilisé pour la date submitted_at"
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Si « Utilisateurs - Gérer les détails de connexion » ou « Statistiques - voir »​est activé, un utilisateur sera en mesure de générer l'activité de connexion/déconnexion dans les Outils d'administration. Pour masquer l'option de l’activité de connexion/déconnexion dans les Outils d'administration, ces autorisations doivent être désactivées."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Si « Utilisateurs — Gérer les détails de connexion » ou « Statistiques — voir » ​est activé, un utilisateur sera en mesure de générer l’activité de connexion/déconnexion dans les Outils d’administration. Pour masquer l’option de l’activité de connexion/déconnexion dans les Outils d’administration, ces autorisations doivent être désactivées."
@@ -17121,7 +17121,7 @@ fr-CA:
   import_as_a_standalone_module_20abf568: "Importation en tant que module autonome"
   import_assessment_as_new_quizzes_help_icon_3e49480f: "Importation d’évaluation comme icône d’aide de nouveaux questionnaires"
   import_assessment_as_new_quizzes_help_modal_918a543d: "Importation d’évaluation comme modale d’aide de nouveaux questionnaires"
-  import_blueprint_course_settings_f6195365: "Importer les paramètres du cours modèle"
+  import_blueprint_course_settings_f6195365: "Importer les paramètres du Cours projet"
   import_commons_favorites_e68fce81: "Importer les favoris de Commons"
   import_content_b2fd6620: "Importer du contenu"
   import_course_student_groups_by_csv_d2cde97d: "Importer des groupes d’étudiants de cours par csv"
@@ -17624,9 +17624,9 @@ fr-CA:
   invalid_address_book_strategy_904a7ada: "Cette méthode de carnet d'adresses n’est pas valide."
   invalid_authenticity_token_b753558c: "Jeton d’authentification non valide"
   invalid_aws_configuration_e8a6ae0f: "Configuration AWS non valide"
-  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Type d’article verrouillé par un modèle non valide %{type} pour un article %{id}"
-  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Types de restriction de modèle non valides dans le paquetage importé; utilisation des valeurs par défaut"
-  invalid_blueprint_restrictions_for_item_id_63aae663: "Restrictions de modèle non valides pour l’élément %{id}"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Type d’article verrouillé par un Cours projet non valide %{type} pour un article %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Types de restriction de Cours projet non valides dans le paquetage importé; utilisation des valeurs par défaut"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Restrictions de Cours projet non valides pour l’élément %{id}"
   invalid_byday_byday_6e361e78: "BYDAY '%{byday}' non valide"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH '%{bymonth}' non valide"
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' non valide"
@@ -19017,7 +19017,7 @@ fr-CA:
   manage_course_content_fc5de138: "Gérer le contenu de cours"
   manage_course_files_57e07038: "Gérer les fichiers de cours"
   manage_course_sections_f482d1b3: "Gérer les sections du cours"
-  manage_course_templates_66c00052: "Gérer les modèles de cours"
+  manage_course_templates_66c00052: "Gérer les Gabarits de cours"
   manage_courses_abe8335f: "Gérer les cours"
   manage_create_edit_delete_groups_f9046ee3: "Gérer (créer/modifier/supprimer) des groupes"
   manage_created_labels_below_ade2cc87: "Gérer les étiquettes créées ci-dessous."
@@ -19889,36 +19889,36 @@ fr-CA:
     assignment_unpublished_module: "Cette tâche fait partie d’un module non publié et n’est pas encore disponible."
     blueprint_content_added: 
       email: 
-        body: "Les modifications du cours modèle ont été synchronisées avec %{name}."
+        body: "Les modifications du Cours projet ont été synchronisées avec %{name}."
         details_link: "Afficher les modifications : %{link}"
         html: 
-          body: "Les modifications du cours modèle ont été synchronisées avec %{name}."
+          body: "Les modifications du Cours projet ont été synchronisées avec %{name}."
           details_link: "Afficher les modifications"
-          subject: "Synchronisation du modèle : %{name}"
-        subject: "Synchronisation du modèle : %{name}"
+          subject: "Synchronisation du Cours projet : %{name}"
+        subject: "Synchronisation du Cours projet : %{name}"
       sms: 
-        body: "Les modifications du cours modèle ont été synchronisées avec %{name}."
+        body: "Les modifications du Cours projet ont été synchronisées avec %{name}."
         link_message: "Plus d'infos à %{url}"
       summary: 
-        body: "Synchronisation du modèle : Modifications synchronisées avec %{name}."
-        subject: "Synchronisation du modèle : %{name}"
+        body: "Synchronisation du Cours projet : Modifications synchronisées avec %{name}."
+        subject: "Synchronisation du Cours projet : %{name}"
       twitter: 
         tweet: "Alerte de Canvas - les modifications du cours modèle ont été synchronisées vers %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "Votre cours modèle, %{name}, a synchronisé les modifications à tous les cours associés."
+        body: "Votre Cours projet, %{name}, a synchronisé les modifications à tous les cours associés."
         details_link: "Plus d'infos : %{link}"
         html: 
-          body: "Votre cours modèle, %{name}, a synchronisé les modifications à tous les cours associés."
+          body: "Votre Cours projet, %{name}, a synchronisé les modifications à tous les cours associés."
           details_link: "Plus d'infos"
-          subject: "Synchronisation du modèle terminé : %{name}"
-        subject: "Synchronisation du modèle terminé : %{name}"
+          subject: "Synchronisation du Cours projet terminé : %{name}"
+        subject: "Synchronisation du Cours projet terminé : %{name}"
       sms: 
-        body: "Les modifications du cours modèle ont été synchronisées depuis %{name}."
+        body: "Les modifications du Cours projet ont été synchronisées depuis %{name}."
         link_message: "Plus d'infos à %{url}"
       summary: 
-        body: "Synchronisation du modèle : Modifications synchronisées à partir de %{name}."
-        subject: "Synchronisation du modèle terminé : %{name}"
+        body: "Synchronisation du Cours projet : Modifications synchronisées à partir de %{name}."
+        subject: "Synchronisation du Cours projet terminé : %{name}"
       twitter: 
         tweet: "Alerte de Canvas - les modifications du cours modèle ont été synchronisées depuis %{name}."
     checkpoints_created: 
@@ -22375,8 +22375,8 @@ fr-CA:
         *Instructeur et administrateur uniquement :*
         
         Le contenu a été synchronisé à partir d'un cours modèle pour les cours associés
-    blueprint_description_legend: "*(Instructeur et Admin seulement)* Le contenu a été synchronisé à partir d'un cours de type Cours modèle vers des cours associés."
-    blueprint_display: "Synchronisation du modèle"
+    blueprint_description_legend: "*(Instructeur et Admin seulement)* Le contenu a été synchronisé à partir d'un cours de type Cours projet vers des cours associés."
+    blueprint_display: "Synchronisation du Cours projet"
     calendar_description: "Éléments nouveaux et modifiés dans le calendrier de votre cours"
     calendar_description_legend: "Éléments nouveaux et modifiés dans le calendrier de votre cours"
     calendar_display: Calendrier
@@ -22387,7 +22387,7 @@ fr-CA:
       appointment_availability: "Disponibilité pour les rendez-vous"
       appointment_cancelations: "Annulations de rendez-vous"
       appointment_signups: "Inscriptions aux rendez-vous"
-      blueprint: Modèle
+      blueprint: "Cours projet"
       calendar: Calendrier
       content_link_error: "Erreur de lien de contenu"
       course_content: "Contenu du cours"
@@ -22531,8 +22531,8 @@ fr-CA:
       assignment_resubmitted: "La tâche a été renvoyée"
       assignment_submitted: "La tâche a été envoyée"
       assignment_submitted_late: "La tâche a été envoyé en retard"
-      blueprint_content_added: "Contenu du modèle ajouté"
-      blueprint_sync_complete: "Synchronisation du modèle terminée"
+      blueprint_content_added: "Contenu du Cours projet ajouté"
+      blueprint_sync_complete: "Synchronisation du Cours projet terminée"
       checkpoints_created: "Points de contrôle créés"
       collaboration_invitation: "Invitation de collaboration"
       confirm_email_communication_channel: "Confirmer le canal de communication par courriel"
@@ -22975,7 +22975,7 @@ fr-CA:
   oops_there_was_an_error_validating_the_service_req_9543a537: "Oops! Une erreur s’est produite lors de la validation de la demande de service. Veuillez essayer de nouveau plus tard."
   oops_we_weren_t_able_to_save_your_page_please_try__25898bd1: "Oops! Nous n’avons pas pu enregistrer votre page. Veuillez réessayer"
   open_address_book_41ce8576: "Ouvrir Carnet d'adresses"
-  open_blueprint_sidebar_830b4c54: "Ouvrir la barre latérale de Modèle"
+  open_blueprint_sidebar_830b4c54: "Ouvrir la barre latérale de Cours projet"
   open_comment_library_9debe2: "Ouvrir la bibliothèque des commentaires"
   open_comment_tray_160293d7: "Ouvrir le plateau des commentaires"
   open_complete_incomplete_menu_cfe2033b: "Ouvrir le menu terminé/non terminé"
@@ -25401,8 +25401,8 @@ fr-CA:
   queued_d0e45c4b: "En file d'attente"
   queued_jobs_9a7a923e: "Travaux en file d’attente"
   quick_look_9bd1a50d: "Coup d’œil rapide"
-  quickly_share_course_content_and_templates_with_te_1cf3dc6f: "Partager rapidement le contenu et les modèles de cours avec les enseignants"
-  quickly_share_course_content_and_templates_with_te_c70a5eeb: "Partager rapidement le contenu et les modèles de cours avec les enseignants"
+  quickly_share_course_content_and_templates_with_te_1cf3dc6f: "Partager rapidement le contenu et les gabarits de cours avec les enseignants"
+  quickly_share_course_content_and_templates_with_te_c70a5eeb: "Partager rapidement le contenu et les gabarits de cours avec les enseignants"
   quiz: 
     regrade: 
       give_everyone_full_credit: "Tout le monde reçoit tous les points pour cette question."
@@ -29628,7 +29628,7 @@ fr-CA:
   show_older_replies_e85891b3: "Afficher les réponses plus anciennes"
   show_one_question_at_a_time_271e346d: "Montrer une question à la fois"
   show_online_classes_only_f9d7b938: "Afficher les cours en ligne uniquement"
-  show_only_blueprint_courses_9fb37b41: "Afficher uniquement les cours modèles"
+  show_only_blueprint_courses_9fb37b41: "Afficher uniquement les cours projet"
   show_only_disabled_calendars_cb8e2bdc: "Afficher uniquement les calendriers désactivés"
   show_only_enabled_calendars_8caef0df: "Afficher uniquement les calendriers activés"
   show_only_public_courses_517ad255: "Afficher uniquement les cours publics"
@@ -32313,9 +32313,9 @@ fr-CA:
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Cette intégration n’est pas activée. Veuillez l’activer afin d’interagir avec les paramètres."
   this_is_a_86303f41: "Il s’agit d’un"
   this_is_a_a_common_tracking_id_for_dsr_requests_c7b8acf5: "Il s'agit d'un identifiant de suivi courant pour les demandes de DSR."
-  this_is_a_blueprint_course_5e7b47fe: "Il s'agit d'un cours modèle."
+  this_is_a_blueprint_course_5e7b47fe: "Il s'agit d'un Cours projet."
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Il s’agit d’une liste d’URL de confiance séparées par des virgules. La confiance accordée à n’importe quelle URL de cette liste rend inutile le jeton CSRF lors de la connexion à Canvas."
-  this_is_a_course_template_99bbe698: "Ceci est un modèle de cours"
+  this_is_a_course_template_99bbe698: "Ceci est un Gabarit de cours"
   this_is_a_feature_to_allow_product_design_to_remov_e92ea1c3: "Il s'agit d'une fonction pour permettre la conception de produits afin de retirer tous les surpassements de taille de police dans l'application."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Il s'agit d'une caractéristique pour permettre le développement d'un modèle réactif"
   this_is_a_full_batch_update_99d726e0: "Correspond à une mise à jour du lot complet"
@@ -32964,7 +32964,7 @@ fr-CA:
   to_add_announcements_discussions_moderate_must_als_a83fd681: "Pour ajouter des annonces, « Discussions - modérer » doit également être activé."
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "Pour ajouter des cours associés, « Cours modèle - ajouter/modifier/associer/supprimer » et « Gérer Cours - ajouter » doivent également être activées."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Pour ajouter les cours associés, « Cours modèles - ajouter/modifier/associer/supprimer » et « Cours — ajouter/modifier/supprimer » doivent également être activés."
-  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "Pour ajouter des cours associés, « Cours modèle - ajouter/modifier/associer/supprimer » et « Cours - ajouter » doivent également être activés."
+  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "Pour ajouter des cours associés, « Cours projet - ajouter/modifier/associer/supprimer » et « Cours - ajouter » doivent également être activés."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Pour ajouter des utilisateurs, des cours et des inscriptions en bloc, cliquez sur Importations SIS."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Pour ajouter, modifier ou supprimer des Groupes, « Groupes - ajouter/modifier/supprimer » doit également être activé."
   to_add_groups_groups_add_must_also_be_enabled_33680f91: "Pour ajouter des groupes, « Groupes - ajouter » doit également être activé."
@@ -33050,7 +33050,7 @@ fr-CA:
   to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "pour créer un lien que vous pouvez utiliser dans Canvas. Vous devez vous inscrire à un compte Zoom si vous n’en avez pas déjà un."
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "pour créer un lien que vous pouvez utiliser dans Canvas. Vous aurez besoin d’un compte Google pour utiliser Google Meet."
   to_create_a_new_course_to_use_as_a_course_template_9e7e2c6c: "Pour créer un nouveau cours à utiliser comme modèle de cours, l’option « Gérer les cours - ajouter » doit également être activée."
-  to_create_a_new_course_to_use_as_a_course_template_aa0ff48e: "Pour créer un nouveau cours à utiliser comme modèle de cours, « Cours - ajouter » doit également être activé."
+  to_create_a_new_course_to_use_as_a_course_template_aa0ff48e: "Pour créer un nouveau cours à utiliser comme Gabarit de cours, « Cours - ajouter » doit également être activé."
   to_create_announcements_discussions_manage_must_al_932ac38f: "Pour créer des annonces, « Discussions - gérer » doit également être activé."
   to_create_announcements_discussions_moderate_must__8a8278f2: "Pour créer des annonces, « Discussions - modérer » doit également être activé."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Pour transférer une section, « Sections de cours - ajouter/modifier/supprimer » doit également être activé. Pour modifier l’ID SIS du cours, « Données SIS - gérer » doit également être activé. Pour permettre à un utilisateur de niveau de compte à supprimer un cours, « État du cours - gérer » doit également être activé."
@@ -33115,7 +33115,7 @@ fr-CA:
   to_edit_assignment_details_on_individual_discussio_99f718a7: "Pour modifier les détails de la tâche sur les discussions, « Discussions - gérer » doit également être activé."
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Pour modifier les paramètres de Cours modèle, « Cours modèle - ajouter/modifier/supprimer/associer » doit également être activé. Pour ajouter un cours associé, « Cours modèles - ajouter/modifier/associer/supprimer » et « Cours - voir la liste » doivent également être activés. Pour modifier les paramètres de verrouillage sur tout d’objet de Modèle, cette autorisation doit être activée. Pour modifier les paramètres de verrouillage sur les fichiers, « Fichiers de cours — ajouter/modifier/supprimer » doit également être activé. Pour modifier les paramètres de verrouillage sur les questionnaires, « Tâches et questionnaires — ajouter/modifier/supprimer » doit également être activé."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des tâches, « Cours — ajouter/modifier/supprimer » doit également être activé. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » est activé, les paramètres de verrouillage de Modèle pour une tâche peuvent être gérés à partir de la page de détails de la tâche. Pour modifier les paramètres de verrouillage de Modèle sur un questionnaire individuel ou depuis la page d’index des Questionnaires, « Cours — ajouter/modifier/supprimer » doit également être activé."
-  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Pour modifier les paramètres de verrouillage du modèle depuis la page d’index de Discussions, « Discussions - Modérer » doit également être activé."
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Pour modifier les paramètres de verrouillage du Cours projet depuis la page d’index de Discussions, « Discussions - Modérer » doit également être activé."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions - Modérer » doivent également être activés. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Pour modifier les paramètres de verrouillage du modèle de la page d’index de Discussions, « Cours — ajouter/modifier/supprimer » et « Discussions — voir » doivent également être activés. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » et « Discussions — voir » sont activés, les paramètres de verrouillage du Modèle peuvent être modifiés sur les discussions individuelles."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Pour modifier les paramètres de verrouillage de Modèle depuis la page d’index des Pages, « Cours — ajouter/modifier/supprimer » doit également être activé. Si cette autorisation n’est pas activée, et « Cours — ajouter/modifier/supprimer » est activé, les paramètres de verrouillage du Modèle peuvent être modifiés sur les pages individuelles."
@@ -33132,18 +33132,18 @@ fr-CA:
   to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "Pour modifier des groupes, « Groupes - gérer » doit également être activé."
   to_edit_lock_settings_for_course_files_course_file_392f6f70: "Pour modifier les paramètres de verrouillage des fichiers de cours, « Fichiers de cours - modifier », « Cours modèle - ajouter/modifier/associer/supprimer », et « Cours - gérer/mettre à jour » doivent également être activés."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "Pour modifier les paramètres de verrouillage des fichiers de cours, « Fichiers de cours - modifier », « Cours modèle - ajouter/modifier/associer/supprimer », et Gérer les cours : « Admin - gérer/mettre à jour » doivent également être activés."
-  to_edit_lock_settings_for_course_files_course_file_92273739: "Pour modifier les paramètres de verrouillage des fichiers de cours, « Fichiers de cours - modifier », « Cours modèle - ajouter/modifier/associer/supprimer », et « Cours - gérer » doivent également être activés."
-  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "Pour modifier les paramètres de verrouillage sur la page d’index des tâches, « Cours modèle – ajouter, modifier, associer, supprimer » et « Cours - gérer » doivent également être activés."
+  to_edit_lock_settings_for_course_files_course_file_92273739: "Pour modifier les paramètres de verrouillage des fichiers de cours, « Fichiers de cours - modifier », « Cours projet - ajouter/modifier/associer/supprimer », et « Cours - gérer » doivent également être activés."
+  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "Pour modifier les paramètres de verrouillage sur la page d’index des tâches, « Cours projet – ajouter, modifier, associer, supprimer » et « Cours - gérer » doivent également être activés."
   to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "Pour modifier les paramètres de verrouillage sur la page d’index des tâches, « Cours modèle – ajouter, modifier, associer, supprimer » et « Cours - gérer/mettre à jour » doivent également être activés."
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       Pour modifier les paramètres de verrouillage sur la page d’index des tâches, « Cours modèle – ajouter, modifier, associer, supprimer » et Gérer les cours : « Admin - gérer/mettre à jour » doivent également être activés. Si ces autorisations supplémentaires sont activées, mais que l’option « Tâches et questionnaires - ajouter/modifier/supprimer » n’est pas activée, les paramètres de verrouillage du modèle pour une tâche peuvent être gérés à partir de la page de détails de la tâche.
               Pour modifier les paramètres de verrouillage d’un questionnaire individuel ou de la page d’index des questionnaires, sélectionnez « Cours modèle - ajouter/modifier/associer/supprimer » et Gérer les cours : « Admin - gérer/mettre à jour » doivent également être activés.
   to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "Pour modifier les paramètres de verrouillage sur la page d’index des tâches, « Cours modèle – ajouter, modifier, associer, supprimer » et « Gérer les cours : Admin - gérer/mettre à jour » doivent également être activés."
   to_edit_lock_settings_from_the_discussions_index_p_d344c544: "Pour modifier les paramètres de verrouillage sur la page d’index de Discussions, « Cours modèle — ajouter/modifier/associer/supprimer » et « Cours - gérer/mettre à jour » doivent également être activés."
-  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "Pour modifier les paramètres de verrouillage sur la page d’index de Discussions, « Cours modèle — ajouter/modifier/associer/supprimer » et « Cours - gérer » doivent également être activés."
+  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "Pour modifier les paramètres de verrouillage sur la page d’index de Discussions, « Cours projet — ajouter/modifier/associer/supprimer » et « Cours - gérer » doivent également être activés."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "Pour modifier les paramètres de verrouillage sur la page d’index des discussions, « Cours modèle – ajouter, modifier, associer, supprimer » et Gérer les cours : « Admin - gérer/mettre à jour » doivent également être activés."
   to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "Pour modifier les paramètres de verrouillage sur un questionnaire individuel ou depuis la page d’index des Questionnaires, « Cours modèle — ajouter/modifier/associer/supprimer » et « Gérer les cours :. « Admin - gérer/mettre à jour » doivent également être activés."
-  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "Pour modifier les paramètres de verrouillage sur un questionnaire individuel ou sur la page d’index des Questionnaires, « Cours modèle — ajouter/modifier/associer/supprimer » et « Cours - gérer» doivent également être activés."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "Pour modifier les paramètres de verrouillage sur un questionnaire individuel ou sur la page d’index des Questionnaires, « Cours projet — ajouter/modifier/associer/supprimer » et « Cours - gérer» doivent également être activés."
   to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "Pour modifier les paramètres de verrouillage sur un questionnaire individuel ou sur la page d’index des Questionnaires, « Cours modèle — ajouter/modifier/associer/supprimer » et « Cours - gérer/mettre à jour » doivent également être activés."
   to_edit_lock_settings_on_files_courses_manage_and__f4718695: "Pour modifier les paramètres de verrouillage sur les fichiers, « Cours - gérer » et « Fichiers de cours - modifier » doivent également être activés."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "Pour modifier les paramètres de verrouillage sur les fichiers, « Cours - gérer/mettre à jour » et « Fichiers de cours - modifier » doivent également être activés."
@@ -33157,7 +33157,7 @@ fr-CA:
   to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "Pour modifier les paramètres de verrouillage de la page d’index de Discussions, « Cours - gérer/mettre à jour » et « Discussions — voir » doivent également être activés."
   to_edit_lock_settings_on_the_discussions_index_pag_9488110a: "Pour modifier les paramètres de verrouillage de la page d’index de Discussions, « Cours - gérer » et « Discussions — voir » doivent également être activés."
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "Pour modifier les paramètres de verrouillage sur la page d’index des pages, « Pages – mettre à jour », « Cours modèle – ajouter, modifier, associer, supprimer » et « Cours - gérer/mettre à jour »."
-  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "Pour modifier les paramètres de verrouillage sur la page d’index des pages, « Pages – mettre à jour », « Cours modèle – ajouter, modifier, associer, supprimer » et « Cours - gérer »."
+  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "Pour modifier les paramètres de verrouillage sur la page d’index des pages, « Pages – mettre à jour », « Cours projet – ajouter, modifier, associer, supprimer » et « Cours - gérer »."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "Pour modifier les paramètres de verrouillage sur la page d’index des pages, Pages – mettre à jour, Cours modèle – ajouter, modifier, associer, supprimer et gérer les cours : Admin - gérer/mettre à jour."
   to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "Pour modifier les questionnaires, « Tâches et questionnaires — gérer/modifier » doit également être activé."
   to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "Pour modifier l’ID SIS du cours, « Cours - gérer » et « Données SIS - gérer » doivent également être activés."
@@ -36084,7 +36084,7 @@ fr-CA:
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "Vous n’avez pas accès à la discussion demandée."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Vous n'êtes pas autorisé à accéder le questionnaire demandé."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Vous n'avez pas accès à la ressource demandée."
-  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "Vous ne disposez pas des autorisations de gestion de cours modèle"
+  you_do_not_have_blueprint_course_management_permis_51ae6ef5: "Vous ne disposez pas des autorisations de gestion de Cours projet"
   you_do_not_have_permission_to_add_this_topic_to_th_fc8622a0: "Vous n’avez pas l’autorisation d’ajouter ce sujet à la liste de choses à faire de l’étudiant."
   you_do_not_have_permission_to_change_this_488c536: "Vous n’avez pas l’autorisation de changer ceci"
   you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Vous n’avez pas l’autorisation de supprimer %{file}. Veuillez contacter votre administrateur de compte."

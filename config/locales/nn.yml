@@ -7418,6 +7418,7 @@ nn:
       add: "Legg til modul"
       add_item: "Legg element til %{module}"
       add_prerequisite: "Legg føresetnad til %{module}"
+      course_modules: Emnemodular
       edit: "Rediger modulinnstillingar"
       edit_item: "Rediger elementdetaljar"
     tool_sequence_footer: 

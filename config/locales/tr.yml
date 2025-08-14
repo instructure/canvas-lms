@@ -5557,6 +5557,7 @@ tr:
       add: "Modül Ekle"
       add_item: "%{module} Modülüne Öğe Ekle"
       add_prerequisite: "%{module} modülüne ön koşul ekle"
+      course_modules: "Ders Modülleri"
       edit: "Modül Ayarlarını Düzenle"
       edit_item: "Öğe ayrıntılarını düzenle"
     tool_sequence_footer: 

@@ -4838,6 +4838,7 @@ uk:
       add: "Додати Розділ"
       add_item: "Додати елемент до %{module}"
       add_prerequisite: "Додати умови до %{module}"
+      course_modules: "Розділи курсу"
       edit: "Редагувати налаштування модуля"
       edit_item: "Редагувати детальну інформацію елемента"
     tool_sequence_footer: 

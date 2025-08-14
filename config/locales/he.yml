@@ -5279,6 +5279,7 @@ he:
       add: "הוספת מודול"
       add_item: "הוספת פריט ל%{module}"
       add_prerequisite: "הוספת דרישה מוקדמת ל%{module}"
+      course_modules: "מודולי הקורס "
       edit: "עריכת הגדרות מודול"
       edit_item: "עריכת פרטי פריט"
     tool_sequence_footer: 
