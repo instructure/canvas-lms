@@ -719,7 +719,12 @@ class Rubric < ActiveRecord::Base
     with_versioning(false) do
       self.read_only = cnt > 1
       self.association_count = cnt
-      save
+      begin
+        save!
+      rescue => e
+        Rails.logger.error "Failed to update rubric association count: #{e.message}"
+        Canvas::Errors.capture(e)
+      end
       destroy if cnt == 0 && rubric_associations.none? && !public
     end
   end
