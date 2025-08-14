@@ -59,10 +59,11 @@ class DropLoginAttributeFromPseudonyms < ActiveRecord::Migration[7.2]
     SQL
               .pluck(:authentication_provider_id, :unique_id_normalized, :account_id)
               .each do |authentication_provider_id, unique_id_normalized, account_id|
-      base_scope.where(authentication_provider_id:, unique_id_normalized:, account_id:)
-                .order("login_attribute NULLS LAST")
-                .offset(1)
-                .update_all(workflow_state: "deleted", updated_at: now)
+      Pseudonym.active
+               .where(authentication_provider_id:, unique_id_normalized:, account_id:)
+               .order("login_attribute NULLS LAST")
+               .offset(1)
+               .update_all(workflow_state: "deleted", updated_at: now)
     end
 
     remove_index :pseudonyms, name: "index_temp_pseudonyms_on_login_attribute", algorithm: :concurrently # rubocop:disable Migration/NonTransactional
