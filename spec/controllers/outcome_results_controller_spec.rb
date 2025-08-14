@@ -1951,4 +1951,91 @@ describe OutcomeResultsController do
       end
     end
   end
+
+  describe "enqueue_outcome_rollup_calculation" do
+    before :once do
+      course_with_teacher(active_all: true)
+      course_with_student(course: @course, active_all: true)
+      account_admin_user
+    end
+
+    let(:course) { @course }
+    let(:teacher) { @teacher }
+    let(:student) { @student }
+
+    context "with valid parameters" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:outcomes_rollup_propagation).and_return(true)
+      end
+
+      it "enqueues rollup calculation for specific student" do
+        user_session(@teacher)
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+          .with(course_id: course.id.to_s, student_id: student.id)
+
+        post :enqueue_outcome_rollup_calculation,
+             params: {
+               course_id: course.id,
+               student_uuid: student.uuid
+             },
+             format: :json
+
+        expect(response).to have_http_status(:ok)
+        json_response = response.parsed_body
+        expect(json_response["message"]).to eq("Rollup calculation enqueued for student #{student.id} in course #{course.id}")
+        expect(json_response["type"]).to eq("student")
+      end
+    end
+
+    context "with missing or invalid course or student" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:outcomes_rollup_propagation).and_return(true)
+      end
+
+      it "returns no content if student does not exist" do
+        user_session(@teacher)
+        non_existent_student_uuid = "888"
+        post :enqueue_outcome_rollup_calculation, params: { course_id: course.id, student_uuid: non_existent_student_uuid }, format: :json
+        expect(response).to have_http_status(:not_found)
+        json_response = response.parsed_body
+        expect(json_response["error"]).to match(/Invalid course or student/i)
+      end
+    end
+
+    context "when service raises an exception" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:outcomes_rollup_propagation).and_return(true)
+      end
+
+      it "returns unprocessable entity with error message for student calculation" do
+        user_session(@teacher)
+        error_message = "Something went wrong with student calculation"
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+          .with(course_id: course.id.to_s, student_id: student.id)
+          .and_raise(StandardError.new(error_message))
+
+        post :enqueue_outcome_rollup_calculation,
+             params: {
+               course_id: course.id,
+               student_uuid: student.uuid
+             },
+             format: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        json_response = response.parsed_body
+        expect(json_response["error"]).to eq(error_message)
+      end
+
+      it "returns no content when FF disabled" do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:outcomes_rollup_propagation).and_return(false)
+        user_session(@teacher)
+        post :enqueue_outcome_rollup_calculation, params: { course_id: course.id, student_uuid: student.uuid }, format: :json
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+  end
 end
