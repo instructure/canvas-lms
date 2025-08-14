@@ -109,7 +109,7 @@ export default class GradingPeriodSetCollection extends React.Component {
       const set = {id: prevState.editSet.id}
       const refKey = this.getShowGradingPeriodSetRef(set)
       if (this.setRefs[refKey] && this.setRefs[refKey].current) {
-        this.setRefs[refKey].current._refs.editButton.focus()
+        this.setRefs[refKey].current.editButtonRef.current.focus()
       }
     }
   }
@@ -282,7 +282,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     } else {
       const setRef = this.getShowGradingPeriodSetRef(this.state.sets[index - 1])
       const setToFocus = this.setRefs[setRef] && this.setRefs[setRef].current
-      return setToFocus && setToFocus._refs && setToFocus._refs.editButton
+      return setToFocus && setToFocus.editButtonRef && setToFocus.editButtonRef.current
     }
   }
 
