@@ -205,13 +205,16 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
       )
     } else {
       return (
-        <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
-          <Tooltip renderTip={tooltipContents}>
+        <Tooltip renderTip={tooltipContents} on={['hover', 'focus']}>
+          <Link
+            href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`}
+            isWithinText={false}
+          >
             <Text weight="normal" size="x-small">
               {I18n.t('Multiple Due Dates')}
             </Text>
-          </Tooltip>
-        </Link>
+          </Link>
+        </Tooltip>
       )
     }
   }
@@ -262,13 +265,13 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
   } else if (hasMultipleDates) {
     // Multiple dates (base + overrides) - show "Multiple Due Dates"
     return (
-      <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
-        <Tooltip renderTip={tooltipContents}>
+      <Tooltip renderTip={tooltipContents} on={['hover', 'focus']}>
+        <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
           <Text weight="normal" size="x-small">
             {I18n.t('Multiple Due Dates')}
           </Text>
-        </Tooltip>
-      </Link>
+        </Link>
+      </Tooltip>
     )
   } else {
     // Single override or single date - get the actual date from the Set
