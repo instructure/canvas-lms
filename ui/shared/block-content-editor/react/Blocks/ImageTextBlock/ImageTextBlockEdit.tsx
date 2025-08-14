@@ -21,7 +21,6 @@ import {TitleEdit} from '../BlockItems/Title/TitleEdit'
 import {ImageEdit} from '../BlockItems/Image'
 import {TextEdit} from '../BlockItems/Text/TextEdit'
 import {ImageTextBlockLayout} from './ImageTextBlockLayout'
-import {View} from '@instructure/ui-view'
 
 export const ImageTextBlockEdit = ({
   title,

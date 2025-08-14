@@ -18,10 +18,12 @@
 
 import {useNode} from '@craftjs/core'
 import {ArrangementOption, ImageTextBlockProps, TextToImageRatioOption} from './types'
+import {ImageData} from '../BlockItems/Image/types'
 import {SettingsIncludeTitle} from '../BlockItems/SettingsIncludeTitle/SettingsIncludeTitle'
 import {ColorPickerWrapper} from '../BlockItems/ColorPickerWrapper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {SettingsSectionToggle} from '../BlockItems/SettingsSectionToggle/SettingsSectionToggle'
+import {SettingsUploadImage} from '../BlockItems/SettingsUploadImage/SettingsUploadImage'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -80,12 +82,16 @@ export const ImageTextBlockSettings = () => {
     textColor,
     arrangement,
     textToImageRatio,
+    url,
+    fileName,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
     backgroundColor: node.data.props.settings.backgroundColor,
     textColor: node.data.props.settings.textColor,
     arrangement: node.data.props.settings.arrangement,
     textToImageRatio: node.data.props.settings.textToImageRatio,
+    url: node.data.props.settings.url,
+    fileName: node.data.props.settings.fileName,
   }))
 
   const handleIncludeBlockTitleChange = () => {
@@ -117,6 +123,14 @@ export const ImageTextBlockSettings = () => {
     const textToImageRatio = value as TextToImageRatioOption
     setProp((props: ImageTextBlockProps) => {
       props.settings.textToImageRatio = textToImageRatio
+    })
+  }
+
+  const handleImageDataChange = (imageData: ImageData) => {
+    setProp((props: ImageTextBlockProps) => {
+      props.settings.url = imageData.url
+      props.settings.altText = imageData.altText
+      props.settings.fileName = imageData.fileName
     })
   }
 
@@ -173,7 +187,7 @@ export const ImageTextBlockSettings = () => {
             ))}
           </RadioInputGroup>
         </View>
-        <View as="div">
+        <View as="div" margin="0 0 medium 0">
           <RadioInputGroup
             name="image-text-text-to-image-ratio"
             description={I18n.t('Text to image ratio')}
@@ -184,6 +198,13 @@ export const ImageTextBlockSettings = () => {
               <RadioInput key={option.value} label={option.label} value={option.value} />
             ))}
           </RadioInputGroup>
+        </View>
+        <View as="div">
+          <SettingsUploadImage
+            onImageChange={handleImageDataChange}
+            url={url || ''}
+            fileName={fileName || ''}
+          />
         </View>
       </SettingsSectionToggle>
     </View>

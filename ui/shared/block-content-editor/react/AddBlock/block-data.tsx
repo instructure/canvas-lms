@@ -85,6 +85,9 @@ export const blockFactory = {
         textColor: defaultTextColor,
         arrangement: 'left',
         textToImageRatio: '1:1',
+        url: '',
+        altText: '',
+        fileName: '',
       }}
     />
   ),

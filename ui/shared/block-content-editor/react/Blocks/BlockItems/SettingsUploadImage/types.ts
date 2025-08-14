@@ -16,13 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type ImageData = {
-  url?: string
-  altText?: string
-  fileName?: string
-}
-export type ImageChangeHandler = {
-  onImageChange: (data: ImageData) => void
-}
-export type ImageEditProps = ImageData & ImageChangeHandler
-export type ImageViewProps = ImageData
+import {ImageChangeHandler, ImageData} from '../Image/types'
+
+export type SettingsUploadImageProps = Omit<ImageData, 'altText'> & ImageChangeHandler
