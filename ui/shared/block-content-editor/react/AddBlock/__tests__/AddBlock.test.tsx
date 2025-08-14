@@ -22,7 +22,6 @@ import {BlockContentEditorContextType} from '../../BlockContentEditorContext'
 
 const openMock = jest.fn()
 const closeMock = jest.fn()
-const setShouldShowMock = jest.fn()
 
 jest.mock('../../BlockContentEditorContext', () => ({
   __esModule: true,
@@ -40,10 +39,6 @@ jest.mock('../../BlockContentEditorContext', () => ({
           open: jest.fn(),
           close: jest.fn(),
         },
-        initialAddBlockHandler: {
-          shouldShow: true,
-          setShouldShow: setShouldShowMock,
-        },
         editor: {
           mode: 'default',
           setMode: jest.fn(),
@@ -54,6 +49,12 @@ jest.mock('../../BlockContentEditorContext', () => ({
 
 jest.mock('../../hooks/useAddNode', () => ({
   useAddNode: jest.fn(),
+}))
+
+jest.mock('../../hooks/useGetBlocksCount', () => ({
+  useGetBlocksCount: () => ({
+    blocksCount: 0,
+  }),
 }))
 
 describe('AddBlock', () => {
