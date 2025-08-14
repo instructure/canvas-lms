@@ -23,6 +23,8 @@ class Mutations::UpdateDiscussionTopicParticipant < Mutations::BaseMutation
 
   argument :discussion_topic_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :expanded, Boolean, required: false
+  argument :has_unread_pinned_entry, Boolean, required: false
+  argument :show_pinned_entries, Boolean, required: false
   argument :sort_order, Types::DiscussionSortOrderType, required: false
   argument :summary_enabled, Boolean, required: false
   field :discussion_topic, Types::DiscussionType, null: false
