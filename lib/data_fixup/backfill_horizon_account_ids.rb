@@ -19,9 +19,9 @@
 
 module DataFixup::BackfillHorizonAccountIds
   def self.run
-    Account.where("settings LIKE ?", "%horizon_account:%").find_each do |account|
+    Account.non_shadow.where("settings LIKE ?", "%horizon_account:%").find_each do |account|
       if account.settings.dig(:horizon_account, :value)
-        root_account = account.root_account
+        root_account = account.root_account.reload
         horizon_account_ids = Set.new(root_account.settings[:horizon_account_ids] || [])
         horizon_account_ids.add(account.id)
         root_account.settings[:horizon_account_ids] = horizon_account_ids.to_a
