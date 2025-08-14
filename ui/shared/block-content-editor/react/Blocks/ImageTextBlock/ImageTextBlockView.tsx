@@ -18,9 +18,10 @@
 
 import {ImageTextBlockViewProps} from './types'
 import {TitleView} from '../BlockItems/Title/TitleView'
-import {Flex} from '@instructure/ui-flex'
 import {ImageView} from '../BlockItems/Image'
 import {TextView} from '../BlockItems/Text/TextView'
+import {ImageTextBlockLayout} from './ImageTextBlockLayout'
+import {View} from '@instructure/ui-view'
 
 export const ImageTextBlockView = ({
   title,
@@ -30,16 +31,14 @@ export const ImageTextBlockView = ({
   settings,
 }: ImageTextBlockViewProps) => {
   return (
-    <>
-      {settings.includeBlockTitle && <TitleView contentColor={settings.textColor} title={title} />}
-      <Flex direction="row" data-testid="imagetext-block-view">
-        <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
-          <ImageView url={url} altText={altText} />
-        </Flex.Item>
-        <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextView contentColor={settings.textColor} content={content} />
-        </Flex.Item>
-      </Flex>
-    </>
+    <ImageTextBlockLayout
+      titleComponent={<TitleView contentColor={settings.textColor} title={title} />}
+      imageComponent={<ImageView url={url} altText={altText} />}
+      textComponent={<TextView contentColor={settings.textColor} content={content} />}
+      includeBlockTitle={settings.includeBlockTitle}
+      arrangement={settings.arrangement}
+      textToImageRatio={settings.textToImageRatio}
+      dataTestId="imagetext-block-view"
+    />
   )
 }

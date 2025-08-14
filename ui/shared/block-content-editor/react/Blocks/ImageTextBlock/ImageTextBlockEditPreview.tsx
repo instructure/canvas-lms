@@ -18,9 +18,10 @@
 
 import {ImageTextBlockEditPreviewProps} from './types'
 import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
-import {Flex} from '@instructure/ui-flex'
 import {ImageView} from '../BlockItems/Image'
 import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
+import {ImageTextBlockLayout} from './ImageTextBlockLayout'
+import {View} from '@instructure/ui-view'
 
 export const ImageTextBlockEditPreview = ({
   title,
@@ -30,18 +31,14 @@ export const ImageTextBlockEditPreview = ({
   settings,
 }: ImageTextBlockEditPreviewProps) => {
   return (
-    <>
-      {settings.includeBlockTitle && (
-        <TitleEditPreview contentColor={settings.textColor} title={title} />
-      )}
-      <Flex direction="row" data-testid="imagetext-block-editpreview">
-        <Flex.Item size="50%" align="start" padding="0 xx-small 0 0">
-          <ImageView url={url} altText={altText} />
-        </Flex.Item>
-        <Flex.Item size="50%" padding="0 0 0 xx-small" align="start">
-          <TextEditPreview contentColor={settings.textColor} content={content} />
-        </Flex.Item>
-      </Flex>
-    </>
+    <ImageTextBlockLayout
+      titleComponent={<TitleEditPreview contentColor={settings.textColor} title={title} />}
+      imageComponent={<ImageView url={url} altText={altText} />}
+      textComponent={<TextEditPreview contentColor={settings.textColor} content={content} />}
+      includeBlockTitle={settings.includeBlockTitle}
+      arrangement={settings.arrangement}
+      textToImageRatio={settings.textToImageRatio}
+      dataTestId="imagetext-block-editpreview"
+    />
   )
 }

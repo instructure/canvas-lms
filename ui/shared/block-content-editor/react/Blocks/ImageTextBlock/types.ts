@@ -19,6 +19,7 @@
 import {ImageData} from '../BlockItems/Image/types'
 import {TextData} from '../BlockItems/Text/types'
 import {TitleData} from '../BlockItems/Title/types'
+import {ReactNode} from 'react'
 
 export type ArrangementOption = 'left' | 'right'
 export type TextToImageRatioOption = '1:1' | '2:1'
@@ -36,6 +37,15 @@ export type ImageTextEditHandlers = {
   onTitleChange: (title: string) => void
   onContentChange: (content: string) => void
   onImageChange: (imageData: ImageData) => void
+}
+export type ImageTextBlockLayoutProps = {
+  titleComponent: ReactNode
+  imageComponent: ReactNode
+  textComponent: ReactNode
+  arrangement: ArrangementOption
+  textToImageRatio: TextToImageRatioOption
+  includeBlockTitle: boolean
+  dataTestId?: string
 }
 
 export type ImageTextBlockBase = ImageTextData & ImageTextSettings & TitleData
