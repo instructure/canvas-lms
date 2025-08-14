@@ -19,11 +19,10 @@
 import type {ThemeOrOverride} from '@instructure/emotion/types/EmotionTypes'
 
 export async function loadCareerTheme(): Promise<ThemeOrOverride | null> {
-  const careerDomain = window.ENV.HORIZON_DOMAIN
-  if (careerDomain) {
+  const themeUrl = window.ENV.CAREER_THEME_URL
+  if (themeUrl) {
     try {
-      const protocol = careerDomain.includes('localhost') ? 'http' : 'https'
-      const response = await fetch(`${protocol}://${careerDomain}/themes/horizon.json`)
+      const response = await fetch(themeUrl)
       if (!response.ok) {
         console.warn('Failed to load career theme:', response.statusText)
         return null

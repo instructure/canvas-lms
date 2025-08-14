@@ -151,7 +151,7 @@ export interface EnvCommon {
   LTI_LAUNCH_FRAME_ALLOWANCES: string[]
   LTI_TOOL_SCOPES?: {[key: string]: string[]}
   DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-  HORIZON_DOMAIN: string
+  CAREER_THEME_URL?: string
   comment_library_suggestions_enabled: boolean
   INCOMPLETE_REGISTRATION: boolean
   SETTINGS: Record<Setting, boolean>

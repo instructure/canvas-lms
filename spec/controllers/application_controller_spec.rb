@@ -618,6 +618,22 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:ACCOUNT_ID]).to eq Account.default.id
         end
       end
+
+      describe "CAREER_THEME_URL" do
+        before do
+          allow_any_instance_of(CanvasCareer::Config).to receive(:theme_url).and_return("https://theme.url")
+        end
+
+        it "is nil if career is not enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(false)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to be_nil
+        end
+
+        it "is set to the theme url if career is enabled" do
+          allow(CanvasCareer::ExperienceResolver).to receive(:career_affiliated_institution?).and_return(true)
+          expect(@controller.js_env[:CAREER_THEME_URL]).to eq "https://theme.url"
+        end
+      end
     end
 
     describe "clean_return_to" do

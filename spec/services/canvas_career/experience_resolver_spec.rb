@@ -386,5 +386,27 @@ module CanvasCareer
         )
       end
     end
+
+    describe "self.career_affiliated_institution?" do
+      it "returns true when root account has horizon_account_ids" do
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be true
+      end
+
+      it "returns false when root account has no horizon_account_ids" do
+        @root_account.settings[:horizon_account_ids] = []
+        @root_account.save!
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be false
+      end
+
+      it "returns false when root account's horizon_account_ids is nil" do
+        @root_account.settings[:horizon_account_ids] = nil
+        @root_account.save!
+        expect(ExperienceResolver.career_affiliated_institution?(@root_account)).to be false
+      end
+
+      it "returns false when root account is nil" do
+        expect(ExperienceResolver.career_affiliated_institution?(nil)).to be false
+      end
+    end
   end
 end

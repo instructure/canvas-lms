@@ -57,6 +57,12 @@ module CanvasCareer
       end
     end
 
+    def self.career_affiliated_institution?(root_account)
+      return false if root_account.nil?
+
+      root_account.settings[:horizon_account_ids].present?
+    end
+
     private
 
     # In an account or course context -> is it a career account/course?
