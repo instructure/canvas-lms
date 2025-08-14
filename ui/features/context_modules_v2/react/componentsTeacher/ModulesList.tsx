@@ -46,6 +46,9 @@ import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/uti
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {TEACHER, STUDENT, MODULE_ITEMS} from '../utils/constants'
+import {IconModuleSolid} from '@instructure/ui-icons'
+import {handleAddModule} from '../handlers/moduleActionHandlers'
+import CreateNewModule from '../components/CreateNewModule'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -361,15 +364,17 @@ const ModulesList: React.FC = () => {
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
           disabled={isDisabled}
         />
-        {isLoading && !data ? (
+        {isLoading && !data && (
           <View as="div" textAlign="center" padding="large">
             <Spinner renderTitle={I18n.t('Loading modules')} size="large" />
           </View>
-        ) : error ? (
+        )}
+        {(!isLoading || data) && error && (
           <View as="div" textAlign="center" padding="large">
             <Text color="danger">{I18n.t('Error loading modules')}</Text>
           </View>
-        ) : (
+        )}
+        {!isLoading && !error && (
           <Droppable droppableId="modules-list" type="MODULE">
             {provided => (
               <div
@@ -391,9 +396,7 @@ const ModulesList: React.FC = () => {
                 ) : null}
                 <Flex direction="column" gap="small">
                   {data?.pages[0]?.modules.length === 0 ? (
-                    <View as="div" textAlign="center" padding="large">
-                      <Text>{I18n.t('No modules found')}</Text>
-                    </View>
+                    <CreateNewModule courseId={courseId} data={data} />
                   ) : (
                     data?.pages
                       .flatMap(page => page.modules)

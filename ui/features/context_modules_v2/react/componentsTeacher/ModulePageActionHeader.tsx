@@ -24,6 +24,7 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
 import {MODULE_ITEMS, MODULES} from '../utils/constants'
 import {ModulesPageIconLegend} from './ModulesPageIconLegend'
+import {handleAddModule} from '../handlers/moduleActionHandlers'
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
@@ -55,10 +56,6 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS]})
     queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL']})
   }, [courseId])
-
-  const handleAddModule = useCallback(() => {
-    handleOpeningModuleUpdateTray(data, courseId, undefined)
-  }, [data, courseId])
 
   return (
     <ContextModulesHeader
