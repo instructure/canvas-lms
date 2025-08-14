@@ -1521,6 +1521,8 @@
   path: '/api/v1/developer_keys/:id'
 - verb: PUT
   path: '/api/v1/developer_keys/:id'
+- verb: POST
+  path: '/api/v1/enqueue_outcome_rollup_calculation'
 - verb: PUT
   path: '/api/v1/eportfolios/:eportfolio_id/moderate'
 - verb: GET
