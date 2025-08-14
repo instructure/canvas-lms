@@ -47,7 +47,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def update_attachment_associations(**args)
-    return if series_uuid.present? && !series_head
+    return if series_uuid.present? && !series_head && description == CalendarEvent.find_by(series_uuid:, series_head: true)&.description
 
     super
   end
