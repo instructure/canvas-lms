@@ -128,29 +128,52 @@ describe('DifferentiationTagTray', () => {
   })
 
   describe('CSV upload interactions', () => {
-    it('opens CSV upload view when clicking "Upload CSV" button', async () => {
-      const mockCategories = [
-        {id: 1, name: 'Advanced', groups: []},
-        {id: 2, name: 'Remedial', groups: []},
-      ]
-      renderComponent({differentiationTagCategories: mockCategories})
-      const uploadButton = screen.getByText('Upload CSV').closest('button')
-      await userEvent.click(uploadButton!)
-      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+    describe('initial view before differentiation tags are created', () => {
+      it('renders CSV Upload button and opens modal in upload CSV mode', async () => {
+        renderComponent({differentiationTagCategories: []})
+
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+      })
+
+      it('opens empty state view when clicking Cancel button', async () => {
+        renderComponent({differentiationTagCategories: []})
+
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+        const cancelButton = screen.getByText('Cancel').closest('button')
+        await userEvent.click(cancelButton!)
+        expect(screen.getByTestId('empty-state')).toBeInTheDocument()
+      })
     })
 
-    it('opens manage tags view when clicking Cancel button', async () => {
-      const mockCategories = [
-        {id: 1, name: 'Advanced', groups: []},
-        {id: 2, name: 'Remedial', groups: []},
-      ]
-      renderComponent({differentiationTagCategories: mockCategories})
-      const uploadButton = screen.getByText('Upload CSV').closest('button')
-      await userEvent.click(uploadButton!)
-      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
-      const cancelButton = screen.getByText('Cancel').closest('button')
-      await userEvent.click(cancelButton!)
-      expect(screen.getByTestId('manage-tags-view')).toBeInTheDocument()
+    describe('differentiation tags exist', () => {
+      it('opens CSV upload view when clicking "Upload CSV" button', async () => {
+        const mockCategories = [
+          {id: 1, name: 'Advanced', groups: []},
+          {id: 2, name: 'Remedial', groups: []},
+        ]
+        renderComponent({differentiationTagCategories: mockCategories})
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+      })
+
+      it('opens manage tags view when clicking Cancel button', async () => {
+        const mockCategories = [
+          {id: 1, name: 'Advanced', groups: []},
+          {id: 2, name: 'Remedial', groups: []},
+        ]
+        renderComponent({differentiationTagCategories: mockCategories})
+        const uploadButton = screen.getByText('Upload CSV').closest('button')
+        await userEvent.click(uploadButton!)
+        expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+        const cancelButton = screen.getByText('Cancel').closest('button')
+        await userEvent.click(cancelButton!)
+        expect(screen.getByTestId('manage-tags-view')).toBeInTheDocument()
+      })
     })
   })
 
