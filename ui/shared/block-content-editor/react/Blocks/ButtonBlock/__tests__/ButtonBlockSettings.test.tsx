@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent} from '@testing-library/react'
+import {fireEvent, RenderResult} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import {ButtonBlockSettings} from '../ButtonBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
 
@@ -30,6 +31,11 @@ const defaultProps = {
   },
 }
 
+const toggleSection = async (component: RenderResult, name: RegExp | string) => {
+  const button = component.getByRole('button', {name})
+  await userEvent.click(button)
+}
+
 describe('ButtonBlockSettings', () => {
   describe('include title', () => {
     it('integrates, changing the state', () => {
@@ -38,6 +44,35 @@ describe('ButtonBlockSettings', () => {
       expect(checkbox).not.toBeChecked()
       fireEvent.click(checkbox)
       expect(checkbox).toBeChecked()
+    })
+  })
+
+  describe('Color settings', () => {
+    it('integrates, changing the background color state', async () => {
+      const component = renderBlock(ButtonBlockSettings, defaultProps)
+      await toggleSection(component, /Expand color settings/i)
+      const textBox = component.getByRole('textbox', {name: /background #/i})
+      expect(textBox).toHaveValue('')
+      fireEvent.change(textBox, {
+        target: {value: '012345'},
+      })
+      expect(textBox).toHaveValue('012345')
+    })
+
+    it('integrates, changing the text color state', async () => {
+      const component = renderBlock(ButtonBlockSettings, {
+        settings: {
+          ...defaultProps.settings,
+          includeBlockTitle: true,
+        },
+      })
+      await toggleSection(component, /Expand color settings/i)
+      const textBox = component.getByRole('textbox', {name: /text #/i})
+      expect(textBox).toHaveValue('')
+      fireEvent.change(textBox, {
+        target: {value: '012345'},
+      })
+      expect(textBox).toHaveValue('012345')
     })
   })
 

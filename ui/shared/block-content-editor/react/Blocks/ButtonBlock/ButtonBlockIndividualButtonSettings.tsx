@@ -63,7 +63,7 @@ export const ButtonBlockIndividualButtonSettings = ({
       <TextInput
         renderLabel={I18n.t('Url')}
         value={button.url}
-        onChange={(e, value) => updateButton(button.id, {url: value})}
+        onChange={(_e, value) => updateButton(button.id, {url: value})}
         placeholder={I18n.t('Url')}
       />
       <SimpleSelect

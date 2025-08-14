@@ -32,12 +32,16 @@ export const ButtonBlockSettings = () => {
   const {
     actions: {setProp},
     includeBlockTitle,
+    backgroundColor,
+    textColor,
     alignment,
     layout,
     isFullWidth,
     buttons,
   } = useNode(node => ({
     includeBlockTitle: node.data.props.settings.includeBlockTitle,
+    backgroundColor: node.data.props.settings.backgroundColor,
+    textColor: node.data.props.settings.textColor,
     alignment: node.data.props.settings.alignment,
     layout: node.data.props.settings.layout,
     isFullWidth: node.data.props.settings.isFullWidth,
@@ -47,6 +51,18 @@ export const ButtonBlockSettings = () => {
   const handleIncludeBlockTitleChange = () => {
     setProp((props: ButtonBlockProps) => {
       props.settings.includeBlockTitle = !includeBlockTitle
+    })
+  }
+
+  const handleBackgroundColorChange = (color: string) => {
+    setProp((props: ButtonBlockProps) => {
+      props.settings.backgroundColor = color
+    })
+  }
+
+  const handleTextColorChange = (color: string) => {
+    setProp((props: ButtonBlockProps) => {
+      props.settings.textColor = color
     })
   }
 
@@ -76,16 +92,27 @@ export const ButtonBlockSettings = () => {
 
   return (
     <View as="div">
-      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
+      <View as="div" margin="medium 0 medium 0">
+        <SettingsIncludeTitle
+          checked={includeBlockTitle}
+          onChange={handleIncludeBlockTitleChange}
+        />
+      </View>
 
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
         expandedLabel={I18n.t('Collapse color settings')}
-        defaultExpanded={true}
+        defaultExpanded={false}
         includeSeparator={true}
       >
-        <ButtonBlockColorSettings />
+        <ButtonBlockColorSettings
+          includeBlockTitle={includeBlockTitle}
+          backgroundColor={backgroundColor}
+          textColor={textColor}
+          onBackgroundColorChange={handleBackgroundColorChange}
+          onTextColorChange={handleTextColorChange}
+        />
       </SettingsSectionToggle>
 
       <SettingsSectionToggle
