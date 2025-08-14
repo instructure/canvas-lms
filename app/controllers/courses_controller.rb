@@ -4123,7 +4123,7 @@ class CoursesController < ApplicationController
 
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    embed = params.require(:embed).permit(:field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
+    embed = params.require(:embed).permit(:width, :height, :field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
     embed[:id] = embed[:id].to_i
     embed[:field] = embed[:field].to_sym
     scan_id = params.require(:scan_id)

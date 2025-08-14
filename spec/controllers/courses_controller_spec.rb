@@ -5364,6 +5364,92 @@ describe CoursesController do
       end
 
       include_examples "youtube migration protection"
+
+      context "when authorized" do
+        before do
+          @course.enable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "permits width parameter" do
+          embed_with_width = embed.merge(width: "640")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_width.stringify_keys).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_width
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_width.stringify_keys)
+        end
+
+        it "permits height parameter" do
+          embed_with_height = embed.merge(height: "480")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_height.stringify_keys).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_height
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_height.stringify_keys)
+        end
+
+        it "permits both width and height parameters" do
+          embed_with_dimensions = embed.merge(width: "1280", height: "720")
+          allow(service).to receive(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_dimensions
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, embed_with_dimensions.stringify_keys)
+        end
+
+        it "converts numeric width and height to strings" do
+          embed_with_numeric_dimensions = embed.merge(width: 1920, height: 1080)
+          expected_embed = embed.merge(width: "1920", height: "1080").stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_numeric_dimensions
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+        end
+
+        it "filters out unpermitted parameters but keeps width and height" do
+          embed_with_extra_params = embed.merge(
+            width: "800",
+            height: "600",
+            invalid_param: "should_be_filtered",
+            another_bad_param: "also_filtered"
+          )
+          expected_embed = embed.merge(width: "800", height: "600").stringify_keys
+          allow(service).to receive(:convert_embed).with(scan_id, expected_embed).and_return(progress)
+
+          post :start_youtube_migration_convert, params: {
+            course_id: @course.id,
+            scan_id:,
+            embed: embed_with_extra_params
+          }
+
+          expect(response).to have_http_status(:ok)
+          expect(service).to have_received(:convert_embed).with(scan_id, expected_embed)
+        end
+      end
     end
 
     describe "get conversion status" do
