@@ -150,8 +150,16 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} [data-testid='discussion-icon']"
   end
 
+  def module_item_due_date_selector(module_item_id)
+    "#context_module_item_#{module_item_id} [data-testid='due-date']"
+  end
+
   def module_item_header_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-title-text']"
+  end
+
+  def module_item_multiple_due_date_selector(module_item_id)
+    "#context_module_item_#{module_item_id}  a:contains('Multiple Due Dates')"
   end
 
   def module_item_text_header_icon_selector(module_item_id)
@@ -164,6 +172,10 @@ module Modules2IndexPage
 
   def module_item_page_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='page-icon']"
+  end
+
+  def module_item_publish_button_selector(module_item_id)
+    "[data-testid='module-item-publish-button-#{module_item_id}']"
   end
 
   def module_item_quiz_icon_selector(module_item_id)
@@ -516,6 +528,10 @@ module Modules2IndexPage
     f(module_item_discussion_icon_selector(module_item_id))
   end
 
+  def module_item_due_date(module_item_id)
+    f(module_item_due_date_selector(module_item_id))
+  end
+
   def module_item_header(module_item_id)
     f(module_item_header_selector(module_item_id))
   end
@@ -528,8 +544,16 @@ module Modules2IndexPage
     f(module_item_mission_pill_selector(module_item_id))
   end
 
+  def module_item_multiple_due_dates(module_item_id)
+    fj(module_item_multiple_due_date_selector(module_item_id))
+  end
+
   def module_item_page_icon(module_item_id)
     f(module_item_page_icon_selector(module_item_id))
+  end
+
+  def module_item_publish_button(module_item_id)
+    f(module_item_publish_button_selector(module_item_id))
   end
 
   def module_item_quiz_icon(module_item_id)
