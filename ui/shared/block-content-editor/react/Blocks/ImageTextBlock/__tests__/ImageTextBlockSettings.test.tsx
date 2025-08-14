@@ -18,7 +18,7 @@
 
 import {ImageTextBlockSettings} from '../ImageTextBlockSettings'
 import {renderBlock} from '../../__tests__/render-helper'
-import {waitFor} from '@testing-library/react'
+import {RenderResult, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const getSettings = (settings: object) => ({
@@ -26,6 +26,11 @@ const getSettings = (settings: object) => ({
 })
 
 const color = '123456'
+
+const toggleSection = async (component: RenderResult, name: RegExp | string) => {
+  const button = component.getByRole('button', {name})
+  await userEvent.click(button)
+}
 
 describe('ImageTextBlockSettings', () => {
   describe('include title', () => {
@@ -44,6 +49,7 @@ describe('ImageTextBlockSettings', () => {
         ImageTextBlockSettings,
         getSettings({backgroundColor: '000000'}),
       )
+      await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Background color/i) as HTMLInputElement
       await userEvent.clear(input)
       await userEvent.type(input, color)
@@ -54,10 +60,31 @@ describe('ImageTextBlockSettings', () => {
   describe('default text color', () => {
     it('integrates, changing the state', async () => {
       const component = renderBlock(ImageTextBlockSettings, getSettings({textColor: '000000'}))
+      await toggleSection(component, /Expand color settings/i)
       const input = component.getByLabelText(/Default text color/i) as HTMLInputElement
       await userEvent.clear(input)
       await userEvent.type(input, color)
       await waitFor(() => expect(input.value).toBe(color))
+    })
+  })
+
+  describe('arrangement', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(ImageTextBlockSettings, getSettings({arrangement: 'left'}))
+      const radioButton = component.getByLabelText(/Image on the right/i)
+      expect(radioButton).not.toBeChecked()
+      await userEvent.click(radioButton)
+      expect(radioButton).toBeChecked()
+    })
+  })
+
+  describe('text to image ratio', () => {
+    it('integrates, changing the state', async () => {
+      const component = renderBlock(ImageTextBlockSettings, getSettings({textToImageRatio: '1:1'}))
+      const radioButton = component.getByLabelText(/2:1/i)
+      expect(radioButton).not.toBeChecked()
+      await userEvent.click(radioButton)
+      expect(radioButton).toBeChecked()
     })
   })
 })

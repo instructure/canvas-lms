@@ -39,6 +39,8 @@ const defaultProps: ImageTextBlockProps = {
     includeBlockTitle: false,
     backgroundColor: '',
     textColor: '',
+    arrangement: 'left',
+    textToImageRatio: '1:1',
   },
 }
 
