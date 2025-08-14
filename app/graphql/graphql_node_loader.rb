@@ -286,6 +286,12 @@ module GraphQLNodeLoader
 
         usage_rights
       end
+    when "AllocationRule"
+      Loaders::IDLoader.for(AllocationRule).load(id).then do |record|
+        next if !record || record.deleted? || !record.course.grants_right?(ctx[:current_user], :read)
+
+        record
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end

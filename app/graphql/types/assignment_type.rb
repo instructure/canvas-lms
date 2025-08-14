@@ -827,5 +827,16 @@ module Types
         AbstractAssignment.build_grader_identities(graders, anonymize: !object.can_view_other_grader_identities?(current_user))
       end
     end
+
+    field :allocation_rules_connection, AllocationRuleType.connection_type, null: true do
+      description "Allocation rules if peer review is enabled"
+    end
+    def allocation_rules_connection
+      return nil unless assignment.grants_right?(current_user, :grade) &&
+                        assignment.context.feature_enabled?(:peer_review_allocation_and_grading) &&
+                        assignment.peer_reviews
+
+      load_association(:allocation_rules).then(&:active)
+    end
   end
 end

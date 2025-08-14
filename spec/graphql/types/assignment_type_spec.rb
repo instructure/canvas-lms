@@ -1862,4 +1862,151 @@ describe Types::AssignmentType do
       ActiveSupport::Notifications.unsubscribe(subscriber)
     end
   end
+
+  describe "allocation_rules_connection" do
+    let(:assignment_with_peer_reviews) do
+      course.assignments.create!(
+        title: "Peer Review Assignment",
+        points_possible: 10,
+        submission_types: ["online_text_entry"],
+        peer_reviews: true,
+        peer_review_count: 2
+      )
+    end
+
+    let(:student1) { student_in_course(course:, active_all: true).user }
+    let(:student2) { student_in_course(course:, active_all: true).user }
+    let(:student3) { student_in_course(course:, active_all: true).user }
+    let(:ta) { ta_in_course(course:, active_all: true).user }
+    let(:observer) { observer_in_course(course:, active_all: true).user }
+
+    before do
+      course.enable_feature!(:peer_review_allocation_and_grading)
+
+      @allocation_rule_1 = AllocationRule.create!(
+        course:,
+        assignment: assignment_with_peer_reviews,
+        assessor: student1,
+        assessee: student2,
+        must_review: true,
+        review_permitted: true,
+        applies_to_assessor: true
+      )
+
+      @allocation_rule_2 = AllocationRule.create!(
+        course:,
+        assignment: assignment_with_peer_reviews,
+        assessor: student2,
+        assessee: student3,
+        must_review: true,
+        review_permitted: true,
+        applies_to_assessor: true
+      )
+      @teacher_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: teacher)
+      @ta_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: ta)
+      @student_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: student1)
+      @observer_assignment_type = GraphQLTypeTester.new(assignment_with_peer_reviews, current_user: observer)
+    end
+
+    context "when user has grading permissions" do
+      it "returns allocation rules connection for teachers" do
+        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to eq([@allocation_rule_1.id.to_s, @allocation_rule_2.id.to_s])
+      end
+
+      it "allows access to nested assessor and assessee information" do
+        assessors = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { assessor { _id } } }")
+        assessees = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { assessee { _id } } }")
+
+        expect(assessors).to eq([@allocation_rule_1.assessor.id.to_s, @allocation_rule_2.assessor.id.to_s])
+        expect(assessees).to eq([@allocation_rule_1.assessee.id.to_s, @allocation_rule_2.assessee.id.to_s])
+      end
+
+      it "allows TAs with grading permissions to access allocation rules" do
+        result = @ta_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to eq([@allocation_rule_1.id.to_s, @allocation_rule_2.id.to_s])
+      end
+
+      it "paginates results" do
+        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 1) { edges { node { _id } } }").length).to eq 1
+        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 1) { pageInfo { hasNextPage } }")).to be true
+        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 2) { edges { node { _id } } }").length).to eq 2
+        expect(@teacher_assignment_type.resolve("allocationRulesConnection (first: 2) { pageInfo { hasNextPage } }")).to be false
+      end
+    end
+
+    context "when user lacks grading permissions" do
+      it "returns nil for students" do
+        result = @student_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to be_nil
+      end
+
+      it "returns nil for observers" do
+        result = @observer_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when feature flag is disabled" do
+      before do
+        course.disable_feature!(:peer_review_allocation_and_grading)
+      end
+
+      it "returns nil even for teachers" do
+        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when peer reviews are disabled" do
+      let(:assignment_without_peer_reviews) do
+        course.assignments.create!(
+          title: "Regular Assignment",
+          points_possible: 10,
+          submission_types: ["online_text_entry"],
+          peer_reviews: false
+        )
+      end
+
+      it "returns nil even for teachers" do
+        peer_reviews_disabled_type = GraphQLTypeTester.new(assignment_without_peer_reviews, current_user: teacher)
+        result = peer_reviews_disabled_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to be_nil
+      end
+    end
+
+    context "when assignment has no allocation rules" do
+      let(:empty_assignment) do
+        course.assignments.create!(
+          title: "Empty Peer Review Assignment",
+          points_possible: 10,
+          submission_types: ["online_text_entry"],
+          peer_reviews: true
+        )
+      end
+
+      it "returns empty connection" do
+        empty_type = GraphQLTypeTester.new(empty_assignment, current_user: teacher)
+        result = empty_type.resolve("allocationRulesConnection { nodes { _id } }")
+
+        expect(result).to be_empty
+      end
+    end
+
+    context "with deleted allocation rules" do
+      it "only returns active allocation rules" do
+        AllocationRule.first.destroy
+        result = @teacher_assignment_type.resolve("allocationRulesConnection { nodes { workflowState } }")
+
+        expect(result.size).to eq 1
+        expect(result.first).to eq "active"
+      end
+    end
+  end
 end

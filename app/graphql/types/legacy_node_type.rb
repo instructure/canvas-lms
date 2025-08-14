@@ -22,6 +22,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   graphql_name "NodeType"
 
   value "Account"
+  value "AllocationRule"
   value "Assignment"
   value "AssignmentGroup"
   value "Conversation"
