@@ -90,6 +90,10 @@ module Modules2IndexPage
     "[data-testid='module-action-menu_#{module_id}-copy']"
   end
 
+  def module_page_dropdowns_selector
+    "input[role='combobox'][title='All Modules']"
+  end
+
   def module_file_drop_selector(module_id)
     "[data-module-id='#{module_id}'] [data-testid='module-file-drop']"
   end
@@ -386,6 +390,9 @@ module Modules2IndexPage
     "[data-testid='quiz-icon']"
   end
 
+  def visible_modules_header_selector
+    "div[class*='context_module'] h2"
+  end
   #------------------------------ Elements ------------------------------
 
   def completion_requirement
@@ -466,6 +473,14 @@ module Modules2IndexPage
 
   def module_action_menu_copy(module_id)
     f(module_action_menu_copy_selector(module_id))
+  end
+
+  def module_page_student_dropdown
+    ff(module_page_dropdowns_selector)[1]
+  end
+
+  def module_page_teacher_dropdown
+    ff(module_page_dropdowns_selector)[0]
   end
 
   def module_file_drop_element(module_id)
@@ -760,6 +775,9 @@ module Modules2IndexPage
     ff(classic_quiz_icon_selector)
   end
 
+  def visible_module_headers
+    ff(visible_modules_header_selector)
+  end
   #------------------------------ Actions -------------------------------
 
   def assignments_due_button_exists?

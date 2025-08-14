@@ -64,7 +64,7 @@ const ModulesList: React.FC = () => {
   const reorderItemsMutation = useReorderModuleItems()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
-  const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
+  const {maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const toggleCollapseMutation = useToggleCollapse(courseId || '')
   const toggleAllCollapse = useToggleAllCollapse(courseId || '')
 
@@ -83,6 +83,12 @@ const ModulesList: React.FC = () => {
   const {data: courseStudentData} = useCourseTeacher(courseId || '')
   const [isDisabled, setIsDisabled] = useState(false)
   const [isExpanding, setIsExpanding] = useState(false)
+
+  function resetIfInvalid(allModules: any[], value: any, setValue: (arg0: string) => void) {
+    if (!allModules.some((m: {_id: any}) => m._id === value)) {
+      setValue(ALL_MODULES)
+    }
+  }
 
   useEffect(() => {
     if (isExpanding) {
@@ -132,6 +138,9 @@ const ModulesList: React.FC = () => {
   useEffect(() => {
     if (data?.pages) {
       const allModules = data.pages.flatMap(page => page.modules)
+
+      resetIfInvalid(allModules, teacherViewValue, setTeacherViewValue)
+      resetIfInvalid(allModules, studentViewValue, setStudentViewValue)
 
       // Create a Map for module expansion state
       const initialExpandedState = new Map<string, boolean>()

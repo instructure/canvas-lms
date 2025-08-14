@@ -117,8 +117,7 @@ describe "context modules", :ignore_js_errors do
 
     it "shows teacher and student dropdown with All Modules default" do
       go_to_modules
-      student_dropdown_input = f("input[role='combobox'][title='All Modules']")
-      expect(student_dropdown_input[:value]).to eq("All Modules")
+      expect(module_page_student_dropdown[:value]).to eq("All Modules")
 
       teacher_select = ff("label")[0]
       expect(teacher_select.text).to include("Teachers View")
@@ -129,10 +128,7 @@ describe "context modules", :ignore_js_errors do
 
     it "updates visible modules when selecting a specific module for teachers" do
       go_to_modules
-
-      teacher_dropdown_input = ff("input[role='combobox'][title='All Modules']")[0]
-      teacher_dropdown_input.click
-
+      module_page_teacher_dropdown.click
       wait_for_ajaximations
 
       first_module = ff("[role='option']")[1]
@@ -140,16 +136,13 @@ describe "context modules", :ignore_js_errors do
 
       first_module.click
       wait_for_ajaximations
-      visible_modules = ff("div[class*='context_module'] h2")[0]
+      visible_modules = visible_module_headers[0]
       expect(visible_modules.text).to include("module1")
     end
 
     it "does not update visible module when selecting a specific module for students" do
       go_to_modules
-
-      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
-      student_dropdown_input.click
-
+      module_page_student_dropdown.click
       wait_for_ajaximations
 
       second_module = ff("[role='option']")[2]
@@ -158,7 +151,7 @@ describe "context modules", :ignore_js_errors do
       second_module.click
       wait_for_ajaximations
 
-      visible_modules = ff("div[class*='context_module'] h2")
+      visible_modules = visible_module_headers
       expect(visible_modules.length).to eq(3)
       expect(visible_modules.first.text).to include("module1")
       expect(visible_modules.last.text).to include("module3")
@@ -166,9 +159,7 @@ describe "context modules", :ignore_js_errors do
 
     it "displays selected module in students view when acting as student" do
       go_to_modules
-      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
-      student_dropdown_input.click
-
+      module_page_student_dropdown.click
       wait_for_ajaximations
 
       second_module = ff("[role='option']")[2]
@@ -186,10 +177,7 @@ describe "context modules", :ignore_js_errors do
 
     it "persists selected module filter after reload" do
       go_to_modules
-
-      teacher_dropdown_input = f("input[role='combobox'][title='All Modules']")
-      teacher_dropdown_input.click
-
+      module_page_teacher_dropdown.click
       wait_for_ajaximations
 
       first_module = ff("[role='option']")[1]
@@ -199,9 +187,28 @@ describe "context modules", :ignore_js_errors do
       refresh_page
       wait_for_ajaximations
 
-      # Ensure the same module is still selected and shown
-      visible_modules = ff("div[class*='context_module'] h2")[0]
+      visible_modules = visible_module_headers[0]
       expect(visible_modules.text).to include("module1")
+    end
+
+    it "resets teacher dropdown to 'All Modules' when the selected module is deleted" do
+      go_to_modules
+      module_page_teacher_dropdown.click
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      expect(first_module.text).to eq("module1")
+
+      first_module.click
+      wait_for_ajaximations
+
+      module_action_menu(@module1.id).click
+      module_action_menu_deletetion(@module1.id).click
+      alert = driver.switch_to.alert
+      alert.accept
+      wait_for_ajaximations
+
+      expect(module_page_teacher_dropdown[:value]).to eq("All Modules")
     end
   end
 
