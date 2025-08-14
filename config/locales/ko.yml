@@ -3827,6 +3827,7 @@ ko:
       add: "모듈 추가"
       add_item: "%{module}에 항목 추가"
       add_prerequisite: "%{module}에 필수 조건 추가"
+      course_modules: "과목 모듈"
       edit: "모듈 설정 편집"
       edit_item: "항목 세부 정보 편집"
   context_modules_api: 
