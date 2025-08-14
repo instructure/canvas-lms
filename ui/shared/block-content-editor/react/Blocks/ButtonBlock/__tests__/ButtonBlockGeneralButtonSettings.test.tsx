@@ -57,6 +57,12 @@ describe('ButtonBlockGeneralButtonSettings', () => {
 
       expect(screen.getByLabelText('Full width buttons')).toBeInTheDocument()
     })
+
+    it('does not render alignment options when isFullWidth is true', () => {
+      render(<ButtonBlockGeneralButtonSettings {...defaultProps} isFullWidth={true} />)
+
+      expect(screen.queryByText('Alignment')).not.toBeInTheDocument()
+    })
   })
 
   describe('state selection', () => {
