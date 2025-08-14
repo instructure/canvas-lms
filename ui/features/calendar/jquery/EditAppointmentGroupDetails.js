@@ -401,7 +401,7 @@ export default class EditAppointmentGroupDetails {
       if (sectionCodes.length > 0) {
         const sectionCode = sectionCodes[0]
         const section = _.chain(this.contexts)
-          .pluck('course_sections')
+          .map('course_sections')
           .flatten()
           .find(s => s.asset_string === sectionCode)
           .value()
