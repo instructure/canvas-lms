@@ -35,6 +35,8 @@ describe Types::DiscussionParticipantType do
       workflowState
       expanded
       sortOrder
+      hasUnreadPinnedEntry
+      showPinnedEntries
       discussionTopic
     ]
     expect(Types::DiscussionParticipantType.fields.keys).to match_array(expected_fields)
@@ -59,6 +61,26 @@ describe Types::DiscussionParticipantType do
 
       @participant.update!(workflow_state: "unread")
       expect(@participant.workflow_state).to eq("unread")
+    end
+  end
+
+  describe "has_unread_pinned_entry field" do
+    it "returns has an unread pinned entry directly from participant" do
+      @participant.update!(has_unread_pinned_entry: true)
+      expect(@participant.has_unread_pinned_entry).to be true
+
+      @participant.update!(has_unread_pinned_entry: false)
+      expect(@participant.has_unread_pinned_entry).to be false
+    end
+  end
+
+  describe "show_pinned_entries field" do
+    it "returns show pinned entries directly from participant" do
+      @participant.update!(show_pinned_entries: true)
+      expect(@participant.show_pinned_entries).to be true
+
+      @participant.update!(show_pinned_entries: false)
+      expect(@participant.show_pinned_entries).to be false
     end
   end
 

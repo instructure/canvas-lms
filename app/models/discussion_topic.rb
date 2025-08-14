@@ -827,6 +827,8 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.expanded = opts[:expanded] if opts.key?(:expanded)
           topic_participant.sort_order = opts[:sort_order] if opts.key?(:sort_order)
           topic_participant.summary_enabled = opts[:summary_enabled] if opts.key?(:summary_enabled)
+          topic_participant.show_pinned_entries = opts[:show_pinned_entries] if opts.key?(:show_pinned_entries)
+          topic_participant.has_unread_pinned_entry = opts[:has_unread_pinned_entry] if opts.key?(:has_unread_pinned_entry)
           topic_participant.save
         end
       end

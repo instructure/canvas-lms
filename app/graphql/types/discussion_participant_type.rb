@@ -42,6 +42,8 @@ module Types
 
     field :summary_enabled, Boolean, null: true
     field :workflow_state, String, null: false
+    field :has_unread_pinned_entry, Boolean, null: true
+    field :show_pinned_entries, Boolean, null: true
 
     field :discussion_topic, Types::DiscussionType, null: false
     def discussion_topic
