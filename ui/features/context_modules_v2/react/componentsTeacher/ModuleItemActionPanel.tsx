@@ -233,6 +233,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const renderItemPublishButton = () => {
     return (
       <IconButton
+        data-testid={`module-item-publish-button-${itemId}`}
         screenReaderLabel={published ? 'Published' : 'Unpublished'}
         renderIcon={published ? IconPublishSolid : IconUnpublishedLine}
         withBackground={false}
