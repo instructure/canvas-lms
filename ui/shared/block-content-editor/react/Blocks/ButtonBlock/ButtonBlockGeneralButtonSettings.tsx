@@ -44,16 +44,25 @@ export const ButtonBlockGeneralButtonSettings = ({
 }: ButtonBlockGeneralButtonSettingsProps) => {
   return (
     <Flex direction="column" gap="medium">
-      <RadioInputGroup
-        name="button-block-general-button-settings-alignment"
-        description={I18n.t('Alignment')}
-        value={alignment}
-        onChange={(_event, value) => onAlignmentChange(value as ButtonAlignment)}
-      >
-        {ALIGNMENT_OPTIONS.map(option => (
-          <RadioInput key={option.value} label={option.label} value={option.value} />
-        ))}
-      </RadioInputGroup>
+      <Checkbox
+        variant="toggle"
+        label={I18n.t('Full width buttons')}
+        checked={isFullWidth}
+        onChange={() => onIsFullWidthChange(!isFullWidth)}
+      />
+
+      {!isFullWidth && (
+        <RadioInputGroup
+          name="button-block-general-button-settings-alignment"
+          description={I18n.t('Alignment')}
+          value={alignment}
+          onChange={(_event, value) => onAlignmentChange(value as ButtonAlignment)}
+        >
+          {ALIGNMENT_OPTIONS.map(option => (
+            <RadioInput key={option.value} label={option.label} value={option.value} />
+          ))}
+        </RadioInputGroup>
+      )}
 
       <RadioInputGroup
         name="button-block-general-button-settings-layout"
@@ -65,13 +74,6 @@ export const ButtonBlockGeneralButtonSettings = ({
           <RadioInput key={option.value} label={option.label} value={option.value} />
         ))}
       </RadioInputGroup>
-
-      <Checkbox
-        variant="toggle"
-        label={I18n.t('Full width buttons')}
-        checked={isFullWidth}
-        onChange={() => onIsFullWidthChange(!isFullWidth)}
-      />
     </Flex>
   )
 }
