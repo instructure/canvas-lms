@@ -143,6 +143,52 @@ describe ContextModulesController do
         end
       end
     end
+
+    context "when user is an admin" do
+      let(:context_module) { @course.context_modules.create! }
+
+      before do
+        @admin = account_admin_user(account: @course.account)
+        user_session(@admin)
+      end
+
+      describe "EXPANDED_MODULES and COLLAPSED_MODULES" do
+        context "when admin has collapsed a module" do
+          before do
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "1" }, format: :json
+          end
+
+          it "should create progressions for admin users and track collapsed state" do
+            progression = ContextModuleProgression.find_by(user_id: @admin.id, context_module_id: context_module.id)
+            expect(progression).not_to be_nil
+            expect(progression.collapsed).to be true
+          end
+
+          it "should assign collapsed module to @collapsed_modules" do
+            subject
+            expect(assigns(:expanded_modules)).to be_empty
+            expect(assigns(:collapsed_modules)).to eql([context_module.id])
+          end
+        end
+
+        context "when admin has expanded a module" do
+          before do
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "1" }, format: :json
+            post "toggle_collapse", params: { course_id: @course.id, context_module_id: context_module.id, collapse: "0" }, format: :json
+          end
+
+          it "should track expanded state and assign to @expanded_modules" do
+            progression = ContextModuleProgression.find_by(user_id: @admin.id, context_module_id: context_module.id)
+            expect(progression).not_to be_nil
+            expect(progression.collapsed).to be false
+
+            subject
+            expect(assigns(:expanded_modules)).to eql([context_module.id])
+            expect(assigns(:collapsed_modules)).to be_empty
+          end
+        end
+      end
+    end
   end
 
   describe "GET 'module_html'" do
