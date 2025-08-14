@@ -29,6 +29,7 @@ interface ModulePageActionHeaderProps {
   onExpandAll: () => void
   anyModuleExpanded?: boolean
   disabled?: boolean
+  hasModules?: boolean
 }
 
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
@@ -36,6 +37,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onExpandAll,
   anyModuleExpanded = true,
   disabled = false,
+  hasModules = false,
 }) => {
   const {courseId} = useContextModule()
 
@@ -58,7 +60,7 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     <ContextModulesHeader
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
-        hasModules: (data?.pages[0]?.modules.length ?? 0) > 0,
+        hasModules: hasModules,
         publishMenu: {
           onPublishComplete: handlePublishComplete,
         },

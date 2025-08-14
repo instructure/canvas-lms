@@ -362,6 +362,7 @@ const ModulesList: React.FC = () => {
           onExpandAll={handleExpandAllRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
           disabled={isDisabled}
+          hasModules={(data?.pages[0]?.modules.length ?? 0) > 0}
         />
         {isLoading && !data && (
           <View as="div" textAlign="center" padding="large">
