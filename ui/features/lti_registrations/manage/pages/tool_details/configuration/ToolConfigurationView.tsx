@@ -42,6 +42,7 @@ import {
   fetchLtiRegistrationWithLegacyConfig,
 } from '../../../api/registrations'
 import {isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
+import {PlacementInfoTooltip} from '../../../components/PlacementInfoTooltip'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -232,14 +233,16 @@ export const ToolConfigurationView = () => {
       ) : null}
 
       <Section title={I18n.t('Permissions')}>
-        <Flex direction="column" data-testid="permissions">
+        <Flex direction="column" data-testid="permissions" gap="xx-small">
           {registration.overlaid_configuration.scopes.length === 0 ? (
             <Text fontStyle="italic">{I18n.t('This app has no permissions configured.')}</Text>
           ) : (
             registration.overlaid_configuration.scopes.map(scope => (
-              <Text key={scope} as="div">
-                {i18nLtiScope(scope)}
-              </Text>
+              <Flex.Item>
+                <Text key={scope} as="div">
+                  {i18nLtiScope(scope)}
+                </Text>
+              </Flex.Item>
             ))
           )}
         </Flex>
@@ -252,11 +255,22 @@ export const ToolConfigurationView = () => {
       </Section>
 
       <Section title={I18n.t('Placements')}>
-        <Flex direction="column">
+        <Flex direction="column" gap="xx-small">
           {enabledPlacements.length === 0 ? (
             <Text fontStyle="italic">{I18n.t('No placements enabled.')}</Text>
           ) : (
-            enabledPlacements.map((p, i) => <Text key={i}>{i18nLtiPlacement(p.placement)}</Text>)
+            enabledPlacements.map((p, i) => (
+              <Flex.Item key={p.placement}>
+                <Flex gap="x-small">
+                  <Flex.Item>
+                    <Text key={i}>{i18nLtiPlacement(p.placement)}</Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <PlacementInfoTooltip placement={p.placement} />
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
+            ))
           )}
         </Flex>
       </Section>
@@ -292,8 +306,8 @@ export const ToolConfigurationView = () => {
           {I18n.t('Placement Names')}
         </Heading>
         {enabledPlacements.map((p, i) => (
-          <Flex direction="row" alignItems="center" margin="small 0 0" key={i}>
-            <Flex.Item margin="0 xx-small 0 0">
+          <Flex direction="row" alignItems="center" margin="small 0 0" key={i} gap="xx-small">
+            <Flex.Item>
               <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
             </Flex.Item>
             <Flex.Item shouldShrink>

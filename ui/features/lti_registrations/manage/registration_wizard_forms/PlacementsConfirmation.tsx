@@ -27,11 +27,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconInfoLine} from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {Img} from '@instructure/ui-img'
-import {Responsive} from '@instructure/ui-responsive'
+import {PlacementInfoTooltip} from '../components/PlacementInfoTooltip'
 
 export type PlacementsConfirmationProps = {
   /**
@@ -164,48 +160,7 @@ const PlacementCheckbox = React.memo(
           placement as (typeof UNDOCUMENTED_PLACEMENTS)[number],
         ) && (
           <Flex.Item>
-            <Tooltip
-              placement="top"
-              constrain="parent"
-              renderTip={
-                <Responsive
-                  match="media"
-                  query={{
-                    small: {maxWidth: 500},
-                    medium: {minWidth: 500},
-                    large: {minWidth: 1000},
-                  }}
-                  props={{
-                    small: {width: '15rem'},
-                    medium: {width: '30rem'},
-                    large: {width: '35rem'},
-                  }}
-                  render={props => {
-                    return (
-                      <Img
-                        {...props}
-                        data-testid={`placement-img-${placement}`}
-                        constrain="contain"
-                        src={`/doc/api/images/placements/${placement}.png`}
-                        alt={I18n.t('An image showing the %{placement} placement within Canvas', {
-                          placement: i18nLtiPlacement(placement),
-                        })}
-                      />
-                    )
-                  }}
-                />
-              }
-            >
-              <IconButton
-                withBackground={false}
-                withBorder={false}
-                renderIcon={IconInfoLine}
-                size="small"
-                screenReaderLabel={I18n.t('Tooltip for the %{placement} placement', {
-                  placement,
-                })}
-              />
-            </Tooltip>
+            <PlacementInfoTooltip placement={placement} />
           </Flex.Item>
         )}
       </Flex>
