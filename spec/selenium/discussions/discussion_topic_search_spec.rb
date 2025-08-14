@@ -22,10 +22,6 @@ describe "Discussion Topic Search" do
   include_context "in-process server selenium tests"
 
   context "when Discussions Redesign feature flag is ON" do
-    before :once do
-      Account.default.enable_feature!(:react_discussions_post)
-    end
-
     before do
       course_with_teacher(active_course: true, active_all: true, name: "teacher")
       @topic_title = "Our Discussion Topic"

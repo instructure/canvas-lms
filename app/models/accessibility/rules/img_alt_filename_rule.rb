@@ -25,7 +25,7 @@ module Accessibility
 
       def self.test(elem)
         return nil if elem.tag_name != "img"
-        return nil unless elem.attribute?("alt") && elem.attribute?("src")
+        return nil unless elem.attribute?("alt")
 
         alt = elem.get_attribute("alt")
         role = elem.attribute?("role") ? elem.get_attribute("role") : nil
@@ -33,11 +33,7 @@ module Accessibility
         return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        src = elem.get_attribute("src")
-        filename = src.split("/").last.split("?").first
-        filename_without_extension = filename.split(".").first
-
-        I18n.t("Alt text should not be the filename of the image.") if alt == filename || alt == filename_without_extension
+        I18n.t("Alt text should not be the filename of the image.") if filename_like?(alt)
       end
 
       def self.message
@@ -55,7 +51,6 @@ module Accessibility
         I18n.t("Alt text is filename")
       end
 
-      # TODO: define undo text
       def self.form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
@@ -64,8 +59,18 @@ module Accessibility
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: 120,
+          can_generate_fix: true,
+          generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
         )
+      end
+
+      def self.generate_fix(elem)
+        return nil if elem.tag_name != "img"
+        return nil unless elem.attribute?("src")
+
+        src = elem.get_attribute("src")
+        ImgAltRuleHelper.generate_alt_text(src)
       end
 
       def self.fix!(elem, value)
@@ -86,6 +91,15 @@ module Accessibility
 
         elem["alt"] = value
         elem
+      end
+
+      def self.filename_like?(string)
+        return false if string.blank?
+
+        parts = string.split(".")
+        return false if parts.length < 2 || parts.last.empty?
+
+        !parts.first.match(/\s+/) && parts.last.match?(/^\w+$/)
       end
     end
   end

@@ -32,7 +32,6 @@ export interface Checkpoint {
 export type ModuleItemContent = {
   id?: string
   _id?: string
-  title: string
   type?:
     | 'Assignment'
     | 'Quiz'
@@ -43,6 +42,7 @@ export type ModuleItemContent = {
     | 'Attachment'
     | 'SubHeader'
     | 'ModuleExternalTool'
+    | 'ExternalTool'
   pointsPossible?: number
   published?: boolean
   canUnpublish?: boolean
@@ -257,9 +257,12 @@ export interface ModuleItem {
   id: string
   _id: string
   url: string
+  title: string
   indent: number
   position: number
   content: ModuleItemContent
+  masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
+  newTab?: boolean
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -321,4 +324,13 @@ export interface ExternalToolLaunchOptions {
   placement: ExternalToolPlacementType
   display?: 'borderless' | 'full'
   contextModuleId?: string
+}
+
+export interface ModuleItemMasterCourseRestrictionType {
+  all: boolean | null
+  availabilityDates: boolean | null
+  content: boolean | null
+  dueDates: boolean | null
+  points: boolean | null
+  settings: boolean | null
 }

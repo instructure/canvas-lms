@@ -135,6 +135,7 @@ const RUBRIC_PREVIEW_QUERY = gql`
           title
         }
       }
+      hidePoints
       title
       ratingOrder
       freeFormCriterionComments
@@ -174,7 +175,12 @@ type CourseRubricQueryResponse = {
 type RubricPreviewQueryResponse = {
   rubric: Pick<
     Rubric,
-    'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+    | 'criteria'
+    | 'title'
+    | 'ratingOrder'
+    | 'freeFormCriterionComments'
+    | 'pointsPossible'
+    | 'hidePoints'
   >
 }
 

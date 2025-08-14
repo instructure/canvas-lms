@@ -102,7 +102,9 @@ export const EditExceptionModal = ({
         ) : (
           <List isUnstyled itemSpacing="medium" margin="0">
             <List.Item>
-              <Alert margin="0">{createAlertMessage(control)}</Alert>
+              <Alert hasShadow={false} margin="0">
+                {createAlertMessage(control)}
+              </Alert>
             </List.Item>
             <List.Item>
               <Heading level="h3" margin="0 0 small 0">

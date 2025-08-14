@@ -55,6 +55,8 @@ module Types
 
     field :unlock_at, Types::DateTimeType, null: true
 
+    field :viewed_at, Types::DateTimeType, null: true
+
     field :size, String, null: true
     def size
       ActiveSupport::NumberHelper.number_to_human_size(object.size)

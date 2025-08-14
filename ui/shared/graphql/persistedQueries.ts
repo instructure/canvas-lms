@@ -20,6 +20,7 @@ import manifest from './persistedQueries/manifest.json'
 import GetCourseStudentQuery from './persistedQueries/GetCourseStudentQuery.graphql'
 import GetModulesStudentQuery from './persistedQueries/GetModulesStudentQuery.graphql'
 import GetModuleItemsStudentQuery from './persistedQueries/GetModuleItemsStudentQuery.graphql'
+import GetModuleItemsQuery from './persistedQueries/GetModuleItemsQuery.graphql'
 
 interface PersistedQuery {
   anonymous_access_allowed: boolean
@@ -30,6 +31,7 @@ const queries: Record<string, string> = {
   GetCourseStudentQuery,
   GetModulesStudentQuery,
   GetModuleItemsStudentQuery,
+  GetModuleItemsQuery,
 }
 
 const persistedQueries: Record<string, PersistedQuery> = {}

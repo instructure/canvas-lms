@@ -73,7 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReportsWrapper} from '../../../shared/lti/react/LtiAssetReportsWrapper'
+import {LtiAssetReportsWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -1752,7 +1752,16 @@ EG = {
   },
 
   addCommentTextAreaFocus() {
-    $add_a_comment_textarea.focus()
+    if (isRceLiteEnabled()) {
+      const rceEditor = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT} .tox-edit-area iframe`)
+      const iframe = rceEditor[0] as HTMLIFrameElement
+      const iframeDoc = iframe.contentDocument
+      if (iframeDoc && iframeDoc.body) {
+        iframeDoc.body.focus()
+      }
+    } else {
+      $add_a_comment_textarea.focus()
+    }
   },
 
   gradeFocus() {

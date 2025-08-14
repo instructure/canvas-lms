@@ -56,6 +56,7 @@ export interface FileFolderTableProps {
   selectionHandler: SelectionHandler
   handleFileDropRef?: (el: HTMLInputElement | null) => void
   selectAllRef?: Ref<Checkbox>
+  onPreviewFile?: (file: File) => void
 }
 
 const FileFolderTable = ({
@@ -73,6 +74,7 @@ const FileFolderTable = ({
   selectionHandler,
   handleFileDropRef,
   selectAllRef,
+  onPreviewFile,
 }: FileFolderTableProps) => {
   const {currentFolder, contextId, contextType} = useFileManagement()
   const isStacked = size !== 'large'
@@ -206,6 +208,7 @@ const FileFolderTable = ({
                 userCanRestrictFilesForContext={userCanRestrictFilesForContext}
                 usageRightsRequiredForContext={usageRightsRequiredForContext}
                 setModalOrTrayOptions={setModalOrTrayOptions}
+                onPreviewFile={onPreviewFile}
               />
             </Table.Body>
           </Table>

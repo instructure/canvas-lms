@@ -22,7 +22,7 @@ require "spec_helper"
 describe Accessibility::Issue do
   let(:mock_rule) do
     Class.new do
-      def self.test(_elem) = true
+      def self.test(_elem) = nil
       def self.id = "mock-rule"
       def self.message = "No issue"
       def self.why = "Just a mock"
@@ -49,12 +49,6 @@ describe Accessibility::Issue do
   describe "#generate" do
     let(:context_double) { double("Context") }
 
-    before do
-      allow_any_instance_of(described_class).to receive(:count_oversize_pages).and_return(0)
-      allow_any_instance_of(described_class).to receive(:count_oversize_attachments).and_return(0)
-      allow_any_instance_of(described_class).to receive(:exceeds_accessibility_scan_limit?).and_return(false)
-    end
-
     it "returns issues for pages" do
       page = double("WikiPage", id: 1, body: "<div>content</div>", title: "Page 1", published?: true, updated_at: Time.zone.now)
 
@@ -64,7 +58,8 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages:,
         assignments: double("Assignments", active: double(order: [])),
-        attachments: double("Attachments", not_deleted: double(order: []))
+        attachments: double("Attachments", not_deleted: double(order: [])),
+        exceeds_accessibility_scan_limit?: false
       )
       allow(wiki_pages).to receive(:not_deleted).and_return(not_deleted_wiki_pages)
       allow(not_deleted_wiki_pages).to receive(:order).and_return([page])
@@ -86,7 +81,8 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments:,
-        attachments: double("Attachments", not_deleted: double(order: []))
+        attachments: double("Attachments", not_deleted: double(order: [])),
+        exceeds_accessibility_scan_limit?: false
       )
       allow(assignments).to receive(:active).and_return(active_assignments)
       allow(active_assignments).to receive(:order).and_return([assignment])
@@ -120,7 +116,8 @@ describe Accessibility::Issue do
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments: double("Assignments", active: double(order: [])),
-        attachments: attachments_collection
+        attachments: attachments_collection,
+        exceeds_accessibility_scan_limit?: false
       )
       allow(attachments_collection).to receive(:not_deleted).and_return(not_deleted_attachments_relation)
       allow(not_deleted_attachments_relation).to receive(:order).and_return([attachment_pdf, attachment_other])
@@ -161,14 +158,11 @@ describe Accessibility::Issue do
     end
 
     it "returns nils if size limits exceeded" do
-      allow_any_instance_of(described_class).to receive(:count_oversize_pages).and_return(10)
-      allow_any_instance_of(described_class).to receive(:count_oversize_attachments).and_return(5)
-      allow_any_instance_of(described_class).to receive(:exceeds_accessibility_scan_limit?).and_return(true)
-
       allow(context_double).to receive_messages(
         wiki_pages: double("WikiPages", not_deleted: double(order: [])),
         assignments: double("Assignments", active: double(order: [])),
-        attachments: double("Attachments", not_deleted: double(order: []))
+        attachments: double("Attachments", not_deleted: double(order: [])),
+        exceeds_accessibility_scan_limit?: true
       )
 
       result = described_class.new(context: context_double).generate

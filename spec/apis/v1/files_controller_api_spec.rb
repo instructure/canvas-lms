@@ -1995,6 +1995,29 @@ describe "Files API", type: :request do
       json = JSON.parse(response.body)
       expect(json).to eq({ "errors" => [{ "message" => "Too many file links requested.  A maximum of 100 file links can be processed per request." }] })
     end
+
+    it "returns the display name and instfs uuid when include_display_name is passed" do
+      doc = attachment_model(context: @course, display_name: "test.docx", uploaded_data: fixture_file_upload("test.docx"), instfs_uuid: "doc")
+
+      file_urls = ["/files/#{doc.id}/download?download_frd=1", "/files/#{doc.id}", "http://example.canvas.edu/files/#{doc.id}/download"]
+      body = { user_uuid: @teacher.uuid, file_urls:, include_display_name: true }
+
+      api_call(:post, "/api/v1/rce_linked_file_instfs_ids", { controller: "files", action: "rce_linked_file_instfs_ids", format: "json" }, body, {}, expected_status: 200)
+      json = JSON.parse(response.body)
+      expect(json).to eq({
+                           "canvas_instfs_ids" => {
+                             "/files/#{doc.id}/download?download_frd=1" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" },
+                             "/files/#{doc.id}" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" },
+                             "http://example.canvas.edu/files/#{doc.id}/download" =>
+                                { "instfs_uuid" => "doc",
+                                  "display_name" => "test.docx" }
+                           }
+                         })
+    end
   end
 
   describe "#update" do

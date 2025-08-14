@@ -321,6 +321,7 @@ class Rubric < ActiveRecord::Base
                                    use_for_grading: !!opts[:use_for_grading],
                                    purpose:)
     ra.skip_updating_points_possible = opts[:skip_updating_points_possible] || @skip_updating_points_possible
+    ra.skip_updating_rubric_association_count = opts[:skip_updating_rubric_association_count]
     ra.updating_user = opts[:current_user]
     if ra.save && association.is_a?(Assignment)
       association.mark_downstream_changes(["rubric"])
@@ -711,6 +712,16 @@ class Rubric < ActiveRecord::Base
     associations = rubric_associations.active.where(association_type: "Assignment")
 
     Assignment.where(id: associations.pluck(:association_id))
+  end
+
+  def update_association_count
+    cnt = rubric_associations.for_grading.count
+    with_versioning(true) do
+      self.read_only = cnt > 1
+      self.association_count = cnt
+      save!
+      destroy if cnt == 0 && rubric_associations.none? && !public
+    end
   end
 
   def self.enhanced_rubrics_assignments_enabled?(context_to_check)

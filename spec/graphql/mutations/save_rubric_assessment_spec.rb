@@ -242,6 +242,32 @@ describe Mutations::SaveRubricAssessment do
       expect(@assignment.moderation_graders.first.user_id).to eq(@teacher.id)
       expect(@assignment.moderation_graders.first.slot_taken).to be true
     end
+
+    it "returns specific error message when max graders limit is reached" do
+      @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
+      ta = @course.enroll_user(User.create!, "TaEnrollment", enrollment_state: "active").user
+
+      ta_mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading"),
+        provisional: true
+      )
+      CanvasSchema.execute(ta_mutation, context: { current_user: ta, domain_root_account: @course.root_account })
+
+      teacher2 = @course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user
+      teacher2_mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading"),
+        provisional: true
+      )
+
+      result = CanvasSchema.execute(teacher2_mutation, context: { current_user: teacher2, domain_root_account: @course.root_account })
+
+      expect(result["errors"]).to be_present
+      expect(result["errors"][0]["message"]).to eq("The maximum number of graders has been reached for this assignment.")
+    end
   end
 
   def get_assessment_details(assessment_type, points = 10)

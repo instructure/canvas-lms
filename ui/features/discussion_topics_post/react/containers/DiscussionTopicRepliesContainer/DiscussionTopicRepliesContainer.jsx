@@ -77,8 +77,10 @@ export const DiscussionTopicRepliesContainer = props => {
     onCompleted: () => {
       setOnSuccess(I18n.t('The replies were successfully updated'))
     },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error while updating the replies'))
+    onError: error => {
+      if (!error.networkError) {
+        setOnFailure(I18n.t('There was an unexpected error while marking replies as read'))
+      }
     },
   })
 
@@ -99,12 +101,6 @@ export const DiscussionTopicRepliesContainer = props => {
           variables: {
             discussionEntryIds: entryIds,
             read: true,
-          },
-          optimisticResponse: {
-            updateDiscussionEntriesReadState: {
-              discussionEntries: entries,
-              __typename: 'UpdateDiscussionEntriesReadStatePayload',
-            },
           },
         })
       }, AUTO_MARK_AS_READ_DELAY)

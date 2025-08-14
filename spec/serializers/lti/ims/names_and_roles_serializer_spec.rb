@@ -276,6 +276,10 @@ describe Lti::IMS::NamesAndRolesSerializer do
         include_context "course and tool for variable substitution"
 
         context "with disallow_null_custom_variables feature flag enabled" do
+          before do
+            Account.site_admin.disable_feature!(:custom_variables_booleans_as_strings)
+          end
+
           it "expand course-related variables from the tool settings" do
             json = serialize
 
@@ -303,6 +307,7 @@ describe Lti::IMS::NamesAndRolesSerializer do
         context "with disallow_null_custom_variables feature flag disabled" do
           before do
             Account.site_admin.disable_feature!(:disallow_null_custom_variables)
+            Account.site_admin.disable_feature!(:custom_variables_booleans_as_strings)
           end
 
           it "expand course-related variables from the tool settings" do

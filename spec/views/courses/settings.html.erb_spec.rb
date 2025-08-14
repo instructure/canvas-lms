@@ -294,4 +294,46 @@ describe "courses/settings" do
       render
     end
   end
+
+  describe "course pacing setting" do
+    context "with course_pace_enable_from_account_setting ff off" do
+      it "is visible" do
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
+    end
+
+    context "with course_pace_enable_from_account_setting ff on" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_enable_from_account_setting)
+        @course.reload
+      end
+
+      it "is visible when account setting is enabled" do
+        @course.root_account.update(settings: { enable_course_paces: { value: true, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
+
+      it "is hidden when account setting is disabled" do
+        @course.root_account.update(settings: { enable_course_paces: { value: false, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).to be_nil
+      end
+
+      it "is visible when account setting is disabled but already using course pacing" do
+        @course.update(settings: { enable_course_paces: true })
+        @course.root_account.update(settings: { enable_course_paces: { value: false, locked: false } })
+
+        render
+        doc = Nokogiri::HTML5(response.body)
+        expect(doc.at_css("input#course_enable_course_paces")).not_to be_nil
+      end
+    end
+  end
 end

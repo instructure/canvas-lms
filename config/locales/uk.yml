@@ -9044,6 +9044,7 @@ uk:
   info_8f47054a: Інформація
   info_panel_displayed_51d481cc: "Показано інформаційну панель"
   info_panel_hidden_bf7c3b7b: "Сховано інформаційну панель"
+  information_7f11072: Інформація
   information_816d9fa5: інформація
   information_icon_8a514faa: "Піктограма інформації"
   inner_box_background_6f9092f: "Фон внутрішнього вікна"
@@ -11959,6 +11960,7 @@ uk:
       . Позиція для цієї властивості SIS включена до цих нових налаштувань
       і буде активуватися за замовчуванням.
   new_topic_for_course_3d98222a: "Нова тема для %{course}"
+  new_user_bd194843: "Новий користувач"
   new_user_s_name_909b6267: "Нове ім'я користувача"
   new_user_tutorial_cdd3a446: "Підручник нового користувача"
   new_zealand_64_f126cf2e: "Нова Зеландія (+64)"
@@ -15340,6 +15342,7 @@ uk:
   require_an_access_code_600e06e8: "Необхідний код доступу"
   require_assignment_due_date_778b200d: "Необхідна дата сдачі завдання"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Учасники групи повинні бути в одному розділі."
+  require_peer_reviews_9b5199d4: "Вимагає рівноправних рецензій"
   require_respondus_lockdown_browser_31425b3a: "Потребує  браузер Respondus LockDown"
   require_usage_rights_for_uploaded_files_4507865b: "Потребує прав користувача для завантажених файлів"
   required_5f7ef8c0: Обов'язковий
@@ -16144,6 +16147,7 @@ uk:
       nonfavorited_tooltip: "Натисніть для додавання до меню курсів."
       published_course: Так
       published_course_tooltip: "Цей курс опублікован."
+      unknown: Невідомий
       unpublished_course: Ні
       unpublished_course_tooltip: "Цей курс ще не опублікован. Студенти повинні зв'язатися з інструктором курсу для доступу."
     dashboard_invitation: 

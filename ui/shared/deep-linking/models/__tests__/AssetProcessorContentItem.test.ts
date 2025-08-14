@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssetProcessorContentItem, assetProcessorContentItemToDto} from "../AssetProcessorContentItem"
+import {
+  AssetProcessorContentItem,
+  assetProcessorContentItemToDto,
+} from '../AssetProcessorContentItem'
 
 describe('assetProcessorContentItemToDto', () => {
   it('converts an AssetProcessorContentItem to the format used by the assignment api', () => {
@@ -25,16 +28,16 @@ describe('assetProcessorContentItemToDto', () => {
       url: 'http://example.com',
       title: 'example',
       text: 'example',
-      icon: {url: 'http://example.com/icon' },
-      thumbnail: {url: 'http://example.com/thumbnail' },
+      icon: {url: 'http://example.com/icon'},
+      thumbnail: {url: 'http://example.com/thumbnail'},
     }
     expect(assetProcessorContentItemToDto(contentItem, 1)).toEqual({
       context_external_tool_id: 1,
       url: 'http://example.com',
       title: 'example',
       text: 'example',
-      icon: {url: 'http://example.com/icon' },
-      thumbnail: {url: 'http://example.com/thumbnail' },
+      icon: {url: 'http://example.com/icon'},
+      thumbnail: {url: 'http://example.com/thumbnail'},
     })
   })
 })

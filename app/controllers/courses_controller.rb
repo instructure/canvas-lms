@@ -358,7 +358,6 @@ class CoursesController < ApplicationController
   include NewQuizzesFeaturesHelper
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
-  include AccessibilityHelper
 
   before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
   before_action :require_user_or_observer, only: [:user_index]
@@ -1228,6 +1227,10 @@ class CoursesController < ApplicationController
                              else
                                enrollment_scope.active_or_pending
                              end
+
+          enrollment_types = UserSearch.validate_enrollment_types(Array(search_params[:enrollment_type])) if search_params[:enrollment_type].present?
+
+          enrollment_scope = enrollment_scope.where(type: enrollment_types) if enrollment_types.present?
           enrollments_by_user = enrollment_scope.group_by(&:user_id)
         else
           confirmed_user_ids = @context.enrollments.where.not(workflow_state: %w[invited creation_pending rejected])
@@ -2280,7 +2283,7 @@ class CoursesController < ApplicationController
         end
 
         @accessibility_scan_enabled =
-          @context.feature_enabled?(:accessibility_tab_enable) ? !exceeds_accessibility_scan_limit? : false
+          @context.feature_enabled?(:accessibility_tab_enable) ? !@context.exceeds_accessibility_scan_limit? : false
       end
 
       return if check_for_xlist
@@ -2498,6 +2501,7 @@ class CoursesController < ApplicationController
             js_env(MODULES_PERMISSIONS: modules_permissions)
 
             js_bundle :context_modules_v2
+            css_bundle :content_next, :context_modules2, :context_modules_v2
           else
             @progress = Progress.find_by(
               context: @context,
@@ -4029,6 +4033,98 @@ class CoursesController < ApplicationController
     else
       render json: { message: "Quiz migration alert not found" }, status: :not_found
     end
+  end
+
+  def youtube_migration
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    js_env(COURSE_ID: @context.id)
+    js_bundle :youtube_migration
+
+    render html: "", layout: true
+  end
+
+  def youtube_migration_scan
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    progress = YoutubeMigrationService.last_youtube_embed_scan_progress_by_course(@context)
+
+    unless progress
+      render json: { id: nil, workflow_state: nil, resources: [], total_count: 0, page: 1, per_page: 25, total_pages: 0 }, status: :ok
+      return
+    end
+
+    page = params[:page]&.to_i || 1
+    per_page = params[:per_page]&.to_i || 25
+
+    page = [page, 1].max
+    per_page = [per_page, 1].max.clamp(1, 100) # Limit per_page to max 100
+    all_resources = progress.results&.dig(:resources)&.values || []
+    total_count = progress.results&.dig(:total_count) || 0
+    total_pages = (all_resources.length.to_f / per_page).ceil
+
+    # Calculate pagination
+    start_index = (page - 1) * per_page
+    end_index = start_index + per_page - 1
+    paginated_resources = all_resources[start_index..end_index] || []
+
+    json = {
+      id: progress.id,
+      workflow_state: progress.workflow_state,
+      resources: paginated_resources,
+      total_count:,
+      page:,
+      per_page:,
+      total_pages:
+    }
+
+    render json:, status: :ok
+  end
+
+  def start_youtube_migration_scan
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    progress = YoutubeMigrationService.queue_scan_course_for_embeds(@context)
+
+    render json: { id: progress.id, workflow_state: progress.workflow_state, resources: [], total_count: 0 }, status: :ok
+  end
+
+  def start_youtube_migration_convert
+    get_context
+
+    unless @context.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    embed = params.require(:embed).permit(:field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
+    embed[:id] = embed[:id].to_i
+    embed[:field] = embed[:field].to_sym
+    scan_id = params.require(:scan_id)
+
+    service = YoutubeMigrationService.new(@context)
+    progress = service.convert_embed(scan_id, embed)
+
+    render json: { id: progress.id }, status: :ok
   end
 
   def start_link_validation

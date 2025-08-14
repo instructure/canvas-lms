@@ -18,13 +18,13 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin, useNewLoginData} from '../context'
 import {ROUTES} from '../routes/routes'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('new_login')
 
@@ -57,21 +57,25 @@ const ForgotPasswordLink = () => {
     <Flex direction="column" gap="small">
       <Flex.Item overflowX="visible" overflowY="visible">
         {forgotPasswordUrl ? (
-          <CondensedButton
+          <Link
             data-testid="forgot-password-link"
+            forceButtonRole={false}
             href={forgotPasswordUrl}
             onClick={handleForgotPasswordUrl(forgotPasswordUrl)}
+            isWithinText={false}
           >
             {I18n.t('Forgot password?')}
-          </CondensedButton>
+          </Link>
         ) : (
-          <CondensedButton
+          <Link
             data-testid="forgot-password-link"
+            forceButtonRole={false}
             href={ROUTES.FORGOT_PASSWORD}
+            isWithinText={false}
             onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}
           >
             {I18n.t('Forgot password?')}
-          </CondensedButton>
+          </Link>
         )}
       </Flex.Item>
     </Flex>

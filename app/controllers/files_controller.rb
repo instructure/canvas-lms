@@ -876,24 +876,6 @@ class FilesController < ApplicationController
     show
   end
 
-  def attachment_content
-    @attachment = @context.attachments.active.find(params[:file_id])
-    if authorized_action(@attachment, @current_user, :update)
-      # The files page lets you edit text content inline by firing off a json
-      # request to get the data.
-      # Protect ourselves against reading huge files into memory -- if the
-      # attachment is too big, don't return it.
-      if @attachment.size > 1.megabyte
-        render json: { error: t("errors.too_large", "The file is too large to edit") }
-        return
-      end
-
-      stream = @attachment.open
-      json = { body: stream.read.force_encoding(Encoding::ASCII_8BIT) }
-      render json:
-    end
-  end
-
   def send_attachment(attachment)
     # check for download_frd param and, if it's present, force the user to download the
     # file and don't display it inline. we use download_frd instead of looking to the
@@ -1631,7 +1613,7 @@ class FilesController < ApplicationController
       file_urls[context] << parsed_file_url
     end
 
-    file_urls_with_uuids = file_urls_by_context.each_with_object({}) do |(context, file_list), file_metadata|
+    file_urls_with_metadata = file_urls_by_context.each_with_object({}) do |(context, file_list), file_metadata|
       next unless context.grants_any_right?(@current_user, session, :manage_files_create, :manage_files_edit, :moderate_user_content, :become_user) &&
                   context.grants_any_right?(user, session, :manage_files_create, :manage_files_edit)
 
@@ -1639,11 +1621,19 @@ class FilesController < ApplicationController
         att = file[:attachment]
         list = (att.media_entry_id.present? || att.canvadocable?) ? :canvas_instfs_ids : :instfs_ids
         file_metadata[list] ||= {}
-        file_metadata[list][file[:url]] = att.instfs_uuid
+        # Check can be removed once NQ is using the display_name field
+        file_metadata[list][file[:url]] = if params[:include_display_name]
+                                            {
+                                              instfs_uuid: att.instfs_uuid,
+                                              display_name: att.display_name,
+                                            }
+                                          else
+                                            att.instfs_uuid
+                                          end
       end
     end
 
-    return render json: file_urls_with_uuids.to_json, status: :ok if file_urls_with_uuids.present?
+    return render json: file_urls_with_metadata.to_json, status: :ok if file_urls_with_metadata.present?
 
     render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_entity
   end

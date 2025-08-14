@@ -22,7 +22,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import pageNotFoundPandaUrl from '@canvas/images/PageNotFoundPanda.svg'
 import {IconImageLine} from '@instructure/ui-icons'
 import {isValidHttpUrl} from '../../common/lib/validators/isValidHttpUrl'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -228,13 +227,6 @@ const IconOverrideInput = React.memo(
                   loading="lazy"
                   height="2rem"
                   width="2rem"
-                  elementRef={ref => {
-                    if (ref instanceof HTMLImageElement) {
-                      ref.onerror = () => {
-                        ref.src = pageNotFoundPandaUrl
-                      }
-                    }
-                  }}
                 />
               </div>
             ) : (

@@ -76,6 +76,7 @@ module Lti
           end
 
           # Asset Processor creation is handled by AssignmentApiController
+          # (Assignment Edit page) or GraphQL (Discussion Topic edit page)
           if for_placement?(:ActivityAssetProcessor)
             items = content_items.filter { |item| item[:type] == "ltiAssetProcessor" }
             render_content_items(reload_page: false, extra: { tool_id: tool.id }, items:)

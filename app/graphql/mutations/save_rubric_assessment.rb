@@ -79,6 +79,8 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
         submission.reload
         return { submission:, rubric_assessment: }
       end
+    rescue Assignment::MaxGradersReachedError => e
+      raise GraphQL::ExecutionError, e.message
     rescue Assignment::GradeError
       raise GraphQL::ExecutionError, "Assignment Grade Error"
     end

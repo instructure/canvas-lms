@@ -396,6 +396,13 @@ module Types
       Loaders::UserLoaders::GroupMembershipsLoader.for(filter:).load(object.id)
     end
 
+    field :differentiation_tags_connection, GroupMembershipType.connection_type, null: true do
+      argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def differentiation_tags_connection(course_id: nil)
+      Loaders::UserLoaders::DifferentiationTagsLoader.for(current_user, course_id).load(object.id)
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or

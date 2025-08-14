@@ -54,7 +54,7 @@ class AnnouncementNewEdit
       "button[data-testid='announcement-submit-button']"
     end
 
-    # -------------------- discussion_create + react_discussions_post flag elements -----------------
+    # -------------------- discussion_create flag elements -----------------
 
     def available_from_reset_button
       f("button[data-testid=reset-available-from-button]")

@@ -191,10 +191,12 @@ module Types
 
     field :submission_statistics, Types::ModuleStatisticsType, null: true
     def submission_statistics
-      if current_user
-        Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+      return {} unless current_user
+
+      if observer_with_observed_students?
+        Loaders::ObserverModuleStatisticsLoader.for(current_user:, request: context[:request]).load(context_module)
       else
-        {}
+        Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
       end
     end
 
@@ -209,7 +211,15 @@ module Types
 
     field :progression, Types::ModuleProgressionType, null: true, description: "The current user's progression through the module"
     def progression
-      ModuleProgressionLoader.for(current_user, session, context_module.context).load(context_module)
+      return nil unless current_user
+
+      course = context_module.context
+
+      if observer_with_observed_students?
+        Loaders::ObserverModuleProgressionLoader.for(current_user:, session:, request: context[:request]).load(context_module)
+      else
+        ModuleProgressionLoader.for(current_user, session, course).load(context_module)
+      end
     end
 
     field :has_active_overrides, Boolean, null: false
@@ -219,6 +229,14 @@ module Types
     end
 
     private
+
+    def observer_with_observed_students?
+      return false unless current_user
+
+      course = context_module.context
+      observed_students = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys
+      !observed_students.empty?
+    end
 
     def apply_module_item_filters(content_tags, filter)
       return content_tags if filter.blank?

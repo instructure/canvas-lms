@@ -133,14 +133,13 @@ describe "Student Gradebook - Assignment Details" do
         expect(StudentGradesPage.submission_comments.first).to include_text "good job"
       end
 
-      it "does not show submission comments if assignment is muted" do
+      it "does show submission comments if assignment is muted" do
         @asn.ensure_post_policy(post_manually: true)
         @sub.submission_comments.create!(comment: "good job")
         user_session @students[0]
         get "/courses/#{@course.id}/grades"
         muted_row = f("tr#submission_#{@asn.id}")
         expect(muted_row).to contain_jqcss("i[title='Instructor has not posted this grade']")
-        expect(f("a[aria-label='Read comments']").attribute("style")).to eq "visibility: hidden;"
       end
     end
 

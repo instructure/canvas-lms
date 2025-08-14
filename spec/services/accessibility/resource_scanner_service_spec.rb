@@ -21,9 +21,7 @@ describe Accessibility::ResourceScannerService do
   subject { described_class.new(resource: wiki_page) }
 
   let(:course) { course_model }
-  let(:wiki_page) { wiki_page_model(course:) }
-  let(:assignment) { assignment_model(course:) }
-  let(:attachment) { attachment_model(course:, content_type: "application/pdf") }
+  let(:wiki_page) { wiki_page_model(course:, body: "<ul><li>foo</li></ul>") }
 
   describe "#call" do
     let(:delay_mock) { double("delay") }
@@ -132,6 +130,13 @@ describe Accessibility::ResourceScannerService do
 
           expect(scan.reload.issue_count).to eq(2)
         end
+
+        it "connects the scan to the issue" do
+          subject.scan_resource(scan:)
+
+          issue = AccessibilityIssue.for_context(wiki_page).first
+          expect(issue.accessibility_resource_scan).to eq(scan)
+        end
       end
 
       it "updates the scan to completed" do
@@ -156,6 +161,63 @@ describe Accessibility::ResourceScannerService do
         subject.scan_resource(scan:)
 
         expect(scan.reload.error_message).to eq("Failure")
+      end
+    end
+
+    context "when the resource exceeds size limit" do
+      context "for a wiki page" do
+        before do
+          wiki_page.update!(body: "a" * (Accessibility::ResourceScannerService::MAX_HTML_SIZE + 1))
+        end
+
+        it "fails the scan with an error message" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.error_message).to eq(
+            "This content is too large to check. HTML body must not be greater than 125 KB."
+          )
+        end
+      end
+
+      context "for an assignment" do
+        subject { described_class.new(resource: assignment) }
+
+        let(:assignment) { assignment_model(course:) }
+        let!(:scan) { accessibility_resource_scan_model(course:, assignment:) }
+
+        before do
+          assignment.update!(description: "a" * (Accessibility::ResourceScannerService::MAX_HTML_SIZE + 1))
+        end
+
+        it "fails the scan with an error message" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.error_message).to eq(
+            "This content is too large to check. HTML body must not be greater than 125 KB."
+          )
+        end
+      end
+
+      context "for an attachment" do
+        subject { described_class.new(resource: attachment) }
+
+        let(:attachment) { attachment_model(course:, content_type: "application/pdf") }
+        let!(:scan) { accessibility_resource_scan_model(course:, attachment:) }
+
+        before do
+          allow(attachment).to receive(:size).and_return(Accessibility::ResourceScannerService::MAX_PDF_SIZE + 1)
+        end
+
+        it "fails the scan with an error message" do
+          subject.scan_resource(scan:)
+
+          expect(scan.reload.workflow_state).to eq("failed")
+          expect(scan.error_message).to eq(
+            "This file is too large to check. PDF attachments must not be greater than 5 MB."
+          )
+        end
       end
     end
   end

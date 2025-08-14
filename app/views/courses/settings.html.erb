@@ -453,8 +453,7 @@
               <%= options_for_select(non_cc, @context.license) %>
               <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]], @context.license) %>
             </select>
-            <%= license_help_link %>
-            <div id="license_mount"></div>
+            <span id="license_mount"></span>
           <% else %>
             <%= @context.readable_license %>
           <% end %>
@@ -471,7 +470,7 @@
           <% if can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
               <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="panel-border">
               <%= f.check_box :custom_course_visibility %>
@@ -506,7 +505,7 @@
             <span>
               <% vis_value = @context.course_visibility_options[@context.course_visibility][:setting] %>
               <%= f.select :course_visibility, [[vis_value, @context.course_visibility]], {}, {"disabled" => true, "aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="public_options checkbox-flex-container">
               <%= f.check_box :indexed, disabled: true %>
@@ -586,20 +585,22 @@
           </div>
         </div>
       <% end %>
-      <div class="form-row course-paces-row">
-        <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
-        <div class="tall-row">
-          <div class="nobr">
-            <%= f.check_box :enable_course_paces, :disabled => !can_manage || @context.homeroom_course%>
-            <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %>
-            <a class="icon-question disabled-warning"
-              id="pacing_disabled_tooltip"
-              data-tooltip
-              title= "<%= t("Course Pacing cannot be used with Homeroom Course")%>">
-            </a><br/>
+      <% if !@context.root_account.feature_enabled?(:course_pace_enable_from_account_setting) || @context.account.enable_course_paces? || @context.enable_course_paces %>
+        <div class="form-row course-paces-row">
+          <div class="form-label nobr"><%= f.blabel :course_paces, :en => "Course Pacing" %></div>
+          <div class="tall-row">
+            <div class="nobr">
+              <%= f.check_box :enable_course_paces, :disabled => !can_manage || @context.homeroom_course%>
+              <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %>
+              <a class="icon-question disabled-warning"
+                id="pacing_disabled_tooltip"
+                data-tooltip
+                title= "<%= t("Course Pacing cannot be used with Homeroom Course")%>">
+              </a><br/>
+            </div>
           </div>
         </div>
-      </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></div>
         <div colspan="3">

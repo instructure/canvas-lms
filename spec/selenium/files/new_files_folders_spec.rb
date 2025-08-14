@@ -27,6 +27,7 @@ describe "better_file_browsing, folders" do
   context "Folders" do
     before do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       get "/courses/#{@course.id}/files"
       folder_name = "new test folder"
       add_folder(folder_name)
@@ -127,6 +128,7 @@ describe "better_file_browsing, folders" do
   context "Folder Tree" do
     before do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       get "/courses/#{@course.id}/files"
     end
 

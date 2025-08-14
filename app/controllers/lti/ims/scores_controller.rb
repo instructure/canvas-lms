@@ -280,13 +280,11 @@ module Lti::IMS
     ].freeze
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
     DEFAULT_SUBMISSION_TYPE = "external_tool"
-    ACTIVITY_PROGRESSES_NEEDS_GRADING = %w[Submitted Completed].freeze
     private_constant :REQUIRED_PARAMS,
                      :OPTIONAL_PARAMS,
                      :EXTENSION_PARAMS,
                      :SCORE_SUBMISSION_TYPES,
-                     :DEFAULT_SUBMISSION_TYPE,
-                     :ACTIVITY_PROGRESSES_NEEDS_GRADING
+                     :DEFAULT_SUBMISSION_TYPE
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -453,7 +451,10 @@ module Lti::IMS
             scores_params.merge(created_at: timestamp, updated_at: timestamp, user:, submission:)
           )
         else
-          result.update!(scores_params.merge(updated_at: timestamp))
+          result.with_lock do
+            # with_lock reloads the record with fresh make sure we update all the changes
+            result.update!(scores_params.merge(updated_at: timestamp))
+          end
         end
         # An update to a result might require updating a submission's workflow_state.
         # The submission will infer that for us.
@@ -607,7 +608,7 @@ module Lti::IMS
 
     def trigger_submission?
       if context.root_account.feature_enabled?(:ags_score_trigger_needs_grading_after_submitted)
-        ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
+        Lti::Result::ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(params[:activityProgress])
       else
         params[:activityProgress] != "Initialized"
       end

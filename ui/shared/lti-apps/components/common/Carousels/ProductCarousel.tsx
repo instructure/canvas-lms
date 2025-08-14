@@ -67,20 +67,21 @@ function ProductCarousel(props: ProductCarouselProps) {
       <Flex margin="small 0 small 0">
         <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 0 small 0">
           <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-            {I18n.t('More Tools by ')} {props.companyName}
+            <span style={{wordBreak: 'break-word'}}>
+              {I18n.t('More Tools by ')} {props.companyName}
+            </span>
           </Heading>
         </Flex.Item>
         {(products?.length ?? 0) > 1 && (
           <Flex direction="row">
             <div style={{marginRight: '0.8rem'}}>
-            <PreviousArrow
-              currentSlideNumber={currentSlideNumber}
-              slider={slider}
-              screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {
-                companyName: companyName,
-              })}
-              
-            />
+              <PreviousArrow
+                currentSlideNumber={currentSlideNumber}
+                slider={slider}
+                screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {
+                  companyName: companyName,
+                })}
+              />
             </div>
             <NextArrow
               currentSlideNumber={currentSlideNumber}

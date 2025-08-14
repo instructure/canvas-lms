@@ -23,6 +23,7 @@ class AccessibilityResourceScan < ActiveRecord::Base
   resolves_root_account through: :course
 
   belongs_to :course
+  has_many :accessibility_issues, dependent: :destroy
 
   enum :workflow_state, %i[queued in_progress completed failed], validate: true
   enum :resource_workflow_state, %i[unpublished published], validate: true

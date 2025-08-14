@@ -26,7 +26,7 @@ class Canvadoc < ActiveRecord::Base
 
   belongs_to :attachment
 
-  has_many :canvadocs_submissions
+  has_many :canvadocs_submissions, dependent: :destroy
 
   def upload(opts = {})
     return if document_id.present?

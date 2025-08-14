@@ -194,26 +194,6 @@ module ConversationsHelper
     end
   end
 
-  def all_recipients_are_instructors?(context, recipients)
-    if context.is_a?(Course)
-      return recipients.inject(true) do |all_recipients_are_instructors, recipient|
-        all_recipients_are_instructors && context.user_is_instructor?(recipient)
-      end
-    end
-    false
-  end
-
-  def observer_to_linked_students(recipients)
-    observee_ids = @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
-    return false if observee_ids.empty?
-
-    recipients.each do |recipient|
-      return false if observee_ids.exclude?(recipient.id)
-    end
-
-    true
-  end
-
   def valid_context?(context)
     case context
     when Account then valid_account_context?(context)
@@ -318,11 +298,8 @@ module ConversationsHelper
   end
 
   def validate_context(context, recipients)
-    recipients_are_instructors = all_recipients_are_instructors?(context, recipients)
-
     if context.is_a?(Course) &&
-       !recipients_are_instructors &&
-       !observer_to_linked_students(recipients) &&
+       missing_right_to_send_any_recipient(recipients, context) &&
        !context.grants_right?(@current_user, session, :send_messages)
 
       raise InvalidContextPermissionsError
@@ -442,6 +419,22 @@ module ConversationsHelper
     # - User with active Teacher, TA or Designer Enrollments
     # - Admin user without active Student, StudentView or Observer Enrollments
     !(active_non_student || (admin_user && !active_student))
+  end
+
+  private
+
+  def missing_right_to_send_any_recipient(recipients, context)
+    recipients.find do |recipient|
+      !context.user_is_instructor?(recipient) && !recipient_is_observed_by_user(recipient)
+    end
+  end
+
+  def recipient_is_observed_by_user(recipient)
+    observee_ids_for_current_user.include?(recipient.id)
+  end
+
+  def observee_ids_for_current_user
+    @observee_ids_for_current_user ||= @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
   end
 
   class Error < StandardError

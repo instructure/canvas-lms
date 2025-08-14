@@ -13518,6 +13518,7 @@ tr:
   new_quizzes_on_the_quizzes_page_b21f338d: "Kısa sınavlar sayfasına Yeni Kısa Sınavlar"
   new_quizzes_submission_history_d81b477b: "Yeni Kısa Sınav gönderi geçmişi"
   new_ui_487a624e: "Yeni UI"
+  new_user_bd194843: "Yeni kullanıcı"
   new_user_tutorial_cdd3a446: "Yeni Kullanıcı Kılavuzu"
   new_zealand_64_f126cf2e: "Yeni Zellanda (+64)"
   newest_oldest_d768cf1a: "En Yeniden - En Eskiye"
@@ -17105,6 +17106,7 @@ tr:
   request_id_1499afb0: "İstek ID'si"
   require_an_access_code_600e06e8: "Erişim kodu gereklidir"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Grup üyeleri aynı bölümden olsun"
+  require_peer_reviews_9b5199d4: "Akran Değerlendirmesi Gerekli"
   require_respondus_lockdown_browser_31425b3a: "Respondus LockDown Tarayıcı Gerekli Olsun"
   require_usage_rights_for_uploaded_files_4507865b: "Yüklenen Dosyalar için Kullanım Hakkı İste"
   required_5f7ef8c0: Zorunlu
@@ -17881,6 +17883,7 @@ tr:
       nonfavorited_tooltip: "Dersler menüsüne eklemek için tıklayınız."
       published_course: Evet
       published_course_tooltip: "Bu ders yayınlandı."
+      unknown: Bilinmiyor
       unpublished_course: Hayır
       unpublished_course_tooltip: "Bu ders yayınlanmadı. Erişim için öğrencilerin dersin eğitmeni ile iletişime geçmeleri gerekmektedir."
     custom_search_results: 

@@ -124,7 +124,7 @@ describe('ItemAssignToCard', () => {
   })
 
   describe('describes the render order', () => {
-    it('renders the Due Date 1st from the top',  async () => {
+    it('renders the Due Date 1st from the top', async () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
       const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({due_at: undefined})
       const dateInput = getByLabelText('Due Date')
@@ -146,7 +146,6 @@ describe('ItemAssignToCard', () => {
       getByRole('option', {name: /10 november 2020/i}).click()
 
       await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM'))
-      
     })
 
     it('renders the Required Replies Due Date 2nd from the top', async () => {
@@ -161,7 +160,7 @@ describe('ItemAssignToCard', () => {
       fireEvent.change(dateInput, {target: {value: 'Nov 10, 2020'}})
       getByRole('option', {name: /10 november 2020/i}).click()
 
-      await waitFor(() =>  expect(getAllByLabelText('Time')[1]).toHaveValue('8:00 AM'))
+      await waitFor(() => expect(getAllByLabelText('Time')[1]).toHaveValue('8:00 AM'))
     })
 
     describe('isCheckpointed is true', () => {
@@ -189,7 +188,7 @@ describe('ItemAssignToCard', () => {
         fireEvent.change(dateInput, {target: {value: 'Nov 14, 2020'}})
         getByRole('option', {name: /14 november 2020/i}).click()
 
-        await waitFor(() => expect(getAllByLabelText('Time')[3]).toHaveValue('11:59 PM'))      
+        await waitFor(() => expect(getAllByLabelText('Time')[3]).toHaveValue('11:59 PM'))
       })
     })
   })
@@ -248,7 +247,7 @@ describe('ItemAssignToCard', () => {
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
 
-    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM'))   
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM'))
   })
 
   it('defaults to 11:59pm for due dates if has null due time on blur', async () => {
@@ -265,7 +264,7 @@ describe('ItemAssignToCard', () => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'due_at',
-        '2020-11-09T23:59:00.000Z',
+        '2020-11-09T23:59:59.000Z',
       )
       expect((await findAllByLabelText('Time'))[0]).toHaveValue('11:59 PM')
     })
@@ -277,8 +276,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM')) 
-    
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('11:59 PM'))
   })
 
   it('defaults to the default due time for due dates from ENV if has null due time', async () => {
@@ -287,8 +285,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')) 
-    
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM'))
   })
 
   it('defaults to the default due time for due dates from ENV if has undefined due time', async () => {
@@ -297,7 +294,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Due Date')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM')) 
+    await waitFor(() => expect(getAllByLabelText('Time')[0]).toHaveValue('8:00 AM'))
   })
 
   it('defaults to midnight for available from dates if it is null on click', () => {
@@ -340,7 +337,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Until')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')) 
+    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM'))
   })
 
   it('defaults to 11:59 PM for available until dates if it is null on blur', async () => {
@@ -356,7 +353,7 @@ describe('ItemAssignToCard', () => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'lock_at',
-        '2020-11-09T23:59:00.000Z',
+        '2020-11-09T23:59:59.000Z',
       )
       expect((await findAllByLabelText('Time'))[2]).toHaveValue('11:59 PM')
     })
@@ -367,7 +364,7 @@ describe('ItemAssignToCard', () => {
     const dateInput = getByLabelText('Until')
     fireEvent.change(dateInput, {target: {value: 'Nov 9, 2020'}})
     getByRole('option', {name: /10 november 2020/i}).click()
-    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM')) 
+    await waitFor(() => expect(getAllByLabelText('Time')[2]).toHaveValue('11:59 PM'))
   })
 
   it('renders context module link', () => {

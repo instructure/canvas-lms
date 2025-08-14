@@ -16,40 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
+import {forwardRef, useCallback, useImperativeHandle, useRef} from 'react'
 
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 
-import {FormComponentProps} from '.'
+import {FormComponentHandle, FormComponentProps} from '.'
 
-const RadioInputGroupForm = ({issue, value, onChangeValue}: FormComponentProps) => {
-  const handleChange = useCallback(
-    (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-      onChangeValue(value)
+const RadioInputGroupForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
+  forwardRef<FormComponentHandle, FormComponentProps>(
+    ({issue, value, error, onChangeValue}: FormComponentProps, _) => {
+      const handleChange = useCallback(
+        (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
+          onChangeValue(value)
+        },
+        [onChangeValue],
+      )
+
+      if (!issue.form.options?.length || !issue.form.label) return null
+
+      return (
+        <RadioInputGroup
+          data-testid="radio-input-group"
+          name={issue.form.label}
+          description={
+            <Text data-testid="radio-description" as="span" weight="weightRegular">
+              {issue.form.label}
+            </Text>
+          }
+          value={value}
+          onChange={handleChange}
+          messages={error ? [{text: error, type: 'newError'}] : []}
+        >
+          {issue.form.options.map(option => (
+            <RadioInput
+              key={option}
+              data-testid={`radio-${option}`}
+              value={option}
+              label={option}
+            />
+          ))}
+        </RadioInputGroup>
+      )
     },
-    [onChangeValue],
   )
-
-  if (!issue.form.options?.length || !issue.form.label) return null
-
-  return (
-    <RadioInputGroup
-      data-testid="radio-input-group"
-      name={issue.form.label}
-      description={
-        <Text data-testid="radio-description" as="span" weight="weightRegular">
-          {issue.form.label}
-        </Text>
-      }
-      value={value}
-      onChange={handleChange}
-    >
-      {issue.form.options.map(option => (
-        <RadioInput key={option} data-testid={`radio-${option}`} value={option} label={option} />
-      ))}
-    </RadioInputGroup>
-  )
-}
 
 export default RadioInputGroupForm

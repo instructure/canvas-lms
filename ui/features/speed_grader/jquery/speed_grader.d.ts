@@ -21,7 +21,7 @@ import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
 import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ZSpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
+import {ZSpeedGraderLtiAssetReports} from '@canvas/lti-asset-processor/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 

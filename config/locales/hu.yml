@@ -5495,6 +5495,7 @@ hu:
       update_assignment_points: "Feladat pontjainak módosítása az értékelőtáblához illeszkedően? "
   change_section_to_sectionname_6e947e90: "Szekció módosítása erre: %{sectionName}"
   change_sis_ids_3a47154d: "SIS ID-k megváltoztatása"
+  change_text_color_1aecb912: "Módosítsa a szöveg színét"
   change_to_b757d327: "módosítás erre:"
   change_visibility_of_account_calendars_fd03fbb8: "A fióknaptárak láthatóságának módosítása"
   changed_item_1d16a85f: "Módosított elem"
@@ -13035,6 +13036,7 @@ hu:
   info_8f47054a: Infó
   info_panel_displayed_51d481cc: "Infopanel megjelenítve"
   info_panel_hidden_bf7c3b7b: "Infopanel elrejtve"
+  information_7f11072: Információ
   information_816d9fa5: információ
   information_icon_8a514faa: Információikon
   inherit_content_security_policy_94aff861: "Tartalombiztonsági házirend öröklése"
@@ -16930,6 +16932,7 @@ hu:
   new_student_group_e31b7cb5: "Új hallgatói csoport"
   new_tab_ab7629d2: "Új fül"
   new_topic_for_course_3d98222a: "Új téma ebben a kurzusban: %{course}"
+  new_user_bd194843: "Új felhasználó"
   new_user_s_name_909b6267: "Új felhasználó neve"
   new_user_tutorial_cdd3a446: "Új felhasználói útmutató"
   new_video_conference_17817456: "Új videokonferencia"
@@ -21307,6 +21310,7 @@ hu:
   require_completion_by_end_date_was_turned_on_and_s_756fc89c: "A Befejezés végdátumig történő befejezés megkövetelése be lett kapcsolva, és %{date}értékre lett beállítva."
   require_group_members_to_be_in_the_same_section_7f6c36af: "A csoporttagoknak azonos szekcióban kell lenniük"
   require_number_characters_0_9_82a543cc: "Szám karakterek szükségesek (0...9)"
+  require_peer_reviews_9b5199d4: "Társértékelést igényel"
   require_respondus_lockdown_browser_31425b3a: "A Respondus LockDown böngésző használata kötelező"
   require_symbol_characters_ie_usd_5bf9ffcc: "Szimbólum karakterek szükségesek (pl.: ! @ # $ %)"
   require_usage_rights_for_uploaded_files_4507865b: "A felhasználási jogok szükségesek a feltöltött fájlokhoz"
@@ -22563,6 +22567,7 @@ hu:
       nonfavorited_tooltip: "Kattintson a kurzus menüjébe való hozzáadáshoz."
       published_course: Igen
       published_course_tooltip: "A kurzus publikálva lett."
+      unknown: Ismeretlen
       unpublished_course: Nem
       unpublished_course_tooltip: "A kurzus még nincs publikálva. A hallgatóknak a hozzáféréshez fel kell venniük a kapcsolatot a kurzus oktatójával. "
     dashboard_invitation: 

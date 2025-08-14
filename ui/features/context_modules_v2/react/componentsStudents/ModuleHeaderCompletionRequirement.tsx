@@ -31,10 +31,10 @@ type Props = {
 
 const getPillText = (requirementCount?: number, completed?: boolean) => {
   if (completed) {
-    return requirementCount ? I18n.t('Completed One Item') : I18n.t('Completed All Items')
+    return requirementCount ? I18n.t('Completed 1 item') : I18n.t('Completed all items')
   }
 
-  return requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')
+  return requirementCount ? I18n.t('Complete 1 item') : I18n.t('Complete all items')
 }
 
 export const getPillColor = (completed?: boolean) => {

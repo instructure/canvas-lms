@@ -9642,6 +9642,7 @@ ko:
   new_page_84b28714: "새 페이지"
   new_password_1232cbf2: "새 암호"
   new_quizzes_dbda7e0a: "새로운 퀴즈"
+  new_user_bd194843: "새 사용자"
   next_40e12421: 다음
   next_assignment_c19812a5: "다음 과제"
   next_module_66f58e91: "다음 모듈"
@@ -12214,6 +12215,7 @@ ko:
   report_inappropriate_picture_af4eefeb: "부적절한 사진 보고"
   reports_1b9ab7a7: 보고서
   request_id_1499afb0: "요청 ID"
+  require_peer_reviews_9b5199d4: "피어 리뷰 필요"
   required_5f7ef8c0: 필수
   resend_invitation_486bd513: "초대 다시 보내기"
   reset_this_contact_method_s_bounce_count_3845ecf4: "이 연락 방법의 응답 횟수 재설정하기"
@@ -12734,6 +12736,8 @@ ko:
     components: 
       ic_submission-download-dialog: 
         click_to_download: "다운로드하려면 여기를 클릭"
+    current_enrollment: 
+      unknown: "알 수 없음"
     custom_search_results: 
       links: 
         search_for_resources: "이 페이지에 관련한 공개 리소스 검색"

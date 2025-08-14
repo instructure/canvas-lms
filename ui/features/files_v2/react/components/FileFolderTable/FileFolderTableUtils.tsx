@@ -157,6 +157,7 @@ export const columnRenderers: {
     toggleSelect,
     setModalOrTrayOptions,
     rowIndex,
+    onPreviewFile,
   }: {
     row: File | Folder
     rows: (File | Folder)[]
@@ -170,9 +171,12 @@ export const columnRenderers: {
     toggleSelect: () => void
     setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
     rowIndex: number
+    onPreviewFile?: (file: File) => void
   }) => React.ReactNode
 } = {
-  name: ({row, rows, isStacked}) => <NameLink isStacked={isStacked} item={row} collection={rows} />,
+  name: ({row, isStacked, onPreviewFile}) => (
+    <NameLink isStacked={isStacked} item={row} onPreviewFile={onPreviewFile} />
+  ),
   created_at: ({row}) => (
     <FriendlyDatetime dateTime={row.created_at} includeScreenReaderContent={false} />
   ),

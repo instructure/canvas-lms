@@ -21,7 +21,7 @@ import {LtiRegistrationId} from '../model/LtiRegistrationId'
 import {LtiDeployment, ZLtiDeployment} from '../model/LtiDeployment'
 import {ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {defaultFetchOptions} from '@canvas/util/xhr'
-import {AccountId} from '../model/AccountId'
+import {AccountId, ZAccountId} from '../model/AccountId'
 import {LtiDeploymentId} from '../model/LtiDeploymentId'
 import {
   LtiContextControl,
@@ -29,6 +29,12 @@ import {
   ZLtiContextControl,
 } from '../model/LtiContextControl'
 import {CourseId} from '../model/CourseId'
+
+const baseUrl = (registrationId: LtiRegistrationId) => {
+  const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
+
+  return `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/controls`
+}
 
 /**
  * Fetches a list of Context controls for a given registration,
@@ -56,7 +62,7 @@ export const fetchControlsByDeployment: FetchControlsByDeployment = options => {
   const url =
     'url' in options
       ? options.url
-      : `/api/v1/lti_registrations/${options.registrationId}/controls?per_page=${options.pageSize ?? 20}`
+      : `${baseUrl(options.registrationId)}?per_page=${options.pageSize ?? 20}`
   return parseFetchResult(z.array(ZLtiDeployment))(fetch(url, defaultFetchOptions()))
 }
 
@@ -67,7 +73,7 @@ export type DeleteContextControl = (
 
 export const deleteContextControl: DeleteContextControl = (registrationId, controlId) =>
   parseFetchResult(z.unknown())(
-    fetch(`/api/v1/lti_registrations/${registrationId}/controls/${controlId}`, {
+    fetch(`${baseUrl(registrationId)}/${controlId}`, {
       ...defaultFetchOptions(),
       method: 'DELETE',
     }),
@@ -80,7 +86,7 @@ export type UpdateContextControl = (
 ) => Promise<ApiResult<LtiContextControl>>
 export const updateContextControl: UpdateContextControl = (registrationId, controlId, available) =>
   parseFetchResult(ZLtiContextControl)(
-    fetch(`/api/v1/lti_registrations/${registrationId}/controls/${controlId}`, {
+    fetch(`${baseUrl(registrationId)}/${controlId}`, {
       ...defaultFetchOptions(),
       method: 'PUT',
       body: JSON.stringify({available}),
@@ -108,7 +114,7 @@ export const createContextControls = (options: {
   contextControls: Array<ContextControlParameter>
 }) =>
   parseFetchResult(z.array(ZLtiContextControl))(
-    fetch(`/api/v1/lti_registrations/${options.registrationId}/controls/bulk`, {
+    fetch(`${baseUrl(options.registrationId)}/bulk`, {
       ...defaultFetchOptions(),
       method: 'POST',
       body: JSON.stringify(options.contextControls),

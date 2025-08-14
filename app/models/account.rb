@@ -403,6 +403,7 @@ class Account < ActiveRecord::Base
 
   add_setting :default_due_time, inheritable: true
   add_setting :conditional_release, default: false, boolean: true, inheritable: true
+  add_setting :enable_course_paces, default: false, boolean: true, inheritable: true
   add_setting :enable_search_indexing, boolean: true, root_only: true, default: false
   add_setting :disable_login_search_indexing, boolean: true, root_only: true, default: false
   add_setting :allow_additional_email_at_registration, boolean: true, root_only: true, default: false
@@ -587,6 +588,10 @@ class Account < ActiveRecord::Base
 
   def conditional_release?
     conditional_release[:value]
+  end
+
+  def enable_course_paces?
+    enable_course_paces[:value]
   end
 
   def open_registration?
@@ -2501,7 +2506,7 @@ class Account < ActiveRecord::Base
     terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.key?(:passive)
 
     if terms.custom?
-      TermsOfServiceContent.ensure_content_for_account(self)
+      TermsOfServiceContent.ensure_content_for_account(self, saving_user)
       terms_of_service_content.saving_user = saving_user
       terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
     end

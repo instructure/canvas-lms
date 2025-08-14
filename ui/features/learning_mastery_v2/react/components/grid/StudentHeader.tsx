@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine, IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, SortOrder, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
+import {CELL_HEIGHT, SortOrder, SortBy, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
 import {Sorting} from '../../types/shapes'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
@@ -53,7 +53,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({sorting}) => {
               </IconButton>
             }
           >
-            <Menu.Group label={I18n.t('Sort')}></Menu.Group>
+            <Menu.Group label={I18n.t('Sort Order')}></Menu.Group>
             <Menu.Item onClick={() => sorting.setSortOrder(SortOrder.ASC)}>
               <Flex gap="x-small">
                 <IconArrowUpLine spacing="small" />
@@ -70,6 +70,38 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({sorting}) => {
                 </Text>
               </Flex>
             </Menu.Item>
+            <Menu.Group label={I18n.t('Sort By')}>
+              <Menu.Item
+                onSelect={() => sorting.setSortBy(SortBy.Name)}
+                selected={sorting.sortBy === SortBy.Name}
+              >
+                {I18n.t('Name')}
+              </Menu.Item>
+              <Menu.Item
+                onSelect={() => sorting.setSortBy(SortBy.SortableName)}
+                selected={sorting.sortBy === SortBy.SortableName}
+              >
+                {I18n.t('Sortable Name')}
+              </Menu.Item>
+              <Menu.Item
+                onSelect={() => sorting.setSortBy(SortBy.SisId)}
+                selected={sorting.sortBy === SortBy.SisId}
+              >
+                {I18n.t('SIS ID')}
+              </Menu.Item>
+              <Menu.Item
+                onSelect={() => sorting.setSortBy(SortBy.IntegrationId)}
+                selected={sorting.sortBy === SortBy.IntegrationId}
+              >
+                {I18n.t('Integration ID')}
+              </Menu.Item>
+              <Menu.Item
+                onSelect={() => sorting.setSortBy(SortBy.LoginId)}
+                selected={sorting.sortBy === SortBy.LoginId}
+              >
+                {I18n.t('Login ID')}
+              </Menu.Item>
+            </Menu.Group>
           </Menu>
         </Flex.Item>
       </Flex>

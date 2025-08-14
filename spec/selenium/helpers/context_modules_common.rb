@@ -59,12 +59,12 @@ module ContextModulesCommon
     @tool = course.context_external_tools.create!(name: "new tool",
                                                   consumer_key: "key",
                                                   shared_secret: "secret",
-                                                  domain: "example.com",
+                                                  url: "http://localhost:3000/",
                                                   custom_fields: { "a" => "1", "b" => "2" })
     @external_tool_tag = @module.add_item({
                                             type: "context_external_tool",
                                             title: "Example",
-                                            url: "http://www.example.com",
+                                            url: "http://localhost:3000/",
                                             new_tab: "0"
                                           })
     @external_tool_tag.publish!
@@ -72,7 +72,7 @@ module ContextModulesCommon
     @external_url_tag = @module.add_item({
                                            type: "external_url",
                                            title: "pls view",
-                                           url: "http://example.com/lolcats"
+                                           url: "http://localhost:3000/lolcats"
                                          })
     @external_url_tag.publish!
 
@@ -425,6 +425,23 @@ module ContextModulesCommon
   def uncollapse_modules(modules, user)
     modules.each do |mod|
       mod.find_or_create_progression(user)&.uncollapse!
+    end
+  end
+
+  def verify_publication_state(modules, module_published:, items_published:)
+    modules.each do |mod|
+      mod.reload
+      expect(mod.published?).to eq(module_published)
+      mod.content_tags.each do |tag|
+        expect(tag.published?).to eq(items_published)
+      end
+    end
+  end
+
+  def prepare_unpublished_modules(modules)
+    modules.each do |mod|
+      mod.update(workflow_state: "unpublished")
+      mod.unpublish_items!
     end
   end
 end

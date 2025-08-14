@@ -629,6 +629,15 @@ describe Types::SubmissionType do
         )
       ).to eq [[@attachment1.id.to_s]]
     end
+
+    it "has a valid viewedAt" do
+      now = Time.zone.now.change(usec: 0)
+      @attachment1.update!(viewed_at: now)
+
+      expect(Time.zone.parse(submission_type.resolve(
+        "submissionHistoriesConnection(first: 1) { nodes { attachments { viewedAt }}}"
+      )[0][0])).to eq now
+    end
   end
 
   describe "submission histories connection" do
@@ -903,6 +912,143 @@ describe Types::SubmissionType do
       expect(
         submission_type.resolve("rubricAssessmentsConnection(filter: {forAllAttempts: true}) { nodes { _id } }")
       ).to eq [@rubric_assessment.id.to_s]
+    end
+
+    describe "with provisional assessments" do
+      before(:once) do
+        @final_grader = @teacher
+        @moderated_assignment = @course.assignments.create!(
+          due_at: 2.years.from_now,
+          final_grader: @final_grader,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10,
+          submission_types: :online_text_entry,
+          title: "Moderated Assignment"
+        )
+        rubric_for_course
+        rubric_association_model(
+          context: @course,
+          rubric: @rubric,
+          association_object: @moderated_assignment,
+          purpose: "grading"
+        )
+        @submission = @moderated_assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
+
+        moderator_provisional_grade = @submission.find_or_create_provisional_grade!(@final_grader)
+        @moderator_provisional_assessment = @rubric_association.assess({
+                                                                         user: @student,
+                                                                         assessor: @final_grader,
+                                                                         artifact: moderator_provisional_grade,
+                                                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                       })
+
+        @provisional_grader = user_factory(active_all: true)
+        @course.enroll_ta(@provisional_grader, enrollment_state: "active")
+
+        provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
+        @provisional_assessment = @rubric_association.assess({
+                                                               user: @student,
+                                                               assessor: @provisional_grader,
+                                                               artifact: provisional_grade,
+                                                               assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                             })
+      end
+
+      it "excludes provisional assessments by default" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @provisional_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
+        ).to eq []
+      end
+
+      it "includes provisional assessments when include_provisional_assessments is true" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @provisional_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(@provisional_assessment.id.to_s)
+      end
+
+      it "allows moderators to see all provisional assessments" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @final_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(@moderator_provisional_assessment.id.to_s, @provisional_assessment.id.to_s)
+      end
+
+      it "allows provisional graders to see only their own provisional assessments" do
+        other_grader = user_factory(active_all: true)
+        @course.enroll_ta(other_grader, enrollment_state: "active")
+
+        other_provisional_grade = @submission.find_or_create_provisional_grade!(other_grader)
+        other_assessment = @rubric_association.assess({
+                                                        user: @student,
+                                                        assessor: other_grader,
+                                                        artifact: other_provisional_grade,
+                                                        assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                      })
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: other_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(other_assessment.id.to_s)
+      end
+    end
+  end
+
+  describe "comments_connection" do
+    describe "with includeProvisionalComments filter" do
+      before(:once) do
+        @course = Course.create!
+        @teacher = course_with_teacher(course: @course, active_all: true).user
+        @first_ta = course_with_ta(course: @course, active_all: true).user
+        @student = course_with_student(course: @course, active_all: true).user
+
+        @assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+        @submission = @assignment.submit_homework(@student, body: "hello")
+
+        @submission.add_comment(author: @teacher, comment: "Regular comment")
+        ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+
+        @provisional_comment = @submission.add_comment(author: @first_ta, comment: "Provisional comment", provisional: true)
+        @provisional_comment.update!(provisional_grade_id: ta_pg.id)
+      end
+
+      it "calls visible_provisional_comments when includeProvisionalComments is true" do
+        expect_any_instance_of(Submission).to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is false" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments)
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: false) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "includes both regular and provisional comments when includeProvisionalComments is true for a moderator" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        result = submission_type.resolve(query)
+
+        expect(result.length).to eq(2)
+      end
+
+      it "includes only regular comments when includeProvisionalComments is false" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: false) { nodes { _id } }"
+        result = submission_type.resolve(query)
+
+        expect(result.length).to eq(1)
+      end
     end
   end
 
@@ -1215,16 +1361,28 @@ describe Types::SubmissionType do
     context "when the current user is a student" do
       let(:current_user) { @student }
 
-      it "does not returns LTI asset reports" do
+      it "returns LTI asset reports" do
+        allow_any_instance_of(Loaders::SubmissionLtiAssetReportsStudentLoader).to receive(:raw_asset_reports).and_return([@lti_asset_report])
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to eq [@lti_asset_report.id.to_s]
+      end
+
+      it "does not return LTI asset reports" do
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when student cannot read their own grade" do
+        allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(@student).and_return(false)
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
       end
     end
 
-    context "when the current user is nil" do
+    context "when the current user is a different student" do
       let(:current_user) { student_in_course(active_all: true).user }
 
-      it "returns nil when no user is provided" do
+      it "returns nil when user cannot read the submission" do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
       end

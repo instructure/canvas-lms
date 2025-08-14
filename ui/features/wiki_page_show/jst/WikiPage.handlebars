@@ -109,6 +109,9 @@
   {{else}}
     {{convertApiUserContent body}}
   {{/if}}
+  {{#if is_block_editor}}
+    <div id="block-editor-content"></div>
+  {{/if}}
 <div id="assign-to-mount-point"></div>
 <div id="choose-editor-mount-point"></div>
 </div>

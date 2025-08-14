@@ -29,6 +29,7 @@ describe "file show page" do
   describe "html file" do
     before(:once) do
       course_with_teacher(active_all: true)
+      @teacher.set_preference(:files_ui_version, "v1")
       @html_file = add_file(
         fixture_file_upload("test.html", "text/html"),
         @course,

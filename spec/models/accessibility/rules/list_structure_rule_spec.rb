@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "rule_test_helper"
 
-RSpec.describe "ListStructureRule", type: :feature do
+describe Accessibility::Rules::ListStructureRule do
   include RuleTestHelper
 
   context "when testing list structure" do
@@ -82,6 +81,24 @@ RSpec.describe "ListStructureRule", type: :feature do
     it "Resolves ordered with a start attribute" do
       input_html = "<p>3. List</p><p>4. List</p><p>5. List</p>"
       expected_html = '<ol start="3"><li>List</li><li>List</li><li>List</li></ol>'
+
+      fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "Resolves unordered items with extra space" do
+      input_html = "<p>* List </p><p>* List </p><p>* List </p>"
+      expected_html = "<ul><li>List </li><li>List </li><li>List </li></ul>"
+
+      fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "Resolves ordered with extra space" do
+      input_html = "<p>1. List </p><p>2. List </p><p>3. List </p>"
+      expected_html = "<ol><li>List </li><li>List </li><li>List </li></ol>"
 
       fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
 
@@ -171,7 +188,7 @@ RSpec.describe "ListStructureRule", type: :feature do
 
   context "form" do
     it "returns the proper form" do
-      expect(Accessibility::Rules::ListStructureRule.form(nil).label).to eq("Format as list")
+      expect(Accessibility::Rules::ListStructureRule.form(nil).label).to eq("Reformat")
     end
   end
 end

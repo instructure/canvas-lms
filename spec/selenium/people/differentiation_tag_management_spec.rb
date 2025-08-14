@@ -716,7 +716,7 @@ describe "Differentiation Tag Management" do
             expect(f(".flashalert-message")).to be_displayed
           end
 
-          it "Displays an error message if tag variant limit is reached", :ignore_js_errors do
+          it "Displays an info alert if tag variant limit is reached", :ignore_js_errors do
             multiple_tags_full = @course.group_categories.create!(name: "Project Tags", non_collaborative: true)
             (1..10).each do |x|
               @course.groups.create!(name: x, group_category: multiple_tags_full)
@@ -728,17 +728,9 @@ describe "Differentiation Tag Management" do
             f("button[aria-label='Edit tag set: #{multiple_tags_full.name}']").click
             wait_for_ajaximations
 
-            fj("button:contains('+ Add another tag')").click
-            wait_for_ajaximations
-            tag_inputs = ff("[data-testid='tag-name-input']")
-            new_input = tag_inputs.last
-            new_input.send_keys("11")
+            expect(f("body")).not_to contain_jqcss("button:contains('+ Add another tag')")
 
-            fj("button:contains('Save')").click
-            wait_for_ajaximations
-
-            expect(f(".flashalert-message")).to be_displayed
-            expect(fj("p:contains('Validation failed: Variant limit reached for tag')")).to be_displayed
+            expect(fj("div:contains('Variant limit reached. Current limit is #{Group.MAX_VARIANTS_PER_TAG_CATEGORY}')")).to be_displayed
           end
 
           it "Displays an error message for tag limit", :ignore_js_errors do
@@ -804,8 +796,8 @@ describe "Differentiation Tag Management" do
           f("input[type='checkbox'][aria-label='Select #{@student.name}']").click
           expect(f("input[type='checkbox'][aria-label='Select #{@student.name}']").attribute("checked")).to be_truthy
           # Use the role filter dropdown (assumed to have id 'role-filter') to filter by "Student"
-          student_role_id = Role.where(name: "StudentEnrollment", root_account_id: @course.account.root_account.id).first.id
-          click_option("select[name=enrollment_role_id]", student_role_id.to_s, :value)
+          student_role_name = Role.role_data(@course, @teacher).find { |r| r[:name] == "StudentEnrollment" }[:label]
+          click_option("#people-filter-select", student_role_name, :text)
           wait_for_ajaximations
 
           # Check the second student from the filtered results
@@ -813,7 +805,7 @@ describe "Differentiation Tag Management" do
           expect(f("input[type='checkbox'][aria-label='Select #{@other_student.name}']").attribute("checked")).to be_truthy
 
           # Clear the role filter by selecting "All"
-          click_option("select[name=enrollment_role_id]", "All Roles")
+          click_option("#people-filter-select", "All Roles")
           wait_for_ajaximations
 
           # Verify that both checkboxes remain checked

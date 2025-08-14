@@ -78,9 +78,12 @@ export const addRubricToAssignment = async (
   const result = await response.json()
 
   const mappedRubric = mapRubricUnderscoredKeysToCamelCase(result.rubric)
+  const mappedRubricAssociation = mapRubricAssociationUnderscoredKeysToCamelCase(
+    result.rubric_association,
+  )
 
   return {
-    rubricAssociation: result.rubric_association,
+    rubricAssociation: mappedRubricAssociation,
     rubric: {
       ...mappedRubric,
       can_update: result.rubric.permissions?.update,

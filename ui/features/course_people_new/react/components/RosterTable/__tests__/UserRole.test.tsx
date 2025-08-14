@@ -19,10 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import UserRole from '../UserRole'
-import {
-  TEACHER_ENROLLMENT,
-  OBSERVER_ENROLLMENT
-} from '../../../../util/constants'
+import {TEACHER_ENROLLMENT, OBSERVER_ENROLLMENT} from '../../../../util/constants'
 import type {Enrollment} from '../../../../types'
 import {mockEnrollment} from '../../../../graphql/Mocks'
 
@@ -34,7 +31,7 @@ describe('UserRole', () => {
   })
   const observerEnrollment: Enrollment = mockEnrollment({
     sisRole: 'observer',
-    hasAssociatedUser: true
+    hasAssociatedUser: true,
   })
   const temporaryEnrollment: Enrollment = mockEnrollment({
     isTemporaryEnrollment: true,

@@ -16,83 +16,104 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {render, screen} from '@testing-library/react'
+import {setupServer} from 'msw/node'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionPanel from '../ModuleItemActionPanel'
 
-jest.mock('@canvas/files/react/components/PublishCloud', () =>
-  jest.fn(() => <div data-testid="publish-cloud" />),
-)
+type ComponentProps = React.ComponentProps<typeof ModuleItemActionPanel>
 
-jest.mock('../../handlers/moduleItemActionHandlers', () => ({
-  handlePublishToggle: jest.fn(),
-  handleEdit: jest.fn(),
-  handleSpeedGrader: jest.fn(),
-  handleAssignTo: jest.fn(),
-  handleDuplicate: jest.fn(),
-  handleMoveTo: jest.fn(),
-  handleDecreaseIndent: jest.fn(),
-  handleIncreaseIndent: jest.fn(),
-  handleSendTo: jest.fn(),
-  handleCopyTo: jest.fn(),
-  handleRemove: jest.fn(),
-  handleMasteryPaths: jest.fn(),
-}))
+const server = setupServer()
 
-jest.mock('../../hooks/useModuleContext', () => ({
-  useContextModule: () => ({
-    courseId: '1',
-    isMasterCourse: false,
-    isChildCourse: false,
-  }),
-}))
+const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
+  moduleId: '1',
+  itemId: '123',
+  id: '123',
+  title: 'Test Discussion',
+  indent: 0,
+  content: {
+    _id: 'discussion1',
+    id: 'discussion1',
+    type: 'Discussion',
+    published: false,
+  },
+  masterCourseRestrictions: null,
+  published: false,
+  canBeUnpublished: true,
+  masteryPathsData: null,
+  setModuleAction: jest.fn(),
+  setSelectedModuleItem: jest.fn(),
+  setIsManageModuleContentTrayOpen: jest.fn(),
+  setSourceModule: jest.fn(),
+  moduleTitle: 'Test Module',
+  ...overrides,
+})
 
-describe('ModuleItemActionPanel', () => {
-  const baseProps = {
-    moduleId: '1',
-    itemId: '123',
-    id: '123',
-    indent: 0,
-    setModuleAction: jest.fn(),
-    setSelectedModuleItem: jest.fn(),
-    setIsManageModuleContentTrayOpen: jest.fn(),
-    setSourceModule: jest.fn(),
-    moduleTitle: 'Test Module',
-    canBeUnpublished: true,
-    masteryPathsData: null,
+const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
+  const contextProps = {
+    ...contextModuleDefaultProps,
+    courseId,
+    moduleGroupMenuTools: [],
+    moduleMenuModalTools: [],
+    moduleMenuTools: [],
+    moduleIndexMenuModalTools: [],
   }
 
+  return render(
+    <ContextModuleProvider {...contextProps}>
+      <ModuleItemActionPanel {...props} />
+    </ContextModuleProvider>,
+  )
+}
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+beforeEach(() => {
+  // @ts-expect-error
+  window.ENV = {
+    TIMEZONE: 'UTC',
+    CONTEXT_URL_ROOT: '/courses/1',
+    MODULE_FILE_PERMISSIONS: {
+      manage_files_edit: true,
+      usage_rights_required: false,
+    },
+  }
+})
+
+describe('ModuleItemActionPanel', () => {
   it('renders PublishCloud component for content type File', () => {
-    render(
-      <ModuleItemActionPanel
-        {...baseProps}
-        published={true}
-        content={{
+    setUp(
+      buildDefaultProps({
+        published: true,
+        title: 'Test File',
+        content: {
           _id: 'file1',
           id: 'file1',
           type: 'File',
-          title: 'Test File',
           published: true,
           fileState: '',
-        }}
-      />,
+        },
+      }),
     )
 
-    expect(screen.getByTestId('publish-cloud')).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: /Test File is Published/})).toBeInTheDocument()
   })
 
   it('renders IconButton for non File content type', () => {
-    render(
-      <ModuleItemActionPanel
-        {...baseProps}
-        published={false}
-        content={{
+    setUp(
+      buildDefaultProps({
+        published: false,
+        title: 'Test Discussion',
+        content: {
           _id: 'discussion1',
           id: 'discussion1',
           type: 'Discussion',
-          title: 'Test Discussion',
           published: false,
-        }}
-      />,
+        },
+      }),
     )
 
     expect(screen.getByText('Unpublished')).toBeInTheDocument()

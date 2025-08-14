@@ -130,7 +130,6 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
       showBlankConfigurationMessage: (product?.canvas_lti_configurations?.length || 0) === 0,
       method: 'manual',
       registering: false,
-      exitOnCancel: false,
       onSuccessfulInstallation: () => {
         refreshRegistrations()
       },

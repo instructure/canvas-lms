@@ -43,7 +43,7 @@ export default function BestResults(props: Props) {
     <Flex direction="column" gap="sectionElements">
       <Flex direction="row" alignItems="start">
         <Flex.Item shouldGrow>
-          <Heading variant="titleSection">
+          <Heading variant="titleSection" level="h2">
             {I18n.t(
               {
                 zero: 'No results',

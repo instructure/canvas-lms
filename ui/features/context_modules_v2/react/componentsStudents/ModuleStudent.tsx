@@ -20,7 +20,6 @@ import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
@@ -31,7 +30,6 @@ import {
   Prerequisite,
 } from '../utils/types'
 
-const I18n = createI18nScope('context_modules_v2')
 export interface ModuleStudentProps {
   id: string
   name: string
@@ -62,9 +60,12 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
 
+  const moduleItems = data?.moduleItems || []
+
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
     setIsExpanded(newExpandedState)
+
     if (onToggleExpand) {
       onToggleExpand(moduleId)
     }
@@ -116,7 +117,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
               {isExpanded && (
                 <Flex.Item>
                   <ModuleItemListStudent
-                    moduleItems={data?.moduleItems || []}
+                    moduleItems={moduleItems}
                     requireSequentialProgress={requireSequentialProgress}
                     completionRequirements={completionRequirements}
                     progression={progression}

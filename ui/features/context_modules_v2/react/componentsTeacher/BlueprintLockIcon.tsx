@@ -35,6 +35,20 @@ interface BlueprintLockIconProps {
 
 export const LOCK_ICON_CLASS = {locked: 'lock-icon-locked', unlocked: 'lock-icon-unlock'}
 
+const mapContentType = (contentType: string) => {
+  const content_type = contentType.toLowerCase()
+  switch (content_type) {
+    case 'discussion':
+      return 'discussion_topic'
+    case 'page':
+      return 'wiki_page'
+    case 'file':
+      return 'attachment'
+    default:
+      return content_type
+  }
+}
+
 const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
   const {initialLockState, contentId, contentType} = props
 
@@ -68,7 +82,7 @@ const BlueprintLockIcon: React.FC<BlueprintLockIconProps> = props => {
     if (!courseId || !contentId || !contentType) return
 
     const formData = new FormData()
-    formData.append('content_type', contentType)
+    formData.append('content_type', mapContentType(contentType))
     formData.append('content_id', contentId)
     formData.append('restricted', locked.toString())
     formData.append('_method', 'PUT')

@@ -37,7 +37,7 @@ export type Lti1p3RegistrationWizardProps = {
   registrationId: LtiRegistrationId
   accountId: AccountId
   service: Lti1p3RegistrationWizardService
-  unregister: () => void
+  onDismiss: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
 }
@@ -52,7 +52,7 @@ export const EditLti1p3RegistrationWizard = ({
   registrationId,
   accountId,
   service,
-  unregister,
+  onDismiss,
   unifiedToolId,
   onSuccessfulRegistration,
 }: Lti1p3RegistrationWizardProps) => {
@@ -85,7 +85,7 @@ export const EditLti1p3RegistrationWizard = ({
         internalConfiguration={reg.data.configuration}
         onSuccessfulRegistration={onSuccessfulRegistration}
         service={service}
-        unregister={unregister}
+        onDismiss={onDismiss}
         existingRegistration={reg.data}
         unifiedToolId={unifiedToolId}
       />

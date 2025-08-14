@@ -25,6 +25,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import CourseColorSelector from './react/components/CourseColorSelector'
 import CourseImageSelector from './react/components/CourseImageSelector'
+import LicenseHelpIcon from './react/components/LicenseHelpIcon'
+import VisibilityHelpIcon from './react/components/VisibilityHelpIcon'
 import configureStore from './react/store/configureStore'
 import initialState from './react/store/initialState'
 import './jquery/index'
@@ -162,6 +164,18 @@ ready(() => {
         />
       </Suspense>,
     )
+  }
+
+  const licenseHelpContainer = document.getElementById('license_mount')
+  if (licenseHelpContainer) {
+    const licenseRoot = createRoot(licenseHelpContainer)
+    licenseRoot.render(<LicenseHelpIcon />)
+  }
+
+  const visibilityHelpContainer = document.getElementById('visibility_mount')
+  if (visibilityHelpContainer) {
+    const root = createRoot(visibilityHelpContainer)
+    root.render(<VisibilityHelpIcon />)
   }
 
   if (ENV.COURSE_COLORS_ENABLED) {

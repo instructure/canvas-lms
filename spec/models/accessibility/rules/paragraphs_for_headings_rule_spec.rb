@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "rule_test_helper"
 
-RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
+describe Accessibility::Rules::ParagraphsForHeadingsRule do
   include RuleTestHelper
 
-  context "when testing headling lengths" do
+  context "when testing heading lengths" do
     it "finds a heading with very long text" do
       input_html = "<div><h2>This heading is way much longer than 120 characters. This heading is way much longer than 120 characters. This heading is way much longer than 120 characters.</h2></div>"
 
@@ -60,6 +59,30 @@ RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
 
     it "change to paragraph button must be in the form" do
       expect(Accessibility::Rules::ParagraphsForHeadingsRule.form(nil).label).to eq("Change to paragraph")
+    end
+  end
+
+  describe ".display_name" do
+    it "returns the correct display name" do
+      expect(described_class.display_name).to eq(I18n.t("Heading is too long"))
+    end
+  end
+
+  describe ".message" do
+    it "returns the correct message" do
+      expect(described_class.message).to eq(I18n.t("This heading is very long. Is it meant to be a paragraph?"))
+    end
+  end
+
+  describe ".why" do
+    it "returns the correct explanation" do
+      expected_message = I18n.t(
+        "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
+        "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
+        "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
+        "short, specific, and meaningful, not full sentences or paragraphs."
+      )
+      expect(described_class.why).to eq(expected_message)
     end
   end
 end

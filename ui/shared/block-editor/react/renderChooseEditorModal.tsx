@@ -37,7 +37,7 @@ declare const ENV: GlobalEnv & EditorPrefEnv
 
 const I18n = createI18nScope('block-editor')
 
-type EditorChoices = 'rce' | 'block_editor' | 'canvas_content_builder' | ''
+type EditorChoices = 'rce' | 'block_editor' | 'block_content_editor' | ''
 
 const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
@@ -50,7 +50,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   }
 
   const validEditorChoice = () => {
-    if (['rce', 'block_editor', 'canvas_content_builder'].includes(editorChoice)) {
+    if (['rce', 'block_editor', 'block_content_editor'].includes(editorChoice)) {
       return true
     } else {
       setErroredForm(true)
@@ -138,9 +138,9 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
               {I18n.t('Try the Block Editor')}
             </SimpleSelect.Option>
           )}
-          {props.editorFeature === 'canvas_content_builder' && (
-            <SimpleSelect.Option id="canvas_content_builder" value="canvas_content_builder">
-              {I18n.t('Try the Canvas Content Builder')}
+          {props.editorFeature === 'block_content_editor' && (
+            <SimpleSelect.Option id="block_content_editor" value="block_content_editor">
+              {I18n.t('Try the Block Content Editor')}
             </SimpleSelect.Option>
           )}
           <SimpleSelect.Option id="rce" value="rce">

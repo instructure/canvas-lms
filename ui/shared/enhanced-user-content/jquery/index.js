@@ -335,6 +335,7 @@ function enhanceUserContentWhenAsked() {
         new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
         explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
         locale: ENV?.LOCALE ?? 'en',
+        showYoutubeAdOverlay: ENV?.FEATURES?.youtube_overlay,
       }),
     50,
   )

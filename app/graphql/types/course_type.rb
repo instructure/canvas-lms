@@ -151,7 +151,7 @@ module Types
     field :assignment_groups_connection,
           AssignmentGroupType.connection_type,
           method: :assignment_groups,
-          null: true
+          null: false
 
     def assignment_groups_connection
       assignment_groups = object.assignment_groups
@@ -228,7 +228,7 @@ module Types
       Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
     end
 
-    field :sections_connection, SectionType.connection_type, null: true do
+    field :sections_connection, SectionType.connection_type, null: false do
       argument :filter, CourseSectionsFilterInputType, required: false
     end
 
@@ -340,7 +340,6 @@ module Types
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
     def custom_grade_statuses_connection
       return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
-      return unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
 
       course.custom_grade_statuses.active.order(:id)
     end
@@ -367,7 +366,7 @@ module Types
       scope
     end
 
-    field :grading_periods_connection, GradingPeriodType.connection_type, null: true
+    field :grading_periods_connection, GradingPeriodType.connection_type, null: false
     def grading_periods_connection
       GradingPeriod.for(course).order(:start_date)
     end
@@ -577,7 +576,15 @@ module Types
     def submission_statistics
       return nil unless course.grants_right?(current_user, :read)
 
-      Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+      # Check if current user is an observer with observed students
+      observed_students = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys
+      is_observer = !observed_students.empty?
+
+      if is_observer
+        Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request]).load(course)
+      else
+        Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+      end
     end
 
     field :allow_final_grade_override, Boolean, null: true

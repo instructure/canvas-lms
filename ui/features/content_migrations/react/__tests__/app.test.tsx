@@ -56,7 +56,7 @@ const mockMigrations = [
 describe('App', () => {
   beforeEach(() => {
     // @ts-expect-error
-    doFetchApi.mockResolvedValue({ json: mockMigrations })
+    doFetchApi.mockResolvedValue({json: mockMigrations})
   })
 
   afterEach(() => {
@@ -69,7 +69,7 @@ describe('App', () => {
 
     expect(screen.getByText('Loading')).toBeInTheDocument()
   })
-  
+
   it('renders the content migrations table with data', async () => {
     render(<App />)
 
@@ -93,7 +93,7 @@ describe('App', () => {
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
-        params: { per_page: 25, page: 1 },
+        params: {per_page: 25, page: 1},
       })
     })
 
@@ -108,18 +108,22 @@ describe('App', () => {
       render(<App />)
 
       await waitFor(() => {
-        expect(screen.queryAllByText("Couldn't load previous content migrations").length).toBeGreaterThan(0)
+        expect(
+          screen.queryAllByText("Couldn't load previous content migrations").length,
+        ).toBeGreaterThan(0)
       })
     })
 
-    it('doesn\'t render loading spinner', async () => {
+    it("doesn't render loading spinner", async () => {
       // @ts-expect-error
       doFetchApi.mockRejectedValue(new Error('API call failed'))
 
       render(<App />)
 
       await waitFor(() => {
-        expect(screen.queryAllByText("Couldn't load previous content migrations").length).toBeGreaterThan(0)
+        expect(
+          screen.queryAllByText("Couldn't load previous content migrations").length,
+        ).toBeGreaterThan(0)
         expect(screen.queryByText('Loading')).not.toBeInTheDocument()
       })
     })

@@ -17,11 +17,11 @@
  */
 
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
-import {filterReports} from '@canvas/lti/react/AssetProcessorHelper'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
+import {filterReports} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {ViewOwnProps} from '@instructure/ui-view'
 import {useMemo} from 'react'
-import AssetReportStatus from '../../../shared/lti/react/AssetReportStatus'
+import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
 
 export const ASSET_REPORT_MODAL_EVENT = 'openAssetReportModal'
 

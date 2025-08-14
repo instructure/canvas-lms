@@ -46,18 +46,11 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
+  # If both a flamegraph and n+1 detection are requested, the flamegraph will take precedence.
+  # This is because otherwise, the flamegraph would also capture the N+1 detection code, which results
+  # in a bad flamegraph and can often lead to stack overflows, as the report is simply too deeply nested.
   around_action :generate_flamegraph, if: :flamegraph_requested_and_permitted?
-
-  if Rails.env.development? && !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
-    around_action :n_plus_one_detection
-
-    def n_plus_one_detection
-      Prosopite.scan
-      yield
-    ensure
-      Prosopite.finish
-    end
-  end
+  around_action :n_plus_one_detection, if: :enable_n_plus_one_detection?
 
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
@@ -139,6 +132,35 @@ class ApplicationController < ActionController::Base
     flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
   end
   private :flamegraph_requested_and_permitted?
+
+  def enable_n_plus_one_detection?
+    if flamegraph_requested_and_permitted? || @current_user.blank?
+      false
+    elsif Rails.env.local?
+      !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
+    else
+      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(@current_user, :update)
+    end
+  end
+  private :enable_n_plus_one_detection?
+
+  def n_plus_one_detection(&)
+    if Rails.env.local?
+      begin
+        Prosopite.scan
+        yield
+      ensure
+        Prosopite.finish
+      end
+    else
+      NPlusOneDetection::NPlusOneDetectionService.call(
+        user: @current_user,
+        source_name: "#{controller_name}##{action_name}",
+        custom_name: params[:n_plus_one_name],
+        &
+      )
+    end
+  end
 
   def generate_flamegraph(&)
     Flamegraphs::FlamegraphService.call(
@@ -438,6 +460,7 @@ class ApplicationController < ActionController::Base
     files_a11y_rewrite
     rce_a11y_resize
     hide_legacy_course_analytics
+    youtube_overlay
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -449,6 +472,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_usage_data
     lti_registrations_usage_tab
     lti_asset_processor
+    lti_asset_processor_discussions
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication
@@ -481,6 +505,7 @@ class ApplicationController < ActionController::Base
     open_tools_in_new_tab
     horizon_learner_app
     horizon_learning_provider_app_on_contextless_routes
+    youtube_migration
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
@@ -2684,10 +2709,17 @@ class ApplicationController < ActionController::Base
   # since we neet to process the attachments in the html.
   def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
     return nil unless str
+    return AttachmentLocationTagger.tag_url(str, location).html_safe if safe_html && !location.nil?
     return str.html_safe if safe_html
 
+    file_association_access_ff_enabled = if context.instance_of?(::User)
+                                           context.associated_root_accounts.any? { |a| a.feature_enabled?(:file_association_access) }
+                                         else
+                                           context.root_account.feature_enabled?(:file_association_access)
+                                         end
+
     is_course_syllabus = location&.include?("course_syllabus_") && context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-    render_location_tag = if is_course_syllabus || (location && context.root_account.feature_enabled?(:file_association_access))
+    render_location_tag = if is_course_syllabus || (location && file_association_access_ff_enabled)
                             location
                           else
                             nil
@@ -2982,6 +3014,12 @@ class ApplicationController < ActionController::Base
       session[:browser_supported] = BrowserSupport.supported?(request.user_agent)
     end
     session[:browser_supported]
+  end
+
+  def native_app?
+    ios_agents = /iosTeacher|iosParent|iCanvas/i
+    android_agents = /candroid|androidParent|androidTeacher/i
+    request.user_agent.to_s =~ ios_agents || request.user_agent.to_s =~ android_agents
   end
 
   def mobile_device?

@@ -275,16 +275,26 @@ describe Types::CourseType do
             submission_types: "online_upload,online_quiz",
             workflow_state: "published"
           )
+          @assignment5 = course.assignments.create!(
+            name: "No Submission Assignment 2",
+            submission_types: "",
+            workflow_state: "published"
+          )
         end
 
-        it "only returns assignments with online_upload submission type" do
+        it "only returns assignments with `online_upload` submission type" do
           result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload] }) { edges { node { _id } } }", current_user: @student)
           expect(result).to eq [@assignment1.id.to_s, @assignment4.id.to_s]
         end
 
-        it "only returns assignments with online_upload, online_quiz submission type" do
+        it "only returns assignments with `online_upload, online_quiz` submission type" do
           result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [online_upload, online_quiz] }) { edges { node { _id } } }", current_user: @student)
           expect(result).to eq [@assignment1.id.to_s, @assignment2.id.to_s, @assignment4.id.to_s]
+        end
+
+        it "only returns assignments with `no submission` submission type" do
+          result = course_type.resolve("assignmentsConnection(filter: { submissionTypes: [none] }) { edges { node { _id } } }", current_user: @student)
+          expect(result).to eq [@assignment3.id.to_s, @assignment5.id.to_s]
         end
       end
 
@@ -653,15 +663,15 @@ describe Types::CourseType do
       ).to be_nil
     end
 
-    it "returns nil when the requesting user lacks needed permissions" do
-      expect(
-        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @student)
-      ).to be_nil
-    end
-
     it "returns the custom grade statuses used by the course" do
       expect(
         course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @teacher)
+      ).to match_array ["My Status"]
+    end
+
+    it "returns the custom grade statuses used by the course for a student" do
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @student)
       ).to match_array ["My Status"]
     end
 

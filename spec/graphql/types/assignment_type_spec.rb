@@ -885,6 +885,63 @@ describe Types::AssignmentType do
     end
   end
 
+  describe "lti_asset_processors_connection" do
+    let(:assignment) { course.assignments.create! }
+    let(:course) { Course.create!(workflow_state: "available") }
+    let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+    let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+
+    context "when lti_asset_processor feature flag is disabled" do
+      before { course.root_account.disable_feature!(:lti_asset_processor) }
+
+      it "returns null" do
+        resolver = GraphQLTypeTester.new(assignment, current_user: teacher)
+        expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil
+      end
+    end
+
+    context "when user has manage_grades permission" do
+      let(:context) { { current_user: teacher } }
+
+      it "returns lti asset processors" do
+        asset_processor = lti_asset_processor_model(assignment:)
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([asset_processor.id.to_s])
+      end
+
+      it "returns empty collection when no asset processors exist" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+        expect(result).to eq([])
+      end
+    end
+
+    context "when user does not have manage_grades permission" do
+      let(:context) { { current_user: student } }
+      let!(:asset_processor) { lti_asset_processor_model(assignment:) }
+
+      context "when student can read their own grade" do
+        it "returns lti asset processors" do
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(true)
+
+          resolver = GraphQLTypeTester.new(assignment, context)
+          result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
+          expect(result).to eq([asset_processor.id.to_s])
+        end
+      end
+
+      context "when student cannot read their own grade" do
+        it "returns null" do
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(false)
+
+          resolver = GraphQLTypeTester.new(assignment, context)
+          expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil
+        end
+      end
+    end
+  end
+
   describe "provisional_grading_locked" do
     let(:moderated_assignment) do
       course.assignments.create!(
@@ -1581,7 +1638,7 @@ describe Types::AssignmentType do
 
     it "returns students with assignment visibility when user has :manage_grades permission" do
       resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
-      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to eq [student.id.to_s, student2.id.to_s]
+      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to match_array [student.id.to_s, student2.id.to_s]
     end
 
     it "returns nil when user doesn't have :manage_grades permission" do

@@ -701,7 +701,8 @@ class OutcomeResultsController < ApplicationController
     return true unless params[:sort_by]
 
     sort_by = params[:sort_by]
-    reject! "invalid sort_by parameter value" if sort_by && !%w[student outcome].include?(sort_by)
+    sortable_fields = %w[student student_name student_sis_id student_integration_id student_login_id outcome]
+    reject! "invalid sort_by parameter value" if sort_by && !sortable_fields.include?(sort_by)
     if sort_by == "outcome"
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
@@ -825,12 +826,25 @@ class OutcomeResultsController < ApplicationController
   end
 
   def apply_sort_order(relation)
-    if params[:sort_by] == "student"
-      order_clause = User.sortable_name_order_by_clause(User.quoted_table_name)
-      order_clause = "#{order_clause} DESC" if params[:sort_order] == "desc"
-      relation.order(Arel.sql(order_clause))
-    else
+    order_by = case params[:sort_by]
+               when "student_name"
+                 "name"
+               when "student_sis_id"
+                 "sis_id"
+               when "student_integration_id"
+                 "integration_id"
+               when "student_login_id"
+                 "login_id"
+               when "student"
+                 "username"
+               else
+                 nil
+               end
+
+    if order_by.nil?
       relation
+    else
+      UserSearch.order_scope(relation, @context, { sort: order_by, order: params[:sort_order] })
     end
   end
 end

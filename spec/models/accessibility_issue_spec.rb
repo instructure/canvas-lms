@@ -20,7 +20,7 @@
 describe AccessibilityIssue do
   subject { described_class.new }
 
-  it_behaves_like "has a single accessibility context"
+  it_behaves_like "it has a single accessibility context"
 
   describe "defaults" do
     it "sets the default workflow_state to active" do

@@ -131,6 +131,21 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   box-sizing: border-box;
   padding: $ic-sp $ic-sp*1.5 0;
   background: $ic-color-light;
+
+  // Set up transparent border to prevent layout shift on focus
+  border: 0.125rem solid transparent;
+  border-radius: $ic-border-radius;
+  transition: border-color 0.2s;
+}
+
+.ic-DashboardCard__link {
+  @if $use_high_contrast {
+    &:focus {
+      .ic-DashboardCard__header_content {
+        border-color: var(--ic-brand-primary);
+      }
+    }
+  }
 }
 
 @mixin dashcardHeaderButton {

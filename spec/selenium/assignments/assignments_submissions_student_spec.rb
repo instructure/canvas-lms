@@ -718,7 +718,6 @@ describe "submissions" do
 
   context "discussion_checkpoints" do
     it "still displays the submission without full discussion context no matter the feature flags set" do
-      Account.default.enable_feature! :react_discussions_post
       Account.default.enable_feature! :discussion_checkpoints
 
       teacher_in_course(active_all: true)
@@ -748,7 +747,6 @@ describe "submissions" do
         expect(f("body")).not_to contain_css("#discussion_preview_iframe")
       end
 
-      Account.default.enable_feature! :react_discussions_post
       Account.default.disable_feature! :discussion_checkpoints
 
       get "/courses/#{@course.id}/assignments/#{@checkpointed_discussion.assignment.id}/submissions/#{@student.id}"

@@ -68,21 +68,6 @@ describe "discussion assignments" do
     end
   end
 
-  context "created with html in title" do
-    it "does not render html in flash notice", priority: "2" do
-      skip "Will be fixed in VICE-5209"
-      discussion_title = "<s>broken</s>"
-      topic = create_discussion(discussion_title, "threaded")
-      get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-      wait_for_ajaximations
-      f(".announcement_cog").click
-      fln("Delete").click
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      assert_flash_notice_message("#{discussion_title} deleted successfully")
-    end
-  end
-
   context "insert content using RCE" do
     it "inserts file using rce in a discussion", priority: "1" do
       discussion_title = "New Discussion"
@@ -97,7 +82,6 @@ describe "discussion assignments" do
 
   context "created by different users" do
     it "lists identical authors after a user merge", priority: "2" do
-      skip "Will be fixed in VICE-5209"
       @student_a = User.create!(name: "Student A")
       @student_b = User.create!(name: "Student B")
       discussion_a = @course.discussion_topics.create!(user: @student_a, title: "title a", message: "from student a")
@@ -108,9 +92,9 @@ describe "discussion assignments" do
       @student_a.reload
       @student_b.reload
       get "/courses/#{@course.id}/discussion_topics/#{discussion_a.id}"
-      expect(f("div .entry-content a.author").text).to eq "Student B"
+      expect(f('[data-testid="student_context_card_trigger_container_author"]').text).to eq "Student B"
       get "/courses/#{@course.id}/discussion_topics/#{discussion_b.id}"
-      expect(f("div .discussion_subentries a.author").text).to eq "Student B"
+      expect(f('[data-testid="student_context_card_trigger_container_author"]').text).to eq "Student B"
     end
   end
 end

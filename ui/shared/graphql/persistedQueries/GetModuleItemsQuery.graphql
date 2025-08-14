@@ -1,0 +1,149 @@
+query GetModuleItemsQuery($moduleId: ID!) {
+  legacyNode(_id: $moduleId, type: Module) {
+    ... on Module {
+      moduleItems {
+        _id
+        id
+        url
+        title
+        indent
+        newTab
+        masterCourseRestrictions {
+          content
+          points
+          availabilityDates
+          settings
+          dueDates
+          all
+        }
+        content {
+          ... on Assignment {
+            _id
+            id
+            type: __typename
+            pointsPossible
+            graded
+            dueAt(applyOverrides: false)
+            lockAt(applyOverrides: false)
+            unlockAt(applyOverrides: false)
+            published
+            canUnpublish
+            isLockedByMasterCourse
+            canDuplicate
+            assignmentOverrides(first: 100) {
+              edges {
+                cursor
+                node {
+                  _id
+                  dueAt
+                  lockAt
+                  unlockAt
+                  set {
+                    ... on AdhocStudents {
+                      students {
+                        id
+                      }
+                    }
+                    ... on Course {
+                      courseId: id
+                    }
+                    ... on Group {
+                      groupId: id
+                    }
+                    ... on Section {
+                      sectionId: id
+                    }
+                  }
+                }
+              }
+            }
+          }
+          ... on Discussion {
+            _id
+            id
+            type: __typename
+            lockAt
+            todoDate
+            discussionType
+            published
+            canUnpublish
+            isLockedByMasterCourse
+            canDuplicate
+            graded
+            replyToEntryRequiredCount
+            checkpoints {
+              dueAt(applyOverrides: false)
+              name
+              tag
+            }
+          }
+          ... on File {
+            _id
+            id
+            type: __typename
+            contentType
+            size
+            thumbnailUrl
+            url
+            published
+            canUnpublish
+            isLockedByMasterCourse
+            canDuplicate
+            fileState
+            locked
+            lockAt
+            unlockAt
+            graded
+          }
+          ... on Page {
+            _id
+            id
+            published
+            canUnpublish
+            type: __typename
+            isLockedByMasterCourse
+            canDuplicate
+            graded
+          }
+          ... on Quiz {
+            _id
+            id
+            type: __typename
+            pointsPossible
+            published
+            canUnpublish
+            isLockedByMasterCourse
+            canDuplicate
+            graded
+          }
+          ... on ExternalUrl {
+            type: __typename
+            url
+            published
+            canUnpublish
+            newTab
+            graded
+          }
+          ... on ModuleExternalTool {
+            type: __typename
+            url
+            published
+            canUnpublish
+            graded
+          }
+          ... on ExternalTool {
+            type: __typename
+            url
+            published
+            canUnpublish
+            graded
+          }
+          ... on SubHeader {
+            published
+            type: __typename
+          }
+        }
+      }
+    }
+  }
+}

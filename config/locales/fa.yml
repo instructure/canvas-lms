@@ -16493,6 +16493,7 @@ fa:
   new_topic_for_course_3d98222a: "موضوع جدید برای %{course}"
   new_typography_4eaeca26: "تایپوگرافی جدید"
   new_ui_487a624e: "واسط کابر جدید"
+  new_user_bd194843: "کاربر جدید"
   new_user_s_name_909b6267: "نام کاربر جدید"
   new_user_tutorial_cdd3a446: "خودآموز کاربر جدید"
   new_zealand_64_f126cf2e: "نیوزیلند (+64)"
@@ -20660,6 +20661,7 @@ fa:
   require_completion_by_end_date_bd154e32: "نیاز به تکمیل تا تاریخ پایان"
   require_completion_by_specified_end_date_ed742ecb: "نیاز به تکمیل تا تاریخ پایان مشخص شده"
   require_group_members_to_be_in_the_same_section_7f6c36af: "باید اعضای گروه در بخش یکسانی باشند"
+  require_peer_reviews_9b5199d4: "نیازمند بازبینی های گروهی"
   require_respondus_lockdown_browser_31425b3a: "نیازمند مرورگر Respondus LockDown"
   require_usage_rights_for_uploaded_files_4507865b: "لازم دانستن حقوق استفاده برای فایل های بارگذاری شده"
   required_5f7ef8c0: لازم
@@ -21795,6 +21797,7 @@ fa:
       nonfavorited_tooltip: "برای افزودن به منوی درس ها، کلیک کنید."
       published_course: بله
       published_course_tooltip: "این درس منتشر شده است"
+      unknown: نامعلوم
       unpublished_course: خیر
       unpublished_course_tooltip: "این درس منتشر نشده است. دانشجویان برای دسترسی باید با استاد درس تماس بگیرند."
     custom_search_results: 

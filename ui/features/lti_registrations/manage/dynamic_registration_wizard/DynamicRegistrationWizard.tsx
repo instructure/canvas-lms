@@ -44,7 +44,6 @@ import {Footer} from '../registration_wizard_forms/Footer'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import {Header} from '../registration_wizard_forms/Header'
 import {isLtiPlacementWithIcon} from '../model/LtiPlacement'
-import type {LtiPlacement} from '../model/LtiPlacement'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -52,7 +51,7 @@ export type DynamicRegistrationWizardProps = {
   dynamicRegistrationUrl: string
   accountId: AccountId
   unifiedToolId?: UnifiedToolId
-  unregister: () => void
+  onDismiss: () => boolean
   onSuccessfulRegistration: () => void
   service: DynamicRegistrationWizardService
   registrationId?: LtiRegistrationId
@@ -87,8 +86,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
   const state = dynamicRegistrationWizardState.state
 
   const onCancel = useCallback(async () => {
-    props.unregister()
-    if (!editing && isReviewingState(state)) {
+    if (props.onDismiss() && !editing && isReviewingState(state)) {
       const result = await dynamicRegistrationWizardState.deleteKey(
         state._type,
         accountId,
@@ -199,8 +197,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
             reviewing={state.reviewing}
             currentScreen="first"
             onPreviousClicked={async () => {
-              props.unregister()
-              if (!props.registrationId) {
+              if (props.onDismiss() && !props.registrationId) {
                 const result = await dynamicRegistrationWizardState.deleteKey(
                   state._type,
                   accountId,

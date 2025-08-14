@@ -156,7 +156,7 @@ module Lti
                    v
                  end
 
-        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && output.is_a?(Numeric)
+        if @tool.is_a?(ContextExternalTool) && @tool.use_1_3? && (output.is_a?(Numeric) || (@root_account.feature_enabled?(:custom_variables_booleans_as_strings) && [true, false].include?(output)))
           output&.to_s
         elsif Account.site_admin.feature_enabled?(:disallow_null_custom_variables)
           output.nil? ? v : output
@@ -1758,6 +1758,42 @@ module Lti
                        ASSIGNMENT_GUARD,
                        default_name: "vnd_canvas_group_name"
 
+    # Returns the Canvas id of the differentiation tag the current user is assigned to
+    # for the current assignment context.
+    #
+    # @example
+    #   ```
+    #   123
+    #   ```
+    register_expansion "com.instructure.Tag.id",
+                       [],
+                       lambda {
+                         return nil unless @current_user && @assignment && @context.is_a?(Course)
+
+                         assignment_override&.set_id
+                       },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: "com_instructure_tag_id"
+
+    # Returns the name of the differentiation tag the current user is assigned to
+    # for the current assignment context.
+    #
+    # @example
+    #   ```
+    #   "Advanced Students"
+    #   ```
+    register_expansion "com.instructure.Tag.name",
+                       [],
+                       lambda {
+                         return nil unless @current_user && @assignment && @context.is_a?(Course)
+
+                         assignment_override&.set&.name
+                       },
+                       USER_GUARD,
+                       ASSIGNMENT_GUARD,
+                       default_name: "com_instructure_tag_name"
+
     # Returns the title of the assignment that was launched.
     #
     # @example
@@ -2315,6 +2351,22 @@ module Lti
 
     def submission
       @assignment&.submissions&.find_by(user: @current_user)
+    end
+
+    def user_differentiation_tags
+      # For LTI assignments, group_category_id is null, so we need to find
+      # differentiation tags (non-collaborative groups) that are assigned to this assignment
+      @context.differentiation_tags
+              .active
+              .joins(:group_memberships)
+              .where(group_memberships: { user_id: @current_user.id, workflow_state: "accepted" })
+    end
+
+    def assignment_override
+      # Find assignment overrides for this assignment that target the user's differentiation tags
+      AssignmentOverride.where(assignment_id: @assignment.id, set_type: "Group")
+                        .where(set_id: user_differentiation_tags.pluck(:id))
+                        .first
     end
   end
 end

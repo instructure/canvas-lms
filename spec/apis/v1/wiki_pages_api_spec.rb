@@ -103,6 +103,10 @@ describe WikiPagesApiController, type: :request do
             create_wiki_page(@teacher, { title: "New Page", editing_roles: "public" })
             expect(WikiPage.last.editing_roles).to eq "public"
           end
+
+          it "requires that editing_roles be set" do
+            create_wiki_page(@teacher, { title: "New Page", editing_roles: nil }, 400)
+          end
         end
 
         context "when the page is in a horizon course" do
@@ -118,6 +122,47 @@ describe WikiPagesApiController, type: :request do
             estimated_duration_attributes = { minutes: 5 }
             create_wiki_page(@teacher, { title: "New Page", estimated_duration_attributes: })
             expect(WikiPage.last.estimated_duration.duration).to eq 5.minutes
+          end
+
+          it "sets editing_roles to teacher" do
+            create_wiki_page(@teacher, { title: "New Page", editing_roles: nil })
+            expect(WikiPage.last.editing_roles).to eq "teachers"
+          end
+        end
+
+        context "when sending block content editor attributes" do
+          context "when block content editor feature flag is on" do
+            before do
+              Account.default.enable_feature!(:block_content_editor)
+            end
+
+            it "creates block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).to be_present
+            end
+          end
+
+          context "when block content editor feature flag is off" do
+            before do
+              Account.default.disable_feature!(:block_content_editor)
+            end
+
+            it "does not create block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).not_to be_present
+            end
           end
         end
 

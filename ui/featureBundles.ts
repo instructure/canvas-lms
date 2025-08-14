@@ -65,7 +65,6 @@ const featureBundles: {
   context_modules_publish_menu: () => import('./features/context_modules_publish_menu/index'),
   context_modules: () => import('./features/context_modules/index'),
   context_modules_v2: () => import('./features/context_modules_v2/index'),
-  context_roster_usage: () => import('./features/context_roster_usage/index'),
   context_roster_user_services: () => import('./features/context_roster_user_services/index'),
   context_roster_user: () => import('./features/context_roster_user/index'),
   context_roster_groups: () => import('./features/context_roster_groups/index'),
@@ -137,7 +136,6 @@ const featureBundles: {
   learning_mastery_v2: () => import('./features/learning_mastery_v2/index'),
   learning_mastery: () => import('./features/learning_mastery/index'),
   learning_outcomes: () => import('./features/learning_outcomes/index'),
-  license_help: () => import('./features/license_help/index'),
   locale: () => import('./features/locale/index'),
   login: () => import('./features/login/index'),
   lti_collaborations: () => import('./features/lti_collaborations/index'),
@@ -224,12 +222,13 @@ const featureBundles: {
   user_outcome_results: () => import('./features/user_outcome_results/index'),
   user: () => import('./features/user/index'),
   users_index: () => import('./features/users_index/index'),
-  visibility_help: () => import('./features/visibility_help/index'),
   webzip_export: () => import('./features/webzip_export/index'),
   wiki_page_edit: () => import('./features/wiki_page_edit/index'),
+  widget_dashboard: () => import('./features/widget_dashboard/index'),
   wiki_page_index: () => import('./features/wiki_page_index/index'),
   wiki_page_revisions: () => import('./features/wiki_page_revisions/index'),
   wiki_page_show: () => import('./features/wiki_page_show/index'),
+  youtube_migration: () => import('./features/youtube_migration/index'),
 }
 
 export default featureBundles

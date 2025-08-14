@@ -264,7 +264,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
           </Menu.Item>
         )}
         {permissions?.canDelete && (
-          <Menu.Item onClick={handleDeleteRef}>
+          <Menu.Item data-testid={`module-action-menu_${id}-deletion`} onClick={handleDeleteRef}>
             <Flex>
               <Flex.Item>
                 <IconTrashLine />
@@ -294,7 +294,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
           </Menu.Item>
         )}
         {permissions?.canDirectShare && (
-          <Menu.Item onClick={handleCopyToRef}>
+          <Menu.Item data-testid={`module-action-menu_${id}-copy`} onClick={handleCopyToRef}>
             <Flex>
               <Flex.Item>
                 <IconCopySolid />

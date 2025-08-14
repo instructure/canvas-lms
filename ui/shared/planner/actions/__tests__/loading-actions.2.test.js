@@ -337,7 +337,7 @@ describe('api actions', () => {
 
       const expectedContextCodes = /context_codes%5B%5D=course_7/
       // Fetching current week, far future date, and far past date should all be filtered by context_codes
-      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls).toHaveLength(3)
       expect(capturedUrls[0]).toMatch(expectedContextCodes)
       expect(capturedUrls[1]).toMatch(expectedContextCodes)
       expect(capturedUrls[2]).toMatch(expectedContextCodes)
@@ -382,7 +382,7 @@ describe('api actions', () => {
         /include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=35/
       // For multi-course mode, fetching current week, far future date, and far past date should all have observee id
       // , account calendars flag and context codes
-      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls).toHaveLength(4)
       expect(capturedUrls[0]).toMatch(/dashboard_cards/)
       expect(capturedUrls[1]).toMatch(expectedParamsFutureRequest)
       expect(capturedUrls[2]).toMatch(expectedParamsPastRequest)
@@ -416,7 +416,7 @@ describe('api actions', () => {
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
       const expectedParams = /observed_user_id=35&context_codes%5B%5D=course_11/
       // For single-course mode, fetching current week, far future date, and far past date should all have observee id and context codes
-      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls).toHaveLength(3)
       expect(capturedUrls[0]).toMatch(expectedParams)
       expect(capturedUrls[1]).toMatch(expectedParams)
       expect(capturedUrls[2]).toMatch(expectedParams)
@@ -450,7 +450,7 @@ describe('api actions', () => {
 
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
-      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls).toHaveLength(4)
       expect(capturedUrls[0]).toMatch(/dashboard_cards/)
       expect(capturedUrls[0]).not.toContain('observed_user_id')
       expect(capturedUrls[1]).not.toContain('observed_user_id')

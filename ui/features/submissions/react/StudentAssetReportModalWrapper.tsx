@@ -18,8 +18,8 @@
 
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {ASSET_REPORT_MODAL_EVENT} from '../../submissions_show_preview_asset_report_status/react/OnlineUploadAssetReportStatusLink'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
-import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 import {useEffect, useState} from 'react'
 
 /**

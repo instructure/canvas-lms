@@ -11401,6 +11401,7 @@ hy:
   new_password_1232cbf2: "Նոր գաղտնաբառ"
   new_quiz_statistics_desc: "Միացնել դասընթացի նոր թեստի վիճակագրության էջը:"
   new_ui_487a624e: "Նոր UI"
+  new_user_bd194843: "Նոր օգտատեր"
   next_40e12421: Հաջորդը
   next_module_66f58e91: "Հաջորդ մոդուլը"
   next_module_item_9bb8a222: "Հաջորդ Մոդուլ/Տարր"
@@ -14692,6 +14693,7 @@ hy:
   report_inappropriate_picture_af4eefeb: "Զեկուցել անընդունելի պատկերի մասին"
   reports_1b9ab7a7: Հաշվետվություններ
   request_id_1499afb0: "Պահանջել ID"
+  require_peer_reviews_9b5199d4: "Պահանջել ունկնդիրներից միմյանց աշխատանքների վերաբերյալ ներկայացնել կարծիքներ "
   require_usage_rights_for_uploaded_files_4507865b: "Բեռնված ֆայլերի համար անհրաժեշտ է նշել օգտագործման իրավունքները"
   required_5f7ef8c0: "Պահանջվում է"
   reregister_9ab95a57: "Կրկին գրանցել"
@@ -15411,6 +15413,7 @@ hy:
     current_enrollment: 
       favorited_tooltip: "Սեղմեք դասընթացների մենյուից հանելու համար"
       nonfavorited_tooltip: "Սեղմեք դասընթացների մենյուում ավելացնելու համար"
+      unknown: "Անհայտ է"
       unpublished_course_tooltip: "Այս դասընթացը հրապարակված չէ: Ունկնդիրները պետք է դիմեն դասավանդողին հասանելիություն ստանալու համար:"
     custom_search_results: 
       links: 

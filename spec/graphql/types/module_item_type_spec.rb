@@ -39,6 +39,11 @@ describe Types::ModuleItemType do
     expect(resolver.resolve("indent")).to eq 0
   end
 
+  it "gets the title" do
+    resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+    expect(resolver.resolve("title")).to eq assign1.title
+  end
+
   it "gets the position" do
     resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
     expect(resolver.resolve("position")).to eq 1
@@ -353,10 +358,11 @@ describe Types::ModuleItemType do
   end
 
   context "external url" do
-    let_once(:module_item) { module1.add_item({ type: "ExternalUrl", title: "External URL", url: "https://example.com" }, nil, position: 1) }
+    let_once(:module_item) { module1.add_item({ type: "ExternalUrl", title: "External URL", url: "https://example.com", new_tab: true }, nil, position: 1) }
 
     it "works" do
       resolver = GraphQLTypeTester.new(module_item, current_user: @teacher)
+      expect(resolver.resolve("newTab")).to be_truthy
       expect(resolver.resolve("content { title }")).to eq module_item.title
       expect(resolver.resolve("content { type }")).to eq "ContentTag"
       expect(resolver.resolve("content { published }")).to be module_item.active?

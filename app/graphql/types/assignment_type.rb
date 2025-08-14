@@ -313,8 +313,15 @@ module Types
     field :has_submitted_submissions,
           Boolean,
           "If true, the assignment has been submitted to by at least one student",
-          method: :has_submitted_submissions?,
           null: true
+    def has_submitted_submissions
+      Loaders::AssignmentHasSubmissionsLoader.for.load(assignment.id).then do |has_submissions|
+        # Set cache for both methods that check submission existence
+        assignment.instance_variable_set(:@has_student_submissions, has_submissions)
+        assignment.instance_variable_set(:@has_submitted_submissions, has_submissions)
+        assignment.has_student_submissions?
+      end
+    end
     field :omit_from_final_grade,
           Boolean,
           "If true, the assignment will be omitted from the student's final grade",
@@ -647,10 +654,15 @@ module Types
     field :lti_asset_processors_connection, LtiAssetProcessorType.connection_type, null: true
     def lti_asset_processors_connection
       load_association(:context).then do |course|
-        # In the future we may need this for students, but for now
-        # this is safest
-        if course.root_account.feature_enabled?(:lti_asset_processor) && course.grants_right?(current_user, :manage_grades)
+        next unless course.root_account.feature_enabled?(:lti_asset_processor)
+
+        # Check if user has manage_grades permission or if student can read their own grade
+        if course.grants_right?(current_user, :manage_grades)
           load_association(:lti_asset_processors)
+        elsif current_user && (submission = assignment.submissions.find_by(user: current_user))
+          if submission.user_can_read_grade?(current_user)
+            load_association(:lti_asset_processors)
+          end
         end
       end
     end
@@ -744,9 +756,15 @@ module Types
       assignment.anonymous_student_identities.values
     end
 
-    field :auto_grade_assignment_errors, [String], null: false, description: "Issues related to the assignment"
-    def auto_grade_assignment_errors
+    field :auto_grade_assignment_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the assignment"
+    def auto_grade_assignment_issues
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+    end
+
+    field :auto_grade_assignment_errors, [String], null: false, description: "Errors related to the assignment"
+    def auto_grade_assignment_errors
+      issues = GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
+      issues ? [issues[:message]] : []
     end
 
     field :is_new_quiz, Boolean, null: false, description: "Assignment is connected to a New Quiz"

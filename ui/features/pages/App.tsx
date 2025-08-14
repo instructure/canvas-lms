@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {MainLayout} from './react/layouts/MainLayout'
-import {ContentBuilderWrapper} from './react/components/ContentBuilderWrapper'
+import {BlockContentEditorWrapper} from './react/components/BlockContentEditorWrapper'
 import {PageTitle} from './react/components/PageTitle'
 import {BodyLayout} from './react/layouts/BodyLayout'
 
@@ -28,8 +28,8 @@ const I18n = createI18nScope('pages')
 export const App = () => {
   return (
     <MainLayout
-      header={<Heading variant="titlePageDesktop">{I18n.t('Page Editor')}</Heading>}
-      body={<BodyLayout title={<PageTitle />} editor={<ContentBuilderWrapper />} />}
+      header={<Heading variant="titlePageDesktop">{I18n.t('Block Content Editor')}</Heading>}
+      body={<BodyLayout title={<PageTitle />} editor={<BlockContentEditorWrapper />} />}
     />
   )
 }

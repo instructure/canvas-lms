@@ -122,7 +122,7 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
           <Flex.Item>
             <FriendlyDatetime
               data-testid="due-date"
-              format={I18n.t('#date.formats.medium')}
+              format={I18n.t('#date.formats.date_at_time')}
               dateTime={dueAt}
             />
           </Flex.Item>
@@ -139,7 +139,7 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
           <Flex.Item>
             <FriendlyDatetime
               data-testid="due-date"
-              format={I18n.t('#date.formats.medium')}
+              format={I18n.t('#date.formats.date_at_time')}
               dateTime={content.dueAt}
             />
           </Flex.Item>
@@ -148,7 +148,7 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
     }
 
     return <span data-testid="override-details">{contents}</span>
-  }, [content])
+  }, [content?.assignmentOverrides?.edges, content?.dueAt, contentTagId])
 
   if (!content || !hasDueOrLockDate) return null
 

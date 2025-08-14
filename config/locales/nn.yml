@@ -6057,6 +6057,7 @@ nn:
       update_assignment_points: "Vil du endre oppgåvepoeng slik at dei samsvarer med vurderingsskjemaet?"
   change_section_to_sectionname_6e947e90: "Endre seksjon til %{sectionName}"
   change_sis_ids_3a47154d: "Endre SIS-ID-ar"
+  change_text_color_1aecb912: "Endre tekstfarge"
   change_to_b757d327: "endre til"
   change_visibility_of_account_calendars_fd03fbb8: "Endre synlegheit av kontokalendrar"
   changed_item_1d16a85f: "Endra element"
@@ -18228,6 +18229,7 @@ nn:
   new_tab_ab7629d2: "Ny knapp"
   new_topic_for_course_3d98222a: "Nytt emne for %{course}"
   new_ui_487a624e: "Nytt brukargrensesnitt"
+  new_user_bd194843: "Ny brukar"
   new_user_s_name_909b6267: "Ny brukar sitt namn"
   new_user_tutorial_cdd3a446: "Ny brukarmanual"
   new_video_conference_17817456: "Ny videokonferanse"
@@ -22754,6 +22756,7 @@ nn:
   require_completion_by_end_date_was_turned_on_and_s_756fc89c: "Krev fullføring ved sluttdato vart slått på og satt til %{date}."
   require_completion_by_specified_end_date_ed742ecb: "Krev fullføring ved spesifikk sluttdato"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Gruppemedlemmar må vere i same seksjon"
+  require_peer_reviews_9b5199d4: "Krev fagfellevurderingar"
   require_respondus_lockdown_browser_31425b3a: "Krev Respondus LockDown Browser"
   require_signed_token_for_oembed_64883303: "Krev signert token for oEmbed"
   require_usage_rights_for_uploaded_files_4507865b: "Krev bruksrettar for opplasta filer"
@@ -24105,6 +24108,7 @@ nn:
       nonfavorited_tooltip: "Klikk for å legge til emnemenyen."
       published_course: Ja
       published_course_tooltip: "Emnet er publisert."
+      unknown: Ukjent
       unpublished_course: Nei
       unpublished_course_tooltip: "Dette emnet er ikkje publisert. Studentane bør kontakte faglærar for tilgang."
     dashboard_invitation: 

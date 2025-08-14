@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import 'jquery-migrate'
 import Quiz from '../Quiz'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
@@ -43,6 +42,7 @@ describe('Quiz', () => {
   })
 
   beforeEach(() => {
+    fakeENV.setup()
     quiz = new Quiz({
       id: 1,
       html_url: 'http://localhost:3000/courses/1/quizzes/24',
@@ -52,6 +52,7 @@ describe('Quiz', () => {
   afterEach(() => {
     server.resetHandlers()
     jest.restoreAllMocks()
+    fakeENV.teardown()
   })
 
   it('ignores assignment if not given', () => {
@@ -185,8 +186,13 @@ describe('Quiz', () => {
     expect(requestReceived).toBe(true)
   })
 
-  it('sets published attribute to true on publish', () => {
-    quiz.publish()
+  it('sets published attribute to true on publish', async () => {
+    server.use(
+      http.post('*/courses/1/quizzes/publish', () => {
+        return HttpResponse.json({})
+      }),
+    )
+    await quiz.publish()
     expect(quiz.get('published')).toBeTruthy()
   })
 
@@ -203,8 +209,13 @@ describe('Quiz', () => {
     expect(requestReceived).toBe(true)
   })
 
-  it('sets published attribute to false on unpublish', () => {
-    quiz.unpublish()
+  it('sets published attribute to false on unpublish', async () => {
+    server.use(
+      http.post('*/courses/1/quizzes/unpublish', () => {
+        return HttpResponse.json({})
+      }),
+    )
+    await quiz.unpublish()
     expect(quiz.get('published')).toBeFalsy()
   })
 })

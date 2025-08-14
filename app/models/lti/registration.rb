@@ -44,6 +44,7 @@ class Lti::Registration < ActiveRecord::Base
   validates :name, :admin_nickname, :vendor, length: { maximum: 255 }
   validates :description, length: { maximum: 2048 }, allow_blank: true
   validates :name, presence: true
+  validate :account_is_root_account
 
   scope :active, -> { where(workflow_state: "active") }
   scope :site_admin, -> { where(account: Account.site_admin) }
@@ -297,5 +298,11 @@ class Lti::Registration < ActiveRecord::Base
   # Overridden in MRA, where federated consortia are supported
   def overlay_for_federated_parent(_account)
     nil
+  end
+
+  def account_is_root_account
+    return unless account
+
+    errors.add :account, "account is not a root account" unless account.root_account?
   end
 end

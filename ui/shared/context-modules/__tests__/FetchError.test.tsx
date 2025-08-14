@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
-import { FetchError } from '../utils/FetchError'
+import {render, fireEvent} from '@testing-library/react'
+import {FetchError} from '../utils/FetchError'
 
 describe('FetchError', () => {
   it('renders the component', () => {

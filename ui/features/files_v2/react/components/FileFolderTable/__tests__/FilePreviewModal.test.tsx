@@ -70,7 +70,7 @@ describe('FilePreviewModal', () => {
 
   it('renders the modal when open', () => {
     renderComponent()
-    expect(screen.getAllByText(defaultProps.item.display_name)).toHaveLength(4)
+    expect(screen.getAllByText(defaultProps.item!.display_name)).toHaveLength(4)
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -86,13 +86,13 @@ describe('FilePreviewModal', () => {
 
   it('renders StudioMediaPlayer when file is a media type', async () => {
     renderComponent({
-      item: {...defaultProps.item, mime_class: 'video', media_entry_id: 'media-123'},
+      item: {...defaultProps.item!, mime_class: 'video', media_entry_id: 'media-123'},
     })
     expect(await screen.findByTestId('media-player')).toBeInTheDocument()
   })
 
   it('renders NoFilePreviewAvailable for unsupported file types', () => {
-    renderComponent({item: {...defaultProps.item, mime_class: 'unsupported'}})
+    renderComponent({item: {...defaultProps.item!, mime_class: 'unsupported'}})
     expect(screen.getByText(/no preview available/i)).toBeInTheDocument()
   })
 
@@ -110,7 +110,7 @@ describe('FilePreviewModal', () => {
 
   it('navigates to next file when next button is clicked', async () => {
     renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: /next/i}))
+    await userEvent.click(screen.getByTestId('next-button'))
     const header = screen.getAllByText(FAKE_FILES[1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
@@ -118,7 +118,7 @@ describe('FilePreviewModal', () => {
 
   it('navigates to previous file when previous button is clicked', async () => {
     renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: /previous/i}))
+    await userEvent.click(screen.getByTestId('previous-button'))
     const header = screen.getAllByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)[0]
     expect(header).toBeInTheDocument()
     expect(window.history.replaceState).toHaveBeenCalled()
@@ -127,7 +127,7 @@ describe('FilePreviewModal', () => {
   // userEvent.type is flaky
   it('navigates to next file when right arrow key is pressed', async () => {
     renderComponent()
-    const modal = screen.getByRole('dialog')
+    const modal = screen.getByTestId('file-preview-modal')
     fireEvent.keyDown(modal, {key: 'ArrowRight'})
     const header = screen.getAllByText(FAKE_FILES[1].display_name)[0]
     expect(header).toBeInTheDocument()
@@ -136,7 +136,7 @@ describe('FilePreviewModal', () => {
 
   it('navigates to previous file when left arrow key is pressed', async () => {
     renderComponent()
-    const modal = screen.getByRole('dialog')
+    const modal = screen.getByTestId('file-preview-modal')
     fireEvent.keyDown(modal, {key: 'ArrowLeft'})
     const header = screen.getAllByText(FAKE_FILES[FAKE_FILES.length - 1].display_name)[0]
     expect(header).toBeInTheDocument()
@@ -154,16 +154,240 @@ describe('FilePreviewModal', () => {
 
     it('does not navigate to next file when right arrow key is pressed', async () => {
       renderComponent()
-      const modal = screen.getByRole('dialog')
+      const modal = screen.getByTestId('file-preview-modal')
       fireEvent.keyDown(modal, {key: 'ArrowRight'})
-      expect(screen.getByRole('heading', {name: FAKE_FILES[0].display_name})).toBeInTheDocument()
+      expect(screen.getByTestId('file-header')).toHaveTextContent(FAKE_FILES[0].display_name)
     })
 
     it('does not navigate to previous file when left arrow key is pressed', async () => {
       renderComponent()
-      const modal = screen.getByRole('dialog')
+      const modal = screen.getByTestId('file-preview-modal')
       fireEvent.keyDown(modal, {key: 'ArrowLeft'})
-      expect(screen.getByRole('heading', {name: FAKE_FILES[0].display_name})).toBeInTheDocument()
+      expect(screen.getByTestId('file-header')).toHaveTextContent(FAKE_FILES[0].display_name)
+    })
+  })
+
+  describe('when item is null (file not found)', () => {
+    it('renders FileNotFound component', () => {
+      renderComponent({
+        item: null,
+        error: 'File not found',
+      })
+
+      expect(screen.getByText('File Not Found')).toBeInTheDocument()
+      expect(screen.getByTestId('file-not-found-message')).toBeInTheDocument()
+    })
+
+    it('disables file info button when no file', () => {
+      renderComponent({
+        item: null,
+        error: 'File not found',
+      })
+
+      const infoButton = document.getElementById('file-info-button')
+      expect(infoButton).toBeDisabled()
+    })
+
+    it('disables download button when no file', () => {
+      renderComponent({
+        item: null,
+        error: 'File not found',
+      })
+
+      const downloadButton = document.getElementById('download-icon-button')
+      expect(downloadButton).toBeDisabled()
+    })
+
+    it('does not render FilePreviewTray when no file', () => {
+      renderComponent({
+        item: null,
+        error: 'File not found',
+      })
+
+      const infoButton = document.getElementById('file-info-button')
+      expect(infoButton).toBeDisabled()
+      expect(screen.queryByText('File Information')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when error is provided', () => {
+    it('renders FileNotFound component even with valid item', () => {
+      renderComponent({
+        item: FAKE_FILES[0],
+        error: 'Custom error message',
+      })
+
+      expect(screen.getByText('File Not Found')).toBeInTheDocument()
+      expect(screen.queryByTestId('file-preview')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('showNavigationButtons prop', () => {
+    it('shows navigation buttons when showNavigationButtons is true and collection has multiple files', () => {
+      renderComponent({
+        showNavigationButtons: true,
+        collection: FAKE_FILES.slice(0, 3), // Multiple files
+      })
+
+      expect(screen.getByTestId('previous-button')).toBeInTheDocument()
+      expect(screen.getByTestId('next-button')).toBeInTheDocument()
+    })
+
+    it('hides navigation buttons when showNavigationButtons is false', () => {
+      renderComponent({
+        showNavigationButtons: false,
+        collection: FAKE_FILES.slice(0, 3), // Multiple files
+      })
+
+      expect(screen.queryByTestId('previous-button')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('next-button')).not.toBeInTheDocument()
+    })
+
+    it('hides navigation buttons when no current item', () => {
+      renderComponent({
+        item: null,
+        showNavigationButtons: true,
+        collection: FAKE_FILES.slice(0, 3),
+      })
+
+      expect(screen.queryByTestId('previous-button')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('next-button')).not.toBeInTheDocument()
+    })
+
+    it('hides navigation buttons when collection has only one file', () => {
+      renderComponent({
+        showNavigationButtons: true,
+        collection: [FAKE_FILES[0]],
+      })
+
+      expect(screen.queryByTestId('previous-button')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('next-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('file info button interaction', () => {
+    it('enables file info button when file is available', () => {
+      renderComponent({
+        item: FAKE_FILES[0],
+      })
+
+      const infoButton = document.getElementById('file-info-button')
+      expect(infoButton).not.toBeDisabled()
+    })
+
+    it('opens file info tray when button is clicked and file is available', async () => {
+      renderComponent({
+        item: FAKE_FILES[0],
+      })
+
+      const infoButton = document.getElementById('file-info-button')?.closest('button')
+      expect(infoButton).not.toBeDisabled()
+      await userEvent.click(infoButton as HTMLElement)
+      expect(screen.getByLabelText('File Information')).toBeInTheDocument()
+    })
+
+    it('renders FilePreviewTray only when currentItem exists', async () => {
+      const {rerender} = renderComponent({
+        item: FAKE_FILES[0],
+      })
+
+      const infoButton = document.getElementById('file-info-button')?.closest('button')
+      await userEvent.click(infoButton as HTMLElement)
+
+      rerender(
+        <MockedQueryClientProvider client={queryClient}>
+          <FilePreviewModal {...defaultProps} item={null} error="File not found" />
+        </MockedQueryClientProvider>,
+      )
+      expect(screen.queryByTestId('tray-close-button')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('modal title handling', () => {
+    it('shows file name when item is available', () => {
+      renderComponent({
+        item: FAKE_FILES[0],
+      })
+
+      expect(screen.getByTestId('file-header')).toHaveTextContent(FAKE_FILES[0].display_name)
+    })
+
+    it('shows "File" as fallback when item is null', () => {
+      renderComponent({
+        item: null,
+        error: 'File not found',
+      })
+
+      expect(screen.getByTestId('file-header')).toHaveTextContent('File')
+    })
+  })
+
+  describe('keyboard navigation with new features', () => {
+    it('hides navigation buttons when showNavigationButtons is false', () => {
+      renderComponent({
+        showNavigationButtons: false,
+        collection: FAKE_FILES.slice(0, 3),
+      })
+
+      expect(screen.queryByLabelText('Previous file')).not.toBeInTheDocument()
+      expect(screen.queryByLabelText('Next file')).not.toBeInTheDocument()
+    })
+
+    it('disables keyboard navigation when showNavigationButtons is false', async () => {
+      renderComponent({
+        showNavigationButtons: false,
+        collection: FAKE_FILES.slice(0, 3),
+      })
+
+      const modal = screen.getByTestId('file-preview-modal')
+      const initialFileName = FAKE_FILES[0].display_name
+
+      expect(screen.getByTestId('file-header')).toHaveTextContent(initialFileName)
+
+      fireEvent.keyDown(modal, {key: 'ArrowRight'})
+      fireEvent.keyDown(modal, {key: 'ArrowLeft'})
+
+      expect(screen.getByTestId('file-header')).toHaveTextContent(initialFileName)
+      expect(window.history.replaceState).not.toHaveBeenCalled()
+    })
+
+    it('disables keyboard navigation when no current item', async () => {
+      renderComponent({
+        item: null,
+        showNavigationButtons: true,
+        collection: FAKE_FILES.slice(0, 3),
+      })
+
+      const modal = screen.getByTestId('file-preview-modal')
+
+      fireEvent.keyDown(modal, {key: 'ArrowRight'})
+      fireEvent.keyDown(modal, {key: 'ArrowLeft'})
+
+      expect(screen.getByText('File Not Found')).toBeInTheDocument()
+    })
+  })
+
+  describe('when keyboard shortcuts are disabled', () => {
+    beforeAll(() => {
+      ENV.disable_keyboard_shortcuts = true
+    })
+
+    afterAll(() => {
+      ENV.disable_keyboard_shortcuts = false
+    })
+
+    it('does not navigate to next file when right arrow key is pressed', async () => {
+      renderComponent()
+      const modal = screen.getByTestId('file-preview-modal')
+      fireEvent.keyDown(modal, {key: 'ArrowRight'})
+      expect(screen.getByTestId('file-header')).toHaveTextContent(FAKE_FILES[0].display_name)
+    })
+
+    it('does not navigate to previous file when left arrow key is pressed', async () => {
+      renderComponent()
+      const modal = screen.getByTestId('file-preview-modal')
+      fireEvent.keyDown(modal, {key: 'ArrowLeft'})
+      expect(screen.getByTestId('file-header')).toHaveTextContent(FAKE_FILES[0].display_name)
     })
   })
 })

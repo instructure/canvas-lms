@@ -34,40 +34,71 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
-  it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
-    @announcement.destroy
-    role_ids = [teacher_role, admin_role].map(&:id)
-    account_notification(role_ids:, message: "Announcement 1")
-    @a1 = @announcement
-    account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
-    @a2 = @announcement
-    account_notification(account: @account, message: "Announcement 3") # no roles, should go to all
-    @a3 = @announcement
+  context "for announcement access" do
+    before do
+      @announcement.destroy
+      @role_ids = [teacher_role, admin_role].map(&:id)
+      account_notification(role_ids: @role_ids, message: "Announcement 1")
+      @a1 = @announcement
+      account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
+      @a2 = @announcement
+      account_notification(account: @account, message: "Announcement 3") # no roles, should go to all
+      @a3 = @announcement
 
-    @unenrolled = @user
-    course_with_teacher(account: @account)
-    @teacher = @user
-    account_admin_user(account: @account)
-    @admin = @user
-    course_with_student(course: @course).accept(true)
-    @student = @user
+      @unenrolled = @user
+      course_with_teacher(account: @account)
+      @teacher = @user
+      account_admin_user(account: @account)
+      @admin = @user
+      course_with_student(course: @course).accept(true)
+      @student = @user
+    end
 
-    expect(AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort).to eq [@a1.id, @a3.id]
-    expect(AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort).to eq [@a1.id, @a2.id, @a3.id]
-    expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
-    expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
+    it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
+      expect(AccountNotification.for_user_and_account(@teacher, @account).map(&:id).sort).to eq [@a1.id, @a3.id]
+      expect(AccountNotification.for_user_and_account(@admin, @account).map(&:id).sort).to eq [@a1.id, @a2.id, @a3.id]
+      expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(account: Account.site_admin, role_ids:, message: "Announcement 1")
-    @a4 = @announcement
-    account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
-    @a5 = @announcement
-    account_notification(account: Account.site_admin, message: "Announcement 3") # no roles, should go to all
-    @a6 = @announcement
+      account_notification(account: Account.site_admin, role_ids: @role_ids, message: "Announcement 1")
+      @a4 = @announcement
+      account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
+      @a5 = @announcement
+      account_notification(account: Account.site_admin, message: "Announcement 3") # no roles, should go to all
+      @a6 = @announcement
 
-    expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a6.id]
-    expect(AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a5.id, @a6.id]
-    expect(AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort).to eq [@a6.id]
-    expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@teacher, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@admin, Account.site_admin).map(&:id).sort).to eq [@a4.id, @a5.id, @a6.id]
+      expect(AccountNotification.for_user_and_account(@student, Account.site_admin).map(&:id).sort).to eq [@a6.id]
+      expect(AccountNotification.for_user_and_account(@unenrolled, Account.site_admin).map(&:id).sort).to eq [@a5.id, @a6.id]
+    end
+
+    it "decides for attachment access" do
+      # this is a horrible hack but i like it... we just need attach_assoc
+      # to respond to .root_account which @account happily does for us
+      attach_assoc = @account
+
+      [
+        [@admin, @a1, true],
+        [@admin, @a2, true],
+        [@admin, @a3, true],
+        [@teacher, @a1, true],
+        [@teacher, @a2, false],
+        [@teacher, @a3, true],
+        [@student, @a1, false],
+        [@student, @a2, false],
+        [@student, @a3, true],
+        [@unenrolled, @a1, false],
+        [@unenrolled, @a2, true],
+        [@unenrolled, @a3, true]
+      ].each do |user, announcement, expected|
+        if expected
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be true
+        else
+          expect(announcement.access_for_attachment_association?(user, nil, attach_assoc, nil)).to be false
+        end
+      end
+    end
   end
 
   describe "current announcements" do

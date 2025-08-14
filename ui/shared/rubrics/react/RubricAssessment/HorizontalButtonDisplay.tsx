@@ -28,6 +28,7 @@ import {possibleString, possibleStringRange} from '../Points'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 type HorizontalButtonDisplayProps = {
+  hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
   ratings: RubricRating[]
@@ -39,6 +40,7 @@ type HorizontalButtonDisplayProps = {
   shouldFocusFirstRating?: boolean
 }
 export const HorizontalButtonDisplay = ({
+  hidePoints,
   isPreviewMode,
   ratings,
   isSelfAssessment,
@@ -108,11 +110,13 @@ export const HorizontalButtonDisplay = ({
               )}
             />
           </View>
-          <View as="div" textAlign="end">
-            <Text size="x-small" weight="bold">
-              {getPossibleText(selectedRatingDescription?.points)}
-            </Text>
-          </View>
+          {!hidePoints && (
+            <View as="div" textAlign="end">
+              <Text size="x-small" weight="bold">
+                {getPossibleText(selectedRatingDescription?.points)}
+              </Text>
+            </View>
+          )}
         </View>
       )}
       <Flex direction={ratingOrder === 'ascending' ? 'row-reverse' : 'row'}>

@@ -25,7 +25,7 @@
 class RubricAssociation < ActiveRecord::Base
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_updating_points_possible
+  attr_accessor :skip_updating_points_possible, :skip_updating_rubric_association_count
   attr_writer :updating_user
 
   belongs_to :rubric
@@ -241,14 +241,9 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def update_rubric
-    cnt = rubric.rubric_associations.for_grading.count
-    rubric&.with_versioning(false) do
-      rubric.read_only = cnt > 1
-      rubric.association_count = cnt
-      rubric.save
+    return if skip_updating_rubric_association_count
 
-      rubric.destroy if cnt == 0 && rubric.rubric_associations.count == 0 && !rubric.public
-    end
+    rubric.update_association_count
   end
   protected :update_rubric
 

@@ -177,6 +177,8 @@
   path: '/api/v1/accounts/:account_id/grading_standards'
 - verb: POST
   path: '/api/v1/accounts/:account_id/grading_standards'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
@@ -223,8 +225,20 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/bind'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:id/overlay_history'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/lti_registrations/:id/reset'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls/:id'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls/:id'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls/:id'
+- verb: POST
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/controls/bulk'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
 - verb: POST
@@ -421,6 +435,8 @@
   path: '/api/v1/accounts/:account_id/users/bulk_update'
 - verb: GET
   path: '/api/v1/accounts/:account_id/visible_calendars_count'
+- verb: POST
+  path: '/api/v1/accounts/:current_account_id/lti_registrations/:registration_id/controls'
 - verb: GET
   path: '/api/v1/accounts/:id'
 - verb: PUT
@@ -1049,6 +1065,8 @@
   path: '/api/v1/courses/:course_id/grading_standards'
 - verb: POST
   path: '/api/v1/courses/:course_id/grading_standards'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
@@ -1057,6 +1075,8 @@
   path: '/api/v1/courses/:course_id/group_categories'
 - verb: POST
   path: '/api/v1/courses/:course_id/group_categories/bulk_manage_differentiation_tag'
+- verb: POST
+  path: '/api/v1/courses/:course_id/group_categories/import_tags'
 - verb: GET
   path: '/api/v1/courses/:course_id/groups'
 - verb: GET
@@ -1457,6 +1477,12 @@
   path: '/api/v1/courses/:course_id/web_zip_exports/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/what_if_grades/reset'
+- verb: POST
+  path: '/api/v1/courses/:course_id/youtube_migration/convert'
+- verb: GET
+  path: '/api/v1/courses/:course_id/youtube_migration/scan'
+- verb: POST
+  path: '/api/v1/courses/:course_id/youtube_migration/scan'
 - verb: DELETE
   path: '/api/v1/courses/:id'
 - verb: GET
@@ -1851,18 +1877,6 @@
   path: '/api/v1/jwts/refresh'
 - verb: GET
   path: '/api/v1/login/session_token'
-- verb: GET
-  path: '/api/v1/lti_registrations/:registration_id/controls'
-- verb: POST
-  path: '/api/v1/lti_registrations/:registration_id/controls'
-- verb: DELETE
-  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
-- verb: GET
-  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
-- verb: PUT
-  path: '/api/v1/lti_registrations/:registration_id/controls/:id'
-- verb: POST
-  path: '/api/v1/lti_registrations/:registration_id/controls/bulk'
 - verb: GET
   path: '/api/v1/manageable_accounts'
 - verb: GET

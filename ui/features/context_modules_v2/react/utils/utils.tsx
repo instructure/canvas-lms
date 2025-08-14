@@ -68,6 +68,7 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconPaperclipLine color={color} data-testid="attachment-icon" />
     case 'ExternalUrl':
     case 'ModuleExternalTool':
+    case 'ExternalTool':
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
@@ -94,6 +95,7 @@ export const getItemTypeText = (content: ModuleItemContent) => {
     case 'Page':
       return I18n.t('Page')
     case 'ModuleExternalTool':
+    case 'ExternalTool':
       return I18n.t('External Tool')
     default:
       return I18n.t('Unknown')
@@ -115,7 +117,7 @@ export const mapContentSelection = (id: string, contentType: string) => {
 
   if (type === 'assignment') return {assignments: [id]}
   if (type === 'quiz') return {quizzes: [id]}
-  if (type === 'discussion') return {discussions: [id]}
+  if (type === 'discussion') return {discussion_topics: [id]}
   if (type === 'attachment' || type === 'file') return {files: [id]}
   if (type === 'external' || type === 'url') return {urls: [id]}
   if (type === 'page') return {pages: [id]}
@@ -134,45 +136,171 @@ export const validateModuleStudentRenderRequirements = (prevProps: any, nextProp
 }
 
 export const validateModuleItemStudentRenderRequirements = (prevProps: any, nextProps: any) => {
-  return (
+  const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.url === nextProps.url &&
+    prevProps.title === nextProps.title &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
-    prevProps.content === nextProps.content &&
     prevProps.smallScreen === nextProps.smallScreen
-  )
+
+  if (!basicPropsEqual) return false
+
+  // If content objects are the same reference, they're equal
+  if (prevProps.content === nextProps.content) return true
+
+  // If one is null/undefined and the other isn't, they're different
+  if (!prevProps.content !== !nextProps.content) return false
+
+  // If both are null/undefined, they're equal
+  if (!prevProps.content && !nextProps.content) return true
+
+  // Compare checkpoint data explicitly (deep comparison needed for nested arrays)
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+
+  // Handle exact null/undefined differences
+  if (prevCheckpoints !== nextCheckpoints && (!prevCheckpoints || !nextCheckpoints)) return false
+
+  if (prevCheckpoints && nextCheckpoints) {
+    if (prevCheckpoints.length !== nextCheckpoints.length) return false
+
+    // Use JSON.stringify for deep comparison of checkpoint arrays
+    if (JSON.stringify(prevCheckpoints) !== JSON.stringify(nextCheckpoints)) return false
+  }
+
+  // If we reach here, checkpoint data is identical (or both are null/undefined)
+  // But since content objects are different references, we need to check if
+  // any other content properties that matter have changed
+  const contentPropsEqual =
+    prevProps.content?.id === nextProps.content?.id &&
+    prevProps.content?.title === nextProps.content?.title &&
+    prevProps.content?.type === nextProps.content?.type &&
+    prevProps.content?.published === nextProps.content?.published &&
+    prevProps.content?.pointsPossible === nextProps.content?.pointsPossible &&
+    prevProps.content?.dueAt === nextProps.content?.dueAt &&
+    prevProps.content?.lockAt === nextProps.content?.lockAt &&
+    prevProps.content?.unlockAt === nextProps.content?.unlockAt
+
+  return contentPropsEqual
+}
+
+// Performance thresholds for module rendering optimizations
+export const LARGE_MODULE_THRESHOLD = 50
+
+// Optimized shallow comparison for completion requirements
+const compareCompletionRequirements = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevReq = prev[i]
+    const nextReq = next[i]
+    if (
+      prevReq?.type !== nextReq?.type ||
+      prevReq?.min_score !== nextReq?.min_score ||
+      prevReq?.minScore !== nextReq?.minScore ||
+      prevReq?.completed !== nextReq?.completed
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized checkpoint comparison
+const compareCheckpoints = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevCP = prev[i]
+    const nextCP = next[i]
+    if (
+      prevCP?.dueAt !== nextCP?.dueAt ||
+      prevCP?.name !== nextCP?.name ||
+      prevCP?.tag !== nextCP?.tag
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized assignment overrides comparison
+const compareAssignmentOverrides = (prev: any, next: any): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+
+  const prevEdges = prev.edges || []
+  const nextEdges = next.edges || []
+
+  if (prevEdges.length !== nextEdges.length) return false
+  if (prevEdges.length === 0) return true
+
+  // For performance, only do deep comparison if edges count is reasonable
+  if (prevEdges.length > 20) {
+    // For very large override lists, fall back to JSON comparison but cache it
+    return JSON.stringify(prev) === JSON.stringify(next)
+  }
+
+  for (let i = 0; i < prevEdges.length; i++) {
+    const prevEdge = prevEdges[i]
+    const nextEdge = nextEdges[i]
+    const prevNode = prevEdge?.node
+    const nextNode = nextEdge?.node
+
+    if (
+      prevNode?._id !== nextNode?._id ||
+      prevNode?.dueAt !== nextNode?.dueAt ||
+      prevNode?.lockAt !== nextNode?.lockAt ||
+      prevNode?.unlockAt !== nextNode?.unlockAt
+    ) {
+      return false
+    }
+  }
+  return true
 }
 
 export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
+  // Basic props comparison (most likely to differ)
   const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.moduleId === nextProps.moduleId &&
     prevProps.published === nextProps.published &&
     prevProps.index === nextProps.index &&
-    prevProps.content?.title === nextProps.content?.title &&
     prevProps.indent === nextProps.indent &&
+    prevProps.title === nextProps.title &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
     prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
 
   if (!basicPropsEqual) return false
 
+  // Optimized completion requirements comparison
+  if (
+    !compareCompletionRequirements(
+      prevProps.completionRequirements,
+      nextProps.completionRequirements,
+    )
+  ) {
+    return false
+  }
+
+  // Optimized checkpoint comparison
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+  if (!compareCheckpoints(prevCheckpoints, nextCheckpoints)) {
+    return false
+  }
+
+  // Optimized assignment overrides comparison
   const prevOverrides = prevProps.content?.assignmentOverrides
   const nextOverrides = nextProps.content?.assignmentOverrides
-
-  if (!!prevOverrides !== !!nextOverrides) return false
-
-  if (!prevOverrides && !nextOverrides) return true
-
-  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
-  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
-  if (prevEdgesCount !== nextEdgesCount) return false
-
-  if (prevEdgesCount > 0) {
-    const prevOverridesStr = JSON.stringify(prevOverrides)
-    const nextOverridesStr = JSON.stringify(nextOverrides)
-    return prevOverridesStr === nextOverridesStr
+  if (!compareAssignmentOverrides(prevOverrides, nextOverrides)) {
+    return false
   }
 
   return true

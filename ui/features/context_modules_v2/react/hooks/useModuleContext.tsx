@@ -28,6 +28,7 @@ const ContextModule = createContext<{
   DEFAULT_POST_TO_SIS: boolean
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
+  restrictQuantitativeData: boolean
   externalTools: ExternalTool[]
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
@@ -45,6 +46,7 @@ const ContextModule = createContext<{
     DEFAULT_POST_TO_SIS: boolean
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
+    restrictQuantitativeData: boolean
     externalTools: ExternalTool[]
     moduleMenuModalTools: ExternalTool[]
     moduleGroupMenuTools: ExternalTool[]
@@ -65,6 +67,7 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS,
   teacherViewEnabled,
   studentViewEnabled,
+  restrictQuantitativeData,
   moduleMenuModalTools,
   moduleGroupMenuTools,
   moduleMenuTools,
@@ -88,6 +91,7 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS: boolean | undefined
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
+  restrictQuantitativeData: boolean | undefined
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
@@ -106,6 +110,7 @@ export const ContextModuleProvider = ({
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         teacherViewEnabled,
         studentViewEnabled,
+        restrictQuantitativeData: restrictQuantitativeData ?? false,
         externalTools: moduleMenuModalTools,
         moduleMenuModalTools,
         moduleGroupMenuTools,
@@ -140,6 +145,7 @@ export const contextModuleDefaultProps = {
   DEFAULT_POST_TO_SIS: false,
   teacherViewEnabled: false,
   studentViewEnabled: false,
+  restrictQuantitativeData: false,
   externalTools: [],
   moduleMenuModalTools: [],
   moduleGroupMenuTools: [],

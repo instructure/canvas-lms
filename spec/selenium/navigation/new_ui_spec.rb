@@ -74,6 +74,7 @@ describe "new ui" do
     end
 
     it "breadcrumbs show for course files navigation menu item", priority: "2" do
+      @teacher.set_preference(:files_ui_version, "v1")
       get "/courses/#{@course.id}/files"
       expect(f("#breadcrumbs .ellipsis")).to include_text("Files")
       expect(f(".ellipsible")).to include_text(@course.course_code)
@@ -82,11 +83,6 @@ describe "new ui" do
     context("files rewrite tooggle") do
       include FilesPage
       folder_name = "base folder"
-
-      before(:once) do
-        Account.site_admin.enable_feature! :files_a11y_rewrite
-        Account.site_admin.enable_feature! :files_a11y_rewrite_toggle
-      end
 
       before do
         user_session @teacher

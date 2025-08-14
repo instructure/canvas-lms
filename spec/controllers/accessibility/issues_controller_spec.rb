@@ -63,6 +63,19 @@ describe Accessibility::IssuesController do
       expect(json["pages"]).to eq({})
       expect(json["last_checked"]).to be_a(String)
     end
+
+    it "searches issues based on the search query" do
+      search_query = "test"
+      mock_result = { results: [{ id: 1, title: "Test Issue" }] }
+
+      allow_any_instance_of(Accessibility::Issue).to receive(:search).with(search_query).and_return(mock_result)
+
+      post :create, params: { course_id: course.id }, body: { search: search_query }.to_json, as: :json
+      json = response.parsed_body
+
+      expect(response).to have_http_status(:ok)
+      expect(json["results"].first["title"]).to eq("Test Issue")
+    end
   end
 
   describe "PUT #update" do

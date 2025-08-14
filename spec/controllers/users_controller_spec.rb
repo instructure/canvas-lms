@@ -3786,4 +3786,43 @@ describe UsersController do
       expect(json_parse["use_classic_font"]).to be_falsey
     end
   end
+
+  describe "#clear_cache" do
+    it "does not allow non-site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      post :clear_cache, params: { id: user.id }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      Account.site_admin.account_users.create!(user:)
+      user_session(user)
+      target_user = user_with_pseudonym(active_all: true)
+      post :clear_cache, params: { id: target_user.id }
+      expect(response).to be_successful
+      expect(json_parse["status"]).to eq("ok")
+    end
+  end
+
+  describe "#destroy" do
+    it "does not allow non-site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      delete :destroy, params: { id: user.id }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      Account.site_admin.account_users.create!(user:)
+      user_session(user)
+      target_user = user_with_pseudonym(active_all: true)
+      delete :destroy, params: { id: target_user.id }
+      expect(response).to be_successful
+      expect(json_parse["deleted"]).to be true
+      expect(json_parse["status"]).to eq("ok")
+    end
+  end
 end

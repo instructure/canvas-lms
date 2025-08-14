@@ -57,6 +57,7 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     field :url, Types::UrlType, null: true
+
     def url
       object.login_or_launch_url
     end
@@ -64,6 +65,12 @@ module Types
     field :name, String, null: true
 
     field :description, String, null: true
+
+    field :published, Boolean, null: true
+
+    def published
+      object.workflow_state != "deleted"
+    end
 
     field :settings, ExternalToolSettingsType, null: true
 

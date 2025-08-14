@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -30,31 +29,20 @@ export default function Description() {
       <View as="p" margin="0 0 small">
         <Text>
           {I18n.t(
-            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:',
+            'While grades for an assignment are hidden, students cannot see any grades or comments that were entered ',
+          )}
+        </Text>
+        <Text weight="weightImportant">{I18n.t('before')}</Text>
+        <Text>{I18n.t(' grades were hidden. However, any grades or comments added ')}</Text>
+        <Text weight="weightImportant">{I18n.t('after')}</Text>
+        <Text>
+          {I18n.t(
+            " the grades are hidden will follow the assignment's posting policy and may be visible to students immediately.",
           )}
         </Text>
       </View>
-
-      <View as="div" margin="0 0 small">
-        <List>
-          <List.Item>{I18n.t('Their grade for the assignment')}</List.Item>
-          <List.Item>{I18n.t('Grade change notifications')}</List.Item>
-          <List.Item>{I18n.t('Submission comments')}</List.Item>
-          <List.Item>{I18n.t('Curving assignments')}</List.Item>
-          <List.Item>{I18n.t('Score change notifications')}</List.Item>
-        </List>
-      </View>
-
       <View as="p" margin="0 0 small">
-        <Text>
-          {I18n.t('Students will be able to see that the grades for this assignment are hidden.')}
-        </Text>
-      </View>
-
-      <View as="p">
-        <Text>
-          {I18n.t('You can begin sending notifications again by clicking the Post Grades link.')}
-        </Text>
+        <Text>{I18n.t('Students will still see that grades for this assignment are hidden.')}</Text>
       </View>
     </>
   )

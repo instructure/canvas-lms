@@ -96,7 +96,7 @@ describe('HeadingBlockToolbar', () => {
 
     expect(defaultSz).toBeInTheDocument()
     expect(rem3).toBeInTheDocument()
-    
+
     const li = rem3?.parentElement?.parentElement as HTMLLIElement
     expect(li?.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
   })

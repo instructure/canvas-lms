@@ -52,12 +52,13 @@ jest.mock('jquery-ui', () => {
   return $
 })
 
-jest.mock('../../../react/AssetProcessors', () => ({
+jest.mock('../../../react/AssetProcessorsForAssignment', () => ({
   attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
     const initialJson = JSON.stringify(initialAttachedProcessors)
     const el = (
       <div>
-        AssetProcessors initialAttachedProcessors={initialJson} courseId={courseId} secureParams=
+        AssetProcessorsForAssignment initialAttachedProcessors={initialJson} courseId={courseId}{' '}
+        secureParams=
         {secureParams}
       </div>
     )
@@ -339,7 +340,7 @@ describe('EditView', () => {
       })
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.text()).toBe(
-          'AssetProcessors initialAttachedProcessors=[] courseId=1 secureParams=some super secure params',
+          'AssetProcessorsForAssignment initialAttachedProcessors=[] courseId=1 secureParams=some super secure params',
         )
       })
     })
@@ -350,7 +351,7 @@ describe('EditView', () => {
       const view = createEditViewOnlineSubmission({onlineUpload: true})
       await waitFor(() => {
         expect(view.$assetProcessorsContainer.text()).toBe(
-          'AssetProcessors initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params',
+          'AssetProcessorsForAssignment initialAttachedProcessors=[{"id":1}] courseId=1 secureParams=some super secure params',
         )
       })
     })

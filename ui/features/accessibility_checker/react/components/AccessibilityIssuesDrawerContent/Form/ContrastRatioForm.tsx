@@ -22,6 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ColorPicker} from '@instructure/ui-color-picker'
 import {Pill} from '@instructure/ui-pill'
+import {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ContrastData} from '../../../types'
 
@@ -31,10 +32,12 @@ interface ContrastRatioFormProps {
   label: string
   inputLabel: string
   options?: string[]
+  messages?: FormMessage[]
   backgroundColor?: string
   foregroundColor?: string
   contrastRatio?: number
   onChange: (value: string) => void
+  inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
 const optionMap: Record<string, keyof ContrastData> = {
@@ -109,6 +112,8 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   onChange,
   inputLabel,
   options = [],
+  messages = [],
+  inputRef,
 }: ContrastRatioFormProps) => {
   const [selectedColor, setSelectedColor] = useState(foregroundColor)
   const [tempContrastData, setTempContrastData] = useState<ContrastData | null>(null)
@@ -160,6 +165,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
       <ContrastOptions options={options} isOptionsValid={isOptionsValid} badgeColor={badgeColor} />
       <View margin="medium 0">
         <ColorPicker
+          id="a11y-color-picker"
           data-testid="color-picker"
           placeholderText={I18n.t('Enter HEX')}
           label={inputLabel}
@@ -170,6 +176,8 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
           }}
           value={selectedColor}
           onChange={handleColorChange}
+          inputRef={inputRef}
+          renderMessages={() => messages}
           colorMixerSettings={{
             popoverAddButtonLabel: I18n.t('Select'),
             popoverCloseButtonLabel: I18n.t('Close'),

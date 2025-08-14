@@ -42,6 +42,7 @@ describe('DifferentiationTagTray', () => {
   const defaultProps: DifferentiationTagTrayProps = {
     isOpen: true,
     onClose: jest.fn(),
+    refetchDiffTags: jest.fn(),
     differentiationTagCategories: [],
     isLoading: false,
     error: null,
@@ -124,6 +125,33 @@ describe('DifferentiationTagTray', () => {
     renderComponent({differentiationTagCategories: mockCategories})
     expect(screen.getByText('Advanced')).toBeInTheDocument()
     expect(screen.getByText('Remedial')).toBeInTheDocument()
+  })
+
+  describe('CSV upload interactions', () => {
+    it('opens CSV upload view when clicking "Upload CSV" button', async () => {
+      const mockCategories = [
+        {id: 1, name: 'Advanced', groups: []},
+        {id: 2, name: 'Remedial', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const uploadButton = screen.getByText('Upload CSV').closest('button')
+      await userEvent.click(uploadButton!)
+      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+    })
+
+    it('opens manage tags view when clicking Cancel button', async () => {
+      const mockCategories = [
+        {id: 1, name: 'Advanced', groups: []},
+        {id: 2, name: 'Remedial', groups: []},
+      ]
+      renderComponent({differentiationTagCategories: mockCategories})
+      const uploadButton = screen.getByText('Upload CSV').closest('button')
+      await userEvent.click(uploadButton!)
+      expect(screen.getByTestId('csv-upload-view')).toBeInTheDocument()
+      const cancelButton = screen.getByText('Cancel').closest('button')
+      await userEvent.click(cancelButton!)
+      expect(screen.getByTestId('manage-tags-view')).toBeInTheDocument()
+    })
   })
 
   describe('modal interactions', () => {

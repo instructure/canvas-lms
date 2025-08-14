@@ -157,8 +157,18 @@ const createAssignmentOverrides = (
   overrideCards.forEach(card => {
     const isUpdatedModuleOverride = !!(card.contextModuleId !== undefined && card.isEdited)
     const sectionOverrides = generateSectionOverrides(card, everyoneCard, isUpdatedModuleOverride)
-    const groupOverrides = generateGroupOverrides(card, isUpdatedModuleOverride)
-    const differentiationTagOverrides = generateGroupOverrides(card, isUpdatedModuleOverride, true)
+    const groupOverrides = generateGroupOverrides(
+      card,
+      isUpdatedModuleOverride,
+      false,
+      hasModuleOverrides,
+    )
+    const differentiationTagOverrides = generateGroupOverrides(
+      card,
+      isUpdatedModuleOverride,
+      true,
+      hasModuleOverrides,
+    )
     overrides = overrides.concat([
       ...sectionOverrides,
       ...groupOverrides,
@@ -215,7 +225,13 @@ const createSectionOverride = (
 // If the group is a default group override, then an override should be made if the card now contains dates
 //   - This means that the the context module override will be overridden by the assignment override
 //   - Context module overrides cannot contain dates
-const shouldCreateGroupOverride = (card: ItemAssignToCardSpec, group: string): boolean => {
+const shouldCreateGroupOverride = (
+  card: ItemAssignToCardSpec,
+  group: string,
+  hasModuleOverrides: boolean,
+): boolean => {
+  if (!hasModuleOverrides) return true
+
   const isDefaultGroupOverride = card.defaultOptions?.[0]?.includes(group)
   const cardHasADate = Boolean(
     card.due_at ||
@@ -231,13 +247,14 @@ const shouldCreateGroupOverride = (card: ItemAssignToCardSpec, group: string): b
 const generateGroupOverrides = (
   card: ItemAssignToCardSpec,
   isUpdatedModuleOverride: boolean,
-  isDifferentiationTag = false,
+  isDifferentiationTag: boolean,
+  hasModuleOverrides: boolean,
 ) => {
   const overrides: DateDetailsOverride[] = []
   const groupType = isDifferentiationTag ? 'tag' : 'group'
   const groupAssignees = getAssigneesByType(card.selectedAssigneeIds, groupType)
   groupAssignees.map(group => {
-    if (shouldCreateGroupOverride(card, group)) {
+    if (shouldCreateGroupOverride(card, group, hasModuleOverrides)) {
       overrides.push(createGroupOverride(card, group, isUpdatedModuleOverride))
     }
   })

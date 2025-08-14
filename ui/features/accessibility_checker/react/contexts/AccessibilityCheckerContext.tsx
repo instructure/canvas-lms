@@ -20,7 +20,7 @@ import React, {createContext, useContext, ReactNode} from 'react'
 
 import {ContentItem} from '../types'
 
-interface AccessibilityCheckerContextType {
+export interface AccessibilityCheckerContextType {
   selectedItem: ContentItem | null
   setSelectedItem: (item: ContentItem | null) => void
 

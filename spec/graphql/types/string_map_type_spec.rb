@@ -48,6 +48,16 @@ describe Types::StringMapType do
       input = { "key1" => 1, "key2" => "value2" }
       expect { type.coerce_input(input, nil) }.to raise_error(GraphQL::CoercionError)
     end
+
+    it "can handle ActionController::Parameters" do
+      input = ActionController::Parameters.new({ "key1" => "value1", "key2" => "value2" })
+      expect(type.coerce_input(input, nil)).to eq({ "key1" => "value1", "key2" => "value2" })
+    end
+
+    it "raises a CoercionError if ActionController::Parameters contains non-string keys or values" do
+      input = ActionController::Parameters.new({ :key1 => "value1", "key2" => ActionController::Parameters.new("nested_key" => "nested_value") })
+      expect { type.coerce_input(input, nil) }.to raise_error(GraphQL::CoercionError)
+    end
   end
 
   describe ".coerce_result" do

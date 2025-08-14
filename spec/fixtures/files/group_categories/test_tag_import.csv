@@ -1,0 +1,6 @@
+canvas_user_id,user_id,login_id,tag_name,canvas_tag_id,tag_id,tag_set_name,canvas_tag_set_id,tag_set_id
+,,user1,tag1,,,,,
+,,user2,tag1,,,,,
+,,user3,tag2,,,,,
+,,user4,tag2,,,,,
+,,user5,tag3,,,,,

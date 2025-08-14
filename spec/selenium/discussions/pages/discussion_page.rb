@@ -181,15 +181,15 @@ class Discussion
     end
 
     def manage_discussion_button
-      fj("[role='button']:contains('Manage Discussion')")
+      f('[data-testid="discussion-post-menu-trigger"]')
     end
 
     def send_to_menuitem
-      fj("li:contains('Send To...')")
+      f('[data-testid="discussion-thread-menuitem-send"]')
     end
 
     def copy_to_menuitem
-      fj("li:contains('Copy To...')")
+      f('[data-testid="discussion-thread-menuitem-copy"]')
     end
 
     def course_pacing_notice

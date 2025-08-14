@@ -199,16 +199,14 @@ class BigBlueButtonConference < WebConference
       req_params[:bbbCanvasCourseCode] = context.course_code
     end
 
-    if Account.site_admin.feature_enabled? :bbb_modal_update
-      req_params.merge!({
-                          lockSettingsDisableCam: settings[:share_webcam] ? false : true,
-                          lockSettingsDisableMic: settings[:share_microphone] ? false : true,
-                          lockSettingsDisablePublicChat: settings[:send_public_chat] ? false : true,
-                          lockSettingsDisablePrivateChat: settings[:send_private_chat] ? false : true,
-                          guestPolicy: settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
-                          webcamsOnlyForModerator: settings[:share_other_webcams] ? false : true,
-                        })
-    end
+    req_params.merge!({
+                        lockSettingsDisableCam: settings[:share_webcam] ? false : true,
+                        lockSettingsDisableMic: settings[:share_microphone] ? false : true,
+                        lockSettingsDisablePublicChat: settings[:send_public_chat] ? false : true,
+                        lockSettingsDisablePrivateChat: settings[:send_private_chat] ? false : true,
+                        guestPolicy: settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
+                        webcamsOnlyForModerator: settings[:share_other_webcams] ? false : true,
+                      })
     response = send_request(:create, req_params) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?

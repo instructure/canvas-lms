@@ -185,7 +185,7 @@ class Submission < ActiveRecord::Base
   has_many :content_participations, as: :content
 
   has_many :canvadocs_annotation_contexts, inverse_of: :submission, dependent: :destroy
-  has_many :canvadocs_submissions
+  has_many :canvadocs_submissions, dependent: :destroy
 
   has_many :auditor_grade_change_records,
            class_name: "Auditors::ActiveRecord::GradeChangeRecord",
@@ -357,26 +357,6 @@ class Submission < ActiveRecord::Base
     %w[body]
   end
 
-  def self.submission_status_conditions
-    <<~SQL.squish
-      CASE
-        WHEN submissions.workflow_state = 'unsubmitted'
-          OR (
-            submissions.submitted_at IS NULL
-            AND submissions.grade IS NULL
-            AND submissions.excused IS NOT TRUE
-          ) THEN 'not_submitted'
-        WHEN submissions.excused IS NOT TRUE
-          AND (
-            submissions.grade IS NULL
-            OR submissions.workflow_state = 'pending_review'
-          ) THEN 'not_graded'
-        WHEN submissions.grade_matches_current_submission IS FALSE THEN 'resubmitted'
-        ELSE 'graded'
-      END
-    SQL
-  end
-
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
   # maintain performance.
@@ -471,7 +451,7 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
-  after_save :extract_text_from_upload_later, if: -> { extract_text_from_upload? }
+  after_save :extract_text_later
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -2810,6 +2790,37 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def visible_provisional_comments(current_user, provisional_comments: nil)
+    return [] unless assignment.moderated_grading?
+
+    if provisional_comments.nil?
+      provisional_comments = SubmissionComment.where(provisional_grade_id: provisional_grades.pluck(:id))
+    end
+
+    grades_published = assignment.grades_published?
+    can_moderate = assignment.permits_moderation?(current_user)
+    comments_visible_to_graders = assignment.grader_comments_visible_to_graders?
+    current_grader_id = grader_id if grades_published
+
+    # If grades are published, filter out the selected grader's provisional comments
+    # since they've been duplicated as non-provisional comments
+    if grades_published && current_grader_id
+      provisional_comments = provisional_comments.reject { |comment| comment.author_id == current_grader_id }
+    end
+
+    # Return appropriate comments based on user role and permissions
+    if current_user.id == user_id
+      # Students can't see provisional comments
+      []
+    elsif !can_moderate && !comments_visible_to_graders
+      # Regular graders can only see their own comments when comments aren't visible to graders
+      provisional_comments.select { |comment| comment.author_id == current_user.id }
+    else
+      # Moderators and graders (when comments are visible) can see all provisional comments
+      provisional_comments
+    end
+  end
+
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
       %w[score grade published_score published_grade entered_score entered_grade].each do |secret_attr|
@@ -3015,7 +3026,7 @@ class Submission < ActiveRecord::Base
     !has_submission? && !graded?
   end
 
-  def visible_rubric_assessments_for(viewing_user, attempt: nil)
+  def visible_rubric_assessments_for(viewing_user, attempt: nil, include_provisional: false, provisional_assessments: nil)
     return [] unless assignment.active_rubric_association?
 
     unless posted? || grants_right?(viewing_user, :read_grade)
@@ -3026,9 +3037,20 @@ class Submission < ActiveRecord::Base
       end
     end
 
+    can_moderate = include_provisional && assignment.permits_moderation?(viewing_user)
+    target_rubric_association = assignment.rubric_association
+
     filtered_assessments = rubric_assessments_for_attempt(attempt:).select do |a|
       a.grants_right?(viewing_user, :read) &&
-        a.rubric_association == assignment.rubric_association
+        a.rubric_association == target_rubric_association
+    end
+
+    if include_provisional && provisional_assessments.present?
+      filtered_provisional = provisional_assessments.select do |assessment|
+        can_moderate || assessment.assessor_id == viewing_user.id
+      end
+
+      filtered_assessments.concat(filtered_provisional)
     end
 
     if assignment.anonymous_peer_reviews? && !grants_right?(viewing_user, :grade)
@@ -3266,12 +3288,12 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def attachment_text
-    read_or_calc_extracted_attachment[:text]
+  def extracted_text
+    read_or_calc_extracted_text[:text]
   end
 
-  def attachment_contains_images
-    read_or_calc_extracted_attachment[:contains_images]
+  def contains_images
+    read_or_calc_extracted_text[:contains_images]
   end
 
   def extract_text_from_upload?
@@ -3513,52 +3535,68 @@ class Submission < ActiveRecord::Base
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
   end
 
-  def extract_text_from_upload_later
-    return unless extract_text_from_upload?
+  def extract_text_later
+    return unless course&.feature_enabled?(:project_lhotse)
 
     delay(
-      n_strand: ["Submission#extract_text_from_upload", global_root_account_id],
-      singleton: "extract_text_from_upload#{global_id}-attempt#{attempt}"
-    ).extract_text_from_upload
+      n_strand: ["Submission#extract_text", global_root_account_id],
+      singleton: "extract_text#{global_id}-attempt#{attempt}"
+    ).extract_text
   end
 
-  def extract_text_from_upload
-    upsert_rows = []
+  def extract_text
+    if extract_text_from_upload?
+      upsert_rows = attachments.map do |attachment|
+        result = FileTextExtractionService.new(attachment:).call
 
-    attachments.find_each do |attachment|
-      result = FileTextExtractionService.new(attachment:).call
+        build_upsert_row(
+          text: result.text,
+          contains_images: result.contains_images,
+          attachment_id: attachment.id
+        )
+      end
 
-      upsert_rows << {
-        submission_id: id,
-        attachment_id: attachment.id,
-        root_account_id: root_account.id,
-        text: result.text,
-        contains_images: result.contains_images,
-        attempt:,
-        updated_at: Time.current,
-        created_at: Time.current
-      }
+      SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt_attach) if upsert_rows.any?
+    else
+      upsert_rows = [
+        build_upsert_row(
+          text: body,
+          contains_images: contains_rce_file_link?(body)
+        )
+      ]
+
+      SubmissionText.upsert_all(upsert_rows, unique_by: :index_on_sub_attempt) if upsert_rows.any?
     end
-
-    SubmissionText.upsert_all(upsert_rows, unique_by: %i[submission_id attachment_id attempt]) if upsert_rows.any?
   end
 
-  def read_or_calc_extracted_attachment
-    return unless extract_text_from_upload?
+  def build_upsert_row(text:, contains_images:, attachment_id: nil)
+    {
+      submission_id: id,
+      attachment_id:,
+      root_account_id: root_account.id,
+      text:,
+      contains_images:,
+      attempt:,
+      updated_at: Time.current,
+      created_at: Time.current,
+      submission_type:
+    }
+  end
 
-    @read_or_calc_extracted_attachment ||= begin
-      result = read_extracted_attachment
+  def read_or_calc_extracted_text
+    @read_or_calc_extracted_text ||= begin
+      result = read_extracted_text
 
       if result[:text].blank? && !result[:contains_images]
-        extract_text_from_upload
-        result = read_extracted_attachment
+        extract_text
+        result = read_extracted_text
       end
 
       result
     end
   end
 
-  def read_extracted_attachment
+  def read_extracted_text
     rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
 
     rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
@@ -3569,5 +3607,13 @@ class Submission < ActiveRecord::Base
   rescue => e
     Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
     { text: "", contains_images: false }
+  end
+
+  def contains_rce_file_link?(html_body)
+    return false if html_body.blank?
+
+    normalized_html = html_body.gsub('\"', '"')
+    decoded_html = CGI.unescapeHTML(normalized_html)
+    decoded_html.match?(/<(img|a)[^>]+(data-api-returntype="File"|class="instructure_file_link")[^>]*>/)
   end
 end

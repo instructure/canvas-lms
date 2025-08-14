@@ -7616,6 +7616,7 @@ el:
   info_8f47054a: Πληροφορίες
   info_panel_displayed_51d481cc: "Έγινε προβολή του μενού πληροφοριών"
   info_panel_hidden_bf7c3b7b: "Έγινε απόκρυψη του μενού πληροφοριών"
+  information_7f11072: Πληροφορίες
   information_816d9fa5: πληροφορίες
   inner_box_background_6f9092f: "Εσωτερικό Φόντο Κουτιού"
   inner_box_border_d0524b03: "Εσωτερικό Πλαίσιο Κουτιού"
@@ -10153,6 +10154,7 @@ el:
   new_password_1232cbf2: "Καινούργιο Συνθηματικό"
   new_question_9107c469: "Νέα Ερώτηση"
   new_quiz_34aacba6: "Νέο Κουίζ"
+  new_user_bd194843: "Νέος χρήστης"
   next_40e12421: Επόμενη
   next_message_780bcf24: "Επόμενο μήνυμα"
   next_module_66f58e91: "Επόμενη Ενότητα"
@@ -13160,6 +13162,7 @@ el:
   reports_1b9ab7a7: Αναφορές
   request_id_1499afb0: "Request ID"
   require_an_access_code_600e06e8: "Να απαιτείται κωδικός πρόσβασης"
+  require_peer_reviews_9b5199d4: "Ζητήστε Αξιολογήσεις Ομότιμων"
   require_usage_rights_for_uploaded_files_4507865b: "Απαιτούνται Δικαιώματα Χρήσης για τα Μεταφορτωμένα Αρχεία"
   required_5f7ef8c0: Απαιτούμενο
   requirement_f5b75da1: Απαιτούμενο
@@ -13806,6 +13809,7 @@ el:
     current_enrollment: 
       favorited_tooltip: "Κάντε κλικ για αφαίρεση από το μενού μαθημάτων."
       nonfavorited_tooltip: "Κάντε κλικ για προσθήκη στο μενού μαθημάτων."
+      unknown: Άγνωστο
       unpublished_course: "μη δημοσιευμένο"
       unpublished_course_tooltip: "<mrk mid=\"1820\" mtype=\"seg\">Αυτό το μάθημα δεν έχει δημοσιευθεί.</mrk> <mrk mid=\"1821\" mtype=\"seg\">Οι σπουδαστές θα πρέπει να επικοινωνήσουν με τον εκπαιδευτή του μαθήματος για πρόσβαση.</mrk>"
     dashboard_invitation: 

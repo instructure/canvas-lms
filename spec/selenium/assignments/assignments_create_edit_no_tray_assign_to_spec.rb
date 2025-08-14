@@ -135,7 +135,7 @@ shared_examples_for "item assign to on page during assignment creation/update" d
       assignment = Assignment.last
       expect(assignment.assignment_overrides.last.set_type).to eq("Group")
 
-      due_at_row = AssignmentPage.retrieve_due_date_table_row("1 Group")
+      due_at_row = AssignmentPage.retrieve_due_date_table_row("1 Tag")
       expect(due_at_row).not_to be_nil
       expect(due_at_row.text.split("\n").first).to include("Dec 31, 2022")
       expect(due_at_row.text.split("\n").third).to include("Dec 27, 2022")
@@ -363,7 +363,7 @@ describe "override assignees" do
           consumer_key: "test_key",
           shared_secret: "test_secret",
           tool_id: "Quizzes 2",
-          url: "http://example.com/launch"
+          url: "http://localhost:3000/launch"
         )
         @course.root_account.settings[:provision] = { "lti" => "lti url" }
         @course.root_account.save!

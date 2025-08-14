@@ -17,8 +17,14 @@
  */
 
 import formatMessage from 'format-message'
+import generateId from 'format-message-generate-id/underscored_crc32'
 
 const ns = formatMessage.namespace()
+
+ns.setup({
+  generateId,
+  missingTranslation: 'ignore',
+})
 
 ns.addLocale = translations => {
   ns.setup({translations: {...ns.setup().translations, ...translations}})

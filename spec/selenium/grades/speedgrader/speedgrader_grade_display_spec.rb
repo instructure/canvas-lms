@@ -185,7 +185,6 @@ describe "SpeedGrader - grade display" do
         course_with_teacher_logged_in
         student_in_course(active_all: true)
         Account.site_admin.enable_feature!(:discussions_speedgrader_revisit)
-        Account.site_admin.enable_feature!(:react_discussions_post)
 
         @dt = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
         @dt.discussion_entries.create!(

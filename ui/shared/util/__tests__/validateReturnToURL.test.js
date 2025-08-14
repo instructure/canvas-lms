@@ -27,10 +27,9 @@ describe('returnToHelper', () => {
     })
 
     test('returns false for javascript protocol', () => {
-       
       expect(isValid('javascript:alert("shame!")')).toEqual(false)
       expect(isValid('  javascript:alert("this would still run")')).toEqual(false)
-       
+
       expect(isValid('JaVaScRiPt:alert("nice try")')).toEqual(false)
     })
 

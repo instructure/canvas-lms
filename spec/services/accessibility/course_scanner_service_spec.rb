@@ -80,28 +80,5 @@ describe Accessibility::CourseScannerService do
         expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: assignment2)
       end
     end
-
-    context "when scanning PDF attachments" do
-      let!(:attachment1) { attachment_model(course:, content_type: "application/pdf") }
-      let!(:attachment2) { attachment_model(course:, content_type: "application/pdf") }
-      let!(:attachment3) { attachment_model(course:, content_type: "text/plain") }
-
-      before do
-        attachment2.destroy!
-        subject.scan_course
-      end
-
-      it "scans the active PDF attachment" do
-        expect(Accessibility::ResourceScannerService).to have_received(:call).with(resource: attachment1)
-      end
-
-      it "does not scan the deleted PDF attachment" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: attachment2)
-      end
-
-      it "does not scan attachments with invalid content type" do
-        expect(Accessibility::ResourceScannerService).not_to have_received(:call).with(resource: attachment3)
-      end
-    end
   end
 end

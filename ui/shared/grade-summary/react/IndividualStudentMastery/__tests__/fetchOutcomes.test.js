@@ -135,36 +135,36 @@ describe('fetchOutcomes', () => {
             ratings: [
               {
                 points: 5,
-                description: "Full Marks"
+                description: 'Full Marks',
               },
               {
                 points: 0,
-                description: "No Marks"
-              }
-            ]
+                description: 'No Marks',
+              },
+            ],
           },
           {
             points: 5,
-            description: "Outcome 1",
+            description: 'Outcome 1',
             ratings: [
               {
                 points: 5,
-                description: "Exceeds Expectations"
+                description: 'Exceeds Expectations',
               },
               {
                 points: 3,
-                description: "Meets Expectations"
+                description: 'Meets Expectations',
               },
               {
                 points: 0,
-                description: "Does Not Meet Expectations"
-              }
+                description: 'Does Not Meet Expectations',
+              },
             ],
-            outcome_id: 1
-          }
-        ]
-      }
-    ]
+            outcome_id: 1,
+          },
+        ],
+      },
+    ],
   })
 
   const expectedOutcomes = [
@@ -257,8 +257,9 @@ describe('fetchOutcomes', () => {
     expect(outcomeGroups).toMatchObject(responses.groupsResponse)
     expect(outcomes).toMatchObject(expectedOutcomes)
     const testResults = outcomes.map(outcome => outcome.results[0])
-    expect(testResults[0].outcomeRatingsFromRubric)
-      .toMatchObject(responses.assignmentsResponse[0].rubric[1].ratings)
+    expect(testResults[0].outcomeRatingsFromRubric).toMatchObject(
+      responses.assignmentsResponse[0].rubric[1].ratings,
+    )
     expect(testResults[1].outcomeRatingsFromRubric).toBeUndefined()
   })
 

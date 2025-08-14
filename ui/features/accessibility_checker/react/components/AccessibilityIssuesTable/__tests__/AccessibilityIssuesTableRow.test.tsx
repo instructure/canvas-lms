@@ -19,22 +19,11 @@
 import {render, screen} from '@testing-library/react'
 
 import {AccessibilityIssuesTableRow} from '../AccessibilityIssuesTableRow'
-import {ContentItem, ContentItemType} from '../../../types'
+import {sampleTableData} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesTableRow', () => {
-  const testData: ContentItem = {
-    id: 1,
-    title: 'Test Wiki Page 1',
-    type: ContentItemType.WikiPage,
-    published: true,
-    updatedAt: '2025-06-03T00:00:00Z',
-    count: 0,
-    url: '/wiki_page_1',
-    issues: [],
-  }
-
   it('renders without crashing', () => {
-    render(<AccessibilityIssuesTableRow item={testData} />)
+    render(<AccessibilityIssuesTableRow item={sampleTableData[0]} />)
     expect(screen.getByTestId('issue-row-1')).toBeInTheDocument()
   })
 })

@@ -82,6 +82,7 @@ describe PageViewsController do
   context "pv4" do
     before do
       allow(PageView).to receive(:pv4?).and_return(true)
+      ConfigFile.reset_cache
       ConfigFile.stub("pv4", {})
       account_admin_user
       user_session(@user)

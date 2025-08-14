@@ -1,6 +1,6 @@
 <div
   id="assignment_{{id}}"
-  class="ig-row {{#ifAll canManage published}}ig-published{{/ifAll}} {{#if is_master_course_master_content}}is-master{{/if}}"
+  class="ig-row {{#ifAll isTeacher published}}ig-published{{/ifAll}} {{#if is_master_course_master_content}}is-master{{/if}}"
   data-item-id="{{labelId}}"
 >
   {{#if isDuplicating}}
@@ -78,7 +78,11 @@
     {{/if}}
     <div class="ig-type-icon">
       {{#if isMasteryConnectTool}}
-        <img src="/images/icons/{{#if published}}mc-assignment-pub.svg{{else}}mc-assignment-unpub.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
+        {{#if newMasteryConnectIconEnabled}}
+          <img src="/images/icons/{{#if published}}mc-assignment-pub-v2.svg{{else}}mc-assignment-unpub-v2.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
+        {{else}}
+          <img src="/images/icons/{{#if published}}mc-assignment-pub.svg{{else}}mc-assignment-unpub.svg{{/if}}" alt="Mastery Connect" style="width: 1rem; height: 1rem;"/>
+        {{/if}}
       {{else}}
         <i aria-hidden="true" class='icon-{{iconType}}'></i>
       {{/if}}

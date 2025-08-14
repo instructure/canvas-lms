@@ -21,10 +21,6 @@ class AccountNotification < ActiveRecord::Base
   include Canvas::SoftDeletable
   include LinkedAttachmentHandler
 
-  def self.html_fields
-    %w[message]
-  end
-
   validates :start_at, :end_at, :subject, :message, :account_id, presence: true
   validate :validate_dates
   validate :send_message_not_set_for_site_admin
@@ -49,6 +45,15 @@ class AccountNotification < ActiveRecord::Base
 
   delegate :root_account_id, to: :account
   delegate :root_account, to: :account
+
+  def self.html_fields
+    %w[message]
+  end
+
+  def access_for_attachment_association?(user, _session, association, _location_param)
+    notification_ids = AccountNotification.for_user_and_account_cached(user, association.root_account).pluck(:id)
+    notification_ids.include?(id)
+  end
 
   def validate_dates
     if start_at && end_at && end_at < start_at
@@ -90,6 +95,12 @@ class AccountNotification < ActiveRecord::Base
     end_at < Time.zone.now
   end
   alias_method :past, :past?
+
+  def self.for_user_and_account_cached(user, root_account)
+    Rails.cache.fetch(["account_notifications_for_u_and_r", user, root_account].cache_key, expires_in: 5.minutes) do
+      for_user_and_account(user, root_account)
+    end
+  end
 
   def self.for_user_and_account(user, root_account, include_near_past: false)
     GuardRail.activate(:secondary) do

@@ -5232,6 +5232,138 @@ describe Submission do
       @another_submission.update!(cached_quiz_lti: false)
       expect(@another_submission).to be_missing
     end
+
+    context "checkpointed discussions" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @checkpointed_assignment = assignment_model(
+          course: @course,
+          submission_types: "discussion_topic",
+          due_at: 1.day.ago,
+          has_sub_assignments: true
+        )
+        @discussion = discussion_topic_model(assignment: @checkpointed_assignment)
+
+        # Create sub-assignments (checkpoints)
+        @reply_to_topic_checkpoint = @checkpointed_assignment.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+          due_at: 1.day.ago,
+          title: "Reply to Topic",
+          submission_types: "discussion_topic"
+        )
+        @reply_to_entry_checkpoint = @checkpointed_assignment.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+          due_at: 1.day.ago,
+          title: "Reply to Entry",
+          submission_types: "discussion_topic"
+        )
+
+        @parent_submission = @checkpointed_assignment.submissions.find_by(user: @student)
+        @topic_submission = @reply_to_topic_checkpoint.submissions.find_by(user: @student)
+        @entry_submission = @reply_to_entry_checkpoint.submissions.find_by(user: @student)
+      end
+
+      context "parent assignment submissions" do
+        it "returns true when any child submission is missing" do
+          # Set one child as missing
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(submitted_at: 2.days.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns true when both child submissions are missing" do
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(late_policy_status: "missing")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns true when user has submitted to neither checkpoint" do
+          # Both submissions are unsubmitted and past due (default state)
+          expect(@topic_submission.workflow_state).to eq("unsubmitted")
+          expect(@entry_submission.workflow_state).to eq("unsubmitted")
+          expect(@topic_submission.submitted_at).to be_nil
+          expect(@entry_submission.submitted_at).to be_nil
+          expect(@topic_submission.past_due?).to be true
+          expect(@entry_submission.past_due?).to be true
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns false when no child submissions are missing" do
+          @topic_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+          @entry_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+
+        it "returns false when parent submission is excused" do
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(excused: true)
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+
+        it "returns false when parent has custom grade status even with missing children" do
+          admin = account_admin_user(account: @course.root_account)
+          custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+            name: "Custom Status",
+            color: "#ABC",
+            created_by: admin
+          )
+          @topic_submission.update!(late_policy_status: "missing")
+          @parent_submission.update!(custom_grade_status:)
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+      end
+
+      context "sub-assignment submissions" do
+        it "returns true when sub-assignment submission is missing and past due" do
+          @topic_submission.update!(late_policy_status: "missing")
+          expect(@topic_submission.reload).to be_missing
+        end
+
+        it "returns false when sub-assignment submission is submitted" do
+          @topic_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+          expect(@topic_submission.reload).not_to be_missing
+        end
+
+        it "returns false when sub-assignment submission is excused" do
+          @topic_submission.update!(excused: true)
+          expect(@topic_submission.reload).not_to be_missing
+        end
+
+        it "returns true when sub-assignment is past due and not submitted" do
+          # Ensure submission expects submission and is past due
+          expect(@reply_to_topic_checkpoint.expects_submission?).to be true
+          expect(@topic_submission.past_due?).to be true
+          expect(@topic_submission.submitted_at).to be_nil
+          expect(@topic_submission.reload).to be_missing
+        end
+      end
+    end
   end
 
   describe "update_attachment_associations" do
@@ -6963,6 +7095,76 @@ describe Submission do
 
         expect(submission.visible_rubric_assessments_for(@student, attempt: 0))
           .to contain_exactly(assessment_before_submitting)
+      end
+    end
+
+    context "with provisional grades" do
+      before(:once) do
+        @final_grader = @teacher
+        @moderated_assignment = @course.assignments.create!(
+          due_at: 2.years.from_now,
+          final_grader: @final_grader,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10,
+          submission_types: :online_text_entry,
+          title: "Moderated Assignment"
+        )
+        @moderated_rubric_association = rubric_association_model(
+          context: @course,
+          rubric: @rubric,
+          association_object: @moderated_assignment,
+          purpose: "grading"
+        )
+        @moderated_submission = @moderated_assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
+
+        moderator_provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@final_grader)
+        @moderator_assessment = @moderated_rubric_association.assess({
+                                                                       user: @student,
+                                                                       assessor: @final_grader,
+                                                                       artifact: moderator_provisional_grade,
+                                                                       assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                     })
+
+        @provisional_grader = user_factory(active_all: true)
+        @course.enroll_ta(@provisional_grader, enrollment_state: "active")
+        provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@provisional_grader)
+        @provisional_assessment = @moderated_rubric_association.assess({
+                                                                         user: @student,
+                                                                         assessor: @provisional_grader,
+                                                                         artifact: provisional_grade,
+                                                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                       })
+        @other_grader = user_factory(active_all: true)
+        @course.enroll_ta(@other_grader, enrollment_state: "active")
+        other_provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@other_grader)
+        @other_assessment = @moderated_rubric_association.assess({
+                                                                   user: @student,
+                                                                   assessor: @other_grader,
+                                                                   artifact: other_provisional_grade,
+                                                                   assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                 })
+        @all_provisional_assessments = [@moderator_assessment, @provisional_assessment, @other_assessment]
+      end
+
+      it "excludes provisional assessments by default" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@provisional_grader)
+        expect(assessments).to be_empty
+      end
+
+      it "includes provisional assessments when include_provisional is true" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@provisional_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@provisional_assessment)
+      end
+
+      it "allows moderators to see all provisional assessments" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@moderator_assessment, @provisional_assessment, @other_assessment)
+      end
+
+      it "allows provisional graders to see only their own provisional assessments" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@other_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@other_assessment)
       end
     end
 
@@ -9942,6 +10144,105 @@ describe Submission do
       @submission.lti_id = "new_id"
       expect(@submission.save).to be_falsey
       expect(@submission.errors[:lti_id]).to include("Cannot change lti_id!")
+    end
+  end
+
+  describe "#visible_provisional_comments" do
+    context "with moderated grading" do
+      before(:once) do
+        @course = Course.create!
+        @teacher = course_with_teacher(course: @course, active_all: true).user
+        @first_ta = course_with_ta(course: @course, active_all: true).user
+        @second_ta = course_with_ta(course: @course, active_all: true).user
+        @student = course_with_student(course: @course, active_all: true).user
+
+        @assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+        @submission = @assignment.submit_homework(@student, body: "hello")
+
+        first_ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+        second_ta_pg = @submission.find_or_create_provisional_grade!(@second_ta)
+        final_grader_pg = @submission.find_or_create_provisional_grade!(@teacher)
+
+        @first_ta_comment = @submission.add_comment(author: @first_ta, comment: "First TA comment", provisional: true)
+        @first_ta_comment.update!(provisional_grade_id: first_ta_pg.id)
+
+        @second_ta_comment = @submission.add_comment(author: @second_ta, comment: "Second TA comment", provisional: true)
+        @second_ta_comment.update!(provisional_grade_id: second_ta_pg.id)
+
+        @final_grader_comment = @submission.add_comment(author: @teacher, comment: "Final Grader comment", provisional: true)
+        @final_grader_comment.update!(provisional_grade_id: final_grader_pg.id)
+      end
+
+      context "when grades are not published" do
+        context "when grader comments are visible to graders" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: true)
+          end
+
+          it "returns all provisional comments for the moderator" do
+            comments = @submission.visible_provisional_comments(@teacher)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns all provisional comments for a grader" do
+            comments = @submission.visible_provisional_comments(@first_ta)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns no comments for a student" do
+            comments = @submission.visible_provisional_comments(@student)
+            expect(comments).to be_empty
+          end
+        end
+
+        context "when grader comments are not visible to graders" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: false)
+          end
+
+          it "returns all provisional comments for the moderator" do
+            comments = @submission.visible_provisional_comments(@teacher)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns only their own comments for a grader" do
+            comments = @submission.visible_provisional_comments(@first_ta)
+            expect(comments).to match_array([@first_ta_comment])
+          end
+
+          it "returns no comments for a student" do
+            comments = @submission.visible_provisional_comments(@student)
+            expect(comments).to be_empty
+          end
+        end
+      end
+
+      context "when grades are published" do
+        before(:once) do
+          # Select the first TA's provisional grade and publish grades
+          first_ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+          first_ta_pg.publish!
+          @assignment.update!(grades_published_at: Time.zone.now)
+
+          # When grades are published, the selected grader's comments are duplicated as non-provisional
+          @submission.add_comment(author: @first_ta, comment: "First TA comment")
+        end
+
+        it "filters out the selected grader's provisional comments" do
+          comments = @submission.visible_provisional_comments(@teacher)
+          expect(comments).to match_array([@second_ta_comment, @final_grader_comment])
+          expect(comments).not_to include(@first_ta_comment)
+        end
+
+        it "still shows other graders' provisional comments" do
+          comments = @submission.visible_provisional_comments(@teacher)
+          expect(comments).to include(@second_ta_comment)
+        end
+      end
     end
   end
 end

@@ -2225,10 +2225,37 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "with cross-shard registration" do
+      specs_require_sharding
+
+      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
+      let(:xshard_account) { @shard2.activate { account_model } }
+      let(:deployment) { registration.new_external_tool(account) }
+      let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+
+      before { subaccount }
+
+      it { is_expected.to be_successful }
+
+      it "includes local contexts" do
+        subject
+        expect(response_json[:accounts].length).to eq(1)
+      end
+
+      context "with cross-shard deployment" do
+        let(:deployment) { @shard2.activate { registration.new_external_tool(xshard_account) } }
+
+        it "returns 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+    end
+
     context "with normal data" do
       let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
-      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101") }
-      let(:other_course) { course_model(account: subaccount, sis_source_id: "OTHER_COURSE_SIS_ID", course_code: "BAR202") }
+      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101", name: "Foo") }
+      let(:other_course) { course_model(account: subaccount, sis_source_id: "OTHER_COURSE_SIS_ID", course_code: "BAR202", name: "Bar") }
       let(:other_account) { account_model(parent_account: account, root_account: account, name: "Other Account", sis_source_id: "BAR") }
 
       before do
@@ -2246,6 +2273,14 @@ RSpec.describe Lti::RegistrationsController do
       it "includes all courses" do
         subject
         expect(response_json[:courses].length).to eq(2)
+      end
+
+      it "returns them in alphabetical order" do
+        subject
+        expect(response_json[:courses].first[:name]).to eq("Bar")
+        expect(response_json[:courses].second[:name]).to eq("Foo")
+        expect(response_json[:accounts].first[:name]).to eq("Other Account")
+        expect(response_json[:accounts].second[:name]).to eq("Sub Account")
       end
 
       context "with search term" do
@@ -2358,6 +2393,148 @@ RSpec.describe Lti::RegistrationsController do
             subject
             expect(response).to be_unprocessable
           end
+        end
+      end
+    end
+  end
+
+  describe "GET overlay_history", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/overlay_history", params: { limit: }.compact }
+
+    let_once(:developer_key) { tool_config.developer_key }
+    let_once(:registration) { developer_key.lti_registration }
+    let_once(:tool_config) { lti_tool_configuration_model(account:) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+    let_once(:overlay) { lti_overlay_model(account:, registration:, data: { "title" => "Test Title" }) }
+    let(:limit) { nil }
+
+    before do
+      tool_config
+      account.enable_feature!(:lti_registrations_next)
+      overlay
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with lti_registrations_next flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "for nonexistent registration" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id + 1000}/overlay_history"
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with no overlay" do
+      before { overlay.destroy }
+
+      it "returns empty array" do
+        subject
+        expect(response).to be_successful
+        expect(response_json).to eq([])
+      end
+    end
+
+    context "with overlay history" do
+      before do
+        # Create some overlay versions
+        3.times do |i|
+          overlay.update!(data: { "title" => "Title #{i}" }, updated_by: admin)
+        end
+      end
+
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the overlay history" do
+        subject
+        expect(response_json).to be_an(Array)
+        expect(response_json.length).to eq(3)
+      end
+
+      it "includes version details" do
+        subject
+        version = response_json.first
+        expect(version).to include(
+          "created_at" => an_instance_of(String),
+          "updated_at" => an_instance_of(String),
+          "caused_by_reset" => be_in([true, false]),
+          "diff" => an_instance_of(Array)
+        )
+      end
+
+      context "with limit parameter" do
+        let(:limit) { 2 }
+
+        it "respects the limit" do
+          subject
+          expect(response_json.length).to eq(2)
+        end
+      end
+
+      context "with limit of 0" do
+        let(:limit) { 0 }
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response_json["errors"].first["message"]).to include("limit must be a positive integer")
+        end
+      end
+
+      context "with limit exceeding maximum" do
+        let(:limit) { 102 }
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response_json["errors"].first["message"]).to include("limit cannot exceed 101")
+        end
+      end
+
+      context "with invalid limit" do
+        let(:limit) { "invalid" }
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response_json["errors"].first["message"]).to include("limit must be a positive integer")
         end
       end
     end

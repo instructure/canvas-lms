@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useRef, useState} from 'react'
+import {useRef, useState, useEffect} from 'react'
 import {keepPreviousData, useQuery} from '@tanstack/react-query'
 import {File, Folder} from '../../interfaces/File'
 import {
@@ -75,43 +75,36 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
         perPage: PER_PAGE,
       })
 
+  useEffect(() => {
+    setBookmarkByPage({1: ''})
+    setCurrentPage(1)
+  }, [folder.id, searchTerm, sort])
+
   const query = useQuery({
     staleTime: 0,
     placeholderData: keepPreviousData,
-    queryKey: [
-      'files',
-      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch},
-    ] as const,
+    queryKey: ['files', {url, currentPage, isSingleCharSearch}] as const,
     queryFn: async ({queryKey}) => {
-      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch}] =
-        queryKey
+      const [, {url, currentPage, isSingleCharSearch}] = queryKey
 
       // Return empty results for single character searches
       if (isSingleCharSearch) {
-        setBookmarkByPage({1: ''})
-        setCurrentPage(1)
         onSettled([])
         return []
       }
 
-      const state = JSON.stringify([folderId, searchTerm, sort])
-      const {bookmarkState, pageState} =
-        prevState.current !== state
-          ? {bookmarkState: {1: ''}, pageState: 1}
-          : {bookmarkState: bookmarkByPage, pageState: currentPage}
-      prevState.current = state
-      setBookmarkByPage(bookmarkState)
-      setCurrentPage(pageState)
-
       const {rows, links, totalItems} = await fetchFilesAndFolders(url)
       setTotalItems(totalItems)
       const bookmark = parseBookmarkFromUrl(links.next)
-      if (bookmark && !bookmarkState[pageState + 1]) {
-        setBookmarkByPage({
-          ...bookmarkState,
-          [pageState + 1]: bookmark,
-        })
-      }
+      setBookmarkByPage(prev => {
+        if (bookmark && !prev[currentPage + 1]) {
+          return {
+            ...prev,
+            [currentPage + 1]: bookmark,
+          }
+        }
+        return prev
+      })
 
       onSettled(rows)
       return rows

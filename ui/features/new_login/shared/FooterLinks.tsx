@@ -49,7 +49,6 @@ const FooterLinks = () => {
             <Link
               aria-controls="helpTray"
               aria-expanded={isHelpTrayOpen}
-              as="button"
               data-testid="help-link"
               data-track-category={helpLink.trackCategory}
               data-track-label={helpLink.trackLabel}

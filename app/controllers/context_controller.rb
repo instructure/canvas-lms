@@ -21,6 +21,7 @@
 class ContextController < ApplicationController
   include SearchHelper
   include CustomSidebarLinksHelper
+  include GroupPermissionHelper
 
   before_action :require_context, except: [:inbox, :object_snippet]
 
@@ -131,6 +132,8 @@ class ContextController < ApplicationController
                  user_services_url: context_url(@context, :context_user_services_url),
                  observer_pairing_codes_url: course_observer_pairing_codes_url(@context),
                  course_student_count: allow_assign_to_differentiation_tags ? @context.student_enrollments.count : nil,
+                 max_differentiation_tag_per_course: allow_assign_to_differentiation_tags ? GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE : nil,
+                 max_variants_per_tag_category: allow_assign_to_differentiation_tags ? Group.MAX_VARIANTS_PER_TAG_CATEGORY : nil,
                }
              })
       set_tutorial_js_env
@@ -356,7 +359,7 @@ class ContextController < ApplicationController
                       rubrics
                       wiki_pages
                       rubric_associations_with_deleted].freeze
-  ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :combined_group_and_differentiation_tag_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @item_types =
@@ -399,10 +402,7 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == "wiki_page"
       type = "all_discussion_topic" if type == "discussion_topic"
-      type = "all_group_category" if type == "group_category"
-      if %w[all_group_category group].include?(type) && !@context.grants_right?(@current_user, :manage_groups_delete)
-        return render_unauthorized_action
-      end
+      type = "combined_group_and_differentiation_tag_categories" if type == "group_category"
 
       type = type.pluralize
       type = "rubric_associations_with_deleted" if type == "rubric_associations"
@@ -411,6 +411,15 @@ class ContextController < ApplicationController
       end
 
       @item = scope.association(type).reader.find(id)
+      if %w[combined_group_and_differentiation_tag_categories group].include?(type)
+        return render_unauthorized_action unless check_group_authorization(
+          context: @context,
+          current_user: @current_user,
+          action_category: :delete,
+          non_collaborative: @item.non_collaborative?
+        )
+      end
+
       @item.restore
       if @item.errors.any?
         return render json: @item.errors.full_messages, status: :forbidden

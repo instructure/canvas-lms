@@ -59,6 +59,13 @@ describe('UserTaggedModal', () => {
     mockuseDeleteTagMembership.mockReturnValue({...defaultMutationMock, ...mutationMockReturn})
     render(<UserTaggedModal {...defaultProps} {...props} />)
   }
+  const mockTags = (numberOfTags: number, tagName: string, tagCategoryname: string) =>
+    Array.from({length: numberOfTags}, (_, i) => ({
+      id: i + 1,
+      name: `${tagName} ${i + 1}`,
+      groupCategoryName: tagCategoryname,
+      isSingleTag: false,
+    }))
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -173,5 +180,48 @@ describe('UserTaggedModal', () => {
   it('it sends a message to RoosterView to remove user tag icon when all tags are removed', async () => {
     renderComponent({data: []})
     expect(MessageBus.trigger).toHaveBeenCalledWith('removeUserTagIcon', {userId: 2})
+  })
+
+  it('has adjustable height when tags < 10', () => {
+    const mockData = mockTags(9, 'Tag', 'Test Category')
+    renderComponent({data: mockData})
+
+    const scrollableContainer = screen.getByTestId('user-tags-scrollable-container')
+    const flexElement = scrollableContainer.querySelector(
+      '[data-testid="user-tags-scrollable-container"] > div',
+    )
+
+    expect(flexElement).toHaveStyle('height: auto')
+  })
+
+  it('has fixed height when tags >= 10', () => {
+    const mockData = mockTags(10, 'Tag', 'Test Category')
+    renderComponent({data: mockData})
+
+    const scrollableContainer = screen.getByTestId('user-tags-scrollable-container')
+    const flexElement = scrollableContainer.querySelector(
+      '[data-testid="user-tags-scrollable-container"] > div',
+    )
+
+    expect(flexElement).toHaveStyle('height: 8rem')
+  })
+
+  it('arranges tags horizontally and wraps to new line when width is insufficient', () => {
+    const mockData = mockTags(5, 'Very Long Tag Name', 'Very Long Category Name')
+    renderComponent({data: mockData})
+
+    const tagsContainer = screen
+      .getByTestId('user-tags-scrollable-container')
+      .querySelector('[data-testid="user-tags-scrollable-container"] > div > span')
+
+    expect(tagsContainer).toHaveStyle({
+      'flex-direction': 'row',
+      'flex-wrap': 'wrap',
+      'max-width': '100%',
+    })
+
+    mockData.forEach(tag => {
+      expect(screen.getByTestId(`user-tag-${tag.id}`)).toBeInTheDocument()
+    })
   })
 })

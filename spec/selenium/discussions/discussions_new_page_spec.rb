@@ -246,51 +246,33 @@ describe "discussions" do
         end
       end
 
-      context "when react_discussions_post feature_flag is on", :ignore_js_errors do
-        before do
-          course.enable_feature! :react_discussions_post
-        end
+      it "allows creating anonymous discussions", :ignore_js_errors do
+        get url
+        wait_for_ajaximations
+        replace_content(f("input[name=title]"), "my anonymous title")
+        f("label[for='anonymous-selector-full-anonymity']").click
 
-        it "allows creating anonymous discussions", :ignore_js_errors do
-          get url
-          wait_for_ajaximations
-          replace_content(f("input[name=title]"), "my anonymous title")
-          f("label[for='anonymous-selector-full-anonymity']").click
-
-          expect_new_page_load { submit_form(".form-actions") }
-          expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
-          expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.")
-          )
-          expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
-        end
-
-        it "disallows full_anonymity along with graded" do
-          skip("revert enable ungraded discussion")
-          get url
-          wait_for_ajaximations
-          replace_content(f("input[name=title]"), "my anonymous title")
-          expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil
-          expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
-          f("input[id='use_for_grading']").click
-          expect(f("input[id='use_for_grading']").attribute("checked")).to eq "true"
-          f("input[value='full_anonymity']").click
-          expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil # disabled
-          expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
-          expect_new_page_load { submit_form(".form-actions") }
-        end
+        expect_new_page_load { submit_form(".form-actions") }
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(f("span[data-testid='anon-conversation']").text).to(
+          eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.")
+        )
+        expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
       end
 
-      context "when react_discussions_post feature_flag is off" do
-        before do
-          course.disable_feature! :react_discussions_post
-        end
-
-        it "does not show anonymous discussion options" do
-          skip "Will be fixed in VICE-5209"
-          get url
-          expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
-        end
+      it "disallows full_anonymity along with graded" do
+        skip("revert enable ungraded discussion")
+        get url
+        wait_for_ajaximations
+        replace_content(f("input[name=title]"), "my anonymous title")
+        expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil
+        expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
+        f("input[id='use_for_grading']").click
+        expect(f("input[id='use_for_grading']").attribute("checked")).to eq "true"
+        f("input[value='full_anonymity']").click
+        expect(f("input[id='use_for_grading']").attribute("checked")).to be_nil # disabled
+        expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
+        expect_new_page_load { submit_form(".form-actions") }
       end
     end
 
@@ -301,92 +283,70 @@ describe "discussions" do
         user_session(student)
       end
 
-      context "when all discussion anonymity feature flags are ON", :ignore_js_errors do
-        before do
-          course.enable_feature! :react_discussions_post
-        end
-
-        it "lets students create anonymous discussions when allowed", :ignore_js_errors do
-          course.allow_student_anonymous_discussion_topics = true
-          course.save!
-          get url
-          wait_for_ajaximations
-          replace_content(f("input[name=title]"), "my anonymous title")
-          f("label[for='anonymous-selector-full-anonymity']").click
-          expect_new_page_load { submit_form(".form-actions") }
-          expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
-          expect(f("span[data-testid='anon-conversation']").text).to(
-            eq("This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.")
-          )
-        end
-
-        it "does not allow creation of anonymous group discussions", :ignore_js_errors do
-          course.allow_student_anonymous_discussion_topics = true
-          course.save!
-          get url
-          wait_for_ajaximations
-          expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
-          f("label[for='anonymous-selector-full-anonymity']").click
-          expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
-        end
-
-        it "does not let students create anonymous discussions when disallowed" do
-          get url
-          expect(course.allow_student_anonymous_discussion_topics).to be false
-          expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
-        end
-
-        it "lets students choose to make topics as themselves" do
-          course.allow_student_anonymous_discussion_topics = true
-          course.save!
-          get url
-          wait_for_ajaximations
-          replace_content(f("input[name=title]"), "Student Partial Discussion")
-          f("label[for='anonymous-selector-partial-anonymity']").click
-
-          # verify default anonymous post selector
-          expect(f("span[data-testid='current_user_avatar']")).to be_present
-          expect(fj("span#sections_anonymous_post_selector span:contains('#{@student.name}')")).to be_truthy
-          expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Show to everyone"
-
-          expect_new_page_load { submit_form(".form-actions") }
-          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
-          expect(f("span[data-testid='author_name']")).to include_text @student.name
-        end
-
-        it "lets students choose to make topics anonymously" do
-          course.allow_student_anonymous_discussion_topics = true
-          course.save!
-          get url
-          wait_for_ajaximations
-          replace_content(f("input[name=title]"), "Student Partial Discussion (student anonymous)")
-          f("label[for='anonymous-selector-partial-anonymity']").click
-          f("input[data-component='anonymous_post_selector']").click
-          fj("li:contains('Hide from everyone')").click
-          expect(f("span[data-testid='anonymous_avatar']")).to be_present
-          expect(fj("span#sections_anonymous_post_selector span:contains('Anonymous')")).to be_truthy
-          expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Hide from everyone"
-
-          expect_new_page_load { submit_form(".form-actions") }
-          expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
-          expect(f("span[data-testid='author_name']")).to include_text "Anonymous"
-        end
+      it "lets students create anonymous discussions when allowed", :ignore_js_errors do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get url
+        wait_for_ajaximations
+        replace_content(f("input[name=title]"), "my anonymous title")
+        f("label[for='anonymous-selector-full-anonymity']").click
+        expect_new_page_load { submit_form(".form-actions") }
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(f("span[data-testid='anon-conversation']").text).to(
+          eq("This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.")
+        )
       end
 
-      it "creates a delayed discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "does not allow creation of anonymous group discussions", :ignore_js_errors do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
         get url
-        wait_for_tiny(f("textarea[name=message]"))
-        replace_content(f("input[name=title]"), "Student Delayed")
-        type_in_tiny("textarea[name=message]", "This is the discussion description.")
-        target_time = 1.day.from_now
-        unlock_text = format_time_for_view(target_time)
-        unlock_text_index_page = format_date_for_view(target_time, :short)
-        replace_content(f("#delayed_post_at"), unlock_text, tab_out: true)
+        wait_for_ajaximations
+        expect(f("span[data-testid=groups_grading_not_allowed]")).to_not be_displayed
+        f("label[for='anonymous-selector-full-anonymity']").click
+        expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
+      end
+
+      it "does not let students create anonymous discussions when disallowed" do
+        get url
+        expect(course.allow_student_anonymous_discussion_topics).to be false
+        expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+      end
+
+      it "lets students choose to make topics as themselves" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get url
+        wait_for_ajaximations
+        replace_content(f("input[name=title]"), "Student Partial Discussion")
+        f("label[for='anonymous-selector-partial-anonymity']").click
+
+        # verify default anonymous post selector
+        expect(f("span[data-testid='current_user_avatar']")).to be_present
+        expect(fj("span#sections_anonymous_post_selector span:contains('#{@student.name}')")).to be_truthy
+        expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Show to everyone"
+
         expect_new_page_load { submit_form(".form-actions") }
-        expect(f(".entry-content").text).to include("This topic is locked until #{unlock_text}")
-        expect_new_page_load { f("#section-tabs .discussions").click }
-        expect(f(".discussion-availability").text).to include("Not available until #{unlock_text_index_page}")
+        expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
+        expect(f("span[data-testid='author_name']")).to include_text @student.name
+      end
+
+      it "lets students choose to make topics anonymously" do
+        course.allow_student_anonymous_discussion_topics = true
+        course.save!
+        get url
+        wait_for_ajaximations
+        replace_content(f("input[name=title]"), "Student Partial Discussion (student anonymous)")
+        f("label[for='anonymous-selector-partial-anonymity']").click
+        f("input[data-component='anonymous_post_selector']").click
+        fj("li:contains('Hide from everyone')").click
+        expect(f("span[data-testid='anonymous_avatar']")).to be_present
+        expect(fj("span#sections_anonymous_post_selector span:contains('Anonymous')")).to be_truthy
+        expect(f("input[data-component='anonymous_post_selector']").attribute("value")).to eq "Hide from everyone"
+
+        expect_new_page_load { submit_form(".form-actions") }
+        expect(f("span[data-testid='non-graded-discussion-info']")).to include_text "Partially Anonymous Discussion"
+        expect(f("span[data-testid='author_name']")).to include_text "Anonymous"
       end
 
       it "gives error if Until date isn't after Available From date", :ignore_js_errors, priority: "1" do
@@ -402,19 +362,6 @@ describe "discussions" do
         expect(
           fj("div.error_text:contains('Date must be after date available')")
         ).to be_present
-      end
-
-      it "allows a student to create a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
-        skip_if_firefox("known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085")
-        get url
-        wait_for_tiny(f("textarea[name=message]"))
-        replace_content(f("input[name=title]"), "Student Discussion")
-        type_in_tiny("textarea[name=message]", "This is the discussion description.")
-        expect(f("#discussion-edit-view")).to_not contain_css("#has_group_category")
-        expect_new_page_load { submit_form(".form-actions") }
-        expect(f(".discussion-title").text).to eq "Student Discussion"
-        expect(f("#content")).not_to contain_css("#topic_publish_button")
       end
 
       it "does not show file attachment if allow_student_forum_attachments is not true", :ignore_js_errors, priority: "2" do
@@ -515,9 +462,6 @@ describe "discussions" do
 
     before do
       Account.site_admin.enable_feature! :discussion_create
-      # we must turn react_discussions_post ON as well since some new
-      # features, like, anonymous discussions, are dependent on it
-      Account.site_admin.enable_feature! :react_discussions_post
     end
 
     context "as a student" do

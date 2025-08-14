@@ -155,6 +155,9 @@ module Lti
       end
     end
 
+    before_action :require_account_context, except: [:create]
+    before_action :require_current_account_context, only: [:create]
+    before_action :require_root_account
     before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
@@ -179,7 +182,7 @@ module Lti
     #
     # @example_request
     #
-    #   curl -X GET 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls' \
+    #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls' \
     #        -H "Authorization: Bearer <token>"
     def index
       bookmarked = BookmarkedCollection.wrap(
@@ -199,7 +202,7 @@ module Lti
         .group_by(&:deployment)
         .map do |deployment, context_controls|
           context_controls_calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(context_controls)
-          lti_deployment_json(deployment, @current_user, session, context, context_controls:, context_controls_calculated_attrs:)
+          lti_deployment_json(deployment, @current_user, session, @account, context_controls:, context_controls_calculated_attrs:)
         end
       )
     rescue => e
@@ -224,10 +227,10 @@ module Lti
     #
     # @example_request
     #
-    #   curl -X GET 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls/<control_id>' \
+    #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls/<control_id>' \
     #        -H "Authorization: Bearer <token>"
     def show
-      render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+      render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
     rescue => e
       report_error(e)
       raise e
@@ -248,7 +251,7 @@ module Lti
     #
     # @example_request
     #
-    #   curl -X POST 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls' \
+    #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls' \
     #        -H "Authorization: Bearer <token>" \
     #        -d '{
     #               "account_id": 1,
@@ -274,7 +277,7 @@ module Lti
 
       control = Lti::ContextControlService.create_or_update(control_params)
 
-      render json: lti_context_control_json(control, @current_user, session, context, include_users: true), status: :created
+      render json: lti_context_control_json(control, @current_user, session, @account, include_users: true), status: :created
     rescue Lti::ContextControlErrors => e
       render_errors(e.errors.full_messages)
     rescue => e
@@ -300,7 +303,7 @@ module Lti
     #
     # @example_request
     #
-    #   curl -X POST 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls' \
+    #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls' \
     #        -H "Authorization: Bearer <token>" \
     #        --json '[ \
     #                  { "account_id": 1, "available": false }, \
@@ -399,7 +402,7 @@ module Lti
       calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       json = controls.map do |control|
-        lti_context_control_json(control, @current_user, session, context, include_users: true, calculated_attrs: calculated_attrs[control.id])
+        lti_context_control_json(control, @current_user, session, @account, include_users: true, calculated_attrs: calculated_attrs[control.id])
       end
 
       render json:, status: :created
@@ -420,7 +423,7 @@ module Lti
     #
     # @example_request
     #
-    #   curl "https://<canvas>/api/v1/lti_registrations/<registration_id>/controls/<id>" \
+    #   curl "https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls/<id>" \
     #        -X PUT \
     #        -F "available=true" \
     #        -H "Authorization: Bearer <token>"
@@ -428,7 +431,7 @@ module Lti
       available = value_to_boolean(params.require(:available))
       control.update!(available:)
 
-      render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+      render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
     rescue => e
       report_error(e)
       raise e
@@ -446,12 +449,12 @@ module Lti
     #
     # @example_request
     #
-    #   curl "https://<canvas>/api/v1/lti_registrations/<registration_id>/controls/<id>" \
+    #   curl "https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/controls/<id>" \
     #        -X DELETE \
     #        -H "Authorization: Bearer <token>"
     def delete
       if control.destroy
-        render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+        render json: lti_context_control_json(control, @current_user, session, @account, include_users: true)
       else
         render_errors(control.errors.full_messages, status: :unprocessable_entity)
       end
@@ -479,22 +482,32 @@ module Lti
     end
 
     def root_account_deployment
-      @root_account_deployment ||= registration.deployments.active.find_by(context: registration.root_account)
+      @root_account_deployment ||= ContextExternalTool.active.find_by(context: @account, lti_registration: registration)
     end
 
     def control
-      @control ||= Lti::ContextControl.active.find_by(id: params[:id], registration:)
+      @control ||= Lti::ContextControl.active.find_by(id: params[:id], registration:, root_account_id: @account.id)
       raise ActiveRecord::RecordNotFound unless @control
 
       @control
     end
 
+    # can be cross-shard (at least for now),
+    # but all ContextControl operations are scoped to
+    # the root account and current shard
     def registration
       @registration ||= Lti::Registration.active.find(params[:registration_id])
     end
 
-    def context
-      registration.account
+    # using `:account_id` in the route for the create action conflicts with the
+    # `account_id` parameter in the request body
+    def require_current_account_context
+      @account = api_find(Account.active, params[:current_account_id]) if params[:current_account_id]
+      raise ActiveRecord::RecordNotFound unless @account
+    end
+
+    def require_root_account
+      raise ActiveRecord::RecordNotFound unless @account.root_account?
     end
 
     def report_error(exception, code = nil)
@@ -533,11 +546,11 @@ module Lti
     end
 
     def require_manage_lti_registrations
-      require_context_with_permission(context, :manage_lti_registrations)
+      require_context_with_permission(@account, :manage_lti_registrations)
     end
 
     def require_feature_flag
-      unless context.root_account.feature_enabled?(:lti_registrations_next)
+      unless @account.feature_enabled?(:lti_registrations_next)
         render json: { error: "The specified resource does not exist." }, status: :not_found
       end
     end

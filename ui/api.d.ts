@@ -768,3 +768,33 @@ export type ExperienceSummary = {
 export type SwitchExperienceResponse = {
   experience: string
 }
+
+export type YoutubeEmbed = Readonly<{
+  path: string
+  src: string
+  resource_type: string
+  field: string
+  id: number
+  resource_group_key: string
+}>
+
+export type YoutubeScanResource = Readonly<{
+  name: string
+  type: string
+  content_url: string
+  count: number
+  failed?: boolean
+  embeds: Array<YoutubeEmbed>
+}>
+
+export type YoutubeScanWorkflowState = 'completed' | 'failed' | 'queued' | 'running'
+
+export type YoutubeScanResultReport = Readonly<{
+  workflow_state: YoutubeScanWorkflowState | null
+  resources: Array<YoutubeScanResource>
+  total_count: number | null
+  id: number
+  page: number
+  per_page: number
+  total_pages: number
+}>

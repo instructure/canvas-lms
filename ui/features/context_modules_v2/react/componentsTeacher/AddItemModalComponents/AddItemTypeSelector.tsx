@@ -31,6 +31,7 @@ interface AddItemTypeSelectorProps {
 const AddItemTypeSelector: React.FC<AddItemTypeSelectorProps> = ({itemType, onChange}) => {
   return (
     <SimpleSelect
+      data-testid="add-item-type-selector"
       renderLabel={I18n.t('Add')}
       value={itemType}
       onChange={(_e, {value}) => onChange(value as ModuleItemContentType)}

@@ -443,6 +443,7 @@ export const ViewRubrics = ({
               isLoading={isLoadingPreview}
               isOpen={isPreviewTrayOpen}
               isPreviewMode={false}
+              hidePoints={rubricPreview?.hidePoints ?? false}
               rubric={rubricPreview}
               rubricAssessmentData={[]}
               onDismiss={() => {

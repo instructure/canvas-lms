@@ -464,6 +464,20 @@ describe "Admins API", type: :request do
         expect(returned_aus.first["workflow_state"]).to eq("deleted")
       end
     end
+
+    context "include parameter" do
+      it "does not include admin uuid by default" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts)
+        expect(json.map { |au| au["user"]["uuid"] }).to eq([nil])
+      end
+
+      it "include admin uuid when include uuid is present" do
+        @user = @admin
+        json = api_call(:get, @path, @path_opts.merge(include: "uuid"))
+        expect(json.map { |au| au["user"]["uuid"] }).to eq([@admin.uuid])
+      end
+    end
   end
 
   describe "self_roles" do

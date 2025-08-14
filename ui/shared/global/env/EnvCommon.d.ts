@@ -306,6 +306,8 @@ export type SiteAdminFeatureId =
   | 'create_external_apps_side_tray_overrides'
   | 'files_a11y_rewrite_toggle'
   | 'files_a11y_rewrite'
+  | 'youtube_migration'
+  | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
@@ -338,6 +340,7 @@ export type RootAccountFeatureId =
   | 'course_pace_pacing_with_mastery_paths'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
+  | 'lti_asset_processor_discussions'
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
   | 'disable_iframe_sandbox_file_show'

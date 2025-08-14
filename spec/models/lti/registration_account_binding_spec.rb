@@ -63,9 +63,9 @@ RSpec.describe Lti::RegistrationAccountBinding do
     end
 
     context "with a non-root account" do
-      let(:account) { account_model(parent_account: account_model) }
-
       it "is invalid" do
+        registration.account = account_model(parent_account: account_model)
+        registration.save(validate: false)
         account_binding.save
         expect(account_binding).not_to be_valid
       end

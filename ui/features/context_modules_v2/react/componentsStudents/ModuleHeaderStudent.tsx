@@ -144,7 +144,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
               </Flex.Item>
             )}
             <Flex.Item margin="none">
-              <Flex gap="xx-small" alignItems="center">
+              <Flex gap="xx-small" alignItems="center" wrap="wrap">
                 {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
                   <Flex.Item>
                     <ModuleHeaderUnlockAt unlockAt={unlockAt} />

@@ -1332,6 +1332,135 @@ describe Assignment do
     end
   end
 
+  describe "#can_read_assignment?" do
+    let_once(:course) { Course.create! }
+    let_once(:teacher) { course_with_teacher(course:, active_all: true).user }
+    let_once(:student) { student_in_course(course:, active_all: true).user }
+    let_once(:admin) { account_admin_user(account: course.account) }
+    let_once(:ta) { ta_in_course(course:, active_all: true).user }
+    let_once(:assignment) { course.assignments.create!(title: "Test Assignment") }
+
+    context "when assignment is published" do
+      before { assignment.update!(workflow_state: "published") }
+
+      it "returns true for teacher with read permission" do
+        expect(assignment.can_read_assignment?(teacher)).to be true
+      end
+
+      it "returns true for admin with read permission" do
+        expect(assignment.can_read_assignment?(admin)).to be true
+      end
+
+      it "returns true for TA with read permission" do
+        expect(assignment.can_read_assignment?(ta)).to be true
+      end
+
+      it "returns false for nil user" do
+        expect(assignment.can_read_assignment?(nil)).to be false
+      end
+
+      it "returns false for user without read permission" do
+        other_course = Course.create!
+        other_teacher = course_with_teacher(course: other_course, active_all: true).user
+        expect(assignment.can_read_assignment?(other_teacher)).to be false
+      end
+
+      it "returns false for student with deactivated enrollment" do
+        student_enrollment = course.enrollments.find_by(user: student)
+        student_enrollment.deactivate
+        expect(assignment.can_read_assignment?(student)).to be false
+      end
+
+      it "returns false for user from different account without cross-account access" do
+        other_account = Account.create!
+        other_course = other_account.courses.create!
+        other_user = course_with_teacher(course: other_course, active_all: true).user
+        expect(assignment.can_read_assignment?(other_user)).to be false
+      end
+
+      it "returns false for user without enrollment" do
+        random_user = User.create!
+        expect(assignment.can_read_assignment?(random_user)).to be false
+      end
+
+      it "returns true for student with concluded course" do
+        course.complete!
+        expect(assignment.can_read_assignment?(student)).to be true
+      end
+
+      it "returns true for teacher with concluded course" do
+        course.complete!
+        expect(assignment.can_read_assignment?(teacher)).to be true
+      end
+
+      it "returns true for TA with concluded course" do
+        course.complete!
+        expect(assignment.can_read_assignment?(ta)).to be true
+      end
+    end
+
+    context "when assignment is unpublished" do
+      before { assignment.update!(workflow_state: "unpublished") }
+
+      it "returns true for teacher with view_unpublished_items permission" do
+        expect(assignment.can_read_assignment?(teacher)).to be true
+      end
+
+      it "returns true for admin with view_unpublished_items permission" do
+        expect(assignment.can_read_assignment?(admin)).to be true
+      end
+
+      it "returns true for ta with view_unpublished_items permission" do
+        expect(assignment.can_read_assignment?(ta)).to be true
+      end
+
+      it "returns false for student without view_unpublished_items permission" do
+        expect(assignment.can_read_assignment?(student)).to be false
+      end
+
+      it "returns false for nil user" do
+        expect(assignment.can_read_assignment?(nil)).to be false
+      end
+
+      it "returns false for admin without read_course_content permission" do
+        account = course.root_account
+        role = custom_account_role("CustomAccountUser", account:)
+        RoleOverride.manage_role_override(account, role, :read_course_content, override: false)
+        custom_admin = account_admin_user(account:, role:, active_all: true)
+        expect(assignment.can_read_assignment?(custom_admin)).to be false
+      end
+
+      it "returns true for admin with read_course_content permission" do
+        account = course.root_account
+        role = custom_account_role("CustomAccountUser", account:)
+        RoleOverride.manage_role_override(account, role, :read_course_content, override: true)
+        custom_admin = account_admin_user(account:, role:, active_all: true)
+        expect(assignment.can_read_assignment?(custom_admin)).to be true
+      end
+
+      it "returns true when passed with valid session parameter" do
+        session = { user_id: teacher.id }
+        expect(assignment.can_read_assignment?(teacher, session)).to be true
+      end
+
+      it "returns true when passed with nil session parameter" do
+        expect(assignment.can_read_assignment?(teacher, nil)).to be true
+      end
+
+      it "returns true for teacher with concluded enrollment" do
+        teacher_enrollment = course.enrollments.find_by(user: teacher)
+        teacher_enrollment.conclude
+        expect(assignment.can_read_assignment?(teacher)).to be true
+      end
+
+      it "returns true for ta with concluded enrollment" do
+        ta_enrollment = course.enrollments.find_by(user: ta)
+        ta_enrollment.conclude
+        expect(assignment.can_read_assignment?(ta)).to be true
+      end
+    end
+  end
+
   describe "#can_view_student_names?" do
     let_once(:admin) do
       admin = account_admin_user
@@ -12500,5 +12629,10 @@ describe Assignment do
 
       expect(@assignment.rubric_self_assessment_enabled?).to be_falsey
     end
+  end
+
+  it_behaves_like "an accessibility scannable resource" do
+    let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
+    let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
   end
 end
