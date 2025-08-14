@@ -41,6 +41,7 @@ const InsightsHeader = () => {
       </Flex.Item>
       <Flex.Item>
         <SurveyLinkBox
+          url={ENV.discussion_ai_survey_link}
           text={I18n.t('What do you think of *Discussion Insights*?', {
             wrappers: [`<strong>$1</strong>`],
           })}

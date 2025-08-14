@@ -82,3 +82,68 @@ export type LtiAssetReportWithAsset = LtiAssetReport & {
     submission_attempt: string | null
   }
 }
+
+/**
+ * GraphQL LtiAsset type corresponding to the GraphQL schema
+ */
+export type GraphqlLtiAsset = {
+  _id: string
+  attachmentId?: string
+  attachmentName?: string
+  submissionAttempt?: number
+  submissionId?: string
+}
+
+/**
+ * GraphQL LtiAssetReport type corresponding to the GraphQL schema
+ */
+export type GraphqlLtiAssetReport = {
+  _id: string
+  asset?: GraphqlLtiAsset
+  comment?: string
+  errorCode?: string
+  indicationAlt?: string
+  indicationColor?: string
+  launchUrlPath?: string
+  priority: number
+  processingProgress: string
+  processorId: string
+  reportType: string
+  resubmitAvailable: boolean
+  result?: string
+  resultTruncated?: string
+  title?: string
+}
+
+/**
+ * Converts a GraphQL LtiAssetReport to LtiAssetReportWithAsset format.
+ *
+ * Note: The GraphQL response now includes attachmentName and submissionId fields.
+ */
+export function convertGraphqlLtiAssetReportToLtiAssetReportWithAsset(
+  graphqlresp: GraphqlLtiAssetReport,
+): LtiAssetReportWithAsset {
+  return {
+    _id: parseInt(graphqlresp._id, 10),
+    comment: graphqlresp.comment,
+    errorCode: graphqlresp.errorCode,
+    indicationAlt: graphqlresp.indicationAlt,
+    indicationColor: graphqlresp.indicationColor,
+    launchUrlPath: graphqlresp.launchUrlPath,
+    priority: graphqlresp.priority as 0 | 1 | 2 | 3 | 4 | 5,
+    processingProgress: graphqlresp.processingProgress as LtiAssetReportProcessingProgress,
+    reportType: graphqlresp.reportType,
+    resubmitAvailable: graphqlresp.resubmitAvailable,
+    result: graphqlresp.result,
+    resultTruncated: graphqlresp.resultTruncated,
+    title: graphqlresp.title,
+    asset_processor_id: parseInt(graphqlresp.processorId, 10),
+    asset: {
+      id: graphqlresp.asset ? parseInt(graphqlresp.asset._id, 10) : 0,
+      attachment_id: graphqlresp.asset?.attachmentId || null,
+      attachment_name: graphqlresp.asset?.attachmentName || null,
+      submission_id: graphqlresp.asset?.submissionId || '',
+      submission_attempt: graphqlresp.asset?.submissionAttempt?.toString() || null,
+    },
+  }
+}

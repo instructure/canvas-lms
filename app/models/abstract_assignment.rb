@@ -165,6 +165,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :sub_assignment_submissions, through: :sub_assignments, source: :submissions
   has_many :sub_assignment_overrides, through: :sub_assignments, source: :assignment_overrides
   has_one :estimated_duration, dependent: :destroy, inverse_of: :assignment
+  has_many :comment_bank_items, dependent: :destroy, inverse_of: :assignment
 
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }
@@ -1592,6 +1593,8 @@ class AbstractAssignment < ActiveRecord::Base
     lti_resource_links.find_each(&:destroy)
     lti_asset_processors.find_each(&:destroy)
 
+    comment_bank_items.destroy_all
+
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
   end
@@ -1629,6 +1632,7 @@ class AbstractAssignment < ActiveRecord::Base
     end
     lti_resource_links.find_each(&:undestroy)
     external_tool_tag&.update!(workflow_state: "active")
+    comment_bank_items.where(workflow_state: "deleted").update_all(workflow_state: "active")
   end
 
   def participants_with_overridden_due_at
@@ -4002,7 +4006,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def ordered_moderation_graders_with_slot_taken
-    moderation_graders.with_slot_taken.order(:anonymous_id)
+    @ordered_moderation_graders_with_slot_taken ||= moderation_graders.with_slot_taken.order(:anonymous_id)
   end
 
   def moderation_grader_users_with_slot_taken

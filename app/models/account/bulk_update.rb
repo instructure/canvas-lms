@@ -31,7 +31,7 @@ class Account::BulkUpdate
     user_ids.each do |user_id|
       begin
         user = api_find(User, user_id, account: @context)
-        errors[user_id] = "Not found" unless @context.user_account_associations.where(user_id: user).exists?
+        continue unless @context.user_account_associations.where(user_id: user).exists?
         if user_params[:event]
           event = user_params[:event]
           if %w[suspend unsuspend].include?(event) &&
@@ -59,8 +59,8 @@ class Account::BulkUpdate
     user_ids.each do |user_id|
       begin
         user = api_find(User, user_id, account: @context)
-        errors[user_id] = "Not found" unless @context.user_account_associations.where(user_id: user).exists?
-        if user.allows_user_to_remove_from_account?(@context, @current_user)
+        continue unless @context.user_account_associations.where(user_id: user).exists?
+        if user.allows_user_to_remove_from_account?(@context.root_account, @current_user)
           user.remove_from_root_account(@context.root_account, updating_user: @current_user)
         else
           errors[user_id] = "Can not be removed"

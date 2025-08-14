@@ -19,7 +19,7 @@
 def call() {
   return [
     "rspecq-ci-node-total": 50,
-    "rspecq-processes": 6,
+    "rspecq-processes": 5,
     "rspecq-max-requeues": 2,
     "rspecq-file-split-threshold": 150,
   ]

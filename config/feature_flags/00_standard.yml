@@ -1,4 +1,11 @@
 ---
+ada_chatbot:
+  type: setting
+  state: hidden
+  display_name: Panda Bot Integration
+  description: Enable Panda Bot virtual assistant in the help menu
+  applies_to: RootAccount
+  shadow: true
 allow_opt_out_of_inbox:
   type: setting
   state: hidden
@@ -389,3 +396,9 @@ pkce:
   applies_to: SiteAdmin
   display_name: PKCE in OAuth2 Authorization Code Flow
   description: Enable PKCE in OAuth2 Authorization Code Flow
+restrict_student_access:
+  state: hidden
+  display_name: Restricted Inbox, Files and Calendar Functionality
+  description: Enable restricted functionalities for students so that inbox communications, file movements and calendar events can be restricted.
+  applies_to: RootAccount
+  shadow: true

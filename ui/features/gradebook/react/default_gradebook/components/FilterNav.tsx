@@ -97,6 +97,8 @@ export default function FilterNav({
         return 'grading-periods'
       case 'student-group':
         return 'student-groups'
+      case 'non-collaborative-group':
+        return 'non-collaborative-groups'
       case 'start-date':
         return 'start-date'
       case 'end-date':

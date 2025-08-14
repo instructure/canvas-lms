@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ContrastRatioForm from '../ContrastRatioForm'
 
@@ -27,10 +26,9 @@ describe('ContrastRatioForm', () => {
   const user = userEvent.setup()
   const defaultProps = {
     label: 'Color Contrast Ratio',
-    inputLabel: 'New Color',
-    backgroundColor: '#000000',
-    foregroundColor: '#FFFFFF',
-    contrastRatio: 8.55,
+    inputLabel: 'New text color',
+    backgroundColor: '#FFFFFF',
+    foregroundColor: '#000000',
     onChange: mockOnChange,
   }
 
@@ -42,8 +40,8 @@ describe('ContrastRatioForm', () => {
     render(<ContrastRatioForm {...defaultProps} />)
 
     expect(screen.getByText('Color Contrast Ratio')).toBeInTheDocument()
-    expect(screen.getByText('8.55:1')).toBeInTheDocument()
-    expect(screen.getByText('New Color')).toBeInTheDocument()
+    expect(screen.getByText('21:1')).toBeInTheDocument()
+    expect(screen.getByText('New text color')).toBeInTheDocument()
   })
 
   it('renders background and foreground with correct color codes', () => {
@@ -56,7 +54,7 @@ describe('ContrastRatioForm', () => {
   it('calls onChange when ColorPicker changes color', async () => {
     render(<ContrastRatioForm {...defaultProps} />)
 
-    const input = screen.getByLabelText(/new color/i)
+    const input = screen.getByLabelText(/new text color/i)
     await user.clear(input)
     await user.type(input, '#ff0000')
 
@@ -78,7 +76,7 @@ describe('ContrastRatioForm', () => {
   it('reacts to foregroundColor prop change', () => {
     const {rerender} = render(<ContrastRatioForm {...defaultProps} />)
 
-    expect(screen.getByText('#FFFFFF')).toBeInTheDocument()
+    expect(screen.getByText('#000000')).toBeInTheDocument()
 
     rerender(<ContrastRatioForm {...defaultProps} foregroundColor="#123456" />)
 
@@ -100,5 +98,24 @@ describe('ContrastRatioForm', () => {
     expect(input).not.toHaveFocus()
     input?.focus()
     expect(input).toHaveFocus()
+  })
+
+  it('renders the description', () => {
+    const description = 'This is a custom description'
+    render(<ContrastRatioForm {...defaultProps} description={description} />)
+
+    expect(screen.getByText(description)).toBeInTheDocument()
+  })
+
+  it('renders the suggestion message when background is white', () => {
+    render(<ContrastRatioForm {...defaultProps} />)
+
+    expect(screen.getByTestId('suggestion-message')).toBeInTheDocument()
+  })
+
+  it('does not render suggestion message when background is not white', () => {
+    render(<ContrastRatioForm {...defaultProps} backgroundColor="#CF4A00" />)
+
+    expect(screen.queryByTestId('suggestion-message')).not.toBeInTheDocument()
   })
 })

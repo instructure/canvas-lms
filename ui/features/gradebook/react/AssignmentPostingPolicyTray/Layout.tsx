@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {ScheduledReleasePolicy} from './ScheduledReleasePolicy/ScheduledReleasePolicy'
 
 const I18n = createI18nScope('assignment_posting_policy_tray')
 
@@ -42,6 +43,8 @@ export interface LayoutProps {
 }
 
 export default function Layout(props: LayoutProps) {
+  const {scheduled_feedback_releases: scheduledFeedbackReleasesEnabled} = ENV.FEATURES
+
   const automaticallyPostLabel = (
     <View as="div">
       <Text as="div">{I18n.t('Automatically')}</Text>
@@ -127,6 +130,9 @@ export default function Layout(props: LayoutProps) {
             value={MANUAL_POST}
           />
         </RadioInputGroup>
+        {scheduledFeedbackReleasesEnabled && props.selectedPostManually && (
+          <ScheduledReleasePolicy />
+        )}
       </View>
 
       <View as="div" margin="0 medium" className="hr" />

@@ -22,15 +22,17 @@ import {ReactNode} from 'react'
 export const GroupedSelectLayout = (props: {
   groups: ReactNode
   items: ReactNode
+  onKeyDown: (event: React.KeyboardEvent) => void
+  onBlur?: (event: React.FocusEvent) => void
 }) => {
   return (
-    <Flex alignItems="start" gap="medium">
-      <Flex direction="column" gap="xx-small">
+    <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown} onBlur={props.onBlur}>
+      <Flex.Item direction="column" size="200px" data-testid="grouped-select-groups">
         {props.groups}
-      </Flex>
-      <Flex direction="column" gap="xx-small">
+      </Flex.Item>
+      <Flex.Item direction="column" shouldGrow data-testid="grouped-select-items">
         {props.items}
-      </Flex>
+      </Flex.Item>
     </Flex>
   )
 }

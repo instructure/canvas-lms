@@ -24,6 +24,7 @@ class CommentBankItem < ActiveRecord::Base
 
   belongs_to :course, optional: false, inverse_of: :comment_bank_items
   belongs_to :user, optional: false
+  belongs_to :assignment, optional: true
   resolves_root_account through: :course
 
   validates :comment, length: { maximum: maximum_text_length, allow_blank: false }

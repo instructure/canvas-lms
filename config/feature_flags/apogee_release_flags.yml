@@ -497,3 +497,22 @@ grading_assistance_file_uploads:
   display_name: Grading Assistance File Uploads
   description: Enables support for uploading files as part of the AI-assisted grading tool in the Modernized Speedgrader.
   shadow: true
+comment_bank_per_assignment:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Filter Comment Bank Items by Assignment
+  description: |
+      Allows the comment bank items in the modernized speedgrader to be limited to the current assignment and course
+      being graded.
+scheduled_feedback_releases:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Scheduled Feedback Release
+  description: |
+      This feature allows for graders to schedule the release of grades and comments at a set date/time when 
+      an assignment is set to be posted manually.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

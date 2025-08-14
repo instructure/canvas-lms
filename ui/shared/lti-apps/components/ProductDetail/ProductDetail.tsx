@@ -232,7 +232,12 @@ const ProductDetail = (props: ProductDetailProps) => {
 
   const renderTags = () => {
     return product?.tags.map((t, i) => (
-      <Tag text={t.name} margin="x-small x-small 0 0" key={`${i + 1}`} />
+      <Tag
+        text={t.name}
+        margin="x-small x-small 0 0"
+        key={`${i + 1}`}
+        themeOverride={{maxWidth: 'none'}}
+      />
     ))
   }
 

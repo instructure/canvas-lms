@@ -334,14 +334,21 @@ module Types
           base_url: self.context[:request].base_url
         )
 
-        collections = search_contexts_and_users(
+        search_options = {
           search:,
           context:,
           synthetic_contexts: true,
           messageable_only: true,
           base_url: self.context[:request].base_url,
           include_concluded: false
-        )
+        }
+
+        # Only allow students to search for teachers to prevent them from messaging other students
+        if object.has_student_enrollment? && object.account.root_account.feature_enabled?(:restrict_student_access)
+          search_options[:restrict_to_teacher_recipients] = true
+        end
+
+        collections = search_contexts_and_users(**search_options)
 
         contexts_collection = collections.select { |c| c[0] == "contexts" }
         users_collection = collections.select { |c| c[0] == "participants" }
@@ -393,7 +400,7 @@ module Types
       argument :filter, Types::UserGroupMembershipsFilterInputType, required: false
     end
     def group_memberships(filter: {})
-      Loaders::UserLoaders::GroupMembershipsLoader.for(filter:).load(object.id)
+      Loaders::UserLoaders::GroupMembershipsLoader.for(executing_user: current_user, filter:).load(object.id)
     end
 
     field :differentiation_tags_connection, GroupMembershipType.connection_type, null: true do
@@ -562,14 +569,19 @@ module Types
       argument :query, String, <<~MD, required: false
         Only include comments that match the query string.
       MD
+      argument :assignment_id, ID, required: false
+      argument :course_id, ID, required: false
       argument :limit, Integer, required: false
     end
-    def comment_bank_items_connection(query: nil, limit: nil)
+    def comment_bank_items_connection(query: nil, course_id: nil, assignment_id: nil, limit: nil)
       return unless object == current_user
 
       comments = current_user.comment_bank_items.shard(object)
 
       comments = comments.where(ActiveRecord::Base.wildcard("comment", query.strip)) if query&.strip.present?
+      comments = comments.where(course_id:) if course_id.present?
+      comments = comments.where(assignment_id:) if assignment_id.present?
+
       # .to_a gets around the .shard() bug documented in FOO-1989 so that it can be properly limited.
       # After that bug is fixed and Switchman is upgraded in Canvas, we can remove the block below
       # and use the 'first' argument on the connection instead of 'limit'.

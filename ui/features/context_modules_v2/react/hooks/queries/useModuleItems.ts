@@ -19,53 +19,75 @@
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@tanstack/react-query'
-import persistedQueries from '@canvas/graphql/persistedQueries'
+import type {
+  ModuleItem,
+  PaginatedNavigationGraphQLResult,
+  PaginatedNavigationResponse,
+} from '../../utils/types'
+import {MODULE_ITEMS, PAGE_SIZE, MODULE_ITEMS_QUERY_MAP} from '../../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
-export const MODULE_ITEMS_QUERY = gql`${persistedQueries.GetModuleItemsQuery.query}`
-
-const transformItems = (items: ModuleItem[], moduleId: string) => {
-  return items.map((item, index) => ({
+const transformItems = (items: ModuleItem[], moduleId: string) =>
+  items.map((item, index) => ({
     ...item,
     moduleId,
     index,
   }))
-}
 
-async function getModuleItems({queryKey}: {queryKey: any}): Promise<ModuleItemsResponse> {
-  const [_key, moduleId] = queryKey
+export async function getModuleItems(
+  moduleId: string,
+  cursor: string | null,
+  view: string = 'teacher',
+  pageSize: number = PAGE_SIZE,
+): Promise<PaginatedNavigationResponse> {
+  const persistedQuery = MODULE_ITEMS_QUERY_MAP[view]
+  const query = gql`${persistedQuery}`
+
   try {
-    const result = await executeQuery<ModuleItemsGraphQLResult>(MODULE_ITEMS_QUERY, {
+    const initialResult = await executeQuery<PaginatedNavigationGraphQLResult>(query, {
       moduleId,
+      cursor: cursor,
+      first: pageSize,
     })
 
-    if (result.errors) {
-      throw new Error(result.errors.map(err => err.message).join(', '))
+    if (initialResult.errors) {
+      throw new Error(initialResult.errors.map(err => err.message).join(', '))
     }
 
-    const moduleItems = result.legacyNode?.moduleItems || []
+    const {moduleItemsConnection} = initialResult.legacyNode || {}
+    const edges = moduleItemsConnection?.edges || []
+    const pageInfo = moduleItemsConnection?.pageInfo || {
+      hasNextPage: false,
+      endCursor: null,
+    }
 
     return {
-      moduleItems: transformItems(moduleItems, moduleId),
+      moduleItems: transformItems(
+        edges.map(edge => edge.node),
+        moduleId,
+      ),
+      pageInfo,
     }
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     showFlashError(I18n.t('Failed to load module items: %{error}', {error: errorMessage}))
     throw error
   }
 }
 
-export function useModuleItems(moduleId: string, enabled: boolean = false) {
-  return useQuery<ModuleItemsResponse, Error>({
-    queryKey: ['moduleItems', moduleId],
-    queryFn: getModuleItems,
+export function useModuleItems(
+  moduleId: string,
+  cursor: string | null,
+  enabled: boolean,
+  view: string = 'teacher',
+) {
+  return useQuery<PaginatedNavigationResponse, Error>({
+    queryKey: [MODULE_ITEMS, moduleId, cursor],
+    queryFn: () => getModuleItems(moduleId, cursor, view),
     enabled,
-    refetchOnWindowFocus: true,
-    // 15 minutes, will reload on refresh because there is no persistence
     staleTime: 15 * 60 * 1000,
   })
 }

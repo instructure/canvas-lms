@@ -42,6 +42,7 @@ class Lti::ContextControl < ActiveRecord::Base
 
   validate :context_belongs_to_deployment
 
+  before_validation :set_registration_id
   before_create :set_path
   before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
@@ -166,6 +167,24 @@ class Lti::ContextControl < ActiveRecord::Base
       end
     end
 
+    # Given one-to-many deployments, return the primary control for each.
+    # Similar to ContextExternalTool#primary_control, but for multiple deployments.
+    # `deployments` is an array of ContextExternalTool objects or their IDs.
+    def primary_controls_for(deployments:)
+      lcc = quoted_table_name
+      join_sql = <<~SQL.squish
+        INNER JOIN #{ContextExternalTool.quoted_table_name} cet
+        ON cet.id = #{lcc}.deployment_id
+        AND (
+          (cet.context_id = #{lcc}.account_id AND cet.context_type = 'Account')
+          OR
+          (cet.context_id = #{lcc}.course_id AND cet.context_type = 'Course')
+        )
+      SQL
+
+      where(deployment_id: deployments).active.joins(join_sql)
+    end
+
     private
 
     def query_by_paths(context:, registration: nil, deployment: nil)
@@ -243,6 +262,10 @@ class Lti::ContextControl < ActiveRecord::Base
 
   def set_path
     self.path = self.class.calculate_path(account || course)
+  end
+
+  def set_registration_id
+    self.registration_id ||= deployment.lti_registration_id
   end
 
   def only_one_context?

@@ -16,28 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Heading} from '@instructure/ui-heading'
-import {type TextBlockProps} from './TextBlock'
+import {TextBlockPreviewProps} from './types'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
+import {TextEditPreview} from '../BlockItems/Text/TextEditPreview'
+import {Flex} from '@instructure/ui-flex'
 
-const I18n = createI18nScope('page_editor')
-
-export const TextBlockEditPreview = (props: TextBlockProps) => {
-  const isTitleDefined = props.title.trim().length > 0
-  const isContentDefined = props.content.trim().length > 0
-
-  const content = isContentDefined
-    ? props.content
-    : `<p style="color: '#9EA6AD'">${I18n.t('Type to add body')}</p>`
-
+export const TextBlockEditPreview = (props: TextBlockPreviewProps) => {
   return (
-    <>
-      {props.settings.includeBlockTitle && (
-        <Heading variant="titleSection" color={isTitleDefined ? 'primary' : 'secondary'}>
-          {isTitleDefined ? props.title : I18n.t('Type to add block title')}
-        </Heading>
-      )}
-      <div dangerouslySetInnerHTML={{__html: content}}></div>
-    </>
+    <Flex direction="column" gap="mediumSmall">
+      {props.settings.includeBlockTitle && <TitleEditPreview title={props.title} />}
+      <TextEditPreview content={props.content} />
+    </Flex>
   )
 }

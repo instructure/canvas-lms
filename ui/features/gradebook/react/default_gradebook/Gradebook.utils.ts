@@ -375,7 +375,7 @@ export const getLabelForFilter = (
       formatGradingPeriodTitleForDisplay(gradingPeriods.find(g => g.id === filter.value)) ||
       I18n.t('Grading Period')
     )
-  } else if (filter.type === 'student-group') {
+  } else if (filter.type === 'student-group' || filter.type === 'non-collaborative-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
       .flat()

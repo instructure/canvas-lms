@@ -284,7 +284,7 @@ module OutcomeCommon
     expect(f("#content")).not_to contain_css(".learning_outcome")
   end
 
-  def should_validate_decaying_average_range
+  def should_validate_decaying_average_range(text = "Must be between 1 and 99")
     get outcome_url
     f(".add_outcome_link").click
     wait_for_tiny(f(".outcomes-content textarea[name=description]"))
@@ -298,14 +298,14 @@ module OutcomeCommon
     wait_for_ajaximations
     error_box = f("#calculation_int_container [class$=formFieldMessages] > span:last-child")
     expect(error_box).to be_present
-    expect(error_box).to include_text("Must be between 1 and 99")
+    expect(error_box).to include_text(text)
     # enter invalid number above range
     replace_content(f("input[name=calculation_int]"), above_range)
     f(".submit_button").click
     wait_for_ajaximations
     error_box = f("#calculation_int_container [class$=formFieldMessages] > span:last-child")
     expect(error_box).to be_present
-    expect(error_box).to include_text("Must be between 1 and 99")
+    expect(error_box).to include_text(text)
   end
 
   def should_validate_n_mastery_range

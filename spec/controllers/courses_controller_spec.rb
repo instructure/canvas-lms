@@ -278,6 +278,37 @@ describe CoursesController do
           end
         end
       end
+
+      context "on accessibility column" do
+        before do
+          skip("Flaky spec needs fixed in LMA-226") unless Account.site_admin.feature_enabled?(:accessibility_tab_enable)
+
+          # For accessibility column
+          wiki_page = wiki_page_model(course: @course1)
+          scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
+          scan.assign_attributes(
+            course: @course1,
+            workflow_state: "completed",
+            resource_name: wiki_page.title,
+            resource_workflow_state: "published",
+            resource_updated_at: wiki_page.updated_at,
+            issue_count: 1
+          )
+          scan.save!
+        end
+
+        it "lists courses with accessibility issues first" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+        end
+
+        it "lists courses with accessibility issues last when descending order" do
+          user_session(@student)
+          get_index(index_params: { sort_column => "accessibility", order_column => "desc" })
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+        end
+      end
     end
 
     describe "current_enrollments" do
@@ -2730,22 +2761,6 @@ describe CoursesController do
       end
     end
 
-    context "with disable_file_verifiers_in_public_syllabus disabled" do
-      before do
-        @account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
-      end
-
-      it "does not create attachment_associations when files are linked in the syllabus" do
-        attachment_model(context: @user)
-        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
-
-        expect(response).to be_successful
-        json = response.parsed_body
-        course = Course.find(json["id"])
-        expect(course.attachment_associations).to be_empty
-      end
-    end
-
     context "when course templates are enabled" do
       def create_account_template
         template = @account.courses.create!(name: "Template Course", template: true)
@@ -4697,6 +4712,34 @@ describe CoursesController do
         ]
       )
     end
+
+    describe "filters by enrollment types" do
+      it "when requested with a string" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: "Student"
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(2)
+      end
+
+      it "when requested with an array of strings" do
+        user_session(teacher)
+        get "users", params: {
+          course_id: course.id,
+          format: "json",
+          include: ["enrollments"],
+          enrollment_type: ["Student", "Teacher"]
+        }
+        json = json_parse(response.body)
+        expect(response).to be_successful
+        expect(json.length).to eq(3)
+      end
+    end
   end
 
   describe "#content_share_users" do
@@ -5321,6 +5364,139 @@ describe CoursesController do
       end
 
       include_examples "youtube migration protection"
+    end
+
+    describe "get conversion status" do
+      subject { get :youtube_migration_conversion_status, params: { course_id: @course.id, resource_type:, resource_id: } }
+
+      let(:resource_type) { "WikiPage" }
+      let(:resource_id) { 123 }
+
+      before do
+        @course.account.enable_feature!(:youtube_migration)
+      end
+
+      context "when not authorized" do
+        before do
+          user_session(user_factory)
+        end
+
+        it "returns unauthorized" do
+          subject
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when authorized" do
+        before do
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        context "with no active conversions" do
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with active conversions" do
+          let(:embed_data) do
+            {
+              "field" => "body",
+              "id" => 123,
+              "path" => "/videos/123",
+              "resource_type" => "WikiPage",
+              "src" => "https://youtube.com/video123"
+            }
+          end
+          let!(:progress) do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "running",
+              results: { "original_embed" => embed_data }
+            )
+          end
+
+          it "returns active conversions for the resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"].length).to eq(1)
+            expect(json["conversions"][0]["id"]).to eq(progress.id)
+            expect(json["conversions"][0]["workflow_state"]).to eq("running")
+            expect(json["conversions"][0]["original_embed"]).to eq(embed_data)
+          end
+        end
+
+        context "with completed conversions" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "WikiPage|123",
+              workflow_state: "completed",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "does not return completed conversions" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "with conversions for different resources" do
+          before do
+            Progress.create!(
+              tag: "youtube_embed_convert",
+              context: @course,
+              message: "Assignment|456",
+              workflow_state: "running",
+              results: { "original_embed" => {} }
+            )
+          end
+
+          it "only returns conversions for the requested resource" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+
+        context "without resource parameters" do
+          subject { get :youtube_migration_conversion_status, params: { course_id: @course.id } }
+
+          it "returns empty conversions array" do
+            subject
+            expect(response).to have_http_status(:ok)
+            json = response.parsed_body
+            expect(json["conversions"]).to eq([])
+          end
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before do
+          @course.account.disable_feature!(:youtube_migration)
+          @teacher = user_factory
+          @course.enroll_teacher(@teacher).accept!
+          user_session(@teacher)
+        end
+
+        it "returns not found" do
+          subject
+          expect(response).to have_http_status(:not_found)
+        end
+      end
     end
   end
 

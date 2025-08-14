@@ -48,7 +48,7 @@ import {
   ModuleItemMasterCourseRestrictionType,
 } from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
-import {mapContentSelection} from '../utils/utils'
+import {mapContentSelection, mapContentTypeForSharing} from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
 import EditItemModal from './EditItemModal'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -98,7 +98,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isEditItemOpen, setIsEditItemOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
-  const {courseId, isMasterCourse, isChildCourse} = useContextModule()
+  const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
 
   const renderMasteryPathsInfo = () => {
     if (!masteryPathsData || (!masteryPathsData.isTrigger && !masteryPathsData.releasedLabel)) {
@@ -141,7 +141,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [content, courseId, setIsMenuOpen, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
-    handleDuplicate(moduleId, itemId, queryClient, courseId, setIsMenuOpen)
+    handleDuplicate(moduleId, itemId, queryClient, courseId, setMenuItemLoadingState, setIsMenuOpen)
   }, [moduleId, itemId, courseId, setIsMenuOpen])
 
   const handleMoveToRef = useCallback(() => {
@@ -192,12 +192,12 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [moduleId, itemId, content, courseId, setIsMenuOpen])
 
   const handleMasteryPathsRef = useCallback(() => {
-    handleMasteryPaths(masteryPathsData, itemId, setIsMenuOpen)
-  }, [masteryPathsData, itemId, setIsMenuOpen])
+    handleMasteryPaths(itemId, setIsMenuOpen)
+  }, [itemId, setIsMenuOpen])
 
   const publishIconOnClickRef = useCallback(() => {
-    handlePublishToggle(moduleId, itemId, title, content, canBeUnpublished, queryClient, courseId)
-  }, [moduleId, itemId, content, canBeUnpublished, courseId])
+    handlePublishToggle(moduleId, itemId, title, canBeUnpublished, queryClient, courseId, published)
+  }, [moduleId, itemId, content, canBeUnpublished, courseId, published])
 
   const renderFilePublishButton = () => {
     const file = new ModuleFile({
@@ -210,11 +210,11 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       display_name: title,
       thumbnail_url: content?.thumbnailUrl,
       module_item_id: parseInt(itemId),
-      published: content?.published,
+      published: published,
     })
 
     const props = {
-      userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit,
+      userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS?.manage_files_edit ?? false,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS?.usage_rights_required,
       fileName: content?.displayName,
     }
@@ -263,7 +263,9 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         {/* Kebab Menu */}
         <Flex.Item data-testid={`module-item-action-menu_${itemId}`}>
           <ModuleItemActionMenu
+            moduleId={moduleId}
             itemType={content?.type || ''}
+            content={content}
             canDuplicate={content?.canDuplicate || false}
             isMenuOpen={isMenuOpen}
             setIsMenuOpen={setIsMenuOpen}
@@ -288,11 +290,12 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       ) && (
         <>
           <DirectShareUserModal
+            id={moduleId}
             open={isDirectShareOpen}
             sourceCourseId={courseId}
             courseId={courseId}
             contentShare={{
-              content_type: content?.type?.toLowerCase() || '',
+              content_type: mapContentTypeForSharing(content?.type || ''),
               content_id: content?._id,
             }}
             onDismiss={() => {

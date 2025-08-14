@@ -73,7 +73,7 @@
 #     }
 #
 class GroupMembershipsController < ApplicationController
-  before_action :find_group, only: %i[index show create update destroy]
+  before_action :find_group, only: %i[index show create update destroy destroy_bulk]
 
   include Api::V1::Group
 
@@ -299,10 +299,49 @@ class GroupMembershipsController < ApplicationController
   def destroy
     find_membership
     if authorized_action(@membership, @current_user, :delete)
-      @membership.workflow_state = "deleted"
-      @membership.save
+      @membership.update(workflow_state: "deleted")
       render json: { "ok" => true }
     end
+  end
+
+  # @API Bulk delete memberships
+  #  Bulk deletes memberships by providing an array of user IDs.
+  #
+  # @argument user_ids[] [Integer] - An array of user IDs to delete memberships in bulk.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/groups/<group_id>/users \
+  #          -X DELETE \
+  #          -F 'user_ids[]=123' \
+  #          -F 'user_ids[]=456' \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [JSON]
+  #   - For single deletion: `{ "ok": true }`
+  #   - For bulk deletion:
+  #     ```json
+  #     {
+  #       "message": "Bulk delete completed",
+  #       "deleted_user_ids": [123, 456],
+  #       "unauthorized_user_ids": [789]
+  #     }
+  def destroy_bulk
+    user_ids = Array(params[:user_ids]).map(&:to_i)
+    memberships = @group.group_memberships.where(user_id: user_ids)
+
+    unauthorized_memberships = memberships.reject do |membership|
+      can_do(membership, @current_user, :delete)
+    end
+
+    memberships_to_delete = memberships - unauthorized_memberships
+    memberships_to_delete.each { |membership| membership.update(workflow_state: "deleted") }
+
+    render json: {
+             message: "Bulk delete completed",
+             deleted_user_ids: memberships_to_delete.map(&:user_id),
+             unauthorized_user_ids: unauthorized_memberships.map(&:user_id)
+           },
+           status: :ok
   end
 
   protected

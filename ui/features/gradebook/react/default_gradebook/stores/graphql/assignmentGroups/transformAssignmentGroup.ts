@@ -18,18 +18,23 @@
 
 import {AssignmentGroup as ApiAssignmentGroup} from 'api.d'
 import {AssignmentGroup} from './getAssignmentGroups'
+import {isNil, omitBy} from 'lodash'
 
-export const transformAssignmentGroup = (it: AssignmentGroup): ApiAssignmentGroup => ({
-  id: it._id,
-  name: it.name ?? '',
-  position: it.position ?? 0,
-  assignments: [],
-  group_weight: it.groupWeight ?? 0,
-  rules: {
+export const transformAssignmentGroup = (it: AssignmentGroup): ApiAssignmentGroup => {
+  const rules = {
     drop_highest: it.rules?.dropHighest ?? undefined,
     drop_lowest: it.rules?.dropLowest ?? undefined,
     never_drop: it.rules?.neverDrop?.map(it => it._id),
-  },
-  sis_source_id: it.sisId,
-  integration_data: null,
-})
+  }
+
+  return {
+    id: it._id,
+    name: it.name ?? '',
+    position: it.position ?? 0,
+    assignments: [],
+    group_weight: it.groupWeight ?? 0,
+    rules: omitBy(rules, isNil),
+    sis_source_id: it.sisId,
+    integration_data: null,
+  }
+}

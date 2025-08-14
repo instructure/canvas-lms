@@ -128,12 +128,12 @@ describe('ModuleItemSupplementalInfo', () => {
       expect(container.container).toBeInTheDocument()
 
       // Should show checkpoint dates, not regular due date
-      expect(container.getAllByTestId('checkpoint-due-date')).toHaveLength(2)
+      expect(container.getAllByTestId('due-date')).toHaveLength(2)
       expect(container.getByText(/Reply to Topic:/)).toBeInTheDocument()
       expect(container.getByText(/Required Replies \(2\):/)).toBeInTheDocument()
 
-      // Should not show regular due date
-      expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+      // Should show checkpoint due dates (which use the same testid as regular due dates)
+      expect(container.queryAllByTestId('due-date')).toHaveLength(2)
     })
 
     it('renders multiple checkpoints with separators', () => {
@@ -152,7 +152,7 @@ describe('ModuleItemSupplementalInfo', () => {
       const container = setUp(singleCheckpointContent, null)
 
       expect(container.getByText(/Reply to Topic:/)).toBeInTheDocument()
-      expect(container.getByTestId('checkpoint-due-date')).toBeInTheDocument()
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
       expect(container.queryByText(/Required Replies/)).not.toBeInTheDocument()
     })
 
@@ -165,7 +165,7 @@ describe('ModuleItemSupplementalInfo', () => {
       const container = setUp(singleCheckpointContent, null)
 
       expect(container.getByText(/Required Replies \(3\):/)).toBeInTheDocument()
-      expect(container.getByTestId('checkpoint-due-date')).toBeInTheDocument()
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
     })
 
     it('renders reply_to_entry checkpoint without count', () => {
@@ -276,6 +276,259 @@ describe('ModuleItemSupplementalInfo', () => {
       }
       const container = setUp(emptyContent, null)
       expect(container.container.firstChild).toBeNull()
+    })
+  })
+
+  describe('discussion date handling integration', () => {
+    const gradedDiscussionWithAssignmentDueAt: ModuleItemContent = {
+      id: '24',
+      type: 'Discussion',
+      graded: true,
+      assignment: {
+        _id: 'assignment-24',
+        dueAt: '2024-01-15T23:59:59Z',
+      },
+      pointsPossible: 10,
+    }
+
+    const gradedDiscussionWithMultipleDates: ModuleItemContent = {
+      id: '25',
+      type: 'Discussion',
+      graded: true,
+      assignment: {
+        _id: 'assignment-25',
+        dueAt: '2024-01-15T23:59:59Z',
+        assignmentOverrides: {
+          edges: [
+            {
+              cursor: 'MQ',
+              node: {
+                dueAt: '2024-01-16T23:59:59Z',
+                set: {sectionId: '1'},
+              },
+            },
+          ],
+        },
+      },
+      pointsPossible: 15,
+    }
+
+    const discussionWithStandardizedDates: ModuleItemContent = {
+      id: '26',
+      type: 'Discussion',
+      graded: true,
+      assignedToDates: [
+        {
+          id: 'everyone',
+          dueAt: '2024-01-15T23:59:59Z',
+          title: 'Everyone',
+          base: true,
+        },
+        {
+          id: 'section-1',
+          dueAt: '2024-01-16T23:59:59Z',
+          title: 'Section 1',
+          set: {
+            id: '1',
+            type: 'CourseSection',
+          },
+        },
+      ],
+      pointsPossible: 20,
+    }
+
+    const checkpointDiscussionWithMixedDates: ModuleItemContent = {
+      id: '27',
+      type: 'Discussion',
+      pointsPossible: 25,
+      checkpoints: [
+        {
+          dueAt: '2024-01-20T23:59:59Z',
+          name: 'Reply to Topic',
+          tag: 'reply_to_topic',
+        },
+        {
+          dueAt: '2024-01-22T23:59:59Z',
+          name: 'Required Replies',
+          tag: 'reply_to_entry',
+        },
+      ],
+      replyToEntryRequiredCount: 3,
+      assignment: {
+        _id: 'assignment-27',
+        dueAt: '2024-01-18T23:59:59Z',
+        assignmentOverrides: {
+          edges: [
+            {
+              cursor: 'MQ',
+              node: {
+                dueAt: '2024-01-19T23:59:59Z',
+                set: {sectionId: '1'},
+              },
+            },
+          ],
+        },
+      },
+    }
+
+    beforeEach(() => {
+      // Reset ENV for each test
+      ENV.FEATURES = {standardize_assignment_date_formatting: false}
+    })
+
+    describe('graded discussion date handling', () => {
+      it('displays assignment.dueAt for graded discussion', () => {
+        const container = setUp(gradedDiscussionWithAssignmentDueAt, null)
+        expect(container.getByTestId('due-date')).toBeInTheDocument()
+        expect(container.getByText('10 pts')).toBeInTheDocument()
+        expect(container.getAllByText('|')).toHaveLength(1)
+      })
+
+      it('displays Multiple Due Dates for graded discussion with overrides', () => {
+        const container = setUp(gradedDiscussionWithMultipleDates, null)
+        expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+        expect(container.getByText('15 pts')).toBeInTheDocument()
+        expect(container.getAllByText('|')).toHaveLength(1)
+      })
+
+      it('integrates with standardized dates when feature flag enabled', () => {
+        ENV.FEATURES = {standardize_assignment_date_formatting: true}
+        const container = setUp(discussionWithStandardizedDates, null)
+        expect(container.getByText('Multiple Due Dates')).toBeInTheDocument()
+        expect(container.getByText('20 pts')).toBeInTheDocument()
+        expect(container.getAllByText('|')).toHaveLength(1)
+      })
+
+      it('shows single date for single standardized date', () => {
+        ENV.FEATURES = {standardize_assignment_date_formatting: true}
+        const singleDateContent = {
+          ...discussionWithStandardizedDates,
+          assignedToDates: [discussionWithStandardizedDates.assignedToDates![0]],
+        }
+        const container = setUp(singleDateContent, null)
+        expect(container.getByTestId('due-date')).toBeInTheDocument()
+        expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+        expect(container.getByText('20 pts')).toBeInTheDocument()
+      })
+    })
+
+    describe('checkpoint discussion integration', () => {
+      it('prioritizes checkpoints over assignment dates', () => {
+        const container = setUp(checkpointDiscussionWithMixedDates, null)
+
+        // Should show checkpoints, not assignment dates
+        expect(container.getAllByTestId('due-date')).toHaveLength(2)
+        expect(container.getByText(/Reply to Topic:/)).toBeInTheDocument()
+        expect(container.getByText(/Required Replies \(3\):/)).toBeInTheDocument()
+
+        // Should not show Multiple Due Dates even though assignment has overrides
+        expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+
+        // Should show points
+        expect(container.getByText('25 pts')).toBeInTheDocument()
+
+        // Should have separators: checkpoint1 | checkpoint2 | points
+        expect(container.getAllByText('|')).toHaveLength(2)
+      })
+
+      it('handles checkpoint discussion with completion requirement', () => {
+        const completionReq: CompletionRequirement = {
+          id: '27',
+          type: 'must_view',
+          completed: false,
+        }
+        const container = setUp(checkpointDiscussionWithMixedDates, completionReq)
+
+        expect(container.getAllByTestId('due-date')).toHaveLength(2)
+        expect(container.getByText('25 pts')).toBeInTheDocument()
+
+        // Should have separators: checkpoint1 | checkpoint2 | points | completion
+        expect(container.getAllByText('|')).toHaveLength(3)
+      })
+    })
+
+    describe('edge cases and error handling', () => {
+      const discussionWithNoDates: ModuleItemContent = {
+        id: '28',
+        type: 'Discussion',
+        graded: false,
+        pointsPossible: 5,
+      }
+
+      const discussionWithNullCheckpoints: ModuleItemContent = {
+        id: '29',
+        type: 'Discussion',
+        checkpoints: [],
+        dueAt: '2024-01-15T23:59:59Z',
+        pointsPossible: 10,
+      }
+
+      const discussionWithMalformedData: ModuleItemContent = {
+        id: '30',
+        type: 'Discussion',
+        graded: true,
+        assignment: {
+          _id: 'assignment-30',
+          // Missing dueAt
+        },
+        assignedToDates: [], // Empty standardized dates
+        pointsPossible: 15,
+      }
+
+      it('handles discussion with no dates gracefully', () => {
+        const container = setUp(discussionWithNoDates, null)
+        expect(container.getByText('5 pts')).toBeInTheDocument()
+        expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+        expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+        expect(container.queryAllByText('|')).toHaveLength(0) // No separators when only points
+      })
+
+      it('falls back to regular due date when checkpoints empty', () => {
+        const container = setUp(discussionWithNullCheckpoints, null)
+        expect(container.getByTestId('due-date')).toBeInTheDocument()
+        expect(container.getByText('10 pts')).toBeInTheDocument()
+        expect(container.getAllByText('|')).toHaveLength(1)
+      })
+
+      it('handles malformed discussion data', () => {
+        ENV.FEATURES = {standardize_assignment_date_formatting: true}
+        const container = setUp(discussionWithMalformedData, null)
+        expect(container.getByText('15 pts')).toBeInTheDocument()
+        expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+        expect(container.queryByText('Multiple Due Dates')).not.toBeInTheDocument()
+      })
+    })
+
+    describe('integration with completion requirements', () => {
+      const completionReq: CompletionRequirement = {
+        id: '31',
+        type: 'must_view',
+        completed: true,
+      }
+
+      it('shows all components for discussion with dates, points, and completion', () => {
+        const container = setUp(gradedDiscussionWithAssignmentDueAt, completionReq)
+        expect(container.getByTestId('due-date')).toBeInTheDocument()
+        expect(container.getByText('10 pts')).toBeInTheDocument()
+
+        // Should have separators: date | points | completion
+        expect(container.getAllByText('|')).toHaveLength(2)
+      })
+
+      it('shows completion without dates for discussion', () => {
+        const discussionNoDates = {
+          id: '32',
+          type: 'Discussion' as const,
+          graded: true,
+          pointsPossible: 8,
+        }
+        const container = setUp(discussionNoDates, completionReq)
+        expect(container.getByText('8 pts')).toBeInTheDocument()
+        expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+
+        // Should have separator: points | completion
+        expect(container.getAllByText('|')).toHaveLength(1)
+      })
     })
   })
 })

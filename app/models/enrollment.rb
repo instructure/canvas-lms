@@ -80,6 +80,7 @@ class Enrollment < ActiveRecord::Base
   after_save :reset_notifications_cache
   after_save :dispatch_invitations_later
   after_save :add_to_favorites_later
+  after_save :delete_student_allocation_rules_if_needed
   after_commit :update_cached_due_dates
   after_save :update_assignment_overrides_if_needed
   after_create :needs_grading_count_updated, if: :active_student?
@@ -199,6 +200,14 @@ class Enrollment < ActiveRecord::Base
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       clear_needs_grading_count_cache
+    end
+  end
+
+  def delete_student_allocation_rules_if_needed
+    # Delete allocation rules for this user in the course if the enrollment was concluded, deactivated, or deleted
+    if saved_change_to_workflow_state? && %w[completed inactive deleted].include?(workflow_state)
+      user_course_rules = AllocationRule.for_user_in_course(user_id, course_id)
+      user_course_rules.update_all(workflow_state: "deleted")
     end
   end
 

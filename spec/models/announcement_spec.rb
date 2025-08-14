@@ -299,6 +299,28 @@ describe Announcement do
         @a.delayed_post
       end.to change { @a.messages_sent[notification_name] }
     end
+
+    it "does not broadcast on update if announcement is locked_for user" do
+      course_with_student(active_all: true)
+      notification_name = "New Announcement"
+      Notification.create(name: notification_name, category: "TestImmediately")
+
+      pseudo_teacher_role = @course.account.roles.create!(
+        name: "Pseudo Teacher",
+        base_role_type: "StudentEnrollment"
+      )
+      pseudo_teacher = user_factory(active_all: true)
+      # pseudo teacher have been enrolled as a teacher but only has user permissions
+      # hence no matter what his enrollement is, he should not receive the announcement
+      @course.enroll_user(pseudo_teacher, "TeacherEnrollment", role: pseudo_teacher_role, enrollment_state: "active")
+      communication_channel(pseudo_teacher)
+
+      announcement_model(user: @teacher, context: @course)
+
+      @a.update!(message: "Updated message", notify_users: true)
+      to_users = @a.messages_sent[notification_name].map(&:user)
+      expect(to_users).not_to include(pseudo_teacher)
+    end
   end
 
   describe "show_in_search_for_user?" do

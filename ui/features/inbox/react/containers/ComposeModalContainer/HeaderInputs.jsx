@@ -90,6 +90,10 @@ const HeaderInputs = props => {
   }
 
   const invalidRecipient = !!props.addressBookMessages?.length
+  const hideIndividualMessageCheckbox =
+    ENV?.FEATURES?.restrict_student_access &&
+    ENV?.current_user_has_teacher_enrollment &&
+    !(ENV?.current_user_roles || []).includes('student')
 
   return (
     <Flex direction="column" width="100%" height="100%" padding="small">
@@ -120,7 +124,7 @@ const HeaderInputs = props => {
           }
         />
       </Flex.Item>
-      {!props.isReply && !props.isForward && (
+      {!props.isReply && !props.isForward && !hideIndividualMessageCheckbox && (
         <Flex.Item padding="none none small none">
           <ComposeInputWrapper
             shouldGrow={true}

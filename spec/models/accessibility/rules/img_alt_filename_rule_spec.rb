@@ -79,8 +79,7 @@ describe Accessibility::Rules::ImgAltFilenameRule do
       input_html = '<div><img id="test-element" src="image.jpg" alt="image.jpg"></div>'
       fixed_html = fix_issue(:img_alt_filename, input_html, './/img[@id="test-element"]', "Descriptive alt text")
 
-      expect(fixed_html).to include('<img id="test-element" src="image.jpg" alt="Descriptive alt text">')
-      expect(fixed_html).not_to include('<img id="test-element" src="image.jpg" alt="image.jpg">')
+      expect(fixed_html).to eq('<div><img id="test-element" src="image.jpg" alt="Descriptive alt text"></div>')
     end
   end
 

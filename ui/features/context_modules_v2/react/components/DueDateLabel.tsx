@@ -75,23 +75,54 @@ const aoSetDescriber = (dueAtCount: DueAtCount) => {
 }
 
 const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
-  const hasDueOrLockDate =
-    content?.dueAt ||
-    content?.lockAt ||
-    content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+  const isStandardizedFormattingEnabled = !!ENV.FEATURES?.standardize_assignment_date_formatting
 
-  let dueDatesCount =
-    content?.assignmentOverrides?.edges?.filter(({node}) => !!node.dueAt).length || 0
-  if (
-    content?.dueAt &&
-    !content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt === content.dueAt)
-  ) {
-    dueDatesCount += 1
+  const getAssignmentOverrides = (content: ModuleItemContent) => {
+    return content?.assignmentOverrides || content?.assignment?.assignmentOverrides
   }
 
+  const getBaseDueDate = (content: ModuleItemContent) => {
+    // For discussions, the base due date might be on the assignment
+    if (content?.type === 'Discussion' && content?.assignment?.dueAt) {
+      return content.assignment.dueAt
+    }
+    // For other content types, use the direct dueAt
+    return content?.dueAt
+  }
+
+  const assignmentOverrides = getAssignmentOverrides(content)
+  const baseDueDate = getBaseDueDate(content)
+  const assignedToDates = isStandardizedFormattingEnabled ? content?.assignedToDates : null
+  const useStandardizedDates = assignedToDates && assignedToDates.length > 0
+  const isUngradedDiscussion = content?.type === 'Discussion' && content?.graded === false
+
   const tooltipContents = useMemo(() => {
+    if (useStandardizedDates) {
+      return (
+        <span data-testid="override-details">
+          {assignedToDates.map((dateHash, index) => (
+            <Flex justifyItems="center" key={`${contentTagId}_${index}`}>
+              <Flex.Item margin="0 small">
+                <Text weight="bold">{dateHash.title || 'Unknown'}</Text>
+              </Flex.Item>
+              <Flex.Item>
+                <FriendlyDatetime
+                  data-testid="due-date"
+                  format={I18n.t('#date.formats.date_at_time')}
+                  dateTime={dateHash.dueAt || null}
+                  alwaysUseSpecifiedFormat={true}
+                />
+              </Flex.Item>
+            </Flex>
+          ))}
+        </span>
+      )
+    }
+
+    // Fallback to existing client-side logic
+    const contents: React.ReactNode[] = []
     const dueAtCounts =
-      content?.assignmentOverrides?.edges?.reduce((acc, edge) => {
+      assignmentOverrides?.edges?.reduce((acc, edge) => {
         const {node} = edge
 
         if (node.dueAt) {
@@ -113,65 +144,67 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
         return acc
       }, {} as DueAtCounts) || {}
 
-    const contents = Object.keys(dueAtCounts).map(dueAt => {
+    const overrideContents = Object.keys(dueAtCounts).map(dueAt => {
       return (
         <Flex justifyItems="center" key={`due_at_${contentTagId}_${dueAt}`}>
           <Flex.Item margin="0 small">
             <Text weight="bold">{aoSetDescriber(dueAtCounts[dueAt])}</Text>
           </Flex.Item>
           <Flex.Item>
-            <FriendlyDatetime
-              data-testid="due-date"
-              format={I18n.t('#date.formats.date_at_time')}
-              dateTime={dueAt}
-            />
+            <Text size="x-small">
+              <FriendlyDatetime
+                data-testid="due-date"
+                format={I18n.t('#date.formats.date_at_time')}
+                dateTime={dueAt}
+                alwaysUseSpecifiedFormat={true}
+              />
+            </Text>
           </Flex.Item>
         </Flex>
       )
     })
 
-    if (content?.dueAt) {
+    contents.push(...overrideContents)
+
+    if (baseDueDate) {
       contents.push(
         <Flex justifyItems="center" key={`due_at_${contentTagId}_default`}>
           <Flex.Item margin="0 small">
             <Text weight="bold">{I18n.t('Everyone else')}</Text>
           </Flex.Item>
           <Flex.Item>
-            <FriendlyDatetime
-              data-testid="due-date"
-              format={I18n.t('#date.formats.date_at_time')}
-              dateTime={content.dueAt}
-            />
+            <Text size="x-small">
+              <FriendlyDatetime
+                data-testid="due-date"
+                format={I18n.t('#date.formats.date_at_time')}
+                dateTime={baseDueDate}
+                alwaysUseSpecifiedFormat={true}
+              />
+            </Text>
           </Flex.Item>
         </Flex>,
       )
     }
 
     return <span data-testid="override-details">{contents}</span>
-  }, [content?.assignmentOverrides?.edges, content?.dueAt, contentTagId])
+  }, [useStandardizedDates, assignedToDates, assignmentOverrides?.edges, baseDueDate, contentTagId])
 
-  if (!content || !hasDueOrLockDate) return null
-
-  if (dueDatesCount == 1) {
-    return (
-      <Flex.Item>
-        <Text weight="normal" size="x-small">
+  // Handle standardized dates first
+  if (useStandardizedDates) {
+    if (assignedToDates.length === 1) {
+      const singleDate = assignedToDates[0]
+      return (
+        <Text size="x-small">
           <FriendlyDatetime
             data-testid="due-date"
             format={I18n.t('#date.formats.medium')}
-            dateTime={
-              content.dueAt ||
-              content.lockAt ||
-              content.assignmentOverrides?.edges?.find(({node}) => node.dueAt)?.node?.dueAt ||
-              null
-            }
+            dateTime={singleDate.dueAt || null}
+            alwaysUseSpecifiedFormat={true}
           />
         </Text>
-      </Flex.Item>
-    )
-  } else {
-    return (
-      <Flex.Item>
+      )
+    } else {
+      return (
         <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
           <Tooltip renderTip={tooltipContents}>
             <Text weight="normal" size="x-small">
@@ -179,7 +212,76 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
             </Text>
           </Tooltip>
         </Link>
-      </Flex.Item>
+      )
+    }
+  }
+
+  // Handle legacy date logic
+  const hasDueDate = baseDueDate || assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+
+  if (!hasDueDate) {
+    return null
+  }
+
+  // Collect all unique due dates
+  const allDueDates = new Set<string>()
+  const hasOverrides = assignmentOverrides?.edges?.length && assignmentOverrides?.edges?.length > 0
+
+  // Add override dates
+  assignmentOverrides?.edges?.forEach(({node}) => {
+    if (node.dueAt) {
+      allDueDates.add(node.dueAt)
+    }
+  })
+
+  // Add base due date if it exists and isn't already in overrides
+  if (baseDueDate) {
+    allDueDates.add(baseDueDate)
+  }
+
+  // Count total effective due dates (base due date + overrides with different dates)
+  const overridesWithDates = assignmentOverrides?.edges?.filter(({node}) => node.dueAt).length || 0
+  let totalDatesCount = overridesWithDates
+
+  // Add base due date if it exists and is different from override dates
+  if (baseDueDate && !assignmentOverrides?.edges?.some(({node}) => node.dueAt === baseDueDate)) {
+    totalDatesCount += 1
+  }
+
+  // Show "Multiple Due Dates" if there are multiple unique dates (Canvas requirement)
+  const hasMultipleDates = allDueDates.size > 1
+
+  if (allDueDates.size === 0) {
+    if (hasOverrides) {
+      // Has overrides but no dates - show "No Due Date"
+      return <Text size="x-small">{I18n.t('No Due Date')}</Text>
+    } else {
+      // No overrides and no dates - return null
+      return null
+    }
+  } else if (hasMultipleDates) {
+    // Multiple dates (base + overrides) - show "Multiple Due Dates"
+    return (
+      <Link href={`/courses/${ENV.course_id}/modules/items/${contentTagId}`} isWithinText={false}>
+        <Tooltip renderTip={tooltipContents}>
+          <Text weight="normal" size="x-small">
+            {I18n.t('Multiple Due Dates')}
+          </Text>
+        </Tooltip>
+      </Link>
+    )
+  } else {
+    // Single override or single date - get the actual date from the Set
+    const singleDate = Array.from(allDueDates)[0]
+    return (
+      <Text size="x-small">
+        <FriendlyDatetime
+          data-testid="due-date"
+          format={I18n.t('#date.formats.medium')}
+          alwaysUseSpecifiedFormat={true}
+          dateTime={singleDate || null}
+        />
+      </Text>
     )
   }
 }

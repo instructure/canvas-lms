@@ -62,6 +62,7 @@ export type CanvasSelectProps = {
   children: React.ReactNode
   disabled?: boolean
   id: string
+  name?: string
   label?: ReactElement | string
   noOptionsLabel?: string
   onChange: (event: ChangeEvent<HTMLSelectElement>, value: string) => void
@@ -136,6 +137,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
     return (
       <>
         <Select
+          name={this.props.name}
           id={id}
           renderLabel={() => label}
           assistiveText={I18n.t('Use arrow keys to navigate options.')}

@@ -67,6 +67,11 @@ module Types
       object.rubric_associations.where(context: object.context).first
     end
 
+    field :can_update_rubric, Boolean, null: false
+    def can_update_rubric
+      object.grants_right?(current_user, session, :update)
+    end
+
     field :button_display, String, null: false
     field :hide_points, Boolean, null: true
     field :points_possible, Float, null: true

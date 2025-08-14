@@ -721,4 +721,66 @@ describe CanvasOutcomesHelper do
       expect(subject.build_request_url("protocol", "domain", "endpoint", params)).to eq "protocol://domain/endpoint"
     end
   end
+
+  describe "#enqueue_rollup_calculation" do
+    let(:course) { course_model }
+    let(:student) { user_model }
+
+    context "with feature flag enabled" do
+      before do
+        Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+      end
+
+      it "enqueues student rollup calculation with course_id and student_id" do
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+          .with(course_id: course.id, student_id: student.id)
+
+        subject.enqueue_rollup_calculation(course_id: course.id, student_id: student.id)
+      end
+
+      it "enqueues course rollup calculation with only course_id" do
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_course)
+          .with(course_id: course.id)
+
+        subject.enqueue_rollup_calculation(course_id: course.id)
+      end
+
+      it "accepts outcome_id parameter but does not affect behavior" do
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+          .with(course_id: course.id, student_id: student.id)
+
+        subject.enqueue_rollup_calculation(course_id: course.id, student_id: student.id, outcome_id: 123)
+      end
+    end
+
+    context "with feature flag disabled" do
+      before do
+        Account.site_admin.disable_feature!(:outcomes_rollup_propagation)
+      end
+
+      it "does not enqueue rollup calculation when feature flag is disabled" do
+        expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_student)
+        expect(Outcomes::StudentOutcomeRollupCalculationService).not_to receive(:calculate_for_course)
+
+        result = subject.enqueue_rollup_calculation(course_id: course.id, student_id: student.id)
+        expect(result).to be_nil
+      end
+    end
+
+    context "edge cases" do
+      before do
+        Account.site_admin.enable_feature!(:outcomes_rollup_propagation)
+      end
+
+      it "raises ArgumentError when course_id is not provided" do
+        expect { subject.enqueue_rollup_calculation(student_id: student.id) }
+          .to raise_error(ArgumentError, "Must provide at least course_id")
+      end
+
+      it "raises ArgumentError when neither course_id nor student_id is provided but outcome_id is provided" do
+        expect { subject.enqueue_rollup_calculation(outcome_id: 123) }
+          .to raise_error(ArgumentError, "Must provide at least course_id")
+      end
+    end
+  end
 end

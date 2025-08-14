@@ -22,6 +22,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import {mapContentTypeForSharing} from './utils'
 import type {ItemType, IconType} from '@canvas/context-modules/differentiated-modules/react/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
@@ -30,6 +31,7 @@ import {
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 // Import payload types directly in onSave function to make TypeScript happy
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -59,8 +61,9 @@ export const getItemType = (contentType?: string): ItemType => {
 
   if (type.includes('assignment')) return 'assignment'
   if (type.includes('quiz')) return 'quiz'
-  if (type.includes('discussion')) return 'discussion_topic'
-  if (type.includes('wiki') || type.includes('page')) return 'wiki_page'
+  if (type.includes('discussion')) return mapContentTypeForSharing('discussion') as ItemType
+  if (type.includes('wiki') || type.includes('page'))
+    return mapContentTypeForSharing('page') as ItemType
 
   return 'wiki_page'
 }
@@ -136,7 +139,7 @@ export const renderItemAssignToManager = (
               // On success, invalidate queries with exact module ID if available
               if (itemProps.moduleId) {
                 queryClient.invalidateQueries({
-                  queryKey: ['moduleItems', itemProps.moduleId],
+                  queryKey: [MODULE_ITEMS, itemProps.moduleId],
                   exact: true,
                 })
               }

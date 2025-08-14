@@ -125,13 +125,20 @@ module Types
     field :lti_asset_reports_connection,
           LtiAssetReportType.connection_type,
           "Lti Asset Reports with active processors, with assets preloaded",
-          null: true
-    def lti_asset_reports_connection
+          null: true do
+      argument :latest, Boolean, required: false, default_value: false, description: "When true, returns only the asset reports of the latest submission attempt (as students would see them)"
+    end
+    def lti_asset_reports_connection(latest: false)
       load_association(:root_account).then do |root_account|
         next unless root_account.feature_enabled?(:lti_asset_processor)
 
         if object.assignment.context.grants_any_right?(current_user, :manage_grades, :view_all_grades)
-          Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
+          if latest
+            # This is used when the student Grades is visited by a grader. Not implemented yet.
+            next
+          else
+            Loaders::SubmissionLtiAssetReportsLoader.load(object.id)
+          end
         elsif object.user_can_read_grade?(current_user)
           Loaders::SubmissionLtiAssetReportsStudentLoader.load(object.id)
         end

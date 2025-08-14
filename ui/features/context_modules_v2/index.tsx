@@ -34,12 +34,15 @@ const I18n = createI18nScope('context_modules_v2')
 
 ready(() => {
   const ENV = window.ENV as GlobalEnv
-
   const container = document.getElementById('content')
 
   if (!ENV.course_id) {
     console.error(I18n.t('Course ID is required'))
     return
+  }
+
+  if (ENV.PAGE_TITLE) {
+    document.title = ENV.PAGE_TITLE
   }
 
   if (container) {
@@ -64,6 +67,8 @@ ready(() => {
             teacherViewEnabled={!!ENV?.MODULE_FEATURES?.TEACHER_MODULE_SELECTION}
             studentViewEnabled={!!ENV?.MODULE_FEATURES?.STUDENT_MODULE_SELECTION}
             restrictQuantitativeData={ENV.restrict_quantitative_data}
+            isObserver={ENV.MODULES_OBSERVER_INFO?.isObserver}
+            observedStudent={ENV.MODULES_OBSERVER_INFO?.observedStudent ?? null}
             moduleMenuModalTools={
               Array.isArray(ENV.MODULE_TOOLS?.module_menu_modal)
                 ? ENV.MODULE_TOOLS.module_menu_modal
@@ -82,6 +87,8 @@ ready(() => {
                 ? ENV.MODULE_TOOLS.module_index_menu_modal
                 : []
             }
+            modulesArePaginated={!!ENV.MODULE_FEATURES?.MODULES_ARE_PAGINATED}
+            pageSize={ENV.MODULE_FEATURES?.PAGE_SIZE || 10}
           >
             {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
               <ModulesContainer />

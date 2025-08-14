@@ -80,7 +80,6 @@ function renderRubric() {
     const assignmentRubric = envRubric
       ? {
           ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
-          can_update: ENV.assigned_rubric?.can_update,
           association_count: ENV.assigned_rubric?.association_count,
         }
       : undefined

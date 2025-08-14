@@ -18,6 +18,7 @@
 import {submitModuleItem, createNewItem} from '../../handlers/addItemHandlers'
 import {queryClient} from '@canvas/query'
 import {useContextModule} from '../useModuleContext'
+import {MODULE_ITEMS, MODULES} from '../../utils/constants'
 
 export const submitItemData = async (
   courseId: string,
@@ -28,7 +29,9 @@ export const submitItemData = async (
   try {
     const response = await submitModuleItem(courseId, moduleId, itemData)
     if (response) {
-      await queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId], exact: false})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+      queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
       onRequestClose?.()
     }
   } catch (error) {

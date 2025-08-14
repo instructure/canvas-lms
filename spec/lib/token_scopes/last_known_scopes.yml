@@ -181,6 +181,8 @@
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/group_categories'
 - verb: POST
@@ -770,6 +772,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/bulk_user_progress'
 - verb: GET
+  path: '/api/v1/courses/:course_id/bulk_user_tags'
+- verb: GET
   path: '/api/v1/courses/:course_id/calendar_events/timetable'
 - verb: POST
   path: '/api/v1/courses/:course_id/calendar_events/timetable'
@@ -1068,6 +1072,8 @@
 - verb: DELETE
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
+  path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
+- verb: PUT
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/group_categories'
@@ -1477,6 +1483,8 @@
   path: '/api/v1/courses/:course_id/web_zip_exports/:id'
 - verb: PUT
   path: '/api/v1/courses/:course_id/what_if_grades/reset'
+- verb: GET
+  path: '/api/v1/courses/:course_id/youtube_migration/conversion_status'
 - verb: POST
   path: '/api/v1/courses/:course_id/youtube_migration/convert'
 - verb: GET
@@ -1829,6 +1837,8 @@
   path: '/api/v1/groups/:group_id/usage_rights'
 - verb: PUT
   path: '/api/v1/groups/:group_id/usage_rights'
+- verb: DELETE
+  path: '/api/v1/groups/:group_id/users'
 - verb: GET
   path: '/api/v1/groups/:group_id/users'
 - verb: DELETE
@@ -2295,8 +2305,6 @@
   path: '/api/v1/users/:user_id/logins'
 - verb: DELETE
   path: '/api/v1/users/:user_id/logins/:id'
-- verb: POST
-  path: '/api/v1/users/:user_id/logins/:id/migrate_login_attribute'
 - verb: GET
   path: '/api/v1/users/:user_id/missing_submissions'
 - verb: GET

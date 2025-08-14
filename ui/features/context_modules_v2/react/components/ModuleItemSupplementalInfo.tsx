@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useCallback} from 'react'
+import React, {useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {ModuleItemContent, CompletionRequirement, Checkpoint} from '../utils/types'
 import CompletionRequirementDisplay from '../components/CompletionRequirementDisplay'
 import DueDateLabel from './DueDateLabel'
@@ -33,137 +32,158 @@ export interface ModuleItemSupplementalInfoProps {
   completionRequirement?: CompletionRequirement
 }
 
+const getCheckpointDescription = (checkpoint: Checkpoint, replyToEntryRequiredCount?: number) => {
+  if (checkpoint.tag === 'reply_to_topic') {
+    return I18n.t('Reply to Topic')
+  } else if (checkpoint.tag === 'reply_to_entry') {
+    if (replyToEntryRequiredCount && replyToEntryRequiredCount > 0) {
+      return I18n.t('Required Replies (%{count})', {count: replyToEntryRequiredCount})
+    }
+    return I18n.t('Reply to Entry')
+  }
+  return checkpoint.name || I18n.t('Checkpoint')
+}
+
 const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   contentTagId,
   content,
   completionRequirement,
 }) => {
-  const hasDueOrLockDate = useMemo(
-    () =>
-      content?.dueAt ||
-      content?.lockAt ||
-      content?.assignmentOverrides?.edges.some(({node}) => node.dueAt),
-    [content?.dueAt, content?.lockAt, content?.assignmentOverrides?.edges],
-  )
+  const sections = useMemo(() => {
+    // Return empty array if no content
+    if (!content) return []
 
-  const hasPointsPossible = useMemo(
-    () => content?.pointsPossible !== undefined && content?.pointsPossible !== null,
-    [content?.pointsPossible],
-  )
+    const sections: React.ReactNode[] = []
 
-  const hasCompletionRequirement = useMemo(() => !!completionRequirement, [completionRequirement])
-
-  const hasCheckpoints = useMemo(
-    () => content?.checkpoints && content.checkpoints.length > 0,
-    [content?.checkpoints],
-  )
-
-  const getCheckpointDescription = useCallback(
-    (checkpoint: Checkpoint) => {
-      const hasDate = !!checkpoint.dueAt
-
-      if (checkpoint.tag === 'reply_to_topic') {
-        return hasDate ? I18n.t('Reply to Topic: ') : I18n.t('Reply to Topic')
-      } else if (checkpoint.tag === 'reply_to_entry') {
-        if (content?.replyToEntryRequiredCount && content.replyToEntryRequiredCount > 0) {
-          return hasDate
-            ? I18n.t('Required Replies (%{count}): ', {count: content.replyToEntryRequiredCount})
-            : I18n.t('Required Replies (%{count})', {count: content.replyToEntryRequiredCount})
+    // Handle checkpointed discussions
+    if (content?.checkpoints && content.checkpoints.length > 0) {
+      content.checkpoints.forEach((checkpoint, index) => {
+        const checkpointContent = {
+          ...checkpoint,
+          type: 'Discussion' as const,
+          assignmentOverrides: checkpoint.assignmentOverrides,
         }
-        return hasDate ? I18n.t('Reply to Entry: ') : I18n.t('Reply to Entry')
+
+        const hasOverrides =
+          checkpoint.assignmentOverrides?.edges?.length &&
+          checkpoint.assignmentOverrides?.edges?.length > 0
+        const hasAnyDate =
+          checkpoint.dueAt || checkpoint.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+
+        const dateComponent = hasAnyDate ? (
+          <DueDateLabel content={checkpointContent} contentTagId={contentTagId} />
+        ) : null
+
+        if (dateComponent) {
+          sections.push(
+            <Flex.Item key={`checkpoint-${index}`}>
+              <Text weight="bold" size="x-small">
+                {getCheckpointDescription(checkpoint, content.replyToEntryRequiredCount)}:{' '}
+              </Text>
+              {dateComponent}
+            </Flex.Item>,
+          )
+        } else if (hasOverrides) {
+          // Has overrides but no dates - show "No Due Date"
+          sections.push(
+            <Flex.Item key={`checkpoint-${index}`}>
+              <Text weight="bold" size="x-small">
+                {getCheckpointDescription(checkpoint, content.replyToEntryRequiredCount)}:{' '}
+              </Text>
+              <Text weight="normal" size="x-small">
+                No Due Date
+              </Text>
+            </Flex.Item>,
+          )
+        } else {
+          // No overrides and no dates - show just the label
+          sections.push(
+            <Flex.Item key={`checkpoint-${index}`}>
+              <Text weight="normal" size="x-small">
+                {getCheckpointDescription(checkpoint, content.replyToEntryRequiredCount)}
+              </Text>
+            </Flex.Item>,
+          )
+        }
+      })
+    } else {
+      // Handle regular content dates - only push if DueDateLabel would render something
+      // Check for standardized dates first (if enabled)
+      const hasStandardizedDates = content?.assignedToDates && content.assignedToDates.length > 0
+
+      // Check for legacy dates
+      const baseDueDate =
+        content?.type === 'Discussion' && content?.assignment?.dueAt
+          ? content.assignment.dueAt
+          : content?.dueAt
+      const hasDueDate =
+        baseDueDate ||
+        content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt) ||
+        content?.assignment?.assignmentOverrides?.edges?.some(({node}) => node.dueAt)
+
+      // Show dates if we have standardized dates OR legacy dates
+      const shouldShowDates = hasStandardizedDates || hasDueDate
+
+      if (shouldShowDates) {
+        const dateComponent = <DueDateLabel content={content} contentTagId={contentTagId} />
+        sections.push(<Flex.Item key="due-date">{dateComponent}</Flex.Item>)
       }
-      return checkpoint.name ? (hasDate ? `${checkpoint.name}: ` : checkpoint.name) : ''
-    },
-    [content?.replyToEntryRequiredCount],
-  )
+    }
 
-  const checkpointElements = useMemo(() => {
-    if (!hasCheckpoints || !content?.checkpoints) return null
-
-    return content.checkpoints.map((checkpoint, index) => (
-      <React.Fragment key={index}>
-        <Flex.Item>
+    // Handle points possible
+    if (content?.pointsPossible !== undefined && content?.pointsPossible !== null) {
+      sections.push(
+        <Flex.Item key="points">
           <Text weight="normal" size="x-small">
-            {getCheckpointDescription(checkpoint)}
-            <FriendlyDatetime
-              data-testid="checkpoint-due-date"
-              format={I18n.t('#date.formats.medium')}
-              dateTime={checkpoint.dueAt || null}
-              alwaysUseSpecifiedFormat={true}
-            />
+            {I18n.t('%{points} pts', {points: content.pointsPossible})}
           </Text>
-        </Flex.Item>
-        {content.checkpoints && index < content.checkpoints.length - 1 && (
-          <Flex.Item>
-            <Text weight="normal" size="x-small" aria-hidden="true">
-              |
-            </Text>
-          </Flex.Item>
-        )}
-      </React.Fragment>
-    ))
-  }, [hasCheckpoints, content?.checkpoints, getCheckpointDescription])
+        </Flex.Item>,
+      )
+    }
 
-  if (
-    !content ||
-    (!hasDueOrLockDate && !hasPointsPossible && !hasCompletionRequirement && !hasCheckpoints)
-  )
+    // Handle completion requirement
+    if (completionRequirement) {
+      sections.push(
+        <Flex.Item key="completion">
+          <CompletionRequirementDisplay
+            completionRequirement={completionRequirement}
+            itemContent={content!}
+          />
+        </Flex.Item>,
+      )
+    }
+
+    // Filter out null/undefined sections and empty React elements
+    return sections.filter(section => {
+      if (!section) return false
+      // If it's a React element, check if it has meaningful content
+      if (React.isValidElement(section)) {
+        // For now, assume all valid React elements are meaningful
+        return true
+      }
+      return Boolean(section)
+    })
+  }, [content, completionRequirement, contentTagId])
+
+  // Don't render if no sections
+  if (sections.length === 0) {
     return null
-
-  const renderCompletionRequirement = () => {
-    if (!completionRequirement) return null
-
-    return (
-      <CompletionRequirementDisplay
-        completionRequirement={completionRequirement}
-        itemContent={content!}
-      />
-    )
   }
 
   return (
     <Flex gap="xx-small" padding="0 0 0 xx-small" wrap="wrap">
-      {hasCheckpoints ? (
-        <>
-          {checkpointElements}
-          {(hasPointsPossible || hasCompletionRequirement) && (
+      {sections.map((section, index) => (
+        <React.Fragment key={index}>
+          {section}
+          {index < sections.length - 1 && (
             <Flex.Item>
               <Text weight="normal" size="x-small" aria-hidden="true">
                 |
               </Text>
             </Flex.Item>
           )}
-        </>
-      ) : (
-        <>
-          <DueDateLabel content={content!} contentTagId={contentTagId} />
-          {hasDueOrLockDate && (hasPointsPossible || hasCompletionRequirement) && (
-            <Flex.Item>
-              <Text weight="normal" size="x-small" aria-hidden="true">
-                |
-              </Text>
-            </Flex.Item>
-          )}
-        </>
-      )}
-
-      {hasPointsPossible && (
-        <Flex.Item>
-          <Text weight="normal" size="x-small">
-            {I18n.t('%{points} pts', {points: content!.pointsPossible})}
-          </Text>
-        </Flex.Item>
-      )}
-
-      {hasPointsPossible && hasCompletionRequirement && (
-        <Flex.Item>
-          <Text weight="normal" size="x-small" aria-hidden="true">
-            |
-          </Text>
-        </Flex.Item>
-      )}
-
-      {renderCompletionRequirement()}
+        </React.Fragment>
+      ))}
     </Flex>
   )
 }

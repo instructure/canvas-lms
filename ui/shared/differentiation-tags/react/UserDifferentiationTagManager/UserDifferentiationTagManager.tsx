@@ -29,6 +29,7 @@ import DifferentiationTagModalManager from '@canvas/differentiation-tags/react/D
 import {useAddTagMembership} from '../hooks/useAddTagMembership'
 import MessageBus from '@canvas/util/MessageBus'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {bulkDeleteGroupMemberships, bulkFetchUserTags, getCommonTagIds} from '../util/diffTagUtils'
 
 const I18n = createI18nScope('differentiation_tags')
 
@@ -44,8 +45,17 @@ type HandleMenuSelection = (
   selected: string | number | (string | number | undefined)[] | undefined,
 ) => void
 
-const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSelection}) => {
-  const {courseId, handleMenuSelection} = props
+function getTagMenuLabel(groupId: number, groupName: string, commonTagGroupIds: Set<number>) {
+  return commonTagGroupIds.has(groupId) ? `${I18n.t('Untag')} ${groupName}` : groupName
+}
+
+const TagAsMenu = (props: {
+  courseId: number
+  handleMenuSelection: HandleMenuSelection
+  userTags: Record<number, number[]>
+  users: number[]
+}) => {
+  const {courseId, handleMenuSelection, userTags, users} = props
   const {
     data: differentiationTagCategories,
     isLoading,
@@ -60,6 +70,8 @@ const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSele
     if (!isLoading && !error) return I18n.t('No Differentiation Tag Categories Yet')
   }
   const empty = [{id: 1, name: fallbackTitle(), groups: []}]
+
+  const commonTagGroupIds = getCommonTagIds(users, userTags)
 
   return (
     <Menu
@@ -87,9 +99,9 @@ const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSele
                   labelPadding: '0.75rem',
                 }}
               >
-                {option.groups[0].name}
+                {getTagMenuLabel(option.groups[0].id, option.groups[0].name, commonTagGroupIds)}
               </Menu.Item>,
-              <Menu.Separator />,
+              <Menu.Separator key={`tag-group-separator-${option.groups[0].id}`} />,
             ]
           : [
               <Menu.Group
@@ -108,11 +120,11 @@ const TagAsMenu = (props: {courseId: number; handleMenuSelection: HandleMenuSele
                         labelPadding: '0.75rem',
                       }}
                     >
-                      {groupOption.name}
+                      {getTagMenuLabel(groupOption.id, groupOption.name, commonTagGroupIds)}
                     </Menu.Item>
                   ))}
               </Menu.Group>,
-              <Menu.Separator />,
+              <Menu.Separator key={`tag-group-separator-${option.id}`} />,
             ],
       )}
       <Menu.Separator />
@@ -140,6 +152,26 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
     ? courseStudentCount - (userExceptions ? userExceptions.length : 0)
     : users.length
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
+  const [userTags, setUserTags] = useState<Record<number, number[]>>({})
+
+  const handleUntag = async (tagGroupId: number) => {
+    try {
+      await bulkDeleteGroupMemberships(tagGroupId, users)
+
+      MessageBus.trigger('reloadUsersTable', {})
+      // need to delay a little bit so that screenreaders can read the success message
+      setTimeout(() => {
+        const singularMessage = I18n.t('Tag removed successfully')
+        const pluralMessage = I18n.t('Tags removed successfully')
+        const message = users.length > 1 ? pluralMessage : singularMessage
+        setOnSuccess(message, false)
+      }, 0)
+    } catch (_error) {
+      setTimeout(() => {
+        setOnFailure(I18n.t('Tags could not be removed'), false)
+      }, 0)
+    }
+  }
 
   const handleMenuSelection: HandleMenuSelection = (_e, selected) => {
     if (!allInCourse && users.length === 0 && selected !== -1) {
@@ -147,12 +179,18 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
       return
     }
 
+    const commonTagGroupIds = getCommonTagIds(users, userTags)
+
     if (Array.isArray(selected)) {
       if (selected.length > 0 && selected[0]) {
-        mutate({
-          groupId: selected[0],
-          ...(allInCourse ? {allInCourse, userExceptions} : {userIds: users}),
-        })
+        if (commonTagGroupIds.has(Number(selected[0]))) {
+          handleUntag(Number(selected[0]))
+        } else {
+          mutate({
+            groupId: selected[0],
+            ...(allInCourse ? {allInCourse, userExceptions} : {userIds: users}),
+          })
+        }
       }
       return
     }
@@ -161,10 +199,14 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
       if (selected === -1) {
         setIsModalOpen(true)
       } else if (selected > 0) {
-        mutate({
-          groupId: selected,
-          ...(allInCourse ? {allInCourse, userExceptions} : {userIds: users}),
-        })
+        if (commonTagGroupIds.has(selected)) {
+          handleUntag(selected)
+        } else {
+          mutate({
+            groupId: selected,
+            ...(allInCourse ? {allInCourse, userExceptions} : {userIds: users}),
+          })
+        }
       }
     }
   }
@@ -173,6 +215,19 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
     setIsOpen(false)
     if (manageTagsRefButton.current) manageTagsRefButton.current.focus()
   }
+
+  useEffect(() => {
+    if (users.length === 0) {
+      setUserTags({})
+      return
+    }
+
+    const fetchTags = async () => {
+      const tagsByUser = await bulkFetchUserTags(courseId, users)
+      setUserTags(tagsByUser)
+    }
+    fetchTags()
+  }, [courseId, users])
 
   useEffect(() => {
     if (isSuccess) {
@@ -203,7 +258,12 @@ export default function UserDifferentiationTagManager(props: UserDifferentiation
           </Text>
         </Flex.Item>
         <Flex.Item margin="xx-small">
-          <TagAsMenu courseId={courseId} handleMenuSelection={handleMenuSelection} />
+          <TagAsMenu
+            courseId={courseId}
+            handleMenuSelection={handleMenuSelection}
+            userTags={userTags}
+            users={users}
+          />
         </Flex.Item>
         <Flex.Item margin="xx-small">
           <Button

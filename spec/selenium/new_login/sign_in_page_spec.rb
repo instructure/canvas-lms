@@ -52,7 +52,7 @@ describe "new login Sign In page" do
       f('[data-testid="username-input"]').send_keys("invalid@example.com")
       f('[data-testid="password-input"]').send_keys("wrongpassword123Ω")
       f('[data-testid="login-button"]').click
-      expect(fxpath("//*[text()='Please verify your email and password and try again.']")).to be_displayed
+      expect(fxpath("//*[text()='Please verify your email or password and try again.']")).to be_displayed
       expect(f('[data-testid="password-input"]').attribute("value")).to eq("")
     end
 
@@ -98,7 +98,7 @@ describe "new login Sign In page" do
       f('[data-testid="username-input"]').send_keys("test@example.com")
       f('[data-testid="password-input"]').send_keys("correctpassword123")
       f('[data-testid="login-button"]').click
-      expect(fxpath("//*[text()='Please verify your email and password and try again.']")).to be_displayed
+      expect(fxpath("//*[text()='Please verify your email or password and try again.']")).to be_displayed
       expect(f('[data-testid="password-input"]').attribute("value")).to eq("")
     end
   end

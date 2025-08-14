@@ -23,6 +23,10 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
   let(:course) { course_model }
   let(:student) { user_model }
 
+  before do
+    course.enroll_student(student, enrollment_state: "active")
+  end
+
   describe ".calculate_for_student" do
     let(:delay_mock) { double("delay") }
 
@@ -56,15 +60,14 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     end
 
     it "calls calculate_for_student for each student in the course" do
-      # Create a list of expected parameters using map
-      expected_params = students.map do |student|
-        { course_id: course.id, student_id: student.id }
-      end
+      # Get all enrolled student IDs to account for any existing enrollments
+      enrolled_student_ids = course.students.pluck(:id)
 
-      # Expect calculate_for_student to be called exactly once for each student
-      expected_params.each do |params|
-        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
-          .with(params).once
+      # Expect calculate_for_student to be called exactly once for each enrolled student
+      expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+        .exactly(enrolled_student_ids.count).times do |args|
+        expect(args[:course_id]).to eq(course.id)
+        expect(enrolled_student_ids).to include(args[:student_id])
       end
 
       Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
@@ -97,6 +100,31 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     it "loads the course and student after initialization" do
       expect(subject.course).to eq(course)
       expect(subject.student).to eq(student)
+    end
+
+    it "raises ArgumentError when course_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(#{student.id}\)/)
+    end
+
+    it "raises ArgumentError when student_id is invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when both course_id and student_id are invalid" do
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: -1, student_id: -1)
+      end.to raise_error(ArgumentError, /Invalid course_id \(-1\) or student_id \(-1\)/)
+    end
+
+    it "raises ArgumentError when student is not enrolled in the course" do
+      other_student = user_model
+      expect do
+        Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: other_student.id)
+      end.to raise_error(ArgumentError, /Invalid course_id \(#{course.id}\) or student_id \(#{other_student.id}\)/)
     end
   end
 
@@ -620,6 +648,68 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
         # Service should fail when OS call fails to prevent inaccurate rollups
         expect { subject.call }.to raise_error(StandardError, "API error")
       end
+    end
+  end
+
+  describe "instrumentation metrics" do
+    subject { Outcomes::StudentOutcomeRollupCalculationService.new(course_id: course.id, student_id: student.id) }
+
+    let(:course) { course_model }
+    let(:student) { user_model }
+    let(:outcome) { outcome_model(context: course) }
+    let(:assignment) { assignment_model(context: course) }
+    let(:alignment) { outcome.align(assignment, course) }
+
+    before do
+      outcome.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome.calculation_method = "highest"
+      outcome.save!
+    end
+
+    it "records all metrics on successful execution" do
+      LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: course,
+        alignment:,
+        score: 3,
+        possible: 5
+      )
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 1, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
+    end
+
+    it "records metrics on error" do
+      allow(subject).to receive(:fetch_canvas_results).and_raise(StandardError, "Database error")
+
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.error", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      expect { subject.call }.to raise_error(StandardError, "Database error")
+    end
+
+    it "records metrics for empty results" do
+      expect(Utils::InstStatsdUtils::Timing).to receive(:track).with("rollup.student.runtime").and_call_original
+      expect(InstStatsd::Statsd).to receive(:distributed_increment).with("rollup.student.success", tags: { course_id: course.id }).at_least(:once)
+      expect(InstStatsd::Statsd).to receive(:count).with("rollup.student.records_processed", 0, tags: { course_id: course.id }).at_least(:once)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+
+      subject.call
     end
   end
 

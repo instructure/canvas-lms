@@ -178,6 +178,8 @@ describe "quiz edit page assign to" do
         get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
         wait_for_ajaximations
         expect(element_exists?(convert_override_alert_selector)).to be_truthy
+        quiz_save_button.click
+        expect(f("body").text).to include "Invalid group selected"
       end
 
       it "clicking convert overrides button converts the override and refreshes the cards" do

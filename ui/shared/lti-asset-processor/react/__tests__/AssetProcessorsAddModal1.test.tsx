@@ -21,7 +21,8 @@ import {render} from '@testing-library/react'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {mockDoFetchApi, mockTools as tools} from './assetProcessorsTestHelpers'
+import {mockDoFetchApi, mockToolsForAssignment as tools} from './assetProcessorsTestHelpers'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -50,6 +51,7 @@ describe('AssetProcessorsAddModal', () => {
           courseId={123}
           secureParams={'my-secure-params'}
           onProcessorResponse={mockOnProcessorResponse}
+          type="ActivityAssetProcessorContribution"
         />
       </MockedQueryClientProvider>,
     )
@@ -58,7 +60,7 @@ describe('AssetProcessorsAddModal', () => {
   it('starts hidden/closed (with no dialog)', () => {
     const {queryByText} = renderModal()
     expect(queryByText('Configure settings for t1.')).toBeNull()
-    expect(queryByText('Add a document processing app')).toBeNull()
+    expect(queryByText('Add A Document Processing App')).toBeNull()
     expect(
       queryByText('Choose the document processing app that you wish to add to this assignment.'),
     ).toBeNull()

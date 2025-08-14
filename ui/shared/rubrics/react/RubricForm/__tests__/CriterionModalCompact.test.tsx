@@ -28,7 +28,6 @@ describe('CriterionModal tests', () => {
     return render(
       <CriterionModal
         isOpen={true}
-        unassessed={true}
         criterionUseRangeEnabled={true}
         onDismiss={() => {}}
         onSave={() => {}}
@@ -444,23 +443,6 @@ describe('CriterionModal tests', () => {
     })
   })
 
-  describe('Assessed rubric tests', () => {
-    it('should not render editable inputs if the rubric is assessed', () => {
-      const {queryByTestId, queryAllByTestId} = renderComponent({unassessed: false})
-
-      expect(queryByTestId('enable-range-checkbox')).toBeNull()
-      expect(queryAllByTestId('rating-points')).toHaveLength(0)
-      expect(queryAllByTestId('rating-points-assessed')).toHaveLength(5)
-    })
-
-    it('should not render the add rating button if the rubric is assessed', () => {
-      const {queryByTestId} = renderComponent({unassessed: false})
-      const addRatingButton = queryByTestId('add-rating-button')
-
-      expect(addRatingButton).toBeNull()
-    })
-  })
-
   describe('Hide Points Tests', () => {
     it('does not render points input if hidePoints is true', () => {
       const {queryByTestId, queryAllByTestId} = renderComponent({hidePoints: true})
@@ -472,7 +454,6 @@ describe('CriterionModal tests', () => {
 
     it('does not render points read-only text if hidePoints is true', () => {
       const {queryByTestId, queryAllByTestId} = renderComponent({
-        unassessed: false,
         hidePoints: true,
       })
 

@@ -4218,7 +4218,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       : '0'
   }
 
-  getGradingPeriod = (gradingPeriodId: string) => {
+  getGradingPeriod = (gradingPeriodId: string | null) => {
+    if (gradingPeriodId === null) return undefined
     return (this.gradingPeriodSet?.gradingPeriods || []).find(
       gradingPeriod => gradingPeriod.id === gradingPeriodId,
     )
@@ -5176,15 +5177,37 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       // student groups
       const prevStudentGroupIds = findFilterValuesOfType('student-group', prevProps.appliedFilters)
       const studentGroupIds = findFilterValuesOfType('student-group', this.props.appliedFilters)
+      const prevNonCollaborativeGroupIds = findFilterValuesOfType(
+        'non-collaborative-group',
+        prevProps.appliedFilters,
+      )
+      const nonCollaborativeGroupIds = findFilterValuesOfType(
+        'non-collaborative-group',
+        this.props.appliedFilters,
+      )
+
       if (this.options.multiselect_gradebook_filters_enabled) {
         if (!idArraysEqual(prevStudentGroupIds, studentGroupIds)) {
-          this.updateCurrentStudentGroups(studentGroupIds)
+          this.updateCurrentStudentGroups([...studentGroupIds, ...nonCollaborativeGroupIds])
         }
       } else if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
         if (studentGroupIds.length === 0 || !studentGroupIds[0]) {
           this.updateCurrentStudentGroup(null)
         } else {
           this.updateCurrentStudentGroup(studentGroupIds[0])
+        }
+      }
+
+      // non collaborative student groups
+      if (this.options.multiselect_gradebook_filters_enabled) {
+        if (!idArraysEqual(prevNonCollaborativeGroupIds, nonCollaborativeGroupIds)) {
+          this.updateCurrentStudentGroups([...studentGroupIds, ...nonCollaborativeGroupIds])
+        }
+      } else if (prevNonCollaborativeGroupIds[0] !== nonCollaborativeGroupIds[0]) {
+        if (nonCollaborativeGroupIds.length === 0 || !nonCollaborativeGroupIds[0]) {
+          this.updateCurrentStudentGroup(null)
+        } else {
+          this.updateCurrentStudentGroup(nonCollaborativeGroupIds[0])
         }
       }
 

@@ -23,32 +23,25 @@ import {TextBlockEditPreview} from './TextBlockEditPreview'
 import {TextBlockSettings} from './TextBlockSettings'
 import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
-
-export type TextBlockProps = {
-  title: string
-  content: string
-  settings: {
-    includeBlockTitle: boolean
-  }
-}
+import {TextBlockProps} from './types'
 
 export const TextBlockContent = (props: TextBlockProps) => {
-  const renderMode = useGetRenderMode()
+  const {isEditMode, isEditPreviewMode} = useGetRenderMode()
   const save = useSave<typeof TextBlock>()
 
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
   useEffect(() => {
-    if (renderMode === 'editPreview') {
+    if (isEditPreviewMode) {
       save({
         title,
         content,
       })
     }
-  }, [renderMode, title, content, save])
+  }, [isEditPreviewMode, title, content, save])
 
-  return renderMode === 'edit' ? (
+  return isEditMode ? (
     <TextBlockEdit
       title={title}
       content={content}
@@ -61,18 +54,22 @@ export const TextBlockContent = (props: TextBlockProps) => {
   )
 }
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const TextBlock = (props: TextBlockProps) => {
   return (
-    <BaseBlock title={TextBlock.craft.displayName}>
+    <BaseBlock<typeof TextBlock>
+      title={TextBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+      statefulProps={{title: props.title, content: props.content}}
+    >
       <TextBlockContent {...props} />
     </BaseBlock>
   )
 }
 
 TextBlock.craft = {
-  displayName: I18n.t('Text Block') as string,
+  displayName: I18n.t('Text column') as string,
   related: {
     settings: TextBlockSettings,
   },

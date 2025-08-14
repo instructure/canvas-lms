@@ -36,26 +36,27 @@ describe FilesController do
     end
 
     it "with safefiles" do
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/files/#{@submission.attachment.id}/download", params: { inline: "1", verifier: @submission.attachment.uuid }
-      expect(response).to be_redirect
-      uri = URI.parse response["Location"]
-      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
-      path_match = uri.path.match(%r{/files/(?<id>\d+)})
-      qs[:file_id] = path_match[:id] if path_match
-      expect(uri.host).to eq "files-test.host"
-      expect(uri.path).to eq "/files/#{@submission.attachment.id}/download"
-      expect { Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@me)
-      expect(qs["verifier"]).to eq @submission.attachment.uuid
-      location = response["Location"]
-      remove_user_session
+      enable_cache do
+        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+        get "http://test.host/files/#{@submission.attachment.id}/download", params: { inline: "1", verifier: @submission.attachment.uuid }
+        expect(response).to be_redirect
+        uri = URI.parse response["Location"]
+        qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+        path_match = uri.path.match(%r{/files/(?<id>\d+)})
+        qs[:file_id] = path_match[:id] if path_match
+        expect(uri.host).to eq "files-test.host"
+        expect(uri.path).to eq "/files/#{@submission.attachment.id}/download"
+        expect(qs["verifier"]).to eq @submission.attachment.uuid
+        location = response["Location"]
+        remove_user_session
 
-      get location
-      # could be success or redirect, depending on S3 config
-      expect(response.status).to be_in [200, 302]
-      # ensure that the user wasn't logged in by the normal means
-      expect(controller.instance_variable_get(:@current_user)).to be_nil
+        get location
+        # could be success or redirect, depending on S3 config
+        expect(response.status).to be_in [200, 302]
+        expect(session["file_access_user_id"]).to eq(@me.global_id)
+        # ensure that the user wasn't logged in by the normal means
+        expect(controller.instance_variable_get(:@current_user)).to be_nil
+      end
     end
 
     it "without safefiles" do
@@ -78,25 +79,26 @@ describe FilesController do
 
     it "with safefiles" do
       allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
-      expect(response).to be_redirect
-      uri = URI.parse response["Location"]
-      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
-      path_match = uri.path.match(%r{/files/(?<id>\d+)})
-      qs[:file_id] = path_match[:id] if path_match
-      expect(uri.host).to eq "files-test.host"
-      # redirects to a relative url, since relative files are available in user context
-      expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/my-pic.png"
-      expect { Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@me)
-      location = response["Location"]
-      remove_user_session
+      enable_cache do
+        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
+        expect(response).to be_redirect
+        uri = URI.parse response["Location"]
+        qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+        path_match = uri.path.match(%r{/files/(?<id>\d+)})
+        qs[:file_id] = path_match[:id] if path_match
+        expect(uri.host).to eq "files-test.host"
+        # redirects to a relative url, since relative files are available in user context
+        expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/my-pic.png"
+        location = response["Location"]
+        remove_user_session
 
-      get location
-      expect(response).to be_successful
-      expect(response.media_type).to eq "image/png"
-      # ensure that the user wasn't logged in by the normal means
-      expect(controller.instance_variable_get(:@current_user)).to be_nil
+        get location
+        expect(response).to be_successful
+        expect(response.media_type).to eq "image/png"
+        expect(session["file_access_user_id"]).to eq(@me.global_id)
+        # ensure that the user wasn't logged in by the normal means
+        expect(controller.instance_variable_get(:@current_user)).to be_nil
+      end
     end
 
     it "without safefiles" do
@@ -114,46 +116,39 @@ describe FilesController do
       end
 
       it "with safefiles" do
-        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", params: { wrap: "1" }
-        expect(response).to be_redirect
-        uri = URI.parse response["Location"]
-        expect(uri.host).to eq "test.host"
-        expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}"
-        location = response["Location"]
+        enable_cache do
+          allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+          get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", params: { wrap: "1" }
+          expect(response).to be_redirect
+          uri = URI.parse response["Location"]
+          expect(uri.host).to eq "test.host"
+          expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}"
+          location = response["Location"]
 
-        get location
+          get location
 
-        # the first response will be a redirect to the files host with a return url embedded in the jwt claims
-        expect(response).to be_redirect
-        files_location = response["Location"]
-        files_uri = URI.parse(response["Location"])
-        expect(files_uri.host).to eq "files-test.host"
+          # the first response will be a redirect to the files host with a return url embedded in the jwt claims
+          expect(response).to be_redirect
+          files_location = response["Location"]
+          files_uri = URI.parse(response["Location"])
+          expect(files_uri.host).to eq "files-test.host"
 
-        get files_location
+          get files_location
 
-        # the second response (from the files domain) will set the cookie and return back to the main domain
-        expect(response).to be_redirect
-        return_location = response["Location"]
-        return_uri = URI.parse(response["Location"])
-        expect(return_uri.host).to eq "test.host"
-        expect(return_uri.query).to eq "fd_cookie_set=1" # with a param so we know not to loop
+          # the second response (from the files domain) will set the cookie and return back to the main domain
+          expect(response).to be_redirect
+          return_location = response["Location"]
+          return_uri = URI.parse(response["Location"])
+          expect(return_uri.host).to eq "test.host"
+          expect(return_uri.query).to eq "fd_cookie_set=1" # with a param so we know not to loop
 
-        get return_location
-        # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
-        expect(response).to be_successful
-        expect(response.media_type).to eq "text/html"
-        doc = Nokogiri::HTML5.fragment(response.body)
-        expect(doc.at_css("iframe#file_content")["src"]).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
-      end
-
-      it "does not get a sf_token" do
-        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?verifier=#{@att.uuid}", params: { inline: "1" }
-        location = response["Location"]
-        expect(location).to include "sf_verifier="
-        get location
-        expect(response["Location"]).not_to include "sf_token="
+          get return_location
+          # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
+          expect(response).to be_successful
+          expect(response.media_type).to eq "text/html"
+          doc = Nokogiri::HTML5.fragment(response.body)
+          expect(doc.at_css("iframe#file_content")["src"]).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
+        end
       end
 
       it "without safefiles" do
@@ -169,266 +164,41 @@ describe FilesController do
       end
 
       it "does not inline the file if passed download_frd param" do
-        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-        get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
-        expect(response).to be_redirect
-        follow_redirect!
-        follow_redirect!
-        expect(response.headers["Content-Disposition"]).to match(/attachment/)
+        enable_cache do
+          allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+          get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
+          expect(response).to be_redirect
+          follow_redirect!
+          expect(response.headers["Content-Disposition"]).to match(/attachment/)
+        end
       end
     end
   end
 
   it "uses relative urls for safefiles in course context" do
-    course_with_teacher_logged_in(active_all: true, user: @user)
-    host!("test.host")
-    a1 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @course)
-    allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-    get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-    expect(response).to be_redirect
-    uri = URI.parse response["Location"]
-    qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
-    path_match = uri.path.match(%r{/files/(?<id>\d+)})
-    qs[:file_id] = path_match[:id] if path_match
-    expect(uri.host).to eq "files-test.host"
-    expect(uri.path).to eq "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
-    expect { Users::AccessVerifier.validate(qs) }.not_to raise_exception
-    expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@user)
-    expect(qs["verifier"]).to be_nil
-    location = response["Location"]
-    remove_user_session
-
-    get location
-    # could be success or redirect, depending on S3 config
-    expect(response.status).to be_in [200, 302]
-    # ensure that the user wasn't logged in by the normal means
-    expect(controller.instance_variable_get(:@current_user)).to be_nil
-  end
-
-  context "sf_token" do
-    specs_require_cache(:redis_cache_store)
-
-    context "when flag is off" do
-      before do
-        Account.site_admin.disable_feature!(:safe_files_token)
-      end
-
-      it "does not generate sf_token" do
-        course_with_teacher_logged_in(active_all: true, user: @user)
-        host!("test.host")
-        a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
-        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-        get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-        location = response["Location"]
-
-        get location
-        second_location = response["Location"]
-        expect(second_location).not_to include "sf_token="
-      end
-
-      it "will not read a token if it exists" do
-        Account.site_admin.enable_feature!(:safe_files_token)
-        course_with_teacher_logged_in(active_all: true, user: @user)
-        host!("test.host")
-        a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "image/png", context: @course)
-        allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-        get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-        location = response["Location"]
-
-        get location
-        expect(response).to be_redirect
-        second_location = response["Location"]
-        expect(second_location).to include "sf_token="
-
-        remove_user_session
-        reset!
-        Account.site_admin.disable_feature!(:safe_files_token)
-        get second_location
-        # in real world, there is a @files_domain so we get a 401
-        # in test world, the @files_domain is nil so we redirect to login
-        expect(response).to be_redirect
-        expect(response["Location"]).to include "login"
-      end
-    end
-
-    it "is used for inline content" do
+    enable_cache do
       course_with_teacher_logged_in(active_all: true, user: @user)
       host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
+      a1 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @course)
       allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
       get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-
-      get location
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      remove_user_session
-      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
-      reset!
-
-      get second_location
-      expect(response).to have_http_status :ok
-      expect(response.body).to include "<html><body>ohai</body></html>"
-    end
-
-    it "works with long global ids" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-      location.gsub!(%r{courses/\d+}, "courses/#{@course.global_id}")
-      location.gsub!(%r{files/\d+}, "files/#{a1.global_id}")
-
-      get location
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      remove_user_session
-      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
-      reset!
-
-      get second_location
-      expect(response).to have_http_status :ok
-      expect(response.body).to include "<html><body>ohai</body></html>"
-    end
-
-    it "works with short global ids" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-      location.gsub!(%r{courses/\d+}, "courses/#{Shard.short_id_for(@course.global_id)}")
-      location.gsub!(%r{files/\d+}, "files/#{Shard.short_id_for(a1.global_id)}")
-
-      get location
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      remove_user_session
-      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
-      reset!
-
-      get second_location
-      expect(response).to have_http_status :ok
-      expect(response.body).to include "<html><body>ohai</body></html>"
-    end
-
-    it "cannot be re-used" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "image/png", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-
-      get location
       expect(response).to be_redirect
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-
-      get second_location
-      expect(response).to have_http_status :ok
-      remove_user_session
-      reset!
-      get second_location
-      # in real world, there is a @files_domain so we get a 401
-      # in test world, the @files_domain is nil so we redirect to login
-      expect(response).to be_redirect
-      expect(response["Location"]).to include "login"
-    end
-
-    it "cannot be used after 5 minutes" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "image/png", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-
-      get location
-      expect(response).to be_redirect
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      remove_user_session
-      reset!
-
-      Timecop.travel(6.minutes.from_now) do
-        get second_location
-        expect(response).to be_redirect
-        expect(response["Location"]).to include "login"
-      end
-    end
-
-    it "cannot be used to access a different file" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "image/png", context: @course)
-      a2 = attachment_model(uploaded_data: stub_file_data("different.html", "<html><body>different</body></html>", "text/html"), content_type: "image/png", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-      location = response["Location"]
-
-      get location
-      expect(response).to be_redirect
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      uri = URI.parse(second_location)
-      qs = Rack::Utils.parse_nested_query(uri.query)
-      token = qs["sf_token"]
-      remove_user_session
-      reset!
-
-      a2_url = "http://files-test.host/courses/#{@course.id}/files/#{a2.id}/course%20files/different.html?context_id=#{@course.id}&context_type=Course&download=1&id=#{a2.id}&inline=1&sf_token=#{token}"
-      get a2_url
-      # in test world, the @files_domain is nil so we redirect to login
-      # in real world, there is a @files_domain so we get a 401
-      expect(response).to be_redirect
-      expect(response["Location"]).to include "login"
-    end
-
-    it "is not generated if sf_verifier does not match requested file" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "image/png", context: @course)
-      a2 = attachment_model(uploaded_data: stub_file_data("different.html", "<html><body>different</body></html>", "text/html"), content_type: "image/png", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
-
       uri = URI.parse response["Location"]
       qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
-      sf_verifier = qs["sf_verifier"]
-      a2_url = "http://files-test.host/courses/#{@course.id}/files/#{a2.id}/course%20files/different.html?context_id=#{@course.id}&context_type=Course&download=1&id=#{a2.id}&inline=1&sf_verifier=#{sf_verifier}"
-      remove_user_session
-      reset!
-
-      get a2_url
-      expect(response["Location"]).not_to include "sf_token="
-    end
-
-    it "cannot read token if not on files domain" do
-      course_with_teacher_logged_in(active_all: true, user: @user)
-      host!("test.host")
-      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
-      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
+      path_match = uri.path.match(%r{/files/(?<id>\d+)})
+      qs[:file_id] = path_match[:id] if path_match
+      expect(uri.host).to eq "files-test.host"
+      expect(uri.path).to eq "/courses/#{@course.id}/files/#{a1.id}/course%20files/test%20my%20file%3F%20hai!%26.png"
+      expect(qs["verifier"]).to be_nil
       location = response["Location"]
+      remove_user_session
 
       get location
-      second_location = response["Location"]
-      expect(second_location).to include "sf_token="
-      remove_user_session
-      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
-      reset!
-
-      uri = URI.parse(second_location)
-      uri.host = "files-test.host"
-      new_url = uri.to_s
-      allow_any_instance_of(AttachmentHelper).to receive(:safer_domain_available?).and_return(true)
-      get new_url
-      expect(response).to be_redirect
-      expect(response["Location"]).to include "login"
+      # could be success or redirect, depending on S3 config
+      expect(response.status).to be_in [200, 302]
+      expect(session["file_access_user_id"]).to eq(@user.global_id)
+      # ensure that the user wasn't logged in by the normal means
+      expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
   end
 
@@ -456,6 +226,27 @@ describe FilesController do
     # go back to original url but with an extra param
     expected_url = "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?inline=1&fallback_ts=#{old_time.to_i}"
     expect(response["Location"]).to eq expected_url
+  end
+
+  it "forwards fallback_url to from sf_verifier to instfs access jwt" do
+    enable_cache do
+      course_with_teacher_logged_in(active_all: true, user: @user)
+      host!("test.host")
+      a1 = attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @course, instfs_uuid: "abcd")
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+
+      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
+      expect(response).to be_redirect
+      files_domain_location = response["Location"]
+
+      get files_domain_location
+      expect(response).to be_redirect
+      instfs_location = response["Location"]
+      uri = URI.parse(instfs_location)
+      qs = Rack::Utils.parse_nested_query(uri.query).with_indifferent_access
+      instfs_jwt = Canvas::Security.decode_jwt(qs["token"])
+      expect(instfs_jwt[:fallback_url]).to include "http://test.host/courses/#{@course.id}/files/#{a1.id}/download?inline=1"
+    end
   end
 
   it "logs user access with safefiles" do
@@ -522,35 +313,35 @@ describe FilesController do
   end
 
   it "updates module progressions for html safefiles iframe" do
-    allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
-    course_with_student_logged_in(active_all: true, user: @user)
-    host!("test.host")
-    @att = @course.attachments.create(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
-    @module = @course.context_modules.create!(name: "module")
-    @tag = @module.add_item({ type: "attachment", id: @att.id })
-    @module.reload
-    hash = {}
-    hash[@tag.id.to_s] = { type: "must_view" }
-    @module.completion_requirements = hash
-    @module.save!
-    expect(@module.evaluate_for(@user).state).to be(:unlocked)
+    enable_cache do
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+      course_with_student_logged_in(active_all: true, user: @user)
+      host!("test.host")
+      @att = @course.attachments.create(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
+      @module = @course.context_modules.create!(name: "module")
+      @tag = @module.add_item({ type: "attachment", id: @att.id })
+      @module.reload
+      hash = {}
+      hash[@tag.id.to_s] = { type: "must_view" }
+      @module.completion_requirements = hash
+      @module.save!
+      expect(@module.evaluate_for(@user).state).to be(:unlocked)
 
-    # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
-    get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
-    expect(response).to be_successful
-    expect(response.media_type).to eq "text/html"
-    doc = Nokogiri::HTML5.fragment(response.body)
-    location = doc.at_css("iframe#file_content")["src"]
+      # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
+      get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
+      expect(response).to be_successful
+      expect(response.media_type).to eq "text/html"
+      doc = Nokogiri::HTML5.fragment(response.body)
+      location = doc.at_css("iframe#file_content")["src"]
 
-    # now reset the user session (simulating accessing via a separate domain), grab the document,
-    # and verify the module progress was recorded
-    remove_user_session
-    get location
-    expect(response).to be_redirect
-    follow_redirect!
-    # could be success or redirect, depending on S3 config
-    expect(response.status).to be_in [200, 302]
-    expect(@module.evaluate_for(@user).state).to be(:completed)
+      # now reset the user session (simulating accessing via a separate domain), grab the document,
+      # and verify the module progress was recorded
+      remove_user_session
+      get location
+      # could be success or redirect, depending on S3 config
+      expect(response.status).to be_in [200, 302]
+      expect(@module.evaluate_for(@user).state).to be(:completed)
+    end
   end
 
   context "should support AssessmentQuestion as a context" do
@@ -572,8 +363,6 @@ describe FilesController do
       qs[:file_id] = path_match[:id] if path_match
       expect(uri.host).to eq "files-test.host"
       expect(uri.path).to eq "/files/#{@att.id}/download"
-      expect { Users::AccessVerifier.validate(qs) }.not_to raise_exception
-      expect(Users::AccessVerifier.validate(qs)[:user]).to eql(@user)
       expect(qs["verifier"]).to eq @att.uuid
       location = response["Location"]
       remove_user_session
@@ -581,17 +370,22 @@ describe FilesController do
       get location
       expect(response).to be_successful
       expect(response.media_type).to eq "image/png"
+      expect(session["file_access_user_id"]).to eq(@user.global_id)
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
 
     context "with safefiles" do
       it "with new url style" do
-        do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
+        enable_cache do
+          do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/#{@att.uuid}")
+        end
       end
 
       it "with old url style" do
-        do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
+        enable_cache do
+          do_with_safefiles_test("http://test.host/assessment_questions/#{@aq.id}/files/#{@att.id}/download?verifier=#{@att.uuid}")
+        end
       end
     end
 
@@ -638,11 +432,6 @@ describe FilesController do
     expect(controller.instance_variable_get(:@context)).to be_nil
   end
 
-  it "does not use relative urls for safefiles in other contexts" do
-    course_with_teacher_logged_in(active_all: true)
-    attachment_model(uploaded_data: stub_png_data, content_type: "image/png", context: @course)
-  end
-
   it "returns the dynamically generated thumbnail of the size given" do
     attachment_model(uploaded_data: stub_png_data)
     sz = "640x>"
@@ -665,21 +454,23 @@ describe FilesController do
   end
 
   it "allows file previews for public-to-auth courses" do
-    course_factory(active_all: true)
-    @course.update_attribute(:is_public_to_auth_users, true)
+    enable_cache do
+      course_factory(active_all: true)
+      @course.update_attribute(:is_public_to_auth_users, true)
 
-    att = attachment_model(uploaded_data: stub_png_data, context: @course)
+      att = attachment_model(uploaded_data: stub_png_data, context: @course)
 
-    user_factory(active_all: true)
-    user_session(@user)
+      user_factory(active_all: true)
+      user_session(@user)
 
-    user_verifier = Users::AccessVerifier.generate(user: @user)
-    get "/files/#{att.id}", params: user_verifier # set the file access session tokens
-    expect(session["file_access_user_id"]).to be_present
+      user_verifier = Users::AccessVerifier.generate(user: @user)
+      get "/files/#{att.id}", params: user_verifier # set the file access session tokens
+      expect(session["file_access_user_id"]).to be_present
 
-    get "/courses/#{@course.id}/files/#{att.id}/file_preview"
-    expect(response.body).to_not include("This file has not been unlocked yet")
-    expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
+      get "/courses/#{@course.id}/files/#{att.id}/file_preview"
+      expect(response.body).to_not include("This file has not been unlocked yet")
+      expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
+    end
   end
 
   it "allows downloads from assignments without context" do

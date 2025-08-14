@@ -122,16 +122,18 @@ module Api::V1::OutcomeResults
   end
 
   # Public: Returns an Array of serialized User objects for the linked hash.
-  def outcome_results_linked_users_json(users)
+  def outcome_results_linked_users_json(users, context)
+    includes = %w[sis_user_id avatar_url]
+    excludes = %w[personal_info]
+    user_json_preloads(users, false, { accounts: true })
+    users = users_json(users, @current_user, session, includes, context, nil, excludes)
+
+    allowed_fields = %w[id name display_name sortable_name sis_id integration_id login_id avatar_url]
     users.map do |u|
-      hash = {
-        id: u.id.to_s,
-        name: u.name,
-        display_name: u.short_name,
-        sortable_name: u.sortable_name
-      }
-      hash[:avatar_url] = avatar_url_for_user(u) if service_enabled?(:avatars)
-      hash
+      u[:id] = u[:id].to_s if u[:id]
+      u[:display_name] = u[:short_name] if u[:short_name]
+      u[:sis_id] = u[:sis_user_id] if u[:sis_user_id]
+      u.select! { |field| allowed_fields.include?(field) }
     end
   end
 

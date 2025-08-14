@@ -1375,6 +1375,16 @@ module Lti
                        -> { @current_user.prefers_high_contrast? ? "true" : "false" },
                        USER_GUARD
 
+    # Returns the users preference for using a dyslexia friendly font (an accessibility feature).
+    # @example
+    #   ```
+    #   false
+    #   ```
+    register_expansion "Canvas.user.prefersDyslexicFont",
+                       [],
+                       -> { @current_user.prefers_dyslexic_font? ? "true" : "false" },
+                       USER_GUARD
+
     # returns the Canvas ids of all active groups in the current course.
     # @example
     #   ```

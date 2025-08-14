@@ -87,7 +87,9 @@ class YoutubeMigrationService
     message = YoutubeMigrationService.generate_resource_key(embed[:resource_type], embed[:id])
     # TODO: Something will listen on this creation
     convert_progress = Progress.create!(tag: CONVERT_TAG, context: course, message:, results: { original_embed: embed })
-    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, {}, course.id, scan_id, embed)
+
+    job_priority = Account.site_admin.feature_enabled?(:youtube_migration_high_priority) ? Delayed::HIGH_PRIORITY : Delayed::LOW_PRIORITY
+    convert_progress.process_job(YoutubeMigrationService, :perform_conversion, { priority: job_priority }, course.id, scan_id, embed)
     convert_progress
   end
 

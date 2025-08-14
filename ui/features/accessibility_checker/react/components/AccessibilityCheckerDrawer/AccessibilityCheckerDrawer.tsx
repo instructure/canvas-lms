@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import AccessibilityIssuesDrawerContent from '../AccessibilityIssuesDrawerContent'
-import {ContentItem} from '../../types'
+import {AccessibilityResourceScan} from '../../types'
 import {AccessibilityChecker} from '../..'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 
@@ -42,7 +42,7 @@ export default function AccessibilityCheckerDrawer({
   container,
 }: AccessibilityCheckerDrawerProps) {
   const pageContentRef = useRef<HTMLDivElement>(null)
-  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
+  const [selectedItem, setSelectedItem] = useState<AccessibilityResourceScan | null>(null)
   const [isTrayOpen, setIsTrayOpen] = useState<boolean>(false)
 
   const onDismiss = useCallback(() => {
@@ -81,7 +81,7 @@ export default function AccessibilityCheckerDrawer({
         <DrawerLayout.Tray
           label={
             selectedItem
-              ? `${selectedItem.title} - ${I18n.t('Accessibility Issues')}`
+              ? `${selectedItem.resourceName} - ${I18n.t('Accessibility Issues')}`
               : I18n.t('Accessibility Issues')
           }
           open={isTrayOpen}

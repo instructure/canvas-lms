@@ -1073,10 +1073,21 @@ describe Types::UserType do
       expect(result).to be_nil
     end
 
-    it "returns known users" do
-      known_users = @student.address_book.search_users.paginate(per_page: 4)
-      result = type.resolve("recipients { usersConnection { nodes { _id } } }")
-      expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    context "when feature is disabled" do
+      it "returns known users including students" do
+        known_users = @student.address_book.search_users.paginate(per_page: 4)
+        result = type.resolve("recipients { usersConnection { nodes { _id } } }")
+        expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+      end
+    end
+
+    context "when feature is enabled" do
+      before { @student.account.root_account.enable_feature!(:restrict_student_access) }
+
+      it "returns known users without students" do
+        result = type.resolve("recipients { usersConnection { nodes { _id } } }")
+        expect(result).to match_array([@teacher.id.to_s])
+      end
     end
 
     it "returns contexts" do

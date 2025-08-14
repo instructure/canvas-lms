@@ -4,6 +4,11 @@
     "Enrollment",
     "Group"
   ],
+  "AssignedDates": [
+    "Assignment",
+    "Discussion",
+    "Quiz"
+  ],
   "AssignmentOverrideSet": [
     "AdhocStudents",
     "Course",
@@ -44,7 +49,6 @@
     "DiscussionEntry",
     "DiscussionEntryDraft",
     "DiscussionEntryVersion",
-    "EligibilityIssue",
     "ExternalTool",
     "ExternalUrl",
     "File",
@@ -156,6 +160,9 @@
   ],
   "PagesConnectionInterface": [
     "Course"
+  ],
+  "PlacementsInterface": [
+    "ExternalTool"
   ],
   "ProgressContext": [
     "Assignment",

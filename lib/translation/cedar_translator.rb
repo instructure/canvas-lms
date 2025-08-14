@@ -29,20 +29,20 @@ module Translation
       type = options[:type]
       root_account_uuid = options[:root_account_uuid]
       feature_slug = options.fetch(:feature_slug, "content-translation")
+      current_user = options.fetch(:current_user)
+      raise "Missing current user" unless current_user
 
       translation_response = CedarClient.translate_text(
         content: text,
         target_language: tgt_lang,
         feature_slug:,
-        root_account_uuid:
+        root_account_uuid:,
+        current_user:
       )
 
       check_same_language(translation_response.source_language, tgt_lang)
       collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type:)
       translation_response.translation
-    rescue => e
-      Rails.logger.error("Cedar Translate API error during text translation: #{e.message})")
-      raise e
     end
 
     def translate_html(html_string:, tgt_lang:, options: {})
@@ -52,20 +52,20 @@ module Translation
       root_account_uuid = options[:root_account_uuid]
       feature_slug = options.fetch(:feature_slug, "content-translation")
       type = options[:type]
+      current_user = options.fetch(:current_user)
+      raise "Missing current user" unless current_user
 
       translation_response = CedarClient.translate_html(
         content: html_string,
         target_language: tgt_lang,
         feature_slug:,
-        root_account_uuid:
+        root_account_uuid:,
+        current_user:
       )
 
       check_same_language(translation_response.source_language, tgt_lang)
       collect_translation_stats(src_lang: translation_response.source_language, tgt_lang:, type:)
       translation_response.translation
-    rescue => e
-      Rails.logger.error("Cedar Translate API error during HTML translation: #{e.message} (rescued as StandardError)")
-      raise e
     end
 
     def self.languages

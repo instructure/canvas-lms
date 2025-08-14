@@ -3860,4 +3860,100 @@ describe Enrollment do
       end
     end
   end
+
+  describe "#delete_student_allocation_rules" do
+    context "when the student enrollment is concluded" do
+      before :once do
+        @enrollment1 = course_with_student(active_all: 1)
+        @course = @enrollment1.course
+        @student1 = @enrollment1.user
+        enrollment2 = course_with_student(active_all: 1, course: @course)
+        @student2 = enrollment2.user
+        @assignment = assignment_model(course: @course)
+      end
+
+      it "deletes allocation rules in the course associated to the concluded user" do
+        assessor_rule = AllocationRule.create!(
+          assessor_id: @student1.id,
+          assessee_id: @student2.id,
+          assignment: @assignment,
+          course: @course
+        )
+
+        assessee_rule = AllocationRule.create!(
+          assessor_id: @student2.id,
+          assessee_id: @student1.id,
+          assignment: @assignment,
+          course: @course
+        )
+
+        expect { @enrollment1.conclude }
+          .to change { AllocationRule.where(id: [assessor_rule.id, assessee_rule.id]).pluck(:workflow_state).uniq }
+          .from(["active"]).to(["deleted"])
+      end
+
+      it "doesn't delete allocation rules associated to the concluded user from another course" do
+        other_course = course_factory(active_all: true)
+        other_course.enroll_student(@student1, enrollment_state: "active")
+        other_course.enroll_student(@student2, enrollment_state: "active")
+        other_assignment = assignment_model(course: other_course)
+        other_course_rule = AllocationRule.create!(
+          assessor_id: @student1.id,
+          assessee_id: @student2.id,
+          assignment: other_assignment,
+          course: other_course
+        )
+
+        @enrollment1.conclude
+        expect(other_course_rule.reload.workflow_state).to eq "active"
+      end
+    end
+
+    context "when the student enrollment is deactivated" do
+      before :once do
+        @enrollment1 = course_with_student(active_all: 1)
+        @course = @enrollment1.course
+        @student1 = @enrollment1.user
+        enrollment2 = course_with_student(active_all: 1, course: @course)
+        @student2 = enrollment2.user
+        @assignment = assignment_model(course: @course)
+      end
+
+      it "deletes allocation rules in the course associated to the deactivate user" do
+        assessor_rule = AllocationRule.create!(
+          assessor_id: @student1.id,
+          assessee_id: @student2.id,
+          assignment: @assignment,
+          course: @course
+        )
+
+        assessee_rule = AllocationRule.create!(
+          assessor_id: @student2.id,
+          assessee_id: @student1.id,
+          assignment: @assignment,
+          course: @course
+        )
+
+        expect { @enrollment1.deactivate }
+          .to change { AllocationRule.where(id: [assessor_rule.id, assessee_rule.id]).pluck(:workflow_state).uniq }
+          .from(["active"]).to(["deleted"])
+      end
+
+      it "doesn't delete allocation rules associated to the deactivate user from another course" do
+        other_course = course_factory(active_all: true)
+        other_course.enroll_student(@student1, enrollment_state: "active")
+        other_course.enroll_student(@student2, enrollment_state: "active")
+        other_assignment = assignment_model(course: other_course, peer_reviews: true)
+        other_course_rule = AllocationRule.create!(
+          assessor_id: @student1.id,
+          assessee_id: @student2.id,
+          assignment: other_assignment,
+          course: other_course
+        )
+
+        @enrollment1.deactivate
+        expect(other_course_rule.reload.workflow_state).to eq "active"
+      end
+    end
+  end
 end

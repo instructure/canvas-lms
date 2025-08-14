@@ -16,9 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-undef */
+
 if (!window.ENV) {
   window.ENV = {}
 }
+
+if (!window.ENV.FEATURES) {
+  window.ENV.FEATURES = {}
+}
+
+if (!window.ENV.current_user_roles) {
+  window.ENV.current_user_roles = []
+}
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  windowPathname: () => '/files',
+  assignLocation: jest.fn(),
+}))
+
+jest.mock('@canvas/files/react/modules/filesEnv', () => ({
+  ...jest.requireActual('@canvas/files/react/modules/filesEnv'),
+  get userFileAccessRestricted() {
+    return (
+      window.ENV?.FEATURES?.restrict_student_access &&
+      (window.ENV?.current_user_roles || []).includes('student')
+    )
+  },
+}))
+
+jest.mock('@canvas/files_v2/react/modules/filesEnvFactory', () => ({
+  ...jest.requireActual('@canvas/files_v2/react/modules/filesEnvFactory'),
+  createFilesEnv: customFilesContexts => ({
+    ...jest
+      .requireActual('@canvas/files_v2/react/modules/filesEnvFactory')
+      .createFilesEnv(customFilesContexts),
+    get userFileAccessRestricted() {
+      return (
+        window.ENV?.FEATURES?.restrict_student_access &&
+        (window.ENV?.current_user_roles || []).includes('student')
+      )
+    },
+  }),
+}))
+
 export default (window.ENV.FILES_CONTEXTS = [
   {
     asset_string: 'course_1',

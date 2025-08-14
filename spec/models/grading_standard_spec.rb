@@ -756,5 +756,13 @@ describe GradingStandard do
     it "returns false if not used as an account or course default grading scheme" do
       expect(@grading_standard.used_as_default?).to be false
     end
+
+    it "returns false if it is used as an assignment grading scheme" do
+      @course.assignments.create!(title: "hi",
+                                  grading_type: "letter_grade",
+                                  grading_standard: @grading_standard,
+                                  submission_types: ["online_text_entry"])
+      expect(@grading_standard.used_as_default?).to be false
+    end
   end
 end

@@ -67,7 +67,7 @@ query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: Stri
         }
         courseId
         createdAt
-        dueAt
+        dueAt(applyOverrides: false)
         dueDateRequired
         gradedSubmissionsExist
         gradeGroupStudentsIndividually
@@ -80,7 +80,7 @@ query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: Stri
         hasSubmittedSubmissions
         htmlUrl
         importantDates
-        lockAt
+        lockAt(applyOverrides: false)
         moderatedGradingEnabled
         moduleItems { position module { _id } }
         muted
@@ -100,7 +100,7 @@ query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: Stri
         published
         state
         submissionTypes
-        unlockAt
+        unlockAt(applyOverrides: false)
         updatedAt
         visibleToEveryone
       }

@@ -101,11 +101,6 @@ describe OutcomesFeaturesHelper do
         @context.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
         expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to be true
       end
-
-      it "returns false when outcome_alignment_summary_with_new_quizzes FF is disabled" do
-        @context.disable_feature!(:outcome_alignment_summary_with_new_quizzes)
-        expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to be false
-      end
     end
   end
 end

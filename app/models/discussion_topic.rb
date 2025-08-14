@@ -43,6 +43,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   REQUIRED_CHECKPOINT_COUNT = 2
+  MAX_ENTRIES_PINNED = 10
 
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, %i[require_initial_post
@@ -131,6 +132,7 @@ class DiscussionTopic < ActiveRecord::Base
   validates_associated :discussion_topic_section_visibilities
   validates :context_id, :context_type, presence: true
   validates :discussion_type, inclusion: { in: DiscussionTypes::TYPES }
+  validates :sort_order, inclusion: { in: SortOrder::TYPES }
   validates :message, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   # For our users, when setting checkpoints, the value must be between 1 and 10.
@@ -287,10 +289,7 @@ class DiscussionTopic < ActiveRecord::Base
     d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
-    d_sort = self["sort_order"]
-    if d_sort.nil? || !SortOrder::TYPES.include?(d_sort)
-      self.sort_order = SortOrder::DEFAULT
-    end
+    self.sort_order ||= SortOrder::DEFAULT
 
     @content_changed = message_changed? || title_changed?
 
@@ -2233,20 +2232,12 @@ class DiscussionTopic < ActiveRecord::Base
     all_overrides
   end
 
-  def sanitized_sort_order
-    if DiscussionTopic::SortOrder::TYPES.include?(sort_order)
-      sort_order
-    else
-      DiscussionTopic::SortOrder::DEFAULT
-    end
-  end
-
   def sort_order_for_user(current_user = nil)
-    return sanitized_sort_order if sort_order_locked
+    return sort_order if sort_order_locked
 
     current_user ||= self.current_user
     participant_sort_order = participant(current_user)&.sort_order
-    participant_sort_order = sanitized_sort_order if participant_sort_order == DiscussionTopic::SortOrder::INHERIT
+    participant_sort_order = sort_order if participant_sort_order == DiscussionTopic::SortOrder::INHERIT
     participant_sort_order || DiscussionTopic::SortOrder::DEFAULT
   end
 
@@ -2264,6 +2255,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def graded?
     assignment_id.present?
+  end
+
+  def pinned_entries
+    discussion_entries.pinned
   end
 
   private

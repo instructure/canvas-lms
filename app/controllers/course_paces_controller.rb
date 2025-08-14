@@ -449,7 +449,7 @@ class CoursePacesController < ApplicationController
   end
 
   # @API Create a Course pace
-  #
+  # Creates a new course pace with specified parameters.
   # @argument course_id [Required, Integer]
   #   The id of the course
   #

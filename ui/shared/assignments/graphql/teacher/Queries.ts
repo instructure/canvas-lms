@@ -75,6 +75,8 @@ export const TEACHER_QUERY = gql`
       lockAt(applyOverrides: false)
       pointsPossible
       state
+      totalSubmissions
+      totalGradedSubmissions
       needsGradingCount
       onlyVisibleToOverrides
       suppressAssignment

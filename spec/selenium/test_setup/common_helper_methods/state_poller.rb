@@ -26,15 +26,15 @@ module StatePoller
     # The method implements specific poll wait sequence pattern. The provided "block" is called until
     # it returns the "expected" response or the "timeout" expires.
     def await(expected, timeout = nil)
-      start = Time.now.to_f
+      start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       deadline = start + ((timeout || SeleniumDriverSetup.timeouts[:script]) * rerun_timeout_multiplier)
       wait = WAIT_STEP
 
-      while (got = yield) != expected && Time.now.to_f < deadline
+      while (got = yield) != expected && Process.clock_gettime(Process::CLOCK_MONOTONIC) < deadline
         sleep(wait)
         wait = next_wait(wait)
       end
-      spent = f3(Time.now.to_f - start)
+      spent = f3(Process.clock_gettime(Process::CLOCK_MONOTONIC) - start)
       { got:, spent: }
     end
 

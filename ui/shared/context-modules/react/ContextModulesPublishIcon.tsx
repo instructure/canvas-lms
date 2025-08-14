@@ -37,6 +37,7 @@ interface Props {
   readonly isPublishing: boolean
   readonly loadingMessage?: string
   readonly onPublishComplete?: () => void
+  readonly setIsPublishing?: (isPublishing: boolean) => void
 }
 
 // TODO: remove and replace MenuItem with Menu.Item below when on v8
@@ -50,6 +51,7 @@ const ContextModulesPublishIcon = ({
   isPublishing,
   loadingMessage,
   onPublishComplete,
+  setIsPublishing,
 }: Props) => {
   const statusIcon = () => {
     const iconStyles = {
@@ -74,24 +76,32 @@ const ContextModulesPublishIcon = ({
     }
   }
 
+  const publishingProps = {
+    courseId,
+    moduleId,
+    onPublishComplete,
+    setIsPublishing,
+    moduleIsPublished: published,
+  }
+
   const unpublishAll = () => {
     if (isPublishing) return
-    unpublishModule(courseId, moduleId, false, onPublishComplete)
+    unpublishModule({...publishingProps, skipItems: false})
   }
 
   const publishAll = () => {
     if (isPublishing) return
-    publishModule(courseId, moduleId, false, onPublishComplete)
+    publishModule({...publishingProps, skipItems: false})
   }
 
   const publishModuleOnly = () => {
     if (isPublishing) return
-    publishModule(courseId, moduleId, true, onPublishComplete)
+    publishModule({...publishingProps, skipItems: true})
   }
 
   const unpublishModuleOnly = () => {
     if (isPublishing) return
-    unpublishModule(courseId, moduleId, true, onPublishComplete)
+    unpublishModule({...publishingProps, skipItems: true})
   }
 
   const publishedStatus = published ? I18n.t('published') : I18n.t('unpublished')
@@ -103,6 +113,7 @@ const ContextModulesPublishIcon = ({
         show={isPublishing ? false : undefined}
         trigger={
           <IconButton
+            data-testid="module-publish-menu"
             withBorder={false}
             screenReaderLabel={I18n.t('%{moduleName} module publish options, %{publishedStatus}', {
               moduleName,
@@ -113,16 +124,16 @@ const ContextModulesPublishIcon = ({
           </IconButton>
         }
       >
-        <MenuItem onClick={publishAll}>
+        <MenuItem data-testid="module-publish-with-all-items" onClick={publishAll}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module and all items')}
         </MenuItem>
-        <MenuItem onClick={publishModuleOnly}>
+        <MenuItem data-testid="module-publish" onClick={publishModuleOnly}>
           <IconPublishSolid color="success" /> {I18n.t('Publish module only')}
         </MenuItem>
-        <MenuItem onClick={unpublishAll}>
+        <MenuItem data-testid="module-unpublish-with-all-items" onClick={unpublishAll}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module and all items')}
         </MenuItem>
-        <MenuItem onClick={unpublishModuleOnly}>
+        <MenuItem data-testid="module-unpublish" onClick={unpublishModuleOnly}>
           <IconUnpublishedLine /> {I18n.t('Unpublish module only')}
         </MenuItem>
       </Menu>

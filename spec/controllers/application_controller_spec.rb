@@ -2086,6 +2086,59 @@ RSpec.describe ApplicationController do
         end
       end
     end
+
+    describe "#check_restricted_file_access_for_students" do
+      context "when current_user is not present" do
+        it "does nothing" do
+          expect(controller).not_to receive(:render_unauthorized_action)
+          expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+        end
+      end
+
+      context "when current_user is present" do
+        before do
+          user_factory
+          controller.instance_variable_set(:@current_user, @user)
+        end
+
+        context "when context_account is not present" do
+          it "does nothing" do
+            expect(controller).not_to receive(:render_unauthorized_action)
+            expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+          end
+        end
+
+        context "when context_account is present" do
+          let(:account) { Account.default }
+
+          before do
+            controller.instance_variable_set(:@context_account, account)
+          end
+
+          context "when account does not have restricted file access for user" do
+            before do
+              allow(account).to receive(:restricted_file_access_for_user?).with(@user).and_return(false)
+            end
+
+            it "does nothing" do
+              expect(controller).not_to receive(:render_unauthorized_action)
+              expect(controller.send(:check_restricted_file_access_for_students)).to be_nil
+            end
+          end
+
+          context "when account has restricted file access for user" do
+            before do
+              allow(account).to receive(:restricted_file_access_for_user?).with(@user).and_return(true)
+            end
+
+            it "renders unauthorized action" do
+              expect(controller).to receive(:render_unauthorized_action)
+              controller.send(:check_restricted_file_access_for_students)
+            end
+          end
+        end
+      end
+    end
   end
 
   describe "flash_notices" do
@@ -3244,7 +3297,7 @@ describe CoursesController do
 
     it "does not affect api requests that use an access token with an unscoped developer key" do
       user = user_model
-      developer_key = DeveloperKey.create!
+      developer_key = DeveloperKey.create!(name: "dev key")
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
@@ -3256,7 +3309,7 @@ describe CoursesController do
 
     it "raises AccessTokenScopeError if scopes do not match" do
       user = user_model
-      developer_key = DeveloperKey.create!(require_scopes: true)
+      developer_key = DeveloperKey.create!(name: "dev key", require_scopes: true)
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
@@ -3268,7 +3321,7 @@ describe CoursesController do
     end
 
     context "with valid scopes on dev key" do
-      let(:developer_key) { DeveloperKey.create!(require_scopes: true, scopes: ["url:GET|/api/v1/accounts"]) }
+      let(:developer_key) { DeveloperKey.create!(name: "dev key", require_scopes: true, scopes: ["url:GET|/api/v1/accounts"]) }
 
       it "allows adequately scoped requests through" do
         user = user_model
@@ -3310,7 +3363,7 @@ describe CoursesController do
     end
 
     context "with valid scopes and allow includes on dev key" do
-      let(:developer_key) { DeveloperKey.create!(require_scopes: true, allow_includes: true, scopes: ["url:GET|/api/v1/accounts"]) }
+      let(:developer_key) { DeveloperKey.create!(name: "dev key", require_scopes: true, allow_includes: true, scopes: ["url:GET|/api/v1/accounts"]) }
 
       it "keeps includes for adequately scoped requests" do
         user = user_model

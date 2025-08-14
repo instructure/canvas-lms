@@ -84,4 +84,32 @@ describe Types::QuizType do
       expect(type.resolve("submissionsConnection { nodes { _id }}")).to be_nil
     end
   end
+
+  describe "assignedToDates field" do
+    context "when standardize_assignment_date_formatting feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      it "returns nil" do
+        expect(quiz_type.resolve("assignedToDates { id }")).to be_nil
+      end
+    end
+
+    context "when standardize_assignment_date_formatting feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      it "includes quiz overrides when present" do
+        student = student_in_course(course: @course, active_all: true).user
+        override = assignment_override_model(assignment: quiz, due_at: 2.weeks.from_now)
+        override.assignment_override_students.create!(user: student)
+
+        result = quiz_type.resolve("assignedToDates { id dueAt title base }")
+        expect(result).to be_an(Array)
+        expect(result.length).to be > 0
+      end
+    end
+  end
 end

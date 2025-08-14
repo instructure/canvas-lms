@@ -292,6 +292,8 @@ class Course < ActiveRecord::Base
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :course
 
   has_many :accessibility_resource_scans, dependent: :destroy
+  has_many :accessibility_issues, dependent: :destroy
+  has_many :allocation_rules, dependent: :destroy
 
   prepend Profile::Association
 
@@ -3550,6 +3552,11 @@ class Course < ActiveRecord::Base
         schedule_tab = default_tabs.detect { |t| t[:id] == TAB_SCHEDULE }
         tabs.insert(1, default_tabs.delete(schedule_tab)) if schedule_tab && !tabs.empty?
       end
+
+      # since TAB_SEARCH is added dynamically, we don't need an extra smart search check
+      smart_search_tab = default_tabs.detect { |t| t[:id] == TAB_SEARCH }
+      tabs.insert(1, default_tabs.delete(smart_search_tab)) if smart_search_tab && !tabs.empty?
+
       tabs += default_tabs
       tabs += external_tabs
 
@@ -4600,7 +4607,6 @@ class Course < ActiveRecord::Base
 
   # Accessibility scan limit check
   def exceeds_accessibility_scan_limit?
-    # TODO: add caching with proper invalidation
     wiki_page_count = wiki_pages.not_deleted.count
     assignment_count = assignments.active.count
 

@@ -35,6 +35,7 @@ export type RubricUnderscoreType = {
   points_possible: number
   unassessed?: boolean
   workflow_state: string
+  can_update?: boolean
 }
 
 type RubricUnderscoreCriteria = {
@@ -126,6 +127,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     id: rubric.id,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
+    canUpdateRubric: rubric.can_update,
   }
 }
 
@@ -146,6 +148,8 @@ export const mapRubricAssessmentDataUnderscoredKeysToCamelCase = (
 }
 
 export type RubricAssociationUnderscore = {
+  association_type: 'Assignment' | 'Account' | 'Course'
+  association_id: string
   id: string
   rubric_id: string
   use_for_grading: boolean
@@ -157,6 +161,8 @@ export const mapRubricAssociationUnderscoredKeysToCamelCase = (
   underscoreAssociation: RubricAssociationUnderscore,
 ): RubricAssociation => {
   return {
+    associationType: underscoreAssociation.association_type,
+    associationId: underscoreAssociation.association_id,
     id: underscoreAssociation.id,
     hideOutcomeResults: underscoreAssociation.hide_outcome_results,
     hidePoints: underscoreAssociation.hide_points,

@@ -23,8 +23,10 @@ require_relative "../graphql_spec_helper"
 describe Types::RubricType do
   let_once(:course) { course_factory(active_all: true) }
   let_once(:student) { student_in_course(course:, active_all: true).user }
+  let_once(:teacher) { teacher_in_course(course:, active_all: true).user }
   let(:rubric) { rubric_for_course }
   let(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
+  let(:rubric_type_teacher) { GraphQLTypeTester.new(rubric, current_user: teacher) }
   let(:assignment) { assignment_model(course: @course) }
 
   it "works" do
@@ -102,6 +104,13 @@ describe Types::RubricType do
       expect(
         rubric_type.resolve("rubricAssociationForContext { _id }")
       ).to eq(rubric.rubric_associations.first.id.to_s)
+    end
+
+    it "can_update_rubric" do
+      expect(rubric_type.resolve("canUpdateRubric")).to be false
+      expect(rubric_type_teacher.resolve("canUpdateRubric")).to be true
+      rubric.update!(read_only: true)
+      expect(rubric_type.resolve("canUpdateRubric")).to be false
     end
   end
 end

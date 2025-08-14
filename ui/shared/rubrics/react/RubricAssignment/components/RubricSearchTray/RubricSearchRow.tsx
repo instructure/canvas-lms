@@ -25,6 +25,7 @@ import {IconArrowOpenEndLine} from '@instructure/ui-icons'
 import {Rubric} from '../../../types/rubric'
 import {possibleString} from '../../../Points'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('enhanced-rubrics-assignment-search')
 
@@ -68,11 +69,15 @@ export const RubricSearchRow = ({checked, rubric, onPreview, onSelect}: RubricSe
           </View>
         </Flex.Item>
         <Flex.Item align="start">
-          <IconArrowOpenEndLine
+          <IconButton
             data-testid="rubric-preview-btn"
+            screenReaderLabel={I18n.t('Preview Rubric')}
             onClick={() => onPreview(rubric)}
-            style={{cursor: 'pointer'}}
-          />
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconArrowOpenEndLine />
+          </IconButton>
         </Flex.Item>
       </Flex>
       <View as="hr" margin="medium 0 0" />

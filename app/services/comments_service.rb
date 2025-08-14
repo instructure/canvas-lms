@@ -21,26 +21,34 @@
 class CommentsService
   COMMENTS_PROMPT = <<~TEXT
     Human: <TASK>
-    You are a teaching assistant that provides student guidance based on the CRITERION and REASONING a teacher has provided. You will use simple language and avoid using complex words. You will also avoid using words that are not commonly used.
+    You are a teaching assistant that provides student guidance based on the CRITERION and REASONING a teacher has provided. You will use simple language and avoid using complex words. You will also avoid using words that are not commonly used. You will rephrase the teacher's feedback into a friendly and clear suggestion written directly to the student, as if you're helping them improve.
     </TASK>
 
     <INPUT>
-    You are given a ASSIGNMENT and a list of REASONINGs and CRITERIONs. You will use this information to provide guidance on what the student needs to do in order to improve their essay.
+    You are given an ASSIGNMENT and a list of REASONINGs and CRITERIA. You will use this information to provide guidance on what the student needs to do in order to improve their essay.
     * ASSIGNMENT: {{assignment}}
     * LIST OF REASONINGs: {{list_of_reasonings}}
     </INPUT>
 
     <INSTRUCTIONS>
-    For each CRITERION in REASONING, provide the following in a JSON array.
-    The output should be formatted as a JSON instance that conforms to the JSON schema below.\n\nAs an example, for the schema {"properties": {"foo": {"title": "Foo", "description": "a list of strings", "type": "array", "items": {"type": "string"}}}, "required": ["foo"]}\nthe object {"foo": ["bar", "baz"]} is a well-formatted instance of the schema. The object {"properties": {"foo": ["bar", "baz"]}} is not well-formatted.\n\nHere is the output schema:\n```\n{"properties": {"criterion": {"title": "Criterion", "description": "The name of the rubric category for which the criterion is selected", "type": "string"}, "guidance": {"title": "Guidance", "description": "Guidance on what the student needs to do in order to improve their essay. The guidance should be concise and to the point, and should be no more than 100 words.", "type": "string"}}, "required": ["criterion", "guidance"]}
-    You will output a 1-2 sentence guidance on what the student needs to do in order to improve their essay. The guidance should be concise and to the point, and should be no more than 100 words. Don't start your response with 'Guidance:', 'To improve your essay', or anything similar.). The guidance MUST be in first person, as if you're addressing the student directly.
+    For each CRITERION in LIST OF REASONINGs, provide the following in a JSON array.
+
+    The output should be formatted as a JSON instance that conforms to the JSON schema below: {"properties": {"criterion": {"title": "Criterion","description": "The name of the rubric category for which the criterion is selected","type": "string"},"guidance": {"title": "Guidance","description": "Guidance on what the student needs to do in order to improve their essay. The guidance should be concise max 200 words and to the point. Include examples from REASONING to give specific next steps.","type": "string"}},"required": ["criterion", "guidance"]}
+
+    Instructions for generating the guidance:
+    - Rephrase each REASONING into a personal piece of advice directed to the student using “I” and “you” (e.g., “I liked how you...” or “You could make it even better by…”).
+    - Keep it short, clear, and no more than **100 words**.
+    - Do **not** start with generic phrases like “To improve your essay,” or “Guidance:”.
+    - Always **include any quoted examples** from the REASONING in your rephrased guidance to help the student understand what worked well or what could be improved.
+    - Use friendly and simple language, like you're speaking directly to a student who needs clear and encouraging advice.
     </INSTRUCTIONS>
   TEXT
 
-  def initialize(assignment:, grade_data:, root_account_uuid:)
+  def initialize(assignment:, grade_data:, root_account_uuid:, current_user:)
     @assignment = assignment.to_s
     @grade_data = grade_data
     @root_account_uuid = root_account_uuid
+    @current_user = current_user
   end
 
   def call
@@ -57,8 +65,9 @@ class CommentsService
         prompt:,
         model: "anthropic.claude-3-haiku-20240307-v1:0",
         feature_slug: "grading-comments-assistance",
-        root_account_uuid: @root_account_uuid
-      )
+        root_account_uuid: @root_account_uuid,
+        current_user: @current_user
+      ).response
 
       guidance_list = safe_parse_json_array(response)
       guidance = guidance_list.to_h { |g| [g["criterion"], g["guidance"]] }

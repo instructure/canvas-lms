@@ -35,10 +35,21 @@ export type ModuleItemContentType =
   | 'external_url'
   | 'external_tool'
 
+export type placementContent = {
+  title: string
+  url: string
+}
+
 // Base interface for all content items
 export interface ContentItem {
   id: string
   name: string
+  // Applies to external tools and external URLs
+  url?: string
+  // Applies for external tools and module external tools.
+  domain?: string
+  description?: string
+  placements?: Record<string, placementContent>
 }
 
 // Common response structure for all queries
@@ -106,6 +117,7 @@ export interface GraphQLResponse {
         id: string
         name: string
         url: string
+        placements: Record<string, any>
       }>
       pageInfo: {
         hasNextPage: boolean
@@ -262,7 +274,31 @@ const EXTERNAL_TOOLS_QUERY = gql`
           nodes {
             _id
             name
+            description
+            domain
             url
+            placements {
+              courseAssignmentsMenu {
+                title
+                url
+              }
+              moduleIndexMenuModal {
+                title
+                url
+              }
+              assignmentSelection {
+                title
+                url
+              }
+              linkSelection {
+                title
+                url
+              }
+              moduleMenuModal {
+                title
+                url
+              }
+            }
           }
           pageInfo {
             hasNextPage
@@ -367,7 +403,10 @@ function transformQueryResult(
           course?.externalToolsConnection?.nodes?.map((node: any) => ({
             id: node._id,
             name: node.name,
+            description: node.description,
+            domain: node.domain,
             url: node.url,
+            placements: node.placements,
           })) || [],
         pageInfo: course?.externalToolsConnection?.pageInfo,
       }

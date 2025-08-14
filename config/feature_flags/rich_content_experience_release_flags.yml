@@ -247,18 +247,15 @@ reset_uuid_on_course_reset:
     Reset the UUID of a course when it is reset.  This allows course restore to work better for New Quizzes.
   applies_to: RootAccount
 
-safe_files_token:
+safe_files_jti:
   applies_to: SiteAdmin
-  state: hidden
-  display_name: Safe Files Token
+  state: allowed_on
+  shadow: true
+  display_name: Safe Files JTI
   description: |-
     Adds a one time use token when redirecting to the safe files domain.
-    This allows access to files within iframes in rich content that would be blocked by cross-site cookie protections.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
+    This prevents replay attacks on the file download links.
+
 
 visibility_performance_improvements:
   state: hidden
@@ -290,6 +287,18 @@ youtube_migration:
   display_name: YouTube content migration
   description: |-
     Turn on YouTube Content Migration feature. Adding the scanning ability and the convert option on YouTube embeddings.
+
+youtube_migration_high_priority:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: YouTube content migration high priority
+  description: |-
+    Set the priority of YouTube content migration conversion jobs to high for faster processing. When disabled, jobs run at low priority.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 youtube_overlay:
   applies_to: SiteAdmin

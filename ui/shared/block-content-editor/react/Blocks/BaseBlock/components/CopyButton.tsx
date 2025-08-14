@@ -20,7 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconDuplicateLine} from '@instructure/ui-icons'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const CopyButton = (props: {
   onClicked: () => void
@@ -29,13 +29,8 @@ export const CopyButton = (props: {
     <IconButton
       data-testid="copy-block-button"
       data-copybutton
-      withBackground={false}
-      withBorder={false}
       screenReaderLabel={I18n.t('Duplicate block')}
-      onClick={e => {
-        e.stopPropagation()
-        props.onClicked()
-      }}
+      onClick={props.onClicked}
     >
       <IconDuplicateLine />
     </IconButton>

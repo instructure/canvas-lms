@@ -15,24 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {getByTestId, queryAllByText, render} from '@testing-library/react'
-import React from 'react'
-import {MemoryRouter, Outlet, Route, Routes} from 'react-router-dom'
 import {ZLtiImsRegistrationId} from '../../../../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZLtiToolConfigurationId} from '../../../../model/lti_tool_configuration/LtiToolConfigurationId'
 import {ToolConfigurationEdit} from '../ToolConfigurationEdit'
 import {mockConfiguration, mockOverlay, renderApp} from './helpers'
-import {i18nLtiPlacement} from '../../../../model/i18nLtiPlacement'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevel} from '../../../../model/i18nLtiPrivacyLevel'
-import {screen} from '@testing-library/dom'
-import {
-  getInputIdForField,
-  Lti1p3RegistrationOverlayStateErrorField,
-} from '../../../../registration_overlay/validateLti1p3RegistrationOverlayState'
+import {getInputIdForField} from '../../../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import * as ue from '@testing-library/user-event'
 import {Lti1p3RegistrationOverlayState} from 'features/lti_registrations/manage/registration_overlay/Lti1p3RegistrationOverlayState'
-import {LtiPlacement} from 'features/developer_keys_v2/model/LtiPlacements'
 
 const userEvent = ue.userEvent.setup({advanceTimers: jest.advanceTimersByTime})
 
@@ -49,8 +40,7 @@ describe('ToolConfigurationEdit', () => {
 
   describe('Manual Registrations', () => {
     it('should render the Launch Settings', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, getByTestId, container} = renderApp({
+      const {getByText, container} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -65,7 +55,7 @@ describe('ToolConfigurationEdit', () => {
           overlay: mockOverlay({}, {}),
           manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByText('Launch Settings')).toBeInTheDocument()
       getInputIdForField(`redirectURIs`)
@@ -80,8 +70,7 @@ describe('ToolConfigurationEdit', () => {
       ['customFields', 'invalid-custom-fields'],
     ] satisfies [keyof Lti1p3RegistrationOverlayState['launchSettings'], string][])(
       'should focus on the %s field when the form is submitted with an invalid value',
-      async (field, value) => {
-        const updateLtiRegistration = jest.fn()
+      async (field, _) => {
         const {getByText, container} = renderApp({
           n: 'Test App',
           i: 1,
@@ -99,7 +88,7 @@ describe('ToolConfigurationEdit', () => {
             overlay: mockOverlay({}, {}),
             manual_configuration_id: ZLtiToolConfigurationId.parse('1'),
           },
-        })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+        })(<ToolConfigurationEdit />)
 
         const element = container.querySelector(`#${getInputIdForField('redirectURIs')}`)
         if (element) {
@@ -121,8 +110,7 @@ describe('ToolConfigurationEdit', () => {
 
   describe('Non-Manual Registrations', () => {
     it('should not render the Launch Settings', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByText, container} = renderApp({
+      const {getByText, queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {},
@@ -130,15 +118,14 @@ describe('ToolConfigurationEdit', () => {
           ims_registration_id: ZLtiImsRegistrationId.parse('1'),
           overlaid_configuration: mockConfiguration({}),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByText('Permissions')).toBeInTheDocument()
       expect(queryAllByText('Launch Settings')).toHaveLength(0)
     })
 
     it("should only render the registration's scopes", () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, getAllByText, queryAllByText} = renderApp({
+      const {getByText, queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -156,7 +143,7 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(
         getByText(i18nLtiScope('https://canvas.instructure.com/lti-ags/progress/scope/show')),
@@ -175,8 +162,7 @@ describe('ToolConfigurationEdit', () => {
     })
 
     it("should only render the registration's placements", () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByTestId, getByTestId} = renderApp({
+      const {queryAllByTestId, getByTestId} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {
@@ -222,7 +208,7 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(getByTestId(`placement-checkbox-course_navigation`)).toBeInTheDocument()
       expect(getByTestId(`placement-checkbox-account_navigation`)).toBeInTheDocument()
@@ -231,8 +217,7 @@ describe('ToolConfigurationEdit', () => {
     })
 
     it('should not render the override URIs', () => {
-      const updateLtiRegistration = jest.fn()
-      const {getByText, queryAllByText} = renderApp({
+      const {queryAllByText} = renderApp({
         n: 'Test App',
         i: 1,
         configuration: {},
@@ -259,14 +244,13 @@ describe('ToolConfigurationEdit', () => {
             ],
           }),
         },
-      })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+      })(<ToolConfigurationEdit />)
 
       expect(queryAllByText('Override URIs')).toHaveLength(0)
     })
   })
 
   it("should render the registration's data sharing setting", () => {
-    const updateLtiRegistration = jest.fn()
     const {getByText, getByDisplayValue} = renderApp({
       n: 'Test App',
       i: 1,
@@ -279,7 +263,7 @@ describe('ToolConfigurationEdit', () => {
           privacy_level: 'email_only',
         }),
       },
-    })(<ToolConfigurationEdit updateLtiRegistration={updateLtiRegistration} />)
+    })(<ToolConfigurationEdit />)
 
     expect(getByText('Data Sharing')).toBeInTheDocument()
     expect(getByDisplayValue(i18nLtiPrivacyLevel('email_only'))).toBeInTheDocument()

@@ -1265,15 +1265,16 @@ describe "Users API", type: :request do
         expect(json.pluck("id")).to match_array([@user1.id, @user2.id])
       end
 
-      it "includes only the first MAX_UUIDS_IN_FILTER uuids in the filter" do
-        stub_const("UsersController::MAX_UUIDS_IN_FILTER", 2)
+      it "returns an error when uuids param is bigger than MAX_UUIDS_IN_FILTER" do
+        max_uuids = 2
+        stub_const("UsersController::MAX_UUIDS_IN_FILTER", max_uuids)
         json = api_call(:get,
                         "/api/v1/accounts/#{@account.id}/users",
                         { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
-                        { uuids: [@user3.uuid, @user1.uuid, @user2.uuid] })
+                        { uuids: [@user1.uuid, @user2.uuid, @user3.uuid] })
 
-        expect(json.count).to eq 2
-        expect(json.pluck("id")).to match_array([@user3.id, @user1.id])
+        expect(response).to have_http_status :bad_request
+        expect(json).to eq({ "error" => "Too many UUIDs in filter. Current limit is #{max_uuids}" })
       end
     end
 
@@ -2854,7 +2855,7 @@ describe "Users API", type: :request do
     let_once(:path_options) { { controller: "users", action: "expire_mobile_sessions", format: "json" } }
 
     before do
-      user.access_tokens.create!
+      user.access_tokens.create!(purpose: "Test Access Token")
     end
 
     it "allows admin to expire mobile sessions" do

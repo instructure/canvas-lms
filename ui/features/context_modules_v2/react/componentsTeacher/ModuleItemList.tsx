@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {memo, useState, useLayoutEffect} from 'react'
+import React, {memo} from 'react'
 import {View} from '@instructure/ui-view'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItem from './ModuleItem'
 import AddItemInline from './AddItemModalComponents/AddItemInline'
@@ -29,7 +28,9 @@ import type {
   ModuleItem as ModuleItemType,
   ModuleAction,
 } from '../utils/types'
-import {validateModuleItemTeacherRenderRequirements, LARGE_MODULE_THRESHOLD} from '../utils/utils'
+import {validateModuleItemTeacherRenderRequirements} from '../utils/utils'
+import {useContextModule} from '../hooks/useModuleContext'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -40,12 +41,12 @@ export interface ModuleItemListProps {
   moduleTitle?: string
   moduleItems: ModuleItemType[]
   completionRequirements?: CompletionRequirement[]
-  isLoading: boolean
   error: any
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setSelectedModuleItem?: (item: {id: string; title: string} | null) => void
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
+  isEmpty?: boolean
 }
 
 const ModuleItemList: React.FC<ModuleItemListProps> = ({
@@ -53,28 +54,17 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
   moduleTitle = '',
   moduleItems,
   completionRequirements,
-  isLoading,
   error,
   setModuleAction,
   setSelectedModuleItem,
   setIsManageModuleContentTrayOpen,
   setSourceModule,
+  isEmpty,
 }) => {
-  const isLargeModule = moduleItems.length >= LARGE_MODULE_THRESHOLD
-  const [isSlowRendering, setIsSlowRendering] = useState(false)
+  const {menuItemLoadingState} = useContextModule()
+  const loadingState = menuItemLoadingState?.[moduleId]
+  const isDuplicateLoading = loadingState?.state && loadingState?.type == 'duplicate'
 
-  // Detect slow rendering for large modules
-  useLayoutEffect(() => {
-    if (!isLoading && isLargeModule && moduleItems.length > 0) {
-      setIsSlowRendering(true)
-      const renderTimer = setTimeout(() => {
-        setIsSlowRendering(false)
-      }, 150) // Show spinner for 150ms during heavy rendering
-      return () => clearTimeout(renderTimer)
-    } else {
-      setIsSlowRendering(false)
-    }
-  }, [moduleItems.length, isLoading, isLargeModule])
   return (
     <View as="div" overflowX="hidden">
       <Droppable droppableId={moduleId} type="MODULE_ITEM">
@@ -83,44 +73,38 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
             ref={provided.innerRef}
             {...provided.droppableProps}
             style={{
-              minHeight: '50px',
               background: snapshot.isDraggingOver ? '#F2F4F4' : 'transparent',
+              borderColor: '#D7DADE',
+              borderWidth: '0 0 0.0625rem 0',
+              borderStyle: 'solid',
               padding: '0',
               overflowX: 'hidden',
             }}
           >
-            {isLoading || isSlowRendering ? (
+            {!!isDuplicateLoading && (
               <View as="div" textAlign="center" padding="medium">
                 <Spinner
-                  renderTitle={
-                    isSlowRendering
-                      ? I18n.t('Rendering %{count} module items...', {
-                          count: moduleItems.length,
-                        })
-                      : I18n.t('Loading %{count} module items...', {
-                          count: moduleItems.length || 'module',
-                        })
-                  }
+                  renderTitle={I18n.t('Duplicating module item…')}
                   size="small"
                   margin="0 small 0 0"
                 />
                 <Text size="small" color="secondary">
-                  {isSlowRendering
-                    ? I18n.t('Rendering %{count} items...', {count: moduleItems.length})
-                    : moduleItems.length > 0
-                      ? I18n.t('Loading %{count} items...', {count: moduleItems.length})
-                      : I18n.t('Loading module items...')}
+                  {I18n.t('Duplicating module item…')}
                 </Text>
               </View>
-            ) : error ? (
+            )}
+            {error && (
               <View as="div" textAlign="center" padding="medium">
                 <Text color="danger">{I18n.t('Error loading module items')}</Text>
               </View>
-            ) : moduleItems.length === 0 ? (
+            )}
+            {isEmpty && !error && (
               <View as="div" textAlign="center" padding="medium">
                 <AddItemInline moduleId={moduleId} itemCount={0} />
               </View>
-            ) : (
+            )}
+            {!error &&
+              !isEmpty &&
               moduleItems.map((item, index) => (
                 <Draggable key={`${item.id}-${index}`} draggableId={item.id} index={index}>
                   {(dragProvided, dragSnapshot) => (
@@ -149,7 +133,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                             moduleTitle={moduleTitle}
                             index={index}
                             id={item.id}
-                            published={item.content?.published ?? false}
+                            published={!!item.published}
                             canUnpublish={item.content?.canUnpublish ?? true}
                             completionRequirements={completionRequirements}
                             dragHandleProps={dragProvided.dragHandleProps}
@@ -163,8 +147,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
                     </div>
                   )}
                 </Draggable>
-              ))
-            )}
+              ))}
             {provided.placeholder}
           </div>
         )}

@@ -27,7 +27,7 @@ describe DataFixup::AddMediaDataAttributeToIframes do
     it "gets media data from attachment" do
       Attachment.create! context: course, media_entry_id: "m-fromattachment", filename: "whatever.flv", display_name: "whatever.flv", content_type: "audio/webm"
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
-      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\"></iframe>"
+      assignment.update!(description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\"></iframe>", saving_user: @user)
       DataFixup::AddMediaDataAttributeToIframes.run
       expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"audio\"></iframe>"
     end
@@ -35,14 +35,14 @@ describe DataFixup::AddMediaDataAttributeToIframes do
     it "gets media data from media object if there is none in the attachment itself" do
       Attachment.create! context: course, filename: "whatever.flv", display_name: "whatever.flv", content_type: "unknown/unknown"
       MediaObject.create! media_id: "m-frommediaobject", data: { extensions: { mp4: { width: 640, height: 400 } } }, attachment_id: Attachment.last.id, media_type: "video/webm"
-      assignment.update! description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\"></iframe>"
+      assignment.update!(description: "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\"></iframe>", saving_user: @user)
       DataFixup::AddMediaDataAttributeToIframes.run
       expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/#{Attachment.last.id}\" data-media-type=\"video\"></iframe>"
     end
 
     it "defaults to video/* if it has no data while leaving unrelated iframes alone" do
       Attachment.create! context: course, filename: "whatever.flv", display_name: "whatever.flv", content_type: "unknown/unknown"
-      assignment.update! description: "<iframe src=\"/media_attachments_iframe/nonexistent\"></iframe><iframe src=\"/files/#{Attachment.last.id}/download?\"></iframe>"
+      assignment.update!(description: "<iframe src=\"/media_attachments_iframe/nonexistent\"></iframe><iframe src=\"/files/#{Attachment.last.id}/download?\"></iframe>", saving_user: @user)
       DataFixup::AddMediaDataAttributeToIframes.run
       expect(assignment.reload.description).to eq "<iframe src=\"/media_attachments_iframe/nonexistent\" data-media-type=\"video\"></iframe><iframe src=\"/files/#{Attachment.last.id}/download?\"></iframe>"
     end
@@ -78,7 +78,7 @@ describe DataFixup::AddMediaDataAttributeToIframes do
           ],
         }
       ]
-      q = course.quizzes.create!(description: quiz_description, quiz_data:)
+      q = course.quizzes.create!(description: quiz_description, quiz_data:, saving_user: @user)
       q.quiz_questions.create! question_data: {
         "question_text" => question_text_3,
         "answers" => [
@@ -104,15 +104,15 @@ describe DataFixup::AddMediaDataAttributeToIframes do
       att = Attachment.create! context: course, filename: "whatever.flv", display_name: "whatever.flv", content_type: "video/avi"
       record_body = "<iframe src=\"/media_attachments_iframe/#{att.id}\"></iframe>"
       another_course = course_model
-      another_course.update! syllabus_body: record_body
-      assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2)
+      another_course.update! syllabus_body: record_body, saving_user: @user
+      assignment = another_course.assignments.create!(description: record_body, submission_types: "online_text_entry", points_possible: 2, saving_user: @user)
       assessment_question_bank = another_course.assessment_question_banks.create!
       assessment_question = assessment_question_bank.assessment_questions.create! question_data: { "question_text" => record_body }
-      discussion_topic = another_course.discussion_topics.create! message: record_body
+      discussion_topic = another_course.discussion_topics.create!(message: record_body, user: @user)
       discussion_entry = discussion_topic.discussion_entries.create! message: record_body, user: User.create!
       quiz = Quizzes::Quiz.create! context: another_course
       quiz_question = quiz.quiz_questions.create! question_data: { "question_text" => record_body }
-      wiki_page = another_course.wiki_pages.create! title: "Whatevs", body: record_body
+      wiki_page = another_course.wiki_pages.create!(title: "Whatevs", body: record_body, saving_user: @user)
       DataFixup::AddMediaDataAttributeToIframes.run
       expect(another_course.reload.syllabus_body).to eq(expected_body(att.id, "video"))
       expect(assignment.reload.description).to eq(expected_body(att.id, "video"))

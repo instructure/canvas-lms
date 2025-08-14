@@ -15,11 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
+<%- if @include_masquerade_layout %>
+  <% provide :head, include_masquerade_stylesheets %>
+<% end %>
+<%- body_classes << 'bare-layout' %>
+<%- body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user -%>
 <%= render :partial => "layouts/head" %>
-<body>
+<body class="<%= (body_classes).uniq.join(" ") %>">
 <%= yield %>
 <div id="react-router-portals"></div>
 <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+<%- if @include_masquerade_layout %>
+  <%= render partial: "layouts/fixed_bottom" %>
+<% end %>
 </body>
 </html>

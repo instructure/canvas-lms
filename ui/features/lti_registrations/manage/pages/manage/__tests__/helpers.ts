@@ -33,8 +33,17 @@ import type {LtiOverlay} from '../../../model/LtiOverlay'
 import {type LtiOverlayVersion, ZLtiOverlayVersionId} from '../../../model/LtiOverlayVersion'
 import {ZLtiOverlayId} from '../../../model/ZLtiOverlayId'
 import type {User} from '../../../model/User'
-import {LtiDeployment} from '../../../model/LtiDeployment'
+import type {LtiDeployment} from '../../../model/LtiDeployment'
 import {ZLtiDeploymentId} from '../../../model/LtiDeploymentId'
+import {http, HttpResponse} from 'msw'
+
+export const mswHandlers = [
+  http.delete('/api/v1/accounts/*/lti_registrations/*', () => {
+    return HttpResponse.json({
+      status: 'ok',
+    })
+  }),
+]
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>

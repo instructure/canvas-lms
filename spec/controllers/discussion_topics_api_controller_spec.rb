@@ -978,6 +978,8 @@ describe DiscussionTopicsApiController do
   context "update_discussion_types" do
     before do
       course_with_teacher(active_all: true)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:gauge)
     end
 
     it "should update the discussions types to 'threaded' and 'not_threaded' according to the parameters" do
@@ -991,6 +993,25 @@ describe DiscussionTopicsApiController do
       expect(response).to be_successful
       expect(topic1.reload.discussion_type).to eq("threaded")
       expect(topic2.reload.discussion_type).to eq("not_threaded")
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.migrate_disallow_manage.count").exactly(:once)
+      expect(InstStatsd::Statsd)
+        .to have_received(:gauge)
+        .with(
+          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          1,
+          tags: { type: DiscussionTopic::DiscussionTypes::THREADED }
+        )
+        .once
+
+      expect(InstStatsd::Statsd)
+        .to have_received(:gauge)
+        .with(
+          "discussion_topic.migrate_disallow_manage.discussions_updated",
+          1,
+          tags: { type: DiscussionTopic::DiscussionTypes::NOT_THREADED }
+        )
+        .once
     end
 
     it "should return an error if the discussion type is not side_comment" do

@@ -22,6 +22,7 @@ class ContextModulesController < ApplicationController
   include Api::V1::ContextModule
   include WebZipExportHelper
   include ContextExternalToolsHelper
+  include ObserverModuleInfo
 
   before_action :require_context
 
@@ -141,11 +142,21 @@ class ContextModulesController < ApplicationController
 
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
-
+      hash[:MODULE_FEATURES] = {}
       if @can_edit && (@feature_student_module_selection || @feature_teacher_module_selection)
-        hash[:MODULE_FEATURES] = {}
         hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
         hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
+      end
+
+      if @context.use_modules_rewrite_view?(@current_user, session)
+        tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(@current_user).count }
+        module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+        module_perf_page_size = Setting.get("module_perf_page_size", 10).to_i
+        modules_are_paginated = tags_count > module_perf_threshold
+        page_size = modules_are_paginated ? module_perf_page_size : module_perf_threshold
+
+        hash[:MODULE_FEATURES][:PAGE_SIZE] = page_size
+        hash[:MODULE_FEATURES][:MODULES_ARE_PAGINATED] = modules_are_paginated
       end
 
       append_default_due_time_js_env(@context, hash)
@@ -317,30 +328,15 @@ class ContextModulesController < ApplicationController
           canDelete: @can_delete,
           canViewUnpublished: @can_view_unpublished,
           canDirectShare: can_do(@context, @current_user, :direct_share),
-          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
+          readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin),
+          canManageSpeedGrader: @context.allows_speed_grader? && @context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
         }
 
-        observer_enrollments = @context.observer_enrollments.for_user(@current_user).active_or_pending
-        is_observer = observer_enrollments.exists?
-        observed_students = if is_observer && @context.grants_right?(@current_user, session, :read_roster)
-                              observer_enrollments.includes(:associated_user).filter_map do |enrollment|
-                                associated_user = enrollment.associated_user
-                                if associated_user && enrollment.associated_user_id &&
-                                   @context.enrollments.where(user_id: associated_user.id, workflow_state: ["active", "completed"]).exists?
-                                  { id: associated_user.id.to_s, name: associated_user.name }
-                                end
-                              end
-                            else
-                              []
-                            end
-
-        modules_observer_info = {
-          isObserver: is_observer,
-          observedStudents: observed_students
-        }
+        modules_observer_info = observer_module_info
 
         js_env(MODULES_PERMISSIONS: modules_permissions)
         js_env(MODULES_OBSERVER_INFO: modules_observer_info)
+        js_env(PAGE_TITLE: "#{t("titles.course_modules", "Course Modules")}: #{@context.name}")
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2

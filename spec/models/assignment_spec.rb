@@ -7713,6 +7713,59 @@ describe Assignment do
               singleton: "refresh_content_participation_counts:#{@assignment.context.global_id}")
       @assignment.destroy
     end
+
+    it "destroys associated comment bank items" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      user = User.create!(name: "Test User")
+      @course.enroll_teacher(user)
+      comment_bank_item = CommentBankItem.create!(
+        course: @course,
+        user:,
+        assignment:,
+        comment: "Test comment"
+      )
+
+      expect(comment_bank_item.reload.workflow_state).to eq "active"
+      assignment.destroy
+      expect(comment_bank_item.reload.workflow_state).to eq "deleted"
+    end
+
+    describe "before_soft_delete callback" do
+      let(:assignment_with_peer_review) { @course.assignments.create!(assignment_valid_attributes) }
+
+      def create_peer_review_sub_assignment(assignment = assignment_with_peer_review)
+        PeerReviewSubAssignment.create!(
+          title: "Peer Review Sub Assignment",
+          context: @course,
+          parent_assignment: assignment
+        )
+      end
+
+      it "destroys peer_review_sub_assignment when assignment is deleted" do
+        peer_review_sub = create_peer_review_sub_assignment
+
+        expect(assignment_with_peer_review.peer_review_sub_assignment).to eq(peer_review_sub)
+        expect(peer_review_sub.workflow_state).to eq("published")
+
+        assignment_with_peer_review.destroy
+
+        expect(assignment_with_peer_review.reload.peer_review_sub_assignment).to be_nil
+        expect(PeerReviewSubAssignment.unscoped.find_by(id: peer_review_sub.id)&.workflow_state).to eq("deleted")
+      end
+
+      it "handles destroy gracefully when no peer_review_sub_assignment exists" do
+        expect(assignment_with_peer_review.peer_review_sub_assignment).to be_nil
+        expect { assignment_with_peer_review.destroy }.not_to raise_error
+        expect(assignment_with_peer_review.reload.workflow_state).to eq("deleted")
+      end
+
+      it "calls destroy on peer_review_sub_assignment during soft delete" do
+        peer_review_sub = create_peer_review_sub_assignment
+
+        expect(peer_review_sub).to receive(:destroy).once
+        assignment_with_peer_review.destroy
+      end
+    end
   end
 
   describe "#too_many_qs_versions" do
@@ -8454,6 +8507,24 @@ describe Assignment do
               singleton: "refresh_content_participation_counts:#{assignment.context.global_id}")
         .once
       assignment.restore
+    end
+
+    it "restores associated comment bank items" do
+      assignment = @course.assignments.create!(title: "Test Assignment")
+      user = User.create!(name: "Test User")
+      @course.enroll_teacher(user)
+      comment_bank_item = CommentBankItem.create!(
+        course: @course,
+        user:,
+        assignment:,
+        comment: "Test comment"
+      )
+
+      assignment.destroy
+      expect(comment_bank_item.reload.workflow_state).to eq "deleted"
+
+      assignment.restore
+      expect(comment_bank_item.reload.workflow_state).to eq "active"
     end
   end
 
@@ -12631,8 +12702,133 @@ describe Assignment do
     end
   end
 
+  describe "#delete_allocation_rules" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      @assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10, peer_reviews: true)
+      @student1 = user_factory
+      @student2 = user_factory
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
+    end
+
+    it "deletes all allocation rules associated with the assignment" do
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor_id: @student1.id,
+        assessee_id: @student2.id
+      )
+
+      AllocationRule.create!(
+        assignment: @assignment,
+        course: @course,
+        assessor_id: @student2.id,
+        assessee_id: @student1.id
+      )
+
+      expect { @assignment.update!(peer_reviews: false) }
+        .to change { AllocationRule.where(assignment: @assignment).pluck(:workflow_state).uniq }.from(["active"]).to(["deleted"])
+    end
+
+    it "is not triggered when peer_reviews changes from false to true" do
+      assignment = @course.assignments.create!(title: "Test Assignment", points_possible: 10, peer_reviews: false)
+
+      expect(assignment).not_to receive(:delete_allocation_rules)
+      assignment.update!(peer_reviews: true)
+    end
+
+    it "is not triggered when peer_reviews stays the same" do
+      expect(@assignment).not_to receive(:delete_allocation_rules)
+      @assignment.update!(title: "Updated Title")
+    end
+  end
+
   it_behaves_like "an accessibility scannable resource" do
     let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
     let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
+  end
+
+  describe "peer_review_sub_assignment association" do
+    let(:assignment) { @course.assignments.create!(assignment_valid_attributes) }
+
+    def create_peer_review_sub_assignment
+      PeerReviewSubAssignment.create!(
+        title: "Peer Review Sub Assignment",
+        context: @course,
+        parent_assignment: assignment
+      )
+    end
+
+    describe "has_one relationship" do
+      it "allows an assignment to have one peer review sub assignment" do
+        peer_review_sub = create_peer_review_sub_assignment
+        expect(assignment.peer_review_sub_assignment).to eq(peer_review_sub)
+      end
+
+      it "allows only one peer review sub assignment per parent assignment" do
+        create_peer_review_sub_assignment
+
+        expect do
+          create_peer_review_sub_assignment
+        end.to raise_error(ActiveRecord::RecordInvalid, /Parent assignment has already been taken/)
+      end
+
+      it "returns nil when no peer review sub assignment exists" do
+        expect(assignment.peer_review_sub_assignment).to be_nil
+      end
+
+      it "uses the active scope to exclude deleted peer review sub assignments" do
+        peer_review_sub = create_peer_review_sub_assignment
+        expect(assignment.peer_review_sub_assignment).to eq(peer_review_sub)
+
+        peer_review_sub.destroy
+        assignment.reload
+
+        expect(assignment.peer_review_sub_assignment).to be_nil
+      end
+    end
+
+    describe "foreign key and inverse relationship" do
+      it "uses parent_assignment_id as foreign key" do
+        peer_review_sub = create_peer_review_sub_assignment
+
+        expect(peer_review_sub.parent_assignment_id).to eq(assignment.id)
+        expect(assignment.peer_review_sub_assignment).to eq(peer_review_sub)
+      end
+
+      it "maintains proper inverse relationship" do
+        peer_review_sub = create_peer_review_sub_assignment
+
+        expect(peer_review_sub.parent_assignment).to eq(assignment)
+        expect(assignment.peer_review_sub_assignment).to eq(peer_review_sub)
+      end
+    end
+
+    describe "destroy behavior" do
+      it "destroys peer review sub assignment when parent assignment is destroyed" do
+        peer_review_sub = create_peer_review_sub_assignment
+        assignment.destroy
+
+        expect(assignment.reload.peer_review_sub_assignment).to be_nil
+        expect(PeerReviewSubAssignment.unscoped.find_by(id: peer_review_sub.id)&.workflow_state).to eq("deleted")
+      end
+
+      it "properly handles destroy of peer review sub assignment" do
+        peer_review_sub = create_peer_review_sub_assignment
+
+        expect(assignment.peer_review_sub_assignment).to eq(peer_review_sub)
+
+        peer_review_sub.destroy
+        assignment.reload
+
+        expect(assignment.peer_review_sub_assignment).to be_nil
+        expect(PeerReviewSubAssignment.unscoped.find(peer_review_sub.id).workflow_state).to eq("deleted")
+      end
+
+      it "does not raise error when destroying assignment without peer review sub assignment" do
+        expect { assignment.destroy }.not_to raise_error
+      end
+    end
   end
 end

@@ -22,6 +22,7 @@ import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission, submitItemData} from './useInlineSubmission'
 import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
+import {useModules} from '../queries/useModules'
 
 type ExternalUrl = {
   url: string
@@ -94,14 +95,12 @@ function reducer(state: FormState, action: Action): FormState {
 export function useAddModuleItem({
   itemType,
   moduleId,
-  itemCount,
   onRequestClose,
   contentItems = [],
   inputValue,
 }: {
   itemType: ModuleItemContentType
   moduleId: string
-  itemCount: number
   onRequestClose?: () => void
   contentItems: ContentItem[]
   inputValue: string
@@ -110,6 +109,8 @@ export function useAddModuleItem({
   const {courseId} = useContextModule()
   const {defaultFolder} = useDefaultCourseFolder()
   const submitInlineItem = useInlineSubmission()
+  const {getModuleItemsTotalCount} = useModules(courseId)
+  const totalCount = getModuleItemsTotalCount(moduleId) || 0
 
   const reset = () => dispatch({type: 'RESET'})
 
@@ -123,11 +124,12 @@ export function useAddModuleItem({
       return
     }
 
-    const selectedItem = contentItems.find(item => item.id === inputValue) || null
+    const selectedItemId = itemType === 'external_tool' ? state.external.selectedToolId : inputValue
+    const selectedItem = contentItems.find(item => item.id === selectedItemId) || null
 
     const itemData = prepareModuleItemData(moduleId, {
       type: itemType,
-      itemCount,
+      itemCount: totalCount,
       indentation,
       selectedTabIndex: tabIndex,
       textHeaderValue: textHeader,

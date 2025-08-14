@@ -19,7 +19,7 @@
 
 describe "ActiveRecord::Associations::CollectionAssociation" do
   it "nulls the scope for new record association scoping" do
-    AccessToken.create!(developer_key_id: nil)
+    AccessToken.create!(developer_key_id: nil, purpose: "Test Access Token")
     # without the patch, this query will find the record above
     expect(DeveloperKey.new.access_tokens.active).to be_empty
   end

@@ -24,19 +24,37 @@ import {SeparatorLineBlockSettings} from './SeparatorLineBlockSettings'
 
 export type SeparatorLineBlockProps = {
   thickness: BorderWidthValues
+  settings: {
+    separatorColor: string
+    backgroundColor: string
+  }
 }
 
 export const SeparatorLineBlockContent = (props: SeparatorLineBlockProps) => {
   const borderWidth: BorderWidth = `0 0 ${props.thickness} 0`
 
-  return <View as="hr" data-testid="separator-line" borderWidth={borderWidth} />
+  return (
+    <View
+      as="hr"
+      data-testid="separator-line"
+      borderWidth={borderWidth}
+      borderColor="primary"
+      themeOverride={{
+        borderColorPrimary: props.settings.separatorColor,
+      }}
+    />
+  )
 }
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const SeparatorLineBlock = (props: SeparatorLineBlockProps) => {
   return (
-    <BaseBlock title={SeparatorLineBlock.craft.displayName}>
+    <BaseBlock<typeof SeparatorLineBlock>
+      title={SeparatorLineBlock.craft.displayName}
+      backgroundColor={props.settings.backgroundColor}
+      statefulProps={{}}
+    >
       <SeparatorLineBlockContent {...props} />
     </BaseBlock>
   )

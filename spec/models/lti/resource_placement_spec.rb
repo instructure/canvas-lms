@@ -52,9 +52,19 @@ module Lti
         expect(described_class.valid_placements(Account.default)).not_to include(:ActivityAssetProcessor)
       end
 
+      it "does not include ActivityAssetProcessorContribution when FF disabled" do
+        Account.default.disable_feature! :lti_asset_processor_discussions
+        expect(described_class.valid_placements(Account.default)).not_to include(:ActivityAssetProcessorContribution)
+      end
+
       it "includes ActivityAssetProcessor when FF enabled" do
         Account.default.enable_feature! :lti_asset_processor
         expect(described_class.valid_placements(Account.default)).to include(:ActivityAssetProcessor)
+      end
+
+      it "includes ActivityAssetProcessorContribution when FF enabled" do
+        Account.default.enable_feature! :lti_asset_processor_discussions
+        expect(described_class.valid_placements(Account.default)).to include(:ActivityAssetProcessorContribution)
       end
     end
 

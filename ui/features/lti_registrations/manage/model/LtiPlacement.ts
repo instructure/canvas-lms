@@ -17,7 +17,6 @@
  */
 import * as z from 'zod'
 import {LtiDeepLinkingRequest, LtiResourceLinkRequest} from './LtiMessageType'
-import {DeveloperKeyId} from './developer_key/DeveloperKeyId'
 
 // TODO: this list is duplicated in ui/features/external_apps/react/components/ExternalToolPlacementList.jsx
 // We should consolidate some of the lti "models" into a shared package that both features depend on
@@ -40,7 +39,7 @@ export const LtiPlacements = {
    */
   AccountNavigation: 'account_navigation',
   /**
-   * Similar to account_navigation, but for allows for better analytics
+   * Similar to account_navigation, but allows for better analytics
    * of what tools use this type of placement.
    */
   AnalyticsHub: 'analytics_hub',
@@ -133,6 +132,7 @@ export const LtiPlacements = {
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
   ActivityAssetProcessor: 'ActivityAssetProcessor',
+  ActivityAssetProcessorContribution: 'ActivityAssetProcessorContribution',
 } as const
 
 export const AllLtiPlacements = [
@@ -176,6 +176,7 @@ export const AllLtiPlacements = [
   LtiPlacements.WikiPageMenu,
   LtiPlacements.WikiIndexMenu,
   LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
 ] as const
 
 export const InternalOnlyLtiPlacements = [
@@ -189,6 +190,8 @@ export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 
 export const LtiPlacementsWithIcons = [
   LtiPlacements.AssignmentIndexMenu,
+  LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
   LtiPlacements.CourseHomeSubNavigation,
   LtiPlacements.CourseSettingsSubNavigation,
   LtiPlacements.DiscussionTopicIndexMenu,
@@ -202,6 +205,8 @@ export const LtiPlacementsWithIcons = [
 export const LtiPlacementsWithDefaultIcon = [
   LtiPlacements.EditorButton,
   LtiPlacements.TopNavigation,
+  LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
 ] as const
 
 /**

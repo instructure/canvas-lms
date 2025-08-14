@@ -20,8 +20,15 @@ import {fireEvent, render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
 
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable'
-import {useAccessibilityCheckerStore, initialState} from '../../../stores/AccessibilityCheckerStore'
-import {sampleTableData} from '../../../stores/mockData'
+import {useAccessibilityScansStore, initialState} from '../../../stores/AccessibilityScansStore'
+import {mockScanData} from '../../../stores/mockData'
+import {useAccessibilityScansFetchUtils} from '../../../hooks/useAccessibilityScansFetchUtils'
+
+jest.mock('../../../hooks/useAccessibilityScansFetchUtils', () => ({
+  useAccessibilityScansFetchUtils: jest.fn(),
+}))
+
+const mockDoFetch = jest.fn()
 
 describe('AccessibilityIssuesTable', () => {
   const mockSetLoading = jest.fn()
@@ -37,14 +44,19 @@ describe('AccessibilityIssuesTable', () => {
   }
 
   beforeEach(() => {
-    useAccessibilityCheckerStore.setState(mockState)
+    jest.clearAllMocks()
+    jest.restoreAllMocks()
+    useAccessibilityScansStore.setState({...mockState})
+    ;(useAccessibilityScansFetchUtils as jest.Mock).mockReturnValue({
+      doFetchAccessibilityScanData: mockDoFetch,
+    })
   })
 
   it('renders empty table without crashing', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
     act(() => {
       result.current.setLoading(true)
-      result.current.setTableData(null)
+      result.current.setAccessibilityScans(null)
     })
 
     const {rerender} = render(<AccessibilityIssuesTable />)
@@ -52,7 +64,7 @@ describe('AccessibilityIssuesTable', () => {
 
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData([])
+      result.current.setAccessibilityScans([])
     })
 
     rerender(<AccessibilityIssuesTable />)
@@ -60,10 +72,10 @@ describe('AccessibilityIssuesTable', () => {
   })
 
   it('renders the loading state correctly', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
     act(() => {
       result.current.setLoading(true)
-      result.current.setTableData(null)
+      result.current.setAccessibilityScans(null)
     })
 
     const {rerender} = render(<AccessibilityIssuesTable />)
@@ -71,7 +83,7 @@ describe('AccessibilityIssuesTable', () => {
 
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
+      result.current.setAccessibilityScans(mockScanData)
     })
 
     rerender(<AccessibilityIssuesTable />)
@@ -79,23 +91,23 @@ describe('AccessibilityIssuesTable', () => {
   })
 
   it('renders the correct number of rows', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
+      result.current.setAccessibilityScans(mockScanData)
     })
 
     render(<AccessibilityIssuesTable />)
-    expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(sampleTableData.length)
+    expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(mockScanData.length)
   })
 
   it('renders the error state correctly', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
     const errorMessage = 'An error occurred while fetching data'
     act(() => {
       result.current.setLoading(false)
       result.current.setError(errorMessage)
-      result.current.setTableData(null)
+      result.current.setAccessibilityScans(null)
     })
 
     const {rerender} = render(<AccessibilityIssuesTable />)
@@ -104,7 +116,7 @@ describe('AccessibilityIssuesTable', () => {
 
     act(() => {
       result.current.setError(null)
-      result.current.setTableData(sampleTableData)
+      result.current.setAccessibilityScans(mockScanData)
     })
 
     rerender(<AccessibilityIssuesTable />)
@@ -112,95 +124,114 @@ describe('AccessibilityIssuesTable', () => {
     expect(screen.queryByText(errorMessage)).not.toBeInTheDocument()
   })
 
-  it('sets tableSortState with the proper values when a column header is clicked', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-    act(() => {
-      result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
+  describe('- sorting -', () => {
+    it('calls doFetchAccessibilityScanData with the proper tableSortState values when a column header is clicked', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      render(<AccessibilityIssuesTable />)
+
+      act(() => {
+        screen.getByText('Resource Type').click()
+      })
+
+      expect(mockDoFetch).toHaveBeenCalledTimes(1)
+      expect(mockDoFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tableSortState: {
+            sortId: 'resource-type-header',
+            sortDirection: 'ascending',
+          },
+        }),
+      )
+
+      act(() => {
+        result.current.setTableSortState({
+          sortId: 'resource-type-header',
+          sortDirection: 'ascending',
+        })
+      })
+
+      act(() => {
+        screen.getByText('Resource Type').click()
+      })
+
+      expect(mockDoFetch).toHaveBeenCalledTimes(2)
+      expect(mockDoFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tableSortState: {
+            sortId: 'resource-type-header',
+            sortDirection: 'descending',
+          },
+        }),
+      )
+
+      act(() => {
+        result.current.setTableSortState({
+          sortId: 'resource-type-header',
+          sortDirection: 'descending',
+        })
+      })
+
+      act(() => {
+        screen.getByText('Resource Type').click()
+      })
+
+      expect(mockDoFetch).toHaveBeenCalledTimes(3)
+      expect(mockDoFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tableSortState: {
+            sortId: 'resource-type-header',
+            sortDirection: 'none',
+          },
+        }),
+      )
     })
-
-    render(<AccessibilityIssuesTable />)
-
-    screen.getByText('Resource Type').click()
-
-    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
-    expect(result.current.tableSortState?.sortDirection).toBe('ascending')
-
-    screen.getByText('Resource Type').click()
-
-    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
-    expect(result.current.tableSortState?.sortDirection).toBe('descending')
-
-    screen.getByText('Resource Type').click()
-
-    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
-    expect(result.current.tableSortState?.sortDirection).toBe('none')
   })
 
-  it('renders data and pagination correctly when there are multiple pages', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-    act(() => {
-      result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
-      result.current.setPageSize(2) // Set perPage to 2 for pagination
+  describe('- pagination -', () => {
+    it('buttons are not rendered when not needed', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      act(() => {
+        result.current.setLoading(false)
+        result.current.setPage(1)
+        result.current.setPageCount(1)
+      })
+
+      render(<AccessibilityIssuesTable />)
+      expect(screen.queryByTestId('accessibility-issues-table-pagination')).not.toBeInTheDocument()
     })
 
-    render(<AccessibilityIssuesTable />)
-    const row1 = screen.getByText('Test Wiki Page 1')
-    const row2 = screen.getByText('Test Assignment 1')
-    const rows = screen.getAllByTestId(/^issue-row-/)
-    expect(row1).toBeInTheDocument()
-    expect(row2).toBeInTheDocument()
-    expect(rows).toHaveLength(2)
-  })
+    it('displays the correct number of pages', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      act(() => {
+        result.current.setLoading(false)
+        result.current.setPage(1)
+        result.current.setPageCount(5)
+      })
 
-  it('handles page change', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-    act(() => {
-      result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
-      result.current.setPageSize(2)
+      render(<AccessibilityIssuesTable />)
+      expect(screen.getByTestId('accessibility-issues-table-pagination')).toBeInTheDocument()
+      const buttonPage5 = screen.getAllByText(/5/i)[0]
+      expect(buttonPage5).toBeInTheDocument()
     })
 
-    render(<AccessibilityIssuesTable />)
-    const buttons = screen.getAllByText(/2/i)
-    fireEvent.click(buttons[2])
-    const row3 = screen.getByText('Test Assignment 2')
-    const rows = screen.getAllByTestId(/^issue-row-/)
-    expect(row3).toBeInTheDocument()
-    expect(rows).toHaveLength(1)
-  })
+    it('handles page change', () => {
+      const {result} = renderHook(() => useAccessibilityScansStore())
+      act(() => {
+        result.current.setLoading(false)
+        result.current.setPage(1)
+        result.current.setPageCount(5)
+      })
 
-  it('pagination is not rendered when not needed', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-    act(() => {
-      result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
-      result.current.setPageSize(3)
+      render(<AccessibilityIssuesTable />)
+      const buttons = screen.getAllByText(/5/i)
+      fireEvent.click(buttons[0])
+
+      expect(mockDoFetch).toHaveBeenCalledTimes(1)
+      expect(mockDoFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          page: 5,
+        }),
+      )
     })
-
-    render(<AccessibilityIssuesTable />)
-    const row1 = screen.getByText('Test Wiki Page 1')
-    const row2 = screen.getByText('Test Assignment 1')
-    const row3 = screen.getByText('Test Assignment 2')
-    const rows = screen.getAllByTestId(/^issue-row-/)
-    expect(row1).toBeInTheDocument()
-    expect(row2).toBeInTheDocument()
-    expect(row3).toBeInTheDocument()
-    expect(rows).toHaveLength(3)
-    expect(screen.queryByTestId('accessibility-issues-table-pagination')).not.toBeInTheDocument()
-  })
-
-  it('displays the correct number of pages', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-    act(() => {
-      result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
-      result.current.setPageSize(1)
-    })
-
-    render(<AccessibilityIssuesTable />)
-    const buttonPage3 = screen.getAllByText(/3/i)[1]
-    expect(buttonPage3).toBeInTheDocument()
   })
 })

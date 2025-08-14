@@ -61,23 +61,22 @@ describe SessionToken do
 
   it "is not valid after tampering" do
     token = SessionToken.new(1)
+    token.to_s # cache the signature
     token.pseudonym_id = 2
     expect(SessionToken.parse(token.to_s)).not_to be_valid
   end
 
   it "is not valid with out of bounds created_at" do
     token = SessionToken.new(1)
-
     token.created_at -= (SessionToken::VALIDITY_PERIOD + 5).seconds
-    token.signature = Canvas::Security.hmac_sha1(token.signature_string)
     expect(SessionToken.parse(token.to_s)).not_to be_valid
 
-    token.created_at += ((2 * SessionToken::VALIDITY_PERIOD) + 10).seconds
-    token.signature = Canvas::Security.hmac_sha1(token.signature_string)
+    token = SessionToken.new(1)
+    token.created_at += (SessionToken::VALIDITY_PERIOD + 5).seconds
     expect(SessionToken.parse(token.to_s)).not_to be_valid
 
-    token.created_at -= (SessionToken::VALIDITY_PERIOD + 5).seconds
-    token.signature = Canvas::Security.hmac_sha1(token.signature_string)
+    token = SessionToken.new(1)
+    token.created_at += 5.seconds
     expect(SessionToken.parse(token.to_s)).to be_valid
   end
 

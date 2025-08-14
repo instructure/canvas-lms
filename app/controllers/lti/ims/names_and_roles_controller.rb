@@ -28,7 +28,7 @@ module Lti::IMS
   #
   # Response Content-Type is application/vnd.ims.lti-nrps.v2.membershipcontainer+json
   #
-  # See <a href="/doc/api/file.provisioning.html">External Tools - LTI - Provisioning</a>
+  # See <a href="file.provisioning.html">External Tools - LTI - Provisioning</a>
   # for an overview of endpoints used for provisioning.
   #
   # @model NamesAndRoleContext

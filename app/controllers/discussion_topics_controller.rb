@@ -929,6 +929,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
                DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
+               restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
@@ -1116,6 +1117,7 @@ class DiscussionTopicsController < ApplicationController
              context_id: @context.id,
              discussion_topic_id: @topic.id,
              INSIGHTS_URL: context_url(@topic.context, :insights_context_discussion_topic_url, @topic),
+             discussion_ai_survey_link: Setting.get("discussion_ai_survey_link", "https://docs.google.com/forms/d/e/1FAIpQLSf6YbHitSwTemk5v1qf8lCFdgVdQvIHXQ16zhzo05qbrqctfA/viewform"),
            })
     render html: "<div id='discussion-insights-container'/>".html_safe, layout: true
   end

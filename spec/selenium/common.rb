@@ -241,7 +241,10 @@ shared_context "in-process server selenium tests" do
         "This file should be served over HTTPS.", # tests are not run over https, this error is expected
         "Uncaught DOMException: signal is aborted without reason", # Investigate as part of LX-2075
         "Support for string refs",
-        "DEV_HOST is not defined" # Federated Modules aren't configured to work in Selenium
+        "DEV_HOST is not defined", # Federated Modules aren't configured to work in Selenium
+        "NoSuchFrameException", # upgrading chrome version is throwing this for some testcases only in pipeline build
+        "Uncaught Error: More value is provided", # upgrading chrome version is throwing this for some testcases only in pipeline build
+        "Support for this event type has been removed" # Mutation events removed from Chrome from July 2024
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

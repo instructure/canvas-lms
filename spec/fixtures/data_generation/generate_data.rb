@@ -115,18 +115,19 @@ def course_with_students_enrolled
   @student_list
 end
 
-def create_assignment(course, title, points_possible = 10)
+def create_assignment(course, title, points_possible = 10, creator = @teacher)
   course.assignments.create!(
     title: "#{title} #{SecureRandom.alphanumeric(10)}",
     description: "General Assignment",
     points_possible:,
     submission_types: "online_text_entry",
-    workflow_state: "published"
+    workflow_state: "published",
+    saving_user: creator
   )
 end
 
 def create_discussion(course, creator, workflow_state = "published")
-  discussion_assignment = create_assignment(@course, "Discussion Assignment", 10)
+  discussion_assignment = create_assignment(@course, "Discussion Assignment", 10, creator)
   course.discussion_topics.create!(
     user: creator,
     title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",

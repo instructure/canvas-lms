@@ -66,7 +66,9 @@ module Types
     def thumbnail_url
       return if object.locked_for?(current_user, check_policies: true)
 
-      authenticated_thumbnail_url(object)
+      Loaders::ThumbnailLoader.for.load(object).then do |preloaded_attachment|
+        authenticated_thumbnail_url(preloaded_attachment)
+      end
     end
 
     field :usage_rights, UsageRightsType, null: true

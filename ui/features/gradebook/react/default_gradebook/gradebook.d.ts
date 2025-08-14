@@ -294,6 +294,7 @@ export type FilterType =
   | 'section'
   | 'start-date'
   | 'student-group'
+  | 'non-collaborative-group'
   | 'submissions'
   | 'unposted'
 

@@ -24,16 +24,13 @@ import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHe
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {useCourseStudent} from '../hooks/queriesStudent/useCourseStudent'
+import {useCourseObserver} from '../hooks/queriesStudent/useCourseObserver'
 import {useContextModule} from '../hooks/useModuleContext'
 import {Flex} from '@instructure/ui-flex'
 import {IconAssignmentLine, IconWarningLine} from '@instructure/ui-icons'
 import FeedbackBlock from './FeedbackBlock'
 
 const I18n = createI18nScope('context_modules_v2')
-
-declare const ENV: {
-  CONTEXT_MODULES_HEADER_PROPS: any
-}
 
 interface ModulePageActionHeaderStudentProps {
   onCollapseAll: () => void
@@ -48,8 +45,11 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
   anyModuleExpanded = true,
   disabled = false,
 }) => {
-  const {courseId} = useContextModule()
-  const {data, isLoading} = useCourseStudent(courseId)
+  const {courseId, isObserver, observedStudent} = useContextModule()
+
+  // Only execute the appropriate query based on user type to avoid unnecessary API calls
+  const studentQuery = useCourseStudent(courseId)
+  const observerQuery = useCourseObserver(courseId, observedStudent)
 
   const handleCollapseExpandClick = useCallback(() => {
     if (anyModuleExpanded) {
@@ -59,12 +59,21 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
     }
   }, [anyModuleExpanded, onCollapseAll, onExpandAll])
 
+  const isLoading = isObserver ? observerQuery.isLoading : studentQuery.isLoading
+  const courseName = isObserver ? observerQuery.courseData?.name : studentQuery.data?.name
+  const dueThisWeekCount = isObserver
+    ? 0
+    : studentQuery.data?.submissionStatistics?.submissionsDueThisWeekCount || 0
+  const missingCount = isObserver
+    ? observerQuery.courseData?.submissionStatistics?.missingSubmissionsCount || 0
+    : studentQuery.data?.submissionStatistics?.missingSubmissionsCount || 0
+
   return (
     !isLoading && (
       <View as="div">
-        {data?.name && (
+        {courseName && (
           <View as="div" margin="0 0 small 0">
-            <Heading level="h1">{`${I18n.t('Welcome to ')} ${data.name}!`}</Heading>
+            <Heading level="h1">{`${I18n.t('Welcome to ')} ${courseName}!`}</Heading>
           </View>
         )}
         <View as="div" margin="0 0 medium 0">
@@ -74,11 +83,10 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
             )}
           </Text>
         </View>
-        {data?.submissionStatistics?.submissionsDueThisWeekCount ||
-        data?.submissionStatistics?.missingSubmissionsCount ? (
+        {(dueThisWeekCount > 0 || missingCount > 0) && (
           <View as="div" margin="0 0 medium 0">
             <Flex gap="small" wrap="wrap">
-              {data?.submissionStatistics?.submissionsDueThisWeekCount > 0 ? (
+              {dueThisWeekCount > 0 && (
                 <Flex.Item>
                   <Button
                     data-testid="assignment-due-this-week-button"
@@ -93,13 +101,13 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                         other: '%{count} Assignments Due This Week',
                       },
                       {
-                        count: data?.submissionStatistics?.submissionsDueThisWeekCount || 0,
+                        count: dueThisWeekCount,
                       },
                     )}
                   </Button>
                 </Flex.Item>
-              ) : null}
-              {data?.submissionStatistics?.missingSubmissionsCount > 0 ? (
+              )}
+              {missingCount > 0 && (
                 <Flex.Item>
                   <Button
                     data-testid="missing-assignment-button"
@@ -114,15 +122,15 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
                         other: '%{count} Missing Assignments',
                       },
                       {
-                        count: data?.submissionStatistics?.missingSubmissionsCount || 0,
+                        count: missingCount,
                       },
                     )}
                   </Button>
                 </Flex.Item>
-              ) : null}
+              )}
             </Flex>
           </View>
-        ) : null}
+        )}
         <FeedbackBlock />
         {ENV.CONTEXT_MODULES_HEADER_PROPS && (
           <ContextModulesHeader

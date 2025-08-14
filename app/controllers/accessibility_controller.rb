@@ -20,17 +20,18 @@
 class AccessibilityController < ApplicationController
   before_action :require_context
   before_action :require_user
-  before_action :validate_allowed
+  before_action :check_authorized_action
 
   def index
     js_bundle :accessibility_checker
+    js_env(SCAN_DISABLED: @context.exceeds_accessibility_scan_limit?)
 
     render html: '<div id="accessibility-checker-container"></div>'.html_safe, layout: true
   end
 
   private
 
-  def validate_allowed
+  def check_authorized_action
     return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
 
     authorized_action(@context, @current_user, [:read, :update])

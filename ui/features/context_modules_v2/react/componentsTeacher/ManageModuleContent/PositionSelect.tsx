@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ModuleAction} from '../../utils/types'
+import {MOVE_MODULE_ITEM, MOVE_MODULE, MOVE_MODULE_CONTENTS} from '../../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -43,11 +44,11 @@ const PositionSelect: React.FC<PositionSelectProps> = ({
   itemTitle,
 }) => {
   const title = useMemo(() => {
-    if (moduleAction === 'move_module_item') {
+    if (moduleAction === MOVE_MODULE_ITEM) {
       return I18n.t('Place "%{itemTitle}"', {itemTitle: itemTitle || I18n.t('Item')})
-    } else if (moduleAction === 'move_module_contents') {
+    } else if (moduleAction === MOVE_MODULE_CONTENTS) {
       return I18n.t('Place Contents')
-    } else if (moduleAction === 'move_module') {
+    } else if (moduleAction === MOVE_MODULE) {
       return I18n.t('Place "%{moduleName}"', {moduleName: itemTitle || I18n.t('Module')})
     } else {
       return I18n.t('Place Module')
@@ -56,12 +57,13 @@ const PositionSelect: React.FC<PositionSelectProps> = ({
 
   return (
     <View as="div" margin="medium 0 0 0">
-      {(moduleAction === 'move_module' || hasItems) && (
+      {(moduleAction === MOVE_MODULE || hasItems) && (
         <SimpleSelect
           renderLabel={hasItems ? title : ''}
           assistiveText={I18n.t('Select position')}
           value={selectedPosition}
           onChange={onPositionChange}
+          data-testid="select_position_listbox"
         >
           <SimpleSelect.Option id="top" value="top">
             {I18n.t('At the top')}

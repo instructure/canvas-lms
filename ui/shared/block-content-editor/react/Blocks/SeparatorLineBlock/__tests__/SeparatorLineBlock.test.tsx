@@ -26,24 +26,42 @@ jest.mock('../../../BlockContentEditorContext', () => ({
   useBlockContentEditorContext: jest.fn(() => ({})),
 }))
 
+const defaultSettings = {
+  separatorColor: '#000',
+  backgroundColor: '#f00',
+}
+
 describe('SeparatorLineBlock', () => {
   it('should render with Separator line title', () => {
-    renderBlock(SeparatorLineBlock, {thickness: 'small'})
+    renderBlock(SeparatorLineBlock, {
+      thickness: 'small',
+      settings: defaultSettings,
+    })
     const title = screen.getByText('Separator line')
 
     expect(title).toBeInTheDocument()
   })
 
   it('should render small thickness', () => {
-    renderBlock(SeparatorLineBlock, {thickness: 'small'})
+    renderBlock(SeparatorLineBlock, {
+      thickness: 'small',
+      settings: defaultSettings,
+    })
     const separatorLine = screen.getByTestId('separator-line')
     const smallBorderWidthValue = canvas.borders.widthSmall
 
     expect(separatorLine).toHaveStyle(`border-width: 0 0 ${smallBorderWidthValue} 0`)
+    renderBlock(SeparatorLineBlock, {
+      thickness: 'large',
+      settings: defaultSettings,
+    })
   })
 
   it('should render large thickness', () => {
-    renderBlock(SeparatorLineBlock, {thickness: 'large'})
+    renderBlock(SeparatorLineBlock, {
+      thickness: 'large',
+      settings: defaultSettings,
+    })
     const separatorLine = screen.getByTestId('separator-line')
     const largeBorderWidthValue = canvas.borders.widthLarge
 

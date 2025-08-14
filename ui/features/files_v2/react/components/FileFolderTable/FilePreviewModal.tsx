@@ -33,6 +33,7 @@ import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
 import {FileNotFound} from './FileNotFound'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -61,6 +62,7 @@ export const FilePreviewModal = ({
   )
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const name = currentItem?.display_name || I18n.t('File')
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
 
   // Reset state when the modal is opened or item changes
   useEffect(() => {
@@ -195,19 +197,21 @@ export const FilePreviewModal = ({
                   disabled={!currentItem}
                 />
               </div>
-              <div style={{gridArea: 'download'}}>
-                <IconButton
-                  color="primary-inverse"
-                  withBackground={false}
-                  withBorder={false}
-                  renderIcon={IconDownloadSolid}
-                  screenReaderLabel={I18n.t('Download')}
-                  margin="0 x-small 0 0"
-                  id="download-icon-button"
-                  href={currentItem?.url}
-                  disabled={!currentItem}
-                />
-              </div>
+              {!isAccessRestricted && (
+                <div style={{gridArea: 'download'}}>
+                  <IconButton
+                    color="primary-inverse"
+                    withBackground={false}
+                    withBorder={false}
+                    renderIcon={IconDownloadSolid}
+                    screenReaderLabel={I18n.t('Download')}
+                    margin="0 x-small 0 0"
+                    id="download-icon-button"
+                    href={currentItem?.url}
+                    disabled={!currentItem}
+                  />
+                </div>
+              )}
               <div style={{gridArea: 'close'}}>
                 <IconButton
                   color="primary-inverse"

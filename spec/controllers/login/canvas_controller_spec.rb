@@ -659,7 +659,7 @@ describe Login::CanvasController do
       allow(Canvas::Security::LoginRegistry).to receive_messages(redis:)
     end
 
-    let_once(:key) { DeveloperKey.create! redirect_uri: "https://example.com" }
+    let_once(:key) { DeveloperKey.create!(name: "Test Developer Key", redirect_uri: "https://example.com") }
     let(:params) { { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } } }
 
     it "redirects to the confirm url if the user has no token" do
@@ -670,8 +670,8 @@ describe Login::CanvasController do
     end
 
     it "redirects to the redirect uri if the user already has remember-me token" do
-      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil)
-      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], nil)
+      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"])
+      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], key.name)
 
       post :create, params:, session: { oauth2: provider.session_hash }
       expect(response).to be_redirect
@@ -679,8 +679,8 @@ describe Login::CanvasController do
     end
 
     it "redirects to the redirect uri with the provided state" do
-      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil)
-      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], nil)
+      @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ["/auth/userinfo"])
+      provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, ["/auth/userinfo"], key.name)
 
       post :create, params:, session: { oauth2: provider.session_hash.merge(state: "supersekrit") }
       expect(response).to be_redirect

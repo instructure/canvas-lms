@@ -17,11 +17,14 @@
  */
 import {render, waitFor} from '@testing-library/react'
 import {Toolbar, ToolbarProps} from '../Toolbar'
+import {DEFAULT_GRADEBOOK_SETTINGS} from '../../../utils/constants'
 
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
   gradebookFilters: ['filter1', 'filter2'],
   showDataDependentControls: true,
+  gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
+  setGradebookSettings: jest.fn(),
   ...props,
 })
 

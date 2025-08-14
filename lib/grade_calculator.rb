@@ -1002,7 +1002,7 @@ class GradeCalculator
       if full_weight.zero?
         final_grade = nil
       elsif full_weight < 100
-        final_grade *= 100.0 / full_weight
+        final_grade = BigDecimal(final_grade.to_s) / BigDecimal(full_weight.to_s) * BigDecimal(100)
       end
 
       rounded_grade = final_grade&.to_f.try(:round, 2)

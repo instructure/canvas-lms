@@ -208,7 +208,7 @@ RSpec.describe Lti::DeploymentsController do
 
     it "has the expected fields in the results" do
       subject
-      control = deployment.context_controls.first
+      control = deployment.primary_context_control
       expect(response_json.find { |c| c["id"] == control.id }).to eq(
         {
           account_id: account.id,

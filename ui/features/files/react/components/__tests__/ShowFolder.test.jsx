@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import ShowFolder from '../ShowFolder'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
@@ -84,6 +85,15 @@ describe('ShowFolder', () => {
   it('does not render the FileUpload component if userCanAddFilesForContext is false', () => {
     const props = defaultProps({userCanAddFilesForContext: false})
     const {queryByText} = render(<ShowFolder {...props} />)
+    expect(queryByText('Drop files here to upload')).not.toBeInTheDocument()
+  })
+
+  it('does not render the FileUpload component if student access is restricted', () => {
+    window.ENV.FEATURES ||= {}
+    window.ENV.FEATURES.restrict_student_access = true
+    window.ENV.current_user_roles = ['student']
+
+    const {queryByText} = render(<ShowFolder {...defaultProps()} />)
     expect(queryByText('Drop files here to upload')).not.toBeInTheDocument()
   })
 

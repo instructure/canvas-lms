@@ -26,9 +26,9 @@ const I18n = createI18nScope('widget_dashboard')
 
 const WidgetDashboardContainer: React.FC = () => {
   return (
-    <View as="div" padding="large">
+    <View as="div" padding="medium">
       <Heading level="h1" margin="0 0 medium">
-        {I18n.t('Widget Dashboard')}
+        {I18n.t('Dashboard')}
       </Heading>
       <DashboardTabs />
     </View>

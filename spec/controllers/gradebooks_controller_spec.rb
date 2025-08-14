@@ -209,6 +209,14 @@ describe GradebooksController do
           expect(submission).to have_key(:asset_reports)
           expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
         end
+
+        it "includes submission_type in submission data" do
+          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:submission_type)
+          expect(submission[:submission_type]).to eq("online_text_entry")
+        end
       end
     end
 
@@ -263,6 +271,13 @@ describe GradebooksController do
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
         assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
         expect(assignment_id).to eq @assignment.id
+      end
+
+      it "returns nil for asset_reports" do
+        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission[:asset_reports]).to be_nil
       end
     end
 
@@ -1455,6 +1470,12 @@ describe GradebooksController do
             expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id, @ncgc.id)
           end
 
+          it "includes non_collaborative field" do
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json[-1].key?("non_collaborative")).to be_truthy
+            expect(group_categories_json[-1]["groups"][-1].key?("non_collaborative")).to be_truthy
+          end
+
           it "excludes differentiation tag categories when user does not have a manage tags permission" do
             ta_in_course
             user_session(@ta)
@@ -1941,13 +1962,6 @@ describe GradebooksController do
               expect(returned_section_ids).to contain_exactly(@section_2.id)
             end
           end
-
-          describe "with the :limit_section_visibility_in_lmgb FF disabled" do
-            it "includes all course sections" do
-              get :show, params: { course_id: @course.id }
-              expect(returned_section_ids).to match_array([@section_2.id, @course.default_section.id])
-            end
-          end
         end
 
         describe "IMPROVED_LMGB" do
@@ -1963,22 +1977,6 @@ describe GradebooksController do
             get :show, params: { course_id: @course.id }
             gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
             expect(gradebook_env[:IMPROVED_LMGB]).to be true
-          end
-        end
-
-        describe "Outcomes Friendly Description" do
-          it "is false if the feature flag is off" do
-            Account.site_admin.disable_feature! :outcomes_friendly_description
-            get :show, params: { course_id: @course.id }
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
-          end
-
-          it "is true if the feature flag is on" do
-            Account.site_admin.enable_feature! :outcomes_friendly_description
-            get :show, params: { course_id: @course.id }
-            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
-            expect(gradebook_env[:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
           end
         end
 
@@ -3107,6 +3105,29 @@ describe GradebooksController do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
         expect(response).not_to render_template(platform_sg_template, locals: { anonymous_grading: false })
       end
+
+      it "includes MANAGE_GRADES in js_env for platform speedgrader" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be true
+      end
+
+      it "sets MANAGE_GRADES to false for users without manage_grades permission" do
+        @assignment.publish
+        Account.site_admin.enable_feature!(:platform_service_speedgrader)
+
+        # Create a user with only view_all_grades permission
+        ta = User.create!
+        @course.enroll_ta(ta)
+        role = ta.enrollments.first.role
+        @course.root_account.role_overrides.create!(permission: :manage_grades, enabled: false, role:)
+        @course.root_account.role_overrides.create!(permission: :view_all_grades, enabled: true, role:)
+
+        user_session(ta)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id, platform_sg: true }
+        expect(assigns[:js_env].fetch(:MANAGE_GRADES)).to be false
+      end
     end
 
     it "falls back to classic speedgrader when the platform speedgrader launch URL is not configured" do
@@ -3183,22 +3204,10 @@ describe GradebooksController do
         expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be true
       end
 
-      it "sets filter_speed_grader_by_student_group_feature_enabled to false when disabled" do
-        @course.root_account.disable_feature!(:filter_speed_grader_by_student_group)
-        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-        expect(js_env.fetch(:filter_speed_grader_by_student_group_feature_enabled)).to be false
-      end
-
       it "sets show_comment_library to true when enabled" do
         @course.root_account.enable_feature!(:assignment_comment_library)
         get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
         expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be true
-      end
-
-      it "sets show_comment_library to false when disabled" do
-        @course.root_account.disable_feature!(:assignment_comment_library)
-        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
-        expect(js_env.fetch(:assignment_comment_library_feature_enabled)).to be false
       end
 
       it "sets outcomes keys" do

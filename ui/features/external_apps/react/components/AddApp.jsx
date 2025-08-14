@@ -48,7 +48,7 @@ export default createReactClass({
     }
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.addToolRef = React.createRef()
     this.addButtonRef = React.createRef()
   },

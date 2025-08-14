@@ -20,32 +20,6 @@
 require "spec_helper"
 
 describe Accessibility::Issue do
-  let(:mock_rule) do
-    Class.new do
-      def self.test(_elem) = nil
-      def self.id = "mock-rule"
-      def self.message = "No issue"
-      def self.why = "Just a mock"
-      def self.form = []
-    end
-  end
-
-  let(:mock_pdf_rule) do
-    Class.new do
-      def self.test(_elem)
-        [{ id: "pdf-mock-issue", message: "PDF Mock issue found", why: "Just a mock PDF issue" }]
-      end
-
-      def self.id = "mock-pdf-rule-class"
-      def self.message = "PDF Mock rule message"
-      def self.why = "Because it's a mock PDF rule"
-      def self.form = []
-    end
-  end
-
-  let(:rules) { [mock_rule] }
-  let(:pdf_rules) { [mock_pdf_rule] }
-
   describe "#generate" do
     let(:context_double) { double("Context") }
 
@@ -171,170 +145,163 @@ describe Accessibility::Issue do
   end
 
   describe "#update_content" do
-    before do
-      allow(Accessibility::Rule).to receive(:registry).and_return({ "mock-rule" => mock_rule })
+    let(:course) { course_model }
+    let(:resource) { wiki_page_model(course:, title: "Test Page", body: "<div><h1>Page Title</h1></div>") }
+
+    it "raises error for invalid resource type" do
+      issue = described_class.new(context: course)
+      expect do
+        issue.update_content(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "InvalidType",
+          nil,
+          nil,
+          nil
+        )
+      end.to raise_error(ArgumentError)
     end
 
-    it "returns bad request for empty input" do
-      issue = described_class.new(context: double)
-      response = issue.update_content(nil, nil, nil, nil, nil)
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Raw rule can't be blank")
+    it "raises error for invalid resource" do
+      issue = described_class.new(context: course)
+      expect do
+        issue.update_content(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Page",
+          nil,
+          nil,
+          nil
+        )
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "returns unprocessable entity for invalid content type" do
-      issue = described_class.new(context: double)
-      response = issue.update_content("mock-rule", "InvalidType", nil, nil, nil)
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Content InvalidType with ID  not found")
-    end
-
-    it "returns bad request for invalid rule name" do
-      context_double = double("Context")
-      wiki_pages_double = double("WikiPages")
-
-      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
-      allow(wiki_pages_double).to receive(:find_by).and_return(nil)
-
-      issue = described_class.new(context: context_double)
+    it "returns an error message for fix issues" do
+      issue = described_class.new(context: course)
       response = issue.update_content(
-        "invalid-rule", "Page", 1, nil, nil
+        Accessibility::Rules::HeadingsStartAtH2Rule.id,
+        "Page",
+        resource.id,
+        "./invalid_path",
+        "Change it to Heading 2"
       )
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Raw rule is invalid")
+      expect(response).to eq(
+        {
+          json: { error: "Element not found for path: ./invalid_path" },
+          status: :bad_request,
+        }
+      )
     end
 
-    it "updates a page successfully" do
-      page = double("Page", id: 1, body: "<div>content</div>", save!: true)
-      context_double = double("Context")
-      wiki_pages_double = double("WikiPages")
-
-      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
-      allow(wiki_pages_double).to receive(:find_by).and_return(page)
-
-      allow(page).to receive(:body).and_return("<div>content</div>")
-      allow(page).to receive(:body=)
-
-      issue = described_class.new(context: context_double)
-      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
-
-      response = issue.update_content(
-        "mock-rule", "Page", 1, "path", "value"
-      )
-
-      expect(response[:status]).to eq(:ok)
-      expect(response[:json][:success]).to be true
-      expect(page).to have_received(:body=).with("<div>fixed content</div>")
-      expect(page).to have_received(:save!)
+    context "with a wiki page" do
+      it "updates the resource successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_content(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Page",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { success: true },
+            status: :ok
+          }
+        )
+        expect(resource.reload.body).to eq "<div><h2>Page Title</h2></div>"
+      end
     end
 
-    it "updates an assignment successfully" do
-      assignment = double("Assignment", id: 2, description: "<div>desc</div>", save!: true)
-      context_double = double("Context")
-      assignments_double = double("Assignments")
+    context "with an assignment" do
+      let(:resource) { assignment_model(course:, description: "<div><h1>Assignment Title</h1></div>") }
 
-      allow(context_double).to receive(:assignments).and_return(assignments_double)
-      allow(assignments_double).to receive(:find_by).and_return(assignment)
-
-      allow(assignment).to receive(:description).and_return("<div>desc</div>")
-      allow(assignment).to receive(:description=)
-
-      issue = described_class.new(context: context_double)
-      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
-
-      response = issue.update_content(
-        "mock-rule", "Assignment", 2, "path", "value"
-      )
-
-      expect(response[:status]).to eq(:ok)
-      expect(response[:json][:success]).to be true
-      expect(assignment).to have_received(:description=).with("<div>fixed description</div>")
-      expect(assignment).to have_received(:save!)
+      it "updates an assignment successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_content(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Assignment",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { success: true },
+            status: :ok
+          }
+        )
+        expect(resource.reload.description).to eq "<div><h2>Assignment Title</h2></div>"
+      end
     end
   end
 
   describe "#update_preview" do
-    before do
-      allow(Accessibility::Rule).to receive(:registry).and_return({ "mock-rule" => mock_rule })
+    let(:course) { course_model }
+    let(:resource) { wiki_page_model(course:, title: "Test Page", body: "<div><h1>Page Title</h1></div>") }
+
+    it "raises error for invalid resource type" do
+      issue = described_class.new(context: course)
+      expect do
+        issue.update_preview(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "InvalidType",
+          nil,
+          nil,
+          nil
+        )
+      end.to raise_error(ArgumentError)
     end
 
-    it "returns bad request for empty input" do
-      issue = described_class.new(context: double)
-      response = issue.update_preview(nil, nil, nil, nil, nil)
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Raw rule can't be blank")
+    it "raises error for invalid resource" do
+      issue = described_class.new(context: course)
+      expect do
+        issue.update_preview(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Page",
+          nil,
+          nil,
+          nil
+        )
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "returns unprocessable entity for invalid content type" do
-      issue = described_class.new(context: double)
-      response = issue.update_preview("mock-rule", "InvalidType", nil, nil, nil)
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Content InvalidType with ID  not found")
+    context "with a wiki page" do
+      it "previews the resource successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_preview(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Page",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { content: "<div><h2>Page Title</h2></div>", path: "./div/h2" },
+            status: :ok
+          }
+        )
+      end
     end
 
-    it "returns bad request for invalid rule name" do
-      context_double = double("Context")
-      wiki_pages_double = double("WikiPages")
+    context "with an assignment" do
+      let(:resource) { assignment_model(course:, description: "<div><h1>Assignment Title</h1></div>") }
 
-      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
-      allow(wiki_pages_double).to receive(:find_by).and_return(nil)
-
-      issue = described_class.new(context: context_double)
-      response = issue.update_content(
-        "invalid-rule", "Page", 1, nil, nil
-      )
-
-      expect(response[:status]).to eq(:bad_request)
-      expect(response[:json][:error]).to include("Raw rule is invalid")
-    end
-
-    it "updates a page successfully" do
-      page = double("Page", id: 1, body: "<div>content</div>", save!: true)
-      context_double = double("Context")
-      wiki_pages_double = double("WikiPages")
-
-      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
-      allow(wiki_pages_double).to receive(:find_by).and_return(page)
-
-      allow(page).to receive(:body).and_return("<div>content</div>")
-      allow(page).to receive(:body=)
-
-      issue = described_class.new(context: context_double)
-      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
-
-      response = issue.update_preview(
-        "mock-rule", "Page", 1, "path", "value"
-      )
-
-      expect(response[:status]).to eq(:ok)
-      expect(response[:json][:content]).to eq("<div>fixed content</div>")
-    end
-
-    it "updates an assignment successfully" do
-      assignment = double("Assignment", id: 2, description: "<div>desc</div>", save!: true)
-      context_double = double("Context")
-      assignments_double = double("Assignments")
-
-      allow(context_double).to receive(:assignments).and_return(assignments_double)
-      allow(assignments_double).to receive(:find_by).and_return(assignment)
-
-      allow(assignment).to receive(:description).and_return("<div>desc</div>")
-      allow(assignment).to receive(:description=)
-
-      issue = described_class.new(context: context_double)
-      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
-
-      response = issue.update_preview(
-        "mock-rule", "Assignment", 2, "path", "value"
-      )
-
-      expect(response[:status]).to eq(:ok)
-      expect(response[:json][:content]).to eq("<div>fixed description</div>")
+      it "previews the resource successfully" do
+        issue = described_class.new(context: course)
+        response = issue.update_preview(
+          Accessibility::Rules::HeadingsStartAtH2Rule.id,
+          "Assignment",
+          resource.id,
+          ".//h1",
+          "Change it to Heading 2"
+        )
+        expect(response).to eq(
+          {
+            json: { content: "<div><h2>Assignment Title</h2></div>", path: "./div/h2" },
+            status: :ok
+          }
+        )
+      end
     end
   end
 end

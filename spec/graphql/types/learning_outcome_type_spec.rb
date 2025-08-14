@@ -135,7 +135,6 @@ describe Types::LearningOutcomeType do
     let(:course) { Course.create! }
 
     it "resolves friendly description correctly" do
-      Account.site_admin.enable_feature!(:outcomes_friendly_description)
       course.account.enable_feature!(:improved_outcomes_management)
 
       course_fd = OutcomeFriendlyDescription.create!({

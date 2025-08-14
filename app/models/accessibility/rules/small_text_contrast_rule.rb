@@ -20,6 +20,8 @@
 module Accessibility
   module Rules
     class SmallTextContrastRule < Accessibility::Rule
+      extend Accessibility::CssAttributesHelper
+
       self.id = "small-text-contrast"
       self.link = "https://www.w3.org/TR/WCAG21/#contrast-minimum"
 
@@ -74,59 +76,6 @@ module Accessibility
                     end
       end
 
-      def self.extract_font_size(style_str)
-        return nil unless style_str
-
-        if style_str =~ /font-size:\s*([^;]+)/
-          size_str = $1.strip
-
-          if size_str.end_with?("px")
-            return size_str.to_f
-          elsif size_str.end_with?("pt")
-            return size_str.to_f * 1.333
-          elsif size_str.end_with?("em", "rem")
-            return size_str.to_f * 16 # Assume 1em = 16px
-          end
-        end
-
-        nil
-      end
-
-      def self.extract_font_weight(style_str)
-        return nil unless style_str
-
-        if style_str =~ /font-weight:\s*([^;]+)/
-          $1.strip
-        else
-          nil
-        end
-      end
-
-      def self.extract_color(style_str, property)
-        return nil unless style_str
-
-        match = style_str.match(/(?:^|;)\s*#{Regexp.escape(property)}:\s*([^;]+)/)
-        return nil unless match
-
-        color = match[1].strip
-
-        if color.start_with?("rgb")
-          rgb_to_hex(color)
-        elsif color.start_with?("#")
-          color.delete_prefix("#").upcase
-        else
-          color.upcase
-        end
-      end
-
-      def self.rgb_to_hex(rgb)
-        if rgb =~ /rgb\((\d+),\s*(\d+),\s*(\d+)\)/
-          r, g, b = $1.to_i, $2.to_i, $3.to_i
-          return format("#%02X%02X%02X", r, g, b)
-        end
-        "#000000"
-      end
-
       def self.form(elem)
         style_str = elem.attribute("style")&.value.to_s
         foreground = extract_color(style_str, "color") || "000000"
@@ -134,8 +83,8 @@ module Accessibility
 
         Accessibility::Forms::ColorPickerField.new(
           title_label: I18n.t("Contrast Ratio"),
-          input_label: I18n.t("New Color"),
-          label: I18n.t("Change Color"),
+          input_label: I18n.t("New text color"),
+          label: I18n.t("Change text color"),
           options: ["normal"],
           background_color: "##{background}",
           undo_text: I18n.t("Color changed"),

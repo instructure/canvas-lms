@@ -27,6 +27,30 @@ export interface Checkpoint {
   dueAt?: string
   name?: string
   tag?: string
+  assignmentOverrides?: AssignmentOverrideGraphQLResult
+}
+
+export interface StandardizedDateHash {
+  id?: string
+  dueAt?: string
+  unlockAt?: string
+  lockAt?: string
+  title?: string
+  base?: boolean
+  set?: {
+    id?: string
+    type?: string
+  }
+}
+
+// Add new menu actions here (e.g., 'delete', 'sendTo', 'copyTo')
+type MenuAction = 'duplicate'
+
+type PerModuleState<T> = Record<ModuleId, T>
+
+type MenuItemActionState = {
+  type: MenuAction
+  state: boolean
 }
 
 export type ModuleItemContent = {
@@ -44,9 +68,11 @@ export type ModuleItemContent = {
     | 'ModuleExternalTool'
     | 'ExternalTool'
   pointsPossible?: number
+  title?: string
   published?: boolean
   canUnpublish?: boolean
   canDuplicate?: boolean
+  canManageAssignTo?: boolean
   dueAt?: string
   lockAt?: string
   unlockAt?: string
@@ -76,6 +102,12 @@ export type ModuleItemContent = {
   locked?: boolean
   graded?: boolean
   assignmentOverrides?: AssignmentOverrideGraphQLResult
+  assignedToDates?: StandardizedDateHash[]
+  assignment?: {
+    _id: string
+    dueAt?: string
+    assignmentOverrides?: AssignmentOverrideGraphQLResult
+  }
   isNewQuiz?: boolean
 } | null
 
@@ -153,6 +185,7 @@ export interface ModuleStatistics {
 }
 
 export interface Module {
+  moduleItemsTotalCount: number
   id: string
   _id: string
   name: string
@@ -239,20 +272,6 @@ interface GraphQLResult {
   }>
 }
 
-export interface ModuleItemsResponse {
-  moduleItems: ModuleItem[]
-}
-
-interface ModuleItemsGraphQLResult {
-  legacyNode?: {
-    moduleItems?: ModuleItem[]
-  }
-  errors?: Array<{
-    message: string
-    [key: string]: any
-  }>
-}
-
 export interface ModuleItem {
   id: string
   _id: string
@@ -263,6 +282,7 @@ export interface ModuleItem {
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   newTab?: boolean
+  published?: boolean
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -307,15 +327,17 @@ export interface ExternalToolModalItem {
   description?: string
   domain?: string | null
   placements: {
-    assignment_selection?: ExternalToolPlacement
-    link_selection?: ExternalToolPlacement
-    module_group_menu?: ExternalToolPlacement
-    module_menu_modal?: ExternalToolPlacement
-    module_menu?: ExternalToolPlacement
-    module_index_menu_modal?: ExternalToolPlacement
+    assignmentSelection?: ExternalToolPlacement
+    linkSelection?: ExternalToolPlacement
+    moduleGroupMenu?: ExternalToolPlacement
+    moduleMenuModal?: ExternalToolPlacement
+    moduleMenu?: ExternalToolPlacement
+    moduleIndexMenuModal?: ExternalToolPlacement
     [key: string]: ExternalToolPlacement | undefined
   }
 }
+
+export type ModuleCursorState = Record<string, string | null>
 
 export type ExternalTool = ExternalToolTrayItem | ExternalToolModalItem
 
@@ -333,4 +355,35 @@ export interface ModuleItemMasterCourseRestrictionType {
   dueDates: boolean | null
   points: boolean | null
   settings: boolean | null
+}
+
+export interface GraphQLError {
+  message: string
+  [key: string]: any
+}
+
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
+interface LegacyNodeModuleItemsConnection {
+  moduleItemsTotalCount?: number
+  moduleItemsConnection?: {
+    edges: Array<{
+      cursor: string
+      node: ModuleItem
+    }>
+    pageInfo: PageInfo
+  }
+}
+
+export interface PaginatedNavigationResponse {
+  moduleItems: ModuleItem[]
+  pageInfo: PageInfo
+}
+
+interface PaginatedNavigationGraphQLResult {
+  legacyNode?: LegacyNodeModuleItemsConnection
+  errors?: GraphQLError[]
 }

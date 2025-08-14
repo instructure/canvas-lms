@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext, useContext, ReactNode} from 'react'
+import {createContext} from 'react'
 
-import {ContentItem} from '../types'
+import {AccessibilityResourceScan} from '../types'
 
 export interface AccessibilityCheckerContextType {
-  selectedItem: ContentItem | null
-  setSelectedItem: (item: ContentItem | null) => void
+  selectedItem: AccessibilityResourceScan | null
+  setSelectedItem: (item: AccessibilityResourceScan | null) => void
 
   isTrayOpen: boolean
   setIsTrayOpen: (open: boolean) => void

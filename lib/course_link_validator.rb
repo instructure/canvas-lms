@@ -314,7 +314,7 @@ class CourseLinkValidator
       raise RuntimeError("photo unavailable") if url&.match?(@unavailable_photo_redirect_pattern)
     end
 
-    begin
+    InstrumentTLSCiphers.without_tls_metrics do
       response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc)
       if %w[404 405].include?(response.code)
         response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc) do

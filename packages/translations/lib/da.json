@@ -413,6 +413,9 @@
     "content_type_2cf90d95": {
         "message": "Indholdstype"
     },
+    "continue_to_youtube_content_a34f0f85": {
+        "message": "Fortsæt til YouTube-indhold"
+    },
     "coproduct_e7838082": {
         "message": "Koprodukt"
     },
@@ -2470,6 +2473,9 @@
     },
     "this_image_is_currently_unavailable_25c68857": {
         "message": "Dette billede er for øjeblikket ikke tilgængeligt"
+    },
+    "this_video_may_display_youtube_ads_4d19d590": {
+        "message": "Denne video kan vise YouTube-annoncer."
     },
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Selvom din video har den rigtige titel i browseren, kunne vi ikke opdatere den i databasen."

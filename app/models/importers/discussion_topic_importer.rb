@@ -106,7 +106,6 @@ module Importers
          allow_rating
          only_graders_can_rate
          sort_by_rating
-         sort_order
          sort_order_locked
          expanded
          expanded_locked

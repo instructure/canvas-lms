@@ -33,7 +33,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       @fake_child_course = course_model
       ContentMigration.create!(migration_settings: { "source_course_id" => course.id }, context: @fake_child_course, source_course_id: course.id)
       @fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever.flv", content_type: "unknown/unknown", migration_id: mig_id(@media_attachment)
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
     end
 
     it "creates a media object based on the parent's" do
@@ -54,7 +54,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       @media_object = MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", user_entered_title: "whatever.flv", title: "whatever.flv", attachment_id: @media_attachment.id
       @fake_child_course = course_model
       @fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever.flv", content_type: "unknown/unknown", migration_id: mig_id(@media_attachment)
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
     end
 
     it "creates a media object based on the parent's" do
@@ -75,7 +75,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       @media_object = MediaObject.create! media_id: "m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW", user_entered_title: "whatever-else-sadly.flv", title: "whatever-else-sadly.flv", attachment_id: @media_attachment.id
       @fake_child_course = course_model
       @fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever.flv", content_type: "unknown/unknown", migration_id: mig_id(@media_attachment)
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
     end
 
     it "creates a media object based on the parent's" do
@@ -94,7 +94,7 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
     before do
       @fake_child_course = course_model
       @fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever.flv", content_type: "unknown/unknown", migration_id: "doesntmatter"
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
     end
 
     it "creates a failure report" do
@@ -128,9 +128,9 @@ describe DataFixup::CreateMediaObjectsForMediaAttachmentsLacking do
       @second_fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever_2.flv", content_type: "unknown/unknown", migration_id: mig_id(@second_media_attachment)
       @third_fake_child_attachment = Attachment.create! context: @fake_child_course, filename: "whatever_3.flv", content_type: "unknown/unknown", migration_id: "doesntmatter"
 
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-2dGZAmbnEHAUkGCSe2Kx5eEc5DCESB73\" src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-2dGZAmbnEHAUkGCSe2Kx5eEc5DCESB73\" data-media-id=\"m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW\" src=\"/media_attachments_iframe/#{@second_fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
-      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-Ec5DCESB732dGZAmbnEHAUkGCSe2Kx5e\" data-media-id=\"m-Ec5DCESB732dGZAmbnEHAUkGCSe2Kx5e\" src=\"/media_attachments_iframe/#{@third_fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>")
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-2dGZAmbnEHAUkGCSe2Kx5eEc5DCESB73\" src=\"/media_attachments_iframe/#{@fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-2dGZAmbnEHAUkGCSe2Kx5eEc5DCESB73\" data-media-id=\"m-3EtLMkFf9KBMneRZozuhGmYGTJSiqELW\" src=\"/media_attachments_iframe/#{@second_fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
+      @fake_child_course.assignments.create!(submission_types: "online_text_entry", points_possible: 2, description: "<iframe width=0 height=0 id=\"media_comment_m-Ec5DCESB732dGZAmbnEHAUkGCSe2Kx5e\" data-media-id=\"m-Ec5DCESB732dGZAmbnEHAUkGCSe2Kx5e\" src=\"/media_attachments_iframe/#{@third_fake_child_attachment.id}/?type=video&amp;embedded=true\"></iframe>", saving_user: @user)
     end
 
     it "sets the media entry id on the children attachments if a media object by that identifier exists" do

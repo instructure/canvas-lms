@@ -91,6 +91,7 @@ export const Assignment = {
           externalTool {
             _id
             name
+            labelFor(placement: ActivityAssetProcessor)
           }
           iconOrToolIconUrl
           text
@@ -162,6 +163,7 @@ export const Assignment = {
         externalTool: {
           _id: string,
           name: string,
+          labelFor: string,
         },
         iconOrToolIconUrl: string,
         text: string,

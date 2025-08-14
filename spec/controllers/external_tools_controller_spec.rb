@@ -116,7 +116,7 @@ describe ExternalToolsController do
     context "with tool availability controls" do
       let(:registration) { lti_registration_with_tool(account: @course.root_account) }
       let(:tool) { registration.new_external_tool(@course) }
-      let(:control) { tool.context_controls.first }
+      let(:control) { tool.primary_context_control }
       let(:lti1tool) { external_tool_model(context: @course) }
 
       before do

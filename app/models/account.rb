@@ -173,6 +173,7 @@ class Account < ActiveRecord::Base
   before_validation :verify_unique_sis_source_id
   before_save :ensure_defaults
   before_save :remove_template_id, if: ->(a) { a.workflow_state_changed? && a.deleted? }
+  before_save :denormalize_horizon_account_if_changed
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
   after_save :update_lti_context_controls_if_necessary
@@ -584,6 +585,11 @@ class Account < ActiveRecord::Base
 
   def limited_access_for_user?(user)
     limited_access_for_students? && user.active_student_enrollments_in_account?(self)
+  end
+
+  def restricted_file_access_for_user?(user)
+    root_account.feature_enabled?(:restrict_student_access) &&
+      user.has_student_enrollment?
   end
 
   def conditional_release?
@@ -2822,8 +2828,31 @@ class Account < ActiveRecord::Base
       locked: value,
       value:
     }
-    if value == false
+  end
+
+  def denormalize_horizon_account_if_changed
+    return unless settings_change_to_be_saved
+
+    old_settings, new_settings = settings_change_to_be_saved
+    return if old_settings[:horizon_account] == new_settings[:horizon_account]
+
+    horizon_account_ids = Set.new(root_account.settings[:horizon_account_ids] || [])
+
+    # Once enabled, don't allow changes in descendant accounts
+    settings[:horizon_account][:locked] = settings[:horizon_account][:value]
+
+    if settings[:horizon_account][:value]
+      horizon_account_ids.add(id)
+      # No need to set horizon_course on associated_courses because this can only be set
+      # on accounts with no courses
+    else
+      horizon_account_ids.delete(id)
       associated_courses&.not_deleted&.update_all(horizon_course: false)
     end
+
+    root_account.settings[:horizon_account_ids] = horizon_account_ids.to_a
+
+    # If this is the root account, it'll be saved shortly since this is called as a before_save
+    root_account.save! unless root_account?
   end
 end

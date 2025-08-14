@@ -25,6 +25,7 @@ import {NoResultsFound} from './NoResultsFound'
 import {FileUploadDrop} from '../shared/FileUploadDrop'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
+import {getFilesEnv} from '../../../utils/filesEnvUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -45,6 +46,8 @@ const SubTableContent = ({
   handleFileDropRef,
 }: SubTableContentProps) => {
   const {currentFolder, contextId, contextType} = useFileManagement()
+  const isAccessRestricted = getFilesEnv().userFileAccessRestricted
+
   if (isLoading) {
     return (
       <Flex as="div" alignItems="center" justifyItems="center" padding="medium">
@@ -59,7 +62,7 @@ const SubTableContent = ({
         <NoResultsFound searchTerm={searchString} />
       </View>
     )
-  } else if (isEmpty && showDrop) {
+  } else if (isEmpty && showDrop && !isAccessRestricted) {
     return (
       <div className="FileDrag">
         <FileUploadDrop

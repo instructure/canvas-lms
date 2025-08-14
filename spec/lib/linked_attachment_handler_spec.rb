@@ -33,7 +33,7 @@ describe LinkedAttachmentHandler do
 
   describe "#associate_attachments_to_rce_object" do
     before do
-      course.root_account.enable_feature!(:file_association_access)
+      course.root_account.enable_feature!(:allow_attachment_association_creation)
       course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
     end
 

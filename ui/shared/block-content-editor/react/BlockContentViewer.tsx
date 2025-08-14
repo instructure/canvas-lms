@@ -16,20 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {SerializedNodes} from '@craftjs/core'
-import {BlockContentEditorContext} from './BlockContentEditorContext'
+import {Editor, Frame, SerializedNodes} from '@craftjs/core'
 import {BlockContentViewerLayout} from './layout/BlockContentViewerLayout'
-import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
+import {components} from './block-content-editor-components'
 
 export type BlockContentViewerProps = {
   data: SerializedNodes | null
 }
 
 export const BlockContentViewer = (props: BlockContentViewerProps) => {
-  const editor = <BlockContentEditorWrapper data={props.data} onInit={null} isEditMode={false} />
+  const editor = <Frame data={props.data ?? undefined} />
   return (
-    <BlockContentEditorContext data={props.data}>
+    <Editor enabled={false} resolver={components}>
       <BlockContentViewerLayout editor={editor} />
-    </BlockContentEditorContext>
+    </Editor>
   )
 }

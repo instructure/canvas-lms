@@ -20,7 +20,7 @@
 class AccessibilityResourceScansController < ApplicationController
   before_action :require_context
   before_action :require_user
-  before_action :validate_allowed
+  before_action :check_authorized_action
 
   ALLOWED_SORTS = %w[resource_name resource_type resource_workflow_state resource_updated_at issue_count].freeze
 
@@ -34,6 +34,7 @@ class AccessibilityResourceScansController < ApplicationController
             .where(course_id: @context.id)
 
     scans = apply_sorting(scans)
+    scans = apply_filters(scans) if params[:filters].present?
 
     base_url = course_accessibility_resource_scans_path(@context)
     paginated = Api.paginate(scans, self, base_url)
@@ -43,7 +44,7 @@ class AccessibilityResourceScansController < ApplicationController
 
   private
 
-  def validate_allowed
+  def check_authorized_action
     return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
 
     authorized_action(@context, @current_user, [:read, :update])
@@ -78,9 +79,54 @@ class AccessibilityResourceScansController < ApplicationController
     relation.order(order_clause)
   end
 
+  # Apply filtering to the supplied ActiveRecord::Relation of AccessibilityResourceScan
+  # based on a JSON-encoded `filters` param. Filters include rule types, resource types,
+  # workflow states, issue workflow states, and a date range.
+  #
+  # Invalid or missing filters are ignored. All conditions are combined with AND logic.
+  #
+  # @param relation [ActiveRecord::Relation<AccessibilityResourceScan>] the base query
+  # @return [ActiveRecord::Relation<AccessibilityResourceScan>]
+  def apply_filters(relation)
+    filters = params[:filters]
+    rule_types      = filters[:ruleTypes]
+    resource_types  = filters[:artifactTypes]
+    workflow_states = filters[:workflowStates]
+    from_date = begin
+      Time.zone.parse(filters[:fromDate])
+    rescue
+      nil
+    end
+    to_date = begin
+      Time.zone.parse(filters[:toDate])
+    rescue
+      nil
+    end
+
+    if rule_types.present?
+      relation = relation.joins(:accessibility_issues)
+                         .where(accessibility_issues: { rule_type: rule_types })
+                         .distinct
+    end
+
+    if resource_types.present?
+      conditions = []
+      conditions << "wiki_page_id IS NOT NULL" if resource_types.include?("wiki_page")
+      conditions << "assignment_id IS NOT NULL" if resource_types.include?("assignment")
+      conditions << "attachment_id IS NOT NULL" if resource_types.include?("attachment")
+      relation = relation.where(conditions.join(" OR ")) if conditions.any?
+    end
+
+    relation = relation.where(resource_workflow_state: workflow_states) if workflow_states.present?
+    relation = relation.where(resource_updated_at: from_date..) if from_date.present?
+    relation = relation.where(resource_updated_at: ..to_date) if to_date.present?
+
+    relation
+  end
+
   # Returns a hash representation of the scan, for JSON rendering.
-  # @param scan [AccessibilityResourceScan]
-  # @return [Hash]
+  # @param scan [AccessibilityResourceScan] the scan record
+  # @return [Hash] the scan attributes
   def scan_attributes(scan)
     resource_id, resource_type = scan.context_id_and_type
     scan_completed = scan.workflow_state == "completed"
@@ -95,7 +141,7 @@ class AccessibilityResourceScansController < ApplicationController
       workflow_state: scan.workflow_state,
       error_message: scan.error_message || "",
       issue_count: scan_completed ? scan.issue_count : 0,
-      issues: scan_completed ? scan.accessibility_issues.map { |issue| issue_attributes(issue) } : []
+      issues: scan_completed ? scan.accessibility_issues.active.map { |issue| issue_attributes(issue) } : []
     }
   end
 

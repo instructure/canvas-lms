@@ -68,6 +68,13 @@ module Lti::Messages
         document_targets: %w[iframe window].freeze,
         media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
       }.freeze,
+      "ActivityAssetProcessorContribution" => {
+        accept_multiple: true,
+        accept_types: %w[ltiAssetProcessorContribution].freeze,
+        auto_create: true,
+        document_targets: %w[iframe window].freeze,
+        media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
+      }.freeze,
       "editor_button" => {
         accept_multiple: true,
         accept_types: %w[link file html ltiResourceLink image].freeze,

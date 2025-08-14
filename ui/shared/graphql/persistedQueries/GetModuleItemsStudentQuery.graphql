@@ -1,111 +1,113 @@
-query GetModuleItemsStudentQuery($moduleId: ID!) {
+query GetModuleItemsStudentQuery($moduleId: ID!, $cursor: String, $first: Int) {
   legacyNode(_id: $moduleId, type: Module) {
     ... on Module {
-      moduleItems {
-        _id
-        id
-        url
-        title
-        newTab
-        indent
-        position
-        content {
-          ... on Assignment {
+      moduleItemsConnection(first: $first, after: $cursor) {
+        edges {
+          cursor
+          node {
             _id
             id
-            title
-            type: __typename
-            pointsPossible
-            isNewQuiz
-            published
-            submissionsConnection(filter: { includeUnsubmitted: true }) {
-              nodes {
-                _id
-                cachedDueDate
-                missing
-              }
-            }
-          }
-          ... on Discussion {
-            _id
-            id
-            title
-            type: __typename
-            lockAt
-            todoDate
-            discussionType
-            graded
-            published
-            replyToEntryRequiredCount
-            submissionsConnection(filter: { includeUnsubmitted: true }) {
-              nodes {
-                _id
-                cachedDueDate
-                missing
-              }
-            }
-            checkpoints {
-              dueAt(applyOverrides: true)
-              name
-              tag
-            }
-          }
-          ... on File {
-            _id
-            id
-            title: displayName
-            type: __typename
-            contentType
-            size
-            thumbnailUrl
             url
-            published
-          }
-          ... on Page {
-            _id
-            id
             title
-            published
-            type: __typename
-          }
-          ... on Quiz {
-            _id
-            id
-            title
-            type: __typename
-            pointsPossible
-            published
-            submissionsConnection(filter: { includeUnsubmitted: true }) {
-              nodes {
-                _id
-                cachedDueDate
-                missing
-              }
-            }
-          }
-          ... on ExternalUrl {
-            title
-            type: __typename
-            url
             published
             newTab
+
+            indent
+            position
+            content {
+              ... on Assignment {
+                _id
+                id
+                title
+                type: __typename
+                pointsPossible
+                isNewQuiz
+                submissionsConnection(filter: { includeUnsubmitted: true }) {
+                  nodes {
+                    _id
+                    cachedDueDate
+                    missing
+                  }
+                }
+              }
+              ... on Discussion {
+                _id
+                id
+                title
+                type: __typename
+                lockAt
+                todoDate
+                discussionType
+                graded
+                replyToEntryRequiredCount
+                submissionsConnection(filter: { includeUnsubmitted: true }) {
+                  nodes {
+                    _id
+                    cachedDueDate
+                    missing
+                  }
+                }
+                checkpoints {
+                  dueAt(applyOverrides: true)
+                  name
+                  tag
+                }
+              }
+              ... on File {
+                _id
+                id
+                title: displayName
+                type: __typename
+                contentType
+                size
+                thumbnailUrl
+                url
+              }
+              ... on Page {
+                _id
+                id
+                title
+                type: __typename
+              }
+              ... on Quiz {
+                _id
+                id
+                title
+                type: __typename
+                pointsPossible
+                submissionsConnection(filter: { includeUnsubmitted: true }) {
+                  nodes {
+                    _id
+                    cachedDueDate
+                    missing
+                  }
+                }
+              }
+              ... on ExternalUrl {
+                title
+                type: __typename
+                url
+                newTab
+              }
+              ... on ModuleExternalTool {
+                title
+                type: __typename
+                url
+              }
+              ... on ExternalTool {
+                type: __typename
+                url
+              }
+              ... on SubHeader {
+                title
+                type: __typename
+              }
+            }
           }
-          ... on ModuleExternalTool {
-            title
-            type: __typename
-            url
-            published
-          }
-          ... on ExternalTool {
-            type: __typename
-            url
-            published
-          }
-          ... on SubHeader {
-            title
-            published
-            type: __typename
-          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }

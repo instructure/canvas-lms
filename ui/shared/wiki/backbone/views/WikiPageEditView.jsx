@@ -66,7 +66,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     })
 
     this.prototype.template = template
-    this.prototype.className = 'form-horizontal edit-form validated-form-view'
+    this.prototype.className = 'form-horizontal-wiki-page edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
     this.prototype.disablingDfd = new $.Deferred()
     this.prototype.attributes = {
@@ -569,7 +569,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     if (this.isBlockContentEditor()) {
-      this.blockEditorData = this.blockEditorData = this.blockEditorHandler.getContent()
+      this.blockEditorData = this.blockEditorHandler.getContent()
     } else if (this.model.get('editor') === 'block_editor') {
       this.blockEditorData = window.block_editor().getBlocks()
     }

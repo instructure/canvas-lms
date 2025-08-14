@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
@@ -27,10 +28,14 @@ import {
   mockDeepLinkResponse,
   mockInvalidDeepLinkResponse,
   mockDoFetchApi,
-  mockTools as tools,
+  mockToolsForAssignment as assignmentTools,
+  mockToolsForDiscussions as discussionTools,
+  mockContributionDeepLinkResponse,
 } from './assetProcessorsTestHelpers'
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
+import {useAssetProcessorsToolsList} from '../hooks/useAssetProcessorsToolsList'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {AssetProcessorType} from '@canvas/lti/model/AssetProcessor'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -38,13 +43,12 @@ jest.mock('@canvas/external-tools/messages')
 describe('AssetProcessorsAddModal', () => {
   let mockOnProcessorResponse: jest.Mock
   const queryClient = new QueryClient()
+  let mockedDoFetchApi: jest.Mock
 
   beforeEach(() => {
     mockOnProcessorResponse = jest.fn()
-
-    queryClient.setQueryData(['assetProcessors', 123], tools)
     const launchDefsUrl = '/api/v1/courses/123/lti_apps/launch_definitions'
-    mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
+    mockedDoFetchApi = mockDoFetchApi(launchDefsUrl, doFetchApi as jest.Mock)
   })
 
   afterEach(() => {
@@ -52,78 +56,94 @@ describe('AssetProcessorsAddModal', () => {
     jest.clearAllMocks()
   })
 
-  function renderModal() {
+  function renderModal(type: AssetProcessorType) {
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <AssetProcessorsAddModal
           courseId={123}
           secureParams={'my-secure-params'}
           onProcessorResponse={mockOnProcessorResponse}
+          type={type}
         />
       </MockedQueryClientProvider>,
     )
   }
 
-  it('is opened by calling the showToolList function in the useAssetProcessorsAddModalState hook', async () => {
-    const {result} = renderHook(() => useAssetProcessorsAddModalState())
+  function toolsForType(type: AssetProcessorType) {
+    return type === 'ActivityAssetProcessor' ? assignmentTools : discussionTools
+  }
 
-    act(() => {
-      result.current.actions.close()
+  describe('Modal state management', () => {
+    it('opens and closes the modal correctly', async () => {
+      const {result} = renderHook(() => useAssetProcessorsAddModalState())
+
+      act(() => {
+        result.current.actions.close()
+      })
+      expect(result.current.state.tag).toBe('closed')
+
+      act(() => {
+        result.current.actions.showToolList()
+      })
+      expect(result.current.state.tag).toBe('toolList')
     })
-
-    expect(result.current.state.tag).toBe('closed')
-
-    act(() => {
-      result.current.actions.showToolList()
-    })
-
-    expect(result.current.state.tag).toBe('toolList')
   })
 
-  it('launches the tool when the AssetProcessorsCard is clicked', async () => {
-    const toolWithId22 = tools.find(tool => tool.definition_id === '22')
-    expect(toolWithId22).not.toBeUndefined()
+  describe.each([
+    {
+      type: 'ActivityAssetProcessor' as AssetProcessorType,
+      tool_id: '22',
+      mockResponse: mockDeepLinkResponse,
+    },
+    {
+      type: 'ActivityAssetProcessorContribution' as AssetProcessorType,
+      tool_id: '22',
+      mockResponse: mockContributionDeepLinkResponse,
+    },
+  ])('with type $type', ({type, tool_id, mockResponse}) => {
+    const tool = toolsForType(type).find(tool => tool.definition_id === tool_id)
 
-    const {getByText, getByTitle, queryAllByTestId} = renderModal()
-    const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
-      .showToolList
-    act(() => open())
+    it(`launches the tool with correct launch_type with correct dimensions`, async () => {
+      const {getByText, getByTitle, queryAllByTestId} = renderModal(type)
+      const open = renderHook(() => useAssetProcessorsAddModalState(s => s.actions)).result.current
+        .showToolList
+      act(() => open())
 
-    await waitFor(
-      () => {
-        expect(getByText('Add a document processing app')).toBeInTheDocument()
+      await waitFor(
+        () => {
+          expect(getByText('Add A Document Processing App')).toBeInTheDocument()
 
-        const cards = queryAllByTestId('asset-processor-card')
-        expect(cards.length).toBeGreaterThan(0)
+          const cards = queryAllByTestId('asset-processor-card')
+          expect(cards).toHaveLength(4)
+          const foundCard = cards.find(card => card.textContent?.includes(tool!.name))
+          expect(foundCard).toBeDefined()
+          return foundCard
+        },
+        {timeout: 3000},
+      ).then(toolCard => {
+        act(() => toolCard!.click())
+      })
 
-        const foundCard = cards.find(card => card.textContent?.includes(toolWithId22!.name))
-        expect(foundCard).toBeDefined()
-        return foundCard
-      },
-      {timeout: 3000},
-    ).then(toolCard => {
-      act(() => toolCard!.click())
+      expect(mockedDoFetchApi).toHaveBeenCalledWith({
+        path: '/api/v1/courses/123/lti_apps/launch_definitions',
+        params: {'placements[]': type},
+      })
+
+      const iframe = await waitFor(() => getByTitle('Configure new document processing app'))
+      expect(iframe).toHaveAttribute(
+        'src',
+        `/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=${type}&secure_params=my-secure-params`,
+      )
+      const {selection_width, selection_height} = tool!.placements[type]!
+      expect(iframe.style.width).toBe(selection_width + 'px')
+      expect(iframe.style.height).toBe(selection_height + 'px')
     })
 
-    const iframe = await waitFor(() => getByTitle('Configure new document processing app'))
-    expect(iframe).toHaveAttribute(
-      'src',
-      '/courses/123/external_tools/22/resource_selection?display=borderless&launch_type=ActivityAssetProcessor&secure_params=my-secure-params',
-    )
-    expect(iframe.style.width).toBe('600px')
-    expect(iframe.style.height).toBe('500px')
-  })
-
-  describe('when valid deep linking response is received from the launch', () => {
-    it('closes the modal and send calls the onProcessorResponse callback with the content items', async () => {
+    it(`handles valid deep linking response for ${type}`, async () => {
       const mockOnProcessorResponse = jest.fn()
 
-      const validToolId = '22'
-      const validTool = tools.find(tool => tool.definition_id === validToolId)
-      expect(validTool).not.toBeUndefined()
-
-      const validResponse = {...mockDeepLinkResponse}
-      expect(validResponse.tool_id).toBe(validToolId)
+      const validResponse = {...mockResponse}
+      expect(validResponse.tool_id).toBe(tool_id)
 
       const mockHECM = handleExternalContentMessages as jest.Mock
       mockHECM.mockImplementation(({onDeepLinkingResponse}) => {
@@ -137,6 +157,7 @@ describe('AssetProcessorsAddModal', () => {
             courseId={123}
             secureParams={'my-secure-params'}
             onProcessorResponse={mockOnProcessorResponse}
+            type={type}
           />
         </MockedQueryClientProvider>,
       )
@@ -144,33 +165,20 @@ describe('AssetProcessorsAddModal', () => {
       const {result} = renderHook(() => useAssetProcessorsAddModalState())
 
       act(() => {
-        result.current.actions.launchTool(validTool!)
+        result.current.actions.launchTool(tool!)
       })
 
       await waitFor(() => {
         expect(mockOnProcessorResponse).toHaveBeenCalledWith({
-          tool: validTool,
+          tool: tool,
           data: validResponse,
         })
       })
     })
-  })
 
-  describe('when invalid deep linking response is received from the launch', () => {
-    it('renders error message', async () => {
+    it(`handles invalid deep linking response for ${type}`, async () => {
       const mockOnProcessorResponse = jest.fn()
-
-      render(
-        <MockedQueryClientProvider client={queryClient}>
-          <AssetProcessorsAddModal
-            courseId={123}
-            secureParams={'my-secure-params'}
-            onProcessorResponse={mockOnProcessorResponse}
-          />
-        </MockedQueryClientProvider>,
-      )
-
-      const matchingTool = tools.find(
+      const matchingTool = toolsForType(type).find(
         tool => tool.definition_id === mockInvalidDeepLinkResponse.tool_id,
       )
       expect(matchingTool).not.toBeUndefined()
@@ -180,6 +188,17 @@ describe('AssetProcessorsAddModal', () => {
         setTimeout(() => onDeepLinkingResponse(mockInvalidDeepLinkResponse), 0)
         return () => {}
       })
+
+      render(
+        <MockedQueryClientProvider client={queryClient}>
+          <AssetProcessorsAddModal
+            courseId={123}
+            secureParams={'my-secure-params'}
+            onProcessorResponse={mockOnProcessorResponse}
+            type={type}
+          />
+        </MockedQueryClientProvider>,
+      )
 
       const {result} = renderHook(() => useAssetProcessorsAddModalState())
 
@@ -202,23 +221,21 @@ describe('AssetProcessorsAddModal', () => {
     act(() => {
       result.current.actions.close()
     })
-
     expect(result.current.state.tag).toBe('closed')
 
     act(() => {
       result.current.actions.showToolList()
     })
-
     expect(result.current.state.tag).toBe('toolList')
 
     act(() => {
-      result.current.actions.launchTool(tools[0])
+      result.current.actions.launchTool(assignmentTools[0])
     })
 
     expect(result.current.state.tag).toBe('toolLaunch')
-    expect('tool' in result.current.state && result.current.state.tool).toBe(tools[0])
+    expect('tool' in result.current.state && result.current.state.tool).toBe(assignmentTools[0])
 
-    const {getByTitle, queryAllByTestId} = renderModal()
+    const {getByTitle} = renderModal('ActivityAssetProcessor')
     const iframe = (await waitFor(() =>
       getByTitle('Configure new document processing app'),
     )) as HTMLIFrameElement

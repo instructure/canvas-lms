@@ -153,7 +153,6 @@ describe('UserTaggedModal', () => {
     fireEvent.click(screen.getByText('Confirm'))
 
     expect(mutateMock).toHaveBeenCalled()
-    expect(screen.getByText(/Tag removed successfully/)).toBeInTheDocument()
   })
 
   it('shows an Alert with error description when mutation fails', async () => {

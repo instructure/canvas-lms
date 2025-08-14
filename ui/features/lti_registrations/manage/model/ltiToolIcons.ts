@@ -28,7 +28,7 @@ export const ltiToolDefaultIconUrl = ({
   developerKeyId?: DeveloperKeyId
 }) => {
   return (
-    `${base}/lti/tool_default_icon?name=${toolName}` +
+    `${base}/lti/tool_default_icon?name=${encodeURIComponent(toolName)}` +
     (developerKeyId ? `&developer_key_id=${developerKeyId}` : '')
   )
 }

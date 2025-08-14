@@ -25,6 +25,7 @@ describe('SpeedGraderPostGradesMenu', () => {
   const defaultProps = {
     allowHidingGradesOrComments: true,
     allowPostingGradesOrComments: true,
+    allowManageGrades: true,
     hasGradesOrPostableComments: true,
     onHideGrades: jest.fn(),
     onPostGrades: jest.fn(),
@@ -147,6 +148,168 @@ describe('SpeedGraderPostGradesMenu', () => {
           expect(menuItem).toHaveAttribute('aria-disabled', 'true')
         })
       })
+    })
+  })
+
+  describe('permission-based access control', () => {
+    describe('when allowManageGrades is false', () => {
+      describe('Post Grades menu item', () => {
+        it('disables the Post Grades menu item even when grades can be posted', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowPostingGradesOrComments: true,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'Post Grades'})
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+        })
+
+        it('does not call onPostGrades when clicked while disabled', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowPostingGradesOrComments: true,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'Post Grades'})
+          // Cannot click disabled items due to pointer-events: none
+          // Just verify it's disabled
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+          expect(defaultProps.onPostGrades).not.toHaveBeenCalled()
+        })
+
+        it('shows disabled state when no grades to post and no permission', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowPostingGradesOrComments: false,
+            hasGradesOrPostableComments: false,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'No Grades to Post'})
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+        })
+      })
+
+      describe('Hide Grades menu item', () => {
+        it('disables the Hide Grades menu item even when grades can be hidden', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowHidingGradesOrComments: true,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'Hide Grades'})
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+        })
+
+        it('does not call onHideGrades when clicked while disabled', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowHidingGradesOrComments: true,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'Hide Grades'})
+          // Cannot click disabled items due to pointer-events: none
+          // Just verify it's disabled
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+          expect(defaultProps.onHideGrades).not.toHaveBeenCalled()
+        })
+
+        it('shows disabled state when no grades to hide and no permission', async () => {
+          await renderMenu({
+            allowManageGrades: false,
+            allowHidingGradesOrComments: false,
+            hasGradesOrPostableComments: false,
+          })
+          const menuItem = screen.getByRole('menuitem', {name: 'No Grades to Hide'})
+          expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+        })
+      })
+    })
+
+    describe('when allowManageGrades is true', () => {
+      it('enables Post Grades when user has permission and grades can be posted', async () => {
+        await renderMenu({
+          allowManageGrades: true,
+          allowPostingGradesOrComments: true,
+        })
+        const menuItem = screen.getByRole('menuitem', {name: 'Post Grades'})
+        expect(menuItem).not.toHaveAttribute('aria-disabled')
+      })
+
+      it('enables Hide Grades when user has permission and grades can be hidden', async () => {
+        await renderMenu({
+          allowManageGrades: true,
+          allowHidingGradesOrComments: true,
+        })
+        const menuItem = screen.getByRole('menuitem', {name: 'Hide Grades'})
+        expect(menuItem).not.toHaveAttribute('aria-disabled')
+      })
+
+      it('calls onPostGrades when Post Grades is clicked with permission', async () => {
+        await renderMenu({
+          allowManageGrades: true,
+          allowPostingGradesOrComments: true,
+        })
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Post Grades'}))
+        expect(defaultProps.onPostGrades).toHaveBeenCalledTimes(1)
+      })
+
+      it('calls onHideGrades when Hide Grades is clicked with permission', async () => {
+        await renderMenu({
+          allowManageGrades: true,
+          allowHidingGradesOrComments: true,
+        })
+        await userEvent.click(screen.getByRole('menuitem', {name: 'Hide Grades'}))
+        expect(defaultProps.onHideGrades).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('when allowManageGrades is undefined (backwards compatibility)', () => {
+      it('defaults to disabling Post Grades when prop is not provided', async () => {
+        await renderMenu({
+          allowManageGrades: undefined,
+          allowPostingGradesOrComments: true,
+        })
+        const menuItem = screen.getByRole('menuitem', {name: 'Post Grades'})
+        // When undefined, the component treats it as false (no permission)
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+      })
+
+      it('defaults to disabling Hide Grades when prop is not provided', async () => {
+        await renderMenu({
+          allowManageGrades: undefined,
+          allowHidingGradesOrComments: true,
+        })
+        const menuItem = screen.getByRole('menuitem', {name: 'Hide Grades'})
+        // When undefined, the component treats it as false (no permission)
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+  })
+
+  describe('complex scenarios', () => {
+    it('handles mixed permissions and states correctly', async () => {
+      await renderMenu({
+        allowManageGrades: false,
+        allowPostingGradesOrComments: true,
+        allowHidingGradesOrComments: false,
+        hasGradesOrPostableComments: true,
+      })
+
+      const postMenuItem = screen.getByRole('menuitem', {name: 'Post Grades'})
+      const hideMenuItem = screen.getByRole('menuitem', {name: 'All Grades Hidden'})
+
+      expect(postMenuItem).toHaveAttribute('aria-disabled', 'true')
+      expect(hideMenuItem).toHaveAttribute('aria-disabled', 'true')
+    })
+
+    it('respects submission state even with manage permission', async () => {
+      await renderMenu({
+        allowManageGrades: true,
+        allowPostingGradesOrComments: false,
+        allowHidingGradesOrComments: false,
+        hasGradesOrPostableComments: true,
+      })
+
+      const postMenuItem = screen.getByRole('menuitem', {name: 'All Grades Posted'})
+      const hideMenuItem = screen.getByRole('menuitem', {name: 'All Grades Hidden'})
+
+      expect(postMenuItem).toHaveAttribute('aria-disabled', 'true')
+      expect(hideMenuItem).toHaveAttribute('aria-disabled', 'true')
     })
   })
 })

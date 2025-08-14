@@ -90,7 +90,7 @@ class FileAuthenticator
     return nil unless attachment
 
     if !Attachment.skip_thumbnails && attachment.instfs_hosted? && attachment.thumbnailable?
-      options = instfs_options(attachment, { geometry: options[:size], original_url: options[:original_url] })
+      options = instfs_options(attachment, { geometry: options[:size], fallback_url: options[:fallback_url] })
       InstFS.authenticated_thumbnail_url(attachment, options)
     else
       attachment.thumbnail_url(options)

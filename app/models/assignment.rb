@@ -26,12 +26,18 @@ class Assignment < AbstractAssignment
   attr_reader :custom_params
   attr_accessor :question_count
 
+  has_one :peer_review_sub_assignment, -> { active }, foreign_key: :parent_assignment_id, inverse_of: :parent_assignment, dependent: :destroy
+  has_many :allocation_rules,
+           dependent: :destroy,
+           inverse_of: :assignment
+
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
   validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
   SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state grading_type].freeze
+  after_update :delete_allocation_rules, if: :peer_reviews_changed?
   after_save :sync_sub_assignments, if: :sync_attributes_changed?
   after_save :sync_stream_items_hidden, if: :saved_change_to_suppress_assignment?
   after_commit :sync_sub_assignments_after_commit, if: :sync_attributes_changed_after_commit?
@@ -163,6 +169,7 @@ class Assignment < AbstractAssignment
 
   def before_soft_delete
     sub_assignments.destroy_all
+    peer_review_sub_assignment&.destroy
   end
 
   def governs_submittable?
@@ -223,5 +230,13 @@ class Assignment < AbstractAssignment
     if has_student_submissions? || has_student_submissions_for_sub_assignments?
       errors.add :workflow_state, I18n.t("Can't unpublish if there are student submissions for the assignment or its sub_assignments")
     end
+  end
+
+  def peer_reviews_changed?
+    saved_change_to_peer_reviews?(from: true, to: false)
+  end
+
+  def delete_allocation_rules
+    allocation_rules.update_all(workflow_state: "deleted")
   end
 end

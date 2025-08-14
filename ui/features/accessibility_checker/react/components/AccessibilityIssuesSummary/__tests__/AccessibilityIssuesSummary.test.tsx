@@ -19,18 +19,21 @@
 import {render, screen, waitFor} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
 
-import {useAccessibilityCheckerStore} from '../../../stores/AccessibilityCheckerStore'
+import {useAccessibilityScansStore} from '../../../stores/AccessibilityScansStore'
 import {AccessibilityIssuesSummary} from '../../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
-import {sampleTableData} from '../../../stores/mockData'
+import {mockScanData} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesSummary', () => {
+  beforeEach(() => {
+    window.ENV.SCAN_DISABLED = false
+  })
+
   it('renders without error', async () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
 
     await act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(false)
-      result.current.setTableData(sampleTableData)
+      result.current.setAccessibilityScans(mockScanData)
     })
 
     render(<AccessibilityIssuesSummary />)
@@ -40,12 +43,11 @@ describe('AccessibilityIssuesSummary', () => {
   })
 
   it('renders without error with empty dataset', async () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
 
     await act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(false)
-      result.current.setTableData([])
+      result.current.setAccessibilityScans([])
     })
 
     render(<AccessibilityIssuesSummary />)
@@ -55,23 +57,19 @@ describe('AccessibilityIssuesSummary', () => {
   })
 
   it('does not render when accessibility scan is disabled', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-
-    act(() => {
-      result.current.setAccessibilityScanDisabled(true)
-    })
+    renderHook(() => useAccessibilityScansStore())
+    window.ENV.SCAN_DISABLED = true
 
     render(<AccessibilityIssuesSummary />)
     expect(screen.queryByTestId('accessibility-issues-summary')).not.toBeInTheDocument()
   })
 
   it('does not render when loading is not completed', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    const {result} = renderHook(() => useAccessibilityScansStore())
 
     act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(true)
-      result.current.setTableData(null)
+      result.current.setAccessibilityScans(null)
     })
 
     render(<AccessibilityIssuesSummary />)

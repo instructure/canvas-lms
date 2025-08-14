@@ -17,6 +17,7 @@
  */
 
 import {EnvContentMigrations} from './ContentMigrations'
+import {EnvAccessibilityChecker} from './EnvAccessibilityChecker'
 import {EnvAccounts} from './EnvAccounts'
 import {EnvAlerts} from './EnvAlerts'
 import {EnvAms} from './EnvAms'
@@ -60,6 +61,7 @@ export type GlobalEnv =
     Partial<
       EnvAccounts &
         EnvAms &
+        EnvAccessibilityChecker &
         EnvAssignments &
         EnvCourse &
         EnvCoursePaces &

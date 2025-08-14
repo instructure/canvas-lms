@@ -21,6 +21,7 @@ import {fireEvent, render, screen} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleActionMenu from '../ModuleActionMenu'
+import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
 
 // External tool data to be provided through context
 const mockExternalTools = {
@@ -67,7 +68,7 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
   const queryClient = createQueryClient()
 
   // Set up query data for modules
-  queryClient.setQueryData(['modules', courseId], {
+  queryClient.setQueryData([MODULES, courseId], {
     pages: [
       {
         modules: [
@@ -89,7 +90,7 @@ const setUp = (permissions = {}, courseId = 'test-course-id', moduleId = 'test-m
   })
 
   // Set up query data for module items
-  queryClient.setQueryData(['moduleItems', moduleId], {
+  queryClient.setQueryData([MODULE_ITEMS, moduleId, null], {
     moduleItems: [
       {
         id: '1',

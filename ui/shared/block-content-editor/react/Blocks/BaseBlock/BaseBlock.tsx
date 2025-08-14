@@ -16,34 +16,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComponentProps, PropsWithChildren, useState} from 'react'
+import {ComponentProps, ElementType, PropsWithChildren, useState} from 'react'
 import {BlockContext} from './BaseBlockContext'
 import {useGetRenderMode} from './useGetRenderMode'
 import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
 import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
+import {useGenHistoryKey} from '../../hooks/useGenHistoryKey'
 
 const BaseBlockContent = (
   props: ComponentProps<typeof BaseBlock> & {
     setIsEditMode: (isEditMode: boolean) => void
   },
 ) => {
-  const renderMode = useGetRenderMode()
-  return renderMode === 'view' ? (
-    <BaseBlockViewLayout>{props.children}</BaseBlockViewLayout>
+  const {isViewMode, isEditMode} = useGetRenderMode()
+  return isViewMode ? (
+    <BaseBlockViewLayout backgroundColor={props.backgroundColor}>
+      {props.children}
+    </BaseBlockViewLayout>
   ) : (
-    <BaseBlockEditWrapper {...props} isEditMode={renderMode === 'edit'} />
+    <BaseBlockEditWrapper {...props} isEditMode={isEditMode} />
   )
 }
 
-export const BaseBlock = (
-  props: PropsWithChildren<{
-    title: string
-  }>,
-) => {
+type BaseBlockProps<T extends ElementType> = PropsWithChildren<{
+  title: string
+  backgroundColor?: string
+  statefulProps: Partial<ComponentProps<T>>
+}>
+
+export function BaseBlock<T extends ElementType>(props: BaseBlockProps<T>) {
   const [isEditMode, setIsEditMode] = useState(false)
+  const historyKey = useGenHistoryKey(props.statefulProps)
   return (
     <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockContent {...props} setIsEditMode={setIsEditMode} />
+      <BaseBlockContent key={historyKey} {...props} setIsEditMode={setIsEditMode} />
     </BlockContext.Provider>
   )
 }

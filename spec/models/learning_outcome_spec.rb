@@ -1048,9 +1048,9 @@ describe LearningOutcome do
         expect(@outcome.points_possible).to be 5
       end
 
-      it "defaults calculation_method to decaying_average" do
+      it "defaults calculation_method to standard_decaying_average" do
         @outcome = LearningOutcome.create!(title: "outcome")
-        expect(@outcome.calculation_method).to eql("decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
         expect(@outcome.calculation_int).to be 65
       end
 
@@ -1083,7 +1083,7 @@ describe LearningOutcome do
 
       # This is to prevent changing behavior of existing outcomes made before we added the
       # ability to set a calculation_method
-      it "sets calculation_method to decaying_average if the record is pre-existing and nil" do
+      it "sets calculation_method to standard_decaying_average if the record is pre-existing and nil" do
         @outcome = LearningOutcome.create!(title: "outcome")
         @outcome.update_column(:calculation_method, nil)
         @outcome.reload
@@ -1092,7 +1092,7 @@ describe LearningOutcome do
         @outcome.save!
         @outcome.reload
         expect(@outcome.description).to eq("foo bar baz qux")
-        expect(@outcome.calculation_method).to eq("decaying_average")
+        expect(@outcome.calculation_method).to eq("standard_decaying_average")
       end
 
       context "color and mastery defaults" do

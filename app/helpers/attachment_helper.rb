@@ -180,10 +180,6 @@ module AttachmentHelper
       return no_error_on_failure ? false : render_unauthorized_action
     end
 
-    if params[:sf_token]
-      return true if check_safe_files_token(attachment, params[:sf_token])
-    end
-
     no_error_on_failure ? attachment.grants_right?(user, session, access_type) : authorized_action(attachment, user, access_type)
   end
 
@@ -195,28 +191,7 @@ module AttachmentHelper
     false
   end
 
-  def check_safe_files_token(attachment, sf_token)
-    return false unless Account.site_admin.feature_enabled?(:safe_files_token) && sf_token && !safer_domain_available?
-
-    sf_token_key = "sf_token:#{sf_token}"
-    sf_token_data = Rails.cache.read(sf_token_key)
-    return false unless sf_token_data
-
-    if sf_token_data[:full_path] == attachment.full_path
-      # access is checked twice so delete token after second check
-      if sf_token_data[:used]
-        Rails.cache.delete(sf_token_key)
-      else
-        sf_token_data[:used] = true
-        Rails.cache.write(sf_token_key, sf_token_data, expires_in: 5.minutes)
-      end
-      true
-    else
-      false
-    end
-  end
-
-  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
+  def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false, options: {})
     can_proxy = inline && attachment.can_be_proxied?
     must_proxy = inline && csp_enforced? && attachment.mime_class == "html"
     direct = attachment.stored_locally? || can_proxy || must_proxy
@@ -224,9 +199,9 @@ module AttachmentHelper
     # up here to preempt files domain redirect
     if attachment.instfs_hosted? && file_location_mode? && !direct
       url = if inline
-              authenticated_inline_url(attachment)
+              authenticated_inline_url(attachment, options:)
             else
-              authenticated_download_url(attachment)
+              authenticated_download_url(attachment, options:)
             end
       render_file_location(url)
       return
@@ -250,9 +225,9 @@ module AttachmentHelper
     elsif must_proxy
       render 400, text: I18n.t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
-      redirect_to authenticated_inline_url(attachment)
+      redirect_to authenticated_inline_url(attachment, options:)
     else
-      redirect_to authenticated_download_url(attachment)
+      redirect_to authenticated_download_url(attachment, options:)
     end
   end
 

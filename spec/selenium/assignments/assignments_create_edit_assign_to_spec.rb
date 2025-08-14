@@ -569,6 +569,8 @@ describe "due date validations", :ignore_js_errors do
       end
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment1.id)
       expect(element_exists?(convert_override_alert_selector)).to be_truthy
+      AssignmentCreateEditPage.assignment_save_button.click
+      expect(f("body").text).to include "Invalid group selected"
     end
 
     it "clicking convert overrides button converts the override and refreshes the cards" do

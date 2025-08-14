@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
@@ -36,6 +35,7 @@ import {Pill} from '@instructure/ui-pill'
 import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import {addSearchHighlighting} from './searchHighlighting'
 import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -142,36 +142,40 @@ export default function ResultCard(props: ResultCardProps) {
   }
 
   return (
-    <Flex
-      key={`${props.result.content_id}-${props.result.content_type}`}
-      alignItems="start"
-      direction="column"
-      gap="space8"
-      justifyItems="space-between"
-      data-testid="search-result"
-    >
-      <Link href={html_url} target="_blank" key="result-link">
-        <Text
-          size="descriptionPage"
-          weight="weightImportant"
-          data-pendo={`smart-search-${props.resultType}-result`}
+    <List margin="none" itemSpacing="none" delimiter="none" isUnstyled={true}>
+      <List.Item>
+        <Flex
+          key={`${props.result.content_id}-${props.result.content_type}`}
+          alignItems="start"
+          direction="column"
+          gap="space8"
+          justifyItems="space-between"
+          data-testid="search-result"
         >
-          {title}
-        </Text>
-      </Link>
-      {renderPills(
-        `${props.result.content_id}-${props.result.content_type}`,
-        props.result.due_date ?? null,
-        props.result.published ?? null,
-      )}
-      <Text
-        key="result-body"
-        variant="content"
-        dangerouslySetInnerHTML={{
-          __html: addSearchHighlighting(props.searchTerm, htmlEscape(body)),
-        }}
-      />
-      {props.result.modules && renderModuleList(props.result.modules)}
-    </Flex>
+          <Link href={html_url} target="_blank" key="result-link">
+            <Text
+              size="descriptionPage"
+              weight="weightImportant"
+              data-pendo={`smart-search-${props.resultType}-result`}
+            >
+              {title}
+            </Text>
+          </Link>
+          {renderPills(
+            `${props.result.content_id}-${props.result.content_type}`,
+            props.result.due_date ?? null,
+            props.result.published ?? null,
+          )}
+          <Text
+            key="result-body"
+            variant="content"
+            dangerouslySetInnerHTML={{
+              __html: addSearchHighlighting(props.searchTerm, htmlEscape(body)),
+            }}
+          />
+          {props.result.modules && renderModuleList(props.result.modules)}
+        </Flex>
+      </List.Item>
+    </List>
   )
 }

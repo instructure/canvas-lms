@@ -309,6 +309,9 @@ export type SiteAdminFeatureId =
   | 'youtube_migration'
   | 'youtube_overlay'
   | 'hide_legacy_course_analytics'
+  | 'standardize_assignment_date_formatting'
+  | 'accessibility_tab_enable'
+  | 'scheduled_feedback_releases'
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES
  */
@@ -347,6 +350,7 @@ export type RootAccountFeatureId =
   | 'ams_service'
   | 'lti_apps_page_ai_translation'
   | 'open_tools_in_new_tab'
+  | 'restrict_student_access'
   | 'horizon_learner_app'
   | 'horizon_learning_provider_app_on_contextless_routes'
 

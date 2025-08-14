@@ -16,19 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ReactElement} from 'react'
+import {ReactElement, useState} from 'react'
 import {GroupedSelect} from '../GroupedSelect'
 import {blockData, blockFactory, BlockTypes} from './block-data'
+import {previewFactory} from '../BlockPreview'
+import {AddBlockModalBodyLayout} from './AddBlockModalBodyLayout'
 
 export const AddBlockModalBody = (props: {
   onBlockSelected: (block: ReactElement) => void
 }) => {
+  const [selectedItem, setSelectedItem] = useState<BlockTypes>(blockData[0].items[0].id)
+  const PreviewComponent = previewFactory[selectedItem]
+
   return (
-    <GroupedSelect
-      data={blockData}
-      onChange={(id: BlockTypes) => {
-        props.onBlockSelected(blockFactory[id]())
-      }}
+    <AddBlockModalBodyLayout
+      groupedSelect={
+        <GroupedSelect
+          data={blockData}
+          onChange={(id: BlockTypes) => {
+            setSelectedItem(id)
+            props.onBlockSelected(blockFactory[id]())
+          }}
+        />
+      }
+      preview={<PreviewComponent />}
     />
   )
 }

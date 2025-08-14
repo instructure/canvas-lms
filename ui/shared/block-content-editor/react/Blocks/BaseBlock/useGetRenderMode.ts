@@ -19,14 +19,21 @@
 import {useEditor} from '@craftjs/core'
 import {useBlockContext} from './BaseBlockContext'
 
+export type RenderMode = 'edit' | 'editPreview' | 'view'
+
 export const useGetRenderMode = () => {
-  const {
-    query: {getOptions},
-  } = useEditor()
-  const isViewMode = !getOptions().enabled
+  const {isViewMode} = useEditor(e => ({isViewMode: !e.options.enabled}))
   const {isEditMode} = useBlockContext()
+
+  let mode: RenderMode = isEditMode ? 'edit' : 'editPreview'
   if (isViewMode) {
-    return 'view'
+    mode = 'view'
   }
-  return isEditMode ? 'edit' : 'editPreview'
+
+  return {
+    mode,
+    isViewMode: mode === 'view',
+    isEditMode: mode === 'edit',
+    isEditPreviewMode: mode === 'editPreview',
+  }
 }

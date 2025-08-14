@@ -30,6 +30,7 @@ module Types
     field :discussion_topic_id, ID, null: false
     field :edited_at, Types::DateTimeType, null: true
     field :parent_id, ID, null: true
+    field :pinned_by, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :root_entry_id, ID, null: true
@@ -89,10 +90,7 @@ module Types
     def root_entry_page_number(per_page: 20)
       load_association(:discussion_topic).then do |topic|
         # we display deleted entries in discussions
-        sort_order = topic.discussion_topic_participants.where(user_id: current_user).first&.sort_order || DiscussionTopic::SortOrder::DEFAULT
-        if sort_order == DiscussionTopic::SortOrder::INHERIT
-          sort_order = topic.sanitized_sort_order || DiscussionTopic::SortOrder::DEFAULT
-        end
+        sort_order = topic.sort_order_for_user(current_user)
         topic_root_entries_ids = topic.discussion_entries.where(parent_id: nil).reorder("created_at #{sort_order}").map(&:id)
         entry_root_id = object.root_entry_id || object.id
         # we can have erroneous entries, if so at least we don't break
@@ -312,6 +310,11 @@ module Types
 
     def rich_content_attachment?
       !Api::Html::Content.collect_attachment_ids(object.message).empty?
+    end
+
+    field :pin_type, Types::DiscussionEntryPinningType, null: true
+    def pin_type
+      object.pin_type.to_s
     end
   end
 end

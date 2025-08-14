@@ -21,10 +21,17 @@ import {render, fireEvent, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import '@canvas/files/mockFilesENV'
 import ItemCog from '../ItemCog'
 import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
 import fakeENV from '@canvas/test-utils/fakeENV'
+
+// Mock globalUtils to prevent navigation errors in tests
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  assignLocation: jest.fn(),
+}))
 
 const readOnlyConfig = {
   download: true,
@@ -39,6 +46,14 @@ const manageFilesConfig = {
   editName: true,
   usageRights: true,
   move: true,
+  deleteLink: true,
+}
+
+const restrictFilesConfig = {
+  download: false,
+  editName: true,
+  usageRights: true,
+  move: false,
   deleteLink: true,
 }
 
@@ -246,6 +261,12 @@ describe('ItemCog', () => {
     // After deletion, focus should move to the name button
     nameButton.focus()
     expect(document.activeElement).toBe(nameButton)
+  })
+
+  it('restrict download & move buttons for users with restricted permission', () => {
+    window.ENV.FEATURES.restrict_student_access = true
+    render(<ItemCog {...sampleProps(true, true, true)} />, {container: fixtures})
+    expect(buttonsEnabled(restrictFilesConfig)).toBe(true)
   })
 
   describe('Send To menu item', () => {

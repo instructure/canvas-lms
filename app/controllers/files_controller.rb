@@ -177,6 +177,7 @@ class FilesController < ApplicationController
   before_action :check_limited_access_contexts, only: %i[index]
   before_action :check_limited_access_for_students, only: %i[api_index]
   before_action :forbid_api_calls_for_limited_access_students, only: :api_show
+  before_action :check_restricted_file_access_for_students, only: %i[show]
 
   def forbid_api_calls_for_limited_access_students
     if @current_user&.student_in_limited_access_account? && request.referer.nil?
@@ -252,7 +253,7 @@ class FilesController < ApplicationController
     rescue Canvas::Security::TokenExpired
       # maybe their browser is being stupid and came to the files domain directly with an old verifier - try to go back and get a new one
       return redirect_to_fallback_url if files_domain?
-    rescue Users::AccessVerifier::InvalidVerifier
+    rescue Users::AccessVerifier::InvalidVerifier, Users::AccessVerifier::JtiReused
       nil
     end
 
@@ -281,6 +282,7 @@ class FilesController < ApplicationController
       session["file_access_expiration"] = 1.hour.from_now.to_i
       session[:permissions_key] = SecureRandom.uuid
     end
+    @access_verifier = access_verifier if access_verifier.present? && Account.site_admin.feature_enabled?(:safe_files_jti)
     true
   end
   protected :check_file_access_flags
@@ -679,21 +681,8 @@ class FilesController < ApplicationController
         @attachment ||= attachment_or_replacement(@context, params[:id])
       end
 
-      if @attachment.inline_content? && params[:sf_verifier] && redirect_for_inline?(params[:sf_verifier])
-        # with cross-site cookie protections, we can't set the cookie on the files domain
-        # and we can't leave the sf_verifier in the url because of security issues (FOO-2918)
-        sf_token = {}
-        begin
-          # User files need a verifier to grant access anyway, so the token is redundant
-          if Account.site_admin.feature_enabled?(:safe_files_token) && !@context.is_a?(User)
-            validate_access_verifier
-            sf_token = SecureRandom.hex(16)
-            Rails.cache.write("sf_token:#{sf_token}", { full_path: @attachment.full_path, used: false }, expires_in: 5.minutes)
-          end
-        rescue Canvas::Security::TokenExpired, Users::AccessVerifier::InvalidVerifier
-          nil
-        end
-        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier).merge(sf_token:))
+      if !Account.site_admin.feature_enabled?(:safe_files_jti) && @attachment.inline_content? && params[:sf_verifier] && redirect_for_inline?(params[:sf_verifier])
+        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
 
       params[:download] ||= params[:preview]
@@ -907,10 +896,13 @@ class FilesController < ApplicationController
       Canvas::LiveEvents.asset_access(@attachment, "files", nil, nil) if @current_user.blank?
     end
 
+    options = {}
+    options[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
     render_or_redirect_to_stored_file(
       attachment:,
       verifier: params[:verifier],
-      inline:
+      inline:,
+      options:
     )
   end
   protected :send_stored_file
@@ -1352,6 +1344,8 @@ class FilesController < ApplicationController
     if authorized_action(@attachment, @current_user, :update)
       @context = @attachment.context
       if @context && params[:parent_folder_id]
+        return if check_restricted_file_access_and_return?
+
         folder = @context.folders.active.find(params[:parent_folder_id])
         if authorized_action(folder, @current_user, :update)
           @attachment.folder = folder
@@ -1650,7 +1644,8 @@ class FilesController < ApplicationController
     if !url || no_cache
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
-      url = authenticated_thumbnail_url(attachment, thumb_opts)
+      thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+      url = authenticated_thumbnail_url(attachment, options: thumb_opts)
       if url
         instfs = attachment.instfs_hosted?
         # only cache for half the time because of use_consistent_iat
@@ -1668,30 +1663,23 @@ class FilesController < ApplicationController
   def image_thumbnail_plain
     cancel_cache_buster
 
-    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
-
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    cache_key = ["thumbnail_url3", params[:id], params[:size], file_authenticator.fingerprint].cache_key
-    url, instfs = Rails.cache.read(cache_key)
-    if !url || no_cache
+    cache_key = ["attachment_user_auth", params[:id], file_authenticator.fingerprint].cache_key
+    authed, attachment = Rails.cache.read(cache_key)
+    unless attachment
       attachment = Attachment.active.find_by(id: params[:id]) if params[:id].present?
-      # We assume that if you can see/download the attachment, you can see/download the thumbnail
-      unless attachment && access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true)
-        redirect_to("/images/no_pic.gif")
-        return
-      end
-
-      thumb_opts = params.slice(:size)
-      url = authenticated_thumbnail_url(attachment, thumb_opts)
-      if url
-        instfs = attachment.instfs_hosted?
-        # only cache for half the time because of use_consistent_iat
-        Rails.cache.write(cache_key, [url, instfs], expires_in: (attachment.url_ttl / 2))
+      if attachment
+        # We assume that if you can see/download the attachment, you can see/download the thumbnail
+        authed = access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true)
+        Rails.cache.write(cache_key, [authed, attachment], expires_in: 5.minutes)
       end
     end
 
-    if url && instfs && file_location_mode?
+    thumb_opts = params.slice(:size)
+    thumb_opts[:fallback_url] = @access_verifier[:fallback_url] if @access_verifier
+    url = authenticated_thumbnail_url(attachment, options: thumb_opts) if attachment && authed
+    if url && attachment.instfs_hosted? && file_location_mode?
       render_file_location(url)
     else
       redirect_to(url || "/images/no_pic.gif")

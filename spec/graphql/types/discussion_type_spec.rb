@@ -1154,8 +1154,6 @@ describe Types::DiscussionType do
       @account = Account.create!
       @group = Group.create!(name: "Admin Group", context: @account)
       @group_student, @group_teacher = create_users(2, return_type: :record)
-      puts @group_teacher
-      puts "Hello"
       group.bulk_add_users_to_group([@group_teacher, @group_student])
 
       @group_topic = DiscussionTopic.create!(title: "Admin Group Topic", context: group, user: @group_teacher, editor: @group_teacher)
@@ -1163,7 +1161,6 @@ describe Types::DiscussionType do
     end
 
     it "returns the correct htmlUrl for" do
-      puts @group_topic
       discussion_type = GraphQLTypeTester.new(
         @group_topic,
         current_user: @group_teacher,
@@ -1175,6 +1172,72 @@ describe Types::DiscussionType do
       entries_url.each do |entry|
         expect(entry).to end_with("/groups/#{@group.id}/users/#{@group_student.id}")
       end
+    end
+  end
+
+  describe "assignedToDates field" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+      student_in_course(course: @course, active_all: true)
+    end
+
+    let(:graded_discussion) { DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion") }
+    let(:discussion_type) { GraphQLTypeTester.new(graded_discussion, current_user: @student) }
+
+    context "when standardize_assignment_date_formatting feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      it "returns nil" do
+        expect(discussion_type.resolve("assignedToDates { id }")).to be_nil
+      end
+    end
+
+    context "when standardize_assignment_date_formatting feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:standardize_assignment_date_formatting)
+      end
+
+      context "for graded discussions with assignments" do
+        it "returns standardized date hash" do
+          result = discussion_type.resolve("assignedToDates { id dueAt title base }")
+          expect(result).to be_an(Array)
+          expect(result.length).to eq(1)
+        end
+      end
+
+      context "for ungraded discussions" do
+        let(:ungraded_discussion) { @course.discussion_topics.create!(title: "Ungraded Discussion") }
+        let(:ungraded_discussion_type) { GraphQLTypeTester.new(ungraded_discussion, current_user: @student) }
+
+        it "returns nil for discussions without assignments" do
+          expect(ungraded_discussion_type.resolve("assignedToDates { id }")).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "pinned entries" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+    end
+
+    let(:discussion) { @course.discussion_topics.create!(title: "Topic with pinned entries") }
+    let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
+
+    it "return pinned entries" do
+      Account.site_admin.enable_feature!(:discussion_pin_post)
+      entry = discussion.discussion_entries.create!(message: "This is it", pinned_by: @teacher, pin_type: "reply")
+
+      expect(discussion_type.resolve("pinnedEntries { _id }")).to eq([entry.id.to_s])
+    end
+
+    it "return an empty array when the feature is disabled" do
+      Account.site_admin.disable_feature!(:discussion_pin_post)
+      discussion.discussion_entries.create!(message: "This is it", pinned_by: @teacher, pin_type: "reply")
+
+      expect(discussion_type.resolve("pinnedEntries { _id }")).to eq([])
     end
   end
 end

@@ -6817,6 +6817,39 @@ describe "Submissions API", type: :request do
       expect(response.headers["Link"]).to match(/rel="next"/)
     end
 
+    it "sorts students alphabetically when sort=name" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+      student_in_course(active_all: true, name: "Charlie Clark").user
+
+      json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=asc", @params.merge(sort: "name", order: "asc"))
+
+      display_names = json.map { |student| student["display_name"] }
+
+      expect(display_names).to start_with("Alice Anderson", "Bob Brown", "Charlie Clark")
+    end
+
+    it "sorts students in descending order when order=desc" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+
+      json = api_call_as_user(@teacher, :get, @path + "?sort=name&order=desc", @params.merge(sort: "name", order: "desc"))
+
+      display_names = json.map { |student| student["display_name"] }
+
+      expect(display_names.last(2)).to eq(["Bob Brown", "Alice Anderson"])
+    end
+
+    it "uses default sorting when no sort parameter is provided" do
+      student_in_course(active_all: true, name: "Alice Anderson").user
+      student_in_course(active_all: true, name: "Bob Brown").user
+
+      json_default = api_call_as_user(@teacher, :get, @path, @params)
+
+      student_ids = json_default.map { |s| s["id"] }
+      expect(student_ids).to eq(student_ids.sort)
+    end
+
     describe "include[]=provisional_grades" do
       before(:once) do
         @course.root_account.enable_service(:avatars)

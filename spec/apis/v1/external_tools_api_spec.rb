@@ -935,6 +935,7 @@ describe ExternalToolsController, type: :request do
     et.course_navigation = { :url => "http://www.example.com/ims/lti/course", :visibility => "admins", :text => "Course nav", "default" => "disabled" }
     et.account_navigation = { url: "http://www.example.com/ims/lti/account", text: "Account nav", custom_fields: { "key" => "value" } }
     et.ActivityAssetProcessor = { url: "http://www.example.com/ims/lti/resource", text: "assignment document processor", display_type: "full_width" }
+    et.ActivityAssetProcessorContribution = { url: "http://www.example.com/ims/lti/resource", text: "discussion document processor", display_type: "full_width" }
     et.analytics_hub = { url: "http://www.example.com/ims/lti/resource", text: "analytics hub", display_type: "full_width", visibility: "admins" }
     et.user_navigation = { url: "http://www.example.com/ims/lti/user", text: "User nav" }
     et.editor_button = { url: "http://www.example.com/ims/lti/editor", icon_url: "/images/delete.png", selection_width: 50, selection_height: 50, text: "editor button" }
@@ -1101,6 +1102,15 @@ describe ExternalToolsController, type: :request do
         "text" => "assignment document processor",
         "url" => "http://www.example.com/ims/lti/resource",
         "label" => "assignment document processor",
+        "display_type" => "full_width",
+        "selection_height" => 400,
+        "selection_width" => 800
+      },
+      "ActivityAssetProcessorContribution" => {
+        "enabled" => true,
+        "text" => "discussion document processor",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "label" => "discussion document processor",
         "display_type" => "full_width",
         "selection_height" => 400,
         "selection_width" => 800

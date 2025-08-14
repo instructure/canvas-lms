@@ -22,13 +22,16 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
-import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
 import {
   CompletionRequirement,
   ModuleProgression,
   ModuleStatistics,
   Prerequisite,
 } from '../utils/types'
+import ModuleItemListSmart from '../components/ModuleItemListSmart'
+import {STUDENT} from '../utils/constants'
+import {useShowAllState} from '../hooks/useShowAllState'
+import {useContextModule} from '../hooks/useModuleContext'
 
 export interface ModuleStudentProps {
   id: string
@@ -58,17 +61,19 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
-  const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
-
-  const moduleItems = data?.moduleItems || []
+  const [showAll, setShowAll] = useShowAllState(id)
+  const {modulesArePaginated} = useContextModule()
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
     setIsExpanded(newExpandedState)
-
     if (onToggleExpand) {
       onToggleExpand(moduleId)
     }
+  }
+
+  const handleToggleShowAll = () => {
+    setShowAll(prev => !prev)
   }
 
   useEffect(() => {
@@ -112,18 +117,28 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                   unlockAt={unlockAt}
                   submissionStatistics={submissionStatistics}
                   smallScreen={smallScreen}
+                  showAll={showAll}
+                  onToggleShowAll={handleToggleShowAll}
                 />
               </Flex.Item>
               {isExpanded && (
                 <Flex.Item>
-                  <ModuleItemListStudent
-                    moduleItems={moduleItems}
-                    requireSequentialProgress={requireSequentialProgress}
-                    completionRequirements={completionRequirements}
-                    progression={progression}
-                    isLoading={isLoading}
-                    error={error}
-                    smallScreen={smallScreen}
+                  <ModuleItemListSmart
+                    moduleId={id}
+                    view={STUDENT}
+                    isExpanded={isExpanded}
+                    isPaginated={modulesArePaginated && !showAll}
+                    renderList={({moduleItems, isEmpty, error}) => (
+                      <ModuleItemListStudent
+                        moduleItems={moduleItems}
+                        requireSequentialProgress={requireSequentialProgress}
+                        completionRequirements={completionRequirements}
+                        progression={progression}
+                        error={error}
+                        smallScreen={smallScreen}
+                        isEmpty={isEmpty}
+                      />
+                    )}
                   />
                 </Flex.Item>
               )}

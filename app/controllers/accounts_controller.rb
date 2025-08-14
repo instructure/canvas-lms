@@ -322,6 +322,7 @@ class AccountsController < ApplicationController
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
   EPORTFOLIO_MODERATION_PER_PAGE = 100
+  HORIZON_MAX_ACCOUNTS = 100
 
   # @API List accounts
   # A paginated list of accounts that the current user can view or manage.
@@ -663,7 +664,7 @@ class AccountsController < ApplicationController
   end
 
   # @API Get the manually-created courses sub-account for the domain root account
-  #
+  # Returns the sub-account that contains manually created courses for the domain root account.
   # @returns Account
   def manually_created_courses_account
     account = @domain_root_account.manually_created_courses_account
@@ -1051,7 +1052,14 @@ class AccountsController < ApplicationController
             K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font))
 
             enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
-            @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
+            unless enable_horizon.nil?
+              existing_account_ids = @account.root_account.settings[:horizon_account_ids] || []
+              if value_to_boolean(enable_horizon) && existing_account_ids.length + 1 > HORIZON_MAX_ACCOUNTS
+                @account.errors.add(:horizon_account, t("You cannot enable horizon_account on more than %{max_accounts} accounts", max_accounts: HORIZON_MAX_ACCOUNTS))
+              else
+                @account.horizon_account = value_to_boolean(enable_horizon)
+              end
+            end
 
             account_settings[:settings].slice!(*permitted_api_account_settings)
             account_settings[:settings][:password_policy] = policy_settings if policy_settings
@@ -1657,6 +1665,10 @@ class AccountsController < ApplicationController
     return render_unauthorized_action unless @account.grants_right?(@current_user, :manage_users_in_bulk)
 
     user_ids = params[:user_ids]
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     progress = Progress.create!(context: @context, user: @current_user, tag: :remove_users_from_account)
     process_params = {
       user_ids:
@@ -1689,6 +1701,11 @@ class AccountsController < ApplicationController
 
     allowed_attributes = [:event] # currently only used for suspend/unsuspend
     user_ids = params[:user_ids]
+
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     user_params = (params[:user] || {}).permit(*allowed_attributes).to_h
     progress = Progress.create!(context: @context, user: @current_user, tag: :update_multiple_users)
     process_params = {

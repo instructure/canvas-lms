@@ -80,6 +80,12 @@ module Factories
     @enrollment
   end
 
+  def course_with_test_student(opts = {})
+    course_with_user("StudentViewEnrollment", opts)
+    @test_student = @user
+    @enrollment
+  end
+
   def course_with_student(opts = {})
     course_with_user("StudentEnrollment", opts)
     @student = @user

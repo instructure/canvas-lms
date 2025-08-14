@@ -889,17 +889,22 @@ describe('RubricForm Tests', () => {
       jest.resetAllMocks()
     })
 
-    it('only renders text inputs for an assessed rubric', () => {
+    it('renders appropriate info alert when rubric is assessed', () => {
       const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, unassessed: false}
       queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
 
-      const {getByTestId, queryByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
-      expect(getByTestId('rubric-form-title')).toHaveValue('Rubric 1')
-      // expect(queryByTestId('rubric-hide-points-select')).toBeNull()
-      expect(queryByTestId('rubric-rating-order-select')).toBeNull()
-      expect(queryByTestId('add-criterion-button')).toBeNull()
-      expect(queryAllByTestId('rubric-criteria-row-delete-button')).toHaveLength(0)
-      expect(queryAllByTestId('rubric-criteria-row-duplicate-button')).toHaveLength(0)
+      const {queryByTestId} = renderComponent({rubricId: '1'})
+      expect(queryByTestId('rubric-limited-edit-mode-alert')).toBeInTheDocument()
+    })
+  })
+
+  describe('cannot update rubric', () => {
+    it('renders appropriate info alert when rubric is assessed', () => {
+      const rubricQueryResponse = {...RUBRICS_QUERY_RESPONSE, canUpdateRubric: false}
+      queryClient.setQueryData(['fetch-rubric', '1'], rubricQueryResponse)
+
+      const {queryByTestId} = renderComponent({rubricId: '1'})
+      expect(queryByTestId('rubric-cannot-update-alert')).toBeInTheDocument()
     })
   })
 

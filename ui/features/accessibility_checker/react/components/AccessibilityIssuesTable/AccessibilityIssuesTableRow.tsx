@@ -24,7 +24,7 @@ import {Link} from '@instructure/ui-link'
 import {Table, TableCellProps} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
-import {ContentItem} from '../../types'
+import {AccessibilityResourceScan, ResourceWorkflowState} from '../../types'
 import {ContentTypeCell} from './ContentTypeCell'
 import {IssueCell} from './IssueCell'
 
@@ -35,14 +35,14 @@ const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme =
 })
 
 type Props = {
-  item: ContentItem
+  item: AccessibilityResourceScan
   // Could be renamed to onIssueRemediationClick for clarity
-  onRowClick?: (item: ContentItem) => void
+  onRowClick?: (item: AccessibilityResourceScan) => void
 }
 
 export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
   const handleRowClick = useCallback(
-    (item: ContentItem) => {
+    (item: AccessibilityResourceScan) => {
       if (onRowClick) {
         onRowClick(item)
       }
@@ -51,10 +51,10 @@ export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
   )
 
   return (
-    <Table.Row key={`${item.type}-${item.id}`} data-testid={`issue-row-${item.id}`}>
+    <Table.Row key={`${item.resourceType}-${item.id}`} data-testid={`issue-row-${item.id}`}>
       <Table.Cell themeOverride={baseCellThemeOverride} textAlign="start">
-        <Link href={item.url}>
-          <Text lineHeight="lineHeight150">{item.title}</Text>
+        <Link href={item.resourceUrl}>
+          <Text lineHeight="lineHeight150">{item.resourceName}</Text>
         </Link>
       </Table.Cell>
       <Table.Cell textAlign="center">
@@ -65,7 +65,7 @@ export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
       </Table.Cell>
       <Table.Cell>
         <Flex alignItems="center">
-          {item.published ? (
+          {item.resourceWorkflowState === ResourceWorkflowState.Published ? (
             <>
               <Flex.Item margin="0 x-small 0 0">
                 <IconPublishSolid color="success" />
@@ -88,12 +88,12 @@ export const AccessibilityIssuesTableRow = ({item, onRowClick}: Props) => {
       </Table.Cell>
       <Table.Cell themeOverride={baseCellThemeOverride}>
         <Text lineHeight="lineHeight150">
-          {item.updatedAt
+          {item.resourceUpdatedAt
             ? new Intl.DateTimeFormat('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: '2-digit',
-              }).format(new Date(item.updatedAt))
+              }).format(new Date(item.resourceUpdatedAt))
             : '-'}
         </Text>
       </Table.Cell>

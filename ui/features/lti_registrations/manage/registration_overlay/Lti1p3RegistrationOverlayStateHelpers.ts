@@ -157,6 +157,7 @@ export const convertToLtiConfigurationOverlay = (
           : state.icons.placements[placement as LtiPlacementWithIcon],
       default:
         courseNavDefaultValue === internalPlacement?.default ? undefined : courseNavDefaultValue,
+      eula: internalPlacement?.eula,
     })
     return {
       ...acc,

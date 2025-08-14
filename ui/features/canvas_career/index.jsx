@@ -32,10 +32,13 @@ const I18n = createI18nScope('canvascareer')
 ready(() => {
   const body = document.querySelector('body')
   const mountPoint = document.createElement('div')
+  const fixed_bottom = document.querySelector('#fixed_bottom')
 
   mountPoint.id = 'canvascareer'
-  mountPoint.style.height = '100vh'
-  mountPoint.style.width = '100vw'
+  mountPoint.style.height = fixed_bottom
+    ? `calc(100vh - ${fixed_bottom.offsetHeight + 5}px)`
+    : '100vh'
+  mountPoint.style.width = '100%'
   mountPoint.style.position = 'relative'
 
   // Modifying the DOM to add the mount point
@@ -43,6 +46,7 @@ ready(() => {
   body.style.lineHeight = 'normal'
   body.style.margin = '0'
   body.style.padding = '0'
+  body.style.overflow = 'hidden'
 
   const root = createRoot(mountPoint)
   root.render(

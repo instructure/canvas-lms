@@ -26,6 +26,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssignedDatesInterface
 
     alias_method :assignment, :object
 
@@ -353,7 +354,9 @@ module Types
     end
     field :muted, Boolean, null: true
 
-    field :assignment_visibility, [ID], null: true
+    field :assignment_visibility, [ID], null: true do
+      description "Returns empty array if visible to everyone"
+    end
     def assignment_visibility
       return unless object.course.grants_any_right?(current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
@@ -369,7 +372,7 @@ module Types
 
     field :rubric, RubricType, null: true
     def rubric
-      load_association(:rubric)
+      assignment.active_rubric_association? ? load_association(:rubric) : nil
     end
 
     field :rubric_association, RubricAssociationType, null: true
@@ -559,6 +562,9 @@ module Types
           Boolean,
           "specifies all other variables that can determine visiblity.",
           null: false
+    def visible_to_everyone
+      Loaders::DatesOverridableLoader.for.load(assignment).then(&:visible_to_everyone)
+    end
 
     field :assignment_overrides, AssignmentOverrideType.connection_type, null: true
     def assignment_overrides
@@ -566,7 +572,9 @@ module Types
       # overrides... there's also the totally different method found in
       # assignment_overrides_json. they may not return the same results?
       # ¯\_(ツ)_/¯
-      AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
+      Loaders::DatesOverridableLoader.for.load(assignment).then do |preloaded_assignment|
+        AssignmentOverrideApplicator.overrides_for_assignment_and_user(preloaded_assignment, current_user)
+      end
     end
 
     field :has_group_category,

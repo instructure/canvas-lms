@@ -277,4 +277,68 @@ describe AssessmentRequest do
       expect(user_ids).to include @submission_student.id
     end
   end
+
+  describe "peer_review_sub_assignment association" do
+    let(:peer_review_sub_assignment) do
+      PeerReviewSubAssignment.create!(
+        title: "Peer Review Sub Assignment",
+        context: @course,
+        parent_assignment: @assignment
+      )
+    end
+
+    def assign_peer_review_sub_assignment
+      @request.peer_review_sub_assignment = peer_review_sub_assignment
+      @request.save!
+    end
+
+    it "can be created without a peer_review_sub_assignment" do
+      expect(@request.peer_review_sub_assignment).to be_nil
+      expect(@request).to be_valid
+    end
+
+    it "can be associated with a peer_review_sub_assignment" do
+      assign_peer_review_sub_assignment
+
+      expect(@request.peer_review_sub_assignment).to eq(peer_review_sub_assignment)
+      expect(@request.peer_review_sub_assignment_id).to eq(peer_review_sub_assignment.id)
+    end
+
+    it "allows peer_review_sub_assignment to be nil" do
+      assign_peer_review_sub_assignment
+
+      @request.peer_review_sub_assignment = nil
+      @request.save!
+
+      expect(@request.peer_review_sub_assignment).to be_nil
+      expect(@request.peer_review_sub_assignment_id).to be_nil
+    end
+
+    it "does not delete the peer_review_sub_assignment when assessment_request is deleted" do
+      assign_peer_review_sub_assignment
+
+      @request.destroy
+
+      expect { peer_review_sub_assignment.reload }.not_to raise_error
+    end
+
+    it "can query assessment_requests by peer_review_sub_assignment" do
+      assign_peer_review_sub_assignment
+
+      other_request = AssessmentRequest.create!(
+        user: @submission_student,
+        asset: @assignment.find_or_create_submission(@submission_student),
+        assessor_asset: @assignment.find_or_create_submission(@review_student),
+        assessor: @review_student
+      )
+
+      requests_with_sub_assignment = AssessmentRequest.where(peer_review_sub_assignment:)
+      requests_without_sub_assignment = AssessmentRequest.where(peer_review_sub_assignment: nil)
+
+      expect(requests_with_sub_assignment).to include(@request)
+      expect(requests_with_sub_assignment).not_to include(other_request)
+      expect(requests_without_sub_assignment).to include(other_request)
+      expect(requests_without_sub_assignment).not_to include(@request)
+    end
+  end
 end

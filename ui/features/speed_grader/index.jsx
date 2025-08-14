@@ -70,7 +70,10 @@ ready(() => {
         lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
         ltiIframeAllowances: iframeAllowances(),
         pendo,
-        permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
+        permissions: {
+          canViewAuditTrail: window.ENV.can_view_audit_trail ?? false,
+          canManageGrades: window.ENV.MANAGE_GRADES ?? false,
+        },
         gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
         gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
       },
@@ -92,6 +95,8 @@ ready(() => {
           window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
         discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
         multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
+        ltiAssetProcessor: window.ENV.FEATURES.lti_asset_processor ?? false,
+        commentBankPerAssignmentEnabled: window.ENV.COMMENT_BANK_PER_ASSIGNMENT_ENABLED ?? false,
       },
     }
   }

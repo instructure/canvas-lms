@@ -1161,7 +1161,9 @@ class Lti::RegistrationsController < ApplicationController
       config = params.require(:lti_configuration).to_unsafe_h
     else
       begin
-        result = CanvasHttp.get(params.require(:url))
+        result = InstrumentTLSCiphers.without_tls_metrics do
+          CanvasHttp.get(params.require(:url))
+        end
 
         unless result.is_a?(Net::HTTPSuccess)
           return render_configuration_errors(["invalid configuration url"])

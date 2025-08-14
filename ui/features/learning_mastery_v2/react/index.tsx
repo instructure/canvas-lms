@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,6 +31,7 @@ import {Toolbar} from './components/toolbar/Toolbar'
 import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {DEFAULT_GRADEBOOK_SETTINGS, DisplayFilter, GradebookSettings} from './utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -47,6 +48,9 @@ interface LearningMasteryProps {
 const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   const contextValues = getLMGBContext() as LMGBContextType
   const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
+  const [gradebookSettings, setGradebookSettings] = useState<GradebookSettings>(
+    DEFAULT_GRADEBOOK_SETTINGS,
+  )
 
   const {
     isLoading,
@@ -70,16 +74,28 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
 
   setSearchParams(currentPage, studentsPerPage, sorting)
 
-  const onGradebookFilterChange = (filterItem: string) => {
+  const addGradebookFilter = (filterItem: string) => {
     const filters = new Set(gradebookFilters)
-
-    if (filters.has(filterItem)) {
-      filters.delete(filterItem)
-    } else {
-      filters.add(filterItem)
-    }
-
+    if (filters.has(filterItem)) return
+    filters.add(filterItem)
     setGradebookFilters(Array.from(filters))
+  }
+
+  const removeGradebookFilter = (filterItem: string) => {
+    const filters = new Set(gradebookFilters)
+    if (!filters.has(filterItem)) return
+    filters.delete(filterItem)
+    setGradebookFilters(Array.from(filters))
+  }
+
+  const handleGradebookSettingsChange = (settings: GradebookSettings) => {
+    setGradebookSettings(settings)
+
+    if (settings.displayFilters.includes(DisplayFilter.SHOW_STUDENTS_WITH_NO_RESULTS)) {
+      removeGradebookFilter('missing_user_rollups')
+    } else {
+      addGradebookFilter('missing_user_rollups')
+    }
   }
 
   const renderBody = () => {
@@ -99,11 +115,10 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         outcomes={outcomes}
         students={students}
         rollups={rollups}
-        gradebookFilters={gradebookFilters}
-        gradebookFilterHandler={onGradebookFilterChange}
         pagination={pagination}
         setCurrentPage={setCurrentPage}
         sorting={sorting}
+        gradebookSettings={gradebookSettings}
         data-testid="gradebook-body"
       />
     )
@@ -116,6 +131,8 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         contextURL={contextURL}
         gradebookFilters={gradebookFilters}
         showDataDependentControls={error === null}
+        gradebookSettings={gradebookSettings}
+        setGradebookSettings={handleGradebookSettingsChange}
       />
       <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
       {renderBody()}

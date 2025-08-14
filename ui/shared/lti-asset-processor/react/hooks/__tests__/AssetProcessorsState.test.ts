@@ -17,10 +17,10 @@
  */
 
 import {renderHook, act} from '@testing-library/react-hooks'
-import {useAssetProcessorsState} from '../AssetProcessorsState'
+import {useAssetProcessorsState, ContentItemType} from '../AssetProcessorsState'
 import {
   mockExistingAttachedAssetProcessor,
-  mockTools,
+  mockToolsForAssignment,
 } from '../../__tests__/assetProcessorsTestHelpers'
 import {AssetProcessorContentItem} from '@canvas/deep-linking/models/AssetProcessorContentItem'
 import {ContentItem} from '@canvas/deep-linking/models/ContentItem'
@@ -42,7 +42,9 @@ describe('useAssetProcessorsState', () => {
   })
 
   afterEach(() => {
-    useAssetProcessorsState.setState({attachedProcessors: []})
+    useAssetProcessorsState.setState({
+      attachedProcessors: [],
+    })
   })
 
   const validContentItem: AssetProcessorContentItem = {
@@ -67,8 +69,9 @@ describe('useAssetProcessorsState', () => {
 
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: [validContentItem]},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -77,12 +80,12 @@ describe('useAssetProcessorsState', () => {
 
       expect(processor.title).toBe('Test Processor')
       expect(processor.text).toBe('Test description')
-      expect(processor.toolName).toBe(mockTools[0].name)
-      expect(processor.toolId).toBe(mockTools[0].definition_id)
+      expect(processor.toolName).toBe(mockToolsForAssignment[0].name)
+      expect(processor.toolId).toBe(mockToolsForAssignment[0].definition_id)
       expect(processor.iconOrToolIconUrl).toBe('https://example.com/icon.png')
       expect(processor.dto).toEqual({
         new_content_item: expect.objectContaining({
-          context_external_tool_id: mockTools[0].definition_id,
+          context_external_tool_id: mockToolsForAssignment[0].definition_id,
           title: 'Test Processor',
           text: 'Test description',
           url: 'https://example.com/processor',
@@ -116,7 +119,11 @@ describe('useAssetProcessorsState', () => {
       const deepLinkResponse = {content_items: [contentItemWithExtraFields]}
 
       act(() => {
-        result.current.addAttachedProcessors({tool: mockTools[0], data: deepLinkResponse})
+        result.current.addAttachedProcessors({
+          tool: mockToolsForAssignment[0],
+          data: deepLinkResponse,
+          type: 'ActivityAssetProcessor',
+        })
       })
 
       expect(result.current.attachedProcessors).toHaveLength(1)
@@ -183,8 +190,9 @@ describe('useAssetProcessorsState', () => {
 
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: [contentItemWithNestedExtras]},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -239,8 +247,9 @@ describe('useAssetProcessorsState', () => {
 
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: mixedContentItems},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -273,8 +282,9 @@ describe('useAssetProcessorsState', () => {
       let error: unknown = null
       try {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: invalidContentItems as any},
+          type: 'ActivityAssetProcessor',
         })
       } catch (e) {
         error = e
@@ -293,8 +303,9 @@ describe('useAssetProcessorsState', () => {
       } as const
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: [firstContentItem]},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -309,8 +320,9 @@ describe('useAssetProcessorsState', () => {
 
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: [secondContentItem]},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -325,7 +337,7 @@ describe('useAssetProcessorsState', () => {
     })
   })
 
-  describe('deleteAttachedProcessor', () => {
+  describe('removeAttachedProcessor', () => {
     it('should delete processor at specified index after confirmation', async () => {
       const {result} = renderHook(() => useAssetProcessorsState())
 
@@ -338,8 +350,9 @@ describe('useAssetProcessorsState', () => {
 
       act(() => {
         result.current.addAttachedProcessors({
-          tool: mockTools[0],
+          tool: mockToolsForAssignment[0],
           data: {content_items: contentItems},
+          type: 'ActivityAssetProcessor',
         })
       })
 
@@ -347,7 +360,7 @@ describe('useAssetProcessorsState', () => {
 
       // Delete the middle processor
       await act(async () => {
-        await result.current.deleteAttachedProcessor(1)
+        await result.current.removeAttachedProcessor(1)
       })
 
       expect(result.current.attachedProcessors).toHaveLength(2)
@@ -378,6 +391,66 @@ describe('useAssetProcessorsState', () => {
       expect(first.iconOrToolIconUrl).toBe('http://instructure.com/icon.png')
       expect(first.iframe).toEqual({width: 600, height: 500})
       expect(first.dto).toEqual({existing_id: 1})
+    })
+
+    describe('content item type filtering', () => {
+      it('filters content items for LtiAssetProcessorContribution type', () => {
+        const {result} = renderHook(() => useAssetProcessorsState())
+
+        const assetProcessorItem: AssetProcessorContentItem = {
+          type: 'ltiAssetProcessor',
+          title: 'Asset Processor 1',
+          url: 'https://example.com/processor1',
+        }
+
+        const assetProcessorContributionItem: AssetProcessorContentItem = {
+          type: 'ltiAssetProcessorContribution',
+          title: 'Asset Processor Contribution 1',
+          url: 'https://example.com/processor-contribution1',
+        }
+
+        const contentItems = [assetProcessorItem, assetProcessorContributionItem]
+
+        act(() => {
+          result.current.addAttachedProcessors({
+            tool: mockToolsForAssignment[0],
+            data: {content_items: contentItems},
+            type: 'ActivityAssetProcessorContribution',
+          })
+        })
+
+        expect(result.current.attachedProcessors).toHaveLength(1)
+        expect(result.current.attachedProcessors[0].title).toBe('Asset Processor Contribution 1')
+      })
+
+      it('filters content items for LtiAssetProcessor type', () => {
+        const {result} = renderHook(() => useAssetProcessorsState())
+
+        const assetProcessorItem: AssetProcessorContentItem = {
+          type: 'ltiAssetProcessor',
+          title: 'Asset Processor 1',
+          url: 'https://example.com/processor1',
+        }
+
+        const assetProcessorContributionItem: AssetProcessorContentItem = {
+          type: 'ltiAssetProcessorContribution',
+          title: 'Asset Processor Contribution 1',
+          url: 'https://example.com/processor-contribution1',
+        }
+
+        const contentItems = [assetProcessorItem, assetProcessorContributionItem]
+
+        act(() => {
+          result.current.addAttachedProcessors({
+            tool: mockToolsForAssignment[0],
+            data: {content_items: contentItems},
+            type: 'ActivityAssetProcessor',
+          })
+        })
+
+        expect(result.current.attachedProcessors).toHaveLength(1)
+        expect(result.current.attachedProcessors[0].title).toBe('Asset Processor 1')
+      })
     })
   })
 })

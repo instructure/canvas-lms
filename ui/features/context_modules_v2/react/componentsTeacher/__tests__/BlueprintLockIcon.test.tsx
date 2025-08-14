@@ -17,14 +17,22 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import BlueprintLockIcon, {LOCK_ICON_CLASS} from '../BlueprintLockIcon'
+import {render, screen, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import BlueprintLockIcon from '../BlueprintLockIcon'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
-const setUpMasterCourse = (initialLockState: boolean = false) => {
+const server = setupServer()
+
+const setUpMasterCourse = (initialLockState: boolean = false, courseId: string = '1') => {
   return render(
-    <ContextModuleProvider {...contextModuleDefaultProps} isMasterCourse={true}>
-      <BlueprintLockIcon initialLockState={initialLockState} contentId="" contentType="" />
+    <ContextModuleProvider {...contextModuleDefaultProps} courseId={courseId} isMasterCourse={true}>
+      <BlueprintLockIcon
+        initialLockState={initialLockState}
+        contentId="1"
+        contentType="assignment"
+      />
     </ContextModuleProvider>,
   )
 }
@@ -32,28 +40,82 @@ const setUpMasterCourse = (initialLockState: boolean = false) => {
 const setUpChildCourse = (initialLockState: boolean = false) => {
   return render(
     <ContextModuleProvider {...contextModuleDefaultProps} isChildCourse={true}>
-      <BlueprintLockIcon initialLockState={initialLockState} contentId="" contentType="" />
+      <BlueprintLockIcon
+        initialLockState={initialLockState}
+        contentId="1"
+        contentType="assignment"
+      />
     </ContextModuleProvider>,
   )
 }
 
 describe('BlueprintLockIcon', () => {
   describe('Master Course', () => {
+    beforeAll(() => {
+      server.use(
+        http.post(
+          '/api/v1/courses/:courseId/blueprint_templates/default/restrict_item',
+          ({params}) => {
+            const {courseId} = params
+            if (courseId === '2') {
+              return new HttpResponse(null, {status: 500})
+            }
+            return HttpResponse.json({success: true})
+          },
+        ),
+      )
+      server.listen()
+    })
+
+    afterAll(() => {
+      server.resetHandlers()
+      server.close()
+    })
+
     it('renders', () => {
       const container = setUpMasterCourse()
       expect(container.container).toBeInTheDocument()
     })
 
-    it('renders unlock icon', () => {
-      const container = setUpMasterCourse()
-      expect(container.getByTestId(LOCK_ICON_CLASS.unlocked)).toBeInTheDocument()
-      expect(container.queryByTestId(LOCK_ICON_CLASS.locked)).toBeNull()
+    it('renders unlock button', () => {
+      const {container, getAllByText} = setUpMasterCourse()
+      // screenreader label and tooltip content
+      expect(getAllByText('Unlocked. Click to lock.')).toHaveLength(2)
+      expect(container.querySelector('[aria-pressed="false"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprintLock"]')).not.toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprint"]')).toBeInTheDocument()
     })
 
     it('renders lock icon', () => {
-      const container = setUpMasterCourse(true)
-      expect(container.getByTestId(LOCK_ICON_CLASS.locked)).toBeInTheDocument()
-      expect(container.queryByTestId(LOCK_ICON_CLASS.unlocked)).toBeNull()
+      const {container, getAllByText} = setUpMasterCourse(true)
+      // screenreader label and tooltip content
+      expect(getAllByText('Locked. Click to unlock.')).toHaveLength(2)
+      expect(container.querySelector('[aria-pressed="true"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprintLock"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprint"]')).not.toBeInTheDocument()
+    })
+
+    it('calls the restrict_item api on clicking', async () => {
+      const {container} = setUpMasterCourse()
+      expect(container.querySelector('svg[name="IconBlueprint"]')).toBeInTheDocument()
+      const button = container.querySelector('button')
+      expect(button).toBeInTheDocument()
+      button?.click()
+      await waitFor(() => {
+        expect(container.querySelector('svg[name="IconBlueprintLock"]')).toBeInTheDocument()
+      })
+    })
+
+    it('shows a flash error message when the api fails', async () => {
+      const {container} = setUpMasterCourse(false, '2')
+      expect(container.querySelector('svg[name="IconBlueprint"]')).toBeInTheDocument()
+      const button = container.querySelector('button')
+      expect(button).toBeInTheDocument()
+      button?.click()
+      await waitFor(() => {
+        expect(screen.getAllByText('An error occurred locking item')).toHaveLength(2)
+      })
+      expect(container.querySelector('svg[name="IconBlueprint"]')).toBeInTheDocument()
     })
   })
 
@@ -63,16 +125,18 @@ describe('BlueprintLockIcon', () => {
       expect(container.container).toBeInTheDocument()
     })
 
-    it('render disabled unlock icon', () => {
-      const container = setUpChildCourse()
-      expect(container.queryByTestId(LOCK_ICON_CLASS.unlocked)).toBeInTheDocument()
-      expect(container.queryByTestId(LOCK_ICON_CLASS.unlocked)).toHaveClass('disabled')
+    it('render unlocked icon', () => {
+      const {container, getByText} = setUpChildCourse()
+
+      expect(container.querySelector('svg[name="IconBlueprintLock"]')).not.toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprint"]')).toBeInTheDocument()
     })
 
-    it('render disabled lock icon', () => {
-      const container = setUpChildCourse(true)
-      expect(container.queryByTestId(LOCK_ICON_CLASS.locked)).toBeInTheDocument()
-      expect(container.queryByTestId(LOCK_ICON_CLASS.locked)).toHaveClass('disabled')
+    it('render lock icon', () => {
+      const {container, getByText} = setUpChildCourse(true)
+
+      expect(container.querySelector('svg[name="IconBlueprintLock"]')).toBeInTheDocument()
+      expect(container.querySelector('svg[name="IconBlueprint"]')).not.toBeInTheDocument()
     })
   })
 })

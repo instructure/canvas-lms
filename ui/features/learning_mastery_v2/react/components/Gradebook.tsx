@@ -28,6 +28,9 @@ import {
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   CELL_HEIGHT,
+  GradebookSettings,
+  DEFAULT_GRADEBOOK_SETTINGS,
+  DisplayFilter,
 } from '../utils/constants'
 import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
 import {GradebookPagination} from './pagination/GradebookPagination'
@@ -38,11 +41,10 @@ export interface GradebookProps {
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
-  gradebookFilters: string[]
-  gradebookFilterHandler: (filter: string) => void
   pagination?: PaginationType
   setCurrentPage: (page: number) => void
   sorting: Sorting
+  gradebookSettings?: GradebookSettings
 }
 
 export const Gradebook: React.FC<GradebookProps> = ({
@@ -53,6 +55,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
   pagination,
   setCurrentPage,
   sorting,
+  gradebookSettings = DEFAULT_GRADEBOOK_SETTINGS,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -114,7 +117,14 @@ export const Gradebook: React.FC<GradebookProps> = ({
               height={CELL_HEIGHT}
               width={STUDENT_COLUMN_WIDTH}
             >
-              <StudentCell courseId={courseId} student={student} />
+              <StudentCell
+                courseId={courseId}
+                student={student}
+                secondaryInfoDisplay={gradebookSettings.secondaryInfoDisplay}
+                showStudentAvatar={gradebookSettings.displayFilters.includes(
+                  DisplayFilter.SHOW_STUDENT_AVATARS,
+                )}
+              />
             </View>
           ))}
         </View>

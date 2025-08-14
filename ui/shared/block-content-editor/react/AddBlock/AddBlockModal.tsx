@@ -22,9 +22,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {AddBlockModalBody} from './AddBlockModalBody'
-import {ReactElement, useState} from 'react'
+import React, {ReactElement, useState, useRef} from 'react'
 
-const I18n = createI18nScope('page_editor')
+const I18n = createI18nScope('block_content_editor')
 
 export const AddBlockModal = (props: {
   open: boolean
@@ -32,6 +32,7 @@ export const AddBlockModal = (props: {
   onAddBlock: (block: ReactElement) => void
 }) => {
   const [selectedBlock, setSelectedBlock] = useState<ReactElement>()
+  const closeButtonRef = useRef<Element | null>(null)
 
   return (
     <Modal
@@ -39,6 +40,8 @@ export const AddBlockModal = (props: {
       size="large"
       open={props.open}
       onDismiss={props.onDismiss}
+      defaultFocusElement={() => closeButtonRef.current}
+      data-testid="add-block-modal"
     >
       <Modal.Header>
         <Flex justifyItems="space-between">
@@ -64,6 +67,7 @@ export const AddBlockModal = (props: {
               props.onAddBlock(selectedBlock!)
               props.onDismiss()
             }}
+            data-testid="add-modal-add-to-page-button"
           >
             {I18n.t('Add to page')}
           </Button>

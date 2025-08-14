@@ -54,6 +54,10 @@ export interface Student {
   id: string | number
   name: string
   display_name: string
+  sortable_name: string
+  sis_id?: string
+  integration_id?: string
+  login_id?: string
   avatar_url?: string
   status?: string
 }

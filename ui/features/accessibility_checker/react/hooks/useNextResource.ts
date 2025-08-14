@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {defaultNextResource, NextResource} from '../stores/AccessibilityCheckerStore'
-import {AccessibilityData, ContentItem} from '../types'
-import {TypeToKeyMap} from '../constants'
+import {defaultNextResource, NextResource} from '../stores/AccessibilityScansStore'
+import {AccessibilityIssue, AccessibilityResourceScan} from '../types'
 
 export const useNextResource = () => {
-  const getNextResource = (items: ContentItem[], currentItem: ContentItem) => {
+  const getNextResource = (
+    items: AccessibilityResourceScan[],
+    currentItem: AccessibilityResourceScan,
+  ) => {
     if (!Array.isArray(items)) {
       return null
     }
 
     const nextResource: NextResource = defaultNextResource
     const currentIndex = items.findIndex(
-      item => item.id === currentItem?.id && item.type === currentItem.type,
+      item => item.id === currentItem?.id && item.resourceType === currentItem.resourceType,
     )
 
     if (currentIndex === -1) {
@@ -38,29 +40,40 @@ export const useNextResource = () => {
     const itemsAfter = items.slice(currentIndex + 1)
     const orderedItems = itemsAfter.concat(itemsBefore)
 
-    nextResource.item = orderedItems.find(item => item.count > 0)
+    nextResource.item = orderedItems.find(item => item.issueCount > 0)
     nextResource.index = items.findIndex(
-      item => item.id === nextResource.item?.id && item.type === nextResource.item.type,
+      item =>
+        item.id === nextResource.item?.id && item.resourceType === nextResource.item.resourceType,
     )
 
     return nextResource
   }
 
-  const updateCountPropertyForItem = (items: ContentItem[], item: ContentItem) => {
+  const updateCountPropertyForItem = (
+    items: AccessibilityResourceScan[],
+    item: AccessibilityResourceScan,
+  ) => {
     return items.map(currentItem => {
-      if (currentItem.id === item.id && currentItem.type === item.type) {
+      if (currentItem.id === item.id && currentItem.resourceType === item.resourceType) {
         return {...currentItem, count: 0}
       }
       return currentItem
     })
   }
 
-  const getAccessibilityIssuesByItem = (issues: AccessibilityData, item: ContentItem) => {
-    const typeKey = TypeToKeyMap[item.type]
-    const contentNextItem = issues?.[typeKey]?.[item.id]
-      ? structuredClone(issues[typeKey]?.[item.id])
-      : undefined
-    return contentNextItem?.issues || []
+  const getAccessibilityIssuesByItem = (
+    items: AccessibilityResourceScan[],
+    item: AccessibilityResourceScan,
+  ): AccessibilityIssue[] => {
+    const foundScan = items.find(
+      currentItem => currentItem.id === item.id && currentItem.resourceType === item.resourceType,
+    )
+    return foundScan?.issues ?? []
   }
-  return {getNextResource, updateCountPropertyForItem, getAccessibilityIssuesByItem}
+
+  return {
+    getNextResource,
+    updateCountPropertyForItem,
+    getAccessibilityIssuesByItem,
+  }
 }

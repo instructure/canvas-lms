@@ -1626,7 +1626,6 @@ describe OutcomeResultsController do
 
       context "enabled" do
         before do
-          Account.site_admin.enable_feature!(:outcomes_friendly_description)
           @course.root_account.enable_feature!(:improved_outcomes_management)
         end
 
@@ -1651,7 +1650,6 @@ describe OutcomeResultsController do
 
       context "outcomes_friendly_description enabled, but improved_outcomes_management disabled" do
         before do
-          Account.site_admin.enable_feature!(:outcomes_friendly_description)
           @course.root_account.disable_feature!(:improved_outcomes_management)
         end
 
@@ -2049,14 +2047,6 @@ describe OutcomeResultsController do
               get_rollups(sort_by: "student", sort_order: "desc")
               json = parse_response(response)
               expect_user_order(json["rollups"], [@student2])
-            end
-          end
-
-          context "with the .limit_section_visibility_in_lmgb FF disabled" do
-            it "returns students in all sections" do
-              get_rollups(sort_by: "student", sort_order: "desc")
-              json = parse_response(response)
-              expect_user_order(json["rollups"], [@student3, @student2, @student1])
             end
           end
         end

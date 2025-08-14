@@ -27,6 +27,10 @@ class Mutations::DeleteConversationMessages < Mutations::BaseMutation
   field :conversation_message_ids, [ID], null: false
 
   def resolve(input:)
+    if current_user.account.root_account.feature_enabled?(:restrict_student_access)
+      raise GraphQL::ExecutionError, "Insufficient permissions"
+    end
+
     messages = ConversationMessage.preload(:conversation).find(input[:ids])
     if messages.map(&:conversation).uniq.length > 1
       raise GraphQL::ExecutionError, "All ConversationMessages must exist within the same Conversation"

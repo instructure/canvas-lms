@@ -20,47 +20,32 @@
 module Accessibility
   class Issue
     class HtmlFixer
-      include ActiveModel::Model
       include ::Accessibility::NokogiriMethods
 
-      CONTENT_ATTRIBUTE_MAP = {
-        "Page" => "body",
-        "Assignment" => "description"
-      }.freeze
+      attr_accessor :resource, :path, :value, :rule
 
-      attr_accessor :raw_rule, :content_type, :content_id, :path, :value, :rule, :record, :issue
-
-      validates :raw_rule, :content_type, :content_id, :path, presence: true
-      validates :content_type, inclusion: { in: CONTENT_ATTRIBUTE_MAP.keys }
-      validate :rule_must_exist
-      validate :record_must_exist
-
-      def initialize(rule, content_type, content_id, path, value, issue)
-        @issue        = issue
-        @raw_rule     = rule
-        @content_type = content_type
-        @content_id   = content_id
+      def initialize(rule_id, resource, path, value)
+        @resource     = resource
         @path         = path
         @value        = value
-        @rule         = Rule.registry[@raw_rule]
-        @record       = find_record
+        @rule         = Rule.registry[rule_id]
       end
 
       def apply_fix!
-        body = record.send(target_attribute)
-        fixed_content, _, error = fix_content(body, rule, path, value)
+        html_content = resource.send(target_attribute)
+        fixed_content, _, error = fix_content(html_content, rule, path, value)
         if error.nil?
-          record.send("#{target_attribute}=", fixed_content)
-          record.save!
+          resource.send("#{target_attribute}=", fixed_content)
+          resource.save!
           { json: { success: true }, status: :ok }
         else
           { json: { error: }, status: :bad_request }
         end
       end
 
-      def fix_preview
-        body = record.send(target_attribute)
-        fixed_content, fixed_path, error = fix_content(body, rule, path, value)
+      def preview_fix
+        html_content = resource.send(target_attribute)
+        fixed_content, fixed_path, error = fix_content(html_content, rule, path, value)
         if error.nil?
           { json: { content: fixed_content, path: fixed_path }, status: :ok }
         else
@@ -69,32 +54,38 @@ module Accessibility
       end
 
       def generate_fix
-        body = record.send(target_attribute)
-        doc = Nokogiri::HTML5.fragment(body, nil, **CanvasSanitize::SANITIZE[:parser_options])
-        issue.extend_nokogiri_with_dom_adapter(doc)
+        html_content = resource.send(target_attribute)
+        doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        extend_nokogiri_with_dom_adapter(doc)
 
         begin
           element = doc.at_xpath(path)
           if element
-            { json: { value: rule.generate_fix(element) }, status: :ok }
+            generated_value = rule.generate_fix(element)
+            if generated_value.nil?
+              { json: { error: I18n.t("Unsupported issue type") }, status: :bad_request }
+            else
+              { json: { value: generated_value }, status: :ok }
+            end
           else
-            { json: { error: "Element not found for path: #{path}" }, status: :bad_request }
+            Rails.logger.error("Element not found for path: #{path} (rule #{rule.id})")
+            { json: { error: "Invalid issue placement" }, status: :bad_request }
           end
         rescue => e
           Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
           Rails.logger.error e.backtrace.join("\n")
-          { json: { error: e.message }, status: :bad_request }
+          { json: { error: "Internal Error" }, status: :internal_server_error }
         end
       end
 
       private
 
-      def fix_content(html_content, rule, target_element, fix_value)
+      def fix_content(html_content, rule, path, fix_value)
         doc = Nokogiri::HTML5.fragment(html_content, nil, **CanvasSanitize::SANITIZE[:parser_options])
-        issue.extend_nokogiri_with_dom_adapter(doc)
+        extend_nokogiri_with_dom_adapter(doc)
 
         begin
-          element = doc.at_xpath(target_element)
+          element = doc.at_xpath(path)
           if element
             changed = rule.fix!(element, fix_value)
             error = nil
@@ -103,7 +94,7 @@ module Accessibility
             end
             [doc.to_html, element_path(element), error]
           else
-            raise "Element not found for path: #{target_element}"
+            raise "Element not found for path: #{path}"
           end
         rescue => e
           Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
@@ -113,23 +104,13 @@ module Accessibility
       end
 
       def target_attribute
-        CONTENT_ATTRIBUTE_MAP[content_type]
-      end
-
-      def rule_must_exist
-        errors.add(:raw_rule, "is invalid") if raw_rule.present? && rule.nil?
-      end
-
-      def record_must_exist
-        errors.add(:content_id, "#{content_type} with ID #{content_id} not found") unless record.present?
-      end
-
-      def find_record
-        case content_type
-        when "Page"
-          issue.context.wiki_pages.find_by(id: content_id)
-        when "Assignment"
-          issue.context.assignments.find_by(id: content_id)
+        case resource
+        when WikiPage
+          :body
+        when Assignment
+          :description
+        else
+          raise ArgumentError, "Unsupported resource type: #{resource.class.name}"
         end
       end
     end

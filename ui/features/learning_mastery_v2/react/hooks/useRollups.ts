@@ -160,9 +160,9 @@ export default function useRollups({
         })
       } catch (e) {
         if (e instanceof axios.AxiosError) {
-          setError((e as any)?.message || 'Error loading rollups')
+          setError((e as any)?.message || I18n.t('Error loading rollups'))
         } else {
-          setError('Error loading rollups')
+          setError(I18n.t('Error loading rollups'))
         }
       } finally {
         setIsLoading(false)
