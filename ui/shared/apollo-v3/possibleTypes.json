@@ -33,6 +33,7 @@
     "Account",
     "AccountDomain",
     "AccountDomainLookup",
+    "AllocationRule",
     "AssessmentRequest",
     "Assignment",
     "AssignmentGroup",
@@ -114,6 +115,7 @@
   ],
   "Node": [
     "Account",
+    "AllocationRule",
     "Assignment",
     "AssignmentGroup",
     "CommentBankItem",
@@ -181,6 +183,7 @@
   "Timestamped": [
     "AccountDomain",
     "AccountDomainLookup",
+    "AllocationRule",
     "AssessmentRequest",
     "Assignment",
     "AssignmentGroup",

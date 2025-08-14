@@ -34,6 +34,7 @@ class AllocationRule < ApplicationRecord
 
   after_initialize :set_defaults
 
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :for_user_in_course, lambda { |user_id, course_id|
     where(course_id:)
       .where(
