@@ -23,7 +23,11 @@ const esModules = ['chai', 'mime', 'react-dnd', 'dnd-core', '@react-dnd', 'graph
   '|',
 )
 
-const baseSetupFilesAfterEnv = ['<rootDir>/jest/stubInstUi.js', '@testing-library/jest-dom']
+const baseSetupFilesAfterEnv = [
+  '<rootDir>/jest/stubInstUi.js',
+  '<rootDir>/jest/jest-after-env-setup.js',
+  '@testing-library/jest-dom',
+]
 const setupFilesAfterEnv = process.env.LOG_PLAYGROUND_URL_ON_FAILURE
   ? baseSetupFilesAfterEnv.concat(['<rootDir>/jest/logPlaygroundURLOnFailure.js'])
   : baseSetupFilesAfterEnv
