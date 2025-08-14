@@ -959,7 +959,8 @@ class ContextModule < ActiveRecord::Base
         existing_progression = ContextModuleProgression.find_by(user:, context_module: self)
         return existing_progression if existing_progression
 
-        if context.enrollments.except(:preload).where(user_id: user).exists?
+        # Create progression for enrolled users or admins
+        if context.enrollments.except(:preload).where(user_id: user).exists? || grants_right?(user, :read_as_admin)
           ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
       end

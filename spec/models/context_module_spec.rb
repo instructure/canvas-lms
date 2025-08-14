@@ -1871,6 +1871,16 @@ describe ContextModule do
       user = User.create!
       expect(cm.find_or_create_progression(user)).to be_nil
     end
+
+    it "creates progressions for admin users" do
+      course = Course.create!
+      cm = course.context_modules.create!
+      admin = account_admin_user(account: course.account)
+      progression = cm.find_or_create_progression(admin)
+      expect(progression).not_to be_nil
+      expect(progression.user_id).to eq(admin.id)
+      expect(progression.context_module_id).to eq(cm.id)
+    end
   end
 
   describe "restore" do
