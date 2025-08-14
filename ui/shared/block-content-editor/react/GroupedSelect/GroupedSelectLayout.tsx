@@ -27,10 +27,10 @@ export const GroupedSelectLayout = (props: {
 }) => {
   return (
     <Flex alignItems="start" gap="medium" onKeyDown={props.onKeyDown} onBlur={props.onBlur}>
-      <Flex.Item direction="column" size="200px">
+      <Flex.Item direction="column" size="200px" data-testid="grouped-select-groups">
         {props.groups}
       </Flex.Item>
-      <Flex.Item direction="column" shouldGrow>
+      <Flex.Item direction="column" shouldGrow data-testid="grouped-select-items">
         {props.items}
       </Flex.Item>
     </Flex>

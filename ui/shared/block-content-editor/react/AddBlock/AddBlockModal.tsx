@@ -41,6 +41,7 @@ export const AddBlockModal = (props: {
       open={props.open}
       onDismiss={props.onDismiss}
       defaultFocusElement={() => closeButtonRef.current}
+      data-testid="add-block-modal"
     >
       <Modal.Header>
         <Flex justifyItems="space-between">
@@ -66,6 +67,7 @@ export const AddBlockModal = (props: {
               props.onAddBlock(selectedBlock!)
               props.onDismiss()
             }}
+            data-testid="add-modal-add-to-page-button"
           >
             {I18n.t('Add to page')}
           </Button>
