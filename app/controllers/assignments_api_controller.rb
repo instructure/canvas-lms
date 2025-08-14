@@ -1151,11 +1151,13 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"|"peer_review"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
   #   For "score_statistics" to be included, the "submission" option must also be set.
+  #   The "peer_review" option requires that the Peer Review Allocation and Grading
+  #   course feature be turned on.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
@@ -1198,6 +1200,7 @@ class AssignmentsApiController < ApplicationController
         include_webhook_info: included_params.include?("webhook_info"),
         include_ab_guid: included_params.include?("ab_guid"),
         include_checkpoints: included_params.include?("checkpoints"),
+        include_peer_review: included_params.include?("peer_review"),
       }
 
       result_json = if use_quiz_json?

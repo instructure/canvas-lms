@@ -6877,6 +6877,127 @@ describe AssignmentsApiController, type: :request do
         expect(json["ab_guid"]).to eq([])
       end
     end
+
+    context "peer_review_sub_assignment serialization" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @assignment = @course.assignments.create!(
+          title: "Assignment with Peer Reviews",
+          peer_reviews: true,
+          points_possible: 100
+        )
+      end
+
+      context "when include_peer_review is false" do
+        it "does not include peer_review_sub_assignment in JSON" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          PeerReviewSubAssignment.create!(
+            title: "Peer Review Sub Assignment",
+            context: @course,
+            parent_assignment: @assignment,
+            points_possible: 50
+          )
+
+          result = assignment_json(@assignment, @teacher, {}, { include_peer_review: false })
+
+          expect(result).not_to have_key("peer_review_sub_assignment")
+        end
+      end
+
+      context "when include_peer_review is not provided" do
+        it "does not include peer_review_sub_assignment" do
+          @course.enable_feature!(:peer_review_allocation_and_grading)
+          PeerReviewSubAssignment.create!(
+            title: "Peer Review Sub Assignment",
+            context: @course,
+            parent_assignment: @assignment,
+            points_possible: 50
+          )
+
+          result = assignment_json(@assignment, @teacher, {}, {})
+
+          expect(result).not_to have_key("peer_review_sub_assignment")
+        end
+      end
+
+      context "when include_peer_review is true" do
+        context "when feature flag is disabled" do
+          before do
+            @course.disable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          it "does not include peer_review_sub_assignment in JSON" do
+            result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+            expect(result).not_to have_key("peer_review_sub_assignment")
+          end
+        end
+
+        context "when feature flag is enabled" do
+          before do
+            @course.enable_feature!(:peer_review_allocation_and_grading)
+          end
+
+          context "when peer review sub assignment exists" do
+            before do
+              @peer_review_sub = PeerReviewSubAssignment.create!(
+                title: "Peer Review Sub Assignment",
+                context: @course,
+                parent_assignment: @assignment,
+                points_possible: 50,
+                grading_type: "points",
+                due_at: 1.week.from_now,
+                unlock_at: 1.day.from_now,
+                lock_at: 2.weeks.from_now
+              )
+            end
+
+            it "includes peer_review_sub_assignment in JSON" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              expect(result).to have_key("peer_review_sub_assignment")
+              expect(result["peer_review_sub_assignment"]).to be_a(Hash)
+            end
+
+            it "serializes peer review sub assignment with correct attributes" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              peer_review_data = result["peer_review_sub_assignment"]
+              expect(peer_review_data["name"]).to eq("Peer Review Sub Assignment")
+              expect(peer_review_data["points_possible"]).to eq(50)
+              expect(peer_review_data["grading_type"]).to eq("points")
+              expect(peer_review_data["id"]).to eq(@peer_review_sub.id)
+              expect(peer_review_data["course_id"]).to eq(@course.id)
+            end
+
+            it "includes dates when present" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              peer_review_data = result["peer_review_sub_assignment"]
+              expect(peer_review_data["due_at"]).to be_present
+              expect(peer_review_data["unlock_at"]).to be_present
+              expect(peer_review_data["lock_at"]).to be_present
+            end
+
+            it "does not include recursive peer_review_sub_assignment in the serialized peer review sub assignment" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              peer_review_data = result["peer_review_sub_assignment"]
+              expect(peer_review_data).not_to have_key("peer_review_sub_assignment")
+            end
+          end
+
+          context "when peer review sub assignment does not exist" do
+            it "includes peer_review_sub_assignment as nil in JSON" do
+              result = assignment_json(@assignment, @teacher, {}, { include_peer_review: true })
+
+              expect(result).to have_key("peer_review_sub_assignment")
+              expect(result["peer_review_sub_assignment"]).to be_nil
+            end
+          end
+        end
+      end
+    end
   end
 
   context "update_from_params" do
