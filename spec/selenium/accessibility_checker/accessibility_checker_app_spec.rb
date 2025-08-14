@@ -21,7 +21,7 @@ require_relative "page_objects/accessibility_pages"
 require_relative "page_objects/accessibility_dashboard"
 require_relative "page_objects/accessibility_drawer"
 
-describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakiness, these specs will be updated in future PSs", type: :selenium do
+describe "Accessibility Checker App UI", type: :selenium do
   include_context "in-process server selenium tests"
   include AccessibilityPages
   include AccessibilityDrawer
@@ -35,7 +35,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
     let(:scan_with_issues) do
       accessibility_resource_scan_model(
         course: @course,
-        wiki_page:,
+        context: wiki_page,
         workflow_state: "completed",
         resource_updated_at: "2025-07-19T02:18:00Z",
         resource_name: "Tutorial",
@@ -130,7 +130,7 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
       context "form type: text input with checkbox" do
         context "page violates img alt rule" do
           before do
-            # wiki_page.update(body: img_alt_rule_html, user: @teacher)
+            wiki_page.update(body: img_alt_rule_html)
             accessibility_issue_model(
               course: @course,
               wiki_page:,
@@ -140,7 +140,9 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
               metadata: {
                 element: "img",
                 form: {
-                  type: "checkbox_text_input"
+                  type: "checkbox_text_input",
+                  checkbox_label: "This image is decorative",
+                  label: "Alt text",
                 },
               }
             )
@@ -180,7 +182,8 @@ describe "Accessibility Checker App UI", skip: "skipping for now to avoid flakin
             metadata: {
               element: "table",
               form: {
-                type: "textinput"
+                type: "textinput",
+                label: "Table caption"
               },
             }
           )
