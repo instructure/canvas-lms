@@ -171,7 +171,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   }
 
   return (
-    <Flex gap="xx-small" padding="0 0 0 xx-small" wrap="wrap">
+    <Flex gap="xx-small" padding="xx-small" wrap="wrap">
       {sections.map((section, index) => (
         <React.Fragment key={index}>
           {section}
