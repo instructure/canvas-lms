@@ -81,6 +81,8 @@ export const blockFactory = {
         includeBlockTitle: true,
         backgroundColor: defaultBackgroundColor,
         textColor: colors.ui.textDescription,
+        arrangement: 'left',
+        textToImageRatio: '1:1',
       }}
     />
   ),

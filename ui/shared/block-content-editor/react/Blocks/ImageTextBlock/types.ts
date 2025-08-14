@@ -20,11 +20,15 @@ import {ImageData} from '../BlockItems/Image/types'
 import {TextData} from '../BlockItems/Text/types'
 import {TitleData} from '../BlockItems/Title/types'
 
+export type ArrangementOption = 'left' | 'right'
+export type TextToImageRatioOption = '1:1' | '2:1'
 export type ImageTextSettings = {
   settings: {
     includeBlockTitle: boolean
     backgroundColor: string
     textColor: string
+    arrangement: ArrangementOption
+    textToImageRatio: TextToImageRatioOption
   }
 }
 export type ImageTextData = TextData & ImageData
