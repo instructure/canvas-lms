@@ -58,6 +58,10 @@ module Modules2IndexPage
     "button[aria-label='Expand All Modules']"
   end
 
+  def empty_state_module_creation_button_selector
+    "//button[.//span[text()='Create a new Module']]"
+  end
+
   def get_student_views_assignment(course_id, assignment_id)
     get "/courses/#{course_id}/assignments/#{assignment_id}"
   end
@@ -338,6 +342,10 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
   end
 
+  def context_module_prerequisites_selector(module_id)
+    "#{context_module_selector(module_id)} [data-testid='module-header-prerequisites']"
+  end
+
   def move_item_tray_selector
     "[data-testid='manage-module-content-tray']"
   end
@@ -369,6 +377,10 @@ module Modules2IndexPage
 
   def collapse_all_modules_button
     f(collapse_all_modules_button_selector)
+  end
+
+  def empty_state_module_creation_button
+    fxpath(empty_state_module_creation_button_selector)
   end
 
   def copy_button
@@ -517,6 +529,10 @@ module Modules2IndexPage
 
   def module_item_title_links
     ff(module_item_title_link_selector)
+  end
+
+  def context_module_prerequisites(module_id)
+    f(context_module_prerequisites_selector(module_id))
   end
 
   def module_item_url_icon(module_item_id)
