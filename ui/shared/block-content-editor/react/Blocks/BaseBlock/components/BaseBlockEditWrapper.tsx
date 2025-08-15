@@ -22,6 +22,7 @@ import {AddButton} from '../../../AddBlock/AddButton'
 import {useBlockContentEditorContext} from '../../../BlockContentEditorContext'
 import {useDeleteNode} from '../../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../../hooks/useDuplicateNode'
+import {useMoveBlock} from '../../../hooks/useMoveBlock'
 import {BaseBlockLayout} from '../layout/BaseBlockLayout'
 import {useSetEditMode} from '../useSetEditMode'
 import {CopyButton} from './CopyButton'
@@ -56,10 +57,12 @@ const EditSettingsButton = () => {
 }
 
 const MoveBlockButton = () => {
+  const {canMoveUp, canMoveDown} = useMoveBlock()
+
   return (
     <MoveButton
-      canMoveUp={true}
-      canMoveDown={true}
+      canMoveUp={canMoveUp}
+      canMoveDown={canMoveDown}
       onMoveUp={() => {}}
       onMoveDown={() => {}}
       onMoveToTop={() => {}}
