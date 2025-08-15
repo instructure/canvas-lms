@@ -28,6 +28,7 @@ import {CopyButton} from './CopyButton'
 import {EditButton} from './EditButton'
 import {RemoveButton} from './RemoveButton'
 import {ApplyButton} from './ApplyButton'
+import {MoveButton} from './MoveButton'
 import {BackgroundColorApplier} from './BackgroundColorApplier'
 import {Flex} from '@instructure/ui-flex'
 
@@ -52,6 +53,19 @@ const EditSettingsButton = () => {
   const {id} = useNode()
 
   return <EditButton onClicked={() => settingsTray.open(id)} />
+}
+
+const MoveBlockButton = () => {
+  return (
+    <MoveButton
+      canMoveUp={true}
+      canMoveDown={true}
+      onMoveUp={() => {}}
+      onMoveDown={() => {}}
+      onMoveToTop={() => {}}
+      onMoveToBottom={() => {}}
+    />
+  )
 }
 
 export const BaseBlockEditWrapper = (
@@ -81,6 +95,7 @@ export const BaseBlockEditWrapper = (
             <DuplicateButton key="menu-duplicate-button" />
             <EditSettingsButton key="menu-edit-settings-button" />
             <DeleteButton key="menu-delete-button" />
+            <MoveBlockButton key="menu-move-block-button" />
           </Flex>
         }
       >
