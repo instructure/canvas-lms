@@ -37,6 +37,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
   const [content, setContent] = useState(props.content)
   const [url, setUrl] = useState(props.url)
   const [altText, setAltText] = useState(props.altText)
+  const [fileName, setFileName] = useState(props.fileName)
 
   useEffect(() => {
     if (isEditPreviewMode) {
@@ -45,9 +46,29 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
         content,
         url,
         altText,
+        fileName,
       })
     }
-  }, [altText, content, isEditPreviewMode, save, title, url])
+  }, [altText, content, fileName, isEditPreviewMode, save, title, url])
+
+  useEffect(() => {
+    setUrl(props.settings.url)
+  }, [props.settings.url])
+
+  useEffect(() => {
+    setAltText(props.settings.altText)
+  }, [props.settings.altText])
+
+  useEffect(() => {
+    setFileName(props.settings.fileName)
+  }, [props.settings.fileName])
+
+  useEffect(() => {
+    if (url || altText || fileName) {
+      save({settings: {...props.settings, url, altText, fileName}})
+    }
+    // NOTE: props.settings is excluded for prevent infinity loop
+  }, [altText, fileName, save, url])
 
   const onTitleChange = (newTitle: string) => setTitle(newTitle)
   const onContentChange = (newContent: string) => setContent(newContent)
@@ -55,6 +76,7 @@ const ImageTextContent = (props: ImageTextBlockProps) => {
   const onImageChange = (imageData: ImageData) => {
     setUrl(imageData.url)
     setAltText(imageData.altText)
+    setFileName(imageData.fileName)
   }
 
   const dataProps = {
@@ -91,6 +113,7 @@ export const ImageTextBlock = (props: ImageTextBlockProps) => {
         content: props.content,
         url: props.url,
         altText: props.altText,
+        fileName: props.fileName,
       }}
     >
       <ImageTextContent {...props} />

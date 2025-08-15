@@ -19,11 +19,18 @@
 import getRCSProps from '@canvas/rce/getRCSProps'
 import {UploadFile} from '@instructure/canvas-rce'
 import {useState} from 'react'
-import {handleImageSubmit, panels, StoreProp, UploadData, UploadFilePanelIds} from './handle-image'
+import {
+  handleImageSubmit,
+  loadFileMetaData,
+  panels,
+  StoreProp,
+  UploadData,
+  UploadFilePanelIds,
+} from './handle-image'
 
 export const ImageBlockUploadModal = (props: {
   open: boolean
-  onSelected: (url: string, alt: string, fileName: string) => void
+  onSelected: (url: string, alt: string, fileName?: string) => void
   onDismiss: () => void
 }) => {
   const [isUploading, setIsUploading] = useState(false)
@@ -36,7 +43,12 @@ export const ImageBlockUploadModal = (props: {
     storeProps: StoreProp,
   ) => {
     setIsUploading(true)
-    const {url, altText, fileName} = await handleImageSubmit(selectedPanel, uploadData, storeProps)
+    const {url, altText} = await handleImageSubmit(selectedPanel, uploadData, storeProps)
+    let fileName = undefined
+    if (selectedPanel !== 'URL') {
+      const metaData = await loadFileMetaData(url)
+      fileName = metaData?.attachment.display_name
+    }
     setIsUploading(false)
     props.onSelected(url, altText, fileName)
   }

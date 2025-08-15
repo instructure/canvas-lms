@@ -77,6 +77,7 @@ export const blockFactory = {
     <ImageTextBlock
       url=""
       altText=""
+      fileName=""
       title=""
       content=""
       settings={{

@@ -31,11 +31,12 @@ export const ImageEdit = ({onImageChange, url, altText}: ImageEditProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
-  const onSelected = (url: string, altText: string) => {
+  const onSelected = (url: string, altText: string, fileName?: string) => {
     closeModal()
     onImageChange({
       url,
       altText,
+      fileName,
     })
   }
 

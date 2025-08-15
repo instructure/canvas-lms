@@ -17,10 +17,12 @@
  */
 
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export type UploadData = {
   theFile: File
   fileUrl: string
+  fileName: string
   usageRights: {
     usageRight: string
     ccLicense: string
@@ -74,7 +76,7 @@ export const handleImageSubmit = async (
 ) => {
   const altText = getAltText(uploadData)
   const url = await getUrl(selectedPanel, uploadData, storeProps)
-  return {url, altText, fileName: uploadData.theFile.name}
+  return {url, altText}
 }
 
 const getAltText = (uploadData: UploadData) => {
@@ -100,4 +102,13 @@ const getUrl = async (
       throw new Error('Selected Panel is invalid')
     }
   }
+}
+
+export const loadFileMetaData = async (url: string) => {
+  const cleanUrl = url.endsWith('/preview') ? url.slice(0, -8) : url
+  const {json} = await doFetchApi<{attachment: {display_name: string}}>({
+    path: cleanUrl,
+    method: 'GET',
+  })
+  return json
 }
