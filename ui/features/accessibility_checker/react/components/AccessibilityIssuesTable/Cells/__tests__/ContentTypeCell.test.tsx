@@ -19,7 +19,7 @@
 import {render, screen} from '@testing-library/react'
 
 import {ContentTypeCell} from '../ContentTypeCell'
-import {AccessibilityResourceScan, ResourceType} from '../../../types'
+import {AccessibilityResourceScan, ResourceType} from '../../../../types'
 
 describe('ContentTypeCell', () => {
   it('renders "Page"', () => {
