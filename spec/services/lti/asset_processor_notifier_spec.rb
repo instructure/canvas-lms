@@ -171,5 +171,28 @@ describe Lti::AssetProcessorNotifier do
         expect(asset[:size]).to eq("Hello world".bytesize)
       end
     end
+
+    it "filters notifications by tool_id when provided" do
+      tool2 = new_valid_external_tool(course)
+      lti_asset_processor_model(tool:, assignment:)
+      lti_asset_processor_model(tool: tool2, assignment:)
+
+      received_notifications = []
+      allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+        received_notifications << payload
+      end
+      allow(Rails.application.routes.url_helpers).to receive(:lti_asset_processor_asset_show_url).and_return("http://example.com")
+
+      submission = assignment.submit_homework(student, attachments: [attachment])
+
+      # initial submit notifies both tools
+      expect(received_notifications.size).to eq(2)
+
+      # resubmit filtered to tool2 only
+      Lti::AssetProcessorNotifier.notify_asset_processors(submission, nil, tool2.id)
+
+      expect(received_notifications.size).to eq(3)
+      expect(received_notifications.last[:cet_id_or_ids]).to eq(tool2.id)
+    end
   end
 end
