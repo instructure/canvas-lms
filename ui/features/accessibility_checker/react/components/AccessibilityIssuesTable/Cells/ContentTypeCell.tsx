@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {AccessibilityResourceScan, ResourceType} from '../../types'
+import {AccessibilityResourceScan, ResourceType} from '../../../types'
 
 interface ContentTypeCellProps {
   item: AccessibilityResourceScan
