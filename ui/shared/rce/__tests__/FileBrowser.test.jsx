@@ -83,6 +83,11 @@ const server = setupServer(
   // Default handlers for folder contents
   http.get('/api/v1/folders/:folderId/folders', () => HttpResponse.json([])),
   http.get('/api/v1/folders/:folderId/files', () => HttpResponse.json([])),
+  // Default handlers for upload endpoints to prevent MSW warnings
+  http.options('http://example.com/upload', () => new HttpResponse(null, {status: 200})),
+  http.post('http://example.com/upload', () =>
+    HttpResponse.json({id: '123', display_name: 'test.png'}),
+  ),
 )
 
 // rewrite using testing-library
