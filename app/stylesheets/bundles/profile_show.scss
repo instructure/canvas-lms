@@ -30,8 +30,10 @@
     display: none !important;
   }
 }
+
 .profile .image-block {
   flex-direction: column;
+
   @include breakpoint(desktop) {
     flex-direction: row;
   }
@@ -85,6 +87,7 @@
     padding: 0;
     border: 0;
   }
+
   legend {
     margin: 0;
     @include fontSize(14px);
@@ -95,6 +98,7 @@
     display: block;
     width: 100%;
   }
+
   #login_information {
     margin-top: 20px;
   }
@@ -105,14 +109,17 @@
     max-width: 28.75rem;
     margin-top: 0.625rem;
   }
+
   textarea.ic-Input {
     height: 11.25rem;
   }
+
   .profile_links {
     .ic-Input {
       max-width: inherit;
       margin-top: 0.375rem;
     }
+
     button {
       margin-top: 0.875rem;
     }
@@ -140,18 +147,23 @@
   flex-direction: column;
   flex: 1;
 }
+
 .profileDetails {
   margin-top: 0;
 }
+
 .profileEnrollment__Items {
   padding: $ic-sp*0.5 0;
 }
+
 .profileLink {
   margin: 0;
 }
+
 .profileLink__Item {
   list-style: none;
   line-height: 2.0;
+
   & a {
     padding-#{direction(left)}: $ic-sp*0.5;
   }
@@ -168,6 +180,7 @@
 .ic-Profile-layout__Primary,
 .ic-Layout-contentMain {
   text-align: direction(left);
+
   .header-block {
     display: flex;
     flex-direction: column;
@@ -175,41 +188,51 @@
     align-items: flex-start;
     gap: 24px;
     margin-bottom: 24px;
+
     @include breakpoint(desktop) {
       flex-direction: row;
     }
+
     .account-info-block {
       display: flex;
       flex-direction: column;
       align-items: start;
       gap: 16px;
+
       @include breakpoint(desktop) {
         flex-direction: row;
         align-items: end;
       }
+
       .account-text-info {
         display: flex;
         flex-direction: column;
         align-items: flex-start;
+
         .user-data-name {
           font-weight: 700;
           font-size: 1.75rem;
+
           @include breakpoint(desktop) {
             font-size: 2.375rem;
           }
         }
+
         .user-data-main-info {
           display: flex;
           flex-direction: row;
+
           span:first-child {
             &:after {
               content: "|";
               margin: 0 3px;
+
               @include mobile-only {
                 content: none;
               }
             }
           }
+
           @include mobile-only {
             flex-direction: column;
           }
@@ -223,6 +246,7 @@
         align-items: center;
         width: 200px;
         height: 200px;
+
         .avatar {
           border: none;
         }
@@ -234,18 +258,23 @@
       flex-direction: row;
       gap: 12px;
       text-align: direction(right);
+
       @include mobile-only {
         flex-direction: column;
         width: 100%;
       }
+
       button {
         height: fit-content;
       }
+
       @include breakpoint(desktop) {
         flex-direction: row-reverse;
       }
+
       form {
         margin: 0;
+
         button {
           @include mobile-only {
             width: 100%;
@@ -253,14 +282,17 @@
         }
       }
     }
+
     &.legacy {
       flex-direction: row;
       align-items: normal;
       margin-bottom: 0;
+
       .account-info-block {
         flex: 1;
         align-items: normal;
       }
+
       .button-area-block {
         @include breakpoint(desktop) {
           flex-direction: row;
@@ -268,27 +300,35 @@
       }
     }
   }
+
   .content-block {
     width: 100%;
+
     @include breakpoint(desktop) {
       flex: 3;
     }
+
     .profileHeader {
       padding: direction-sides($ic-sp 0 0 0);
       line-height: 1.25;
     }
+
     .profile-tip {
       @include fontSize(14px);
     }
+
     .stats {
       text-align: direction(left);
       width: 100%;
+
       tr {
         border-bottom: 1px solid #dfdfdf;
       }
+
       .stats-header {
         border-bottom: 1px solid $borderColor;
       }
+
       td {
         text-align: direction(right);
         color: var(--ic-link-color);
@@ -305,10 +345,12 @@
       list-style-type: none;
       margin: 0;
       padding: 0;
+
       li {
         float: direction(left);
         margin-#{direction(right)}: 10px;
         text-align: center;
+
         .social {
           width: 30px;
           height: 30px;
@@ -320,6 +362,7 @@
 
     .message {
       background-position: 0 0;
+
       &:hover {
         background-position: 0 -32px;
       }
@@ -327,6 +370,7 @@
 
     .google_docs {
       background-position: -296px 0;
+
       &:hover {
         background-position: -296px -32px;
       }
@@ -334,6 +378,7 @@
 
     .twitter {
       background-position: -34px 0;
+
       &:hover {
         background-position: -34px -32px;
       }
@@ -341,15 +386,9 @@
 
     .diigo {
       background-position: -160px 0;
+
       &:hover {
         background-position: -160px -32px;
-      }
-    }
-
-    .skype {
-      background-position: -193px 0;
-      &:hover {
-        background-position: -193px -32px;
       }
     }
   }

@@ -39,11 +39,6 @@ module AccountServices
                                       description: "",
                                       expose_to_ui: :service
                                     },
-                                    skype: {
-                                      name: I18n.t("Skype"),
-                                      description: "",
-                                      expose_to_ui: :service
-                                    },
                                     diigo: {
                                       name: I18n.t("Diigo"),
                                       description: "",

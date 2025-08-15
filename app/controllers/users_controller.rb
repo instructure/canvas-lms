@@ -1333,11 +1333,8 @@ class UsersController < ApplicationController
     user_name = params[:user_service][:user_name]
     password = params[:user_service][:password]
     service = ServiceCredentials.new(user_name, password)
-    case params[:user_service][:service]
-    when "diigo"
+    if params[:user_service][:service] == "diigo"
       Diigo::Connection.diigo_get_bookmarks(service)
-    when "skype"
-      true
     else
       return render json: { errors: true }, status: :bad_request
     end
@@ -1771,7 +1768,16 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled default_to_block_editor].freeze
+  BOOLEAN_PREFS = %i[
+    manual_mark_as_read
+    collapse_global_nav
+    collapse_course_nav
+    hide_dashcard_color_overlays
+    release_notes_badge_disabled
+    comment_library_suggestions_enabled
+    elementary_dashboard_disabled
+    default_to_block_editor
+  ].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.

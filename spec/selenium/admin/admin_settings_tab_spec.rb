@@ -325,11 +325,6 @@ describe "admin settings tab" do
       expect(f("[data-testid='about-google-docs']")).to include_text("About Google Docs Previews")
     end
 
-    it "unclicks and then click on skype" do
-      check_box_verifier("#account_services_skype", { allowed_services: :skype }, false)
-      check_box_verifier("#account_services_skype", { allowed_services: :skype })
-    end
-
     it "unclicks and click on google docs previews" do
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
