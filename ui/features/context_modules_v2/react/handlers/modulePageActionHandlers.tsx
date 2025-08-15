@@ -22,10 +22,16 @@ import {Module as ModuleType} from '@canvas/context-modules/differentiated-modul
 import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-modules/react/DifferentiatedModulesTray'
 import {queryClient} from '@canvas/query'
 import {InfiniteData} from '@tanstack/react-query'
-import type {ModuleItem, ModulesResponse} from '../utils/types'
+import type {
+  HTMLElementWithRoot,
+  ModuleItem,
+  ModulesResponse,
+  PaginatedNavigationResponse,
+} from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {MODULES} from '../utils/constants'
+import {MODULE_ITEMS, MODULES} from '../utils/constants'
+import EditItemModal from '../componentsTeacher/EditItemModal'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
@@ -241,6 +247,45 @@ export const handleOpeningModuleUpdateTray = (
   }
 
   root.render(<DifferentiatedModulesTray {...(trayProps as any)} />)
+}
+
+export const handleOpeningEditItemModal = (
+  courseId: string,
+  moduleId: string,
+  moduleItemId: string,
+) => {
+  const queryData = queryClient.getQueryData<PaginatedNavigationResponse>([
+    MODULE_ITEMS,
+    moduleId,
+    null,
+  ])
+  if (!queryData) return
+  const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
+  if (!moduleItem) return
+  const itemProps = {
+    courseId,
+    itemName: moduleItem.title,
+    itemURL: moduleItem.content?.url,
+    itemNewTab: moduleItem.newTab,
+    itemIndent: moduleItem.indent,
+    moduleId: moduleId,
+    itemId: moduleItem._id,
+    itemType: moduleItem.content?.type?.toLowerCase(),
+    masterCourseRestrictions: moduleItem.masterCourseRestrictions,
+  }
+
+  const mountPoint = document.getElementById('module-item-mount-point') as HTMLElementWithRoot
+  let root = mountPoint.reactRoot
+  if (!root) {
+    root = createRoot(mountPoint)
+    mountPoint.reactRoot = root
+  }
+
+  const onRequestClose = () => {
+    root.render(<EditItemModal {...itemProps} isOpen={false} onRequestClose={onRequestClose} />)
+  }
+
+  root.render(<EditItemModal {...itemProps} isOpen={true} onRequestClose={onRequestClose} />)
 }
 
 export const handleAddItem = (

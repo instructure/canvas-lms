@@ -22,7 +22,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconPublishSolid, IconUnpublishedLine, IconMasteryPathsLine} from '@instructure/ui-icons'
 import {
   handlePublishToggle,
-  handleEdit,
   handleSpeedGrader,
   handleAssignTo,
   handleDuplicate,
@@ -31,7 +30,6 @@ import {
   handleIncreaseIndent,
   handleSendTo,
   handleCopyTo,
-  handleRemove,
   handleMasteryPaths,
 } from '../handlers/moduleItemActionHandlers'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
@@ -54,9 +52,9 @@ import {
   mapContentTypeForSharing,
 } from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
-import EditItemModal from './EditItemModal'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
+import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -65,7 +63,6 @@ interface ModuleItemActionPanelProps {
   itemId: string
   id: string
   title: string
-  newTab?: boolean
   indent: number
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
@@ -85,7 +82,6 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   itemId,
   id: _id,
   title,
-  newTab,
   indent,
   content,
   masterCourseRestrictions,
@@ -101,7 +97,6 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
-  const [isEditItemOpen, setIsEditItemOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
 
   const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
@@ -135,8 +130,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }
 
   const handleEditRef = useCallback(() => {
-    handleEdit(setIsEditItemOpen)
-  }, [setIsEditItemOpen])
+    dispatchCommandEvent({action: 'edit', courseId, moduleId, moduleItemId: itemId})
+  }, [courseId, moduleId, itemId])
 
   const handleSpeedGraderRef = useCallback(() => {
     handleSpeedGrader(content, courseId, setIsMenuOpen)
@@ -195,10 +190,15 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [setIsDirectShareCourseOpen, setIsMenuOpen])
 
   const handleRemoveRef = useCallback(() => {
-    handleRemove(moduleId, itemId, title, queryClient, courseId, setIsMenuOpen, () =>
-      focusModuleItemTitleLinkById(focusTargetItemId),
-    )
-  }, [moduleId, itemId, title, courseId, focusTargetItemId])
+    dispatchCommandEvent({
+      action: 'remove',
+      courseId,
+      moduleId,
+      moduleItemId: itemId,
+      setIsMenuOpen,
+      onAfterSuccess: () => focusModuleItemTitleLinkById(focusTargetItemId),
+    })
+  }, [moduleId, itemId, courseId, focusTargetItemId, setIsMenuOpen])
 
   const handleMasteryPathsRef = useCallback(() => {
     handleMasteryPaths(itemId, setIsMenuOpen)
@@ -325,21 +325,6 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
             />
           )}
         </>
-      )}
-      {content && (
-        <EditItemModal
-          isOpen={isEditItemOpen}
-          onRequestClose={() => setIsEditItemOpen(false)}
-          itemName={title}
-          itemURL={content?.url}
-          itemNewTab={newTab}
-          itemIndent={indent}
-          itemId={itemId}
-          itemType={content?.type?.toLowerCase()}
-          courseId={courseId}
-          moduleId={moduleId}
-          masterCourseRestrictions={masterCourseRestrictions}
-        />
       )}
     </>
   )

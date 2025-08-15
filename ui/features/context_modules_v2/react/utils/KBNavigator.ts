@@ -111,8 +111,12 @@ class KBNavigator {
     return this.getNextSibling(elem, '.context_module', '.context_module_item')
   }
 
+  getModuleFromItem(elem: HTMLElement): HTMLElement | null {
+    return elem.closest('.context_module') as HTMLElement | null
+  }
+
   getModuleIdFromItem(elem: HTMLElement) {
-    const module = elem.closest('.context_module') as HTMLElement
+    const module = this.getModuleFromItem(elem)
     return module?.getAttribute('data-module-id')
   }
 
@@ -192,7 +196,7 @@ class KBNavigator {
     if (type.type === 'module') {
       const moduleId = type.elem.getAttribute('data-module-id')
       if (!moduleId) return false
-      dispatchCommandEvent('edit', courseId, moduleId)
+      dispatchCommandEvent({action: 'edit', courseId, moduleId})
       return true
     }
     if (type.type === 'item') {
@@ -200,7 +204,7 @@ class KBNavigator {
       if (!moduleItemId) return false
       const moduleId = this.getModuleIdFromItem(type.elem)
       if (!moduleId) return false
-      dispatchCommandEvent('edit', courseId, moduleId, moduleItemId)
+      dispatchCommandEvent({action: 'edit', courseId, moduleId, moduleItemId})
       return true
     }
     return false
@@ -212,7 +216,7 @@ class KBNavigator {
     if (type.type === 'module') {
       const moduleId = type.elem.getAttribute('data-module-id')
       if (!moduleId) return false
-      dispatchCommandEvent('delete', courseId, moduleId)
+      dispatchCommandEvent({action: 'delete', courseId, moduleId})
       return true
     }
     if (type.type === 'item') {
@@ -220,7 +224,28 @@ class KBNavigator {
       if (!moduleItemId) return false
       const moduleId = this.getModuleIdFromItem(type.elem)
       if (!moduleId) return false
-      dispatchCommandEvent('remove', courseId, moduleId, moduleItemId)
+      // after removing an item, focus goes
+      // 1. to the previous item if one exists, or
+      // 2. to the parent module
+      const previousItem = this.getPreviousItem(type.elem)
+      let focusNext: HTMLElement | null = null
+      if (previousItem) {
+        focusNext = this.itemTitle(previousItem)
+      } else {
+        const itemModule = this.getModuleFromItem(type.elem)
+        if (itemModule) {
+          focusNext = this.getFocusableElem(itemModule)
+        }
+      }
+      const focusAfterRemoval = () => focusNext?.focus()
+      dispatchCommandEvent({
+        action: 'remove',
+        courseId,
+        moduleId,
+        moduleItemId,
+        setMenuIsOpen: undefined, // we didn't get here from the menu
+        onAfterSuccess: focusAfterRemoval,
+      })
       return true
     }
     return false
@@ -234,7 +259,7 @@ class KBNavigator {
     if (!moduleId) return false
     const itemId = type.elem.getAttribute('data-item-id')
     if (!itemId) return false
-    dispatchCommandEvent('indent', courseId, moduleId, itemId)
+    dispatchCommandEvent({action: 'indent', courseId, moduleId, moduleItemId: itemId})
     return true
   }
 
@@ -246,14 +271,14 @@ class KBNavigator {
     if (!moduleId) return false
     const itemId = type.elem.getAttribute('data-item-id')
     if (!itemId) return false
-    dispatchCommandEvent('outdent', courseId, moduleId, itemId)
+    dispatchCommandEvent({action: 'outdent', courseId, moduleId, moduleItemId: itemId})
     return true
   }
 
   handleNew(_type: ElemType): boolean {
     const courseId = ENV.course_id
     if (!courseId) return false
-    dispatchCommandEvent('new', courseId)
+    dispatchCommandEvent({action: 'new', courseId})
     return true
   }
 

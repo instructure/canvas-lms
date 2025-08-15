@@ -98,18 +98,30 @@ describe('usePageState', () => {
     expect(pageIndex).toBe(NaN) // parseInt('invalid') returns NaN
   })
 
-  it('handles localStorage errors gracefully', () => {
-    localStorageMock.setItem.mockImplementationOnce(() => {
-      throw new Error('Storage error')
+  describe('error handling', () => {
+    let originalError: any
+    beforeEach(() => {
+      originalError = window.onerror
+      console.error = () => {}
     })
 
-    const {result} = renderHook(() => usePageState(moduleId))
-    const [, setPageIndex] = result.current
+    afterEach(() => {
+      console.error = originalError
+    })
 
-    expect(() => {
-      act(() => {
-        setPageIndex(3)
+    it('handles localStorage errors gracefully', () => {
+      localStorageMock.setItem.mockImplementationOnce(() => {
+        throw new Error('Storage error')
       })
-    }).not.toThrow()
+
+      const {result} = renderHook(() => usePageState(moduleId))
+      const [, setPageIndex] = result.current
+
+      expect(() => {
+        act(() => {
+          setPageIndex(3)
+        })
+      }).not.toThrow()
+    })
   })
 })

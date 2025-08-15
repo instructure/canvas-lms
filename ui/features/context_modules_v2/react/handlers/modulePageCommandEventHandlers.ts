@@ -29,10 +29,10 @@ import {
   PaginatedNavigationResponse,
 } from '../utils/types'
 import {queryClient} from '@canvas/query'
-import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
+import {handleOpeningModuleUpdateTray, handleOpeningEditItemModal} from './modulePageActionHandlers'
 import {handleDelete} from './moduleActionHandlers'
 import {InfiniteData} from '@tanstack/react-query'
-import {updateIndent} from './moduleItemActionHandlers'
+import {updateIndent, handleRemove} from './moduleItemActionHandlers'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -57,7 +57,8 @@ const getModuleItemTitles = async ({queryKey}: {queryKey: any}): Promise<Partial
 }
 
 class ModulePageCommandEventHandlers {
-  // ------ edit ------
+  // --------------- Modules ---------------
+
   handleEditModule = async (courseId: string, moduleId: string) => {
     if (!(courseId && moduleId)) return
 
@@ -87,17 +88,14 @@ class ModulePageCommandEventHandlers {
     )
   }
 
-  // ------ delete ------
-  handleDeleteModule = async (courseId: string, moduleId: string) => {
+  handleDeleteModule = (courseId: string, moduleId: string) => {
     const module = document.querySelector(`[data-module-id="${moduleId}"]`) as HTMLElement
     if (!module) return
     const moduleName = module?.getAttribute('data-module-name') || `module ${moduleId}`
     handleDelete(moduleId, moduleName, queryClient, courseId)
   }
 
-  // ------ new module ------
-
-  handleNewModule = async () => {
+  handleNewModule = () => {
     // I'm not crazy about clicking the button to get the job done,
     // but it's off in another component tree altogether and this
     // is the cleanest way to get it done
@@ -120,12 +118,29 @@ class ModulePageCommandEventHandlers {
     return moduleItem
   }
 
-  handleEditModuleItem = async (courseId: string, moduleItemId: string) => {
-    console.log('>>>edit item', courseId, moduleItemId)
+  handleEditModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
+    handleOpeningEditItemModal(courseId, moduleId, moduleItemId)
   }
 
-  handleDeleteModuleItem = async (courseId: string, moduleItemId: string) => {
-    console.log('>>>delete item', courseId, moduleItemId)
+  handleRemoveModuleItem = (
+    courseId: string,
+    moduleId: string,
+    moduleItemId: string,
+    setIsMenuOpen?: (isOpen: boolean) => void,
+    onAfterSuccess?: () => void,
+  ) => {
+    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!moduleItem) return
+
+    handleRemove(
+      moduleId,
+      moduleItem._id,
+      moduleItem.title,
+      queryClient,
+      courseId,
+      setIsMenuOpen,
+      onAfterSuccess,
+    )
   }
 
   handleIndentModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
@@ -153,17 +168,28 @@ class ModulePageCommandEventHandlers {
 
     switch (action) {
       case 'edit':
-        if (moduleId) {
+        if (moduleId && moduleItemId) {
+          this.handleEditModuleItem(courseId, moduleId, moduleItemId)
+        } else if (moduleId) {
           this.handleEditModule(courseId, moduleId)
-        } else if (moduleItemId) {
-          this.handleEditModuleItem(courseId, moduleItemId)
         }
         break
       case 'delete':
         if (moduleId) {
           this.handleDeleteModule(courseId, moduleId)
-        } else if (moduleItemId) {
-          this.handleDeleteModuleItem(courseId, moduleItemId)
+        }
+        break
+      case 'remove':
+        if (moduleId && moduleItemId) {
+          const setIsMenuOpen = event.detail.setIsMenuOpen as (isOpen: boolean) => void
+          const onAfterSuccess = event.detail.onAfterSuccess as () => void
+          this.handleRemoveModuleItem(
+            courseId,
+            moduleId,
+            moduleItemId,
+            setIsMenuOpen,
+            onAfterSuccess,
+          )
         }
         break
       case 'new':

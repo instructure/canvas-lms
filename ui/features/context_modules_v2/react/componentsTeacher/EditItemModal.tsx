@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
@@ -69,6 +69,13 @@ const EditItemModal = (props: EditItemModalProps) => {
   const [indent, setIndent] = useState(itemIndent)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [nameError, setNameError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setTitle(itemName)
+    setUrl(itemURL)
+    setNewTab(itemNewTab || false)
+    setIndent(itemIndent)
+  }, [itemIndent, itemName, itemNewTab, itemURL])
 
   const showExternalUrlFields =
     itemType &&

@@ -88,7 +88,7 @@ describe('modulePageCommandEventHandlers', () => {
       const dispatchSpy = jest.spyOn(document, 'dispatchEvent')
       const action = 'edit' as const
 
-      dispatchCommandEvent(action, courseId, moduleId)
+      dispatchCommandEvent({action, courseId, moduleId})
 
       expect(dispatchSpy).toHaveBeenCalled()
       const event = dispatchSpy.mock.calls[0][0] as CustomEvent

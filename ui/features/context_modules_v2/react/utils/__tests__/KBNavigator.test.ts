@@ -18,6 +18,7 @@
 
 import {fireEvent} from '@testing-library/react'
 import {KBNavigator, handleShortcutKey} from '../KBNavigator'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const buildTeacherModule = (id: string, position: number, collapsed: boolean): HTMLElement => {
   const mod = `
@@ -81,6 +82,14 @@ const getModuleList = (): HTMLElement => {
 }
 
 describe('KBNavigator', () => {
+  beforeAll(() => {
+    fakeENV.setup({course_id: '123'})
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
+  })
+
   const navigator = new KBNavigator()
   beforeEach(() => {
     const mainContent = document.createElement('div')
@@ -196,141 +205,372 @@ describe('KBNavigator', () => {
       moduleList.appendChild(buildTeacherModule('4', 4, false))
     })
 
-    it('should call handleDown on j key', () => {
-      const spy = jest.spyOn(navigator, 'handleDown')
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const mockEvent = createMockEvent('j', module1)
-      navigator.handleShortcutKey(mockEvent)
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should call handleDown on ArrowDown key', () => {
-      const spy = jest.spyOn(navigator, 'handleDown')
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const mockEvent = createMockEvent('ArrowDown', module1)
-      navigator.handleShortcutKey(mockEvent)
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should call handleUp on k key', () => {
-      const spy = jest.spyOn(navigator, 'handleUp')
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const mockEvent = createMockEvent('k', module1)
-      navigator.handleShortcutKey(mockEvent)
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should call handleUp on ArrowUp key', () => {
-      const spy = jest.spyOn(navigator, 'handleUp')
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const mockEvent = createMockEvent('ArrowUp', module1)
-      navigator.handleShortcutKey(mockEvent)
-      expect(spy).toHaveBeenCalled()
-    })
-
-    it('should call handleHelp on ? key', () => {
-      const spy = jest.spyOn(navigator, 'handleHelp')
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const mockEvent = createMockEvent('?', module1)
-      navigator.handleShortcutKey(mockEvent)
-      expect(spy).toHaveBeenCalled()
-    })
-
-    describe('down', () => {
-      it('should move focus from the main content area to the first module', () => {
-        const mainContent = document.querySelector('#content') as HTMLElement
-        mainContent.focus()
-        fireEvent.keyDown(mainContent, {key: 'j'})
-        expect(document.activeElement).toBe(
-          navigator.getFocusableElem(document.querySelector('[data-module-id="1"]') as HTMLElement),
-        )
-      })
-      it('down should move focus from collapsed module to next module', () => {
+    describe('navigation', () => {
+      it('should call handleDown on j key', () => {
+        const spy = jest.spyOn(navigator, 'handleDown')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-        const module2 = document.querySelector('[data-module-id="2"]') as HTMLElement
         module1.focus()
-        fireEvent.keyDown(module1, {key: 'j'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(module2))
+        const mockEvent = createMockEvent('j', module1)
+        navigator.handleShortcutKey(mockEvent)
+        expect(spy).toHaveBeenCalled()
       })
 
-      it('should move from expanded module to its first item', () => {
-        const module2 = document.querySelector('[data-module-id="3"]') as HTMLElement
-        const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
-        module2.focus()
-        fireEvent.keyDown(module2, {key: 'j'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(item1))
-      })
-
-      it('should move from one item to the next', () => {
-        const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
-        const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
-        const focusable1 = navigator.getFocusableElem(item1) as HTMLElement
-        const focusable2 = navigator.getFocusableElem(item2) as HTMLElement
-        focusable1.focus()
-        fireEvent.keyDown(focusable1, {key: 'j'})
-        expect(document.activeElement).toBe(focusable2)
-      })
-
-      it('should move from the last item to the next module', () => {
-        const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
-        const focusable2 = navigator.getFocusableElem(item2) as HTMLElement
-        focusable2.focus()
-        fireEvent.keyDown(focusable2, {key: 'j'})
-        expect(document.activeElement).toBe(
-          navigator.getFocusableElem(document.querySelector('[data-module-id="4"]') as HTMLElement),
-        )
-      })
-    })
-
-    describe('up', () => {
-      it(`should move from a collapsed module to the previous collapses module`, () => {
+      it('should call handleDown on ArrowDown key', () => {
+        const spy = jest.spyOn(navigator, 'handleDown')
         const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-        const module2 = document.querySelector('[data-module-id="2"]') as HTMLElement
-        module2.focus()
-        fireEvent.keyDown(module2, {key: 'k'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(module1))
+        module1.focus()
+        const mockEvent = createMockEvent('ArrowDown', module1)
+        navigator.handleShortcutKey(mockEvent)
+        expect(spy).toHaveBeenCalled()
       })
 
-      it(`move from the first item to its module`, () => {
-        const module3 = document.querySelector('[data-module-id="3"]') as HTMLElement
-        const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
-        item1.focus()
-        fireEvent.keyDown(item1, {key: 'k'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(module3))
+      it('should call handleUp on k key', () => {
+        const spy = jest.spyOn(navigator, 'handleUp')
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const mockEvent = createMockEvent('k', module1)
+        navigator.handleShortcutKey(mockEvent)
+        expect(spy).toHaveBeenCalled()
       })
 
-      it('move from an item to the previous item', () => {
-        const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
-        const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
-        item2.focus()
-        fireEvent.keyDown(item2, {key: 'k'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(item1))
+      it('should call handleUp on ArrowUp key', () => {
+        const spy = jest.spyOn(navigator, 'handleUp')
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const mockEvent = createMockEvent('ArrowUp', module1)
+        navigator.handleShortcutKey(mockEvent)
+        expect(spy).toHaveBeenCalled()
       })
 
-      it('move from a module to the last item in the previous expanded module', () => {
-        const module4 = document.querySelector('[data-module-id="4"]') as HTMLElement
-        const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
-        const focusableModule4 = navigator.getFocusableElem(module4) as HTMLElement
-        focusableModule4.focus()
-        fireEvent.keyDown(focusableModule4, {key: 'k'})
-        expect(document.activeElement).toBe(navigator.getFocusableElem(item2))
+      it('should call handleHelp on ? key', () => {
+        const spy = jest.spyOn(navigator, 'handleHelp')
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const mockEvent = createMockEvent('?', module1)
+        navigator.handleShortcutKey(mockEvent)
+        expect(spy).toHaveBeenCalled()
+      })
+
+      describe('down', () => {
+        it('should move focus from the main content area to the first module', () => {
+          const mainContent = document.querySelector('#content') as HTMLElement
+          mainContent.focus()
+          fireEvent.keyDown(mainContent, {key: 'j'})
+          expect(document.activeElement).toBe(
+            navigator.getFocusableElem(
+              document.querySelector('[data-module-id="1"]') as HTMLElement,
+            ),
+          )
+        })
+        it('down should move focus from collapsed module to next module', () => {
+          const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+          const module2 = document.querySelector('[data-module-id="2"]') as HTMLElement
+          module1.focus()
+          fireEvent.keyDown(module1, {key: 'j'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(module2))
+        })
+
+        it('should move from expanded module to its first item', () => {
+          const module2 = document.querySelector('[data-module-id="3"]') as HTMLElement
+          const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
+          module2.focus()
+          fireEvent.keyDown(module2, {key: 'j'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(item1))
+        })
+
+        it('should move from one item to the next', () => {
+          const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
+          const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
+          const focusable1 = navigator.getFocusableElem(item1) as HTMLElement
+          const focusable2 = navigator.getFocusableElem(item2) as HTMLElement
+          focusable1.focus()
+          fireEvent.keyDown(focusable1, {key: 'j'})
+          expect(document.activeElement).toBe(focusable2)
+        })
+
+        it('should move from the last item to the next module', () => {
+          const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
+          const focusable2 = navigator.getFocusableElem(item2) as HTMLElement
+          focusable2.focus()
+          fireEvent.keyDown(focusable2, {key: 'j'})
+          expect(document.activeElement).toBe(
+            navigator.getFocusableElem(
+              document.querySelector('[data-module-id="4"]') as HTMLElement,
+            ),
+          )
+        })
+      })
+
+      describe('up', () => {
+        it(`should move from a collapsed module to the previous collapses module`, () => {
+          const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+          const module2 = document.querySelector('[data-module-id="2"]') as HTMLElement
+          module2.focus()
+          fireEvent.keyDown(module2, {key: 'k'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(module1))
+        })
+
+        it(`move from the first item to its module`, () => {
+          const module3 = document.querySelector('[data-module-id="3"]') as HTMLElement
+          const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
+          item1.focus()
+          fireEvent.keyDown(item1, {key: 'k'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(module3))
+        })
+
+        it('move from an item to the previous item', () => {
+          const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
+          const item1 = document.querySelector('[data-item-id="3-1"]') as HTMLElement
+          item2.focus()
+          fireEvent.keyDown(item2, {key: 'k'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(item1))
+        })
+
+        it('move from a module to the last item in the previous expanded module', () => {
+          const module4 = document.querySelector('[data-module-id="4"]') as HTMLElement
+          const item2 = document.querySelector('[data-item-id="3-2"]') as HTMLElement
+          const focusableModule4 = navigator.getFocusableElem(module4) as HTMLElement
+          focusableModule4.focus()
+          fireEvent.keyDown(focusableModule4, {key: 'k'})
+          expect(document.activeElement).toBe(navigator.getFocusableElem(item2))
+        })
+      })
+
+      it('should handle ? key press for help - no focus change', () => {
+        const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
+        module1.focus()
+        const initialFocus = document.activeElement
+
+        fireEvent.keyDown(module1, {key: '?', shiftKey: true})
+
+        // Help action doesn't change focus
+        expect(document.activeElement).toBe(initialFocus)
       })
     })
 
-    it('should handle ? key press for help - no focus change', () => {
-      const module1 = document.querySelector('[data-module-id="1"]') as HTMLElement
-      module1.focus()
-      const initialFocus = document.activeElement
+    describe('commands', () => {
+      // Event listener and spy setup
+      let eventSpy: jest.Mock
 
-      fireEvent.keyDown(module1, {key: '?', shiftKey: true})
+      beforeEach(() => {
+        eventSpy = jest.fn()
+        document.addEventListener('module-action', eventSpy)
+      })
 
-      // Help action doesn't change focus
-      expect(document.activeElement).toBe(initialFocus)
+      afterEach(() => {
+        document.removeEventListener('module-action', eventSpy)
+        jest.restoreAllMocks()
+      })
+
+      describe('e', () => {
+        it('should dispatch edit command for a module', () => {
+          const module1Title = document.querySelector(
+            '[data-module-id="1"] .module_title',
+          ) as HTMLElement
+          module1Title.focus()
+
+          fireEvent.keyDown(module1Title, {key: 'e'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'edit',
+            courseId: '123',
+            moduleId: '1',
+          })
+        })
+
+        it('should dispatch edit command for an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'e'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'edit',
+            courseId: '123',
+            moduleId: '3',
+            moduleItemId: '3-1',
+          })
+        })
+      })
+
+      describe('d', () => {
+        it('should dispatch delete command for a module', () => {
+          const moduleTitle = document.querySelector(
+            '[data-module-id="1"] .module_title',
+          ) as HTMLElement
+          moduleTitle.focus()
+
+          fireEvent.keyDown(moduleTitle, {key: 'd'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'delete',
+            courseId: '123',
+            moduleId: '1',
+          })
+        })
+
+        it('should dispatch remove command for an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'd'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'remove',
+            courseId: '123',
+            moduleId: '3',
+            moduleItemId: '3-1',
+            setMenuIsOpen: undefined,
+            onAfterSuccess: expect.any(Function),
+          })
+        })
+
+        it('should focus the previous item after deleting an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-2"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'd'})
+
+          // Extract and call the callback
+          const event = eventSpy.mock.calls[0][0]
+          const callback = event.detail.onAfterSuccess
+          callback()
+
+          expect(document.activeElement).toBe(
+            navigator.getFocusableElem(
+              document.querySelector('[data-item-id="3-1"]') as HTMLElement,
+            ),
+          )
+        })
+
+        it('should focus the parent module after deleting the first item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'd'})
+
+          // Extract and call the callback
+          const event = eventSpy.mock.calls[0][0]
+          const callback = event.detail.onAfterSuccess
+          callback()
+
+          expect(document.activeElement).toBe(
+            navigator.getFocusableElem(
+              document.querySelector('[data-module-id="3"]') as HTMLElement,
+            ),
+          )
+        })
+      })
+
+      describe('i', () => {
+        it('should dispatch indent command for an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'i'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'indent',
+            courseId: '123',
+            moduleId: '3',
+            moduleItemId: '3-1',
+          })
+        })
+
+        it('should not dispatch indent command for a module', () => {
+          const moduleTitle = document.querySelector(
+            '[data-module-id="1"] .module_title',
+          ) as HTMLElement
+          moduleTitle.focus()
+
+          fireEvent.keyDown(moduleTitle, {key: 'i'})
+
+          expect(eventSpy).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('o', () => {
+        it('should dispatch outdent command for an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'o'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'outdent',
+            courseId: '123',
+            moduleId: '3',
+            moduleItemId: '3-1',
+          })
+        })
+
+        it('should not dispatch outdent command for a module', () => {
+          const moduleTitle = document.querySelector(
+            '[data-module-id="1"] .module_title',
+          ) as HTMLElement
+          moduleTitle.focus()
+
+          fireEvent.keyDown(moduleTitle, {key: 'o'})
+
+          expect(eventSpy).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('n', () => {
+        it('should dispatch new command when focused on a module', () => {
+          const moduleTitle = document.querySelector(
+            '[data-module-id="1"] .module_title',
+          ) as HTMLElement
+          moduleTitle.focus()
+
+          fireEvent.keyDown(moduleTitle, {key: 'n'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'new',
+            courseId: '123',
+          })
+        })
+
+        it('should dispatch new command when focused on an item', () => {
+          const itemKabobMenuButton = document.querySelector(
+            '[data-item-id="3-1"] .al-trigger',
+          ) as HTMLElement
+          itemKabobMenuButton.focus()
+
+          fireEvent.keyDown(itemKabobMenuButton, {key: 'n'})
+
+          expect(eventSpy).toHaveBeenCalled()
+          const event = eventSpy.mock.calls[0][0]
+          expect(event.detail).toEqual({
+            action: 'new',
+            courseId: '123',
+          })
+        })
+      })
     })
 
     it('should not handle unhandled keys - no focus change', () => {

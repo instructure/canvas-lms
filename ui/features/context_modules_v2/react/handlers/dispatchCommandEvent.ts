@@ -16,21 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ModuleActionEventDetail, ModuleKBAction, ModuleItemKBAction} from '../utils/types'
+import {ModuleActionEventDetail} from '../utils/types'
 
-export const dispatchCommandEvent = (
-  action: ModuleKBAction | ModuleItemKBAction,
-  courseId: string,
-  moduleId?: string,
-  moduleItemId?: string,
-) => {
-  const event = new CustomEvent<ModuleActionEventDetail>('module-action', {
-    detail: {
-      action,
-      courseId,
-      moduleId,
-      moduleItemId,
-    },
-  })
+export const dispatchCommandEvent = (detail: ModuleActionEventDetail) => {
+  const event = new CustomEvent<ModuleActionEventDetail>('module-action', {detail})
   document.dispatchEvent(event)
 }

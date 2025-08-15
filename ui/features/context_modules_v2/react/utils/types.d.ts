@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type Root} from 'react-dom/client'
+
 export interface MasteryPathsData {
   isCyoeAble: boolean
   isTrigger: boolean
@@ -393,12 +395,16 @@ export type QuizEngine = 'new' | 'classic'
 export type ModuleKBActionEvent = 'module-action'
 export type ModuleKBAction = 'edit' | 'delete' | 'new'
 export type ModuleItemKBAction = 'edit' | 'remove' | 'indent' | 'outdent'
-
 export interface ModuleActionEventDetail {
   action: ModuleKBAction | ModuleItemKBAction
   courseId: string
   moduleId?: string
   moduleItemId?: string
+  [key: string]: unknown
+}
+
+export interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
 }
 
 declare global {
