@@ -65,12 +65,16 @@ const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
   return sources.map(convertMediaSource).sort(byBitrate)
 }
 
+const isCaptionMetaData = (track: MediaTrack | CaptionMetaData): track is CaptionMetaData => {
+  return 'src' in track
+}
+
 const convertMediaTracksIfNeeded = (
   tracks: MediaTrack[] | CaptionMetaData[],
 ): CaptionMetaData[] => {
   // @ts-expect-error
   return tracks.map(track => {
-    if ('src' in track) return track
+    if (isCaptionMetaData(track)) return track
     return {
       locale: track.locale,
       language: captionLanguageForLocale(track.locale),
@@ -240,12 +244,14 @@ export default function CanvasStudioPlayer({
       return
     }
 
-    await fetch(caption.src, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-Token': getCookie('_csrf_token'),
-      },
-    })
+    if (caption.src) {
+      await fetch(caption.src, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': getCookie('_csrf_token'),
+        },
+      })
+    }
     setMediaCaptions(prev => prev?.filter(c => c.src !== caption.src))
   }, [])
 
