@@ -44,7 +44,7 @@ module Accessibility
     def scan_relevant_attribute_changed?
       case self
       when WikiPage
-        saved_change_to_body?
+        saved_change_to_body? || saved_change_to_title?
       else
         true
       end

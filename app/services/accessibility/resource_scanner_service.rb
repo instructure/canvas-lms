@@ -54,7 +54,7 @@ class Accessibility::ResourceScannerService < ApplicationService
 
     issues = scan_resource_for_issues
 
-    scan.accessibility_issues.delete_all
+    scan.accessibility_issues.active.delete_all
     scan.accessibility_issues.create!(issues) if issues.any?
 
     scan.update(

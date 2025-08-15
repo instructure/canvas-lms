@@ -104,6 +104,29 @@ describe Accessibility::ResourceScannerService do
         end
       end
 
+      context "when there are existing issues for the scan" do
+        before do
+          4.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "active") }
+          3.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "resolved") }
+          2.times { accessibility_issue_model(accessibility_resource_scan: scan, workflow_state: "dismissed") }
+        end
+
+        it "removes the active issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).active.count).to be(0)
+        end
+
+        it "keeps the resolved issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).resolved.count).to be(3)
+        end
+
+        it "keeps the dismissed issues" do
+          subject.scan_resource(scan:)
+          expect(AccessibilityIssue.for_context(wiki_page).dismissed.count).to be(2)
+        end
+      end
+
       context "when issues were found" do
         before do
           html_with_issues = <<-HTML

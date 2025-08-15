@@ -141,7 +141,7 @@ class AccessibilityResourceScansController < ApplicationController
       workflow_state: scan.workflow_state,
       error_message: scan.error_message || "",
       issue_count: scan_completed ? scan.issue_count : 0,
-      issues: scan_completed ? scan.accessibility_issues.active.map { |issue| issue_attributes(issue) } : []
+      issues: scan_completed ? scan.accessibility_issues.select(&:active?).map { |issue| issue_attributes(issue) } : []
     }
   end
 
