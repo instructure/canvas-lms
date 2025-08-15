@@ -174,7 +174,9 @@ export const RubricTable = ({
               </Flex>
             </Cell>
 
-            <Cell data-testid={`rubric-points-${index}`}>{rubric.pointsPossible}</Cell>
+            <Cell data-testid={`rubric-points-${index}`}>
+              {rubric.hidePoints ? '--' : rubric.pointsPossible}
+            </Cell>
             <Cell data-testid={`rubric-criterion-count-${index}`}>{rubric.criteriaCount}</Cell>
             <Cell data-testid={`rubric-locations-${index}`}>
               {rubric.hasRubricAssociations ? (
