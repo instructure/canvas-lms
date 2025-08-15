@@ -221,14 +221,16 @@ module AccountReports
         attachment.display_name = filename
         attachment.filename = filename
         attachment.user = account_report.user
-        attachment.save!
+        Attachment.skip_touch_context { attachment.save! }
       else
-        attachment = account_report.account.attachments.create!(
-          uploaded_data: data,
-          display_name: filename,
-          filename:,
-          user: account_report.user
-        )
+        Attachment.skip_touch_context do
+          attachment = account_report.account.attachments.create!(
+            uploaded_data: data,
+            display_name: filename,
+            filename:,
+            user: account_report.user
+          )
+        end
       end
     end
     account_report.attachment = attachment
