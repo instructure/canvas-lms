@@ -1393,7 +1393,7 @@ describe Types::SubmissionType do
       end
 
       it "returns nil when student cannot read their own grade" do
-        allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(@student).and_return(false)
+        allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(@student, for_plagiarism: true).and_return(false)
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
       end

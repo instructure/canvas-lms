@@ -670,7 +670,7 @@ module Types
         if course.grants_right?(current_user, :manage_grades)
           load_association(:lti_asset_processors)
         elsif current_user && (submission = assignment.submissions.find_by(user: current_user))
-          if submission.user_can_read_grade?(current_user)
+          if submission.user_can_read_grade?(current_user, for_plagiarism: true)
             load_association(:lti_asset_processors)
           end
         end

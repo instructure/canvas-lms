@@ -139,7 +139,7 @@ module Types
           else
             Loaders::SubmissionLtiAssetReportsLoader.for(is_student: false).load(object.id)
           end
-        elsif object.user_can_read_grade?(current_user)
+        elsif object.user_can_read_grade?(current_user, for_plagiarism: true)
           Loaders::SubmissionLtiAssetReportsLoader.for(is_student: true).load(object.id)
         end
       end
