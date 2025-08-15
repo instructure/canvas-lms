@@ -19,7 +19,6 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import type {Widget, WidgetConfig} from '../types'
 import {getWidget} from './WidgetRegistry'

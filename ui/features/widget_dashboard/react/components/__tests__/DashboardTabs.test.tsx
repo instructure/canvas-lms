@@ -23,30 +23,9 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {setupServer} from 'msw/node'
 import {graphql, http, HttpResponse} from 'msw'
 import DashboardTabs from '../DashboardTabs'
+import {defaultGraphQLHandlers} from '../../__tests__/testHelpers'
 
 type Props = Record<string, never> // DashboardTabs has no props
-
-const mockCoursesData = {
-  data: {
-    legacyNode: {
-      _id: '123',
-      enrollments: [
-        {
-          course: {
-            _id: '1',
-            name: 'Introduction to Computer Science',
-          },
-        },
-        {
-          course: {
-            _id: '2',
-            name: 'Advanced Mathematics',
-          },
-        },
-      ],
-    },
-  },
-}
 
 const mockStatisticsData = {
   data: {
@@ -83,10 +62,9 @@ const mockStatisticsData = {
 let queryClient: QueryClient
 
 const server = setupServer(
-  // Mock GraphQL queries used by CourseWorkSummaryWidget
-  graphql.query('GetUserCourses', () => {
-    return HttpResponse.json(mockCoursesData)
-  }),
+  // Use default GraphQL handlers
+  ...defaultGraphQLHandlers,
+  // Override specific queries if needed
   graphql.query('GetUserCourseStatistics', () => {
     return HttpResponse.json(mockStatisticsData)
   }),

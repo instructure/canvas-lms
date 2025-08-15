@@ -69,3 +69,36 @@ export const DEFAULT_WIDGET_CONFIG = {
     },
   ],
 }
+
+// Course Grades Widget Constants
+export const COURSE_GRADES_WIDGET = {
+  MAX_GRID_ITEMS: 6,
+  CARD_HEIGHT: '14rem',
+  GRID_COLUMNS: 3,
+  GRID_COL_SPACING: 'small',
+  GRID_ROW_SPACING: 'small',
+  DEFAULT_COURSE_CODE: 'N/A',
+  GRADING_SCHEMES: {
+    LETTER: 'letter',
+    PERCENTAGE: 'percentage',
+  },
+} as const
+
+// Data fetching constants
+export const QUERY_CONFIG = {
+  STALE_TIME: {
+    COURSES: 10, // minutes
+    GRADES: 5, // minutes
+    STATISTICS: 5, // minutes
+  },
+  RETRY: {
+    DISABLED: false,
+    DEFAULT: 3,
+  },
+} as const
+
+// URL patterns
+export const URL_PATTERNS = {
+  GRADEBOOK: '/courses/{courseId}/gradebook',
+  ALL_GRADES: '/grades',
+} as const
