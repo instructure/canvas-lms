@@ -760,9 +760,6 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.4)
-    marginalia (1.11.1)
-      actionpack (>= 5.2)
-      activerecord (>= 5.2)
     matrix (0.4.2)
     method_source (1.1.0)
     mime-types (3.6.2)
@@ -1387,7 +1384,6 @@ DEPENDENCIES
   lti-advantage!
   lti_outbound!
   luminosity_contrast (= 0.2.1)
-  marginalia (= 1.11.1)
   method_source (~> 1.1)
   mime-types (~> 3.5)
   mimemagic (~> 0.4.3)
