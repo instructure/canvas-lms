@@ -17,12 +17,9 @@
  */
 
 import React from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {DEFAULT_WIDGET_CONFIG} from '../constants'
 import WidgetGrid from './WidgetGrid'
-
-const I18n = createI18nScope('widget_dashboard')
 
 const DashboardTab: React.FC = () => {
   return (

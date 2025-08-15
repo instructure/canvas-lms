@@ -17,13 +17,10 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import moment from 'moment-timezone'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {executeQuery} from '@canvas/graphql'
 import {gql} from 'graphql-tag'
 import type {CourseWorkSummary} from '../types'
-
-const I18n = createI18nScope('widget_dashboard')
+import {getCurrentUserId, executeGraphQLQuery, createUserQueryConfig} from '../utils/graphql'
+import {QUERY_CONFIG} from '../constants'
 
 interface SubmissionStatistics {
   submissionsDueCount: number
@@ -40,11 +37,10 @@ interface UserEnrollment {
 }
 
 interface GraphQLResponse {
-  legacyNode?: {
+  legacyNode: {
     _id: string
     enrollments: UserEnrollment[]
-  } | null
-  errors?: {message: string}[]
+  }
 }
 
 interface CourseWorkStatisticsParams {
@@ -78,30 +74,16 @@ async function fetchAllCourseStatistics({
   startDate,
   endDate,
 }: Omit<CourseWorkStatisticsParams, 'courseId'>): Promise<UserEnrollment[]> {
-  // Get current user ID from ENV
-  const currentUserId = window.ENV?.current_user_id
-  if (!currentUserId) {
-    throw new Error('No current user ID found - please ensure you are logged in')
-  }
-
   try {
-    const result = await executeQuery<GraphQLResponse>(USER_COURSE_STATISTICS_QUERY, {
+    const currentUserId = getCurrentUserId()
+
+    const result = await executeGraphQLQuery<GraphQLResponse>(USER_COURSE_STATISTICS_QUERY, {
       userId: currentUserId,
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
     })
 
-    if (result.errors) {
-      throw new Error(
-        `GraphQL query failed: ${result.errors.map((err: {message: string}) => err.message).join(', ')}`,
-      )
-    }
-
-    if (!result.legacyNode) {
-      throw new Error('No user data found - please ensure you are logged in')
-    }
-
-    if (!result.legacyNode.enrollments) {
+    if (!result.legacyNode?.enrollments) {
       // User has no enrollments - this is a valid state
       return []
     }
@@ -141,23 +123,17 @@ function calculateSummaryFromEnrollments(
 }
 
 export function useCourseWorkStatistics(params: CourseWorkStatisticsParams) {
-  const currentUserId = window.ENV?.current_user_id
-
   // Only include date range in query key, not courseId
   const queryKey = [
     'courseStatistics',
-    currentUserId,
     params.startDate.toISOString(),
     params.endDate.toISOString(),
   ]
 
   return useQuery({
-    queryKey,
+    ...createUserQueryConfig(queryKey, QUERY_CONFIG.STALE_TIME.STATISTICS),
     queryFn: () => fetchAllCourseStatistics({startDate: params.startDate, endDate: params.endDate}),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-    retry: false, // Disable retry for tests
-    enabled: !!currentUserId, // Only run if user is logged in
+    retry: QUERY_CONFIG.RETRY.DISABLED, // Disable retry for tests
     select: (enrollments: UserEnrollment[]) => {
       // Calculate summary based on selected course
       return calculateSummaryFromEnrollments(enrollments, params.courseId)
