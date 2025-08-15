@@ -58,6 +58,15 @@ const mockStatisticsData = {
 
 let queryClient: QueryClient
 
+const mockAnnouncementsData = {
+  data: {
+    legacyNode: {
+      _id: '123',
+      enrollments: [],
+    },
+  },
+}
+
 const server = setupServer(
   // Handle GetUserCoursesWithGrades query with default handler
   graphql.query('GetUserCoursesWithGrades', () => {
@@ -106,6 +115,10 @@ const server = setupServer(
   // Override specific queries with local mock data
   graphql.query('GetUserCourseStatistics', () => {
     return HttpResponse.json(mockStatisticsData)
+  }),
+  // Mock GraphQL queries used by AnnouncementsWidget
+  graphql.query('GetUserAnnouncements', () => {
+    return HttpResponse.json(mockAnnouncementsData)
   }),
   // Handle any other common queries that might be used
   graphql.query('GetAnnouncements', () => {

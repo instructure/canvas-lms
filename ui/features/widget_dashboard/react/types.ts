@@ -102,3 +102,22 @@ export interface CourseGradeCardProps {
   globalGradeVisibility?: boolean
   onGradeVisibilityChange?: (visible: boolean) => void
 }
+export interface Announcement {
+  id: string
+  title: string
+  message: string
+  posted_at: string
+  html_url: string
+  context_code: string
+  course?: {
+    id: string
+    name: string
+    courseCode?: string
+  }
+  author?: {
+    _id: string
+    name: string
+    avatarUrl: string
+  } | null
+  isRead?: boolean
+}
