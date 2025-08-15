@@ -16,28 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {setupServer} from 'msw/node'
+import {queryClient} from '@canvas/query'
 import {handleDelete} from '../moduleActionHandlers'
 import {handleOpeningModuleUpdateTray} from '../modulePageActionHandlers'
-import {dispatchCommandEvent} from '../modulePageCommandEventHandlers'
+import {dispatchCommandEvent} from '../dispatchCommandEvent'
+import {updateIndent} from '../moduleItemActionHandlers'
+import '../modulePageCommandEventHandlers'
+import {MODULE_ITEMS, MODULE_ITEM_TITLES, MODULES} from '../../utils/constants'
 
 // Mock the handlers
 jest.mock('../moduleActionHandlers')
 jest.mock('../modulePageActionHandlers')
+jest.mock('../moduleItemActionHandlers')
 
-// Mock the query client methods
-const mockGetQueryData = jest.fn()
-const mockEnsureQueryData = jest.fn()
+const server = setupServer()
 
-jest.mock('@canvas/query', () => ({
-  queryClient: {
-    getQueryData: (...args: any[]) => mockGetQueryData(...args),
-    ensureQueryData: (...args: any[]) => mockEnsureQueryData(...args),
-  },
-}))
+const courseId = '1'
+const moduleId = '2'
+const moduleItemId = '3'
+
+const mockModulesData = {
+  pages: [
+    {
+      modules: [
+        {
+          _id: moduleId,
+          name: 'Test Module',
+        },
+      ],
+    },
+  ],
+}
+
+const mockItemsData = {
+  moduleItems: [
+    {
+      _id: moduleItemId,
+      id: moduleItemId,
+      title: 'Test Item',
+      indent: 1,
+    },
+  ],
+}
+
+queryClient.setQueryData([MODULE_ITEMS, moduleId, null], mockItemsData)
+
+queryClient.setQueryData([MODULES, courseId], mockModulesData)
+
+queryClient.setQueryData([MODULE_ITEM_TITLES, moduleId], mockItemsData)
 
 describe('modulePageCommandEventHandlers', () => {
-  const courseId = '1'
-  const moduleId = '2'
+  beforeAll(() => {
+    server.listen()
+  })
 
   afterEach(() => {
     jest.clearAllMocks()
@@ -72,23 +104,6 @@ describe('modulePageCommandEventHandlers', () => {
   describe('handleModuleAction', () => {
     describe('module actions', () => {
       it('calls handleEditModule when action is edit with moduleId and no moduleItemId', async () => {
-        const mockModulesData = {
-          pages: [
-            {
-              modules: [
-                {
-                  _id: moduleId,
-                  name: 'Test Module',
-                },
-              ],
-            },
-          ],
-        }
-
-        // Mock the query client responses
-        mockGetQueryData.mockReturnValue(mockModulesData)
-        mockEnsureQueryData.mockResolvedValue([])
-
         const event = new CustomEvent('module-action', {
           detail: {
             action: 'edit',
@@ -102,15 +117,13 @@ describe('modulePageCommandEventHandlers', () => {
         // Allow any pending promises to resolve
         await new Promise(process.nextTick)
 
-        expect(mockGetQueryData).toHaveBeenCalledWith(['modules', courseId])
-        expect(mockEnsureQueryData).toHaveBeenCalled()
         expect(handleOpeningModuleUpdateTray).toHaveBeenCalledWith(
           mockModulesData,
           courseId,
           moduleId,
           'Test Module',
           'settings',
-          [],
+          mockItemsData,
         )
       })
 
@@ -149,6 +162,50 @@ describe('modulePageCommandEventHandlers', () => {
         document.dispatchEvent(event)
 
         expect(clickSpy).toHaveBeenCalled()
+      })
+    })
+
+    describe('module item actions', () => {
+      it('calls upateIndent when action is indent', () => {
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'indent',
+            courseId,
+            moduleId,
+            moduleItemId,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        expect(updateIndent).toHaveBeenCalledWith(
+          moduleItemId,
+          moduleId,
+          2,
+          courseId,
+          expect.anything(), // queryClient
+        )
+      })
+
+      it('calls upateIndent when action is outdent', () => {
+        const event = new CustomEvent('module-action', {
+          detail: {
+            action: 'outdent',
+            courseId,
+            moduleId,
+            moduleItemId,
+          },
+        })
+
+        document.dispatchEvent(event)
+
+        expect(updateIndent).toHaveBeenCalledWith(
+          moduleItemId,
+          moduleId,
+          0,
+          courseId,
+          expect.anything(), // queryClient
+        )
       })
     })
   })

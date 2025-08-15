@@ -20,18 +20,19 @@ import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {MODULE_ITEM_TITLES, MODULE_ITEMS_QUERY_MAP, MODULES} from '../utils/constants'
+import {MODULE_ITEM_TITLES, MODULE_ITEMS, MODULE_ITEMS_QUERY_MAP, MODULES} from '../utils/constants'
 import {
   GraphQLResult,
   ModuleActionEventDetail,
   ModuleItem,
-  ModuleKBAction,
   ModulesResponse,
+  PaginatedNavigationResponse,
 } from '../utils/types'
 import {queryClient} from '@canvas/query'
 import {handleOpeningModuleUpdateTray} from './modulePageActionHandlers'
 import {handleDelete} from './moduleActionHandlers'
 import {InfiniteData} from '@tanstack/react-query'
+import {updateIndent} from './moduleItemActionHandlers'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -86,20 +87,12 @@ class ModulePageCommandEventHandlers {
     )
   }
 
-  handleEditModuleItem = async (courseId: string, moduleItemId: string) => {
-    console.log('>>>edit item', courseId, moduleItemId)
-  }
-
   // ------ delete ------
   handleDeleteModule = async (courseId: string, moduleId: string) => {
     const module = document.querySelector(`[data-module-id="${moduleId}"]`) as HTMLElement
     if (!module) return
     const moduleName = module?.getAttribute('data-module-name') || `module ${moduleId}`
     handleDelete(moduleId, moduleName, queryClient, courseId)
-  }
-
-  handleDeleteModuleItem = async (courseId: string, moduleItemId: string) => {
-    console.log('>>>delete item', courseId, moduleItemId)
   }
 
   // ------ new module ------
@@ -112,6 +105,47 @@ class ModulePageCommandEventHandlers {
       '#context-modules-header-add-module-button',
     ) as HTMLElement | null
     addModuleButton?.click()
+  }
+
+  // --------------- ModuleItems ---------------
+
+  getModuleItemFromCache = (moduleId: string, moduleItemId: string) => {
+    const queryData = queryClient.getQueryData<PaginatedNavigationResponse>([
+      MODULE_ITEMS,
+      moduleId,
+      null,
+    ])
+    if (!queryData) return
+    const moduleItem = queryData.moduleItems.find((item: any) => item._id === moduleItemId)
+    return moduleItem
+  }
+
+  handleEditModuleItem = async (courseId: string, moduleItemId: string) => {
+    console.log('>>>edit item', courseId, moduleItemId)
+  }
+
+  handleDeleteModuleItem = async (courseId: string, moduleItemId: string) => {
+    console.log('>>>delete item', courseId, moduleItemId)
+  }
+
+  handleIndentModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
+    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!moduleItem) return
+    const indent = moduleItem.indent
+    if (indent < 5) {
+      const newIndent = indent + 1
+      updateIndent(moduleItemId, moduleId, newIndent, courseId, queryClient)
+    }
+  }
+
+  handleOutdentModuleItem = (courseId: string, moduleId: string, moduleItemId: string) => {
+    const moduleItem = this.getModuleItemFromCache(moduleId, moduleItemId)
+    if (!moduleItem) return
+    const indent = moduleItem.indent
+    if (indent > 0) {
+      const newIndent = indent - 1
+      updateIndent(moduleItemId, moduleId, newIndent, courseId, queryClient)
+    }
   }
 
   handleModuleAction = (event: CustomEvent<ModuleActionEventDetail>) => {
@@ -135,27 +169,20 @@ class ModulePageCommandEventHandlers {
       case 'new':
         this.handleNewModule()
         break
+      case 'indent':
+        if (moduleId && moduleItemId) {
+          this.handleIndentModuleItem(courseId, moduleId, moduleItemId)
+        }
+        break
+      case 'outdent':
+        if (moduleId && moduleItemId) {
+          this.handleOutdentModuleItem(courseId, moduleId, moduleItemId)
+        }
+        break
       default:
         break
     }
   }
-}
-
-export const dispatchCommandEvent = (
-  action: ModuleKBAction,
-  courseId: string,
-  moduleId?: string,
-  moduleItemId?: string,
-) => {
-  const event = new CustomEvent<ModuleActionEventDetail>('module-action', {
-    detail: {
-      action,
-      courseId,
-      moduleId,
-      moduleItemId,
-    },
-  })
-  document.dispatchEvent(event)
 }
 
 // the singleton

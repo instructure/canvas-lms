@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {dispatchCommandEvent} from '../handlers/modulePageCommandEventHandlers'
+import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
 
 type ElemType = {
   type: 'modulelist' | 'module' | 'item' | undefined
@@ -111,6 +111,11 @@ class KBNavigator {
     return this.getNextSibling(elem, '.context_module', '.context_module_item')
   }
 
+  getModuleIdFromItem(elem: HTMLElement) {
+    const module = elem.closest('.context_module') as HTMLElement
+    return module?.getAttribute('data-module-id')
+  }
+
   /* *******************************************************
    * Arrow up/down assumes the <li> elements are all siblings
    * (not true for modules in the teacher view)
@@ -193,7 +198,9 @@ class KBNavigator {
     if (type.type === 'item') {
       const moduleItemId = type.elem.getAttribute('data-item-id')
       if (!moduleItemId) return false
-      dispatchCommandEvent('edit', courseId, undefined, moduleItemId)
+      const moduleId = this.getModuleIdFromItem(type.elem)
+      if (!moduleId) return false
+      dispatchCommandEvent('edit', courseId, moduleId, moduleItemId)
       return true
     }
     return false
@@ -208,17 +215,39 @@ class KBNavigator {
       dispatchCommandEvent('delete', courseId, moduleId)
       return true
     }
+    if (type.type === 'item') {
+      const moduleItemId = type.elem.getAttribute('data-item-id')
+      if (!moduleItemId) return false
+      const moduleId = this.getModuleIdFromItem(type.elem)
+      if (!moduleId) return false
+      dispatchCommandEvent('remove', courseId, moduleId, moduleItemId)
+      return true
+    }
     return false
   }
 
-  handleIndent(_type: ElemType): boolean {
-    // TODO: implement
-    return false
+  handleItemIndent(type: ElemType): boolean {
+    if (type.type !== 'item') return false
+    const courseId = ENV.course_id
+    if (!courseId) return false
+    const moduleId = this.getModuleIdFromItem(type.elem)
+    if (!moduleId) return false
+    const itemId = type.elem.getAttribute('data-item-id')
+    if (!itemId) return false
+    dispatchCommandEvent('indent', courseId, moduleId, itemId)
+    return true
   }
 
-  handleOutdent(_type: ElemType): boolean {
-    // TODO: implement
-    return false
+  handleItemOutdent(type: ElemType): boolean {
+    if (type.type !== 'item') return false
+    const courseId = ENV.course_id
+    if (!courseId) return false
+    const moduleId = this.getModuleIdFromItem(type.elem)
+    if (!moduleId) return false
+    const itemId = type.elem.getAttribute('data-item-id')
+    if (!itemId) return false
+    dispatchCommandEvent('outdent', courseId, moduleId, itemId)
+    return true
   }
 
   handleNew(_type: ElemType): boolean {
@@ -267,10 +296,10 @@ class KBNavigator {
           handled = this.handleDelete(elemType)
           break
         case 'i':
-          handled = this.handleIndent(elemType)
+          handled = this.handleItemIndent(elemType)
           break
         case 'o':
-          handled = this.handleOutdent(elemType)
+          handled = this.handleItemOutdent(elemType)
           break
         case 'n':
           handled = this.handleNew(elemType)

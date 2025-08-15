@@ -30,6 +30,7 @@ import {
   handleCopyTo,
 } from '../../handlers/moduleActionHandlers'
 import {handleOpeningModuleUpdateTray} from '../../handlers/modulePageActionHandlers'
+import '../../handlers/modulePageCommandEventHandlers'
 
 jest.mock('../../handlers/moduleActionHandlers')
 jest.mock('../../handlers/modulePageActionHandlers', () => ({
