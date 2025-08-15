@@ -321,7 +321,7 @@ const EXTERNAL_TOOLS_QUERY = gql`
   query GetExternalToolsQuery($courseId: ID!, $after: String) {
     course: legacyNode(_id: $courseId, type: Course) {
       ... on Course {
-        externalToolsConnection(first: 25, after: $after) {
+        externalToolsConnection(first: 100, after: $after, filter: {placementList: [link_selection, resource_selection]}) {
           nodes {
             _id
             name

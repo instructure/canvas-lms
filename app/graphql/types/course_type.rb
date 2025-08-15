@@ -513,12 +513,9 @@ module Types
       course.active_folders
     end
 
-    field :external_tools_connection, ExternalToolType.connection_type, null: true do
-      argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
-    end
-    def external_tools_connection(filter:)
-      scope = Lti::ContextToolFinder.all_tools_for(course, placements: filter.placement)
-      filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
+    implements Interfaces::ExternalToolsConnectionInterface
+    def external_tools_connection(filter: {})
+      super(filter:, course:)
     end
 
     field :term, TermType, null: true
