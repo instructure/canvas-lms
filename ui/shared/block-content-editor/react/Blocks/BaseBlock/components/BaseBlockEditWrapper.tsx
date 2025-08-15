@@ -57,16 +57,16 @@ const EditSettingsButton = () => {
 }
 
 const MoveBlockButton = () => {
-  const {canMoveUp, canMoveDown} = useMoveBlock()
+  const {canMoveUp, canMoveDown, moveToTop, moveUp, moveToBottom, moveDown} = useMoveBlock()
 
   return (
     <MoveButton
       canMoveUp={canMoveUp}
       canMoveDown={canMoveDown}
-      onMoveUp={() => {}}
-      onMoveDown={() => {}}
-      onMoveToTop={() => {}}
-      onMoveToBottom={() => {}}
+      onMoveUp={moveUp}
+      onMoveDown={moveDown}
+      onMoveToTop={moveToTop}
+      onMoveToBottom={moveToBottom}
     />
   )
 }

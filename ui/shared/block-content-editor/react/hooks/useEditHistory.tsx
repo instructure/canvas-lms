@@ -41,5 +41,6 @@ export const useEditHistory = () => {
     redo,
     canUndo,
     canRedo,
+    isEdited: canUndo || canRedo,
   }
 }
