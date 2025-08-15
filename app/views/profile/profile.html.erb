@@ -360,9 +360,6 @@ TEXT
       <li id="unregistered_service_google_drive" class="service" style="<%= hidden if !feature_and_service_enabled?(:google_drive) || services.include?("google_drive") %>">
         <a href="#" class="btn btn-small"><%= image_tag "google_drive_icon.png", :alt => '' %> <%= t('links.google_drive', "Google Drive") %></a>
       </li>
-      <li id="unregistered_service_skype" class="service" style="<%= hidden if services.include?("skype") || !service_enabled?(:skype) %>">
-        <a href="#" class="btn btn-small"><%= image_tag "skype_icon.png", :alt => '' %> <%= t('links.skype', "Skype") %></a>
-      </li>
       <li id="unregistered_service_diigo" class="service" style="<%= hidden if services.include?("diigo") || !feature_and_service_enabled?(:diigo) %>">
         <a href="#" class="btn btn-small"><%= image_tag "diigo_icon.png", :alt => '' %> <%= t('links.diigo', "Diigo") %></a>
       </li>

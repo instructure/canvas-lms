@@ -33,7 +33,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('profile')
 
-type ServiceName = 'skype' | 'google_drive' | 'diigo'
+type ServiceName = 'google_drive' | 'diigo'
 
 export const USERNAME_MAX_LENGTH = 255
 
@@ -65,35 +65,6 @@ export const serviceConfigByName: Record<
     button: ({isSubmitting}: {isSubmitting: boolean}) => ReactNode
   }
 > = {
-  skype: {
-    title: I18n.t('Register Skype'),
-    description: I18n.t(
-      'Skype offers free online voice and video calls. Lots of students use Skype as a free, easy way to communicate. If you register your Skype Name and enable visibility, then other students can easily find your contact and call or add you using Skype.',
-    ),
-    image: {path: '/images/skype.png', alt: I18n.t('Skype logo')},
-    fields: control => (
-      <Controller
-        name="username"
-        control={control}
-        render={({field, formState: {errors}}) => (
-          <TextInput
-            {...field}
-            renderLabel={I18n.t('Skype Name')}
-            messages={getFormErrorMessage(errors, 'username')}
-          />
-        )}
-      />
-    ),
-    button: ({isSubmitting}) => {
-      const buttonText = isSubmitting ? I18n.t('Saving Skype Name...') : I18n.t('Save Skype Name')
-
-      return (
-        <Button type="submit" color="primary" disabled={isSubmitting} aria-label={buttonText}>
-          {buttonText}
-        </Button>
-      )
-    },
-  },
   google_drive: {
     title: I18n.t('Authorize Google Drive'),
     description: I18n.t(
