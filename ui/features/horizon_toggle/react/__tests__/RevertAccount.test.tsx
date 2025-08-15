@@ -20,8 +20,13 @@ import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {RevertAccount} from '../RevertAccount'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import * as globalUtils from '@canvas/util/globalUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  reloadWindow: jest.fn(),
+}))
 
 describe('RevertAccount', () => {
   const setup = (propOverrides = {}) => {
@@ -32,7 +37,7 @@ describe('RevertAccount', () => {
     }
     return render(<RevertAccount {...props} />)
   }
-  it('makes an API call when the Revert button is clicked', () => {
+  it('makes an API call when the Revert button is clicked', async () => {
     ;(doFetchApi as jest.Mock).mockResolvedValue({})
 
     setup()
@@ -44,13 +49,16 @@ describe('RevertAccount', () => {
     expect(revertButton).not.toBeUndefined()
     fireEvent.click(revertButton!)
 
-    expect(doFetchApi).toHaveBeenCalledWith({
-      path: '/api/v1/accounts/123',
-      method: 'PUT',
-      body: {
-        id: '123',
-        account: {settings: {horizon_account: {value: false}}},
-      },
+    await waitFor(() => {
+      expect(doFetchApi).toHaveBeenCalledWith({
+        path: '/api/v1/accounts/123',
+        method: 'PUT',
+        body: {
+          id: '123',
+          account: {settings: {horizon_account: {value: false}}},
+        },
+      })
+      expect(globalUtils.reloadWindow).toHaveBeenCalled()
     })
   })
 
