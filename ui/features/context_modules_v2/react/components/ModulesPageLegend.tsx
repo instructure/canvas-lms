@@ -199,38 +199,6 @@ const ModulesPageLegend: React.FC<ModulesPagePageLegendProps> = ({
               'When the drag handle has focus, select the module or item to begin dragging, then again to drop selected item',
             )}
           </Text>
-          {/*}
-          <Text as="dt" size="contentSmall" weight="bold">
-            {I18n.t('e:')}
-          </Text>
-          <Text as="dd" size="contentSmall">
-            {I18n.t('Edit current module or module item')}
-          </Text>
-          <Text as="dt" size="contentSmall" weight="bold">
-            {I18n.t('d:')}
-          </Text>
-          <Text as="dd" size="contentSmall">
-            {I18n.t('Delete current module or module item')}
-          </Text>
-          <Text as="dt" size="contentSmall" weight="bold">
-            {I18n.t('i:')}
-          </Text>
-          <Text as="dd" size="contentSmall">
-            {I18n.t('Increase indent')}
-          </Text>
-          <Text as="dt" size="contentSmall" weight="bold">
-            {I18n.t('o:')}
-          </Text>
-          <Text as="dd" size="contentSmall">
-            {I18n.t('Decrease indent')}
-          </Text>
-          <Text as="dt" size="contentSmall" weight="bold">
-            {I18n.t('n:')}
-          </Text>
-          <Text as="dd" size="contentSmall">
-            {I18n.t('New module or module item')}
-          </Text>
-          */}
           <Text as="dt" size="contentSmall" weight="bold">
             {I18n.t('?:')}
           </Text>
@@ -239,6 +207,43 @@ const ModulesPageLegend: React.FC<ModulesPagePageLegendProps> = ({
           </Text>
         </View>
       </View>
+    )
+  }
+
+  const renderCommandInfo = () => {
+    return (
+      <>
+        <Text as="dt" size="contentSmall" weight="bold">
+          {I18n.t('e:')}
+        </Text>
+        <Text as="dd" size="contentSmall">
+          {I18n.t('Edit current module or module item')}
+        </Text>
+        <Text as="dt" size="contentSmall" weight="bold">
+          {I18n.t('d:')}
+        </Text>
+        <Text as="dd" size="contentSmall">
+          {I18n.t('Delete current module or module item')}
+        </Text>
+        <Text as="dt" size="contentSmall" weight="bold">
+          {I18n.t('i:')}
+        </Text>
+        <Text as="dd" size="contentSmall">
+          {I18n.t('Increase item indent')}
+        </Text>
+        <Text as="dt" size="contentSmall" weight="bold">
+          {I18n.t('o:')}
+        </Text>
+        <Text as="dd" size="contentSmall">
+          {I18n.t('Decrease item indent')}
+        </Text>
+        <Text as="dt" size="contentSmall" weight="bold">
+          {I18n.t('n:')}
+        </Text>
+        <Text as="dd" size="contentSmall">
+          {I18n.t('New module')}
+        </Text>
+      </>
     )
   }
 
@@ -261,6 +266,13 @@ const ModulesPageLegend: React.FC<ModulesPagePageLegendProps> = ({
           onSelect={() => setSelectionIndex(1)}
         >
           {renderNavInfo()}
+        </Tabs.Panel>
+        <Tabs.Panel
+          renderTitle={I18n.t('Commands')}
+          isSelected={selectionIndex === 2}
+          onSelect={() => setSelectionIndex(2)}
+        >
+          {renderCommandInfo()}
         </Tabs.Panel>
       </Tabs>
     )

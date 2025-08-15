@@ -91,7 +91,7 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   const {data: moduleItems} = useModuleItems(id, null, expanded || isMenuOpen)
 
   const handleEditRef = useCallback(() => {
-    dispatchCommandEvent('edit', courseId, id)
+    dispatchCommandEvent({action: 'edit', courseId, moduleId: id})
   }, [courseId, id])
 
   const handleMoveContentsRef = useCallback(() => {

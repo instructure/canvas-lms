@@ -77,8 +77,8 @@ export const handlePublishToggle = async (
   }
 }
 
-export const handleEdit = (setIsEditItemOpen: (isOpen: boolean) => void) => {
-  setIsEditItemOpen(true)
+export const handleEdit = (courseId: string, itemId: string) => {
+  dispatchCommandEvent({action: 'edit', courseId, moduleItemId: itemId})
 }
 
 export const handleSpeedGrader = (
@@ -233,7 +233,7 @@ export const handleDecreaseIndent = async (
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  dispatchCommandEvent('outdent', courseId, moduleId, itemId)
+  dispatchCommandEvent({action: 'outdent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -245,7 +245,7 @@ export const handleIncreaseIndent = async (
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  dispatchCommandEvent('indent', courseId, moduleId, itemId)
+  dispatchCommandEvent({action: 'indent', courseId, moduleId, moduleItemId: itemId})
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
