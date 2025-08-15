@@ -924,7 +924,7 @@ describe Types::AssignmentType do
 
       context "when student can read their own grade" do
         it "returns lti asset processors" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(true)
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(true)
 
           resolver = GraphQLTypeTester.new(assignment, context)
           result = resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")
@@ -934,7 +934,7 @@ describe Types::AssignmentType do
 
       context "when student cannot read their own grade" do
         it "returns null" do
-          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student).and_return(false)
+          allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(student, for_plagiarism: true).and_return(false)
 
           resolver = GraphQLTypeTester.new(assignment, context)
           expect(resolver.resolve("ltiAssetProcessorsConnection { edges { node { _id } } }")).to be_nil

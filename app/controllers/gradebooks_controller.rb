@@ -134,12 +134,16 @@ class GradebooksController < ApplicationController
                       excused: submission.excused?,
                       score: submission.score,
                       workflow_state: submission.workflow_state,
-                      asset_processors: asset_processors(assignment: submission.assignment),
-                      asset_reports: @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:),
                       submission_type: submission.submission_type,
                       auto_grade_result_present: submission.auto_grade_result_present?
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
+      end
+
+      if submission.user_can_read_grade?(@presenter.student, for_plagiarism: true)
+        json[:asset_processors] = asset_processors(assignment: submission.assignment)
+        json[:asset_reports] = @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:)
+        json[:submission_type] = submission.submission_type
       end
 
       json[:submission_comments] = submission.visible_submission_comments.map do |comment|
