@@ -2119,6 +2119,8 @@
   path: '/api/v1/show_k5_dashboard'
 - verb: PUT
   path: '/api/v1/submissions/:id/what_if_grades'
+- verb: POST
+  path: '/api/v1/support_helpers/asset_processor/bulk_resubmit'
 - verb: GET
   path: '/api/v1/support_helpers/asset_processor/submission_details'
 - verb: GET
@@ -2443,4 +2445,3 @@
   path: '/api/v1/users/self/todo_item_count'
 - verb: GET
   path: '/api/v1/users/self/upcoming_events'
-

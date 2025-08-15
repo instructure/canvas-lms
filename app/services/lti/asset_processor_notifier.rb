@@ -24,12 +24,15 @@ module Lti
 
     class MissingGroupmateSubmissionError < StandardError; end
 
-    def notify_asset_processors(submission, asset_processor = nil)
+    def notify_asset_processors(submission, asset_processor = nil, tool_id = nil)
       return unless submission.asset_processor_compatible?
 
       asset_processors = submission.assignment.lti_asset_processors
       if asset_processor.present?
         asset_processors = asset_processors.where(id: asset_processor.id)
+      end
+      if tool_id.present?
+        asset_processors = asset_processors.where(context_external_tool_id: tool_id)
       end
       return if asset_processors.empty?
 
@@ -43,7 +46,6 @@ module Lti
       return if lti_assets.empty?
 
       lti_assets.each(&:calculate_sha256_checksum!)
-
       asset_processors.each do |ap|
         params = notice_params(submission, lti_assets, ap)
         builder = Pns::LtiAssetProcessorSubmissionNoticeBuilder.new(params)
