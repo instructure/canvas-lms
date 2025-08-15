@@ -392,7 +392,8 @@ export type QuizEngine = 'new' | 'classic'
 
 export type ModuleKBActionEvent = 'module-action'
 export type ModuleKBAction = 'edit' | 'delete' | 'new'
-export type ModuleItemKBAction = 'edit' | 'delete' | 'indent' | 'outdent'
+export type ModuleItemKBAction = 'edit' | 'remove' | 'indent' | 'outdent'
+
 export interface ModuleActionEventDetail {
   action: ModuleKBAction | ModuleItemKBAction
   courseId: string

@@ -144,11 +144,11 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 
   const handleAssignToRef = useCallback(() => {
     handleAssignTo(content, courseId, title, setIsMenuOpen, moduleId)
-  }, [content, courseId, setIsMenuOpen, moduleId])
+  }, [content, courseId, title, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
     handleDuplicate(moduleId, itemId, queryClient, courseId, setMenuItemLoadingState, setIsMenuOpen)
-  }, [moduleId, itemId, courseId, setIsMenuOpen])
+  }, [moduleId, itemId, courseId, setMenuItemLoadingState, setIsMenuOpen])
 
   const handleMoveToRef = useCallback(() => {
     if (!setModuleAction || !setSelectedModuleItem || !setIsManageModuleContentTrayOpen) return
@@ -169,6 +169,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     moduleId,
     moduleTitle,
     itemId,
+    title,
     content,
     setModuleAction,
     setSelectedModuleItem,
@@ -178,12 +179,12 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   ])
 
   const handleDecreaseIndentRef = useCallback(() => {
-    handleDecreaseIndent(itemId, moduleId, indent, courseId, queryClient, setIsMenuOpen)
-  }, [itemId, moduleId, indent, courseId, setIsMenuOpen])
+    handleDecreaseIndent(itemId, moduleId, courseId, setIsMenuOpen)
+  }, [itemId, moduleId, courseId, setIsMenuOpen])
 
   const handleIncreaseIndentRef = useCallback(() => {
-    handleIncreaseIndent(itemId, moduleId, indent, courseId, queryClient, setIsMenuOpen)
-  }, [itemId, moduleId, indent, courseId, setIsMenuOpen])
+    handleIncreaseIndent(itemId, moduleId, courseId, setIsMenuOpen)
+  }, [itemId, moduleId, courseId, setIsMenuOpen])
 
   const handleSendToRef = useCallback(() => {
     handleSendTo(setIsDirectShareOpen, setIsMenuOpen)
@@ -197,7 +198,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     handleRemove(moduleId, itemId, title, queryClient, courseId, setIsMenuOpen, () =>
       focusModuleItemTitleLinkById(focusTargetItemId),
     )
-  }, [moduleId, itemId, content, courseId, setIsMenuOpen, focusTargetItemId])
+  }, [moduleId, itemId, title, courseId, focusTargetItemId])
 
   const handleMasteryPathsRef = useCallback(() => {
     handleMasteryPaths(itemId, setIsMenuOpen)
@@ -205,7 +206,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
 
   const publishIconOnClickRef = useCallback(() => {
     handlePublishToggle(moduleId, itemId, title, canBeUnpublished, queryClient, courseId, published)
-  }, [moduleId, itemId, content, canBeUnpublished, courseId, published])
+  }, [moduleId, itemId, title, canBeUnpublished, courseId, published])
 
   const renderFilePublishButton = () => {
     const file = new ModuleFile({

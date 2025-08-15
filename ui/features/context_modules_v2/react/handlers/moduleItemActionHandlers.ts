@@ -30,6 +30,7 @@ import type {
 } from '../utils/types'
 import React from 'react'
 import {MODULE_ITEMS, MODULES, MOVE_MODULE_ITEM} from '../utils/constants'
+import {dispatchCommandEvent} from './dispatchCommandEvent'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -229,15 +230,10 @@ export const updateIndent = async (
 export const handleDecreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent > 0) {
-    const newIndent = Math.max(indent - 1, 0)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent('outdent', courseId, moduleId, itemId)
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }
@@ -246,15 +242,10 @@ export const handleDecreaseIndent = async (
 export const handleIncreaseIndent = async (
   itemId: string,
   moduleId: string,
-  indent: number,
   courseId: string,
-  queryClient: QueryClient,
   setIsMenuOpen?: (isOpen: boolean) => void,
 ) => {
-  if (indent < 5) {
-    const newIndent = Math.min(indent + 1, 5)
-    await updateIndent(itemId, moduleId, newIndent, courseId, queryClient)
-  }
+  dispatchCommandEvent('indent', courseId, moduleId, itemId)
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
   }

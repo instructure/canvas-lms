@@ -47,7 +47,7 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {ModuleAction, ExternalTool, ExternalToolPlacementType} from '../utils/types'
 import {useExternalToolLaunch} from '../hooks/useExternalToolLaunch'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
-import {dispatchCommandEvent} from '../handlers/modulePageCommandEventHandlers'
+import {dispatchCommandEvent} from '../handlers/dispatchCommandEvent'
 import {MOVE_MODULE, MOVE_MODULE_CONTENTS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')

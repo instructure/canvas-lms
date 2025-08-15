@@ -22,8 +22,8 @@ import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
 import type {ModuleItem} from '../utils/types'
 import {SHOW_ALL_PAGE_SIZE} from '../utils/constants'
-import {useModuleItems, getModuleItems} from '../hooks/queries/useModuleItems'
-import {useQuery} from '@tanstack/react-query'
+import {useModuleItems} from '../hooks/queries/useModuleItems'
+import {useAllModuleItems} from '../hooks/queries/useAllModuleItems'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {ErrorBoundary} from '@sentry/react'
@@ -89,25 +89,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
 
   // Always call both hooks to avoid conditional hook calls
   const paginatedResult = useModuleItems(moduleId, cursor, isExpanded, view)
-  const allItemsResult = useQuery({
-    queryKey: ['MODULE_ITEMS_ALL', moduleId, view, SHOW_ALL_PAGE_SIZE],
-    queryFn: async () => {
-      const allItems: ModuleItem[] = []
-      let currentCursor: string | null = null
-      let hasMore = true
-
-      while (hasMore) {
-        const result = await getModuleItems(moduleId, currentCursor, view, SHOW_ALL_PAGE_SIZE)
-        allItems.push(...result.moduleItems)
-        hasMore = result.pageInfo.hasNextPage
-        currentCursor = result.pageInfo.endCursor
-      }
-
-      return {moduleItems: allItems, pageInfo: {hasNextPage: false, endCursor: null}}
-    },
-    enabled: isExpanded && !isPaginated,
-    staleTime: 15 * 60 * 1000,
-  })
+  const allItemsResult = useAllModuleItems(moduleId, isExpanded && !isPaginated, view)
 
   // Use the appropriate result based on pagination mode
   const moduleItemsResult = isPaginated ? paginatedResult : allItemsResult
