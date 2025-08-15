@@ -8857,4 +8857,44 @@ describe Course do
       end
     end
   end
+
+  describe "#active_now?" do
+    let(:now) { Time.zone.now }
+
+    def expect_active_now(expected, start_at: nil, end_at: nil, restrict: true)
+      course = Course.new
+      if restrict
+        course.start_at = start_at
+        course.conclude_at = end_at
+        course.restrict_enrollments_to_course_dates = true
+      else
+        course.restrict_enrollments_to_course_dates = false
+        enrollment_term = double("EnrollmentTerm", start_at:, end_at:)
+        allow(course).to receive(:enrollment_term).and_return(enrollment_term)
+      end
+      expect(course.active_now?).to eq(expected)
+    end
+
+    context "when restrict_enrollments_to_course_dates is true" do
+      it { expect_active_now(true, start_at: nil, end_at: nil, restrict: true) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: nil, restrict: true) }
+      it { expect_active_now(true, start_at: nil, end_at: now + 1.day, restrict: true) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: now + 1.day, restrict: true) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: nil, restrict: true) }
+      it { expect_active_now(false, start_at: nil, end_at: now - 1.day, restrict: true) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: now + 2.days, restrict: true) }
+      it { expect_active_now(false, start_at: now - 2.days, end_at: now - 1.day, restrict: true) }
+    end
+
+    context "when restrict_enrollments_to_course_dates is false" do
+      it { expect_active_now(true, start_at: nil, end_at: nil, restrict: false) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: nil, restrict: false) }
+      it { expect_active_now(true, start_at: nil, end_at: now + 1.day, restrict: false) }
+      it { expect_active_now(true, start_at: now - 1.day, end_at: now + 1.day, restrict: false) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: nil, restrict: false) }
+      it { expect_active_now(false, start_at: nil, end_at: now - 1.day, restrict: false) }
+      it { expect_active_now(false, start_at: now + 1.day, end_at: now + 2.days, restrict: false) }
+      it { expect_active_now(false, start_at: now - 2.days, end_at: now - 1.day, restrict: false) }
+    end
+  end
 end

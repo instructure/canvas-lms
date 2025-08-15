@@ -2102,6 +2102,18 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?(enrollment_type)
   end
 
+  def active_now?
+    now = Time.zone.now
+    if restrict_enrollments_to_course_dates
+      started = start_at.nil? || start_at <= now
+      not_concluded = conclude_at.nil? || conclude_at > now
+    else
+      started = enrollment_term&.start_at.nil? || enrollment_term.start_at <= now
+      not_concluded = enrollment_term&.end_at.nil? || enrollment_term.end_at > now
+    end
+    started && not_concluded
+  end
+
   def set_concluded_assignments_grading_standard
     ActiveRecord::Base.transaction do
       assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.zone.now)
