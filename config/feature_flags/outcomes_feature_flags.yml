@@ -173,3 +173,9 @@ outcomes_rollup_propagation:
   description: Controls whether background jobs populate the rollup table. Only Site Admins can toggle.
   applies_to: SiteAdmin
   shadow: true
+outcomes_rollup_read:
+  state: hidden
+  display_name: Outcomes Rollup Read
+  description: When enabled, LMGB reads from rollup table instead of calculating. Only Site Admins can toggle.
+  applies_to: SiteAdmin
+  shadow: true
