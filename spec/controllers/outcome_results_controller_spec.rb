@@ -1897,5 +1897,54 @@ describe OutcomeResultsController do
         end
       end
     end
+
+    context "StatsD metrics" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:time).and_call_original
+      end
+
+      it "tracks runtime with outcomes_rollup_read tag when feature flag is off" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get_rollups({})
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "off" }
+        )
+      end
+
+      it "tracks runtime with outcomes_rollup_read tag when feature flag is on" do
+        Account.site_admin.enable_feature!(:outcomes_rollup_read)
+        get_rollups({})
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "on" }
+        )
+      end
+
+      it "tracks runtime for CSV format" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get "rollups",
+            params: {
+              context_id: @course.id,
+              course_id: @course.id,
+              context_type: "Course"
+            },
+            format: "csv"
+
+        expect(InstStatsd::Statsd).to have_received(:time).with(
+          "lmgb.rollup.endpoint.runtime",
+          tags: { outcomes_rollup_read: "off" }
+        )
+      end
+
+      it "does not track metrics for aggregate rollups since feature flag doesn't affect them" do
+        Account.site_admin.disable_feature!(:outcomes_rollup_read)
+        get_rollups({ aggregate: "course" })
+
+        expect(InstStatsd::Statsd).not_to have_received(:time)
+      end
+    end
   end
 end

@@ -357,19 +357,30 @@ class OutcomeResultsController < ApplicationController
       format.json do
         json = case params[:aggregate]
                when "course" then aggregate_rollups_json
-               else user_rollups_json
+               else
+                 ff_read_enabled = Account.site_admin.feature_enabled?(:outcomes_rollup_read)
+                 metric_tags = { outcomes_rollup_read: ff_read_enabled ? "on" : "off" }
+
+                 InstStatsd::Statsd.time("lmgb.rollup.endpoint.runtime", tags: metric_tags) do
+                   user_rollups_json
+                 end
                end
         json[:linked] = linked_include_collections if params[:include].present?
         render json: json if json
       end
       format.csv do
-        build_outcome_paths
-        send_data(
-          outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
-          type: "text/csv",
-          filename: t("outcomes_filename", "Outcomes").tr(" ", "_") + "-" + @context.name.to_s.tr(" ", "_") + ".csv",
-          disposition: "attachment"
-        )
+        ff_read_enabled = Account.site_admin.feature_enabled?(:outcomes_rollup_read)
+        metric_tags = { outcomes_rollup_read: ff_read_enabled ? "on" : "off" }
+
+        InstStatsd::Statsd.time("lmgb.rollup.endpoint.runtime", tags: metric_tags) do
+          build_outcome_paths
+          send_data(
+            outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
+            type: "text/csv",
+            filename: t("outcomes_filename", "Outcomes").tr(" ", "_") + "-" + @context.name.to_s.tr(" ", "_") + ".csv",
+            disposition: "attachment"
+          )
+        end
       end
     end
   end
