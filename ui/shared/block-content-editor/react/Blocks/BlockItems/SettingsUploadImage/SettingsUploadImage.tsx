@@ -18,12 +18,13 @@
 
 import {SettingsUploadImageProps} from './types'
 import {CondensedButton, IconButton} from '@instructure/ui-buttons'
-import {IconTrashLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconExternalLinkLine, IconTrashLine, IconUploadLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useState} from 'react'
 import {ImageBlockUploadModal} from '../Image/ImageBlockUploadModal'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -32,7 +33,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
 
-  const onSelected = (url: string, altText: string, fileName: string) => {
+  const onSelected = (url: string, altText: string, fileName?: string) => {
     closeModal()
     onImageChange({
       url,
@@ -49,7 +50,7 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
     })
   }
 
-  const buttonText = url ? I18n.t('Replace Image') : I18n.t('Upload image')
+  const buttonText = url?.trim() ? I18n.t('Replace Image') : I18n.t('Upload image')
 
   return (
     <>
@@ -58,7 +59,18 @@ export const SettingsUploadImage = ({url, fileName, onImageChange}: SettingsUplo
         {url?.trim() && (
           <Flex direction="row">
             <Flex.Item shouldShrink shouldGrow padding="0 medium 0 0">
-              <Text wrap="break-word">{fileName}</Text>
+              {fileName ? (
+                <Text wrap="break-word">{fileName}</Text>
+              ) : (
+                <Link
+                  target="_blank"
+                  renderIcon={<IconExternalLinkLine />}
+                  iconPlacement="end"
+                  href={url}
+                >
+                  {I18n.t('Image external URL')}
+                </Link>
+              )}
             </Flex.Item>
             <Flex.Item>
               <IconButton
