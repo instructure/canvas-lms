@@ -47,6 +47,8 @@ ActiveSupport::TimeZone.include(TimeZoneAsJson)
 # Custom friendly time zones
 ActiveSupport::TimeZone::MAPPING["Asuncion"] = "America/Asuncion"
 ActiveSupport::TimeZone::MAPPING["Philippines"] = "Asia/Manila"
+# Additional Pacific zones
+ActiveSupport::TimeZone::MAPPING["Rarotonga/Cook Islands"] = "Pacific/Rarotonga"
 # Additional Brazil zones
 ActiveSupport::TimeZone::MAPPING["Noronha"] = "America/Noronha"
 ActiveSupport::TimeZone::MAPPING["Fortaleza"] = "America/Fortaleza"
