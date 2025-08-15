@@ -1637,6 +1637,12 @@ describe AssignmentOverrideApplicator do
       expect(due_at).to eq @assignment.due_at
     end
 
+    it "does not fall back on assignment's due_at if only module overrides exist" do
+      @override.context_module_id = 123
+      due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
+      expect(due_at).to eq @override.due_at
+    end
+
     it "recognizes overrides with overridden-but-nil due_at" do
       @override.override_due_at(nil)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])

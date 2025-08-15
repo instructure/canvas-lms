@@ -427,7 +427,11 @@ module AssignmentOverrideApplicator
 
   # perform overrides of specific fields
   def self.override_for_due_at(learning_object, overrides)
-    due_at_overrides = overrides.select(&:due_at_overridden)
+    due_at_overrides = if overrides.all? { |o| !o.context_module_id.nil? }
+                         overrides
+                       else
+                         overrides.select(&:due_at_overridden)
+                       end
     select_override_by_attribute(learning_object, due_at_overrides, :due_at, :max)
   end
 
