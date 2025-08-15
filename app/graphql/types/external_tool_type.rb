@@ -34,14 +34,8 @@ module Types
     description "Placements that an External Tool can have"
     value "homework_submission"
     value "ActivityAssetProcessor"
-  end
-
-  class ExternalToolFilterInputType < Types::BaseInputObject
-    graphql_name "ExternalToolFilterInput"
-
-    argument :state, ExternalToolStateType, required: false, default_value: nil
-
-    argument :placement, ExternalToolPlacementType, required: false, default_value: nil
+    value "link_selection"
+    value "resource_selection"
   end
 
   # This is a little funky. External tools can either be backed by a `ContextExternalTool`

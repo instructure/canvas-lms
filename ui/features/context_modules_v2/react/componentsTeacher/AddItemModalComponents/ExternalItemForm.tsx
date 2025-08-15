@@ -70,25 +70,19 @@ export const ExternalItemForm: React.FC<ExternalItemFormProps> = ({
   const [localUrlError, setLocalUrlError] = useState(formErrors.url || '')
   const [hasUserInteracted, setHasUserInteracted] = useState(false)
 
-  const externalToolItems = useMemo(() => {
-    const mappedItems = contentItems.map((item: ContentItem) => ({
-      definition_id: item.id,
-      definition_type: ITEM_TYPE.EXTERNAL_TOOL,
-      name: item.name,
-      url: item.url,
-      domain: item.domain,
-      description: item.description,
-      placements: item.placements,
-    })) as ExternalToolModalItem[]
-
-    if (itemType === ITEM_TYPE.EXTERNAL_TOOL) {
-      return mappedItems.filter(
-        ({placements}) => placements?.linkSelection || placements?.resourceSelection,
-      )
-    } else {
-      return mappedItems
-    }
-  }, [contentItems, itemType])
+  const externalToolItems = useMemo(
+    () =>
+      contentItems.map((item: ContentItem) => ({
+        definition_id: item.id,
+        definition_type: ITEM_TYPE.EXTERNAL_TOOL,
+        name: item.name,
+        url: item.url,
+        domain: item.domain,
+        description: item.description,
+        placements: item.placements,
+      })) as ExternalToolModalItem[],
+    [contentItems],
+  )
 
   // Handle tool selection and auto-populate URL/name
   const handleToolSelect = (tool: ExternalToolModalItem | null) => {
