@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import {useState, useCallback, useRef, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
@@ -37,19 +37,39 @@ export const ButtonBlockIndividualButtonSettings = ({
   onButtonsChange,
 }: ButtonBlockIndividualButtonSettingsProps) => {
   const [expandedButtonId, setExpandedButtonId] = useState<number | null>(null)
+  const [focusButtonId, setFocusButtonId] = useState<number | null>(null)
+  const toggleRefs = useRef<Record<number, ToggleGroup | null>>({})
   const {buttons, addButton, removeButton, updateButton, canAddButton, canDeleteButton} =
     useButtonManager(initialButtons, onButtonsChange)
+
+  useEffect(() => {
+    if (focusButtonId) {
+      const toggleRef = toggleRefs.current[focusButtonId]
+      toggleRef?.focus()
+      setFocusButtonId(null)
+    }
+  }, [focusButtonId, buttons])
 
   const handleButtonToggle = useCallback((buttonId: number) => {
     setExpandedButtonId(prevId => (prevId === buttonId ? null : buttonId))
   }, [])
 
   const handleButtonRemove = useCallback(
-    (buttonId: number) => {
+    (buttonId: number, buttonIndex: number) => {
+      if (buttons.length <= 1) return
+
+      const buttonAboveIndex = buttonIndex - 1
+      const buttonToFocus = buttonAboveIndex >= 0 ? buttons[buttonAboveIndex] : buttons[1]
+
       removeButton(buttonId)
       setExpandedButtonId(prevId => (prevId === buttonId ? null : prevId))
+      delete toggleRefs.current[buttonId]
+
+      if (buttonToFocus) {
+        setFocusButtonId(buttonToFocus.id)
+      }
     },
-    [removeButton],
+    [removeButton, buttons],
   )
 
   const renderButtonSettingsContent = (button: ButtonData) => (
@@ -82,7 +102,7 @@ export const ButtonBlockIndividualButtonSettings = ({
     </Flex>
   )
 
-  const renderButtonSettings = (button: ButtonData) => {
+  const renderButtonSettings = (button: ButtonData, buttonIndex: number) => {
     const isExpanded = expandedButtonId === button.id
     return (
       <View
@@ -97,7 +117,7 @@ export const ButtonBlockIndividualButtonSettings = ({
             <Flex justifyItems="space-between" alignItems="center">
               <Text>{I18n.t('Button')}</Text>
               <IconButton
-                onClick={() => handleButtonRemove(button.id)}
+                onClick={() => handleButtonRemove(button.id, buttonIndex)}
                 withBackground={false}
                 withBorder={false}
                 screenReaderLabel={I18n.t('Delete button')}
@@ -116,6 +136,9 @@ export const ButtonBlockIndividualButtonSettings = ({
           }
           data-buttonsettingstoggle
           data-testid={`button-settings-toggle-${button.id}`}
+          ref={(el: ToggleGroup | null) => {
+            toggleRefs.current[button.id] = el
+          }}
         >
           <View as="div" padding="small" data-testid={`button-settings-${button.id}`}>
             {renderButtonSettingsContent(button)}

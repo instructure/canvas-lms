@@ -123,6 +123,45 @@ describe('ButtonBlockIndividualButtonSettings', () => {
       expect(buttonsChanged).toHaveBeenCalledWith([createButton(2, {text: 'Button 2'})])
     })
 
+    describe('focus after delete', () => {
+      const renderFocusTest = (onButtonsChange = jest.fn()) => {
+        const propsWithThreeButtons = {
+          ...defaultProps,
+          initialButtons: [
+            createButton(1, {text: 'Button 1'}),
+            createButton(2, {text: 'Button 2'}),
+            createButton(3, {text: 'Button 3'}),
+          ],
+          onButtonsChange,
+        }
+        render(<ButtonBlockIndividualButtonSettings {...propsWithThreeButtons} />)
+        return onButtonsChange
+      }
+
+      const deleteButton = (buttonId: number) => {
+        act(() => {
+          fireEvent.click(screen.getByTestId(`button-settings-delete-${buttonId}`))
+        })
+      }
+
+      const expectToggleToHaveFocus = (buttonId: number) => {
+        const toggle = screen.getByTestId(`button-settings-toggle-${buttonId}`)
+        expect(toggle.querySelector('button')).toHaveFocus()
+      }
+
+      it('focuses on the button above after deleting a button', () => {
+        renderFocusTest()
+        deleteButton(2)
+        expectToggleToHaveFocus(1)
+      })
+
+      it('focuses on the next button after deleting the first button', () => {
+        renderFocusTest()
+        deleteButton(1)
+        expectToggleToHaveFocus(2)
+      })
+    })
+
     it('updates button text', () => {
       const buttonsChanged = jest.fn()
       render(
