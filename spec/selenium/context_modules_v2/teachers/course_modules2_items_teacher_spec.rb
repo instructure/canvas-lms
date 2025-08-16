@@ -181,8 +181,7 @@ describe "context module items", :ignore_js_errors do
       go_to_modules
       wait_for_ajaximations
       module_header_expand_toggles.last.click
-      text_header_icon = module_item_text_header_icon(text_header.id)
-      expect(text_header_icon).to be_displayed
+      expect(module_item_by_id_selector(text_header.id)).not_to include("[data-testid='document-icon']")
     end
 
     it "displays the correct icon for external URL" do

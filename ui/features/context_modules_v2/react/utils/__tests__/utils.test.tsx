@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
 import {
   getItemIcon,
   validateModuleStudentRenderRequirements,
@@ -28,6 +27,8 @@ import {
   filterRequirementsMet,
 } from '../utils'
 import {CompletionRequirement, ModuleRequirement} from '../types'
+import React from 'react'
+import {render, screen} from '@testing-library/react'
 
 describe('utils', () => {
   describe('getIconColor', () => {
@@ -45,64 +46,68 @@ describe('utils', () => {
   })
 
   describe('getItemIcon', () => {
-    it('should return the correct icon for an assignment', () => {
-      const container = render(getItemIcon({type: 'Assignment'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('assignment-icon')).toBeInTheDocument()
+    const renderIcon = (content: any) =>
+      render(<div data-testid="host">{getItemIcon(content)}</div>)
+
+    it('returns the correct icon for an assignment', () => {
+      renderIcon({type: 'Assignment'})
+      expect(screen.getByTestId('assignment-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a quiz', () => {
-      const container = render(getItemIcon({type: 'Quiz'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('quiz-icon')).toBeInTheDocument()
+    it('returns the correct icon for a quiz', () => {
+      renderIcon({type: 'Quiz'})
+      expect(screen.getByTestId('quiz-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a new quiz', () => {
-      const container = render(getItemIcon({type: 'Assignment', isNewQuiz: true}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('new-quiz-icon')).toBeInTheDocument()
+    it('returns the correct icon for a new quiz', () => {
+      renderIcon({type: 'Assignment', isNewQuiz: true})
+      expect(screen.getByTestId('new-quiz-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a discussion', () => {
-      const container = render(getItemIcon({type: 'Discussion'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('discussion-icon')).toBeInTheDocument()
+    it('returns the correct icon for a discussion', () => {
+      renderIcon({type: 'Discussion'})
+      expect(screen.getByTestId('discussion-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a file', () => {
-      const container = render(getItemIcon({type: 'File'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('attachment-icon')).toBeInTheDocument()
+    it('returns the correct icon for a file', () => {
+      renderIcon({type: 'File'})
+      expect(screen.getByTestId('attachment-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a attachment', () => {
-      const container = render(getItemIcon({type: 'Attachment'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('attachment-icon')).toBeInTheDocument()
+    it('returns the correct icon for an attachment', () => {
+      renderIcon({type: 'Attachment'})
+      expect(screen.getByTestId('attachment-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for an external URL', () => {
-      const container = render(getItemIcon({type: 'ExternalUrl'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('url-icon')).toBeInTheDocument()
+    it('returns the correct icon for an external URL', () => {
+      renderIcon({type: 'ExternalUrl'})
+      expect(screen.getByTestId('url-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for an external tool', () => {
-      const container = render(getItemIcon({type: 'ModuleExternalTool'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('url-icon')).toBeInTheDocument()
+    it('returns the correct icon for an external tool', () => {
+      renderIcon({type: 'ModuleExternalTool'})
+      expect(screen.getByTestId('url-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for a page', () => {
-      const container = render(getItemIcon({type: 'Page'}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('page-icon')).toBeInTheDocument()
+    it('returns the correct icon for a page', () => {
+      renderIcon({type: 'Page'})
+      expect(screen.getByTestId('page-icon')).toBeInTheDocument()
     })
 
-    it('should return the correct icon for an unknown type (default icon)', () => {
-      const container = render(getItemIcon({type: 'unknown' as any}))
-      expect(container.container).toBeInTheDocument()
-      expect(container.getByTestId('document-icon')).toBeInTheDocument()
+    it('returns the default icon for an unknown type', () => {
+      renderIcon({type: 'unknown' as any})
+      expect(screen.getByTestId('document-icon')).toBeInTheDocument()
+    })
+
+    it('returns null for SubHeader (renders nothing)', () => {
+      const {container, queryByTestId} = renderIcon({type: 'SubHeader'})
+      // host div is present, but it has no children when icon is null
+      expect(screen.getByTestId('host')).toBeInTheDocument()
+      expect(screen.getByTestId('host').firstChild).toBeNull()
+      // sanity: no known icon testids appear
+      expect(queryByTestId('document-icon')).toBeNull()
+      expect(queryByTestId('attachment-icon')).toBeNull()
+      expect(queryByTestId('quiz-icon')).toBeNull()
     })
   })
 

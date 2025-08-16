@@ -73,6 +73,8 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
+    case 'SubHeader':
+      return null
     default:
       return <IconDocumentLine color="primary" data-testid="document-icon" />
   }
