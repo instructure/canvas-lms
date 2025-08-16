@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import ModuleItemListSmart, {ModuleItemListSmartProps} from '../ModuleItemListSmart'
@@ -122,13 +122,16 @@ describe('ModuleItemListSmart', () => {
     const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
     renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />, itemCount)
 
-    expect(await screen.findByTestId('item-list')).toBeInTheDocument()
+    await screen.findByTestId('item-list')
+    if (screen.queryByTestId('loading')) {
+      await waitForElementToBeRemoved(() => screen.getByTestId('loading'))
+    }
 
-    await waitFor(() => {
-      const summary = screen.getByTestId('pagination-info-text')
-      expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
-      expect(screen.getByText('All module items loaded')).toBeInTheDocument() // screenreader alert
-    })
+    const summary = await screen.findByTestId('pagination-info-text')
+    expect(summary).toHaveTextContent(`Showing 1-10 of ${itemCount} items`)
+
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent(/all module items loaded/i)
   })
 
   it('navigates to the next page and updates visible items', async () => {
