@@ -51,7 +51,7 @@ const nonBreakingSpace = '\u00a0'
 
 function byName(a: Account, b: Account): number {
   const locale = ENV.LOCALES[0] || navigator.language || 'en'
-  return a.name.localeCompare(b.name, locale)
+  return (a.name ?? '').localeCompare(b.name ?? '', locale)
 }
 
 const renderAccountOptions = (accounts: Account[] = [], depth = 0): {id: string; name: string}[] =>
