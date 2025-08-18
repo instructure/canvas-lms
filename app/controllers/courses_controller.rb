@@ -3375,6 +3375,14 @@ class CoursesController < ApplicationController
         params_for_update[:start_at] = nil if @course.unpublished?
         params_for_update[:conclude_at] = nil
       end
+      can_change_csp = @course.account.grants_right?(@current_user, session, :manage_courses_admin)
+      if params_for_update.key?(:disable_csp) && can_change_csp
+        if value_to_boolean(params_for_update.delete(:disable_csp))
+          @course.disable_csp!
+        elsif !@course.csp_inherited?
+          @course.inherit_csp!
+        end
+      end
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
@@ -4513,7 +4521,8 @@ class CoursesController < ApplicationController
       :default_due_time,
       :conditional_release,
       :post_manually,
-      :horizon_course
+      :horizon_course,
+      :disable_csp
     )
   end
 
