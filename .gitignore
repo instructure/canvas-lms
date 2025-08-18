@@ -94,6 +94,9 @@ docker-compose/api-gateway.override.yml
 # generated live events docs
 /doc/api/data_services/md/dynamic/*.md
 
+# generated permissions docs
+/doc/api/permissions/md/dynamic/*.md
+
 # js coverage stuff
 .nyc_output
 coverage-jest
