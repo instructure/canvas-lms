@@ -1260,6 +1260,8 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :brand_configs_api) do
       get "brand_variables", action: :show
+      get "accounts/:account_id/brand_variables", action: :show_context
+      get "courses/:course_id/brand_variables", action: :show_context
     end
 
     scope(controller: :accounts) do

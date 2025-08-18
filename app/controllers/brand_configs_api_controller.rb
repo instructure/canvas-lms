@@ -19,6 +19,9 @@
 
 # @API Brand Configs
 class BrandConfigsApiController < ApplicationController
+  before_action :require_user, only: [:show_context]
+  before_action :require_context, only: [:show_context]
+
   # @API Get the brand config variables that should be used for this domain
   #
   # Will redirect to a static json file that has all of the brand
@@ -31,6 +34,23 @@ class BrandConfigsApiController < ApplicationController
   #   curl 'https://<canvas>/api/v1/brand_variables'
   def show
     headers["Access-Control-Allow-Origin"] = "*"
+    redirect_to active_brand_config_url("json")
+  end
+
+  # @API Get the brand config variables for a sub-account or course
+  #
+  # Will redirect to a static json file that has all of the brand
+  # variables used by the provided context. Even though this is a redirect,
+  # do not store the redirected url since if the sub-account makes any changes
+  # it will redirect to a new url.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/accounts/123/brand_variables'
+  #     -H 'Authorization: Bearer <token>'
+  def show_context
+    return bad_request unless @context.is_a?(Account) || @context.is_a?(Course)
+
     redirect_to active_brand_config_url("json")
   end
 end
