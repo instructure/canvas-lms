@@ -29,6 +29,7 @@ type ExternalUrl = {
   name: string
   newTab: boolean
   selectedToolId?: string
+  isUrlValid?: boolean
 }
 
 type NewItem = {
@@ -50,7 +51,7 @@ type FormState = {
 const initialState: FormState = {
   indentation: 0,
   textHeader: '',
-  external: {url: '', name: '', newTab: false, selectedToolId: ''},
+  external: {url: '', name: '', newTab: false, selectedToolId: '', isUrlValid: false},
   newItem: {name: '', assignmentGroup: '', file: null, folder: ''},
   tabIndex: 0,
   isLoading: false,
@@ -120,7 +121,7 @@ export function useAddModuleItem({
 
     const {external, textHeader, indentation, tabIndex, newItem} = state
 
-    if (itemType === 'external_url' && (!external.url || !external.name)) {
+    if (itemType === 'external_url' && (!external.url || !external.name || !external.isUrlValid)) {
       dispatch({type: 'SET_LOADING', value: false})
       return
     }
