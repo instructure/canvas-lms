@@ -38,8 +38,12 @@ export const Toolbar = () => {
           active={isPreviewMode}
           onClick={() => setMode(isPreviewMode ? 'default' : 'preview')}
         />
-        <UndoButton active={canUndo} onClick={undo} />
-        <RedoButton active={canRedo} onClick={redo} />
+        {!isPreviewMode && (
+          <>
+            <UndoButton active={canUndo} onClick={undo} />
+            <RedoButton active={canRedo} onClick={redo} />
+          </>
+        )}
       </Flex>
     </View>
   )
