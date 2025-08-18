@@ -24,6 +24,7 @@ require "controller_list_view"
 require "api_scope_mapping_writer"
 
 Rails.root.glob("doc/api/data_services/*.rb").sort.each { |file| require file }
+require_relative "../../permissions/permissions_markdown_creator"
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -175,6 +176,7 @@ def init
                         .sort_by  { |o| o.first.downcase }
   generate_swagger_json
   generate_data_services_markdown_pages
+  generate_permissions_markdown_pages
   scope_writer = ApiScopeMappingWriter.new(options[:resources])
   scope_writer.generate_scope_mapper
 
@@ -292,8 +294,14 @@ def generate_data_services_markdown_pages
   DataServicesMarkdownCreator.run
 end
 
+def generate_permissions_markdown_pages
+  PermissionsMarkdownCreator.run
+end
+
 def serialize_markdown_pages
-  (Dir.glob("doc/api/*.md") + Dir.glob("doc/api/data_services/md/**/*.md")).each do |file|
+  (Dir.glob("doc/api/*.md") +
+   Dir.glob("doc/api/data_services/md/**/*.md") +
+   Dir.glob("doc/api/permissions/md/**/*.md")).each do |file|
     options[:file] = file
     filename = File.split(file).last.sub(/\.md$/, ".html")
     serialize("file." + filename, page_title: extract_page_title_from_markdown(file))
