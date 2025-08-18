@@ -26,9 +26,13 @@ import useModuleCourseSearchApi, {
 } from '../../effects/useModuleCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('../../effects/useManagedCourseSearchApi')
 jest.mock('../../effects/useModuleCourseSearchApi')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn().mockReturnValue(jest.fn()),
+}))
 
 describe('DirectShareCoursePanel', () => {
   let ariaLive
@@ -235,6 +239,7 @@ describe('DirectShareCoursePanel', () => {
   describe('errors', () => {
     beforeEach(() => {
       jest.spyOn(console, 'error').mockImplementation()
+      showFlashError.mockClear()
     })
 
     afterEach(() => {
@@ -255,6 +260,20 @@ describe('DirectShareCoursePanel', () => {
       expect(getByText(/problem/i)).toBeInTheDocument()
       expect(queryByText('Copy')).toBeNull()
       expect(getByText('Close')).toBeInTheDocument()
+    })
+
+    it('calls showFlashError when the fetch fails', async () => {
+      fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
+      fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
+      const {getByText, getByLabelText} = render(<DirectShareCoursePanel sourceCourseId="42" />)
+      const input = getByLabelText(/select a course/i)
+      fireEvent.click(input)
+      fireEvent.click(getByText('abc'))
+      fireEvent.click(getByText('Copy'))
+      await act(() => fetchMock.flush(true))
+      expect(showFlashError).toHaveBeenCalledWith(
+        'Failed to start copy operation. Please try again.',
+      )
     })
   })
 })

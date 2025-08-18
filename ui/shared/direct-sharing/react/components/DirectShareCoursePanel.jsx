@@ -24,6 +24,7 @@ import {Alert} from '@instructure/ui-alerts'
 import './DirectShareCoursePanel.css'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import contentSelectionShape from '../proptypes/contentSelection'
 import ConfirmActionButtonBar from './ConfirmActionButtonBar'
 import CourseAndModulePicker from './CourseAndModulePicker'
@@ -84,10 +85,15 @@ export default function DirectShareCoursePanel({
             insert_into_module_position: selectedPosition,
           },
         },
-      }).then(() => {
-        queryClient.invalidateQueries({queryKey: ['moduleItems', selectedModule?.id || '']})
-        queryClient.invalidateQueries({queryKey: ['modules', sourceCourseId | '']})
-      }),
+      })
+        .then(() => {
+          queryClient.invalidateQueries({queryKey: ['moduleItems', selectedModule?.id || '']})
+          queryClient.invalidateQueries({queryKey: ['modules', sourceCourseId | '']})
+        })
+        .catch(error => {
+          showFlashError(I18n.t('Failed to start copy operation. Please try again.'))(error)
+          throw error
+        }),
     )
   }
 
