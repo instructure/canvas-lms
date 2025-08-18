@@ -153,13 +153,14 @@ class FeatureFlagsController < ApplicationController
       @context.feature_flags.load if skip_cache
 
       flags = features.filter_map do |fd|
-        @context.lookup_feature_flag(fd.feature,
-                                     override_hidden: can_read_site_admin?,
-                                     include_shadowed: can_read_site_admin?,
-                                     skip_cache:,
-                                     # Hide flags that are forced ON at a higher level
-                                     # Undocumented flag for frontend use only
-                                     hide_inherited_enabled: params[:hide_inherited_enabled])
+        ff = @context.lookup_feature_flag(fd.feature,
+                                          override_hidden: can_read_site_admin?,
+                                          include_shadowed: can_read_site_admin?,
+                                          skip_cache:)
+
+        # Hide flags that are forced ON at a higher level
+        # Undocumented flag for frontend use only
+        ff unless params[:hide_inherited_enabled] && ff&.enabled? && ff.locked?(@context)
       end
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }

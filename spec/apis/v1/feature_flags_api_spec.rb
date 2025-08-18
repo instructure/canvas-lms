@@ -242,6 +242,16 @@ describe "Feature Flags API", type: :request do
       end
     end
 
+    describe "hide_inherited_enabled" do
+      it "hides flags that are forced ON at a higher level" do
+        json = api_call_as_user(site_admin_user,
+                                :get,
+                                "/api/v1/accounts/#{t_site_admin.id}/features",
+                                { controller: "feature_flags", action: "index", format: "json", account_id: t_site_admin.id.to_s, hide_inherited_enabled: true })
+        expect(json.pluck("feature")).to match_array %w[course_feature hidden_feature hidden_user_feature root_account_feature root_opt_in_feature user_feature]
+      end
+    end
+
     it "operates on a course" do
       allow(Feature).to receive(:definitions).and_return({
                                                            "granular_permissions_manage_groups" => granular_permissions_feature,

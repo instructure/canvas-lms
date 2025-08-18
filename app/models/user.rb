@@ -1961,13 +1961,17 @@ class User < ActiveRecord::Base
   def can_see_dyslexic_font_feature_flag?(session)
     can_read_site_admin = Account.site_admin.grants_right?(@current_user, session, :read)
 
-    !!lookup_feature_flag(
+    ff = lookup_feature_flag(
       "use_dyslexic_font",
       override_hidden: can_read_site_admin,
       include_shadowed: can_read_site_admin,
-      skip_cache: false,
-      hide_inherited_enabled: true
+      skip_cache: false
     )
+
+    return false unless ff
+    return false if ff.enabled? && ff.locked?(self)
+
+    true
   end
 
   def auto_show_cc?
