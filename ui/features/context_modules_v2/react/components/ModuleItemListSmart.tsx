@@ -17,7 +17,7 @@
  */
 
 import type React from 'react'
-import {useState, useEffect, useMemo} from 'react'
+import {useCallback, useState, useEffect, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import PaginatedNavigation from './PaginatedNavigation'
 import type {ModuleItem} from '../utils/types'
@@ -78,6 +78,13 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   const {getModuleItemsTotalCount} = useModules(courseId, view)
   const totalCount = getModuleItemsTotalCount(moduleId) || 0
   const isEmptyModule = totalCount === 0
+
+  const getCursor = useCallback(
+    (page: number): string | null => {
+      return page > 1 ? btoa(String((page - 1) * pageSize)) : null
+    },
+    [pageSize],
+  )
   const cursor = getCursor(pageIndex)
 
   // Always call both hooks to avoid conditional hook calls
@@ -112,10 +119,6 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
   )
   const isLoading = moduleItemsResult.isLoading
   const error = moduleItemsResult.error
-
-  function getCursor(page: number): string | null {
-    return page > 1 ? btoa(String((page - 1) * pageSize)) : null
-  }
 
   useEffect(() => {
     if (!isLoading && totalCount > 0) {
@@ -166,7 +169,7 @@ const ModuleItemListSmart: React.FC<ModuleItemListSmartProps> = ({
         [moduleId]: getCursor(newPage),
       }))
     }
-  }, [pageIndex, totalPages, moduleId, setModuleCursorState, setPageIndex])
+  }, [pageIndex, totalPages, moduleId, setModuleCursorState, setPageIndex, getCursor])
 
   const handlePageChange = (page: number) => {
     setPageIndex(page)

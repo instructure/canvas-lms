@@ -118,6 +118,10 @@ const renderWithClient = (
 }
 
 describe('ModuleItemListSmart', () => {
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   it('renders paginated items and shows pagination UI when needed', async () => {
     const itemCount = 25 // PAGE_SIZE = 10, so this gives 3 pages
     renderWithClient(<ModuleItemListSmart {...defaultProps()} renderList={renderList} />, itemCount)
