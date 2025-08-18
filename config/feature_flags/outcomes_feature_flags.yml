@@ -84,6 +84,10 @@ menu_option_for_outcome_details_page:
   environments:
     development:
       state: on
+    test:
+      state: on
+    ci:
+      state: on
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
