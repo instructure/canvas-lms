@@ -120,7 +120,7 @@ pipeline {
     RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
-    RSPEC_PROCESSES = 6
+    RSPEC_PROCESSES = commitMessageFlag('rspecq-processes').asType(Integer)
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
     POSTGRES_PASSWORD = 'sekret'
