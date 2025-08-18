@@ -174,4 +174,36 @@ describe('ExternalItemForm', () => {
     expect(nameInput.value).toBe('Initial Name')
     expect(checkbox.checked).toBe(true)
   })
+
+  it('validates URL format and shows error for invalid URLs', async () => {
+    const user = userEvent.setup()
+    const {props} = setUp({itemType: 'external_url'})
+
+    const urlInput = screen.getByLabelText('URL')
+
+    // Type invalid URL that URL.canParse will reject
+    await user.type(urlInput, 'not a valid url')
+
+    await waitFor(() => {
+      expect(screen.getByText('Please enter a valid URL')).toBeInTheDocument()
+    })
+
+    // Check that isUrlValid is false
+    expect(props.onChange).toHaveBeenCalledWith('isUrlValid', false)
+  })
+
+  it('validates URL format and shows no error for valid URLs', async () => {
+    const user = userEvent.setup()
+    const {props} = setUp({itemType: 'external_url'})
+
+    const urlInput = screen.getByLabelText('URL')
+
+    await user.type(urlInput, 'https://example.com')
+
+    await waitFor(() => {
+      expect(screen.queryByText('Please enter a valid URL')).not.toBeInTheDocument()
+    })
+
+    expect(props.onChange).toHaveBeenCalledWith('isUrlValid', true)
+  })
 })
