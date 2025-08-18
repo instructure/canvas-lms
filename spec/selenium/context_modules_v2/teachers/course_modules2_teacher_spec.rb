@@ -277,6 +277,306 @@ describe "context modules", :ignore_js_errors do
     it_behaves_like "course_module2 add module tray", :course_homepage
   end
 
+  context "update assign to settings using tray" do
+    before :once do
+      @section1 = @course.course_sections.create!(name: "section1")
+      @section2 = @course.course_sections.create!(name: "section2")
+      @student1 = user_factory(name: "user1", active_all: true, active_state: "active")
+      @student2 = user_factory(name: "user2", active_all: true, active_state: "active", section: @section2)
+      @course.enroll_user(@student1, "StudentEnrollment", enrollment_state: "active")
+      @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+    end
+
+    before do
+      user_session(@teacher)
+      go_to_modules
+    end
+
+    it "shows Everyone as default selection in Assign-To tray" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      expect(is_checked(everyone_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to when clicked" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(is_checked(custom_access_radio_checked)).to be true
+    end
+
+    it "selects the custom radio button for module assign to and cancels" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(module_settings_tray).to be_displayed
+      expect(cancel_tray_button).to be_displayed
+
+      cancel_tray_button.click
+      expect(settings_tray_exists?).to be_falsey
+    end
+
+    it "adds more than one name to the assign to list" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user2")
+
+      assignee_list = assignee_selection_item.map(&:text)
+      expect(assignee_list.sort).to eq(%w[user1 user2])
+    end
+
+    it "adds a section to the list of assignees" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("section")
+      click_option(assignee_selection, "section1")
+      expect(assignee_selection_item[0].text).to eq("section1")
+      expect(assignee_selection_item.count).to eq(1)
+    end
+
+    it "adds a user to assign to and shows the user from View Assign To" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+
+      custom_access_radio_click.click
+      expect(assignee_selection).to be_displayed
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+      submit_add_module_button.click
+
+      expect(view_assign_to_link_on_module(@module1.id)).to be_displayed
+      view_assign_to_link_on_module(@module1.id).click
+      expect(assignee_selection).to be_displayed
+      expect(assignee_selection_item[0].text).to eq("user1")
+      expect(assignee_selection_item.count).to eq(1)
+    end
+
+    it_behaves_like "course_module2 module tray assign to", :context_modules
+    it_behaves_like "course_module2 module tray assign to", :course_homepage
+
+    it "deletes added assignee by clicking on it" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      assignee_selection_item_remove("user1").click
+      expect(element_exists?(assignee_selection_item_selector)).to be false
+    end
+
+    it "clears the assignee list when clear all is clicked" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      clear_all.click
+      expect(element_exists?(assignee_selection_item_selector)).to be false
+    end
+
+    it "does not show the assign to buttons when the user does not have the manage_course_content_edit permission" do
+      skip("LX-3149")
+      @module1.assignment_overrides.create!
+
+      go_to_modules
+      module_action_menu(@module1.id).click
+
+      expect(f("body")).to contain_jqcss(module_index_menu_tool_link_selector("Assign To..."))
+      expect(f("body")).to contain_jqcss(context_module_view_assign_to_link_selector(@module1.id))
+
+      RoleOverride.create!(context: @course.account, permission: "manage_course_content_edit", role: teacher_role, enabled: false)
+      go_to_modules
+
+      module_action_menu(@module1.id).click
+      expect(f("body")).not_to contain_jqcss(module_index_menu_tool_link_selector("Assign To..."))
+      expect(f("body")).not_to contain_jqcss(context_module_view_assign_to_link_selector(@module1.id))
+    end
+
+    it "displays correct error message if assignee list is empty" do
+      module_action_menu(@module1.id).click
+      module_item_action_menu_link("Assign To...").click
+      custom_access_radio_click.click
+
+      assignee_selection.send_keys("user")
+      click_option(assignee_selection, "user1")
+
+      clear_all.click
+      expect(assign_to_error_message.text).to eq("A student or section must be selected")
+    end
+
+    context "differentiation tags" do
+      before :once do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+
+        @differentiation_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag1 = @course.groups.create!(name: "Differentiation Tag 1", group_category: @differentiation_tag_category, non_collaborative: true)
+        @diff_tag2 = @course.groups.create!(name: "Differentiation Tag 2", group_category: @differentiation_tag_category, non_collaborative: true)
+
+        @diff_tag1.add_user(@student1)
+        @diff_tag2.add_user(@student2)
+      end
+
+      it "can add differentiation tags as assignees to module overrides" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will persist after saving" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        submit_add_module_button.click
+
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        expect(assignee_selection_item[0].text).to eq("Differentiation Tag 1")
+      end
+
+      it "differentiation tags will not show as assignee option if the account setting is disabled" do
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          a.save!
+        end
+
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.click
+        options = ff("[data-testid='assignee_selector_option']").map(&:text)
+        expect(options).not_to include("Differentiation")
+      end
+
+      it "displays correct error message if assignee list is empty" do
+        go_to_modules
+        module_action_menu(@module1.id).click
+        module_item_action_menu_link("Assign To...").click
+        custom_access_radio_click.click
+
+        assignee_selection.send_keys("Differentiation")
+        click_option(assignee_selection, "Differentiation Tag 1")
+
+        clear_all.click
+        expect(assign_to_error_message.text).to eq("A student, section, or tag must be selected")
+      end
+
+      context "differentiation tag rollback" do
+        it "displays error message and disables saving if differentiaiton tags exist after account setting is turned off" do
+          go_to_modules
+
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          expect(assign_to_error_message.text).to eq("Differentiation tag overrides must be removed")
+          expect(convert_differentiated_tag_button).to be_displayed
+        end
+
+        it "removes error message when user manually removes all differentiation tags from assignee selector" do
+          go_to_modules
+
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+          expect(convert_differentiated_tag_button).to be_displayed
+
+          assignee_selection_item_remove("Differentiation Tag 1").click
+          expect(element_exists?(convert_differentiated_tag_button_selector)).to be_falsey
+          expect(assign_to_error_message.text).to eq("A student or section must be selected")
+        end
+
+        it "converts differentiation tags to ADHOC overrides when 'convert tags' button is clicked" do
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 1")
+          assignee_selection.send_keys("Differentiation")
+          click_option(assignee_selection, "Differentiation Tag 2")
+          submit_add_module_button.click
+
+          # Turn off differentiaiton tags account setting
+          @course.account.tap do |a|
+            a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+            a.save!
+          end
+
+          go_to_modules
+          module_action_menu(@module1.id).click
+          module_item_action_menu_link("Assign To...").click
+          custom_access_radio_click.click
+
+          convert_differentiated_tag_button.click
+          wait_for_ajaximations
+
+          expect(assignee_selection_item[0].text).to eq("user1")
+          expect(assignee_selection_item[1].text).to eq("user2")
+        end
+      end
+    end
+  end
+
   context "adding files after course creation" do
     before :once do
       @course = course_factory(active_all: true)

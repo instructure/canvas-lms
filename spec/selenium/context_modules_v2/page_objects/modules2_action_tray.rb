@@ -49,6 +49,50 @@ module Modules2ActionTray
     "button[data-testid='differentiated_modules_save_button']"
   end
 
+  def module_settings_tray_selector
+    "[aria-label='Edit Module Settings']"
+  end
+
+  def everyone_radio_checked_selector
+    "[data-testid = 'everyone-option']"
+  end
+
+  def custom_access_radio_checked_selector
+    "[data-testid = 'custom-option']"
+  end
+
+  def custom_access_radio_click_selector
+    "//label[../input[@data-testid = 'custom-option']]"
+  end
+
+  def assignee_selection_selector
+    "[data-testid='assignee_selector']"
+  end
+
+  def assignee_selection_item_selector
+    "[data-testid='assignee_selector_selected_option']"
+  end
+
+  def assignee_selection_item_remove_selector(assignee)
+    "//*[@data-testid='assignee_selector_selected_option']//*[contains(@title, 'Remove #{assignee}')]"
+  end
+
+  def clear_all_selector
+    "[data-testid='clear_selection_button']"
+  end
+
+  def module_index_menu_tool_link_selector(tool_text)
+    "[role=menuitem]:contains('#{tool_text}')"
+  end
+
+  def assign_to_error_message_selector
+    "#TextInput-messages___0"
+  end
+
+  def convert_differentiated_tag_button_selector
+    "[data-testid='convert-differentiation-tags-button']"
+  end
+
   #------------------------------ Elements ------------------------------
   def add_module_button
     f(add_module_button_selector)
@@ -82,6 +126,50 @@ module Modules2ActionTray
     f(submit_add_module_button_selector)
   end
 
+  def module_settings_tray
+    f(module_settings_tray_selector)
+  end
+
+  def everyone_radio_checked
+    f(everyone_radio_checked_selector)
+  end
+
+  def custom_access_radio_click
+    fxpath(custom_access_radio_click_selector)
+  end
+
+  def custom_access_radio_checked
+    f(custom_access_radio_checked_selector)
+  end
+
+  def assignee_selection
+    f(assignee_selection_selector)
+  end
+
+  def assignee_selection_item
+    ff(assignee_selection_item_selector)
+  end
+
+  def assignee_selection_item_remove(assignee)
+    fxpath(assignee_selection_item_remove_selector(assignee))
+  end
+
+  def clear_all
+    f(clear_all_selector)
+  end
+
+  def module_index_menu_tool_link(tool_text)
+    fj(module_index_menu_tool_link_selector(tool_text))
+  end
+
+  def assign_to_error_message
+    f(assign_to_error_message_selector)
+  end
+
+  def convert_differentiated_tag_button
+    f(convert_differentiated_tag_button_selector)
+  end
+
   #------------------------------ Actions -------------------------------
   def fill_in_module_name(name)
     replace_content(input_module_name, name)
@@ -89,5 +177,9 @@ module Modules2ActionTray
 
   def select_prerequisites_dropdown_option(item_number, option)
     click_option(prerequisites_dropdown[item_number], option)
+  end
+
+  def settings_tray_exists?
+    element_exists?(module_settings_tray_selector)
   end
 end
