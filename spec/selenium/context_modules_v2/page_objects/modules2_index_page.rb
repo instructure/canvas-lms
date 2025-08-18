@@ -366,6 +366,14 @@ module Modules2IndexPage
     "#{context_module_selector(module_id)} [data-testid='module-header-prerequisites']"
   end
 
+  def context_module_view_assign_to_link_selector(module_id)
+    "#{context_module_selector(module_id)} button:contains('View Assign To')"
+  end
+
+  def view_assign_to_link_selector
+    "button:contains('View Assign To')"
+  end
+
   def move_item_tray_selector
     "[data-testid='manage-module-content-tray']"
   end
@@ -778,6 +786,15 @@ module Modules2IndexPage
   def visible_module_headers
     ff(visible_modules_header_selector)
   end
+
+  def view_assign_to_links
+    ffj(view_assign_to_link_selector)
+  end
+
+  def view_assign_to_link_on_module(module_id)
+    fj(context_module_view_assign_to_link_selector(module_id))
+  end
+
   #------------------------------ Actions -------------------------------
 
   def assignments_due_button_exists?
@@ -908,5 +925,13 @@ module Modules2IndexPage
 
   def external_tool_page_name_input
     f(external_tool_page_name_input_selector)
+  end
+
+  # method to scroll to the top of the modules page, especially for the canvas for elementary pages that
+  # have a collapsing head that hides content.
+  def scroll_to_the_top_of_modules_page
+    where_to_scroll = element_exists?("#student-view-btn") ? "#student-view-btn" : "#easy_student_view"
+    scroll_to(f(where_to_scroll))
+    wait_for_ajaximations
   end
 end

@@ -206,3 +206,50 @@ shared_examples_for "course_module2 add module tray" do |context|
     expect(@course.context_modules.count).to eq 1
   end
 end
+
+shared_examples_for "course_module2 module tray assign to" do |context|
+  include ContextModulesCommon
+  include Modules2IndexPage
+  include Modules2ActionTray
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "adds both user and section to assignee list" do
+    get @mod_url
+    scroll_to_the_top_of_modules_page
+    module_action_menu(@module1.id).click
+    module_item_action_menu_link("Assign To...").click
+    custom_access_radio_click.click
+    assignee_selection.send_keys("user")
+    click_option(assignee_selection, "user1")
+    assignee_selection.send_keys("section")
+    click_option(assignee_selection, "section1")
+    assignee_list = assignee_selection_item.map(&:text)
+    expect(assignee_list.sort).to eq(%w[section1 user1])
+  end
+
+  it "adds to assignee list and updates shows assign to after update" do
+    get @mod_url
+    scroll_to_the_top_of_modules_page
+    module_action_menu(@module1.id).click
+    module_item_action_menu_link("Assign To...").click
+    custom_access_radio_click.click
+    assignee_selection.send_keys("user")
+    click_option(assignee_selection, "user1")
+    assignee_selection.send_keys("section")
+    click_option(assignee_selection, "section1")
+    assignee_list = assignee_selection_item.map(&:text)
+    expect(assignee_list.sort).to eq(%w[section1 user1])
+    submit_add_module_button.click
+    expect(settings_tray_exists?).to be_falsey
+    expect(view_assign_to_links[0].text).to eq "View Assign To"
+  end
+end
