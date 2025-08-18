@@ -99,9 +99,9 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   activate() {
     const availableContexts = this.event.plannerNoteContexts()?.map(context => context.name)
     if (!this.event.contextInfo || !availableContexts?.includes(this.event.contextInfo.name)) {
-      this.setContext(availableContexts[0])
       this.currentContextInfo =
         this.event.possibleContexts().find(context => context.name === availableContexts[0]) || null
+      this.setContext(this.currentContextInfo.asset_string)
       this.event.contextInfo = this.currentContextInfo
       this.contextChangeCB(this.currentContextInfo.asset_string)
     }
