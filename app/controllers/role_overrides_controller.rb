@@ -121,11 +121,51 @@
 #           "type": "datetime"
 #         },
 #         "permissions": {
-#           "description": "A dictionary of permissions keyed by name (see permissions input parameter in the 'Create a role' API).",
+#           "description": "A dictionary of permissions keyed by name (see 'List assignable permissions' API).",
 #           "example": {"read_course_content": {"enabled": true, "locked": false, "readonly": false, "explicit": true, "prior_default": false}, "read_course_list": {"enabled": true, "locked": true, "readonly": true, "explicit": false}, "read_question_banks": {"enabled": false, "locked": true, "readonly": false, "explicit": true, "prior_default": false}, "read_reports": {"enabled": true, "locked": false, "readonly": false, "explicit": false}},
 #           "type": "object",
 #           "key": { "type": "string" },
 #           "value": { "$ref": "RolePermissions" }
+#         }
+#       }
+#     }
+#
+# @model Permission
+#     {
+#       "id": "Permission",
+#       "description": "A permission that can be granted to a role",
+#       "properties": {
+#         "key": {
+#           "description": "The API identifier for the permission",
+#           "example": "manage_lti_add",
+#           "type": "string"
+#         },
+#         "label": {
+#           "description": "The human-readable label for the permission",
+#           "example": "LTI - add",
+#           "type": "string"
+#         },
+#         "group": {
+#           "description": "The group this permission belongs to, if it is part of a granular permission group",
+#           "example": "manage_lti",
+#           "type": "string"
+#         },
+#         "group_label": {
+#           "description": "The human-readable label for the group this permission belongs to",
+#           "example": "Manage LTI",
+#           "type": "string"
+#         },
+#         "available_to": {
+#           "description": "The base role types this permission can be enabled for",
+#           "example": ["AccountAdmin", "AccountMembership", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment"],
+#           "type": "array",
+#           "items": {"type": "string"}
+#         },
+#         "true_for": {
+#           "description": "The base role types this permission is enabled for by default",
+#           "example": ["AccountAdmin", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment"],
+#           "type": "array",
+#           "items": {"type": "string"}
 #         }
 #       }
 #     }
@@ -456,6 +496,48 @@ class RoleOverridesController < ApplicationController
       render json: role_json(@context, @role, @current_user, session)
     rescue BadPermissionSettingError => e
       render json: { message: e }, status: :bad_request
+    end
+  end
+
+  # @API List assignable permissions
+  # List all permissions that can be granted to roles in the given account.
+  #
+  # This returns largely the same information documented on the {file:file.permissions.html Permissions list page},
+  # with a few caveats:
+  # * Permission labels and group labels returned by this API are localized (the same text visible in the web UI).
+  # * This API includes permissions added by plugins.
+  # * This API excludes permissions that are disabled in or otherwise do not apply to the given account.
+  #
+  # @argument search_term [String]
+  #  If provided, return only permissions whose key, label, group, or group_label match the search string.
+  #
+  # @returns [Permission]
+  def manageable_permissions
+    if authorized_action(@context, @current_user, :manage_role_overrides)
+      perms = RoleOverride.manageable_permissions(@context)
+
+      perms.transform_values! do |info|
+        {
+          label: info[:label_v2]&.call || info[:label]&.call,
+          available_to: info[:available_to],
+          true_for: info[:true_for]
+        }.tap do |h|
+          h[:group] = info[:group] if info[:group]
+          h[:group_label] = info[:group_label]&.call if info[:group_label]
+        end
+      end
+
+      if params[:search_term].present?
+        search = params[:search_term].downcase
+        perms.select! do |key, info|
+          key.to_s.include?(search) ||
+            info[:label].downcase.include?(search) ||
+            info[:group]&.downcase&.include?(search) ||
+            info[:group_label]&.downcase&.include?(search)
+        end
+      end
+
+      render json: perms.map { |key, info| { key: }.merge(info) }
     end
   end
 

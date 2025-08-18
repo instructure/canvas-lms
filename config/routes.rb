@@ -1851,6 +1851,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :role_overrides) do
       get "accounts/:account_id/roles", action: :api_index, as: "account_roles"
+      get "accounts/:account_id/roles/permissions", action: :manageable_permissions
       get "accounts/:account_id/roles/:id", action: :show
       post "accounts/:account_id/roles", action: :add_role
       post "accounts/:account_id/roles/:id/activate", action: :activate_role
