@@ -328,6 +328,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/roles/:id/activate'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/roles/permissions'
+- verb: GET
   path: '/api/v1/accounts/:account_id/root_outcome_group'
 - verb: GET
   path: '/api/v1/accounts/:account_id/rubrics'
