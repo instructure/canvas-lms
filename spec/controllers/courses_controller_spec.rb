@@ -281,12 +281,13 @@ describe CoursesController do
 
       context "on accessibility column" do
         before do
-          skip("Flaky spec needs fixed in LMA-226") unless @course1.root_account.enable_content_a11y_checker?
+          account = Account.default
+          account.settings[:enable_content_a11y_checker] = true
+          account.save!
 
-          # For accessibility column
-          wiki_page = wiki_page_model(course: @course1)
-          scan = AccessibilityResourceScan.for_context(wiki_page).first_or_initialize
-          scan.assign_attributes(
+          wiki_page = wiki_page_model(course: @course1, title: "Wiki Page", body: "<div><h1>Document Title</h1></div>")
+          scan = AccessibilityResourceScan.for_context(wiki_page).first
+          scan.update!(
             course: @course1,
             workflow_state: "completed",
             resource_name: wiki_page.title,
@@ -294,19 +295,24 @@ describe CoursesController do
             resource_updated_at: wiki_page.updated_at,
             issue_count: 1
           )
-          scan.save!
+          accessibility_issue_model(
+            course: @course1,
+            accessibility_resource_scan: scan,
+            rule_type: Accessibility::Rules::HeadingsStartAtH2Rule.id,
+            node_path: "./div/h1"
+          )
         end
 
-        it "lists courses with accessibility issues first" do
+        it "lists courses with less accessibility issues first" do
           user_session(@student)
           get_index(index_params: { sort_column => "accessibility" })
-          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
         end
 
-        it "lists courses with accessibility issues last when descending order" do
+        it "lists courses with less accessibility issues last when descending order" do
           user_session(@student)
           get_index(index_params: { sort_column => "accessibility", order_column => "desc" })
-          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course2.id, @course1.id]
+          expect(assigns["#{type}_enrollments"].map(&:course_id)).to eq [@course1.id, @course2.id]
         end
       end
     end
