@@ -27,10 +27,11 @@ import {
   UploadData,
   UploadFilePanelIds,
 } from './handle-image'
+import {ModalImageData} from '../Image/types'
 
 export const ImageBlockUploadModal = (props: {
   open: boolean
-  onSelected: (url: string, alt: string, decorativeImage: boolean, fileName?: string) => void
+  onSelected: (modalImageData: ModalImageData) => void
   onDismiss: () => void
 }) => {
   const [isUploading, setIsUploading] = useState(false)
@@ -54,7 +55,7 @@ export const ImageBlockUploadModal = (props: {
       fileName = metaData?.attachment.display_name
     }
     setIsUploading(false)
-    props.onSelected(url, altText, decorativeImage, fileName)
+    props.onSelected({url, altText, decorativeImage, fileName})
   }
 
   return props.open ? (

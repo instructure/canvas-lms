@@ -20,7 +20,7 @@ import './image-block.css'
 import {useState} from 'react'
 import {ImageBlockUploadModal} from './ImageBlockUploadModal'
 import {ImageBlockAddButton} from './ImageBlockAddButton'
-import {ImageEditProps} from './types'
+import {ImageEditProps, ModalImageData} from './types'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconUploadLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -44,20 +44,13 @@ export const ImageEdit = ({
 
   const closeModal = () => setIsOpen(false)
   const openModal = () => setIsOpen(true)
-  const onSelected = (
-    url: string,
-    altText: string,
-    decorativeImage: boolean,
-    fileName?: string,
-  ) => {
+  const onSelected = (modalImageData: ModalImageData) => {
     closeModal()
-    const imageCaption = altTextAsCaption ? altText : caption
+    const imageCaption = altTextAsCaption ? modalImageData.altText : caption
     onImageChange({
-      url,
-      altText: decorativeImage ? '' : altText,
-      caption: decorativeImage ? '' : imageCaption,
-      fileName,
-      decorativeImage,
+      ...modalImageData,
+      altText: modalImageData.decorativeImage ? '' : modalImageData.altText,
+      caption: modalImageData.decorativeImage ? '' : imageCaption,
     })
   }
 
