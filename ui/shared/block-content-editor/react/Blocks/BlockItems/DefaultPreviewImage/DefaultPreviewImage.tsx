@@ -16,27 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconAddSolid} from '@instructure/ui-icons'
+import {IconImageLine, IconVideoLine} from '@instructure/ui-icons'
 
-export const ImageBlockAddButton = (props: {
-  onClick: () => void
-}) => {
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      props.onClick()
-    }
-  }
+type DefaultPreviewImageProps = {
+  blockType: 'image' | 'media'
+}
 
+export const DefaultPreviewImage = ({blockType}: DefaultPreviewImageProps) => {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={props.onClick}
-      onKeyDown={handleKeyDown}
-      className="image-block-container image-block-add-button"
-    >
-      <IconAddSolid size="medium" />
+    <div className="image-block-container image-block-default-preview">
+      {blockType === 'image' && <IconImageLine size="large" />}
+      {blockType === 'media' && <IconVideoLine size="large" />}
     </div>
   )
 }

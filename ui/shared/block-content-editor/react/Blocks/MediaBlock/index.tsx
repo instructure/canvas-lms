@@ -16,12 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconImageLine} from '@instructure/ui-icons'
-
-export const ImageBlockDefaultPreviewImage = () => {
-  return (
-    <div className="image-block-container image-block-default-preview">
-      <IconImageLine size="large" />
-    </div>
-  )
-}
+export {MediaBlock} from './MediaBlock'

@@ -16,20 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonBlock} from './Blocks/ButtonBlock'
-import {HighlightBlock} from './Blocks/HighlightBlock'
-import {ImageBlock} from './Blocks/ImageBlock'
-import {ImageTextBlock} from './Blocks/ImageTextBlock'
-import {MediaBlock} from './Blocks/MediaBlock'
-import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
-import {TextBlock} from './Blocks/TextBlock'
+import {IconAddSolid} from '@instructure/ui-icons'
 
-export const components = {
-  TextBlock,
-  ImageBlock,
-  MediaBlock,
-  SeparatorLineBlock,
-  ButtonBlock,
-  HighlightBlock,
-  ImageTextBlock,
+export const AddButton = (props: {
+  onClick: () => void
+}) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      props.onClick()
+    }
+  }
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={props.onClick}
+      onKeyDown={handleKeyDown}
+      className="image-block-container image-block-add-button"
+    >
+      <IconAddSolid size="medium" />
+    </div>
+  )
 }

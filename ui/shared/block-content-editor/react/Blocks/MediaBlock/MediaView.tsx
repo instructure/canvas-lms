@@ -16,34 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './image-block.css'
-import {ImageViewProps} from './types'
-import {DefaultPreviewImage} from '../DefaultPreviewImage/DefaultPreviewImage'
-import {ImageCaption} from './ImageCaption'
+import React from 'react'
+import {View} from '@instructure/ui-view'
+import {MediaData} from './types'
+import {TitleEditPreview} from '../BlockItems/Title/TitleEditPreview'
 import {Flex} from '@instructure/ui-flex'
+import {DefaultPreviewImage} from '../BlockItems/DefaultPreviewImage/DefaultPreviewImage'
 
-export const ImageView = ({
-  url,
-  altText,
-  decorativeImage,
-  altTextAsCaption,
-  caption,
-}: ImageViewProps) => {
-  const calculatedCaption = altTextAsCaption ? altText : caption
-
+export const MediaView = ({src, title, titleColor, includeBlockTitle}: MediaData) => {
   return (
-    <Flex direction="column" gap="mediumSmall">
-      {url ? (
-        // eslint-disable-next-line jsx-a11y/alt-text
-        <img
-          src={url}
-          alt={decorativeImage ? undefined : altText}
-          role={decorativeImage ? 'presentation' : undefined}
-        />
+    <Flex gap="mediumSmall" direction="column">
+      {includeBlockTitle && <TitleEditPreview title={title} contentColor={titleColor} />}
+      {src ? (
+        <View as="div" width="100%" height="400px">
+          Media content here...
+        </View>
       ) : (
-        <DefaultPreviewImage blockType="image" />
+        <DefaultPreviewImage blockType="media" />
       )}
-      {!!calculatedCaption && <ImageCaption>{calculatedCaption}</ImageCaption>}
     </Flex>
   )
 }

@@ -16,20 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ButtonBlock} from './Blocks/ButtonBlock'
-import {HighlightBlock} from './Blocks/HighlightBlock'
-import {ImageBlock} from './Blocks/ImageBlock'
-import {ImageTextBlock} from './Blocks/ImageTextBlock'
-import {MediaBlock} from './Blocks/MediaBlock'
-import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
-import {TextBlock} from './Blocks/TextBlock'
+export type MediaData = {
+  src: string
+  title: string
+} & MediaSettings
 
-export const components = {
-  TextBlock,
-  ImageBlock,
-  MediaBlock,
-  SeparatorLineBlock,
-  ButtonBlock,
-  HighlightBlock,
-  ImageTextBlock,
+export type MediaSettings = {
+  titleColor: string
+  includeBlockTitle: boolean
+} & BaseBlockSettings
+
+type BaseBlockSettings = {
+  backgroundColor: string
 }
+
+export type MediaBlockEditHandlers = {
+  onTitleChange: (newTitle: string) => void
+}
+
+export type MediaBlockEditProps = MediaData & MediaBlockEditHandlers
+
+export type MediaBlockProps = BaseBlockSettings & MediaData

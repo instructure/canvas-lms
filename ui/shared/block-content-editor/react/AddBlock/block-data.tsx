@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
+import {MediaBlock} from '../Blocks/MediaBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
 import {HighlightBlock} from '../Blocks/HighlightBlock'
@@ -124,7 +125,15 @@ export const blockFactory = {
       }}
     />
   ),
-  video: () => <p>video</p>,
+  [MediaBlock.name]: () => (
+    <MediaBlock
+      src=""
+      title=""
+      backgroundColor={defaultBackgroundColor}
+      titleColor={defaultTextColor}
+      includeBlockTitle={true}
+    />
+  ),
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -159,7 +168,7 @@ export const blockData: BlockData[] = [
   },
   {
     groupName: I18n.t('Multimedia'),
-    items: [{itemName: I18n.t('Video'), id: 'video'}],
+    items: [{itemName: MediaBlock.craft.displayName, id: MediaBlock.name}],
   },
   {
     groupName: I18n.t('Interactive element'),
