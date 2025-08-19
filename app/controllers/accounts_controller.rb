@@ -911,7 +911,7 @@ class AccountsController < ApplicationController
         or_clause = Course.where(code).or(Course.where(name))
 
         if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
-          or_clause = Course.where(id: search_term).or(or_clause)
+          or_clause = Course.shard(@account.shard).where(id: search_term).or(or_clause)
         end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
