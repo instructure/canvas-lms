@@ -164,13 +164,13 @@
     {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
-      "fingerprint": "20234c20551af8a01f9b7e12a20a6677af395d7057a648a04eee3cb3d6a0808b",
+      "fingerprint": "d284d0b1acd041a6b0cac1b0ac0327f44a5f58ce452ec362014f748a4c64be08",
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/gradebook_settings_controller.rb",
-      "line": 76,
+      "line": 77,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, { :context_module_ids => ([]) }, :grading_period_id, :assignment_group_id, { :assignment_group_ids => ([]) }, :submissions, { :submission_filters => ([]) }, :start_date, :end_date]), :filter_rows_by => ([:section_id, { :section_ids => ([]) }, :student_group_id, { :student_group_ids => ([]) }]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, { :context_module_ids => ([]) }, :grading_period_id, :assignment_group_id, { :assignment_group_ids => ([]) }, :submissions, { :submission_filters => ([]) }, :start_date, :end_date]), :filter_rows_by => ([:section_id, { :section_ids => ([]) }, :student_group_id, { :student_group_ids => ([]) }]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :view_hidden_grades_indicator, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
       "render_path": null,
       "location": {
         "type": "method",
@@ -182,7 +182,7 @@
       "cwe_id": [
         915
       ],
-      "note": ""
+      "note": "permit! is needed here to allow enter_grades_as to accept dynamic assignment ID keys. This endpoint is protected by authorization checks requiring manage_grades or view_all_grades permissions."
     },
     {
       "warning_type": "SQL Injection",
