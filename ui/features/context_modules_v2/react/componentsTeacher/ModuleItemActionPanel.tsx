@@ -98,6 +98,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDirectShareOpen, setIsDirectShareOpen] = useState(false)
   const [isDirectShareCourseOpen, setIsDirectShareCourseOpen] = useState(false)
+  const [isPublishButtonEnabled, setIsPublishButtonEnabled] = useState(true)
 
   const {courseId, isMasterCourse, isChildCourse, setMenuItemLoadingState} = useContextModule()
 
@@ -204,8 +205,18 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
     handleMasteryPaths(itemId, setIsMenuOpen)
   }, [itemId, setIsMenuOpen])
 
-  const publishIconOnClickRef = useCallback(() => {
-    handlePublishToggle(moduleId, itemId, title, canBeUnpublished, queryClient, courseId, published)
+  const publishIconOnClickRef = useCallback(async () => {
+    setIsPublishButtonEnabled(false)
+    await handlePublishToggle(
+      moduleId,
+      itemId,
+      title,
+      canBeUnpublished,
+      queryClient,
+      courseId,
+      published,
+    )
+    setIsPublishButtonEnabled(true)
   }, [moduleId, itemId, title, canBeUnpublished, courseId, published])
 
   const renderFilePublishButton = () => {
@@ -241,7 +252,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         withBorder={false}
         color={published ? 'success' : 'secondary'}
         size="small"
-        interaction={canBeUnpublished ? 'enabled' : 'disabled'}
+        interaction={canBeUnpublished && isPublishButtonEnabled ? 'enabled' : 'disabled'}
         onClick={publishIconOnClickRef}
       />
     )

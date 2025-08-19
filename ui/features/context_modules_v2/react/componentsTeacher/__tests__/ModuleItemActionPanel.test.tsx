@@ -17,15 +17,17 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleItemActionPanel from '../ModuleItemActionPanel'
+import {http, HttpResponse} from 'msw'
 
 type ComponentProps = React.ComponentProps<typeof ModuleItemActionPanel>
 
 const server = setupServer()
 
+const DEFAULT_COURSE_ID = 'test-course-id'
 const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
   moduleId: '1',
   itemId: '123',
@@ -50,7 +52,7 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   ...overrides,
 })
 
-const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
+const setUp = (props: ComponentProps, courseId = DEFAULT_COURSE_ID) => {
   const contextProps = {
     ...contextModuleDefaultProps,
     courseId,
@@ -117,5 +119,32 @@ describe('ModuleItemActionPanel', () => {
     )
 
     expect(screen.getByText('Unpublished')).toBeInTheDocument()
+  })
+
+  it('disables and re-enables the publish button when clicked', async () => {
+    const props = buildDefaultProps()
+
+    // Mock API return value, the button will re-enable regardless of API success or failure
+    server.use(
+      http.put(
+        `**/api/v1/courses/${DEFAULT_COURSE_ID}/modules/${props.moduleId}/items/${props.itemId}`,
+        () => HttpResponse.json({success: true}),
+      ),
+    )
+
+    setUp(props)
+
+    const button = screen.getByTestId(`module-item-publish-button-${props.itemId}`)
+
+    expect(button).toBeInTheDocument()
+    expect(button).not.toBeDisabled()
+
+    fireEvent.click(button)
+
+    expect(button).toBeDisabled()
+
+    await waitFor(() => {
+      expect(button).not.toBeDisabled()
+    })
   })
 })
