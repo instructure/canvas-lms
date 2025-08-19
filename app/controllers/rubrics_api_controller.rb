@@ -384,7 +384,7 @@ class RubricsApiController < ApplicationController
   end
 
   def download_rubrics
-    return unless authorized_action(@context, @current_user, :manage_rubrics)
+    return unless authorized_action(@context, @current_user, :read_rubrics)
 
     rubric_ids = params[:rubric_ids]
     if rubric_ids.blank?
