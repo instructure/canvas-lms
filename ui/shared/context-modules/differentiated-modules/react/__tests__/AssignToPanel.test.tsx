@@ -412,12 +412,32 @@ describe('AssignToPanel', () => {
         onDidSubmit: onDidSubmitMock,
         onDismiss: onDismissMock,
       })
-      await userEvent.click(screen.getByTestId('custom-option'))
+      const customOption = await screen.findByTestId('custom-option')
+      await userEvent.click(customOption)
       await userEvent.click(screen.getByTestId('assignee_selector'))
       await userEvent.click(screen.getByText(SECTIONS_DATA[0].name))
       await userEvent.click(screen.getByTestId('differentiated_modules_save_button'))
       expect(onDidSubmitMock).toHaveBeenCalled()
       expect(onDismissMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('keyboard navigation', () => {
+    it('focuses the selected radio input when tabbing through radio inputs', async () => {
+      renderComponent({defaultOption: 'custom'})
+      const everyoneOption = await screen.findByTestId('everyone-option')
+      const customOption = await screen.findByTestId('custom-option')
+
+      for (let i = 0; i < 4; i++) {
+        await userEvent.tab()
+      }
+      expect(customOption).toHaveFocus()
+
+      await userEvent.click(everyoneOption)
+      expect(everyoneOption).toBeChecked()
+      await userEvent.tab({shift: true})
+      await userEvent.tab()
+      expect(everyoneOption).toHaveFocus()
     })
   })
 })
