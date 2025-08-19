@@ -598,14 +598,44 @@ describe "Rubrics API", type: :request do
       end
 
       it "returns the csv file for the selected rubrics" do
-        @user = account_admin_user
-        user_session(@user)
+        teacher = teacher_in_course(course: @course, active_all: true).user
+        user_session(teacher)
         post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
         expect(response).to be_successful
         data = response.body.split("\n")
         expect(data.size).to eq 3
         expect(data[1]).to eq "Unnamed Course Rubric,Criteria row 1,,,Rockin',,3,Lame,,0"
         expect(data[2]).to eq "Unnamed Course Rubric,Criteria row,,,Rockin',,5,Meh',,3,Lame,,0"
+      end
+
+      it "returns the csv file if the user has read_rubrics permissions for rubrics" do
+        ta_user = ta_in_course(course: @course, active_all: true).user
+        user_session(ta_user)
+        post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
+        expect(response).to be_successful
+        data = response.body.split("\n")
+        expect(data.size).to eq 3
+        expect(data[1]).to eq "Unnamed Course Rubric,Criteria row 1,,,Rockin',,3,Lame,,0"
+        expect(data[2]).to eq "Unnamed Course Rubric,Criteria row,,,Rockin',,5,Meh',,3,Lame,,0"
+      end
+
+      it "allows teacher to download rubrics after course has concluded" do
+        teacher = teacher_in_course(course: @course, active_all: true).user
+        user_session(teacher)
+        @course.complete!
+        post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
+        expect(response).to be_successful
+        data = response.body.split("\n")
+        expect(data.size).to eq 3
+        expect(data[1]).to eq "Unnamed Course Rubric,Criteria row 1,,,Rockin',,3,Lame,,0"
+        expect(data[2]).to eq "Unnamed Course Rubric,Criteria row,,,Rockin',,5,Meh',,3,Lame,,0"
+      end
+
+      it "returns a 401 error if the user does not have read_rubrics permissions for rubrics" do
+        student = student_in_course(course: @course, active_all: true).user
+        user_session(student)
+        post "/api/v1/courses/#{@course.id}/rubrics/download_rubrics", params: { rubric_ids: [@rubric.id] }
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
