@@ -20,7 +20,13 @@ import {useState} from 'react'
 
 export type PreviewMode = 'desktop' | 'tablet' | 'mobile'
 
+const previewSizes: Record<PreviewMode, {containerWidth: number; contentWidth: number}> = {
+  desktop: {containerWidth: 900, contentWidth: 1042},
+  tablet: {containerWidth: 600, contentWidth: 768},
+  mobile: {containerWidth: 375, contentWidth: 375},
+}
+
 export const usePreviewMode = () => {
   const [previewMode, setPreviewMode] = useState<PreviewMode>('desktop')
-  return {previewMode, setPreviewMode}
+  return {previewMode, setPreviewMode, ...previewSizes[previewMode]}
 }

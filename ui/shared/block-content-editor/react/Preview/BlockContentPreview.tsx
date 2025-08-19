@@ -25,7 +25,7 @@ import {useGetSerializedNodes} from '../hooks/useGetSerializedNodes'
 import {ScaleView} from './ScaleView'
 
 export const BlockContentPreview = () => {
-  const {previewMode, setPreviewMode} = usePreviewMode()
+  const {previewMode, setPreviewMode, containerWidth, contentWidth} = usePreviewMode()
   const data = useGetSerializedNodes()
 
   return (
@@ -34,7 +34,7 @@ export const BlockContentPreview = () => {
         <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
       }
       preview={
-        <ScaleView>
+        <ScaleView containerWidth={containerWidth} contentWidth={contentWidth}>
           <Editor enabled={false} resolver={components}>
             <Frame data={data} />
           </Editor>

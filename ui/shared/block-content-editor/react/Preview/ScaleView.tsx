@@ -19,7 +19,12 @@
 import {View} from '@instructure/ui-view'
 import {PropsWithChildren, useRef, useLayoutEffect} from 'react'
 
-export const ScaleView = (props: PropsWithChildren) => {
+export const ScaleView = (
+  props: PropsWithChildren<{
+    containerWidth: number
+    contentWidth: number
+  }>,
+) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
 
@@ -27,7 +32,7 @@ export const ScaleView = (props: PropsWithChildren) => {
     const updateScale = () => {
       if (containerRef.current && innerRef.current) {
         const containerWidth = containerRef.current.offsetWidth
-        const fixedContentWidth = 1042
+        const fixedContentWidth = props.contentWidth
 
         const calculatedScale = Math.min(containerWidth / fixedContentWidth, 1)
 
@@ -46,14 +51,25 @@ export const ScaleView = (props: PropsWithChildren) => {
     if (containerRef.current) {
       resizeObserver.observe(containerRef.current)
     }
+    const contentResizeObserver = new ResizeObserver(updateScale)
+    if (innerRef.current) {
+      contentResizeObserver.observe(innerRef.current)
+    }
 
     return () => {
       resizeObserver.disconnect()
+      contentResizeObserver.disconnect()
     }
-  }, [])
+  }, [props.contentWidth])
 
   return (
-    <View borderWidth="small" borderRadius="medium" overflowX="hidden" overflowY="hidden">
+    <View
+      width={props.containerWidth}
+      borderWidth="small"
+      borderRadius="medium"
+      overflowX="hidden"
+      overflowY="hidden"
+    >
       <div
         ref={containerRef}
         style={{

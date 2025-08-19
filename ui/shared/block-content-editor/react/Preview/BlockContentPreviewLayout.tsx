@@ -25,7 +25,7 @@ export const BlockContentPreviewLayout = (props: {
 }) => {
   return (
     <View background="secondary" padding="medium large" height="100%">
-      <Flex direction="column" gap="medium">
+      <Flex direction="column" gap="medium" alignItems="center">
         {props.selectorbar}
         {props.preview}
       </Flex>
