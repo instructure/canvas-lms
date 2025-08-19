@@ -23,24 +23,28 @@ import {
   RubricAssessmentContainer,
   type RubricAssessmentContainerProps,
 } from '../RubricAssessmentContainer'
+import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 describe('RubricAssessmentContainer Tests', () => {
   const renderComponent = (props?: Partial<RubricAssessmentContainerProps>) => {
     return render(
-      <RubricAssessmentContainer
-        criteria={RUBRIC_DATA.criteria}
-        hidePoints={false}
-        isFreeFormCriterionComments={false}
-        isPeerReview={false}
-        isPreviewMode={false}
-        ratingOrder="descending"
-        rubricAssessmentData={[]}
-        rubricTitle="Rubric"
-        viewModeOverride="horizontal"
-        onDismiss={jest.fn()}
-        onSubmit={jest.fn()}
-        {...props}
-      />,
+      <MockedQueryProvider>
+        <RubricAssessmentContainer
+          criteria={RUBRIC_DATA.criteria}
+          currentUserId="1"
+          hidePoints={false}
+          isFreeFormCriterionComments={false}
+          isPeerReview={false}
+          isPreviewMode={false}
+          ratingOrder="descending"
+          rubricAssessmentData={[]}
+          rubricTitle="Rubric"
+          viewModeOverride="horizontal"
+          onDismiss={jest.fn()}
+          onSubmit={jest.fn()}
+          {...props}
+        />
+      </MockedQueryProvider>,
     )
   }
 

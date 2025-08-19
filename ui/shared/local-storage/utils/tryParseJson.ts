@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './RubricAssessmentTray'
-export * from './RubricAssessmentContainer'
-export * from './RubricAssessmentContainerWrapper'
-export * from './TraditionalView'
-export * from './utils/rubricUtils'
-export * from './OutcomeTag'
+export default function tryParseJson(maybeInvalidJsonString: string): {
+  parseError: boolean
+  parsedValue: unknown
+} {
+  try {
+    const parsedValue = JSON.parse(maybeInvalidJsonString)
+    return {parseError: false, parsedValue}
+  } catch {
+    console.error(`tryParseJson failed to parse JSON! Received value: '${maybeInvalidJsonString}'`)
+    return {parseError: true, parsedValue: null}
+  }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './RubricAssessmentTray'
-export * from './RubricAssessmentContainer'
-export * from './RubricAssessmentContainerWrapper'
-export * from './TraditionalView'
-export * from './utils/rubricUtils'
-export * from './OutcomeTag'
+import {QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
+import {
+  RubricAssessmentContainerProps,
+  RubricAssessmentContainer,
+} from './RubricAssessmentContainer'
+
+export const RubricAssessmentContainerWrapper = (props: RubricAssessmentContainerProps) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RubricAssessmentContainer {...props} />
+    </QueryClientProvider>
+  )
+}

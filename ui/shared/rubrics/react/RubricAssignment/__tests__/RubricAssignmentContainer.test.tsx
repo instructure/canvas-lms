@@ -94,6 +94,7 @@ describe('RubricAssignmentContainer Tests', () => {
   const renderComponent = (props: Partial<RubricAssignmentContainerProps> = {}) => {
     return render(
       <RubricAssignmentContainer
+        currentUserId="1"
         assignmentId="1"
         courseId="1"
         canManageRubrics={true}

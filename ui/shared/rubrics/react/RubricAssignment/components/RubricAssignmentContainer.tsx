@@ -50,6 +50,7 @@ export type RubricAssignmentContainerProps = {
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
   courseId: string
+  currentUserId: string
   rubricSelfAssessmentFFEnabled: boolean
   aiRubricsEnabled: boolean
 }
@@ -59,6 +60,7 @@ export const RubricAssignmentContainer = ({
   assignmentRubricAssociation,
   canManageRubrics,
   courseId,
+  currentUserId,
   rubricSelfAssessmentFFEnabled,
   aiRubricsEnabled,
 }: RubricAssignmentContainerProps) => {
@@ -228,6 +230,7 @@ export const RubricAssignmentContainer = ({
         onSaveRubric={handleSaveRubric}
       />
       <RubricAssessmentTray
+        currentUserId={currentUserId}
         hidePoints={rubricAssociation?.hidePoints}
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}

@@ -44,6 +44,7 @@ type ENVType = {
   rubric_association: RubricAssociationUnderscore
   rubric_self_assessment_ff_enabled: boolean
   context_asset_string: string
+  current_user_id: string
 }
 declare const ENV: ENVType
 
@@ -86,6 +87,7 @@ $(() => {
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
         courseId={ENV.COURSE_ID}
+        currentUserId={ENV.current_user_id}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}
       />,
