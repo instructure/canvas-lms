@@ -673,12 +673,9 @@ shared_examples_for "all learning objects" do
     end
 
     it "includes an assignment's quiz's context module overrides" do
-      if %i[quiz wiki_page discussion_topic].include?(overridable_type)
-        assignment = @course.assignments.create!(title: "Test Assignment")
-        overridable.assignment_id = assignment.id
-        overridable.save!
-        assignment.reload
-        expect(assignment.all_assignment_overrides).to include(@module_override)
+      if overridable_type == :quiz || overridable_type == :wiki_page || overridable_type == :discussion_topic
+        overridable.assignment = Assignment.new
+        expect(overridable.assignment.all_assignment_overrides).to include(@module_override)
       end
       expect(overridable.all_assignment_overrides).to include(@module_override)
     end

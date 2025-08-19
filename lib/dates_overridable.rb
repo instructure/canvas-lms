@@ -103,21 +103,13 @@ module DatesOverridable
   end
 
   def assignment_context_modules
-    if is_a?(AbstractAssignment)
-      # Use a single SQL query to find context modules for this assignment
-      # Check all possible content types (Assignment, Quiz, DiscussionTopic, WikiPage) in one query
-      ContextModule.not_deleted.where(
-        id: ContentTag.not_deleted
-                      .where(tag_type: "context_module")
-                      .where(
-                        "(content_type = 'Assignment' AND content_id = :id) OR " \
-                        "(content_type = 'Quizzes::Quiz' AND content_id IN (SELECT id FROM #{Quizzes::Quiz.quoted_table_name} WHERE assignment_id = :id)) OR " \
-                        "(content_type = 'DiscussionTopic' AND content_id IN (SELECT id FROM #{DiscussionTopic.quoted_table_name} WHERE assignment_id = :id AND root_topic_id IS NULL)) OR " \
-                        "(content_type = 'WikiPage' AND content_id IN (SELECT id FROM #{WikiPage.quoted_table_name} WHERE assignment_id = :id))",
-                        id:
-                      )
-                      .select(:context_module_id)
-      )
+    if is_a?(AbstractAssignment) && quiz.present?
+      # if it's another learning object's assignment, the context module content tags are attached to the learning object
+      ContextModule.not_deleted.where(id: quiz.context_module_tags.select(:context_module_id))
+    elsif is_a?(AbstractAssignment) && discussion_topic.present?
+      ContextModule.not_deleted.where(id: discussion_topic.context_module_tags.select(:context_module_id))
+    elsif is_a?(AbstractAssignment) && wiki_page.present? # wiki pages can have assignments through mastery paths
+      ContextModule.not_deleted.where(id: wiki_page.context_module_tags.select(:context_module_id))
     else
       ContextModule.not_deleted.where(id: context_module_tags.select(:context_module_id))
     end
