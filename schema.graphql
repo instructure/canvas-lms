@@ -4175,8 +4175,10 @@ enum DiscussionFilterType {
 type DiscussionParticipant {
   expanded: Boolean
   id: ID!
+  read: Boolean!
   sortOrder: DiscussionSortOrderType
   summaryEnabled: Boolean
+  workflowState: String!
 }
 
 type DiscussionPermissions {
