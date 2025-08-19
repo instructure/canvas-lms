@@ -321,7 +321,7 @@ class YoutubeMigrationService
   def update_resource_content(embed, new_html)
     resource_type = embed[:resource_type]
     resource_id = embed[:id]
-    embed[:field]
+    field = embed[:field]
 
     case resource_type
     when "WikiPage"
@@ -336,6 +336,10 @@ class YoutubeMigrationService
       topic = course.discussion_topics.find(resource_id)
       topic.message = replace_youtube_embed_in_html(topic.message, embed, new_html)
       topic.save!
+    when "DiscussionEntry"
+      entry = DiscussionEntry.find(resource_id)
+      entry.message = replace_youtube_embed_in_html(entry.message, embed, new_html)
+      entry.save!
     when "CalendarEvent"
       event = course.calendar_events.find(resource_id)
       event.description = replace_youtube_embed_in_html(event.description, embed, new_html)
@@ -343,6 +347,26 @@ class YoutubeMigrationService
     when "Course"
       course.syllabus_body = replace_youtube_embed_in_html(course.syllabus_body, embed, new_html)
       course.save!
+    when "AssessmentQuestion"
+      assessment_question = course.assessment_questions.find(resource_id)
+      question_data = assessment_question.question_data.dup
+      question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
+      assessment_question.question_data = question_data
+      assessment_question.save!
+    when "Quizzes::QuizQuestion"
+      quiz_question = Quizzes::QuizQuestion.find(resource_id)
+      question_data = quiz_question.question_data.dup
+      question_data[field] = replace_youtube_embed_in_html(question_data[field], embed, new_html) if question_data[field]
+      quiz_question.question_data = question_data
+      quiz_question.save!
+    when "Quizzes::Quiz"
+      quiz = course.quizzes.find(resource_id)
+      if field == :description
+        quiz.description = replace_youtube_embed_in_html(quiz.description, embed, new_html)
+        quiz.save!
+      else
+        raise "Quiz field #{field} not supported for conversion"
+      end
     else
       raise "Unsupported resource type for conversion: #{resource_type}"
     end
