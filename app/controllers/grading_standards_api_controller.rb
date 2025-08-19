@@ -165,7 +165,7 @@ class GradingStandardsApiController < ApplicationController
   #     ]
   #   }
   def create
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, :manage_grading_schemes)
       @standard = @context.grading_standards.build(build_grading_scheme(params))
       @standard.user = @current_user
       respond_to do |format|

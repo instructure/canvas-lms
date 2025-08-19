@@ -125,7 +125,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def create
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, :manage_grading_schemes)
       grading_standard = @context.grading_standards.build(grading_scheme_payload)
 
       respond_to do |format|

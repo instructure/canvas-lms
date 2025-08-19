@@ -23,6 +23,7 @@
   set_active_tab "settings"
 
   can_manage = can_do(@context, @current_user, :manage)
+  can_set_grading_scheme = can_do(@context, @current_user, :set_grading_scheme)
 
   can_manage_courses = can_do(@context.account, @current_user, :manage_courses_admin)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
@@ -431,7 +432,7 @@
         </div>
         <div id="course_grading_scheme">
           <div class="checkbox-flex-container">
-            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_manage %>
+            <%= f.check_box :course_grading_standard_enabled, :class => "grading_standard_checkbox", :disabled => !can_set_grading_scheme %>
             <%= f.label :course_grading_standard_enabled, :en => "Enable course grading scheme" %>
           </div>
           <% if Account.site_admin.feature_enabled?(:grading_scheme_updates) %>
