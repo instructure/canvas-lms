@@ -657,7 +657,8 @@ class DiscussionTopicsController < ApplicationController
       IS_MODULE_ITEM: !@topic.context_module_tags.empty?,
       PERMISSIONS: {
         manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS),
-        manage_grading_schemes: can_do(@context, @current_user, :manage_grades)
+        manage_grading_schemes: can_do(@context, @current_user, :manage_grading_schemes),
+        set_grading_scheme: can_do(@context, @current_user, :set_grading_scheme)
       },
       REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
       allow_student_anonymous_discussion_topics: @context.allow_student_anonymous_discussion_topics,

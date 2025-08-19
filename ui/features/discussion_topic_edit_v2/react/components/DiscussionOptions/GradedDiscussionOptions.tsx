@@ -138,6 +138,7 @@ export const GradedDiscussionOptions = ({
       {(displayGradeAs === 'gpa_scale' || displayGradeAs === 'letter_grade') && (
         <GradingSchemesSelector
           canManage={ENV?.PERMISSIONS?.manage_grading_schemes || false}
+          canSet={ENV?.PERMISSIONS?.set_grading_scheme || false}
           contextId={ENV.COURSE_ID || ''}
           contextType="Course"
           initiallySelectedGradingSchemeId={gradingSchemeId}

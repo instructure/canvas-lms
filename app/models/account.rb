@@ -441,6 +441,7 @@ class Account < ActiveRecord::Base
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
   add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: true
+  add_setting :restrict_grading_scheme_editing_to_admins, boolean: true, root_only: true, default: false
 
   add_setting :horizon_account, boolean: true, default: false, inheritable: true
 
@@ -1697,6 +1698,9 @@ class Account < ActiveRecord::Base
       limited_access_for_user?(user)
     end
     can :make_submission_comments
+
+    given { |user| grants_right?(user, :manage_grades) }
+    can :manage_grading_schemes
   end
 
   def reload(*)
