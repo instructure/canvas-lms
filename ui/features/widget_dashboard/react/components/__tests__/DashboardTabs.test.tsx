@@ -81,6 +81,17 @@ const server = setupServer(
   graphql.query('GetUserAnnouncements', () => {
     return HttpResponse.json(mockAnnouncementsData)
   }),
+  // Handle GetUserCourseWork query - empty response since this test doesn't need course work data
+  graphql.query('GetUserCourseWork', () => {
+    return HttpResponse.json({
+      data: {
+        legacyNode: {
+          _id: '123',
+          enrollments: [],
+        },
+      },
+    })
+  }),
   // Mock REST API for CoursesTab
   http.get('/api/v1/dashboard/dashboard_cards', () => {
     return HttpResponse.json([
