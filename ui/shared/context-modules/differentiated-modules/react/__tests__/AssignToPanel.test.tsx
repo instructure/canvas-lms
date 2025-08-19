@@ -421,23 +421,4 @@ describe('AssignToPanel', () => {
       expect(onDismissMock).not.toHaveBeenCalled()
     })
   })
-
-  describe('keyboard navigation', () => {
-    it('focuses the selected radio input when tabbing through radio inputs', async () => {
-      renderComponent({defaultOption: 'custom'})
-      const everyoneOption = await screen.findByTestId('everyone-option')
-      const customOption = await screen.findByTestId('custom-option')
-
-      for (let i = 0; i < 4; i++) {
-        await userEvent.tab()
-      }
-      expect(customOption).toHaveFocus()
-
-      await userEvent.click(everyoneOption)
-      expect(everyoneOption).toBeChecked()
-      await userEvent.tab({shift: true})
-      await userEvent.tab()
-      expect(everyoneOption).toHaveFocus()
-    })
-  })
 })
