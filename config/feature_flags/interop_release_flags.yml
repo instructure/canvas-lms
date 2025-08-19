@@ -270,6 +270,17 @@ lti_deployment_id_in_login_request:
       state: allowed_on
     ci:
       state: allowed_on
+lti_dr_registrations_update:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: LTI Dynamic Registration Updates
+  description: When enabled, LTI Apps installed with dynamic registration can be updated.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
   applies_to: RootAccount
