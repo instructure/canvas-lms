@@ -7,7 +7,7 @@ set -ex
 bundle config --global unset frozen
 bundle install
 
-diff="$(git diff 'Gemfile*.lock')"
+diff="$(git diff 'Gemfile*.lock' '**/Gemfile*.lock')"
 if [ -n "$diff" ]; then
     diff="\n\n\`\`\`\n$diff\n\`\`\`"
     diff=${diff//$'\n'/'\n'}
