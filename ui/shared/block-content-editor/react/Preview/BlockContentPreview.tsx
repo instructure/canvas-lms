@@ -22,6 +22,7 @@ import {BlockContentPreviewSelectorBar} from './BlockContentPreviewSelectorBar'
 import {usePreviewMode} from './usePreviewMode'
 import {components} from '../block-content-editor-components'
 import {useGetSerializedNodes} from '../hooks/useGetSerializedNodes'
+import {ScaleView} from './ScaleView'
 
 export const BlockContentPreview = () => {
   const {previewMode, setPreviewMode} = usePreviewMode()
@@ -33,9 +34,11 @@ export const BlockContentPreview = () => {
         <BlockContentPreviewSelectorBar activeTab={previewMode} onTabChange={setPreviewMode} />
       }
       preview={
-        <Editor enabled={false} resolver={components}>
-          <Frame data={data} />
-        </Editor>
+        <ScaleView>
+          <Editor enabled={false} resolver={components}>
+            <Frame data={data} />
+          </Editor>
+        </ScaleView>
       }
     />
   )
