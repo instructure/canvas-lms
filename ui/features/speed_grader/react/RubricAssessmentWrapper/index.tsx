@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {RubricAssessmentContainer} from '@canvas/rubrics/react/RubricAssessment'
 import useStore from '../../stores'
 import type {RubricAssessmentData} from '@canvas/rubrics/react/types/rubric'
 import {
@@ -28,6 +27,7 @@ import {
 } from '@canvas/rubrics/react/utils'
 import {Transition} from '@instructure/ui-motion'
 import {View} from '@instructure/ui-view'
+import {RubricAssessmentContainerWrapper} from '@canvas/rubrics/react/RubricAssessment'
 
 const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any => {
   const {assessment_user_id, anonymous_id, assessment_type} = ENV.RUBRIC_ASSESSMENT ?? {}
@@ -55,18 +55,20 @@ const convertSubmittedAssessment = (assessments: RubricAssessmentData[]): any =>
   return data
 }
 
-type RubricAssessmentContainerWrapperProps = {
+type RubricAssessmentWrapperProps = {
+  currentUserId: string
   rubric: RubricUnderscoreType
   rubricOutcomeData?: RubricOutcomeUnderscore[]
   onDismiss: () => void
   onSave: (assessmentData: any) => void
 }
 export default ({
+  currentUserId,
   rubric,
   rubricOutcomeData,
   onDismiss,
   onSave,
-}: RubricAssessmentContainerWrapperProps) => {
+}: RubricAssessmentWrapperProps) => {
   const {
     currentStudentAvatarPath,
     currentStudentName,
@@ -102,8 +104,9 @@ export default ({
       type="fade"
     >
       <View as="div">
-        <RubricAssessmentContainer
+        <RubricAssessmentContainerWrapper
           criteria={mappedRubric?.criteria ?? []}
+          currentUserId={currentUserId}
           hidePoints={rubricHidePoints}
           isPreviewMode={false}
           isPeerReview={false}

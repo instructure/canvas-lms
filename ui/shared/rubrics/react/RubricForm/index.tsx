@@ -445,6 +445,7 @@ export const RubricForm = ({
         onDismiss={() => setIsOutcomeCriterionModalOpen(false)}
       />
       <RubricAssessmentTray
+        currentUserId={ENV.current_user_id ?? ''}
         hidePoints={rubricForm.hidePoints}
         isOpen={isPreviewTrayOpen}
         isPreviewMode={false}

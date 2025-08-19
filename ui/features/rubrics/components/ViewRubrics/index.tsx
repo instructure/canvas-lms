@@ -444,6 +444,7 @@ export const ViewRubrics = ({
             )}
 
             <RubricAssessmentTray
+              currentUserId={ENV.current_user_id ?? ''}
               isLoading={isLoadingPreview}
               isOpen={isPreviewTrayOpen}
               isPreviewMode={false}

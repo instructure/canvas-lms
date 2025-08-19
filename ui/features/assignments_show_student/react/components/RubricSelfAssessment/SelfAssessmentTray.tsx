@@ -88,7 +88,7 @@ export const SelfAssessmentTray = ({
       await submitSelfAssessment({assessment, rubricAssociationId, rubric})
       showFlashSuccess(I18n.t('Self Assessment was successfully submitted'))()
       handleOnSuccess()
-    } catch (error) {
+    } catch (_error) {
       useStore.setState({selfAssessment: null})
       const errorMessage = I18n.t('Error submitting self assessment')
       showFlashError(errorMessage)()
@@ -98,6 +98,7 @@ export const SelfAssessmentTray = ({
 
   return (
     <RubricAssessmentTray
+      currentUserId={ENV.current_user_id ?? ''}
       hidePoints={hidePoints}
       isOpen={isOpen}
       isPreviewMode={isPreviewMode}

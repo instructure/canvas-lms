@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './RubricAssessmentTray'
-export * from './RubricAssessmentContainer'
-export * from './RubricAssessmentContainerWrapper'
-export * from './TraditionalView'
-export * from './utils/rubricUtils'
-export * from './OutcomeTag'
+export const RUBRIC_VIEW_MODE_LOCALSTORAGE_KEY = (userId: string) =>
+  `_${userId}_eg_rubric_view_mode`
+
+export const RUBRIC_VIEW_MODE_DEFAULT = 'traditional'
