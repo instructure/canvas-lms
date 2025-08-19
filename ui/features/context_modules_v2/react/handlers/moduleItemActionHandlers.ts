@@ -63,7 +63,7 @@ export const handlePublishToggle = async (
         title: title,
         publishState: newPublishedState ? I18n.t('published') : I18n.t('unpublished'),
       }),
-    )
+    )()
 
     queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
     queryClient.invalidateQueries({queryKey: ['MODULE_ITEMS_ALL', moduleId || '']})
@@ -72,7 +72,7 @@ export const handlePublishToggle = async (
       I18n.t('Failed to change published state for %{title}', {
         title: title,
       }),
-    )
+    )()
     console.error('Error updating published state:', error)
   }
 }
