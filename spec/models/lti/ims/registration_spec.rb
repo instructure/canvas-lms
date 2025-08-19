@@ -961,6 +961,60 @@ module Lti::IMS
       end
     end
 
+    describe "to_internal_lti_configuration" do
+      let(:expected_config) do
+        {
+          title: "Example Tool",
+          domain: "example.com",
+          target_link_uri: "http://example.com/launch",
+          privacy_level: "anonymous",
+          oidc_initiation_url: "http://example.com/login",
+          redirect_uris: ["http://example.com"],
+          public_jwk_url: "http://example.com/jwks",
+          scopes: [],
+          placements: [],
+          launch_settings: {
+            icon_url: "http://example.com/logo.png",
+            text: "Example Tool"
+          }
+        }.with_indifferent_access
+      end
+
+      context "when called with an Lti::IMS::Registration instance" do
+        subject { Registration.to_internal_lti_configuration(registration) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+
+      context "when called with a hash" do
+        let(:registration_hash) do
+          {
+            "client_name" => "Example Tool",
+            "initiate_login_uri" => "http://example.com/login",
+            "jwks_uri" => "http://example.com/jwks",
+            "scopes" => [],
+            "redirect_uris" => ["http://example.com"],
+            "logo_uri" => "http://example.com/logo.png",
+            "lti_tool_configuration" => {
+              "target_link_uri" => "http://example.com/launch",
+              "domain" => "example.com",
+              "messages" => [],
+              "claims" => []
+            },
+            "https://canvas.instructure.com/lti/privacy_level" => "anonymous"
+          }
+        end
+
+        subject { Registration.to_internal_lti_configuration(registration_hash) }
+
+        it "returns the correct internal configuration" do
+          expect(subject).to eq(expected_config)
+        end
+      end
+    end
+
     describe "as_json" do
       subject { registration.as_json }
 
@@ -991,6 +1045,7 @@ module Lti::IMS
             guid
             tool_configuration
             default_configuration
+            registration_url
           ]
         )
       end
