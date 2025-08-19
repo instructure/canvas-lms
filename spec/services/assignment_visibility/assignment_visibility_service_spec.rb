@@ -1034,6 +1034,36 @@ describe AssignmentVisibility::AssignmentVisibilityService do
           assignment_only_visible_to_overrides.save!
           assignments_with_visibilities
         end
+
+        it "preloads override data for assignments to optimize performance" do
+          # Test that DatesOverridable.preload_override_data_for_objects is called
+          expect(DatesOverridable).to receive(:preload_override_data_for_objects)
+            .with([assignment, assignment_only_visible_to_overrides])
+            .and_call_original
+
+          assignments_with_visibilities
+        end
+
+        it "works correctly with preloaded override data" do
+          # Manually preload the data first
+          assignments = [assignment, assignment_only_visible_to_overrides]
+          DatesOverridable.preload_override_data_for_objects(assignments)
+
+          # Verify that the assignments have preloaded data
+          expect(assignment.preloaded_overrides).not_to be_nil
+          expect(assignment_only_visible_to_overrides.preloaded_overrides).not_to be_nil
+
+          # The method should still return correct results with preloaded data
+          expected_visibilities = {
+            assignment.id => [],
+            assignment_only_visible_to_overrides.id => [first_student.id]
+          }
+
+          result = AssignmentVisibility::AssignmentVisibilityService
+                   .assignments_with_user_visibilities(course, assignments)
+
+          expect(result).to eq expected_visibilities
+        end
       end
     end
   end

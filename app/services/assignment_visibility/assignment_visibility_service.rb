@@ -42,6 +42,8 @@ module AssignmentVisibility
 
       # TODO: better name for this method, or a better location?
       def assignments_with_user_visibilities(course, assignments)
+        DatesOverridable.preload_override_data_for_objects(assignments)
+
         visible_to_everyone, only_visible_to_overrides = assignments.partition(&:visible_to_everyone)
         assignment_visibilities = {}
 
