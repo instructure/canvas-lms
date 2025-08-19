@@ -24,7 +24,9 @@ import {Flex} from '@instructure/ui-flex'
 export const TextBlockEditPreview = (props: TextBlockPreviewProps) => {
   return (
     <Flex direction="column" gap="mediumSmall">
-      {props.settings.includeBlockTitle && <TitleEditPreview title={props.title} />}
+      {props.settings.includeBlockTitle && (
+        <TitleEditPreview title={props.title} contentColor={props.settings.titleColor} />
+      )}
       <TextEditPreview content={props.content} />
     </Flex>
   )

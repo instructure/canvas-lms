@@ -31,6 +31,7 @@ describe('TextBlock', () => {
       settings: {
         includeBlockTitle: true,
         backgroundColor: '#ff0000',
+        titleColor: '#00ff00',
       },
       content: '',
     })

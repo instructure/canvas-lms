@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {SettingsIncludeTitleProps} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -24,11 +25,13 @@ const I18n = createI18nScope('block_content_editor')
 
 export const SettingsIncludeTitle = ({checked, onChange}: SettingsIncludeTitleProps) => {
   return (
-    <Checkbox
-      variant="toggle"
-      label={I18n.t('Include block title')}
-      checked={checked}
-      onChange={onChange}
-    />
+    <View as="div" margin="medium 0 medium 0">
+      <Checkbox
+        variant="toggle"
+        label={I18n.t('Include block title')}
+        checked={checked}
+        onChange={onChange}
+      />
+    </View>
   )
 }

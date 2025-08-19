@@ -23,6 +23,7 @@ export type TextSettings = {
   settings: {
     includeBlockTitle: boolean
     backgroundColor: string
+    titleColor: string
   }
 }
 export type TextBlockEditHandlers = {

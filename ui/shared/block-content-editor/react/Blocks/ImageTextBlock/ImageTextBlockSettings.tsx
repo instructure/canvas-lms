@@ -136,12 +136,7 @@ export const ImageTextBlockSettings = () => {
 
   return (
     <View as="div">
-      <View as="div" margin="medium 0 medium 0">
-        <SettingsIncludeTitle
-          checked={includeBlockTitle}
-          onChange={handleIncludeBlockTitleChange}
-        />
-      </View>
+      <SettingsIncludeTitle checked={includeBlockTitle} onChange={handleIncludeBlockTitleChange} />
       <SettingsSectionToggle
         title={I18n.t('Color settings')}
         collapsedLabel={I18n.t('Expand color settings')}
